@@ -1,105 +1,44 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
-import {
-  getAssignmentDisplayTitle,
-  getAssignmentDisplayType,
-  getCurriculumEntriesByDayForLevel,
-} from "../data/germanAssignmentCatalog";
+import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
-import { mergeAssignmentProgress, toCourseTabStatus } from "../utils/assignmentProgress";
-import { fetchResults } from "../services/resultsService";
-import {
-  collection,
-  db,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  serverTimestamp,
-  setDoc,
-  query,
-  where,
-} from "../firebase";
+
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const normalizeLevel = (level) => normalizeCourseLevel(level);
 
 const ASSIGNMENT_STATUSES = {
-  notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
-  inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
-  passed: { key: "courseTab.status.passed", color: "#0f766e" },
-  failed: { key: "courseTab.status.failed", color: "#dc2626" },
-  submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
-  milestoneComplete: { key: "courseTab.status.milestoneComplete", color: "#0f766e" },
+  notStarted: { key: "Not started", color: "#9ca3af" },
+  inProgress: { key: "In progress", color: "#2563eb" },
+  passed: { key: "Passed", color: "#0f766e" },
+  failed: { key: "Failed", color: "#dc2626" },
+  submitted: { key: "Submitted", color: "#16a34a" },
+  milestoneComplete: { key: "Complete", color: "#0f766e" },
 };
 
-const formatAssignmentScore = (score) => {
-  const numericScore = Number(score);
-  if (!Number.isFinite(numericScore)) return "";
-  return Number.isInteger(numericScore) ? String(numericScore) : numericScore.toFixed(1);
-};
-
-const SCORE_RELEVANT_STATUSES = new Set(["submitted", "passed", "failed"]);
 const CANONICAL_ASSIGNMENT_ID_PATTERN = /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i;
-
-const isCanonicalAssignmentId = (value = "") => CANONICAL_ASSIGNMENT_ID_PATTERN.test(String(value || "").trim());
-
-const resolveStrictResultAssignmentId = (result = {}, level = "") => {
-  const canonical = resolveAssignmentCanonicalKey({
-    level,
-    assignmentId: result?.assignmentId || result?.assignment_id || result?.assignmentKey,
-    assignmentTitle: "",
-  });
-
-  return isCanonicalAssignmentId(canonical) ? String(canonical).trim().toUpperCase() : "";
-};
-
-export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) => {
-  const fallbackStatus = String(statusInfo?.finalStatus || statusInfo?.status || "").trim();
-  const assignmentIds = Array.isArray(statusInfo?.requiredAssignmentIds) && statusInfo.requiredAssignmentIds.length
-    ? statusInfo.requiredAssignmentIds
-    : [statusInfo?.assignmentId].filter(Boolean);
-
-  const scoreCandidates = assignmentIds
-    .map((assignmentId) => progressByAssignmentId?.[assignmentId])
-    .filter(Boolean)
-    .map((progress) => ({
-      score: Number(progress?.bestScore),
-      updatedAt: new Date(progress?.lastUpdatedAt || 0).getTime(),
-    }))
-    .filter((row) => Number.isFinite(row.score));
-
-  if (scoreCandidates.length) {
-    const latestScore = scoreCandidates
-      .sort((a, b) => b.updatedAt - a.updatedAt)[0]?.score;
-    const label = formatAssignmentScore(latestScore);
-    if (label) {
-      return {
-        tone: "scored",
-        text: `Best score: ${label}/100`,
-      };
-    }
-  }
-
-  if (SCORE_RELEVANT_STATUSES.has(fallbackStatus)) {
-    return {
-      tone: "awaiting",
-      text: "Awaiting score",
-    };
-  }
-
-  return null;
+const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
+const LEVEL_FALLBACK_RESOURCES = {
+  A2: {
+    video: "https://youtu.be/a1-day0-tutorial",
+    grammarbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    workbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    instructionNote: "Course book links use the A2 class folder until the full A2 course book dictionary is loaded.",
+  },
 };
 
 const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
+const isCanonicalAssignmentId = (value = "") => CANONICAL_ASSIGNMENT_ID_PATTERN.test(String(value || "").trim());
+const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
+
 const hasTutorMarkedWork = (entry) => {
   if (entry?.assignment) return true;
   return (
@@ -107,31 +46,10 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
-const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
+
 const isTutorMarkedEntry = (entry, level) => {
   if (SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(level))) return false;
   return hasTutorMarkedWork(entry);
-};
-const SUBMISSION_COLLECTION = "submissions";
-const DRAFT_COLLECTION = "submissionDrafts";
-
-const normalizeLevel = (level) => normalizeCourseLevel(level);
-const SYNTHETIC_ASSIGNMENT_ID_PATTERN = /(?:-DAY-\d+(?:-TASK-\d+)?)|(?:-TITLE-)/i;
-const PRACTICE_PROGRESS_COLLECTION = "practiceProgress";
-const A1_PRACTICAL_BADGE_CLUSTERS = [
-  { id: "foundation", label: "🧩 Foundation Speaker", days: [5, 6] },
-  { id: "exam-readiness", label: "🎯 Exam Readiness", days: [13, 14, 15] },
-  { id: "communication", label: "💬 Communication Builder", days: [19, 23, 24] },
-];
-
-const LEVEL_FALLBACK_RESOURCES = {
-  A2: {
-    video: "https://youtu.be/a1-day0-tutorial",
-    grammarbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
-    workbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
-    instructionNote:
-      "Course book links use the A2 class folder until the full A2 course book dictionary is loaded.",
-  },
 };
 
 const buildLevelSchedules = () => {
@@ -181,8 +99,7 @@ const buildLevelSchedules = () => {
       });
 
       const notes = lessonList.map((lesson) => lesson.note).filter(Boolean);
-      const instructionNote =
-        usedFallbackResource && fallback.instructionNote ? ` ${fallback.instructionNote}` : "";
+      const instructionNote = usedFallbackResource && fallback.instructionNote ? ` ${fallback.instructionNote}` : "";
 
       return {
         day: day.dayNumber,
@@ -199,10 +116,7 @@ const buildLevelSchedules = () => {
           primarySession.chapter ||
           `Day ${day.dayNumber}`,
         chapter: primarySession.chapter || primarySession.title || null,
-        instruction:
-          notes.length > 0
-            ? `${notes.join(" • ")}${instructionNote}`
-            : `${schedule.generatedNote || `Class plan for ${schedule.className}`}${instructionNote}`,
+        instruction: notes.length > 0 ? `${notes.join(" • ")}${instructionNote}` : `${schedule.generatedNote || `Class plan for ${schedule.className}`}${instructionNote}`,
         grammar_topic: primarySession.type || null,
         lesen_hören: lessonList,
       };
@@ -214,10 +128,6 @@ const buildLevelSchedules = () => {
 
 const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
 
-const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
-const getPracticeEntryKey = (entry) => `day-${entry?.day || "x"}-occ-${entry?.occurrence || 1}`;
-
 export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
   resolveAssignmentCanonicalKey({
     level,
@@ -228,23 +138,15 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
 const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   if (!entry) return "";
   const normalizedLevel = normalizeLevel(level);
-
-  const entryDictionaryMatch =
+  const dictionaryMatch =
     getCourseScheduleDictionaryEntry({
       level: normalizedLevel,
       assignmentId: entry.assignmentId || entry.assignment_id,
       chapter: entry.chapter,
       assignmentDay: entry.day,
-    }) ||
-    getCourseScheduleDictionaryEntry({
-      level: normalizedLevel,
-      chapter: entry.chapter,
-      assignmentDay: entry.day,
-    });
+    }) || getCourseScheduleDictionaryEntry({ level: normalizedLevel, chapter: entry.chapter, assignmentDay: entry.day });
 
-  if (entryDictionaryMatch?.assignment_id) {
-    return entryDictionaryMatch.assignment_id;
-  }
+  if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
 
   const direct = resolveAssignmentCanonicalKey({
     level,
@@ -253,410 +155,34 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   });
   if (direct) return direct;
 
-  const lessonCandidates = [...toLessonArray(entry.lesen_hören), ...toLessonArray(entry.schreiben_sprechen)].filter(
-    (lesson) => lesson?.assignment
-  );
-  for (const lesson of lessonCandidates) {
-    const dictionaryMatch = getCourseScheduleDictionaryEntry({
-      level: normalizedLevel,
-      assignmentId: lesson.assignmentId || lesson.assignment_id || entry.assignmentId || entry.assignment_id,
-      chapter: lesson.chapter || entry.chapter,
-      mode: lesson.type || lesson.mode,
-      assignmentDay: entry.day,
-    });
-    if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
-
-    const resolved = resolveAssignmentCanonicalKey({
-      level,
-      assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter,
-      assignmentTitle: lesson.title || lesson.chapter || entry.topic,
-    });
-    if (resolved) return resolved;
-  }
-
   return getEntryAssignmentKey(entry, level, occurrence);
 };
 
-const isSyntheticAssignmentId = (assignmentId = "") => SYNTHETIC_ASSIGNMENT_ID_PATTERN.test(String(assignmentId || "").trim());
+export const getStatusForEntry = () => "notStarted";
 
-const getRequiredAssignmentIdsForEntry = (entry, level) => {
-  const normalizedLevel = normalizeLevel(level);
-  const lessonCandidates = [...toLessonArray(entry?.lesen_hören), ...toLessonArray(entry?.schreiben_sprechen)].filter(
-    (lesson) => lesson?.assignment
-  );
-
-  const lessonAssignmentIds = lessonCandidates
-    .map((lesson) => {
-      const dictionaryMatch = getCourseScheduleDictionaryEntry({
-        level: normalizedLevel,
-        assignmentId: lesson.assignmentId || lesson.assignment_id || entry?.assignmentId || entry?.assignment_id,
-        chapter: lesson.chapter || entry?.chapter,
-        mode: lesson.type || lesson.mode,
-        assignmentDay: entry?.day,
-      });
-      if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
-
-      return (
-        resolveAssignmentCanonicalKey({
-          level: normalizedLevel || level,
-          assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter,
-          assignmentTitle: lesson.title || lesson.chapter || entry?.topic,
-        }) || ""
-      );
-    })
-    .filter(Boolean);
-
-  if (lessonAssignmentIds.length > 1) {
-    return [...new Set(lessonAssignmentIds)];
+export const getAutoStatusForEntry = ({ entry, level, occurrence }) => {
+  const assignmentId = getEntryAssignmentId(entry, level, occurrence);
+  if (isMilestoneEntry(entry)) {
+    return { status: "milestoneComplete", finalStatus: "milestoneComplete", assignmentId };
   }
-
-  const curriculumMatches = (getCurriculumEntriesByDayForLevel(normalizedLevel)?.[Number(entry?.day)] || [])
-    .filter((item) => item?.assignment === true)
-    .map((item) => item.assignment_id)
-    .filter(Boolean);
-
-  if (curriculumMatches.length > 1) {
-    return [...new Set(curriculumMatches)];
-  }
-
-  const primaryAssignmentId = getEntryAssignmentId(entry, level, 1);
-  return primaryAssignmentId ? [primaryAssignmentId] : [];
+  return { status: "notStarted", finalStatus: "notStarted", assignmentId };
 };
 
-const resolveResultCanonicalAssignmentId = (result = {}, level = "") =>
-  resolveStrictResultAssignmentId(result, level);
-
-const filterResultsForLevel = (results = [], level = "") => {
-  const normalizedLevel = normalizeLevel(level);
-  if (!normalizedLevel) return [];
-
-  return (Array.isArray(results) ? results : []).filter((result) => {
-    const rowLevel = normalizeLevel(result?.level);
-    if (rowLevel) return rowLevel === normalizedLevel;
-
-    const canonicalId = resolveResultCanonicalAssignmentId(result, normalizedLevel);
-    return canonicalId.startsWith(`${normalizedLevel}-`);
-  });
-};
-
-const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignmentId }) => {
-  const normalizedLevel = normalizeLevel(level);
-  const tutorLessons = [...toLessonArray(entry?.lesen_hören), ...toLessonArray(entry?.schreiben_sprechen)].filter(
-    (lesson) => lesson?.assignment
-  );
-  const curriculumDayEntries = (getCurriculumEntriesByDayForLevel(normalizedLevel)?.[Number(entry?.day)] || []).map((item) => ({
-    assignment_id: item.assignment_id,
-    chapter: item.chapter,
-    mode: item.mode,
-    assignment: item.assignment,
-  }));
-
-  const fallbackReason = !assignmentId
-    ? "missingAssignmentId"
-    : isSyntheticAssignmentId(assignmentId)
-      ? "syntheticAssignmentId"
-      : "unknown";
-
-  return {
-    issue: "missingCanonicalAssignmentId",
-    level: normalizedLevel || level,
-    day: entry?.day ?? null,
-    occurrence,
-    topic: entry?.topic || "",
-    chapter: entry?.chapter || "",
-    fallbackAssignmentId: assignmentId || "",
-    fallbackReason,
-    tutorLessonCount: tutorLessons.length,
-    tutorLessons: tutorLessons.map((lesson) => ({
-      chapter: lesson?.chapter || "",
-      title: lesson?.title || "",
-      assignmentId: lesson?.assignmentId || lesson?.assignment_id || "",
-      mode: lesson?.mode || lesson?.type || "",
-    })),
-    curriculumDayEntries,
-  };
-};
-
-const buildUnresolvedDiagnosticSignature = (diagnostic = {}) => {
-  const level = normalizeLevel(diagnostic.level) || String(diagnostic.level || "").toUpperCase();
-  const day = Number(diagnostic.day || 0) || 0;
-  const occurrence = Number(diagnostic.occurrence || 1) || 1;
-  const chapter = String(diagnostic.chapter || "").trim().toLowerCase();
-  const topic = String(diagnostic.topic || "").trim().toLowerCase();
-  const fallbackAssignmentId = String(diagnostic.fallbackAssignmentId || "").trim().toUpperCase();
-  const tutorLessonSignature = (diagnostic.tutorLessons || [])
-    .map((lesson) => `${String(lesson.chapter || "").trim().toLowerCase()}::${String(lesson.title || "").trim().toLowerCase()}`)
-    .filter(Boolean)
-    .join("|");
-
-  return [level, `day-${day}`, `task-${occurrence}`, chapter, topic, fallbackAssignmentId, tutorLessonSignature].join("::");
-};
-
-export const aggregateUnresolvedTutorDiagnostics = (diagnostics = []) => {
-  const grouped = diagnostics.reduce((acc, diagnostic) => {
-    const signature = buildUnresolvedDiagnosticSignature(diagnostic);
-    if (!acc[signature]) {
-      acc[signature] = {
-        signature,
-        occurrences: 0,
-        fallbackAssignmentIds: new Set(),
-        days: new Set(),
-        fallbackReasonCounts: {},
-        sample: diagnostic,
-      };
-    }
-
-    acc[signature].occurrences += 1;
-    if (diagnostic?.fallbackAssignmentId) acc[signature].fallbackAssignmentIds.add(diagnostic.fallbackAssignmentId);
-    if (diagnostic?.day) acc[signature].days.add(diagnostic.day);
-    const fallbackReason = String(diagnostic?.fallbackReason || "unknown");
-    acc[signature].fallbackReasonCounts[fallbackReason] = (acc[signature].fallbackReasonCounts[fallbackReason] || 0) + 1;
-    return acc;
-  }, {});
-
-  return Object.values(grouped)
-    .map((entry) => ({
-      ...entry,
-      fallbackAssignmentIds: [...entry.fallbackAssignmentIds],
-      days: [...entry.days].sort((a, b) => Number(a) - Number(b)),
-    }))
-    .sort((a, b) => b.occurrences - a.occurrences || String(a.signature).localeCompare(String(b.signature)));
-};
-
-export const collectUnresolvedTutorAssignmentDiagnostics = (schedule = [], level = "") =>
-  schedule
-    .filter((entry) => isTutorMarkedEntry(entry, level))
-    .map((entry) => {
-      const assignmentId = getEntryAssignmentId(entry, level, entry.occurrence || 1);
-      if (assignmentId && !isSyntheticAssignmentId(assignmentId)) return null;
-      return buildMissingAssignmentIdDiagnostic({
-        entry,
-        level,
-        occurrence: entry.occurrence || 1,
-        assignmentId,
-      });
-    })
-    .filter(Boolean);
-
-const getStatusValue = (candidate) => {
-  if (!candidate) return "";
-  if (typeof candidate === "string") return toCourseTabStatus(candidate);
-  if (typeof candidate.value === "string") return toCourseTabStatus(candidate.value);
-  if (typeof candidate.status === "string") return toCourseTabStatus(candidate.status);
-  return "";
-};
-
-const getUpdatedAtValue = (candidate) => {
-  if (!candidate || typeof candidate !== "object") return 0;
-  const updatedAt = Number(candidate.updatedAt || 0);
-  return Number.isFinite(updatedAt) ? updatedAt : 0;
-};
-
-const STATUS_PRIORITY = {
-  passed: 5,
-  failed: 4,
-  submitted: 3,
-  inProgress: 2,
-  notStarted: 1,
-};
-
-const isCompleteStatus = (status) => status === "passed" || status === "submitted" || status === "milestoneComplete";
-
-const pickHigherStatus = (left, right) => {
-  const leftPriority = STATUS_PRIORITY[left] || 0;
-  const rightPriority = STATUS_PRIORITY[right] || 0;
-  return rightPriority > leftPriority ? right : left;
-};
-
-const deriveMergedProgressStatus = (progress = {}) => {
-  const statusFromStatusField = toCourseTabStatus(progress.status);
-  const statusFromRawField = toCourseTabStatus(progress.rawStatus || progress.status);
-  const statusFromFlags =
-    progress.passed === true
-      ? "passed"
-      : progress.failed === true
-        ? "failed"
-        : progress.submitted === true
-          ? "submitted"
-          : progress.inProgress === true
-            ? "inProgress"
-            : "notStarted";
-
-  return {
-    statusFromStatusField,
-    statusFromRawField,
-    statusFromFlags,
-    normalizedStatus: pickHigherStatus(statusFromStatusField, statusFromRawField),
-    finalStatus: pickHigherStatus(pickHigherStatus(statusFromStatusField, statusFromRawField), statusFromFlags),
-  };
-};
-
-export const mergeCourseProgressStatuses = (localStatuses = {}, profileStatuses = {}) => {
-  const merged = { ...profileStatuses };
-
-  Object.entries(localStatuses || {}).forEach(([key, localEntry]) => {
-    const incomingEntry = profileStatuses?.[key];
-
-    if (!incomingEntry) {
-      merged[key] = localEntry;
-      return;
-    }
-
-    const localUpdatedAt = getUpdatedAtValue(localEntry);
-    const incomingUpdatedAt = getUpdatedAtValue(incomingEntry);
-
-    if (localUpdatedAt > incomingUpdatedAt) {
-      merged[key] = localEntry;
-    }
-  });
-
-  return merged;
-};
-
-export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
-  const assignmentKey = getEntryAssignmentKey(entry, level, occurrence);
-  const levelToken = normalizeLevel(level);
-  const dayNumber = String(entry?.day || "").trim();
-  const dayAlias = levelToken && dayNumber ? `${levelToken}-DAY-${dayNumber}` : "";
-  const dayTaskAlias = dayAlias && occurrence > 1 ? `${dayAlias}-TASK-${occurrence}` : "";
-
-  const directMatch =
-    getStatusValue(dayStatuses[assignmentKey]) ||
-    getStatusValue(dayStatuses[dayTaskAlias]) ||
-    getStatusValue(dayStatuses[dayAlias]) ||
-    getStatusValue(dayStatuses[dayNumber]);
-
-  if (directMatch) return directMatch;
-
-  const aliases = new Set([assignmentKey, dayTaskAlias, dayAlias].filter(Boolean));
-  for (const [key, statusEntry] of Object.entries(dayStatuses || {})) {
-    if (!statusEntry || typeof statusEntry !== "object") continue;
-    const referenceKey = String(statusEntry.assignmentKey || key || "").trim();
-    if (!referenceKey || !aliases.has(referenceKey)) continue;
-    const resolvedStatus = getStatusValue(statusEntry);
-    if (resolvedStatus) return resolvedStatus;
-  }
-
-  return "notStarted";
-};
-
-export const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
-  const requiredAssignmentIds = getRequiredAssignmentIdsForEntry(entry, level);
-  const assignmentId = requiredAssignmentIds[0] || getEntryAssignmentId(entry, level, occurrence);
-  const missingCanonicalAssignmentId = !assignmentId || isSyntheticAssignmentId(assignmentId);
-
-  if (!assignmentId) {
-    return {
-      status: "notStarted",
-      assignmentId,
-      missingAssignmentId: true,
-      diagnostics: buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }),
-    };
-  }
-
-  const requiredProgress = requiredAssignmentIds.map((requiredAssignmentId) => {
-    const progress = progressByAssignmentId[requiredAssignmentId];
-    if (!progress) {
-      return {
-        assignmentId: requiredAssignmentId,
-        status: "notStarted",
-        finalStatus: "notStarted",
-      };
-    }
-
-    const derivedStatus = deriveMergedProgressStatus(progress);
-    return {
-      assignmentId: requiredAssignmentId,
-      status: derivedStatus.normalizedStatus,
-      finalStatus: derivedStatus.finalStatus,
-      rawStatus: progress.status,
-      mergedStatus: progress,
-    };
-  });
-
-  const hasMultipleRequiredAssignments = requiredProgress.length > 1;
-  if (hasMultipleRequiredAssignments) {
-    const finalStatuses = requiredProgress.map((item) => item.finalStatus || item.status || "notStarted");
-    const allPassed = finalStatuses.every((status) => status === "passed");
-    const allCompleted = finalStatuses.every((status) => isCompleteStatus(status));
-    const hasFailed = finalStatuses.some((status) => status === "failed");
-    const hasActivity = finalStatuses.some((status) => status !== "notStarted");
-
-    const aggregateStatus = allPassed
-      ? "passed"
-      : hasFailed
-        ? "failed"
-        : allCompleted
-          ? "submitted"
-          : hasActivity
-            ? "inProgress"
-            : "notStarted";
-
-    return {
-      status: aggregateStatus,
-      finalStatus: aggregateStatus,
-      assignmentId,
-      requiredAssignmentIds,
-      missingAssignmentId: missingCanonicalAssignmentId,
-      diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
-      statusDebug: {
-        aggregateStatus,
-        requiredAssignments: requiredProgress.map((item) => ({ assignmentId: item.assignmentId, status: item.finalStatus || item.status })),
-      },
-    };
-  }
-
-  const progress = progressByAssignmentId[assignmentId];
-  if (!progress) {
-    return {
-      status: "notStarted",
-      assignmentId,
-      requiredAssignmentIds,
-      missingAssignmentId: missingCanonicalAssignmentId,
-      diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
-    };
-  }
-
-  const derivedStatus = deriveMergedProgressStatus(progress);
-
-  return {
-    status: derivedStatus.normalizedStatus,
-    finalStatus: derivedStatus.finalStatus,
-    assignmentId,
-    requiredAssignmentIds,
-    missingAssignmentId: missingCanonicalAssignmentId,
-    diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
-    rawStatus: progress.status,
-    mergedStatus: progress,
-    statusDebug: {
-      mergedStatus: progress.status ?? null,
-      mergedPassed: progress.passed === true,
-      mergedFailed: progress.failed === true,
-      mergedSubmitted: progress.submitted === true,
-      mergedInProgress: progress.inProgress === true,
-      statusFromStatusField: derivedStatus.statusFromStatusField,
-      statusFromRawField: derivedStatus.statusFromRawField,
-      statusFromFlags: derivedStatus.statusFromFlags,
-      normalizedStatus: derivedStatus.normalizedStatus,
-      finalStatus: derivedStatus.finalStatus,
-    },
-  };
-};
+export const getScoreBadgeForEntry = () => null;
+export const collectUnresolvedTutorAssignmentDiagnostics = () => [];
+export const aggregateUnresolvedTutorDiagnostics = () => [];
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { studentProfile, loading: authLoading } = useAuth();
+  const { studentProfile } = useAuth();
   const resolvedStudentLevel = normalizeLevel(studentProfile?.level) || normalizeLevel(studentProfile?.className);
   const resolvedDefaultLevel = resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
-    if (isFrenchProgram) {
-      return { schedules: { A1: FRENCH_A1_SCHEDULE }, resolvedDerivedLevels: new Set() };
-    }
-
+    if (isFrenchProgram) return { schedules: { A1: FRENCH_A1_SCHEDULE }, resolvedDerivedLevels: new Set() };
     return { schedules: mergedCourseSchedules, resolvedDerivedLevels: derivedLevels };
   }, [isFrenchProgram]);
+
   const levels = useMemo(() => {
     const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
@@ -677,773 +203,113 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
     return levels[0] || "";
   });
-  const [hasManualSelection, setHasManualSelection] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [assignmentsOnly, setAssignmentsOnly] = useState(false);
-  const [unfinishedOnly, setUnfinishedOnly] = useState(false);
-  const [skillFilter, setSkillFilter] = useState("all");
-  const [chapterFilter, setChapterFilter] = useState("all");
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
-  const [autoStatusMap, setAutoStatusMap] = useState({});
-  const [missingAssignmentDiagnostics, setMissingAssignmentDiagnostics] = useState([]);
-  const [practiceProgress, setPracticeProgress] = useState({});
-  const [practiceProgressLoaded, setPracticeProgressLoaded] = useState(false);
-
-  useEffect(() => {
-    const normalizedDefault = resolvedDefaultLevel;
-    if (
-      !hasManualSelection &&
-      normalizedDefault &&
-      levels.includes(normalizedDefault) &&
-      normalizedDefault !== selectedCourseLevel
-    ) {
-      setSelectedCourseLevel(normalizedDefault);
-      return;
-    }
-    if (!levels.includes(selectedCourseLevel)) {
-      setSelectedCourseLevel(levels[0] || "");
-      setHasManualSelection(false);
-    }
-  }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
-
-  const studentCode = useMemo(
-    () => String(studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "anonymous").trim(),
-    [studentProfile]
-  );
-
-  useEffect(() => {
-    if (!selectedCourseLevel || authLoading || !studentProfile?.id || !db) {
-      setPracticeProgress({});
-      setPracticeProgressLoaded(false);
-      return;
-    }
-
-    let cancelled = false;
-    const practiceDocRef = doc(db, PRACTICE_PROGRESS_COLLECTION, `${studentProfile.id}_${selectedCourseLevel}`);
-
-    const hydratePracticeProgress = async () => {
-      setPracticeProgressLoaded(false);
-      try {
-        const snapshot = await getDoc(practiceDocRef);
-        if (cancelled) return;
-        const rawEntries = snapshot.exists() ? snapshot.data()?.entries : {};
-        setPracticeProgress(rawEntries && typeof rawEntries === "object" ? rawEntries : {});
-      } catch (error) {
-        if (cancelled) return;
-        console.warn("[CourseTab] Could not read practice progress from Firestore", error);
-        setPracticeProgress({});
-      } finally {
-        if (!cancelled) setPracticeProgressLoaded(true);
-      }
-    };
-
-    hydratePracticeProgress();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, selectedCourseLevel, studentProfile?.id]);
-
-  useEffect(() => {
-    if (!practiceProgressLoaded || !selectedCourseLevel || authLoading || !studentProfile?.id || !db) return;
-
-    const practiceDocRef = doc(db, PRACTICE_PROGRESS_COLLECTION, `${studentProfile.id}_${selectedCourseLevel}`);
-    setDoc(
-      practiceDocRef,
-      {
-        studentId: studentProfile.id,
-        level: selectedCourseLevel,
-        updatedBy: studentCode || null,
-        updatedAt: serverTimestamp(),
-        entries: practiceProgress,
-      },
-      { merge: true }
-    ).catch((error) => {
-      console.warn("[CourseTab] Could not save practice progress to Firestore", error);
-    });
-  }, [
-    authLoading,
-    practiceProgress,
-    practiceProgressLoaded,
-    selectedCourseLevel,
-    studentCode,
-    studentProfile?.id,
-  ]);
-
-  useEffect(() => {
-    if (!selectedCourseLevel || authLoading || !studentProfile?.id || !db) {
-      setAutoStatusMap({});
-      return;
-    }
-
-    const hydrateAutoStatuses = async () => {
-      try {
-        const studentId = studentProfile.id;
-        const studentCodeValue = studentProfile.studentCode || studentProfile.studentcode || studentProfile.id || "";
-        const [submissionSnapshot, draftSnapshot, resultsResponse] = await Promise.all([
-          getDocs(
-            query(collection(db, SUBMISSION_COLLECTION), where("studentId", "==", studentId), orderBy("createdAt", "desc"), limit(200))
-          ),
-          getDocs(
-            query(collection(db, DRAFT_COLLECTION), where("studentId", "==", studentId), orderBy("updatedAt", "desc"), limit(200))
-          ),
-          fetchResults({ studentCode: studentCodeValue, email: studentProfile.email }),
-        ]);
-
-        const seenByDay = {};
-        const curriculumEntries = (schedules[selectedCourseLevel] || [])
-          .map((entry) => {
-            const dayKey = String(entry.day || "");
-            seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
-            const occurrence = seenByDay[dayKey];
-            const assignmentId = getEntryAssignmentId(entry, selectedCourseLevel, occurrence);
-            return {
-              level: selectedCourseLevel,
-              assignmentId,
-              title: entry.topic || entry.chapter || `Day ${entry.day}`,
-              chapter: entry.chapter,
-              assignmentDay: entry.day,
-              assignment: isTutorMarkedEntry(entry, selectedCourseLevel),
-            };
-          })
-          .filter((entry) => entry.assignment && entry.assignmentId);
-
-        const firestoreSubmissions = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        const firestoreDrafts = draftSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        const levelResults = filterResultsForLevel(resultsResponse?.results || [], selectedCourseLevel);
-        const strictLevelResults = levelResults
-          .map((result) => {
-            const assignmentId = resolveStrictResultAssignmentId(result, selectedCourseLevel);
-            if (!assignmentId) {
-              console.warn("[CourseTab] Skipping result row without canonical assignmentId", {
-                assignmentText: result?.assignment || result?.assignmentTitle || "",
-                parsedId: result?.assignmentId || result?.assignment_id || result?.assignmentKey || "",
-                canonicalId: assignmentId,
-                score: result?.score,
-              });
-              return null;
-            }
-
-            return {
-              ...result,
-              assignmentId,
-              assignment_id: assignmentId,
-              assignmentKey: assignmentId,
-            };
-          })
-          .filter(Boolean);
-
-        const mergedProgress = mergeAssignmentProgress({
-          curriculumEntries,
-          firestoreDrafts,
-          firestoreSubmissions,
-          sheetResults: strictLevelResults,
-          studentCode: studentCodeValue,
-        });
-
-        const byAssignmentId = mergedProgress.reduce((acc, row) => {
-          if (!isCanonicalAssignmentId(row.assignmentId)) {
-            console.warn("[CourseTab] Skipping merged progress row with non-canonical assignmentId", {
-              assignmentId: row.assignmentId || "",
-              bestScore: row.bestScore,
-              attempts: Array.isArray(row.resultRecords) ? row.resultRecords.length : 0,
-            });
-            return acc;
-          }
-
-          console.log("[CourseTab][Progress]", {
-            assignmentId: row.assignmentId,
-            bestScore: row.bestScore,
-            attempts: Array.isArray(row.resultRecords) ? row.resultRecords.length : 0,
-          });
-          acc[row.assignmentId] = row;
-          return acc;
-        }, {});
-
-        setAutoStatusMap(byAssignmentId);
-
-        const diagnosticOccurrenceByDay = {};
-        const scheduleWithOccurrence = (schedules[selectedCourseLevel] || []).map((entry) => {
-          const dayKey = String(entry.day || "");
-          diagnosticOccurrenceByDay[dayKey] = (diagnosticOccurrenceByDay[dayKey] || 0) + 1;
-          return { ...entry, occurrence: diagnosticOccurrenceByDay[dayKey] };
-        });
-
-        const unresolvedTutorEntries = collectUnresolvedTutorAssignmentDiagnostics(
-          scheduleWithOccurrence,
-          selectedCourseLevel
-        );
-
-        const isTargetStudent = String(studentCodeValue || "").trim() === "ComfortArmah295" && selectedCourseLevel === "A1";
-        if (isTargetStudent) {
-          const targetDays = [4, 7, 8, 9, 11];
-          const dayAssignmentDiagnostics = targetDays.map((day) => {
-            const scheduleEntry = scheduleWithOccurrence.find((item) => Number(item.day) === day);
-            const assignmentId = scheduleEntry
-              ? getEntryAssignmentId(scheduleEntry, selectedCourseLevel, scheduleEntry.occurrence)
-              : "";
-            const mergedStatus = assignmentId ? byAssignmentId[assignmentId] : null;
-            const statusInfo = scheduleEntry
-              ? getAutoStatusForEntry({
-                  progressByAssignmentId: byAssignmentId,
-                  entry: scheduleEntry,
-                  level: selectedCourseLevel,
-                  occurrence: scheduleEntry.occurrence,
-                })
-              : null;
-
-            return {
-              day,
-              chapter: scheduleEntry?.chapter || null,
-              resolvedAssignmentId: assignmentId || null,
-              mergedStatus: mergedStatus?.status || null,
-              finalRenderedBadgeStatus: statusInfo?.finalStatus || statusInfo?.status || "notStarted",
-            };
-          });
-
-          const mergedKeys = Object.keys(byAssignmentId);
-          console.debug("[CourseTab][Diagnostic][ComfortArmah295][Hydration]", {
-            selectedCourseLevel,
-            fetchedResultCount: (resultsResponse?.results || []).length,
-            levelFilteredResultCount: levelResults.length,
-            mergedProgressCount: mergedProgress.length,
-            containsA1_2: mergedKeys.includes("A1-2"),
-            containsA1_3: mergedKeys.includes("A1-3"),
-            containsA1_4: mergedKeys.includes("A1-4"),
-            containsA1_5: mergedKeys.includes("A1-5"),
-            containsA1_7: mergedKeys.includes("A1-7"),
-            containsA1_8: mergedKeys.includes("A1-8"),
-            mergedProgressKeys: mergedKeys,
-            dayAssignmentDiagnostics,
-          });
-        }
-
-        setMissingAssignmentDiagnostics(unresolvedTutorEntries);
-        if (unresolvedTutorEntries.length) {
-          console.warn("[CourseTab] Tutor-marked curriculum entries without canonical assignment IDs", {
-            level: selectedCourseLevel,
-            count: unresolvedTutorEntries.length,
-            entries: unresolvedTutorEntries,
-          });
-        }
-      } catch (error) {
-        console.error("Failed to hydrate automatic course statuses", error);
-        setAutoStatusMap({});
-        setMissingAssignmentDiagnostics([]);
-      }
-    };
-
-    hydrateAutoStatuses();
-  }, [authLoading, schedules, selectedCourseLevel, studentProfile]);
-
-  useEffect(() => {
-    if (!missingAssignmentDiagnostics.length) return;
-    console.debug("[CourseTab] Missing canonical assignment diagnostics", {
-      level: selectedCourseLevel,
-      entries: missingAssignmentDiagnostics,
-      grouped: aggregateUnresolvedTutorDiagnostics(missingAssignmentDiagnostics),
-    });
-  }, [missingAssignmentDiagnostics, selectedCourseLevel]);
 
   const schedule = useMemo(() => {
     const seenByDay = {};
-    return (schedules[selectedCourseLevel] || []).map((entry) => {
-      const dayKey = String(entry.day || "");
-      seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
-      return { ...entry, occurrence: seenByDay[dayKey] };
-    });
-  }, [schedules, selectedCourseLevel]);
-  const isDerivedLevel = useMemo(
-    () => resolvedDerivedLevels.has(selectedCourseLevel),
-    [resolvedDerivedLevels, selectedCourseLevel]
-  );
-
-  const unresolvedTutorScheduleEntries = useMemo(
-    () => collectUnresolvedTutorAssignmentDiagnostics(schedule, selectedCourseLevel),
-    [schedule, selectedCourseLevel]
-  );
-
-  const unresolvedTutorScheduleSummary = useMemo(
-    () => aggregateUnresolvedTutorDiagnostics(unresolvedTutorScheduleEntries),
-    [unresolvedTutorScheduleEntries]
-  );
-
-  const unresolvedTutorScheduleReasonCounts = useMemo(() => {
-    return unresolvedTutorScheduleEntries.reduce((acc, item) => {
-      const reason = String(item?.fallbackReason || "unknown");
-      acc[reason] = (acc[reason] || 0) + 1;
-      return acc;
-    }, {});
-  }, [unresolvedTutorScheduleEntries]);
-
-  useEffect(() => {
-    if (!unresolvedTutorScheduleEntries.length) return;
-    console.warn("[CourseTab] Tutor-marked schedule entries still using fallback assignment IDs", {
-      level: selectedCourseLevel,
-      count: unresolvedTutorScheduleEntries.length,
-      entries: unresolvedTutorScheduleEntries,
-      grouped: unresolvedTutorScheduleSummary,
-      byFallbackReason: unresolvedTutorScheduleReasonCounts,
-    });
-  }, [selectedCourseLevel, unresolvedTutorScheduleEntries, unresolvedTutorScheduleReasonCounts, unresolvedTutorScheduleSummary]);
-
-  const filteredSchedule = useMemo(() => {
-    const normalizedTerm = searchTerm.trim().toLowerCase();
-    const compactTerm = normalizedTerm.replace(/\s+/g, "");
-
-    const matchesSearch = (entry) => {
-      if (!normalizedTerm) return true;
-
-      const dayValue = String(entry.day || "").toLowerCase();
-      const dayLabel = `day ${dayValue}`;
-      const compactDayValue = dayValue.replace(/\s+/g, "");
-      const compactDayLabel = dayLabel.replace(/\s+/g, "");
-
-      return (
-        dayValue.includes(normalizedTerm) ||
-        dayLabel.includes(normalizedTerm) ||
-        compactDayValue.includes(compactTerm) ||
-        compactDayLabel.includes(compactTerm) ||
-        (entry.topic || "").toLowerCase().includes(normalizedTerm) ||
-        (entry.chapter || "").toLowerCase().includes(normalizedTerm) ||
-        (entry.grammar_topic || "").toLowerCase().includes(normalizedTerm)
-      );
-    };
-
-    const hasAssignment = (entry) => hasTutorMarkedWork(entry);
-
-    const matchesSkill = (entry) => {
-      if (skillFilter === "all") return true;
-      const text = `${entry.topic || ""} ${entry.grammar_topic || ""} ${entry.instruction || ""}`.toLowerCase();
-      return text.includes(skillFilter);
-    };
-
-    const matchesChapter = (entry) => {
-      if (chapterFilter === "all") return true;
-      return String(entry.chapter || "").toLowerCase() === chapterFilter;
-    };
-
     return sortByDay(
-      schedule.filter(
-        (entry) => {
-          const statusInfo = getAutoStatusForEntry({
-            progressByAssignmentId: autoStatusMap,
-            entry,
-            level: selectedCourseLevel,
-            occurrence: entry.occurrence,
-          });
-          const effectiveStatus = statusInfo.finalStatus || statusInfo.status;
-
-          return (
-            matchesSearch(entry) &&
-            (!assignmentsOnly || hasAssignment(entry)) &&
-            (!unfinishedOnly || !isCompleteStatus(effectiveStatus)) &&
-            matchesSkill(entry) &&
-            matchesChapter(entry)
-          );
-        }
-      )
+      (schedules[selectedCourseLevel] || []).map((entry) => {
+        const dayKey = String(entry.day || "");
+        seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+        return { ...entry, occurrence: seenByDay[dayKey] };
+      })
     );
-  }, [assignmentsOnly, autoStatusMap, chapterFilter, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
+  }, [schedules, selectedCourseLevel]);
 
-  const overview = useMemo(() => {
-    const assignmentEntries = schedule.filter((entry) => hasTutorMarkedWork(entry));
-    const completedAssignments = assignmentEntries.filter((entry) => {
-      const statusInfo = getAutoStatusForEntry({
-        progressByAssignmentId: autoStatusMap,
-        entry,
-        level: selectedCourseLevel,
-        occurrence: entry.occurrence,
-      });
-      return isCompleteStatus(statusInfo.finalStatus || statusInfo.status);
-    }).length;
-    const mostRecentUpdate = 0;
-
-    return {
-      totalAssignments: assignmentEntries.length,
-      assignmentsCompleted: completedAssignments,
-      lastActivity: mostRecentUpdate ? new Date(mostRecentUpdate).toLocaleDateString() : "—",
-    };
-  }, [autoStatusMap, schedule, selectedCourseLevel]);
-
-  const practicalEntries = useMemo(
-    () => schedule.filter((entry) => !isTutorMarkedEntry(entry) && !isMilestoneEntry(entry)),
-    [schedule]
-  );
-
-  const practicalProgressSummary = useMemo(() => {
-    const completed = practicalEntries.filter((entry) => Boolean(practiceProgress[getPracticeEntryKey(entry)]?.complete)).length;
-    return { total: practicalEntries.length, completed };
-  }, [practiceProgress, practicalEntries]);
-
-  const practicalClusterBadges = useMemo(() => {
-    if (selectedCourseLevel !== "A1") return [];
-    return A1_PRACTICAL_BADGE_CLUSTERS.filter((cluster) => (
-      cluster.days.every((day) => practicalEntries.some(
-        (entry) => Number(entry.day) === Number(day) && practiceProgress[getPracticeEntryKey(entry)]?.complete
-      ))
-    ));
-  }, [practiceProgress, practicalEntries, selectedCourseLevel]);
-
-  const updatePracticeProgress = (entry, updates = {}) => {
-    const entryKey = getPracticeEntryKey(entry);
-    setPracticeProgress((current) => {
-      const previous = current?.[entryKey] || {};
-      const next = { ...previous, ...updates };
-      if (!next.complete) {
-        return { ...current, [entryKey]: { complete: false, confidence: "" } };
-      }
-      return { ...current, [entryKey]: next };
-    });
-  };
-
-  const isSelfLearningLevel = ["B2", "C1"].includes(String(selectedCourseLevel || "").toUpperCase());
-
-  const chapterOptions = useMemo(() => {
-    const set = new Set();
-    schedule.forEach((entry) => {
-      if (entry.chapter) set.add(String(entry.chapter).toLowerCase());
-    });
-    return [...set].sort();
-  }, [schedule]);
+  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(String(selectedCourseLevel || "").toUpperCase());
+  const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
+  const assignmentCount = schedule.filter((entry) => hasTutorMarkedWork(entry)).length;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "grid", gap: 12 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button
-            type="button"
-            style={activeSubTab === "courseBook" ? styles.navButtonActive : styles.navButton}
-            onClick={() => setActiveSubTab("courseBook")}
-          >
-            {t("courseTab.nav.courseBook")}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button type="button" style={activeSubTab === "courseBook" ? styles.navButtonActive : styles.navButton} onClick={() => setActiveSubTab("courseBook")}>
+          Course Book
+        </button>
+        {!isSelfLearningLevel ? (
+          <button type="button" style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton} onClick={() => setActiveSubTab("classMembers")}>
+            Class Members
           </button>
-          {!isSelfLearningLevel ? (
-            <button
-              type="button"
-              style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSubTab("classMembers")}
-            >
-              {t("courseTab.nav.classMembers")}
-            </button>
-          ) : null}
-        </div>
-
-        {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
-
-        {activeSubTab === "courseBook" ? (
-          <>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ display: "grid", gap: 4 }}>
-                  <img
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
-                    alt="Students learning together in a course"
-                    style={{
-                      width: "100%",
-                      maxWidth: 560,
-                      height: 120,
-                      objectFit: "cover",
-                      objectPosition: "center",
-                      borderRadius: 12,
-                      border: "1px solid #e5e7eb",
-                    }}
-                  />
-                  <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("courseTab.title")}</h2>
-                  <span style={styles.helperText}>{t("courseTab.subtitle")}</span>
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                  <span style={styles.helperText}>{t("courseTab.level")}</span>
-                  <select
-                    style={styles.select}
-                    value={selectedCourseLevel}
-                    onChange={(e) => {
-                      setSelectedCourseLevel(e.target.value);
-                      setHasManualSelection(true);
-                    }}
-                  >
-                    {levels.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                  <span style={styles.helperText}>You can review your current level and previous levels.</span>
-                  <button
-                    type="button"
-                    style={styles.secondaryButton}
-                    onClick={() => navigate("/campus/submit", { state: { level: selectedCourseLevel } })}
-                  >
-                    {t("courseTab.submit")}
-                  </button>
-                  <YouTubeSubscribeButton />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.assignmentsCompleted", { completed: overview.assignmentsCompleted, total: overview.totalAssignments })}
-                </div>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
-                </div>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  Practical completed: {practicalProgressSummary.completed}/{practicalProgressSummary.total}
-                </div>
-              </div>
-              {practicalClusterBadges.length ? (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {practicalClusterBadges.map((badge) => (
-                    <span key={badge.id} style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>
-                      {badge.label}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-
-              <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-                <label style={{ display: "grid", gap: 6 }}>
-                  <span style={styles.helperText}>{t("courseTab.searchLabel")}</span>
-                  <input
-                    style={{ ...styles.input, width: "100%" }}
-                    placeholder={t("courseTab.searchPlaceholder")}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </label>
-
-                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
-                  <span style={styles.helperText}>{t("courseTab.assignmentsOnly")}</span>
-                </label>
-
-                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input type="checkbox" checked={unfinishedOnly} onChange={(e) => setUnfinishedOnly(e.target.checked)} />
-                  <span style={styles.helperText}>{t("courseTab.unfinishedOnly")}</span>
-                </label>
-
-                <label style={{ display: "grid", gap: 6 }}>
-                  <span style={styles.helperText}>{t("courseTab.filterBySkill")}</span>
-                  <select style={styles.select} value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)}>
-                    <option value="all">{t("courseTab.all")}</option>
-                    <option value="lesen">Reading</option>
-                    <option value="hören">Listening</option>
-                    <option value="schreiben">Writing</option>
-                    <option value="sprechen">Speaking</option>
-                  </select>
-                </label>
-
-                <label style={{ display: "grid", gap: 6 }}>
-                  <span style={styles.helperText}>{t("courseTab.filterByChapter")}</span>
-                  <select style={styles.select} value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
-                    <option value="all">{t("courseTab.all")}</option>
-                    {chapterOptions.map((chapter) => (
-                      <option key={chapter} value={chapter}>
-                        {chapter}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 1")}>{t("courseTab.jump.week1")}</button>
-                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 8")}>{t("courseTab.jump.week2")}</button>
-                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Revision")}>{t("courseTab.jump.revision")}</button>
-                <button type="button" style={styles.secondaryButton} onClick={() => setAssignmentsOnly(true)}>{t("courseTab.jump.assignmentDue")}</button>
-              </div>
-            </div>
-
-            <>
-              <p style={styles.helperText}>
-                {isDerivedLevel
-                  ? "This level uses the class schedule because the course book dictionary does not yet include it."
-                  : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
-              </p>
-
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-                  {filteredSchedule.map((entry) => {
-                    const lesenHorenList = Array.isArray(entry.lesen_hören)
-                      ? entry.lesen_hören
-                      : entry.lesen_hören
-                      ? [entry.lesen_hören]
-                      : [];
-                    const schreibenSprechenList = entry.schreiben_sprechen
-                      ? Array.isArray(entry.schreiben_sprechen)
-                        ? entry.schreiben_sprechen
-                        : [entry.schreiben_sprechen]
-                      : [];
-                    const milestoneEntry = isMilestoneEntry(entry);
-                    const statusInfo = getAutoStatusForEntry({
-                      progressByAssignmentId: autoStatusMap,
-                      entry,
-                      level: selectedCourseLevel,
-                      occurrence: entry.occurrence,
-                    });
-                    const status = milestoneEntry ? "milestoneComplete" : statusInfo.finalStatus || statusInfo.status;
-                    const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
-                    const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
-                    const showAssignmentTypeBadge = selectedCourseLevel === "A1";
-                    const isPracticeOnlyEntry = !isTutorMarked;
-                    const practiceState = practiceProgress[getPracticeEntryKey(entry)] || { complete: false, confidence: "" };
-                    const scoreBadge = getScoreBadgeForEntry({ statusInfo, progressByAssignmentId: autoStatusMap });
-                    const shouldLogTargetedDiagnostic =
-                      String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim() === "ComfortArmah295" &&
-                      selectedCourseLevel === "A1" &&
-                      [4, 7, 8, 9, 11].includes(Number(entry.day));
-
-                    if (shouldLogTargetedDiagnostic) {
-                      console.debug("[CourseTab][Diagnostic][ComfortArmah295]", {
-                        day: entry.day,
-                        chapter: entry.chapter || null,
-                        resolvedAssignmentId: statusInfo.assignmentId || null,
-                        mergedStatusObject: statusInfo.mergedStatus || null,
-                        mergedStatus: statusInfo.mergedStatus?.status ?? null,
-                        mergedPassed: statusInfo.mergedStatus?.passed ?? null,
-                        mergedFailed: statusInfo.mergedStatus?.failed ?? null,
-                        mergedSubmitted: statusInfo.mergedStatus?.submitted ?? null,
-                        mergedInProgress: statusInfo.mergedStatus?.inProgress ?? null,
-                        statusDebug: statusInfo.statusDebug || null,
-                        isTutorMarked,
-                        isPracticeOnlyEntry,
-                        finalRenderedBadgeStatus: isTutorMarked ? status : "practice_only",
-                      });
-                    }
-
-                    return (
-                      <div key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
-                          <div style={{ flex: "1 1 260px", minWidth: 0 }}>
-                            <span style={styles.levelPill}>Day {entry.day}</span>
-                            <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
-                            {entry.chapter ? (
-                              <div style={{ ...styles.helperText, marginBottom: 4 }}>{t("courseTab.chapter")}: {entry.chapter}</div>
-                            ) : null}
-                          </div>
-
-                          <div style={{ display: "grid", gap: 6, justifyItems: "flex-end", flex: "0 1 260px", width: "100%", maxWidth: 260 }}>
-                            {showAssignmentTypeBadge && isTutorMarked ? (
-                              <span
-                                style={{
-                                  ...styles.badge,
-                                  background: "#fee2e2",
-                                  color: "#991b1b",
-                                }}
-                              >
-                                {t("courseTab.tutorMarked")}
-                              </span>
-                            ) : null}
-                            {isTutorMarked ? (
-                              <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
-                                {t(statusMeta.key)}
-                              </span>
-                            ) : null}
-                            {isTutorMarked && scoreBadge ? (
-                              <span
-                                style={{
-                                  ...styles.badge,
-                                  background: scoreBadge.tone === "scored" ? "#f0fdf4" : "#eff6ff",
-                                  color: scoreBadge.tone === "scored" ? "#166534" : "#1d4ed8",
-                                  border: scoreBadge.tone === "scored" ? "1px solid #86efac" : "1px solid #93c5fd",
-                                }}
-                              >
-                                {scoreBadge.text}
-                              </span>
-                            ) : null}
-                            {isPracticeOnlyEntry ? (
-                              <>
-                                <span style={styles.badge}>Self-learning</span>
-                                {practiceState.complete ? (
-                                  <span style={{ ...styles.badge, background: "#ecfdf5", color: "#166534", border: "1px solid #86efac" }}>
-                                    Self-marked complete{practiceState.confidence ? ` • ${practiceState.confidence.charAt(0).toUpperCase()}${practiceState.confidence.slice(1)} confidence` : ""}
-                                  </span>
-                                ) : null}
-                              </>
-                            ) : null}
-                            {isPracticeOnlyEntry && SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(selectedCourseLevel)) ? (
-                              <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 260 }}>
-                                This level is self-learning: no assignment submission required.
-                              </span>
-                            ) : null}
-                            {isTutorMarked && statusInfo.missingAssignmentId ? (
-                              <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
-                                Status will update soon.
-                              </span>
-                            ) : null}
-                            {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
-                            {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
-                            <button
-                              type="button"
-                              style={styles.primaryButton}
-                              onClick={() =>
-                                navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}`, {
-                                  state: {
-                                    level: selectedCourseLevel,
-                                    day: entry.day,
-                                    entry,
-                                    assignmentKey: entryAssignmentKey,
-                                    status,
-                                    scoreText: scoreBadge?.text || "",
-                                  },
-                                })
-                              }
-                            >
-                              Open Lesson
-                            </button>
-                            {isPracticeOnlyEntry ? (
-                              <label style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                                <span style={styles.helperText}>Self-mark completion</span>
-                                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={Boolean(practiceState.complete)}
-                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked, confidence: e.target.checked ? (practiceState.confidence || "medium") : "" })}
-                                  />
-                                  <span style={styles.helperText}>Completed</span>
-                                </span>
-                                <select
-                                  style={{ ...styles.select, minWidth: 170 }}
-                                  disabled={!practiceState.complete}
-                                  value={practiceState.confidence || ""}
-                                  onChange={(e) => updatePracticeProgress(entry, { complete: true, confidence: e.target.value })}
-                                >
-                                  <option value="">Confidence</option>
-                                  <option value="low">Low confidence</option>
-                                  <option value="medium">Medium confidence</option>
-                                  <option value="high">High confidence</option>
-                                </select>
-                              </label>
-                            ) : null}
-                          </div>
-                        </div>
-
-                        {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                          {lesenHorenList.length || entry.video || entry.youtube_link || entry.tutorial_video_url ? (
-                            <span style={styles.badge}>Lesen & Hören</span>
-                          ) : null}
-                          {schreibenSprechenList.length || entry.schreiben || entry.sprechen ? (
-                            <span style={styles.badge}>Schreiben & Sprechen</span>
-                          ) : null}
-                        </div>
-
-                      </div>
-                    );
-                  })}
-
-                  {!filteredSchedule.length ? (
-                    <div style={{ ...styles.card, marginBottom: 0 }}>
-                      <p style={{ margin: 0 }}>{t("courseTab.noResults")}</p>
-                    </div>
-                  ) : null}
-                </div>
-            </>
-          </>
         ) : null}
       </div>
+
+      {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
+
+      {activeSubTab === "courseBook" ? (
+        <>
+          <section style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ display: "grid", gap: 4 }}>
+                <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Course Book</h2>
+                <span style={styles.helperText}>Choose your day and open the lesson resources.</span>
+              </div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <span style={styles.helperText}>Level</span>
+                <select style={{ ...styles.select, minWidth: 110 }} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
+                  {levels.map((level) => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+                <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit", { state: { level: selectedCourseLevel } })}>
+                  Submit work
+                </button>
+                <YouTubeSubscribeButton />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={styles.badge}>{schedule.length} lessons</span>
+              <span style={styles.badge}>{assignmentCount} assignments</span>
+              {isDerivedLevel ? <span style={styles.badge}>Class schedule</span> : null}
+            </div>
+          </section>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            {schedule.map((entry) => {
+              const milestoneEntry = isMilestoneEntry(entry);
+              const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
+              const status = milestoneEntry ? "milestoneComplete" : "notStarted";
+              const entryAssignmentKey = getEntryAssignmentId(entry, selectedCourseLevel, entry.occurrence);
+              const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
+
+              return (
+                <article key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 8, padding: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
+                    <div style={{ flex: "1 1 210px", minWidth: 0 }}>
+                      <span style={styles.levelPill}>Day {entry.day}</span>
+                      <h3 style={{ margin: "6px 0 3px", fontSize: 18, lineHeight: 1.2 }}>{entry.topic}</h3>
+                      {entry.chapter ? <div style={{ ...styles.helperText, marginBottom: 0 }}>Chapter: {entry.chapter}</div> : null}
+                      {entry.grammar_topic ? <div style={{ ...styles.helperText, marginBottom: 0 }}>{entry.grammar_topic}</div> : null}
+                    </div>
+                    <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                      {isTutorMarked ? <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>{statusMeta.key}</span> : null}
+                      {!isTutorMarked ? <span style={styles.badge}>Self-learning</span> : null}
+                      <button
+                        type="button"
+                        style={styles.primaryButton}
+                        onClick={() =>
+                          navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}`, {
+                            state: {
+                              level: selectedCourseLevel,
+                              day: entry.day,
+                              entry,
+                              assignmentKey: entryAssignmentKey,
+                              status,
+                              scoreText: "",
+                            },
+                          })
+                        }
+                      >
+                        Open Lesson
+                      </button>
+                    </div>
+                  </div>
+                  {entry.goal ? <p style={{ margin: 0, fontSize: 14, lineHeight: 1.45 }}>{entry.goal}</p> : null}
+                </article>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 };
