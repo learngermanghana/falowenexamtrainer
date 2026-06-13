@@ -3,7 +3,7 @@ export const LESSON_RADIO_DICTIONARY = {
     9: {
       key: "a2-day9-urlaub-falowen-radio",
       title: "Urlaub planen",
-      youtubeId: "",
+      youtubeId: "BD663tMiWpg",
       duration: "",
       instruction:
         "Höre zweimal zu. Notiere fünf nützliche Ausdrücke und beantworte danach die Fragen.",
