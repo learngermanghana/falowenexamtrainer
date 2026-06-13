@@ -64,6 +64,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     1: {
       ai_grammar_video: "https://youtu.be/HMEs3mEKdrk?si=VYK4VjV9Da2_AzU0",
     },
+    2: {
+      ai_grammar_video: "https://youtu.be/AxSh8t71Jlo?si=1tM_ouDy_JBOayP7",
+    },
     9: {
       ai_grammar_video: "https://youtu.be/8Eqzb0rK-Cc",
     },
@@ -71,10 +74,22 @@ export const LESSON_VIDEO_DICTIONARY = {
       ai_grammar_video: "https://youtu.be/Jgrhl9m89ME",
     },
     11: {
-      ai_grammar_video: "https://youtu.be/-mcgpnwRQRo",
+      ai_grammar_video: "https://youtu.be/qPZ44s10O04?si=S0eysGDwS30WrGZ-",
+    },
+    13: {
+      ai_grammar_video: "https://youtu.be/derL046nbF8?si=VP2St42knZFk3NKo",
     },
     15: {
       ai_grammar_video: "https://youtu.be/uf3OJwalh6U",
+    },
+    16: {
+      ai_grammar_video: "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR",
+    },
+    19: {
+      ai_grammar_video: "https://youtu.be/aL_CJ75l11s?si=mQTO5LEU3SsOj5xe",
+    },
+    22: {
+      ai_grammar_video: "https://youtu.be/xwOKasZ7nsU?si=oUw6qXJQR6tMyKH4",
     },
     27: {
       ai_grammar_video: "https://youtu.be/5vmLAg1aWq8",
