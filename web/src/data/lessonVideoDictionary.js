@@ -139,7 +139,7 @@ const uniqueVideoResources = (...groups) => {
     });
 };
 
-const legacyTeacherVideoResource = (source = {}) => {
+const legacyVideoResource = (source = {}, type = "teacher") => {
   const url = pickFirst(
     source.video,
     source.youtube_link,
@@ -147,11 +147,15 @@ const legacyTeacherVideoResource = (source = {}) => {
   );
   if (!url) return null;
 
+  const teacherVideo = type === "teacher";
+
   return {
-    key: "teacher-explanation",
+    key: teacherVideo ? "teacher-explanation" : "ai-grammar-video",
     chapter: source.chapter || null,
-    title: "Teacher explanation",
-    description: "Recorded class explanation from the teacher.",
+    title: teacherVideo ? "Teacher explanation" : "AI grammar video",
+    description: teacherVideo
+      ? "Recorded class explanation from the teacher."
+      : "Step-by-step grammar explanation for revision and self-study.",
     url,
   };
 };
@@ -289,12 +293,25 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const explicitResources = entries.flatMap((resource) =>
     normalizeVideoResources(resource),
   );
-  const legacyTeacherVideos = entries
-    .map(legacyTeacherVideoResource)
+  const legacyVideos = entries
+    .map((resource) => legacyVideoResource(resource, "teacher"))
     .filter(Boolean);
   const dictionaryResources = normalizeVideoResources(dictionaryEntry);
+  const hasConfiguredAiVideo = [...explicitResources, ...dictionaryResources].some(
+    (resource) => !isTeacherVideoResource(resource),
+  );
+  const fallbackLegacyVideos =
+    normalizedLevel === "A1" || hasConfiguredAiVideo
+      ? legacyVideos
+      : legacyVideos.map((resource) => ({
+          ...resource,
+          key: "ai-grammar-video",
+          title: "AI grammar video",
+          description:
+            "Step-by-step grammar explanation for revision and self-study.",
+        }));
   const allResources = uniqueVideoResources(
-    legacyTeacherVideos,
+    fallbackLegacyVideos,
     explicitResources,
     dictionaryResources,
   );
