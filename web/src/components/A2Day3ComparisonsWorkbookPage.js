@@ -364,7 +364,7 @@ const A2Day3ComparisonsWorkbookPage = () => {
             Treffen zu planen.
           </p>
           <p style={{ margin: 0 }}>
-            Tipp: Beginne mit „Lieber Felix“. Schreibe: „Wie geht es dir? Mir geht es gut. Ich schreibe dir, weil ...“ Verwende
+            Tipp: Beginne mit „Lieber Felix“. Schreibe: „Wie geht es dir? Ich schreibe dir, weil ...“ Verwende
             Konjunktionen wie „denn“, „aber“, „weil“ oder „deshalb“. Schließe mit: „Ich freue mich im Voraus auf deine Antwort.
             Viele Grüße, [Dein Name]“
           </p>
