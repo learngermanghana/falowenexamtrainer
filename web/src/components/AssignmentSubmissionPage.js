@@ -1195,20 +1195,11 @@ const AssignmentSubmissionPage = () => {
       setResubmissionText("");
       setResubmissionImprovement("");
       setResubmissionStatus({ loading: false, error: "", success: "" });
-    } else if (!form.submissionText && draft?.submissionText) {
-      setForm((prev) => ({
-        ...prev,
-        submissionText: draft.submissionText,
-        confirmed: false,
-      }));
     }
 
   }, [
     draftsByAssignment,
     form.assignmentTitle,
-    form.submissionText,
-    resubmissionImprovement,
-    resubmissionText,
   ]);
 
   // Locked state for currently selected assignment.

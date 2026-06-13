@@ -79,7 +79,7 @@ jest.mock("../firebase", () => ({
   setDoc: jest.fn(() => Promise.resolve()),
 }));
 
-import { addDoc } from "../firebase";
+import { addDoc, getDocs } from "../firebase";
 import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
 
 const renderPage = (initialEntries = ["/"]) =>
@@ -122,6 +122,38 @@ describe("AssignmentSubmissionPage", () => {
     expect(screen.getByRole("combobox")).toBeDisabled();
     expect(screen.getByText(/Opened from course\/workbook link/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /choose a different assignment instead/i })).toBeInTheDocument();
+  });
+
+  it("lets a student delete all text from a loaded draft", async () => {
+    const loadedDraft = "This draft contains an error that the student needs to remove.";
+    getDocs.mockResolvedValue({
+      empty: false,
+      docs: [
+        {
+          id: "draft-1",
+          data: () => ({
+            assignmentTitle: TUTOR_ASSIGNMENT_LABEL,
+            assignmentKey: "A1-1.1",
+            level: "A1",
+            submissionText: loadedDraft,
+          }),
+        },
+      ],
+    });
+
+    renderPage();
+
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeInTheDocument());
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: TUTOR_ASSIGNMENT_LABEL },
+    });
+
+    const editor = await screen.findByPlaceholderText(/type your answer here or paste it in/i);
+    await waitFor(() => expect(editor).toHaveValue(loadedDraft));
+
+    fireEvent.change(editor, { target: { value: "" } });
+
+    expect(editor).toHaveValue("");
   });
 
 
