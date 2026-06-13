@@ -5,6 +5,7 @@ import WritingPage from "../WritingPage";
 import { useAuth } from "../../context/AuthContext";
 import { loadWritingProgress, saveWritingProgress } from "../../services/writingProgressService";
 import c1Day2QuestionWritingBuilder from "../../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
+import { getC1OpinionWritingTip } from "../../data/writingQuestionBuilders/c1OpinionWritingTips";
 
 const countWords = (text = "") => String(text || "").trim().split(/\s+/).filter(Boolean).length;
 
@@ -245,9 +246,14 @@ function C1Day2QuestionEssayBuilder() {
                 </div>
                 <h4 style={{ margin: 0, fontSize: "1.02rem", lineHeight: 1.5 }}>{item.question}</h4>
                 <p style={{ margin: 0, color: "#64748b", lineHeight: 1.6 }}>{item.help}</p>
-                <div style={{ borderLeft: "4px solid #818cf8", padding: "9px 12px", background: "#f8fafc", borderRadius: 8, lineHeight: 1.55 }}>
-                  <strong>Sentence starter:</strong> {item.starter}
-                </div>
+                {getC1OpinionWritingTip({ id: item.id, level: config.level, taskType: config.taskType }) ? (
+                  <div style={{ borderLeft: "4px solid #818cf8", padding: "10px 12px", background: "#f8fafc", borderRadius: 8, lineHeight: 1.65, overflowWrap: "anywhere" }}>
+                    <strong style={{ display: "block", marginBottom: 4 }}>Tip:</strong>
+                    <p style={{ margin: 0 }}>
+                      {getC1OpinionWritingTip({ id: item.id, level: config.level, taskType: config.taskType })}
+                    </p>
+                  </div>
+                ) : null}
                 <textarea
                   value={state.answers?.[item.id] || ""}
                   onChange={(event) => updateAnswer(item.id, event.target.value)}

@@ -2,6 +2,7 @@ const c1Day2QuestionWritingBuilder = {
   level: "C1",
   day: 2,
   title: "Kultur und Identität",
+  taskType: "C1 opinion essay / Stellungnahme",
   targetWords: 230,
   questions: [
     {
@@ -9,7 +10,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Einleitung",
       question: "Warum ist das Thema „Kultur und Identität“ heute relevant?",
       help: "Führe in das Thema ein und erkläre, warum es gesellschaftlich aktuell ist.",
-      starter: "Das Thema Kultur und Identität wird heute zunehmend diskutiert, weil ...",
       minimumWords: 30,
     },
     {
@@ -17,7 +17,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Rolle der Kultur",
       question: "Welche Rolle spielt Kultur für das Selbstverständnis eines Menschen?",
       help: "Denke an Sprache, Familie, Werte, Religion, Schule, Medien, Migration und Alltag.",
-      starter: "Kultur beeinflusst das Selbstverständnis eines Menschen, indem ...",
       minimumWords: 40,
     },
     {
@@ -25,7 +24,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Konkretes Beispiel",
       question: "Welches konkrete Beispiel zeigt, wie Kultur die Identität prägen kann?",
       help: "Beschreibe eine Person oder Situation, zum Beispiel jemanden, der in zwei Kulturen aufgewachsen ist.",
-      starter: "Ein anschauliches Beispiel hierfür ist ...",
       minimumWords: 45,
     },
     {
@@ -33,7 +31,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Einwand",
       question: "Welche Probleme entstehen, wenn Menschen starr einer einzigen Kultur zugeordnet werden?",
       help: "Zeige, warum Herkunft allein eine Person nicht vollständig beschreibt.",
-      starter: "Kritisch zu betrachten ist jedoch, dass ...",
       minimumWords: 40,
     },
     {
@@ -41,7 +38,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Alternative",
       question: "Wie kann Identität stattdessen flexibel und vielschichtig verstanden werden?",
       help: "Erkläre Mehrfachzugehörigkeit, persönliche Entwicklung und wandelbare Identität.",
-      starter: "Eine sinnvollere Alternative wäre ein Identitätsverständnis, das ...",
       minimumWords: 45,
     },
     {
@@ -49,7 +45,6 @@ const c1Day2QuestionWritingBuilder = {
       section: "Schluss",
       question: "Zu welchem differenzierten Fazit kommen Sie?",
       help: "Fasse deine Position zusammen, ohne zu absolut zu formulieren.",
-      starter: "Zusammenfassend lässt sich festhalten, dass ...",
       minimumWords: 30,
     },
   ],

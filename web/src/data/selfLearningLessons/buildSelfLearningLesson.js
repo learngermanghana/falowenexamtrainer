@@ -1,3 +1,5 @@
+import { C1_OPINION_WRITING_TIPS, isC1OpinionWriting } from "../writingQuestionBuilders/c1OpinionWritingTips";
+
 export const defaultReadingTasks = [
   "Choose one suitable article from a German platform such as WELT, Tagesschau, Deutschlandfunk or DW.",
   "Read once for the general idea, not for every unknown word.",
@@ -64,7 +66,9 @@ export const makeLesson = ({
   speakingBuilder,
   writingTaskType,
   writingTopic,
-  writingBuilder,
+  writingBuilder: writingBuilder && isC1OpinionWriting({ level, taskType: writingTaskType })
+    ? { ...writingBuilder, opinionWritingTips: C1_OPINION_WRITING_TIPS }
+    : writingBuilder,
   phrases,
   tasks,
   readingResource,
