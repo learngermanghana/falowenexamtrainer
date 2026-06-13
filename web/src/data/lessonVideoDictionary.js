@@ -79,6 +79,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     27: {
       ai_grammar_video: "https://youtu.be/5vmLAg1aWq8",
     },
+    28: {
+      ai_grammar_video: "https://www.youtube.com/watch?v=1iW2E4Pw6-M",
+    },
   },
   B1: {
     1: {
