@@ -6,19 +6,7 @@ export const LESSON_RADIO_DICTIONARY = {
       youtubeId: "BD663tMiWpg",
       duration: "",
       instruction:
-        "Höre zweimal zu. Notiere fünf nützliche Ausdrücke und beantworte danach die Fragen.",
-      questions: [
-        "Wohin möchten die Personen reisen?",
-        "Welches Verkehrsmittel wählen sie?",
-        "Welche Unterkunft und Aktivitäten planen sie?",
-      ],
-      usefulExpressions: [
-        "Ich möchte nach ... reisen.",
-        "Wir fahren mit ...",
-        "Wir möchten in ... übernachten.",
-        "Dort wollen wir ...",
-        "Das gefällt mir, weil ...",
-      ],
+        "Höre einfach zu und stimme dich auf das Thema Urlaub ein. Danach gehst du weiter zu Teil 1.",
     },
   },
 };
