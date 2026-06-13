@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { styles } from "../styles";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
+import FalowenRadioWarmup from "./FalowenRadioWarmup";
 
 const PILOT_PATH = "/campus/course/a2-day-9-urlaub-workbook";
 
@@ -151,7 +151,7 @@ const Day9FalowenRadioPilot = () => {
       {radioTab}
       {open && (
         <section ref={sectionRef} aria-label="Falowen Radio warm-up">
-          <FalowenRadioTabContent level="A2" day={9} onContinue={handleContinue} />
+          <FalowenRadioWarmup level="A2" day={9} onContinue={handleContinue} />
         </section>
       )}
     </>
