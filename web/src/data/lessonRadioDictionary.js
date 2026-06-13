@@ -8,6 +8,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Urlaub ein. Danach gehst du weiter zu Teil 1.",
     },
+    16: {
+      key: "a2-day16-wohlbefinden-falowen-radio",
+      title: "Wohlbefinden und Entspannung",
+      youtubeId: "6lq6uWK1wAs",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Wohlbefinden und Entspannung ein.",
+    },
   },
 };
 
