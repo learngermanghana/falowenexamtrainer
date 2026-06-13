@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { styles } from "../styles";
+import Day9FalowenRadioPilot from "./Day9FalowenRadioPilot";
 import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
 
 const resolveWorkbookLevel = (level) => {
@@ -20,6 +21,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   return (
     <>
       <WorkbookReadAloudInjector />
+      <Day9FalowenRadioPilot />
       <section
         aria-label="Workbook guide"
         style={{
