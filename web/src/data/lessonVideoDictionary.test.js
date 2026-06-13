@@ -35,6 +35,24 @@ describe("getLessonVideoResources", () => {
     ).toEqual(["https://example.com/ai"]);
   });
 
+  test("uses the scheduled generic video as an AI fallback when no AI video is configured", () => {
+    const entry = {
+      chapter: "9.23",
+      lesen_hören: {
+        video: "https://example.com/day-23-video",
+        youtube_link: "https://example.com/day-23-video",
+      },
+    };
+
+    expect(getLessonVideoResources("A2", 23, entry)).toEqual([
+      expect.objectContaining({
+        key: "ai-grammar-video",
+        chapter: "9.23",
+        url: "https://example.com/day-23-video",
+      }),
+    ]);
+  });
+
   test.each([
     [2, "https://youtu.be/AxSh8t71Jlo?si=1tM_ouDy_JBOayP7"],
     [3, "https://youtu.be/wV45Md6nSgY"],
