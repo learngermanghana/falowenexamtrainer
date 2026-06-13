@@ -37,10 +37,15 @@ describe("getLessonVideoResources", () => {
 
   test.each([
     [2, "https://youtu.be/AxSh8t71Jlo?si=1tM_ouDy_JBOayP7"],
+    [3, "https://youtu.be/wV45Md6nSgY"],
+    [4, "https://youtu.be/U14gkjld0ys"],
+    [5, "https://youtu.be/8605_yumfoM"],
+    [6, "https://youtu.be/eP4NeBmmZF8"],
     [11, "https://youtu.be/qPZ44s10O04?si=S0eysGDwS30WrGZ-"],
     [13, "https://youtu.be/derL046nbF8?si=VP2St42knZFk3NKo"],
     [16, "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR"],
     [19, "https://youtu.be/aL_CJ75l11s?si=mQTO5LEU3SsOj5xe"],
+    [20, "https://youtu.be/P_ruQxHKzPg"],
     [22, "https://youtu.be/xwOKasZ7nsU?si=oUw6qXJQR6tMyKH4"],
   ])("returns the configured A2 AI lecture for Day %i", (day, expectedUrl) => {
     expect(getLessonVideoResources("A2", day)).toEqual([
