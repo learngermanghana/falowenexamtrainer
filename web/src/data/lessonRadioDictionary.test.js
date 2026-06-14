@@ -19,6 +19,15 @@ test("B2 Day 1 radio remains available", () =>
   ),
 );
 
+test("C1 Day 2 Kultur und Identität radio remains available", () =>
+  expect(getLessonRadioResource("C1", 2)).toEqual(
+    expect.objectContaining({
+      title: "Kultur und Identität",
+      youtubeId: "rmaxh302FEY",
+    }),
+  ),
+);
+
 test("radio is hidden without a dictionary entry", () =>
   expect(getLessonRadioResource("C1", 1)).toBeNull(),
 );
@@ -34,6 +43,8 @@ test.each([
   ["/campus/course/a2-day-27-digitale-kommunikation-workbook", { level: "A2", day: 27 }],
   ["/campus/course/lesson/B2/1", { level: "B2", day: 1 }],
   ["/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook", { level: "B2", day: 1 }],
+  ["/campus/course/lesson/C1/2", { level: "C1", day: 2 }],
+  ["/campus/course/c1-day-2-kultur-und-identitaet-workbook", { level: "C1", day: 2 }],
 ])("detects radio route %s", (path, expected) =>
   expect(resolveLessonRoute(path)).toEqual(expected),
 );
