@@ -30,12 +30,20 @@ export const LESSON_VIDEO_DICTIONARY = {
     2: {
       videoResources: [
         {
-          key: "ai-grammar-video",
+          key: "ai-grammar-video-0-2",
           chapter: "0.2",
-          title: "Kapitel 0.2 AI grammar video",
+          title: "Kapitel 0.2 · Deutsches Alphabet · AI video",
           description:
-            "AI video lesson for German alphabet revision and self-study.",
-          url: "https://youtu.be/pCQVdJGsvtk",
+            "AI video lesson for the German alphabet, pronunciation and revision.",
+          url: "https://youtu.be/pCQVdJGsvtk?si=KCoF9Lf5y3wWrwoc",
+        },
+        {
+          key: "ai-grammar-video-1-1",
+          chapter: "1.1",
+          title: "Kapitel 1.1 · Personalpronomen · AI video",
+          description:
+            "AI video lesson for German personal pronouns and basic verb conjugation.",
+          url: "https://youtu.be/kqagu9qsOcc",
         },
       ],
     },
@@ -117,6 +125,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
     20: {
       ai_grammar_video: "https://youtu.be/P_ruQxHKzPg",
+    },
+    21: {
+      ai_grammar_video: "https://youtu.be/iLnCuTEoWec",
     },
     22: {
       ai_grammar_video: "https://youtu.be/xwOKasZ7nsU?si=oUw6qXJQR6tMyKH4",
