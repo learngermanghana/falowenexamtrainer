@@ -1,7 +1,8 @@
 import React from "react";
 import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
-import B2Day1RadioGatePage from "./B2Day1RadioGatePage";
+import StandardFourStageLessonPage from "./StandardFourStageLessonPage";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
+import { buildStandardLessonFromCanonical } from "../data/standardLessonJourney";
 import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
 import c1Day2KulturUndIdentitaet from "../data/selfLearningLessons/c1/day2KulturUndIdentitaet";
@@ -93,22 +94,38 @@ const componentRegistry = Object.fromEntries(
     lessons.map((lesson) => [
       lessonKey(level, lesson.day),
       ({ canonicalLesson }) => (
-        <SelfLearningEditableLessonPageV2
-          lesson={lesson}
-          falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
-        />
+        Number(lesson.day) === 0 ? (
+          <SelfLearningEditableLessonPageV2
+            lesson={lesson}
+            falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+          />
+        ) : (
+          <StandardFourStageLessonPage
+            lesson={lesson}
+            canonicalLesson={canonicalLesson}
+          />
+        )
       ),
     ])
   )
 );
 
-componentRegistry[lessonKey("B2", 1)] = ({ canonicalLesson }) => (
-  <B2Day1RadioGatePage
-    lesson={b2Day1PersoenlicheIdentitaet}
-    falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+const B1StandardLessonComponent = ({ canonicalLesson }) => (
+  <StandardFourStageLessonPage
+    lesson={buildStandardLessonFromCanonical(canonicalLesson)}
+    canonicalLesson={canonicalLesson}
   />
 );
 
-export const getSelfLearningLessonComponent = (level, day) => componentRegistry[lessonKey(level, day)] || null;
+export const getSelfLearningLessonComponent = (level, day) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  const dayNumber = Number(day || 0);
+
+  if (normalizedLevel === "B1" && dayNumber > 0) {
+    return B1StandardLessonComponent;
+  }
+
+  return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null;
+};
 
 export default getSelfLearningLessonComponent;
