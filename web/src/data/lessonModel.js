@@ -18,6 +18,11 @@ const firstEntry = (raw = {}) => {
 const resource = (url, extra = {}) => url ? { url, ...extra } : null;
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
 const INTERNAL_RESOURCE_ROUTES = {
+  A2: {
+    17: {
+      grammarBook: "/campus/course/a2-day-17-in-die-apotheke-grammar-notes.html",
+    },
+  },
   B1: {
     1: {
       grammarBook: "/campus/course/lesson/B1/1?view=grammar",
