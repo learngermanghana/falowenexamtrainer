@@ -2,15 +2,99 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
-import { LessonResourcesHub } from "./CourseLessonPage";
 import { styles } from "../styles";
 
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
+const isInternalLink = (url = "") => String(url || "").startsWith("/");
+const getExternalProps = (url = "") =>
+  isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" };
 
 const firstWorkbookUrl = (canonicalLesson = {}) => {
   const groups = canonicalLesson?.resources?.resourceGroups || [];
   const fromGroups = groups.find((group) => group?.workbook?.url)?.workbook?.url;
   return fromGroups || canonicalLesson?.resources?.workbook?.url || "";
+};
+
+const B1ResourceCard = ({ icon, title, description, url }) => {
+  if (!url) return null;
+  return (
+    <article
+      style={{
+        border: "1px solid #eadfd0",
+        borderRadius: 14,
+        background: "#fffaf3",
+        padding: 13,
+        display: "grid",
+        gap: 8,
+      }}
+    >
+      <strong>{icon} {title}</strong>
+      <p style={{ margin: 0, color: "#6f6a80", lineHeight: 1.5 }}>
+        {description}
+      </p>
+      <a
+        href={url}
+        {...getExternalProps(url)}
+        style={{ ...styles.linkButton, width: "fit-content" }}
+      >
+        Open
+      </a>
+    </article>
+  );
+};
+
+const B1TutorResources = ({ canonicalLesson }) => {
+  const groups = canonicalLesson?.resources?.resourceGroups || [];
+  const videos = canonicalLesson?.resources?.videos || [];
+
+  return (
+    <section
+      style={{
+        ...styles.card,
+        display: "grid",
+        gap: 12,
+        border: "1px solid #fed7aa",
+        background: "#fffaf3",
+      }}
+    >
+      <div>
+        <h2 style={{ margin: 0 }}>Lesson resources</h2>
+        <p style={{ margin: "5px 0 0", color: "#6f6a80" }}>
+          Use the video and grammar notes, then open the original tutor-marked workbook.
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {groups.map((group, index) => (
+          <React.Fragment key={`${group.chapter || index}-${group.workbook?.url || ""}`}>
+            {group.chapter ? <strong>Kapitel {group.chapter}</strong> : null}
+            <B1ResourceCard
+              icon="📘"
+              title="Grammar notes"
+              description="Review the grammar explanations and examples."
+              url={group.grammarBook?.url}
+            />
+            <B1ResourceCard
+              icon="📝"
+              title="Tutor-marked workbook"
+              description="Complete Teil 1, Teil 2, Teil 3 and Teil 4, then submit your work normally."
+              url={group.workbook?.url}
+            />
+          </React.Fragment>
+        ))}
+
+        {videos.map((video) => (
+          <B1ResourceCard
+            key={video.url}
+            icon="🎬"
+            title={video.title || "Lesson video"}
+            description={video.description || "Watch this lesson video before completing the workbook."}
+            url={video.url}
+          />
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export const shouldShowB1RadioEntrance = (canonicalLesson = {}) =>
@@ -149,7 +233,7 @@ export default function B1TutorLessonPage({ canonicalLesson }) {
         ) : null}
       </header>
 
-      <LessonResourcesHub lesson={canonicalLesson} />
+      <B1TutorResources canonicalLesson={canonicalLesson} />
 
       {canSubmit ? (
         <section
