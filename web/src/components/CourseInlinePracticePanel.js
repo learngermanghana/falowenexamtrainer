@@ -13,11 +13,11 @@ const practiceConfig = {
     render: () => <SpeakingPage mode="course" />,
   },
   writing: {
-    defaultTitle: "Practise your writing here",
+    defaultTitle: "Mark my letter",
     defaultDescription:
-      "Use this writing coach to plan, write, mark and improve your answer. When your final answer is ready, go to the Submission tab and submit it there.",
-    label: "Writing practice",
-    closedButtonLabel: "Open writing practice",
+      "Paste your completed text here. Falowen AI will mark it, show your score, explain the corrections and help you improve the final version. Submit the finished work through your normal assignment area when required.",
+    label: "Mark my letter",
+    closedButtonLabel: "Open Mark my letter",
     render: () => <WritingPage mode="course" initialTab="mark" />,
   },
 };
