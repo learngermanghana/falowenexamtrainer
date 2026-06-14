@@ -301,9 +301,11 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     (resource) => !isTeacherVideoResource(resource),
   );
   const fallbackLegacyVideos =
-    normalizedLevel === "A1" || hasConfiguredAiVideo
+    normalizedLevel === "A1"
       ? legacyVideos
-      : legacyVideos.map((resource) => ({
+      : hasConfiguredAiVideo
+        ? []
+        : legacyVideos.map((resource) => ({
           ...resource,
           key: "ai-grammar-video",
           title: "AI grammar video",

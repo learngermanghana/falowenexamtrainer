@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import FalowenRadioWarmup from "../FalowenRadioWarmup";
 import "./AppBackButton.css";
 
 const hasUsableHistory = () => {
@@ -33,7 +32,6 @@ const AppBackButton = ({
   };
 
   return (
-    <>
       <button
         type="button"
         className={`app-back-button ${className}`.trim()}
@@ -43,8 +41,6 @@ const AppBackButton = ({
         <span className="app-back-button__icon" aria-hidden="true">←</span>
         <span>{label}</span>
       </button>
-      <FalowenRadioWarmup />
-    </>
   );
 };
 
