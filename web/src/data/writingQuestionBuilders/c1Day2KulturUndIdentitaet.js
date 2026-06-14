@@ -2,8 +2,8 @@ const c1Day2QuestionWritingBuilder = {
   level: "C1",
   day: 2,
   title: "Kultur und Identität",
-  taskType: "C1 opinion essay / Stellungnahme",
-  targetWords: 230,
+  taskType: "C1 guided opinion writing",
+  targetWords: 200,
   questions: [
     {
       id: "introduction",
@@ -37,15 +37,8 @@ const c1Day2QuestionWritingBuilder = {
       id: "alternative",
       section: "Alternative",
       question: "Wie kann Identität stattdessen flexibel und vielschichtig verstanden werden?",
-      help: "Erkläre Mehrfachzugehörigkeit, persönliche Entwicklung und wandelbare Identität.",
+      help: "Erkläre Mehrfachzugehörigkeit, persönliche Entwicklung und wandelbare Identität. Ein eigener Schluss wird erst ab Day 20 verlangt.",
       minimumWords: 45,
-    },
-    {
-      id: "conclusion",
-      section: "Schluss",
-      question: "Zu welchem differenzierten Fazit kommen Sie?",
-      help: "Fasse deine Position zusammen, ohne zu absolut zu formulieren.",
-      minimumWords: 30,
     },
   ],
   checklist: [
@@ -54,7 +47,6 @@ const c1Day2QuestionWritingBuilder = {
     "Ein konkretes Beispiel wird ausführlich dargestellt.",
     "Ein Einwand gegen starre kulturelle Zuordnung wird genannt.",
     "Eine flexible und vielschichtige Alternative wird erläutert.",
-    "Der Schluss enthält eine differenzierte eigene Position.",
   ],
 };
 
