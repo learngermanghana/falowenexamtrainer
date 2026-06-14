@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -7,6 +8,7 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
+  { key: "radio", label: "🎙️ Falowen Radio" },
   { key: "sprechen", label: "Teil 1 · Sprechen" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
@@ -56,7 +58,7 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 export default function A2Day27DigitaleKommunikationWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("radio");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -66,10 +68,14 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 27 Workbook · Digitale Kommunikation</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Falowen Radio plus a 4-part workbook for speaking, writing, reading and listening practice.</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{tabs.map((tab) => <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>{tab.label}</TabButton>)}</div>
         <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
       </div>
+
+      {activeTab === "radio" && (
+        <FalowenRadioTabContent level="A2" day={27} onContinue={() => setActiveTab("sprechen")} />
+      )}
 
       <A2B1WorkbookGuidance />
 
@@ -127,9 +133,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0 }}>Welche digitalen Kommunikationsmittel benutzt du am meisten? Warum? Wie oft? Handy oder Computer?</p>
         <SpeakingPracticeTimerCard />
         <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
-      <CourseInlinePracticePanel
-          type="speaking"
-        />
+        <CourseInlinePracticePanel type="speaking" />
         <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
       </div>}
 
@@ -140,9 +144,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0 }}><strong>Aufgabe:</strong> Schreiben Sie eine E-Mail an den Kundenservice.</p>
         <ol style={listSpacing}><li>Erklären Sie, warum Sie ein neues Handy bestellen möchten.</li><li>Fragen Sie nach Empfehlungen für ein passendes Modell.</li><li>Bitten Sie um Informationen zur Bestellung und Lieferung.</li></ol>
         <p style={{ margin: 0, color: "#4b5563" }}>Submit your final writing in the assignment submission area (not directly on this page).</p>
-      <CourseInlinePracticePanel
-          type="writing"
-        />
+        <CourseInlinePracticePanel type="writing" />
         <WorkbookSubmissionReminder />
         <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
       </div>}
@@ -166,7 +168,6 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1600&q=80" alt="Listening practice with headphones and digital devices" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h2 style={sectionTitle}>Teil 4 · Hören</h2>
         <p style={{ margin: 0 }}>Listen, then submit answers in the assignment area (not on this page).</p>
-
         <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
         {hoerenQuestions.map((question, index) => <div key={question.stem} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{question.options.map((option) => <span key={option}>{option}</span>)}</div>)}
         <p style={{ margin: 0 }}>Recommended video: <a href="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5" target="_blank" rel="noreferrer">Digitale Kommunikation (A2)</a></p>
