@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -7,6 +8,7 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
+  { key: "radio", label: "🎙️ Falowen Radio" },
   { key: "sprechen", label: "Teil 1 · Sprechen" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
@@ -118,7 +120,7 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("radio");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -152,6 +154,10 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           Tab {activeIndex + 1} of {tabs.length}
         </p>
       </div>
+
+      {activeTab === "radio" && (
+        <FalowenRadioTabContent level="A2" day={16} onContinue={() => setActiveTab("sprechen")} />
+      )}
 
       <A2B1WorkbookGuidance />
 

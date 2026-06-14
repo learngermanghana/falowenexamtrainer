@@ -4,6 +4,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
+import { normalizeLesson } from "../data/lessonModel";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -488,6 +490,7 @@ const CourseLessonPage = () => {
     entry?.completion?.nonActionableStatus ||
     "notStarted";
   const scoreText = location.state?.scoreText || "";
+  const canonicalLesson = normalizeLesson(entry || { day }, level);
   const videoResources = getLessonVideoResources(level, day, entry || {});
   const isOrientationLesson = isA1Day0Orientation(level, day);
   const resourceHubVideoResources = isOrientationLesson ? [] : videoResources;
@@ -653,6 +656,12 @@ const CourseLessonPage = () => {
             >
               {entry.instruction}
             </p>
+          </section>
+        ) : null}
+
+        {canonicalLesson.resources.falowenRadio ? (
+          <section aria-label={`Falowen Radio warm-up for ${level} Day ${day}`}>
+            <FalowenRadioTabContent level={level} day={day} />
           </section>
         ) : null}
 

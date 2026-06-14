@@ -74,3 +74,16 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 });
+
+test("explicit AI video takes priority over a generic legacy video", () => {
+  expect(getLessonVideoResources("A2", 8, { video: "generic", ai_video: "explicit-ai" }).map(({ url }) => url)).toEqual(["explicit-ai"]);
+});
+
+test("removes duplicate videos and preserves chapter ordering", () => {
+  const resources = getLessonVideoResources("A1", 99, { lesen_hören: [
+    { chapter: "2", video: "second" },
+    { chapter: "1", video: "first" },
+    { chapter: "1", video: "first" },
+  ]});
+  expect(resources.map(({ url }) => url)).toEqual(["second", "first"]);
+});

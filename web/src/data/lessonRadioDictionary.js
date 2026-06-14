@@ -27,3 +27,9 @@ export const getLessonRadioResource = (level = "", day = "") => {
 
   return LESSON_RADIO_DICTIONARY[normalizedLevel]?.[normalizedDay] || null;
 };
+
+export const resolveLessonRoute = (pathname = "") => {
+  const match = String(pathname).match(/^\/campus\/course\/lesson\/(A2|B1|B2|C1)\/(\d+)\/?$/i)
+    || String(pathname).match(/^\/campus\/course\/(A2|B1|B2|C1)-day-(\d+)-.*-workbook\/?$/i);
+  return match ? { level: match[1].toUpperCase(), day: Number(match[2]) } : null;
+};
