@@ -10,6 +10,15 @@ test.each([
   expect(getLessonRadioResource("A2", day).youtubeId).toBe(id),
 );
 
+test("B2 Day 1 radio remains available", () =>
+  expect(getLessonRadioResource("B2", 1)).toEqual(
+    expect.objectContaining({
+      title: "Persönliche Identität und Selbstverständnis",
+      youtubeId: "0lTNin1NTgc",
+    }),
+  ),
+);
+
 test("radio is hidden without a dictionary entry", () =>
   expect(getLessonRadioResource("C1", 1)).toBeNull(),
 );
@@ -23,6 +32,8 @@ test.each([
   ["/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook", { level: "A2", day: 26 }],
   ["/campus/course/lesson/A2/27", { level: "A2", day: 27 }],
   ["/campus/course/a2-day-27-digitale-kommunikation-workbook", { level: "A2", day: 27 }],
+  ["/campus/course/lesson/B2/1", { level: "B2", day: 1 }],
+  ["/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook", { level: "B2", day: 1 }],
 ])("detects radio route %s", (path, expected) =>
   expect(resolveLessonRoute(path)).toEqual(expected),
 );
