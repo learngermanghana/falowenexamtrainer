@@ -16,6 +16,38 @@ const firstEntry = (raw = {}) => {
   return nested[0] || raw;
 };
 const resource = (url, extra = {}) => url ? { url, ...extra } : null;
+const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
+const INTERNAL_RESOURCE_ROUTES = {
+  B1: {
+    1: {
+      grammarBook: "/campus/course/lesson/B1/1?view=grammar",
+      workbook: "/campus/course/lesson/B1/1?view=workbook",
+    },
+  },
+};
+
+const normalizeResourceGroups = (rawLesson, level, day) => {
+  const nested = [
+    ...toArray(rawLesson.schreiben_sprechen),
+    ...toArray(rawLesson.lesen_hören),
+  ].filter(Boolean);
+  const entries = nested.length ? nested : [rawLesson];
+  const internal = INTERNAL_RESOURCE_ROUTES[level]?.[day] || {};
+
+  return entries.map((entry) => ({
+    chapter: entry.chapter || rawLesson.chapter || null,
+    grammarBook: resource(internal.grammarBook || firstString(
+      entry.grammarbook_link,
+      entry.grammar_link,
+      rawLesson.grammarbook_link,
+      rawLesson.grammar_link,
+    )),
+    workbook: resource(internal.workbook || firstString(
+      entry.workbook_link,
+      rawLesson.workbook_link,
+    )),
+  }));
+};
 
 export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level) => {
   const level = normalizeLevel(requestedLevel);
@@ -27,6 +59,8 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
   const aiVideo = videos.find((item) => !`${item.key} ${item.title}`.toLowerCase().includes("teacher")) || null;
   const radio = capabilities.radio ? getLessonRadioResource(level, day) : null;
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
+  const resourceGroups = normalizeResourceGroups(rawLesson, level, day);
+  const firstResourceGroup = resourceGroups[0] || {};
 
   return {
     level, day,
@@ -38,9 +72,10 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
       falowenRadio: radio,
       teacherVideo,
       aiVideo,
-      grammarBook: resource(firstString(primary.grammarbook_link, primary.grammar_link, rawLesson.grammarbook_link, rawLesson.grammar_link)),
-      workbook: resource(firstString(primary.workbook_link, rawLesson.workbook_link)),
+      grammarBook: firstResourceGroup.grammarBook || null,
+      workbook: firstResourceGroup.workbook || null,
       videos,
+      resourceGroups,
     },
     submission: { enabled: capabilities.tutorSubmission && Boolean(rawLesson.assignment || assignmentId), assignmentId },
     raw: rawLesson,
