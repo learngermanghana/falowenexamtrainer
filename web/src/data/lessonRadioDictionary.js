@@ -51,6 +51,16 @@ export const LESSON_RADIO_DICTIONARY = {
         "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
     },
   },
+  C1: {
+    2: {
+      key: "c1-day2-kultur-identitaet-falowen-radio",
+      title: "Kultur und Identität",
+      youtubeId: "rmaxh302FEY",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Kultur und Identität ein. Danach gehst du weiter zum Lernteil.",
+    },
+  },
 };
 
 export const getLessonRadioResource = (level = "", day = "") => {
