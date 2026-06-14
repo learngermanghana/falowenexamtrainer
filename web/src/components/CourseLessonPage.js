@@ -3,7 +3,6 @@ import AppBackButton from "./navigation/AppBackButton";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
-import { getLessonVideoResources } from "../data/lessonVideoDictionary";
 import { normalizeLesson } from "../data/lessonModel";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
@@ -46,15 +45,6 @@ const B1_WORKBOOK_PAGES = {
   1: B1Day1TraumweltWorkbookPage,
 };
 
-const INTERNAL_RESOURCE_ROUTES = {
-  B1: {
-    1: {
-      grammarbook_link: "/campus/course/lesson/B1/1?view=grammar",
-      workbook_link: "/campus/course/lesson/B1/1?view=workbook",
-    },
-  },
-};
-
 const palette = {
   page: "#f6f1e9",
   card: "#fffaf3",
@@ -95,21 +85,16 @@ const resourceButtonStyle = {
   lineHeight: 1.15,
 };
 
-const lessonResourceEntries = (entry = {}, level = "", day = "") => {
+const lessonResourceEntries = (entry = {}) => {
   const nestedResources = [
     ...toLessonArray(entry.schreiben_sprechen),
     ...toLessonArray(entry.lesen_hören),
   ].filter(Boolean);
   const resources = nestedResources.length ? nestedResources : [entry];
-  const internalRoutes =
-    INTERNAL_RESOURCE_ROUTES[normalizeLevel(level)]?.[
-      Number(day || entry.day)
-    ] || {};
 
   return resources.map((resource) => ({
     ...resource,
     chapter: resource?.chapter || entry?.chapter || null,
-    ...internalRoutes,
   }));
 };
 
@@ -272,9 +257,14 @@ const OrientationAiVideoHero = () => (
   </section>
 );
 
-const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
-  const lessonResources = lessonResourceEntries(entry, level, day).filter(
-    (resource) => resource.grammarbook_link || resource.workbook_link,
+export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
+  const resources = lesson?.resources || {};
+  const hiddenVideoUrls = new Set(hideVideoUrls);
+  const videoResources = (resources.videos || []).filter(
+    (video) => !hiddenVideoUrls.has(video.url),
+  );
+  const lessonResources = (resources.resourceGroups || []).filter(
+    (resource) => resource.grammarBook || resource.workbook,
   );
   const groupedVideoUrls = new Set();
   let resourceNumber = 0;
@@ -345,14 +335,14 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
 
           return (
             <React.Fragment
-              key={`${resource.chapter || index}-${resource.grammarbook_link || ""}-${resource.workbook_link || ""}`}
+              key={`${resource.chapter || index}-${resource.grammarBook?.url || ""}-${resource.workbook?.url || ""}`}
             >
               {chapterLabel ? (
                 <strong style={{ color: palette.ink, marginTop: 4 }}>
                   {chapterLabel}
                 </strong>
               ) : null}
-              {resource.grammarbook_link ? (
+              {resource.grammarBook ? (
                 <LessonResourceCard
                   number={nextNumber()}
                   icon="📘"
@@ -363,17 +353,17 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
                   }
                   description="Read the grammar notes and examples before or after watching the videos."
                   actionLabel="Open grammar book"
-                  url={resource.grammarbook_link}
+                  url={resource.grammarBook.url}
                 />
               ) : null}
-              {resource.workbook_link ? (
+              {resource.workbook ? (
                 <LessonResourceCard
                   number={nextNumber()}
                   icon="📝"
                   title={chapterLabel ? `${chapterLabel} workbook` : "Workbook"}
                   description="Open the workbook, answer the tasks, and prepare your final answers."
                   actionLabel="Open workbook"
-                  url={resource.workbook_link}
+                  url={resource.workbook.url}
                 />
               ) : null}
               {relatedVideos.map((video) => (
@@ -491,9 +481,7 @@ const CourseLessonPage = () => {
     "notStarted";
   const scoreText = location.state?.scoreText || "";
   const canonicalLesson = normalizeLesson(entry || { day }, level);
-  const videoResources = getLessonVideoResources(level, day, entry || {});
   const isOrientationLesson = isA1Day0Orientation(level, day);
-  const resourceHubVideoResources = isOrientationLesson ? [] : videoResources;
   const primaryResource = firstLessonResource(entry || {});
   const submitLabel = primaryResource.chapter
     ? `Submit Kapitel ${primaryResource.chapter} assignment`
@@ -666,10 +654,8 @@ const CourseLessonPage = () => {
         ) : null}
 
         <LessonResourcesHub
-          entry={entry}
-          videoResources={resourceHubVideoResources}
-          level={level}
-          day={day}
+          lesson={canonicalLesson}
+          hideVideoUrls={isOrientationLesson ? [DAY0_AI_ORIENTATION_VIDEO.url] : []}
         />
         <SubmitAssignmentCard
           canSubmit={canSubmit}
