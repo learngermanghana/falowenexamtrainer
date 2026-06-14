@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useToast } from "../context/ToastContext";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
 
@@ -589,7 +590,7 @@ const buildInitialProgress = () => ({
   writingBuilderDraft: {},
 });
 
-export default function SelfLearningEditableLessonPageV2({ lesson }) {
+export default function SelfLearningEditableLessonPageV2({ lesson, falowenRadio = null }) {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("learn");
@@ -667,6 +668,12 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           </div>
         </div>
       </header>
+
+      {falowenRadio ? (
+        <section aria-label={`Falowen Radio warm-up for ${lesson.level} Day ${lesson.day}`}>
+          <FalowenRadioTabContent level={lesson.level} day={lesson.day} resource={falowenRadio} />
+        </section>
+      ) : null}
 
       {isOrientationDay ? (
         <>

@@ -518,7 +518,7 @@ const CourseLessonPage = () => {
   };
 
   if (SelfLearningComponent) {
-    return <SelfLearningComponent />;
+    return <SelfLearningComponent canonicalLesson={canonicalLesson} />;
   }
 
   if (!entry) {

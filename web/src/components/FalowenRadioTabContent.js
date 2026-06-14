@@ -5,10 +5,11 @@ import { styles } from "../styles";
 const FalowenRadioTabContent = ({
   level = "A2",
   day = 9,
+  resource,
   onContinue,
   actionLabel = "Continue to Teil 1 · Sprechen →",
 }) => {
-  const radio = getLessonRadioResource(level, day) || {};
+  const radio = resource || getLessonRadioResource(level, day) || {};
   const hasVideo = Boolean(String(radio.youtubeId || "").trim());
   const showAction = typeof onContinue === "function";
 
