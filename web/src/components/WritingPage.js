@@ -577,20 +577,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
-  const isA1Student = isLevelLocked && profileLevel === "A1";
-  const canUseIdeasGenerator = !isA1Student;
+  // Idea support now lives in Study Buddy so the writing room can stay focused.
+  const canUseIdeasGenerator = false;
   const canUsePracticeLetters = isExamMode;
   const canUseFormsPractice = isExamMode && level === "A1";
   const canUseTutorFeedback = isExamMode;
   const isTutorOnlyView = initialTab === "tutor" && canUseTutorFeedback;
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
-    const tabs = [{ key: "mark", label: "Mark my letter" }];
+    const tabs = [{ key: "mark", label: isCourseMode ? "Analyse my text" : "Mark my letter" }];
     tabs.push({ key: "references", label: "References (notes)" });
-
-    if (canUseIdeasGenerator) {
-      tabs.push({ key: "ideas", label: "Ideas helper" });
-    }
 
     if (canUsePracticeLetters) {
       tabs.push({ key: "practice", label: "Practice prompts" });
@@ -605,7 +601,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     }
 
     return tabs;
-  }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters, canUseTutorFeedback]);
+  }, [canUseFormsPractice, canUsePracticeLetters, canUseTutorFeedback, isCourseMode]);
   const visibleTabs = useMemo(() => {
     if (!isTutorOnlyView) {
       return availableTabs;
@@ -1692,16 +1688,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         <h2 style={styles.sectionTitle}>
           {isTutorOnlyView
             ? "Writing – Tutor feedback"
-            : canUseIdeasGenerator
-              ? "Writing – Practice exam letters"
-              : "Writing – Mark my letter"}
+            : isCourseMode
+              ? "Writing – Build first, then finish"
+              : "Writing – Practice exam letters"}
         </h2>
         <p style={styles.helperText}>
           {isTutorOnlyView
             ? "View tutor comments and reply from here."
-            : canUseIdeasGenerator
-              ? "Simple flow: paste your letter, get feedback, improve one section, then save the version for your tutor."
-              : "A1 students should use Mark my letter to get focused feedback on their draft."}
+            : isCourseMode
+              ? "For Days 1–19, build consistency by writing and analysing one section at a time. From Day 20, write and mark one complete essay."
+              : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
@@ -1710,14 +1706,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               : isCourseMode
                 ? (
                   <>
-                    Course-book mode keeps only <strong>Mark my letter</strong>, references, and ideas. For full exam prompts,
-                    open the <a href="/exams/writing">Writing exam room</a>.
+                    Course-book mode is for short, level-based text analysis and references. If you need help understanding
+                    a question, ask <strong>Study Buddy</strong>. From Day 20, open the <a href="/exams/writing">Writing exam room</a> to mark a full essay.
                   </>
                 )
                 : (
                   <>
-                    Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need
-                    extra practice or idea support.
+                    From Day 20, use <strong>Mark my letter</strong> for one complete essay. Use Study Buddy if a question is unclear.
                   </>
                 )}
           </p>
@@ -1942,16 +1937,18 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       {activeTab === "mark" && (
         <>
           <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>Mark my letter</h3>
+            <h3 style={styles.sectionTitle}>{isCourseMode ? "Analyse my text" : "Mark my letter"}</h3>
             <p style={styles.helperText}>
-              Keep it simple: one text box for your draft, one click for feedback, one revised version to save.
+              {isCourseMode
+                ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
+                : "From Day 20, write one complete essay, get full feedback, and save one revised version."}
             </p>
             <div style={styles.infoBox}>
-              <strong>Student workflow:</strong>
+              <strong>{isCourseMode ? "Days 1–19 workflow:" : "Day 20+ workflow:"}</strong>
               <ol style={styles.promptList}>
-                <li>Paste your full letter draft</li>
-                <li>Click <strong>Get AI feedback</strong></li>
-                <li>Revise and save a clean tutor version</li>
+                <li>{isCourseMode ? "Write one focused section from today's five-question practice" : "Write one complete letter or essay"}</li>
+                <li>Click <strong>{isCourseMode ? "Analyse my text" : "Get AI feedback"}</strong></li>
+                <li>Revise the weak part and save a cleaner version</li>
               </ol>
             </div>
 
@@ -1977,7 +1974,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               </select>
             </div>
 
-            <label style={styles.label}>Your letter (single box)</label>
+            <label style={styles.label}>{isCourseMode ? "Your combined section" : "Your complete letter or essay"}</label>
             <textarea
               ref={markDraftRef}
               value={typedAnswer}
@@ -1985,7 +1982,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 setError("");
                 setTypedAnswer(e.target.value);
               }}
-              placeholder="Paste your finished letter or essay here for marking..."
+              placeholder={isCourseMode ? "Combine what you wrote today and paste it here for level-based analysis..." : "Paste your finished letter or essay here for marking..."}
               style={styles.textArea}
               rows={9}
             />
@@ -2005,7 +2002,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                   onClick={sendTypedAnswerForCorrection}
                   disabled={loading}
                 >
-                  {loading ? "Getting feedback..." : "Get AI feedback"}
+                  {loading ? "Getting feedback..." : isCourseMode ? "Analyse my text" : "Get AI feedback"}
                 </button>
                 <button style={styles.secondaryButton} type="button" onClick={handleExportDraft}>
                   Export final draft (PDF/print)
