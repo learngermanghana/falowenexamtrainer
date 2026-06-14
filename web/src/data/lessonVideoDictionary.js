@@ -124,6 +124,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     23: {
       ai_grammar_video: "https://youtu.be/x_zEONfBhQQ",
     },
+    24: {
+      ai_grammar_video: "https://youtu.be/J06a4gccQJg",
+    },
     25: {
       ai_grammar_video: "https://youtu.be/0wi37VWPEHE",
     },
