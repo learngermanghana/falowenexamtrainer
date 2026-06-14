@@ -70,6 +70,7 @@ describe("getLessonVideoResources", () => {
     [22, "https://youtu.be/xwOKasZ7nsU?si=oUw6qXJQR6tMyKH4"],
     [23, "https://youtu.be/x_zEONfBhQQ"],
     [25, "https://youtu.be/0wi37VWPEHE"],
+    [26, "https://youtu.be/qWy7yMgwmvQ"],
   ])("returns the configured A2 AI lecture for Day %i", (day, expectedUrl) => {
     expect(getLessonVideoResources("A2", day)).toEqual([
       expect.objectContaining({
