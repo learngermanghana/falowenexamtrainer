@@ -12,16 +12,16 @@ const toolCardStyle = {
 
 const writingTools = [
   {
+    title: "Analyse my text",
+    description: "For guided B2/C1 writing before Day 20: combine the five sections and receive feedback based on your current level.",
+  },
+  {
     title: "Mark my letter",
-    description: "Paste your finished draft in the writing panel below and get a score, corrections, feedback and a better version.",
+    description: "From Day 20, paste the complete essay or letter in the writing panel and receive a score, corrections, feedback and an improved version.",
   },
   {
     title: "Ref / Redemittel",
-    description: "Use the writing panel below on A2, B1, B2 and C1 lessons to save a clear topic, paste the full body, search it later and open it as its own study page.",
-  },
-  {
-    title: "Ideas generator",
-    description: "Use the writing panel below to build ideas, examples and a simple writing plan before drafting.",
+    description: "Save useful model phrases and reference texts for later revision. Use Study Buddy when you need explanations, questions or idea support.",
   },
 ];
 
@@ -36,15 +36,14 @@ const SelfLearningWritingTools = ({ writingType, structure = [], usefulLines = [
         lineHeight: 1.7,
       }}
     >
-      <strong>Use the writing task above.</strong> First understand the topic, then use the writing panel below to plan,
-      write, mark and improve your answer. The Ref tab below uses the same topic/body library for A2, B1, B2 and C1 lessons. Full extra exam prompts are still in the Exam Room.
+      <strong>Use the writing task above.</strong> B2 and C1 students build five focused sections during Days 1–19. From Day 20, students write and mark one complete task. Use Study Buddy for questions or idea support; the separate Ideas Generator is no longer part of the writing workflow.
     </div>
 
     <div style={toolCardStyle}>
       <strong>Writing type for this topic</strong>
       <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
       <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-        Use the type as a guide, then write your own answer and mark it with AI inside this lesson.
+        Follow the writing phase shown in the lesson, then analyse or mark your work at the correct stage.
       </p>
     </div>
 
