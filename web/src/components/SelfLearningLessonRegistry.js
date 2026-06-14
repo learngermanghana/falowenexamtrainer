@@ -1,5 +1,6 @@
 import React from "react";
 import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
+import B2Day1IdentityPilotLessonPage from "./B2Day1IdentityPilotLessonPage";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
@@ -99,6 +100,13 @@ const componentRegistry = Object.fromEntries(
       ),
     ])
   )
+);
+
+componentRegistry[lessonKey("B2", 1)] = ({ canonicalLesson }) => (
+  <B2Day1IdentityPilotLessonPage
+    lesson={b2Day1PersoenlicheIdentitaet}
+    falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+  />
 );
 
 export const getSelfLearningLessonComponent = (level, day) => componentRegistry[lessonKey(level, day)] || null;
