@@ -89,7 +89,15 @@ const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number
 
 const componentRegistry = Object.fromEntries(
   Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) =>
-    lessons.map((lesson) => [lessonKey(level, lesson.day), () => <SelfLearningEditableLessonPageV2 lesson={lesson} />])
+    lessons.map((lesson) => [
+      lessonKey(level, lesson.day),
+      ({ canonicalLesson }) => (
+        <SelfLearningEditableLessonPageV2
+          lesson={lesson}
+          falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+        />
+      ),
+    ])
   )
 );
 
