@@ -3,6 +3,7 @@ import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2
 import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
+import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
 import c1Day2KulturUndIdentitaet from "../data/selfLearningLessons/c1/day2KulturUndIdentitaet";
@@ -110,7 +111,7 @@ const componentRegistry = Object.fromEntries(
   )
 );
 
-const B1TutorMarkedLessonComponent = ({ canonicalLesson }) => (
+const B1RadioLessonComponent = ({ canonicalLesson }) => (
   <B1TutorLessonPage canonicalLesson={canonicalLesson} />
 );
 
@@ -118,8 +119,12 @@ export const getSelfLearningLessonComponent = (level, day) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const dayNumber = Number(day || 0);
 
-  if (normalizedLevel === "B1" && dayNumber > 0) {
-    return B1TutorMarkedLessonComponent;
+  if (
+    normalizedLevel === "B1" &&
+    dayNumber > 0 &&
+    getLessonRadioResource("B1", dayNumber)
+  ) {
+    return B1RadioLessonComponent;
   }
 
   return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null;
