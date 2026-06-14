@@ -79,6 +79,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     6: {
       ai_grammar_video: "https://youtu.be/eP4NeBmmZF8",
     },
+    7: {
+      ai_grammar_video: "https://youtu.be/1AXFec1Dcvg?si=gEWf7Et9qi9sHLW-",
+    },
     9: {
       ai_grammar_video: "https://youtu.be/8Eqzb0rK-Cc",
     },
@@ -87,6 +90,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
     11: {
       ai_grammar_video: "https://youtu.be/qPZ44s10O04?si=S0eysGDwS30WrGZ-",
+    },
+    12: {
+      ai_grammar_video: "https://youtu.be/qPZ44s10O04?si=aH8lpbNzy5TZmaEj",
     },
     13: {
       ai_grammar_video: "https://youtu.be/derL046nbF8?si=VP2St42knZFk3NKo",
@@ -306,12 +312,12 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
       : hasConfiguredAiVideo
         ? []
         : legacyVideos.map((resource) => ({
-          ...resource,
-          key: "ai-grammar-video",
-          title: "AI grammar video",
-          description:
-            "Step-by-step grammar explanation for revision and self-study.",
-        }));
+            ...resource,
+            key: "ai-grammar-video",
+            title: "AI grammar video",
+            description:
+              "Step-by-step grammar explanation for revision and self-study.",
+          }));
   const allResources = uniqueVideoResources(
     fallbackLegacyVideos,
     explicitResources,
