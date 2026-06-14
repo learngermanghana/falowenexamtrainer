@@ -32,6 +32,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Gefühle in verschiedenen Situationen ein. Danach gehst du weiter zu Teil 1.",
     },
+    27: {
+      key: "a2-day27-digitale-kommunikation-falowen-radio",
+      title: "Digitale Kommunikation 10.27",
+      youtubeId: "XLyXDfsM-HY",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema digitale Kommunikation ein. Danach gehst du weiter zu Teil 1.",
+    },
   },
 };
 
