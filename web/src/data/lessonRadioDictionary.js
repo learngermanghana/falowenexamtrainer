@@ -8,6 +8,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Urlaub ein. Danach gehst du weiter zu Teil 1.",
     },
+    15: {
+      key: "a2-day15-lieblingssport-falowen-radio",
+      title: "Mein Lieblingssport",
+      youtubeId: "WbsTFqIT058",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Lieblingssport ein. Danach gehst du weiter zu Teil 1.",
+    },
     16: {
       key: "a2-day16-wohlbefinden-falowen-radio",
       title: "Wohlbefinden und Entspannung",
