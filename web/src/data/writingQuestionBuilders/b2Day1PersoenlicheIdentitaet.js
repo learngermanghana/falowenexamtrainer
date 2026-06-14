@@ -1,0 +1,68 @@
+const b2Day1QuestionWritingBuilder = {
+  level: "B2",
+  day: 1,
+  title: "Persönliche Identität online und offline",
+  taskType: "B2 opinion essay / Meinungsbeitrag",
+  targetWords: 200,
+  questions: [
+    {
+      id: "introduction",
+      section: "Einleitung",
+      question: "Warum ist das Thema Online-Identität und echte Persönlichkeit heute wichtig?",
+      help: "Führe kurz in das Thema ein. Denke an soziale Medien, Selbstdarstellung und Alltag.",
+      starter: "In der heutigen Zeit spielt die Online-Identität eine wichtige Rolle, weil ...",
+      minimumWords: 25,
+    },
+    {
+      id: "opinion",
+      section: "Eigene Meinung",
+      question: "Sollten Menschen online genauso sein wie im echten Leben? Was ist deine Meinung?",
+      help: "Formuliere eine klare Position und begründe sie mit mindestens einem Grund.",
+      starter: "Meiner Meinung nach sollten Menschen online ..., denn ...",
+      minimumWords: 35,
+    },
+    {
+      id: "reasons",
+      section: "Gründe",
+      question: "Warum wirken viele Menschen online anders als offline?",
+      help: "Nenne zwei Gründe, zum Beispiel Anerkennung, Unsicherheit, Privatsphäre oder den Wunsch, perfekt zu wirken.",
+      starter: "Ein Grund dafür ist, dass ... Außerdem ...",
+      minimumWords: 35,
+    },
+    {
+      id: "example",
+      section: "Konkretes Beispiel",
+      question: "Welches konkrete Beispiel zeigt den Unterschied zwischen Online- und Offline-Identität?",
+      help: "Beschreibe eine Person oder eine Situation aus Alltag, Schule, Arbeit oder sozialen Medien.",
+      starter: "Ein konkretes Beispiel dafür ist ...",
+      minimumWords: 35,
+    },
+    {
+      id: "alternatives",
+      section: "Andere Möglichkeiten",
+      question: "Wie kann man sich online ehrlich und authentisch zeigen?",
+      help: "Nenne realistische Möglichkeiten, zum Beispiel echte Interessen zeigen, Grenzen setzen und nicht nur Erfolge posten.",
+      starter: "Eine andere Möglichkeit wäre, ...",
+      minimumWords: 35,
+    },
+    {
+      id: "benefitsConclusion",
+      section: "Vorteile und Schluss",
+      question: "Welche Vorteile hat eine authentische Online-Identität, und zu welchem Fazit kommst du?",
+      help: "Erkläre mindestens einen Vorteil und beende den Beitrag mit deiner zusammengefassten Position.",
+      starter: "Ein Vorteil besteht darin, dass ... Zusammenfassend lässt sich sagen, dass ...",
+      minimumWords: 35,
+    },
+  ],
+  checklist: [
+    "Die Einleitung führt verständlich in das Thema ein.",
+    "Meine Meinung ist klar und begründet.",
+    "Ich habe mindestens zwei Gründe genannt.",
+    "Ich habe ein konkretes Beispiel beschrieben.",
+    "Ich habe andere Möglichkeiten für authentisches Verhalten erklärt.",
+    "Ich habe einen Vorteil und ein klares Fazit formuliert.",
+    "Ich habe B2-Konnektoren wie weil, deshalb, während, obwohl oder außerdem benutzt.",
+  ],
+};
+
+export default b2Day1QuestionWritingBuilder;
