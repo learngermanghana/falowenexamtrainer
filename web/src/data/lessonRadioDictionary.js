@@ -41,6 +41,16 @@ export const LESSON_RADIO_DICTIONARY = {
         "Höre einfach zu und stimme dich auf das Thema digitale Kommunikation ein. Danach gehst du weiter zu Teil 1.",
     },
   },
+  B2: {
+    1: {
+      key: "b2-day1-persoenliche-identitaet-falowen-radio",
+      title: "Persönliche Identität und Selbstverständnis",
+      youtubeId: "0lTNin1NTgc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
+    },
+  },
 };
 
 export const getLessonRadioResource = (level = "", day = "") => {
