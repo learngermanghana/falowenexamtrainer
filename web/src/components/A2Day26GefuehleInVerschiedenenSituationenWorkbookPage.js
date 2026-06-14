@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
 
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
+  { key: "radio", label: "🎙️ Falowen Radio" },
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
@@ -42,7 +44,7 @@ function TabButton({ active, onClick, children }) {
 }
 
 const A2Day26GefuehleInVerschiedenenSituationenWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("radio");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -50,6 +52,10 @@ const A2Day26GefuehleInVerschiedenenSituationenWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Chapter 10.26 Workbook · Gefühle in verschiedenen Situationen</h1><p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p><div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{tabs.map((tab) => <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>{tab.label}</TabButton>)}</div><p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p></div>
+
+      {activeTab === "radio" && (
+        <FalowenRadioTabContent level="A2" day={26} onContinue={() => setActiveTab("sprechen")} />
+      )}
 
       <A2B1WorkbookGuidance />
 
