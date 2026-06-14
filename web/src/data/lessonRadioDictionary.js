@@ -24,6 +24,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Wohlbefinden und Entspannung ein.",
     },
+    26: {
+      key: "a2-day26-gefuehle-beschreiben-falowen-radio",
+      title: "Gefühle in verschiedenen Situationen beschreiben 10.26",
+      youtubeId: "9OVfA1B-nuU",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Gefühle in verschiedenen Situationen ein. Danach gehst du weiter zu Teil 1.",
+    },
   },
 };
 
