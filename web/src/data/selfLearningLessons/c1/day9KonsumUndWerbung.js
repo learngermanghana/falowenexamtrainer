@@ -27,12 +27,12 @@ const c1Day9KonsumUndWerbung = makeLesson({
       "Auf C1-Niveau sollten Position, Gegenargument und Lösung logisch miteinander verbunden und sprachlich abgestuft werden.",
     ],
     rules: [
-      "Leite Positionen mit meines Erachtens, aus meiner Sicht oder es spricht vieles dafür ein.",
+      "Leite Positionen mit Formulierungen wie meines Erachtens, aus meiner Sicht oder es spricht vieles dafür ein.",
       "Nutze ein entscheidender Aspekt ist und besonders problematisch erscheint zur Gewichtung.",
       "Formuliere Gegenargumente mit dagegen ließe sich einwenden oder dem steht jedoch entgegen.",
       "Nutze sollte, könnte, müsste und wäre, um Empfehlungen und Kritik weniger direkt zu formulieren.",
       "Verbinde Folgen mit daraus ergäbe sich, dies hätte zur Folge oder dadurch ließe sich.",
-      "Beende die Abwägung mit insgesamt überwiegen, unter der Voraussetzung, dass oder eine tragfähige Lösung wäre.",
+      "Beende die Abwägung mit Formulierungen wie insgesamt überwiegen, unter der Voraussetzung, dass oder eine tragfähige Lösung wäre.",
     ],
     examples: [
       "Meines Erachtens sollte personalisierte Werbung deutlich transparenter gekennzeichnet werden.",
@@ -47,7 +47,7 @@ const c1Day9KonsumUndWerbung = makeLesson({
         question: "Welche Formulierung drückt eine höfliche Empfehlung aus?",
         options: ["Unternehmen sollten Werbung klar kennzeichnen.", "Unternehmen kennzeichnen Werbung!", "Unternehmen haben Werbung gekennzeichnet.", "Unternehmen werden Werbung kennzeichnen."],
         answer: "Unternehmen sollten Werbung klar kennzeichnen.",
-        explanation: "Sollten formuliert eine Empfehlung sachlich und weniger direkt.",
+        explanation: "Die Form sollten formuliert eine Empfehlung sachlich und weniger direkt.",
       },
       {
         question: "Welches Redemittel leitet ein Gegenargument ein?",
