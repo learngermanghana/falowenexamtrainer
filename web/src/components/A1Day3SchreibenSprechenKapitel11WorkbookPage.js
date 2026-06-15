@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import CourseInlineDiscussionPanel from "./CourseInlineDiscussionPanel";
+import { getDiscussionLesson } from "../utils/discussionLessons";
 
 import { styles } from "../styles";
 
@@ -669,27 +671,12 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
         </div>
       </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Discussion Practice</h2>
-        <div style={{ ...subCardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-          <strong>Join the group discussion</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Go to the group discussion page, open <strong>Class Members</strong>, and write your
-            introduction using this structure:
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            “Ich heiße [Name]. Ich komme aus [Country]. Ich bin [Age] Jahre alt. Ich wohne in [City].”
-          </p>
-          <a
-            href="https://www.falowen.app/campus/discussion"
-            target="_blank"
-            rel="noreferrer"
-            style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-          >
-            Open Group Discussion Page
-          </a>
-        </div>
-      </section>
+      <CourseInlineDiscussionPanel
+        lessonId={getDiscussionLesson({ level: "A1", day: 3, chapter: "1.1_1.2" }).id}
+        lessonLabel={getDiscussionLesson({ level: "A1", day: 3, chapter: "1.1_1.2" }).label}
+        title="Class Discussion"
+        description="Read the discussion question, write your answer and respond to your classmates. Your answers are visible only to students in your class."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Key Things You Learned Today</h2>
