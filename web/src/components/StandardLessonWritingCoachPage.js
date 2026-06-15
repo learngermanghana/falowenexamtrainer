@@ -7,7 +7,8 @@ export const shouldMountMarkMyLetter = () => false;
 export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson }) {
   const level = String(lesson?.level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
-  const isCompactC1Lesson = level === "C1" && [7, 8, 9, 10, 11, 12].includes(day);
+  const compactDays = [7, 8, 9, 10, 11, 12, 13];
+  const isCompactC1Lesson = level === "C1" && compactDays.includes(day);
   const LessonPage = isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
   return <LessonPage lesson={lesson} canonicalLesson={canonicalLesson} />;
 }
