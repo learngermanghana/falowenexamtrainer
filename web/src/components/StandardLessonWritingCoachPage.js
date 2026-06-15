@@ -5,7 +5,9 @@ import CompactC1LessonPage from "./CompactC1LessonPage";
 export const shouldMountMarkMyLetter = () => false;
 
 export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson }) {
-  const isCompactC1Day7 = String(lesson?.level || "").toUpperCase() === "C1" && Number(lesson?.day) === 7;
-  const LessonPage = isCompactC1Day7 ? CompactC1LessonPage : StandardFourStageLessonPage;
+  const level = String(lesson?.level || "").toUpperCase();
+  const day = Number(lesson?.day || 0);
+  const isCompactC1Lesson = level === "C1" && [7, 8].includes(day);
+  const LessonPage = isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
   return <LessonPage lesson={lesson} canonicalLesson={canonicalLesson} />;
 }
