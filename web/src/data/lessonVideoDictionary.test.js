@@ -47,6 +47,16 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
+  test("returns the configured A1 Day 3 Kapitel 1.1 AI video", () => {
+    expect(getLessonVideoResources("A1", 3)).toEqual([
+      expect.objectContaining({
+        chapter: "1.1",
+        title: "Kapitel 1.1 · Schreiben & Sprechen · AI video",
+        url: "https://youtu.be/LdCVsY-SFTg",
+      }),
+    ]);
+  });
+
   test("hides teacher videos but keeps available AI videos from A2 through C1", () => {
     const entry = {
       teacher_video: "https://example.com/teacher",
