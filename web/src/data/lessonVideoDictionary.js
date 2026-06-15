@@ -47,6 +47,18 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    3: {
+      videoResources: [
+        {
+          key: "ai-grammar-video-1-1",
+          chapter: "1.1",
+          title: "Kapitel 1.1 · Schreiben & Sprechen · AI video",
+          description:
+            "AI video lesson for the Day 3 Kapitel 1.1 writing and speaking practice.",
+          url: "https://youtu.be/LdCVsY-SFTg",
+        },
+      ],
+    },
     14: {
       ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
     },
