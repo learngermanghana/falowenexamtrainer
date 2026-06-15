@@ -18,8 +18,8 @@
   },
   "classDefaults": {
     "language": "German",
-    "location": "Hybrid: Awoshie, Ghana or online",
-    "format": "Live hybrid class with recordings and Falowen app access",
+    "location": "Ghana, Accra - Awoshie",
+    "format": "Live hybrid class in Ghana, Accra - Awoshie with online access, recordings, and Falowen app support",
     "selfLearningFormat": "Self-learning with AI assistant and tutor support by email",
     "selfLearningLocation": "Online",
     "scheduleBaseUrl": "https://admin.falowen.app/course-schedule/public",
@@ -46,87 +46,318 @@
     },
     "highlightsByLevel": {
       "A1": [
-        "A1 beginner German foundation",
+        "Beginner German foundation",
         "Live class plus assignment support",
-        "Falowen app access for practice, results, attendance, and resources",
-        "Good for students preparing for Goethe A1 pathway"
+        "Falowen app access"
       ],
       "A2": [
-        "A2 grammar and workbook structure",
+        "Everyday German communication",
         "Speaking, writing, listening, and reading practice",
-        "Useful for students continuing after A1",
-        "Includes Falowen app learning support"
+        "Falowen app support"
       ],
       "B1": [
-        "B1 exam-focused learning path",
+        "Exam-focused learning path",
         "Grammar plus workbook structure",
-        "Longer live sessions for deeper exam practice",
-        "Includes Falowen app support and tutor guidance"
+        "Tutor guidance"
       ],
       "B2": [
-        "Flexible B2 self-learning track",
-        "AI support for grammar, writing, speaking, and vocabulary",
-        "Tutor support by email when needed",
-        "Structured course plan inside Falowen"
+        "Flexible higher-level German",
+        "AI-supported practice",
+        "Tutor support by email"
       ],
       "C1": [
-        "Advanced German self-learning track",
-        "AI-supported independent practice",
-        "Tutor support by email when needed",
-        "Suitable for learners moving beyond B2"
+        "Advanced German communication",
+        "Independent practice with support",
+        "Professional-level writing and speaking"
       ]
     }
   },
   "classes": [
     {
       "level": "A1",
-      "city": "Hamburg",
-      "startDate": "2026-06-09",
+      "city": "Stuttgart",
+      "startDate": "2026-01-14",
+      "endDate": "2026-03-26",
       "meetingDays": [
-        { "day": "Monday", "startTime": "18:00" },
-        { "day": "Tuesday", "startTime": "18:00" },
-        { "day": "Wednesday", "startTime": "18:00" }
-      ]
+        {
+          "day": "Wednesday",
+          "startTime": "14:00",
+          "endTime": "15:00"
+        },
+        {
+          "day": "Thursday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Friday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        }
+      ],
+      "scheduleUrl": "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing"
     },
     {
       "level": "A1",
-      "city": "Munich",
-      "startDate": "2026-06-12",
+      "city": "Berlin",
+      "startDate": "2026-02-18",
+      "endDate": "2026-04-14",
       "meetingDays": [
-        { "day": "Thursday", "startTime": "18:00" },
-        { "day": "Friday", "startTime": "18:00" },
-        { "day": "Saturday", "startTime": "08:00" }
-      ]
+        {
+          "day": "Monday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "14:00",
+          "endTime": "15:00"
+        }
+      ],
+      "scheduleUrl": "https://drive.google.com/file/d/1H87C3y6Xj09PY-giD1N73Mv8qbzCb8zk/view?usp=sharing"
+    },
+    {
+      "level": "A1",
+      "city": "Dortmund",
+      "startDate": "2026-03-09",
+      "endDate": "2026-04-29",
+      "meetingDays": [
+        {
+          "day": "Monday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-03-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
+      "level": "A1",
+      "city": "Leipzig",
+      "startDate": "2026-04-04",
+      "orientationDate": "2026-04-04",
+      "endDate": "2026-05-29",
+      "meetingDays": [
+        {
+          "day": "Friday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Saturday",
+          "startTime": "08:00",
+          "endTime": "09:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-04-04&defaultWeekdays=Thursday%2CFriday%2CSaturday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
     },
     {
       "level": "A2",
       "city": "Freiburg",
       "startDate": "2026-05-08",
+      "orientationDate": "2026-05-07",
+      "endDate": "2026-06-25",
       "meetingDays": [
-        { "day": "Wednesday", "startTime": "11:00" },
-        { "day": "Thursday", "startTime": "11:00" },
-        { "day": "Friday", "startTime": "11:00" }
-      ]
+        {
+          "day": "Wednesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Thursday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Friday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-05-08&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
+      "level": "A1",
+      "city": "Koln",
+      "startDate": "2026-05-12",
+      "orientationDate": "2026-05-12",
+      "endDate": "2026-06-10",
+      "meetingDays": [
+        {
+          "day": "Monday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-05-12&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
+      "level": "A1",
+      "city": "Hamburg",
+      "startDate": "2026-06-09",
+      "orientationDate": "2026-06-09",
+      "endDate": "2026-08-04",
+      "meetingDays": [
+        {
+          "day": "Monday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-06-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
+      "level": "A1",
+      "city": "Munich",
+      "startDate": "2026-06-12",
+      "endDate": "2026-08-07",
+      "meetingDays": [
+        {
+          "day": "Thursday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Friday",
+          "startTime": "18:00",
+          "endTime": "19:00"
+        },
+        {
+          "day": "Saturday",
+          "startTime": "08:00",
+          "endTime": "09:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-06-13&defaultWeekdays=Saturday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
     },
     {
       "level": "B1",
       "city": "Stuttgart",
-      "orientationDate": "2026-07-02",
       "startDate": "2026-07-03",
+      "orientationDate": "2026-07-02",
       "endDate": "2026-10-08",
       "meetingDays": [
-        { "day": "Thursday", "startTime": "19:30", "endTime": "20:30" },
-        { "day": "Friday", "startTime": "19:30", "endTime": "20:30" }
+        {
+          "day": "Thursday",
+          "startTime": "19:30",
+          "endTime": "20:30"
+        },
+        {
+          "day": "Friday",
+          "startTime": "19:30",
+          "endTime": "20:30"
+        }
       ],
       "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=B1&startDate=2026-07-03&defaultWeekdays=Thursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
     },
     {
+      "level": "A1",
+      "city": "Bonn",
+      "startDate": "2026-07-08",
+      "orientationDate": "2026-07-07",
+      "endDate": "2026-09-01",
+      "meetingDays": [
+        {
+          "day": "Monday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-07-08&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
+      "level": "A2",
+      "city": "Munich",
+      "startDate": "2026-08-04",
+      "orientationDate": "2026-08-04",
+      "endDate": "2026-10-12",
+      "meetingDays": [
+        {
+          "day": "Monday",
+          "startTime": "19:00",
+          "endTime": "20:30"
+        },
+        {
+          "day": "Tuesday",
+          "startTime": "19:00",
+          "endTime": "20:30"
+        },
+        {
+          "day": "Wednesday",
+          "startTime": "19:00",
+          "endTime": "20:30"
+        }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-08-04&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=2026-09-21&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+    },
+    {
       "level": "B2",
-      "availability": "always"
+      "availability": "always",
+      "startDate": "2025-08-08",
+      "endDate": "2025-10-08",
+      "meetingDays": [
+        {
+          "day": "Friday",
+          "startTime": "14:00",
+          "endTime": "15:30"
+        },
+        {
+          "day": "Saturday",
+          "startTime": "09:30",
+          "endTime": "10:00"
+        }
+      ],
+      "scheduleUrl": "https://drive.google.com/file/d/1gn6vYBbRyHSvKgqvpj5rr8OfUOYRL09W/view?usp=sharing",
+      "title": "B2 Munich Klasse"
     },
     {
       "level": "C1",
-      "availability": "always"
+      "availability": "always",
+      "title": "C1 Self-learning"
     }
   ]
 }
