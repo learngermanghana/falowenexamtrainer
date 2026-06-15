@@ -2,6 +2,7 @@ import b2Day1QuestionWritingBuilder from "./writingQuestionBuilders/b2Day1Persoe
 import c1Day2QuestionWritingBuilder from "./writingQuestionBuilders/c1Day2KulturUndIdentitaet";
 import c1Day1QuestionWritingBuilder from "./writingQuestionBuilders/c1Day1ZieleUndLernweg";
 import c1Day3QuestionWritingBuilder from "./writingQuestionBuilders/c1Day3MedienUndInformationskompetenz";
+import c1Day4QuestionWritingBuilder from "./writingQuestionBuilders/c1Day4BeziehungenUndTeamarbeit";
 
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
@@ -24,6 +25,7 @@ const SPECIAL_WRITING_CONFIGS = {
   "C1-1": c1Day1QuestionWritingBuilder,
   "C1-2": c1Day2QuestionWritingBuilder,
   "C1-3": c1Day3QuestionWritingBuilder,
+  "C1-4": c1Day4QuestionWritingBuilder,
 };
 
 const defaultStarters = [
