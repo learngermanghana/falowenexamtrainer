@@ -1,0 +1,60 @@
+const c1Day8QuestionWritingBuilder = {
+  level: "C1",
+  day: 8,
+  title: "C1 Day 8 guided writing: Wohnen und Stadtentwicklung",
+  taskType: "Formal proposal / formelle Eingabe",
+  targetWords: 230,
+  questions: [
+    {
+      id: "opening",
+      section: "Betreff, Anlass und Problem",
+      question: "An welche Stelle schreiben Sie, und welches konkrete Wohn- oder Infrastrukturproblem möchten Sie ansprechen?",
+      help: "Formulieren Sie einen präzisen Betreff, eine höfliche Anrede und eine sachliche Einleitung.",
+      starter: "Ich wende mich an Sie aufgrund ...",
+      minimumWords: 40,
+    },
+    {
+      id: "effects",
+      section: "Folgen für die Bevölkerung",
+      question: "Welche konkreten Folgen hat das Problem für Bewohnerinnen und Bewohner?",
+      help: "Beschreiben Sie Auswirkungen auf Kosten, Mobilität, Sicherheit, Gesundheit oder Lebensqualität.",
+      starter: "Infolge des Mangels an ..., hat sich ...",
+      minimumWords: 45,
+    },
+    {
+      id: "measures",
+      section: "Konkrete Maßnahmen",
+      question: "Welche zwei realistischen Maßnahmen schlagen Sie vor?",
+      help: "Erklären Sie Ziel und Wirkung der Maßnahmen. Nutzen Sie zur, zum oder durch mit Nominalisierungen.",
+      starter: "Zur Verbesserung ... schlage ich vor, ...",
+      minimumWords: 50,
+    },
+    {
+      id: "constraints",
+      section: "Kosten und Umsetzbarkeit",
+      question: "Welche Kosten, Flächenkonflikte oder praktischen Schwierigkeiten müssen berücksichtigt werden?",
+      help: "Zeigen Sie, dass Sie mögliche Einschränkungen realistisch einschätzen.",
+      starter: "Trotz der damit verbundenen Kosten ...",
+      minimumWords: 45,
+    },
+    {
+      id: "closing",
+      section: "Bitte und Abschluss",
+      question: "Wie bitten Sie höflich um Prüfung, weitere Informationen oder eine Rückmeldung?",
+      help: "Beenden Sie das Schreiben verbindlich und professionell.",
+      starter: "Ich bitte Sie höflich um Prüfung ...",
+      minimumWords: 35,
+    },
+  ],
+  checklist: [
+    "Ich habe einen klaren Betreff und eine höfliche Anrede verwendet.",
+    "Ich habe das Problem konkret und sachlich beschrieben.",
+    "Ich habe die Folgen für die Bevölkerung erläutert.",
+    "Ich habe mindestens zwei realistische Maßnahmen vorgeschlagen.",
+    "Ich habe Kosten oder Umsetzungsprobleme berücksichtigt.",
+    "Ich habe mindestens drei passende Nominalisierungen oder Präpositionalgruppen verwendet.",
+    "Ich habe höflich um Prüfung und Rückmeldung gebeten.",
+  ],
+};
+
+export default c1Day8QuestionWritingBuilder;
