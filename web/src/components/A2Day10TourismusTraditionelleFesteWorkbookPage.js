@@ -610,13 +610,13 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
           <h3 style={sectionTitle}>Recommended Video</h3>
           <p style={{ margin: 0 }}>
             Deutsche Welle — Oktoberfest: {" "}
-            <a href="https://youtu.be/XFxV3GSSm8E" target="_blank" rel="noreferrer">
-              https://youtu.be/XFxV3GSSm8E
+            <a href="https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q" target="_blank" rel="noreferrer">
+              https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q
             </a>
           </p>
           <iframe
             title="Recommended video for Tourismus und Traditionelle Feste"
-            src="https://www.youtube.com/embed/XFxV3GSSm8E"
+            src="https://www.youtube.com/embed/vpSwGAtqIlU"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             style={videoPreviewStyle}
