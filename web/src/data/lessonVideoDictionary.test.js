@@ -98,6 +98,7 @@ describe("getLessonVideoResources", () => {
     [13, "https://youtu.be/derL046nbF8?si=VP2St42knZFk3NKo"],
     [14, "https://youtu.be/qWy7yMgwmvQ"],
     [16, "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR"],
+    [17, "https://youtu.be/0p28KQE2A8c"],
     [18, "https://youtu.be/jdhvRlRMiIc"],
     [19, "https://youtu.be/aL_CJ75l11s?si=mQTO5LEU3SsOj5xe"],
     [20, "https://youtu.be/P_ruQxHKzPg"],
