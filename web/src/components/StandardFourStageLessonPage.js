@@ -83,8 +83,13 @@ const ResourceButton = ({ href, children }) => {
   );
 };
 
+const isC1Day2 = (lesson = {}) => String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 2;
+
 const SpeakingBrainMap = ({ lesson }) => {
   const branches = getStandardBrainMap(lesson);
+  if (isC1Day2(lesson)) {
+    return <NoteBox tone="amber"><strong>Speaking order:</strong> Follow the branches from 1 to 5. Give reasons and at least one concrete example.</NoteBox>;
+  }
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <div style={{ justifySelf: "center", width: "min(270px, 92%)", minHeight: 120, borderRadius: 999, display: "grid", placeItems: "center", textAlign: "center", padding: 20, color: "#fff", background: "linear-gradient(135deg, #1d4ed8, #7c3aed)", boxShadow: "0 16px 34px rgba(37, 99, 235, 0.28)" }}>
@@ -433,7 +438,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
           <EmbeddedSpeechPracticePanel />
           <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
             <input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((previous) => ({ ...previous, speakDone: event.target.checked }))} />
-            I used the brain map and completed a speaking practice.
+            {isC1Day2(lesson) ? "I completed a speaking practice." : "I used the brain map and completed a speaking practice."}
           </label>
         </Section>
       ) : null}

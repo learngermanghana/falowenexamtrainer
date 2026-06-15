@@ -141,54 +141,6 @@ function LearnUpgrade() {
   );
 }
 
-function SpeakingIdeaList() {
-  const { speaking } = c1Day2LearningSpeakingGuide;
-
-  return (
-    <div style={{ display: "grid", gap: 14 }}>
-      <div
-        style={{
-          border: "1px solid #c7d2fe",
-          borderRadius: 14,
-          padding: 14,
-          background: "linear-gradient(135deg, #eef2ff, #ffffff)",
-          display: "grid",
-          gap: 8,
-        }}
-      >
-        <h3 style={{ margin: 0 }}>{speaking.title}</h3>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>{speaking.instruction}</p>
-      </div>
-
-      <ol style={{ ...listStyle, display: "grid", gap: 16 }}>
-        {speaking.branches.map((branch) => (
-          <li key={branch.id} style={{ paddingLeft: 4 }}>
-            <strong>{branch.title}</strong>
-            <ul style={{ ...listStyle, marginTop: 6 }}>
-              <li><strong>Ideen:</strong> {branch.keywords.join(" · ")}</li>
-              <li><strong>Frage:</strong> {branch.prompt}</li>
-              <li><strong>Beispielsatz:</strong> {branch.example}</li>
-            </ul>
-          </li>
-        ))}
-      </ol>
-
-      <div
-        style={{
-          border: "1px solid #bae6fd",
-          borderRadius: 12,
-          padding: 12,
-          background: "#ecfeff",
-          color: "#155e75",
-          lineHeight: 1.65,
-        }}
-      >
-        <strong>So bereitest du deine Antwort vor:</strong> Wähle aus der Liste drei oder vier passende Bereiche aus, notiere ein Beispiel und beantworte danach die eigentliche Sprechfrage darunter.
-      </div>
-    </div>
-  );
-}
-
 function findSectionByTitle(title) {
   return Array.from(document.querySelectorAll("section")).find((section) => {
     const heading = section.querySelector(":scope > h2");
@@ -200,15 +152,12 @@ function C1Day2LearningSpeakingAutoMount() {
   const location = useLocation();
   const enabled = isC1Day2Path(location.pathname);
   const [learnTarget, setLearnTarget] = useState(null);
-  const [speakingTarget, setSpeakingTarget] = useState(null);
 
   useEffect(() => {
     if (!enabled) return undefined;
 
     let learnMount = null;
-    let speakingMount = null;
     let learnCleanup = null;
-    let speakingCleanup = null;
 
     const mountLearn = () => {
       if (learnMount?.isConnected) return;
@@ -259,31 +208,8 @@ function C1Day2LearningSpeakingAutoMount() {
       };
     };
 
-    const mountSpeaking = () => {
-      if (speakingMount?.isConnected) return;
-      speakingCleanup?.();
-      speakingCleanup = null;
-      speakingMount = null;
-
-      const speakingSection = findSectionByTitle("Speaking builder");
-      if (!speakingSection) return;
-
-      const heading = speakingSection.querySelector(":scope > h2");
-      const firstContent = Array.from(speakingSection.children).find((child) => child !== heading);
-      const mount = document.createElement("div");
-      mount.setAttribute("data-c1-day2-speaking-ideas", "true");
-      speakingSection.insertBefore(mount, firstContent || null);
-      speakingMount = mount;
-      setSpeakingTarget(mount);
-
-      speakingCleanup = () => {
-        if (mount.isConnected) mount.remove();
-      };
-    };
-
     const sync = () => {
       mountLearn();
-      mountSpeaking();
     };
 
     sync();
@@ -293,18 +219,12 @@ function C1Day2LearningSpeakingAutoMount() {
     return () => {
       observer.disconnect();
       learnCleanup?.();
-      speakingCleanup?.();
     };
   }, [enabled, location.pathname]);
 
   if (!enabled) return null;
 
-  return (
-    <>
-      {learnTarget?.isConnected ? createPortal(<LearnUpgrade />, learnTarget) : null}
-      {speakingTarget?.isConnected ? createPortal(<SpeakingIdeaList />, speakingTarget) : null}
-    </>
-  );
+  return learnTarget?.isConnected ? createPortal(<LearnUpgrade />, learnTarget) : null;
 }
 
 export default C1Day2LearningSpeakingAutoMount;
