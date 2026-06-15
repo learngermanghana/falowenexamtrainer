@@ -81,58 +81,6 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
-const SpeakingBrainMap = ({ lesson }) => {
-  const branches = [
-    {
-      title: "Persönlichkeit",
-      prompt: "Welche 2–3 Eigenschaften beschreiben dich?",
-      starter: "Ich würde mich als ... beschreiben, weil ...",
-    },
-    {
-      title: "Werte",
-      prompt: "Welche Werte sind dir besonders wichtig?",
-      starter: "Ein wichtiger Wert in meinem Leben ist ..., denn ...",
-    },
-    {
-      title: "Prägende Erfahrung",
-      prompt: "Welche Erfahrung hat dich verändert?",
-      starter: "Eine Erfahrung, die mich geprägt hat, war ...",
-    },
-    {
-      title: "Online und offline",
-      prompt: "Wo gibt es Unterschiede in deinem Verhalten?",
-      starter: "Online wirke ich ..., während ich im echten Leben ...",
-    },
-    {
-      title: "Zukunft",
-      prompt: "Welche Eigenschaft möchtest du weiterentwickeln?",
-      starter: "In Zukunft möchte ich ... stärker entwickeln.",
-    },
-  ];
-
-  return (
-    <div style={{ display: "grid", gap: 14 }}>
-      <div style={{ justifySelf: "center", width: "min(260px, 90%)", minHeight: 120, borderRadius: 999, display: "grid", placeItems: "center", textAlign: "center", padding: 20, color: "#fff", background: "linear-gradient(135deg, #1d4ed8, #7c3aed)", boxShadow: "0 16px 34px rgba(37, 99, 235, 0.28)" }}>
-        <div>
-          <small style={{ opacity: 0.82, fontWeight: 800 }}>SPRECHEN-BRAIN-MAP</small>
-          <h3 style={{ margin: "5px 0 0", fontSize: "1.25rem" }}>{lesson.title}</h3>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
-        {branches.map((branch, index) => (
-          <article key={branch.title} style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: index % 2 === 0 ? "#eef2ff" : "#f8fafc", display: "grid", gap: 8 }}>
-            <span style={{ width: 32, height: 32, borderRadius: 999, display: "grid", placeItems: "center", background: "#1d4ed8", color: "#fff", fontWeight: 900 }}>{index + 1}</span>
-            <strong>{branch.title}</strong>
-            <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}>{branch.prompt}</p>
-            <div style={{ borderLeft: "4px solid #818cf8", paddingLeft: 10, color: "#3730a3", lineHeight: 1.55 }}>{branch.starter}</div>
-          </article>
-        ))}
-      </div>
-      <NoteBox tone="amber"><strong>Speaking order:</strong> Persönlichkeit → Werte → Erfahrung → Online/Offline → Zukunft. Sprich 2–3 Minuten und gib mindestens zwei konkrete Beispiele.</NoteBox>
-    </div>
-  );
-};
-
 const makeEmptyWritingState = () => ({
   answers: {},
   finalEssay: "",
@@ -290,7 +238,7 @@ function B2Day1GuidedWritingBuilder({ onStatusChange }) {
     <div style={{ border: "1px solid #c7d2fe", borderRadius: 18, background: "linear-gradient(180deg, #ffffff, #f8fafc)", padding: 16, display: "grid", gap: 16 }}>
       <div style={{ display: "grid", gap: 6 }}>
         <span style={{ ...styles.badge, width: "fit-content", background: "#eef2ff", color: "#3730a3" }}>Guided B2 Writing</span>
-        <h3 style={{ margin: 0 }}>Answer 6 questions and combine your essay</h3>
+        <h3 style={{ margin: 0 }}>Answer {config.questions.length} questions and combine your essay</h3>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Write one focused section at a time. When every section reaches its minimum, Falowen combines your answers into one editable essay.</p>
         <small style={{ color: cloudSaveStatus === "error" ? "#b91c1c" : "#166534", fontWeight: 800 }}>{saveLabel}</small>
       </div>
@@ -327,7 +275,7 @@ function B2Day1GuidedWritingBuilder({ onStatusChange }) {
           <button type="button" onClick={combineAnswers} disabled={!allComplete} style={{ ...styles.primaryButton, opacity: allComplete ? 1 : 0.5 }}>
             Combine my answers into an essay
           </button>
-          {!allComplete ? <p style={{ margin: 0, textAlign: "center", color: "#64748b" }}>Complete all six minimum word requirements to unlock the combined essay.</p> : null}
+          {!allComplete ? <p style={{ margin: 0, textAlign: "center", color: "#64748b" }}>Complete all minimum word requirements to unlock the combined essay.</p> : null}
         </>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
@@ -361,7 +309,7 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
   const { showToast } = useToast();
   const storageKey = "falowen:b2:day1:identity-pilot-progress";
   const [activeTab, setActiveTab] = useState("learn");
-  const [writingStatus, setWritingStatus] = useState({ complete: false, completedQuestions: 0, totalQuestions: 6, wordCount: 0 });
+  const [writingStatus, setWritingStatus] = useState({ complete: false, completedQuestions: 0, totalQuestions: b2Day1QuestionWritingBuilder.questions.length, wordCount: 0 });
   const [progress, setProgress] = useState(() => {
     try {
       return {
@@ -455,11 +403,11 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
 
       {activeTab === "speak" ? (
         <Section title="Speaking builder">
-          <SpeakingBrainMap lesson={lesson} />
+          <NoteBox tone="amber"><strong>Speaking order:</strong> Follow the branches from 1 to 5. Give reasons and at least one concrete example.</NoteBox>
           <EmbeddedSpeechPracticePanel />
           <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
             <input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((previous) => ({ ...previous, speakDone: event.target.checked }))} />
-            I used the brain map and completed a speaking practice.
+            I completed a speaking practice.
           </label>
         </Section>
       ) : null}
