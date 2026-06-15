@@ -82,19 +82,12 @@ const c1Day3MedienUndInformationskompetenz = makeLesson({
   speakingTaskType: "C1 argumentation talk",
   speakingTopic: "Sprechen: Erkläre, warum Medienkompetenz wichtig ist. Nenne ein Beispiel für Falschinformationen, einen Einwand gegen zu starke Kontrolle und eine sinnvolle Alternative.",
   speakingBuilder: {
-    plan: [
-      "Einleitung: Erkläre, warum Medien und Informationskompetenz heute besonders wichtig sind.",
-      "Erklärung: Nenne Kriterien für zuverlässige Quellen.",
-      "Beispiel: Beschreibe, wie sich eine Falschinformation online verbreiten kann.",
-      "Einwand: Nenne Risiken von zu viel Kontrolle, zum Beispiel Zensur oder Einschränkung der Meinungsfreiheit.",
-      "Alternative: Erläutere Medienbildung, transparente Quellenprüfung und digitale Verantwortung als Lösung.",
-    ],
-    starters: [
-      "Informationskompetenz ist heute unverzichtbar, weil ...",
-      "Eine zuverlässige Quelle erkennt man unter anderem daran, dass ...",
-      "Ein anschauliches Beispiel für Desinformation ist ...",
-      "Gegen zu strenge Kontrolle spricht jedoch, dass ...",
-      "Eine sinnvolle Alternative wäre, Medienbildung stärker zu fördern und ...",
+    branches: [
+      { id: "quellenkritik", title: "Quellenkritik und journalistische Standards", keywords: ["Urheberschaft", "Beleglage", "Transparenz", "Aktualität", "Redaktion"], prompt: "Anhand welcher Kriterien lässt sich die Verlässlichkeit einer digitalen Quelle differenziert beurteilen?", example: "Eine als glaubwürdig einzustufende Quelle legt nicht nur ihre Urheberschaft offen, sondern ermöglicht durch überprüfbare Belege auch eine unabhängige Einordnung ihrer Aussagen.", starter: "Bei genauerer Betrachtung erweist sich als entscheidend, dass ..." },
+      { id: "desinformation", title: "Desinformation und digitale Dynamiken", keywords: ["Algorithmen", "Emotionalisierung", "Reichweite", "Echokammer", "Manipulation"], prompt: "Welche digitalen Mechanismen begünstigen die schnelle Verbreitung manipulierter Inhalte?", example: "Durch emotionalisierende Überschriften verstärkte Inhalte erzielen häufig eine hohe Reichweite, obwohl ihre unzureichend geprüften Aussagen einer sachlichen Grundlage entbehren.", starter: "Die rasche Verbreitung lässt sich unter anderem darauf zurückführen, dass ..." },
+      { id: "verantwortung", title: "Verantwortung von Plattformen und Nutzenden", keywords: ["Moderation", "Sorgfaltspflicht", "Kennzeichnung", "Mediennutzung", "Plattformverantwortung"], prompt: "Wie sollte Verantwortung zwischen Plattformen, Medienhäusern und Nutzenden verteilt werden?", example: "Während Plattformbetreiber transparente Moderationsverfahren gewährleisten müssen, sind auch Nutzende dazu angehalten, Inhalte vor ihrer Weitergabe kritisch zu prüfen.", starter: "Eine ausgewogene Verantwortungsverteilung setzt voraus, dass ..." },
+      { id: "freiheit", title: "Meinungsfreiheit und Regulierung", keywords: ["Zensur", "Pluralismus", "Regulierung", "Grundrechte", "Abwägung"], prompt: "Wie kann Desinformation begrenzt werden, ohne legitime Meinungsvielfalt einzuschränken?", example: "Eine rechtsstaatlich kontrollierte Regulierung sollte nachweislich schädliche Manipulation begrenzen, ohne kontroverse, jedoch legitime Positionen vorschnell aus dem Diskurs auszuschließen.", starter: "So berechtigt der Ruf nach Regulierung sein mag, ..." },
+      { id: "medienbildung", title: "Medienbildung und gesellschaftliche Resilienz", keywords: ["Bildung", "Urteilsfähigkeit", "Demokratie", "Prävention", "Teilhabe"], prompt: "Welchen langfristigen Beitrag kann Medienbildung zu einer informierten Gesellschaft leisten?", example: "Eine frühzeitig vermittelte Medienkompetenz stärkt die gesellschaftliche Resilienz, da sie Menschen befähigt, widersprüchliche Informationen eigenständig zu bewerten.", starter: "Langfristig erscheint insbesondere ein Ansatz erfolgversprechend, der ..." },
     ],
   },
   writingTaskType: "C1 opinion essay / Stellungnahme",
