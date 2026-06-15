@@ -16,6 +16,7 @@ import c1Day8WohnenUndStadtentwicklung from "../data/selfLearningLessons/c1/day8
 import c1Day9KonsumUndWerbung from "../data/selfLearningLessons/c1/day9KonsumUndWerbung";
 import c1Day10IntegrationUndGesellschaft from "../data/selfLearningLessons/c1/day10IntegrationUndGesellschaft";
 import c1Day11EngagementUndEhrenamt from "../data/selfLearningLessons/c1/day11EngagementUndEhrenamt";
+import c1Day12FreizeitUndKultur from "../data/selfLearningLessons/c1/day12FreizeitUndKultur";
 import b2Day0Orientation from "../data/selfLearningLessons/b2/day0Orientation";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
@@ -24,7 +25,6 @@ import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUn
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 
 const c1FallbackLessons = [
-  [12, "3.2", "Freizeit und Kultur", "Kulturelle Angebote, Erholung und gesellschaftliche Bedeutung"],
   [13, "3.3", "Mehrsprachigkeit", "Sprachenlernen, Identität und Kommunikation"],
   [14, "3.4", "Innovation und Zukunft", "Technologische Entwicklung und gesellschaftlicher Wandel"],
   [15, "3.5", "Bildung und lebenslanges Lernen", "Lernen, Weiterbildung und Chancengleichheit"],
@@ -92,6 +92,7 @@ export const SELF_LEARNING_LESSONS = {
     c1Day9KonsumUndWerbung,
     c1Day10IntegrationUndGesellschaft,
     c1Day11EngagementUndEhrenamt,
+    c1Day12FreizeitUndKultur,
     ...c1FallbackLessons,
   ],
 };
