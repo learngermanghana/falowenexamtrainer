@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
-import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
+import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import { useToast } from "../context/ToastContext";
 import {
   getStandardBrainMap,
@@ -13,7 +13,8 @@ import {
 import { styles } from "../styles";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
-import { speakingTopics as b2Day1SpeakingTopics } from "./B2Day1IdentityPilotLessonPage";
+import { SpeakingPoints } from "./B2Day1IdentityPilotLessonPage";
+import { getAdvancedWritingPhase } from "../data/advancedWritingProgression";
 
 const tabs = [
   { id: "learn", label: "1. Learn" },
@@ -100,7 +101,7 @@ const C1Day2SpeakingPoints = () => (
 
 const SpeakingBrainMap = ({ lesson }) => {
   const branches = getStandardBrainMap(lesson);
-  if (isB2Day1(lesson)) return <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{b2Day1SpeakingTopics.map(([title, ...lines]) => <article key={title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65 }}><strong>{title}</strong><p style={{ margin: "5px 0 0" }}>{lines.join(" • ")}</p></article>)}</div>;
+  if (isB2Day1(lesson)) return <SpeakingPoints />;
   if (isC1Day2(lesson)) {
     return <C1Day2SpeakingPoints />;
   }
@@ -179,6 +180,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const finishReady = progress.learnDone && progress.speakDone && writingStatus.complete;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && canonicalLesson?.submission?.assignmentId);
+  const isFullEssayWriting = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
 
   const markComplete = () => {
     if (!finishReady) return;
@@ -270,7 +272,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
         <Section title="Guided writing builder">
           <NoteBox><strong>Task:</strong> {lesson.writingTopic || `Schreibe einen Text zum Thema „${lesson.title}“.`}</NoteBox>
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
-          <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWritingStatus} />
+          {isFullEssayWriting ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWritingStatus} />}
         </Section>
       ) : null}
 

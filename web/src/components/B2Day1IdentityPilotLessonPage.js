@@ -79,14 +79,49 @@ const ProgressCard = ({ label, complete, detail }) => (
 );
 
 export const speakingTopics = [
-  ["Persönlichkeit", "Wie würdest du dich beschreiben?", "Ich würde mich als offene und zuverlässige Person beschreiben.", "Was ist eine deiner Stärken?", "Eine meiner größten Stärken ist, dass ich auch in schwierigen Situationen ruhig bleibe."],
-  ["Werte und Überzeugungen", "Was ist dir im Leben besonders wichtig?", "Ehrlichkeit und gegenseitiger Respekt sind mir besonders wichtig.", "Welche Werte hast du von deiner Familie gelernt?", "Meine Familie hat mir beigebracht, Verantwortung zu übernehmen und andere Menschen zu unterstützen."],
-  ["Prägende Erfahrungen", "Welche Erfahrung hat dich besonders geprägt?", "Mein Umzug in eine andere Stadt hat mich selbstständiger gemacht.", "Gibt es eine Person, die dich stark beeinflusst hat?", "Meine Mutter hat mich stark beeinflusst, weil sie mir gezeigt hat, wie wichtig Ausdauer ist."],
-  ["Online und offline", "Zeigst du dich online genauso wie im echten Leben?", "Online teile ich nur bestimmte Seiten meiner Persönlichkeit, während ich offline viel spontaner bin.", "Warum wirken Menschen in sozialen Medien manchmal anders?", "Viele Menschen möchten online ein besonders positives Bild von sich zeigen."],
-  ["Zukunft und persönliche Entwicklung", "Was möchtest du an dir weiterentwickeln?", "In Zukunft möchte ich selbstbewusster auftreten und meine Meinung klarer ausdrücken.", "Haben sich deine Ziele in den letzten Jahren verändert?", "Ja, meine Ziele haben sich verändert, weil ich heute andere Prioritäten habe."],
+  {
+    title: "Kultur",
+    keywords: ["Traditionen", "Feste", "Herkunft", "Werte", "Zugehörigkeit"],
+    examples: [
+      ["Welche Traditionen gehören zu deiner Kultur?", "In meiner Kultur spielen Familie und traditionelle Feste eine wichtige Rolle."],
+      ["Fühlst du dich mit einer bestimmten Kultur verbunden?", "Ich fühle mich mit meiner ghanaischen Kultur verbunden, obwohl ich auch andere Kulturen interessant finde."],
+    ],
+  },
+  {
+    title: "Essen",
+    keywords: ["traditionelle Gerichte", "Familienessen", "Essgewohnheiten", "Kindheitserinnerungen", "kulturelle Bedeutung"],
+    examples: [
+      ["Welches Essen gehört für dich zu deiner Identität?", "Traditionelle Gerichte erinnern mich an meine Familie und meine Kindheit."],
+      ["Gibt es ein Gericht, das bei Familienfeiern wichtig ist?", "Bei Familienfeiern essen wir häufig Jollof-Reis oder Fufu."],
+    ],
+  },
+  {
+    title: "Sprache",
+    keywords: ["Muttersprache", "Deutsch", "Mehrsprachigkeit", "Dialekt oder Akzent", "Zugehörigkeit"],
+    examples: [
+      ["Welche Sprachen sprichst du?", "Ich spreche Englisch und Twi und lerne außerdem Deutsch."],
+      ["Welche Rolle spielt Sprache für deine Identität?", "Durch meine Muttersprache fühle ich mich meiner Familie und meiner Kultur besonders verbunden."],
+    ],
+  },
+  {
+    title: "Familie und Werte",
+    keywords: ["Erziehung", "Respekt", "Verantwortung", "Religion", "Unterstützung"],
+    examples: [
+      ["Welche Werte hast du von deiner Familie gelernt?", "Meine Familie hat mir beigebracht, respektvoll und verantwortungsbewusst zu handeln."],
+      ["Wer hat dich besonders geprägt?", "Meine Mutter hat mich stark geprägt, weil sie mir gezeigt hat, wie wichtig Ausdauer ist."],
+    ],
+  },
+  {
+    title: "Interessen und persönliche Entwicklung",
+    keywords: ["Musik", "Sport", "Kleidung", "Hobbys", "persönliche Ziele", "Veränderungen"],
+    examples: [
+      ["Welche Interessen zeigen deine Persönlichkeit?", "Musik und kreative Arbeit sind ein wichtiger Teil meiner Persönlichkeit."],
+      ["Was möchtest du in Zukunft an dir weiterentwickeln?", "Ich möchte selbstbewusster werden und meine Meinung klarer ausdrücken."],
+    ],
+  },
 ];
 
-const SpeakingPoints = () => <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{speakingTopics.map(([title, ...lines]) => <article key={title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65 }}><strong>{title}</strong><p style={{ margin: "5px 0 0" }}>{lines.join(" • ")}</p></article>)}</div>;
+export const SpeakingPoints = () => <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{speakingTopics.map((topic, index) => <article key={topic.title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65, display: "grid", gap: 8 }}><strong>{index + 1}. {topic.title}</strong><div style={{ color: "#475569", fontWeight: 700 }}>{topic.keywords.join(" • ")}</div>{topic.examples.map(([question, answer]) => <div key={question}><div>{question}</div><div style={{ color: "#3730a3" }}>• {answer}</div></div>)}</article>)}</div>;
 
 export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = null }) {
   const { showToast } = useToast();
