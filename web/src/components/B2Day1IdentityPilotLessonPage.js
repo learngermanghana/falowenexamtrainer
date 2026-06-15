@@ -80,54 +80,60 @@ const ProgressCard = ({ label, complete, detail }) => (
 
 export const speakingTopics = [
   {
-    title: "Kultur",
-    keywords: ["Traditionen", "Feste", "Herkunft", "Werte", "Zugehörigkeit"],
-    examples: [
-      ["Welche Traditionen gehören zu deiner Kultur?", "In meiner Kultur spielen Familie und traditionelle Feste eine wichtige Rolle."],
-      ["Fühlst du dich mit einer bestimmten Kultur verbunden?", "Ich fühle mich mit meiner ghanaischen Kultur verbunden, obwohl ich auch andere Kulturen interessant finde."],
-    ],
+    title: "Persönlichkeit und Selbstbild",
+    keywords: ["Eigenschaften", "Stärken", "Schwächen", "Selbstbild", "Selbstbewusstsein", "Authentizität"],
   },
   {
-    title: "Essen",
-    keywords: ["traditionelle Gerichte", "Familienessen", "Essgewohnheiten", "Kindheitserinnerungen", "kulturelle Bedeutung"],
-    examples: [
-      ["Welches Essen gehört für dich zu deiner Identität?", "Traditionelle Gerichte erinnern mich an meine Familie und meine Kindheit."],
-      ["Gibt es ein Gericht, das bei Familienfeiern wichtig ist?", "Bei Familienfeiern essen wir häufig Jollof-Reis oder Fufu."],
-    ],
+    title: "Werte und Überzeugungen",
+    keywords: ["Ehrlichkeit", "Respekt", "Verantwortung", "Familie", "Religion", "Lebensziele"],
   },
   {
-    title: "Sprache",
-    keywords: ["Muttersprache", "Deutsch", "Mehrsprachigkeit", "Dialekt oder Akzent", "Zugehörigkeit"],
-    examples: [
-      ["Welche Sprachen sprichst du?", "Ich spreche Englisch und Twi und lerne außerdem Deutsch."],
-      ["Welche Rolle spielt Sprache für deine Identität?", "Durch meine Muttersprache fühle ich mich meiner Familie und meiner Kultur besonders verbunden."],
-    ],
+    title: "Prägende Erfahrungen",
+    keywords: ["Kindheit", "Schule", "Arbeit", "Beziehungen", "Erfolge", "Rückschläge"],
   },
   {
-    title: "Familie und Werte",
-    keywords: ["Erziehung", "Respekt", "Verantwortung", "Religion", "Unterstützung"],
-    examples: [
-      ["Welche Werte hast du von deiner Familie gelernt?", "Meine Familie hat mir beigebracht, respektvoll und verantwortungsbewusst zu handeln."],
-      ["Wer hat dich besonders geprägt?", "Meine Mutter hat mich stark geprägt, weil sie mir gezeigt hat, wie wichtig Ausdauer ist."],
-    ],
+    title: "Herkunft und Zugehörigkeit",
+    keywords: ["Kultur", "Sprache", "Heimat", "Familie", "Gemeinschaft", "Mehrfachzugehörigkeit"],
   },
   {
-    title: "Interessen und persönliche Entwicklung",
-    keywords: ["Musik", "Sport", "Kleidung", "Hobbys", "persönliche Ziele", "Veränderungen"],
-    examples: [
-      ["Welche Interessen zeigen deine Persönlichkeit?", "Musik und kreative Arbeit sind ein wichtiger Teil meiner Persönlichkeit."],
-      ["Was möchtest du in Zukunft an dir weiterentwickeln?", "Ich möchte selbstbewusster werden und meine Meinung klarer ausdrücken."],
-    ],
+    title: "Online und offline",
+    keywords: ["soziale Medien", "Selbstdarstellung", "Privatsphäre", "Rollen", "Erwartungen", "echtes Leben"],
+  },
+  {
+    title: "Persönliche Entwicklung",
+    keywords: ["Entscheidungen", "Veränderungen", "Vorbilder", "Zukunftspläne", "Lernziele", "Weiterentwicklung"],
   },
 ];
 
-export const SpeakingPoints = () => <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{speakingTopics.map((topic, index) => <article key={topic.title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65, display: "grid", gap: 8 }}><strong>{index + 1}. {topic.title}</strong><div style={{ color: "#475569", fontWeight: 700 }}>{topic.keywords.join(" • ")}</div>{topic.examples.map(([question, answer]) => <div key={question}><div>{question}</div><div style={{ color: "#3730a3" }}>• {answer}</div></div>)}</article>)}</div>;
+export const b2Day1SpeakingQuestion = "Welche Faktoren prägen deine persönliche Identität, und wie unterscheidet sich dein Selbstbild online und offline?";
+
+export const SpeakingPoints = () => (
+  <div style={{ display: "grid", gap: 12 }}>
+    <NoteBox tone="amber">
+      <strong>Sprechfrage:</strong> {b2Day1SpeakingQuestion}
+    </NoteBox>
+    <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
+      <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
+      <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
+      <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
+        {speakingTopics.map((topic) => (
+          <li key={topic.title}><strong>{topic.title}:</strong> {topic.keywords.join(", ")}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+);
 
 export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = null }) {
   const { showToast } = useToast();
   const storageKey = "falowen:b2:day1:identity-pilot-progress";
   const [activeTab, setActiveTab] = useState("learn");
-  const [writingStatus, setWritingStatus] = useState({ complete: false, completedQuestions: 0, totalQuestions: b2Day1QuestionWritingBuilder.questions.length, wordCount: 0 });
+  const [writingStatus, setWritingStatus] = useState({
+    complete: false,
+    completedQuestions: 0,
+    totalQuestions: b2Day1QuestionWritingBuilder.questions.length,
+    wordCount: 0,
+  });
   const [progress, setProgress] = useState(() => {
     try {
       return {
@@ -241,7 +247,7 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
         <Section title="Finish B2 Day 1">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
             <ProgressCard label="Learn" complete={progress.learnDone} detail="AI video and grammar reviewed" />
-            <ProgressCard label="Speak" complete={progress.speakDone} detail="Brain map speaking practice completed" />
+            <ProgressCard label="Speak" complete={progress.speakDone} detail="Speaking practice completed" />
             <ProgressCard label="Write" complete={writingStatus.complete} detail={`${writingStatus.completedQuestions}/${writingStatus.totalQuestions} questions · ${writingStatus.wordCount} final words`} />
           </div>
           <label style={{ display: "grid", gap: 7 }}>
