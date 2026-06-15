@@ -35,12 +35,6 @@ const card = {
   gap: 10,
 };
 
-const listStyle = {
-  margin: 0,
-  paddingLeft: 22,
-  lineHeight: 1.75,
-};
-
 function VideoCard({ resource }) {
   const embedUrl = getYouTubeEmbedUrl(resource.url);
   if (!embedUrl) return null;
