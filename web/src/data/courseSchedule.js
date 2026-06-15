@@ -199,8 +199,8 @@ const A2_SCHEDULE = [
     instruction:
       "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Präteritum",
-    video: "https://youtu.be/XFxV3GSSm8E",
-    youtube_link: "https://youtu.be/XFxV3GSSm8E",
+    video: "https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q",
+    youtube_link: "https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q",
     grammarbook_link: "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
     workbook_link: "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
   },
@@ -297,8 +297,8 @@ const A2_SCHEDULE = [
     instruction:
       "Watch the recommended material, review grammar notes, and complete all four workbook parts in-app. Submit final answers in the assignment submission area.",
     grammar_topic: "Modalverben + W-Fragen/Ja-Nein-Fragen in der Apotheke",
-    video: "https://youtu.be/PtrlVtdhPVw",
-    youtube_link: "https://youtu.be/PtrlVtdhPVw",
+    video: "https://youtu.be/0p28KQE2A8c",
+    youtube_link: "https://youtu.be/0p28KQE2A8c",
     grammarbook_link: "/campus/course/modal-verbs-day-14-3-6",
     workbook_link: "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
   },
@@ -764,8 +764,8 @@ const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
     instruction: entry.instruction,
     grammar_topic: null,
     assignment: entry.assignment === true,
-    video: "",
-    youtube_link: "",
+    video: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
+    youtube_link: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
     ...resolveC1LessonLinks(assignmentDay),
   };
 });
@@ -881,8 +881,8 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: [
         {
           chapter: "1.2",
-          video: "https://youtu.be/9CqtP3J5UGo",
-          youtube_link: "https://youtu.be/9CqtP3J5UGo",
+          video: "https://youtu.be/McNk1VTFvMk",
+          youtube_link: "https://youtu.be/McNk1VTFvMk",
           grammarbook_link: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
           workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
           assignment: true,

@@ -423,13 +423,13 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
 
           <p style={{ margin: 0 }}>
             Recommended video:{" "}
-            <a href="https://youtu.be/PtrlVtdhPVw" target="_blank" rel="noreferrer">
+            <a href="https://youtu.be/0p28KQE2A8c" target="_blank" rel="noreferrer">
               In die Apotheke gehen – A2 Lesson Video
             </a>
           </p>
           <iframe
             style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/PtrlVtdhPVw"
+            src="https://www.youtube.com/embed/0p28KQE2A8c"
             title="In die Apotheke gehen – A2 Lesson Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
