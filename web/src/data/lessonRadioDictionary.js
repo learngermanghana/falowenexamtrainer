@@ -16,6 +16,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Verkehrsmittel vergleichen ein. Danach gehst du weiter zu Teil 1.",
     },
+    14: {
+      key: "a2-day14-beruf-karriere-falowen-radio",
+      title: "Beruf und Karriere 5.14",
+      youtubeId: "HJ60GX0pbiI",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Beruf und Karriere ein. Danach gehst du weiter zu Teil 1.",
+    },
     9: {
       key: "a2-day9-urlaub-falowen-radio",
       title: "Urlaub planen",
@@ -39,6 +47,14 @@ export const LESSON_RADIO_DICTIONARY = {
       duration: "",
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Wohlbefinden und Entspannung ein.",
+    },
+    17: {
+      key: "a2-day17-in-die-apotheke-gehen-falowen-radio",
+      title: "In die Apotheke gehen 6.17",
+      youtubeId: "kp7KvFmaRuo",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Apotheke ein. Danach gehst du weiter zu Teil 1.",
     },
     26: {
       key: "a2-day26-gefuehle-beschreiben-falowen-radio",

@@ -9,6 +9,15 @@ const A1_DAY_2 = {
 };
 
 describe("getLessonVideoResources", () => {
+  test("A1 Day 15 uses the requested Imperatives AI grammar video", () => {
+    expect(getLessonVideoResources("A1", 15)).toEqual([
+      expect.objectContaining({
+        key: "ai-grammar-video",
+        url: "https://youtu.be/FLe36q-tONA",
+      }),
+    ]);
+  });
+
   test("returns both A1 Day 2 AI videos beside their matching chapter videos", () => {
     const resources = getLessonVideoResources("A1", 2, A1_DAY_2);
 
