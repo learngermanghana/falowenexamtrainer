@@ -283,7 +283,15 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
     speakingTopic: formalTask
       ? `Sprechen: Erkläre die formelle Situation zum Thema „${title}“ und formuliere eine höfliche Lösung.`
       : `Sprechen: Erkläre deine Meinung zum Thema „${title}“ und nenne mindestens zwei Beispiele.`,
-    speakingBuilder: {
+    speakingBuilder: level === "C1" ? {
+      branches: [
+        { id: "bedeutung", title: `${title}: gesellschaftliche Bedeutung`, keywords: ["Relevanz", "Wandel", "Teilhabe", "Verantwortung", "Auswirkungen"], prompt: `Welche gesellschaftliche Bedeutung kommt dem Thema „${title}“ zu?`, example: `Die zunehmende Bedeutung von „${title}“ ist nicht isoliert zu betrachten, da sie sowohl individuelle Entscheidungen als auch gesellschaftliche Entwicklungen beeinflusst.`, starter: "Differenziert betrachtet lässt sich feststellen, dass ..." },
+        { id: "chancen", title: "Chancen und Entwicklungspotenziale", keywords: ["Innovation", "Zugang", "Entwicklung", "Nutzen", "Gestaltung"], prompt: `Welche Chancen und Entwicklungspotenziale ergeben sich im Zusammenhang mit „${title}“?`, example: `Verantwortungsvoll gestaltete Rahmenbedingungen können bislang ungenutzte Potenziale erschließen und zugleich eine breitere gesellschaftliche Teilhabe ermöglichen.`, starter: "Als besonders vielversprechend erweist sich ..." },
+        { id: "herausforderungen", title: "Herausforderungen und Zielkonflikte", keywords: ["Risiken", "Ungleichheit", "Zielkonflikt", "Grenzen", "Folgen"], prompt: `Welche Zielkonflikte müssen bei „${title}“ berücksichtigt werden?`, example: `Den erkennbaren Vorteilen stehen jedoch strukturelle Risiken gegenüber, deren Folgen insbesondere benachteiligte Gruppen überproportional treffen können.`, starter: "So nachvollziehbar diese Position zunächst erscheint, ..." },
+        { id: "perspektiven", title: "Unterschiedliche Perspektiven", keywords: ["Interessen", "Abwägung", "Betroffene", "Kontroverse", "Kontext"], prompt: `Wie unterscheiden sich die Perspektiven verschiedener Beteiligter auf „${title}“?`, example: `Je nach institutionellem und sozialem Kontext wird die Entwicklung unterschiedlich bewertet, weshalb pauschale Schlussfolgerungen kaum angemessen erscheinen.`, starter: "Aus der Perspektive der unmittelbar Betroffenen ..." },
+        { id: "loesungen", title: "Ausgewogene Lösungsansätze", keywords: ["Regulierung", "Bildung", "Kooperation", "Nachhaltigkeit", "Kompromiss"], prompt: `Wie könnte ein ausgewogener und langfristig tragfähiger Umgang mit „${title}“ aussehen?`, example: `Ein langfristig tragfähiger Ansatz setzt voraus, dass verbindliche Rahmenbedingungen mit Bildung, transparenter Kommunikation und gesellschaftlicher Mitwirkung verknüpft werden.`, starter: "Ein tragfähiger Lösungsansatz müsste gewährleisten, dass ..." },
+      ],
+    } : {
       plan: formalTask
         ? level === "C1"
           ? [

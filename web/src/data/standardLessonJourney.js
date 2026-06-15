@@ -10,7 +10,7 @@ const firstString = (...values) => values.find((value) => typeof value === "stri
 const LEVEL_TARGETS = {
   B1: { targetWords: 160, minimums: [20, 25, 25, 30, 30, 30] },
   B2: { targetWords: 200, minimums: [25, 35, 35, 35, 35, 35] },
-  C1: { targetWords: 230, minimums: [30, 40, 40, 40, 40, 40] },
+  C1: { targetWords: 230, minimums: [35, 45, 45, 45, 45] },
 };
 
 const HERO_IMAGES = {
@@ -28,7 +28,6 @@ const SPECIAL_WRITING_CONFIGS = {
 
 const defaultStarters = [
   "In der heutigen Zeit ist dieses Thema wichtig, weil ...",
-  "Meiner Meinung nach ...",
   "Ein wichtiger Grund dafür ist, dass ...",
   "Ein konkretes Beispiel dafür ist ...",
   "Eine andere Möglichkeit wäre, ...",
@@ -36,12 +35,11 @@ const defaultStarters = [
 ];
 
 const defaultSections = [
-  "Einleitung",
-  "Eigene Position",
-  "Gründe",
+  "Einleitung und Relevanz",
+  "Wichtige Aspekte",
   "Konkretes Beispiel",
-  "Alternative oder Einwand",
-  "Schluss",
+  "Andere Perspektive oder Problem",
+  "Lösung und Schlussposition",
 ];
 
 export const getStandardWritingConfig = (lesson = {}) => {
@@ -63,10 +61,6 @@ export const getStandardWritingConfig = (lesson = {}) => {
         : "Führe verständlich in das Thema ein und zeige seine Bedeutung.",
     },
     {
-      question: `Was ist deine persönliche Meinung oder Hauptaussage zu „${title}“?`,
-      help: "Formuliere eine klare Position und vermeide eine zu allgemeine Antwort.",
-    },
-    {
       question: `Welche Gründe, Ursachen oder wichtigen Aspekte gehören zu „${title}“?`,
       help: isC1
         ? "Erkläre mindestens zwei Aspekte differenziert und verbinde sie logisch."
@@ -83,10 +77,10 @@ export const getStandardWritingConfig = (lesson = {}) => {
       help: "Zeige, dass du das Thema nicht nur aus einer Perspektive betrachtest.",
     },
     {
-      question: `Zu welchem Schluss kommst du beim Thema „${title}“?`,
+      question: `Welche ausgewogene Lösung oder Schlussposition vertrittst du beim Thema „${title}“?`,
       help: isC1
-        ? "Formuliere ein differenziertes Fazit mit Ausblick."
-        : "Fasse deine Position zusammen und nenne einen letzten wichtigen Gedanken.",
+        ? "Verbinde eine tragfähige Lösung mit einem differenzierten abschließenden Urteil."
+        : "Nenne eine sinnvolle Lösung und fasse deine Position klar zusammen.",
     },
   ];
 
@@ -97,7 +91,7 @@ export const getStandardWritingConfig = (lesson = {}) => {
     taskType: lesson.writingTaskType || `${level} guided writing`,
     targetWords: target.targetWords,
     questions: questions.map((item, index) => ({
-      id: ["introduction", "position", "reasons", "example", "alternative", "conclusion"][index],
+      id: ["introduction", "reasons", "example", "alternative", "conclusion"][index],
       section: defaultSections[index],
       question: item.question,
       help: item.help,
@@ -106,11 +100,10 @@ export const getStandardWritingConfig = (lesson = {}) => {
     })),
     checklist: [
       "Die Einleitung stellt das Thema klar vor.",
-      "Meine Hauptaussage oder Meinung ist verständlich.",
       "Ich habe Gründe oder wichtige Aspekte erklärt.",
       "Ich habe ein konkretes Beispiel verwendet.",
       "Ich habe eine Alternative, Lösung oder Gegenposition genannt.",
-      "Der Schluss fasst meine Aussage sinnvoll zusammen.",
+      "Meine Lösung oder Schlussposition ist nachvollziehbar.",
       `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.`,
     ],
   };

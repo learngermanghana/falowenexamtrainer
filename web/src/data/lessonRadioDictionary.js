@@ -84,6 +84,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Kultur und Identität ein. Danach gehst du weiter zum Lernteil.",
     },
+    3: {
+      key: "c1-day3-medien-informationskompetenz-falowen-radio",
+      title: "Medien und Informationskompetenz",
+      youtubeId: "6IvVh9RPJ5s",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Nachrichten, Quellenkritik und digitale Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
 };
 

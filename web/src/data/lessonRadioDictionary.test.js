@@ -39,6 +39,15 @@ test("C1 Day 1 Ziele und Lernweg radio remains available", () =>
   ),
 );
 
+test("C1 Day 3 uses the requested Medien und Informationskompetenz radio", () =>
+  expect(getLessonRadioResource("C1", 3)).toEqual(
+    expect.objectContaining({
+      title: "Medien und Informationskompetenz",
+      youtubeId: "6IvVh9RPJ5s",
+    }),
+  ),
+);
+
 test.each([
   ["/campus/course/lesson/A2/15", { level: "A2", day: 15 }],
   ["/campus/course/a2-day-15-mein-lieblingssport-workbook", { level: "A2", day: 15 }],

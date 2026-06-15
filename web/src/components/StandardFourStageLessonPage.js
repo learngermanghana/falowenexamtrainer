@@ -153,7 +153,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
   const falowenRadio = canonicalLesson?.resources?.falowenRadio || null;
   const [hasEnteredLesson, setHasEnteredLesson] = useState(() => !shouldShowStandardRadioGate(falowenRadio));
   const [activeTab, setActiveTab] = useState("learn");
-  const [writingStatus, setWritingStatus] = useState({ complete: false, completedQuestions: 0, totalQuestions: 6, wordCount: 0 });
+  const [writingStatus, setWritingStatus] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
     try {
