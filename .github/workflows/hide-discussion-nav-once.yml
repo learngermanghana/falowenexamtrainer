@@ -32,46 +32,58 @@ jobs:
               raise SystemExit("Discussion tab entry was not found")
           text = text.replace(discussion_tab, "", 1)
 
-          old_preferred = '''const getPreferredSection = (allowedSections, preferred, tabStructure) => {
-            if (preferred && allowedSections[preferred]) return preferred;
-
-            return findFirstAllowedSection(allowedSections, tabStructure);
-          };'''
-          new_preferred = '''const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHidden = false } = {}) => {
-            const isVisibleSection = Boolean(preferred && getMainTabForSection(preferred, tabStructure));
-            if (preferred && allowedSections[preferred] && (allowHidden || isVisibleSection)) return preferred;
-
-            return findFirstAllowedSection(allowedSections, tabStructure);
-          };'''
+          old_preferred = (
+              'const getPreferredSection = (allowedSections, preferred, tabStructure) => {\n'
+              '  if (preferred && allowedSections[preferred]) return preferred;\n'
+              '\n'
+              '  return findFirstAllowedSection(allowedSections, tabStructure);\n'
+              '};'
+          )
+          new_preferred = (
+              'const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHidden = false } = {}) => {\n'
+              '  const isVisibleSection = Boolean(preferred && getMainTabForSection(preferred, tabStructure));\n'
+              '  if (preferred && allowedSections[preferred] && (allowHidden || isVisibleSection)) return preferred;\n'
+              '\n'
+              '  return findFirstAllowedSection(allowedSections, tabStructure);\n'
+              '};'
+          )
           if old_preferred not in text:
               raise SystemExit("Preferred-section helper was not found")
           text = text.replace(old_preferred, new_preferred, 1)
 
-          old_resolved = '''  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection, tabStructure), [
-            allowedSections,
-            defaultSection,
-            section,
-            tabStructure,
-          ]);'''
-          new_resolved = '''  const resolvedSection = useMemo(
-            () =>
-              getPreferredSection(allowedSections, section || defaultSection, tabStructure, {
-                allowHidden: Boolean(section),
-              }),
-            [allowedSections, defaultSection, section, tabStructure]
-          );'''
+          old_resolved = (
+              '  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection, tabStructure), [\n'
+              '    allowedSections,\n'
+              '    defaultSection,\n'
+              '    section,\n'
+              '    tabStructure,\n'
+              '  ]);'
+          )
+          new_resolved = (
+              '  const resolvedSection = useMemo(\n'
+              '    () =>\n'
+              '      getPreferredSection(allowedSections, section || defaultSection, tabStructure, {\n'
+              '        allowHidden: Boolean(section),\n'
+              '      }),\n'
+              '    [allowedSections, defaultSection, section, tabStructure]\n'
+              '  );'
+          )
           if old_resolved not in text:
               raise SystemExit("Campus section resolver was not found")
           text = text.replace(old_resolved, new_resolved, 1)
 
-          old_storage = '''  useEffect(() => {
-            if (!tabStorageKey) return;
-            localStorage.setItem(tabStorageKey, resolvedSection);
-          }, [resolvedSection, tabStorageKey]);'''
-          new_storage = '''  useEffect(() => {
-            if (!tabStorageKey || !getMainTabForSection(resolvedSection, tabStructure)) return;
-            localStorage.setItem(tabStorageKey, resolvedSection);
-          }, [resolvedSection, tabStorageKey, tabStructure]);'''
+          old_storage = (
+              '  useEffect(() => {\n'
+              '    if (!tabStorageKey) return;\n'
+              '    localStorage.setItem(tabStorageKey, resolvedSection);\n'
+              '  }, [resolvedSection, tabStorageKey]);'
+          )
+          new_storage = (
+              '  useEffect(() => {\n'
+              '    if (!tabStorageKey || !getMainTabForSection(resolvedSection, tabStructure)) return;\n'
+              '    localStorage.setItem(tabStorageKey, resolvedSection);\n'
+              '  }, [resolvedSection, tabStorageKey, tabStructure]);'
+          )
           if old_storage not in text:
               raise SystemExit("Campus tab persistence effect was not found")
           text = text.replace(old_storage, new_storage, 1)
