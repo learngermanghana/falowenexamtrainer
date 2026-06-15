@@ -1278,6 +1278,17 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     }
   };
 
+  const handleRetryMarking = () => {
+    setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setMarkStructuredFeedback(null);
+    setFeedbackTrend(null);
+    setImprovedFeedback("");
+    setError("");
+  };
+
   const revisionSummary = useMemo(
     () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText, level),
     [firstDraftSnapshot, revisedDraftText, level]
@@ -1943,15 +1954,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
                 : "From Day 20, write one complete essay, get full feedback, and save one revised version."}
             </p>
-            <div style={styles.infoBox}>
-              <strong>{isCourseMode ? "Days 1–19 workflow:" : "Day 20+ workflow:"}</strong>
-              <ol style={styles.promptList}>
-                <li>{isCourseMode ? "Write one focused section from today's five-question practice" : "Write one complete letter or essay"}</li>
-                <li>Click <strong>{isCourseMode ? "Analyse my text" : "Get AI feedback"}</strong></li>
-                <li>Revise the weak part and save a cleaner version</li>
-              </ol>
-            </div>
-
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
@@ -1999,81 +2001,26 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               <div className="writing-mark-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button
                   style={styles.primaryButton}
-                  onClick={sendTypedAnswerForCorrection}
+                  onClick={markFeedback ? handleRetryMarking : sendTypedAnswerForCorrection}
                   disabled={loading}
                 >
-                  {loading ? "Getting feedback..." : isCourseMode ? "Analyse my text" : "Get AI feedback"}
+                  {loading ? "Getting feedback..." : markFeedback ? "Retry" : isCourseMode ? "Analyse my text" : "Get AI feedback"}
                 </button>
-                <button style={styles.secondaryButton} type="button" onClick={handleExportDraft}>
-                  Export final draft (PDF/print)
-                </button>
-                {isExamMode ? (
-                  <button
-                    style={styles.secondaryButton}
-                    type="button"
-                    onClick={handleSaveForTutorReview}
-                    disabled={tutorSaveState.loading}
-                  >
-                    {tutorSaveState.loading ? "Submitting to tutor..." : "Submit copy to tutor"}
-                  </button>
-                ) : null}
               </div>
-              {isExamMode ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                  <p style={styles.helperText}>
-                    Exam room only: submit this marked draft so your tutor receives your latest practice.
-                  </p>
-                  {!tutorReviewCloudEnabled ? (
-                    <p style={{ ...styles.helperText, color: "#b45309", margin: "0" }}>
-                      Firebase is not configured in this environment, so tutor responses cannot be synced yet.
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-              {tutorSaveState.error ? (
-                <div style={{ ...styles.helperText, color: "#b91c1c" }}>{tutorSaveState.error}</div>
-              ) : null}
-              {tutorSaveState.success ? (
-                <div style={{ ...styles.helperText, color: "#166534" }}>{tutorSaveState.success}</div>
-              ) : null}
             </div>
 
             {markFeedback ? (
-              <div style={{ ...styles.infoBox, marginTop: 12 }}>
-                <strong>Step 2 (required): reflection + revised submission</strong>
-                <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                  <textarea
-                    value={reflectionText}
-                    onChange={(e) => setReflectionText(e.target.value)}
-                    placeholder="What I fixed: ..."
-                    style={styles.textareaSmall}
-                    rows={2}
-                  />
-                  <textarea
-                    value={revisedDraftText}
-                    onChange={(e) => setRevisedDraftText(e.target.value)}
-                    placeholder="Submit revised version"
-                    style={styles.textArea}
-                    rows={7}
-                  />
-                </div>
-                <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
-                  Attempt 1: {revisionSummary.firstWords} words · Attempt 2: {revisionSummary.revisedWords} words · Δ {revisionSummary.delta}
-                </p>
-                {revisionSummary.badges.length ? (
-                  <div style={styles.tagRow}>
-                    {revisionSummary.badges.map((badge) => (
-                      <span key={badge} style={styles.tagPill}>{badge}</span>
-                    ))}
-                  </div>
-                ) : null}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-                  <button style={styles.primaryButton} onClick={handleCompleteWorkflow}>Complete</button>
-                  <button style={styles.secondaryButton} onClick={handleMarkAndCompareImproved} disabled={improvedLoading}>
-                    {improvedLoading ? "Marking improved draft..." : "Mark & compare improved"}
-                  </button>
-                </div>
-                {workflowComplete ? <div style={{ ...styles.successBox, marginTop: 8 }}>Workflow complete. Great revision discipline.</div> : null}
+              <div style={{ marginTop: 16 }}>
+                <WritingFeedbackCard
+                  feedback={markFeedback}
+                  level={level}
+                  draft={typedAnswer}
+                  rubric={markRubric}
+                  corrections={markCorrections}
+                  simplifiedFeedback={markSimpleFeedback}
+                  structuredFeedback={markStructuredFeedback}
+                  trend={feedbackTrend}
+                />
               </div>
             ) : null}
 
@@ -2083,22 +2030,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               </div>
             )}
           </section>
-
-          {markFeedback && !improvedFeedback ? (
-            <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>AI feedback</h3>
-              <WritingFeedbackCard
-                feedback={markFeedback}
-                level={level}
-                draft={typedAnswer}
-                rubric={markRubric}
-                corrections={markCorrections}
-                simplifiedFeedback={markSimpleFeedback}
-                structuredFeedback={markStructuredFeedback}
-                trend={feedbackTrend}
-              />
-            </section>
-          ) : null}
 
           {improvedFeedback ? (
             <section style={styles.card}>
