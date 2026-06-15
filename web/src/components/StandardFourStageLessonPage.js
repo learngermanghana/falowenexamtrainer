@@ -76,11 +76,13 @@ const matches = (lesson, level, day) => String(lesson?.level || "").toUpperCase(
 const isB2Day1 = (lesson) => matches(lesson, "B2", 1);
 const isC1Day1 = (lesson) => matches(lesson, "C1", 1);
 const isC1Day2 = (lesson) => matches(lesson, "C1", 2);
-const isCompactC1 = (lesson) => isC1Day1(lesson) || isC1Day2(lesson);
+const isC1Day4 = (lesson) => matches(lesson, "C1", 4);
+const isCompactC1 = (lesson) => isC1Day1(lesson) || isC1Day2(lesson) || isC1Day4(lesson);
 
 const c1Questions = {
   1: "Wie kann man einen realistischen und zugleich flexiblen Lernweg planen, um ein anspruchsvolles Sprachziel zu erreichen?",
   2: "Wie stark prägt Kultur die persönliche Identität, und warum sollte Identität nicht starr definiert werden?",
+  4: "Welche Bedingungen braucht ein Team, damit Zusammenarbeit auch bei Konflikten langfristig gelingt?",
 };
 
 const CompactSpeakingPoints = ({ question, branches = [] }) => (
