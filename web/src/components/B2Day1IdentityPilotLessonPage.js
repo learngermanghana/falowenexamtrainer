@@ -81,6 +81,24 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
+const speakingPoints = [
+  ["Persönlichkeit", "Eigenschaften, Stärken und Verhalten"],
+  ["Werte", "Was dir wichtig ist und warum"],
+  ["Prägende Erfahrungen", "Erlebnisse, die dich verändert haben"],
+  ["Online und offline", "Unterschiede in deinem Auftreten"],
+  ["Zukunft", "Was du weiterentwickeln möchtest"],
+];
+
+const SpeakingPoints = () => (
+  <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
+    <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
+    <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
+    <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
+      {speakingPoints.map(([title, detail]) => <li key={title}><strong>{title}:</strong> {detail}</li>)}
+    </ul>
+  </div>
+);
+
 const makeEmptyWritingState = () => ({
   answers: {},
   finalEssay: "",
@@ -403,7 +421,7 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
 
       {activeTab === "speak" ? (
         <Section title="Speaking builder">
-          <NoteBox tone="amber"><strong>Speaking order:</strong> Follow the branches from 1 to 5. Give reasons and at least one concrete example.</NoteBox>
+          <SpeakingPoints />
           <EmbeddedSpeechPracticePanel />
           <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
             <input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((previous) => ({ ...previous, speakDone: event.target.checked }))} />

@@ -13,6 +13,7 @@ import {
   getStandardWritingConfig,
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
+import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 
 const tabs = [
   { id: "learn", label: "1. Learn" },
@@ -85,10 +86,22 @@ const ResourceButton = ({ href, children }) => {
 
 const isC1Day2 = (lesson = {}) => String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 2;
 
+const C1Day2SpeakingPoints = () => (
+  <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
+    <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
+    <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
+    <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
+      {c1Day2LearningSpeakingGuide.speaking.branches.map((branch) => (
+        <li key={branch.id}><strong>{branch.title}:</strong> {branch.keywords.join(", ")}</li>
+      ))}
+    </ul>
+  </div>
+);
+
 const SpeakingBrainMap = ({ lesson }) => {
   const branches = getStandardBrainMap(lesson);
   if (isC1Day2(lesson)) {
-    return <NoteBox tone="amber"><strong>Speaking order:</strong> Follow the branches from 1 to 5. Give reasons and at least one concrete example.</NoteBox>;
+    return <C1Day2SpeakingPoints />;
   }
   return (
     <div style={{ display: "grid", gap: 14 }}>
