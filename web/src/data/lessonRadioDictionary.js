@@ -8,6 +8,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Tourismus und traditionelle Feste ein. Danach gehst du weiter zu Teil 1.",
     },
+    11: {
+      key: "a2-day11-unterwegs-verkehrsmittel-vergleichen-falowen-radio",
+      title: "Unterwegs: Verkehrsmittel vergleichen 4.11",
+      youtubeId: "hsR31V7Fb4U",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Verkehrsmittel vergleichen ein. Danach gehst du weiter zu Teil 1.",
+    },
     9: {
       key: "a2-day9-urlaub-falowen-radio",
       title: "Urlaub planen",

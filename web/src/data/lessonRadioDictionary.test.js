@@ -3,6 +3,7 @@ import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDiction
 test.each([
   [9, "BD663tMiWpg"],
   [10, "vpSwGAtqIlU"],
+  [11, "hsR31V7Fb4U"],
   [15, "WbsTFqIT058"],
   [16, "6lq6uWK1wAs"],
   [26, "9OVfA1B-nuU"],
