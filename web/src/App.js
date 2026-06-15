@@ -182,10 +182,6 @@ import { persistInterfaceLanguage } from "./i18n";
 
 const getTabStructure = (program, t) => {
   const isFrenchProgram = program === "french";
-  const aiLabel = isFrenchProgram ? t("appNav.tabs.aiFrench") : t("appNav.tabs.ai");
-  const grammarLabel = isFrenchProgram ? t("appNav.sections.grammarFrench") : t("appNav.sections.grammar");
-  const writingLabel = isFrenchProgram ? t("appNav.sections.writingFrench") : t("appNav.sections.writing");
-  const speechLabel = isFrenchProgram ? t("appNav.sections.speechFrench") : t("appNav.sections.speech");
   const vocabLabel = isFrenchProgram ? t("appNav.sections.vocabFrench") : t("appNav.sections.vocab");
 
   return [
@@ -200,14 +196,9 @@ const getTabStructure = (program, t) => {
       ],
     },
     {
-      key: "falowenAI",
-      label: aiLabel,
-      sections: [
-        { key: "grammar", label: grammarLabel },
-        { key: "writing", label: writingLabel },
-        { key: "speech", label: speechLabel },
-        { key: "vocab", label: vocabLabel },
-      ],
+      key: "vocab",
+      label: vocabLabel,
+      section: "vocab",
     },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
     { key: "discussion", label: t("appNav.tabs.discussion"), section: "discussion" },
@@ -286,9 +277,6 @@ function App() {
       examFile: (isEnrolled || isStaff) && !isSelfLearningTrack,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
-      grammar: true,
-      writing: true,
-      speech: true,
       vocab: true,
       discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
