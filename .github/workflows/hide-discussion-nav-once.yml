@@ -1,0 +1,98 @@
+name: Hide discussion navigation once
+
+on:
+  push:
+    branches:
+      - codex/hide-discussion-nav-preserve-route
+
+permissions:
+  contents: write
+
+jobs:
+  update-navigation:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update campus navigation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("web/src/App.js")
+          text = path.read_text(encoding="utf-8")
+
+          discussion_tab = '    { key: "discussion", label: t("appNav.tabs.discussion"), section: "discussion" },\n'
+          if discussion_tab not in text:
+              raise SystemExit("Discussion tab entry was not found")
+          text = text.replace(discussion_tab, "", 1)
+
+          old_preferred = '''const getPreferredSection = (allowedSections, preferred, tabStructure) => {
+            if (preferred && allowedSections[preferred]) return preferred;
+
+            return findFirstAllowedSection(allowedSections, tabStructure);
+          };'''
+          new_preferred = '''const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHidden = false } = {}) => {
+            const isVisibleSection = Boolean(preferred && getMainTabForSection(preferred, tabStructure));
+            if (preferred && allowedSections[preferred] && (allowHidden || isVisibleSection)) return preferred;
+
+            return findFirstAllowedSection(allowedSections, tabStructure);
+          };'''
+          if old_preferred not in text:
+              raise SystemExit("Preferred-section helper was not found")
+          text = text.replace(old_preferred, new_preferred, 1)
+
+          old_resolved = '''  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection, tabStructure), [
+            allowedSections,
+            defaultSection,
+            section,
+            tabStructure,
+          ]);'''
+          new_resolved = '''  const resolvedSection = useMemo(
+            () =>
+              getPreferredSection(allowedSections, section || defaultSection, tabStructure, {
+                allowHidden: Boolean(section),
+              }),
+            [allowedSections, defaultSection, section, tabStructure]
+          );'''
+          if old_resolved not in text:
+              raise SystemExit("Campus section resolver was not found")
+          text = text.replace(old_resolved, new_resolved, 1)
+
+          old_storage = '''  useEffect(() => {
+            if (!tabStorageKey) return;
+            localStorage.setItem(tabStorageKey, resolvedSection);
+          }, [resolvedSection, tabStorageKey]);'''
+          new_storage = '''  useEffect(() => {
+            if (!tabStorageKey || !getMainTabForSection(resolvedSection, tabStructure)) return;
+            localStorage.setItem(tabStorageKey, resolvedSection);
+          }, [resolvedSection, tabStorageKey, tabStructure]);'''
+          if old_storage not in text:
+              raise SystemExit("Campus tab persistence effect was not found")
+          text = text.replace(old_storage, new_storage, 1)
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Install frontend dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: web
+        run: npm run build
+
+      - name: Commit navigation update
+        shell: bash
+        run: |
+          rm .github/workflows/hide-discussion-nav-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/App.js .github/workflows/hide-discussion-nav-once.yml
+          git commit -m "Hide discussion from campus navigation"
+          git push origin HEAD:codex/hide-discussion-nav-preserve-route
