@@ -1,5 +1,6 @@
 import b2Day1QuestionWritingBuilder from "./writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
 import c1Day2QuestionWritingBuilder from "./writingQuestionBuilders/c1Day2KulturUndIdentitaet";
+import c1Day1QuestionWritingBuilder from "./writingQuestionBuilders/c1Day1ZieleUndLernweg";
 
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
@@ -19,6 +20,7 @@ const HERO_IMAGES = {
 
 const SPECIAL_WRITING_CONFIGS = {
   "B2-1": b2Day1QuestionWritingBuilder,
+  "C1-1": c1Day1QuestionWritingBuilder,
   "C1-2": c1Day2QuestionWritingBuilder,
 };
 

@@ -100,10 +100,27 @@ const C1Day2SpeakingPoints = () => (
 );
 
 const SpeakingBrainMap = ({ lesson }) => {
+  const richBranches = lesson.speakingBuilder?.branches;
   const branches = getStandardBrainMap(lesson);
   if (isB2Day1(lesson)) return <SpeakingPoints />;
   if (isC1Day2(lesson)) {
     return <C1Day2SpeakingPoints />;
+  }
+  if (Array.isArray(richBranches) && richBranches.length) {
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div><h3 style={{ margin: "0 0 6px" }}>Ideen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Wähle passende Themenbereiche aus, verknüpfe sie differenziert und entwickle daraus deine eigene Antwort.</p></div>
+        {richBranches.map((branch, index) => (
+          <article key={branch.id} style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: "#eef2ff", display: "grid", gap: 8 }}>
+            <strong>{index + 1}. {branch.title}</strong>
+            <div style={{ color: "#475569", fontWeight: 700 }}>{branch.keywords.join(" • ")}</div>
+            <div><strong>Leitfrage:</strong> {branch.prompt}</div>
+            <div style={{ color: "#3730a3" }}>• {branch.example}</div>
+            {branch.starter ? <div style={{ borderLeft: "4px solid #818cf8", paddingLeft: 10 }}><strong>Fortgeschrittener Satzanfang:</strong> {branch.starter}</div> : null}
+          </article>
+        ))}
+      </div>
+    );
   }
   return (
     <div style={{ display: "grid", gap: 14 }}>

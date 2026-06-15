@@ -52,6 +52,14 @@ export const LESSON_RADIO_DICTIONARY = {
     },
   },
   C1: {
+    1: {
+      key: "c1-day1-ziele-lernweg-falowen-radio",
+      title: "Ziele und Lernweg",
+      youtubeId: "McNk1VTFvMk",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf realistische Lernziele und einen flexiblen Lernweg ein. Danach gehst du weiter zum Lernteil.",
+    },
     2: {
       key: "c1-day2-kultur-identitaet-falowen-radio",
       title: "Kultur und Identität",
