@@ -201,7 +201,6 @@ const getTabStructure = (program, t) => {
       section: "vocab",
     },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
-    { key: "discussion", label: t("appNav.tabs.discussion"), section: "discussion" },
     { key: "account", label: t("appNav.tabs.account"), section: "account" },
   ];
 };
@@ -234,8 +233,9 @@ const findFirstAllowedSection = (allowedSections, tabStructure) => {
   return "account";
 };
 
-const getPreferredSection = (allowedSections, preferred, tabStructure) => {
-  if (preferred && allowedSections[preferred]) return preferred;
+const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHidden = false } = {}) => {
+  const isVisibleSection = Boolean(preferred && getMainTabForSection(preferred, tabStructure));
+  if (preferred && allowedSections[preferred] && (allowHidden || isVisibleSection)) return preferred;
 
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
@@ -1076,12 +1076,13 @@ const CampusArea = ({
   const { section } = useParams();
   const navigate = useNavigate();
 
-  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection, tabStructure), [
-    allowedSections,
-    defaultSection,
-    section,
-    tabStructure,
-  ]);
+  const resolvedSection = useMemo(
+    () =>
+      getPreferredSection(allowedSections, section || defaultSection, tabStructure, {
+        allowHidden: Boolean(section),
+      }),
+    [allowedSections, defaultSection, section, tabStructure]
+  );
 
   const activeMainTabConfig = useMemo(
     () => getMainTabForSection(resolvedSection, tabStructure),
@@ -1095,9 +1096,9 @@ const CampusArea = ({
   }, [navigate, resolvedSection, section]);
 
   useEffect(() => {
-    if (!tabStorageKey) return;
+    if (!tabStorageKey || !getMainTabForSection(resolvedSection, tabStructure)) return;
     localStorage.setItem(tabStorageKey, resolvedSection);
-  }, [resolvedSection, tabStorageKey]);
+  }, [resolvedSection, tabStorageKey, tabStructure]);
 
   const handleMainTabClick = (tab) => {
     if (tab.section) {
