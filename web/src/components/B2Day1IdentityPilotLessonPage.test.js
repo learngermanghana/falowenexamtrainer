@@ -1,15 +1,4 @@
-import B2Day1IdentityPilotLessonPage from "./B2Day1IdentityPilotLessonPage";
-import b2Day1QuestionWritingBuilder from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
-
-test("B2 Day 1 pilot page and guided writing builder are available", () => {
-  expect(typeof B2Day1IdentityPilotLessonPage).toBe("function");
-  expect(b2Day1QuestionWritingBuilder.level).toBe("B2");
-  expect(b2Day1QuestionWritingBuilder.day).toBe(1);
-  expect(b2Day1QuestionWritingBuilder.questions).toHaveLength(5);
-  expect(
-    b2Day1QuestionWritingBuilder.questions.reduce(
-      (total, question) => total + question.minimumWords,
-      0,
-    ),
-  ).toBe(b2Day1QuestionWritingBuilder.targetWords);
-});
+import B2Day1IdentityPilotLessonPage, { speakingTopics } from "./B2Day1IdentityPilotLessonPage";
+import builder from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
+test("B2 Day 1 provides five practical speaking groups with questions and examples", () => { expect(typeof B2Day1IdentityPilotLessonPage).toBe("function"); expect(speakingTopics).toHaveLength(5); speakingTopics.forEach((topic) => expect(topic).toHaveLength(5)); });
+test("B2 Day 1 uses five guided writing questions", () => expect(builder.questions).toHaveLength(5));

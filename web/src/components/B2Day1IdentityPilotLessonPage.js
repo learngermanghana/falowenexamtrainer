@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
-import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
-import { useAuth } from "../context/AuthContext";
+import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
+import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import { useToast } from "../context/ToastContext";
-import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
 import b2Day1QuestionWritingBuilder from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
 import { styles } from "../styles";
 
@@ -37,8 +36,6 @@ const tabBarStyle = {
   background: "rgba(248, 250, 252, 0.94)",
   backdropFilter: "blur(12px)",
 };
-
-const countWords = (text = "") => String(text || "").trim().split(/\s+/).filter(Boolean).length;
 
 const getYouTubeEmbedUrl = (url = "") => {
   try {
@@ -81,247 +78,15 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
-const speakingPoints = [
-  ["Persönlichkeit", "Eigenschaften, Stärken und Verhalten"],
-  ["Werte", "Was dir wichtig ist und warum"],
-  ["Prägende Erfahrungen", "Erlebnisse, die dich verändert haben"],
-  ["Online und offline", "Unterschiede in deinem Auftreten"],
-  ["Zukunft", "Was du weiterentwickeln möchtest"],
+export const speakingTopics = [
+  ["Persönlichkeit", "Wie würdest du dich beschreiben?", "Ich würde mich als offene und zuverlässige Person beschreiben.", "Was ist eine deiner Stärken?", "Eine meiner größten Stärken ist, dass ich auch in schwierigen Situationen ruhig bleibe."],
+  ["Werte und Überzeugungen", "Was ist dir im Leben besonders wichtig?", "Ehrlichkeit und gegenseitiger Respekt sind mir besonders wichtig.", "Welche Werte hast du von deiner Familie gelernt?", "Meine Familie hat mir beigebracht, Verantwortung zu übernehmen und andere Menschen zu unterstützen."],
+  ["Prägende Erfahrungen", "Welche Erfahrung hat dich besonders geprägt?", "Mein Umzug in eine andere Stadt hat mich selbstständiger gemacht.", "Gibt es eine Person, die dich stark beeinflusst hat?", "Meine Mutter hat mich stark beeinflusst, weil sie mir gezeigt hat, wie wichtig Ausdauer ist."],
+  ["Online und offline", "Zeigst du dich online genauso wie im echten Leben?", "Online teile ich nur bestimmte Seiten meiner Persönlichkeit, während ich offline viel spontaner bin.", "Warum wirken Menschen in sozialen Medien manchmal anders?", "Viele Menschen möchten online ein besonders positives Bild von sich zeigen."],
+  ["Zukunft und persönliche Entwicklung", "Was möchtest du an dir weiterentwickeln?", "In Zukunft möchte ich selbstbewusster auftreten und meine Meinung klarer ausdrücken.", "Haben sich deine Ziele in den letzten Jahren verändert?", "Ja, meine Ziele haben sich verändert, weil ich heute andere Prioritäten habe."],
 ];
 
-const SpeakingPoints = () => (
-  <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
-    <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
-    <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
-    <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
-      {speakingPoints.map(([title, detail]) => <li key={title}><strong>{title}:</strong> {detail}</li>)}
-    </ul>
-  </div>
-);
-
-const makeEmptyWritingState = () => ({
-  answers: {},
-  finalEssay: "",
-  view: "questions",
-  updatedAt: "",
-});
-
-function B2Day1GuidedWritingBuilder({ onStatusChange }) {
-  const config = b2Day1QuestionWritingBuilder;
-  const storageKey = "falowen:b2:day1:question-writing-builder";
-  const { user, studentProfile } = useAuth();
-  const userId = user?.uid || "";
-  const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || userId;
-  const hasCloudOwner = Boolean(studentCode || userId);
-  const [state, setState] = useState(() => {
-    try {
-      return {
-        ...makeEmptyWritingState(),
-        ...JSON.parse(localStorage.getItem(storageKey) || "{}"),
-      };
-    } catch (error) {
-      return makeEmptyWritingState();
-    }
-  });
-  const [cloudLoaded, setCloudLoaded] = useState(false);
-  const [cloudSaveStatus, setCloudSaveStatus] = useState("idle");
-  const [copyMessage, setCopyMessage] = useState("");
-
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(state));
-  }, [state]);
-
-  useEffect(() => {
-    let active = true;
-
-    if (!hasCloudOwner) {
-      setCloudLoaded(true);
-      setCloudSaveStatus("device");
-      return undefined;
-    }
-
-    setCloudSaveStatus("loading");
-    loadWritingProgress({ userId, studentCode, mode: "course" })
-      .then((saved) => {
-        if (!active) return;
-        const cloudDraft = saved?.b2Day1GuidedWriting;
-        if (cloudDraft && typeof cloudDraft === "object") {
-          setState((current) => {
-            const cloudTime = Date.parse(cloudDraft.updatedAt || "") || 0;
-            const localTime = Date.parse(current.updatedAt || "") || 0;
-            if (localTime > cloudTime) return current;
-            return {
-              ...makeEmptyWritingState(),
-              ...cloudDraft,
-              answers: cloudDraft.answers && typeof cloudDraft.answers === "object" ? cloudDraft.answers : {},
-            };
-          });
-        }
-        setCloudSaveStatus("saved");
-      })
-      .catch(() => {
-        if (active) setCloudSaveStatus("error");
-      })
-      .finally(() => {
-        if (active) setCloudLoaded(true);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [hasCloudOwner, studentCode, userId]);
-
-  useEffect(() => {
-    if (!cloudLoaded || !hasCloudOwner) return undefined;
-    setCloudSaveStatus("saving");
-    const timer = window.setTimeout(async () => {
-      const saved = await saveWritingProgress({
-        userId,
-        studentCode,
-        mode: "course",
-        data: { b2Day1GuidedWriting: state },
-      });
-      setCloudSaveStatus(saved ? "saved" : "error");
-    }, 800);
-    return () => window.clearTimeout(timer);
-  }, [cloudLoaded, hasCloudOwner, state, studentCode, userId]);
-
-  const questionStats = useMemo(
-    () => config.questions.map((item) => {
-      const words = countWords(state.answers?.[item.id]);
-      return { ...item, words, complete: words >= item.minimumWords };
-    }),
-    [config.questions, state.answers],
-  );
-  const completedQuestions = questionStats.filter((item) => item.complete).length;
-  const totalWords = questionStats.reduce((sum, item) => sum + item.words, 0);
-  const allComplete = completedQuestions === questionStats.length;
-  const combinedAnswers = questionStats
-    .map((item) => String(state.answers?.[item.id] || "").trim())
-    .filter(Boolean)
-    .join("\n\n");
-
-  useEffect(() => {
-    onStatusChange?.({
-      complete: allComplete && Boolean(state.finalEssay.trim()),
-      completedQuestions,
-      totalQuestions: questionStats.length,
-      wordCount: countWords(state.finalEssay),
-    });
-  }, [allComplete, completedQuestions, onStatusChange, questionStats.length, state.finalEssay]);
-
-  const updateState = (updater) => {
-    setState((previous) => {
-      const next = typeof updater === "function" ? updater(previous) : { ...previous, ...updater };
-      return { ...next, updatedAt: new Date().toISOString() };
-    });
-  };
-
-  const updateAnswer = (id, value) => {
-    updateState((previous) => ({
-      ...previous,
-      answers: { ...(previous.answers || {}), [id]: value },
-    }));
-  };
-
-  const combineAnswers = () => {
-    if (!allComplete) return;
-    updateState((previous) => ({
-      ...previous,
-      finalEssay: combinedAnswers,
-      view: "final",
-    }));
-  };
-
-  const copyEssay = async () => {
-    try {
-      await navigator.clipboard.writeText(state.finalEssay || "");
-      setCopyMessage("Essay copied.");
-    } catch (error) {
-      setCopyMessage("Copy failed. Select the text manually.");
-    }
-  };
-
-  const saveLabel = !hasCloudOwner
-    ? "Saved on this device"
-    : cloudSaveStatus === "loading"
-      ? "Loading saved work..."
-      : cloudSaveStatus === "saving"
-        ? "Saving to Falowen..."
-        : cloudSaveStatus === "error"
-          ? "Cloud save failed — device copy is safe"
-          : "Saved to Falowen";
-
-  return (
-    <div style={{ border: "1px solid #c7d2fe", borderRadius: 18, background: "linear-gradient(180deg, #ffffff, #f8fafc)", padding: 16, display: "grid", gap: 16 }}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <span style={{ ...styles.badge, width: "fit-content", background: "#eef2ff", color: "#3730a3" }}>Guided B2 Writing</span>
-        <h3 style={{ margin: 0 }}>Answer {config.questions.length} questions and combine your essay</h3>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Write one focused section at a time. When every section reaches its minimum, Falowen combines your answers into one editable essay.</p>
-        <small style={{ color: cloudSaveStatus === "error" ? "#b91c1c" : "#166534", fontWeight: 800 }}>{saveLabel}</small>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
-        <ProgressCard label="Questions" complete={allComplete} detail={`${completedQuestions}/${questionStats.length} complete`} />
-        <ProgressCard label="Words written" complete={totalWords >= config.targetWords} detail={`${totalWords}/${config.targetWords} words`} />
-      </div>
-
-      {state.view !== "final" ? (
-        <>
-          <div style={{ display: "grid", gap: 14 }}>
-            {questionStats.map((item, index) => (
-              <article key={item.id} style={{ border: `1px solid ${item.complete ? "#86efac" : "#e2e8f0"}`, borderRadius: 16, padding: 14, background: item.complete ? "#f0fdf4" : "#fff", display: "grid", gap: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                  <strong>Question {index + 1} of {questionStats.length} · {item.section}</strong>
-                  <span style={{ ...styles.badge, background: item.complete ? "#dcfce7" : "#fef3c7", color: item.complete ? "#166534" : "#92400e" }}>{item.words}/{item.minimumWords} words {item.complete ? "✓" : ""}</span>
-                </div>
-                <h4 style={{ margin: 0, fontSize: "1.03rem" }}>{item.question}</h4>
-                <p style={{ margin: 0, color: "#64748b", lineHeight: 1.6 }}>{item.help}</p>
-                <div style={{ borderLeft: "4px solid #818cf8", padding: "9px 11px", background: "#f8fafc", borderRadius: 8 }}><strong>Starter:</strong> {item.starter}</div>
-                <textarea
-                  value={state.answers?.[item.id] || ""}
-                  onChange={(event) => updateAnswer(item.id, event.target.value)}
-                  placeholder={`Write at least ${item.minimumWords} words...`}
-                  style={{ minHeight: 125, width: "100%", boxSizing: "border-box", border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, resize: "vertical", font: "inherit", lineHeight: 1.6 }}
-                />
-                <small style={{ color: item.complete ? "#166534" : "#92400e", fontWeight: 800 }}>
-                  {item.complete ? "Section completed." : `Add ${Math.max(item.minimumWords - item.words, 0)} more words.`}
-                </small>
-              </article>
-            ))}
-          </div>
-          <button type="button" onClick={combineAnswers} disabled={!allComplete} style={{ ...styles.primaryButton, opacity: allComplete ? 1 : 0.5 }}>
-            Combine my answers into an essay
-          </button>
-          {!allComplete ? <p style={{ margin: 0, textAlign: "center", color: "#64748b" }}>Complete all minimum word requirements to unlock the combined essay.</p> : null}
-        </>
-      ) : (
-        <div style={{ display: "grid", gap: 12 }}>
-          <NoteBox tone="green"><strong>Your essay draft is ready.</strong> Improve transitions, grammar and paragraph flow before using the AI writing coach.</NoteBox>
-          <textarea
-            value={state.finalEssay || ""}
-            onChange={(event) => updateState((previous) => ({ ...previous, finalEssay: event.target.value }))}
-            style={{ minHeight: 340, width: "100%", boxSizing: "border-box", border: "1px solid #94a3b8", borderRadius: 12, padding: 14, resize: "vertical", font: "inherit", lineHeight: 1.7 }}
-          />
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>Words: {countWords(state.finalEssay)}</span>
-            <span style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>Target: about {config.targetWords}</span>
-          </div>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, background: "#fff" }}>
-            <strong>Final checklist</strong>
-            <ul style={{ marginBottom: 0, paddingLeft: 20, lineHeight: 1.7 }}>{config.checklist.map((item) => <li key={item}>{item}</li>)}</ul>
-          </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.secondaryButton} onClick={() => updateState((previous) => ({ ...previous, view: "questions" }))}>Back to questions</button>
-            <button type="button" style={styles.secondaryButton} onClick={combineAnswers}>Refresh from answers</button>
-            <button type="button" style={styles.primaryButton} onClick={copyEssay} disabled={!state.finalEssay}>Copy final essay</button>
-          </div>
-          {copyMessage ? <small style={{ color: "#475569", fontWeight: 700 }}>{copyMessage}</small> : null}
-        </div>
-      )}
-    </div>
-  );
-}
+const SpeakingPoints = () => <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{speakingTopics.map(([title, ...lines]) => <article key={title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65 }}><strong>{title}</strong><p style={{ margin: "5px 0 0" }}>{lines.join(" • ")}</p></article>)}</div>;
 
 export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = null }) {
   const { showToast } = useToast();
@@ -433,12 +198,7 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
       {activeTab === "write" ? (
         <Section title="Guided writing builder">
           <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
-          <B2Day1GuidedWritingBuilder onStatusChange={setWritingStatus} />
-          <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 14, display: "grid", gap: 10 }}>
-            <h3 style={{ margin: 0 }}>AI writing coach and marking</h3>
-            <p style={{ margin: 0, color: "#64748b" }}>After combining your essay, copy it into the coach below for feedback and correction.</p>
-            <EmbeddedWritingPracticePanel />
-          </div>
+          <GuidedWritingWorkspace config={b2Day1QuestionWritingBuilder} storageKey="falowen:b2:day1:question-writing-builder" cloudField="b2Day1GuidedWriting" onStatusChange={setWritingStatus} />
         </Section>
       ) : null}
 
