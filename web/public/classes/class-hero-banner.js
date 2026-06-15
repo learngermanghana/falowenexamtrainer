@@ -31,8 +31,8 @@
     return match ? match[1] : "";
   }
 
-  function formUrl(slug) {
-    return slug ? "/classes/?class=" + encodeURIComponent(slug) : "/classes/";
+  function signupUrl(slug) {
+    return slug ? "/signup/?class=" + encodeURIComponent(slug) : "/signup/";
   }
 
   function detailsUrl(slug) {
@@ -147,14 +147,14 @@
     if (leadCard) leadCard.remove();
     var slug = selectedSlug();
     document.querySelectorAll("a[href^='/signup'],a[href^='/classes/?class']").forEach(function (link) {
-      link.href = formUrl(slug);
+      link.href = signupUrl(slug);
       link.textContent = "Register Now";
       link.removeAttribute("target");
       link.removeAttribute("rel");
     });
     var cta = document.getElementById("mainSignupCta");
     if (cta) {
-      cta.href = formUrl(slug);
+      cta.href = signupUrl(slug);
       cta.textContent = "Register Now";
     }
   }
@@ -178,7 +178,7 @@
           "Starts: " + formatDate(course.startDate) + "<br>" +
           "Time: " + classTime(course) + "<br>" +
           "Fee: " + formatMoney(course.tuitionGhs) +
-          "</div><div class='other-class-actions'><a class='button' href='" + detailsUrl(slug) + "'>View details</a><a class='button primary' href='" + formUrl(slug) + "'>Register</a></div></article>";
+          "</div><div class='other-class-actions'><a class='button' href='" + detailsUrl(slug) + "'>View details</a><a class='button primary' href='" + signupUrl(slug) + "'>Register</a></div></article>";
       }).join("") + "</div>";
 
     var anchor = document.getElementById("class-summary") || document.querySelector(".class-main-card") || document.querySelector(".hero");
