@@ -68,6 +68,6 @@ test.each([
 test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", () =>
   expect(getLessonRadioResource("A2", 10)).toEqual(expect.objectContaining({
     title: "Tourismus und Traditionelle Feste 4.10",
-    youtubeId: "0_iGhcuysag",
+    youtubeId: "vpSwGAtqIlU",
   })),
 );
