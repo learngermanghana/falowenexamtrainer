@@ -140,7 +140,7 @@ const getTimerMeta = (thread, now) => {
 
 const repliesCollectionRef = (threadId) => collection(db, "qa_posts", threadId, "responses");
 
-export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, title = "Class discussion", description }) => {
+export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, title = "Class discussion", description, contributionOnly = false }) => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
   const [repliesByThread, setRepliesByThread] = useState({});
@@ -754,6 +754,9 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
     const status = thread.status || "open";
     const timerMeta = getTimerMeta(thread, now);
     const repliesLocked = status === "archived";
+    const visibleReplies = contributionOnly
+      ? thread.replies.filter((reply) => reply.responderUid === user?.uid || reply.createdByUid === user?.uid)
+      : thread.replies;
 
 
     const statusBadgeStyle = {
@@ -767,7 +770,7 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
 
     return (
       <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div
+        {!contributionOnly ? <div
           style={{
             display: "flex",
             alignItems: "center",
@@ -845,9 +848,9 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
               </button>
             ) : null}
           </div>
-        </div>
+        </div> : null}
 
-        {isEditingThisThread ? (
+        {!contributionOnly && isEditingThisThread ? (
           <div style={{ display: "grid", gap: 10, background: "#f8fafc", padding: 12, borderRadius: 12 }}>
             <div style={styles.field}>
               <label style={styles.label}>Topic / headline</label>
@@ -905,7 +908,7 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
               </button>
             </div>
           </div>
-        ) : (
+        ) : !contributionOnly ? (
           <>
             {status === "archived" ? (
               <div
@@ -979,14 +982,16 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
               ) : null}
             </div>
           </>
-        )}
+        ) : null}
 
 
         <div style={{ display: "grid", gap: 8 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>
+            {contributionOnly ? "Your class contribution" : `Responses (${thread.replies.length})`}
+          </div>
 
           <div style={{ display: "grid", gap: 10 }}>
-            {thread.replies.map((reply) => {
+            {visibleReplies.map((reply) => {
               const canManage = canEditReply(reply);
 
               return (
@@ -1062,8 +1067,10 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
               );
             })}
 
-            {thread.replies.length === 0 && (
-              <div style={{ ...styles.helperText, margin: 0 }}>No responses yet — start the discussion!</div>
+            {visibleReplies.length === 0 && (
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                {contributionOnly ? "Your contribution will appear here after you save it." : "No responses yet — start the discussion!"}
+              </div>
             )}
           </div>
 
@@ -1223,7 +1230,7 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
           </button>
         </div> : null}
 
-        {activeTab === "discussion" && (!embedded || isDiscussionAdmin) ? (
+        {activeTab === "discussion" && (!embedded || isDiscussionAdmin) && !contributionOnly ? (
           <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               <span style={styles.helperText}>Time display</span>
@@ -1388,7 +1395,7 @@ export const ClassDiscussionPanel = ({ embedded = false, lessonId, lessonLabel, 
             <div style={styles.card}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>{embedded ? "Discussion not open yet" : "No matching discussions"}</div>
               <p style={{ ...styles.helperText, margin: 0 }}>
-                {embedded && !isDiscussionAdmin ? "The discussion for this lesson has not been opened yet. Your tutor will add the discussion question here." : embedded ? "Create this lesson’s discussion using the form above." : "Try adjusting your filters, or create a new post for your class."}
+                {contributionOnly ? "Your tutor needs to open this lesson’s class contribution box first." : embedded && !isDiscussionAdmin ? "The discussion for this lesson has not been opened yet. Your tutor will add the discussion question here." : embedded ? "Create this lesson’s discussion using the form above." : "Try adjusting your filters, or create a new post for your class."}
               </p>
             </div>
           ) : (

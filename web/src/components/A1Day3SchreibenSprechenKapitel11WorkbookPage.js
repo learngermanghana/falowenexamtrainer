@@ -471,52 +471,6 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Introducing Yourself</h2>
-
-        <div style={subCardStyle}>
-          <strong>1. Name</strong>
-          <p style={{ margin: 0 }}>"Ich heiße [Name]."</p>
-          <p style={{ margin: 0 }}>Example: "Ich heiße Felix."</p>
-        </div>
-
-        <div style={subCardStyle}>
-          <strong>2. Country</strong>
-          <p style={{ margin: 0 }}>"Ich komme aus [Country]."</p>
-          <p style={{ margin: 0 }}>Example: "Ich komme aus Deutschland."</p>
-        </div>
-
-        <div style={subCardStyle}>
-          <strong>3. Age</strong>
-          <p style={{ margin: 0 }}>"Ich bin [Age] Jahre alt."</p>
-          <p style={{ margin: 0 }}>Example: "Ich bin 25 Jahre alt."</p>
-        </div>
-
-        <div style={subCardStyle}>
-          <strong>4. Location</strong>
-          <p style={{ margin: 0 }}>"Ich wohne in [City/Location]."</p>
-          <p style={{ margin: 0 }}>Example: "Ich wohne in Berlin."</p>
-        </div>
-
-        <div style={{ ...subCardStyle, background: "#fefce8", border: "1px solid #fde68a" }}>
-          <strong>Combined Introduction</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            "Hallo! Ich heiße Felix. Ich komme aus Deutschland. Ich bin 25 Jahre alt und ich wohne in
-            Berlin."
-          </p>
-        </div>
-
-        <div style={subCardStyle}>
-          <strong>Vocabulary List</strong>
-          <ul style={listStyle}>
-            <li>Name: der Name</li>
-            <li>To be called: heißen</li>
-            <li>Country: das Land</li>
-            <li>To come from: kommen aus</li>
-          </ul>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
         <img
           src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1600&q=80"
           alt="Student learning question words in class"
@@ -671,11 +625,58 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
         </div>
       </section>
 
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Introducing Yourself</h2>
+
+        <div style={subCardStyle}>
+          <strong>1. Name</strong>
+          <p style={{ margin: 0 }}>"Ich heiße [Name]."</p>
+          <p style={{ margin: 0 }}>Example: "Ich heiße Felix."</p>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>2. Country</strong>
+          <p style={{ margin: 0 }}>"Ich komme aus [Country]."</p>
+          <p style={{ margin: 0 }}>Example: "Ich komme aus Deutschland."</p>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>3. Age</strong>
+          <p style={{ margin: 0 }}>"Ich bin [Age] Jahre alt."</p>
+          <p style={{ margin: 0 }}>Example: "Ich bin 25 Jahre alt."</p>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>4. Location</strong>
+          <p style={{ margin: 0 }}>"Ich wohne in [City/Location]."</p>
+          <p style={{ margin: 0 }}>Example: "Ich wohne in Berlin."</p>
+        </div>
+
+        <div style={{ ...subCardStyle, background: "#fefce8", border: "1px solid #fde68a" }}>
+          <strong>Combined Introduction</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            "Hallo! Ich heiße Felix. Ich komme aus Deutschland. Ich bin 25 Jahre alt und ich wohne in
+            Berlin."
+          </p>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>Vocabulary List</strong>
+          <ul style={listStyle}>
+            <li>Name: der Name</li>
+            <li>To be called: heißen</li>
+            <li>Country: das Land</li>
+            <li>To come from: kommen aus</li>
+          </ul>
+        </div>
+      </section>
+
       <CourseInlineDiscussionPanel
         lessonId={getDiscussionLesson({ level: "A1", day: 3, chapter: "1.1_1.2" }).id}
         lessonLabel={getDiscussionLesson({ level: "A1", day: 3, chapter: "1.1_1.2" }).label}
-        title="Class Discussion"
-        description="Read the discussion question, write your answer and respond to your classmates. Your answers are visible only to students in your class."
+        title="Save your class contribution"
+        description="Write your introduction below. It is saved to your class discussion, and this workbook shows only your own contribution."
+        contributionOnly
       />
 
       <section style={sectionStyle}>
