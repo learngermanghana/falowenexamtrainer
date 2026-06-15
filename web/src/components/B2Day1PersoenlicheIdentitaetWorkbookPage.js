@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 
 const tabs = [
-  { key: "radio", label: "🎙️ Falowen Radio" },
   { key: "sprechen", label: "Sprechen" },
   { key: "schreiben", label: "Schreiben" },
   { key: "lesen", label: "Lesen" },
@@ -11,7 +9,7 @@ const tabs = [
 ];
 
 export default function B2Day1PersoenlicheIdentitaetWorkbookPage() {
-  const [active, setActive] = useState("radio");
+  const [active, setActive] = useState("sprechen");
   const activeLabel = useMemo(() => tabs.find((t) => t.key === active)?.label, [active]);
 
   return (
@@ -23,14 +21,6 @@ export default function B2Day1PersoenlicheIdentitaetWorkbookPage() {
         {tabs.map((t) => <button key={t.key} onClick={() => setActive(t.key)} style={{ fontWeight: active === t.key ? 700 : 400 }}>{t.label}</button>)}
       </div>
       <p><strong>Aktiver Tab:</strong> {activeLabel}</p>
-
-      {active === "radio" && (
-        <FalowenRadioTabContent
-          level="B2"
-          day={1}
-          onContinue={() => setActive("sprechen")}
-        />
-      )}
 
       {active === "sprechen" && <section><h2>Teil 1 · Sprechen</h2><p>Beschreiben Sie in 2–3 Minuten, wie sich Ihre Identität im Laufe der Zeit verändert hat (Familie, Schule, Arbeit, soziale Medien).</p><p><strong>Selbstbewertung:</strong> Habe ich Beispiele gegeben? Habe ich verbindende Ausdrücke benutzt (zuerst, außerdem, dennoch)?</p></section>}
 
