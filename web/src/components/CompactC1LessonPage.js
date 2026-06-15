@@ -42,6 +42,12 @@ const NoteBox = ({ children, tone = "blue" }) => {
   return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 12, background, color, lineHeight: 1.65 }}>{children}</div>;
 };
 
+const ResourceButton = ({ href, children }) => {
+  if (!href) return null;
+  const external = !String(href).startsWith("/");
+  return <a href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})} style={{ ...styles.linkButton, width: "fit-content" }}>{children}</a>;
+};
+
 const embedUrl = (url = "") => {
   try {
     const parsed = new URL(url);
@@ -92,6 +98,8 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const grammarRules = (lesson.grammarLesson?.rules || []).slice(0, 6);
   const grammarExamples = (lesson.grammarLesson?.examples || []).slice(0, 5);
   const branches = lesson.speakingBuilder?.branches || [];
+  const grammarUrl = canonicalLesson?.resources?.grammarBook?.url || lesson.resources?.grammarBook?.url || "";
+  const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const finishReady = progress.learnDone && progress.speakDone && writing.complete;
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
@@ -140,6 +148,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
             <div><h3>Model sentences</h3><ul style={listStyle}>{grammarExamples.map((item) => <li key={item}>{item}</li>)}</ul></div>
           </div>
           {lesson.grammarLesson?.miniExercise ? <NoteBox><strong>Mini practice:</strong> {lesson.grammarLesson.miniExercise}</NoteBox> : null}
+          <ResourceButton href={grammarUrl}>Open full grammar notes</ResourceButton>
           <label style={{ fontWeight: 800 }}><input type="checkbox" checked={progress.learnDone} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} /> I reviewed the grammar.</label>
         </Section>
       </> : null}
@@ -157,6 +166,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
 
       {active === "write" ? <Section title="Guided writing builder">
         <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
+        <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
         {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
       </Section> : null}
 
