@@ -42,3 +42,14 @@ test("C1 Day 3 keeps five rich C1 speaking branches", () => {
   });
   expect(lesson.speakingBuilder.branches.map((branch) => branch.title)).not.toEqual(expect.arrayContaining(["Einleitung", "Hauptteil 1", "Hauptteil 2", "Schluss"]));
 });
+
+test.each([4, 10, 19, 20, 28])("C1 Day %i uses the rich C1 speaking standard", (day) => {
+  const lesson = SELF_LEARNING_LESSONS.C1.find((entry) => entry.day === day);
+  expect(lesson.speakingBuilder.branches).toHaveLength(5);
+  lesson.speakingBuilder.branches.forEach((branch) => {
+    expect(branch.keywords).toHaveLength(5);
+    expect(branch.prompt).toBeTruthy();
+    expect(branch.example).toBeTruthy();
+    expect(branch.starter).toBeTruthy();
+  });
+});

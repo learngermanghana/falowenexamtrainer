@@ -145,7 +145,7 @@
     const style = document.createElement("style");
     style.id = "classLeadStyles";
     style.textContent = `
-      body.lead-gate-active .page > section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),
+      body.lead-gate-active .page > section:not(.intro-video):not(.hero):not(.lead-capture-card):not(#studentReviewsCard),
       body.lead-gate-active .page > .card:not(.lead-capture-card):not(#studentReviewsCard),
       body.lead-gate-active .page > .grid,
       body.lead-gate-active .page > p.footer,

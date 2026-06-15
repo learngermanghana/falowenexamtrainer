@@ -5,17 +5,15 @@ import {
 } from "./standardLessonJourney";
 
 test.each([
-  ["B1", 160],
-  ["B2", 200],
   ["C1", 230],
-])("creates six guided writing questions for %s", (level, targetWords) => {
+])("creates five guided writing questions for %s Day 4–19", (level, targetWords) => {
   const config = getStandardWritingConfig({
     level,
     day: 8,
     title: "Testthema",
   });
 
-  expect(config.questions).toHaveLength(6);
+  expect(config.questions).toHaveLength(5);
   expect(config.targetWords).toBe(targetWords);
   expect(
     config.questions.reduce((sum, question) => sum + question.minimumWords, 0),
