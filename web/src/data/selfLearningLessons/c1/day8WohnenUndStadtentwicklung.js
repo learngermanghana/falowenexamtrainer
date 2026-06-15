@@ -22,7 +22,7 @@ const c1Day8WohnenUndStadtentwicklung = makeLesson({
   grammarLesson: {
     title: "Nominalisierung und Präpositionalstil",
     explanation: [
-      "Bei der Nominalisierung wird ein Verb oder Adjektiv in ein Nomen umgewandelt: bauen wird zu der Bau, verbessern zu die Verbesserung und verfügbar zu die Verfügbarkeit.",
+      "Bei der Nominalisierung wird ein Verb oder Adjektiv in ein Nomen umgewandelt: Aus bauen wird der Bau, aus verbessern die Verbesserung und aus verfügbar die Verfügbarkeit.",
       "Der Präpositionalstil ersetzt Nebensätze durch präzise Präpositionalgruppen: weil Wohnraum fehlt wird zu aufgrund des Mangels an Wohnraum.",
       "Diese Formen passen zu Berichten, Stellungnahmen und formellen Vorschlägen. Zu viele Nominalisierungen können einen Text jedoch unnötig schwer verständlich machen.",
     ],
