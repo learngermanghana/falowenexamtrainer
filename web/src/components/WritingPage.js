@@ -1998,13 +1998,32 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             <WordCountMeter count={typedWordCount} range={typedWordRange} />
 
             <div style={{ marginTop: 12 }}>
-              <div className="writing-mark-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div
+                className="writing-mark-actions"
+                style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+              >
                 <button
+                  type="button"
                   style={styles.primaryButton}
                   onClick={markFeedback ? handleRetryMarking : sendTypedAnswerForCorrection}
                   disabled={loading}
                 >
-                  {loading ? "Getting feedback..." : markFeedback ? "Retry" : isCourseMode ? "Analyse my text" : "Get AI feedback"}
+                  {loading
+                    ? "Getting feedback..."
+                    : markFeedback
+                      ? "Retry"
+                      : isCourseMode
+                        ? "Analyse my text"
+                        : "Get AI feedback"}
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={handleExportDraft}
+                  disabled={!typedAnswer.trim()}
+                >
+                  Export / Print draft
                 </button>
               </div>
             </div>
@@ -2021,6 +2040,139 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                   structuredFeedback={markStructuredFeedback}
                   trend={feedbackTrend}
                 />
+              </div>
+            ) : null}
+
+            {markFeedback && isExamMode ? (
+              <div
+                style={{
+                  ...styles.helperCard,
+                  marginTop: 18,
+                  display: "grid",
+                  gap: 14,
+                }}
+              >
+                <div>
+                  <h4 style={{ ...styles.resultHeading, marginBottom: 4 }}>
+                    Improve your draft
+                  </h4>
+
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    Reflect on the feedback, revise your draft, compare the improved
+                    version, and then submit it for tutor review.
+                  </p>
+                </div>
+
+                <div>
+                  <label style={styles.label}>
+                    What will you improve?
+                  </label>
+
+                  <textarea
+                    value={reflectionText}
+                    onChange={(event) => {
+                      setReflectionText(event.target.value);
+                      setWorkflowComplete(false);
+                      setTutorSaveState({
+                        loading: false,
+                        success: "",
+                        error: "",
+                      });
+                    }}
+                    placeholder="Example: I will improve my word order and answer every task point."
+                    style={styles.textArea}
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label style={styles.label}>
+                    Your improved draft
+                  </label>
+
+                  <textarea
+                    value={revisedDraftText}
+                    onChange={(event) => {
+                      setRevisedDraftText(event.target.value);
+                      setWorkflowComplete(false);
+                      setTutorSaveState({
+                        loading: false,
+                        success: "",
+                        error: "",
+                      });
+                    }}
+                    placeholder="Rewrite your improved letter or essay here."
+                    style={styles.textArea}
+                    rows={9}
+                  />
+
+                  <p style={{ ...styles.helperText, marginBottom: 0 }}>
+                    Original: {revisionSummary.firstWords} words · Improved:{" "}
+                    {revisionSummary.revisedWords} words · Difference:{" "}
+                    {revisionSummary.delta >= 0 ? "+" : ""}
+                    {revisionSummary.delta}
+                  </p>
+                </div>
+
+                {revisionSummary.badges.length > 0 ? (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {revisionSummary.badges.map((badge) => (
+                      <span key={badge} style={styles.badge}>
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    style={styles.primaryButton}
+                    onClick={handleCompleteWorkflow}
+                    disabled={
+                      reflectionText.trim().length < 12 ||
+                      !revisionSummary.changed
+                    }
+                  >
+                    {workflowComplete
+                      ? "Improvement completed"
+                      : "Complete improvement"}
+                  </button>
+
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={handleMarkAndCompareImproved}
+                    disabled={improvedLoading || !revisionSummary.changed}
+                  >
+                    {improvedLoading
+                      ? "Comparing drafts..."
+                      : "Mark improved draft"}
+                  </button>
+
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={handleSaveForTutorReview}
+                    disabled={tutorSaveState.loading || !workflowComplete}
+                  >
+                    {tutorSaveState.loading
+                      ? "Submitting..."
+                      : "Save for tutor review"}
+                  </button>
+                </div>
+
+                {tutorSaveState.error ? (
+                  <div style={styles.errorBox}>
+                    {tutorSaveState.error}
+                  </div>
+                ) : null}
+
+                {tutorSaveState.success ? (
+                  <div style={styles.successBox}>
+                    {tutorSaveState.success}
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
