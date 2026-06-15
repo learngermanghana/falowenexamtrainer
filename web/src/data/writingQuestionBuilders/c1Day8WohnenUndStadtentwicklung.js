@@ -18,7 +18,7 @@ const c1Day8QuestionWritingBuilder = {
       section: "Folgen für die Bevölkerung",
       question: "Welche konkreten Folgen hat das Problem für Bewohnerinnen und Bewohner?",
       help: "Beschreiben Sie Auswirkungen auf Kosten, Mobilität, Sicherheit, Gesundheit oder Lebensqualität.",
-      starter: "Infolge des Mangels an ..., hat sich ...",
+      starter: "Infolge des Mangels an ... hat sich ...",
       minimumWords: 45,
     },
     {
