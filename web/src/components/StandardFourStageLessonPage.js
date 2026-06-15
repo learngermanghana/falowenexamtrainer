@@ -87,12 +87,12 @@ const isB2Day1 = (lesson = {}) => String(lesson.level || "").toUpperCase() === "
 
 const isC1Day2 = (lesson = {}) => String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 2;
 
-const C1Day2SpeakingPoints = () => (
+const SpeakingPointsList = ({ branches = [] }) => (
   <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
     <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
     <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
     <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
-      {c1Day2LearningSpeakingGuide.speaking.branches.map((branch) => (
+      {branches.map((branch) => (
         <li key={branch.id}><strong>{branch.title}:</strong> {branch.keywords.join(", ")}</li>
       ))}
     </ul>
@@ -104,23 +104,10 @@ const SpeakingBrainMap = ({ lesson }) => {
   const branches = getStandardBrainMap(lesson);
   if (isB2Day1(lesson)) return <SpeakingPoints />;
   if (isC1Day2(lesson)) {
-    return <C1Day2SpeakingPoints />;
+    return <SpeakingPointsList branches={c1Day2LearningSpeakingGuide.speaking.branches} />;
   }
   if (Array.isArray(richBranches) && richBranches.length) {
-    return (
-      <div style={{ display: "grid", gap: 12 }}>
-        <div><h3 style={{ margin: "0 0 6px" }}>Ideen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Wähle passende Themenbereiche aus, verknüpfe sie differenziert und entwickle daraus deine eigene Antwort.</p></div>
-        {richBranches.map((branch, index) => (
-          <article key={branch.id} style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: "#eef2ff", display: "grid", gap: 8 }}>
-            <strong>{index + 1}. {branch.title}</strong>
-            <div style={{ color: "#475569", fontWeight: 700 }}>{branch.keywords.join(" • ")}</div>
-            <div><strong>Leitfrage:</strong> {branch.prompt}</div>
-            <div style={{ color: "#3730a3" }}>• {branch.example}</div>
-            {branch.starter ? <div style={{ borderLeft: "4px solid #818cf8", paddingLeft: 10 }}><strong>Fortgeschrittener Satzanfang:</strong> {branch.starter}</div> : null}
-          </article>
-        ))}
-      </div>
-    );
+    return <SpeakingPointsList branches={richBranches} />;
   }
   return (
     <div style={{ display: "grid", gap: 14 }}>
@@ -276,6 +263,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
 
       {activeTab === "speak" ? (
         <Section title="Speaking builder">
+          <NoteBox tone="amber"><strong>Diskussionsfrage:</strong> {lesson.speakingTopic || `Welche Rolle spielt „${lesson.title}“ in deinem Leben und in der Gesellschaft?`}</NoteBox>
           <SpeakingBrainMap lesson={lesson} />
           <EmbeddedSpeechPracticePanel />
           <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>

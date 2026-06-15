@@ -121,7 +121,7 @@ export const speakingTopics = [
   },
 ];
 
-export const SpeakingPoints = () => <div style={{ display: "grid", gap: 10 }}><div><h3 style={{ margin: "0 0 6px" }}>Themen für deine Antwort</h3><p style={{ margin: 0, color: "#475569" }}>Lies die Fragen und Beispiele. Wähle passende Ideen aus und verwende sie in deiner eigenen Sprechübung.</p></div>{speakingTopics.map((topic, index) => <article key={topic.title} style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 12, background: "#eef2ff", lineHeight: 1.65, display: "grid", gap: 8 }}><strong>{index + 1}. {topic.title}</strong><div style={{ color: "#475569", fontWeight: 700 }}>{topic.keywords.join(" • ")}</div>{topic.examples.map(([question, answer]) => <div key={question}><div>{question}</div><div style={{ color: "#3730a3" }}>• {answer}</div></div>)}</article>)}</div>;
+export const SpeakingPoints = () => <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}><h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3><p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p><ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>{speakingTopics.map((topic) => <li key={topic.title}><strong>{topic.title}:</strong> {topic.keywords.join(", ")}</li>)}</ul></div>;
 
 export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = null }) {
   const { showToast } = useToast();
@@ -221,6 +221,7 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
 
       {activeTab === "speak" ? (
         <Section title="Speaking builder">
+          <NoteBox tone="amber"><strong>Diskussionsfrage:</strong> {lesson.speakingTopic}</NoteBox>
           <SpeakingPoints />
           <EmbeddedSpeechPracticePanel />
           <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
