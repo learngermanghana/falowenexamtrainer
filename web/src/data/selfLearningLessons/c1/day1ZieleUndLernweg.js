@@ -1,4 +1,5 @@
 import { makeLesson } from "../buildSelfLearningLesson";
+import c1Day1LearningSpeakingGuide from "./day1LearningSpeakingGuide";
 
 const c1Day1ZieleUndLernweg = makeLesson({
   level: "C1",
@@ -87,6 +88,7 @@ const c1Day1ZieleUndLernweg = makeLesson({
   speakingTaskType: "C1 argumentation talk",
   speakingTopic: "Sprechen: Erkläre, wie man ein realistisches C1-Lernziel plant, und nenne eine Alternative zu einem starren Lernplan.",
   speakingBuilder: {
+    branches: c1Day1LearningSpeakingGuide.branches,
     plan: [
       "Einleitung: Nenne das Thema und warum Lernziele wichtig sind.",
       "Erklärung: Nenne wichtige Kriterien für einen realistischen Lernweg.",
