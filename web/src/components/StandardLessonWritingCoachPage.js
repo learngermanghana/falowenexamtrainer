@@ -1,5 +1,5 @@
 import React from "react";
-import StandardFourStageLessonPage from "./StandardFourStageLessonPage";
+import StandardFourStageLessonPage from "./StandardFourStageLessonPageV2";
 
 export const shouldMountMarkMyLetter = () => false;
 
