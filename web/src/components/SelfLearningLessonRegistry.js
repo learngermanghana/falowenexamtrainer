@@ -18,6 +18,7 @@ import c1Day10IntegrationUndGesellschaft from "../data/selfLearningLessons/c1/da
 import c1Day11EngagementUndEhrenamt from "../data/selfLearningLessons/c1/day11EngagementUndEhrenamt";
 import c1Day12FreizeitUndKultur from "../data/selfLearningLessons/c1/day12FreizeitUndKultur";
 import c1Day13Mehrsprachigkeit from "../data/selfLearningLessons/c1/day13Mehrsprachigkeit";
+import c1Day14InnovationUndZukunft from "../data/selfLearningLessons/c1/day14InnovationUndZukunft";
 import b2Day0Orientation from "../data/selfLearningLessons/b2/day0Orientation";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
@@ -26,7 +27,6 @@ import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUn
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 
 const c1FallbackLessons = [
-  [14, "3.4", "Innovation und Zukunft", "Technologische Entwicklung und gesellschaftlicher Wandel"],
   [15, "3.5", "Bildung und lebenslanges Lernen", "Lernen, Weiterbildung und Chancengleichheit"],
   [16, "4.1", "Technologie im Alltag", "Digitale Werkzeuge, Abhängigkeit und praktische Nutzung"],
   [17, "4.2", "Umwelt und Verantwortung", "Nachhaltigkeit, Klima und persönliches Handeln"],
@@ -94,6 +94,7 @@ export const SELF_LEARNING_LESSONS = {
     c1Day11EngagementUndEhrenamt,
     c1Day12FreizeitUndKultur,
     c1Day13Mehrsprachigkeit,
+    c1Day14InnovationUndZukunft,
     ...c1FallbackLessons,
   ],
 };
