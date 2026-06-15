@@ -160,7 +160,9 @@
       .lead-field input:focus, .lead-field select:focus { outline: 2px solid #bfdbfe; border-color: #1455f5; }
       .lead-form-grid { display: grid; gap: 10px; }
       .lead-help { color: #64748b; font-size: 12px; line-height: 1.45; }
+      .lead-actions { display: grid; gap: 10px; }
       .lead-submit { width: 100%; min-height: 50px; }
+      .lead-whatsapp { width: 100%; min-height: 50px; }
       .lead-status { min-height: 20px; color: #1d4ed8; font-weight: 800; font-size: 13px; }
       .lead-status.error { color: #b91c1c; }
       .lead-inline-error { color: #b91c1c; font-size: 12px; min-height: 16px; }
@@ -174,6 +176,7 @@
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
+        .lead-actions { grid-template-columns: 1fr 1fr; }
       }
     `;
     document.head.appendChild(style);
@@ -266,7 +269,10 @@
         </label>
         <div class="lead-inline-error" id="leadConsentError"></div>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
-        <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
+        <div class="lead-actions">
+          <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
+          <a class="button amber lead-whatsapp" href="https://wa.me/233241113054?text=${encodeURIComponent("Hello Falowen, I would like more information about your German classes.")}" target="_blank" rel="noreferrer">Contact us on WhatsApp</a>
+        </div>
         <a class="lead-open-link" id="leadOpenClassLink" href="${buildClassUrl(selected)}">Open selected class information without saving</a>
         <div class="lead-status" id="leadStatus"></div>
         <details class="lead-debug ${isDebugMode() ? "active" : ""}" id="leadDebugBox" ${isDebugMode() ? "open" : ""}>
