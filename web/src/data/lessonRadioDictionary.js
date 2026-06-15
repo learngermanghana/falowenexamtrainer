@@ -1,5 +1,13 @@
 export const LESSON_RADIO_DICTIONARY = {
   A2: {
+    10: {
+      key: "a2-day10-tourismus-traditionelle-feste-falowen-radio",
+      title: "Tourismus und Traditionelle Feste 4.10",
+      youtubeId: "vpSwGAtqIlU",
+      duration: "",
+      instruction:
+        "Höre einfach zu und stimme dich auf das Thema Tourismus und traditionelle Feste ein. Danach gehst du weiter zu Teil 1.",
+    },
     9: {
       key: "a2-day9-urlaub-falowen-radio",
       title: "Urlaub planen",

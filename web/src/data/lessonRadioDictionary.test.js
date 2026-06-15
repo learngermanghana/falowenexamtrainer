@@ -2,6 +2,7 @@ import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDiction
 
 test.each([
   [9, "BD663tMiWpg"],
+  [10, "vpSwGAtqIlU"],
   [15, "WbsTFqIT058"],
   [16, "6lq6uWK1wAs"],
   [26, "9OVfA1B-nuU"],
@@ -28,8 +29,13 @@ test("C1 Day 2 Kultur und Identität radio remains available", () =>
   ),
 );
 
-test("radio is hidden without a dictionary entry", () =>
-  expect(getLessonRadioResource("C1", 1)).toBeNull(),
+test("C1 Day 1 Ziele und Lernweg radio remains available", () =>
+  expect(getLessonRadioResource("C1", 1)).toEqual(
+    expect.objectContaining({
+      title: "Ziele und Lernweg",
+      youtubeId: "McNk1VTFvMk",
+    }),
+  ),
 );
 
 test.each([
