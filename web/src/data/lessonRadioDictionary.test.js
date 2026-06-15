@@ -4,8 +4,10 @@ test.each([
   [9, "BD663tMiWpg"],
   [10, "0_iGhcuysag"],
   [11, "hsR31V7Fb4U"],
+  [14, "HJ60GX0pbiI"],
   [15, "WbsTFqIT058"],
   [16, "6lq6uWK1wAs"],
+  [17, "kp7KvFmaRuo"],
   [26, "9OVfA1B-nuU"],
   [27, "XLyXDfsM-HY"],
 ])("A2 Day %i radio remains available", (day, id) =>
