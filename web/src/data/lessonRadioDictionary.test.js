@@ -2,7 +2,7 @@ import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDiction
 
 test.each([
   [9, "BD663tMiWpg"],
-  [10, "vpSwGAtqIlU"],
+  [10, "0_iGhcuysag"],
   [11, "hsR31V7Fb4U"],
   [15, "WbsTFqIT058"],
   [16, "6lq6uWK1wAs"],
@@ -54,4 +54,11 @@ test.each([
   ["/campus/course/c1-day-2-kultur-und-identitaet-workbook", { level: "C1", day: 2 }],
 ])("detects radio route %s", (path, expected) =>
   expect(resolveLessonRoute(path)).toEqual(expected),
+);
+
+test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", () =>
+  expect(getLessonRadioResource("A2", 10)).toEqual(expect.objectContaining({
+    title: "Tourismus und Traditionelle Feste 4.10",
+    youtubeId: "0_iGhcuysag",
+  })),
 );

@@ -59,3 +59,12 @@ test("converts a canonical B1 lesson into the shared journey structure", () => {
   expect(lesson.grammarFocus).toBe("Relativsätze");
   expect(getStandardBrainMap(lesson)).toHaveLength(5);
 });
+
+test("C1 Day 3 uses five guided media-literacy questions", () => {
+  const config = getStandardWritingConfig({ level: "C1", day: 3 });
+  expect(config.title).toBe("Medien und Informationskompetenz");
+  expect(config.questions).toHaveLength(5);
+  expect(config.questions.map((question) => question.section)).toEqual([
+    "Einleitung und Relevanz", "Quellen kritisch prüfen", "Konkretes Beispiel", "Einwand und Abwägung", "Lösung und Position",
+  ]);
+});
