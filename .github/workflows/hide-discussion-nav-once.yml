@@ -1,9 +1,10 @@
 name: Hide discussion navigation once
 
 on:
-  push:
+  pull_request:
     branches:
-      - codex/hide-discussion-nav-preserve-route
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -13,9 +14,10 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out pull request branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Update campus navigation
@@ -107,4 +109,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add web/src/App.js .github/workflows/hide-discussion-nav-once.yml
           git commit -m "Hide discussion from campus navigation"
-          git push origin HEAD:codex/hide-discussion-nav-preserve-route
+          git push origin HEAD:${{ github.head_ref }}
