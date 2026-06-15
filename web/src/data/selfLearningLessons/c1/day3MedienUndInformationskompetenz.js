@@ -8,9 +8,9 @@ const c1Day3MedienUndInformationskompetenz = makeLesson({
   topic: "Nachrichten, Quellenkritik und digitale Verantwortung differenziert bewerten",
   heroImage: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1600&q=80",
   videoResource: {
-    title: "C1 lecture video: Medien und Informationskompetenz",
+    title: "C1 video: Medien und Informationskompetenz",
     description: "Watch this lecture first, then continue with the grammar focus, speaking task and C1 writing support.",
-    url: "https://youtu.be/cACcTLIld50?si=FYVaX0NcWeD8q6_H",
+    url: "https://youtu.be/CFkrrVxhdL4",
   },
   grammarFocus: "Konjunktiv I für indirekte Rede: Medienberichte sachlich wiedergeben und Distanz zeigen",
   objectives: [
