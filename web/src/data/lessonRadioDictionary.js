@@ -1,3 +1,5 @@
+import { ADDITIONAL_A2_RADIO_ENTRIES } from "./additionalA2RadioEntries";
+
 export const LESSON_RADIO_DICTIONARY = {
   A2: {
     10: {
@@ -72,6 +74,7 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre einfach zu und stimme dich auf das Thema digitale Kommunikation ein. Danach gehst du weiter zu Teil 1.",
     },
+    ...ADDITIONAL_A2_RADIO_ENTRIES,
   },
   B2: {
     1: {
