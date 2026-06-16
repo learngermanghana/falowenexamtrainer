@@ -55,7 +55,13 @@ export default function PlacementTestPage() {
       }
 
       setMount((current) => (current === target ? current : target));
-      setResult({ level: parsed.level, correct: parsed.correct, total: parsed.total });
+      setResult((current) =>
+        current?.level === parsed.level &&
+        current?.correct === parsed.correct &&
+        current?.total === parsed.total
+          ? current
+          : { level: parsed.level, correct: parsed.correct, total: parsed.total }
+      );
 
       const key = `${parsed.level}:${parsed.correct}:${parsed.total}`;
       if (trackedRef.current !== key) {
