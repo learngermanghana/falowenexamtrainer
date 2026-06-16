@@ -1,1 +1,1 @@
-export * from "./standardLessonJourneyV11";
+export * from "./standardLessonJourneyV12";
