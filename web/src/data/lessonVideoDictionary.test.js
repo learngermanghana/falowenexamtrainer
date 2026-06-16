@@ -18,19 +18,15 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("returns both A1 Day 2 AI videos beside their matching chapter videos", () => {
+  test("returns the A1 Day 2 combined AI video beside matching chapter videos", () => {
     const resources = getLessonVideoResources("A1", 2, A1_DAY_2);
 
     expect(
       resources.map(({ chapter, url }) => ({ chapter, url })),
     ).toEqual([
       { chapter: "0.2", url: "https://example.com/teacher-0-2" },
-      {
-        chapter: "0.2",
-        url: "https://youtu.be/pCQVdJGsvtk?si=KCoF9Lf5y3wWrwoc",
-      },
       { chapter: "1.1", url: "https://example.com/teacher-1-1" },
-      { chapter: "1.1", url: "https://youtu.be/kqagu9qsOcc" },
+      { chapter: "0.2_1.1", url: "https://youtu.be/LyfFDU0U_7U" },
     ]);
 
     expect(
@@ -38,21 +34,17 @@ describe("getLessonVideoResources", () => {
     ).toHaveLength(2);
     expect(
       resources.filter((resource) => resource.title.includes("AI video")),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
   });
 
-  test("returns only the two configured AI videos when A1 Day 2 has no legacy entry", () => {
+  test("returns the configured combined AI video when A1 Day 2 has no legacy entry", () => {
     expect(
       getLessonVideoResources("A1", 2).map(({ chapter, url }) => ({
         chapter,
         url,
       })),
     ).toEqual([
-      {
-        chapter: "0.2",
-        url: "https://youtu.be/pCQVdJGsvtk?si=KCoF9Lf5y3wWrwoc",
-      },
-      { chapter: "1.1", url: "https://youtu.be/kqagu9qsOcc" },
+      { chapter: "0.2_1.1", url: "https://youtu.be/LyfFDU0U_7U" },
     ]);
   });
 
@@ -60,8 +52,28 @@ describe("getLessonVideoResources", () => {
     expect(getLessonVideoResources("A1", 3)).toEqual([
       expect.objectContaining({
         chapter: "1.1",
-        title: "Kapitel 1.1 · Schreiben & Sprechen · AI video",
-        url: "https://youtu.be/LdCVsY-SFTg",
+        title: "Kapitel 1.1 · Greetings, Spelling, Vocabulary & W-Words · AI video",
+        url: "https://youtu.be/DnfWKdi6DsA",
+      }),
+    ]);
+  });
+
+  test("returns the configured A1 Day 4 numbers AI video", () => {
+    expect(getLessonVideoResources("A1", 4)).toEqual([
+      expect.objectContaining({
+        chapter: "2",
+        title: "Kapitel 2 · Zahlen · AI video",
+        url: "https://youtu.be/GyhH8zPXDy4",
+      }),
+    ]);
+  });
+
+  test("returns the configured A1 Day 6 family and hobbies AI video", () => {
+    expect(getLessonVideoResources("A1", 6)).toEqual([
+      expect.objectContaining({
+        chapter: "2.3",
+        title: "Kapitel 2.3 · Family and Hobbies · AI video",
+        url: "https://youtu.be/XbvzygJg16E",
       }),
     ]);
   });

@@ -30,20 +30,12 @@ export const LESSON_VIDEO_DICTIONARY = {
     2: {
       videoResources: [
         {
-          key: "ai-grammar-video-0-2",
-          chapter: "0.2",
-          title: "Kapitel 0.2 · Deutsches Alphabet · AI video",
+          key: "ai-grammar-video-0-2-1-1",
+          chapter: "0.2_1.1",
+          title: "Kapitel 0.2 + 1.1 · Alphabet, Pronouns & Verb Conjugation · AI video",
           description:
-            "AI video lesson for the German alphabet, pronunciation and revision.",
-          url: "https://youtu.be/pCQVdJGsvtk?si=KCoF9Lf5y3wWrwoc",
-        },
-        {
-          key: "ai-grammar-video-1-1",
-          chapter: "1.1",
-          title: "Kapitel 1.1 · Personalpronomen · AI video",
-          description:
-            "AI video lesson for German personal pronouns and basic verb conjugation.",
-          url: "https://youtu.be/kqagu9qsOcc",
+            "AI video lesson for the German alphabet, personal pronouns and basic verb conjugation.",
+          url: "https://youtu.be/LyfFDU0U_7U",
         },
       ],
     },
@@ -52,10 +44,10 @@ export const LESSON_VIDEO_DICTIONARY = {
         {
           key: "ai-grammar-video-1-1",
           chapter: "1.1",
-          title: "Kapitel 1.1 · Schreiben & Sprechen · AI video",
+          title: "Kapitel 1.1 · Greetings, Spelling, Vocabulary & W-Words · AI video",
           description:
-            "AI video lesson for the Day 3 Kapitel 1.1 writing and speaking practice.",
-          url: "https://youtu.be/LdCVsY-SFTg",
+            "AI video lesson for the Day 3 practice book covering greetings, spelling, vocabulary and W-words.",
+          url: "https://youtu.be/DnfWKdi6DsA",
         },
       ],
     },
@@ -67,7 +59,19 @@ export const LESSON_VIDEO_DICTIONARY = {
           title: "Kapitel 2 · Zahlen · AI video",
           description:
             "AI-generated video lesson for German numbers and number practice.",
-          url: "https://youtu.be/jb2NDRJPit0",
+          url: "https://youtu.be/GyhH8zPXDy4",
+        },
+      ],
+    },
+    6: {
+      videoResources: [
+        {
+          key: "ai-grammar-video-family-hobbies-day-6",
+          chapter: "2.3",
+          title: "Kapitel 2.3 · Family and Hobbies · AI video",
+          description:
+            "AI video lesson for family vocabulary and talking about hobbies.",
+          url: "https://youtu.be/XbvzygJg16E",
         },
       ],
     },
