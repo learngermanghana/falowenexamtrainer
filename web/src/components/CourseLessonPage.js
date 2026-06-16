@@ -8,9 +8,8 @@ const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-const applyA1Day3Metadata = () => {
-  const lesson = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
-  if (!lesson) return;
+const decorateA1Day3Lesson = (lesson) => {
+  if (!lesson || Number(lesson.day) !== 3) return;
 
   lesson.topic = A1_DAY_3_TITLE;
   lesson.grammar_topic = A1_DAY_3_TITLE;
@@ -43,7 +42,8 @@ const applyA1Day3Metadata = () => {
   }
 };
 
-applyA1Day3Metadata();
+const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
+decorateA1Day3Lesson(scheduleDay3);
 
 const replaceText = (element, text) => {
   if (element && element.textContent !== text) element.textContent = text;
@@ -97,6 +97,8 @@ export default function CourseLessonPage() {
   const level = String(location.state?.level || params.level || "").toUpperCase();
   const day = Number(location.state?.day ?? params.day ?? 0);
   const isA1Day3 = level === "A1" && day === 3;
+
+  if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
 
   useEffect(() => {
     if (!isA1Day3 || !rootRef.current) return undefined;
