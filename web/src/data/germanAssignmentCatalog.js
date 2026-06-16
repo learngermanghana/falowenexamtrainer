@@ -5,6 +5,16 @@ import {
   normalizeLevel,
 } from "./curriculumManifest";
 
+const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
+const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
+  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
+);
+
+if (a1Day5Entry) {
+  a1Day5Entry.topic = A1_DAY_5_TITLE;
+  a1Day5Entry.title = A1_DAY_5_TITLE;
+}
+
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
   if (!token) return "";
