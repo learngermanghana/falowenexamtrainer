@@ -59,6 +59,18 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    4: {
+      videoResources: [
+        {
+          key: "ai-grammar-video-numbers-day-4",
+          chapter: "2",
+          title: "Kapitel 2 · Zahlen · AI video",
+          description:
+            "AI-generated video lesson for German numbers and number practice.",
+          url: "https://youtu.be/jb2NDRJPit0",
+        },
+      ],
+    },
     14: {
       ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
     },
@@ -257,125 +269,3 @@ export const normalizeVideoResources = (source = {}) => {
       })
       .filter(Boolean);
   }
-
-  const teacherUrl = pickFirst(
-    source.teacher_video,
-    source.teacherVideo,
-    source.teacher_lecture_url,
-    source.teacherLectureUrl,
-    source.teacher_explanation_url,
-    source.teacherExplanationUrl,
-  );
-  const aiGrammarUrl = pickFirst(
-    source.ai_grammar_video,
-    source.aiGrammarVideo,
-    source.ai_grammar_video_url,
-    source.aiGrammarVideoUrl,
-    source.ai_video,
-    source.aiVideo,
-  );
-
-  return [
-    teacherUrl
-      ? {
-          key: "teacher-explanation",
-          chapter: source.chapter || null,
-          title: "Teacher explanation",
-          description: "Recorded class explanation from the teacher.",
-          url: teacherUrl,
-        }
-      : null,
-    aiGrammarUrl
-      ? {
-          key: "ai-grammar-video",
-          chapter: source.chapter || null,
-          title: "AI grammar video",
-          description:
-            "Step-by-step grammar explanation for revision and self-study.",
-          url: aiGrammarUrl,
-        }
-      : null,
-  ].filter(Boolean);
-};
-
-const isTeacherVideoResource = (resource = {}) => {
-  const label = `${resource.key || ""} ${resource.title || ""}`.toLowerCase();
-  return label.includes("teacher");
-};
-
-const toResourceArray = (value) =>
-  Array.isArray(value) ? value : value ? [value] : [];
-
-const lessonResourceEntries = (entry = {}) => {
-  const nestedResources = [
-    ...toResourceArray(entry?.schreiben_sprechen),
-    ...toResourceArray(entry?.lesen_hören),
-  ].filter(Boolean);
-
-  if (!nestedResources.length) return [entry];
-  return nestedResources.map((resource) => ({
-    ...resource,
-    chapter: resource?.chapter || entry?.chapter || null,
-  }));
-};
-
-const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
-  const chapterOrder = new Map();
-  entries.forEach((entry, index) => {
-    const chapter = String(entry?.chapter || "").trim();
-    if (chapter && !chapterOrder.has(chapter)) chapterOrder.set(chapter, index);
-  });
-
-  const typeRank = (resource = {}) => (isTeacherVideoResource(resource) ? 0 : 1);
-  const chapterRank = (resource = {}) => {
-    const chapter = String(resource.chapter || "").trim();
-    return chapterOrder.has(chapter) ? chapterOrder.get(chapter) : 999;
-  };
-
-  return [...resources].sort(
-    (a, b) =>
-      chapterRank(a) - chapterRank(b) || typeRank(a) - typeRank(b),
-  );
-};
-
-export const getLessonVideoResources = (level, day, entry = {}) => {
-  const normalizedLevel = normalizeLevel(level);
-  const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
-  const showTeacherVideos = normalizedLevel === "A1" && dayKey !== "0";
-  const dictionaryEntry =
-    LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
-  const entries = lessonResourceEntries(entry);
-
-  const explicitResources = entries.flatMap((resource) =>
-    normalizeVideoResources(resource),
-  );
-  const legacyVideos = entries
-    .map((resource) => legacyVideoResource(resource, "teacher"))
-    .filter(Boolean);
-  const dictionaryResources = normalizeVideoResources(dictionaryEntry);
-  const hasConfiguredAiVideo = [...explicitResources, ...dictionaryResources].some(
-    (resource) => !isTeacherVideoResource(resource),
-  );
-  const fallbackLegacyVideos =
-    normalizedLevel === "A1"
-      ? legacyVideos
-      : hasConfiguredAiVideo
-        ? []
-        : legacyVideos.map((resource) => ({
-            ...resource,
-            key: "ai-grammar-video",
-            title: "AI grammar video",
-            description:
-              "Step-by-step grammar explanation for revision and self-study.",
-          }));
-  const allResources = uniqueVideoResources(
-    fallbackLegacyVideos,
-    explicitResources,
-    dictionaryResources,
-  );
-  const visibleResources = showTeacherVideos
-    ? allResources
-    : allResources.filter((resource) => !isTeacherVideoResource(resource));
-
-  return sortVideoResourcesByLessonOrder(visibleResources, entries);
-};
