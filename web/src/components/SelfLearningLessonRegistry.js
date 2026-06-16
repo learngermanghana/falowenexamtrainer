@@ -20,6 +20,7 @@ import c1Day12FreizeitUndKultur from "../data/selfLearningLessons/c1/day12Freize
 import c1Day13Mehrsprachigkeit from "../data/selfLearningLessons/c1/day13Mehrsprachigkeit";
 import c1Day14InnovationUndZukunft from "../data/selfLearningLessons/c1/day14InnovationUndZukunft";
 import c1Day15BildungUndLebenslangesLernen from "../data/selfLearningLessons/c1/day15BildungUndLebenslangesLernen";
+import c1Day16TechnologieImAlltag from "../data/selfLearningLessons/c1/day16TechnologieImAlltag";
 import b2Day0Orientation from "../data/selfLearningLessons/b2/day0Orientation";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
@@ -28,7 +29,6 @@ import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUn
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 
 const c1FallbackLessons = [
-  [16, "4.1", "Technologie im Alltag", "Digitale Werkzeuge, Abhängigkeit und praktische Nutzung"],
   [17, "4.2", "Umwelt und Verantwortung", "Nachhaltigkeit, Klima und persönliches Handeln"],
   [18, "4.3", "Gesellschaft und Zusammenhalt", "Gemeinschaft, Konflikte und Solidarität"],
   [19, "4.4", "Arbeit der Zukunft", "Digitalisierung, neue Kompetenzen und Arbeitsmodelle"],
@@ -96,6 +96,7 @@ export const SELF_LEARNING_LESSONS = {
     c1Day13Mehrsprachigkeit,
     c1Day14InnovationUndZukunft,
     c1Day15BildungUndLebenslangesLernen,
+    c1Day16TechnologieImAlltag,
     ...c1FallbackLessons,
   ],
 };
