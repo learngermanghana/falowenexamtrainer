@@ -7,6 +7,14 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Personen beschreiben ein. Danach gehst du weiter zu Teil 1.",
   },
+  12: {
+    key: "a2-day12-mein-traumberuf-falowen-radio",
+    title: "Mein Traumberuf 5.12",
+    youtubeId: "0_iGhcuysag",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Mein Traumberuf ein. Danach gehst du weiter zu Teil 1.",
+  },
   13: {
     key: "a2-day13-vorstellungsgespraech-falowen-radio",
     title: "Ein Vorstellungsgespräch 5.13",
