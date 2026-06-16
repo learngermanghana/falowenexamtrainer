@@ -20,7 +20,20 @@ const replaceText = (element, label, value) => {
   element.replaceChildren(strong, document.createTextNode(` ${value}`));
 };
 
-const updateExercise = (root) => {
+const removeSectionByText = (root, selector, text) => {
+  const marker = Array.from(root?.querySelectorAll(selector) || []).find(
+    (element) => element.textContent?.trim() === text
+  );
+  const section = marker?.closest("section") || marker?.parentElement;
+  if (section) section.remove();
+};
+
+const removeExcludedSections = (root) => {
+  removeSectionByText(root, "h1, h2, h3, h4", "Teil 1 · Reading / Writing");
+  removeSectionByText(root, "p", "Class activity");
+};
+
+const updateWWordExercise = (root) => {
   const heading = Array.from(root?.querySelectorAll("h1, h2, h3, h4") || []).find(
     (element) => element.textContent?.trim() === "Lückentext mit W-Wörtern"
   );
@@ -43,15 +56,22 @@ const updateExercise = (root) => {
   );
 };
 
+const updateWorkbook = (root) => {
+  removeExcludedSections(root);
+  updateWWordExercise(root);
+};
+
 export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
   const rootRef = useRef(null);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
-    updateExercise(root);
-    const observer = new MutationObserver(() => updateExercise(root));
+
+    updateWorkbook(root);
+    const observer = new MutationObserver(() => updateWorkbook(root));
     observer.observe(root, { childList: true, subtree: true });
+
     return () => observer.disconnect();
   }, []);
 
