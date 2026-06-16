@@ -1,9 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { LESSON_VIDEO_DICTIONARY } from "../data/lessonVideoDictionary";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { useToast } from "../context/ToastContext";
+import {
+  getPublicFunnelContext,
+  trackPublicFunnelEvent,
+} from "../lib/publicFunnelTracking";
 
 const getYouTubeId = (url = "") => {
   const match = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/i);
@@ -44,6 +48,12 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const video = useMemo(() => LESSON_VIDEO_DICTIONARY?.[level]?.[0]?.videoResources?.[0] || null, [level]);
   const videoId = getYouTubeId(video?.url);
 
+  useEffect(() => {
+    const context = getPublicFunnelContext();
+    if (!context.sessionId && !context.source && !context.video) return;
+    trackPublicFunnelEvent("onboarding_view", { level, onboardingVideo: videoId });
+  }, [level, videoId]);
+
   const openDashboard = async () => {
     if (!watchedVideo) {
       showToast("Please watch the short welcome video first.", "info");
@@ -54,6 +64,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
     setSaveError("");
     try {
       await onSaveOnboarding?.();
+      trackPublicFunnelEvent("onboarding_completed", { level, onboardingVideo: videoId });
       showToast("Welcome to Falowen. Your dashboard is ready.", "success");
       navigate("/", { replace: true });
     } catch (error) {
