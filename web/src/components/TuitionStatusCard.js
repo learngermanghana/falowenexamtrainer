@@ -1,349 +1,69 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { styles } from "../styles";
-import { computeTuitionStatus, MIN_INSTALLMENT_GHS } from "../data/levelFees";
-import { isPaymentsEnabled } from "../lib/featureFlags";
+import React, { useEffect, useRef } from "react";
+import TuitionStatusCardLegacy from "./TuitionStatusCardLegacy";
 import { useAuth } from "../context/AuthContext";
-import { getBackendUrl } from "../services/backendUrl";
-import { formatCurrency } from "../lib/formatters";
+import {
+  getPublicFunnelContext,
+  trackPublicFunnelEvent,
+} from "../lib/publicFunnelTracking";
 
-const PAYMENT_GRACE_PERIOD_DAYS = 7;
+const PAID_TRACKED_KEY = "falowen:public-funnel-payment-confirmed";
 
-const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) => {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return min;
-  return Math.min(Math.max(numeric, min), max);
-};
-
-/**
- * TuitionStatusCard
- * - shows tuition fee, paid so far, balance.
- * - lets students choose how much to pay now.
- * - enforces: minimum GH₵2000 unless they're paying the final remaining balance.
- * - calls backend /paystack/initialize so Paystack receives clear metadata (paid so far, balance, plan).
- */
-const TuitionStatusCard = ({
-  level,
-  paidAmount,
-  balanceDue,
-  tuitionFee,
-  showPaymentAction = true,
-  title,
-  description,
-  checkoutAmountOverride,
-}) => {
-  const { i18n, t } = useTranslation();
-  const locale = i18n.language;
-  const formatMoney = useMemo(
-    () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
-    [locale]
-  );
-  const paymentsEnabled = isPaymentsEnabled();
-  const { idToken, studentProfile, user } = useAuth();
-
-  const summary = useMemo(
-    () =>
-      computeTuitionStatus({
-        level,
-        paidAmount,
-        tuitionFee,
-        balanceDue,
-      }),
-    [balanceDue, level, paidAmount, tuitionFee]
-  );
-
-  const maxPayable = Math.max(Number(summary.balanceDue) || 0, 0);
-
-  // If remaining balance is below the minimum installment, it's a final top-up (pay exact balance).
-  const isFinalTopUp = maxPayable > 0 && maxPayable < MIN_INSTALLMENT_GHS;
-
-  const defaultAmount =
-    checkoutAmountOverride !== undefined && checkoutAmountOverride !== null
-      ? clampNumber(checkoutAmountOverride, { min: 0, max: maxPayable })
-      : clampNumber(studentProfile?.paymentIntentAmount ?? maxPayable, { min: 0, max: maxPayable });
-
-  const [amountText, setAmountText] = useState(defaultAmount ? String(defaultAmount) : "");
-  const [isStartingPayment, setIsStartingPayment] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
+export default function TuitionStatusCard(props) {
+  const rootRef = useRef(null);
+  const { studentProfile } = useAuth();
 
   useEffect(() => {
-    // If we are in final-topup mode, force the exact remaining balance.
-    if (isFinalTopUp) {
-      setAmountText(String(maxPayable));
-      return;
-    }
-    // Otherwise keep input synced to suggested default.
-    const nextDefault = defaultAmount ? String(defaultAmount) : "";
-    setAmountText(nextDefault);
-  }, [defaultAmount, isFinalTopUp, maxPayable]);
+    const root = rootRef.current;
+    if (!root) return undefined;
 
-  const amountNow = useMemo(() => {
-    if (!amountText) return 0;
-    const numericOnly = String(amountText).replace(/[^0-9]/g, "");
-    return clampNumber(numericOnly, { min: 0, max: maxPayable });
-  }, [amountText, maxPayable]);
+    const handleClick = (event) => {
+      const button = event.target?.closest?.("button");
+      if (!button || !root.contains(button)) return;
+      const label = String(button.textContent || "").toLowerCase();
+      const isPaymentAction =
+        label.includes("pay online") ||
+        label.includes("pay to finish") ||
+        label.includes("zahlung") ||
+        label.includes("payer") ||
+        label.includes("bezahlen");
+      if (!isPaymentAction) return;
 
-  // In final-topup mode, always charge the exact remaining balance.
-  const amountToPay = isFinalTopUp ? maxPayable : amountNow;
-
-  const paidSoFar = Math.max(Number(summary.paidAmount) || 0, 0);
-  const tuitionTotal = Math.max(Number(summary.tuitionFee) || 0, 0);
-  const projectedTotalPaid = paidSoFar + amountToPay;
-
-  const isFinalPayment = maxPayable > 0 && Math.abs(amountToPay - maxPayable) < 0.5;
-  const meetsMinimum = amountToPay >= MIN_INSTALLMENT_GHS || isFinalPayment;
-
-  const willClearTuition = tuitionTotal > 0 && projectedTotalPaid >= tuitionTotal;
-  const accessAfterPayment = willClearTuition ? "6 months" : "1 month";
-
-  const amountHelper = useMemo(() => {
-    if (maxPayable <= 0) return t("accountSettings.tuition.noBalance");
-
-    if (isFinalTopUp) {
-      return t("accountSettings.tuition.finalTopUp", { amount: formatMoney(maxPayable), access: accessAfterPayment });
-    }
-
-    if (!amountToPay) {
-      return t("accountSettings.tuition.enterAmount", { min: formatMoney(MIN_INSTALLMENT_GHS) });
-    }
-
-    if (!meetsMinimum) {
-      return t("accountSettings.tuition.minimumRule", { min: formatMoney(MIN_INSTALLMENT_GHS), remaining: formatMoney(maxPayable) });
-    }
-
-    const remaining = Math.max(maxPayable - amountToPay, 0);
-    return t("accountSettings.tuition.afterPayment", { access: accessAfterPayment, remaining: formatMoney(remaining) });
-  }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum, t]);
-
-  const canPay =
-    paymentsEnabled &&
-    showPaymentAction &&
-    maxPayable > 0 &&
-    amountToPay > 0 &&
-    meetsMinimum &&
-    Boolean(idToken);
-
-  const paymentGraceNotice = useMemo(() => {
-    const paymentStatus = `${studentProfile?.paymentStatus || ""}`.toLowerCase();
-    if (paymentStatus === "paid") return null;
-
-    const carryoverUntilMs = new Date(studentProfile?.upgradeCarryoverUntil || "").getTime();
-    const hasQueuedUpgradeAccess =
-      String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
-      Number.isFinite(carryoverUntilMs) &&
-      carryoverUntilMs > Date.now();
-    if (hasQueuedUpgradeAccess) return null;
-
-    const joinedAtRaw = studentProfile?.joined_at;
-    if (!joinedAtRaw) return null;
-
-    const joinedAt = new Date(joinedAtRaw);
-    if (Number.isNaN(joinedAt.getTime())) return null;
-
-    const expiresAt = new Date(joinedAt.getTime() + PAYMENT_GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
-    const now = new Date();
-    const millisecondsLeft = expiresAt.getTime() - now.getTime();
-    const daysLeft = Math.max(Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)), 0);
-
-    return {
-      daysLeft,
-      isExpired: millisecondsLeft <= 0,
-    };
-  }, [studentProfile?.contractMergeMode, studentProfile?.joined_at, studentProfile?.paymentStatus, studentProfile?.upgradeCarryoverUntil]);
-
-  const startPayment = async () => {
-    setPaymentError("");
-
-    const studentCode =
-      studentProfile?.studentCode ||
-      studentProfile?.studentcode ||
-      studentProfile?.id ||
-      user?.uid ||
-      "";
-
-    if (!studentCode) {
-      setPaymentError("Missing student code. Please re-login or contact support.");
-      return;
-    }
-
-    if (!idToken) {
-      setPaymentError("Your login session is missing. Please refresh and try again.");
-      return;
-    }
-
-    setIsStartingPayment(true);
-    try {
-      const res = await fetch(`${getBackendUrl()}/paystack/initialize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          studentCode,
-          amount: amountToPay,
-          redirectUrl: `${window.location.origin}/payment-complete`,
-        }),
+      trackPublicFunnelEvent("payment_start_click", {
+        level: props.level || studentProfile?.level || "",
+        amount: props.checkoutAmountOverride || "",
+        balanceDue: props.balanceDue ?? studentProfile?.balanceDue ?? "",
       });
+    };
 
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(json?.error || "Could not start the payment.");
-      }
+    root.addEventListener("click", handleClick, true);
+    return () => root.removeEventListener("click", handleClick, true);
+  }, [props.balanceDue, props.checkoutAmountOverride, props.level, studentProfile?.balanceDue, studentProfile?.level]);
 
-      const url = json?.authorization_url;
-      if (!url) {
-        throw new Error("Paystack did not return a payment link.");
-      }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const context = getPublicFunnelContext();
+    if (!context.sessionId && !context.source && !context.video) return;
 
-      window.location.assign(url);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not start the payment.";
-      setPaymentError(message);
-    } finally {
-      setIsStartingPayment(false);
-    }
-  };
+    const status = String(studentProfile?.paymentStatus || "").toLowerCase();
+    const paidAmount = Number(studentProfile?.initialPaymentAmount ?? studentProfile?.paidAmount ?? props.paidAmount ?? 0);
+    const balance = Number(studentProfile?.balanceDue ?? props.balanceDue ?? 0);
+    const confirmed = status === "paid" || (paidAmount > 0 && balance <= 0);
+    if (!confirmed) return;
+
+    const identity = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.email || "student";
+    const key = `${PAID_TRACKED_KEY}:${identity}`;
+    if (window.localStorage.getItem(key) === "1") return;
+    window.localStorage.setItem(key, "1");
+    trackPublicFunnelEvent("payment_confirmed", {
+      level: props.level || studentProfile?.level || "",
+      paidAmount,
+      balanceDue: balance,
+    });
+  }, [props.balanceDue, props.level, props.paidAmount, studentProfile]);
 
   return (
-    <div style={{ ...styles.card, margin: 0 }} data-testid="tuition-status-card">
-      <div style={styles.metaRow}>
-        <h3 style={{ margin: 0 }}>{title || t("accountSettings.billing.balanceTitle")}</h3>
-        <span style={styles.badge}>{summary.statusLabel}</span>
-      </div>
-
-      {description ? <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{description}</p> : null}
-
-      <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.tuition")}</span>
-          <strong>{formatMoney(summary.tuitionFee)}</strong>
-        </div>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.paidSoFar")}</span>
-          <strong>{formatMoney(summary.paidAmount)}</strong>
-        </div>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.balanceRemaining")}</span>
-          <strong>{formatMoney(summary.balanceDue)}</strong>
-        </div>
-      </div>
-
-      {paymentsEnabled && showPaymentAction ? (
-        <div style={{ marginTop: 12 }}>
-          {paymentGraceNotice ? (
-            <div
-              style={{
-                ...styles.errorBox,
-                background: "#fff7ed",
-                borderColor: "#fdba74",
-                color: "#9a3412",
-                marginBottom: 10,
-              }}
-            >
-              <strong>
-                {paymentGraceNotice.isExpired
-                  ? t("accountSettings.tuition.graceEnded")
-                  : t("accountSettings.tuition.graceDays", { count: paymentGraceNotice.daysLeft })}
-              </strong>
-              <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#9a3412" }}>
-                {t("accountSettings.tuition.graceBody")}
-              </p>
-            </div>
-          ) : null}
-
-          <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155" }}>
-            {t("payments.notice.nonRefundable")}
-            {" "}
-            <a href="https://register.falowen.app/" target="_blank" rel="noreferrer" style={{ color: "#1d4ed8", fontWeight: 600 }}>
-              {t("payments.notice.contractLink")}
-            </a>
-            . {t("payments.notice.emailReminder")}
-          </p>
-          {maxPayable <= 0 ? null : isFinalTopUp ? (
-            <>
-              <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
-                <div style={styles.metaRow}>
-                  <span>{t("accountSettings.tuition.finalPayment")}</span>
-                  <strong>{formatMoney(maxPayable)}</strong>
-                </div>
-                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  {t("accountSettings.tuition.finalPaymentHelp", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
-                </p>
-              </div>
-
-              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{amountHelper}</p>
-
-              <button
-                type="button"
-                style={{ ...styles.primaryButton, marginTop: 10 }}
-                onClick={startPayment}
-                disabled={!canPay || isStartingPayment}
-              >
-                {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payToFinish", { amount: formatMoney(maxPayable) })}
-              </button>
-            </>
-          ) : (
-            <>
-              <label style={{ ...styles.label, marginBottom: 6 }}>{t("accountSettings.tuition.amountNow")}</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={amountText}
-                onChange={(e) => {
-                  setPaymentError("");
-                  setAmountText(e.target.value);
-                }}
-                style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-                placeholder={t("accountSettings.tuition.amountPlaceholder", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
-              />
-              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
-
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-                <button
-                  type="button"
-                  style={styles.secondaryButton}
-                  onClick={() => {
-                    setPaymentError("");
-                    setAmountText(String(maxPayable));
-                  }}
-                  disabled={maxPayable <= 0 || isStartingPayment}
-                >
-                  {t("accountSettings.tuition.payOutstanding", { amount: formatMoney(maxPayable) })}
-                </button>
-
-                <button
-                  type="button"
-                  style={styles.primaryButton}
-                  onClick={startPayment}
-                  disabled={!canPay || isStartingPayment}
-                >
-                  {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payOnline")}
-                </button>
-              </div>
-            </>
-          )}
-
-          {paymentError ? <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div> : null}
-        </div>
-      ) : (
-        <div
-          style={{
-            ...styles.errorBox,
-            background: "#f1f5f9",
-            borderColor: "#cbd5e1",
-            color: "#0f172a",
-            marginTop: 12,
-          }}
-        >
-          <strong>{t("accountSettings.tuition.webOnlyTitle")}</strong>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            {t("accountSettings.tuition.webOnlyBody")}
-          </p>
-        </div>
-      )}
+    <div ref={rootRef}>
+      <TuitionStatusCardLegacy {...props} />
     </div>
   );
-};
-
-export default TuitionStatusCard;
+}
