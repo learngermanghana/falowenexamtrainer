@@ -41,7 +41,20 @@
   }
 
   function context() {
-    return Object.assign({}, read(FIRST_TOUCH_KEY, {}), read(CONTEXT_KEY, {}));
+    return Object.assign({}, read(FIRST_TOUCH_KEY, {}), read(CONTEXT_KEY, {}), queryContext());
+  }
+
+  function journeyBase() {
+    var existing = context();
+    var source = existing.source || existing.src || "classes_video";
+    var video = existing.video || existing.lesson || VIDEO_ID;
+    return {
+      source: source,
+      video: video,
+      utm_source: existing.utm_source || (source === "classes_video" ? "youtube" : source),
+      utm_medium: existing.utm_medium || "classes_video",
+      utm_campaign: existing.utm_campaign || "public_funnel",
+    };
   }
 
   function track(stage, details) {
@@ -76,14 +89,8 @@
   }
 
   function updateLinks() {
-    var base = {
-      source: "classes_video",
-      video: VIDEO_ID,
-      utm_source: "youtube",
-      utm_medium: "classes_video",
-      utm_campaign: "public_funnel",
-    };
-    remember(base);
+    var base = journeyBase();
+    remember(Object.assign({}, base, { lastStage: "classes" }));
 
     var placement = document.getElementById("funnelPlacementLink");
     var classes = document.getElementById("funnelClassLink");
@@ -95,6 +102,7 @@
 
   function updateIncompleteWhatsApp(form) {
     if (!form) return;
+    var attribution = journeyBase();
     var name = form.querySelector("#leadName")?.value.trim() || "";
     var email = form.querySelector("#leadEmail")?.value.trim() || "";
     var phone = form.querySelector("#leadPhone")?.value.trim() || "";
@@ -106,7 +114,8 @@
     if (email) text += " Email: " + email + ".";
     if (phone) text += " Phone: " + phone + ".";
     if (classSlug) text += " Selected class: " + classSlug + ".";
-    text += " I came from YouTube lesson " + VIDEO_ID + ". Please help me continue.";
+    if (attribution.video) text += " I came from YouTube lesson " + attribution.video + ".";
+    text += " Please help me continue.";
     link.href = "https://wa.me/233205706589?text=" + encodeURIComponent(text);
   }
 
@@ -115,14 +124,14 @@
     var lead = {
       id: "journey_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
       createdAt: new Date().toISOString(),
-      source: "classes-video-funnel",
+      source: "public-class-interest",
       status: "class_interest_submitted",
       name: form.querySelector("#leadName")?.value.trim() || "",
       phone: form.querySelector("#leadPhone")?.value.trim() || "",
       email: form.querySelector("#leadEmail")?.value.trim() || "",
       classSlug: form.querySelector("#leadClass")?.value || "",
       className: form.querySelector("#leadClass option:checked")?.textContent || "",
-      level: new URLSearchParams(window.location.search).get("level") || "",
+      level: new URLSearchParams(window.location.search).get("level") || data.level || "",
       paymentStatus: "not_requested",
       followUpCount: 0,
       nextFollowUpAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -137,6 +146,7 @@
   }
 
   function wireInteractions() {
+    var base = journeyBase();
     [
       ["funnelPlacementLink", "classes_video_placement_click"],
       ["funnelClassLink", "classes_video_class_click"],
@@ -145,7 +155,7 @@
       var element = document.getElementById(entry[0]);
       if (element && !element.dataset.funnelWired) {
         element.dataset.funnelWired = "1";
-        element.addEventListener("click", function () { track(entry[1], { video: VIDEO_ID }); });
+        element.addEventListener("click", function () { track(entry[1], { video: base.video, source: base.source }); });
       }
     });
 
@@ -156,7 +166,8 @@
       form.addEventListener("input", function () { updateIncompleteWhatsApp(form); });
       form.addEventListener("change", function () { updateIncompleteWhatsApp(form); });
       form.addEventListener("submit", function () {
-        track("class_interest_submit", { video: VIDEO_ID, classSlug: form.querySelector("#leadClass")?.value || "" });
+        var attribution = journeyBase();
+        track("class_interest_submit", { video: attribution.video, source: attribution.source, classSlug: form.querySelector("#leadClass")?.value || "" });
         submitAttributedClassInterest(form);
       }, true);
     }
@@ -170,8 +181,9 @@
     if (video) video.style.display = "block";
   }
 
-  remember({ source: "classes_video", video: VIDEO_ID, lastStage: "classes" });
-  track("classes_page_view", { video: VIDEO_ID });
+  var initial = journeyBase();
+  remember(Object.assign({}, initial, { lastStage: "classes" }));
+  track("classes_page_view", { video: initial.video, source: initial.source });
   run();
   window.addEventListener("load", run);
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
