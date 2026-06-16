@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 
 const A1_DAY_3_TITLE = "German Subject Pronouns, Verb Conjugation and Introducing Yourself";
+const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
+
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
 const applyA1Day3Metadata = () => {
   const lesson = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
@@ -12,10 +16,102 @@ const applyA1Day3Metadata = () => {
   lesson.grammar_topic = A1_DAY_3_TITLE;
   lesson.goal =
     "Learn all German subject pronouns, conjugate useful everyday verbs, distinguish informal and formal forms of you, and introduce yourself in German.";
+  lesson.instruction =
+    "Start with Kapitel 1.1 Self-practice. Use the workbook and videos to practise, then check your own work. Do not submit Kapitel 1.1. After that, complete Kapitel 1.2 Assignment under Lesen & Hören and submit only Kapitel 1.2 for tutor marking.";
+  lesson.assignment = true;
+  lesson.assignmentId = A1_DAY_3_ASSIGNMENT_ID;
+  lesson.assignment_id = A1_DAY_3_ASSIGNMENT_ID;
+  lesson.canonicalAssignmentId = A1_DAY_3_ASSIGNMENT_ID;
+
+  const practice = toArray(lesson.schreiben_sprechen).find(
+    (resource) => String(resource.chapter) === "1.1"
+  );
+  if (practice) {
+    practice.assignment = false;
+    practice.resourceRole = "selfPractice";
+  }
+
+  const assignment = toArray(lesson.lesen_hören).find(
+    (resource) => String(resource.chapter) === "1.2"
+  );
+  if (assignment) {
+    assignment.assignment = true;
+    assignment.assignmentId = A1_DAY_3_ASSIGNMENT_ID;
+    assignment.assignment_id = A1_DAY_3_ASSIGNMENT_ID;
+    assignment.canonicalAssignmentId = A1_DAY_3_ASSIGNMENT_ID;
+    assignment.resourceRole = "assignment";
+  }
 };
 
 applyA1Day3Metadata();
 
+const replaceText = (element, text) => {
+  if (element && element.textContent !== text) element.textContent = text;
+};
+
+const labelA1Day3Resources = (root) => {
+  if (!root) return;
+
+  Array.from(root.querySelectorAll("strong")).forEach((element) => {
+    const text = element.textContent?.trim();
+    if (text === "Kapitel 1.1") replaceText(element, "Kapitel 1.1 · Self-practice");
+    if (text === "Kapitel 1.2") replaceText(element, "Kapitel 1.2 · Assignment");
+  });
+
+  Array.from(root.querySelectorAll("article")).forEach((card) => {
+    const title = card.querySelector("strong");
+    const description = card.querySelector("p");
+    const action = card.querySelector("a");
+    const titleText = title?.textContent || "";
+
+    if (titleText.includes("Kapitel 1.1 workbook")) {
+      replaceText(title, "📝 Kapitel 1.1 self-practice workbook");
+      replaceText(
+        description,
+        "Practice only. Complete the tasks and check your own work. Do not submit this workbook."
+      );
+      replaceText(action, "Open self-practice workbook ›");
+    }
+
+    if (titleText.includes("Kapitel 1.2 workbook")) {
+      replaceText(title, "📝 Kapitel 1.2 assignment workbook");
+      replaceText(
+        description,
+        "Graded assignment. Complete this workbook and submit your final answers for tutor marking."
+      );
+      replaceText(action, "Open assignment workbook ›");
+    }
+  });
+
+  Array.from(root.querySelectorAll("button")).forEach((button) => {
+    if (button.textContent?.includes("Submit Kapitel")) {
+      replaceText(button, "Submit Kapitel 1.2 assignment ›");
+    }
+  });
+};
+
 export default function CourseLessonPage() {
-  return <CourseLessonPageLegacy />;
+  const rootRef = useRef(null);
+  const location = useLocation();
+  const params = useParams();
+  const level = String(location.state?.level || params.level || "").toUpperCase();
+  const day = Number(location.state?.day ?? params.day ?? 0);
+  const isA1Day3 = level === "A1" && day === 3;
+
+  useEffect(() => {
+    if (!isA1Day3 || !rootRef.current) return undefined;
+
+    const root = rootRef.current;
+    labelA1Day3Resources(root);
+    const observer = new MutationObserver(() => labelA1Day3Resources(root));
+    observer.observe(root, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [isA1Day3]);
+
+  return (
+    <div ref={rootRef}>
+      <CourseLessonPageLegacy />
+    </div>
+  );
 }
