@@ -2,10 +2,15 @@ import React, { useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
+import {
+  getPublicFunnelContext,
+  trackPublicFunnelEvent,
+} from "../lib/publicFunnelTracking";
 
 const A1_DAY_3_TITLE = "German Subject Pronouns, Verb Conjugation and Introducing Yourself";
 const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
+const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -115,6 +120,22 @@ export default function CourseLessonPage() {
 
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
+
+  useEffect(() => {
+    const context = getPublicFunnelContext();
+    if (!context.sessionId && !context.source && !context.video) return;
+
+    trackPublicFunnelEvent("lesson_view", { level, day });
+    try {
+      if (!window.localStorage.getItem(FIRST_LESSON_TRACKED_KEY)) {
+        window.localStorage.setItem(
+          FIRST_LESSON_TRACKED_KEY,
+          JSON.stringify({ level, day, at: new Date().toISOString() })
+        );
+        trackPublicFunnelEvent("first_lesson_started", { level, day });
+      }
+    } catch (_error) {}
+  }, [day, level]);
 
   useEffect(() => {
     if (!isA1Day3 || !rootRef.current) return undefined;
