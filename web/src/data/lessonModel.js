@@ -1,5 +1,6 @@
 import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
+import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 
 export const LEVEL_CAPABILITIES = Object.freeze({
   A1: { radio: false, fourPartWorkbook: false, tutorSubmission: true, selfAssessment: false },
@@ -17,6 +18,15 @@ const firstEntry = (raw = {}) => {
 };
 const resource = (url, extra = {}) => url ? { url, ...extra } : null;
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
+const mergeVideoResources = (...groups) => {
+  const seen = new Set();
+  return groups.flat().filter((item) => {
+    const url = item?.url;
+    if (!url || seen.has(url)) return false;
+    seen.add(url);
+    return true;
+  });
+};
 const INTERNAL_RESOURCE_ROUTES = {
   A2: {
     17: {
@@ -59,7 +69,10 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
   const day = Number(rawLesson.day ?? rawLesson.assignmentDay ?? 0);
   const primary = firstEntry(rawLesson);
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
-  const videos = getLessonVideoResources(level, day, rawLesson);
+  const videos = mergeVideoResources(
+    getLessonVideoResources(level, day, rawLesson),
+    getAdditionalLessonVideoResources(level, day),
+  );
   const teacherVideo = videos.find((item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher")) || null;
   const aiVideo = videos.find((item) => !`${item.key} ${item.title}`.toLowerCase().includes("teacher")) || null;
   const radio = capabilities.radio ? getLessonRadioResource(level, day) : null;
