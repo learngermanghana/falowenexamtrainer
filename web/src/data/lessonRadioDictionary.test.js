@@ -8,6 +8,8 @@ test.each([
   [15, "WbsTFqIT058"],
   [16, "6lq6uWK1wAs"],
   [17, "kp7KvFmaRuo"],
+  [21, "LlXsNA1a8lc"],
+  [22, "KR2oT-mujmI"],
   [26, "9OVfA1B-nuU"],
   [27, "XLyXDfsM-HY"],
 ])("A2 Day %i radio remains available", (day, id) =>

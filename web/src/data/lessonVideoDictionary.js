@@ -99,6 +99,38 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    12: {
+      videoResources: [
+        {
+          key: "a1-day12-24-hour-clock-dates-ai-video",
+          chapter: "8",
+          title: "A1 Day 12 · The 24 Hour Clock and Dates · AI video",
+          description:
+            "AI video lesson for using the 24-hour clock and dates in German.",
+          url: "https://youtu.be/ZE24QSbGaSo",
+        },
+        {
+          key: "a1-day12-24-hour-clock-dates-ai-video-2",
+          chapter: "8",
+          title: "A1 Day 12 · The 24 Hour Clock and Dates · AI video 2",
+          description:
+            "Additional AI video support for the 24-hour clock and dates lesson.",
+          url: "https://youtu.be/xesl04zaQ1E",
+        },
+      ],
+    },
+    13: {
+      videoResources: [
+        {
+          key: "a1-day13-numbers-time-prices-ai-video",
+          chapter: "3.5",
+          title: "A1 Day 13 · Revision: Numbers, Time and Prices · AI video",
+          description:
+            "AI video lesson for revising numbers, time and prices in German.",
+          url: "https://youtu.be/_awD0Xbsj78",
+        },
+      ],
+    },
     14: {
       ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
     },
@@ -215,7 +247,20 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   B2: {},
-  C1: {},
+  C1: {
+    4: {
+      videoResources: [
+        {
+          key: "c1-day4-beziehungen-teamarbeit-ai-video",
+          chapter: "1.4",
+          title: "C1 Day 4 · Beziehungen und Teamarbeit · AI video",
+          description:
+            "AI video lesson for discussing relationships, teamwork and participial attributes.",
+          url: "https://youtu.be/-1GtaOiI8mc",
+        },
+      ],
+    },
+  },
 };
 
 const pickFirst = (...values) =>

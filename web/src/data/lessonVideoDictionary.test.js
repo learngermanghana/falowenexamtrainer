@@ -78,6 +78,31 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
+  test("returns both configured A1 Day 12 AI videos for the 24 hour clock and dates", () => {
+    expect(getLessonVideoResources("A1", 12).map((resource) => resource.url)).toEqual([
+      "https://youtu.be/ZE24QSbGaSo",
+      "https://youtu.be/xesl04zaQ1E",
+    ]);
+  });
+
+  test("returns the configured A1 Day 13 revision AI video", () => {
+    expect(getLessonVideoResources("A1", 13)).toEqual([
+      expect.objectContaining({
+        chapter: "3.5",
+        url: "https://youtu.be/_awD0Xbsj78",
+      }),
+    ]);
+  });
+
+  test("returns the configured C1 Day 4 Beziehungen und Teamarbeit AI video", () => {
+    expect(getLessonVideoResources("C1", 4)).toEqual([
+      expect.objectContaining({
+        chapter: "1.4",
+        url: "https://youtu.be/-1GtaOiI8mc",
+      }),
+    ]);
+  });
+
   test("hides teacher videos but keeps available AI videos from A2 through C1", () => {
     const entry = {
       teacher_video: "https://example.com/teacher",
