@@ -18,6 +18,7 @@ export default function WorkbookReferenceAnswers({ level, lesson = {}, task, wor
         initialTab="references"
         enabledTabs={["references"]}
         hideTabList
+        hideWorkspaceIntro
         writingContext={{
           courseLevel: resolvedLevel,
           level: resolvedLevel,
