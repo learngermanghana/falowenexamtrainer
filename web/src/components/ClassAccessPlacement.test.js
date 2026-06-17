@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import HomeClassPreviewCard from "./HomeClassPreviewCard";
 import ClassMembersTab from "./ClassMembersTab";
+import ClassDiscussionPage from "./ClassDiscussionPage";
 
 const mockGetDocs = jest.fn();
 const mockNavigate = jest.fn();
@@ -35,6 +36,8 @@ jest.mock("../context/AuthContext", () => ({
     saveStudentProfile: jest.fn(() => Promise.resolve()),
   }),
 }));
+
+jest.mock("./ClassDiscussionPanel", () => () => <div>Discussion panel</div>);
 
 beforeEach(() => {
   mockNavigate.mockReset();
@@ -105,4 +108,18 @@ test("Course Book class members area is replaced by a small class link", async (
 
   await userEvent.click(screen.getByRole("button", { name: "View classmates" }));
   expect(mockNavigate).toHaveBeenCalledWith("/campus/discussion?tab=members");
+});
+
+test("the classmates link opens the directory directly", async () => {
+  mockGetDocs.mockResolvedValue({ docs: [] });
+
+  render(
+    <MemoryRouter initialEntries={["/campus/discussion?tab=members"]}>
+      <ClassDiscussionPage />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByRole("heading", { name: "Class members" })).toBeInTheDocument();
+  expect(screen.queryByText("Discussion panel")).not.toBeInTheDocument();
+  expect(await screen.findByText("No classmates found")).toBeInTheDocument();
 });
