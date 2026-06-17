@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../firebase";
 import { styles } from "../styles";
@@ -38,12 +37,12 @@ const avatarStyle = (index) => ({
 });
 
 const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = false }) => {
-  const navigate = useNavigate();
   const { studentProfile: authProfile } = useAuth();
   const studentProfile = providedProfile || authProfile;
   const [members, setMembers] = useState([]);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   const className = studentProfile?.className || "";
   const level = String(studentProfile?.level || "").toUpperCase();
@@ -80,6 +79,7 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
   }, [className, shouldShow, studentProfile?.level]);
 
   useEffect(() => {
+    setShowAll(false);
     loadMembers();
   }, [loadMembers]);
 
@@ -116,28 +116,62 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
       {status === "error" ? <p style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{error}</p> : null}
 
       {status === "success" ? (
-        <div style={{ display: "flex", alignItems: "center", minHeight: 46 }} aria-label={`${members.length} class members`}>
-          {previewMembers.map((member, index) => (
-            <div key={member.id} style={avatarStyle(index)} title={member.name} aria-label={member.name}>
-              {getInitials(member.name)}
-            </div>
-          ))}
-          {remainingCount > 0 ? (
-            <div style={{ ...avatarStyle(previewMembers.length), background: "#e2e8f0", color: "#334155" }}>
-              +{remainingCount}
+        <>
+          <div style={{ display: "flex", alignItems: "center", minHeight: 46 }} aria-label={`${members.length} class members`}>
+            {previewMembers.map((member, index) => (
+              <div key={member.id} style={avatarStyle(index)} title={member.name} aria-label={member.name}>
+                {getInitials(member.name)}
+              </div>
+            ))}
+            {remainingCount > 0 ? (
+              <div style={{ ...avatarStyle(previewMembers.length), background: "#e2e8f0", color: "#334155" }}>
+                +{remainingCount}
+              </div>
+            ) : null}
+            {members.length === 0 ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>Your classmates will appear here when their profiles are ready.</p>
+            ) : null}
+          </div>
+
+          {showAll && members.length > 0 ? (
+            <div style={{ display: "grid", gap: 8 }} aria-label="All classmates">
+              {members.map((member) => (
+                <div
+                  key={member.id}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "40px minmax(0, 1fr)",
+                    gap: 10,
+                    alignItems: "center",
+                    padding: 10,
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 12,
+                    background: "#fff",
+                  }}
+                >
+                  <div style={{ ...avatarStyle(0), width: 38, height: 38, marginLeft: 0, borderWidth: 2 }} aria-hidden="true">
+                    {getInitials(member.name)}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <strong>{member.name}</strong>
+                    <p style={{ ...styles.helperText, margin: "3px 0 0", whiteSpace: "pre-wrap" }}>
+                      {member.biography || "No biography yet."}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : null}
-          {members.length === 0 ? (
-            <p style={{ ...styles.helperText, margin: 0 }}>Your classmates will appear here when their profiles are ready.</p>
-          ) : null}
-        </div>
+        </>
       ) : null}
 
-      <PrimaryActionBar align="start">
-        <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/discussion?tab=members")}>
-          View classmates
-        </button>
-      </PrimaryActionBar>
+      {status === "success" && members.length > 0 ? (
+        <PrimaryActionBar align="start">
+          <button type="button" style={styles.primaryButton} onClick={() => setShowAll((current) => !current)} aria-expanded={showAll}>
+            {showAll ? "Hide classmates" : "View all classmates"}
+          </button>
+        </PrimaryActionBar>
+      ) : null}
     </section>
   );
 };
