@@ -23,7 +23,7 @@ jest.mock("../context/AuthContext", () => ({
 }));
 
 test("hides the old Course Book class tab and shows a compact shortcut", async () => {
-  render(
+  const { container } = render(
     <div>
       <button>Course Book</button>
       <button>Class Members</button>
@@ -31,7 +31,11 @@ test("hides the old Course Book class tab and shows a compact shortcut", async (
     </div>,
   );
 
-  const oldTab = screen.getByRole("button", { name: "Class Members" });
+  const oldTab = Array.from(container.querySelectorAll("button")).find(
+    (button) => button.textContent === "Class Members",
+  );
+  expect(oldTab).toBeTruthy();
   await waitFor(() => expect(oldTab).toHaveStyle({ display: "none" }));
+  expect(oldTab).toHaveAttribute("aria-hidden", "true");
   expect(screen.getByRole("button", { name: "View classmates" })).toBeInTheDocument();
 });
