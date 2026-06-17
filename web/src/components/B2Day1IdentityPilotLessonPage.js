@@ -6,6 +6,9 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import { useToast } from "../context/ToastContext";
 import b2Day1QuestionWritingBuilder from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
 import { styles } from "../styles";
+import SpeakingMindMap from "./speaking/SpeakingMindMap";
+import SpeakingPreparationFlow from "./speaking/SpeakingPreparationFlow";
+import { b2Day1IdentitySpeakingMindMap } from "../data/speakingMindMaps/pilotSpeakingMindMaps";
 
 const tabs = [
   { id: "learn", label: "1. Learn" },
@@ -41,9 +44,11 @@ const getYouTubeEmbedUrl = (url = "") => {
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.replace(/^www\./, "");
-    const videoId = host === "youtu.be"
-      ? parsed.pathname.replace(/^\//, "")
-      : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
+    const videoId =
+      host === "youtu.be"
+        ? parsed.pathname.replace(/^\//, "")
+        : parsed.searchParams.get("v") ||
+          parsed.pathname.split("/").filter(Boolean).pop();
     return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
   } catch (error) {
     return "";
@@ -65,66 +70,54 @@ const NoteBox = ({ children, tone = "blue" }) => {
   };
   const selected = tones[tone] || tones.blue;
   return (
-    <div style={{ border: `1px solid ${selected.border}`, borderRadius: 14, padding: 12, background: selected.background, color: selected.color, lineHeight: 1.65 }}>
+    <div
+      style={{
+        border: `1px solid ${selected.border}`,
+        borderRadius: 14,
+        padding: 12,
+        background: selected.background,
+        color: selected.color,
+        lineHeight: 1.65,
+      }}
+    >
       {children}
     </div>
   );
 };
 
 const ProgressCard = ({ label, complete, detail }) => (
-  <div style={{ border: `1px solid ${complete ? "#86efac" : "#cbd5e1"}`, borderRadius: 14, padding: 13, background: complete ? "#f0fdf4" : "#fff", display: "grid", gap: 5 }}>
-    <strong>{complete ? "✅" : "⬜"} {label}</strong>
+  <div
+    style={{
+      border: `1px solid ${complete ? "#86efac" : "#cbd5e1"}`,
+      borderRadius: 14,
+      padding: 13,
+      background: complete ? "#f0fdf4" : "#fff",
+      display: "grid",
+      gap: 5,
+    }}
+  >
+    <strong>
+      {complete ? "✅" : "⬜"} {label}
+    </strong>
     <span style={{ color: "#64748b", fontSize: 13 }}>{detail}</span>
   </div>
 );
 
-export const speakingTopics = [
-  {
-    title: "Persönlichkeit und Selbstbild",
-    keywords: ["Eigenschaften", "Stärken", "Schwächen", "Selbstbild", "Selbstbewusstsein", "Authentizität"],
-  },
-  {
-    title: "Werte und Überzeugungen",
-    keywords: ["Ehrlichkeit", "Respekt", "Verantwortung", "Familie", "Religion", "Lebensziele"],
-  },
-  {
-    title: "Prägende Erfahrungen",
-    keywords: ["Kindheit", "Schule", "Arbeit", "Beziehungen", "Erfolge", "Rückschläge"],
-  },
-  {
-    title: "Herkunft und Zugehörigkeit",
-    keywords: ["Kultur", "Sprache", "Heimat", "Familie", "Gemeinschaft", "Mehrfachzugehörigkeit"],
-  },
-  {
-    title: "Online und offline",
-    keywords: ["soziale Medien", "Selbstdarstellung", "Privatsphäre", "Rollen", "Erwartungen", "echtes Leben"],
-  },
-  {
-    title: "Persönliche Entwicklung",
-    keywords: ["Entscheidungen", "Veränderungen", "Vorbilder", "Zukunftspläne", "Lernziele", "Weiterentwicklung"],
-  },
-];
-
-export const b2Day1SpeakingQuestion = "Welche Faktoren prägen deine persönliche Identität, und wie unterscheidet sich dein Selbstbild online und offline?";
-
-export const SpeakingPoints = () => (
-  <div style={{ display: "grid", gap: 12 }}>
-    <NoteBox tone="amber">
-      <strong>Sprechfrage:</strong> {b2Day1SpeakingQuestion}
-    </NoteBox>
-    <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
-      <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
-      <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
-      <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
-        {speakingTopics.map((topic) => (
-          <li key={topic.title}><strong>{topic.title}:</strong> {topic.keywords.join(", ")}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
+export const speakingTopics = b2Day1IdentitySpeakingMindMap.branches.map(
+  ({ title, keywords }) => ({ title, keywords }),
 );
 
-export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = null }) {
+export const b2Day1SpeakingQuestion =
+  b2Day1IdentitySpeakingMindMap.question;
+
+export const SpeakingPoints = () => (
+  <SpeakingMindMap config={b2Day1IdentitySpeakingMindMap} />
+);
+
+export default function B2Day1IdentityPilotLessonPage({
+  lesson,
+  falowenRadio = null,
+}) {
   const { showToast } = useToast();
   const storageKey = "falowen:b2:day1:identity-pilot-progress";
   const [activeTab, setActiveTab] = useState("learn");
@@ -144,7 +137,12 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
         ...JSON.parse(localStorage.getItem(storageKey) || "{}"),
       };
     } catch (error) {
-      return { learnDone: false, speakDone: false, reflection: "", completed: false };
+      return {
+        learnDone: false,
+        speakDone: false,
+        reflection: "",
+        completed: false,
+      };
     }
   });
 
@@ -153,13 +151,18 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
   }, [progress, storageKey]);
 
   const videoEmbed = getYouTubeEmbedUrl(lesson.videoResource?.url);
-  const finishReady = progress.learnDone && progress.speakDone && writingStatus.complete;
+  const finishReady =
+    progress.learnDone && progress.speakDone && writingStatus.complete;
   const grammarRules = (lesson.grammarLesson?.rules || []).slice(0, 5);
   const grammarExamples = (lesson.grammarLesson?.examples || []).slice(0, 4);
 
   const markComplete = () => {
     if (!finishReady) return;
-    setProgress((previous) => ({ ...previous, completed: true, completedAt: new Date().toISOString() }));
+    setProgress((previous) => ({
+      ...previous,
+      completed: true,
+      completedAt: new Date().toISOString(),
+    }));
     showToast("B2 Day 1 completed. Your progress was saved.", "success");
   };
 
@@ -167,20 +170,81 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
     <div style={{ ...styles.container, display: "grid", gap: 18 }}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-      <header style={{ borderRadius: 22, overflow: "hidden", color: "#fff", backgroundImage: `linear-gradient(135deg, rgba(2,6,23,.94), rgba(30,64,175,.72)), url(${lesson.heroImage})`, backgroundSize: "cover", backgroundPosition: "center", padding: "clamp(22px, 4vw, 42px)", display: "grid", gap: 16, minHeight: 300, alignContent: "space-between", boxShadow: "0 20px 52px rgba(15,23,42,.18)" }}>
+      <header
+        style={{
+          borderRadius: 22,
+          overflow: "hidden",
+          color: "#fff",
+          backgroundImage: `linear-gradient(135deg, rgba(2,6,23,.94), rgba(30,64,175,.72)), url(${lesson.heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: "clamp(22px, 4vw, 42px)",
+          display: "grid",
+          gap: 16,
+          minHeight: 300,
+          alignContent: "space-between",
+          boxShadow: "0 20px 52px rgba(15,23,42,.18)",
+        }}
+      >
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>B2</span>
-          <span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>Day 1</span>
-          <span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Self-learning pilot</span>
+          <span
+            style={{
+              ...styles.badge,
+              background: "rgba(255,255,255,.16)",
+              color: "#fff",
+            }}
+          >
+            B2
+          </span>
+          <span
+            style={{
+              ...styles.badge,
+              background: "rgba(255,255,255,.16)",
+              color: "#fff",
+            }}
+          >
+            Day 1
+          </span>
+          <span
+            style={{
+              ...styles.badge,
+              background: "rgba(37,99,235,.9)",
+              color: "#fff",
+            }}
+          >
+            Self-learning pilot
+          </span>
         </div>
         <div>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 5vw, 3.8rem)", lineHeight: 1.04 }}>{lesson.title}</h1>
-          <p style={{ margin: "10px 0 0", color: "#e2e8f0", fontSize: "1.05rem", lineHeight: 1.6 }}>{lesson.topic}</p>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "clamp(2rem, 5vw, 3.8rem)",
+              lineHeight: 1.04,
+            }}
+          >
+            {lesson.title}
+          </h1>
+          <p
+            style={{
+              margin: "10px 0 0",
+              color: "#e2e8f0",
+              fontSize: "1.05rem",
+              lineHeight: 1.6,
+            }}
+          >
+            {lesson.topic}
+          </p>
         </div>
       </header>
 
       {falowenRadio ? (
-        <FalowenRadioTabContent level="B2" day={1} resource={falowenRadio} onContinue={() => setActiveTab("learn")} />
+        <FalowenRadioTabContent
+          level="B2"
+          day={1}
+          resource={falowenRadio}
+          onContinue={() => setActiveTab("learn")}
+        />
       ) : null}
 
       <div style={tabBarStyle}>
@@ -189,7 +253,13 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            style={{ ...(activeTab === tab.id ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}
+            style={{
+              ...(activeTab === tab.id
+                ? styles.primaryButton
+                : styles.secondaryButton),
+              borderRadius: 999,
+              minHeight: 44,
+            }}
           >
             {tab.label}
           </button>
@@ -199,26 +269,92 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
       {activeTab === "learn" ? (
         <>
           <Section title="AI video">
-            <NoteBox><strong>Keep this tab simple:</strong> Watch the video, study the core grammar and mark the section complete.</NoteBox>
+            <NoteBox>
+              <strong>Keep this tab simple:</strong> Watch the video, study the
+              core grammar and mark the section complete.
+            </NoteBox>
             <div style={{ display: "grid", gap: 10 }}>
               <strong>{lesson.videoResource?.title}</strong>
-              <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{lesson.videoResource?.description}</p>
+              <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+                {lesson.videoResource?.description}
+              </p>
               {videoEmbed ? (
-                <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}>
-                  <iframe title={lesson.videoResource?.title || "B2 AI video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} />
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    paddingTop: "56.25%",
+                    borderRadius: 16,
+                    overflow: "hidden",
+                    background: "#0f172a",
+                  }}
+                >
+                  <iframe
+                    title={lesson.videoResource?.title || "B2 AI video"}
+                    src={videoEmbed}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      border: 0,
+                    }}
+                  />
                 </div>
               ) : null}
             </div>
           </Section>
           <Section title="Grammar: Adjektivdeklination und klare Begründungen">
-            <NoteBox tone="amber"><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-              <div><h3>Core rules</h3><ul style={{ paddingLeft: 20, lineHeight: 1.75 }}>{grammarRules.map((rule) => <li key={rule}>{rule}</li>)}</ul></div>
-              <div><h3>Model sentences</h3><ul style={{ paddingLeft: 20, lineHeight: 1.75 }}>{grammarExamples.map((example) => <li key={example}>{example}</li>)}</ul></div>
+            <NoteBox tone="amber">
+              <strong>Focus:</strong> {lesson.grammarFocus}
+            </NoteBox>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                gap: 12,
+              }}
+            >
+              <div>
+                <h3>Core rules</h3>
+                <ul style={{ paddingLeft: 20, lineHeight: 1.75 }}>
+                  {grammarRules.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3>Model sentences</h3>
+                <ul style={{ paddingLeft: 20, lineHeight: 1.75 }}>
+                  {grammarExamples.map((example) => (
+                    <li key={example}>{example}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <NoteBox><strong>Mini practice:</strong> {lesson.grammarLesson?.miniExercise}</NoteBox>
-            <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
-              <input type="checkbox" checked={progress.learnDone} onChange={(event) => setProgress((previous) => ({ ...previous, learnDone: event.target.checked }))} />
+            <NoteBox>
+              <strong>Mini practice:</strong> {lesson.grammarLesson?.miniExercise}
+            </NoteBox>
+            <label
+              style={{
+                display: "flex",
+                gap: 9,
+                alignItems: "center",
+                fontWeight: 800,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={progress.learnDone}
+                onChange={(event) =>
+                  setProgress((previous) => ({
+                    ...previous,
+                    learnDone: event.target.checked,
+                  }))
+                }
+              />
               I watched the AI video and reviewed the grammar.
             </label>
           </Section>
@@ -227,38 +363,122 @@ export default function B2Day1IdentityPilotLessonPage({ lesson, falowenRadio = n
 
       {activeTab === "speak" ? (
         <Section title="Speaking builder">
-          <SpeakingPoints />
-          <EmbeddedSpeechPracticePanel />
-          <label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}>
-            <input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((previous) => ({ ...previous, speakDone: event.target.checked }))} />
-            I completed a speaking practice.
+          <SpeakingPreparationFlow
+            config={b2Day1IdentitySpeakingMindMap}
+            showTimer
+          >
+            <EmbeddedSpeechPracticePanel />
+          </SpeakingPreparationFlow>
+          <label
+            style={{
+              display: "flex",
+              gap: 9,
+              alignItems: "center",
+              fontWeight: 800,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={progress.speakDone}
+              onChange={(event) =>
+                setProgress((previous) => ({
+                  ...previous,
+                  speakDone: event.target.checked,
+                }))
+              }
+            />
+            I used the brain map and completed a speaking practice.
           </label>
         </Section>
       ) : null}
 
       {activeTab === "write" ? (
         <Section title="Guided writing builder">
-          <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
-          <GuidedWritingWorkspace config={b2Day1QuestionWritingBuilder} storageKey="falowen:b2:day1:question-writing-builder" cloudField="b2Day1GuidedWriting" onStatusChange={setWritingStatus} />
+          <NoteBox>
+            <strong>Task:</strong> {lesson.writingTopic}
+          </NoteBox>
+          <GuidedWritingWorkspace
+            config={b2Day1QuestionWritingBuilder}
+            storageKey="falowen:b2:day1:question-writing-builder"
+            cloudField="b2Day1GuidedWriting"
+            onStatusChange={setWritingStatus}
+          />
         </Section>
       ) : null}
 
       {activeTab === "finish" ? (
         <Section title="Finish B2 Day 1">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
-            <ProgressCard label="Learn" complete={progress.learnDone} detail="AI video and grammar reviewed" />
-            <ProgressCard label="Speak" complete={progress.speakDone} detail="Speaking practice completed" />
-            <ProgressCard label="Write" complete={writingStatus.complete} detail={`${writingStatus.completedQuestions}/${writingStatus.totalQuestions} questions · ${writingStatus.wordCount} final words`} />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 10,
+            }}
+          >
+            <ProgressCard
+              label="Learn"
+              complete={progress.learnDone}
+              detail="AI video and grammar reviewed"
+            />
+            <ProgressCard
+              label="Speak"
+              complete={progress.speakDone}
+              detail="Brain-map speaking practice completed"
+            />
+            <ProgressCard
+              label="Write"
+              complete={writingStatus.complete}
+              detail={`${writingStatus.completedQuestions}/${writingStatus.totalQuestions} questions · ${writingStatus.wordCount} final words`}
+            />
           </div>
           <label style={{ display: "grid", gap: 7 }}>
             <strong>Short reflection</strong>
-            <span style={{ color: "#64748b", fontSize: 13 }}>What did you learn about your identity, and what should you improve next?</span>
-            <textarea value={progress.reflection} onChange={(event) => setProgress((previous) => ({ ...previous, reflection: event.target.value }))} style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} />
+            <span style={{ color: "#64748b", fontSize: 13 }}>
+              What did you learn about your identity, and what should you improve
+              next?
+            </span>
+            <textarea
+              value={progress.reflection}
+              onChange={(event) =>
+                setProgress((previous) => ({
+                  ...previous,
+                  reflection: event.target.value,
+                }))
+              }
+              style={{
+                minHeight: 120,
+                border: "1px solid #cbd5e1",
+                borderRadius: 12,
+                padding: 12,
+                font: "inherit",
+                resize: "vertical",
+              }}
+            />
           </label>
-          {!finishReady ? <NoteBox tone="amber">Complete Learn, Speak and the guided writing task before marking the lesson complete.</NoteBox> : null}
-          {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> B2 Day 1 is saved as complete on this device.</NoteBox> : null}
-          <button type="button" style={{ ...styles.primaryButton, opacity: finishReady ? 1 : 0.5 }} disabled={!finishReady} onClick={markComplete}>
-            {progress.completed ? "Mark complete again" : "Mark B2 Day 1 complete"}
+          {!finishReady ? (
+            <NoteBox tone="amber">
+              Complete Learn, Speak and the guided writing task before marking
+              the lesson complete.
+            </NoteBox>
+          ) : null}
+          {progress.completed ? (
+            <NoteBox tone="green">
+              <strong>Completed.</strong> B2 Day 1 is saved as complete on this
+              device.
+            </NoteBox>
+          ) : null}
+          <button
+            type="button"
+            style={{
+              ...styles.primaryButton,
+              opacity: finishReady ? 1 : 0.5,
+            }}
+            disabled={!finishReady}
+            onClick={markComplete}
+          >
+            {progress.completed
+              ? "Mark complete again"
+              : "Mark B2 Day 1 complete"}
           </button>
         </Section>
       ) : null}
