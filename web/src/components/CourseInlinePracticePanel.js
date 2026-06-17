@@ -83,6 +83,7 @@ const CourseInlinePracticePanel = ({
 
   return (
     <div
+      data-course-inline-practice={type || "speaking"}
       style={{
         ...styles.card,
         margin: 0,

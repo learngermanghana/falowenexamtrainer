@@ -24,11 +24,11 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Test the speaking timer
+      - name: Test speaking focus mode and timer
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingPracticeTimerCard.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
 
       - name: Build web app
         working-directory: web

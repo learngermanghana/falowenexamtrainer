@@ -46,6 +46,42 @@ test("moves through the configured speaking route", async () => {
   expect(screen.getByText("2/5")).toBeInTheDocument();
 });
 
+test("starts A2 focus mode collapsed and opens extra speaking help", async () => {
+  const { container } = render(<SpeakingMindMap config={config} />);
+  const root = container.querySelector("[data-speaking-mind-map]");
+
+  expect(root).toHaveAttribute("data-focus-mode", "true");
+  expect(root).toHaveAttribute("data-help-open", "false");
+  expect(
+    screen.getByRole("button", { name: "More speaking help" }),
+  ).toHaveAttribute("aria-expanded", "false");
+
+  await userEvent.click(
+    screen.getByRole("button", { name: "More speaking help" }),
+  );
+
+  expect(root).toHaveAttribute("data-help-open", "true");
+  expect(
+    screen.getByRole("button", { name: "Hide extra speaking help" }),
+  ).toHaveAttribute("aria-expanded", "true");
+});
+
+test("allows focus mode to be disabled for advanced layouts", () => {
+  const advancedConfig = {
+    ...config,
+    level: "B2",
+    focusMode: false,
+  };
+  const { container } = render(<SpeakingMindMap config={advancedConfig} />);
+
+  expect(
+    container.querySelector("[data-speaking-mind-map]"),
+  ).toHaveAttribute("data-focus-mode", "false");
+  expect(
+    screen.queryByRole("button", { name: "More speaking help" }),
+  ).not.toBeInTheDocument();
+});
+
 test("handles missing configuration safely", () => {
   render(<SpeakingMindMap />);
   expect(

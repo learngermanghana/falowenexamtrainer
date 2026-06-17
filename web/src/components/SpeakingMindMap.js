@@ -93,10 +93,19 @@ const SpeakingMindMap = ({ config }) => {
   const firstBranchId =
     safeConfig.speakingRoute[0] || safeConfig.branches[0]?.id || "";
   const [selectedBranchId, setSelectedBranchId] = useState(firstBranchId);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const focusModeEnabled =
+    safeConfig.focusMode !== undefined
+      ? Boolean(safeConfig.focusMode)
+      : ["A2", "B1"].includes(String(safeConfig.level || "").toUpperCase());
 
   useEffect(() => {
     setSelectedBranchId(firstBranchId);
   }, [firstBranchId]);
+
+  useEffect(() => {
+    setHelpOpen(false);
+  }, [safeConfig.lessonId, safeConfig.day, focusModeEnabled]);
 
   const selectedBranch =
     safeConfig.branches.find((branch) => branch.id === selectedBranchId) ||
@@ -140,6 +149,8 @@ const SpeakingMindMap = ({ config }) => {
       className="speaking-mind-map"
       data-speaking-mind-map
       data-level={safeConfig.level}
+      data-focus-mode={focusModeEnabled ? "true" : "false"}
+      data-help-open={helpOpen ? "true" : "false"}
     >
       <header className="speaking-mind-map__header">
         <div>
@@ -291,6 +302,21 @@ const SpeakingMindMap = ({ config }) => {
           </button>
         </div>
       </div>
+
+      {focusModeEnabled ? (
+        <div className="speaking-mind-map__help-toggle">
+          <button
+            type="button"
+            className="speaking-mind-map__help-button"
+            style={styles.secondaryButton}
+            onClick={() => setHelpOpen((current) => !current)}
+            aria-expanded={helpOpen}
+          >
+            {helpOpen ? "Hide extra speaking help" : "More speaking help"}
+          </button>
+          <span>Phrase bank · vocabulary · model answer · detailed instructions</span>
+        </div>
+      ) : null}
     </section>
   );
 };
