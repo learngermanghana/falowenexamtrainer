@@ -676,8 +676,8 @@ const courseSchedules = {
       instruction: "Watch the video, review grammar, and complete your workbook.",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/hLpPFOthVkU",
-        youtube_link: "https://youtu.be/hLpPFOthVkU",
+        video: "https://youtu.be/ZE24QSbGaSo",
+        youtube_link: "https://youtu.be/ZE24QSbGaSo",
         grammarbook_link: "https://www.falowen.app/campus/course/a1-day-12-the-24-hour-clock-and-dates",
         workbook_link: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
         assignment: true,
@@ -692,8 +692,8 @@ const courseSchedules = {
       instruction:
         "Use the statement rule to talk about your weekly routine using the activities listed. Go to the classnotes page, search for the assignment number and add your contribution",
       schreiben_sprechen: {
-        video: "https://youtu.be/eqSc_5p5uyQ",
-        youtube_link: "https://youtu.be/eqSc_5p5uyQ",
+        video: "https://youtu.be/_awD0Xbsj78",
+        youtube_link: "https://youtu.be/_awD0Xbsj78",
         assignment: false,
         workbook_link: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
       },

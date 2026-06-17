@@ -39,4 +39,20 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Einkaufen ein. Danach gehst du weiter zu Teil 1.",
   },
+  21: {
+    key: "a2-day21-ein-wochenende-planen-falowen-radio",
+    title: "Ein Wochenende planen 8.21",
+    youtubeId: "LlXsNA1a8lc",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Ein Wochenende planen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  22: {
+    key: "a2-day22-die-woche-planung-falowen-radio",
+    title: "Die Woche Planung 8.22",
+    youtubeId: "KR2oT-mujmI",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Wochenplanung ein. Danach gehst du weiter zu Teil 1.",
+  },
 };
