@@ -22,13 +22,13 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --silent
 
       - name: Test class access placement
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/ClassAccessPlacement.test.js
+        run: npm test -- --watchAll=false --silent --runTestsByPath src/components/ClassAccessPlacement.test.js
 
       - name: Build web app
         working-directory: web
