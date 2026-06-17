@@ -1,7 +1,17 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 import CourseClassMembersShortcut from "./CourseClassMembersShortcut";
+
+const mockNavigate = jest.fn();
+
+jest.mock(
+  "react-router-dom",
+  () => ({
+    useLocation: () => ({ pathname: "/campus/course", search: "" }),
+    useNavigate: () => mockNavigate,
+  }),
+  { virtual: true },
+);
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({
@@ -14,13 +24,11 @@ jest.mock("../context/AuthContext", () => ({
 
 test("hides the old Course Book class tab and shows a compact shortcut", async () => {
   render(
-    <MemoryRouter initialEntries={["/campus/course"]}>
-      <div>
-        <button>Course Book</button>
-        <button>Class Members</button>
-        <CourseClassMembersShortcut />
-      </div>
-    </MemoryRouter>,
+    <div>
+      <button>Course Book</button>
+      <button>Class Members</button>
+      <CourseClassMembersShortcut />
+    </div>,
   );
 
   const oldTab = screen.getByRole("button", { name: "Class Members" });
