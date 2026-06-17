@@ -1,7 +1,28 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
+
+const routeWritingContext = () => {
+  if (typeof window === "undefined") return {};
+  const path = String(window.location?.pathname || "").toLowerCase();
+  const match =
+    path.match(/\/campus\/course\/lesson\/(a1|a2|b1|b2|c1)\/(\d+)/) ||
+    path.match(/(a1|a2|b1|b2|c1)-day-(\d+)/);
+  if (!match) return {};
+
+  const level = match[1].toUpperCase();
+  const day = Number(match[2]);
+  const lessonId = `${level}-day-${day}`;
+  return {
+    level,
+    courseLevel: level,
+    day,
+    lessonId,
+    workbookId: lessonId,
+    writingTaskId: `${lessonId}-teil-2-writing`,
+  };
+};
 
 const practiceConfig = {
   speaking: {
@@ -13,12 +34,12 @@ const practiceConfig = {
     render: () => <SpeakingPage mode="course" />,
   },
   writing: {
-    defaultTitle: "Mark my letter",
+    defaultTitle: "Mark My Letter",
     defaultDescription:
       "Paste your completed text here. Falowen AI will mark it, show your score, explain the corrections and help you improve the final version. Submit the finished work through your normal assignment area when required.",
-    label: "Mark my letter",
-    closedButtonLabel: "Open Mark my letter",
-    render: () => (
+    label: "Mark My Letter",
+    closedButtonLabel: "Open Mark My Letter",
+    render: (writingContext) => (
       <WritingPage
         mode="course"
         initialTab="mark"
@@ -26,6 +47,7 @@ const practiceConfig = {
         hideTabList
         markLabel="Mark My Letter"
         submitLabel="Mark My Letter"
+        writingContext={writingContext}
       />
     ),
   },
@@ -36,10 +58,28 @@ const CourseInlinePracticePanel = ({
   title,
   description,
   defaultOpen = true,
+  writingContext = {},
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
+  const resolvedWritingContext = useMemo(() => {
+    if (type !== "writing") return {};
+    const routeContext = routeWritingContext();
+    const merged = { ...routeContext, ...writingContext };
+    const fallbackId = [merged.level, merged.day]
+      .filter((value) => value !== undefined && value !== null && value !== "")
+      .join("-day-");
+    return {
+      ...merged,
+      lessonId: merged.lessonId || fallbackId || "course-writing",
+      workbookId: merged.workbookId || fallbackId || "course-writing",
+      writingTaskId:
+        merged.writingTaskId ||
+        `${merged.workbookId || fallbackId || "course-writing"}-teil-2-writing`,
+      taskTitle: merged.taskTitle || title || "Teil 2 writing task",
+    };
+  }, [title, type, writingContext]);
 
   return (
     <div
@@ -80,7 +120,7 @@ const CourseInlinePracticePanel = ({
           <span style={styles.helperText}>
             {config.label} loaded inside this workbook page.
           </span>
-          {config.render()}
+          {config.render(resolvedWritingContext)}
         </div>
       ) : null}
     </div>
