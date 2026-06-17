@@ -1,25 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isStaff() {
+      return signedIn() && (
+        request.auth.token.admin == true ||
+        request.auth.token.role == 'admin' ||
+        request.auth.token.role == 'tutor'
+      );
+    }
+
     function ownsResource() {
-      return signedIn() && (resource.data.userId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.ownerUid == request.auth.uid);
+      return signedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.uid == request.auth.uid ||
+        resource.data.ownerUid == request.auth.uid
+      );
     }
+
     function ownsIncoming() {
-      return signedIn() && (request.resource.data.userId == request.auth.uid || request.resource.data.uid == request.auth.uid || request.resource.data.ownerUid == request.auth.uid);
+      return signedIn() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.resource.data.uid == request.auth.uid ||
+        request.resource.data.ownerUid == request.auth.uid
+      );
     }
 
-    match /users/{userId}/{document=**} { allow read, write: if isOwner(userId); }
+    match /users/{userId}/{document=**} {
+      allow read: if isOwner(userId) || isStaff();
+      allow create, update, delete: if isOwner(userId);
+    }
 
-    match /writingProgress/{ownerId} {
+    match /writingProgress/{progressId} {
       allow create: if ownsIncoming();
-      allow read: if ownsResource();
+      allow read: if ownsResource() || isStaff();
       allow update: if ownsResource() && ownsIncoming();
       allow delete: if ownsResource();
+
       match /attempts/{attemptId} {
         allow create: if ownsIncoming();
-        allow read: if ownsResource();
+        allow read: if ownsResource() || isStaff();
         allow update: if ownsResource() && ownsIncoming();
         allow delete: if ownsResource();
       }
@@ -27,24 +54,59 @@ service cloud.firestore {
 
     match /writingReferences/{docId} {
       allow create: if ownsIncoming();
-      allow read: if ownsResource();
-      allow update: if ownsResource() && ownsIncoming();
-      allow delete: if ownsResource();
-    }
-    match /savedWriting/{docId} {
-      allow create: if ownsIncoming();
-      allow read: if ownsResource();
-      allow update: if ownsResource() && ownsIncoming();
-      allow delete: if ownsResource();
-    }
-    match /writingFeedback/{docId} {
-      allow create: if ownsIncoming();
-      allow read: if ownsResource();
+      allow read: if ownsResource() || isStaff();
       allow update: if ownsResource() && ownsIncoming();
       allow delete: if ownsResource();
     }
 
-    // Preserve existing Falowen app/tutor/admin workflows while writing rules are tightened.
-    match /{document=**} { allow read, write: if signedIn(); }
+    match /savedWriting/{docId} {
+      allow create: if ownsIncoming();
+      allow read: if ownsResource() || isStaff();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
+    }
+
+    match /writingFeedback/{docId} {
+      allow create: if ownsIncoming();
+      allow read: if ownsResource() || isStaff();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
+    }
+
+    // Existing Falowen collections that previously used the authenticated
+    // fallback are listed explicitly so they cannot override private writing
+    // and user-document rules.
+    match /aiAuditLogs/{document=**} { allow read, write: if signedIn(); }
+    match /announcements/{document=**} { allow read, write: if signedIn(); }
+    match /archived/{document=**} { allow read, write: if signedIn(); }
+    match /assignmentProgress/{document=**} { allow read, write: if signedIn(); }
+    match /attendance/{document=**} { allow read, write: if signedIn(); }
+    match /class_board/{document=**} { allow read, write: if signedIn(); }
+    match /class_lesson_notes/{document=**} { allow read, write: if signedIn(); }
+    match /classes/{document=**} { allow read, write: if signedIn(); }
+    match /grammarQuestions/{document=**} { allow read, write: if signedIn(); }
+    match /group_discussion/{document=**} { allow read, write: if signedIn(); }
+    match /language/{document=**} { allow read, write: if signedIn(); }
+    match /leadCaptures/{document=**} { allow read, write: if signedIn(); }
+    match /lessonProgress/{document=**} { allow read, write: if signedIn(); }
+    match /loginSessions/{document=**} { allow read, write: if signedIn(); }
+    match /notifications/{document=**} { allow read, write: if signedIn(); }
+    match /paystackInitRequests/{document=**} { allow read, write: if signedIn(); }
+    match /paystackWebhookEvents/{document=**} { allow read, write: if signedIn(); }
+    match /presentationSessions/{document=**} { allow read, write: if signedIn(); }
+    match /qa_posts/{document=**} { allow read, write: if signedIn(); }
+    match /scores/{document=**} { allow read, write: if signedIn(); }
+    match /sessions/{document=**} { allow read, write: if signedIn(); }
+    match /studentActivityEvents/{document=**} { allow read, write: if signedIn(); }
+    match /studentNotifications/{document=**} { allow read, write: if signedIn(); }
+    match /students/{document=**} { allow read, write: if signedIn(); }
+    match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
+    match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
+    match /writingScoreStats/{document=**} { allow read, write: if signedIn(); }
+    match /writingSubmissions/{document=**} { allow read, write: if signedIn(); }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
