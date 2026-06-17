@@ -1,116 +1,109 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import "./SpeakingPracticeTimerCard.css";
 
-const timerOptions = [5, 10, 15].map((minutes) => ({
-  label: `${minutes} min`,
-  seconds: minutes * 60,
-}));
+const levelTargets = {
+  A2: 45,
+  B1: 90,
+  B2: 120,
+  C1: 120,
+};
 
 const formatTimer = (seconds) => {
-  const safeSeconds = Math.max(0, seconds);
+  const safeSeconds = Math.max(0, Number(seconds) || 0);
   const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
   const remaining = String(safeSeconds % 60).padStart(2, "0");
   return `${minutes}:${remaining}`;
 };
 
-const SpeakingPracticeTimerCard = () => {
-  const [timerDurationSeconds, setTimerDurationSeconds] = useState(timerOptions[0].seconds);
-  const [timerSecondsLeft, setTimerSecondsLeft] = useState(timerOptions[0].seconds);
+const inferLevelFromPath = () => {
+  if (typeof window === "undefined") return "";
+  const path = String(window.location?.pathname || "").toUpperCase();
+  const match = path.match(/(?:^|\/|-)(A2|B1|B2|C1)(?:\/|-|$)/);
+  return match?.[1] || "";
+};
+
+const resolveDuration = (targetSeconds, level) => {
+  const explicit = Number(targetSeconds);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  const resolvedLevel = String(level || inferLevelFromPath()).toUpperCase();
+  return levelTargets[resolvedLevel] || 300;
+};
+
+const SpeakingPracticeTimerCard = ({ targetSeconds, level }) => {
+  const resolvedDuration = useMemo(
+    () => resolveDuration(targetSeconds, level),
+    [level, targetSeconds],
+  );
+  const [timerSecondsLeft, setTimerSecondsLeft] = useState(resolvedDuration);
   const [timerRunning, setTimerRunning] = useState(false);
 
-  const timerProgress = useMemo(() => {
-    if (!timerDurationSeconds) return 0;
-    return (timerSecondsLeft / timerDurationSeconds) * 100;
-  }, [timerDurationSeconds, timerSecondsLeft]);
+  useEffect(() => {
+    setTimerSecondsLeft(resolvedDuration);
+    setTimerRunning(false);
+  }, [resolvedDuration]);
 
   useEffect(() => {
     if (!timerRunning || timerSecondsLeft <= 0) return undefined;
 
     const intervalId = window.setInterval(() => {
-      setTimerSecondsLeft((prevSeconds) => {
-        if (prevSeconds <= 1) {
+      setTimerSecondsLeft((previous) => {
+        if (previous <= 1) {
           window.clearInterval(intervalId);
           setTimerRunning(false);
           return 0;
         }
-        return prevSeconds - 1;
+        return previous - 1;
       });
     }, 1000);
 
     return () => window.clearInterval(intervalId);
   }, [timerRunning, timerSecondsLeft]);
 
-  const handleTimerOptionChange = (nextDurationSeconds) => {
-    setTimerDurationSeconds(nextDurationSeconds);
-    setTimerSecondsLeft(nextDurationSeconds);
-    setTimerRunning(false);
-  };
-
-  const startSpeakingTimer = () => {
+  const toggleTimer = () => {
     if (timerSecondsLeft === 0) {
-      setTimerSecondsLeft(timerDurationSeconds);
+      setTimerSecondsLeft(resolvedDuration);
+      setTimerRunning(true);
+      return;
     }
-    setTimerRunning(true);
+    setTimerRunning((current) => !current);
   };
 
-  const pauseSpeakingTimer = () => setTimerRunning(false);
-
-  const resetSpeakingTimer = () => {
+  const resetTimer = () => {
     setTimerRunning(false);
-    setTimerSecondsLeft(timerDurationSeconds);
+    setTimerSecondsLeft(resolvedDuration);
   };
 
   return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#f0f9ff", display: "grid", gap: 10 }}>
-      <strong>Teil 1 confidence timer (keep this page open)</strong>
-      <p style={{ margin: 0, lineHeight: 1.6 }}>
-        Click “Practice here” above to open the speaking coach on this page, then start this timer for focused practice.
-      </p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {timerOptions.map((option) => (
-          <button
-            key={option.seconds}
-            type="button"
-            style={{
-              ...styles.secondaryButton,
-              background: timerDurationSeconds === option.seconds ? "#dbeafe" : "#fff",
-              borderColor: timerDurationSeconds === option.seconds ? "#2563eb" : "#d1d5db",
-              color: timerDurationSeconds === option.seconds ? "#1d4ed8" : "#111827",
-            }}
-            onClick={() => handleTimerOptionChange(option.seconds)}
-            disabled={timerRunning}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <div aria-live="polite" style={{ fontSize: "2rem", fontWeight: 700 }}>
+    <div
+      className="speaking-compact-timer"
+      data-compact-speaking-timer
+      aria-label="Teil 1 speaking timer"
+    >
+      <span className="speaking-compact-timer__icon" aria-hidden="true">
+        ⏱
+      </span>
+      <span className="speaking-compact-timer__time" aria-live="polite">
         {formatTimer(timerSecondsLeft)}
-      </div>
-
-      <div style={{ width: "100%", height: 10, background: "#bfdbfe", borderRadius: 999, overflow: "hidden" }}>
-        <div
-          style={{
-            width: `${timerProgress}%`,
-            height: "100%",
-            background: "linear-gradient(90deg,#2563eb,#7c3aed)",
-            transition: "width 0.3s ease",
-          }}
-        />
-      </div>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <button type="button" style={styles.primaryButton} onClick={startSpeakingTimer} disabled={timerRunning}>
-          ▶ Start
-        </button>
-        <button type="button" style={styles.secondaryButton} onClick={pauseSpeakingTimer} disabled={!timerRunning}>
-          ⏸ Pause
-        </button>
-        <button type="button" style={styles.secondaryButton} onClick={resetSpeakingTimer}>
-          ↺ Reset
-        </button>
-      </div>
+      </span>
+      <button
+        type="button"
+        className="speaking-compact-timer__button speaking-compact-timer__button--primary"
+        style={styles.primaryButton}
+        onClick={toggleTimer}
+        aria-label={timerRunning ? "Pause speaking timer" : "Start speaking timer"}
+      >
+        {timerRunning ? "Pause" : timerSecondsLeft === 0 ? "Again" : "Start"}
+      </button>
+      <button
+        type="button"
+        className="speaking-compact-timer__button"
+        style={styles.secondaryButton}
+        onClick={resetTimer}
+        aria-label="Reset speaking timer"
+      >
+        Reset
+      </button>
     </div>
   );
 };
