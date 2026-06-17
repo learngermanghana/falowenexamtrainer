@@ -6,6 +6,8 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -78,6 +80,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
       {activeTab === "sprechen" && <div style={card}>
         <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1600&q=80" alt="People using smartphones and laptops for digital communication" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(27)} />
         <p style={{ margin: 0, lineHeight: 1.7 }}>Zentrales Thema: <strong>Digitale Kommunikation im Alltag</strong>.</p>
         <ul style={listSpacing}><li><strong>Kommunikationsmittel:</strong> E-Mail, Telefonieren, Chatten, soziale Netzwerke, Online-Meetings.</li><li><strong>Soziale Medien:</strong> Plattformen, Aktivitäten, Zeitvertreib, Gefahren.</li><li><strong>Vorteile/Nachteile:</strong> schnell/einfach vs. Ablenkung/zu viel Zeit.</li><li><strong>Sicherheit:</strong> starke Passwörter, Datenschutz, 2FA, Updates.</li><li><strong>Alltag/Beruf:</strong> privat, beruflich, Schule/Uni, Herausforderungen.</li></ul>
         <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>

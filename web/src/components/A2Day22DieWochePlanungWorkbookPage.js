@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -156,6 +158,8 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
             In this chapter, we&apos;ll engage in group exercises discussing these topics. Following this, I&apos;ll revise the
             questions and invite you to write a brief essay about yourself.
           </p>
+          <SpeakingMindMap config={getA2SpeakingMindMap(22)} />
+
           <h3 style={{ margin: 0 }}>Instructions</h3>
           <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
             <li>

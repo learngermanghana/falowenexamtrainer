@@ -6,6 +6,8 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -225,6 +227,8 @@ const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
+
+          <SpeakingMindMap config={getA2SpeakingMindMap(19)} />
 
           <h3 style={sectionTitle}>Instructions</h3>
           <ol style={listSpacing}>

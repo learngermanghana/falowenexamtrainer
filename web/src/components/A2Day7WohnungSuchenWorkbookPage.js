@@ -6,6 +6,8 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -192,6 +194,8 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             In this chapter, we&apos;ll engage in group exercises discussing apartment search in German.
           </p>
+
+          <SpeakingMindMap config={getA2SpeakingMindMap(7)} />
 
           <h3 style={sectionTitle}>Instructions</h3>
           <ol style={listSpacing}>

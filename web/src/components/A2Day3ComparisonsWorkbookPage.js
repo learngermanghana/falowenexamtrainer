@@ -7,6 +7,8 @@ import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -183,6 +185,7 @@ const A2Day3ComparisonsWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen / Speaking) · Group Practice</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(3)} />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Zentrales Thema: <strong>Dinge und Personen vergleichen</strong> (Main topic: <strong>comparing things and people</strong>).
           </p>

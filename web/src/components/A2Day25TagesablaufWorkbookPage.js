@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -73,6 +75,7 @@ export default function A2Day25TagesablaufWorkbookPage() {
 
     {activeTab === "sprechen" && <div style={card}><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Students discussing their day in class" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
       <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(25)} />
       <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
       <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Instructions</h3>
       <ol style={listSpacing}>

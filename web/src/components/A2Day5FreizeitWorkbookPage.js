@@ -7,6 +7,8 @@ import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -177,6 +179,7 @@ const A2Day5FreizeitWorkbookPage = () => {
       {activeTab === "sprechen" && (
         <div style={card}>
           <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(5)} />
           <p style={{ margin: 0 }}>
             For this assignment, you will talk about your leisure time activities. This exercise will help you practice your
             German speaking skills and prepare for the Goethe A2 exam.

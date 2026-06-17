@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "teil1", label: "Teil 1 · Group Practice" },
@@ -111,6 +113,8 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
             In this chapter, we will engage in group discussions about <strong>Autos und Transportmittel</strong>. Following
             the discussions, the questions will be rephrased for an assignment.
           </p>
+
+          <SpeakingMindMap config={getA2SpeakingMindMap(23)} />
 
           <h3 style={sectionTitle}>Instructions</h3>
           <ol style={listStyle}>
