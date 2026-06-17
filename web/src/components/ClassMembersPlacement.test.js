@@ -1,13 +1,24 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
 import NavigationGuide from "./NavigationGuide";
 import ClassMembersTab from "./ClassMembersTab";
 import ClassDiscussionPage from "./ClassDiscussionPage";
 import { fetchClassDirectoryMembers } from "../services/studentDirectory";
 
-const saveStudentProfile = jest.fn(() => Promise.resolve());
+let mockPathname = "/";
+let mockSearch = "";
+const mockNavigate = jest.fn();
+const mockSaveStudentProfile = jest.fn(() => Promise.resolve());
+
+jest.mock(
+  "react-router-dom",
+  () => ({
+    useLocation: () => ({ pathname: mockPathname, search: mockSearch }),
+    useNavigate: () => mockNavigate,
+  }),
+  { virtual: true },
+);
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({
@@ -18,7 +29,7 @@ jest.mock("../context/AuthContext", () => ({
       className: "A2 Stuttgart Klasse",
       biography: "I enjoy speaking practice.",
     },
-    saveStudentProfile,
+    saveStudentProfile: mockSaveStudentProfile,
   }),
 }));
 
@@ -27,6 +38,10 @@ jest.mock("../services/studentDirectory", () => ({
 }));
 
 beforeEach(() => {
+  mockPathname = "/";
+  mockSearch = "";
+  mockNavigate.mockClear();
+  mockSaveStudentProfile.mockClear();
   fetchClassDirectoryMembers.mockResolvedValue([
     {
       id: "student-1",
@@ -47,25 +62,22 @@ beforeEach(() => {
       className: "A2 Stuttgart Klasse",
     },
   ]);
-  saveStudentProfile.mockClear();
 });
 
 test("places the Your Class preview before the Campus and Exams cards", async () => {
   render(
-    <MemoryRouter>
-      <main className="layout-main">
-        <div data-testid="home-root">
-          <section>Welcome back</section>
-          <div data-testid="main-access">
-            <button>Enter Campus</button>
-            <button>Open Exams Room</button>
-          </div>
-          <details open>
-            <NavigationGuide />
-          </details>
+    <main className="layout-main">
+      <div data-testid="home-root">
+        <section>Welcome back</section>
+        <div data-testid="main-access">
+          <button>Enter Campus</button>
+          <button>Open Exams Room</button>
         </div>
-      </main>
-    </MemoryRouter>,
+        <details open>
+          <NavigationGuide />
+        </details>
+      </div>
+    </main>,
   );
 
   await screen.findByRole("region", { name: "Your class" });
@@ -81,12 +93,9 @@ test("places the Your Class preview before the Campus and Exams cards", async ()
   ).toBeTruthy();
 });
 
-test("Course Book shows only a shortcut instead of the full directory", () => {
-  render(
-    <MemoryRouter initialEntries={["/campus/course"]}>
-      <ClassMembersTab />
-    </MemoryRouter>,
-  );
+test("Course Book directory fallback is only a My Class shortcut", () => {
+  mockPathname = "/campus/course";
+  render(<ClassMembersTab />);
 
   expect(screen.getByRole("region", { name: "Class members moved" })).toBeInTheDocument();
   expect(
@@ -96,11 +105,9 @@ test("Course Book shows only a shortcut instead of the full directory", () => {
 });
 
 test("the My Class members link opens the full directory without emails", async () => {
-  render(
-    <MemoryRouter initialEntries={["/campus/discussion?tab=members"]}>
-      <ClassDiscussionPage />
-    </MemoryRouter>,
-  );
+  mockPathname = "/campus/discussion";
+  mockSearch = "?tab=members";
+  render(<ClassDiscussionPage />);
 
   await waitFor(() => expect(fetchClassDirectoryMembers).toHaveBeenCalled());
   expect(screen.getByText("Ama Mensah")).toBeInTheDocument();
@@ -109,4 +116,5 @@ test("the My Class members link opens the full directory without emails", async 
   expect(screen.queryByText(/@/)).not.toBeInTheDocument();
 
   await userEvent.click(screen.getByRole("button", { name: "Open class discussion" }));
+  expect(mockNavigate).toHaveBeenCalledWith("/campus/discussion");
 });
