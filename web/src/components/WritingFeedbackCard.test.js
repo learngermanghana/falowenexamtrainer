@@ -37,7 +37,7 @@ describe("WritingFeedbackCard", () => {
     );
 
     expect(screen.getByText(/Score: 16\/20/i)).toBeInTheDocument();
-    expect(screen.getByText("4/5")).toBeInTheDocument();
+    expect(screen.getAllByText("4/5")).toHaveLength(2);
     expect(screen.getByText("3/5")).toBeInTheDocument();
     expect(screen.getByText("5/5")).toBeInTheDocument();
     expect(container.textContent).not.toContain("NaN");
