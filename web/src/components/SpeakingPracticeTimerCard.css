@@ -33,6 +33,46 @@ div:has(> .speaking-mind-map) > .speaking-mind-map {
   order: -1;
 }
 
+/* Focus mode keeps the essential speaking workflow visible and collapses the
+   older phrase banks, vocabulary lists and duplicated model answers. */
+div:has(> .speaking-mind-map[data-focus-mode="true"]) > .speaking-compact-timer {
+  position: sticky;
+  top: 8px;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+}
+
+div:has(
+    > .speaking-mind-map[data-focus-mode="true"][data-help-open="false"]
+  )
+  > :not(img):not(h2):not(.speaking-compact-timer):not(.speaking-mind-map):not(
+    [data-course-inline-practice="speaking"]
+  ):not(label:has(input[type="checkbox"])) {
+  display: none !important;
+}
+
+.speaking-mind-map__help-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.speaking-mind-map__help-toggle span {
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.speaking-mind-map__help-button {
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+}
+
 .speaking-compact-timer__icon {
   font-size: 1rem;
   line-height: 1;
@@ -106,6 +146,10 @@ div:has(> .speaking-mind-map) > .speaking-mind-map {
     justify-content: flex-start;
   }
 
+  div:has(> .speaking-mind-map[data-focus-mode="true"]) > .speaking-compact-timer {
+    top: 6px;
+  }
+
   .speaking-compact-timer__time {
     margin-right: auto;
   }
@@ -113,5 +157,14 @@ div:has(> .speaking-mind-map) > .speaking-mind-map {
   .speaking-compact-timer__custom {
     flex-basis: 100%;
     padding-left: 26px;
+  }
+
+  .speaking-mind-map__help-toggle {
+    display: grid;
+    gap: 6px;
+  }
+
+  .speaking-mind-map__help-button {
+    width: fit-content;
   }
 }
