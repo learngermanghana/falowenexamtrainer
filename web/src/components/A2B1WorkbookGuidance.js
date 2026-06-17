@@ -1,6 +1,9 @@
-import React, { useMemo } from "react";
-import { styles } from "../styles";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
+import "./A2B1WorkbookGuidance.css";
+
+const GUIDE_SEEN_PREFIX = "falowen:workbook-guide-seen:v1:";
 
 const resolveWorkbookLevel = (level) => {
   const explicit = String(level || "").trim().toUpperCase();
@@ -13,42 +16,104 @@ const resolveWorkbookLevel = (level) => {
   return "";
 };
 
+const hasSeenGuide = (level) => {
+  if (typeof window === "undefined" || !window.localStorage) return false;
+  try {
+    return window.localStorage.getItem(`${GUIDE_SEEN_PREFIX}${level || "general"}`) === "1";
+  } catch {
+    return false;
+  }
+};
+
+const markGuideSeen = (level) => {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
+    window.localStorage.setItem(`${GUIDE_SEEN_PREFIX}${level || "general"}`, "1");
+  } catch {
+    // Ignore unavailable storage.
+  }
+};
+
+const findGuideTarget = (marker) => {
+  const workbookRoot = marker?.parentElement;
+  if (!workbookRoot) return null;
+
+  const headerCard = Array.from(workbookRoot.children).find(
+    (child) =>
+      child.querySelector?.("h1") &&
+      Array.from(child.querySelectorAll?.("button") || []).some((button) =>
+        /teil\s*1/i.test(button.textContent || ""),
+      ),
+  );
+  if (!headerCard) return null;
+
+  const existingHost = headerCard.querySelector(":scope > .workbook-guide__host");
+  if (existingHost) return existingHost;
+
+  const tabRow = Array.from(headerCard.children).find((child) => {
+    const buttons = Array.from(child.querySelectorAll?.("button") || []);
+    return buttons.length >= 4 && buttons.some((button) => /teil\s*1/i.test(button.textContent || ""));
+  });
+
+  const host = document.createElement("div");
+  host.className = "workbook-guide__host";
+  host.dataset.workbookGuideHost = "true";
+  headerCard.insertBefore(host, tabRow || null);
+  return host;
+};
+
+const GuidancePanel = ({ workbookLabel, open, onToggle }) => (
+  <details className="workbook-guide" open={open} onToggle={onToggle}>
+    <summary>How this workbook works</summary>
+    <div className="workbook-guide__content">
+      <p>
+        This {workbookLabel} has <strong>four parts</strong>: Sprechen, Schreiben, Lesen and Hören.
+      </p>
+      <p>
+        <strong>Teil 1 · Sprechen:</strong> Prepare before class and practise with the AI speaking coach. No submission is required.
+      </p>
+      <p>
+        <strong>Teile 2–4:</strong> Practise on this page, then submit your final answers in the <strong>Submission</strong> tab.
+      </p>
+    </div>
+  </details>
+);
+
 export const A2B1WorkbookGuidance = ({ level = "" }) => {
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
   const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
+  const markerRef = useRef(null);
+  const [portalTarget, setPortalTarget] = useState(null);
+  const [isOpen, setIsOpen] = useState(() => !hasSeenGuide(workbookLevel));
+
+  useEffect(() => {
+    setIsOpen(!hasSeenGuide(workbookLevel));
+    markGuideSeen(workbookLevel);
+  }, [workbookLevel]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    const target = findGuideTarget(markerRef.current);
+    setPortalTarget(target);
+
+    return () => {
+      if (target?.dataset?.workbookGuideHost === "true") target.remove();
+    };
+  }, []);
+
+  const panel = (
+    <GuidancePanel
+      workbookLabel={workbookLabel}
+      open={isOpen}
+      onToggle={(event) => setIsOpen(event.currentTarget.open)}
+    />
+  );
 
   return (
     <>
       <WorkbookReadAloudInjector />
-      <section
-        aria-label="Workbook guide"
-        style={{
-          ...styles.card,
-          margin: 0,
-          display: "grid",
-          gap: 12,
-          border: "1px solid #bfdbfe",
-          background: "#eff6ff",
-          color: "#1e3a8a",
-        }}
-      >
-        <h2 style={{ margin: 0, fontSize: "1.05rem" }}>How this workbook works</h2>
-
-        <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-          <p style={{ margin: 0 }}>
-            This {workbookLabel} has <strong>four parts</strong>: Sprechen, Schreiben, Lesen and Hören.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submission</strong> tab.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Read aloud:</strong> In Teil 3 · Lesen, use the free German voice controls to listen to the text, pause, continue, stop and change speed.
-          </p>
-        </div>
-      </section>
+      <span ref={markerRef} hidden aria-hidden="true" />
+      {portalTarget ? createPortal(panel, portalTarget) : panel}
     </>
   );
 };
