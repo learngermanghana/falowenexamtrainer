@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
-import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
