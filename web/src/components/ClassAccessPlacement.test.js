@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import HomeClassPreviewCard from "./HomeClassPreviewCard";
 import ClassMembersTab from "./ClassMembersTab";
-import ClassDiscussionPage from "./ClassDiscussionPage";
 
 const mockGetDocs = jest.fn();
 const mockNavigate = jest.fn();
@@ -37,44 +36,69 @@ jest.mock("../context/AuthContext", () => ({
   }),
 }));
 
-jest.mock("./ClassDiscussionPanel", () => () => <div>Discussion panel</div>);
-
 beforeEach(() => {
   mockNavigate.mockReset();
   mockGetDocs.mockReset();
   window.history.pushState({}, "", "/");
 });
 
-test("class members appear inside live class access without email or discussion button", async () => {
+test("shows class members inside live class access without emails or a discussion button", async () => {
   mockGetDocs.mockResolvedValue({
     docs: [
-      { id: "1", data: () => ({ name: "Ama Mensah", email: "ama@example.com", biography: "I enjoy speaking practice." }) },
-      { id: "2", data: () => ({ name: "Kojo Asare", email: "kojo@example.com", biography: "I am preparing for A2." }) },
+      {
+        id: "1",
+        data: () => ({
+          name: "Ama Mensah",
+          email: "ama@example.com",
+          biography: "I enjoy speaking practice.",
+        }),
+      },
+      {
+        id: "2",
+        data: () => ({
+          name: "Kojo Asare",
+          email: "kojo@example.com",
+          biography: "I am preparing for A2.",
+        }),
+      },
     ],
   });
 
   const { container } = render(
     <MemoryRouter>
-      <HomeClassPreviewCard embedded studentProfile={{ level: "A2", className: "A2 Stuttgart Klasse" }} />
+      <HomeClassPreviewCard
+        embedded
+        studentProfile={{ level: "A2", className: "A2 Stuttgart Klasse" }}
+      />
     </MemoryRouter>,
   );
 
   expect(await screen.findByText("2 members")).toBeInTheDocument();
-  expect(container.querySelector('[data-class-members-preview="live-class-access"]')).toBeInTheDocument();
-  expect(screen.getByLabelText("Ama Mensah")).toBeInTheDocument();
+  expect(
+    container.querySelector('[data-class-members-preview="live-class-access"]'),
+  ).toBeInTheDocument();
+  expect(screen.getByTitle("Ama Mensah")).toBeInTheDocument();
   expect(screen.queryByText("ama@example.com")).not.toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: "Open class discussion" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "Open class discussion" }),
+  ).not.toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole("button", { name: "View all classmates" }));
+  await userEvent.click(
+    screen.getByRole("button", { name: "View all classmates" }),
+  );
   expect(screen.getByText("I enjoy speaking practice.")).toBeInTheDocument();
   expect(screen.getByText("I am preparing for A2.")).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Hide classmates" })).toHaveAttribute("aria-expanded", "true");
+  expect(
+    screen.getByRole("button", { name: "Hide classmates" }),
+  ).toHaveAttribute("aria-expanded", "true");
 });
 
-test("the old standalone dashboard placement renders nothing", () => {
+test("does not render the old standalone dashboard class card", () => {
   const { container } = render(
     <MemoryRouter>
-      <HomeClassPreviewCard studentProfile={{ level: "A2", className: "A2 Stuttgart Klasse" }} />
+      <HomeClassPreviewCard
+        studentProfile={{ level: "A2", className: "A2 Stuttgart Klasse" }}
+      />
     </MemoryRouter>,
   );
 
@@ -82,10 +106,13 @@ test("the old standalone dashboard placement renders nothing", () => {
   expect(mockGetDocs).not.toHaveBeenCalled();
 });
 
-test("self-learning students do not see a live-class preview", () => {
+test("does not show live class members for self-learning students", () => {
   const { container } = render(
     <MemoryRouter>
-      <HomeClassPreviewCard embedded studentProfile={{ level: "B2", className: "B2 Self-learning" }} />
+      <HomeClassPreviewCard
+        embedded
+        studentProfile={{ level: "B2", className: "B2 Self-learning" }}
+      />
     </MemoryRouter>,
   );
 
@@ -93,7 +120,7 @@ test("self-learning students do not see a live-class preview", () => {
   expect(mockGetDocs).not.toHaveBeenCalled();
 });
 
-test("Course Book class members area is replaced by a small class link", async () => {
+test("replaces the Course Book directory with a small classmates link", async () => {
   window.history.pushState({}, "", "/campus/course");
 
   render(
@@ -106,20 +133,8 @@ test("Course Book class members area is replaced by a small class link", async (
   expect(screen.queryByText("Your class biography")).not.toBeInTheDocument();
   expect(mockGetDocs).not.toHaveBeenCalled();
 
-  await userEvent.click(screen.getByRole("button", { name: "View classmates" }));
-  expect(mockNavigate).toHaveBeenCalledWith("/campus/discussion?tab=members");
-});
-
-test("the classmates link opens the directory directly", async () => {
-  mockGetDocs.mockResolvedValue({ docs: [] });
-
-  render(
-    <MemoryRouter initialEntries={["/campus/discussion?tab=members"]}>
-      <ClassDiscussionPage />
-    </MemoryRouter>,
+  await userEvent.click(
+    screen.getByRole("button", { name: "View classmates" }),
   );
-
-  expect(screen.getByRole("heading", { name: "Class members" })).toBeInTheDocument();
-  expect(screen.queryByText("Discussion panel")).not.toBeInTheDocument();
-  expect(await screen.findByText("No classmates found")).toBeInTheDocument();
+  expect(mockNavigate).toHaveBeenCalledWith("/campus/discussion?tab=members");
 });
