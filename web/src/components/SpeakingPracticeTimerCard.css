@@ -1,6 +1,6 @@
 .speaking-compact-timer {
-  order: -1;
-  justify-self: end;
+  order: 0;
+  justify-self: start;
   align-self: start;
   width: fit-content;
   min-height: 40px;
@@ -9,9 +9,28 @@
   gap: 8px;
   padding: 5px 7px 5px 10px;
   border: 1px solid #cbd5e1;
-  border-radius: 999px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  flex-wrap: wrap;
+}
+
+/* On speaking pages with a brain map, keep the visual order consistent even
+   when older workbook files render the timer later in the JSX. */
+div:has(> .speaking-mind-map) > img:first-child {
+  order: -4;
+}
+
+div:has(> .speaking-mind-map) > h2:first-of-type {
+  order: -3;
+}
+
+div:has(> .speaking-mind-map) > .speaking-compact-timer {
+  order: -2;
+}
+
+div:has(> .speaking-mind-map) > .speaking-mind-map {
+  order: -1;
 }
 
 .speaking-compact-timer__icon {
@@ -20,11 +39,40 @@
 }
 
 .speaking-compact-timer__time {
-  min-width: 52px;
+  min-width: 58px;
   color: #0f172a;
   font-variant-numeric: tabular-nums;
   font-weight: 900;
   letter-spacing: 0.03em;
+}
+
+.speaking-compact-timer__duration select,
+.speaking-compact-timer__custom input {
+  min-height: 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.speaking-compact-timer__duration select {
+  padding: 4px 26px 4px 8px;
+}
+
+.speaking-compact-timer__custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.speaking-compact-timer__custom input {
+  width: 58px;
+  padding: 4px 6px;
 }
 
 .speaking-compact-timer__button {
@@ -39,14 +87,31 @@
   min-width: 58px;
 }
 
+.speaking-compact-timer .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 640px) {
   .speaking-compact-timer {
     justify-self: stretch;
     width: auto;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .speaking-compact-timer__time {
     margin-right: auto;
+  }
+
+  .speaking-compact-timer__custom {
+    flex-basis: 100%;
+    padding-left: 26px;
   }
 }
