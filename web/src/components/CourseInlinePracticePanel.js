@@ -2,6 +2,8 @@ import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
+import SpeakingPreparationFlow from "./speaking/SpeakingPreparationFlow";
+import { resolvePilotSpeakingMindMapFromPath } from "../data/speakingMindMaps/pilotSpeakingMindMaps";
 
 const routeWritingContext = () => {
   if (typeof window === "undefined") return {};
@@ -24,14 +26,29 @@ const routeWritingContext = () => {
   };
 };
 
+const resolveSpeakingMindMap = (explicitConfig) => {
+  if (explicitConfig) return explicitConfig;
+  if (typeof window === "undefined") return null;
+  return resolvePilotSpeakingMindMapFromPath(window.location?.pathname || "");
+};
+
 const practiceConfig = {
   speaking: {
     defaultTitle: "Practice Teil 1 speaking here",
     defaultDescription:
-      "Teil 1 is for practice and class discussion only. You do not submit it as an assignment. Use this AI speaking coach to prepare your answer before class.",
-    label: "Custom speaking chat",
-    closedButtonLabel: "Open custom speaking chat",
-    render: () => <SpeakingPage mode="course" />,
+      "Teil 1 is for practice and class discussion only. You do not submit it as an assignment. Use the mind map first, then open the AI speaking coach and practise your complete answer.",
+    label: "Mind map and custom speaking chat",
+    closedButtonLabel: "Open speaking preparation",
+    render: (context) => {
+      const coach = <SpeakingPage mode="course" />;
+      return context.speakingMindMap ? (
+        <SpeakingPreparationFlow config={context.speakingMindMap}>
+          {coach}
+        </SpeakingPreparationFlow>
+      ) : (
+        coach
+      );
+    },
   },
   writing: {
     defaultTitle: "Mark My Letter",
@@ -39,7 +56,7 @@ const practiceConfig = {
       "Paste your completed text here. Falowen AI will mark it, show your score, explain the corrections and help you improve the final version. Submit the finished work through your normal assignment area when required.",
     label: "Mark My Letter",
     closedButtonLabel: "Open Mark My Letter",
-    render: (writingContext) => (
+    render: (context) => (
       <WritingPage
         mode="course"
         initialTab="mark"
@@ -47,7 +64,7 @@ const practiceConfig = {
         hideTabList
         markLabel="Mark My Letter"
         submitLabel="Mark My Letter"
-        writingContext={writingContext}
+        writingContext={context.writingContext}
       />
     ),
   },
@@ -59,10 +76,12 @@ const CourseInlinePracticePanel = ({
   description,
   defaultOpen = true,
   writingContext = {},
+  speakingMindMap = null,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
+
   const resolvedWritingContext = useMemo(() => {
     if (type !== "writing") return {};
     const routeContext = routeWritingContext();
@@ -80,6 +99,16 @@ const CourseInlinePracticePanel = ({
       taskTitle: merged.taskTitle || title || "Teil 2 writing task",
     };
   }, [title, type, writingContext]);
+
+  const resolvedSpeakingMindMap = useMemo(
+    () => (type === "speaking" ? resolveSpeakingMindMap(speakingMindMap) : null),
+    [speakingMindMap, type],
+  );
+
+  const renderContext = {
+    writingContext: resolvedWritingContext,
+    speakingMindMap: resolvedSpeakingMindMap,
+  };
 
   return (
     <div
@@ -120,7 +149,7 @@ const CourseInlinePracticePanel = ({
           <span style={styles.helperText}>
             {config.label} loaded inside this workbook page.
           </span>
-          {config.render(resolvedWritingContext)}
+          {config.render(renderContext)}
         </div>
       ) : null}
     </div>
