@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -363,6 +364,11 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day14BerufUndKarriere", level: "A2", workbookId: "A2Day14BerufUndKarriere" }} workbookId="A2Day14BerufUndKarriere" />
+      )}
+
     </div>
   );
 };

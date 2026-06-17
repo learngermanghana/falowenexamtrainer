@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { useToast } from "../context/ToastContext";
 import {
   getStandardLessonStorageKey,
@@ -22,8 +23,8 @@ const card = {
   boxShadow: "0 10px 26px rgba(15,23,42,.06)",
 };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
-const tabs = ["learn", "speak", "write", "finish"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish" };
+const tabs = ["learn", "speak", "write", "finish", "references"];
+const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Reference Answers" };
 
 const Section = ({ title, children }) => (
   <section style={card}>
@@ -169,6 +170,8 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
         <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
         {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
       </Section> : null}
+
+      {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
 
       {active === "finish" ? <Section title={`Finish ${lesson.level} Day ${lesson.day}`}>
         <p><strong>Learn:</strong> {progress.learnDone ? "Complete" : "Not complete"}</p>

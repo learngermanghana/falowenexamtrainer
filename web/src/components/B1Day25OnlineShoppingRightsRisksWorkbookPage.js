@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
@@ -10,6 +11,7 @@ const tabs = [
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "references", label: "Teil 5 · Reference Answers" },
 ];
 
 const card = {
@@ -350,6 +352,11 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
         <WorkbookSubmissionReminder />
         </div>
       )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day25OnlineShoppingRightsRisks", level: "B1", workbookId: "B1Day25OnlineShoppingRightsRisks" }} workbookId="B1Day25OnlineShoppingRightsRisks" />
+      )}
+
     </div>
   );
 };

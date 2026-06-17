@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
@@ -10,6 +11,7 @@ const tabs = [
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "references", label: "Teil 5 · Reference Answers" },
 ];
 
 const cardStyle = {
@@ -466,6 +468,11 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
           Open Submission Area
         </a>
       </section>
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day20TypischeReklamationssituationen", level: "A2", workbookId: "A2Day20TypischeReklamationssituationen" }} workbookId="A2Day20TypischeReklamationssituationen" />
+      )}
+
     </div>
   );
 };
