@@ -75,6 +75,30 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    7: {
+      videoResources: [
+        {
+          key: "ai-grammar-video-prices-preferences-day-7",
+          chapter: "3",
+          title: "A1 Day 7 · Asking About Prices and Preferences · AI video",
+          description:
+            "AI video lesson for asking about prices and expressing preferences.",
+          url: "https://youtu.be/S14FmblPIRY",
+        },
+      ],
+    },
+    9: {
+      videoResources: [
+        {
+          key: "ai-grammar-video-nominative-accusative-day-9",
+          chapter: "5",
+          title: "A1 Day 9 · Nominative and Accusative Cases · AI video",
+          description:
+            "AI video lesson for nominative and accusative cases in A1 German.",
+          url: "https://youtu.be/0W1ZMXnaDxI",
+        },
+      ],
+    },
     14: {
       ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
     },
