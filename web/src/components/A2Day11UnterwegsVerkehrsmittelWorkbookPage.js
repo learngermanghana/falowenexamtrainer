@@ -6,6 +6,8 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -189,6 +191,7 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(11)} />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             In this chapter, we&apos;ll engage in group exercises discussing <strong>Unterwegs: Verkehrsmittel vergleichen</strong>.
           </p>

@@ -6,6 +6,8 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -135,6 +137,7 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={{ margin: 0 }}>Teil 1 (Sprechen) · Group Practice</h2>
+          <SpeakingMindMap config={getA2SpeakingMindMap(21)} />
           <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Ein Wochenende planen</strong></p>
           <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Instructions</strong></p>
           <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
