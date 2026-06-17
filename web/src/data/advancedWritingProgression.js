@@ -1,4 +1,4 @@
-export const FULL_ESSAY_START_DAY = 20;
+export const FULL_ESSAY_START_DAY = 21;
 
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 
@@ -58,7 +58,7 @@ export const getGenericGuidedWritingConfig = (level, day) => {
         id: "alternative",
         section: "Ausgewogene Lösung",
         question: "Welche Alternative, Lösung oder ausgewogene Position schlägst du vor?",
-        help: "Verbinde deine bisherigen Gedanken. Der Schluss wird erst ab Day 20 gezielt trainiert.",
+        help: "Verbinde deine bisherigen Gedanken. Der Schluss wird erst ab Day 21 gezielt trainiert.",
         minimumWords: minimums[4],
       },
     ],

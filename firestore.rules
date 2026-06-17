@@ -1,8 +1,56 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function ownsResource() {
+      return signedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.uid == request.auth.uid ||
+        resource.data.ownerUid == request.auth.uid
+      );
+    }
+    function ownsIncoming() {
+      return signedIn() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.resource.data.uid == request.auth.uid ||
+        request.resource.data.ownerUid == request.auth.uid
+      );
+    }
+    function ownsExistingAndIncoming() {
+      return ownsResource() && ownsIncoming();
+    }
+
+    match /users/{userId}/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /writingProgress/{docId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExistingAndIncoming();
+      match /{subcollection}/{entryId} {
+        allow create: if ownsIncoming();
+        allow read, update, delete: if ownsExistingAndIncoming();
+      }
+    }
+
+    match /writingReferences/{docId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExistingAndIncoming();
+    }
+
+    match /savedWriting/{docId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExistingAndIncoming();
+    }
+
+    match /writingFeedback/{docId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExistingAndIncoming();
+    }
+
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

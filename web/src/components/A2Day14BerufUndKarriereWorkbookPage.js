@@ -11,6 +11,7 @@ const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
+  { key: "references", label: "5. Ref" },
 ];
 
 const card = {

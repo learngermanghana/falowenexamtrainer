@@ -3,9 +3,10 @@ import AppBackButton from "../navigation/AppBackButton";
 
 import { styles } from "../../styles";
 import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./EmbeddedPracticePanels";
+import WorkbookReferenceAnswers from "../WorkbookReferenceAnswers";
 
 const DEFAULT_HERO = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
-const tabs = [["learn", "1. Learn"], ["speak", "2. Speak"], ["write", "3. Write"], ["finish", "4. Finish"]];
+const tabs = [["learn", "1. Learn"], ["speak", "2. Speak"], ["write", "3. Write"], ["finish", "4. Finish"], ["ref", "5. Ref"]];
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e5e7eb", boxShadow: "0 10px 24px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 
@@ -75,5 +76,6 @@ export default function SelfLearningTabbedLessonPage({ lesson }) {
       <Box title="Lesen, Hören und Wortschatz"><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}><ExternalCard title="Recommended reading" resource={lesson.readingResource} /><ExternalCard title="Recommended listening" resource={lesson.listeningResource} /></div><strong>Vocabulary builder</strong><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{(lesson.vocabulary || []).map((w) => <span key={w} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{w}</span>)}</div></Box>
       <Box title="Complete this day"><Note good={progress.completed}>{progress.completed ? "This day is marked as complete." : "When you finish learning, speaking, writing, reading and listening practice, mark this day as complete."}</Note><button type="button" style={styles.primaryButton} onClick={() => setP({ completed: true })}>{progress.completed ? "Completed" : "Mark as complete"}</button></Box>
     </> : null}
+    {tab === "ref" ? <WorkbookReferenceAnswers level={lesson.level} lesson={{ ...lesson, lessonId: `${lesson.level}-day-${lesson.day}`, workbookId: `${lesson.level}-day-${lesson.day}` }} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
   </div>;
 }
