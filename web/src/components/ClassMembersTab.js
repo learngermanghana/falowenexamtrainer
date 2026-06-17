@@ -123,7 +123,7 @@ const ClassMembersTab = () => {
             Your full class directory now lives in the class discussion area, so the Course Book stays focused on lessons.
           </p>
         </div>
-        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/discussion")}>
+        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/discussion?tab=members")}>
           View classmates
         </button>
       </section>
