@@ -10,24 +10,26 @@ export default function WorkbookReferenceAnswers({ level, lesson = {}, task, wor
   const resolvedLevel = level || inferLevel(lesson);
   const resolvedWorkbookId = workbookId || inferWorkbookId(lesson);
   const taskTitle = task?.title || lesson?.writingTask?.title || lesson?.writingTopic || lesson?.topic || lesson?.title || "Writing task";
+  const writingPage = WritingPage({
+    mode: "course",
+    initialTab: "references",
+    enabledTabs: ["references"],
+    hideTabList: true,
+    writingContext: {
+      courseLevel: resolvedLevel,
+      level: resolvedLevel,
+      day: inferDay(lesson),
+      lessonId: inferLessonId(lesson),
+      workbookId: resolvedWorkbookId,
+      writingTaskId: task?.id || lesson?.writingTask?.id || `${resolvedWorkbookId}-writing`,
+      taskTitle,
+    },
+  });
+  const referenceChildren = React.Children.toArray(writingPage.props.children).slice(1);
 
   return (
     <section data-workbook-reference-library>
-      <WritingPage
-        mode="course"
-        initialTab="references"
-        enabledTabs={["references"]}
-        hideTabList
-        writingContext={{
-          courseLevel: resolvedLevel,
-          level: resolvedLevel,
-          day: inferDay(lesson),
-          lessonId: inferLessonId(lesson),
-          workbookId: resolvedWorkbookId,
-          writingTaskId: task?.id || lesson?.writingTask?.id || `${resolvedWorkbookId}-writing`,
-          taskTitle,
-        }}
-      />
+      {referenceChildren}
     </section>
   );
 }
