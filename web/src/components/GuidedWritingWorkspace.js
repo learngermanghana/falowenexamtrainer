@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
+  loadWritingAttempts,
   loadWritingProgress,
   saveWritingAttempt,
   saveWritingProgress,
@@ -18,24 +19,61 @@ const countWords = (text = "") =>
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
+
 const emptyState = () => ({
   answers: {},
   finalEssay: "",
   combinedDraftMode: "auto",
   analysisFeedback: null,
   analysisUpdatedAt: "",
-  writingHistory: [],
   updatedAt: "",
 });
-export const migrateGuidedWritingState = (saved = {}) => ({
-  ...emptyState(),
-  ...saved,
-  answers:
-    saved.answers && typeof saved.answers === "object" ? saved.answers : {},
-  combinedDraftMode:
-    saved.combinedDraftMode ||
-    (saved.finalEssay && saved.view === "final" ? "manual" : "auto"),
-});
+
+const normalizeSavedFeedback = (feedback) => {
+  if (!feedback) return null;
+  const normalized = normalizeWritingFeedback(feedback);
+  return normalized.parseError ? null : normalized;
+};
+
+export const migrateGuidedWritingState = (saved = {}) => {
+  const { writingHistory: _legacyHistory, ...rest } = saved || {};
+  return {
+    ...emptyState(),
+    ...rest,
+    answers:
+      saved.answers && typeof saved.answers === "object" ? saved.answers : {},
+    combinedDraftMode:
+      saved.combinedDraftMode ||
+      (saved.finalEssay && saved.view === "final" ? "manual" : "auto"),
+    analysisFeedback: normalizeSavedFeedback(saved.analysisFeedback),
+  };
+};
+
+const readLocalSnapshot = (storageKey) => {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey) || "{}");
+  } catch {
+    return {};
+  }
+};
+
+const dedupeAttempts = (entries = []) => {
+  const seen = new Set();
+  return entries.filter((entry) => {
+    const key =
+      entry?.id ||
+      [entry?.submissionDate, entry?.writingTaskId, entry?.originalText].join("|");
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const inferDay = (config, storageKey) => {
+  if (config?.day === 0 || config?.day) return Number(config.day);
+  const match = String(storageKey || "").match(/(?:day|lesson)[-_:]?(\d+)/i);
+  return match ? Number(match[1]) : null;
+};
 
 export default function GuidedWritingWorkspace({
   config,
@@ -47,38 +85,44 @@ export default function GuidedWritingWorkspace({
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || userId;
-  const hasCloudOwner = Boolean(studentCode || userId);
-  const [state, setState] = useState(() => {
-    try {
-      return migrateGuidedWritingState(
-        JSON.parse(localStorage.getItem(storageKey) || "{}"),
-      );
-    } catch {
-      return emptyState();
-    }
-  });
+  const hasCloudOwner = Boolean(userId);
+  const initialSnapshot = useMemo(
+    () => readLocalSnapshot(storageKey),
+    [storageKey],
+  );
+  const [state, setState] = useState(() =>
+    migrateGuidedWritingState(initialSnapshot),
+  );
+  const [writingHistory, setWritingHistory] = useState(() =>
+    Array.isArray(initialSnapshot.writingHistory)
+      ? initialSnapshot.writingHistory
+      : [],
+  );
   const [cloudLoaded, setCloudLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState("idle");
   const [analysisStatus, setAnalysisStatus] = useState("idle");
   const [analysisError, setAnalysisError] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
+
   const questions = useMemo(
     () =>
-      config.questions.map((q) => ({
-        ...q,
-        words: countWords(state.answers[q.id]),
-        complete: countWords(state.answers[q.id]) >= q.minimumWords,
+      config.questions.map((question) => ({
+        ...question,
+        words: countWords(state.answers[question.id]),
+        complete:
+          countWords(state.answers[question.id]) >= question.minimumWords,
       })),
     [config.questions, state.answers],
   );
   const autoText = questions
-    .map((q) => String(state.answers[q.id] || "").trim())
+    .map((question) => String(state.answers[question.id] || "").trim())
     .filter(Boolean)
     .join("\n\n");
   const finalEssay =
     state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
-  const completeCount = questions.filter((q) => q.complete).length;
+  const completeCount = questions.filter((question) => question.complete).length;
   const allComplete = completeCount === questions.length;
+  const lessonDay = inferDay(config, storageKey);
 
   const update = (updater) =>
     setState((old) => ({
@@ -87,9 +131,14 @@ export default function GuidedWritingWorkspace({
         : { ...old, ...updater }),
       updatedAt: new Date().toISOString(),
     }));
+
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify({ ...state, finalEssay }));
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({ ...state, finalEssay }),
+    );
   }, [finalEssay, state, storageKey]);
+
   useEffect(() => {
     onStatusChange?.({
       complete: allComplete && Boolean(finalEssay.trim()),
@@ -104,6 +153,7 @@ export default function GuidedWritingWorkspace({
     onStatusChange,
     questions.length,
   ]);
+
   useEffect(() => {
     let active = true;
     if (!hasCloudOwner) {
@@ -111,43 +161,73 @@ export default function GuidedWritingWorkspace({
       setSaveStatus("device");
       return undefined;
     }
+
     setSaveStatus("loading");
-    loadWritingProgress({ userId, studentCode, mode: "course" })
-      .then((saved) => {
+    Promise.all([
+      loadWritingProgress({ userId, studentCode, mode: "course" }),
+      loadWritingAttempts({
+        userId,
+        studentCode,
+        mode: "course",
+        level: config.level,
+        workbookId: storageKey,
+        pageSize: 25,
+      }),
+    ])
+      .then(([saved, attempts]) => {
         if (!active) return;
         const draft = saved?.[cloudField];
-        if (draft)
+        const legacyHistory = Array.isArray(draft?.writingHistory)
+          ? draft.writingHistory
+          : [];
+
+        if (draft) {
           setState((local) =>
             Date.parse(local.updatedAt || "") >
             Date.parse(draft.updatedAt || "")
               ? local
               : migrateGuidedWritingState(draft),
           );
+        }
+
+        setWritingHistory((local) =>
+          dedupeAttempts([...(attempts || []), ...legacyHistory, ...local]),
+        );
         setSaveStatus("saved");
       })
       .catch(() => active && setSaveStatus("error"))
       .finally(() => active && setCloudLoaded(true));
+
     return () => {
       active = false;
     };
-  }, [cloudField, hasCloudOwner, studentCode, userId]);
+  }, [
+    cloudField,
+    config.level,
+    hasCloudOwner,
+    storageKey,
+    studentCode,
+    userId,
+  ]);
+
   useEffect(() => {
     if (!cloudLoaded || !hasCloudOwner) return undefined;
     setSaveStatus("saving");
-    const timer = window.setTimeout(
-      async () =>
-        setSaveStatus(
-          (await saveWritingProgress({
-            userId,
-            studentCode,
-            mode: "course",
-            data: { [cloudField]: { ...state, finalEssay } },
-          }))
-            ? "saved"
-            : "error",
-        ),
-      800,
-    );
+    const timer = window.setTimeout(async () => {
+      const saved = await saveWritingProgress({
+        userId,
+        studentCode,
+        mode: "course",
+        data: {
+          [cloudField]: {
+            ...state,
+            finalEssay,
+          },
+        },
+      });
+      setSaveStatus(saved ? "saved" : "error");
+    }, 800);
+
     return () => window.clearTimeout(timer);
   }, [
     cloudField,
@@ -160,11 +240,14 @@ export default function GuidedWritingWorkspace({
   ]);
 
   const analyse = async () => {
+    const draft = finalEssay.trim();
+    if (!draft || analysisStatus === "loading") return;
+
     setAnalysisStatus("loading");
     setAnalysisError("");
     try {
       const data = await markLetterWithAI({
-        text: finalEssay,
+        text: draft,
         level: config.level,
         studentName:
           studentProfile?.name || user?.displayName || user?.email || "Student",
@@ -177,30 +260,36 @@ export default function GuidedWritingWorkspace({
         data?.structuredFeedback ?? data,
       );
       if (normalized.parseError) throw new Error(normalized.summary);
+
       const historyRecord = buildWritingHistoryRecord({
         userId,
         studentCode,
         level: config.level,
-        workbookId: storageKey,
-        taskId: cloudField,
+        day: lessonDay,
+        lessonId: config.lessonId || storageKey,
+        workbookId: config.workbookId || storageKey,
+        taskId: config.writingTaskId || cloudField,
         taskTitle: config.title || config.topic || "Guided writing task",
-        text: finalEssay,
+        text: draft,
         data: {
           ...data,
+          feedback: normalized.summary,
           structuredFeedback: normalized,
           score: normalized.score,
           maxScore: normalized.maxScore,
           rubric: normalized.rubric,
+          corrections: normalized.corrections,
         },
         context: "course-guided-writing-analysis",
       });
+
       update((old) => ({
         ...old,
         analysisFeedback: normalized,
         analysisUpdatedAt: new Date().toISOString(),
-        writingHistory: [...(old.writingHistory || []), historyRecord],
       }));
-      saveWritingAttempt({
+      setWritingHistory((old) => dedupeAttempts([historyRecord, ...old]));
+      await saveWritingAttempt({
         userId,
         studentCode,
         mode: "course",
@@ -215,6 +304,7 @@ export default function GuidedWritingWorkspace({
       setAnalysisStatus("error");
     }
   };
+
   const saveLabel = !hasCloudOwner
     ? "Saved on this device"
     : saveStatus === "loading"
@@ -266,15 +356,16 @@ export default function GuidedWritingWorkspace({
           {saveLabel}
         </small>
       </header>
+
       <div style={{ display: "grid", gap: 14 }}>
-        {questions.map((q, i) => (
+        {questions.map((question, index) => (
           <article
-            key={q.id}
+            key={question.id}
             style={{
-              border: `1px solid ${q.complete ? "#86efac" : "#e2e8f0"}`,
+              border: `1px solid ${question.complete ? "#86efac" : "#e2e8f0"}`,
               borderRadius: 16,
               padding: 14,
-              background: q.complete ? "#f0fdf4" : "#fff",
+              background: question.complete ? "#f0fdf4" : "#fff",
               display: "grid",
               gap: 9,
             }}
@@ -288,14 +379,15 @@ export default function GuidedWritingWorkspace({
               }}
             >
               <strong>
-                Question {i + 1} of 5 · {q.section}
+                Question {index + 1} of 5 · {question.section}
               </strong>
               <span>
-                {q.words}/{q.minimumWords} words {q.complete ? "✓" : ""}
+                {question.words}/{question.minimumWords} words{" "}
+                {question.complete ? "✓" : ""}
               </span>
             </div>
-            <h4 style={{ margin: 0 }}>{q.question}</h4>
-            <p style={{ margin: 0, color: "#64748b" }}>{q.help}</p>
+            <h4 style={{ margin: 0 }}>{question.question}</h4>
+            <p style={{ margin: 0, color: "#64748b" }}>{question.help}</p>
             <div
               style={{
                 borderLeft: "4px solid #818cf8",
@@ -304,16 +396,19 @@ export default function GuidedWritingWorkspace({
               }}
             >
               <strong>Starter:</strong>{" "}
-              {q.starter ||
+              {question.starter ||
                 "Beginne mit einer klaren Aussage und begründe sie."}
             </div>
             <textarea
-              aria-label={`Question ${i + 1}`}
-              value={state.answers[q.id] || ""}
-              onChange={(e) =>
+              aria-label={`Question ${index + 1}`}
+              value={state.answers[question.id] || ""}
+              onChange={(event) =>
                 update((old) => ({
                   ...old,
-                  answers: { ...old.answers, [q.id]: e.target.value },
+                  answers: {
+                    ...old.answers,
+                    [question.id]: event.target.value,
+                  },
                 }))
               }
               style={{
@@ -325,13 +420,14 @@ export default function GuidedWritingWorkspace({
               }}
             />
             <small>
-              {q.complete
+              {question.complete
                 ? "Section completed."
-                : `Add ${Math.max(q.minimumWords - q.words, 0)} more words.`}
+                : `Add ${Math.max(question.minimumWords - question.words, 0)} more words.`}
             </small>
           </article>
         ))}
       </div>
+
       <section
         data-combined-text-card
         style={{
@@ -352,10 +448,10 @@ export default function GuidedWritingWorkspace({
         <textarea
           aria-label="Your combined text"
           value={finalEssay}
-          onChange={(e) =>
+          onChange={(event) =>
             update((old) => ({
               ...old,
-              finalEssay: e.target.value,
+              finalEssay: event.target.value,
               combinedDraftMode: "manual",
             }))
           }
@@ -375,8 +471,8 @@ export default function GuidedWritingWorkspace({
         <div>
           <strong>Checklist</strong>
           <ul>
-            {config.checklist.map((x) => (
-              <li key={x}>{x}</li>
+            {config.checklist.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
         </div>
@@ -405,27 +501,30 @@ export default function GuidedWritingWorkspace({
             Copy text
           </button>
         </div>
-        {copyMessage && <small>{copyMessage}</small>}
-        {analysisError && (
+        {copyMessage ? <small>{copyMessage}</small> : null}
+        {analysisError ? (
           <div style={{ color: "#b91c1c", fontWeight: 700 }}>
             {analysisError}
           </div>
-        )}
+        ) : null}
         <WritingHistorySection
           title="Saved Texts"
-          entries={state.writingHistory || []}
+          entries={writingHistory}
           level={config.level}
           onOpen={(entry) =>
             update((old) => ({
               ...old,
               finalEssay: entry.originalLetter || entry.originalText || "",
               combinedDraftMode: "manual",
-              analysisFeedback: entry.structuredFeedback || null,
-              analysisUpdatedAt: entry.submissionDate || entry.updatedAt || "",
+              analysisFeedback: normalizeSavedFeedback(
+                entry.structuredFeedback || entry.feedback || entry.summary,
+              ),
+              analysisUpdatedAt:
+                entry.submissionDate || entry.updatedAt || "",
             }))
           }
         />
-        {state.analysisFeedback && (
+        {state.analysisFeedback ? (
           <div data-analysis-feedback style={{ marginTop: 8 }}>
             <WritingFeedbackCard
               level={config.level}
@@ -433,7 +532,7 @@ export default function GuidedWritingWorkspace({
               structuredFeedback={state.analysisFeedback}
             />
           </div>
-        )}
+        ) : null}
       </section>
     </div>
   );

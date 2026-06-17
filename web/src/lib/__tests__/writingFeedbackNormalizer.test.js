@@ -62,4 +62,62 @@ describe("normalizeWritingFeedback", () => {
       { wrong: "der Frau", correct: "die Frau", reason: "Accusative" },
     ]);
   });
+
+  it("parses fenced JSON nested inside feedback", () => {
+    const result = normalizeWritingFeedback({
+      requestId: "abc",
+      feedback:
+        '```json\n{"score":16,"maxScore":25,"summary":"Structured result","rubric":{"task":4}}\n```',
+    });
+
+    expect(result.parseError).toBe(false);
+    expect(result.score).toBe(16);
+    expect(result.summary).toBe("Structured result");
+    expect(result.rubric.task.score).toBe(4);
+    expect(result.summary).not.toContain("```");
+  });
+
+  it("parses raw JSON nested inside result", () => {
+    const result = normalizeWritingFeedback({
+      result: '{"score":"14/25","summary":"Nested result"}',
+    });
+
+    expect(result.parseError).toBe(false);
+    expect(result.score).toBe(14);
+    expect(result.maxScore).toBe(25);
+    expect(result.summary).toBe("Nested result");
+  });
+
+  it("keeps normal plain-text feedback as a safe summary", () => {
+    const result = normalizeWritingFeedback({
+      feedback: "Your argument is clear. Improve the word order in paragraph two.",
+    });
+
+    expect(result.parseError).toBe(false);
+    expect(result.summary).toMatch(/argument is clear/i);
+  });
+
+  it("rejects malformed nested JSON instead of displaying it", () => {
+    const result = normalizeWritingFeedback({
+      feedback: '```json\n{"score":16, invalid}\n```',
+    });
+
+    expect(result.parseError).toBe(true);
+    expect(result.summary).toMatch(/try again/i);
+    expect(result.summary).not.toContain("invalid");
+  });
+
+  it("uses an overall rubric object when top-level scores are missing", () => {
+    const result = normalizeWritingFeedback({
+      rubric: {
+        overall: { score: 18, maxScore: 25 },
+        coherence: { score: 4, maxScore: 5 },
+      },
+      summary: "Good structure",
+    });
+
+    expect(result.score).toBe(18);
+    expect(result.maxScore).toBe(25);
+    expect(result.rubric.coherence.score).toBe(4);
+  });
 });

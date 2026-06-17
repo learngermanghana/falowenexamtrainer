@@ -43,7 +43,7 @@
       "no-unused-vars": [
         "warn",
         {
-          "varsIgnorePattern": "^StudyCalendarPage$",
+          "varsIgnorePattern": "^(?:_|StudyCalendarPage$)",
           "argsIgnorePattern": "^(defaultLevel|idToken|writingType)$"
         }
       ]

@@ -6,14 +6,15 @@ import {
   getDocs,
   isFirebaseConfigured,
   limit,
-  orderBy,
   query,
   serverTimestamp,
   setDoc,
-  addDoc,
+  where,
 } from "../firebase";
 
 const COLLECTION_NAME = "writingProgress";
+const DEFAULT_ATTEMPT_PAGE_SIZE = 25;
+const MAX_ATTEMPT_PAGE_SIZE = 50;
 
 const normalizeOwnerKey = (value = "") => value.trim().toLowerCase();
 
@@ -22,6 +23,19 @@ const buildDocId = ({ userId, studentCode, mode } = {}) => {
   if (!owner) return "";
   return `${owner}__${mode || "course"}`;
 };
+
+const timestampToMillis = (value) => {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.toDate === "function") return value.toDate().getTime();
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const safeAttemptId = (attempt = {}) =>
+  String(attempt.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
+    .replace(/[^a-zA-Z0-9_-]/g, "-")
+    .slice(0, 120);
 
 export const loadWritingProgress = async ({
   userId,
@@ -55,7 +69,7 @@ export const saveWritingProgress = async ({
   data,
 } = {}) => {
   const docId = buildDocId({ userId, studentCode, mode });
-  if (!docId) return false;
+  if (!docId || !userId) return false;
   const payload = {
     ...data,
     userId,
@@ -90,16 +104,25 @@ export const saveWritingAttempt = async ({
   attempt,
 } = {}) => {
   const ownerId = buildDocId({ userId, studentCode, mode });
-  if (!ownerId || !attempt || !isFirebaseConfigured || !db) return false;
+  if (!ownerId || !userId || !attempt || !isFirebaseConfigured || !db) {
+    return false;
+  }
+
   try {
     const attemptsRef = collection(db, COLLECTION_NAME, ownerId, "attempts");
-    await addDoc(attemptsRef, {
-      ...attempt,
-      userId,
-      studentCode: studentCode || null,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+    const attemptRef = doc(attemptsRef, safeAttemptId(attempt));
+    await setDoc(
+      attemptRef,
+      {
+        ...attempt,
+        userId,
+        studentCode: studentCode || null,
+        mode: mode || "course",
+        createdAt: attempt.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
     return true;
   } catch (error) {
     console.error("Failed to save writing attempt to Firebase", error);
@@ -111,18 +134,42 @@ export const loadWritingAttempts = async ({
   userId,
   studentCode,
   mode,
-  pageSize = 25,
+  pageSize = DEFAULT_ATTEMPT_PAGE_SIZE,
+  level,
+  lessonId,
+  workbookId,
 } = {}) => {
   const ownerId = buildDocId({ userId, studentCode, mode });
-  if (!ownerId || !isFirebaseConfigured || !db) return [];
+  if (!ownerId || !userId || !isFirebaseConfigured || !db) return [];
+
   try {
+    const requestedSize = Math.min(
+      Math.max(Number(pageSize) || DEFAULT_ATTEMPT_PAGE_SIZE, 1),
+      MAX_ATTEMPT_PAGE_SIZE,
+    );
     const attemptsQuery = query(
       collection(db, COLLECTION_NAME, ownerId, "attempts"),
-      orderBy("createdAt", "desc"),
-      limit(pageSize),
+      where("userId", "==", userId),
+      limit(requestedSize),
     );
     const snapshot = await getDocs(attemptsQuery);
-    return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+    const attempts = snapshot.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .filter((attempt) => {
+        if (level && String(attempt.level || attempt.courseLevel || "").toUpperCase() !== String(level).toUpperCase()) {
+          return false;
+        }
+        if (lessonId && attempt.lessonId !== lessonId) return false;
+        if (workbookId && attempt.workbookId !== workbookId) return false;
+        return true;
+      })
+      .sort(
+        (left, right) =>
+          timestampToMillis(right.createdAt || right.submissionDate) -
+          timestampToMillis(left.createdAt || left.submissionDate),
+      );
+
+    return attempts;
   } catch (error) {
     console.error("Failed to load writing attempts from Firebase", error);
     return [];
