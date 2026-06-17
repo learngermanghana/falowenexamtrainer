@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SpeakingPage from "./SpeakingPage";
+import SpeakingTeilOneGuide from "./SpeakingTeilOneGuide";
 import WritingPage from "./WritingPage";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
@@ -165,7 +166,12 @@ const ExamRoom = () => {
       );
     }
 
-    return <SpeakingPage mode="exam" />;
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <SpeakingTeilOneGuide level={studentLevel} />
+        <SpeakingPage mode="exam" />
+      </div>
+    );
   };
 
   const tabs = [
