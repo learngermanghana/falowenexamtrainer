@@ -22,7 +22,7 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Test the speaking timer
         working-directory: web
