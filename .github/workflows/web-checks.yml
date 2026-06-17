@@ -28,7 +28,9 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/ClassMembersPlacement.test.js src/components/CourseClassMembersShortcut.test.js
+        run: |
+          set -o pipefail
+          npm test -- --watchAll=false --runTestsByPath src/components/ClassMembersPlacement.test.js src/components/CourseClassMembersShortcut.test.js 2>&1 | tail -n 160
 
       - name: Build web app
         working-directory: web
