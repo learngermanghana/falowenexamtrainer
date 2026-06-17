@@ -120,7 +120,7 @@ const ClassMembersTab = () => {
         <div>
           <div style={{ fontWeight: 800, fontSize: 17, color: "#312e81" }}>Class members have moved</div>
           <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#475569" }}>
-            Your full class directory now lives in the class discussion area, so the Course Book stays focused on lessons.
+            Your full class directory is now available from the live class area and class page, so the Course Book stays focused on lessons.
           </p>
         </div>
         <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/discussion?tab=members")}>
