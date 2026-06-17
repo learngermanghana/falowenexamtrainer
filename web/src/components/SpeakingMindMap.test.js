@@ -18,10 +18,10 @@ test("renders a central question with one visible connection per branch", () => 
   expect(screen.getAllByTestId("mind-map-connection")).toHaveLength(
     config.branches.length,
   );
-  expect(screen.getByText("Speaking goal: 45 seconds")).toBeInTheDocument();
+  expect(screen.queryByText(/Speaking goal:/i)).not.toBeInTheDocument();
 });
 
-test("selects a branch and shows its full speaking support", async () => {
+test("selects a branch and shows compact speaking support", async () => {
   render(<SpeakingMindMap config={config} />);
 
   await userEvent.click(screen.getByRole("button", { name: /Daten/i }));
@@ -31,18 +31,19 @@ test("selects a branch and shows its full speaking support", async () => {
   ).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].guidingQuestion)).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].sentenceStarter)).toBeInTheDocument();
+  expect(screen.getByText("Show model sentence")).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].modelSentence)).toBeInTheDocument();
 });
 
 test("moves through the configured speaking route", async () => {
   render(<SpeakingMindMap config={config} />);
 
-  await userEvent.click(screen.getByRole("button", { name: /Next branch/i }));
+  await userEvent.click(screen.getByRole("button", { name: /^Next$/i }));
 
   expect(
     screen.getByRole("heading", { name: "Daten" }),
   ).toBeInTheDocument();
-  expect(screen.getByText(/Route 2 \/ 5/i)).toBeInTheDocument();
+  expect(screen.getByText("2/5")).toBeInTheDocument();
 });
 
 test("handles missing configuration safely", () => {
