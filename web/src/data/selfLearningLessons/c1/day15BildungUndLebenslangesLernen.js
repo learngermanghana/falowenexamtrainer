@@ -1,6 +1,6 @@
 import { makeLesson } from "../buildSelfLearningLesson";
 
-const c1Day15BildungUndLebenslangesLernen = makeLesson({
+const lesson = makeLesson({
   level: "C1",
   day: 15,
   chapter: "3.5",
@@ -138,5 +138,84 @@ const c1Day15BildungUndLebenslangesLernen = makeLesson({
   },
   vocabulary: ["lebenslanges Lernen", "Weiterbildung", "Chancengleichheit", "Bildungszugang", "Finanzierungsmodell", "Anerkennung", "Eigenverantwortung", "Beschäftigungsfähigkeit"],
 });
+
+const c1Day15BildungUndLebenslangesLernen = {
+  ...lesson,
+  speakingMindMap: {
+    level: "C1",
+    day: 15,
+    lessonId: "c1-day-15-bildung-und-lebenslanges-lernen",
+    title: "Bildung und lebenslanges Lernen",
+    centralQuestion: "Wer trägt die Verantwortung dafür, dass Menschen sich lebenslang weiterbilden können?",
+    targetDurationSeconds: 180,
+    focusMode: false,
+    branches: [
+      {
+        id: "thesis",
+        type: "thesis",
+        label: "These",
+        keywords: ["gemeinsame Verantwortung", "lebenslanges Lernen", "Zugang"],
+        guidingQuestion: "Welche differenzierte Hauptthese vertrittst du?",
+        sentenceStarter: "Meine zentrale These lautet, dass ...",
+        modelSentence: "Meine zentrale These lautet, dass lebenslanges Lernen nur dann realistisch ist, wenn Lernende, Unternehmen und Staat gemeinsam Verantwortung übernehmen.",
+      },
+      {
+        id: "context",
+        type: "context",
+        label: "Kontext",
+        keywords: ["technologischer Wandel", "Berufsbilder", "Ungleichheit"],
+        guidingQuestion: "In welchen gesellschaftlichen Zusammenhang stellst du das Thema?",
+        sentenceStarter: "Vor dem Hintergrund von ... gewinnt das Thema an Bedeutung, weil ...",
+        modelSentence: "Vor dem Hintergrund des technologischen Wandels gewinnt Weiterbildung an Bedeutung, weil berufliche Kompetenzen schneller veralten und Zugänge weiterhin ungleich verteilt sind.",
+      },
+      {
+        id: "evidence",
+        type: "evidence",
+        label: "Beleg",
+        keywords: ["Kosten", "Zeit", "Betreuungspflichten"],
+        guidingQuestion: "Welche konkrete Beobachtung stützt deine These?",
+        sentenceStarter: "Dafür spricht die Beobachtung, dass ...",
+        modelSentence: "Dafür spricht die Beobachtung, dass besonders Menschen mit geringem Einkommen, Betreuungspflichten oder wenig flexiblen Arbeitszeiten Weiterbildungen häufig nicht nutzen können.",
+      },
+      {
+        id: "evaluation",
+        type: "evaluation",
+        label: "Bewertung",
+        keywords: ["Chancengleichheit", "Beschäftigungsfähigkeit", "Teilhabe"],
+        guidingQuestion: "Wie bewertest du Nutzen und Grenzen kritisch?",
+        sentenceStarter: "Diese Entwicklung ist ambivalent, denn ...",
+        modelSentence: "Diese Entwicklung ist ambivalent, denn Weiterbildung verbessert Beschäftigungsfähigkeit und Teilhabe, kann aber zugleich zusätzlichen Leistungsdruck erzeugen.",
+      },
+      {
+        id: "objection",
+        type: "objection",
+        label: "Einwand",
+        keywords: ["Eigenverantwortung", "öffentliche Kosten", "Mitnahmeeffekte"],
+        guidingQuestion: "Welchen gewichtigen Einwand berücksichtigst du?",
+        sentenceStarter: "Ein gewichtiger Einwand lautet, dass ...",
+        modelSentence: "Ein gewichtiger Einwand lautet, dass eine umfassende öffentliche Finanzierung hohe Kosten und ungerechte Mitnahmeeffekte verursachen könnte.",
+      },
+      {
+        id: "qualification",
+        type: "qualification",
+        label: "Einschränkung",
+        keywords: ["Kofinanzierung", "Qualitätsstandards", "Zielgruppen"],
+        guidingQuestion: "Unter welchen Bedingungen bleibt deine Position überzeugend?",
+        sentenceStarter: "Diese Kritik überzeugt teilweise; entscheidend ist jedoch, dass ...",
+        modelSentence: "Diese Kritik überzeugt teilweise; entscheidend ist jedoch, dass Förderung zielgerichtet, qualitätsgesichert und als gemeinsame Finanzierung organisiert wird.",
+      },
+      {
+        id: "conclusion",
+        type: "conclusion",
+        label: "Schluss",
+        keywords: ["gemeinsames Modell", "gerechter Zugang", "Anerkennung"],
+        guidingQuestion: "Welche klare Schlussfolgerung ziehst du?",
+        sentenceStarter: "Daraus folgt für mich, dass ...",
+        modelSentence: "Daraus folgt für mich, dass ein gemeinsames Modell aus Eigeninitiative, betrieblicher Unterstützung und öffentlicher Förderung den gerechtesten Zugang ermöglicht.",
+      },
+    ],
+    speakingRoute: ["thesis", "context", "evidence", "evaluation", "objection", "qualification", "conclusion"],
+  },
+};
 
 export default c1Day15BildungUndLebenslangesLernen;
