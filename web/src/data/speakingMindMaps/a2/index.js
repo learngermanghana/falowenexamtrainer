@@ -1,3 +1,5 @@
+import { validateSpeakingMindMapConfig as validateMultiLevelSpeakingMindMapConfig } from "../index";
+
 const topics = [
   [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"]],
   [3, "a2-day-3-vergleichen", "Dinge und Personen vergleichen", "Was vergleichst du und was ist anders oder gleich?", ["Personen", "Dinge", "Größe", "Preis", "Meinung"]],
@@ -44,6 +46,7 @@ export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQues
   const branches = labels.map((label, index) => makeBranch(label, index, title));
   return {
     level: "A2",
+    branchTypeSet: "A2",
     day,
     lessonId,
     title,
@@ -58,14 +61,4 @@ export const a2SpeakingMindMapsByDay = a2SpeakingMindMaps.reduce((registry, conf
 
 export const getA2SpeakingMindMap = (day) => a2SpeakingMindMapsByDay[Number(day)] || null;
 
-export const validateSpeakingMindMapConfig = (config) => {
-  if (!config || typeof config !== "object") return false;
-  if (config.level !== "A2" || !config.day || !config.lessonId || !config.title || !config.centralQuestion) return false;
-  if (!Array.isArray(config.branches) || config.branches.length < 4 || config.branches.length > 5) return false;
-  const ids = new Set(config.branches.map((branch) => branch.id));
-  if (ids.size !== config.branches.length) return false;
-  if (!Array.isArray(config.speakingRoute) || config.speakingRoute.length !== config.branches.length) return false;
-  if (!config.speakingRoute.every((id) => ids.has(id))) return false;
-  if (config.targetDurationSeconds < 30 || config.targetDurationSeconds > 45) return false;
-  return config.branches.every((branch) => branch.id && branch.label && Array.isArray(branch.keywords) && branch.keywords.length > 0 && branch.guidingQuestion && branch.sentenceStarter && branch.modelSentence);
-};
+export const validateSpeakingMindMapConfig = (config) => validateMultiLevelSpeakingMindMapConfig(config, { requiredLevel: "A2" });

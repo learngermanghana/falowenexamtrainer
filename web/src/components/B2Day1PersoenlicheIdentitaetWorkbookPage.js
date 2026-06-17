@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { b2SpeakingMindMapExample } from "../data/speakingMindMaps/examples";
 
 const tabs = [
   { key: "sprechen", label: "Sprechen" },
@@ -22,7 +24,7 @@ export default function B2Day1PersoenlicheIdentitaetWorkbookPage() {
       </div>
       <p><strong>Aktiver Tab:</strong> {activeLabel}</p>
 
-      {active === "sprechen" && <section><h2>Teil 1 · Sprechen</h2><p>Beschreiben Sie in 2–3 Minuten, wie sich Ihre Identität im Laufe der Zeit verändert hat (Familie, Schule, Arbeit, soziale Medien).</p><p><strong>Selbstbewertung:</strong> Habe ich Beispiele gegeben? Habe ich verbindende Ausdrücke benutzt (zuerst, außerdem, dennoch)?</p></section>}
+      {active === "sprechen" && <section><h2>Teil 1 · Sprechen</h2><SpeakingMindMap config={b2SpeakingMindMapExample} /><p>Beschreiben Sie in 2–3 Minuten, wie sich Ihre Identität im Laufe der Zeit verändert hat (Familie, Schule, Arbeit, soziale Medien).</p><p><strong>Selbstbewertung:</strong> Habe ich eine klare Position formuliert, Belege eingeordnet und ein Gegenargument beantwortet?</p></section>}
 
       {active === "schreiben" && <section><h2>Teil 2 · Schreiben</h2><p><em>Genre-Entscheidung: Meinungsessay/Erörterung, weil das Thema gesellschaftlich-persönlich ist und keine institutionelle Anfrage/Beschwerde verlangt.</em></p><p><strong>Situation:</strong> Ihre Volkshochschule organisiert eine Diskussionsreihe: „Wer bin ich online – wer bin ich offline?“. Schreiben Sie einen Meinungsessay (180–220 Wörter) für das Kursforum.</p><p><strong>Inhaltspunkte (Pflicht):</strong></p><ul><li>Welche Faktoren prägen Ihr Selbstverständnis?</li><li>Welche Rolle spielen soziale Medien für persönliche Identität?</li><li>Welche Chancen und Risiken sehen Sie?</li><li>Wie kann man authentisch bleiben?</li></ul><p><strong>Register/Ton:</strong> neutral-formell, klar argumentativ, B2-Niveau.</p><p><strong>Struktur:</strong> Einleitung (Thema + Position), Hauptteil (2–3 Argumente + Beispiele), Schluss (Fazit + Ausblick).</p><p><strong>Self-check:</strong> Kohärenz? Register passend? Adjektivdeklination korrekt? Wortschatz variantenreich? Aufgabenbezug vollständig?</p></section>}
 
