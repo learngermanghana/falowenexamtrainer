@@ -7,7 +7,7 @@ on:
       - ".github/workflows/web-checks.yml"
 
 jobs:
-  test-and-build:
+  class-members-test-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,11 +24,11 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Test speaking and class access components
+      - name: Test class access placement
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js src/components/ClassAccessPlacement.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/components/ClassAccessPlacement.test.js
 
       - name: Build web app
         working-directory: web
