@@ -42,6 +42,7 @@ beforeEach(() => {
   mockSearch = "";
   mockNavigate.mockClear();
   mockSaveStudentProfile.mockClear();
+  fetchClassDirectoryMembers.mockReset();
   fetchClassDirectoryMembers.mockResolvedValue([
     {
       id: "student-1",
@@ -81,8 +82,9 @@ test("places the Your Class preview before the Campus and Exams cards", async ()
   );
 
   await screen.findByRole("region", { name: "Your class" });
+  await waitFor(() => expect(fetchClassDirectoryMembers).toHaveBeenCalledTimes(1));
+  expect(await screen.findByText("2 class members")).toBeInTheDocument();
   expect(screen.getByText("A2 Stuttgart Klasse")).toBeInTheDocument();
-  expect(screen.getByText("2 class members")).toBeInTheDocument();
 
   const homeRoot = screen.getByTestId("home-root");
   const previewHost = homeRoot.querySelector("[data-home-class-members-host]");
@@ -109,8 +111,8 @@ test("the My Class members link opens the full directory without emails", async 
   mockSearch = "?tab=members";
   render(<ClassDiscussionPage />);
 
-  await waitFor(() => expect(fetchClassDirectoryMembers).toHaveBeenCalled());
-  expect(screen.getByText("Ama Mensah")).toBeInTheDocument();
+  await waitFor(() => expect(fetchClassDirectoryMembers).toHaveBeenCalledTimes(1));
+  expect(await screen.findByText("Ama Mensah")).toBeInTheDocument();
   expect(screen.getByText("Kojo Asare")).toBeInTheDocument();
   expect(screen.getByText("Your class biography")).toBeInTheDocument();
   expect(screen.queryByText(/@/)).not.toBeInTheDocument();
