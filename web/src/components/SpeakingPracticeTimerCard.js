@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import {
+  readSpeakingProgress,
+  resolveSpeakingProgressScope,
+  writeSpeakingProgress,
+} from "../services/speakingProgressStorage";
 import "./SpeakingPracticeTimerCard.css";
 
 const PRESET_MINUTES = [5, 10, 15, 20];
@@ -24,23 +29,54 @@ const clampMinutes = (value) => {
   return Math.min(MAX_CUSTOM_MINUTES, Math.max(MIN_CUSTOM_MINUTES, parsed));
 };
 
-const SpeakingPracticeTimerCard = ({ targetSeconds }) => {
-  const initialMinutes = useMemo(
-    () => resolveInitialMinutes(targetSeconds),
-    [targetSeconds],
+const resolveTimerMemory = (scope, targetSeconds) => {
+  const fallbackMinutes = resolveInitialMinutes(targetSeconds);
+  const memory = readSpeakingProgress(scope);
+  if (!memory.timerMinutes) {
+    return {
+      minutes: fallbackMinutes,
+      choice: String(fallbackMinutes),
+      customMinutes: 25,
+    };
+  }
+
+  const minutes = clampMinutes(memory.timerMinutes);
+  const custom =
+    memory.timerChoice === "custom" || !PRESET_MINUTES.includes(minutes);
+  return {
+    minutes,
+    choice: custom ? "custom" : String(minutes),
+    customMinutes: custom ? minutes : clampMinutes(memory.customTimerMinutes || 25),
+  };
+};
+
+const SpeakingPracticeTimerCard = ({ targetSeconds, progressScope }) => {
+  const storageScope = useMemo(
+    () => resolveSpeakingProgressScope({}, progressScope),
+    [progressScope],
   );
-  const [durationMinutes, setDurationMinutes] = useState(initialMinutes);
-  const [timerSecondsLeft, setTimerSecondsLeft] = useState(initialMinutes * 60);
+  const initialTimer = useMemo(
+    () => resolveTimerMemory(storageScope, targetSeconds),
+    [storageScope, targetSeconds],
+  );
+  const [durationMinutes, setDurationMinutes] = useState(initialTimer.minutes);
+  const [timerSecondsLeft, setTimerSecondsLeft] = useState(
+    initialTimer.minutes * 60,
+  );
   const [timerRunning, setTimerRunning] = useState(false);
-  const [durationChoice, setDurationChoice] = useState(String(initialMinutes));
-  const [customMinutes, setCustomMinutes] = useState(25);
+  const [durationChoice, setDurationChoice] = useState(initialTimer.choice);
+  const [customMinutes, setCustomMinutes] = useState(
+    initialTimer.customMinutes,
+  );
 
   useEffect(() => {
-    setDurationMinutes(initialMinutes);
-    setTimerSecondsLeft(initialMinutes * 60);
-    setDurationChoice(String(initialMinutes));
+    const restored = resolveTimerMemory(storageScope, targetSeconds);
+    setDurationMinutes(restored.minutes);
+    setTimerSecondsLeft(restored.minutes * 60);
+    setDurationChoice(restored.choice);
+    setCustomMinutes(restored.customMinutes);
     setTimerRunning(false);
-  }, [initialMinutes]);
+  }, [storageScope, targetSeconds]);
 
   useEffect(() => {
     if (!timerRunning || timerSecondsLeft <= 0) return undefined;
@@ -59,20 +95,34 @@ const SpeakingPracticeTimerCard = ({ targetSeconds }) => {
     return () => window.clearInterval(intervalId);
   }, [timerRunning, timerSecondsLeft]);
 
+  const rememberDuration = (minutes, choice, customValue) => {
+    writeSpeakingProgress(storageScope, {
+      timerMinutes: minutes,
+      timerChoice: choice,
+      customTimerMinutes: customValue,
+    });
+  };
+
   const applyDuration = (minutes, nextChoice = String(minutes)) => {
     const safeMinutes = clampMinutes(minutes);
+    const safeCustomMinutes =
+      nextChoice === "custom" ? safeMinutes : clampMinutes(customMinutes);
     setDurationMinutes(safeMinutes);
     setTimerSecondsLeft(safeMinutes * 60);
     setTimerRunning(false);
     setDurationChoice(nextChoice);
+    if (nextChoice === "custom") setCustomMinutes(safeMinutes);
+    rememberDuration(safeMinutes, nextChoice, safeCustomMinutes);
   };
 
   const handleDurationChoice = (event) => {
     const nextChoice = event.target.value;
     setDurationChoice(nextChoice);
-    if (nextChoice !== "custom") {
-      applyDuration(Number(nextChoice), nextChoice);
+    if (nextChoice === "custom") {
+      rememberDuration(durationMinutes, "custom", clampMinutes(customMinutes));
+      return;
     }
+    applyDuration(Number(nextChoice), nextChoice);
   };
 
   const applyCustomDuration = () => {
@@ -106,6 +156,7 @@ const SpeakingPracticeTimerCard = ({ targetSeconds }) => {
     <div
       className="speaking-compact-timer"
       data-compact-speaking-timer
+      data-progress-scope={storageScope}
       aria-label="Teil 1 speaking timer"
     >
       <span className="speaking-compact-timer__icon" aria-hidden="true">

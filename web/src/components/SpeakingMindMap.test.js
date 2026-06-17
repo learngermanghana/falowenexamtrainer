@@ -9,6 +9,10 @@ import {
 
 const config = getA2SpeakingMindMap(18);
 
+beforeEach(() => {
+  window.localStorage.clear();
+});
+
 test("renders a central question with one visible connection per branch", () => {
   render(<SpeakingMindMap config={config} />);
 

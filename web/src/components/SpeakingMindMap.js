@@ -1,5 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
+import {
+  readSpeakingProgress,
+  resolveSpeakingProgressScope,
+  writeSpeakingProgress,
+} from "../services/speakingProgressStorage";
 import "./SpeakingMindMap.css";
 
 const emptyConfig = {
@@ -88,24 +93,51 @@ const getPositions = (count) =>
     };
   });
 
-const SpeakingMindMap = ({ config }) => {
+const getRestoredBranchId = (config, memory, fallbackId) => {
+  const knownIds = new Set(config.branches.map((branch) => branch.id));
+  if (knownIds.has(memory.selectedBranchId)) return memory.selectedBranchId;
+  const routeIndex = Number(memory.routeIndex);
+  if (
+    Number.isInteger(routeIndex) &&
+    routeIndex >= 0 &&
+    routeIndex < config.speakingRoute.length
+  ) {
+    return config.speakingRoute[routeIndex];
+  }
+  return fallbackId;
+};
+
+const SpeakingMindMap = ({ config, progressScope }) => {
   const safeConfig = useMemo(() => normalizeConfig(config), [config]);
+  const storageScope = useMemo(
+    () => resolveSpeakingProgressScope(safeConfig, progressScope),
+    [progressScope, safeConfig],
+  );
   const firstBranchId =
     safeConfig.speakingRoute[0] || safeConfig.branches[0]?.id || "";
-  const [selectedBranchId, setSelectedBranchId] = useState(firstBranchId);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const initialMemory = useMemo(
+    () => readSpeakingProgress(storageScope),
+    [storageScope],
+  );
+  const [selectedBranchId, setSelectedBranchId] = useState(() =>
+    getRestoredBranchId(safeConfig, initialMemory, firstBranchId),
+  );
+  const [helpOpen, setHelpOpen] = useState(() =>
+    Boolean(initialMemory.helpOpen),
+  );
+  const rootRef = useRef(null);
   const focusModeEnabled =
     safeConfig.focusMode !== undefined
       ? Boolean(safeConfig.focusMode)
       : ["A2", "B1"].includes(String(safeConfig.level || "").toUpperCase());
 
   useEffect(() => {
-    setSelectedBranchId(firstBranchId);
-  }, [firstBranchId]);
-
-  useEffect(() => {
-    setHelpOpen(false);
-  }, [safeConfig.lessonId, safeConfig.day, focusModeEnabled]);
+    const memory = readSpeakingProgress(storageScope);
+    setSelectedBranchId(
+      getRestoredBranchId(safeConfig, memory, firstBranchId),
+    );
+    setHelpOpen(Boolean(memory.helpOpen));
+  }, [firstBranchId, safeConfig, storageScope]);
 
   const selectedBranch =
     safeConfig.branches.find((branch) => branch.id === selectedBranchId) ||
@@ -113,6 +145,50 @@ const SpeakingMindMap = ({ config }) => {
   const routeIndex = safeConfig.speakingRoute.indexOf(selectedBranch?.id);
   const selectedRouteIndex = routeIndex >= 0 ? routeIndex : 0;
   const positions = getPositions(safeConfig.branches.length);
+
+  useEffect(() => {
+    if (!selectedBranch?.id) return;
+    writeSpeakingProgress(storageScope, {
+      selectedBranchId: selectedBranch.id,
+      routeIndex: selectedRouteIndex,
+    });
+  }, [selectedBranch?.id, selectedRouteIndex, storageScope]);
+
+  useEffect(() => {
+    writeSpeakingProgress(storageScope, { helpOpen });
+  }, [helpOpen, storageScope]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const speakingCard = root?.parentElement;
+    if (!speakingCard) return undefined;
+
+    const preparedInput = Array.from(
+      speakingCard.querySelectorAll('input[type="checkbox"]'),
+    ).find((input) =>
+      String(input.closest("label")?.textContent || "")
+        .toLowerCase()
+        .includes("prepared"),
+    );
+    if (!preparedInput) return undefined;
+
+    const savePrepared = () => {
+      writeSpeakingProgress(storageScope, {
+        prepared: Boolean(preparedInput.checked),
+      });
+    };
+    preparedInput.addEventListener("change", savePrepared);
+
+    const memory = readSpeakingProgress(storageScope);
+    if (
+      typeof memory.prepared === "boolean" &&
+      preparedInput.checked !== memory.prepared
+    ) {
+      preparedInput.click();
+    }
+
+    return () => preparedInput.removeEventListener("change", savePrepared);
+  }, [storageScope]);
 
   const selectRouteOffset = (offset) => {
     if (!safeConfig.speakingRoute.length) return;
@@ -145,12 +221,14 @@ const SpeakingMindMap = ({ config }) => {
 
   return (
     <section
+      ref={rootRef}
       aria-label={`${safeConfig.title} interactive brain map`}
       className="speaking-mind-map"
       data-speaking-mind-map
       data-level={safeConfig.level}
       data-focus-mode={focusModeEnabled ? "true" : "false"}
       data-help-open={helpOpen ? "true" : "false"}
+      data-progress-scope={storageScope}
     >
       <header className="speaking-mind-map__header">
         <div>
@@ -160,6 +238,7 @@ const SpeakingMindMap = ({ config }) => {
           <h3>Baue deine Antwort als Mindmap auf</h3>
           <p>Frage lesen, einen Ast öffnen und die Ideen laut verbinden.</p>
         </div>
+        <span className="speaking-mind-map__saved">Saved on this device</span>
       </header>
 
       <div className="speaking-mind-map__viewport">
