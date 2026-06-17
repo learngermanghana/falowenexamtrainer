@@ -88,13 +88,6 @@ const getPositions = (count) =>
     };
   });
 
-const formatDuration = (seconds) => {
-  const safeSeconds = Number(seconds) || 0;
-  if (safeSeconds < 60) return `${safeSeconds} seconds`;
-  if (safeSeconds % 60 === 0) return `${safeSeconds / 60} minutes`;
-  return `${Math.floor(safeSeconds / 60)} min ${safeSeconds % 60} sec`;
-};
-
 const SpeakingMindMap = ({ config }) => {
   const safeConfig = useMemo(() => normalizeConfig(config), [config]);
   const firstBranchId =
@@ -154,14 +147,8 @@ const SpeakingMindMap = ({ config }) => {
             {safeConfig.level} · Sprechvorbereitung
           </span>
           <h3>Baue deine Antwort als Mindmap auf</h3>
-          <p>
-            Beginne mit der Frage in der Mitte. Öffne danach die Äste und
-            verbinde die Ideen zu einer vollständigen Antwort.
-          </p>
+          <p>Frage lesen, einen Ast öffnen und die Ideen laut verbinden.</p>
         </div>
-        <strong className="speaking-mind-map__goal">
-          Speaking goal: {formatDuration(safeConfig.targetDurationSeconds)}
-        </strong>
       </header>
 
       <div className="speaking-mind-map__viewport">
@@ -217,7 +204,7 @@ const SpeakingMindMap = ({ config }) => {
                   <span className="speaking-mind-map__branch-copy">
                     <strong>{branch.label}</strong>
                     {branch.keywords.length ? (
-                      <small>{branch.keywords.slice(0, 3).join(" · ")}</small>
+                      <small>{branch.keywords.slice(0, 2).join(" · ")}</small>
                     ) : null}
                   </span>
                 </button>
@@ -249,15 +236,16 @@ const SpeakingMindMap = ({ config }) => {
             <strong>Guiding question</strong>
             <p>{selectedBranch.guidingQuestion}</p>
           </div>
-          <div>
-            <strong>Model sentence</strong>
-            <p>{selectedBranch.modelSentence}</p>
-          </div>
           <div className="speaking-mind-map__starter">
             <strong>Sentence starter</strong>
             <p>{selectedBranch.sentenceStarter}</p>
           </div>
         </div>
+
+        <details className="speaking-mind-map__model">
+          <summary>Show model sentence</summary>
+          <p>{selectedBranch.modelSentence}</p>
+        </details>
 
         {selectedBranch.keywords.length ? (
           <div className="speaking-mind-map__keywords">
@@ -269,18 +257,16 @@ const SpeakingMindMap = ({ config }) => {
       </article>
 
       <div className="speaking-mind-map__route">
-        <div>
-          <strong>Recommended speaking route</strong>
-          <p>
-            {safeConfig.speakingRoute
-              .map(
-                (id) =>
-                  safeConfig.branches.find((branch) => branch.id === id)?.label,
-              )
-              .filter(Boolean)
-              .join(" → ")}
-          </p>
-        </div>
+        <strong>Route:</strong>
+        <span className="speaking-mind-map__route-copy">
+          {safeConfig.speakingRoute
+            .map(
+              (id) =>
+                safeConfig.branches.find((branch) => branch.id === id)?.label,
+            )
+            .filter(Boolean)
+            .join(" → ")}
+        </span>
         <div className="speaking-mind-map__route-buttons">
           <button
             type="button"
@@ -288,10 +274,10 @@ const SpeakingMindMap = ({ config }) => {
             onClick={() => selectRouteOffset(-1)}
             disabled={selectedRouteIndex === 0}
           >
-            Previous branch
+            Previous
           </button>
           <span>
-            Route {selectedRouteIndex + 1} / {safeConfig.speakingRoute.length}
+            {selectedRouteIndex + 1}/{safeConfig.speakingRoute.length}
           </span>
           <button
             type="button"
@@ -301,7 +287,7 @@ const SpeakingMindMap = ({ config }) => {
               selectedRouteIndex >= safeConfig.speakingRoute.length - 1
             }
           >
-            Next branch
+            Next
           </button>
         </div>
       </div>
