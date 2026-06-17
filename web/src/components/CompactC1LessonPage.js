@@ -5,6 +5,8 @@ import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import SpeakingMindMap from "./SpeakingMindMap";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import { useToast } from "../context/ToastContext";
 import {
   getStandardLessonStorageKey,
@@ -105,6 +107,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
+  const speakingScope = `${String(lesson.level || "C1").toLowerCase()}-day-${lesson.day}-${String(lesson.title || "speaking").toLowerCase().replace(/[^a-z0-9äöüß]+/gi, "-")}`;
 
   const finish = () => {
     if (!finishReady) return;
@@ -155,12 +158,27 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
       </> : null}
 
       {active === "speak" ? <Section title="Speaking builder">
-        <NoteBox tone="amber"><strong>Sprechfrage:</strong> {String(lesson.speakingTopic || "").replace(/^Sprechen:\s*/, "")}</NoteBox>
-        <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
-          <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
-          <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
-          <ul style={listStyle}>{branches.map((branch) => <li key={branch.id || branch.title}><strong>{branch.title}:</strong> {(branch.keywords || []).join(", ")}</li>)}</ul>
-        </div>
+        {lesson.speakingMindMap ? (
+          <div style={{ display: "grid", gap: 12 }}>
+            <SpeakingPracticeTimerCard
+              targetSeconds={lesson.speakingMindMap.targetDurationSeconds}
+              progressScope={speakingScope}
+            />
+            <SpeakingMindMap
+              config={lesson.speakingMindMap}
+              progressScope={speakingScope}
+            />
+          </div>
+        ) : (
+          <>
+            <NoteBox tone="amber"><strong>Sprechfrage:</strong> {String(lesson.speakingTopic || "").replace(/^Sprechen:\s*/, "")}</NoteBox>
+            <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
+              <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
+              <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
+              <ul style={listStyle}>{branches.map((branch) => <li key={branch.id || branch.title}><strong>{branch.title}:</strong> {(branch.keywords || []).join(", ")}</li>)}</ul>
+            </div>
+          </>
+        )}
         <EmbeddedSpeechPracticePanel />
         <label style={{ fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} /> I completed a speaking practice.</label>
       </Section> : null}
