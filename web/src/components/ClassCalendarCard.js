@@ -14,6 +14,7 @@ import {
 } from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import { formatPercent } from "../lib/formatters";
+import HomeClassPreviewCard from "./HomeClassPreviewCard";
 
 const infoCardStyle = {
   border: "1px solid #e5e7eb",
@@ -247,6 +248,8 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
           <span>{t("classCalendar.zoomDetails", { meetingId: ZOOM_DETAILS.meetingId, passcode: ZOOM_DETAILS.passcode })}</span>
         </div>
       </section>
+
+      <HomeClassPreviewCard embedded />
 
       {timeline ? (
         <section style={infoCardStyle}>

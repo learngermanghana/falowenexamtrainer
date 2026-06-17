@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../firebase";
 import { styles } from "../styles";
 
 const ClassMembersTab = () => {
+  const navigate = useNavigate();
   const { studentProfile, saveStudentProfile } = useAuth();
   const [members, setMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
@@ -12,6 +14,11 @@ const ClassMembersTab = () => {
   const [isBiographyDirty, setIsBiographyDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [isSavingBio, setIsSavingBio] = useState(false);
+
+  const isCourseBookContext = useMemo(
+    () => typeof window !== "undefined" && window.location.pathname.startsWith("/campus/course"),
+    [],
+  );
 
   useEffect(() => {
     if (!isBiographyDirty) {
@@ -24,6 +31,11 @@ const ClassMembersTab = () => {
   }, [studentProfile?.id]);
 
   const loadMembers = useCallback(async () => {
+    if (isCourseBookContext) {
+      setLoadingMembers(false);
+      return;
+    }
+
     if (!isFirebaseConfigured || !db) {
       setMembersError("Firebase is not configured. Please add your credentials.");
       setMembers([]);
@@ -46,15 +58,14 @@ const ClassMembersTab = () => {
       const q = query(
         studentsRef,
         where("level", "==", studentProfile.level),
-        where("className", "==", studentProfile.className)
+        where("className", "==", studentProfile.className),
       );
       const snapshot = await getDocs(q);
       const nextMembers = snapshot.docs.map((docSnapshot) => {
         const data = docSnapshot.data();
         return {
           id: docSnapshot.id,
-          name: data.name || data.email || "Student",
-          email: data.email || "",
+          name: data.name || data.displayName || "Student",
           biography: data.biography || "",
           level: data.level || "",
           className: data.className || "",
@@ -69,7 +80,7 @@ const ClassMembersTab = () => {
     } finally {
       setLoadingMembers(false);
     }
-  }, [studentProfile?.className, studentProfile?.level]);
+  }, [isCourseBookContext, studentProfile?.className, studentProfile?.level]);
 
   useEffect(() => {
     loadMembers();
@@ -85,7 +96,7 @@ const ClassMembersTab = () => {
       .then(async () => {
         setBiographyDraft(nextBiography);
         setIsBiographyDirty(false);
-        setSaveStatus("Biography saved to Firebase. Your classmates will see the latest update.");
+        setSaveStatus("Biography saved. Your classmates will see the latest update.");
         await loadMembers();
       })
       .catch((saveError) => {
@@ -94,6 +105,30 @@ const ClassMembersTab = () => {
       })
       .finally(() => setIsSavingBio(false));
   };
+
+  if (isCourseBookContext) {
+    return (
+      <section
+        style={{
+          ...styles.card,
+          display: "grid",
+          gap: 10,
+          border: "1px solid #c7d2fe",
+          background: "#eef2ff",
+        }}
+      >
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 17, color: "#312e81" }}>Class members have moved</div>
+          <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#475569" }}>
+            Your full class directory is now available from the live class area and class page, so the Course Book stays focused on lessons.
+          </p>
+        </div>
+        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/discussion?tab=members")}>
+          View classmates
+        </button>
+      </section>
+    );
+  }
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
@@ -140,7 +175,7 @@ const ClassMembersTab = () => {
         <div style={styles.card}>
           <div style={{ fontWeight: 700, marginBottom: 6 }}>No classmates found</div>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Invite classmates to add their biography in this tab. Once everyone adds theirs, you will see them here.
+            Classmates will appear here once their profiles are available.
           </p>
         </div>
       ) : null}
@@ -149,10 +184,7 @@ const ClassMembersTab = () => {
         ? members.map((member) => (
             <div key={member.id} style={{ ...styles.card, margin: 0 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <div style={{ display: "grid", gap: 4 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{member.name}</div>
-                  <div style={{ fontSize: 13, color: "#4b5563" }}>{member.email}</div>
-                </div>
+                <div style={{ fontWeight: 700, fontSize: 16 }}>{member.name}</div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <span style={styles.badge}>Level: {member.level || "–"}</span>
                   <span style={styles.badge}>Class: {member.className || "–"}</span>
