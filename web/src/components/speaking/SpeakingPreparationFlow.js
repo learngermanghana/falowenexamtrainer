@@ -14,7 +14,12 @@ export default function SpeakingPreparationFlow({
       style={{ display: "grid", gap: 16 }}
     >
       <SpeakingMindMap config={config} />
-      {showTimer ? <SpeakingPracticeTimerCard /> : null}
+      {showTimer ? (
+        <SpeakingPracticeTimerCard
+          targetSeconds={config?.targetSeconds}
+          title={`${config?.level || ""} speaking target timer`.trim()}
+        />
+      ) : null}
       {note ? (
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
           {note}
