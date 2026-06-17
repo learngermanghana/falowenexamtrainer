@@ -28,7 +28,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js src/components/ClassMembersPlacement.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js src/components/ClassMembersPlacement.test.js src/components/CourseClassMembersShortcut.test.js
 
       - name: Build web app
         working-directory: web
