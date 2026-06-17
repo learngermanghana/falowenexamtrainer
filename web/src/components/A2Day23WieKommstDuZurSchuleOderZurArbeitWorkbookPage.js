@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
@@ -296,6 +297,11 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </a>
       <WorkbookSubmissionReminder />
       </div>
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day23WieKommstDuZurSchuleOderZurArbeit", level: "A2", workbookId: "A2Day23WieKommstDuZurSchuleOderZurArbeit" }} workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit" />
+      )}
+
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -12,6 +13,7 @@ const tabs = [
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "references", label: "Teil 5 · Reference Answers" },
 ];
 
 const card = {
@@ -434,6 +436,11 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day4WohnungSuchen", level: "B1", workbookId: "B1Day4WohnungSuchen" }} workbookId="B1Day4WohnungSuchen" />
+      )}
+
     </div>
   );
 };

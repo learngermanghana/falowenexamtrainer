@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
@@ -332,6 +333,11 @@ const B1Day23ErstesDateWorkbookPage = () => {
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
+      )}
+
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day23ErstesDate", level: "B1", workbookId: "B1Day23ErstesDate" }} workbookId="B1Day23ErstesDate" />
       )}
 
     </div>

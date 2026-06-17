@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -11,6 +12,7 @@ const tabs = [
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "references", label: "Teil 5 · Reference Answers" },
 ];
 
 const card = { ...styles.card, display: "grid", gap: 12 };
@@ -461,6 +463,11 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day28UeberDieZukunftSprechen", level: "A2", workbookId: "A2Day28UeberDieZukunftSprechen" }} workbookId="A2Day28UeberDieZukunftSprechen" />
+      )}
+
     </div>
   );
 };

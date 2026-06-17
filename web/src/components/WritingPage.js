@@ -16,6 +16,7 @@ import {
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import WritingHistorySection, { buildWritingHistoryRecord } from "./WritingHistorySection";
 import WritingReferenceLibrary from "./WritingReferenceLibrary";
 import { makeReferenceId, normalizeReferenceNotes } from "../lib/writingReferenceLibrary";
 
@@ -426,6 +427,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     buildRubricBreakdown("")
   );
   const [draftHistory, setDraftHistory] = useState([]);
+  const [writingHistory, setWritingHistory] = useState([]);
   const [completionLog, setCompletionLog] = useState([]);
   const [errorBank, setErrorBank] = useState([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -788,6 +790,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         if (Array.isArray(saved.draftHistory)) {
           setDraftHistory(saved.draftHistory);
         }
+        if (Array.isArray(saved.writingHistory)) {
+          setWritingHistory(saved.writingHistory);
+        }
         if (Array.isArray(saved.completionLog)) {
           setCompletionLog(saved.completionLog);
         }
@@ -839,6 +844,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           timerRunning,
           rubricBreakdown,
           draftHistory,
+          writingHistory,
           completionLog,
           errorBank,
         },
@@ -867,6 +873,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     chatMessages,
     completionLog,
     draftHistory,
+    writingHistory,
     errorBank,
     editableDraftById,
     ideaDraftWorkspace,
@@ -1264,6 +1271,20 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           breakdown,
           score: overallScore,
         },
+      ]);
+      setWritingHistory((prev) => [
+        ...prev,
+        buildWritingHistoryRecord({
+          userId,
+          studentCode,
+          level,
+          workbookId: isCourseMode ? "course-writing" : "exam-writing",
+          taskId: selectedLetterId || "custom",
+          taskTitle: selectedLetter?.letter || selectedLetter?.title || "Custom prompt",
+          text: trimmed,
+          data: { ...data, score: data?.score ?? overallScore, maxScore: data?.maxScore ?? 12 },
+          context: isExamMode ? "exam-room" : "course",
+        }),
       ]);
       addResultToHistory(enrichedResult);
     } catch (err) {
@@ -2027,6 +2048,20 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 </button>
               </div>
             </div>
+
+
+            <WritingHistorySection
+              title={isCourseMode ? "Saved Texts" : "Saved Letters"}
+              entries={writingHistory}
+              level={level}
+              onOpen={(entry) => {
+                setTypedAnswer(entry.originalLetter || entry.originalText || "");
+                setMarkFeedback(entry.feedback || "");
+                setMarkRubric(entry.rubricScores || null);
+                setMarkCorrections(Array.isArray(entry.corrections) ? entry.corrections : []);
+                setMarkStructuredFeedback(entry.structuredFeedback || null);
+              }}
+            />
 
             {markFeedback ? (
               <div style={{ marginTop: 16 }}>

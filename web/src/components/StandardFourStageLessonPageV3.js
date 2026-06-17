@@ -12,12 +12,13 @@ import {
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 import { SpeakingPoints } from "./B2Day1IdentityPilotLessonPage";
 import { getAdvancedWritingPhase } from "../data/advancedWritingProgression";
 
-const tabs = ["learn", "speak", "write", "finish"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish" };
+const tabs = ["learn", "speak", "write", "finish", "references"];
+const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Reference Answers" };
 const card = {
   ...styles.card,
   display: "grid",
@@ -259,6 +260,8 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
         <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
         {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
       </Section> : null}
+
+      {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
 
       {active === "finish" ? <Section title={`Finish ${lesson.level} Day ${lesson.day}`}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>

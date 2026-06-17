@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
@@ -444,6 +445,11 @@ const B1Day22BeziehungWichtigWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day22BeziehungWichtig", level: "B1", workbookId: "B1Day22BeziehungWichtig" }} workbookId="B1Day22BeziehungWichtig" />
+      )}
+
     </div>
   );
 };
