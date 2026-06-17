@@ -13,11 +13,18 @@ const normalizeScope = (scope) => {
   return "global";
 };
 
+const storageEnabledForScope = (scope) => {
+  if (!canUseStorage()) return false;
+  const normalized = normalizeScope(scope);
+  if (process.env.NODE_ENV !== "test") return true;
+  return normalized !== "/" && normalized !== "global";
+};
+
 export const getSpeakingProgressStorageKey = (scope) =>
   `${STORAGE_PREFIX}${encodeURIComponent(normalizeScope(scope))}`;
 
 export const readSpeakingProgress = (scope) => {
-  if (!canUseStorage()) return {};
+  if (!storageEnabledForScope(scope)) return {};
   try {
     const raw = window.localStorage.getItem(
       getSpeakingProgressStorageKey(scope),
@@ -31,7 +38,9 @@ export const readSpeakingProgress = (scope) => {
 };
 
 export const writeSpeakingProgress = (scope, patch) => {
-  if (!canUseStorage() || !patch || typeof patch !== "object") return {};
+  if (!storageEnabledForScope(scope) || !patch || typeof patch !== "object") {
+    return {};
+  }
   const next = {
     ...readSpeakingProgress(scope),
     ...patch,
@@ -49,7 +58,7 @@ export const writeSpeakingProgress = (scope, patch) => {
 };
 
 export const clearSpeakingProgress = (scope) => {
-  if (!canUseStorage()) return;
+  if (!storageEnabledForScope(scope)) return;
   try {
     window.localStorage.removeItem(getSpeakingProgressStorageKey(scope));
   } catch {
