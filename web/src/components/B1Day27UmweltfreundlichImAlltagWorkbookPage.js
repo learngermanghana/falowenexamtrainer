@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { b1SpeakingMindMapExample } from "../data/speakingMindMaps/examples";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -203,6 +205,8 @@ const B1Day27UmweltfreundlichImAlltagWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
+
+          <SpeakingMindMap config={b1SpeakingMindMapExample} />
 
           <h3 style={sectionTitle}>Umweltfreundlich im Alltag</h3>
           <p style={{ margin: 0 }}><strong>🏠 Zuhause</strong></p>

@@ -3,6 +3,8 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { c1SpeakingMindMapExample } from "../data/speakingMindMaps/examples";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=1600&q=80";
@@ -124,6 +126,8 @@ const C1Day11EngagementUndEhrenamtWorkbookPage = () => {
               Menschen dazu motivieren?
             </strong>
           </p>
+          <SpeakingMindMap config={c1SpeakingMindMapExample} />
+
           <h3 style={sectionTitle}>Denkimpulse / Brainstorming</h3>
           <ul style={listSpacing}>
             <li>gesellschaftlicher Zusammenhalt</li>
