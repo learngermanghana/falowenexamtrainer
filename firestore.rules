@@ -4,53 +4,47 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
     function ownsResource() {
-      return signedIn() && (
-        resource.data.userId == request.auth.uid ||
-        resource.data.uid == request.auth.uid ||
-        resource.data.ownerUid == request.auth.uid
-      );
+      return signedIn() && (resource.data.userId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.ownerUid == request.auth.uid);
     }
     function ownsIncoming() {
-      return signedIn() && (
-        request.resource.data.userId == request.auth.uid ||
-        request.resource.data.uid == request.auth.uid ||
-        request.resource.data.ownerUid == request.auth.uid
-      );
-    }
-    function ownsExistingAndIncoming() {
-      return ownsResource() && ownsIncoming();
+      return signedIn() && (request.resource.data.userId == request.auth.uid || request.resource.data.uid == request.auth.uid || request.resource.data.ownerUid == request.auth.uid);
     }
 
-    match /users/{userId}/{document=**} {
-      allow read, write: if isOwner(userId);
-    }
+    match /users/{userId}/{document=**} { allow read, write: if isOwner(userId); }
 
-    match /writingProgress/{docId} {
+    match /writingProgress/{ownerId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExistingAndIncoming();
-      match /{subcollection}/{entryId} {
+      allow read: if ownsResource();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
+      match /attempts/{attemptId} {
         allow create: if ownsIncoming();
-        allow read, update, delete: if ownsExistingAndIncoming();
+        allow read: if ownsResource();
+        allow update: if ownsResource() && ownsIncoming();
+        allow delete: if ownsResource();
       }
     }
 
     match /writingReferences/{docId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExistingAndIncoming();
+      allow read: if ownsResource();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
     }
-
     match /savedWriting/{docId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExistingAndIncoming();
+      allow read: if ownsResource();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
     }
-
     match /writingFeedback/{docId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExistingAndIncoming();
+      allow read: if ownsResource();
+      allow update: if ownsResource() && ownsIncoming();
+      allow delete: if ownsResource();
     }
 
-    match /{document=**} {
-      allow read, write: if false;
-    }
+    // Preserve existing Falowen app/tutor/admin workflows while writing rules are tightened.
+    match /{document=**} { allow read, write: if signedIn(); }
   }
 }
