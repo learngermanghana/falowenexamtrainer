@@ -4,7 +4,7 @@ import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../
 import { styles } from "../styles";
 import { PrimaryActionBar, SectionHeader } from "./ui";
 
-const getInitials = (name = "Student") =>
+export const getClassMemberInitials = (name = "Student") =>
   String(name)
     .trim()
     .split(/\s+/)
@@ -13,13 +13,23 @@ const getInitials = (name = "Student") =>
     .map((part) => part[0]?.toUpperCase())
     .join("") || "S";
 
-const normaliseMember = (snapshot) => {
-  const data = snapshot.data() || {};
+export const normalisePublicClassMember = (snapshot) => {
+  const data = snapshot?.data?.() || {};
   return {
-    id: snapshot.id,
+    id: snapshot?.id || "",
     name: data.name || data.displayName || "Student",
     biography: data.biography || "",
   };
+};
+
+export const shouldShowClassMembersPreview = ({ embedded, className, level }) => {
+  const normalisedLevel = String(level || "").toUpperCase();
+  return Boolean(
+    embedded &&
+      className &&
+      normalisedLevel &&
+      !["B2", "C1"].includes(normalisedLevel),
+  );
 };
 
 const avatarStyle = (index) => ({
@@ -46,8 +56,7 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
 
   const className = studentProfile?.className || "";
   const level = String(studentProfile?.level || "").toUpperCase();
-  const isSelfLearning = ["B2", "C1"].includes(level);
-  const shouldShow = Boolean(embedded && className && level && !isSelfLearning);
+  const shouldShow = shouldShowClassMembersPreview({ embedded, className, level });
 
   const loadMembers = useCallback(async () => {
     if (!shouldShow) return;
@@ -67,7 +76,9 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
           where("className", "==", className),
         ),
       );
-      const nextMembers = result.docs.map(normaliseMember).sort((a, b) => a.name.localeCompare(b.name));
+      const nextMembers = result.docs
+        .map(normalisePublicClassMember)
+        .sort((a, b) => a.name.localeCompare(b.name));
       setMembers(nextMembers);
       setStatus("success");
     } catch (loadError) {
@@ -120,7 +131,7 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
           <div style={{ display: "flex", alignItems: "center", minHeight: 46 }} aria-label={`${members.length} class members`}>
             {previewMembers.map((member, index) => (
               <div key={member.id} style={avatarStyle(index)} title={member.name} aria-label={member.name}>
-                {getInitials(member.name)}
+                {getClassMemberInitials(member.name)}
               </div>
             ))}
             {remainingCount > 0 ? (
@@ -150,7 +161,7 @@ const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = fals
                   }}
                 >
                   <div style={{ ...avatarStyle(0), width: 38, height: 38, marginLeft: 0, borderWidth: 2 }} aria-hidden="true">
-                    {getInitials(member.name)}
+                    {getClassMemberInitials(member.name)}
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <strong>{member.name}</strong>
