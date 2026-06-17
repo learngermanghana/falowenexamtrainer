@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { collection, db, getDocs, isFirebaseConfigured, query, where } from "../firebase";
 import { styles } from "../styles";
 import { PrimaryActionBar, SectionHeader } from "./ui";
@@ -36,8 +37,10 @@ const avatarStyle = (index) => ({
   boxShadow: "0 6px 16px rgba(15, 23, 42, 0.12)",
 });
 
-const HomeClassPreviewCard = ({ studentProfile }) => {
+const HomeClassPreviewCard = ({ studentProfile: providedProfile, embedded = false }) => {
   const navigate = useNavigate();
+  const { studentProfile: authProfile } = useAuth();
+  const studentProfile = providedProfile || authProfile;
   const [members, setMembers] = useState([]);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
@@ -45,7 +48,7 @@ const HomeClassPreviewCard = ({ studentProfile }) => {
   const className = studentProfile?.className || "";
   const level = String(studentProfile?.level || "").toUpperCase();
   const isSelfLearning = ["B2", "C1"].includes(level);
-  const shouldShow = Boolean(className && level && !isSelfLearning);
+  const shouldShow = Boolean(embedded && className && level && !isSelfLearning);
 
   const loadMembers = useCallback(async () => {
     if (!shouldShow) return;
@@ -69,7 +72,7 @@ const HomeClassPreviewCard = ({ studentProfile }) => {
       setMembers(nextMembers);
       setStatus("success");
     } catch (loadError) {
-      console.error("Failed to load home class preview", loadError);
+      console.error("Failed to load class members preview", loadError);
       setMembers([]);
       setStatus("error");
       setError("Could not load your class right now.");
@@ -87,19 +90,21 @@ const HomeClassPreviewCard = ({ studentProfile }) => {
 
   return (
     <section
-      aria-label="Your class"
+      aria-label="Class members"
+      data-class-members-preview="live-class-access"
       style={{
-        ...styles.card,
         display: "grid",
         gap: 12,
         border: "1px solid #c7d2fe",
+        borderRadius: 14,
+        padding: 13,
         background: "linear-gradient(135deg, #ffffff, #eef2ff)",
       }}
     >
       <SectionHeader
         eyebrow="Your class"
-        title={className}
-        subtitle="Meet the classmates learning with you. Class communication now stays inside Falowen."
+        title="Class members"
+        subtitle={`Meet the classmates learning with you in ${className}.`}
         actions={
           <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3", borderColor: "#c7d2fe" }}>
             {status === "success" ? `${members.length} member${members.length === 1 ? "" : "s"}` : level}
@@ -128,12 +133,9 @@ const HomeClassPreviewCard = ({ studentProfile }) => {
         </div>
       ) : null}
 
-      <PrimaryActionBar align="start" wrap>
-        <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/discussion")}>
+      <PrimaryActionBar align="start">
+        <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/discussion?tab=members")}>
           View classmates
-        </button>
-        <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/discussion")}>
-          Open class discussion
         </button>
       </PrimaryActionBar>
     </section>
