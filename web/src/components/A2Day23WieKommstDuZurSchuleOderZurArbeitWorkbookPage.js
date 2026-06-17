@@ -11,6 +11,7 @@ const tabs = [
   { key: "teil2", label: "Teil 2 · Schreiben" },
   { key: "teil3", label: "Teil 3 · Lesen" },
   { key: "teil4", label: "Teil 4 · Hören" },
+  { key: "references", label: "5. Ref" },
 ];
 
 const cardStyle = {

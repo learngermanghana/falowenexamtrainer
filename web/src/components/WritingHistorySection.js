@@ -2,14 +2,17 @@ import React from "react";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 import { styles } from "../styles";
 
-export const buildWritingHistoryRecord = ({ userId, studentCode, level, workbookId, taskId, taskTitle, text, data, context }) => {
+export const buildWritingHistoryRecord = ({ userId, studentCode, level, day, lessonId, workbookId, taskId, taskTitle, text, data, context }) => {
   const now = new Date().toISOString();
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     studentId: studentCode || userId || "",
+    userId: userId || "",
     courseLevel: level || data?.level || "",
-    workbookId: workbookId || context || "writing-room",
-    lessonId: workbookId || context || "writing-room",
+    level: level || data?.level || "",
+    day: day || data?.day || null,
+    lessonId: lessonId || data?.lessonId || workbookId || context || "writing-room",
+    workbookId: workbookId || data?.workbookId || context || "writing-room",
     writingTaskId: taskId || "custom",
     taskTitle: taskTitle || "Custom writing task",
     originalLetter: text,

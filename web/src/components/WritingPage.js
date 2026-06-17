@@ -345,7 +345,7 @@ const SpecialCharacterRow = ({ onInsert, label = "Quick umlaut keys" }) => (
   </div>
 );
 
-const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
+const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null, hideTabList = false, writingContext = {} }) => {
   const {
     level,
     setLevel,
@@ -602,8 +602,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       tabs.push({ key: "tutor", label: "Tutor feedback" });
     }
 
-    return tabs;
-  }, [canUseFormsPractice, canUsePracticeLetters, canUseTutorFeedback, isCourseMode]);
+    const allowed = Array.isArray(enabledTabs) && enabledTabs.length ? new Set(enabledTabs) : null;
+    return allowed ? tabs.filter((tab) => allowed.has(tab.key)) : tabs;
+  }, [canUseFormsPractice, canUsePracticeLetters, canUseTutorFeedback, enabledTabs, isCourseMode]);
   const visibleTabs = useMemo(() => {
     if (!isTutorOnlyView) {
       return availableTabs;
@@ -847,6 +848,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           writingHistory,
           completionLog,
           errorBank,
+          writingContext,
         },
       };
 
@@ -862,6 +864,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           referenceNotes,
           selectedReferenceNoteId,
           referenceSearch,
+          writingContext,
         },
       }).catch((err) => {
         console.error("Failed to sync reference notes across writing modes", err);
@@ -900,6 +903,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     workflowComplete,
     userId,
     studentCode,
+    writingContext,
   ]);
 
   const addReferenceNote = () => {
@@ -1278,9 +1282,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           userId,
           studentCode,
           level,
-          workbookId: isCourseMode ? "course-writing" : "exam-writing",
-          taskId: selectedLetterId || "custom",
-          taskTitle: selectedLetter?.letter || selectedLetter?.title || "Custom prompt",
+          day: writingContext?.day || null,
+          lessonId: writingContext?.lessonId || selectedLetter?.lessonId || selectedLetterId || (isExamMode ? "exam-room" : "course-writing-custom"),
+          workbookId: writingContext?.workbookId || selectedLetter?.workbookId || selectedLetterId || (isExamMode ? "exam-writing" : "course-writing-custom"),
+          taskId: writingContext?.writingTaskId || selectedLetterId || "custom",
+          taskTitle: writingContext?.taskTitle || selectedLetter?.letter || selectedLetter?.title || "Custom prompt",
           text: trimmed,
           data: { ...data, score: data?.score ?? overallScore, maxScore: data?.maxScore ?? 12 },
           context: isExamMode ? "exam-room" : "course",
@@ -1728,7 +1734,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           {isTutorOnlyView
             ? "View tutor comments and reply from here."
             : isCourseMode
-              ? "For Days 1–19, build consistency by writing and analysing one section at a time. From Day 20, write and mark one complete essay."
+              ? "For Days 1–19, build consistency by writing and analysing one section at a time. From Day 21, write and mark one complete essay."
               : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
@@ -1739,17 +1745,17 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 ? (
                   <>
                     Course-book mode is for short, level-based text analysis and references. If you need help understanding
-                    a question, ask <strong>Study Buddy</strong>. From Day 20, open the <a href="/exams/writing">Writing exam room</a> to mark a full essay.
+                    a question, ask <strong>Study Buddy</strong>. From Day 21, open the <a href="/exams/writing">Writing exam room</a> to mark a full essay.
                   </>
                 )
                 : (
                   <>
-                    From Day 20, use <strong>Mark my letter</strong> for one complete essay. Use Study Buddy if a question is unclear.
+                    From Day 21, use <strong>Mark my letter</strong> for one complete essay. Use Study Buddy if a question is unclear.
                   </>
                 )}
           </p>
         </div>
-        <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
+        {!hideTabList && <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
           {visibleTabs.map((tab) => (
             <button
               key={tab.key}
@@ -1973,7 +1979,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             <p style={styles.helperText}>
               {isCourseMode
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
-                : "From Day 20, write one complete essay, get full feedback, and save one revised version."}
+                : "From Day 21, write one complete essay, get full feedback, and save one revised version."}
             </p>
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

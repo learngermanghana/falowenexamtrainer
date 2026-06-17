@@ -11,6 +11,7 @@ const tabs = [
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Lesen" },
+  { key: "references", label: "5. Ref" },
 ];
 
 const speakingBranches = [

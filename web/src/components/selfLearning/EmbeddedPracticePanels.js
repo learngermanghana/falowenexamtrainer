@@ -5,6 +5,8 @@ import WritingPage from "../WritingPage";
 import { useAuth } from "../../context/AuthContext";
 import { loadWritingProgress, saveWritingProgress } from "../../services/writingProgressService";
 import { markLetterWithAI } from "../../services/coachService";
+import WritingFeedbackCard from "../WritingFeedbackCard";
+import { normalizeWritingFeedback } from "../../lib/writingFeedbackNormalizer";
 import c1Day2QuestionWritingBuilder from "../../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
 import { getC1OpinionWritingTip } from "../../data/writingQuestionBuilders/c1OpinionWritingTips";
 import {
@@ -53,7 +55,7 @@ const secondaryButton = {
 function GuidedDraftAnalysisPanel({ text, level }) {
   const { user, idToken, studentProfile } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState(null);
   const [error, setError] = useState("");
   const wordCount = countWords(text);
 
@@ -65,7 +67,7 @@ function GuidedDraftAnalysisPanel({ text, level }) {
     }
 
     setLoading(true);
-    setFeedback("");
+    setFeedback(null);
     setError("");
 
     try {
@@ -78,7 +80,12 @@ function GuidedDraftAnalysisPanel({ text, level }) {
         submissionContext: "course-guided-writing-analysis",
         promptType: "argument",
       });
-      setFeedback(data?.feedback || data?.structuredFeedback?.summary || "Analysis completed.");
+      const normalized = normalizeWritingFeedback(data?.structuredFeedback || data?.feedback);
+      if (normalized.parseError) {
+        setError("Falowen could not read the AI analysis safely. Please retry; your draft is still here.");
+        return;
+      }
+      setFeedback(normalized);
     } catch (analysisError) {
       setError(
         analysisError?.response?.data?.error ||
@@ -114,7 +121,7 @@ function GuidedDraftAnalysisPanel({ text, level }) {
       </div>
 
       <div style={{ padding: 10, borderRadius: 12, border: "1px solid #fde68a", background: "#fffbeb", lineHeight: 1.6 }}>
-        This is guided feedback, not full-essay marking. <strong>Mark My Letter begins from Day 20.</strong>
+        This is guided feedback, not full-essay marking. <strong>Mark My Letter begins from Day 21.</strong>
       </div>
 
       <button type="button" style={{ ...primaryButton, justifySelf: "start" }} onClick={analyseDraft} disabled={loading || !text?.trim()}>
@@ -125,7 +132,7 @@ function GuidedDraftAnalysisPanel({ text, level }) {
       {feedback ? (
         <div style={{ border: "1px solid #bbf7d0", borderRadius: 14, padding: 14, background: "#f0fdf4", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
           <strong style={{ display: "block", marginBottom: 6 }}>Your level-based analysis</strong>
-          {feedback}
+          <WritingFeedbackCard level={level} structuredFeedback={feedback} />
         </div>
       ) : null}
     </div>
@@ -290,7 +297,7 @@ function GuidedQuestionWritingBuilder({ config, storageKey, cloudField }) {
         </span>
         <h3 style={{ margin: 0 }}>Answer five questions and build the text</h3>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-          Work on one focused part at a time. You are learning how to develop a strong text; a separate conclusion and full-essay demand begin from Day 20.
+          Work on one focused part at a time. You are learning how to develop a strong text; a separate conclusion and full-essay demand begin from Day 21.
         </p>
         <small style={{ color: cloudSaveStatus === "error" ? "#b91c1c" : "#166534", fontWeight: 800 }}>{saveLabel}</small>
       </div>
