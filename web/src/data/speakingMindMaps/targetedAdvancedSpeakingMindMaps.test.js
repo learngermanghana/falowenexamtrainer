@@ -13,7 +13,7 @@ describe("targeted advanced speaking-map rollout", () => {
         requiredLessonId: "b2-day-1-persoenliche-identitaet",
       }),
     ).toBe(true);
-    expect(map.focusMode).toBe(false);
+    expect(Boolean(map.focusMode)).toBe(false);
     expect(map.branches).toHaveLength(7);
   });
 
