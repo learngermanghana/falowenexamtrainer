@@ -33,6 +33,14 @@ service cloud.firestore {
       );
     }
 
+    function ownershipFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'userId',
+        'uid',
+        'ownerUid'
+      ]);
+    }
+
     match /users/{userId}/{document=**} {
       allow read: if isOwner(userId) || isStaff();
       allow create, update, delete: if isOwner(userId);
@@ -41,13 +49,13 @@ service cloud.firestore {
     match /writingProgress/{progressId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
-      allow update: if ownsResource() && ownsIncoming();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
       allow delete: if ownsResource();
 
       match /attempts/{attemptId} {
         allow create: if ownsIncoming();
         allow read: if ownsResource() || isStaff();
-        allow update: if ownsResource() && ownsIncoming();
+        allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
         allow delete: if ownsResource();
       }
     }
@@ -55,21 +63,21 @@ service cloud.firestore {
     match /writingReferences/{docId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
-      allow update: if ownsResource() && ownsIncoming();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
       allow delete: if ownsResource();
     }
 
     match /savedWriting/{docId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
-      allow update: if ownsResource() && ownsIncoming();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
       allow delete: if ownsResource();
     }
 
     match /writingFeedback/{docId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
-      allow update: if ownsResource() && ownsIncoming();
+      allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
       allow delete: if ownsResource();
     }
 

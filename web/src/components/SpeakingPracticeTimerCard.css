@@ -1,0 +1,52 @@
+.speaking-compact-timer {
+  order: -1;
+  justify-self: end;
+  align-self: start;
+  width: fit-content;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px 5px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.speaking-compact-timer__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.speaking-compact-timer__time {
+  min-width: 52px;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.speaking-compact-timer__button {
+  min-height: 30px !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  line-height: 1 !important;
+}
+
+.speaking-compact-timer__button--primary {
+  min-width: 58px;
+}
+
+@media (max-width: 640px) {
+  .speaking-compact-timer {
+    justify-self: stretch;
+    width: auto;
+    justify-content: space-between;
+  }
+
+  .speaking-compact-timer__time {
+    margin-right: auto;
+  }
+}
