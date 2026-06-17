@@ -1,13 +1,28 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import ResultHistory from "./ResultHistory";
-import { fetchIdeasFromCoach, fetchWritingLetters, markLetterWithAI } from "../services/coachService";
+import {
+  fetchIdeasFromCoach,
+  fetchWritingLetters,
+  markLetterWithAI,
+} from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
-import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
+import {
+  loadWritingAttempts,
+  loadWritingProgress,
+  saveWritingAttempt,
+  saveWritingProgress,
+} from "../services/writingProgressService";
 import {
   isTutorReviewCloudEnabled,
   subscribeTutorReviewsForStudent,
@@ -16,9 +31,14 @@ import {
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import WritingFeedbackCard from "./WritingFeedbackCard";
-import WritingHistorySection, { buildWritingHistoryRecord } from "./WritingHistorySection";
-import WritingReferenceLibrary from "./WritingReferenceLibrary";
-import { makeReferenceId, normalizeReferenceNotes } from "../lib/writingReferenceLibrary";
+import WritingHistorySection, {
+  buildWritingHistoryRecord,
+} from "./WritingHistorySection";
+import WritingLibraryTab from "./WritingLibraryTab";
+import {
+  makeReferenceId,
+  normalizeReferenceNotes,
+} from "../lib/writingReferenceLibrary";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -58,7 +78,13 @@ const IDEAS_COACHING_PROMPTS = [
 ];
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
-const IMPORTANT_PHRASE_COLORS = ["#1d4ed8", "#7c3aed", "#be123c", "#0f766e", "#b45309"];
+const IMPORTANT_PHRASE_COLORS = [
+  "#1d4ed8",
+  "#7c3aed",
+  "#be123c",
+  "#0f766e",
+  "#b45309",
+];
 
 const RUBRIC_CRITERIA = [
   {
@@ -69,12 +95,27 @@ const RUBRIC_CRITERIA = [
   {
     key: "coherence",
     label: "Coherence",
-    keywords: ["coherence", "structure", "flow", "connector", "paragraph", "order"],
+    keywords: [
+      "coherence",
+      "structure",
+      "flow",
+      "connector",
+      "paragraph",
+      "order",
+    ],
   },
   {
     key: "grammar",
     label: "Grammar & accuracy",
-    keywords: ["grammar", "spelling", "case", "verb", "tense", "word order", "article"],
+    keywords: [
+      "grammar",
+      "spelling",
+      "case",
+      "verb",
+      "tense",
+      "word order",
+      "article",
+    ],
   },
 ];
 
@@ -92,8 +133,7 @@ const A1_FORM_PRACTICE_TASKS = [
     title: "Anmeldung für einen Familienausflug",
     context:
       "Deine Freundin Ana reist mit ihrem Mann und zwei Kindern (7 und 10 Jahre). Sie möchte eine Busfahrt am Sonntag rund um ein Seengebiet buchen und kann nur bar bezahlen.",
-    prompt:
-      "Ergänze die fehlenden Informationen im Anmeldeformular.",
+    prompt: "Ergänze die fehlenden Informationen im Anmeldeformular.",
     formFields: [
       { label: "Nachname, Vorname", value: "Neto, Ana (Beispiel)" },
       { label: "Anzahl Personen", value: "(1)" },
@@ -107,8 +147,17 @@ const A1_FORM_PRACTICE_TASKS = [
       { label: "Unterschrift", value: "Ana Neto" },
     ],
     answers: [
-      { blank: "(1)", answer: "4 / vier", explanation: "Ana, ihr Mann und zwei Kinder sind zusammen vier Personen." },
-      { blank: "(2)", answer: "2 / zwei", explanation: "Zwei Reisende sind Kinder." },
+      {
+        blank: "(1)",
+        answer: "4 / vier",
+        explanation:
+          "Ana, ihr Mann und zwei Kinder sind zusammen vier Personen.",
+      },
+      {
+        blank: "(2)",
+        answer: "2 / zwei",
+        explanation: "Zwei Reisende sind Kinder.",
+      },
       {
         blank: "(3)",
         answer: "Seedorf",
@@ -141,15 +190,31 @@ const A1_FORM_PRACTICE_TASKS = [
       { label: "Anreisetag", value: "(5)" },
     ],
     answers: [
-      { blank: "(1)", answer: "3 / drei", explanation: "Karim und zwei Geschwister sind drei Teilnehmende." },
-      { blank: "(2)", answer: "2 / zwei", explanation: "Die Schwester und der Bruder sind beide unter 14 Jahren." },
-      { blank: "(3)", answer: "München", explanation: "Ihr Aufenthaltsort ist München." },
+      {
+        blank: "(1)",
+        answer: "3 / drei",
+        explanation: "Karim und zwei Geschwister sind drei Teilnehmende.",
+      },
+      {
+        blank: "(2)",
+        answer: "2 / zwei",
+        explanation: "Die Schwester und der Bruder sind beide unter 14 Jahren.",
+      },
+      {
+        blank: "(3)",
+        answer: "München",
+        explanation: "Ihr Aufenthaltsort ist München.",
+      },
       {
         blank: "(4)",
         answer: "cash / bar",
         explanation: "Die alternative Zahlungsart im Formular ist Barzahlung.",
       },
-      { blank: "(5)", answer: "Monday / Montag", explanation: "Im Kontext steht, dass sie am Montag ankommen." },
+      {
+        blank: "(5)",
+        answer: "Monday / Montag",
+        explanation: "Im Kontext steht, dass sie am Montag ankommen.",
+      },
     ],
   },
 ];
@@ -163,7 +228,7 @@ const mapExamPromptsToLetters = (prompts) =>
       durationMinutes: DEFAULT_EXAM_TIMINGS[level] || 20,
       situation: item.Thema,
       whatToInclude: item.Punkte || [],
-    }))
+    })),
   );
 
 const splitSentences = (text = "") => {
@@ -179,14 +244,20 @@ const countWords = (value = "") => {
   return trimmed.split(/\s+/).length;
 };
 
-const summarizeDraftChanges = (firstDraft = "", revisedDraft = "", level = "A1") => {
+const summarizeDraftChanges = (
+  firstDraft = "",
+  revisedDraft = "",
+  level = "A1",
+) => {
   const firstWords = countWords(firstDraft);
   const revisedWords = countWords(revisedDraft);
   const delta = revisedWords - firstWords;
   const changed = firstDraft.trim() !== revisedDraft.trim();
   const connectors = CONNECTORS_BY_LEVEL[level] || [];
   const lower = revisedDraft.toLowerCase();
-  const usedConnector = connectors.some((item) => lower.includes(item.toLowerCase()));
+  const usedConnector = connectors.some((item) =>
+    lower.includes(item.toLowerCase()),
+  );
 
   return {
     firstWords,
@@ -227,8 +298,14 @@ const scoreFromFeedback = (feedback) => {
     "problem",
   ];
   const lower = feedback.toLowerCase();
-  const posHits = positive.reduce((count, word) => count + (lower.includes(word) ? 1 : 0), 0);
-  const negHits = negative.reduce((count, word) => count + (lower.includes(word) ? 1 : 0), 0);
+  const posHits = positive.reduce(
+    (count, word) => count + (lower.includes(word) ? 1 : 0),
+    0,
+  );
+  const negHits = negative.reduce(
+    (count, word) => count + (lower.includes(word) ? 1 : 0),
+    0,
+  );
   const base = 3 + posHits - negHits;
   return Math.min(5, Math.max(1, base));
 };
@@ -246,7 +323,9 @@ const buildRubricBreakdown = (feedback) => {
   return RUBRIC_CRITERIA.map((item) => {
     const match =
       sentences.find((sentence) =>
-        item.keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+        item.keywords.some((keyword) =>
+          sentence.toLowerCase().includes(keyword),
+        ),
       ) || feedback;
     return {
       ...item,
@@ -261,18 +340,31 @@ const derivePromptMeta = (task) => {
   const label = (task.letter || "").toLowerCase();
   const situation = (task.situation || "").toLowerCase();
   let type = "letter";
-  if (label.includes("e-mail") || label.includes("email") || tags.includes("email")) {
+  if (
+    label.includes("e-mail") ||
+    label.includes("email") ||
+    tags.includes("email")
+  ) {
     type = "email";
-  } else if (label.includes("meinung") || label.includes("opinion") || tags.includes("article")) {
+  } else if (
+    label.includes("meinung") ||
+    label.includes("opinion") ||
+    tags.includes("article")
+  ) {
     type = "argument";
   } else if (tags.includes("note")) {
     type = "note";
   }
 
   let formality = "neutral";
-  if (tags.some((tag) => tag.includes("formal")) || situation.includes("rathaus")) {
+  if (
+    tags.some((tag) => tag.includes("formal")) ||
+    situation.includes("rathaus")
+  ) {
     formality = "formal";
-  } else if (tags.some((tag) => ["birthday", "invitation", "note"].includes(tag))) {
+  } else if (
+    tags.some((tag) => ["birthday", "invitation", "note"].includes(tag))
+  ) {
     formality = "informal";
   }
 
@@ -283,12 +375,20 @@ const derivePromptMeta = (task) => {
 const extractErrorBank = (feedback) => {
   if (!feedback) return [];
   const sentences = splitSentences(feedback);
-  const keywords = ["error", "incorrect", "wrong", "fix", "grammar", "spelling", "case", "word order"];
+  const keywords = [
+    "error",
+    "incorrect",
+    "wrong",
+    "fix",
+    "grammar",
+    "spelling",
+    "case",
+    "word order",
+  ];
   return sentences.filter((sentence) =>
-    keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+    keywords.some((keyword) => sentence.toLowerCase().includes(keyword)),
   );
 };
-
 
 const WordCountMeter = ({ count, range }) => {
   if (!range) return null;
@@ -345,7 +445,15 @@ const SpecialCharacterRow = ({ onInsert, label = "Quick umlaut keys" }) => (
   </div>
 );
 
-const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null, hideTabList = false, writingContext = {} }) => {
+const WritingPage = ({
+  mode = "course",
+  initialTab = "mark",
+  enabledTabs = null,
+  hideTabList = false,
+  markLabel,
+  submitLabel,
+  writingContext = {},
+}) => {
   const {
     level,
     setLevel,
@@ -360,19 +468,22 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
   const { showToast } = useToast();
   const userId = user?.uid;
   const studentCode =
-    studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
+    studentProfile?.studentCode ||
+    studentProfile?.studentcode ||
+    user?.uid ||
+    "";
   const isExamMode = mode === "exam";
   const isCourseMode = mode === "course";
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   const examWritingLetters = useMemo(
     () => mapExamPromptsToLetters(WRITING_PROMPTS),
-    []
+    [],
   );
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [writingTasks, setWritingTasks] = useState(() =>
-    isExamMode ? examWritingLetters : courseWritingLetters
+    isExamMode ? examWritingLetters : courseWritingLetters,
   );
   const [writingTasksLoading, setWritingTasksLoading] = useState(!isExamMode);
   const [writingTasksError, setWritingTasksError] = useState("");
@@ -412,19 +523,31 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
   const [improvedRubric, setImprovedRubric] = useState(null);
   const [improvedCorrections, setImprovedCorrections] = useState([]);
   const [improvedSimpleFeedback, setImprovedSimpleFeedback] = useState(null);
-  const [improvedStructuredFeedback, setImprovedStructuredFeedback] = useState(null);
+  const [improvedStructuredFeedback, setImprovedStructuredFeedback] =
+    useState(null);
   const [improvedLoading, setImprovedLoading] = useState(false);
-  const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
+  const [tutorSaveState, setTutorSaveState] = useState({
+    loading: false,
+    success: "",
+    error: "",
+  });
   const [tutorReviews, setTutorReviews] = useState([]);
   const [selectedTutorReviewId, setSelectedTutorReviewId] = useState("");
   const [studentReplyText, setStudentReplyText] = useState("");
-  const [studentReplyState, setStudentReplyState] = useState({ loading: false, success: "", error: "" });
+  const [studentReplyState, setStudentReplyState] = useState({
+    loading: false,
+    success: "",
+    error: "",
+  });
   const latestTutorReview = useMemo(
-    () => tutorReviews.find((review) => review.id === selectedTutorReviewId) || tutorReviews[0] || null,
-    [selectedTutorReviewId, tutorReviews]
+    () =>
+      tutorReviews.find((review) => review.id === selectedTutorReviewId) ||
+      tutorReviews[0] ||
+      null,
+    [selectedTutorReviewId, tutorReviews],
   );
   const [rubricBreakdown, setRubricBreakdown] = useState(() =>
-    buildRubricBreakdown("")
+    buildRubricBreakdown(""),
   );
   const [draftHistory, setDraftHistory] = useState([]);
   const [writingHistory, setWritingHistory] = useState([]);
@@ -446,10 +569,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
   }, [isExamMode, level, writingTasks]);
   const selectedLetter = useMemo(
     () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
-    [selectedLetterId, visibleWritingTasks]
+    [selectedLetterId, visibleWritingTasks],
   );
   const pinnedIdeaQuestion = useMemo(() => {
-    const firstUserMessage = chatMessages.find((message) => message.role === "user");
+    const firstUserMessage = chatMessages.find(
+      (message) => message.role === "user",
+    );
     return firstUserMessage?.content || "";
   }, [chatMessages]);
 
@@ -458,9 +583,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     () =>
       referenceNotes.filter((note) => {
         if (!normalizedReferenceSearch) return true;
-        return `${note.topic} ${note.body}`.toLowerCase().includes(normalizedReferenceSearch);
+        return `${note.topic} ${note.body}`
+          .toLowerCase()
+          .includes(normalizedReferenceSearch);
       }),
-    [normalizedReferenceSearch, referenceNotes]
+    [normalizedReferenceSearch, referenceNotes],
   );
   const selectedReferenceNote = useMemo(
     () =>
@@ -468,10 +595,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       filteredReferenceNotes[0] ||
       referenceNotes[0] ||
       null,
-    [filteredReferenceNotes, referenceNotes, selectedReferenceNoteId]
+    [filteredReferenceNotes, referenceNotes, selectedReferenceNoteId],
   );
   const [remainingSeconds, setRemainingSeconds] = useState(
-    (selectedLetter?.durationMinutes || 0) * 60
+    (selectedLetter?.durationMinutes || 0) * 60,
   );
   const [timerRunning, setTimerRunning] = useState(false);
   const chatLogRef = useRef(null);
@@ -484,7 +611,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     setter((previousValue) => {
       const currentValue = String(previousValue || "");
       const inputElement = fieldRef?.current;
-      const hasCursor = inputElement && typeof inputElement.selectionStart === "number";
+      const hasCursor =
+        inputElement && typeof inputElement.selectionStart === "number";
 
       if (!hasCursor) return `${currentValue}${character}`;
 
@@ -496,8 +624,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     window.requestAnimationFrame(() => {
       const inputElement = fieldRef?.current;
       if (!inputElement) return;
-      const start = typeof inputElement.selectionStart === "number" ? inputElement.selectionStart : inputElement.value.length;
-      const end = typeof inputElement.selectionEnd === "number" ? inputElement.selectionEnd : inputElement.value.length;
+      const start =
+        typeof inputElement.selectionStart === "number"
+          ? inputElement.selectionStart
+          : inputElement.value.length;
+      const end =
+        typeof inputElement.selectionEnd === "number"
+          ? inputElement.selectionEnd
+          : inputElement.value.length;
       const cursorPosition = Math.max(start, end) + character.length;
       inputElement.focus();
       inputElement.setSelectionRange(cursorPosition, cursorPosition);
@@ -555,7 +689,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
 
   const handleResetWorkspace = () => {
     const confirmed = window.confirm(
-      "Start fresh? This will clear your draft, AI feedback, and ideas chat history for this writing mode."
+      "Start fresh? This will clear your draft, AI feedback, and ideas chat history for this writing mode.",
     );
 
     if (!confirmed) return;
@@ -571,7 +705,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     }
 
     const fuzzyMatch = ALLOWED_LEVELS.find((allowed) =>
-      normalized.startsWith(allowed)
+      normalized.startsWith(allowed),
     );
 
     return fuzzyMatch || "";
@@ -587,7 +721,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
   const isTutorOnlyView = initialTab === "tutor" && canUseTutorFeedback;
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
-    const tabs = [{ key: "mark", label: isCourseMode ? "Analyse my text" : "Mark my letter" }];
+    const tabs = [
+      {
+        key: "mark",
+        label:
+          markLabel || (isCourseMode ? "Analyse my text" : "Mark my letter"),
+      },
+    ];
     tabs.push({ key: "references", label: "References (notes)" });
 
     if (canUsePracticeLetters) {
@@ -602,9 +742,19 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       tabs.push({ key: "tutor", label: "Tutor feedback" });
     }
 
-    const allowed = Array.isArray(enabledTabs) && enabledTabs.length ? new Set(enabledTabs) : null;
+    const allowed =
+      Array.isArray(enabledTabs) && enabledTabs.length
+        ? new Set(enabledTabs)
+        : null;
     return allowed ? tabs.filter((tab) => allowed.has(tab.key)) : tabs;
-  }, [canUseFormsPractice, canUsePracticeLetters, canUseTutorFeedback, enabledTabs, isCourseMode]);
+  }, [
+    canUseFormsPractice,
+    canUsePracticeLetters,
+    canUseTutorFeedback,
+    enabledTabs,
+    isCourseMode,
+    markLabel,
+  ]);
   const visibleTabs = useMemo(() => {
     if (!isTutorOnlyView) {
       return availableTabs;
@@ -648,14 +798,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       } else {
         setWritingTasks(courseWritingLetters);
         setWritingTasksError(
-          "No writing tasks found in the sheet – showing sample prompts instead."
+          "No writing tasks found in the sheet – showing sample prompts instead.",
         );
       }
     } catch (err) {
       console.error("Failed to load writing tasks", err);
       setWritingTasks(courseWritingLetters);
       setWritingTasksError(
-        "Could not load writing tasks. Showing local example data."
+        "Could not load writing tasks. Showing local example data.",
       );
     } finally {
       setWritingTasksLoading(false);
@@ -722,7 +872,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       try {
         const [saved, alternateSaved] = await Promise.all([
           loadWritingProgress({ userId, studentCode, mode: progressMode }),
-          loadWritingProgress({ userId, studentCode, mode: alternateProgressMode }),
+          loadWritingProgress({
+            userId,
+            studentCode,
+            mode: alternateProgressMode,
+          }),
         ]);
         if (!isMounted) return;
 
@@ -731,15 +885,28 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           return;
         }
 
-        if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
-        if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
-        if (saved.markStructuredFeedback && typeof saved.markStructuredFeedback === "object") setMarkStructuredFeedback(saved.markStructuredFeedback);
-        if (typeof saved.firstDraftSnapshot === "string") setFirstDraftSnapshot(saved.firstDraftSnapshot);
-        if (typeof saved.reflectionText === "string") setReflectionText(saved.reflectionText);
-        if (typeof saved.revisedDraftText === "string") setRevisedDraftText(saved.revisedDraftText);
-        if (typeof saved.workflowComplete === "boolean") setWorkflowComplete(saved.workflowComplete);
+        if (typeof saved.typedAnswer === "string")
+          setTypedAnswer(saved.typedAnswer);
+        if (typeof saved.markFeedback === "string")
+          setMarkFeedback(saved.markFeedback);
+        if (
+          saved.markStructuredFeedback &&
+          typeof saved.markStructuredFeedback === "object"
+        )
+          setMarkStructuredFeedback(saved.markStructuredFeedback);
+        if (typeof saved.firstDraftSnapshot === "string")
+          setFirstDraftSnapshot(saved.firstDraftSnapshot);
+        if (typeof saved.reflectionText === "string")
+          setReflectionText(saved.reflectionText);
+        if (typeof saved.revisedDraftText === "string")
+          setRevisedDraftText(saved.revisedDraftText);
+        if (typeof saved.workflowComplete === "boolean")
+          setWorkflowComplete(saved.workflowComplete);
         if (typeof saved.ideaInput === "string") setIdeaInput(saved.ideaInput);
-        if (Array.isArray(saved.chatMessages) && saved.chatMessages.length > 0) {
+        if (
+          Array.isArray(saved.chatMessages) &&
+          saved.chatMessages.length > 0
+        ) {
           setChatMessages(saved.chatMessages);
         } else {
           setChatMessages([IDEA_COACH_INTRO]);
@@ -754,38 +921,59 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
         } else {
           setHiddenDraftIds([]);
         }
-        if (saved.editableDraftById && typeof saved.editableDraftById === "object") {
+        if (
+          saved.editableDraftById &&
+          typeof saved.editableDraftById === "object"
+        ) {
           setEditableDraftById(saved.editableDraftById);
         } else {
           setEditableDraftById({});
         }
-        if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
-        if (typeof saved.referenceTopicInput === "string") setReferenceTopicInput(saved.referenceTopicInput);
-        if (typeof saved.referenceBodyInput === "string") setReferenceBodyInput(saved.referenceBodyInput);
-        if (typeof saved.referenceInput === "string") setReferenceBodyInput(saved.referenceInput);
+        if (typeof saved.ideaDraftWorkspace === "string")
+          setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
+        if (typeof saved.referenceTopicInput === "string")
+          setReferenceTopicInput(saved.referenceTopicInput);
+        if (typeof saved.referenceBodyInput === "string")
+          setReferenceBodyInput(saved.referenceBodyInput);
+        if (typeof saved.referenceInput === "string")
+          setReferenceBodyInput(saved.referenceInput);
         const currentModeNotes = normalizeReferenceNotes(saved.referenceNotes);
-        const alternateModeNotes = normalizeReferenceNotes(alternateSaved?.referenceNotes);
-        const mergedReferenceNotes = [...currentModeNotes, ...alternateModeNotes].filter(
+        const alternateModeNotes = normalizeReferenceNotes(
+          alternateSaved?.referenceNotes,
+        );
+        const mergedReferenceNotes = [
+          ...currentModeNotes,
+          ...alternateModeNotes,
+        ].filter(
           (note, index, list) =>
-            list.findIndex((candidate) => candidate.topic.toLowerCase() === note.topic.toLowerCase()) === index
+            list.findIndex(
+              (candidate) =>
+                candidate.topic.toLowerCase() === note.topic.toLowerCase(),
+            ) === index,
         );
         setReferenceNotes(mergedReferenceNotes);
         if (
           typeof saved.selectedReferenceNoteId === "string" &&
-          mergedReferenceNotes.some((item) => item.id === saved.selectedReferenceNoteId)
+          mergedReferenceNotes.some(
+            (item) => item.id === saved.selectedReferenceNoteId,
+          )
         ) {
           setSelectedReferenceNoteId(saved.selectedReferenceNoteId);
         } else {
           setSelectedReferenceNoteId(mergedReferenceNotes[0]?.id || "");
         }
-        if (typeof saved.referenceSearch === "string") setReferenceSearch(saved.referenceSearch);
+        if (typeof saved.referenceSearch === "string")
+          setReferenceSearch(saved.referenceSearch);
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
         if (typeof saved.timerRunning === "boolean") {
           setTimerRunning(saved.timerRunning);
         }
-        if (Array.isArray(saved.rubricBreakdown) && saved.rubricBreakdown.length) {
+        if (
+          Array.isArray(saved.rubricBreakdown) &&
+          saved.rubricBreakdown.length
+        ) {
           setRubricBreakdown(saved.rubricBreakdown);
         }
         if (Array.isArray(saved.draftHistory)) {
@@ -794,6 +982,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
         if (Array.isArray(saved.writingHistory)) {
           setWritingHistory(saved.writingHistory);
         }
+        loadWritingAttempts({ userId, studentCode, mode: progressMode }).then(
+          (attempts) => {
+            if (attempts.length)
+              setWritingHistory((existing) => [
+                ...attempts.reverse(),
+                ...existing,
+              ]);
+          },
+        );
         if (Array.isArray(saved.completionLog)) {
           setCompletionLog(saved.completionLog);
         }
@@ -812,7 +1009,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     return () => {
       isMounted = false;
     };
-  }, [alternateProgressMode, progressMode, resetWritingWorkspace, studentCode, userId]);
+  }, [
+    alternateProgressMode,
+    progressMode,
+    resetWritingWorkspace,
+    studentCode,
+    userId,
+  ]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
@@ -845,7 +1048,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           timerRunning,
           rubricBreakdown,
           draftHistory,
-          writingHistory,
           completionLog,
           errorBank,
           writingContext,
@@ -867,7 +1069,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           writingContext,
         },
       }).catch((err) => {
-        console.error("Failed to sync reference notes across writing modes", err);
+        console.error(
+          "Failed to sync reference notes across writing modes",
+          err,
+        );
       });
     }, 800);
 
@@ -916,7 +1121,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       return;
     }
 
-    const alreadyExists = referenceNotes.some((note) => note.topic.toLowerCase() === topic.toLowerCase());
+    const alreadyExists = referenceNotes.some(
+      (note) => note.topic.toLowerCase() === topic.toLowerCase(),
+    );
     if (alreadyExists) {
       setIdeaSuccess("That topic is already saved in your references.");
       setIdeaError("");
@@ -935,7 +1142,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     setReferenceTopicInput("");
     setReferenceBodyInput("");
     setIdeaError("");
-    setIdeaSuccess("Reference saved. Open the topic to study the body on its own page.");
+    setIdeaSuccess(
+      "Reference saved. Open the topic to study the body on its own page.",
+    );
   };
 
   const startEditingReferenceNote = (note) => {
@@ -964,7 +1173,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     }
 
     const alreadyExists = referenceNotes.some(
-      (note) => note.id !== originalNote.id && note.topic.toLowerCase() === topic.toLowerCase()
+      (note) =>
+        note.id !== originalNote.id &&
+        note.topic.toLowerCase() === topic.toLowerCase(),
     );
 
     if (alreadyExists) {
@@ -982,8 +1193,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               body,
               updatedAt: new Date().toISOString(),
             }
-          : note
-      )
+          : note,
+      ),
     );
     setSelectedReferenceNoteId(originalNote.id);
     setEditingReferenceNoteId(null);
@@ -1074,7 +1285,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     const stats = { approved: 0, pending: 0, needsRevision: 0 };
     tutorReviews.forEach((review) => {
       if (review?.reviewStatus === "approved") stats.approved += 1;
-      else if (review?.reviewStatus === "needs_improvement") stats.needsRevision += 1;
+      else if (review?.reviewStatus === "needs_improvement")
+        stats.needsRevision += 1;
       else stats.pending += 1;
     });
     return stats;
@@ -1100,13 +1312,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       (reviews) => {
         setTutorReviews(reviews);
         setSelectedTutorReviewId((current) => {
-          if (current && reviews.some((review) => review.id === current)) return current;
+          if (current && reviews.some((review) => review.id === current))
+            return current;
           return reviews[0]?.id || "";
         });
       },
       (error) => {
         console.error("Failed to subscribe to tutor reviews", error);
-      }
+      },
     );
 
     return () => {
@@ -1116,13 +1329,21 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
 
   const handleStudentReplySubmit = async () => {
     if (!latestTutorReview?.id) {
-      setStudentReplyState({ loading: false, success: "", error: "Tutor has not posted feedback yet." });
+      setStudentReplyState({
+        loading: false,
+        success: "",
+        error: "Tutor has not posted feedback yet.",
+      });
       return;
     }
 
     const message = studentReplyText.trim();
     if (!message) {
-      setStudentReplyState({ loading: false, success: "", error: "Write your question or response before sending." });
+      setStudentReplyState({
+        loading: false,
+        success: "",
+        error: "Write your question or response before sending.",
+      });
       return;
     }
 
@@ -1132,11 +1353,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       await saveStudentReplyToTutorReview({
         reviewId: latestTutorReview.id,
         message,
-        studentName: studentProfile?.name || user?.displayName || user?.email || "",
+        studentName:
+          studentProfile?.name || user?.displayName || user?.email || "",
         studentCode,
       });
       setStudentReplyText("");
-      setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
+      setStudentReplyState({
+        loading: false,
+        success: "Reply sent to tutor.",
+        error: "",
+      });
       triggerInteractionFeedback({
         sound: "success",
         toastMessage: "Reply sent to tutor.",
@@ -1162,7 +1388,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               },
             ],
           };
-        })
+        }),
       );
     } catch (err) {
       setStudentReplyState({
@@ -1233,12 +1459,30 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       });
       const breakdown = data?.rubric
         ? [
-            { key: "task", label: "Task completion", score: Number(data.rubric.task || 0), explanation: "Backend rubric" },
-            { key: "coherence", label: "Coherence", score: Number(data.rubric.coherence || 0), explanation: "Backend rubric" },
-            { key: "grammar", label: "Grammar & accuracy", score: Number(data.rubric.grammar || 0), explanation: "Backend rubric" },
+            {
+              key: "task",
+              label: "Task completion",
+              score: Number(data.rubric.task || 0),
+              explanation: "Backend rubric",
+            },
+            {
+              key: "coherence",
+              label: "Coherence",
+              score: Number(data.rubric.coherence || 0),
+              explanation: "Backend rubric",
+            },
+            {
+              key: "grammar",
+              label: "Grammar & accuracy",
+              score: Number(data.rubric.grammar || 0),
+              explanation: "Backend rubric",
+            },
           ]
         : buildRubricBreakdown(data.feedback);
-      const overallScore = breakdown.reduce((sum, item) => sum + (item.score || 0), 0);
+      const overallScore = breakdown.reduce(
+        (sum, item) => sum + (item.score || 0),
+        0,
+      );
       const enrichedResult = {
         id: Date.now(),
         mode: "Mark my letter",
@@ -1259,7 +1503,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       setRubricBreakdown(breakdown);
       setErrorBank(extractErrorBank(data.feedback));
       setMarkRubric(data?.rubric || null);
-      setMarkCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setMarkCorrections(
+        Array.isArray(data?.corrections) ? data.corrections : [],
+      );
       setMarkSimpleFeedback(data?.simplifiedFeedback || null);
       setMarkStructuredFeedback(data?.structuredFeedback || data || null);
       setFeedbackTrend(data?.trend || null);
@@ -1276,22 +1522,42 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           score: overallScore,
         },
       ]);
-      setWritingHistory((prev) => [
-        ...prev,
-        buildWritingHistoryRecord({
-          userId,
-          studentCode,
-          level,
-          day: writingContext?.day || null,
-          lessonId: writingContext?.lessonId || selectedLetter?.lessonId || selectedLetterId || (isExamMode ? "exam-room" : "course-writing-custom"),
-          workbookId: writingContext?.workbookId || selectedLetter?.workbookId || selectedLetterId || (isExamMode ? "exam-writing" : "course-writing-custom"),
-          taskId: writingContext?.writingTaskId || selectedLetterId || "custom",
-          taskTitle: writingContext?.taskTitle || selectedLetter?.letter || selectedLetter?.title || "Custom prompt",
-          text: trimmed,
-          data: { ...data, score: data?.score ?? overallScore, maxScore: data?.maxScore ?? 12 },
-          context: isExamMode ? "exam-room" : "course",
-        }),
-      ]);
+      const historyRecord = buildWritingHistoryRecord({
+        userId,
+        studentCode,
+        level,
+        day: writingContext?.day || null,
+        lessonId:
+          writingContext?.lessonId ||
+          selectedLetter?.lessonId ||
+          selectedLetterId ||
+          (isExamMode ? "exam-room" : "course-writing-custom"),
+        workbookId:
+          writingContext?.workbookId ||
+          selectedLetter?.workbookId ||
+          selectedLetterId ||
+          (isExamMode ? "exam-writing" : "course-writing-custom"),
+        taskId: writingContext?.writingTaskId || selectedLetterId || "custom",
+        taskTitle:
+          writingContext?.taskTitle ||
+          selectedLetter?.letter ||
+          selectedLetter?.title ||
+          "Custom prompt",
+        text: trimmed,
+        data: {
+          ...data,
+          score: data?.score ?? overallScore,
+          maxScore: data?.maxScore ?? 12,
+        },
+        context: isExamMode ? "exam-room" : "course",
+      });
+      setWritingHistory((prev) => [...prev, historyRecord]);
+      saveWritingAttempt({
+        userId,
+        studentCode,
+        mode: progressMode,
+        attempt: historyRecord,
+      });
       addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
@@ -1318,7 +1584,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
 
   const revisionSummary = useMemo(
     () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText, level),
-    [firstDraftSnapshot, revisedDraftText, level]
+    [firstDraftSnapshot, revisedDraftText, level],
   );
 
   const handleSaveForTutorReview = async () => {
@@ -1326,12 +1592,20 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     const draftToSave = revisedDraftText.trim();
 
     if (!draftToSave) {
-      setTutorSaveState({ loading: false, success: "", error: "Please add your improved draft before saving for tutor review." });
+      setTutorSaveState({
+        loading: false,
+        success: "",
+        error: "Please add your improved draft before saving for tutor review.",
+      });
       return;
     }
 
     if (!markFeedback) {
-      setTutorSaveState({ loading: false, success: "", error: "Get AI feedback first, then save for tutor review." });
+      setTutorSaveState({
+        loading: false,
+        success: "",
+        error: "Get AI feedback first, then save for tutor review.",
+      });
       return;
     }
 
@@ -1339,7 +1613,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       setTutorSaveState({
         loading: false,
         success: "",
-        error: "Please complete the improve step first, then submit only the improved draft to tutor.",
+        error:
+          "Please complete the improve step first, then submit only the improved draft to tutor.",
       });
       return;
     }
@@ -1348,7 +1623,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       setTutorSaveState({
         loading: false,
         success: "",
-        error: "Tutor workflow requires Firebase. Please enable Firebase config before saving.",
+        error:
+          "Tutor workflow requires Firebase. Please enable Firebase config before saving.",
       });
       return;
     }
@@ -1392,7 +1668,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       return;
     }
     if (!revisedDraftText.trim() || !revisionSummary.changed) {
-      setError("Step 2: submit a revised version that differs from your first draft.");
+      setError(
+        "Step 2: submit a revised version that differs from your first draft.",
+      );
       return;
     }
 
@@ -1433,12 +1711,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
         studentName,
         idToken,
         program: studentProfile?.program,
-        submissionContext: isExamMode ? "exam-room-improved" : "course-improved",
+        submissionContext: isExamMode
+          ? "exam-room-improved"
+          : "course-improved",
         promptType: derivePromptMeta(selectedLetter || {}).type || "letter",
       });
       setImprovedFeedback(data.feedback);
       setImprovedRubric(data?.rubric || null);
-      setImprovedCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setImprovedCorrections(
+        Array.isArray(data?.corrections) ? data.corrections : [],
+      );
       setImprovedSimpleFeedback(data?.simplifiedFeedback || null);
       setImprovedStructuredFeedback(data?.structuredFeedback || data || null);
       setFeedbackTrend(data?.trend || null);
@@ -1464,7 +1746,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
   };
 
   const renderImportantPhraseLine = (line) => {
-    const importantPattern = /^(?:[-•\d.)\s]*)?(important phrases?|key phrases?)\s*:\s*(.*)$/i;
+    const importantPattern =
+      /^(?:[-•\d.)\s]*)?(important phrases?|key phrases?)\s*:\s*(.*)$/i;
     const matches = line.match(importantPattern);
     if (!matches) return line;
 
@@ -1492,7 +1775,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               padding: "2px 8px",
               borderRadius: 999,
               background: "#f3f4f6",
-              color: IMPORTANT_PHRASE_COLORS[index % IMPORTANT_PHRASE_COLORS.length],
+              color:
+                IMPORTANT_PHRASE_COLORS[index % IMPORTANT_PHRASE_COLORS.length],
               fontWeight: 800,
             }}
           >
@@ -1525,7 +1809,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
 
   const isNearBottom = useCallback((element) => {
     if (!element) return true;
-    const remaining = element.scrollHeight - element.scrollTop - element.clientHeight;
+    const remaining =
+      element.scrollHeight - element.scrollTop - element.clientHeight;
     return remaining < 28;
   }, []);
 
@@ -1540,9 +1825,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     const overflowing = chatLog.scrollHeight > chatLog.clientHeight + 4;
     setIsChatOverflowing(overflowing);
     setIsChatScrolled(overflowing && chatLog.scrollTop > 4);
-    setHasHiddenNewerMessages(
-      overflowing && !isNearBottom(chatLog)
-    );
+    setHasHiddenNewerMessages(overflowing && !isNearBottom(chatLog));
   }, [isNearBottom]);
 
   useEffect(() => {
@@ -1550,7 +1833,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     if (!chatLog) return;
 
     const lastMessage = chatMessages[chatMessages.length - 1];
-    const shouldAutoScroll = !lastMessage || lastMessage.role === "user" || isNearBottom(chatLog);
+    const shouldAutoScroll =
+      !lastMessage || lastMessage.role === "user" || isNearBottom(chatLog);
 
     if (shouldAutoScroll) {
       scrollChatToBottom();
@@ -1576,14 +1860,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     return () => window.removeEventListener("resize", handleResize);
   }, [updateChatScrollMeta]);
 
-
   const sendDraftsToMarkTab = () => {
     const combinedDraft = ideaDraftWorkspace.trim();
 
     if (!combinedDraft) {
-      setIdeaError(
-        "Add text to the workspace before sending it for marking."
-      );
+      setIdeaError("Add text to the workspace before sending it for marking.");
       setIdeaSuccess("");
       return;
     }
@@ -1600,7 +1881,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
     setMarkSimpleFeedback(null);
     setMarkStructuredFeedback(null);
     setFeedbackTrend(null);
-    setIdeaSuccess("Your workspace draft is now pasted into the “Mark my letter” tab.");
+    setIdeaSuccess(
+      "Your workspace draft is now pasted into the “Mark my letter” tab.",
+    );
     setIdeaError("");
     setSelectedDraftIds([]);
     setActiveTab("mark");
@@ -1739,38 +2022,49 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            {isTutorOnlyView
-              ? "Tutor updates only."
-              : isCourseMode
-                ? (
-                  <>
-                    Course-book mode is for short, level-based text analysis and references. If you need help understanding
-                    a question, ask <strong>Study Buddy</strong>. From Day 21, open the <a href="/exams/writing">Writing exam room</a> to mark a full essay.
-                  </>
-                )
-                : (
-                  <>
-                    From Day 21, use <strong>Mark my letter</strong> for one complete essay. Use Study Buddy if a question is unclear.
-                  </>
-                )}
+            {isTutorOnlyView ? (
+              "Tutor updates only."
+            ) : isCourseMode ? (
+              <>
+                Course-book mode is for short, level-based text analysis and
+                references. If you need help understanding a question, ask{" "}
+                <strong>Study Buddy</strong>. From Day 21, open the{" "}
+                <a href="/exams/writing">Writing exam room</a> to mark a full
+                essay.
+              </>
+            ) : (
+              <>
+                From Day 21, use <strong>Mark my letter</strong> for one
+                complete essay. Use Study Buddy if a question is unclear.
+              </>
+            )}
           </p>
         </div>
-        {!hideTabList && <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
-          {visibleTabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => handleTabChange(tab.key)}
-              className="tab-button"
-              role="tab"
-              aria-selected={activeTab === tab.key}
-              style={
-                activeTab === tab.key ? styles.tabButtonActive : styles.tabButton
-              }
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {!hideTabList && (
+          <div
+            style={styles.tabList}
+            className="tab-list"
+            role="tablist"
+            aria-label="Writing workflow tabs"
+          >
+            {visibleTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => handleTabChange(tab.key)}
+                className="tab-button"
+                role="tab"
+                aria-selected={activeTab === tab.key}
+                style={
+                  activeTab === tab.key
+                    ? styles.tabButtonActive
+                    : styles.tabButton
+                }
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
         {!isTutorOnlyView && (
           <div style={{ marginTop: 12 }}>
             <button
@@ -1803,7 +2097,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 >
                   {selectedLetter.situation}
                 </p>
-                <h4 style={{ ...styles.resultHeading, fontSize: 14, marginTop: 2 }}>Checklist</h4>
+                <h4
+                  style={{
+                    ...styles.resultHeading,
+                    fontSize: 14,
+                    marginTop: 2,
+                  }}
+                >
+                  Checklist
+                </h4>
                 <ul style={{ ...styles.checklist, marginTop: 0, fontSize: 14 }}>
                   {(selectedLetter.whatToInclude || []).map((item) => (
                     <li key={item}>{item}</li>
@@ -1828,57 +2130,62 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               </div>
             )}
             {writingTasksLoading ? (
-              <p style={styles.helperText}>Loading writing tasks from the sheet ...</p>
+              <p style={styles.helperText}>
+                Loading writing tasks from the sheet ...
+              </p>
             ) : visibleWritingTasks.length === 0 ? (
               <p style={styles.helperText}>
-                No writing tasks are available for this level. Please adjust your level or try again later.
+                No writing tasks are available for this level. Please adjust
+                your level or try again later.
               </p>
             ) : (
               <div style={styles.gridTwo}>
                 {visibleWritingTasks.map((item) => {
                   const meta = derivePromptMeta(item);
                   return (
-                  <div
-                    key={item.id}
-                    style={{
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 12,
-                      padding: 12,
-                      background:
-                        selectedLetterId === item.id ? "#eff6ff" : "#f9fafb",
-                      boxShadow:
-                        selectedLetterId === item.id
-                          ? "0 8px 18px rgba(37,99,235,0.15)"
-                          : "none",
-                    }}
-                  >
-                    <div style={styles.metaRow}>
-                      <div style={{ fontWeight: 800 }}>{item.letter}</div>
-                      <span style={styles.levelPill}>Level {item.level}</span>
-                    </div>
-                    <p style={styles.helperText}>{item.situation}</p>
-                    <div style={styles.tagRow}>
-                      <span style={styles.tagPill}>{meta.theme}</span>
-                      <span style={styles.tagPill}>{meta.type}</span>
-                      <span style={styles.tagPill}>{meta.formality}</span>
-                    </div>
-                    <div style={styles.metaRow}>
-                      <span style={styles.badge}>
-                        ⏱️ {item.durationMinutes} minutes
-                      </span>
-                      <button
-                        style={
+                    <div
+                      key={item.id}
+                      style={{
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 12,
+                        padding: 12,
+                        background:
+                          selectedLetterId === item.id ? "#eff6ff" : "#f9fafb",
+                        boxShadow:
                           selectedLetterId === item.id
-                            ? styles.primaryButton
-                            : styles.secondaryButton
-                        }
-                        onClick={() => setSelectedLetterId(item.id)}
-                      >
-                        {selectedLetterId === item.id ? "Selected" : "Practice"}
-                      </button>
+                            ? "0 8px 18px rgba(37,99,235,0.15)"
+                            : "none",
+                      }}
+                    >
+                      <div style={styles.metaRow}>
+                        <div style={{ fontWeight: 800 }}>{item.letter}</div>
+                        <span style={styles.levelPill}>Level {item.level}</span>
+                      </div>
+                      <p style={styles.helperText}>{item.situation}</p>
+                      <div style={styles.tagRow}>
+                        <span style={styles.tagPill}>{meta.theme}</span>
+                        <span style={styles.tagPill}>{meta.type}</span>
+                        <span style={styles.tagPill}>{meta.formality}</span>
+                      </div>
+                      <div style={styles.metaRow}>
+                        <span style={styles.badge}>
+                          ⏱️ {item.durationMinutes} minutes
+                        </span>
+                        <button
+                          style={
+                            selectedLetterId === item.id
+                              ? styles.primaryButton
+                              : styles.secondaryButton
+                          }
+                          onClick={() => setSelectedLetterId(item.id)}
+                        >
+                          {selectedLetterId === item.id
+                            ? "Selected"
+                            : "Practice"}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
+                  );
                 })}
               </div>
             )}
@@ -1891,7 +2198,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>A1 form practice – Teil 1</h3>
             <p style={styles.helperText}>
-              Practise reading a short situation and completing a simple German form. Try the blanks first, then reveal the model answers.
+              Practise reading a short situation and completing a simple German
+              form. Try the blanks first, then reveal the model answers.
             </p>
             <div style={{ marginTop: 12 }}>
               <button
@@ -1913,11 +2221,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 return (
                   <article key={task.id} style={styles.helperCard}>
                     <div style={styles.metaRow}>
-                      <h4 style={{ ...styles.resultHeading, margin: 0 }}>{task.title}</h4>
+                      <h4 style={{ ...styles.resultHeading, margin: 0 }}>
+                        {task.title}
+                      </h4>
                       <span style={styles.levelPill}>A1 Teil 1</span>
                     </div>
                     <p style={styles.helperText}>{task.context}</p>
-                    <p style={{ margin: "8px 0", fontWeight: 700 }}>{task.prompt}</p>
+                    <p style={{ margin: "8px 0", fontWeight: 700 }}>
+                      {task.prompt}
+                    </p>
 
                     <div
                       style={{
@@ -1932,7 +2244,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                           key={`${task.id}-${field.label}`}
                           style={{
                             display: "grid",
-                            gridTemplateColumns: "minmax(120px, 0.9fr) minmax(140px, 1.1fr)",
+                            gridTemplateColumns:
+                              "minmax(120px, 0.9fr) minmax(140px, 1.1fr)",
                             gap: 8,
                             padding: "8px 10px",
                             borderBottom: "1px solid #f3f4f6",
@@ -1957,8 +2270,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                         <strong>Model answers</strong>
                         <ol style={{ margin: "8px 0 0 18px", padding: 0 }}>
                           {task.answers.map((item) => (
-                            <li key={`${task.id}-${item.blank}`} style={{ marginBottom: 6 }}>
-                              <strong>{item.blank} {item.answer}</strong> – {item.explanation}
+                            <li
+                              key={`${task.id}-${item.blank}`}
+                              style={{ marginBottom: 6 }}
+                            >
+                              <strong>
+                                {item.blank} {item.answer}
+                              </strong>{" "}
+                              – {item.explanation}
                             </li>
                           ))}
                         </ol>
@@ -1975,7 +2294,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       {activeTab === "mark" && (
         <>
           <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>{isCourseMode ? "Analyse my text" : "Mark my letter"}</h3>
+            <h3 style={styles.sectionTitle}>
+              {markLabel ||
+                (isCourseMode ? "Analyse my text" : "Mark my letter")}
+            </h3>
             <p style={styles.helperText}>
               {isCourseMode
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
@@ -2003,7 +2325,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               </select>
             </div>
 
-            <label style={styles.label}>{isCourseMode ? "Your combined section" : "Your complete letter or essay"}</label>
+            <label style={styles.label}>
+              {isCourseMode
+                ? "Your combined section"
+                : "Your complete letter or essay"}
+            </label>
             <textarea
               ref={markDraftRef}
               value={typedAnswer}
@@ -2011,12 +2337,18 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 setError("");
                 setTypedAnswer(e.target.value);
               }}
-              placeholder={isCourseMode ? "Combine what you wrote today and paste it here for level-based analysis..." : "Paste your finished letter or essay here for marking..."}
+              placeholder={
+                isCourseMode
+                  ? "Combine what you wrote today and paste it here for level-based analysis..."
+                  : "Paste your finished letter or essay here for marking..."
+              }
               style={styles.textArea}
               rows={9}
             />
             <SpecialCharacterRow
-              onInsert={(character) => insertSpecialCharacter(setTypedAnswer, markDraftRef, character)}
+              onInsert={(character) =>
+                insertSpecialCharacter(setTypedAnswer, markDraftRef, character)
+              }
             />
             <p style={styles.helperText}>
               Words: {typedWordCount} · Characters: {typedAnswer.length}
@@ -2032,7 +2364,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 <button
                   type="button"
                   style={styles.primaryButton}
-                  onClick={markFeedback ? handleRetryMarking : sendTypedAnswerForCorrection}
+                  onClick={
+                    markFeedback
+                      ? handleRetryMarking
+                      : sendTypedAnswerForCorrection
+                  }
                   disabled={loading}
                 >
                   {loading
@@ -2040,8 +2376,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                     : markFeedback
                       ? "Retry"
                       : isCourseMode
-                        ? "Analyse my text"
-                        : "Get AI feedback"}
+                        ? submitLabel || "Analyse my text"
+                        : submitLabel || "Get AI feedback"}
                 </button>
 
                 <button
@@ -2055,16 +2391,19 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               </div>
             </div>
 
-
             <WritingHistorySection
               title={isCourseMode ? "Saved Texts" : "Saved Letters"}
               entries={writingHistory}
               level={level}
               onOpen={(entry) => {
-                setTypedAnswer(entry.originalLetter || entry.originalText || "");
+                setTypedAnswer(
+                  entry.originalLetter || entry.originalText || "",
+                );
                 setMarkFeedback(entry.feedback || "");
                 setMarkRubric(entry.rubricScores || null);
-                setMarkCorrections(Array.isArray(entry.corrections) ? entry.corrections : []);
+                setMarkCorrections(
+                  Array.isArray(entry.corrections) ? entry.corrections : [],
+                );
                 setMarkStructuredFeedback(entry.structuredFeedback || null);
               }}
             />
@@ -2099,15 +2438,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                   </h4>
 
                   <p style={{ ...styles.helperText, margin: 0 }}>
-                    Reflect on the feedback, revise your draft, compare the improved
-                    version, and then submit it for tutor review.
+                    Reflect on the feedback, revise your draft, compare the
+                    improved version, and then submit it for tutor review.
                   </p>
                 </div>
 
                 <div>
-                  <label style={styles.label}>
-                    What will you improve?
-                  </label>
+                  <label style={styles.label}>What will you improve?</label>
 
                   <textarea
                     value={reflectionText}
@@ -2127,9 +2464,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 </div>
 
                 <div>
-                  <label style={styles.label}>
-                    Your improved draft
-                  </label>
+                  <label style={styles.label}>Your improved draft</label>
 
                   <textarea
                     value={revisedDraftText}
@@ -2204,15 +2539,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 </div>
 
                 {tutorSaveState.error ? (
-                  <div style={styles.errorBox}>
-                    {tutorSaveState.error}
-                  </div>
+                  <div style={styles.errorBox}>{tutorSaveState.error}</div>
                 ) : null}
 
                 {tutorSaveState.success ? (
-                  <div style={styles.successBox}>
-                    {tutorSaveState.success}
-                  </div>
+                  <div style={styles.successBox}>{tutorSaveState.success}</div>
                 ) : null}
               </div>
             ) : null}
@@ -2238,7 +2569,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 trend={feedbackTrend}
               />
               <details style={{ marginTop: 10 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                  Previous AI feedback
+                </summary>
                 <WritingFeedbackCard
                   feedback={markFeedback}
                   level={level}
@@ -2256,7 +2589,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           {draftHistory.length >= 2 && (
             <section style={styles.card}>
               <details>
-                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Compare drafts (optional)</summary>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                  Compare drafts (optional)
+                </summary>
                 <p style={{ ...styles.helperText, marginTop: 8 }}>
                   Review the last two submissions to track improvements.
                 </p>
@@ -2267,15 +2602,20 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                         {index === 0 ? "Previous draft" : "Latest draft"}
                       </div>
                       <div style={styles.helperText}>
-                        {entry.promptTitle} · {new Date(entry.createdAt).toLocaleString()}
+                        {entry.promptTitle} ·{" "}
+                        {new Date(entry.createdAt).toLocaleString()}
                       </div>
-                      <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{entry.draft}</pre>
+                      <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>
+                        {entry.draft}
+                      </pre>
                     </div>
                   ))}
                 </div>
                 {latestImprovementNotes.length > 0 ? (
                   <>
-                    <div style={{ fontWeight: 700, marginTop: 10 }}>Improvement notes</div>
+                    <div style={{ fontWeight: 700, marginTop: 10 }}>
+                      Improvement notes
+                    </div>
                     <ul style={styles.checklist}>
                       {latestImprovementNotes.map((note) => (
                         <li key={note}>{note}</li>
@@ -2295,10 +2635,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
         <section style={styles.card} className="idea-generator-card">
           <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
-            Paste your task and chat in a single field. Herr Felix replies step by step with the updated coaching prompt.
+            Paste your task and chat in a single field. Herr Felix replies step
+            by step with the updated coaching prompt.
           </p>
           <p style={styles.helperText}>
-            Your first pasted question stays pinned here so you can reference it while writing. Keep checking the task bullet points too.
+            Your first pasted question stays pinned here so you can reference it
+            while writing. Keep checking the task bullet points too.
           </p>
           <div style={styles.infoBox}>
             <strong>Use the coach to learn from your ideas:</strong>
@@ -2337,7 +2679,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                     : `👩‍🎓 ${user?.displayName || "Student"}`}
                 </strong>
                 <div style={{ whiteSpace: "pre-wrap" }}>
-                  {msg.role === "assistant" ? renderCoachMessage(msg.content) : msg.content}
+                  {msg.role === "assistant"
+                    ? renderCoachMessage(msg.content)
+                    : msg.content}
                 </div>
               </div>
             ))}
@@ -2386,8 +2730,20 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 padding: 10,
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6, color: "#1d4ed8" }}>📌 Pinned question</div>
-              <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.5 }}>{pinnedIdeaQuestion}</div>
+              <div
+                style={{ fontWeight: 700, marginBottom: 6, color: "#1d4ed8" }}
+              >
+                📌 Pinned question
+              </div>
+              <div
+                style={{
+                  whiteSpace: "pre-wrap",
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                }}
+              >
+                {pinnedIdeaQuestion}
+              </div>
             </div>
           ) : null}
           <div style={{ marginTop: 12 }}>
@@ -2405,22 +2761,28 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
               rows={3}
             />
             <SpecialCharacterRow
-              onInsert={(character) => insertSpecialCharacter(setIdeaInput, ideasPromptRef, character)}
+              onInsert={(character) =>
+                insertSpecialCharacter(setIdeaInput, ideasPromptRef, character)
+              }
             />
           </div>
           <div style={{ marginTop: 10 }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Useful connectors</div>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>
+              Useful connectors
+            </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {(CONNECTORS_BY_LEVEL[level] || CONNECTORS_BY_LEVEL.B1).map((connector) => (
-                <button
-                  key={connector}
-                  style={styles.chipButton}
-                  onClick={() => insertConnector(connector)}
-                  type="button"
-                >
-                  {connector}
-                </button>
-              ))}
+              {(CONNECTORS_BY_LEVEL[level] || CONNECTORS_BY_LEVEL.B1).map(
+                (connector) => (
+                  <button
+                    key={connector}
+                    style={styles.chipButton}
+                    onClick={() => insertConnector(connector)}
+                    type="button"
+                  >
+                    {connector}
+                  </button>
+                ),
+              )}
             </div>
           </div>
           <div
@@ -2463,10 +2825,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Keep one running draft box so students can keep building and refining what they type.
+              Keep one running draft box so students can keep building and
+              refining what they type.
             </p>
             <div
-              style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 12,
+                padding: 12,
+              }}
               className="idea-generator-panel"
             >
               <div>
@@ -2485,13 +2852,28 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 <SpecialCharacterRow
                   label="Quick umlaut keys for this draft"
                   onInsert={(character) =>
-                    insertSpecialCharacter(setIdeaDraftWorkspace, ideasWorkspaceRef, character)
+                    insertSpecialCharacter(
+                      setIdeaDraftWorkspace,
+                      ideasWorkspaceRef,
+                      character,
+                    )
                   }
                 />
-                <div style={{ ...styles.helperText, marginTop: 4, marginBottom: 0 }}>{countWords(ideaDraftWorkspace)} words</div>
+                <div
+                  style={{
+                    ...styles.helperText,
+                    marginTop: 4,
+                    marginBottom: 0,
+                  }}
+                >
+                  {countWords(ideaDraftWorkspace)} words
+                </div>
               </div>
 
-              <button style={{ ...styles.primaryButton, marginTop: 10 }} onClick={sendDraftsToMarkTab}>
+              <button
+                style={{ ...styles.primaryButton, marginTop: 10 }}
+                onClick={sendDraftsToMarkTab}
+              >
                 Send to “Mark my letter”
               </button>
               {ideaSuccess && (
@@ -2505,70 +2887,114 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
       )}
 
       {activeTab === "references" && (
-        <WritingReferenceLibrary
-          emptyText="No references saved yet. Add your first topic above — it will be saved to Firebase with your writing workspace."
-          idPrefix="writing-reference"
-          topicPlaceholder="e.g., Complaint letter phrases"
-          referenceTopicInput={referenceTopicInput}
-          setReferenceTopicInput={setReferenceTopicInput}
-          referenceBodyInput={referenceBodyInput}
-          setReferenceBodyInput={setReferenceBodyInput}
-          referenceNotes={referenceNotes}
-          filteredReferenceNotes={filteredReferenceNotes}
-          selectedReferenceNote={selectedReferenceNote}
-          setSelectedReferenceNoteId={setSelectedReferenceNoteId}
-          editingReferenceNoteId={editingReferenceNoteId}
-          referenceEditTopicInput={referenceEditTopicInput}
-          setReferenceEditTopicInput={setReferenceEditTopicInput}
-          referenceEditBodyInput={referenceEditBodyInput}
-          setReferenceEditBodyInput={setReferenceEditBodyInput}
-          referenceSearch={referenceSearch}
-          setReferenceSearch={setReferenceSearch}
-          ideaError={ideaError}
-          ideaSuccess={ideaSuccess}
-          setIdeaError={setIdeaError}
-          setIdeaSuccess={setIdeaSuccess}
-          addReferenceNote={addReferenceNote}
-          startEditingReferenceNote={startEditingReferenceNote}
-          cancelEditingReferenceNote={cancelEditingReferenceNote}
-          saveEditedReferenceNote={saveEditedReferenceNote}
-          removeReferenceNote={removeReferenceNote}
-          addReferenceToLetter={addReferenceToLetter}
-          bodyInputRef={referencesRef}
-          bodyInputStyle={styles.textareaSmall}
-          bodyRows={7}
-          renderBodyTools={() => (
-            <SpecialCharacterRow
-              label="Quick umlaut keys for reference body"
-              onInsert={(character) =>
-                insertSpecialCharacter(setReferenceBodyInput, referencesRef, character)
-              }
-            />
-          )}
+        <WritingLibraryTab
+          context={{ level, ...writingContext }}
+          historyEntries={writingHistory}
+          level={level}
+          onOpenAttempt={(entry) => {
+            setTypedAnswer(entry.originalLetter || entry.originalText || "");
+            setMarkFeedback(entry.feedback || entry.summary || "");
+            setMarkRubric(entry.rubricScores || entry.rubric || null);
+            setMarkCorrections(
+              Array.isArray(entry.corrections) ? entry.corrections : [],
+            );
+            setMarkStructuredFeedback(entry.structuredFeedback || null);
+            setActiveTab("mark");
+          }}
+          referenceProps={{
+            emptyText:
+              "No references saved yet. Add your first topic above — it will be saved to Firebase with your writing workspace.",
+            idPrefix: "writing-reference",
+            topicPlaceholder: "e.g., Complaint letter phrases",
+            referenceTopicInput,
+            setReferenceTopicInput,
+            referenceBodyInput,
+            setReferenceBodyInput,
+            referenceNotes,
+            filteredReferenceNotes,
+            selectedReferenceNote,
+            setSelectedReferenceNoteId,
+            editingReferenceNoteId,
+            referenceEditTopicInput,
+            setReferenceEditTopicInput,
+            referenceEditBodyInput,
+            setReferenceEditBodyInput,
+            referenceSearch,
+            setReferenceSearch,
+            ideaError,
+            ideaSuccess,
+            setIdeaError,
+            setIdeaSuccess,
+            addReferenceNote,
+            startEditingReferenceNote,
+            cancelEditingReferenceNote,
+            saveEditedReferenceNote,
+            removeReferenceNote,
+            addReferenceToLetter,
+            bodyInputRef: referencesRef,
+            bodyInputStyle: styles.textareaSmall,
+            bodyRows: 7,
+            renderBodyTools: () => (
+              <SpecialCharacterRow
+                label="Quick umlaut keys for reference body"
+                onInsert={(character) =>
+                  insertSpecialCharacter(
+                    setReferenceBodyInput,
+                    referencesRef,
+                    character,
+                  )
+                }
+              />
+            ),
+          }}
         />
       )}
 
       {activeTab === "tutor" && canUseTutorFeedback && (
         <section style={styles.card}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
             <div>
-              <h3 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Tutor Feedback</h3>
-              <p style={{ ...styles.helperText, margin: 0 }}>View tutor updates and reply here.</p>
+              <h3 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
+                Tutor Feedback
+              </h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                View tutor updates and reply here.
+              </p>
             </div>
           </div>
-          <div style={{ ...styles.infoBox, marginTop: 12, display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <div
+            style={{
+              ...styles.infoBox,
+              marginTop: 12,
+              display: "flex",
+              gap: 10,
+              alignItems: "flex-start",
+            }}
+          >
             <span style={{ fontSize: 18, lineHeight: 1 }}>ℹ️</span>
-            <div style={{ margin: 0 }}>Select a submission to see feedback and next steps.</div>
+            <div style={{ margin: 0 }}>
+              Select a submission to see feedback and next steps.
+            </div>
           </div>
           {!tutorReviewCloudEnabled ? (
             <div style={styles.errorBox}>
-              Tutor feedback sync is unavailable because Firebase is not configured in this environment.
+              Tutor feedback sync is unavailable because Firebase is not
+              configured in this environment.
             </div>
           ) : null}
           <div style={{ ...styles.helperCard, marginTop: 12 }}>
             {!tutorReviews.length ? (
               <p style={{ ...styles.helperText, margin: 0 }}>
-                No feedback yet. To see feedback, go to the Writing tab and save a sample for your tutor to review.
+                No feedback yet. To see feedback, go to the Writing tab and save
+                a sample for your tutor to review.
               </p>
             ) : (
               <>
@@ -2576,7 +3002,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                 <select
                   style={{ ...styles.input, marginTop: 6, marginBottom: 10 }}
                   value={latestTutorReview?.id || ""}
-                  onChange={(event) => setSelectedTutorReviewId(event.target.value)}
+                  onChange={(event) =>
+                    setSelectedTutorReviewId(event.target.value)
+                  }
                 >
                   {tutorReviews.map((review, index) => (
                     <option key={review.id} value={review.id}>
@@ -2585,24 +3013,54 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                   ))}
                 </select>
                 {(() => {
-                  const meta = getTutorStatusMeta(latestTutorReview?.reviewStatus);
+                  const meta = getTutorStatusMeta(
+                    latestTutorReview?.reviewStatus,
+                  );
                   return (
-                    <div style={{ marginBottom: 10, border: `1px solid ${meta.soft}`, background: meta.soft, borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", border: `2px solid ${meta.accent}`, color: meta.accent, fontWeight: 800, display: "grid", placeItems: "center" }}>{meta.icon}</div>
-                      <div style={{ fontWeight: 800, color: meta.accent }}>Status: {meta.label}</div>
+                    <div
+                      style={{
+                        marginBottom: 10,
+                        border: `1px solid ${meta.soft}`,
+                        background: meta.soft,
+                        borderRadius: 12,
+                        padding: 12,
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: "50%",
+                          border: `2px solid ${meta.accent}`,
+                          color: meta.accent,
+                          fontWeight: 800,
+                          display: "grid",
+                          placeItems: "center",
+                        }}
+                      >
+                        {meta.icon}
+                      </div>
+                      <div style={{ fontWeight: 800, color: meta.accent }}>
+                        Status: {meta.label}
+                      </div>
                     </div>
                   );
                 })()}
                 {latestTutorReview?.reviewedAt ? (
                   <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
-                    Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}
+                    Reviewed:{" "}
+                    {new Date(latestTutorReview.reviewedAt).toLocaleString()}
                   </p>
                 ) : null}
                 {latestTutorReview?.tutorFeedback ? (
                   <pre
                     style={{
                       ...styles.pre,
-                      background: "linear-gradient(120deg, #0f172a 0%, #1e293b 100%)",
+                      background:
+                        "linear-gradient(120deg, #0f172a 0%, #1e293b 100%)",
                       color: "#f8fafc",
                       border: "1px solid #1e3a8a",
                       fontSize: 16,
@@ -2613,17 +3071,28 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
                   </pre>
                 ) : (
                   <p style={{ ...styles.helperText, margin: 0 }}>
-                    No tutor notes yet. Submit a copy from “Mark my letter” and check back here.
+                    No tutor notes yet. Submit a copy from “Mark my letter” and
+                    check back here.
                   </p>
                 )}
-                {Array.isArray(latestTutorReview?.studentReplies) && latestTutorReview.studentReplies.length ? (
+                {Array.isArray(latestTutorReview?.studentReplies) &&
+                latestTutorReview.studentReplies.length ? (
                   <div style={{ marginTop: 10 }}>
-                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Your replies</div>
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                      Your replies
+                    </div>
                     <div style={{ display: "grid", gap: 8 }}>
                       {latestTutorReview.studentReplies.map((reply, index) => (
-                        <div key={`${reply?.createdAt || "reply"}-${index}`} style={{ ...styles.infoBox, margin: 0 }}>
-                          <div style={{ ...styles.helperText, margin: "0 0 4px" }}>
-                            {reply?.createdAt ? new Date(reply.createdAt).toLocaleString() : "Just now"}
+                        <div
+                          key={`${reply?.createdAt || "reply"}-${index}`}
+                          style={{ ...styles.infoBox, margin: 0 }}
+                        >
+                          <div
+                            style={{ ...styles.helperText, margin: "0 0 4px" }}
+                          >
+                            {reply?.createdAt
+                              ? new Date(reply.createdAt).toLocaleString()
+                              : "Just now"}
                           </div>
                           <div>{reply?.message || ""}</div>
                         </div>
@@ -2638,41 +3107,127 @@ const WritingPage = ({ mode = "course", initialTab = "mark", enabledTabs = null,
             <div style={{ ...styles.helperCard, marginTop: 10 }}>
               <label style={styles.label}>Reply to tutor feedback</label>
               <textarea
-                style={{ ...styles.textArea, marginTop: 6, minHeight: 130, borderRadius: 14, border: "1px solid #cbd5e1" }}
+                style={{
+                  ...styles.textArea,
+                  marginTop: 6,
+                  minHeight: 130,
+                  borderRadius: 14,
+                  border: "1px solid #cbd5e1",
+                }}
                 rows={4}
                 placeholder="Tell your tutor what is still confusing or ask a follow-up question."
                 value={studentReplyText}
                 onChange={(event) => {
                   setStudentReplyText(event.target.value);
-                  setStudentReplyState({ loading: false, success: "", error: "" });
+                  setStudentReplyState({
+                    loading: false,
+                    success: "",
+                    error: "",
+                  });
                 }}
               />
-              <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  marginTop: 8,
+                  display: "flex",
+                  gap: 8,
+                  flexWrap: "wrap",
+                }}
+              >
                 <button
                   type="button"
-                  style={{ ...styles.primaryButton, borderRadius: 10, padding: "10px 16px" }}
+                  style={{
+                    ...styles.primaryButton,
+                    borderRadius: 10,
+                    padding: "10px 16px",
+                  }}
                   onClick={handleStudentReplySubmit}
                   disabled={studentReplyState.loading || !latestTutorReview?.id}
                 >
-                  {studentReplyState.loading ? "Sending..." : "Send reply to tutor"}
+                  {studentReplyState.loading
+                    ? "Sending..."
+                    : "Send reply to tutor"}
                 </button>
               </div>
-              {studentReplyState.error ? <p style={{ ...styles.helperText, color: "#b91c1c" }}>{studentReplyState.error}</p> : null}
-              {studentReplyState.success ? <p style={{ ...styles.helperText, color: "#166534" }}>{studentReplyState.success}</p> : null}
+              {studentReplyState.error ? (
+                <p style={{ ...styles.helperText, color: "#b91c1c" }}>
+                  {studentReplyState.error}
+                </p>
+              ) : null}
+              {studentReplyState.success ? (
+                <p style={{ ...styles.helperText, color: "#166534" }}>
+                  {studentReplyState.success}
+                </p>
+              ) : null}
             </div>
           ) : null}
           {tutorReviews.length ? (
-            <div style={{ marginTop: 14, display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
+            <div
+              style={{
+                marginTop: 14,
+                display: "grid",
+                gap: 10,
+                gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+              }}
+            >
               {[
-                { label: "Approved", value: tutorStatusStats.approved, accent: "#16a34a", soft: "#dcfce7", icon: "✓" },
-                { label: "Pending", value: tutorStatusStats.pending, accent: "#ca8a04", soft: "#fef9c3", icon: "◷" },
-                { label: "Needs Revision", value: tutorStatusStats.needsRevision, accent: "#f97316", soft: "#ffedd5", icon: "!" },
+                {
+                  label: "Approved",
+                  value: tutorStatusStats.approved,
+                  accent: "#16a34a",
+                  soft: "#dcfce7",
+                  icon: "✓",
+                },
+                {
+                  label: "Pending",
+                  value: tutorStatusStats.pending,
+                  accent: "#ca8a04",
+                  soft: "#fef9c3",
+                  icon: "◷",
+                },
+                {
+                  label: "Needs Revision",
+                  value: tutorStatusStats.needsRevision,
+                  accent: "#f97316",
+                  soft: "#ffedd5",
+                  icon: "!",
+                },
               ].map((item) => (
-                <div key={item.label} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.06)" }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: item.soft, color: item.accent, fontWeight: 900, display: "grid", placeItems: "center" }}>{item.icon}</div>
+                <div
+                  key={item.label}
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 12,
+                    padding: 12,
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "center",
+                    boxShadow: "0 8px 20px rgba(15, 23, 42, 0.06)",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 10,
+                      background: item.soft,
+                      color: item.accent,
+                      fontWeight: 900,
+                      display: "grid",
+                      placeItems: "center",
+                    }}
+                  >
+                    {item.icon}
+                  </div>
                   <div>
-                    <div style={{ fontSize: 28, lineHeight: 1, fontWeight: 800 }}>{item.value}</div>
-                    <div style={{ ...styles.helperText, margin: 0 }}>{item.label}</div>
+                    <div
+                      style={{ fontSize: 28, lineHeight: 1, fontWeight: 800 }}
+                    >
+                      {item.value}
+                    </div>
+                    <div style={{ ...styles.helperText, margin: 0 }}>
+                      {item.label}
+                    </div>
                   </div>
                 </div>
               ))}

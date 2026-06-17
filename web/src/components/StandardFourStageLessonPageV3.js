@@ -18,7 +18,7 @@ import { SpeakingPoints } from "./B2Day1IdentityPilotLessonPage";
 import { getAdvancedWritingPhase } from "../data/advancedWritingProgression";
 
 const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Reference Answers" };
+const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 const card = {
   ...styles.card,
   display: "grid",

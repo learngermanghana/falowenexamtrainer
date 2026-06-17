@@ -1,4 +1,17 @@
-import { db, doc, getDoc, isFirebaseConfigured, serverTimestamp, setDoc } from "../firebase";
+import {
+  db,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  isFirebaseConfigured,
+  limit,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  addDoc,
+} from "../firebase";
 
 const COLLECTION_NAME = "writingProgress";
 
@@ -10,7 +23,11 @@ const buildDocId = ({ userId, studentCode, mode } = {}) => {
   return `${owner}__${mode || "course"}`;
 };
 
-export const loadWritingProgress = async ({ userId, studentCode, mode } = {}) => {
+export const loadWritingProgress = async ({
+  userId,
+  studentCode,
+  mode,
+} = {}) => {
   const docId = buildDocId({ userId, studentCode, mode });
   if (!docId) return null;
 
@@ -31,7 +48,12 @@ export const loadWritingProgress = async ({ userId, studentCode, mode } = {}) =>
   }
 };
 
-export const saveWritingProgress = async ({ userId, studentCode, mode, data } = {}) => {
+export const saveWritingProgress = async ({
+  userId,
+  studentCode,
+  mode,
+  data,
+} = {}) => {
   const docId = buildDocId({ userId, studentCode, mode });
   if (!docId) return false;
   const payload = {
@@ -52,11 +74,57 @@ export const saveWritingProgress = async ({ userId, studentCode, mode, data } = 
         ...payload,
         updatedAt: serverTimestamp(),
       },
-      { merge: true }
+      { merge: true },
     );
     return true;
   } catch (error) {
     console.error("Failed to save writing progress to Firebase", error);
     return false;
+  }
+};
+
+export const saveWritingAttempt = async ({
+  userId,
+  studentCode,
+  mode,
+  attempt,
+} = {}) => {
+  const ownerId = buildDocId({ userId, studentCode, mode });
+  if (!ownerId || !attempt || !isFirebaseConfigured || !db) return false;
+  try {
+    const attemptsRef = collection(db, COLLECTION_NAME, ownerId, "attempts");
+    await addDoc(attemptsRef, {
+      ...attempt,
+      userId,
+      studentCode: studentCode || null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to save writing attempt to Firebase", error);
+    return false;
+  }
+};
+
+export const loadWritingAttempts = async ({
+  userId,
+  studentCode,
+  mode,
+  pageSize = 25,
+} = {}) => {
+  const ownerId = buildDocId({ userId, studentCode, mode });
+  if (!ownerId || !isFirebaseConfigured || !db) return [];
+  try {
+    const attemptsQuery = query(
+      collection(db, COLLECTION_NAME, ownerId, "attempts"),
+      orderBy("createdAt", "desc"),
+      limit(pageSize),
+    );
+    const snapshot = await getDocs(attemptsQuery);
+    return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+  } catch (error) {
+    console.error("Failed to load writing attempts from Firebase", error);
+    return [];
   }
 };

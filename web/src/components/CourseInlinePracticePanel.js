@@ -18,11 +18,25 @@ const practiceConfig = {
       "Paste your completed text here. Falowen AI will mark it, show your score, explain the corrections and help you improve the final version. Submit the finished work through your normal assignment area when required.",
     label: "Mark my letter",
     closedButtonLabel: "Open Mark my letter",
-    render: () => <WritingPage mode="course" initialTab="mark" />,
+    render: () => (
+      <WritingPage
+        mode="course"
+        initialTab="mark"
+        enabledTabs={["mark"]}
+        hideTabList
+        markLabel="Mark My Letter"
+        submitLabel="Mark My Letter"
+      />
+    ),
   },
 };
 
-const CourseInlinePracticePanel = ({ type, title, description, defaultOpen = true }) => {
+const CourseInlinePracticePanel = ({
+  type,
+  title,
+  description,
+  defaultOpen = true,
+}) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
@@ -40,7 +54,9 @@ const CourseInlinePracticePanel = ({ type, title, description, defaultOpen = tru
     >
       <div style={{ display: "grid", gap: 6 }}>
         <strong>{title || config.defaultTitle}</strong>
-        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{description || config.defaultDescription}</p>
+        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+          {description || config.defaultDescription}
+        </p>
       </div>
       <button
         type="button"
@@ -61,7 +77,9 @@ const CourseInlinePracticePanel = ({ type, title, description, defaultOpen = tru
             paddingTop: 12,
           }}
         >
-          <span style={styles.helperText}>{config.label} loaded inside this workbook page.</span>
+          <span style={styles.helperText}>
+            {config.label} loaded inside this workbook page.
+          </span>
           {config.render()}
         </div>
       ) : null}

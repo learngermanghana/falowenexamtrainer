@@ -24,7 +24,7 @@ const card = {
 };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Reference Answers" };
+const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 
 const Section = ({ title, children }) => (
   <section style={card}>
