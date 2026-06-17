@@ -3,6 +3,7 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../firebase";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
+import { normalizeWritingFeedback } from "../lib/writingFeedbackNormalizer";
 import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 
 const backendUrl = getBackendUrl();
@@ -155,6 +156,21 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
   return response.data;
 };
 
+const toLegacyRubric = (normalized) => {
+  const rubric = Object.fromEntries(
+    Object.entries(normalized?.rubric || {}).map(([key, value]) => [
+      key,
+      Number(value && typeof value === "object" ? value.score : value) || 0,
+    ]),
+  );
+
+  if (!rubric.overall && Number(normalized?.score) > 0) {
+    rubric.overall = Number(normalized.score);
+  }
+
+  return rubric;
+};
+
 export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, promptType, previousText, previousFeedback, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/mark`,
@@ -171,7 +187,26 @@ export const markLetterWithAI = async ({ text, level, studentName, program, subm
     { headers: authHeaders(idToken) }
   );
 
-  return response.data;
+  const raw = response.data || {};
+  const normalized = normalizeWritingFeedback(raw?.structuredFeedback ?? raw);
+
+  if (normalized.parseError) {
+    const error = new Error(
+      "Falowen could not read the AI feedback safely. Please retry; your writing is still here.",
+    );
+    error.code = "INVALID_WRITING_FEEDBACK";
+    throw error;
+  }
+
+  return {
+    ...raw,
+    score: normalized.score,
+    maxScore: normalized.maxScore,
+    rubric: toLegacyRubric(normalized),
+    corrections: normalized.corrections,
+    structuredFeedback: normalized,
+    feedback: normalized.summary || "Analysis completed.",
+  };
 };
 
 export const fetchIdeasFromCoach = async ({ messages, level, program, idToken }) => {
