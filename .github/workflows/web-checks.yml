@@ -1,0 +1,35 @@
+name: Web checks
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/web-checks.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: Test the speaking timer
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingPracticeTimerCard.test.js
+
+      - name: Build web app
+        working-directory: web
+        run: npm run build

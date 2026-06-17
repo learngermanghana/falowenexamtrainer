@@ -2,12 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import "./SpeakingPracticeTimerCard.css";
 
-const levelTargets = {
-  A2: 45,
-  B1: 90,
-  B2: 120,
-  C1: 120,
-};
+const PRESET_MINUTES = [5, 10, 15, 20];
+const MIN_CUSTOM_MINUTES = 1;
+const MAX_CUSTOM_MINUTES = 120;
 
 const formatTimer = (seconds) => {
   const safeSeconds = Math.max(0, Number(seconds) || 0);
@@ -16,32 +13,34 @@ const formatTimer = (seconds) => {
   return `${minutes}:${remaining}`;
 };
 
-const inferLevelFromPath = () => {
-  if (typeof window === "undefined") return "";
-  const path = String(window.location?.pathname || "").toUpperCase();
-  const match = path.match(/(?:^|\/|-)(A2|B1|B2|C1)(?:\/|-|$)/);
-  return match?.[1] || "";
+const resolveInitialMinutes = (targetSeconds) => {
+  const explicitMinutes = Math.round(Number(targetSeconds) / 60);
+  return PRESET_MINUTES.includes(explicitMinutes) ? explicitMinutes : 5;
 };
 
-const resolveDuration = (targetSeconds, level) => {
-  const explicit = Number(targetSeconds);
-  if (Number.isFinite(explicit) && explicit > 0) return explicit;
-  const resolvedLevel = String(level || inferLevelFromPath()).toUpperCase();
-  return levelTargets[resolvedLevel] || 300;
+const clampMinutes = (value) => {
+  const parsed = Math.round(Number(value));
+  if (!Number.isFinite(parsed)) return 5;
+  return Math.min(MAX_CUSTOM_MINUTES, Math.max(MIN_CUSTOM_MINUTES, parsed));
 };
 
-const SpeakingPracticeTimerCard = ({ targetSeconds, level }) => {
-  const resolvedDuration = useMemo(
-    () => resolveDuration(targetSeconds, level),
-    [level, targetSeconds],
+const SpeakingPracticeTimerCard = ({ targetSeconds }) => {
+  const initialMinutes = useMemo(
+    () => resolveInitialMinutes(targetSeconds),
+    [targetSeconds],
   );
-  const [timerSecondsLeft, setTimerSecondsLeft] = useState(resolvedDuration);
+  const [durationMinutes, setDurationMinutes] = useState(initialMinutes);
+  const [timerSecondsLeft, setTimerSecondsLeft] = useState(initialMinutes * 60);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [durationChoice, setDurationChoice] = useState(String(initialMinutes));
+  const [customMinutes, setCustomMinutes] = useState(25);
 
   useEffect(() => {
-    setTimerSecondsLeft(resolvedDuration);
+    setDurationMinutes(initialMinutes);
+    setTimerSecondsLeft(initialMinutes * 60);
+    setDurationChoice(String(initialMinutes));
     setTimerRunning(false);
-  }, [resolvedDuration]);
+  }, [initialMinutes]);
 
   useEffect(() => {
     if (!timerRunning || timerSecondsLeft <= 0) return undefined;
@@ -60,9 +59,38 @@ const SpeakingPracticeTimerCard = ({ targetSeconds, level }) => {
     return () => window.clearInterval(intervalId);
   }, [timerRunning, timerSecondsLeft]);
 
+  const applyDuration = (minutes, nextChoice = String(minutes)) => {
+    const safeMinutes = clampMinutes(minutes);
+    setDurationMinutes(safeMinutes);
+    setTimerSecondsLeft(safeMinutes * 60);
+    setTimerRunning(false);
+    setDurationChoice(nextChoice);
+  };
+
+  const handleDurationChoice = (event) => {
+    const nextChoice = event.target.value;
+    setDurationChoice(nextChoice);
+    if (nextChoice !== "custom") {
+      applyDuration(Number(nextChoice), nextChoice);
+    }
+  };
+
+  const applyCustomDuration = () => {
+    const safeMinutes = clampMinutes(customMinutes);
+    setCustomMinutes(safeMinutes);
+    applyDuration(safeMinutes, "custom");
+  };
+
+  const handleCustomKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      applyCustomDuration();
+    }
+  };
+
   const toggleTimer = () => {
     if (timerSecondsLeft === 0) {
-      setTimerSecondsLeft(resolvedDuration);
+      setTimerSecondsLeft(durationMinutes * 60);
       setTimerRunning(true);
       return;
     }
@@ -71,7 +99,7 @@ const SpeakingPracticeTimerCard = ({ targetSeconds, level }) => {
 
   const resetTimer = () => {
     setTimerRunning(false);
-    setTimerSecondsLeft(resolvedDuration);
+    setTimerSecondsLeft(durationMinutes * 60);
   };
 
   return (
@@ -86,6 +114,51 @@ const SpeakingPracticeTimerCard = ({ targetSeconds, level }) => {
       <span className="speaking-compact-timer__time" aria-live="polite">
         {formatTimer(timerSecondsLeft)}
       </span>
+
+      <label className="speaking-compact-timer__duration">
+        <span className="sr-only">Timer duration</span>
+        <select
+          value={durationChoice}
+          onChange={handleDurationChoice}
+          disabled={timerRunning}
+          aria-label="Timer duration"
+        >
+          {PRESET_MINUTES.map((minutes) => (
+            <option key={minutes} value={minutes}>
+              {minutes} min
+            </option>
+          ))}
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+
+      {durationChoice === "custom" ? (
+        <span className="speaking-compact-timer__custom">
+          <input
+            type="number"
+            min={MIN_CUSTOM_MINUTES}
+            max={MAX_CUSTOM_MINUTES}
+            step="1"
+            value={customMinutes}
+            onChange={(event) => setCustomMinutes(event.target.value)}
+            onKeyDown={handleCustomKeyDown}
+            disabled={timerRunning}
+            aria-label="Custom timer minutes"
+          />
+          <span>min</span>
+          <button
+            type="button"
+            className="speaking-compact-timer__button"
+            style={styles.secondaryButton}
+            onClick={applyCustomDuration}
+            disabled={timerRunning}
+            aria-label="Set custom timer duration"
+          >
+            Set
+          </button>
+        </span>
+      ) : null}
+
       <button
         type="button"
         className="speaking-compact-timer__button speaking-compact-timer__button--primary"
