@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
-import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
+import CourseWorkbookTabsV2 from "./CourseWorkbookTabsV2";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 const workbookRouteIndex = buildWorkbookRouteIndex();
@@ -29,7 +29,7 @@ const AutoWorkbookStartGuide = () => {
       }}
     >
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
-      <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />
+      <CourseWorkbookTabsV2 hostRef={hostRef} match={match} />
     </div>
   );
 };
