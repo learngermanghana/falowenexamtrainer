@@ -52,25 +52,60 @@ div:has(
 }
 
 .speaking-mind-map__help-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(220px, 1.15fr);
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding-top: 2px;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid #2563eb;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #eff6ff, #eef2ff);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.14);
 }
 
 .speaking-mind-map__help-toggle span {
-  color: #64748b;
-  font-size: 0.78rem;
-  line-height: 1.45;
+  color: #1e3a8a;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 .speaking-mind-map__help-button {
-  min-height: 34px !important;
-  padding: 6px 12px !important;
-  border-radius: 999px !important;
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px !important;
+  border: 1px solid #1d4ed8 !important;
+  border-radius: 12px !important;
+  background: #2563eb !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+}
+
+.speaking-mind-map__help-button:hover,
+.speaking-mind-map__help-button:focus-visible {
+  background: #1d4ed8 !important;
+  box-shadow: 0 10px 22px rgba(29, 78, 216, 0.3);
+  outline: 3px solid rgba(96, 165, 250, 0.45);
+  outline-offset: 2px;
+}
+
+.speaking-mind-map[data-help-open="false"] .speaking-mind-map__help-button::before {
+  content: "＋";
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.speaking-mind-map[data-help-open="true"] .speaking-mind-map__help-button::before {
+  content: "−";
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .speaking-compact-timer__icon {
@@ -160,11 +195,14 @@ div:has(
   }
 
   .speaking-mind-map__help-toggle {
-    display: grid;
-    gap: 6px;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 12px;
   }
 
   .speaking-mind-map__help-button {
-    width: fit-content;
+    width: 100% !important;
+    min-height: 56px !important;
+    font-size: 1.02rem !important;
   }
 }
