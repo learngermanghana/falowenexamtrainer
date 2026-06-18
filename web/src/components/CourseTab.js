@@ -9,6 +9,7 @@ import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/ger
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
@@ -449,6 +450,58 @@ const courseBookStyles = {
   chip: { display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 999, padding: "5px 9px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 700 },
   statusChip: { display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" },
   lessonActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
+  floatingSubmitButton: {
+    position: "fixed",
+    right: "max(18px, env(safe-area-inset-right))",
+    bottom: "max(18px, env(safe-area-inset-bottom))",
+    zIndex: 40,
+    alignItems: "center",
+    background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+    border: "1px solid rgba(255,255,255,0.5)",
+    borderRadius: 999,
+    boxShadow: "0 18px 36px rgba(37,99,235,0.35)",
+    color: "#ffffff",
+    cursor: "pointer",
+    display: "inline-flex",
+    fontWeight: 900,
+    gap: 8,
+    minHeight: 54,
+    padding: "0 20px",
+  },
+  submitOverlay: {
+    position: "fixed",
+    inset: 0,
+    zIndex: 70,
+  },
+  submitBackdrop: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(15,23,42,0.42)",
+  },
+  submitPanel: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: "min(920px, 100%)",
+    overflowY: "auto",
+    background: "#f8fafc",
+    boxShadow: "-24px 0 48px rgba(15,23,42,0.24)",
+    padding: "clamp(14px, 3vw, 24px)",
+  },
+  submitPanelHeader: {
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    alignItems: "center",
+    background: "rgba(248,250,252,0.96)",
+    borderBottom: "1px solid #e2e8f0",
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    marginBottom: 12,
+    padding: "8px 0 12px",
+  },
   practiceControls: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 8 },
   emptyState: { ...styles.card, marginBottom: 0, textAlign: "center", borderRadius: 18, padding: 24 },
 };
@@ -519,6 +572,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return levels[0] || "";
   });
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
+  const [courseSubmitOpen, setCourseSubmitOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
@@ -689,9 +743,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
                   Continue learning
                 </button>
-                <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)", fontWeight: 800 }} onClick={() => navigate("/campus/submit", { state: { level: selectedCourseLevel } })}>
-                  Submit work
-                </button>
+                {!isSelfLearningLevel ? (
+                  <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)", fontWeight: 800 }} onClick={() => setCourseSubmitOpen(true)}>
+                    Submit work
+                  </button>
+                ) : null}
                 <YouTubeSubscribeButton />
               </div>
             </div>
@@ -734,6 +790,43 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {decoratedSchedule.length} lessons passed</p>
             </div>
           </section>
+
+
+          {!isSelfLearningLevel ? (
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={courseSubmitOpen}
+              onClick={() => setCourseSubmitOpen(true)}
+              style={courseBookStyles.floatingSubmitButton}
+            >
+              <span style={{ fontSize: 18 }} aria-hidden="true">✍️</span>
+              <span>Submit</span>
+            </button>
+          ) : null}
+
+          {courseSubmitOpen ? (
+            <div role="dialog" aria-modal="true" aria-label={`${selectedCourseLevel} assignment submit`} style={courseBookStyles.submitOverlay}>
+              <div style={courseBookStyles.submitBackdrop} onClick={() => setCourseSubmitOpen(false)} />
+              <section style={courseBookStyles.submitPanel}>
+                <div style={courseBookStyles.submitPanelHeader}>
+                  <div>
+                    <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase" }}>
+                      {selectedCourseLevel} assignment submit
+                    </p>
+                    <h3 style={{ margin: "3px 0 0", color: "#0f172a" }}>Submit your workbook answers</h3>
+                  </div>
+                  <button type="button" style={styles.secondaryButton} onClick={() => setCourseSubmitOpen(false)}>
+                    Close
+                  </button>
+                </div>
+                <div className="course-book-drawer-submission-page">
+                  <style>{`.course-book-drawer-submission-page > div > section:first-child { display: none !important; }`} </style>
+                  <AssignmentSubmissionPage submissionContext={{ level: selectedCourseLevel }} />
+                </div>
+              </section>
+            </div>
+          ) : null}
 
           {nextLesson ? (
             <section style={courseBookStyles.nextCard}>
