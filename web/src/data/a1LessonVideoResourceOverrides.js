@@ -27,5 +27,31 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   // prevents two different numbers videos from appearing in the lesson hub.
   a1[4] = { videoResources: [] };
 
+  a1[19] = {
+    videoResources: [
+      {
+        key: "a1-day19-goethe-speaking-practice-ai-video",
+        chapter: "13",
+        title: "A1 Day 19 · Goethe A1 Speaking Practice · AI video",
+        description:
+          "AI-supported Goethe A1 speaking practice for preparing short, clear exam answers.",
+        url: "https://youtu.be/gprnEZtMUPM",
+      },
+    ],
+  };
+
+  a1[21] = {
+    videoResources: [
+      {
+        key: "a1-day21-weather-ai-video",
+        chapter: "14",
+        title: "A1 Day 21 · Weather · AI video",
+        description:
+          "AI video lesson for describing the weather and answering simple weather questions in German.",
+        url: "https://youtu.be/fRYM7ojc0Yo",
+      },
+    ],
+  };
+
   return dictionary;
 };
