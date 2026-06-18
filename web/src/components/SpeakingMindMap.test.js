@@ -102,14 +102,39 @@ test("renders only one mind map root per component", () => {
   expect(container.querySelectorAll("[data-speaking-mind-map]")).toHaveLength(1);
 });
 
-test("registry validates every A2 Teil 1 speaking mind map", () => {
-  expect(a2SpeakingMindMaps).toHaveLength(27);
+test("registry validates every A2 Teil 1 speaking mind map from Day 1 to Day 28", () => {
+  expect(a2SpeakingMindMaps).toHaveLength(28);
   expect(
     a2SpeakingMindMaps.map((entry) => entry.day).sort((a, b) => a - b),
-  ).toEqual(Array.from({ length: 27 }, (_, index) => index + 2));
+  ).toEqual(Array.from({ length: 28 }, (_, index) => index + 1));
   a2SpeakingMindMaps.forEach((entry) =>
     expect(validateSpeakingMindMapConfig(entry)).toBe(true),
   );
+});
+
+test("A2 Days 1 to 8 use topic-specific prompts instead of the generic template", () => {
+  const earlyMaps = Array.from({ length: 8 }, (_, index) =>
+    getA2SpeakingMindMap(index + 1),
+  );
+
+  expect(earlyMaps[0]).toEqual(
+    expect.objectContaining({
+      day: 1,
+      title: "Small Talk",
+      centralQuestion: "Wie führst du ein kurzes freundliches Gespräch?",
+    }),
+  );
+
+  earlyMaps.forEach((entry) => {
+    expect(validateSpeakingMindMapConfig(entry)).toBe(true);
+    entry.branches.forEach((branch) => {
+      expect(branch.guidingQuestion).not.toMatch(/^Was sagst du über/i);
+      expect(branch.sentenceStarter).not.toMatch(/^Bei .+ sage ich:/i);
+      expect(branch.modelSentence).not.toContain(
+        "einen einfachen Satz zum Thema",
+      );
+    });
+  });
 });
 
 test("registry validation rejects incomplete configuration", () => {
