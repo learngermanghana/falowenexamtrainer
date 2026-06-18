@@ -254,7 +254,12 @@ function App() {
     notificationStatus,
     saveStudentProfile,
   } = useAuth();
-  const [authMode, setAuthMode] = useState("landing");
+  const [authMode, setAuthMode] = useState(() => {
+    if (typeof window === "undefined") return "landing";
+    if (window.location.pathname.startsWith("/signup")) return "signup";
+    if (window.location.pathname.startsWith("/login")) return "login";
+    return "landing";
+  });
   const programStorageKey = "falowen:signup-program";
   const [signupProgram, setSignupProgram] = useState(() => {
     if (typeof window === "undefined") return "german";
@@ -293,6 +298,19 @@ function App() {
   useEffect(() => {
     localStorage.setItem(programStorageKey, signupProgram);
   }, [programStorageKey, signupProgram]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/signup")) {
+      const program = new URLSearchParams(location.search).get("program");
+      if (["german", "french"].includes(program)) setSignupProgram(program);
+      setAuthMode("signup");
+    } else if (location.pathname.startsWith("/login")) {
+      setAuthMode("login");
+    } else if (location.pathname.startsWith("/classes")) {
+      setAuthMode("landing");
+      window.setTimeout(() => document.getElementById("upcoming-classes")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    }
+  }, [location.pathname, location.search]);
 
   const availableTabs = useMemo(
     () => tabStructure.filter((tab) => isTabAvailable(tab, allowedSections)),
