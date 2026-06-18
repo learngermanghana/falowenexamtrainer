@@ -24,12 +24,27 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Test speaking focus mode and timer
+      - name: Test class-member placement
+        id: class-tests
+        continue-on-error: true
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/components/ClassMembersPlacement.test.js src/components/CourseClassMembersShortcut.test.js > ../class-members-test.log 2>&1
+
+      - name: Upload class-member test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: class-members-test-log
+          path: class-members-test.log
+          if-no-files-found: error
+
+      - name: Fail when class-member tests fail
+        if: steps.class-tests.outcome == 'failure'
+        run: exit 1
 
       - name: Build web app
+        if: steps.class-tests.outcome == 'success'
         working-directory: web
         run: npm run build
