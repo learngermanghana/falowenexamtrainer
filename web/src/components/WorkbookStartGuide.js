@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
+import { getAdditionalLessonVideoResources } from "../data/additionalLessonVideoResources";
 
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
@@ -71,6 +72,16 @@ const findResourceUrl = (entry = {}, key, level = "", day = "") => {
   return nested?.[key] || "";
 };
 
+const mergeVideoResources = (...groups) => {
+  const seen = new Set();
+  return groups.flat().filter((resource) => {
+    const url = resource?.url;
+    if (!url || seen.has(url)) return false;
+    seen.add(url);
+    return true;
+  });
+};
+
 const findVideo = (videos = [], keyword) => videos.find((resource) => String(resource.title || "").toLowerCase().includes(keyword));
 
 const LessonResourceItem = ({ number, icon, title, actionLabel, url }) => {
@@ -108,7 +119,13 @@ const LessonResourceItem = ({ number, icon, title, actionLabel, url }) => {
 
 const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) => {
   const entry = useMemo(() => suppliedEntry || findEntry(level, day), [day, level, suppliedEntry]);
-  const videos = useMemo(() => getLessonVideoResources(level, day, entry || {}), [day, entry, level]);
+  const videos = useMemo(
+    () => mergeVideoResources(
+      getLessonVideoResources(level, day, entry || {}),
+      getAdditionalLessonVideoResources(level, day),
+    ),
+    [day, entry, level],
+  );
   const teacherVideo = findVideo(videos, "teacher") || videos[0];
   const aiVideo = findVideo(videos, "ai") || videos.find((resource) => resource?.url !== teacherVideo?.url);
   const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link", level, day);

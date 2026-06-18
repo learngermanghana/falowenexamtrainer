@@ -1,13 +1,16 @@
 import { validateSpeakingMindMapConfig as validateMultiLevelSpeakingMindMapConfig } from "../index";
+import { earlyA2LessonBranchesByDay } from "./earlyLessonBranches";
+import { personenBeschreibenBranches } from "./personenBeschreiben";
 
 const topics = [
-  [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"]],
-  [3, "a2-day-3-vergleichen", "Dinge und Personen vergleichen", "Was vergleichst du und was ist anders oder gleich?", ["Personen", "Dinge", "Größe", "Preis", "Meinung"]],
-  [4, "a2-day-4-treffen", "Wo möchten wir uns treffen?", "Wo und wann möchtest du dich treffen?", ["Ort", "Zeit", "Aktivität", "Weg", "Bestätigung"]],
-  [5, "a2-day-5-freizeit", "Freizeit", "Was machst du gern in deiner Freizeit?", ["Hobbys", "Zeit", "Ort", "Freunde", "Warum"]],
-  [6, "a2-day-6-moebel-raeume", "Möbel und Räume", "Wie beschreibst du dein Zimmer oder deine Wohnung?", ["Zimmer", "Möbel", "Farben", "Position", "Lieblingsplatz"]],
-  [7, "a2-day-7-wohnung-suchen", "Eine Wohnung suchen", "Welche Wohnung suchst du und warum?", ["Größe", "Lage", "Preis", "Ausstattung", "Termin"]],
-  [8, "a2-day-8-rezepte-essen", "Rezepte und Essen", "Was kochst oder isst du gern?", ["Gericht", "Zutaten", "Schritte", "Geschmack", "Anlass"]],
+  [1, "a2-day-1-small-talk", "Small Talk", "Wie führst du ein kurzes freundliches Gespräch?", ["Begrüßung", "Kennenlernen", "Arbeit oder Studium", "Freizeit", "Gespräch beenden"], earlyA2LessonBranchesByDay[1]],
+  [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"], personenBeschreibenBranches],
+  [3, "a2-day-3-vergleichen", "Dinge und Personen vergleichen", "Was vergleichst du und was ist anders oder gleich?", ["Auswahl", "Gemeinsamkeiten", "Unterschiede", "Preis und Qualität", "Meinung"], earlyA2LessonBranchesByDay[3]],
+  [4, "a2-day-4-treffen", "Wo möchten wir uns treffen?", "Wo und wann möchtest du dich treffen?", ["Aktivität", "Treffpunkt", "Zeit", "Anreise", "Bestätigung"], earlyA2LessonBranchesByDay[4]],
+  [5, "a2-day-5-freizeit", "Freizeit", "Was machst du gern in deiner Freizeit?", ["Hobby", "Zeit und Häufigkeit", "Ort", "Mit wem?", "Grund und Gefühl"], earlyA2LessonBranchesByDay[5]],
+  [6, "a2-day-6-moebel-raeume", "Möbel und Räume", "Wie beschreibst du dein Zimmer oder deine Wohnung?", ["Raum", "Möbel", "Position", "Farben und Zustand", "Lieblingsplatz"], earlyA2LessonBranchesByDay[6]],
+  [7, "a2-day-7-wohnung-suchen", "Eine Wohnung suchen", "Welche Wohnung suchst du und warum?", ["Größe und Zimmer", "Lage", "Miete und Kosten", "Ausstattung", "Besichtigung"], earlyA2LessonBranchesByDay[7]],
+  [8, "a2-day-8-rezepte-essen", "Rezepte und Essen", "Was kochst oder isst du gern?", ["Gericht", "Zutaten", "Vorbereitung", "Kochschritte", "Geschmack und Anlass"], earlyA2LessonBranchesByDay[8]],
   [9, "a2-day-9-urlaub", "Urlaub", "Wie war dein Urlaub oder wie planst du Urlaub?", ["Ort", "Reise", "Aktivitäten", "Wetter", "Meinung"]],
   [10, "a2-day-10-tourismus-feste", "Tourismus und traditionelle Feste", "Welches Fest oder welchen Ort empfiehlst du?", ["Ort", "Fest", "Essen", "Aktivitäten", "Tipp"]],
   [11, "a2-day-11-verkehrsmittel", "Verkehrsmittel vergleichen", "Welches Verkehrsmittel benutzt du und warum?", ["Verkehrsmittel", "Preis", "Zeit", "Komfort", "Meinung"]],
@@ -42,8 +45,8 @@ const makeBranch = (label, index, title) => {
   };
 };
 
-export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels]) => {
-  const branches = labels.map((label, index) => makeBranch(label, index, title));
+export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels, configuredBranches]) => {
+  const branches = configuredBranches || labels.map((label, index) => makeBranch(label, index, title));
   return {
     level: "A2",
     branchTypeSet: "A2",

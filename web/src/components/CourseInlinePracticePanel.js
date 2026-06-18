@@ -1,11 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { styles } from "../styles";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import SpeakingMindMap from "./SpeakingMindMap";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
 
+const currentPath = () => {
+  if (typeof window === "undefined") return "";
+  return String(window.location?.pathname || "").toLowerCase();
+};
+
 const routeWritingContext = () => {
-  if (typeof window === "undefined") return {};
-  const path = String(window.location?.pathname || "").toLowerCase();
+  const path = currentPath();
   const match =
     path.match(/\/campus\/course\/lesson\/(a1|a2|b1|b2|c1)\/(\d+)/) ||
     path.match(/(a1|a2|b1|b2|c1)-day-(\d+)/);
@@ -22,6 +28,18 @@ const routeWritingContext = () => {
     workbookId: lessonId,
     writingTaskId: `${lessonId}-teil-2-writing`,
   };
+};
+
+const routeSpeakingMindMap = () => {
+  const path = currentPath();
+
+  // The historical URL says "day-2", but the A2 course schedule correctly
+  // identifies Small Talk 1.1 as the first teaching lesson (Day 1).
+  if (path.includes("/campus/course/a2-day-2-small-talk-workbook")) {
+    return getA2SpeakingMindMap(1);
+  }
+
+  return null;
 };
 
 const practiceConfig = {
@@ -63,6 +81,10 @@ const CourseInlinePracticePanel = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
+  const speakingMindMap = useMemo(
+    () => (type === "speaking" ? routeSpeakingMindMap() : null),
+    [type],
+  );
   const resolvedWritingContext = useMemo(() => {
     if (type !== "writing") return {};
     const routeContext = routeWritingContext();
@@ -82,49 +104,52 @@ const CourseInlinePracticePanel = ({
   }, [title, type, writingContext]);
 
   return (
-    <div
-      data-course-inline-practice={type || "speaking"}
-      style={{
-        ...styles.card,
-        margin: 0,
-        display: "grid",
-        gap: 12,
-        background: "#f8fafc",
-        border: "1px solid #dbeafe",
-      }}
-    >
-      <div style={{ display: "grid", gap: 6 }}>
-        <strong>{title || config.defaultTitle}</strong>
-        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-          {description || config.defaultDescription}
-        </p>
-      </div>
-      <button
-        type="button"
-        style={{ ...styles.primaryButton, width: "fit-content" }}
-        onClick={() => setIsOpen((current) => !current)}
-        aria-expanded={isOpen}
-        aria-controls={panelId}
+    <Fragment>
+      {speakingMindMap ? <SpeakingMindMap config={speakingMindMap} /> : null}
+      <div
+        data-course-inline-practice={type || "speaking"}
+        style={{
+          ...styles.card,
+          margin: 0,
+          display: "grid",
+          gap: 12,
+          background: "#f8fafc",
+          border: "1px solid #dbeafe",
+        }}
       >
-        {isOpen ? "Hide practice" : config.closedButtonLabel}
-      </button>
-      {isOpen ? (
-        <div
-          id={panelId}
-          style={{
-            display: "grid",
-            gap: 12,
-            borderTop: "1px solid #dbeafe",
-            paddingTop: 12,
-          }}
-        >
-          <span style={styles.helperText}>
-            {config.label} loaded inside this workbook page.
-          </span>
-          {config.render(resolvedWritingContext)}
+        <div style={{ display: "grid", gap: 6 }}>
+          <strong>{title || config.defaultTitle}</strong>
+          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+            {description || config.defaultDescription}
+          </p>
         </div>
-      ) : null}
-    </div>
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, width: "fit-content" }}
+          onClick={() => setIsOpen((current) => !current)}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+        >
+          {isOpen ? "Hide practice" : config.closedButtonLabel}
+        </button>
+        {isOpen ? (
+          <div
+            id={panelId}
+            style={{
+              display: "grid",
+              gap: 12,
+              borderTop: "1px solid #dbeafe",
+              paddingTop: 12,
+            }}
+          >
+            <span style={styles.helperText}>
+              {config.label} loaded inside this workbook page.
+            </span>
+            {config.render(resolvedWritingContext)}
+          </div>
+        ) : null}
+      </div>
+    </Fragment>
   );
 };
 

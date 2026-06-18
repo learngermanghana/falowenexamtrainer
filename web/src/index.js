@@ -8,6 +8,7 @@ import SubmitPageLevelGuidanceInjector from './components/SubmitPageLevelGuidanc
 import SubmitSuccessScreenInjector from './components/SubmitSuccessScreenInjector';
 import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
+import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -17,6 +18,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+      <PublicAuthRouteBridge />
       <AuthProvider>
         <ToastProvider>
           <LandingPublicLanguageGuard />
