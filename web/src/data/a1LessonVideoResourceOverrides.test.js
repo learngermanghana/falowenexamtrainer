@@ -9,6 +9,13 @@ const aiVideos = (lesson) =>
     (video) => !`${video.key || ""} ${video.title || ""}`.toLowerCase().includes("teacher"),
   );
 
+const expectRequestedAiVideo = (day, expected) => {
+  const lesson = normalizeLesson(getA1Lesson(day), "A1");
+  expect(aiVideos(lesson)).toEqual(
+    expect.arrayContaining([expect.objectContaining(expected)]),
+  );
+};
+
 test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
   const lesson = normalizeLesson(getA1Lesson(2), "A1");
   const videos = aiVideos(lesson);
@@ -44,4 +51,18 @@ test("A1 Day 4 keeps only Kapitel 2 German Numbers AI video", () => {
     }),
   );
   expect(lesson.resources.videos.some((video) => video.title === "Kapitel 2 · Zahlen · AI video")).toBe(false);
+});
+
+test("A1 Day 19 uses the requested Goethe A1 Speaking Practice AI video", () => {
+  expectRequestedAiVideo(19, {
+    title: "A1 Day 19 · Goethe A1 Speaking Practice · AI video",
+    url: "https://youtu.be/gprnEZtMUPM",
+  });
+});
+
+test("A1 Day 21 uses the requested Weather AI video", () => {
+  expectRequestedAiVideo(21, {
+    title: "A1 Day 21 · Weather · AI video",
+    url: "https://youtu.be/fRYM7ojc0Yo",
+  });
 });
