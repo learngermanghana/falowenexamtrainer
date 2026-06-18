@@ -45,11 +45,14 @@
         function tryOpenSignup() {
           if (!shouldOpenSignup()) return true;
 
-          var buttons = Array.prototype.slice.call(document.querySelectorAll("button"));
-          var signupButton = buttons.find(function (button) {
-            var text = (button.textContent || "").toLowerCase();
-            return text.includes("join") || text.includes("sign up") || text.includes("get started");
-          });
+          var signupButton = document.querySelector("button.falowen-home-primary");
+          if (!signupButton) {
+            var buttons = Array.prototype.slice.call(document.querySelectorAll("button"));
+            signupButton = buttons.find(function (button) {
+              var text = (button.textContent || "").toLowerCase();
+              return text.includes("join") || text.includes("sign up") || text.includes("get started");
+            });
+          }
 
           if (signupButton) {
             clearSignupFlag();
