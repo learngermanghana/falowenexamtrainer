@@ -3,8 +3,11 @@ import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
+import SpeakingMindMap from "./SpeakingMindMap";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import { useToast } from "../context/ToastContext";
 import b2Day1QuestionWritingBuilder from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
+import { b2SpeakingMindMapExample } from "../data/speakingMindMaps/examples";
 import { styles } from "../styles";
 
 const tabs = [
@@ -109,18 +112,14 @@ export const b2Day1SpeakingQuestion = "Welche Faktoren prägen deine persönlich
 
 export const SpeakingPoints = () => (
   <div style={{ display: "grid", gap: 12 }}>
-    <NoteBox tone="amber">
-      <strong>Sprechfrage:</strong> {b2Day1SpeakingQuestion}
-    </NoteBox>
-    <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
-      <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
-      <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus und gib Gründe und Beispiele.</p>
-      <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.75 }}>
-        {speakingTopics.map((topic) => (
-          <li key={topic.title}><strong>{topic.title}:</strong> {topic.keywords.join(", ")}</li>
-        ))}
-      </ul>
-    </div>
+    <SpeakingPracticeTimerCard
+      targetSeconds={b2SpeakingMindMapExample.targetDurationSeconds}
+      progressScope="b2-day-1-persoenliche-identitaet"
+    />
+    <SpeakingMindMap
+      config={b2SpeakingMindMapExample}
+      progressScope="b2-day-1-persoenliche-identitaet"
+    />
   </div>
 );
 

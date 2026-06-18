@@ -1,6 +1,7 @@
 import { buildWeltReadingSearchUrl, makeLesson } from "../buildSelfLearningLesson";
+import { b2SpeakingMindMapExample } from "../../speakingMindMaps/examples";
 
-const b2Day1PersoenlicheIdentitaet = makeLesson({
+const lesson = makeLesson({
   level: "B2",
   day: 1,
   chapter: "1.1",
@@ -176,5 +177,10 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
     "Selbstbewusstsein",
   ],
 });
+
+const b2Day1PersoenlicheIdentitaet = {
+  ...lesson,
+  speakingMindMap: b2SpeakingMindMapExample,
+};
 
 export default b2Day1PersoenlicheIdentitaet;
