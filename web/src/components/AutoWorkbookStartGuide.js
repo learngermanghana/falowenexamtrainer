@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import { styles } from "../styles";
+import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -33,7 +34,7 @@ export const buildWorkbookRouteIndex = (schedules = courseSchedules) => {
       getWorkbookResources(entry).forEach((resource) => {
         const pathname = normalizeInAppPath(resource?.workbook_link);
         if (!pathname || index.has(pathname)) return;
-        index.set(pathname, { level, day: entry?.day, entry });
+        index.set(pathname, { level, day: entry?.day, entry, resource });
       });
     });
   });
@@ -45,12 +46,15 @@ const workbookRouteIndex = buildWorkbookRouteIndex();
 
 const AutoWorkbookStartGuide = () => {
   const { pathname } = useLocation();
+  const hostRef = useRef(null);
   const match = useMemo(() => workbookRouteIndex.get(normalizeInAppPath(pathname)), [pathname]);
 
   if (!match) return null;
 
   return (
     <div
+      ref={hostRef}
+      data-auto-workbook-start-guide="true"
       style={{
         ...styles.container,
         display: "grid",
@@ -62,6 +66,7 @@ const AutoWorkbookStartGuide = () => {
       }}
     >
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
+      <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />
     </div>
   );
 };
