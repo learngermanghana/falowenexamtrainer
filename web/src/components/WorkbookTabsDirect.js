@@ -1,3 +1,3 @@
-import WorkbookTabsContainer from "./WorkbookTabsContainer";
+import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 
-export default WorkbookTabsContainer;
+export default CourseWorkbookSubmissionTabs;
