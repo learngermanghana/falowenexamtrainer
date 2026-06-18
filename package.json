@@ -1,9 +1,9 @@
 {
   "name": "falowen-exam-coach-backend",
   "version": "1.0.0",
-  "main": "functions/functionz/server.final.js",
+  "main": "functions/functionz/server.js",
   "scripts": {
-    "start": "node functions/functionz/server.final.js",
+    "start": "node functions/functionz/server.js",
     "test": "npm run test:backend",
     "test:backend": "npx --yes jest --config jest.config.js",
     "test:ci": "npm run test:integration",

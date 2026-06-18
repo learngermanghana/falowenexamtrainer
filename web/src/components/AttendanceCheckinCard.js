@@ -13,7 +13,6 @@ export default function AttendanceCheckinCard() {
 
   const className = studentProfile?.className || "";
   const studentCode = getStudentCode(studentProfile, user);
-  const studentDocumentId = studentProfile?.id || "";
 
   useEffect(() => {
     let cancelled = false;
@@ -23,12 +22,7 @@ export default function AttendanceCheckinCard() {
         return;
       }
       try {
-        const activeSession = await getActiveAttendanceSession({
-          className,
-          studentCode,
-          studentUid: user?.uid,
-          studentDocumentId,
-        });
+        const activeSession = await getActiveAttendanceSession({ className, studentCode, studentUid: user?.uid });
         if (!cancelled) setSession(activeSession);
       } catch (err) {
         if (!cancelled) setSession(null);
@@ -40,7 +34,7 @@ export default function AttendanceCheckinCard() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [className, studentCode, studentDocumentId, user?.uid]);
+  }, [className, studentCode, user?.uid]);
 
   if (!session || status === "done") return null;
 
