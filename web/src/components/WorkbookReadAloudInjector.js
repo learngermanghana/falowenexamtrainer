@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import ReadAloudControls from "./ReadAloudControls";
+import "./A2B1WorkbookGuidance.css";
 
 const READ_ALOUD_MOUNT_CLASS = "falowen-read-aloud-mount";
 
@@ -82,11 +83,16 @@ const mountReadAloud = (card) => {
 
   const root = createRoot(mount);
   root.render(
-    <ReadAloudControls
-      title="Read Teil 3 text aloud"
-      compact
-      getText={() => collectReadingText(card)}
-    />
+    <>
+      <p className="workbook-read-aloud-note">
+        <strong>Read aloud:</strong> Use the free German voice controls to listen to the text, pause, continue, stop and change speed.
+      </p>
+      <ReadAloudControls
+        title="Read Teil 3 text aloud"
+        compact
+        getText={() => collectReadingText(card)}
+      />
+    </>
   );
 
   return { mount, root };
