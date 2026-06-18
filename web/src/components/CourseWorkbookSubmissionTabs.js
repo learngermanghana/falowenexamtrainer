@@ -448,7 +448,15 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
             <div className="course-book-tab-submission-page">
               <style>{`.course-book-tab-submission-page > div > section:first-child { display: none !important; }
               .course-book-tab-submission-page select { display: none !important; }`}</style>
-              <AssignmentSubmissionPage key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`} />
+              <AssignmentSubmissionPage
+                key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
+                submissionContext={{
+                  level,
+                  day,
+                  assignmentKey,
+                  canonicalAssignmentKey: assignmentKey,
+                }}
+              />
             </div>
           )}
         </div>

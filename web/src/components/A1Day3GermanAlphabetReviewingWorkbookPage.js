@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 
 const cardStyle = {
   ...styles.card,
@@ -109,6 +111,14 @@ const listeningBoxStyle = {
 };
 
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
+  const level = "A1";
+  const day = 2;
+  const [activeTab, setActiveTab] = useState("assignment");
+  const assignmentKey = useMemo(() => {
+    const alphabetAssignment = getInlineCourseAssignments(level, day).find((assignment) => assignment.chapter === "0.2");
+    return alphabetAssignment?.assignmentKey || "A1-0.2";
+  }, []);
+
 
   useEffect(() => {
     updatePageMeta({
@@ -126,14 +136,48 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
           A1 · Day 2 Workbook · German Alphabet + Reviewing
         </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2</p>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2 · Assignment for tutor marking</p>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete all sections on this page, then submit your final answers in the submission area, not directly on this
-          page.
+          Complete the workbook in the Assignment tab, then use the Submit tab below to send final answers for this exact
+          assignment.
         </p>
+
+        <div
+          role="tablist"
+          aria-label="A1 Day 2 workbook tabs"
+          style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid #dbeafe", paddingTop: 12 }}
+        >
+          {[
+            { key: "assignment", label: "Assignment" },
+            { key: "submit", label: "Submit" },
+          ].map((tab) => {
+            const selected = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setActiveTab(tab.key)}
+                style={{
+                  ...styles.secondaryButton,
+                  background: selected ? "#2563eb" : "#ffffff",
+                  borderColor: selected ? "#2563eb" : "#93c5fd",
+                  color: selected ? "#ffffff" : "#1d4ed8",
+                  fontWeight: 800,
+                  minWidth: 120,
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
+      {activeTab === "assignment" ? (
+        <>
       <section style={sectionStyle}>
         <img
           src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80"
@@ -219,18 +263,35 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
 
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ margin: 0, fontWeight: 600 }}>
-          Finished the workbook? Submit all final answers in the submission area.
+          Finished the workbook? Open the Submit tab above and paste your final answers there.
         </p>
-
-        <a
-          href="https://www.falowen.app/campus/submit"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Submit Workbook Answers
-        </a>
       </div>
+        </>
+      ) : (
+        <section style={{ ...sectionStyle, border: "1px solid #bfdbfe" }} aria-label="Submit A1 Day 2 workbook answers">
+          <div>
+            <p style={{ color: "#1d4ed8", fontSize: 13, fontWeight: 900, letterSpacing: ".04em", margin: 0, textTransform: "uppercase" }}>
+              Tutor-marked assignment
+            </p>
+            <h2 style={{ margin: "4px 0" }}>Submit A1 · Day 2 · German Alphabet</h2>
+            <p style={{ color: "#475569", margin: 0 }}>
+              This submission box is locked to {assignmentKey}, so your work is saved under the correct assignment.
+            </p>
+          </div>
+          <div className="a1-day2-workbook-submit-tab">
+            <style>{`.a1-day2-workbook-submit-tab > div > section:first-child { display: none !important; }
+              .a1-day2-workbook-submit-tab select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level,
+                day,
+                assignmentKey,
+                canonicalAssignmentKey: assignmentKey,
+              }}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 };
