@@ -39,12 +39,11 @@ export const getInlineCourseAssignments = (level, day) => {
 
     const title = String(entry?.topic || entry?.title || `Day ${numericDay} assignment`).trim();
     const assignmentId = entry?.assignment_id || entry?.assignmentId || entry?.assignmentKey || "";
-    const assignmentKey =
-      resolveAssignmentCanonicalKey({
-        level: normalizedLevel,
-        assignmentId,
-        assignmentTitle: title,
-      }) || String(assignmentId || "").trim().toUpperCase();
+    const assignmentKey = resolveAssignmentCanonicalKey({
+      level: normalizedLevel,
+      assignmentId,
+      assignmentTitle: title,
+    });
     const normalizedKey = normalizeAssignmentKey(assignmentKey);
 
     if (!normalizedKey || seenKeys.has(normalizedKey)) return assignments;
