@@ -308,7 +308,14 @@ const getUpcomingClassCards = () => {
     .slice(0, 2);
 };
 
-const UpcomingClassCard = ({ className, details, level }) => (
+const buildSignupUrl = (program = "german", className = "") => {
+  const params = new URLSearchParams();
+  if (program) params.set("program", program);
+  if (className) params.set("class", className);
+  return `/signup/${params.toString() ? `?${params.toString()}` : ""}`;
+};
+
+const UpcomingClassCard = ({ className, details, level, onJoin }) => (
   <div
     style={{
       border: "1px solid #dbeafe",
@@ -335,6 +342,13 @@ const UpcomingClassCard = ({ className, details, level }) => (
     <p style={{ ...styles.helperText, margin: 0 }}>
       Live or online access, Falowen app support, assignments, and class records in one place.
     </p>
+    <button
+      type="button"
+      onClick={() => onJoin?.(className)}
+      style={{ ...styles.primaryButton, padding: "10px 12px", width: "100%" }}
+    >
+      Join this cohort
+    </button>
   </div>
 );
 
@@ -465,6 +479,21 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
   const handleProgramSelect = (nextProgram) => onProgramSelect?.(nextProgram);
 
+  const handleSignupClick = (className = "") => {
+    if (className) {
+      try {
+        window.localStorage.setItem("exam-coach-class", className);
+      } catch (_error) {}
+    }
+    window.history.replaceState(null, "", buildSignupUrl(resolvedProgram, className));
+    onSignUp(resolvedProgram);
+  };
+
+  const handleLoginClick = () => {
+    window.history.replaceState(null, "", "/login/");
+    onLogin();
+  };
+
   const handleInterfaceLanguageChange = (language) => {
     i18n.changeLanguage(language);
     persistInterfaceLanguage(language);
@@ -507,13 +536,13 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <a href={CLASS_BROCHURE_URL} style={{ ...styles.primaryButton, textDecoration: "none", background: "#fbbf24", color: "#111827" }}>
                   View upcoming classes
                 </a>
-                <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
+                <button type="button" style={styles.primaryButton} onClick={() => handleSignupClick()}>
                   {t("landing.cta.join", { language: selectedProgram.shortLabel })}
                 </button>
                 <a href={PLACEMENT_TEST_URL} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
                   Free placement test
                 </a>
-                <button type="button" style={styles.secondaryButton} onClick={onLogin}>
+                <button type="button" style={styles.secondaryButton} onClick={handleLoginClick}>
                   {t("landing.cta.login")}
                 </button>
                 <a href="https://play.google.com/store/apps/details?id=com.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
@@ -550,7 +579,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
             {upcomingClassCards.map((item) => (
-              <UpcomingClassCard key={item.className} className={item.className} details={item.details} level={item.level} />
+              <UpcomingClassCard key={item.className} className={item.className} details={item.details} level={item.level} onJoin={handleSignupClick} />
             ))}
           </div>
         </section>
@@ -615,7 +644,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             </div>
             <button
               type="button"
-              onClick={() => onSignUp(resolvedProgram)}
+              onClick={() => handleSignupClick()}
               style={{
                 color: "#1d4ed8",
                 fontWeight: 900,
@@ -701,12 +730,12 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <div style={{ display: "grid", gap: 8 }}>
                   <a href={CLASS_BROCHURE_URL} style={{ ...styles.primaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}>View upcoming classes</a>
                   <a href={PLACEMENT_TEST_URL} style={{ ...styles.secondaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}>Take placement test</a>
-                  <button type="button" style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={() => onSignUp(resolvedProgram)}>
+                  <button type="button" style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={() => handleSignupClick()}>
                     {t("landing.darkCta.ctaJoin", { language: selectedProgram.shortLabel })}
                   </button>
                   <button
                     type="button"
-                    onClick={onLogin}
+                    onClick={handleLoginClick}
                     style={{
                       color: "#a5b4fc",
                       fontWeight: 900,
@@ -744,6 +773,32 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             </div>
           </div>
         </section>
+
+
+        <div
+          aria-label="Quick sign up and login actions"
+          style={{
+            position: "sticky",
+            bottom: 12,
+            zIndex: 20,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 10,
+            padding: 10,
+            borderRadius: 18,
+            background: "rgba(255,255,255,0.94)",
+            border: "1px solid #dbeafe",
+            boxShadow: "0 16px 32px rgba(15,23,42,0.18)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <button type="button" onClick={() => handleSignupClick()} style={{ ...styles.primaryButton, padding: "12px 14px" }}>
+            Sign up
+          </button>
+          <button type="button" onClick={handleLoginClick} style={{ ...styles.secondaryButton, padding: "12px 14px", background: "#ffffff" }}>
+            Log in
+          </button>
+        </div>
 
         <footer style={{ ...styles.card, display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           <div>
