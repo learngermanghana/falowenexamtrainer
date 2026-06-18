@@ -80,6 +80,33 @@ initFirebaseAdmin();
 
 const { scoresSummaryHandler } = require("./routes/scoresSummary");
 
+const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
+const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
+const isAttendanceSessionOpen = (session = {}) => {
+  const status = String(session.status || "").toLowerCase();
+  const active = session.active === true || session.isActive === true || status === "open" || status === "active";
+  const closed = session.closed === true || session.isClosed === true || status === "closed";
+  const expiry = session.expiresAt || session.endsAt || session.closesAt || session.activeUntil;
+  const expiryMs = typeof expiry?.toMillis === "function" ? expiry.toMillis() : expiry ? new Date(expiry).getTime() : null;
+  return active && !closed && (!Number.isFinite(expiryMs) || expiryMs > Date.now());
+};
+
+async function findAuthedStudentProfile(db, authedUser) {
+  const studentsRef = db.collection("students");
+  const direct = await studentsRef.doc(authedUser.uid).get();
+  if (direct.exists) return { snap: direct, data: direct.data() || {} };
+  const queries = [
+    studentsRef.where("studentCode", "==", authedUser.uid).limit(1),
+    authedUser.email ? studentsRef.where("email", "==", String(authedUser.email).toLowerCase()).limit(1) : null,
+  ].filter(Boolean);
+  for (const q of queries) {
+    const snap = await q.get();
+    if (!snap.empty) return { snap: snap.docs[0], data: snap.docs[0].data() || {} };
+  }
+  return null;
+}
+
+
 async function getAuthedUser(req) {
   const authHeader = req.headers?.authorization || "";
   const match = authHeader.match(/^Bearer (.+)$/i);
@@ -680,6 +707,64 @@ app.post("/webhooks/zoom", async (req, res) => {
   } catch (err) {
     requestLog.error("zoom.webhook.error", { error: err?.message || err });
     return res.status(500).json({ error: err?.message || "Unknown error" });
+  }
+});
+
+
+app.post("/attendance/checkin", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(500).json({ error: "Firestore not available" });
+
+    const { className = "", sessionId = "", source = "falowen_student_app" } = req.body || {};
+    if (!className || !sessionId) return res.status(400).json({ error: "className and sessionId are required" });
+    if (!ATTENDANCE_CHECKIN_SOURCES.has(source)) return res.status(400).json({ error: "Invalid attendance source" });
+
+    const student = await findAuthedStudentProfile(db, authedUser);
+    if (!student) return res.status(404).json({ error: "Student profile not found" });
+    const studentData = student.data;
+    if (String(studentData.className || "") !== String(className)) {
+      return res.status(403).json({ error: "Attendance session is not for your class" });
+    }
+
+    const studentCode = normalizeStudentCodeForAttendance(studentData.studentCode || studentData.studentcode || student.snap.id || authedUser.uid);
+    const email = String(studentData.email || authedUser.email || "").toLowerCase();
+    const phone = String(studentData.phone || studentData.phoneNumber || studentData.whatsapp || "").trim();
+    const sessionRef = db.collection("attendance").doc(className).collection("sessions").doc(sessionId);
+    const checkinRef = sessionRef.collection("checkins").doc(authedUser.uid);
+
+    const result = await db.runTransaction(async (tx) => {
+      const sessionSnap = await tx.get(sessionRef);
+      if (!sessionSnap.exists) throw Object.assign(new Error("Attendance session not found"), { status: 404 });
+      const session = sessionSnap.data() || {};
+      if (!isAttendanceSessionOpen(session)) throw Object.assign(new Error("Attendance session is not active"), { status: 409 });
+      const attendance = session.attendance || {};
+      if (attendance[studentCode]) return { duplicate: true };
+      tx.set(checkinRef, {
+        studentCode,
+        studentUid: authedUser.uid,
+        email,
+        phone,
+        status: "present",
+        present: true,
+        method: source === "falowen_student_app" ? "falowen_button" : "qr",
+        source,
+        checkedInAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      tx.set(sessionRef, {
+        attendance: { [studentCode]: { status: "present", present: true, method: source === "falowen_student_app" ? "falowen_button" : "qr", source, studentUid: authedUser.uid, email, phone, checkedInAt: admin.firestore.FieldValue.serverTimestamp() } },
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      return { duplicate: false };
+    });
+
+    return res.json({ ok: true, duplicate: result.duplicate, status: "present" });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || "Could not check in" });
   }
 });
 

@@ -173,6 +173,7 @@ import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
+import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
@@ -1203,6 +1204,7 @@ const CampusArea = ({
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
       {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
+      <AttendanceCheckinCard />
       {resolvedSection === "tutor-marking" && allowedSections["tutor-marking"] ? <TutorMarkingPage /> : null}
     </>
   );
