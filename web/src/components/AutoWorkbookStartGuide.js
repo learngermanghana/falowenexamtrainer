@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
+import WorkbookContextSync from "./WorkbookContextSync";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 const workbookRouteIndex = buildWorkbookRouteIndex();
@@ -34,6 +35,7 @@ const AutoWorkbookStartGuide = () => {
         boxSizing: "border-box",
       }}
     >
+      {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
       {usesSelfManagedSubmissionTabs ? null : <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />}
     </div>
