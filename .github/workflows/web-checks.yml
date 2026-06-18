@@ -46,7 +46,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js src/components/CourseWorkbookAssignmentSubmission.test.js
 
       - name: Build web app
         working-directory: web
