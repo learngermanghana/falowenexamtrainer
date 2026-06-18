@@ -8,9 +8,10 @@ jest.mock("../data/germanAssignmentCatalog", () => ({
 }));
 
 jest.mock("../utils/assignmentIdentity", () => ({
-  resolveAssignmentCanonicalKey: jest.fn(({ level, assignmentId }) =>
-    assignmentId ? `${level}-${String(assignmentId).replace(/^.*?-/, "")}` : ""
-  ),
+  resolveAssignmentCanonicalKey: jest.fn(({ assignmentId }) => {
+    const token = String(assignmentId || "").toUpperCase();
+    return /^(A1|A2|B1)-\d+\.\d+$/.test(token) ? token : "";
+  }),
 }));
 
 jest.mock("./CourseLessonPageLegacy", () => () => null);
@@ -43,9 +44,10 @@ describe("getInlineCourseAssignments", () => {
     ]);
   });
 
-  it("never returns null assignment keys and removes duplicate catalog entries", () => {
+  it("never returns null or invalid assignment keys and removes duplicate catalog entries", () => {
     getCurriculumEntriesForLevel.mockReturnValue([
       { assignmentDay: 8, topic: "Missing identity", assignment: true },
+      { assignmentDay: 8, topic: "Invalid identity", assignment: true, assignment_id: "bad-id" },
       { assignmentDay: 8, topic: "First copy", assignment: true, chapter: "2.1", assignment_id: "A2-2.1" },
       { assignmentDay: 8, topic: "Second copy", assignment: true, chapter: "2.1", assignment_id: "A2-2.1" },
     ]);
