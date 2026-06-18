@@ -266,6 +266,7 @@ function App() {
     return localStorage.getItem(programStorageKey) || "german";
   });
   const location = useLocation();
+  const navigate = useNavigate();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -388,8 +389,12 @@ function App() {
         onSignUp={() => {
           setSignupProgram("german");
           setAuthMode("signup");
+          navigate("/signup?program=german");
         }}
-        onLogin={() => setAuthMode("login")}
+        onLogin={() => {
+          setAuthMode("login");
+          navigate("/login/");
+        }}
       />
     );
   }
@@ -418,10 +423,15 @@ function App() {
           program={signupProgram}
           onProgramSelect={setSignupProgram}
           onSignUp={(program) => {
-            setSignupProgram(program || "german");
+            const nextProgram = program || "german";
+            setSignupProgram(nextProgram);
             setAuthMode("signup");
+            navigate(`/signup?program=${encodeURIComponent(nextProgram)}`);
           }}
-          onLogin={() => setAuthMode("login")}
+          onLogin={() => {
+            setAuthMode("login");
+            navigate("/login/");
+          }}
         />
       );
     }
