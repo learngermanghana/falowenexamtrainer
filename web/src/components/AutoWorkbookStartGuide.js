@@ -6,11 +6,17 @@ import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 const workbookRouteIndex = buildWorkbookRouteIndex();
+const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
+  "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+  "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
+]);
 
 const AutoWorkbookStartGuide = () => {
   const { pathname } = useLocation();
   const hostRef = useRef(null);
-  const match = useMemo(() => workbookRouteIndex.get(normalizeInAppPath(pathname)), [pathname]);
+  const normalizedPathname = normalizeInAppPath(pathname);
+  const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
+  const usesSelfManagedSubmissionTabs = SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname);
 
   if (!match) return null;
 
@@ -29,7 +35,7 @@ const AutoWorkbookStartGuide = () => {
       }}
     >
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
-      <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />
+      {usesSelfManagedSubmissionTabs ? null : <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />}
     </div>
   );
 };
