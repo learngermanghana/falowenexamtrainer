@@ -1,6 +1,9 @@
 import { getLessonRadioResource } from "./lessonRadioDictionary";
-import { getLessonVideoResources } from "./lessonVideoDictionary";
+import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
+import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+
+applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
 
 export const LEVEL_CAPABILITIES = Object.freeze({
   A1: { radio: false, fourPartWorkbook: false, tutorSubmission: true, selfAssessment: false },
