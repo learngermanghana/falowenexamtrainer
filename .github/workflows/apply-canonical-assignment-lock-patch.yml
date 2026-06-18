@@ -1,0 +1,450 @@
+name: Apply canonical assignment lock patch
+
+on:
+  push:
+    branches:
+      - fix/canonical-assignment-locks
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/canonical-assignment-locks
+          fetch-depth: 0
+
+      - name: Apply focused source patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected one match, found {count}")
+              return text.replace(old, new, 1)
+
+          assignment_path = Path("web/src/components/AssignmentSubmissionPage.js")
+          text = assignment_path.read_text()
+          if "const [lockedAssignments, setLockedAssignments]" not in text:
+              text = replace_once(
+                  text,
+                  '''  const [lockedChapters, setLockedChapters] = useState(new Set());
+          const [lockInfoByChapterKey, setLockInfoByChapterKey] = useState({}); // { [chapterKey]: { lockedAt, assignmentTitle } }
+          ''',
+                  '''  const [lockedChapters, setLockedChapters] = useState(new Set());
+          const [lockInfoByChapterKey, setLockInfoByChapterKey] = useState({}); // Legacy fallback only.
+          const [lockedAssignments, setLockedAssignments] = useState(new Set());
+          const [lockInfoByAssignmentKey, setLockInfoByAssignmentKey] = useState({});
+          ''',
+                  "lock state",
+              )
+
+              text = replace_once(
+                  text,
+                  '''  const getLockDocId = useCallback(
+            (assignmentTitle) => {
+              const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
+              const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || selectedSubmitLevel;
+              return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
+            },
+            [assignmentDictionary, buildChapterKey, selectedSubmitLevel, studentScopeKey]
+          );
+          ''',
+                  '''  const getCanonicalLockAssignmentKey = useCallback(
+            (assignmentTitle) => {
+              if (!assignmentTitle) return "";
+              const entry = assignmentDictionary.find((item) => item.label === assignmentTitle);
+              const assignmentLevel = normalizeLevel(entry?.level || selectedSubmitLevel);
+              const assignmentId = entry?.canonicalAssignmentId || entry?.assignmentId || buildAssignmentId(assignmentTitle);
+              return (
+                resolveAssignmentCanonicalKey({
+                  level: assignmentLevel,
+                  assignmentId,
+                  assignmentTitle,
+                }) || assignmentId || ""
+              );
+            },
+            [assignmentDictionary, buildAssignmentId, selectedSubmitLevel]
+          );
+
+          const getLockDocId = useCallback(
+            (assignmentTitle) => {
+              const assignmentKey = getCanonicalLockAssignmentKey(assignmentTitle) || "unknown";
+              return `${studentScopeKey}__${normalizeIdPart(assignmentKey)}`;
+            },
+            [getCanonicalLockAssignmentKey, studentScopeKey]
+          );
+
+          const getLegacyLockDocId = useCallback(
+            (assignmentTitle) => {
+              const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
+              const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || selectedSubmitLevel;
+              return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
+            },
+            [assignmentDictionary, buildChapterKey, selectedSubmitLevel, studentScopeKey]
+          );
+          ''',
+                  "canonical lock builder",
+              )
+
+              text = replace_once(
+                  text,
+                  '''      // Submitted: check lock first
+                const lockId = getLockDocId(form.assignmentTitle);
+                const lockRef = doc(db, LOCK_COLLECTION, lockId);
+
+                const lockSnap = await getDoc(lockRef);
+                if (lockSnap.exists()) {
+                  const chapterKey = buildChapterKey(form.assignmentTitle);
+                  if (chapterKey) setLockedChapters((prev) => new Set([...prev, chapterKey]));
+                  setConfirmationLocked(true);
+                  return { ok: false, reason: "locked" };
+                }
+
+                // Add submission history
+                await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
+
+                // Create lock deterministically
+                const nowLocal = new Date();
+                await setDoc(
+                  lockRef,
+                  {
+                    studentId: user?.uid || "",
+                    studentEmail: user?.email || "",
+                    studentCode,
+                    level: selectedAssignmentLevel,
+                    lockedAt: serverTimestamp(),
+                    assignmentTitle: form.assignmentTitle,
+                    day: selectedAssignmentDay,
+                    chapter: selectedAssignmentChapter || "",
+                    chapterKey: buildChapterKey(form.assignmentTitle),
+                  },
+                  { merge: true }
+                );
+
+                const currentChapterKey = buildChapterKey(form.assignmentTitle);
+                if (currentChapterKey) {
+                  setLockedChapters((prev) => new Set([...prev, currentChapterKey]));
+                  setLockInfoByChapterKey((prev) => ({
+                    ...prev,
+                    [currentChapterKey]: { lockedAt: nowLocal, assignmentTitle: form.assignmentTitle },
+                  }));
+                }
+
+                // Preview (use local time immediately)
+                setPreview({
+                  assignmentTitle: form.assignmentTitle,
+                  submissionText: trimmedText,
+                  createdAt: nowLocal,
+                  assignmentId: selectedAssignmentId,
+                  canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+                  chapterKey: currentChapterKey,
+                });
+
+                return { ok: true };
+          ''',
+                  '''      // Submitted: canonical assignment lock is the source of truth.
+                const lockAssignmentKey =
+                  getCanonicalLockAssignmentKey(form.assignmentTitle) ||
+                  selectedCanonicalAssignmentKey ||
+                  selectedAssignmentId ||
+                  "";
+                const normalizedLockAssignmentKey = normalizeAssignmentIdentity(lockAssignmentKey);
+                const lockId = getLockDocId(form.assignmentTitle);
+                const legacyLockId = getLegacyLockDocId(form.assignmentTitle);
+                const lockRef = doc(db, LOCK_COLLECTION, lockId);
+                const legacyLockRef = doc(db, LOCK_COLLECTION, legacyLockId);
+
+                const [lockSnap, legacyLockSnap] = await Promise.all([getDoc(lockRef), getDoc(legacyLockRef)]);
+                const legacyLockData = legacyLockSnap.exists() ? legacyLockSnap.data() || {} : null;
+                const normalizedLegacyAssignmentKey = normalizeAssignmentIdentity(
+                  legacyLockData?.assignmentKey || legacyLockData?.canonicalAssignmentKey || ""
+                );
+                const legacyLocksSelectedAssignment =
+                  legacyLockSnap.exists() &&
+                  (!normalizedLegacyAssignmentKey || normalizedLegacyAssignmentKey === normalizedLockAssignmentKey);
+
+                if (lockSnap.exists() || legacyLocksSelectedAssignment) {
+                  if (!lockSnap.exists() && legacyLockData) {
+                    await setDoc(
+                      lockRef,
+                      {
+                        ...legacyLockData,
+                        assignmentKey: lockAssignmentKey,
+                        canonicalAssignmentKey: lockAssignmentKey,
+                        lockIdentity: "canonical_assignment",
+                        migratedAt: serverTimestamp(),
+                      },
+                      { merge: true }
+                    );
+                  }
+
+                  if (normalizedLockAssignmentKey) {
+                    setLockedAssignments((prev) => new Set([...prev, normalizedLockAssignmentKey]));
+                    setLockInfoByAssignmentKey((prev) => ({
+                      ...prev,
+                      [normalizedLockAssignmentKey]: {
+                        lockedAt: lockSnap.data()?.lockedAt || legacyLockData?.lockedAt || null,
+                        assignmentTitle: form.assignmentTitle,
+                      },
+                    }));
+                  } else {
+                    const chapterKey = buildChapterKey(form.assignmentTitle);
+                    if (chapterKey) setLockedChapters((prev) => new Set([...prev, chapterKey]));
+                  }
+                  setConfirmationLocked(true);
+                  return { ok: false, reason: "locked" };
+                }
+
+                // Add submission history
+                await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
+
+                // Create the canonical lock and a non-destructive legacy alias.
+                const nowLocal = new Date();
+                const lockPayload = {
+                  studentId: user?.uid || "",
+                  studentEmail: user?.email || "",
+                  studentCode,
+                  studentScopeKey,
+                  level: selectedAssignmentLevel,
+                  lockedAt: serverTimestamp(),
+                  assignmentTitle: form.assignmentTitle,
+                  assignmentId: selectedAssignmentId,
+                  assignmentKey: lockAssignmentKey,
+                  canonicalAssignmentKey: lockAssignmentKey,
+                  day: selectedAssignmentDay,
+                  chapter: selectedAssignmentChapter || "",
+                  chapterKey: buildChapterKey(form.assignmentTitle),
+                  lockIdentity: "canonical_assignment",
+                  canonicalLockId: lockId,
+                  legacyLockId,
+                };
+                await setDoc(lockRef, lockPayload, { merge: true });
+                if (!legacyLockSnap.exists()) {
+                  await setDoc(legacyLockRef, { ...lockPayload, lockIdentity: "legacy_alias" }, { merge: true });
+                }
+
+                if (normalizedLockAssignmentKey) {
+                  setLockedAssignments((prev) => new Set([...prev, normalizedLockAssignmentKey]));
+                  setLockInfoByAssignmentKey((prev) => ({
+                    ...prev,
+                    [normalizedLockAssignmentKey]: { lockedAt: nowLocal, assignmentTitle: form.assignmentTitle },
+                  }));
+                }
+
+                const currentChapterKey = buildChapterKey(form.assignmentTitle);
+
+                // Preview (use local time immediately)
+                setPreview({
+                  assignmentTitle: form.assignmentTitle,
+                  submissionText: trimmedText,
+                  createdAt: nowLocal,
+                  assignmentId: selectedAssignmentId,
+                  canonicalAssignmentKey: lockAssignmentKey,
+                  chapterKey: currentChapterKey,
+                });
+
+                return { ok: true };
+          ''',
+                  "submission lock persistence",
+              )
+
+              text = replace_once(
+                  text,
+                  '''      getDraftDocId,
+                getLockDocId,
+                selectedAssignmentChapter,
+          ''',
+                  '''      getDraftDocId,
+                getCanonicalLockAssignmentKey,
+                getLegacyLockDocId,
+                getLockDocId,
+                selectedAssignmentChapter,
+          ''',
+                  "persistence dependencies",
+              )
+
+              text = replace_once(
+                  text,
+                  '''        setRecentSubmissions([]);
+                  setLockedChapters(new Set());
+                  setLockInfoByChapterKey({});
+                  setDraftsByAssignment({});
+          ''',
+                  '''        setRecentSubmissions([]);
+                  setLockedChapters(new Set());
+                  setLockInfoByChapterKey({});
+                  setLockedAssignments(new Set());
+                  setLockInfoByAssignmentKey({});
+                  setDraftsByAssignment({});
+          ''',
+                  "empty lock state",
+              )
+
+              text = replace_once(
+                  text,
+                  '''        const locked = new Set();
+                  const lockMeta = {};
+
+                  lockSnapshot.docs.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (!levelMatches(data.level, selectedSubmitLevel)) return;
+
+                    const chapterKey =
+                      data.chapterKey ||
+                      buildChapterKey(data.assignmentTitle) ||
+                      (data.chapter ? `day-${data.chapter}` : null);
+
+                    if (chapterKey) {
+                      locked.add(chapterKey);
+                      lockMeta[chapterKey] = {
+                        assignmentTitle: data.assignmentTitle || "",
+                        lockedAt: data.lockedAt || data.createdAt || null,
+                      };
+                    }
+                  });
+
+                  setLockedChapters(locked);
+                  setLockInfoByChapterKey(lockMeta);
+          ''',
+                  '''        const locked = new Set();
+                  const lockMeta = {};
+                  const lockedAssignmentKeys = new Set();
+                  const assignmentLockMeta = {};
+
+                  lockSnapshot.docs.forEach((docSnap) => {
+                    const data = docSnap.data() || {};
+                    if (!levelMatches(data.level, selectedSubmitLevel)) return;
+
+                    const computedAssignmentKey =
+                      data.assignmentKey ||
+                      data.canonicalAssignmentKey ||
+                      resolveAssignmentCanonicalKey({
+                        level: data.level || selectedSubmitLevel,
+                        assignmentId: data.assignmentId || data.assignment_id,
+                        assignmentTitle: data.assignmentTitle || data.title,
+                      });
+                    const normalizedAssignmentKey = normalizeAssignmentIdentity(computedAssignmentKey);
+
+                    if (normalizedAssignmentKey) {
+                      lockedAssignmentKeys.add(normalizedAssignmentKey);
+                      assignmentLockMeta[normalizedAssignmentKey] = {
+                        assignmentTitle: data.assignmentTitle || "",
+                        lockedAt: data.lockedAt || data.createdAt || null,
+                      };
+                      if (!data.assignmentKey || !data.canonicalAssignmentKey) {
+                        setDoc(
+                          doc(db, LOCK_COLLECTION, docSnap.id),
+                          {
+                            assignmentKey: computedAssignmentKey,
+                            canonicalAssignmentKey: computedAssignmentKey,
+                          },
+                          { merge: true }
+                        ).catch(() => {});
+                      }
+                      return;
+                    }
+
+                    // Old locks without assignment identity retain chapter/day fallback behavior.
+                    const chapterKey =
+                      data.chapterKey ||
+                      buildChapterKey(data.assignmentTitle) ||
+                      (data.chapter ? `day-${data.chapter}` : null);
+
+                    if (chapterKey) {
+                      locked.add(chapterKey);
+                      lockMeta[chapterKey] = {
+                        assignmentTitle: data.assignmentTitle || "",
+                        lockedAt: data.lockedAt || data.createdAt || null,
+                      };
+                    }
+                  });
+
+                  setLockedChapters(locked);
+                  setLockInfoByChapterKey(lockMeta);
+                  setLockedAssignments(lockedAssignmentKeys);
+                  setLockInfoByAssignmentKey(assignmentLockMeta);
+          ''',
+                  "lock loading",
+              )
+
+              text = replace_once(
+                  text,
+                  '''  const selectedLockInfo = useMemo(
+            () => (selectedChapterKey ? lockInfoByChapterKey[selectedChapterKey] : null),
+            [lockInfoByChapterKey, selectedChapterKey]
+          );
+
+          const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
+          ''',
+                  '''  const selectedAssignmentLockKey = useMemo(
+            () => normalizeAssignmentIdentity(selectedCanonicalAssignmentKey || selectedAssignmentId || ""),
+            [selectedAssignmentId, selectedCanonicalAssignmentKey]
+          );
+
+          const selectedLockInfo = useMemo(
+            () =>
+              (selectedAssignmentLockKey ? lockInfoByAssignmentKey[selectedAssignmentLockKey] : null) ||
+              (selectedChapterKey ? lockInfoByChapterKey[selectedChapterKey] : null),
+            [lockInfoByAssignmentKey, lockInfoByChapterKey, selectedAssignmentLockKey, selectedChapterKey]
+          );
+
+          const isSelectedLocked = Boolean(
+            (selectedAssignmentLockKey && lockedAssignments.has(selectedAssignmentLockKey)) ||
+              (selectedChapterKey && lockedChapters.has(selectedChapterKey))
+          );
+          ''',
+                  "selected lock state",
+              )
+
+              assignment_path.write_text(text)
+
+          tabs_path = Path("web/src/components/CourseWorkbookSubmissionTabs.js")
+          tabs = tabs_path.read_text()
+          if "legacyMatchesSelectedAssignment" not in tabs:
+              tabs = replace_once(
+                  tabs,
+                  '''      const canonicalData = canonicalSnapshot.exists() ? canonicalSnapshot.data() || {} : null;
+                const legacyData = legacySnapshot.exists() ? legacySnapshot.data() || {} : null;
+                const sharedIdentity = {
+          ''',
+                  '''      const canonicalData = canonicalSnapshot.exists() ? canonicalSnapshot.data() || {} : null;
+                const legacyData = legacySnapshot.exists() ? legacySnapshot.data() || {} : null;
+                const normalizedSelectedAssignmentKey = normalizeCourseAssignmentKey(assignmentKey);
+                const normalizedLegacyAssignmentKey = normalizeCourseAssignmentKey(
+                  legacyData?.assignmentKey || legacyData?.canonicalAssignmentKey || ""
+                );
+                const legacyMatchesSelectedAssignment =
+                  !normalizedLegacyAssignmentKey || normalizedLegacyAssignmentKey === normalizedSelectedAssignmentKey;
+                const sharedIdentity = {
+          ''',
+                  "workbook legacy identity",
+              )
+              tabs = replace_once(
+                  tabs,
+                  '''      if (legacyData && !canonicalData) {
+          ''',
+                  '''      if (legacyData && !canonicalData && legacyMatchesSelectedAssignment) {
+          ''',
+                  "workbook legacy migration guard",
+              )
+              tabs_path.write_text(tabs)
+          PY
+
+      - name: Commit patched source
+        run: |
+          if git diff --quiet; then
+            echo "Patch already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/AssignmentSubmissionPage.js web/src/components/CourseWorkbookSubmissionTabs.js
+          git commit -m "Use canonical assignment IDs for submission locks"
+          git push origin HEAD:fix/canonical-assignment-locks
