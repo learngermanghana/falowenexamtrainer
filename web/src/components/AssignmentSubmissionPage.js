@@ -392,7 +392,7 @@ const buildAttemptMetadata = ({ attempt = 1, isResubmission = false, previousSco
 
 const normalizePreferredLevel = (rawLevel) => normalizeCourseLevel(rawLevel) || "A1";
 
-const AssignmentSubmissionPage = () => {
+const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const { showToast } = useToast();
@@ -405,8 +405,13 @@ const AssignmentSubmissionPage = () => {
     [studentProfile?.className, studentProfile?.level]
   );
   const requestedSubmitLevel = useMemo(
-    () => normalizeCourseLevel(location?.state?.level || new URLSearchParams(location?.search || "").get("level")),
-    [location?.search, location?.state?.level]
+    () =>
+      normalizeCourseLevel(
+        submissionContext?.level ||
+          location?.state?.level ||
+          new URLSearchParams(location?.search || "").get("level")
+      ),
+    [location?.search, location?.state?.level, submissionContext?.level]
   );
   const accessibleSubmitLevels = useMemo(
     () => getAccessibleLevels(preferredLevel, Object.keys(courseSchedules)),
