@@ -82,13 +82,29 @@ const { scoresSummaryHandler } = require("./routes/scoresSummary");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
-const isAttendanceSessionOpen = (session = {}) => {
+const toAttendanceMillis = (value) => {
+  if (!value) return null;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (typeof value.toDate === "function") return value.toDate().getTime();
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : null;
+};
+const isAttendanceSessionOpen = (session = {}, now = Date.now()) => {
+  const openFromMs = toAttendanceMillis(session.openFrom);
+  const openToMs = toAttendanceMillis(session.openTo);
+  if (Object.prototype.hasOwnProperty.call(session, "opened")) {
+    return (
+      session.opened === true &&
+      (!Number.isFinite(openFromMs) || now >= openFromMs) &&
+      (!Number.isFinite(openToMs) || now <= openToMs)
+    );
+  }
+
   const status = String(session.status || "").toLowerCase();
   const active = session.active === true || session.isActive === true || status === "open" || status === "active";
   const closed = session.closed === true || session.isClosed === true || status === "closed";
-  const expiry = session.expiresAt || session.endsAt || session.closesAt || session.activeUntil;
-  const expiryMs = typeof expiry?.toMillis === "function" ? expiry.toMillis() : expiry ? new Date(expiry).getTime() : null;
-  return active && !closed && (!Number.isFinite(expiryMs) || expiryMs > Date.now());
+  const expiryMs = toAttendanceMillis(session.expiresAt || session.endsAt || session.closesAt || session.activeUntil);
+  return active && !closed && (!Number.isFinite(expiryMs) || expiryMs > now);
 };
 
 async function findAuthedStudentProfile(db, authedUser) {
@@ -741,6 +757,8 @@ app.post("/attendance/checkin", async (req, res) => {
       if (!sessionSnap.exists) throw Object.assign(new Error("Attendance session not found"), { status: 404 });
       const session = sessionSnap.data() || {};
       if (!isAttendanceSessionOpen(session)) throw Object.assign(new Error("Attendance session is not active"), { status: 409 });
+      const checkinSnap = await tx.get(checkinRef);
+      if (checkinSnap.exists) return { duplicate: true };
       const attendance = session.attendance || {};
       if (attendance[studentCode]) return { duplicate: true };
       tx.set(checkinRef, {
@@ -3444,3 +3462,7 @@ app.use((err, req, res, _next) => {
 });
 
 module.exports = app;
+module.exports._test = {
+  isAttendanceSessionOpen,
+  normalizeStudentCodeForAttendance,
+};

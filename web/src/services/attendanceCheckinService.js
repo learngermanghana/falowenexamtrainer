@@ -22,6 +22,23 @@ const isPresentEntry = (entry) => {
   return entry.present === true || entry.attended === true || status === "present";
 };
 
+export const isAttendanceSessionActive = (session = {}, now = Date.now()) => {
+  const openFromMs = toMillis(session.openFrom);
+  const openToMs = toMillis(session.openTo);
+  if (Object.prototype.hasOwnProperty.call(session, "opened")) {
+    return (
+      session.opened === true &&
+      (!Number.isFinite(openFromMs) || now >= openFromMs) &&
+      (!Number.isFinite(openToMs) || now <= openToMs)
+    );
+  }
+
+  const expiresAtMs = toMillis(session.expiresAt || session.endsAt || session.closesAt || session.activeUntil);
+  const closed = truthy(session.closed) || truthy(session.isClosed) || String(session.status || "").toLowerCase() === "closed";
+  const explicitlyActive = truthy(session.active) || truthy(session.isActive) || ["open", "active"].includes(String(session.status || "").toLowerCase());
+  return !closed && explicitlyActive && (!Number.isFinite(expiresAtMs) || expiresAtMs > now);
+};
+
 export const getActiveAttendanceSession = async ({ className, studentCode, studentUid } = {}) => {
   if (!className || !studentCode || !isFirebaseConfigured || !db) return null;
   const snap = await getDocs(collection(db, "attendance", className, "sessions"));
@@ -30,10 +47,8 @@ export const getActiveAttendanceSession = async ({ className, studentCode, stude
 
   snap.forEach((sessionDoc) => {
     const data = sessionDoc.data() || {};
-    const expiresAtMs = toMillis(data.expiresAt || data.endsAt || data.closesAt || data.activeUntil);
-    const closed = truthy(data.closed) || truthy(data.isClosed) || String(data.status || "").toLowerCase() === "closed";
-    const explicitlyActive = truthy(data.active) || truthy(data.isActive) || ["open", "active"].includes(String(data.status || "").toLowerCase());
-    if (closed || !explicitlyActive || (expiresAtMs && expiresAtMs <= now)) return;
+    const expiresAtMs = toMillis(data.openTo || data.expiresAt || data.endsAt || data.closesAt || data.activeUntil);
+    if (!isAttendanceSessionActive(data, now)) return;
     if (isPresentEntry(data.attendance?.[studentCode]) || isPresentEntry(data.students?.[studentCode]) || isPresentEntry(data.participants?.[studentCode])) return;
     active.push({ id: sessionDoc.id, ...data, expiresAtMs });
   });
