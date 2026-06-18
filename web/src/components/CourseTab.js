@@ -474,15 +474,6 @@ const groupLessonsByWeek = (entries) =>
     return groups;
   }, {});
 
-const getCourseBookAssignmentAction = (entry) => {
-  if (!entry?.isTutorMarked) return "Open Lesson";
-  if (entry.status === "passed") return "Passed";
-  if (entry.status === "failed") return "Correct and resubmit";
-  if (["submitted", "resubmitted"].includes(entry.status)) return "Awaiting score";
-  if (entry.status === "inProgress") return "Continue draft";
-  return "Submit assignment";
-};
-
 const getPracticeStorageKey = ({ studentCode, level }) => `coursePracticeProgress:${studentCode || "student"}:${level || "course"}`;
 
 const readPracticeProgress = (key) => {
@@ -698,6 +689,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
                   Continue learning
                 </button>
+                <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)", fontWeight: 800 }} onClick={() => navigate("/campus/submit", { state: { level: selectedCourseLevel } })}>
+                  Submit work
+                </button>
                 <YouTubeSubscribeButton />
               </div>
             </div>
@@ -835,7 +829,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               </>
                             ) : null}
                             <button type="button" style={styles.primaryButton} onClick={() => openLesson(entry)}>
-                              {getCourseBookAssignmentAction(entry)}
+                              Open Lesson
                             </button>
                           </div>
                         </div>
