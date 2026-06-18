@@ -1,1 +1,1 @@
-run canonical assignment lock patch after enabling runner
+retry canonical assignment lock patch after workflow activation
