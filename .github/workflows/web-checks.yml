@@ -24,11 +24,29 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Test speaking and inline course submissions
+      - name: Test speaking tools
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js src/components/CourseLessonInlineSubmission.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
+
+      - name: Test inline course submissions
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/components/CourseLessonInlineSubmission.test.js
+
+      - name: Test workbook route matching
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+
+      - name: Test workbook tabs and lock identities
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
       - name: Build web app
         working-directory: web
