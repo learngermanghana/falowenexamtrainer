@@ -1,0 +1,42 @@
+export const personenBeschreibenBranches = [
+  {
+    id: "aussehen",
+    label: "Aussehen",
+    keywords: ["groß oder klein", "Haare", "Augen"],
+    guidingQuestion: "Wie sieht die Person aus?",
+    sentenceStarter: "Die Person ist ... und hat ...",
+    modelSentence: "Die Person ist groß und schlank. Sie hat kurze schwarze Haare und braune Augen.",
+  },
+  {
+    id: "charakter",
+    label: "Charakter",
+    keywords: ["freundlich", "ruhig", "hilfsbereit"],
+    guidingQuestion: "Wie ist die Person vom Charakter her?",
+    sentenceStarter: "Vom Charakter her ist die Person ...",
+    modelSentence: "Vom Charakter her ist sie freundlich, ruhig und sehr hilfsbereit.",
+  },
+  {
+    id: "kleidung",
+    label: "Kleidung",
+    keywords: ["trägt", "Farben", "Schuhe"],
+    guidingQuestion: "Was trägt die Person?",
+    sentenceStarter: "Die Person trägt ...",
+    modelSentence: "Sie trägt ein weißes Hemd, eine blaue Hose und schwarze Schuhe.",
+  },
+  {
+    id: "beziehung",
+    label: "Beziehung",
+    keywords: ["Familie", "Freundschaft", "Arbeit oder Schule"],
+    guidingQuestion: "Woher kennst du die Person?",
+    sentenceStarter: "Ich kenne die Person aus ...",
+    modelSentence: "Ich kenne sie aus meiner Klasse, und wir lernen oft zusammen.",
+  },
+  {
+    id: "meinung",
+    label: "Meinung",
+    keywords: ["sympathisch", "besonders", "weil"],
+    guidingQuestion: "Was findest du besonders an der Person?",
+    sentenceStarter: "Ich finde die Person ..., weil ...",
+    modelSentence: "Ich finde sie sympathisch, weil sie gut zuhört und anderen gern hilft.",
+  },
+];
