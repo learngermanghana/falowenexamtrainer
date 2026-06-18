@@ -10,7 +10,12 @@ export const normalizeCourseAssignmentKey = (value) =>
     .replace(/_/g, "-")
     .replace(/\s+/g, "");
 
-export const getInlineCourseAssignments = (level, day) => {
+export const buildInlineCourseAssignments = ({
+  level,
+  day,
+  entries = [],
+  resolveCanonicalKey = resolveAssignmentCanonicalKey,
+} = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const numericDay = Number(day);
   if (!INLINE_SUBMISSION_LEVELS.has(normalizedLevel) || !Number.isFinite(numericDay) || numericDay <= 0) {
@@ -18,14 +23,14 @@ export const getInlineCourseAssignments = (level, day) => {
   }
 
   const seenKeys = new Set();
-  return (getCurriculumEntriesForLevel(normalizedLevel) || []).reduce((assignments, entry, index) => {
+  return (Array.isArray(entries) ? entries : []).reduce((assignments, entry, index) => {
     if (!entry?.assignment || entry?.progressionEligible === false || Number(entry?.assignmentDay) !== numericDay) {
       return assignments;
     }
 
     const title = String(entry?.topic || entry?.title || `Day ${numericDay} assignment`).trim();
     const assignmentId = entry?.assignment_id || entry?.assignmentId || entry?.assignmentKey || "";
-    const assignmentKey = resolveAssignmentCanonicalKey({
+    const assignmentKey = resolveCanonicalKey({
       level: normalizedLevel,
       assignmentId,
       assignmentTitle: title,
@@ -47,3 +52,10 @@ export const getInlineCourseAssignments = (level, day) => {
     return assignments;
   }, []);
 };
+
+export const getInlineCourseAssignments = (level, day) =>
+  buildInlineCourseAssignments({
+    level,
+    day,
+    entries: getCurriculumEntriesForLevel(level) || [],
+  });
