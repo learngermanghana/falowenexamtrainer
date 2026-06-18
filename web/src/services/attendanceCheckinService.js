@@ -1,9 +1,9 @@
 import { collection, db, doc, getDoc, getDocs, isFirebaseConfigured } from "../firebase";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE_URL ||
-  process.env.REACT_APP_FUNCTIONS_BASE_URL ||
-  "";
+export const resolveAttendanceApiBase = (env = process.env) =>
+  env.REACT_APP_API_BASE_URL || env.REACT_APP_FUNCTIONS_BASE_URL || "/api";
+
+const API_BASE = resolveAttendanceApiBase();
 
 const truthy = (value) => value === true || ["true", "open", "active"].includes(String(value || "").toLowerCase());
 
@@ -39,7 +39,12 @@ export const isAttendanceSessionActive = (session = {}, now = Date.now()) => {
   return !closed && explicitlyActive && (!Number.isFinite(expiresAtMs) || expiresAtMs > now);
 };
 
-export const getActiveAttendanceSession = async ({ className, studentCode, studentUid } = {}) => {
+export const getActiveAttendanceSession = async ({
+  className,
+  studentCode,
+  studentUid,
+  studentDocumentId,
+} = {}) => {
   if (!className || !studentCode || !isFirebaseConfigured || !db) return null;
   const snap = await getDocs(collection(db, "attendance", className, "sessions"));
   const now = Date.now();
@@ -57,7 +62,7 @@ export const getActiveAttendanceSession = async ({ className, studentCode, stude
   const session = active[0] || null;
   if (!session) return null;
 
-  const checkinIds = [studentUid, studentCode].filter(Boolean);
+  const checkinIds = [...new Set([studentUid, studentDocumentId, studentCode].filter(Boolean))];
   for (const checkinId of checkinIds) {
     const checkinSnap = await getDoc(doc(db, "attendance", className, "sessions", session.id, "checkins", checkinId));
     if (checkinSnap.exists() && isPresentEntry(checkinSnap.data())) return null;
@@ -67,7 +72,9 @@ export const getActiveAttendanceSession = async ({ className, studentCode, stude
 };
 
 export const submitFalowenAttendanceCheckin = async ({ idToken, className, sessionId } = {}) => {
-  if (!API_BASE) throw new Error("Missing REACT_APP_API_BASE_URL (or REACT_APP_FUNCTIONS_BASE_URL).");
+  if (!idToken) throw new Error("Missing Firebase ID token.");
+  if (!className || !sessionId) throw new Error("Missing class or attendance session.");
+
   const response = await fetch(`${API_BASE.replace(/\/$/, "")}/attendance/checkin`, {
     method: "POST",
     headers: {
