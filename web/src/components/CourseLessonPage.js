@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
-import { getCurriculumEntriesForLevel } from "../data/germanAssignmentCatalog";
-import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { getInlineCourseAssignments, normalizeCourseAssignmentKey } from "../utils/courseLessonAssignments";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import {
@@ -14,53 +13,7 @@ const A1_DAY_3_TITLE = "German Subject Pronouns, Verb Conjugation and Introducin
 const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
-const INLINE_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1"]);
-
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-const normalizeAssignmentKey = (value) =>
-  String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/_/g, "-")
-    .replace(/\s+/g, "");
-
-export const getInlineCourseAssignments = (level, day) => {
-  const normalizedLevel = String(level || "").trim().toUpperCase();
-  const numericDay = Number(day);
-  if (!INLINE_SUBMISSION_LEVELS.has(normalizedLevel) || !Number.isFinite(numericDay) || numericDay <= 0) {
-    return [];
-  }
-
-  const seenKeys = new Set();
-  return (getCurriculumEntriesForLevel(normalizedLevel) || []).reduce((assignments, entry, index) => {
-    if (!entry?.assignment || entry?.progressionEligible === false || Number(entry?.assignmentDay) !== numericDay) {
-      return assignments;
-    }
-
-    const title = String(entry?.topic || entry?.title || `Day ${numericDay} assignment`).trim();
-    const assignmentId = entry?.assignment_id || entry?.assignmentId || entry?.assignmentKey || "";
-    const assignmentKey = resolveAssignmentCanonicalKey({
-      level: normalizedLevel,
-      assignmentId,
-      assignmentTitle: title,
-    });
-    const normalizedKey = normalizeAssignmentKey(assignmentKey);
-
-    if (!normalizedKey || seenKeys.has(normalizedKey)) return assignments;
-    seenKeys.add(normalizedKey);
-
-    const chapter = String(entry?.chapter || "").trim();
-    assignments.push({
-      assignmentKey,
-      chapter,
-      day: numericDay,
-      level: normalizedLevel,
-      title,
-      label: chapter ? `Chapter ${chapter}: ${title}` : title || `Assignment ${index + 1}`,
-    });
-    return assignments;
-  }, []);
-};
 
 const decorateA1Day3Lesson = (lesson) => {
   if (!lesson || Number(lesson.day) !== 3) return;
@@ -190,14 +143,14 @@ export default function CourseLessonPage() {
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
 
   useEffect(() => {
-    const requestedKey = normalizeAssignmentKey(requestedAssignmentKey);
+    const requestedKey = normalizeCourseAssignmentKey(requestedAssignmentKey);
     const requestedAssignment = inlineAssignments.find(
-      (assignment) => normalizeAssignmentKey(assignment.assignmentKey) === requestedKey
+      (assignment) => normalizeCourseAssignmentKey(assignment.assignmentKey) === requestedKey
     );
     const nextAssignmentKey = requestedAssignment?.assignmentKey || inlineAssignments[0]?.assignmentKey || "";
 
     setSelectedAssignmentKey((current) =>
-      normalizeAssignmentKey(current) === normalizeAssignmentKey(nextAssignmentKey) ? current : nextAssignmentKey
+      normalizeCourseAssignmentKey(current) === normalizeCourseAssignmentKey(nextAssignmentKey) ? current : nextAssignmentKey
     );
     setSubmissionOpen(Boolean(nextAssignmentKey));
   }, [day, inlineAssignments, level, requestedAssignmentKey]);
@@ -205,10 +158,10 @@ export default function CourseLessonPage() {
   useEffect(() => {
     if (!selectedAssignmentKey) return;
 
-    const currentKey = normalizeAssignmentKey(
+    const currentKey = normalizeCourseAssignmentKey(
       location.state?.assignmentKey || location.state?.canonicalAssignmentKey || ""
     );
-    if (currentKey === normalizeAssignmentKey(selectedAssignmentKey) && String(location.state?.level || "").toUpperCase() === level) {
+    if (currentKey === normalizeCourseAssignmentKey(selectedAssignmentKey) && String(location.state?.level || "").toUpperCase() === level) {
       return;
     }
 
@@ -260,7 +213,7 @@ export default function CourseLessonPage() {
   }, [isA1Day3]);
 
   const selectedAssignment = inlineAssignments.find(
-    (assignment) => normalizeAssignmentKey(assignment.assignmentKey) === normalizeAssignmentKey(selectedAssignmentKey)
+    (assignment) => normalizeCourseAssignmentKey(assignment.assignmentKey) === normalizeCourseAssignmentKey(selectedAssignmentKey)
   );
 
   return (
@@ -302,7 +255,7 @@ export default function CourseLessonPage() {
           {inlineAssignments.length > 1 ? (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="Assignments for this lesson">
               {inlineAssignments.map((assignment) => {
-                const selected = normalizeAssignmentKey(assignment.assignmentKey) === normalizeAssignmentKey(selectedAssignmentKey);
+                const selected = normalizeCourseAssignmentKey(assignment.assignmentKey) === normalizeCourseAssignmentKey(selectedAssignmentKey);
                 return (
                   <button
                     key={assignment.assignmentKey}
