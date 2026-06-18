@@ -1,7 +1,5 @@
-import { getInlineCourseAssignments } from "./CourseLessonPage";
+import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { getCurriculumEntriesForLevel } from "../data/germanAssignmentCatalog";
-
-jest.mock("../data/courseSchedule", () => ({ courseSchedules: { A1: [] } }));
 
 jest.mock("../data/germanAssignmentCatalog", () => ({
   getCurriculumEntriesForLevel: jest.fn(),
@@ -12,13 +10,6 @@ jest.mock("../utils/assignmentIdentity", () => ({
     const token = String(assignmentId || "").toUpperCase();
     return /^(A1|A2|B1)-\d+\.\d+$/.test(token) ? token : "";
   }),
-}));
-
-jest.mock("./CourseLessonPageLegacy", () => () => null);
-jest.mock("./AssignmentSubmissionPage", () => () => null);
-jest.mock("../lib/publicFunnelTracking", () => ({
-  getPublicFunnelContext: jest.fn(() => ({})),
-  trackPublicFunnelEvent: jest.fn(),
 }));
 
 describe("getInlineCourseAssignments", () => {
