@@ -1,4 +1,4 @@
-import { buildWorkbookRouteIndex, normalizeInAppPath } from "./AutoWorkbookStartGuide";
+import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
 describe("AutoWorkbookStartGuide route matching", () => {
   test("normalizes relative and Falowen-hosted in-app links", () => {
