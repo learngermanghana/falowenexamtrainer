@@ -1,7 +1,8 @@
 import { validateSpeakingMindMapConfig as validateMultiLevelSpeakingMindMapConfig } from "../index";
+import { personenBeschreibenBranches } from "./personenBeschreiben";
 
 const topics = [
-  [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"]],
+  [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"], personenBeschreibenBranches],
   [3, "a2-day-3-vergleichen", "Dinge und Personen vergleichen", "Was vergleichst du und was ist anders oder gleich?", ["Personen", "Dinge", "Größe", "Preis", "Meinung"]],
   [4, "a2-day-4-treffen", "Wo möchten wir uns treffen?", "Wo und wann möchtest du dich treffen?", ["Ort", "Zeit", "Aktivität", "Weg", "Bestätigung"]],
   [5, "a2-day-5-freizeit", "Freizeit", "Was machst du gern in deiner Freizeit?", ["Hobbys", "Zeit", "Ort", "Freunde", "Warum"]],
@@ -42,8 +43,8 @@ const makeBranch = (label, index, title) => {
   };
 };
 
-export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels]) => {
-  const branches = labels.map((label, index) => makeBranch(label, index, title));
+export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels, configuredBranches]) => {
+  const branches = configuredBranches || labels.map((label, index) => makeBranch(label, index, title));
   return {
     level: "A2",
     branchTypeSet: "A2",
