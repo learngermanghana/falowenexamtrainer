@@ -1,5 +1,3 @@
-import React from "react";
+import CourseWorkbookTabsV2Shell from "./CourseWorkbookTabsV2Shell";
 
-const CourseWorkbookTabsV2 = () => null;
-
-export default CourseWorkbookTabsV2;
+export default CourseWorkbookTabsV2Shell;
