@@ -1,1 +1,1 @@
-trigger canonical assignment lock patch
+run canonical assignment lock patch after enabling runner
