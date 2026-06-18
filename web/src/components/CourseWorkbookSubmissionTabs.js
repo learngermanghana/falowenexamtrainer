@@ -87,12 +87,12 @@ const restoreNativeWorkbookNavigation = (pageRoot) => {
   );
 };
 
-const isSelfPracticeResource = (resource = {}) => {
+export const isSelfPracticeWorkbookResource = (resource = {}) => {
   const role = `${resource?.resourceRole || ""} ${resource?.mode || ""} ${resource?.title || ""}`.toLowerCase();
   return resource?.assignment === false || resource?.progressionEligible === false || role.includes("self-practice");
 };
 
-const chooseAssignmentForWorkbook = (assignments, resource) => {
+export const chooseAssignmentForWorkbook = (assignments, resource) => {
   if (!assignments.length) return null;
   const resourceChapter = normalizeChapter(resource?.chapter);
   if (!resourceChapter) return assignments[0];
@@ -153,11 +153,33 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
   const submissionEnabled =
     navigationTabs.length > 0 &&
     Boolean(selectedAssignment && assignmentKey) &&
-    !isSelfPracticeResource(match?.resource);
+    !isSelfPracticeWorkbookResource(match?.resource);
 
   const ensureSubmissionContext = useCallback(() => {
     if (!assignmentKey) return;
+
     const search = new URLSearchParams(location.search || "");
+    const currentSearchKey = normalizeCourseAssignmentKey(search.get("assignmentKey"));
+    const currentSearchId = normalizeCourseAssignmentKey(search.get("assignmentId"));
+    const currentSearchLevel = String(search.get("level") || "").trim().toUpperCase();
+    const currentStateKey = normalizeCourseAssignmentKey(
+      location.state?.assignmentKey || location.state?.canonicalAssignmentKey
+    );
+    const currentStateLevel = String(location.state?.level || "").trim().toUpperCase();
+    const currentStateDay = Number(location.state?.day);
+    const normalizedAssignmentKey = normalizeCourseAssignmentKey(assignmentKey);
+
+    if (
+      currentSearchKey === normalizedAssignmentKey &&
+      currentSearchId === normalizedAssignmentKey &&
+      currentSearchLevel === level &&
+      currentStateKey === normalizedAssignmentKey &&
+      currentStateLevel === level &&
+      currentStateDay === day
+    ) {
+      return;
+    }
+
     search.set("assignmentKey", assignmentKey);
     search.set("assignmentId", assignmentKey);
     search.set("level", level);
@@ -361,52 +383,61 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
         gap: 10,
         margin: "12px 0 0",
         padding: 12,
-        position: "sticky",
-        top: 8,
-        zIndex: 20,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-        <div>
-          <strong style={{ color: "#0f172a" }}>{level} · Day {day} workbook</strong>
-          <p style={{ color: "#475569", fontSize: 12, margin: "2px 0 0" }}>
-            {selectedAssignment?.chapter ? `Chapter ${selectedAssignment.chapter} · ` : ""}{assignmentKey}
-          </p>
-        </div>
-        <span style={{ color: "#1d4ed8", fontSize: 12, fontWeight: 800 }}>Assignment and submission</span>
-      </div>
-
       <div
-        role="tablist"
-        aria-label={`${level} workbook sections`}
-        style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}
+        style={{
+          background: "#eff6ff",
+          borderRadius: 12,
+          display: "grid",
+          gap: 10,
+          position: "sticky",
+          top: 8,
+          zIndex: 20,
+        }}
       >
-        {navigationTabs.map((tab) => {
-          const selected = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              onClick={() => {
-                lastClickedRef.current = { key: "", button: null };
-                setActiveTab(tab.key);
-              }}
-              style={{
-                ...styles.secondaryButton,
-                background: selected ? "#2563eb" : "#ffffff",
-                borderColor: selected ? "#2563eb" : "#93c5fd",
-                color: selected ? "#ffffff" : "#1d4ed8",
-                flex: "0 0 auto",
-                fontWeight: 800,
-                minWidth: level === "A1" ? 120 : 74,
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <strong style={{ color: "#0f172a" }}>{level} · Day {day} workbook</strong>
+            <p style={{ color: "#475569", fontSize: 12, margin: "2px 0 0" }}>
+              {selectedAssignment?.chapter ? `Chapter ${selectedAssignment.chapter} · ` : ""}{assignmentKey}
+            </p>
+          </div>
+          <span style={{ color: "#1d4ed8", fontSize: 12, fontWeight: 800 }}>Assignment and submission</span>
+        </div>
+
+        <div
+          role="tablist"
+          aria-label={`${level} workbook sections`}
+          style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}
+        >
+          {navigationTabs.map((tab) => {
+            const selected = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => {
+                  lastClickedRef.current = { key: "", button: null };
+                  setActiveTab(tab.key);
+                }}
+                style={{
+                  ...styles.secondaryButton,
+                  background: selected ? "#2563eb" : "#ffffff",
+                  borderColor: selected ? "#2563eb" : "#93c5fd",
+                  color: selected ? "#ffffff" : "#1d4ed8",
+                  flex: "0 0 auto",
+                  fontWeight: 800,
+                  minWidth: level === "A1" ? 120 : 74,
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {activeTab === "submit" ? (
