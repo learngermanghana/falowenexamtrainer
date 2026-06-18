@@ -192,6 +192,7 @@ const getTabStructure = (program, t) => {
       label: t("appNav.tabs.course"),
       sections: [
         { key: "course", label: t("appNav.sections.courseBook") },
+        { key: "submit", label: t("appNav.sections.submit") },
         { key: "examFile", label: t("appNav.sections.examFile") },
         { key: "attendance", label: t("appNav.sections.attendance") },
       ],

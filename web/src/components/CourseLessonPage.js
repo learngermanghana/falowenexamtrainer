@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
-import AssignmentSubmissionPanel from "./assignments/AssignmentSubmissionPanel";
-import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
@@ -15,34 +13,6 @@ const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questio
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-
-const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
-
-const collectInlineAssignments = (entry, level) => {
-  if (!entry || SELF_LEARNING_ONLY_LEVELS.has(level)) return [];
-  const resources = [...toArray(entry.lesen_hören), ...toArray(entry.schreiben_sprechen)];
-  const assignmentResources = resources.filter((resource) => resource?.assignment || resource?.assignmentId || resource?.assignment_id || resource?.assignmentKey);
-  const source = assignmentResources.length ? assignmentResources : entry.assignment ? [entry] : [];
-  return source.map((item, index) => {
-    const occurrence = source.length > 1 ? index + 1 : entry.occurrence || 1;
-    const title = item.title || item.topic || entry.topic || `Day ${entry.day} assignment`;
-    const assignmentId = item.assignmentId || item.assignment_id || item.assignmentKey || item.chapter || entry.assignmentId || entry.assignment_id || entry.assignmentKey || entry.chapter;
-    const canonicalKey = resolveAssignmentCanonicalKey({ level, assignmentId, assignmentTitle: title });
-    return {
-      level,
-      day: entry.day,
-      occurrence,
-      title,
-      assignmentTitle: title,
-      chapter: item.chapter || entry.chapter || "",
-      assignmentId: canonicalKey || assignmentId,
-      assignment_id: canonicalKey || assignmentId,
-      assignmentKey: canonicalKey || assignmentId,
-      canonicalAssignmentKey: canonicalKey || assignmentId,
-    };
-  });
-};
-
 
 const decorateA1Day3Lesson = (lesson) => {
   if (!lesson || Number(lesson.day) !== 3) return;
@@ -147,8 +117,6 @@ export default function CourseLessonPage() {
   const day = Number(location.state?.day ?? params.day ?? 0);
   const isA1Day3 = level === "A1" && day === 3;
   const isA1Day5 = level === "A1" && day === 5;
-  const entry = location.state?.entry || (courseSchedules[level] || []).find((item) => Number(item.day) === day) || null;
-  const inlineAssignments = collectInlineAssignments(entry, level);
 
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
@@ -183,13 +151,6 @@ export default function CourseLessonPage() {
   return (
     <div ref={rootRef}>
       <CourseLessonPageLegacy />
-      {inlineAssignments.length ? (
-        <div style={{ display: "grid", gap: 12, marginTop: 16, padding: "0 0 80px" }}>
-          {inlineAssignments.map((assignment) => (
-            <AssignmentSubmissionPanel key={assignment.canonicalAssignmentKey} assignment={assignment} />
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }
