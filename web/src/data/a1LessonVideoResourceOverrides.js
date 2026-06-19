@@ -17,6 +17,19 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
         title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
         description:
           "AI video lesson for German subject pronouns and basic verb conjugation.",
+        url: "https://youtu.be/ldpOPC21nLE",
+      },
+    ],
+  };
+
+  a1[3] = {
+    videoResources: [
+      {
+        key: "a1-day3-kapitel-1-2-assignment-ai-video",
+        chapter: "1.2",
+        title: "Kapitel 1.2 · Assignment for day 3 · AI video",
+        description:
+          "AI video lesson for the Day 3 Kapitel 1.2 assignment on introducing yourself.",
         url: "https://youtu.be/LyfFDU0U_7U",
       },
     ],

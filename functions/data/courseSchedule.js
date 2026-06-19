@@ -538,8 +538,8 @@ const courseSchedules = {
       lesen_hören: [
         {
           chapter: "1.2",
-          video: "https://youtu.be/McNk1VTFvMk",
-          youtube_link: "https://youtu.be/McNk1VTFvMk",
+          video: "",
+          youtube_link: "",
           grammarbook_link: "https://www.falowen.app/campus/course/personen-beschreiben-1-2-grammar-notes",
           workbook_link: "https://www.falowen.app/campus/course/a1-day-3-kapitel-1-2-workbook",
           assignment: true,

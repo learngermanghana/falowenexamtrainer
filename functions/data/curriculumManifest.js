@@ -180,7 +180,7 @@ const CANONICAL_CURRICULUM = [
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
     "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
-    "video": "https://youtu.be/McNk1VTFvMk",
+    "video": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "resources": [
@@ -197,7 +197,7 @@ const CANONICAL_CURRICULUM = [
         "kind": "lesen_hören",
         "chapter": "1.2",
         "title": "Introducing Yourself",
-        "video": "https://youtu.be/McNk1VTFvMk",
+        "video": "",
         "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
         "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
         "submissionRequired": true,
