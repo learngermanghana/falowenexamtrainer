@@ -1,9 +1,9 @@
-name: Run canonical lock patch
+name: Run course book task patch
 
 on:
   push:
     branches:
-      - fix/canonical-assignment-locks
+      - fix/course-book-task-cards-submit-tabs
 
 permissions:
   contents: write
@@ -12,10 +12,11 @@ jobs:
   patch:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/canonical-assignment-locks
+          ref: fix/course-book-task-cards-submit-tabs
           fetch-depth: 0
 
       - name: Extract and apply patch
@@ -23,7 +24,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          workflow = Path('.github/workflows/apply-canonical-assignment-lock-patch.yml').read_text().splitlines()
+          workflow = Path('.github/workflows/apply-course-book-task-split.yml').read_text().splitlines()
           start = next(i for i, line in enumerate(workflow) if "python - <<'PY'" in line) + 1
           end = next(i for i in range(start, len(workflow)) if workflow[i].strip() == 'PY')
           script_lines = []
@@ -32,15 +33,18 @@ jobs:
           Path('/tmp/apply_patch.py').write_text('\n'.join(script_lines) + '\n')
           PY
           python /tmp/apply_patch.py
+          rm -f .course-book-patch-trigger
 
       - name: Commit patched source
         run: |
-          if git diff --quiet; then
-            echo "Patch already applied"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/src/components/AssignmentSubmissionPage.js web/src/components/CourseWorkbookSubmissionTabs.js
-          git commit -m "Use canonical assignment IDs for submission locks"
-          git push origin HEAD:fix/canonical-assignment-locks
+          git add -A
+          git commit -m "Split course book task cards and standardize submit tabs"
+          git push origin HEAD:fix/course-book-task-cards-submit-tabs
+
+      - name: Run focused tests
+        working-directory: web
+        run: |
+          npm ci
+          CI=true npm test -- --watchAll=false --runInBand src/utils/courseBookEntries.test.js src/components/CourseLessonInlineSubmission.test.js
