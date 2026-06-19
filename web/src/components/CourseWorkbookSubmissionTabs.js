@@ -26,6 +26,8 @@ const TAB_COUNTER_REGEX = /^tab\s+\d+\s+of\s+\d+/i;
 const HIDDEN_ROW_ATTRIBUTE = "data-falowen-workbook-native-tabs-hidden";
 const HIDDEN_COUNTER_ATTRIBUTE = "data-falowen-workbook-tab-counter-hidden";
 const PAGE_DISPLAY_ATTRIBUTE = "data-falowen-workbook-page-display";
+const CONTENT_DISPLAY_ATTRIBUTE = "data-falowen-workbook-content-display";
+const INJECTED_SUBMIT_ATTRIBUTE = "data-falowen-workbook-submit-tab";
 
 const normalizeChapter = (value) => String(value || "").trim().toLowerCase();
 
@@ -85,6 +87,41 @@ const restoreNativeWorkbookNavigation = (pageRoot) => {
   Array.from(pageRoot.querySelectorAll(`[${HIDDEN_COUNTER_ATTRIBUTE}]`)).forEach((element) =>
     restoreDisplay(element, HIDDEN_COUNTER_ATTRIBUTE)
   );
+};
+
+const findNativeTabRow = (pageRoot) => {
+  if (!pageRoot) return null;
+  const nativeButtons = Array.from(pageRoot.querySelectorAll("button")).filter((button) =>
+    getWorkbookNativeTabKey(button.textContent)
+  );
+  const buttonsByParent = new Map();
+
+  nativeButtons.forEach((button) => {
+    const parent = button.parentElement;
+    if (!parent) return;
+    buttonsByParent.set(parent, (buttonsByParent.get(parent) || 0) + 1);
+  });
+
+  return [...buttonsByParent.entries()]
+    .sort((left, right) => right[1] - left[1])
+    .find(([, count]) => count >= 3)?.[0] || null;
+};
+
+const setWorkbookContentHidden = (pageRoot, hidden) => {
+  if (!pageRoot) return;
+  Array.from(pageRoot.children || []).forEach((child, index) => {
+    if (index === 0) return;
+    if (hidden) {
+      rememberDisplay(child, CONTENT_DISPLAY_ATTRIBUTE);
+      child.style.display = "none";
+    } else {
+      restoreDisplay(child, CONTENT_DISPLAY_ATTRIBUTE);
+    }
+  });
+};
+
+const removeInjectedSubmitTabs = (pageRoot) => {
+  Array.from(pageRoot?.querySelectorAll(`[${INJECTED_SUBMIT_ATTRIBUTE}]`) || []).forEach((button) => button.remove());
 };
 
 export const isSelfPracticeWorkbookResource = (resource = {}) => {
@@ -155,6 +192,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     navigationTabs.length > 0 &&
     Boolean(selectedAssignment && assignmentKey) &&
     !isSelfPracticeWorkbookResource(match?.resource);
+  const useNativeWorkbookTabs = ["A2", "B1"].includes(level);
 
   const ensureSubmissionContext = useCallback(() => {
     if (!assignmentKey) return;
@@ -334,7 +372,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
   );
 
   useEffect(() => {
-    if (!submissionEnabled) return undefined;
+    if (!submissionEnabled || useNativeWorkbookTabs) return undefined;
     const pageRoot = getWorkbookPageRoot(hostRef);
     if (!pageRoot) return undefined;
 
@@ -360,18 +398,98 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     observer.observe(pageRoot, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [activeTab, activateNativeWorkbookTab, ensureSubmissionContext, hostRef, level, submissionEnabled]);
+  }, [activeTab, activateNativeWorkbookTab, ensureSubmissionContext, hostRef, level, submissionEnabled, useNativeWorkbookTabs]);
+
+  useEffect(() => {
+    if (!submissionEnabled || !useNativeWorkbookTabs) return undefined;
+    const pageRoot = getWorkbookPageRoot(hostRef);
+    const nativeRow = findNativeTabRow(pageRoot);
+    if (!pageRoot || !nativeRow) return undefined;
+
+    removeInjectedSubmitTabs(pageRoot);
+    const nativeButtons = Array.from(nativeRow.querySelectorAll("button")).filter((nativeButton) =>
+      getWorkbookNativeTabKey(nativeButton.textContent)
+    );
+    const nativeButtonHandlers = nativeButtons.map((nativeButton) => {
+      const handler = () => {
+        const tabKey = getWorkbookNativeTabKey(nativeButton.textContent);
+        if (!tabKey) return;
+        lastClickedRef.current = { key: tabKey, button: nativeButton };
+        setActiveTab(tabKey);
+      };
+      nativeButton.addEventListener("click", handler);
+      return [nativeButton, handler];
+    });
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Submit";
+    button.setAttribute(INJECTED_SUBMIT_ATTRIBUTE, "true");
+    button.setAttribute("aria-pressed", activeTab === "submit" ? "true" : "false");
+    Object.assign(button.style, {
+      ...styles.secondaryButton,
+      background: activeTab === "submit" ? "#2563eb" : "#ffffff",
+      borderColor: activeTab === "submit" ? "#2563eb" : "#93c5fd",
+      color: activeTab === "submit" ? "#ffffff" : "#1d4ed8",
+      fontWeight: "800",
+    });
+    button.addEventListener("click", () => {
+      lastClickedRef.current = { key: "", button: null };
+      setActiveTab("submit");
+    });
+    nativeRow.appendChild(button);
+
+    if (activeTab === "submit") {
+      setWorkbookContentHidden(pageRoot, true);
+      ensureSubmissionContext();
+    } else {
+      setWorkbookContentHidden(pageRoot, false);
+    }
+
+    return () => {
+      nativeButtonHandlers.forEach(([nativeButton, handler]) => nativeButton.removeEventListener("click", handler));
+      button.remove();
+    };
+  }, [activeTab, ensureSubmissionContext, hostRef, submissionEnabled, useNativeWorkbookTabs]);
 
   useEffect(
     () => () => {
       const pageRoot = getWorkbookPageRoot(hostRef);
       restoreDisplay(pageRoot, PAGE_DISPLAY_ATTRIBUTE);
+      setWorkbookContentHidden(pageRoot, false);
+      removeInjectedSubmitTabs(pageRoot);
       restoreNativeWorkbookNavigation(pageRoot);
     },
     [hostRef]
   );
 
   if (!submissionEnabled) return null;
+
+  if (useNativeWorkbookTabs) {
+    return activeTab === "submit" ? (
+      <section style={{ ...styles.container, padding: "0 16px", width: "100%" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #bfdbfe", borderRadius: 14, padding: 8 }}>
+          {!lockReady ? (
+            <p style={{ color: "#475569", margin: 8 }}>Preparing the correct assignment submission…</p>
+          ) : (
+            <div className="course-book-tab-submission-page">
+              <style>{`.course-book-tab-submission-page > div > section:first-child { display: none !important; }
+              .course-book-tab-submission-page select { display: none !important; }`}</style>
+              <AssignmentSubmissionPage
+                key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
+                submissionContext={{
+                  level,
+                  day,
+                  assignmentKey,
+                  canonicalAssignmentKey: assignmentKey,
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+    ) : null;
+  }
 
   return (
     <section
