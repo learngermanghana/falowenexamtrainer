@@ -1,6 +1,8 @@
 import { getLessonRadioResource } from "./lessonRadioDictionary";
 
 test.each([
+  [3, "Dinge und Personen vergleichen 1.3", "wpGj-ZcZVv0"],
+  [4, "Wo möchten wir uns treffen? 2.4", "JsZBblW70C8"],
   [23, "Wie kommst du zur Schule / zur Arbeit? 9.23", "LtARwiCljLY"],
   [24, "Einen Urlaub planen 9.24", "UXiBiiXwqwY"],
   [25, "Tagesablauf (Exercise) 9.25", "m7nP2qE9gNg"],

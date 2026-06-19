@@ -1,5 +1,6 @@
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { normalizeLesson } from "./lessonModel";
+import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
 
 describe("additional A1 AI lesson videos", () => {
   test("Day 16 uses the Food and Negation + Food and Daily Life video", () => {
@@ -39,5 +40,20 @@ describe("additional A1 AI lesson videos", () => {
 
   test("Day 17 remains unchanged until a new link is supplied", () => {
     expect(getAdditionalLessonVideoResources("A1", 17)).toEqual([]);
+  });
+});
+
+
+describe("A1 AI lesson video overrides", () => {
+  const dictionary = applyA1LessonVideoResourceOverrides({});
+
+  test.each([
+    [22, "A1 Day 22 · Health · AI video", "https://youtu.be/U2pns6E1_yE"],
+    [23, "A1 Day 23 · Dative and Accusative Verbs · AI video", "https://youtu.be/V4RxPYSPwhg"],
+    [24, "A1 Day 24 · Conjunctions · AI video", "https://youtu.be/gprBXwwAT-o"],
+  ])("Day %i uses the requested AI video override", (day, title, url) => {
+    expect(dictionary.A1[day].videoResources).toEqual([
+      expect.objectContaining({ title, url }),
+    ]);
   });
 });
