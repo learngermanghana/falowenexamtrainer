@@ -65,6 +65,13 @@ const collapseRepeatedTitleParts = (value) => {
     .join(" + ");
 };
 
+const normalizeMode = (value) => {
+  const token = String(value || "").trim();
+  if (token === "lesen_hören" || token === "lesen_hoeren") return "Lesen & Hören";
+  if (token === "schreiben_sprechen") return "Schreiben & Sprechen";
+  return token;
+};
+
 const buildLookupEntriesForLevel = (level) => {
   const normalizedLevel = normalizeLevel(level);
   const entries = CURRICULUM_BY_LEVEL[normalizedLevel] || [];
@@ -73,9 +80,12 @@ const buildLookupEntriesForLevel = (level) => {
     const resources = Array.isArray(entry.resources) ? entry.resources : [];
     const nestedResources = resources.map((resource, resourceIndex) => {
       const submissionRequired = Boolean(resource.submissionRequired ?? resource.assignment ?? false);
+      const chapter = String(resource.chapter || entry.chapter || "").trim();
       const resourceAssignmentId = String(resource.assignmentId || resource.assignment_id || "")
         .trim()
         .toUpperCase();
+      const lookupAssignmentId =
+        resourceAssignmentId || (normalizeChapter(chapter) ? `${normalizedLevel}-${normalizeChapter(chapter)}` : "");
       const resourceTitle = collapseRepeatedTitleParts(
         resource.topic || resource.title || entry.topic || entry.title
       );
@@ -86,16 +96,16 @@ const buildLookupEntriesForLevel = (level) => {
         level: normalizedLevel,
         day: Number(entry.day ?? entry.assignmentDay),
         assignmentDay: Number(entry.assignmentDay ?? entry.day),
-        chapter: String(resource.chapter || entry.chapter || "").trim(),
+        chapter,
         topic: resourceTitle,
         title: resourceTitle,
-        mode: resource.mode || resource.kind || entry.mode,
-        type: resource.type || resource.kind || entry.type,
+        mode: normalizeMode(resource.mode || resource.kind || entry.mode),
+        type: normalizeMode(resource.type || resource.kind || entry.type),
         assignment: submissionRequired,
         submissionRequired,
         progressionEligible: submissionRequired ? entry.progressionEligible !== false : false,
-        assignmentId: resourceAssignmentId,
-        assignment_id: resourceAssignmentId,
+        assignmentId: lookupAssignmentId,
+        assignment_id: lookupAssignmentId,
         canonicalAssignmentId: resourceAssignmentId,
         parentAssignmentId: entry.assignment_id,
         __lookupOrder: entryIndex * 100 + resourceIndex,
@@ -109,6 +119,8 @@ const buildLookupEntriesForLevel = (level) => {
         ...entry,
         topic: collapseRepeatedTitleParts(entry.topic || entry.title),
         title: collapseRepeatedTitleParts(entry.title || entry.topic),
+        mode: normalizeMode(entry.mode),
+        type: normalizeMode(entry.type),
         __lookupOrder: entryIndex * 100 + 99,
         __isNestedResource: false,
       },
@@ -152,7 +164,9 @@ const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true }
 
 const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
   const entry = entryParam || {};
-  return String(entry.mode || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || entry.topic || "").trim();
+  return normalizeMode(
+    entry.mode || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || entry.topic || ""
+  );
 };
 
 export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
@@ -164,16 +178,17 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
 
   const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter });
   const chapterToken = normalizeChapter(chapter);
-  const modeToken = String(mode || "").trim();
+  const modeToken = normalizeMode(mode).toLowerCase();
   const dayToken = Number(assignmentDay || 0);
 
   const matches = buildLookupEntriesForLevel(normalizedLevel).filter((entry) => {
     const entryAssignmentId = String(entry.assignment_id || entry.assignmentId || "").trim().toUpperCase();
     const entryChapter = normalizeChapter(entry.chapter);
+    const entryMode = normalizeMode(entry.mode).toLowerCase();
 
     if (canonicalId && entryAssignmentId !== canonicalId) return false;
     if (!canonicalId && chapterToken && entryChapter !== chapterToken) return false;
-    if (modeToken && entry.mode !== modeToken) return false;
+    if (modeToken && entryMode !== modeToken) return false;
     if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
     return true;
   });
@@ -190,27 +205,68 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
         ...entry,
         topic: collapseRepeatedTitleParts(entry.topic || entry.title),
         title: collapseRepeatedTitleParts(entry.title || entry.topic),
+        mode: normalizeMode(entry.mode),
+        type: normalizeMode(entry.type),
         assignment: entry.assignment === true,
-        canonicalAssignmentId: entry.assignment_id || "",
+        canonicalAssignmentId: entry.canonicalAssignmentId || (entry.assignment ? entry.assignment_id : ""),
       }
     : null;
 };
 
-export const getAssignmentSequenceForLevel = (level, { includePractical = true } = {}) => {
-  const entries = getCurriculumEntriesForLevel(level)
-    .filter((entry) => includePractical || entry.progressionEligible === true)
-    .sort((a, b) => {
-      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
-      if (dayDiff !== 0) return dayDiff;
-      if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
-      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
-    });
+const getProgressionEntriesForLevel = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  const parents = getCurriculumEntriesForLevel(normalizedLevel);
 
-  if (includePractical) return entries;
+  return parents.flatMap((entry) => {
+    const resources = Array.isArray(entry.resources) ? entry.resources : [];
+    const submissionResources = resources.filter((resource) =>
+      Boolean(resource.submissionRequired ?? resource.assignment ?? false)
+    );
+
+    if (!submissionResources.length) {
+      return entry.progressionEligible === true && entry.assignment === true ? [entry] : [];
+    }
+
+    return submissionResources.map((resource) => {
+      const assignmentId = String(resource.assignmentId || resource.assignment_id || entry.assignment_id || "")
+        .trim()
+        .toUpperCase();
+      return {
+        ...entry,
+        ...resource,
+        chapter: String(resource.chapter || entry.chapter || "").trim(),
+        topic: collapseRepeatedTitleParts(resource.topic || resource.title || entry.topic || entry.title),
+        title: collapseRepeatedTitleParts(resource.title || resource.topic || entry.title || entry.topic),
+        mode: normalizeMode(resource.mode || resource.kind || entry.mode),
+        type: normalizeMode(resource.type || resource.kind || entry.type),
+        assignment: true,
+        submissionRequired: true,
+        progressionEligible: true,
+        assignmentId,
+        assignment_id: assignmentId,
+        canonicalAssignmentId: assignmentId,
+      };
+    });
+  });
+};
+
+export const getAssignmentSequenceForLevel = (level, { includePractical = true } = {}) => {
+  const entries = includePractical
+    ? getCurriculumEntriesForLevel(level)
+    : getProgressionEntriesForLevel(level);
+
+  const sorted = entries.sort((a, b) => {
+    const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+    if (dayDiff !== 0) return dayDiff;
+    if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
+    return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
+  });
+
+  if (includePractical) return sorted;
 
   const seen = new Set();
-  return entries.filter((entry) => {
-    if (seen.has(entry.assignment_id)) return false;
+  return sorted.filter((entry) => {
+    if (!entry.assignment_id || seen.has(entry.assignment_id)) return false;
     seen.add(entry.assignment_id);
     return true;
   });
