@@ -14,7 +14,9 @@ describe("A2 and B1 course books", () => {
   test("describes the shared workbook as four parts without class notes", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
-    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("four parts");
+    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("four workbook parts");
+    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("Ref");
+    expect(screen.getByText(/Submit tab in the Course Book/i)).toBeInTheDocument();
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 

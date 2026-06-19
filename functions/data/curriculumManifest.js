@@ -1451,7 +1451,7 @@ const CANONICAL_CURRICULUM = [
     "assignmentId": "B1-1.2",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/2?view=grammar",
-    "workbookRoute": "https://drive.google.com/file/d/1AgjhFYw07JYvsgVP1MBKYEMFBjeAwQ1e/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/2",
     "video": "https://youtu.be/piJE4ucYFuc",
     "submissionRequired": true,
     "progressionEligible": true,
@@ -1461,7 +1461,7 @@ const CANONICAL_CURRICULUM = [
         "title": "Freunde fürs Leben (Übung) 1.2",
         "video": "https://youtu.be/piJE4ucYFuc",
         "grammarPage": "/campus/course/lesson/B1/2?view=grammar",
-        "workbookRoute": "https://drive.google.com/file/d/1AgjhFYw07JYvsgVP1MBKYEMFBjeAwQ1e/view?usp=sharing",
+        "workbookRoute": "/campus/course/lesson/B1/2",
         "submissionRequired": true,
         "assignmentId": "B1-1.2"
       }

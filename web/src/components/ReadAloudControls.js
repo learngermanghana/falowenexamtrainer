@@ -8,7 +8,7 @@ const MAX_UTTERANCE_LENGTH = 1700;
 const cleanText = (value = "") =>
   String(value || "")
     .replace(/Open Teil 4 audio/gi, "")
-    .replace(/Reminder:.*?Submission tab\./gi, "")
+    .replace(/Reminder:.*?(Submission|Submit) tab(?: in the Course Book)?\./gi, "")
     .replace(/https?:\/\/\S+/gi, "")
     .replace(/[•●▪▫]/g, ". ")
     .replace(/\s*→\s*/g, ", dann ")

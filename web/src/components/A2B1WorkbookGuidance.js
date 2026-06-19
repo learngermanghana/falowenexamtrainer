@@ -16,6 +16,7 @@ const resolveWorkbookLevel = (level) => {
 export const A2B1WorkbookGuidance = ({ level = "" }) => {
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
   const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
+  const levelPrefix = workbookLevel || "A2/B1";
 
   return (
     <>
@@ -36,13 +37,13 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
         <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            This {workbookLabel} has <strong>four parts</strong>: Sprechen, Schreiben, Lesen and Hören.
+            This {workbookLabel} has <strong>four workbook parts</strong>: Sprechen, Schreiben, Lesen and Hören. In the Course Book tab system, you also have a <strong>Ref</strong> tab for reference answers and a <strong>Submit</strong> tab for final submission.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
+            <strong>{levelPrefix} · Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submission</strong> tab.
+            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submit</strong> tab in the Course Book.
           </p>
           <p style={{ margin: 0 }}>
             <strong>Read aloud:</strong> In Teil 3 · Lesen, use the free German voice controls to listen to the text, pause, continue, stop and change speed.
@@ -66,6 +67,6 @@ export const WorkbookSubmissionReminder = () => (
       lineHeight: 1.5,
     }}
   >
-    Reminder: This page is for learning and practice. Submit only your final assignment work in the Submission tab.
+    Reminder: This page is for learning and practice. Submit only your final assignment work in the Submit tab in the Course Book.
   </div>
 );
