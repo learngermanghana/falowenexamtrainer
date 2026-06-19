@@ -49,23 +49,6 @@ const toEmbeddableUrl = (resourceUrl) => {
   }
 };
 
-const inferAssignmentKeyFromWorkbookUrl = (resourceUrl) => {
-  if (!resourceUrl) return "";
-  const normalizedUrl = String(resourceUrl).toLowerCase();
-  const levelDayMatch = normalizedUrl.match(/\/([abc]\d)-day-(\d+)-/i);
-  if (!levelDayMatch) return "";
-  const level = levelDayMatch[1].toUpperCase();
-  const day = Number(levelDayMatch[2]);
-  if (!Number.isFinite(day)) return "";
-
-  const chapterMatch = normalizedUrl.match(/(?:kapitel|chapter)-(\d+)-(\d+)/i);
-  if (chapterMatch) {
-    return `${level}-${Number(chapterMatch[1])}.${Number(chapterMatch[2])}`;
-  }
-
-  return `${level}-DAY-${day}`;
-};
-
 const CourseResourceViewerPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,7 +61,6 @@ const CourseResourceViewerPage = () => {
   const resourceUrl = query.get("url") || "";
   const label = query.get("label") || "Course resource";
   const legacySelfLearningRoute = useMemo(() => getLegacySelfLearningRoute(resourceUrl), [resourceUrl]);
-  const inferredAssignmentKey = useMemo(() => inferAssignmentKeyFromWorkbookUrl(resourceUrl), [resourceUrl]);
   const embedUrl = useMemo(() => toEmbeddableUrl(resourceUrl), [resourceUrl]);
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
   const campusQuickTabs = [
