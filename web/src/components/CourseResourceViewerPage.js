@@ -65,6 +65,7 @@ const CourseResourceViewerPage = () => {
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
   const campusQuickTabs = [
     { key: "course", label: "My Course", path: "/campus/course" },
+    { key: "submit", label: "Submit", path: "/campus/course?submitWork=1" },
     { key: "examFile", label: "My Exam File", path: "/campus/examFile" },
     { key: "results", label: "Results", path: "/campus/results" },
     { key: "discussion", label: "Discussion", path: "/campus/discussion" },

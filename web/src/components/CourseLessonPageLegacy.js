@@ -342,7 +342,7 @@ export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
                   number={nextNumber()}
                   icon="📝"
                   title={chapterLabel ? `${chapterLabel} workbook` : "Workbook"}
-                  description="Open the workbook, answer the tasks, and prepare your final answers."
+                  description="Instruction: Open the workbook, answer the tasks, and prepare your final answers."
                   actionLabel="Open workbook"
                   url={resource.workbook.url}
                 />
