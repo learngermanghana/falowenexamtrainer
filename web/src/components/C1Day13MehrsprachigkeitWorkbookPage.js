@@ -3,6 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import RouteSpeakingMindMap from "./RouteSpeakingMindMap";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
