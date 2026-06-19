@@ -1,22 +1,21 @@
-name: Run course book task patch
+name: Run canonical lock patch
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - fix/canonical-assignment-locks
 
 permissions:
   contents: write
 
 jobs:
   patch:
-    if: github.actor != 'github-actions[bot]' && github.head_ref == 'fix/course-book-task-cards-submit-tabs'
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/course-book-task-cards-submit-tabs
+          ref: fix/canonical-assignment-locks
           fetch-depth: 0
 
       - name: Extract and apply patch
@@ -24,55 +23,24 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          workflow = Path('.github/workflows/apply-course-book-task-split.yml').read_text().splitlines()
+          workflow = Path('.github/workflows/apply-canonical-assignment-lock-patch.yml').read_text().splitlines()
           start = next(i for i, line in enumerate(workflow) if "python - <<'PY'" in line) + 1
           end = next(i for i in range(start, len(workflow)) if workflow[i].strip() == 'PY')
           script_lines = []
           for line in workflow[start:end]:
               script_lines.append(line[10:] if line.startswith('          ') else line)
-          script_text = '\n'.join(script_lines) + '\n'
-
-          link_start = script_text.index("old_link = '''        <a")
-          write_start = script_text.index("day4.write_text(day4_text)", link_start)
-          write_end = write_start + len("day4.write_text(day4_text)")
-          link_replacement = '''import re
-          day4_text = re.sub(
-              r'\\s*<a\\s+href="/campus/course\\?submitWork=1".*?</a>',
-              '\\n        <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8" }}>\\n          Choose Submit above when you are ready.\\n        </p>',
-              day4_text,
-              count=1,
-              flags=re.S,
-          )
-          day4.write_text(day4_text)'''
-          script_text = script_text[:link_start] + link_replacement + script_text[write_end:]
-          Path('/tmp/apply_patch.py').write_text(script_text)
+          Path('/tmp/apply_patch.py').write_text('\n'.join(script_lines) + '\n')
           PY
-          set +e
-          python /tmp/apply_patch.py > /tmp/course-book-patch.log 2>&1
-          status=$?
-          set -e
-          if [ "$status" -ne 0 ]; then
-            git reset --hard HEAD
-            cp /tmp/course-book-patch.log .course-book-patch-error.log
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .course-book-patch-error.log
-            git commit -m "Record course book patch error"
-            git push origin HEAD:fix/course-book-task-cards-submit-tabs
-            exit "$status"
-          fi
-          rm -f .course-book-patch-trigger .course-book-patch-error.log
+          python /tmp/apply_patch.py
 
       - name: Commit patched source
         run: |
+          if git diff --quiet; then
+            echo "Patch already applied"
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Split course book task cards and standardize submit tabs"
-          git push origin HEAD:fix/course-book-task-cards-submit-tabs
-
-      - name: Run focused tests
-        working-directory: web
-        run: |
-          npm ci
-          CI=true npm test -- --watchAll=false --runInBand src/utils/courseBookEntries.test.js src/components/CourseLessonInlineSubmission.test.js
+          git add web/src/components/AssignmentSubmissionPage.js web/src/components/CourseWorkbookSubmissionTabs.js
+          git commit -m "Use canonical assignment IDs for submission locks"
+          git push origin HEAD:fix/canonical-assignment-locks
