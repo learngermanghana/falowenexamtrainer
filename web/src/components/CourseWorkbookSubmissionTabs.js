@@ -107,10 +107,20 @@ const findNativeTabRow = (pageRoot) => {
     .find(([, count]) => count >= 3)?.[0] || null;
 };
 
-const setWorkbookContentHidden = (pageRoot, hidden) => {
+const getDirectChildAncestor = (pageRoot, descendant) => {
+  if (!pageRoot || !descendant) return null;
+  let current = descendant;
+  while (current?.parentElement && current.parentElement !== pageRoot) {
+    current = current.parentElement;
+  }
+  return current?.parentElement === pageRoot ? current : null;
+};
+
+const setWorkbookContentHidden = (pageRoot, hidden, nativeRow = null) => {
   if (!pageRoot) return;
+  const preservedChild = getDirectChildAncestor(pageRoot, nativeRow);
   Array.from(pageRoot.children || []).forEach((child, index) => {
-    if (index === 0) return;
+    if (child === preservedChild || (!preservedChild && index === 0)) return;
     if (hidden) {
       rememberDisplay(child, CONTENT_DISPLAY_ATTRIBUTE);
       child.style.display = "none";
@@ -122,6 +132,12 @@ const setWorkbookContentHidden = (pageRoot, hidden) => {
 
 const removeInjectedSubmitTabs = (pageRoot) => {
   Array.from(pageRoot?.querySelectorAll(`[${INJECTED_SUBMIT_ATTRIBUTE}]`) || []).forEach((button) => button.remove());
+};
+
+export const __TESTING__ = {
+  findNativeTabRow,
+  getDirectChildAncestor,
+  setWorkbookContentHidden,
 };
 
 export const isSelfPracticeWorkbookResource = (resource = {}) => {
@@ -153,6 +169,9 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
   const defaultTab = requestedWorkbookTab === "submit" ? "submit" : level === "A1" ? "assignment" : "teil1";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [lockReady, setLockReady] = useState(false);
+  const [nativeTabRowDetected, setNativeTabRowDetected] = useState(false);
+  const [nativeTabRowVersion, setNativeTabRowVersion] = useState(0);
+  const nativeTabRowRef = useRef(null);
   const syncInFlightRef = useRef(false);
   const lastClickedRef = useRef({ key: "", button: null });
 
@@ -192,7 +211,8 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     navigationTabs.length > 0 &&
     Boolean(selectedAssignment && assignmentKey) &&
     !isSelfPracticeWorkbookResource(match?.resource);
-  const useNativeWorkbookTabs = ["A2", "B1"].includes(level);
+  const nativeWorkbookTabsEligible = ["A2", "B1"].includes(level);
+  const useNativeWorkbookTabs = nativeWorkbookTabsEligible && nativeTabRowDetected;
 
   const ensureSubmissionContext = useCallback(() => {
     if (!assignmentKey) return;
@@ -327,6 +347,9 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     setActiveTab(defaultTab);
     setLockReady(false);
     lastClickedRef.current = { key: "", button: null };
+    nativeTabRowRef.current = null;
+    setNativeTabRowDetected(false);
+    setNativeTabRowVersion((version) => version + 1);
   }, [defaultTab, location.pathname]);
 
   useEffect(() => {
@@ -359,6 +382,36 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     };
   }, [canonicalLockId, legacyLockId, submissionEnabled, syncCanonicalLockAliases, user?.uid]);
 
+  useEffect(() => {
+    if (!submissionEnabled || !nativeWorkbookTabsEligible) {
+      nativeTabRowRef.current = null;
+      setNativeTabRowDetected(false);
+      return undefined;
+    }
+
+    const pageRoot = getWorkbookPageRoot(hostRef);
+    if (!pageRoot) {
+      nativeTabRowRef.current = null;
+      setNativeTabRowDetected(false);
+      return undefined;
+    }
+
+    const updateNativeTabRowDetected = () => {
+      const nativeRow = findNativeTabRow(pageRoot);
+      if (nativeTabRowRef.current !== nativeRow) {
+        nativeTabRowRef.current = nativeRow;
+        setNativeTabRowVersion((version) => version + 1);
+      }
+      setNativeTabRowDetected(Boolean(nativeRow));
+    };
+
+    updateNativeTabRowDetected();
+    const observer = new MutationObserver(updateNativeTabRowDetected);
+    observer.observe(pageRoot, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [hostRef, nativeWorkbookTabsEligible, submissionEnabled]);
+
   const activateNativeWorkbookTab = useCallback(
     (tabKey) => {
       const pageRoot = getWorkbookPageRoot(hostRef);
@@ -382,7 +435,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
       ensureSubmissionContext();
     } else {
       restoreDisplay(pageRoot, PAGE_DISPLAY_ATTRIBUTE);
-      if (["A2", "B1"].includes(level)) {
+      if (nativeWorkbookTabsEligible) {
         hideNativeWorkbookNavigation(pageRoot);
         window.setTimeout(() => activateNativeWorkbookTab(activeTab), 0);
       }
@@ -390,15 +443,18 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
 
     const observer = new MutationObserver(() => {
       if (activeTab === "submit") return;
-      if (["A2", "B1"].includes(level)) {
+      if (nativeWorkbookTabsEligible) {
         hideNativeWorkbookNavigation(pageRoot);
         activateNativeWorkbookTab(activeTab);
       }
     });
     observer.observe(pageRoot, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
-  }, [activeTab, activateNativeWorkbookTab, ensureSubmissionContext, hostRef, level, submissionEnabled, useNativeWorkbookTabs]);
+    return () => {
+      observer.disconnect();
+      restoreNativeWorkbookNavigation(pageRoot);
+    };
+  }, [activeTab, activateNativeWorkbookTab, ensureSubmissionContext, hostRef, nativeWorkbookTabsEligible, submissionEnabled, useNativeWorkbookTabs]);
 
   useEffect(() => {
     if (!submissionEnabled || !useNativeWorkbookTabs) return undefined;
@@ -440,17 +496,17 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     nativeRow.appendChild(button);
 
     if (activeTab === "submit") {
-      setWorkbookContentHidden(pageRoot, true);
+      setWorkbookContentHidden(pageRoot, true, nativeRow);
       ensureSubmissionContext();
     } else {
-      setWorkbookContentHidden(pageRoot, false);
+      setWorkbookContentHidden(pageRoot, false, nativeRow);
     }
 
     return () => {
       nativeButtonHandlers.forEach(([nativeButton, handler]) => nativeButton.removeEventListener("click", handler));
       button.remove();
     };
-  }, [activeTab, ensureSubmissionContext, hostRef, submissionEnabled, useNativeWorkbookTabs]);
+  }, [activeTab, ensureSubmissionContext, hostRef, nativeTabRowDetected, nativeTabRowVersion, submissionEnabled, useNativeWorkbookTabs]);
 
   useEffect(
     () => () => {

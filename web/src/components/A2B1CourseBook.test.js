@@ -4,6 +4,7 @@ import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
 import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
+import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
 jest.mock("./WorkbookReadAloudInjector", () => () => null);
 jest.mock("./SpeakingPracticeTimerCard", () => () => null);
@@ -37,6 +38,44 @@ describe("A2 and B1 course books", () => {
       "Ref",
       "Submit",
     ]);
+  });
+
+
+  test("detects native workbook tabs only when at least three recognized buttons share a row", () => {
+    const pageRoot = document.createElement("div");
+    const nativeRow = document.createElement("div");
+    ["Teil 1", "Teil 2", "Ref"].forEach((label) => {
+      const button = document.createElement("button");
+      button.textContent = label;
+      nativeRow.appendChild(button);
+    });
+    pageRoot.appendChild(nativeRow);
+
+    expect(courseWorkbookSubmissionTabsTesting.findNativeTabRow(pageRoot)).toBe(nativeRow);
+
+    nativeRow.lastChild.remove();
+    expect(courseWorkbookSubmissionTabsTesting.findNativeTabRow(pageRoot)).toBeNull();
+  });
+
+  test("preserves the direct child that contains native tabs when hiding workbook content", () => {
+    const pageRoot = document.createElement("div");
+    const introCard = document.createElement("section");
+    const workbookCard = document.createElement("section");
+    const nativeRow = document.createElement("div");
+    const exerciseCard = document.createElement("section");
+
+    workbookCard.appendChild(nativeRow);
+    pageRoot.append(introCard, workbookCard, exerciseCard);
+
+    courseWorkbookSubmissionTabsTesting.setWorkbookContentHidden(pageRoot, true, nativeRow);
+
+    expect(introCard.style.display).toBe("none");
+    expect(workbookCard.style.display).toBe("");
+    expect(exerciseCard.style.display).toBe("none");
+
+    courseWorkbookSubmissionTabsTesting.setWorkbookContentHidden(pageRoot, false, nativeRow);
+    expect(introCard.style.display).toBe("");
+    expect(exerciseCard.style.display).toBe("");
   });
 
   test.each(["a2", "b1"])("does not mention class notes in the %s Day 0 guide", (level) => {
