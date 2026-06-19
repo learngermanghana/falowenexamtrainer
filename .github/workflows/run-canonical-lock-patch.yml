@@ -4,13 +4,16 @@ on:
   push:
     branches:
       - fix/course-book-task-cards-submit-tabs
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   patch:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && github.head_ref == 'fix/course-book-task-cards-submit-tabs'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
