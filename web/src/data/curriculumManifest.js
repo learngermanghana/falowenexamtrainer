@@ -122,7 +122,7 @@ const CANONICAL_CURRICULUM = [
     "assignmentId": "A1-0.1",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
-    "workbookRoute": "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+    "workbookRoute": "/campus/course/a1-day-1-greetings-workbook",
     "video": "https://youtu.be/CqFbBQG9M3U",
     "submissionRequired": true,
     "progressionEligible": true,
@@ -132,7 +132,7 @@ const CANONICAL_CURRICULUM = [
         "title": "Greetings and Asking About Well-being",
         "video": "https://youtu.be/CqFbBQG9M3U",
         "grammarPage": "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
-        "workbookRoute": "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+        "workbookRoute": "/campus/course/a1-day-1-greetings-workbook",
         "submissionRequired": true,
         "assignmentId": "A1-0.1"
       }
