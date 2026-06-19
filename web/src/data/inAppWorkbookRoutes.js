@@ -1,4 +1,4 @@
-import routeConfig from "../../../shared/inAppWorkbookRoutes.json";
+import routeConfig from "./inAppWorkbookRoutes.json";
 
 const GUARDED_LEVELS = new Set(["A1", "A2"]);
 
