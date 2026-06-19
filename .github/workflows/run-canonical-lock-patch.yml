@@ -30,7 +30,22 @@ jobs:
           script_lines = []
           for line in workflow[start:end]:
               script_lines.append(line[10:] if line.startswith('          ') else line)
-          Path('/tmp/apply_patch.py').write_text('\n'.join(script_lines) + '\n')
+          script_text = '\n'.join(script_lines) + '\n'
+
+          link_start = script_text.index("old_link = '''        <a")
+          write_start = script_text.index("day4.write_text(day4_text)", link_start)
+          write_end = write_start + len("day4.write_text(day4_text)")
+          link_replacement = '''import re
+          day4_text = re.sub(
+              r'\\s*<a\\s+href="/campus/course\\?submitWork=1".*?</a>',
+              '\\n        <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8" }}>\\n          Choose Submit above when you are ready.\\n        </p>',
+              day4_text,
+              count=1,
+              flags=re.S,
+          )
+          day4.write_text(day4_text)'''
+          script_text = script_text[:link_start] + link_replacement + script_text[write_end:]
+          Path('/tmp/apply_patch.py').write_text(script_text)
           PY
           set +e
           python /tmp/apply_patch.py > /tmp/course-book-patch.log 2>&1
