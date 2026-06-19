@@ -18,7 +18,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Install frontend dependencies
         working-directory: web
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: Run course book tests
         working-directory: web
         run: CI=true npm test -- --watchAll=false --runInBand src/utils/courseBookEntries.test.js src/components/CourseLessonInlineSubmission.test.js
