@@ -196,3 +196,22 @@ code {
   box-shadow: none;
   cursor: not-allowed;
 }
+
+.onboarding-video-subscribe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  background: #fff1f2;
+  color: #7f1d1d;
+  text-align: center;
+  font-weight: 700;
+}
+
+.onboarding-video-subscribe a {
+  flex: 0 0 auto;
+}

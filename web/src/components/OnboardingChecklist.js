@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { LESSON_VIDEO_DICTIONARY } from "../data/lessonVideoDictionary";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { useToast } from "../context/ToastContext";
+import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
@@ -89,14 +90,20 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         </div>
 
         {videoId ? (
-          <div className="onboarding-video">
-            <iframe
-              title={video?.title || "Falowen welcome video"}
-              src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          </div>
+          <>
+            <div className="onboarding-video">
+              <iframe
+                title={video?.title || "Falowen welcome video"}
+                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+            <div className="onboarding-video-subscribe">
+              <span>New student? Subscribe to the YouTube channel so you do not miss new lessons.</span>
+              <YouTubeSubscribeButton label="Subscribe to LLEA Ghana on YouTube" />
+            </div>
+          </>
         ) : (
           <div className="onboarding-video-placeholder">
             <span aria-hidden style={{ fontSize: 38 }}>▶️</span>
