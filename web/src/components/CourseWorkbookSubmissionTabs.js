@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -382,7 +382,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     };
   }, [canonicalLockId, legacyLockId, submissionEnabled, syncCanonicalLockAliases, user?.uid]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!submissionEnabled || !nativeWorkbookTabsEligible) {
       nativeTabRowRef.current = null;
       setNativeTabRowDetected(false);
