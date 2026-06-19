@@ -1,0 +1,27 @@
+name: Course Book entry tests
+
+on:
+  push:
+    branches:
+      - feat/standardize-course-book-entries
+
+jobs:
+  focused-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test Course Book entry normalization
+        run: npm test -- --runInBand src/utils/courseBookEntries.test.js
