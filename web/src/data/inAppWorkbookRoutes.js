@@ -39,11 +39,11 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
 
 export const resolveInAppWorkbookRoute = ({ level, day, chapter, fallback } = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const configured = getConfiguredInAppWorkbookRoute({ level: normalizedLevel, day, chapter });
-  if (configured) return configured;
-
   const normalizedFallback = normalizeFalowenCourseRoute(fallback);
   if (normalizedFallback) return normalizedFallback;
+
+  const configured = getConfiguredInAppWorkbookRoute({ level: normalizedLevel, day, chapter });
+  if (configured) return configured;
 
   if (GUARDED_LEVELS.has(normalizedLevel)) return "";
   return String(fallback || "").trim();
