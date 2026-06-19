@@ -495,7 +495,7 @@ const B1Day0OrientationKnowledgeTestWorkbookPage = () => {
         </p>
 
         <p style={{ margin: 0 }}>
-          <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer">
+          <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer">
             Submit your assignment
           </a>
         </p>

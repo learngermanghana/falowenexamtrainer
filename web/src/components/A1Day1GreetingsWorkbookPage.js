@@ -146,7 +146,7 @@ const A1Day1GreetingsWorkbookPage = () => {
           Submit only your Teil 2 answers in the submission area.
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, width: "fit-content", textDecoration: "none", padding: "8px 12px", fontSize: 13 }}

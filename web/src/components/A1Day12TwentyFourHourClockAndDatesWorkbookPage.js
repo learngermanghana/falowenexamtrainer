@@ -210,7 +210,7 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
           After completing all parts, submit your answers in the submission area only (not on this page).
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}

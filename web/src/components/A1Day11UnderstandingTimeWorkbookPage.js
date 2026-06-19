@@ -176,7 +176,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           When you finish, submit all answers in the submission area (not on this page).
         </p>
-        <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
+        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
           Open Submission Area
         </a>
       </div>

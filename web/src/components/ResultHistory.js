@@ -220,7 +220,7 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const breakdownRows = getScoreBreakdownRows(item);
   const wrongObjectiveRows = getWrongObjectiveRows(item);
   const correctionPoints = getCorrectionPoints(item);
-  const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/submit";
+  const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/course?submitWork=1";
   const passed = item.numericScore >= PASS_MARK;
 
   return (

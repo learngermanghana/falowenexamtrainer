@@ -205,7 +205,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
 
   const submit = () => {
     if (!assignmentId) return;
-    navigate(`/campus/submit?assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`, {
+    navigate(`/campus/course?submitWork=1&assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`, {
       state: { assignmentKey: assignmentId, assignmentId, canonicalAssignmentId: assignmentId, day: lesson.day, level: lesson.level, assignmentTitle: lesson.title },
     });
   };

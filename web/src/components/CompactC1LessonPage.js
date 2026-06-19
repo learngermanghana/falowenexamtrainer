@@ -114,7 +114,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
 
   const submit = () => {
     if (!assignmentId) return;
-    navigate(`/campus/submit?assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`, {
+    navigate(`/campus/course?submitWork=1&assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`, {
       state: { assignmentKey: assignmentId, assignmentId, day: lesson.day, level: lesson.level, assignmentTitle: lesson.title },
     });
   };

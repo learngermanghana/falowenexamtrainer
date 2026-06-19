@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 
 const MENU_LINKS = [
   { label: "Course Book", href: "/campus/course" },
-  { label: "Submit Work", href: "/campus/submit" },
   { label: "Falowen A.I", href: "/campus/grammar" },
   { label: "Results", href: "/campus/results" },
   { label: "Exam File", href: "/campus/examFile" },

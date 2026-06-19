@@ -221,7 +221,7 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Submit your answers in the submission area (not on this workbook page).
         </p>
-        <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
+        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
           Open submission area
         </a>
       </section>

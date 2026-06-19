@@ -182,7 +182,7 @@ export default function B1TutorLessonPage({ canonicalLesson }) {
   const submitAssignment = () => {
     if (!assignmentId) return;
     navigate(
-      `/campus/submit?assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`,
+      `/campus/course?submitWork=1&assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`,
       {
         state: {
           assignmentKey: assignmentId,

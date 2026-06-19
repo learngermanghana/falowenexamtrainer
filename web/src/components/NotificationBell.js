@@ -78,7 +78,7 @@ const resolveAction = (item = {}) => {
   const category = resolveCategory(item);
   switch (category) {
     case "assignments":
-      return { label: "Open submissions", route: "/campus/submit" };
+      return { label: "Open Course Book", route: "/campus/course?submitWork=1" };
     case "feedback":
       return { label: "Open results", route: "/campus/results" };
     case "account":

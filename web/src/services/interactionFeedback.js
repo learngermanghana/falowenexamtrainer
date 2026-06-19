@@ -46,7 +46,7 @@ const inferEventType = (title = "", body = "") => {
 
 const inferEventRoute = (type = "") => {
   if (type === "Feedback") return "/campus/results";
-  if (type === "Assignment") return "/campus/submit";
+  if (type === "Assignment") return "/campus/course?submitWork=1";
   if (type === "Account") return "/campus/account";
   return "/campus/course";
 };

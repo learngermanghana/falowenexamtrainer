@@ -159,7 +159,7 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
           Submit all your answers in the submission area after you complete the workbook tasks.
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, textDecoration: "none", width: "fit-content" }}

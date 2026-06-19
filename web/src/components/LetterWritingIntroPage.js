@@ -914,7 +914,7 @@ const A1LetterWritingQuestionBookPage = () => {
             <button
               type="button"
               style={{ ...styles.primaryButton, width: "fit-content" }}
-              onClick={() => navigate("/campus/submit")}
+              onClick={() => navigate("/campus/course?submitWork=1")}
             >
               Go to Submit Assignment
             </button>
@@ -978,7 +978,7 @@ const A1LetterWritingQuestionBookPage = () => {
             <button
               type="button"
               style={{ ...styles.primaryButton, width: "fit-content" }}
-              onClick={() => navigate("/campus/submit")}
+              onClick={() => navigate("/campus/course?submitWork=1")}
             >
               Go to Submit Assignment Page
             </button>

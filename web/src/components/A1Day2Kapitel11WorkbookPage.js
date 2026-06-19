@@ -128,7 +128,7 @@ const A1Day2Kapitel11WorkbookPage = () => {
           Finished the workbook? Submit all final answers in the submission area.
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}

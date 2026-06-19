@@ -116,7 +116,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       <SectionHeader
         eyebrow={t("generalHome.campus.eyebrow")}
         title={t("generalHome.campus.title")}
-        subtitle="Course book, submit work, results and grammar help."
+        subtitle="Course book, workbook submissions, results and grammar help."
         actions={
           <PrimaryActionBar align="flex-end">
             <PillBadge tone="success">Daily work</PillBadge>
