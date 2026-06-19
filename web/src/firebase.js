@@ -35,6 +35,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -82,6 +83,7 @@ const getFirebaseApp = () => {
 const app = isFirebaseConfigured ? getFirebaseApp() : null;
 const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
+const functions = app ? getFunctions(app, "europe-west1") : null;
 
 let messagingServiceWorkerRegistrationPromise = null;
 let unregisteringMessagingServiceWorkerPromise = null;
@@ -283,4 +285,6 @@ export {
   deleteField,
   arrayUnion,
   runTransaction,
+  functions,
+  httpsCallable,
 };

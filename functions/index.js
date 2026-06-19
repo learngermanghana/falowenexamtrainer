@@ -1,5 +1,5 @@
 const { setGlobalOptions } = require("firebase-functions/v2");
-const { onRequest } = require("firebase-functions/v2/https");
+const { onCall, HttpsError, onRequest } = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
@@ -43,6 +43,42 @@ const getStudentAppender = () => {
   }
   return appendStudentToStudentsSheetSafely;
 };
+
+
+const MAX_RESUBMISSION_TRIES = 2;
+const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
+const PASS_THRESHOLD_SCORE = 60;
+const RESUBMISSION_ATTEMPT_STATUSES = new Set(["submitted", "resubmitted", "pending_review", "pending", "awaiting_review", "passed", "failed"]);
+const PASS_STATUSES = new Set(["approved", "pass", "passed", "complete", "completed"]);
+
+const normalizeCallableText = (value, maxLength = 12000) => String(value || "").trim().slice(0, maxLength);
+
+const countSubmissionAttemptDoc = (data = {}) => {
+  const status = normalizeValue(data.status || data.reviewStatus || data.result);
+  return RESUBMISSION_ATTEMPT_STATUSES.has(status) || Number(data.attempt || data.attemptNumber || 0) > 0;
+};
+
+const getScoreValue = (data = {}) => {
+  const raw = data.score ?? data.percentage ?? data.mark ?? data.previousScore;
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string") {
+    const match = raw.match(/-?\d+(?:\.\d+)?/);
+    if (match) {
+      const parsed = Number(match[0]);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+};
+
+const isPassedSubmissionDoc = (data = {}) => {
+  const score = getScoreValue(data);
+  if (typeof score === "number") return score >= PASS_THRESHOLD_SCORE;
+  return PASS_STATUSES.has(normalizeValue(data.reviewStatus || data.result || data.status));
+};
+
+const buildAttemptCounterId = ({ studentId, canonicalAssignmentKey }) =>
+  `${String(studentId || "").replace(/[^a-zA-Z0-9._-]/g, "_")}__${String(canonicalAssignmentKey || "").replace(/[^a-zA-Z0-9._-]/g, "_")}`.slice(0, 300);
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
@@ -1365,6 +1401,110 @@ exports.onExamTutorReviewCreated = onDocumentCreated(
       afterData,
     });
     return null;
+  }
+);
+
+exports.submitAssignmentResubmission = onCall(
+  { region: "europe-west1" },
+  async (request) => {
+    const authUid = request.auth?.uid || "";
+    if (!authUid) {
+      throw new HttpsError("unauthenticated", "Please sign in before resubmitting work.");
+    }
+
+    const input = request.data || {};
+    const canonicalAssignmentKey = normalizeCallableText(input.canonicalAssignmentKey || input.assignmentKey || input.assignmentId, 160);
+    const selectedAssignmentId = normalizeCallableText(input.assignmentId || canonicalAssignmentKey, 160);
+    const level = normalizeCallableText(input.level, 20).toUpperCase();
+    const submissionText = normalizeCallableText(input.submissionText);
+    const improvementSummary = normalizeCallableText(input.improvementSummary, 2000);
+
+    if (!canonicalAssignmentKey || !selectedAssignmentId || !submissionText || !improvementSummary) {
+      throw new HttpsError("invalid-argument", "Missing assignment, corrected text, or improvement summary.");
+    }
+
+    const db = getAdmin().firestore();
+    const counterRef = db.collection("submissionAttemptCounters").doc(
+      buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
+    );
+    const submissionsRef = db.collection("submissions");
+
+    const result = await db.runTransaction(async (transaction) => {
+      const counterSnap = await transaction.get(counterRef);
+      let attempts = Number(counterSnap.data()?.attempts || 0);
+      let passed = counterSnap.data()?.passed === true;
+
+      if (!counterSnap.exists) {
+        const existingSnap = await transaction.get(
+          submissionsRef
+            .where("studentId", "==", authUid)
+            .where("canonicalAssignmentKey", "==", canonicalAssignmentKey)
+            .limit(50)
+        );
+        attempts = 0;
+        passed = false;
+        existingSnap.forEach((docSnap) => {
+          const data = docSnap.data() || {};
+          if (countSubmissionAttemptDoc(data)) attempts += 1;
+          if (isPassedSubmissionDoc(data)) passed = true;
+        });
+      }
+
+      if (passed) {
+        throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
+      }
+
+      if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
+        transaction.set(counterRef, {
+          attempts,
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+        return { limitReached: true, attempt: attempts, maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS };
+      }
+
+      const nextAttempt = attempts + 1;
+      const submissionRef = submissionsRef.doc();
+      transaction.set(submissionRef, {
+        ...input,
+        studentId: authUid,
+        assignmentId: selectedAssignmentId,
+        assignment_id: selectedAssignmentId,
+        assignmentKey: canonicalAssignmentKey,
+        canonicalAssignmentKey,
+        submissionText,
+        answer: submissionText,
+        workContent: submissionText,
+        improvementSummary,
+        status: "resubmitted",
+        reviewStatus: "pending_review",
+        isResubmission: true,
+        attempt: nextAttempt,
+        attemptNumber: nextAttempt,
+        submittedAt: FieldValue.serverTimestamp(),
+        resubmittedAt: FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      transaction.set(counterRef, {
+        studentId: authUid,
+        canonicalAssignmentKey,
+        assignmentId: selectedAssignmentId,
+        level,
+        attempts: nextAttempt,
+        passed: false,
+        lastSubmissionId: submissionRef.id,
+        updatedAt: FieldValue.serverTimestamp(),
+        createdAt: counterSnap.exists ? counterSnap.data()?.createdAt || FieldValue.serverTimestamp() : FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      return {
+        submissionId: submissionRef.id,
+        attempt: nextAttempt,
+        maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
+      };
+    });
+
+    return result;
   }
 );
 
