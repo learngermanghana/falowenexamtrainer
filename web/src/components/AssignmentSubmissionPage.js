@@ -36,6 +36,7 @@ const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
 const MIN_RESUBMISSION_NEW_WORDS = 8;
 const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
+const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
 const ACTION_COOLDOWN_MS = 10 * 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
@@ -405,6 +406,9 @@ const toNumericScore = (value) => {
 
 const getSubmissionScore = (entry) =>
   toNumericScore(entry?.score ?? entry?.finalScore ?? entry?.mark ?? entry?.grade ?? entry?.previousScore);
+
+const isSubmissionAttemptStatus = (status) =>
+  ["submitted", "resubmitted", "pending_review", "pending", "awaiting_review", "passed", "failed"].includes(safeLower(status));
 
 const getLatestSubmissionScore = (entries, matchesAssignment = () => true) => {
   const scoredEntries = (entries || []).filter(
@@ -1282,6 +1286,16 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }, 0);
   }, [isSameSelectedAssignment, recentSubmissions]);
 
+  const selectedSubmissionAttemptCount = useMemo(() => {
+    return recentSubmissions.reduce((count, entry) => {
+      if (!isSameSelectedAssignment(entry)) return count;
+      if (isSubmissionAttemptStatus(entry?.status) || Number(entry?.attempt || entry?.attemptNumber || 0) > 0) {
+        return count + 1;
+      }
+      return count;
+    }, 0);
+  }, [isSameSelectedAssignment, recentSubmissions]);
+
   const latestSelectedAssignmentScore = useMemo(
     () => getLatestSubmissionScore(recentSubmissions, isSameSelectedAssignment),
     [isSameSelectedAssignment, recentSubmissions]
@@ -1301,8 +1315,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return ["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus);
   }, [isSameSelectedAssignment, latestSelectedAssignmentScore, recentSubmissions]);
 
-  const remainingResubmissions = Math.max(0, MAX_RESUBMISSION_TRIES - selectedResubmissionCount);
-  const resubmissionLimitReached = remainingResubmissions === 0;
+  const remainingResubmissions = Math.max(
+    0,
+    Math.min(MAX_RESUBMISSION_TRIES - selectedResubmissionCount, MAX_TOTAL_SUBMISSION_ATTEMPTS - selectedSubmissionAttemptCount)
+  );
+  const resubmissionLimitReached = selectedSubmissionAttemptCount >= MAX_TOTAL_SUBMISSION_ATTEMPTS || remainingResubmissions === 0;
 
   useEffect(() => {
     setConfirmationLocked(isSelectedLocked);
@@ -2197,7 +2214,13 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                     Choose a different assignment instead
                   </button>
                 </div>
-              ) : isSelectedLocked && !selectedAssignmentPassed ? (
+              ) : selectedAssignmentPassed ? (
+                <div style={{ marginTop: 8 }}>
+                  <InfoBox tone="success">
+                    You have passed this assignment with a score of at least {PASS_THRESHOLD_SCORE}%. Resubmission is disabled because no further work is needed.
+                  </InfoBox>
+                </div>
+              ) : isSelectedLocked ? (
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span
                     style={{
@@ -2417,7 +2440,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed ? "Available" : "Not available"}</span>
+          <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed && !resubmissionLimitReached ? "Available" : "Not available"}</span>
         </div>
 
         <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
@@ -2440,12 +2463,17 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
               {resubmissionLimitReached
-                ? `Resubmissions used: ${selectedResubmissionCount}/${MAX_RESUBMISSION_TRIES}.`
+                ? `Submission limit reached: ${Math.max(selectedSubmissionAttemptCount, MAX_TOTAL_SUBMISSION_ATTEMPTS)}/${MAX_TOTAL_SUBMISSION_ATTEMPTS} total attempts used.`
                 : `Resubmissions left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              First submission is #1. The school can mark only two resubmissions (#2 and #3). If one work reaches 3 total submissions, a late mark of {PASS_THRESHOLD_SCORE} is given.
+              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, submission is blocked and a flat score of {PASS_THRESHOLD_SCORE} will be awarded.
             </p>
+            {resubmissionLimitReached ? (
+              <InfoBox tone="warning">
+                Submission is blocked because this work already has {MAX_TOTAL_SUBMISSION_ATTEMPTS} total submissions. A flat score of {PASS_THRESHOLD_SCORE} will be awarded.
+              </InfoBox>
+            ) : null}
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
               If your score is below {PASS_THRESHOLD_SCORE}%, read the tutor comments, apply every fix, then scroll down and submit your improved version.
             </p>
@@ -2458,6 +2486,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 160 }}
                 placeholder="Paste your corrected letter/text here."
+                disabled={resubmissionLimitReached}
               />
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
@@ -2471,6 +2500,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 onChange={(event) => setResubmissionImprovement(event.target.value)}
                 style={{ ...styles.textArea, minHeight: 120 }}
                 placeholder="Example: I fixed verb placement in Nebensätze, corrected article endings, and rewrote the opening paragraph to match the prompt."
+                disabled={resubmissionLimitReached}
               />
               <span style={styles.helperText}>Add at least {MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS} characters.</span>
             </label>
@@ -2512,7 +2542,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         ) : (
           <p style={{ ...styles.helperText, margin: 0 }}>
             {selectedAssignmentPassed
-              ? "Great news: this assignment is already passed, so no resubmission is needed."
+              ? `Great news: you have passed this assignment with a score of at least ${PASS_THRESHOLD_SCORE}%. Resubmission is disabled because no further work is needed.`
               : <>
                   Resubmission is only available after you submit <strong>this selected assignment</strong>.  
                   If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
@@ -2589,6 +2619,7 @@ export const __TESTING__ = {
   buildAttemptMetadata,
   getSubmissionScore,
   getLatestSubmissionScore,
+  isSubmissionAttemptStatus,
 };
 
 export default AssignmentSubmissionPage;
