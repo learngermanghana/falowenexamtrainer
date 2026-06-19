@@ -5,15 +5,41 @@ import {
   normalizeLevel,
 } from "./curriculumManifest";
 
+const A1_DAY_2_TITLE = "German Alphabet + Personal Pronouns and Verb Conjugation";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
-const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
-  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
+
+const a1Day2Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
+  (entry) => Number(entry.assignmentDay) === 2
 );
+const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
+  (entry) => Number(entry.assignmentDay) === 5
+);
+
+if (a1Day2Entry) {
+  a1Day2Entry.topic = A1_DAY_2_TITLE;
+  a1Day2Entry.title = A1_DAY_2_TITLE;
+}
 
 if (a1Day5Entry) {
   a1Day5Entry.topic = A1_DAY_5_TITLE;
   a1Day5Entry.title = A1_DAY_5_TITLE;
 }
+
+const normalizeRepeatedTitle = (value) => {
+  const parts = String(value || "")
+    .split(/\s*\+\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const seen = new Set();
+  return parts
+    .filter((part) => {
+      const key = part.toLowerCase().replace(/[^a-z0-9äöüß]+/gi, " ").trim();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(" + ");
+};
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
@@ -77,7 +103,8 @@ export const getCurriculumEntriesByDayForLevel = (level) => {
 
 const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
   const entry = entryParam || {};
-  return String(entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "").trim();
+  const rawTitle = entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "";
+  return normalizeRepeatedTitle(rawTitle);
 };
 
 const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
@@ -114,6 +141,8 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   return entry
     ? {
         ...entry,
+        topic: normalizeRepeatedTitle(entry.topic || entry.title),
+        title: normalizeRepeatedTitle(entry.title || entry.topic),
         assignment: entry.assignment === true,
         canonicalAssignmentId: entry.assignment_id,
       }
