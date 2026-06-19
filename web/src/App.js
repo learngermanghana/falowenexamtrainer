@@ -193,9 +193,9 @@ const getTabStructure = (program, t) => {
       label: t("appNav.tabs.course"),
       sections: [
         { key: "course", label: t("appNav.sections.courseBook") },
-        { key: "submit", label: t("appNav.sections.submit") },
         { key: "examFile", label: t("appNav.sections.examFile") },
         { key: "attendance", label: t("appNav.sections.attendance") },
+        { key: "classMembers", label: "Class Members" },
       ],
     },
     {
@@ -1092,12 +1092,12 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
           style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
         >
           {activeMainTabConfig.sections
-            .filter((subTab) => allowedSections[subTab.key])
+            .filter((subTab) => subTab.key === "classMembers" ? allowedSections.course : allowedSections[subTab.key])
             .map((subTab) => (
               <button
                 key={subTab.key}
                 style={subTab.key === "course" ? styles.navButtonActive : styles.navButton}
-                onClick={() => navigate(subTab.key === "submit" ? "/campus/course?submitWork=1" : `/campus/${subTab.key}`)}
+                onClick={() => navigate(subTab.key === "submit" ? "/campus/course?submitWork=1" : subTab.key === "classMembers" ? "/campus/course?classMembers=1" : `/campus/${subTab.key}`)}
               >
                 {subTab.label}
               </button>
@@ -1168,6 +1168,10 @@ const CampusArea = ({
       navigate("/campus/course?submitWork=1");
       return;
     }
+    if (sectionKey === "classMembers") {
+      navigate("/campus/course?classMembers=1");
+      return;
+    }
     navigate(`/campus/${sectionKey}`);
   };
 
@@ -1178,10 +1182,12 @@ const CampusArea = ({
 
   return (
     <>
-      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
-        <button style={styles.secondaryButton} onClick={onBack}>
-          {t("appNav.backHome")}
+      <div style={{ marginBottom: 10 }}>
+        <button type="button" style={styles.backTextLink} onClick={onBack}>
+          <span aria-hidden="true">←</span> {t("appNav.backHome")}
         </button>
+      </div>
+      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
         {availableTabs.map((tab) => {
           const activeMainTab = activeMainTabConfig?.key;
           return (
@@ -1202,16 +1208,21 @@ const CampusArea = ({
           style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
         >
           {activeMainTabConfig.sections
-            .filter((subTab) => allowedSections[subTab.key])
-            .map((subTab) => (
-              <button
-                key={subTab.key}
-                style={resolvedSection === subTab.key ? styles.navButtonActive : styles.navButton}
-                onClick={() => handleSubTabClick(subTab.key)}
-              >
-                {subTab.label}
-              </button>
-            ))}
+            .filter((subTab) => subTab.key === "classMembers" ? allowedSections.course : allowedSections[subTab.key])
+            .map((subTab) => {
+              const searchParams = new URLSearchParams(location.search || "");
+              const isClassMembersActive = resolvedSection === "course" && searchParams.get("classMembers") === "1";
+              const isActive = subTab.key === "classMembers" ? isClassMembersActive : resolvedSection === subTab.key && !isClassMembersActive;
+              return (
+                <button
+                  key={subTab.key}
+                  style={isActive ? styles.navButtonActive : styles.navButton}
+                  onClick={() => handleSubTabClick(subTab.key)}
+                >
+                  {subTab.label}
+                </button>
+              );
+            })}
         </div>
       ) : null}
 

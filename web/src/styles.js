@@ -61,6 +61,15 @@ export const styles = {
     whiteSpace: "nowrap",
     flexShrink: 0,
   },
+  backTextLink: {
+    border: 0,
+    background: "transparent",
+    color: "#2563eb",
+    cursor: "pointer",
+    fontWeight: 700,
+    padding: "4px 0",
+    textDecoration: "none",
+  },
   card: {
     background: "#ffffff",
     borderRadius: 12,

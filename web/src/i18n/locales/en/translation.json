@@ -31,7 +31,7 @@
     "title": "Falowen Learning Hub",
     "signedInAs": "Signed in as {{email}}",
     "logout": "Log out",
-    "backHome": "Back to general home",
+    "backHome": "Back to Falowen Home",
     "subtitle": {
       "campus": "Campus: course book, submissions, community",
       "exams": "Exams Room: speaking, writing, resources",
@@ -48,8 +48,8 @@
     },
     "sections": {
       "courseBook": "Course Book",
-      "submit": "Submit Assignment",
-      "examFile": "My Exam File",
+      "submit": "Submit Work",
+      "examFile": "Exam File",
       "grammar": "Ask Grammar Question",
       "grammarFrench": "French Grammar Help",
       "writing": "Writing Practice",
@@ -69,7 +69,7 @@
       "horen": "Listening",
       "lesen": "Reading",
       "resources": "Resources",
-      "file": "My Exam File"
+      "file": "Exam File"
     },
     "campusTabs": {
       "speech": "Speech trainer",

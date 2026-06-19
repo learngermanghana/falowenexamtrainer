@@ -586,8 +586,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   useEffect(() => {
     if (query.get("submitWork") === "1") {
+      setActiveSubTab("courseBook");
       setCourseSubmitOpen(true);
+      return;
     }
+    if (query.get("classMembers") === "1") {
+      setActiveSubTab("classMembers");
+      setCourseSubmitOpen(false);
+      return;
+    }
+    setActiveSubTab("courseBook");
   }, [query]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -721,17 +729,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   return (
     <div style={{ display: "grid", gap: 14, paddingBottom: 80 }}>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button type="button" style={activeSubTab === "courseBook" ? styles.navButtonActive : styles.navButton} onClick={() => setActiveSubTab("courseBook")}>
-          Course Book
-        </button>
-        {!isSelfLearningLevel ? (
-          <button type="button" style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton} onClick={() => setActiveSubTab("classMembers")}>
-            Class Members
-          </button>
-        ) : null}
-      </div>
-
       {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
 
       {showLegacySubmitRedirectMessage ? (
@@ -782,7 +779,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     Submit work
                   </button>
                 ) : null}
-                <YouTubeSubscribeButton />
               </div>
             </div>
 
@@ -825,6 +821,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </div>
           </section>
 
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <YouTubeSubscribeButton />
+          </div>
 
           {!isSelfLearningLevel ? (
             <button
