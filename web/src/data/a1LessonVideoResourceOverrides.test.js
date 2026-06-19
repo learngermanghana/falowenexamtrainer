@@ -30,11 +30,19 @@ test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
       expect.objectContaining({
         chapter: "1.1",
         title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
-        url: "https://youtu.be/LyfFDU0U_7U",
+        url: "https://youtu.be/ldpOPC21nLE",
       }),
     ]),
   );
   expect(videos.some((video) => video.title.includes("Kapitel 0.2 + 1.1"))).toBe(false);
+});
+
+test("A1 Day 3 uses Kapitel 1.2 assignment AI video", () => {
+  expectRequestedAiVideo(3, {
+    chapter: "1.2",
+    title: "Kapitel 1.2 · Assignment for day 3 · AI video",
+    url: "https://youtu.be/LyfFDU0U_7U",
+  });
 });
 
 test("A1 Day 4 keeps only Kapitel 2 German Numbers AI video", () => {

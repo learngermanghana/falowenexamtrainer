@@ -30,24 +30,32 @@ export const LESSON_VIDEO_DICTIONARY = {
     2: {
       videoResources: [
         {
-          key: "ai-grammar-video-0-2-1-1",
-          chapter: "0.2_1.1",
-          title: "Kapitel 0.2 + 1.1 · Alphabet, Pronouns & Verb Conjugation · AI video",
+          key: "ai-grammar-video-0-2",
+          chapter: "0.2",
+          title: "Kapitel 0.2 · Alphabet · AI video",
           description:
-            "AI video lesson for the German alphabet, personal pronouns and basic verb conjugation.",
-          url: "https://youtu.be/LyfFDU0U_7U",
+            "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
+          url: "https://youtu.be/pCQVdJGsvtk",
+        },
+        {
+          key: "ai-grammar-video-1-1-pronouns-conjugation",
+          chapter: "1.1",
+          title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
+          description:
+            "AI video lesson for German subject pronouns and basic verb conjugation.",
+          url: "https://youtu.be/ldpOPC21nLE",
         },
       ],
     },
     3: {
       videoResources: [
         {
-          key: "ai-grammar-video-1-1",
-          chapter: "1.1",
-          title: "Kapitel 1.1 · Greetings, Spelling, Vocabulary & W-Words · AI video",
+          key: "ai-grammar-video-1-2-assignment-day-3",
+          chapter: "1.2",
+          title: "Kapitel 1.2 · Assignment for day 3 · AI video",
           description:
-            "AI video lesson for the Day 3 practice book covering greetings, spelling, vocabulary and W-words.",
-          url: "https://youtu.be/DnfWKdi6DsA",
+            "AI video lesson for the Day 3 Kapitel 1.2 assignment on introducing yourself.",
+          url: "https://youtu.be/LyfFDU0U_7U",
         },
       ],
     },

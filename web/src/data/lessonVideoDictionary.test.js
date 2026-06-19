@@ -18,15 +18,16 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("returns the A1 Day 2 combined AI video beside matching chapter videos", () => {
+  test("returns the A1 Day 2 chapter-specific AI videos beside matching teacher videos", () => {
     const resources = getLessonVideoResources("A1", 2, A1_DAY_2);
 
     expect(
       resources.map(({ chapter, url }) => ({ chapter, url })),
     ).toEqual([
       { chapter: "0.2", url: "https://example.com/teacher-0-2" },
+      { chapter: "0.2", url: "https://youtu.be/pCQVdJGsvtk" },
       { chapter: "1.1", url: "https://example.com/teacher-1-1" },
-      { chapter: "0.2_1.1", url: "https://youtu.be/LyfFDU0U_7U" },
+      { chapter: "1.1", url: "https://youtu.be/ldpOPC21nLE" },
     ]);
 
     expect(
@@ -34,26 +35,27 @@ describe("getLessonVideoResources", () => {
     ).toHaveLength(2);
     expect(
       resources.filter((resource) => resource.title.includes("AI video")),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
   });
 
-  test("returns the configured combined AI video when A1 Day 2 has no legacy entry", () => {
+  test("returns the configured chapter-specific AI videos when A1 Day 2 has no legacy entry", () => {
     expect(
       getLessonVideoResources("A1", 2).map(({ chapter, url }) => ({
         chapter,
         url,
       })),
     ).toEqual([
-      { chapter: "0.2_1.1", url: "https://youtu.be/LyfFDU0U_7U" },
+      { chapter: "0.2", url: "https://youtu.be/pCQVdJGsvtk" },
+      { chapter: "1.1", url: "https://youtu.be/ldpOPC21nLE" },
     ]);
   });
 
-  test("returns the configured A1 Day 3 Kapitel 1.1 AI video", () => {
+  test("returns the configured A1 Day 3 Kapitel 1.2 assignment AI video", () => {
     expect(getLessonVideoResources("A1", 3)).toEqual([
       expect.objectContaining({
-        chapter: "1.1",
-        title: "Kapitel 1.1 · Greetings, Spelling, Vocabulary & W-Words · AI video",
-        url: "https://youtu.be/DnfWKdi6DsA",
+        chapter: "1.2",
+        title: "Kapitel 1.2 · Assignment for day 3 · AI video",
+        url: "https://youtu.be/LyfFDU0U_7U",
       }),
     ]);
   });
