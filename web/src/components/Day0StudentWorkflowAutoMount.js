@@ -29,7 +29,7 @@ const Day0StudentWorkflowAutoMount = () => {
     }
 
     const root = createRoot(mount);
-    root.render(<Day0StudentWorkflowUpgrade />);
+    root.render(<Day0StudentWorkflowUpgrade pathname={location.pathname} />);
 
     return () => {
       root.unmount();
