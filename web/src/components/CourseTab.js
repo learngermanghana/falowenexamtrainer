@@ -158,6 +158,19 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
 
 const buildEntryLabel = (entry) => entry?.topic || entry?.title || entry?.chapter || `Day ${entry?.day}`;
 
+const getCourseBookDisplayDay = (entry = {}) => entry.displayDay || entry.day;
+
+const getCourseBookDayLabel = (entry = {}) => {
+  const day = getCourseBookDisplayDay(entry);
+  const chapter = String(entry.displayChapter || entry.chapter || "").trim();
+  return chapter ? `Day ${day} ${chapter}` : `Day ${day}`;
+};
+
+const formatCourseBookInstruction = (instruction = "") =>
+  String(instruction || "")
+    .replace(/^\s*(?:📝\s*)?Instruction\s*:\s*/i, "")
+    .trim();
+
 const shouldShowGrammarChip = (entry = {}) => {
   const grammarTopic = String(entry.grammar_topic || "").trim();
   if (!grammarTopic) return false;
@@ -450,7 +463,7 @@ const courseBookStyles = {
   lessonCardCurrent: { border: "1px solid #2563eb", background: "linear-gradient(135deg, #eff6ff, #ffffff 60%)", boxShadow: "0 18px 34px rgba(37, 99, 235, 0.16)" },
   lessonTop: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" },
   lessonMain: { display: "flex", gap: 12, flex: "1 1 320px", minWidth: 0 },
-  dayBubble: { width: 48, height: 48, borderRadius: 16, background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8", display: "grid", placeItems: "center", flexShrink: 0, fontWeight: 900, lineHeight: 1.1, textAlign: "center", fontSize: 12 },
+  dayBubble: { minWidth: 72, minHeight: 48, padding: "6px 8px", borderRadius: 16, background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8", display: "grid", placeItems: "center", flexShrink: 0, fontWeight: 900, lineHeight: 1.1, textAlign: "center", fontSize: 12 },
   lessonTitle: { margin: 0, fontSize: 17, lineHeight: 1.25, color: "#0f172a" },
   lessonMeta: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 },
   chip: { display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 999, padding: "5px 9px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 700 },
@@ -525,7 +538,7 @@ const lessonMatchesSearch = (entry, searchTerm) => {
 
 const groupLessonsByWeek = (entries) =>
   entries.reduce((groups, entry, index) => {
-    const numericDay = Number(entry.day || index + 1);
+    const numericDay = Number(getCourseBookDisplayDay(entry) || entry.day || index + 1);
     const weekNumber = Math.max(1, Math.ceil(numericDay / 5));
     const key = `Week ${weekNumber}`;
     if (!groups[key]) groups[key] = [];
@@ -886,7 +899,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             <section style={courseBookStyles.nextCard}>
               <div>
                 <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>Next lesson</p>
-                <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>Day {nextLesson.day}: {nextLesson.topic}</h3>
+                <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>{getCourseBookDayLabel(nextLesson)}: {nextLesson.topic}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>{nextLesson.grammar_topic || nextLesson.chapter || "Open this lesson to continue."}</p>
               </div>
               <button type="button" style={styles.primaryButton} onClick={() => openLesson(nextLesson)}>
@@ -924,11 +937,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
                     const practiceMeta = practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly;
+                    const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
                       <article key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
                         <div style={courseBookStyles.lessonTop}>
                           <div style={courseBookStyles.lessonMain}>
-                            <div style={courseBookStyles.dayBubble}>Day<br />{entry.day}</div>
+                            <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry)}</div>
                             <div style={{ minWidth: 0 }}>
                               <h3 style={courseBookStyles.lessonTitle}>{entry.topic}</h3>
                               <div style={courseBookStyles.lessonMeta}>
@@ -981,6 +995,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
                         </div>
                         {entry.goal ? <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.45 }}>{entry.goal}</p> : null}
+                        {instruction ? (
+                          <p style={{ margin: 0, fontSize: 14, color: "#334155", lineHeight: 1.5 }}>
+                            <strong>Instruction:</strong> {instruction}
+                          </p>
+                        ) : null}
                       </article>
                     );
                   })}
