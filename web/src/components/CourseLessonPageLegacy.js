@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
@@ -97,9 +97,6 @@ const lessonResourceEntries = (entry = {}) => {
     chapter: resource?.chapter || entry?.chapter || null,
   }));
 };
-
-const firstLessonResource = (entry = {}) =>
-  lessonResourceEntries(entry)[0] || {};
 
 const isTeacherVideo = (resource = {}) =>
   `${resource.key || ""} ${resource.title || ""}`
@@ -391,8 +388,8 @@ export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
   );
 };
 
-const SubmitAssignmentCard = ({ canSubmit, submitLabel, onSubmit }) => {
-  if (!canSubmit) return null;
+const WorkbookSubmissionGuidance = ({ hasAssignment }) => {
+  if (!hasAssignment) return null;
 
   return (
     <section
@@ -406,27 +403,19 @@ const SubmitAssignmentCard = ({ canSubmit, submitLabel, onSubmit }) => {
       }}
     >
       <strong style={{ color: "#1e3a8a", fontSize: 14 }}>
-        Finished the workbook?
+        Assignment and submit are inside the workbook
       </strong>
       <p
         style={{ margin: 0, color: "#334155", fontSize: 13, lineHeight: 1.45 }}
       >
-        Submit your final answers when you are ready.
+        Click <strong>Open workbook</strong> above, complete the Assignment
+        section, then use the workbook <strong>Submit</strong> tab for your
+        final tutor-marked answers.
       </p>
-      <button
-        type="button"
-        style={{
-          ...resourceButtonStyle,
-          borderColor: "#2563eb",
-          background: "#2563eb",
-        }}
-        onClick={onSubmit}
-      >
-        {submitLabel} ›
-      </button>
     </section>
   );
 };
+
 
 const TextBlock = ({ title, children }) => {
   if (!children) return null;
@@ -439,7 +428,6 @@ const TextBlock = ({ title, children }) => {
 };
 
 const CourseLessonPage = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
   const level = normalizeLevel(location.state?.level || params.level);
@@ -470,11 +458,6 @@ const CourseLessonPage = () => {
 
   const SelfLearningComponent = getSelfLearningLessonComponent(level, day);
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
-  const assignmentKey =
-    location.state?.assignmentKey ||
-    entry?.assignmentId ||
-    entry?.assignment_id ||
-    `${level}-DAY-${day}`;
   const status =
     location.state?.status ||
     entry?.completion?.nonActionableStatus ||
@@ -482,29 +465,6 @@ const CourseLessonPage = () => {
   const scoreText = location.state?.scoreText || "";
   const canonicalLesson = normalizeLesson(entry || { day }, level);
   const isOrientationLesson = isA1Day0Orientation(level, day);
-  const primaryResource = firstLessonResource(entry || {});
-  const submitLabel = primaryResource.chapter
-    ? `Submit Kapitel ${primaryResource.chapter} assignment`
-    : "Submit assignment";
-  const canSubmit = Boolean(entry?.assignment && !isSelfLearning);
-
-  const handleSubmitAssignment = () => {
-    if (!assignmentKey || isSelfLearning) return;
-    navigate(
-      `/campus/submit?assignmentKey=${encodeURIComponent(assignmentKey)}&assignmentId=${encodeURIComponent(assignmentKey)}`,
-      {
-        state: {
-          assignmentKey,
-          assignmentId: assignmentKey,
-          canonicalAssignmentId: assignmentKey,
-          day: entry?.day || day,
-          level,
-          assignmentTitle: entry?.topic || "Assignment",
-        },
-      },
-    );
-  };
-
   if (SelfLearningComponent) {
     return <SelfLearningComponent canonicalLesson={canonicalLesson} />;
   }
@@ -657,11 +617,7 @@ const CourseLessonPage = () => {
           lesson={canonicalLesson}
           hideVideoUrls={isOrientationLesson ? [DAY0_AI_ORIENTATION_VIDEO.url] : []}
         />
-        <SubmitAssignmentCard
-          canSubmit={canSubmit}
-          submitLabel={submitLabel}
-          onSubmit={handleSubmitAssignment}
-        />
+        <WorkbookSubmissionGuidance hasAssignment={Boolean(entry?.assignment && !isSelfLearning)} />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
         <TextBlock title="Sprechen">{entry.sprechen}</TextBlock>
