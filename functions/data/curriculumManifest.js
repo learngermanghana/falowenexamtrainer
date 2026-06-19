@@ -142,7 +142,7 @@ const CANONICAL_CURRICULUM = [
     "level": "A1",
     "day": 2,
     "chapter": "0.2_1.1",
-    "title": "German Alphabet + Personal Pronouns and Verb Conjugation",
+    "title": "German Alphabet",
     "assignmentId": "A1-0.2",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
@@ -233,7 +233,7 @@ const CANONICAL_CURRICULUM = [
     "level": "A1",
     "day": 5,
     "chapter": "1.3",
-    "title": "Pronouns and Identity Expressions in German",
+    "title": "Personal Information, Articles, Adjectives and W-Questions",
     "assignmentId": "A1-1.3",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "",
@@ -244,7 +244,7 @@ const CANONICAL_CURRICULUM = [
     "resources": [
       {
         "chapter": "1.3",
-        "title": "Pronouns and Identity Expressions in German",
+        "title": "Personal Information, Articles, Adjectives and W-Questions",
         "video": "https://youtu.be/aQNXQlTJMBA",
         "grammarPage": "",
         "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",

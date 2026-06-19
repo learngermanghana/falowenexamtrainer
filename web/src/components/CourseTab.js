@@ -158,6 +158,13 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
 
 const buildEntryLabel = (entry) => entry?.topic || entry?.title || entry?.chapter || `Day ${entry?.day}`;
 
+const shouldShowGrammarChip = (entry = {}) => {
+  const grammarTopic = String(entry.grammar_topic || "").trim();
+  if (!grammarTopic) return false;
+  const topic = String(entry.topic || "").trim();
+  return grammarTopic.toLowerCase() !== topic.toLowerCase();
+};
+
 const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   if (!entry) return "";
   const normalizedLevel = normalizeLevel(level);
@@ -917,7 +924,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               <div style={courseBookStyles.lessonMeta}>
                                 {isCurrent ? <span style={{ ...courseBookStyles.chip, background: "#dbeafe", borderColor: "#93c5fd", color: "#1d4ed8" }}>Current</span> : null}
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
-                                {entry.grammar_topic ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
+                                {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
                                 {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
                               </div>
                               {!entry.isTutorMarked ? (
