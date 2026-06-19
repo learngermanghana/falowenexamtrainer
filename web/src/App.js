@@ -87,6 +87,7 @@ import A2Day24EinenUrlaubPlanenGrammarPage from "./components/A2Day24EinenUrlaub
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import RadioFirstWorkbookGate from "./components/RadioFirstWorkbookGate";
+import { getLessonRadioResource } from "./data/lessonRadioDictionary";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
 import A2Day11UnterwegsVerkehrsmittelWorkbookPage from "./components/A2Day11UnterwegsVerkehrsmittelWorkbookPage";
 import A2Day12MeinTraumberufWorkbookPage from "./components/A2Day12MeinTraumberufWorkbookPage";
@@ -241,6 +242,13 @@ const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHi
 
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
+
+const withRadioWorkbookGate = (level, day, workbookPage) =>
+  getLessonRadioResource(level, day) ? (
+    <RadioFirstWorkbookGate level={level} day={day}>{workbookPage}</RadioFirstWorkbookGate>
+  ) : (
+    workbookPage
+  );
 
 function App() {
   const { t } = useTranslation();
@@ -755,7 +763,7 @@ const AppShell = ({
             element={<A1Day6FamilyAndHobbiesWorkbookPage />}
           />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
-          <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={<A2Day2PersonenBeschreibenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={withRadioWorkbookGate("A2", 2, <A2Day2PersonenBeschreibenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook" element={<A2Day3ComparisonsWorkbookPage />} />
           <Route path="/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook" element={<A2Day4WoMoechtenWirUnsTreffenWorkbookPage />} />
           <Route path="/campus/course/b1-day-4-wohnung-suchen-workbook" element={<B1Day4WohnungSuchenWorkbookPage />} />
@@ -763,55 +771,55 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-6-moebel-und-raeume-workbook" element={<A2Day6MoebelRaeumeWorkbookPage />} />
           <Route path="/campus/course/a2-day-7-eine-wohnung-suchen-workbook" element={<A2Day7WohnungSuchenWorkbookPage />} />
           <Route path="/campus/course/a2-day-8-rezepte-und-essen-workbook" element={<A2Day8RezepteUndEssenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-9-urlaub-workbook" element={<RadioFirstWorkbookGate level="A2" day={9}><A2Day9UrlaubWorkbookPage /></RadioFirstWorkbookGate>} />
+          <Route path="/campus/course/a2-day-9-urlaub-workbook" element={withRadioWorkbookGate("A2", 9, <A2Day9UrlaubWorkbookPage />)} />
           <Route
             path="/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook"
-            element={<RadioFirstWorkbookGate level="A2" day={10}><A2Day10TourismusTraditionelleFesteWorkbookPage /></RadioFirstWorkbookGate>}
+            element={withRadioWorkbookGate("A2", 10, <A2Day10TourismusTraditionelleFesteWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook"
-            element={<RadioFirstWorkbookGate level="A2" day={11}><A2Day11UnterwegsVerkehrsmittelWorkbookPage /></RadioFirstWorkbookGate>}
+            element={withRadioWorkbookGate("A2", 11, <A2Day11UnterwegsVerkehrsmittelWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-12-mein-traumberuf-workbook"
-            element={<A2Day12MeinTraumberufWorkbookPage />}
+            element={withRadioWorkbookGate("A2", 12, <A2Day12MeinTraumberufWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-13-vorstellungsgespraech-workbook"
-            element={<A2Day13VorstellungsgespraechWorkbookPage />}
+            element={withRadioWorkbookGate("A2", 13, <A2Day13VorstellungsgespraechWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-14-beruf-und-karriere-workbook"
-            element={<A2Day14BerufUndKarriereWorkbookPage />}
+            element={withRadioWorkbookGate("A2", 14, <A2Day14BerufUndKarriereWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-15-mein-lieblingssport-workbook"
-            element={<RadioFirstWorkbookGate level="A2" day={15}><A2Day15MeinLieblingssportWorkbookPage /></RadioFirstWorkbookGate>}
+            element={withRadioWorkbookGate("A2", 15, <A2Day15MeinLieblingssportWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook"
-            element={<RadioFirstWorkbookGate level="A2" day={16}><A2Day16WohlbefindenUndEntspannungWorkbookPage /></RadioFirstWorkbookGate>}
+            element={withRadioWorkbookGate("A2", 16, <A2Day16WohlbefindenUndEntspannungWorkbookPage />)}
           />
           <Route
             path="/campus/course/a2-day-17-in-die-apotheke-gehen-workbook"
-            element={<A2Day17InDieApothekeGehenWorkbookPage />}
+            element={withRadioWorkbookGate("A2", 17, <A2Day17InDieApothekeGehenWorkbookPage />)}
           />
-          <Route path="/campus/course/a2-day-18-die-bank-anrufen-workbook" element={<A2Day18DieBankAnrufenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook" element={<A2Day19EinkaufenWoUndWieWorkbookPage />} />
+          <Route path="/campus/course/a2-day-18-die-bank-anrufen-workbook" element={withRadioWorkbookGate("A2", 18, <A2Day18DieBankAnrufenWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook" element={withRadioWorkbookGate("A2", 19, <A2Day19EinkaufenWoUndWieWorkbookPage />)} />
           <Route path="/campus/course/a2-day-20-typische-reklamationssituationen-workbook" element={<A2Day20TypischeReklamationssituationenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-21-ein-wochenende-planen-workbook" element={<A2Day21EinWochenendePlanenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-22-die-woche-planung-workbook" element={<A2Day22DieWochePlanungWorkbookPage />} />
-          <Route path="/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook" element={<A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />} />
-          <Route path="/campus/course/a2-day-24-einen-urlaub-planen-workbook" element={<A2Day24EinenUrlaubPlanenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-25-tagesablauf-workbook" element={<A2Day25TagesablaufWorkbookPage />} />
-          <Route path="/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" element={<RadioFirstWorkbookGate level="A2" day={26}><A2Day26GefuehleInVerschiedenenSituationenWorkbookPage /></RadioFirstWorkbookGate>} />
-          <Route path="/campus/course/a2-day-27-digitale-kommunikation-workbook" element={<RadioFirstWorkbookGate level="A2" day={27}><A2Day27DigitaleKommunikationWorkbookPage /></RadioFirstWorkbookGate>} />
-          <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={<A2Day28UeberDieZukunftSprechenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-21-ein-wochenende-planen-workbook" element={withRadioWorkbookGate("A2", 21, <A2Day21EinWochenendePlanenWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-22-die-woche-planung-workbook" element={withRadioWorkbookGate("A2", 22, <A2Day22DieWochePlanungWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook" element={withRadioWorkbookGate("A2", 23, <A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-24-einen-urlaub-planen-workbook" element={withRadioWorkbookGate("A2", 24, <A2Day24EinenUrlaubPlanenWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-25-tagesablauf-workbook" element={withRadioWorkbookGate("A2", 25, <A2Day25TagesablaufWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" element={withRadioWorkbookGate("A2", 26, <A2Day26GefuehleInVerschiedenenSituationenWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-27-digitale-kommunikation-workbook" element={withRadioWorkbookGate("A2", 27, <A2Day27DigitaleKommunikationWorkbookPage />)} />
+          <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={withRadioWorkbookGate("A2", 28, <A2Day28UeberDieZukunftSprechenWorkbookPage />)} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
-          <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={<RadioFirstWorkbookGate level="C1" day={1}><C1Day1WillkommenSelbstlernstartWorkbookPage /></RadioFirstWorkbookGate>} />
+          <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={withRadioWorkbookGate("C1", 1, <C1Day1WillkommenSelbstlernstartWorkbookPage />)} />
           <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes" element={<B2Day1PersoenlicheIdentitaetGrammarNotesPage />} />
-          <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook" element={<RadioFirstWorkbookGate level="B2" day={1}><B2Day1PersoenlicheIdentitaetWorkbookPage /></RadioFirstWorkbookGate>} />
+          <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook" element={withRadioWorkbookGate("B2", 1, <B2Day1PersoenlicheIdentitaetWorkbookPage />)} />
                     <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-workbook" element={<C1Day10IntegrationUndGesellschaftWorkbookPage />} />

@@ -4,7 +4,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
-import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -373,34 +372,6 @@ export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
   );
 };
 
-const WorkbookSubmissionGuidance = ({ hasAssignment }) => {
-  if (!hasAssignment) return null;
-
-  return (
-    <section
-      style={{
-        background: "#eff6ff",
-        border: "1px solid #bfdbfe",
-        borderRadius: 14,
-        padding: 12,
-        display: "grid",
-        gap: 8,
-      }}
-    >
-      <strong style={{ color: "#1e3a8a", fontSize: 14 }}>
-        Assignment and submit are inside the workbook
-      </strong>
-      <p
-        style={{ margin: 0, color: "#334155", fontSize: 13, lineHeight: 1.45 }}
-      >
-        Click <strong>Open workbook</strong> above, complete the Assignment
-        section, then use the workbook <strong>Submit</strong> tab for your
-        final tutor-marked answers.
-      </p>
-    </section>
-  );
-};
-
 
 const TextBlock = ({ title, children }) => {
   if (!children) return null;
@@ -592,17 +563,10 @@ const CourseLessonPage = () => {
           </section>
         ) : null}
 
-        {canonicalLesson.resources.falowenRadio ? (
-          <section aria-label={`Falowen Radio warm-up for ${level} Day ${day}`}>
-            <FalowenRadioTabContent level={level} day={day} />
-          </section>
-        ) : null}
-
         <LessonResourcesHub
           lesson={canonicalLesson}
           hideVideoUrls={isOrientationLesson ? [DAY0_AI_ORIENTATION_VIDEO.url] : []}
         />
-        <WorkbookSubmissionGuidance hasAssignment={Boolean(entry?.assignment && !isSelfLearning)} />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
         <TextBlock title="Sprechen">{entry.sprechen}</TextBlock>
