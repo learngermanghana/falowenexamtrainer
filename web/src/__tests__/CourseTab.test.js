@@ -50,6 +50,20 @@ jest.mock("../data/courseSchedule", () => ({
         lesen_hören: { chapter: "0.1", assignment: true },
       },
       {
+        day: 2,
+        topic: "German Alphabet",
+        chapter: "0.2",
+        assignment: true,
+        lesen_hören: { chapter: "0.2", assignment: true },
+      },
+      {
+        day: 2,
+        topic: "Personal Pronouns",
+        chapter: "1.1",
+        assignment: true,
+        lesen_hören: { chapter: "1.1", assignment: true },
+      },
+      {
         day: 4,
         topic: "Numbers",
         chapter: "2",
@@ -160,6 +174,21 @@ describe("CourseTab", () => {
       data: () => ({}),
     });
     mockSetDoc.mockResolvedValue(undefined);
+  });
+
+
+  it("shows chapter suffixes only when a day has multiple course-book tasks", async () => {
+    render(<CourseTab defaultLevel="A1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("German Alphabet")).toBeInTheDocument();
+      expect(screen.getByText("Numbers")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("Day 2 0.2")).toBeInTheDocument();
+    expect(screen.getByText("Day 2 1.1")).toBeInTheDocument();
+    expect(screen.getByText("Day 4")).toBeInTheDocument();
+    expect(screen.queryByText("Day 4 2")).not.toBeInTheDocument();
   });
 
   it("renders Passed for tutor-marked entries when merged progress status is passed even with a submission state", async () => {

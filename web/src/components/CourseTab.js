@@ -160,10 +160,11 @@ const buildEntryLabel = (entry) => entry?.topic || entry?.title || entry?.chapte
 
 const getCourseBookDisplayDay = (entry = {}) => entry.displayDay || entry.day;
 
-const getCourseBookDayLabel = (entry = {}) => {
+const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
   const day = getCourseBookDisplayDay(entry);
   const chapter = String(entry.displayChapter || entry.chapter || "").trim();
-  return chapter ? `Day ${day} ${chapter}` : `Day ${day}`;
+  const taskCount = Number(dayTaskCounts[String(day)] || 0);
+  return chapter && taskCount > 1 ? `Day ${day} ${chapter}` : `Day ${day}`;
 };
 
 const formatCourseBookInstruction = (instruction = "") =>
@@ -637,12 +638,22 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const seenByDay = {};
     return sortByDay(
       (schedules[selectedCourseLevel] || []).map((entry) => {
-        const dayKey = String(entry.day || "");
+        const dayKey = String(getCourseBookDisplayDay(entry) || "");
         seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
         return { ...entry, occurrence: seenByDay[dayKey] };
       })
     );
   }, [schedules, selectedCourseLevel]);
+
+  const dayTaskCounts = useMemo(
+    () =>
+      schedule.reduce((counts, entry) => {
+        const dayKey = String(getCourseBookDisplayDay(entry) || "");
+        counts[dayKey] = (counts[dayKey] || 0) + 1;
+        return counts;
+      }, {}),
+    [schedule]
+  );
 
   const decoratedSchedule = useMemo(
     () =>
@@ -899,7 +910,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             <section style={courseBookStyles.nextCard}>
               <div>
                 <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>Next lesson</p>
-                <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>{getCourseBookDayLabel(nextLesson)}: {nextLesson.topic}</h3>
+                <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>{getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLesson.topic}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>{nextLesson.grammar_topic || nextLesson.chapter || "Open this lesson to continue."}</p>
               </div>
               <button type="button" style={styles.primaryButton} onClick={() => openLesson(nextLesson)}>
@@ -942,7 +953,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       <article key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
                         <div style={courseBookStyles.lessonTop}>
                           <div style={courseBookStyles.lessonMain}>
-                            <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry)}</div>
+                            <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
                             <div style={{ minWidth: 0 }}>
                               <h3 style={courseBookStyles.lessonTitle}>{entry.topic}</h3>
                               <div style={courseBookStyles.lessonMeta}>
