@@ -28,24 +28,20 @@ export const buildWorkbookRouteIndex = (schedules = courseSchedules) => {
   Object.entries(schedules).forEach(([level, entries]) => {
     toArray(entries).forEach((entry) => {
       getWorkbookResources(entry).forEach((resource) => {
+        const originalRoute = resource?.workbook_link || resource?.workbookRoute || "";
+        const originalPath = normalizeInAppPath(originalRoute);
         const resolvedRoute = resolveInAppWorkbookRoute({
           level,
           day: entry?.day,
           chapter: resource?.chapter || entry?.chapter,
-          fallback: resource?.workbook_link || resource?.workbookRoute,
+          fallback: originalRoute,
         });
         const pathname = normalizeInAppPath(resolvedRoute);
         if (!pathname || index.has(pathname)) return;
-        index.set(pathname, {
-          level,
-          day: entry?.day,
-          entry,
-          resource: {
-            ...resource,
-            workbook_link: resolvedRoute,
-            workbookRoute: resolvedRoute,
-          },
-        });
+        const matchedResource = originalPath === pathname
+          ? resource
+          : { ...resource, workbook_link: resolvedRoute, workbookRoute: resolvedRoute };
+        index.set(pathname, { level, day: entry?.day, entry, resource: matchedResource });
       });
     });
   });
