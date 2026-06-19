@@ -2,7 +2,7 @@ import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
-import { resolveInAppWorkbookRoute } from "./inAppWorkbookRoutes";
+import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
 
@@ -61,7 +61,7 @@ const normalizeResourceGroups = (rawLesson, level, day) => {
       entry.workbookRoute,
       rawLesson.workbookRoute,
     );
-    const workbookRoute = resolveInAppWorkbookRoute({
+    const workbookRoute = resolveStrictInAppWorkbookRoute({
       level,
       day,
       chapter,
