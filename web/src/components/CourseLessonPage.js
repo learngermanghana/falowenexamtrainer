@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
+import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbookPage";
+import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 import {
@@ -12,6 +15,15 @@ const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+const B1_WORKBOOK_PAGES = {
+  1: B1Day1TraumweltWorkbookPage,
+  2: B1Day2FreundeFuersLebenWorkbookPage,
+};
+
+const B1_GRAMMAR_PAGES = {
+  2: B1Day2FreundeFuersLebenGrammarNotesPage,
+};
 
 const decorateA1Day3Lesson = (lesson) => {
   if (!lesson || Number(lesson.day) !== 3) return;
@@ -146,6 +158,21 @@ export default function CourseLessonPage() {
 
     return () => observer.disconnect();
   }, [isA1Day3]);
+
+  if (level === "B1") {
+    const query = new URLSearchParams(location.search);
+    const dayNumber = Number(day);
+
+    if (query.get("view") === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
+      const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
+      return <GrammarPage />;
+    }
+
+    if (B1_WORKBOOK_PAGES[dayNumber]) {
+      const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
+      return <WorkbookPage />;
+    }
+  }
 
   return (
     <div ref={rootRef}>
