@@ -86,7 +86,7 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2</p>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Please complete all parts below and submit your final answers in the submission area, not on this page.
+          Complete the assignment below, then open the Submit tab above to send your answers immediately.
         </p>
       </div>
 
@@ -156,16 +156,11 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
       >
         <h2 style={sectionTitle}>Final Submission</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Submit all your answers in the submission area after you complete the workbook tasks.
+          After completing the workbook tasks, use the Submit tab above. The correct A1 Day 4 assignment is selected automatically.
         </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, textDecoration: "none", width: "fit-content" }}
-        >
-          Go to Submission Area
-        </a>
+        <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8" }}>
+          Choose Submit above when you are ready.
+        </p>
       </div>
     </div>
   );

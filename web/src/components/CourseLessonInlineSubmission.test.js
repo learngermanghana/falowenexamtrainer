@@ -2,7 +2,7 @@ import { buildInlineCourseAssignments } from "../utils/courseLessonAssignments";
 
 const resolveCanonicalKey = ({ assignmentId }) => {
   const token = String(assignmentId || "").toUpperCase();
-  return /^(A1|A2|B1)-\d+\.\d+$/.test(token) ? token : "";
+  return /^(A1|A2|B1)-\d+(?:\.\d+)?$/.test(token) ? token : "";
 };
 
 const buildAssignments = (level, day, entries) =>
@@ -24,6 +24,22 @@ describe("buildInlineCourseAssignments", () => {
         level: "A1",
         title: "Tutor task",
       }),
+    ]);
+  });
+
+  it("uses the visible course-book day when canonical entries have different internal day numbers", () => {
+    const entries = [
+      { assignmentDay: 2, displayDay: 2, topic: "Alphabet", assignment: true, chapter: "0.2", assignment_id: "A1-0.2" },
+      { assignmentDay: 3, displayDay: 2, topic: "Pronouns", assignment: true, chapter: "1.1", assignment_id: "A1-1.1" },
+      { assignmentDay: 6, displayDay: 4, topic: "Numbers", assignment: true, chapter: "2", assignment_id: "A1-2" },
+    ];
+
+    expect(buildAssignments("A1", 2, entries).map((assignment) => assignment.assignmentKey)).toEqual([
+      "A1-0.2",
+      "A1-1.1",
+    ]);
+    expect(buildAssignments("A1", 4, entries)).toEqual([
+      expect.objectContaining({ assignmentKey: "A1-2", chapter: "2", day: 4 }),
     ]);
   });
 
