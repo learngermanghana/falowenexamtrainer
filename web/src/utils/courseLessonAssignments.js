@@ -24,7 +24,8 @@ export const buildInlineCourseAssignments = ({
 
   const seenKeys = new Set();
   return (Array.isArray(entries) ? entries : []).reduce((assignments, entry, index) => {
-    if (!entry?.assignment || entry?.progressionEligible === false || Number(entry?.assignmentDay) !== numericDay) {
+    const courseBookDay = Number(entry?.displayDay ?? entry?.assignmentDay ?? entry?.day);
+    if (!entry?.assignment || entry?.progressionEligible === false || courseBookDay !== numericDay) {
       return assignments;
     }
 

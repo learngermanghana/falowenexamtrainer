@@ -10,6 +10,7 @@ import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
@@ -182,6 +183,13 @@ const shouldShowGrammarChip = (entry = {}) => {
 const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   if (!entry) return "";
   const normalizedLevel = normalizeLevel(level);
+  if (entry?.courseBookTaskSection && !hasTutorMarkedWork(entry)) {
+    const displayDay = getCourseBookDisplayDay(entry);
+    const chapterToken = String(entry.displayChapter || entry.chapter || occurrence)
+      .trim()
+      .replace(/[^a-z0-9._-]/gi, "-");
+    return `${normalizedLevel || "GENERAL"}-DAY-${displayDay}-PRACTICE-${chapterToken || occurrence}`;
+  }
   const dictionaryMatch =
     lookupScheduleDictionaryEntry({
       level: normalizedLevel,
@@ -636,8 +644,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const schedule = useMemo(() => {
     const seenByDay = {};
+    const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || []);
     return sortByDay(
-      (schedules[selectedCourseLevel] || []).map((entry) => {
+      expandedEntries.map((entry) => {
         const dayKey = String(getCourseBookDisplayDay(entry) || "");
         seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
         return { ...entry, occurrence: seenByDay[dayKey] };
@@ -739,7 +748,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   const openLesson = (entry) => {
-    navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}`, {
+    const chapter = String(entry.displayChapter || entry.chapter || "").trim();
+    const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";
+    navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}${search}`, {
       state: {
         level: selectedCourseLevel,
         day: entry.day,

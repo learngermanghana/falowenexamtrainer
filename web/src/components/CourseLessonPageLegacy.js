@@ -4,6 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
+import { findCourseBookEntry } from "../utils/courseBookEntries";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -388,14 +389,18 @@ const CourseLessonPage = () => {
   const params = useParams();
   const level = normalizeLevel(location.state?.level || params.level);
   const day = location.state?.day ?? params.day;
+  const requestedChapter = useMemo(
+    () => new URLSearchParams(location.search || "").get("chapter") || "",
+    [location.search]
+  );
   const entry = useMemo(() => {
     if (location.state?.entry) return location.state.entry;
-    return (
-      (courseSchedules[level] || []).find(
-        (lesson) => String(lesson.day) === String(day),
-      ) || null
-    );
-  }, [day, level, location.state]);
+    return findCourseBookEntry({
+      entries: courseSchedules[level] || [],
+      day,
+      chapter: requestedChapter,
+    });
+  }, [day, level, location.state, requestedChapter]);
 
   if (level === "B1") {
     const query = new URLSearchParams(location.search);
