@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "web/**"
+      - "shared/**"
+      - "scripts/**"
+      - "functions/data/curriculumManifest.js"
+      - "package.json"
       - ".github/workflows/web-checks.yml"
 
 jobs:
@@ -19,6 +23,9 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: web/package-lock.json
+
+      - name: Check curriculum manifest sync
+        run: npm run check:curriculum-sync
 
       - name: Install web dependencies
         working-directory: web

@@ -8,6 +8,39 @@ const normalizeLevel = (value = "") => {
   return LEVEL_PATTERN.test(token) ? token : "";
 };
 
+const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
+
+const firstString = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || "";
+
+const normalizeLessonResource = (resource = {}, entry = {}) => {
+  const submissionRequired = Boolean(resource.submissionRequired ?? resource.assignment ?? false);
+  const assignmentId = submissionRequired ? String(resource.assignmentId || resource.assignment_id || entry.assignmentId || "").trim() : "";
+  const normalized = {
+    ...resource,
+    chapter: String(resource.chapter || entry.chapter || "").trim(),
+    title: String(resource.title || entry.title || "").trim(),
+    video: firstString(resource.video, resource.youtube_link),
+    youtube_link: firstString(resource.youtube_link, resource.video) || null,
+    grammarPage: firstString(resource.grammarPage, resource.grammarbook_link, resource.grammar_link),
+    grammarbook_link: firstString(resource.grammarbook_link, resource.grammarPage, resource.grammar_link) || null,
+    grammar_link: firstString(resource.grammar_link, resource.grammarPage, resource.grammarbook_link) || null,
+    workbookRoute: firstString(resource.workbookRoute, resource.workbook_link),
+    workbook_link: firstString(resource.workbook_link, resource.workbookRoute) || null,
+    assignment: submissionRequired,
+    submissionRequired,
+  };
+
+  if (assignmentId) {
+    normalized.assignmentId = assignmentId;
+    normalized.assignment_id = assignmentId;
+  } else {
+    delete normalized.assignmentId;
+    delete normalized.assignment_id;
+  }
+
+  return normalized;
+};
+
 const normalizeCanonicalEntry = (entry) => {
   const level = normalizeLevel(entry.level);
   const chapter = String(entry.chapter || "").trim();
@@ -16,16 +49,19 @@ const normalizeCanonicalEntry = (entry) => {
   const assignmentType = String(entry.assignmentType || "").trim();
   const submissionRequired = Boolean(entry.submissionRequired);
   const progressionEligible = Boolean(entry.progressionEligible);
-  const resource = {
-    video: entry.video || null,
-    youtube_link: entry.video || null,
-    grammarbook_link: entry.grammarPage || null,
-    grammar_link: entry.grammarPage || null,
-    workbook_link: entry.workbookRoute || null,
-    assignment: submissionRequired,
-    assignmentId,
-    assignment_id: assignmentId,
-  };
+  const resources = toArray(entry.resources).length
+    ? toArray(entry.resources).map((item) => normalizeLessonResource(item, { ...entry, assignmentId }))
+    : [normalizeLessonResource({
+        chapter,
+        title,
+        video: entry.video || "",
+        grammarPage: entry.grammarPage || "",
+        workbookRoute: entry.workbookRoute || "",
+        submissionRequired,
+        assignmentId,
+      }, { ...entry, assignmentId })];
+  const submissionResource = resources.find((item) => item.submissionRequired) || resources[0] || {};
+  const practiceResources = resources.filter((item) => !item.submissionRequired);
 
   return {
     ...entry,
@@ -47,8 +83,10 @@ const normalizeCanonicalEntry = (entry) => {
     grammarPage: entry.grammarPage || "",
     workbookRoute: entry.workbookRoute || "",
     video: entry.video || "",
-    lesen_hören: resource,
-    schreiben_sprechen: { grammar_link: entry.grammarPage || null, workbook_link: entry.workbookRoute || null, assignment: submissionRequired, assignmentId, assignment_id: assignmentId },
+    resources,
+    lesen_hören: resources.filter((item) => item.kind !== "schreiben_sprechen" && item.submissionRequired),
+    schreiben_sprechen: practiceResources.length ? practiceResources : { grammar_link: entry.grammarPage || null, workbook_link: entry.workbookRoute || null, assignment: false },
+    primaryResource: submissionResource,
   };
 };
 
@@ -64,7 +102,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
     "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "Tutorial",
+        "title": "Tutorial",
+        "video": "https://youtu.be/a1-day0-tutorial",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -77,33 +125,85 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
     "video": "https://youtu.be/CqFbBQG9M3U",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "0.1",
+        "title": "Greetings and Asking About Well-being",
+        "video": "https://youtu.be/CqFbBQG9M3U",
+        "grammarPage": "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
+        "workbookRoute": "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-0.1"
+      }
+    ]
   },
   {
     "level": "A1",
     "day": 2,
-    "chapter": "0.2",
-    "title": "German Alphabet + Personal Pronouns and Verb Conjugation + German Alphabet + Personal Pronouns and Verb Conjugation",
+    "chapter": "0.2_1.1",
+    "title": "German Alphabet + Personal Pronouns and Verb Conjugation",
     "assignmentId": "A1-0.2",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
     "workbookRoute": "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
     "video": "https://youtu.be/uhFgKp4WVEc",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "0.2",
+        "title": "German Alphabet",
+        "video": "https://youtu.be/uhFgKp4WVEc",
+        "grammarPage": "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
+        "workbookRoute": "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-0.2"
+      },
+      {
+        "chapter": "1.1",
+        "title": "Personal Pronouns and Verb Conjugation",
+        "video": "https://youtu.be/AjsnO1hxDs4",
+        "grammarPage": "/campus/course/singular-pronouns-verb-conjugation-day-2",
+        "workbookRoute": "/campus/course/a1-day-2-kapitel-1-1-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-1.1"
+      }
+    ]
   },
   {
     "level": "A1",
     "day": 3,
-    "chapter": "1.1",
-    "title": "German Alphabet + Personal Pronouns and Verb Conjugation + Pronouns and Identity Expressions in German",
-    "assignmentId": "A1-1.1",
+    "chapter": "1.1_1.2",
+    "title": "Personal Pronouns and Verb Conjugation + Introducing Yourself",
+    "assignmentId": "A1-1.2",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "https://www.falowen.app/campus/course/personen-beschreiben-1-2-grammar-notes",
-    "workbookRoute": "https://www.falowen.app/campus/course/a1-day-3-kapitel-1-2-workbook",
+    "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
+    "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
     "video": "https://youtu.be/McNk1VTFvMk",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "kind": "schreiben_sprechen",
+        "chapter": "1.1",
+        "title": "Personal Pronouns and Verb Conjugation self-practice",
+        "video": "https://youtu.be/iZDv1rcYWsQ",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+        "submissionRequired": false
+      },
+      {
+        "kind": "lesen_hören",
+        "chapter": "1.2",
+        "title": "Introducing Yourself",
+        "video": "https://youtu.be/McNk1VTFvMk",
+        "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
+        "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-1.2"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -116,20 +216,41 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1C4VZDUj7VT27Qrn9vS5MNc3QfRqpmDGE/view?usp=sharing",
     "video": "https://youtu.be/lN7xxSbkPZ4",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2",
+        "title": "Numbers",
+        "video": "https://youtu.be/lN7xxSbkPZ4",
+        "grammarPage": "https://www.falowen.app/campus/course/german-numbers-1-10-with-pronunciation",
+        "workbookRoute": "https://drive.google.com/file/d/1C4VZDUj7VT27Qrn9vS5MNc3QfRqpmDGE/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-2"
+      }
+    ]
   },
   {
     "level": "A1",
     "day": 5,
-    "chapter": "1.2",
+    "chapter": "1.3",
     "title": "Pronouns and Identity Expressions in German",
-    "assignmentId": "A1-1.2",
+    "assignmentId": "A1-1.3",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "",
-    "workbookRoute": "/campus/course/a1-day-5-articles-adjectives-personal-information-workbook",
+    "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
     "video": "https://youtu.be/aQNXQlTJMBA",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "1.3",
+        "title": "Pronouns and Identity Expressions in German",
+        "video": "https://youtu.be/aQNXQlTJMBA",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -142,7 +263,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-6-family-and-hobbies-workbook",
     "video": "https://youtu.be/_WdlEcKXuVg",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "2.3",
+        "title": "Family and Hobbies",
+        "video": "https://youtu.be/_WdlEcKXuVg",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a1-day-6-family-and-hobbies-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -155,7 +286,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1W5GCdtp-NzSQWMz_ir7uQSKJc3F4LGPb/view?usp=sharing",
     "video": "https://youtu.be/Ioq0_bNJ1bE",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3",
+        "title": "Asking About Prices",
+        "video": "https://youtu.be/Ioq0_bNJ1bE",
+        "grammarPage": "/campus/course/a1-day-7-asking-about-prices-and-preferences",
+        "workbookRoute": "https://drive.google.com/file/d/1W5GCdtp-NzSQWMz_ir7uQSKJc3F4LGPb/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-3"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -168,7 +310,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-8-countries-and-languages-workbook",
     "video": "https://youtu.be/p3xFdekEZPg",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4",
+        "title": "Countries and Languages",
+        "video": "https://youtu.be/p3xFdekEZPg",
+        "grammarPage": "https://www.falowen.app/campus/course/forming-basic-statements-german-a1-day-8",
+        "workbookRoute": "/campus/course/a1-day-8-countries-and-languages-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-4"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -181,7 +334,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1zjAqvQqNb7iKknuhJ79bUclimEaTg-mt/view?usp=sharing",
     "video": "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5",
+        "title": "German Cases",
+        "video": "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
+        "grammarPage": "/campus/course/a1-day-9-nominative-and-accusative-cases",
+        "workbookRoute": "https://drive.google.com/file/d/1zjAqvQqNb7iKknuhJ79bUclimEaTg-mt/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-5"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -194,7 +358,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/18B1O4Jr_CYKtlGlINPRM3z2Es5YGkMAf/view?usp=sharing",
     "video": "https://youtu.be/sDL5z3lsITk",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6",
+        "title": "Objects and Colors",
+        "video": "https://youtu.be/sDL5z3lsITk",
+        "grammarPage": "https://www.falowen.app/campus/course/objects-and-colors-chapter-6",
+        "workbookRoute": "https://drive.google.com/file/d/18B1O4Jr_CYKtlGlINPRM3z2Es5YGkMAf/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-6"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -207,7 +382,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
     "video": "https://youtu.be/qrkQJc5kQJQ",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7",
+        "title": "Understanding Time",
+        "video": "https://youtu.be/qrkQJc5kQJQ",
+        "grammarPage": "https://www.falowen.app/campus/course/the-12-hour-clock-system-in-german-chapter-7",
+        "workbookRoute": "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-7"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -220,7 +406,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
     "video": "https://youtu.be/hLpPFOthVkU",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "8",
+        "title": "24 Hour Clock",
+        "video": "https://youtu.be/hLpPFOthVkU",
+        "grammarPage": "https://www.falowen.app/campus/course/a1-day-12-the-24-hour-clock-and-dates",
+        "workbookRoute": "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-8"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -233,7 +430,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
     "video": "https://youtu.be/eqSc_5p5uyQ",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "3.5",
+        "title": "Revision",
+        "video": "https://youtu.be/eqSc_5p5uyQ",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -246,7 +453,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
     "video": "https://youtu.be/vMfOb_nPRNc",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "3.6",
+        "title": "Modal Verbs",
+        "video": "https://youtu.be/vMfOb_nPRNc",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -259,20 +476,41 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://www.falowen.app/campus/course/speaking-exams-intro-4-7",
     "video": "https://youtu.be/o9nn_hSDzw8",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "4.7",
+        "title": "Introduction to Speaking Exams",
+        "video": "https://youtu.be/o9nn_hSDzw8",
+        "grammarPage": "",
+        "workbookRoute": "https://www.falowen.app/campus/course/speaking-exams-intro-4-7",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
     "day": 16,
     "chapter": "9",
-    "title": "Food and Negation + Food and Negation",
+    "title": "Food and Negation",
     "assignmentId": "A1-9",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1g-qLEH1ZDnFZCT83TW-MPLxNt2nO7UAv/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1hKtQdXg5y3yJyFBQsCMr7fZ11cYbuG7D/view?usp=sharing",
     "video": "https://youtu.be/yYIjI6P-qmw",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "9",
+        "title": "Food and Negation",
+        "video": "https://youtu.be/yYIjI6P-qmw",
+        "grammarPage": "https://drive.google.com/file/d/1g-qLEH1ZDnFZCT83TW-MPLxNt2nO7UAv/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1hKtQdXg5y3yJyFBQsCMr7fZ11cYbuG7D/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-9"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -285,20 +523,42 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
     "video": "https://youtu.be/9wvr4iwGsIc",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "11",
+        "title": "Instructions",
+        "video": "https://youtu.be/9wvr4iwGsIc",
+        "grammarPage": "https://www.falowen.app/campus/course/directions-imperative-11",
+        "workbookRoute": "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-11"
+      }
+    ]
   },
   {
     "level": "A1",
     "day": 18,
     "chapter": "12.1",
-    "title": "Two Case Preposition + Two Case Preposition",
+    "title": "Two Case Prepositions",
     "assignmentId": "A1-12.1",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://www.falowen.app/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
     "workbookRoute": "https://drive.google.com/file/d/1A0NkFl1AG68jHeqSytI3ygJ0k7H74AEX/view?usp=sharing",
     "video": "https://youtu.be/-vTEvx9a8Ts",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "12.1",
+        "title": "Two Case Prepositions",
+        "video": "https://youtu.be/-vTEvx9a8Ts",
+        "grammarPage": "https://www.falowen.app/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
+        "workbookRoute": "https://drive.google.com/file/d/1A0NkFl1AG68jHeqSytI3ygJ0k7H74AEX/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-12.1"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -311,7 +571,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
     "video": "https://youtu.be/ZfXw4fRQ0Tg",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "5.9",
+        "title": "Goethe A1 Speaking Confidence Lab",
+        "video": "https://youtu.be/ZfXw4fRQ0Tg",
+        "grammarPage": "",
+        "workbookRoute": "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -324,7 +594,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
     "video": "https://youtu.be/JtgoO2fmOpU",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "12.3",
+        "title": "Introduction to Letter Writing 12.3",
+        "video": "https://youtu.be/JtgoO2fmOpU",
+        "grammarPage": "",
+        "workbookRoute": "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
+        "submissionRequired": true,
+        "assignmentId": "A1-12.3"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -337,7 +618,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a1-day-21-weather-workbook",
     "video": "https://youtu.be/ijEY8XVrsZs",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "13",
+        "title": "Weather",
+        "video": "https://youtu.be/ijEY8XVrsZs",
+        "grammarPage": "https://www.falowen.app/campus/course/weather-perfekt-letter-13",
+        "workbookRoute": "/campus/course/a1-day-21-weather-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A1-13"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -350,7 +642,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1LkDUU7r78E_pzeFnHKw9vfD9QgUAAacu/view?usp=sharing",
     "video": "https://youtu.be/hktvDESwX3k",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "14.1",
+        "title": "Health",
+        "video": "https://youtu.be/hktvDESwX3k",
+        "grammarPage": "/campus/course/health-and-body-parts-14-1",
+        "workbookRoute": "https://drive.google.com/file/d/1LkDUU7r78E_pzeFnHKw9vfD9QgUAAacu/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "A1-14.1"
+      }
+    ]
   },
   {
     "level": "A1",
@@ -363,7 +666,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
     "video": "https://youtu.be/J98JJU2v4Uw",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "14.2",
+        "title": "Dative and Accusative Verbs",
+        "video": "https://youtu.be/J98JJU2v4Uw",
+        "grammarPage": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
+        "workbookRoute": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A1",
@@ -376,7 +689,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/conjunctions-5-10",
     "video": "https://youtu.be/8l1LiXGYqFA",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "5.10",
+        "title": "Conjunctions",
+        "video": "https://youtu.be/8l1LiXGYqFA",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/conjunctions-5-10",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A2",
@@ -389,7 +712,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
     "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "Tutorial",
+        "title": "Tutorial",
+        "video": "https://youtu.be/a1-day0-tutorial",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "A2",
@@ -399,10 +732,21 @@ const CANONICAL_CURRICULUM = [
     "assignmentId": "A2-1.1",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/a2-starter-conjunctions-day-1",
-    "workbookRoute": "/campus/course/a2-day-1-small-talk-workbook",
+    "workbookRoute": "/campus/course/lesson/A2/1?view=workbook",
     "video": "https://youtu.be/DfJ04x4JGOo",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.1",
+        "title": "Small Talk 1.1 (Exercise)",
+        "video": "https://youtu.be/DfJ04x4JGOo",
+        "grammarPage": "/campus/course/a2-starter-conjunctions-day-1",
+        "workbookRoute": "/campus/course/lesson/A2/1?view=workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-1.1"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -415,7 +759,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-2-personen-beschreiben-workbook",
     "video": "https://youtu.be/3_X7pyFA5A4",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.2",
+        "title": "Personen beschreiben 1.2 (Exercise)",
+        "video": "https://youtu.be/3_X7pyFA5A4",
+        "grammarPage": "/campus/course/personen-beschreiben-1-2-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-2-personen-beschreiben-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-1.2"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -428,7 +783,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook",
     "video": "https://youtu.be/wV45Md6nSgY",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.3",
+        "title": "Dinge und Personen vergleichen 1.3",
+        "video": "https://youtu.be/wV45Md6nSgY",
+        "grammarPage": "https://drive.google.com/file/d/1Z3sSDCxPQz27TDSpN9r8lQUpHhBVfhYZ/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-1.3"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -441,7 +807,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook",
     "video": "https://youtu.be/U14gkjld0ys",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.4",
+        "title": "Wo möchten wir uns treffen? 2.4",
+        "video": "https://youtu.be/U14gkjld0ys",
+        "grammarPage": "https://drive.google.com/file/d/14qE_XJr3mTNr6PF5aa0aCqauh9ngYTJ8/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-2.4"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -454,7 +831,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-5-freizeit-workbook",
     "video": "https://youtu.be/8605_yumfoM",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.5",
+        "title": "Was machst du in deiner Freizeit? 2.5 ",
+        "video": "https://youtu.be/8605_yumfoM",
+        "grammarPage": "https://drive.google.com/file/d/11yEcMioSB9x1ZD-x5_67ApFzP53iau-N/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-5-freizeit-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-2.5"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -467,7 +855,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-6-moebel-und-raeume-workbook",
     "video": "https://youtu.be/eP4NeBmmZF8",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.6",
+        "title": "Möbel und Räume kennenlernen 3.6",
+        "video": "https://youtu.be/eP4NeBmmZF8",
+        "grammarPage": "https://drive.google.com/file/d/1MSahBEyElIiLnitWoJb5xkvRlB21yo0y/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-6-moebel-und-raeume-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-3.6"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -480,7 +879,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-7-eine-wohnung-suchen-workbook",
     "video": "https://youtu.be/ScU6w8VQgNg",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.7",
+        "title": "Eine Wohnung suchen (Übung) 3.7",
+        "video": "https://youtu.be/ScU6w8VQgNg",
+        "grammarPage": "/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes",
+        "workbookRoute": "/campus/course/a2-day-7-eine-wohnung-suchen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-3.7"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -493,7 +903,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-8-rezepte-und-essen-workbook",
     "video": "https://youtu.be/hxkk6dZSjNM",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.8",
+        "title": "Rezepte und Essen (Exercise) 3.8",
+        "video": "https://youtu.be/hxkk6dZSjNM",
+        "grammarPage": "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-8-rezepte-und-essen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-3.8"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -506,7 +927,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-9-urlaub-workbook",
     "video": "https://youtu.be/NxoQH-BY9Js",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.9",
+        "title": "Urlaub 4.9",
+        "video": "https://youtu.be/NxoQH-BY9Js",
+        "grammarPage": "/campus/course/perfekt-urlaub-4-9-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-9-urlaub-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-4.9"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -519,7 +951,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
     "video": "https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.10",
+        "title": "Tourismus und Traditionelle Feste 4.10",
+        "video": "https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q",
+        "grammarPage": "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-4.10"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -532,7 +975,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
     "video": "https://youtu.be/RkvfRiPCZI4",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.11",
+        "title": "Unterwegs: Verkehrsmittel vergleichen 4.11",
+        "video": "https://youtu.be/RkvfRiPCZI4",
+        "grammarPage": "https://drive.google.com/file/d/19I7oOHX8r4daxXmx38mNMaZO10AXHEFu/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-4.11"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -545,7 +999,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-12-mein-traumberuf-workbook",
     "video": "https://youtu.be/w81bsmssGXQ",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.12",
+        "title": "Mein Traumberuf (Übung) 5.12",
+        "video": "https://youtu.be/w81bsmssGXQ",
+        "grammarPage": "https://drive.google.com/file/d/1dyGB5q92EePy8q60eWWYA91LXnsWQFb1/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-12-mein-traumberuf-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-5.12"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -558,7 +1023,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
     "video": "https://youtu.be/urKBrX5VAYU",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.13",
+        "title": "Ein Vorstellungsgespräch (Exercise) 5.13",
+        "video": "https://youtu.be/urKBrX5VAYU",
+        "grammarPage": "https://drive.google.com/file/d/1tv2tYzn9mIG57hwWr_ilxV1My7kt-RKQ/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-5.13"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -571,7 +1047,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-14-beruf-und-karriere-workbook",
     "video": "https://youtu.be/_YlapM9rQq4",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.14",
+        "title": "Beruf und Karriere (Exercise) 5.14",
+        "video": "https://youtu.be/_YlapM9rQq4",
+        "grammarPage": "https://drive.google.com/file/d/13mVpVGfhY1NQn-BEb7xYUivnaZbhXJsK/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-14-beruf-und-karriere-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-5.14"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -584,7 +1071,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-15-mein-lieblingssport-workbook",
     "video": "https://youtu.be/uf3OJwalh6U",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.15",
+        "title": "Mein Lieblingssport 6.15",
+        "video": "https://youtu.be/uf3OJwalh6U",
+        "grammarPage": "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-15-mein-lieblingssport-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-6.15"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -597,7 +1095,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
     "video": "https://youtu.be/r4se8KuS8cA",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.16",
+        "title": "Wohlbefinden und Entspannung 6.16",
+        "video": "https://youtu.be/r4se8KuS8cA",
+        "grammarPage": "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-6.16"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -610,7 +1119,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
     "video": "https://youtu.be/0p28KQE2A8c",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.17",
+        "title": "In die Apotheke gehen 6.17 (Exercise)",
+        "video": "https://youtu.be/0p28KQE2A8c",
+        "grammarPage": "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-6.17"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -623,7 +1143,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-18-die-bank-anrufen-workbook",
     "video": "https://youtu.be/ahIUVAbsuxU",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.18",
+        "title": "Die Bank anrufen 7.18",
+        "video": "https://youtu.be/ahIUVAbsuxU",
+        "grammarPage": "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-18-die-bank-anrufen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-7.18"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -636,7 +1167,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
     "video": "https://youtu.be/TOTK1yohCTg",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.19",
+        "title": "Einkaufen? Wo und wie? (Exercise) 7.19",
+        "video": "https://youtu.be/TOTK1yohCTg",
+        "grammarPage": "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-7.19"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -649,7 +1191,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
     "video": "https://youtu.be/P_ruQxHKzPg",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.20",
+        "title": "Typische Reklamationssituationen üben 7.20",
+        "video": "https://youtu.be/P_ruQxHKzPg",
+        "grammarPage": "/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-7.20"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -662,7 +1215,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "8.21",
+        "title": "Ein Wochenende planen 8.21",
+        "video": "",
+        "grammarPage": "/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-8.21"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -675,7 +1239,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-22-die-woche-planung-workbook",
     "video": "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "8.22",
+        "title": "Die Woche Planung 8.22",
+        "video": "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
+        "grammarPage": "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-22-die-woche-planung-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-8.22"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -688,7 +1263,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
     "video": "https://youtu.be/c4TpUe3teBE",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "9.23",
+        "title": "Wie kommst du zur Schule / zur Arbeit? 9.23",
+        "video": "https://youtu.be/c4TpUe3teBE",
+        "grammarPage": "/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes",
+        "workbookRoute": "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-9.23"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -701,7 +1287,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "9.24",
+        "title": "Einen Urlaub planen 9.24",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1tFXs-DNKvt97Q4dsyXsYvKVQvT5Qqt0y/view?usp=sharing",
+        "workbookRoute": "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-9.24"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -714,7 +1311,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-25-tagesablauf-workbook",
     "video": "https://youtu.be/NxoQH-BY9Js",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "9.25",
+        "title": "Tagesablauf (Exercise) 9.25",
+        "video": "https://youtu.be/NxoQH-BY9Js",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a2-day-25-tagesablauf-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-9.25"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -727,7 +1335,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
     "video": "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "10.26",
+        "title": "Gefühle in verschiedenen Situationen beschreiben 10.26",
+        "video": "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-10.26"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -740,7 +1359,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-27-digitale-kommunikation-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "10.27",
+        "title": "Digitale Kommunikation 10.27",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a2-day-27-digitale-kommunikation-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-10.27"
+      }
+    ]
   },
   {
     "level": "A2",
@@ -753,7 +1383,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
     "video": "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "10.28",
+        "title": "Über die Zukunft sprechen 10.28",
+        "video": "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "A2-10.28"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -766,7 +1407,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
     "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "Tutorial",
+        "title": "Tutorial",
+        "video": "https://youtu.be/a1-day0-tutorial",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "B1",
@@ -779,7 +1430,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1gTcOHHGW2bXKkhxAC38jdl6OikgHCT9g/view?usp=sharing",
     "video": "https://youtu.be/wMrdW2DhD5o",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.1",
+        "title": "Traumwelten (Übung) 1.1",
+        "video": "https://youtu.be/wMrdW2DhD5o",
+        "grammarPage": "https://drive.google.com/file/d/17dO2pWXKQ3V3kWZIgLHXpLJ-ozKHKxu5/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1gTcOHHGW2bXKkhxAC38jdl6OikgHCT9g/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-1.1"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -792,7 +1454,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1AgjhFYw07JYvsgVP1MBKYEMFBjeAwQ1e/view?usp=sharing",
     "video": "https://youtu.be/piJE4ucYFuc",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.2",
+        "title": "Freunde fürs Leben (Übung) 1.2",
+        "video": "https://youtu.be/piJE4ucYFuc",
+        "grammarPage": "/campus/course/lesson/B1/2?view=grammar",
+        "workbookRoute": "https://drive.google.com/file/d/1AgjhFYw07JYvsgVP1MBKYEMFBjeAwQ1e/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-1.2"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -805,7 +1478,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1qVANqTLg4FOU40_WfLZyVTu5KBluzYrh/view?usp=sharing",
     "video": "https://youtu.be/8k0Iaw_-o8c",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.3",
+        "title": "Erfolgsgeschichten (Übung) 1.3",
+        "video": "https://youtu.be/8k0Iaw_-o8c",
+        "grammarPage": "https://drive.google.com/file/d/1kUtriLOZfJXUxj2IVU2VHZZkghIWDWKv/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1qVANqTLg4FOU40_WfLZyVTu5KBluzYrh/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-1.3"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -818,7 +1502,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/12r_HE51QtpknXSSU0R75ur-EDFpTjzXU/view?usp=sharing",
     "video": "https://youtu.be/kR8SmSY99c8",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.4",
+        "title": "Wohnung suchen (Übung) 2.4",
+        "video": "https://youtu.be/kR8SmSY99c8",
+        "grammarPage": "https://drive.google.com/file/d/1NW5F0R5zj6nn2SqDjhpQlkGcfK-UBUqk/view?usp=drive_link",
+        "workbookRoute": "https://drive.google.com/file/d/12r_HE51QtpknXSSU0R75ur-EDFpTjzXU/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-2.4"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -831,7 +1526,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1-HaOiGQtP_JI7ujg4-h-u1GnCumabdx_/view?usp=sharing",
     "video": "https://youtu.be/2lUPAnzx4e4",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.5",
+        "title": "Der Besichtigungstermin (Übung) 2.5",
+        "video": "https://youtu.be/2lUPAnzx4e4",
+        "grammarPage": "https://drive.google.com/file/d/13SI6AiqC2BAWLZjPh-AsiyTEfvGyk8DR/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1-HaOiGQtP_JI7ujg4-h-u1GnCumabdx_/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-2.5"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -844,7 +1550,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1xAUFfq2knYxfoGMTlXO_MA8F_RK5_i8o/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.6",
+        "title": "Leben in der Stadt oder auf dem Land? 2.6",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1qUPAIGiwKNm4O9Z1VsFPprVVoNOZzCbF/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1xAUFfq2knYxfoGMTlXO_MA8F_RK5_i8o/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-2.6"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -857,7 +1574,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1XXVhFMJdFI_j3pZXw3UkuHCoKqYR8dkj/view?usp=sharing",
     "video": "https://youtu.be/y5wqJv8_GMI",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.7",
+        "title": "Fast Food vs. Hausmannskost 3.7",
+        "video": "https://youtu.be/y5wqJv8_GMI",
+        "grammarPage": "https://drive.google.com/file/d/1DMyTdt1cxhDxYJZQPHe3pAqE30TNwThU/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1XXVhFMJdFI_j3pZXw3UkuHCoKqYR8dkj/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-3.7"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -870,7 +1598,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1PgsULeo11OhzpICZ77RSlVEuuyrSdxSe/view?usp=sharing",
     "video": "https://youtu.be/_aFuOTSdMb8",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.8",
+        "title": "Alles für die Gesundheit 3.8",
+        "video": "https://youtu.be/_aFuOTSdMb8",
+        "grammarPage": "https://drive.google.com/file/d/1s6TcUzjADzicOKRx3adxW4UdqEXQmz_L/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1PgsULeo11OhzpICZ77RSlVEuuyrSdxSe/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-3.8"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -883,7 +1622,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1giWw3qYhTmm3VO9and2ZuS7ARUFkq7vO/view?usp=sharing",
     "video": "https://youtu.be/3ozjxgOenaI",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.9",
+        "title": "Work-Life-Balance im modernen Arbeitsumfeld 3.9",
+        "video": "https://youtu.be/3ozjxgOenaI",
+        "grammarPage": "https://drive.google.com/file/d/1Mp6i2pbaTd3r5fLZGqh6NLFZE6txCZpJ/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1giWw3qYhTmm3VO9and2ZuS7ARUFkq7vO/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-3.9"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -896,7 +1646,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1Rh6SS45s3UCyX5mnU-RTby4K15a0Z_al/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.10",
+        "title": "Digitale Auszeit und Selbstfürsorge 4.10",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1zuzkGBkX-NeL6v_lLkOf8dWmc2dJ1n71/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1Rh6SS45s3UCyX5mnU-RTby4K15a0Z_al/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-4.10"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -909,7 +1670,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1kq9m4nHQVyj_clhr9GtadLfpSU0CuhnH/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.11",
+        "title": "Teamspiele und Kooperative Aktivitäten 4.11",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1kq9m4nHQVyj_clhr9GtadLfpSU0CuhnH/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-4.11"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -922,7 +1694,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/14jYuVQ1WKDakOT_z4a4EzwJ0soqQrr8V/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.12",
+        "title": "Abenteuer in der Natur 4.12",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1tR7dhUkR-am4c21HInXHP8XdY210MDII/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/14jYuVQ1WKDakOT_z4a4EzwJ0soqQrr8V/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-4.12"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -935,7 +1718,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1dC4H3hyiX2gZ0R3jj_0CAjhl7iBa5oA7/view?usp=sharing",
     "video": "https://youtu.be/8rclmwsAYtc",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.13",
+        "title": "Eigene Filmkritik schreiben 4.13",
+        "video": "https://youtu.be/8rclmwsAYtc",
+        "grammarPage": "https://drive.google.com/file/d/11_i8x_tmppV5Vzc1jfYAkGAhJYelwMrr/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1dC4H3hyiX2gZ0R3jj_0CAjhl7iBa5oA7/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-4.13"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -948,7 +1742,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1TMNv-jozqNaaJ_ejoV_5hDXkIbSdr3Nu/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.14",
+        "title": "Traditionelles vs. digitales Lernen 5.14",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1-E7DhaqHRwiFgZ3tWg-NWjctDW7rZScT/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1TMNv-jozqNaaJ_ejoV_5hDXkIbSdr3Nu/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-5.14"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -961,7 +1766,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1u82w53DQ2lml3ivUMHiK2I9kXDk_T1IH/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.15",
+        "title": "Medien und Arbeiten im Homeoffice 5.15",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1a-UYqXhVb4q71o2_2A6z8tk1Fyb_6PA9/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1u82w53DQ2lml3ivUMHiK2I9kXDk_T1IH/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-5.15"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -974,7 +1790,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/11MN70gt1zEc0nSyeriUNDP4ZOdooYfYF/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.16",
+        "title": "Prüfungsangst und Stressbewältigung 5.16",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/11MN70gt1zEc0nSyeriUNDP4ZOdooYfYF/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-5.16"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -987,7 +1814,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1U2qtjXfid8Aj5LOqP2Uqpbv18-utgZIh/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.17",
+        "title": "Wie lernt man am besten? 5.17",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1U2qtjXfid8Aj5LOqP2Uqpbv18-utgZIh/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-5.17"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1000,7 +1838,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1ynVwqtIMGSH1rbCfbPeYE2iRH5plkTC8/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.18",
+        "title": "Wege zum Wunschberuf 6.18",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/13iU-2CldgD1-pP-kRx55Q7ld0KCU37vD/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1ynVwqtIMGSH1rbCfbPeYE2iRH5plkTC8/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-6.18"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1013,7 +1862,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1fHjQGvObAE3TBmnstPhQBm5RUooP_NyJ/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.19",
+        "title": "Das Vorstellungsgespräch 6.19",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1IimP5JZHHvUYkDSuE7F-YI-Z4PeMYad2/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1fHjQGvObAE3TBmnstPhQBm5RUooP_NyJ/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-6.19"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1026,7 +1886,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1kfFEDI3ufCCndSi-LhfMFYEdih58D5XQ/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.20",
+        "title": "Wie wird man …? (Ausbildung und Qu) 6.20",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1kfFEDI3ufCCndSi-LhfMFYEdih58D5XQ/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-6.20"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1039,7 +1910,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1y9B__4gEvvdgNzaD17SSWJO0TVRYxFBa/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.21",
+        "title": "Lebensformen heute – Familie, Wohnge 7.21",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1-5hQoiAohD-lB-keyi7mTidjw8YJbvgT/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1y9B__4gEvvdgNzaD17SSWJO0TVRYxFBa/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-7.21"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1052,7 +1934,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/15H7jEA7zkl4c58rhybkKPjN1eqK7mPoM/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.22",
+        "title": "Was ist dir in einer Beziehung wichtig? 7.22",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/15H7jEA7zkl4c58rhybkKPjN1eqK7mPoM/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-7.22"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1065,7 +1958,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1DZxrsgU-vZPGrQAqLuYP3Q3U6KCFy-Cy/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "7.23",
+        "title": "Erstes Date – Typische Situationen 7.23",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1DZxrsgU-vZPGrQAqLuYP3Q3U6KCFy-Cy/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-7.23"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1078,7 +1982,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1x8IM6xcjR2hv3jbnnNudjyxLWPiT0-VL/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "8.24",
+        "title": "Konsum und Nachhaltigkeit 8.24",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1x8IM6xcjR2hv3jbnnNudjyxLWPiT0-VL/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-8.24"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1091,7 +2006,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "8.25",
+        "title": "Online einkaufen – Rechte und Risiken 8.25",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
+        "submissionRequired": true,
+        "assignmentId": "B1-8.25"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1104,7 +2030,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1BMwDDkfPJVEhL3wHNYqGMAvjOts9tv24/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "9.26",
+        "title": "Reiseprobleme und Lösungen 9.26",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1BMwDDkfPJVEhL3wHNYqGMAvjOts9tv24/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-9.26"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1117,7 +2054,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/15fjOKp_u75GfcbvRJVbR8UbHg-cgrgWL/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "10.27",
+        "title": "Umweltfreundlich im Alltag 10.27",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/15fjOKp_u75GfcbvRJVbR8UbHg-cgrgWL/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-10.27"
+      }
+    ]
   },
   {
     "level": "B1",
@@ -1130,7 +2078,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1iBeZHMDq_FnusY4kkRwRQvyOfm51-COU/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "10.28",
+        "title": "Klimafreundlich leben 10.28",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "https://drive.google.com/file/d/1iBeZHMDq_FnusY4kkRwRQvyOfm51-COU/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B1-10.28"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1143,7 +2102,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "Tutorial",
+        "title": "Tutorial",
+        "video": "https://youtu.be/a1-day0-tutorial",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1156,7 +2125,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1D1eb-iwfl_WA2sXPOSPD_66NCiTB4o2w/view?usp=sharing",
     "video": "https://youtu.be/a9LxkxNdnEg",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.1",
+        "title": "Persönliche Identität und Selbstverständnis",
+        "video": "https://youtu.be/a9LxkxNdnEg",
+        "grammarPage": "https://drive.google.com/file/d/17pVc0VfLm32z4zmkaaa_cdshKJEQQxYa/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1D1eb-iwfl_WA2sXPOSPD_66NCiTB4o2w/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B2-1.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1169,7 +2149,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1XCLW0y-MMyIu_bNO3EkKIgp-8QLKgEek/view?usp=sharing",
     "video": "https://youtu.be/gCzZnddwC_c",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.2",
+        "title": "Beziehungen und Kommunikation",
+        "video": "https://youtu.be/gCzZnddwC_c",
+        "grammarPage": "https://drive.google.com/file/d/1Mlt-cK6YqPuJe9iCWfqT9DOG9oKhJBdK/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1XCLW0y-MMyIu_bNO3EkKIgp-8QLKgEek/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B2-1.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1182,7 +2173,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1VteR5sVx_uiKdhSVMBosMxiXe1lfnQnW/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.3",
+        "title": "Öffentliches vs. Privates Leben",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1R0sQc4uSWQNUxPa0_Gdz7PiQaiCyQrrL/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1VteR5sVx_uiKdhSVMBosMxiXe1lfnQnW/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B2-1.3"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1195,7 +2197,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "https://drive.google.com/file/d/1tEKd5Umb-imLpPYrmFfNQyjf4oe2weBp/view?usp=sharing",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.4",
+        "title": "Beruf und Karriere",
+        "video": "",
+        "grammarPage": "https://drive.google.com/file/d/1_xVoBqbwCSCs0Xps2Rlx92Ho43Pcbreu/view?usp=sharing",
+        "workbookRoute": "https://drive.google.com/file/d/1tEKd5Umb-imLpPYrmFfNQyjf4oe2weBp/view?usp=sharing",
+        "submissionRequired": true,
+        "assignmentId": "B2-1.4"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1208,7 +2221,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.5",
+        "title": "Bildung und Lernen",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-1.5"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1221,7 +2245,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.1",
+        "title": "Migration und Integration",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-2.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1234,7 +2269,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.2",
+        "title": "Gesellschaftliche Vielfalt",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-2.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1247,7 +2293,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.3",
+        "title": "Politik und Engagement",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-2.3"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1260,7 +2317,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.4",
+        "title": "Technologie und Digitalisierung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-2.4"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1273,7 +2341,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.5",
+        "title": "Umwelt und Nachhaltigkeit",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-2.5"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1286,7 +2365,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.1",
+        "title": "Gesundheit und Wohlbefinden",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-3.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1299,7 +2389,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.2",
+        "title": "Konsum und Medien",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-3.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1312,7 +2413,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.3",
+        "title": "Reisen und Mobilität",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-3.3"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1325,7 +2437,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.4",
+        "title": "Wohnen und Zusammenleben",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-3.4"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1338,7 +2461,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.5",
+        "title": "Kunst und Kultur",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-3.5"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1351,7 +2485,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.1",
+        "title": "Wissenschaft und Forschung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-4.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1364,7 +2509,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.2",
+        "title": "Feste und Traditionen",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-4.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1377,7 +2533,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.3",
+        "title": "Freizeit und Hobbys",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-4.3"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1390,7 +2557,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.4",
+        "title": "Ernährung und Esskultur",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-4.4"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1403,7 +2581,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.5",
+        "title": "Mode und Lebensstil",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-4.5"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1416,7 +2605,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.1",
+        "title": "Werte und Normen",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-5.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1429,7 +2629,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.2",
+        "title": "Sprache und Kommunikation",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-5.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1442,7 +2653,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.3",
+        "title": "Innovation und Zukunft",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-5.3"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1455,7 +2677,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.4",
+        "title": "Gesellschaftliche Herausforderungen",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-5.4"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1468,7 +2701,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.5",
+        "title": "Globalisierung und internationale Beziehungen",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-5.5"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1481,7 +2725,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.1",
+        "title": "Kreatives Schreiben & Projekte",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-6.1"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1494,7 +2749,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.2",
+        "title": "Prüfungstraining & Wiederholung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-6.2"
+      }
+    ]
   },
   {
     "level": "B2",
@@ -1507,7 +2773,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.3",
+        "title": "Abschlusspräsentation & Feedback",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "B2-6.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1520,7 +2797,17 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-0-progression-workbook",
     "video": "",
     "submissionRequired": false,
-    "progressionEligible": false
+    "progressionEligible": false,
+    "resources": [
+      {
+        "chapter": "Tutorial",
+        "title": "Tutorial",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "/campus/course/c1-day-0-progression-workbook",
+        "submissionRequired": false
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1533,7 +2820,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "https://youtu.be/McNk1VTFvMk",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.1",
+        "title": "Ziele und Lernweg",
+        "video": "https://youtu.be/McNk1VTFvMk",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-1.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1546,7 +2844,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.2",
+        "title": "Kultur und Identität",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-1.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1559,7 +2868,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.3",
+        "title": "Medien und Informationskompetenz",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-1.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1572,7 +2892,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.4",
+        "title": "Beziehungen und Teamarbeit",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-1.4"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1585,7 +2916,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "1.5",
+        "title": "Berufliche Entwicklung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-1.5"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1598,7 +2940,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.1",
+        "title": "Gesundheit und Lebensstil",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-2.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1611,7 +2964,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.2",
+        "title": "Reisen und Nachhaltigkeit",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-2.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1624,7 +2988,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.3",
+        "title": "Wohnen und Stadtentwicklung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-2.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1637,7 +3012,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.4",
+        "title": "Konsum und Werbung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-2.4"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1650,7 +3036,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-10-integration-und-gesellschaft-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "2.5",
+        "title": "Integration und Gesellschaft",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-10-integration-und-gesellschaft-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-2.5"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1663,7 +3060,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.1",
+        "title": "Engagement und Ehrenamt",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-3.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1676,7 +3084,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.2",
+        "title": "Freizeit und Kultur",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-3.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1689,7 +3108,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.3",
+        "title": "Mehrsprachigkeit",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-3.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1702,7 +3132,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-14-innovation-und-zukunft-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.4",
+        "title": "Innovation und Zukunft",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-14-innovation-und-zukunft-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-3.4"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1715,7 +3156,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "3.5",
+        "title": "Bildung und lebenslanges Lernen",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-3.5"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1728,7 +3180,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "/campus/course/c1-day-16-technologie-im-alltag-workbook",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.1",
+        "title": "Technologie im Alltag",
+        "video": "",
+        "grammarPage": "/campus/course/c1-day-16-technologie-im-alltag-grammar-notes",
+        "workbookRoute": "/campus/course/c1-day-16-technologie-im-alltag-workbook",
+        "submissionRequired": true,
+        "assignmentId": "C1-4.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1741,7 +3204,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.2",
+        "title": "Umwelt und Verantwortung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-4.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1754,7 +3228,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.3",
+        "title": "Gesellschaft und Zusammenhalt",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-4.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1767,7 +3252,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.4",
+        "title": "Arbeit der Zukunft",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-4.4"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1780,7 +3276,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "4.5",
+        "title": "Digitale Gesundheit",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-4.5"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1793,7 +3300,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.1",
+        "title": "Migration und Teilhabe",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-5.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1806,7 +3324,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.2",
+        "title": "Politik und Mitbestimmung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-5.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1819,7 +3348,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.3",
+        "title": "Freizeit und Work-Life-Balance",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-5.3"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1832,7 +3372,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.4",
+        "title": "Mobilität und Infrastruktur",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-5.4"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1845,7 +3396,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "5.5",
+        "title": "Wissenschaft und Forschung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-5.5"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1858,7 +3420,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.1",
+        "title": "Nachhaltiger Konsum",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-6.1"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1871,7 +3444,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.2",
+        "title": "Digitalisierung und Verwaltung",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-6.2"
+      }
+    ]
   },
   {
     "level": "C1",
@@ -1884,7 +3468,18 @@ const CANONICAL_CURRICULUM = [
     "workbookRoute": "",
     "video": "",
     "submissionRequired": true,
-    "progressionEligible": true
+    "progressionEligible": true,
+    "resources": [
+      {
+        "chapter": "6.3",
+        "title": "Review und Transfer",
+        "video": "",
+        "grammarPage": "",
+        "workbookRoute": "",
+        "submissionRequired": true,
+        "assignmentId": "C1-6.3"
+      }
+    ]
   }
 ];
 
