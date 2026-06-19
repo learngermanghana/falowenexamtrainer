@@ -7,7 +7,7 @@ import {
 
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
 const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
-  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
+  (entry) => Number(entry.assignmentDay) === 5 && ["1.2", "1.3"].includes(String(entry.chapter))
 );
 
 if (a1Day5Entry) {
@@ -48,6 +48,74 @@ const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
   return normalizeChapter(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
 };
 
+const collapseRepeatedTitleParts = (value) => {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const seen = new Set();
+  return text
+    .split(/\s*\+\s*/)
+    .map((part) => part.trim())
+    .filter((part) => {
+      const key = part.toLowerCase().replace(/\s+/g, " ");
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(" + ");
+};
+
+const buildLookupEntriesForLevel = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  const entries = CURRICULUM_BY_LEVEL[normalizedLevel] || [];
+
+  return entries.flatMap((entry, entryIndex) => {
+    const resources = Array.isArray(entry.resources) ? entry.resources : [];
+    const nestedResources = resources.map((resource, resourceIndex) => {
+      const submissionRequired = Boolean(resource.submissionRequired ?? resource.assignment ?? false);
+      const resourceAssignmentId = String(resource.assignmentId || resource.assignment_id || "")
+        .trim()
+        .toUpperCase();
+      const resourceTitle = collapseRepeatedTitleParts(
+        resource.topic || resource.title || entry.topic || entry.title
+      );
+
+      return {
+        ...entry,
+        ...resource,
+        level: normalizedLevel,
+        day: Number(entry.day ?? entry.assignmentDay),
+        assignmentDay: Number(entry.assignmentDay ?? entry.day),
+        chapter: String(resource.chapter || entry.chapter || "").trim(),
+        topic: resourceTitle,
+        title: resourceTitle,
+        mode: resource.mode || resource.kind || entry.mode,
+        type: resource.type || resource.kind || entry.type,
+        assignment: submissionRequired,
+        submissionRequired,
+        progressionEligible: submissionRequired ? entry.progressionEligible !== false : false,
+        assignmentId: resourceAssignmentId,
+        assignment_id: resourceAssignmentId,
+        canonicalAssignmentId: resourceAssignmentId,
+        parentAssignmentId: entry.assignment_id,
+        __lookupOrder: entryIndex * 100 + resourceIndex,
+        __isNestedResource: true,
+      };
+    });
+
+    return [
+      ...nestedResources,
+      {
+        ...entry,
+        topic: collapseRepeatedTitleParts(entry.topic || entry.title),
+        title: collapseRepeatedTitleParts(entry.title || entry.topic),
+        __lookupOrder: entryIndex * 100 + 99,
+        __isNestedResource: false,
+      },
+    ];
+  });
+};
+
 export { CURRICULUM_ENTRIES };
 
 export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
@@ -77,7 +145,9 @@ export const getCurriculumEntriesByDayForLevel = (level) => {
 
 const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
   const entry = entryParam || {};
-  return String(entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "").trim();
+  return collapseRepeatedTitleParts(
+    entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || ""
+  );
 };
 
 const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
@@ -97,25 +167,31 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   const modeToken = String(mode || "").trim();
   const dayToken = Number(assignmentDay || 0);
 
-  const matches = (CURRICULUM_BY_LEVEL[normalizedLevel] || []).filter((entry) => {
-    if (canonicalId && entry.assignment_id !== canonicalId) return false;
-    if (!canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
+  const matches = buildLookupEntriesForLevel(normalizedLevel).filter((entry) => {
+    const entryAssignmentId = String(entry.assignment_id || entry.assignmentId || "").trim().toUpperCase();
+    const entryChapter = normalizeChapter(entry.chapter);
+
+    if (canonicalId && entryAssignmentId !== canonicalId) return false;
+    if (!canonicalId && chapterToken && entryChapter !== chapterToken) return false;
     if (modeToken && entry.mode !== modeToken) return false;
     if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
     return true;
   });
 
   const prioritized = matches.sort((a, b) => {
+    if (a.__isNestedResource !== b.__isNestedResource) return a.__isNestedResource ? -1 : 1;
     if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
-    return Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+    return Number(a.__lookupOrder || 0) - Number(b.__lookupOrder || 0);
   });
 
   const entry = prioritized[0] || null;
   return entry
     ? {
         ...entry,
+        topic: collapseRepeatedTitleParts(entry.topic || entry.title),
+        title: collapseRepeatedTitleParts(entry.title || entry.topic),
         assignment: entry.assignment === true,
-        canonicalAssignmentId: entry.assignment_id,
+        canonicalAssignmentId: entry.assignment_id || "",
       }
     : null;
 };
