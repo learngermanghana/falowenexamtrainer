@@ -2308,6 +2308,60 @@ const getDefaultInstruction = (instruction, level) => {
   return instruction;
 };
 
+
+const getCanonicalCurriculumEntry = ({ level, day, chapter, assignmentId }) => {
+  const entries = getCurriculumEntriesForLevel(level);
+  const normalizedChapter = String(chapter || "").trim();
+  const normalizedAssignmentId = String(assignmentId || "").trim().toUpperCase();
+  return entries.find((entry) =>
+    (Number(entry.day ?? entry.assignmentDay) === Number(day) && String(entry.chapter || "").trim() === normalizedChapter) ||
+    (normalizedAssignmentId && String(entry.assignment_id || entry.assignmentId || "").trim().toUpperCase() === normalizedAssignmentId)
+  ) || null;
+};
+
+const overlayCanonicalCurriculumResources = ({ entry, level, lesen_hören, schreiben_sprechen }) => {
+  const canonical = getCanonicalCurriculumEntry({
+    level,
+    day: entry?.day,
+    chapter: entry?.chapter,
+    assignmentId: entry?.assignmentId,
+  });
+  if (!canonical) return { entry, lesen_hören, schreiben_sprechen };
+
+  const patchResource = (resource) => {
+    if (!resource || typeof resource !== "object") return resource;
+    return {
+      ...resource,
+      video: canonical.video || resource.video || null,
+      youtube_link: canonical.video || resource.youtube_link || resource.video || null,
+      grammarbook_link: canonical.grammarPage || resource.grammarbook_link || resource.grammar_link || null,
+      grammar_link: canonical.grammarPage || resource.grammar_link || resource.grammarbook_link || null,
+      workbook_link: canonical.workbookRoute || resource.workbook_link || null,
+      assignment: canonical.submissionRequired,
+      assignmentId: canonical.assignment_id,
+      assignment_id: canonical.assignment_id,
+    };
+  };
+
+  return {
+    entry: {
+      ...entry,
+      topic: canonical.title || entry.topic,
+      title: canonical.title || entry.title,
+      assignmentTitle: canonical.title || entry.assignmentTitle,
+      assignment: canonical.submissionRequired,
+      progressionEligible: canonical.progressionEligible,
+      assignmentId: canonical.assignment_id,
+      assignment_id: canonical.assignment_id,
+      grammarPage: canonical.grammarPage,
+      workbookRoute: canonical.workbookRoute,
+      video: canonical.video,
+    },
+    lesen_hören: Array.isArray(lesen_hören) ? lesen_hören.map(patchResource) : patchResource(lesen_hören),
+    schreiben_sprechen: Array.isArray(schreiben_sprechen) ? schreiben_sprechen.map(patchResource) : patchResource(schreiben_sprechen),
+  };
+};
+
 const resolveA1TopicName = (entry, lesen_hören, schreiben_sprechen) => {
   if (!entry || typeof entry !== "object") return entry?.topic || "";
 
@@ -2383,21 +2437,30 @@ const normalizeCourseSchedules = (schedules) =>
                 ? DEFAULT_INSTRUCTION_DE
                 : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
+          const canonicalOverlay = overlayCanonicalCurriculumResources({
+            entry: entryWithAssignmentId,
+            level,
+            lesen_hören,
+            schreiben_sprechen,
+          });
+          const canonicalEntry = canonicalOverlay.entry;
+          const canonicalLesenHoeren = canonicalOverlay.lesen_hören;
+          const canonicalSchreibenSprechen = canonicalOverlay.schreiben_sprechen;
           const resolvedTopic =
             level === "A1"
-              ? resolveA1TopicName(entryWithAssignmentId, lesen_hören, schreiben_sprechen)
-              : entryWithAssignmentId.topic;
+              ? resolveA1TopicName(canonicalEntry, canonicalLesenHoeren, canonicalSchreibenSprechen)
+              : canonicalEntry.topic;
 
           return {
-            ...entryWithAssignmentId,
-            assignment: isA1PracticalTopic(entryWithAssignmentId, level) ? false : entryWithAssignmentId.assignment,
+            ...canonicalEntry,
+            assignment: isA1PracticalTopic(canonicalEntry, level) ? false : canonicalEntry.assignment,
             topic: resolvedTopic,
             instruction:
               needsSelfPracticeNote && levelSpecificInstruction && !hasNote
                 ? `${levelSpecificInstruction} ${SELF_PRACTICE_NOTE}`
                 : levelSpecificInstruction,
-            lesen_hören,
-            schreiben_sprechen,
+            lesen_hören: canonicalLesenHoeren,
+            schreiben_sprechen: canonicalSchreibenSprechen,
           };
         }),
       ];
