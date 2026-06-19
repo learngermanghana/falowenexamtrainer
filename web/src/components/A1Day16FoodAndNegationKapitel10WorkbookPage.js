@@ -185,7 +185,7 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ margin: 0, fontWeight: 600 }}>Submit your answers in the submission area after finishing all parts.</p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}

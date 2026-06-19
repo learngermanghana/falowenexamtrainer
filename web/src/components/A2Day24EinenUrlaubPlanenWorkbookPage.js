@@ -409,7 +409,7 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7, color: "#1e3a8a" }}>
           Submit your final answers in the submission area. Do not submit answers directly on this workbook page.
         </p>
-        <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer">
+        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer">
           Go to submission area
         </a>
       </div>

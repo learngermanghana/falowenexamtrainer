@@ -81,12 +81,8 @@ const CourseResourceViewerPage = () => {
   const inferredAssignmentKey = useMemo(() => inferAssignmentKeyFromWorkbookUrl(resourceUrl), [resourceUrl]);
   const embedUrl = useMemo(() => toEmbeddableUrl(resourceUrl), [resourceUrl]);
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
-  const submitPath = inferredAssignmentKey
-    ? `/campus/submit?assignmentKey=${encodeURIComponent(inferredAssignmentKey)}&assignmentId=${encodeURIComponent(inferredAssignmentKey)}`
-    : "/campus/submit";
   const campusQuickTabs = [
     { key: "course", label: "My Course", path: "/campus/course" },
-    { key: "submit", label: "Submit", path: submitPath },
     { key: "examFile", label: "My Exam File", path: "/campus/examFile" },
     { key: "results", label: "Results", path: "/campus/results" },
     { key: "discussion", label: "Discussion", path: "/campus/discussion" },

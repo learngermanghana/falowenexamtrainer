@@ -213,7 +213,7 @@ const A1ReadingPage = () => {
 
       {/* BUTTON */}
       <a
-        href="https://www.falowen.app/campus/submit"
+        href="/campus/course?submitWork=1"
         style={{ ...styles.button, textDecoration: "none", display: "inline-flex", justifyContent: "center" }}
       >
         Submit Assignment

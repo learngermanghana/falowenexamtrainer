@@ -463,7 +463,7 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
           Submit all answers in the submission area. Do not submit answers directly on this workbook page.
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, textDecoration: "none", justifySelf: "start" }}

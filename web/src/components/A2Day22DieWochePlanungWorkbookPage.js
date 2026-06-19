@@ -394,7 +394,7 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
           After you complete all Teile, submit your final answers in the submission area. Do not submit answers directly
           on this workbook page.
         </p>
-        <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer" style={{ ...styles.button, width: "fit-content" }}>
+        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer" style={{ ...styles.button, width: "fit-content" }}>
           Go to Submission Area
         </a>
       </section>

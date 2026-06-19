@@ -159,7 +159,7 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
           Finished the workbook? Please submit all answers in the submission area.
         </p>
         <a
-          href="https://www.falowen.app/campus/submit"
+          href="/campus/course?submitWork=1"
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}

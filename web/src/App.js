@@ -280,7 +280,7 @@ function App() {
 
   const allowedSections = useMemo(
     () => ({
-      submit: !isSelfLearningTrack,
+      submit: isStaff,
       course: true,
       examFile: (isEnrolled || isStaff) && !isSelfLearningTrack,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
@@ -1105,6 +1105,7 @@ const CampusArea = ({
   const { t } = useTranslation();
   const { section } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const resolvedSection = useMemo(
     () =>
@@ -1120,14 +1121,14 @@ const CampusArea = ({
   );
 
   useEffect(() => {
-    if (resolvedSection === "submit") {
-      navigate("/campus/course?submitWork=1", { replace: true });
+    if (section === "submit" && !allowedSections.submit) {
+      navigate(`/campus/course?submitWork=1&legacySubmitRedirect=1${location.search ? `&${location.search.slice(1)}` : ""}`, { replace: true });
       return;
     }
     if (!section || section !== resolvedSection) {
       navigate(`/campus/${resolvedSection}`, { replace: true });
     }
-  }, [navigate, resolvedSection, section]);
+  }, [allowedSections.submit, location.search, navigate, resolvedSection, section]);
 
   useEffect(() => {
     if (!tabStorageKey || !getMainTabForSection(resolvedSection, tabStructure)) return;

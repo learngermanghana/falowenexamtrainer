@@ -574,12 +574,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
   const [courseSubmitOpen, setCourseSubmitOpen] = useState(false);
 
+  const query = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
+  const showLegacySubmitRedirectMessage = query.get("legacySubmitRedirect") === "1";
+
   useEffect(() => {
-    const query = new URLSearchParams(location.search || "");
     if (query.get("submitWork") === "1") {
       setCourseSubmitOpen(true);
     }
-  }, [location.search]);
+  }, [query]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
@@ -724,6 +726,24 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       </div>
 
       {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
+
+      {showLegacySubmitRedirectMessage ? (
+        <section
+          role="status"
+          style={{
+            ...styles.card,
+            borderColor: "#bfdbfe",
+            background: "#eff6ff",
+            color: "#1e3a8a",
+            padding: 14,
+          }}
+        >
+          <strong>Assignments are now submitted inside the Course Book.</strong>
+          <p style={{ margin: "4px 0 0", color: "#1d4ed8" }}>
+            We kept your old Submit Assignment link working and brought you here so you can continue from the correct workbook lesson.
+          </p>
+        </section>
+      ) : null}
 
       {activeSubTab === "courseBook" ? (
         <>

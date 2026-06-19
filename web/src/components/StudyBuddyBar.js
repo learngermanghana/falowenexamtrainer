@@ -512,15 +512,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
       {
-        key: "submit",
-        label: t("studyBuddy.shortcuts.submit"),
-        action: () => {
-          playOpenFeedback();
-          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "submit", shortcutLabel: t("studyBuddy.shortcuts.submit"), destination: "/campus/submit" });
-          navigate("/campus/submit");
-        },
-      },
-      {
         key: "ai",
         label: t("studyBuddy.shortcuts.ai"),
         action: () => {
