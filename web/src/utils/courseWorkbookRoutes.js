@@ -1,5 +1,6 @@
 import { courseSchedules } from "../data/courseSchedule";
 import { resolveInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
+import { resolveStrictInAppWorkbookRoute } from "../data/strictInAppWorkbookRoutes";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -24,13 +25,16 @@ const getWorkbookResources = (entry = {}) => [
 
 export const buildWorkbookRouteIndex = (schedules = courseSchedules) => {
   const index = new Map();
+  const resolveRoute = schedules === courseSchedules
+    ? resolveStrictInAppWorkbookRoute
+    : resolveInAppWorkbookRoute;
 
   Object.entries(schedules).forEach(([level, entries]) => {
     toArray(entries).forEach((entry) => {
       getWorkbookResources(entry).forEach((resource) => {
         const originalRoute = resource?.workbook_link || resource?.workbookRoute || "";
         const originalPath = normalizeInAppPath(originalRoute);
-        const resolvedRoute = resolveInAppWorkbookRoute({
+        const resolvedRoute = resolveRoute({
           level,
           day: entry?.day,
           chapter: resource?.chapter || entry?.chapter,
