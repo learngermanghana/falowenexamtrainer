@@ -1,22 +1,19 @@
+const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
 
 (async () => {
   const repoRoot = path.resolve(__dirname, '..');
-  const webManifestPath = path.join(repoRoot, 'web/src/data/curriculumManifest.js');
-  const functionsManifestPath = path.join(repoRoot, 'functions/data/curriculumManifest.js');
+  const canonical = JSON.parse(fs.readFileSync(path.join(repoRoot, 'shared/curriculumCanonical.json'), 'utf8'));
+  const webModule = await import(pathToFileURL(path.join(repoRoot, 'web/src/data/curriculumManifest.js')));
+  const functionsModule = require(path.join(repoRoot, 'functions/data/curriculumManifest.js'));
 
-  const webModule = await import(pathToFileURL(webManifestPath));
-  const functionsModule = require(functionsManifestPath);
-
-  const webEntries = webModule.CURRICULUM_ENTRIES || [];
-  const functionEntries = functionsModule.CURRICULUM_ENTRIES || [];
-
-  if (JSON.stringify(webEntries) === JSON.stringify(functionEntries)) {
-    console.log('Curriculum manifests are in sync.');
+  const webCanonical = webModule.CANONICAL_CURRICULUM || [];
+  const functionsCanonical = functionsModule.CANONICAL_CURRICULUM || [];
+  if (JSON.stringify(canonical) === JSON.stringify(webCanonical) && JSON.stringify(canonical) === JSON.stringify(functionsCanonical)) {
+    console.log('Curriculum manifests are generated from the canonical source of truth.');
     process.exit(0);
   }
-
-  console.error('Curriculum manifest drift detected between web and functions copies. Run: node scripts/syncCurriculumManifest.js');
+  console.error('Curriculum manifest drift detected. Run: npm run sync:curriculum');
   process.exit(1);
 })();
