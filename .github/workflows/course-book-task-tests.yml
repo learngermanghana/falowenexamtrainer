@@ -1,0 +1,24 @@
+name: Course book task tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  focused-tests:
+    if: github.head_ref == 'fix/course-book-task-cards-submit-tabs'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: web
+        run: npm ci
+      - name: Run course book tests
+        working-directory: web
+        run: CI=true npm test -- --watchAll=false --runInBand src/utils/courseBookEntries.test.js src/components/CourseLessonInlineSubmission.test.js
