@@ -1,5 +1,4 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 
 export const DAY0_PATH_CONFIG = [
@@ -209,9 +208,8 @@ const SelfLearningGuidance = ({ config }) => (
   </>
 );
 
-const Day0StudentWorkflowUpgrade = () => {
-  const location = useLocation();
-  const config = DAY0_PATH_CONFIG.find((item) => location.pathname === item.match);
+const Day0StudentWorkflowUpgrade = ({ pathname = "" }) => {
+  const config = DAY0_PATH_CONFIG.find((item) => pathname === item.match);
   if (!config) return null;
 
   const isSelfLearning = config.mode === "selfLearning";
