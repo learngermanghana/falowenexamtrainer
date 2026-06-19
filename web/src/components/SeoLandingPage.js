@@ -54,23 +54,41 @@ const HighlightCard = ({ title, description }) => (
 
 const faq = [
   {
-    question: "Is Falowen available in Ghana and Nigeria?",
+    question: "Is Falowen available in Ghana, Nigeria, Sierra Leone, and wider Africa?",
     answer:
-      "Yes. Falowen supports learners in Ghana and Nigeria with live online classes, WhatsApp support, and flexible schedules.",
+      "Yes. Falowen supports German learners in Ghana, Nigeria, Sierra Leone, and other African countries with online cohorts, self-learning options, WhatsApp support, and flexible schedules.",
   },
   {
     question: "What level of German do you teach?",
     answer:
-      "We teach beginner to intermediate levels (A1 to B1), with structured practice for speaking, writing, and vocabulary.",
+      "Falowen supports German learners from A1 to C1 with live classes, self-learning tracks, recorded teacher videos, workbooks, grammar support, exam preparation, and AI-assisted practice.",
   },
   {
     question: "Do I need prior German knowledge?",
     answer:
-      "No. Beginners can start at A1 and follow the cohort learning plan with guided lessons and practice.",
+      "No. Beginners can start at A1, while continuing learners can join the right A2, B1, B2, or C1 path after placement guidance.",
   },
 ];
 
-const SeoLandingPage = ({ onSignUp, onLogin }) => {
+const seoCountryPaths = {
+  "/learn-german-ghana": "Ghana",
+  "/learn-german-nigeria": "Nigeria",
+  "/learn-german-sierra-leone": "Sierra Leone",
+  "/learn-german-africa": "Africa",
+};
+
+const coreFeatures = [
+  "German levels A1, A2, B1, B2, and C1",
+  "Falowen Radio listening practice",
+  "AI grammar video support",
+  "Teacher-recorded lesson videos",
+  "Improved workbooks and grammar notes",
+  "Attendance tracking and progress records",
+  "Exam preparation for speaking, writing, reading, and listening",
+  "Study Buddy with AI support",
+];
+
+const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
   const [leadCaptureOpen, setLeadCaptureOpen] = useState(false);
 
   const handleLeadSubmit = (payload) => {
@@ -78,8 +96,11 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
   };
 
   useEffect(() => {
+    const currentPath = typeof window !== "undefined" ? window.location.pathname : "/learn-german-ghana";
+    const canonicalPath = seoCountryPaths[currentPath] ? currentPath : "/learn-german-ghana";
+    const marketLabel = market || seoCountryPaths[canonicalPath] || "Ghana";
     const descriptionContent =
-      "Falowen offers German lessons in Ghana and Nigeria with live classes, tutor feedback, and exam-focused practice. Join a cohort to learn German the right way.";
+      `Learn German in ${marketLabel} with Falowen: A1 to C1 courses, live and recorded teacher lessons, AI grammar videos, Falowen Radio, workbooks, attendance tracking, exam prep, and an AI Study Buddy.`;
 
     const organizationSchema = {
       "@context": "https://schema.org",
@@ -92,7 +113,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
         "https://www.youtube.com/@LLEAGhana",
         "https://web.facebook.com/lleaghana",
       ],
-      areaServed: ["Ghana", "Nigeria"],
+      areaServed: ["Ghana", "Nigeria", "Sierra Leone", "Africa"],
     };
 
     const serviceSchema = {
@@ -104,8 +125,23 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
         name: "Falowen",
       },
       serviceType: "German language training",
-      areaServed: ["Ghana", "Nigeria"],
-      url: "https://www.falowen.app/learn-german-ghana",
+      areaServed: ["Ghana", "Nigeria", "Sierra Leone", "Africa"],
+      url: `https://www.falowen.app${canonicalPath}`,
+      audience: {
+        "@type": "Audience",
+        audienceType: "German language learners in Africa",
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Falowen German learning features",
+        itemListElement: coreFeatures.map((feature) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: feature,
+          },
+        })),
+      },
       offers: {
         "@type": "Offer",
         availability: "https://schema.org/OnlineOnly",
@@ -126,9 +162,9 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
     };
 
     updatePageMeta({
-      title: "Learn German in Ghana & Nigeria | Falowen",
+      title: `Learn German in ${marketLabel} & Africa | A1-C1 German Classes | Falowen`,
       description: descriptionContent,
-      canonicalPath: "/learn-german-ghana",
+      canonicalPath,
       ogType: "website",
       structuredData: [
         { id: "organization", schema: organizationSchema },
@@ -136,28 +172,28 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
         { id: "faq", schema: faqSchema },
       ],
     });
-  }, []);
+  }, [market]);
 
   const highlights = [
     {
-      title: "Local support in Ghana & Nigeria",
+      title: "Local support in Ghana, Nigeria & Sierra Leone",
       description:
-        "Falowen works with learners in Ghana and Nigeria, so schedules, payment support, and communication are built for West Africa.",
+        "Falowen works with learners in Ghana, Nigeria, Sierra Leone, and across Africa, so schedules, payment support, and communication are built for West African learners.",
     },
     {
       title: "Exam-ready German training",
       description:
-        "We focus on speaking, writing, and vocabulary tasks that mirror Goethe-style exams so you feel confident on test day.",
+        "We support A1 to C1 German with speaking, writing, reading, listening, attendance tracking, and exam-style tasks so you feel confident on test day.",
     },
     {
       title: "Tutor feedback that keeps you improving",
       description:
-        "Submit your writing or speaking tasks and get tutor feedback during live sessions to correct mistakes early.",
+        "Use teacher-recorded videos, improved workbook and grammar lessons, Falowen Radio, AI grammar videos, and the AI Study Buddy to correct mistakes early.",
     },
   ];
 
   const steps = [
-    "Pick your level (A1, A2, B1) and preferred schedule.",
+    "Pick your level (A1, A2, B1, B2, or C1) and preferred schedule.",
     "Join a cohort and get onboarding support from our team.",
     "Complete daily practice tasks on your phone or laptop.",
     "Attend live classes and receive tutor feedback.",
@@ -195,14 +231,17 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               <Pill>German lessons in Ghana</Pill>
               <Pill>German lessons in Nigeria</Pill>
+              <Pill>German lessons in Sierra Leone</Pill>
+              <Pill>A1 to C1 German</Pill>
               <Pill>Exam preparation</Pill>
             </div>
             <h1 style={{ margin: 0, fontSize: 34 }}>
-              Falowen: The right place to learn German in Ghana and Nigeria.
+              Falowen: Learn German in Ghana, Nigeria, Sierra Leone, and across Africa.
             </h1>
             <p style={{ margin: 0, fontSize: 15, color: "#e0e7ff", lineHeight: 1.7 }}>
-              Falowen helps learners across Ghana and Nigeria gain real German fluency with live classes, tutor feedback,
-              and daily practice. Build speaking confidence, improve writing, and prepare for German certification exams.
+              Falowen helps learners across Ghana, Nigeria, Sierra Leone, and Africa gain real German fluency from A1 to C1.
+              Study with live classes, teacher-recorded videos, Falowen Radio, AI grammar video support, improved workbooks,
+              attendance tracking, exam preparation, and a Study Buddy with AI.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
@@ -225,15 +264,17 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
           <div style={{ display: "grid", gap: 10 }}>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Why Falowen stands out</h2>
             <p style={{ margin: 0, fontSize: 13, color: "#4b5563", lineHeight: 1.7 }}>
-              We combine structured German lessons with instructor feedback. You will practice real-life conversation,
-              exam-style tasks, and daily vocabulary. Our learning system is built to support busy learners in Ghana and
-              Nigeria who want results quickly.
+              We combine structured German lessons with instructor feedback, recorded teacher videos, AI grammar support,
+              Falowen Radio listening practice, improved workbooks, and exam preparation. Our learning system is built to
+              support busy learners in Ghana, Nigeria, Sierra Leone, and wider Africa who want results quickly.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               <Pill>Live Zoom classes</Pill>
-              <Pill>WhatsApp support</Pill>
-              <Pill>Weekly tutor reviews</Pill>
-              <Pill>Flexible schedules</Pill>
+              <Pill>Teacher-recorded videos</Pill>
+              <Pill>Falowen Radio</Pill>
+              <Pill>AI grammar video</Pill>
+              <Pill>Attendance tracking</Pill>
+              <Pill>Study Buddy with AI</Pill>
             </div>
           </div>
           <div style={{ display: "grid", gap: 8 }}>
@@ -243,6 +284,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               <li>Writing letters, emails, and exam responses.</li>
               <li>Vocabulary for daily life, work, and travel.</li>
               <li>Pronunciation coaching with tutor feedback.</li>
+              <li>AI-supported grammar review and teacher-recorded revision videos.</li>
             </ul>
           </div>
         </SectionCard>
@@ -372,7 +414,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               Ready to learn German with Falowen?
             </h2>
             <p style={{ margin: 0, fontSize: 13, color: "#cbd5f5", lineHeight: 1.7 }}>
-              We help learners in Ghana and Nigeria build confidence in German. Join a cohort or contact our team for the
+              We help learners in Ghana, Nigeria, Sierra Leone, and across Africa build confidence in German. Join a cohort or contact our team for the
               next available class.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>

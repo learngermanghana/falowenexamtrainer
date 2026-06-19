@@ -391,9 +391,17 @@ function App() {
     return <PaymentComplete />;
   }
 
-  if (location.pathname === "/learn-german-ghana") {
+  const seoMarkets = {
+    "/learn-german-ghana": "Ghana",
+    "/learn-german-nigeria": "Nigeria",
+    "/learn-german-sierra-leone": "Sierra Leone",
+    "/learn-german-africa": "Africa",
+  };
+
+  if (seoMarkets[location.pathname]) {
     return (
       <SeoLandingPage
+        market={seoMarkets[location.pathname]}
         onSignUp={() => {
           setSignupProgram("german");
           setAuthMode("signup");
