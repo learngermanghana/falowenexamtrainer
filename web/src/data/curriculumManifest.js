@@ -112,7 +112,10 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 0,
+    "displayChapter": "Tutorial",
+    "displayLabel": "Day 0 Tutorial"
   },
   {
     "level": "A1",
@@ -136,12 +139,15 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-0.1"
       }
-    ]
+    ],
+    "displayDay": 1,
+    "displayChapter": "0.1",
+    "displayLabel": "Day 1 0.1"
   },
   {
     "level": "A1",
     "day": 2,
-    "chapter": "0.2_1.1",
+    "chapter": "0.2",
     "title": "German Alphabet",
     "assignmentId": "A1-0.2",
     "assignmentType": "Lesen & Hören",
@@ -159,7 +165,25 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
         "submissionRequired": true,
         "assignmentId": "A1-0.2"
-      },
+      }
+    ],
+    "displayDay": 2,
+    "displayChapter": "0.2",
+    "displayLabel": "Day 2 0.2"
+  },
+  {
+    "level": "A1",
+    "day": 3,
+    "chapter": "1.1",
+    "title": "Personal Pronouns and Verb Conjugation",
+    "assignmentId": "A1-1.1",
+    "assignmentType": "Lesen & Hören",
+    "grammarPage": "/campus/course/singular-pronouns-verb-conjugation-day-2",
+    "workbookRoute": "/campus/course/a1-day-2-kapitel-1-1-workbook",
+    "video": "https://youtu.be/AjsnO1hxDs4",
+    "submissionRequired": true,
+    "progressionEligible": true,
+    "resources": [
       {
         "chapter": "1.1",
         "title": "Personal Pronouns and Verb Conjugation",
@@ -169,20 +193,23 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-1.1"
       }
-    ]
+    ],
+    "displayDay": 2,
+    "displayChapter": "1.1",
+    "displayLabel": "Day 2 1.1"
   },
   {
     "level": "A1",
-    "day": 3,
-    "chapter": "1.1_1.2",
-    "title": "Personal Pronouns and Verb Conjugation + Introducing Yourself",
-    "assignmentId": "A1-1.2",
-    "assignmentType": "Lesen & Hören",
+    "day": 4,
+    "chapter": "1.1",
+    "title": "Personal Pronouns and Verb Conjugation self-practice",
+    "assignmentId": "A1-1.1-practice",
+    "assignmentType": "Schreiben & Sprechen",
     "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
-    "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
-    "video": "",
-    "submissionRequired": true,
-    "progressionEligible": true,
+    "workbookRoute": "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+    "video": "https://youtu.be/iZDv1rcYWsQ",
+    "submissionRequired": false,
+    "progressionEligible": false,
     "resources": [
       {
         "kind": "schreiben_sprechen",
@@ -191,8 +218,27 @@ const CANONICAL_CURRICULUM = [
         "video": "https://youtu.be/iZDv1rcYWsQ",
         "grammarPage": "",
         "workbookRoute": "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-        "submissionRequired": false
-      },
+        "submissionRequired": false,
+        "assignment": false
+      }
+    ],
+    "displayDay": 3,
+    "displayChapter": "1.1",
+    "displayLabel": "Day 3 1.1"
+  },
+  {
+    "level": "A1",
+    "day": 5,
+    "chapter": "1.2",
+    "title": "Introducing Yourself",
+    "assignmentId": "A1-1.2",
+    "assignmentType": "Lesen & Hören",
+    "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
+    "workbookRoute": "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+    "video": "",
+    "submissionRequired": true,
+    "progressionEligible": true,
+    "resources": [
       {
         "kind": "lesen_hören",
         "chapter": "1.2",
@@ -203,11 +249,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-1.2"
       }
-    ]
+    ],
+    "displayDay": 3,
+    "displayChapter": "1.2",
+    "displayLabel": "Day 3 1.2"
   },
   {
     "level": "A1",
-    "day": 4,
+    "day": 6,
     "chapter": "2",
     "title": "Numbers",
     "assignmentId": "A1-2",
@@ -227,11 +276,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-2"
       }
-    ]
+    ],
+    "displayDay": 4,
+    "displayChapter": "2",
+    "displayLabel": "Day 4 2"
   },
   {
     "level": "A1",
-    "day": 5,
+    "day": 7,
     "chapter": "1.3",
     "title": "Personal Information, Articles, Adjectives and W-Questions",
     "assignmentId": "A1-1.3",
@@ -250,11 +302,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 5,
+    "displayChapter": "1.3",
+    "displayLabel": "Day 5 1.3"
   },
   {
     "level": "A1",
-    "day": 6,
+    "day": 8,
     "chapter": "2.3",
     "title": "Family and Hobbies",
     "assignmentId": "A1-2.3",
@@ -273,11 +328,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/a1-day-6-family-and-hobbies-workbook",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 6,
+    "displayChapter": "2.3",
+    "displayLabel": "Day 6 2.3"
   },
   {
     "level": "A1",
-    "day": 7,
+    "day": 9,
     "chapter": "3",
     "title": "Asking About Prices",
     "assignmentId": "A1-3",
@@ -297,11 +355,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-3"
       }
-    ]
+    ],
+    "displayDay": 7,
+    "displayChapter": "3",
+    "displayLabel": "Day 7 3"
   },
   {
     "level": "A1",
-    "day": 8,
+    "day": 10,
     "chapter": "4",
     "title": "Countries and Languages",
     "assignmentId": "A1-4",
@@ -321,11 +382,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-4"
       }
-    ]
+    ],
+    "displayDay": 8,
+    "displayChapter": "4",
+    "displayLabel": "Day 8 4"
   },
   {
     "level": "A1",
-    "day": 9,
+    "day": 11,
     "chapter": "5",
     "title": "German Cases",
     "assignmentId": "A1-5",
@@ -345,11 +409,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-5"
       }
-    ]
+    ],
+    "displayDay": 9,
+    "displayChapter": "5",
+    "displayLabel": "Day 9 5"
   },
   {
     "level": "A1",
-    "day": 10,
+    "day": 12,
     "chapter": "6",
     "title": "Objects and Colors",
     "assignmentId": "A1-6",
@@ -369,11 +436,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-6"
       }
-    ]
+    ],
+    "displayDay": 10,
+    "displayChapter": "6",
+    "displayLabel": "Day 10 6"
   },
   {
     "level": "A1",
-    "day": 11,
+    "day": 13,
     "chapter": "7",
     "title": "Understanding Time",
     "assignmentId": "A1-7",
@@ -393,11 +463,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-7"
       }
-    ]
+    ],
+    "displayDay": 11,
+    "displayChapter": "7",
+    "displayLabel": "Day 11 7"
   },
   {
     "level": "A1",
-    "day": 12,
+    "day": 14,
     "chapter": "8",
     "title": "24 Hour Clock",
     "assignmentId": "A1-8",
@@ -417,11 +490,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-8"
       }
-    ]
+    ],
+    "displayDay": 12,
+    "displayChapter": "8",
+    "displayLabel": "Day 12 8"
   },
   {
     "level": "A1",
-    "day": 13,
+    "day": 15,
     "chapter": "3.5",
     "title": "Revision",
     "assignmentId": "A1-3.5",
@@ -440,11 +516,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 13,
+    "displayChapter": "3.5",
+    "displayLabel": "Day 13 3.5"
   },
   {
     "level": "A1",
-    "day": 14,
+    "day": 16,
     "chapter": "3.6",
     "title": "Modal Verbs",
     "assignmentId": "A1-3.6",
@@ -463,11 +542,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 14,
+    "displayChapter": "3.6",
+    "displayLabel": "Day 14 3.6"
   },
   {
     "level": "A1",
-    "day": 15,
+    "day": 17,
     "chapter": "4.7",
     "title": "Introduction to Speaking Exams",
     "assignmentId": "A1-4.7",
@@ -486,11 +568,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "https://www.falowen.app/campus/course/speaking-exams-intro-4-7",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 15,
+    "displayChapter": "4.7",
+    "displayLabel": "Day 15 4.7"
   },
   {
     "level": "A1",
-    "day": 16,
+    "day": 18,
     "chapter": "9",
     "title": "Food and Negation",
     "assignmentId": "A1-9",
@@ -510,11 +595,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-9"
       }
-    ]
+    ],
+    "displayDay": 16,
+    "displayChapter": "9",
+    "displayLabel": "Day 16 9"
   },
   {
     "level": "A1",
-    "day": 17,
+    "day": 19,
     "chapter": "11",
     "title": "Instructions",
     "assignmentId": "A1-11",
@@ -534,11 +622,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-11"
       }
-    ]
+    ],
+    "displayDay": 17,
+    "displayChapter": "11",
+    "displayLabel": "Day 17 11"
   },
   {
     "level": "A1",
-    "day": 18,
+    "day": 20,
     "chapter": "12.1",
     "title": "Two Case Prepositions",
     "assignmentId": "A1-12.1",
@@ -558,11 +649,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-12.1"
       }
-    ]
+    ],
+    "displayDay": 18,
+    "displayChapter": "12.1",
+    "displayLabel": "Day 18 12.1"
   },
   {
     "level": "A1",
-    "day": 19,
+    "day": 21,
     "chapter": "5.9",
     "title": "Goethe A1 Speaking Confidence Lab",
     "assignmentId": "A1-5.9",
@@ -581,11 +675,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 19,
+    "displayChapter": "5.9",
+    "displayLabel": "Day 19 5.9"
   },
   {
     "level": "A1",
-    "day": 20,
+    "day": 22,
     "chapter": "12.3",
     "title": "Introduction to Letter Writing 12.3",
     "assignmentId": "A1-12.3",
@@ -605,11 +702,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-12.3"
       }
-    ]
+    ],
+    "displayDay": 20,
+    "displayChapter": "12.3",
+    "displayLabel": "Day 20 12.3"
   },
   {
     "level": "A1",
-    "day": 21,
+    "day": 23,
     "chapter": "13",
     "title": "Weather",
     "assignmentId": "A1-13",
@@ -629,11 +729,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-13"
       }
-    ]
+    ],
+    "displayDay": 21,
+    "displayChapter": "13",
+    "displayLabel": "Day 21 13"
   },
   {
     "level": "A1",
-    "day": 22,
+    "day": 24,
     "chapter": "14.1",
     "title": "Health",
     "assignmentId": "A1-14.1",
@@ -653,11 +756,14 @@ const CANONICAL_CURRICULUM = [
         "submissionRequired": true,
         "assignmentId": "A1-14.1"
       }
-    ]
+    ],
+    "displayDay": 22,
+    "displayChapter": "14.1",
+    "displayLabel": "Day 22 14.1"
   },
   {
     "level": "A1",
-    "day": 23,
+    "day": 25,
     "chapter": "14.2",
     "title": "Dative and Accusative Verbs",
     "assignmentId": "A1-14.2",
@@ -676,11 +782,14 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 23,
+    "displayChapter": "14.2",
+    "displayLabel": "Day 23 14.2"
   },
   {
     "level": "A1",
-    "day": 24,
+    "day": 26,
     "chapter": "5.10",
     "title": "Conjunctions",
     "assignmentId": "A1-5.10",
@@ -699,7 +808,10 @@ const CANONICAL_CURRICULUM = [
         "workbookRoute": "/campus/course/conjunctions-5-10",
         "submissionRequired": false
       }
-    ]
+    ],
+    "displayDay": 24,
+    "displayChapter": "5.10",
+    "displayLabel": "Day 24 5.10"
   },
   {
     "level": "A2",
