@@ -1,0 +1,30 @@
+name: A1 A2 workbook routes
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/inAppWorkbookRoutes.json"
+      - "web/src/data/inAppWorkbookRoutes.js"
+      - "web/src/data/strictInAppWorkbookRoutes.js"
+      - "web/src/data/lessonModel.js"
+      - "web/src/utils/courseWorkbookRoutes.js"
+      - "web/src/components/AutoWorkbookStartGuide.test.js"
+
+jobs:
+  test-routes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+      - working-directory: web
+        run: npm run build
