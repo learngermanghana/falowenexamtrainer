@@ -729,7 +729,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   return (
     <div style={{ display: "grid", gap: 14, paddingBottom: 80 }}>
-      {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
+      {activeSubTab === "classMembers" ? (
+        isSelfLearningLevel ? (
+          <section role="status" style={{ ...styles.card, borderColor: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a", padding: 14 }}>
+            <strong>Class Members is available for tutor-guided classes.</strong>
+            <p style={{ margin: "4px 0 0", color: "#1d4ed8" }}>
+              Your self-learning course does not include a class roster. Use the Course Book to continue your workbook lessons.
+            </p>
+          </section>
+        ) : (
+          <ClassMembersTab />
+        )
+      ) : null}
 
       {showLegacySubmitRedirectMessage ? (
         <section

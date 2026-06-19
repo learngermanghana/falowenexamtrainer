@@ -44,7 +44,8 @@
       "results": "Résultats",
       "discussion": "Discussion de classe",
       "account": "Compte",
-      "attendance": "Présence"
+      "attendance": "Présence",
+      "classMembers": "Membres de classe"
     },
     "sections": {
       "courseBook": "Livre de cours",
@@ -58,7 +59,8 @@
       "speechFrench": "Entraînement à l’oral français",
       "vocab": "Entraînement au vocabulaire",
       "vocabFrench": "Vocabulaire français",
-      "attendance": "Présence"
+      "attendance": "Présence",
+      "classMembers": "Membres de classe"
     },
     "examTabs": {
       "overview": "Aperçu",

@@ -44,7 +44,8 @@
       "results": "Results",
       "discussion": "Group Discussion",
       "account": "Account",
-      "attendance": "Attendance"
+      "attendance": "Attendance",
+      "classMembers": "Class Members"
     },
     "sections": {
       "courseBook": "Course Book",
@@ -58,7 +59,8 @@
       "speechFrench": "French Speech Trainer",
       "vocab": "Vocab Practice",
       "vocabFrench": "French Vocab Practice",
-      "attendance": "Attendance"
+      "attendance": "Attendance",
+      "classMembers": "Class Members"
     },
     "examTabs": {
       "overview": "Overview",
