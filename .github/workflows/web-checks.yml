@@ -24,9 +24,6 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Check curriculum manifest sync
-        run: npm run check:curriculum-sync
-
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
@@ -70,3 +67,6 @@ jobs:
       - name: Build web app
         working-directory: web
         run: npm run build
+
+      - name: Check curriculum manifest sync
+        run: npm run check:curriculum-sync
