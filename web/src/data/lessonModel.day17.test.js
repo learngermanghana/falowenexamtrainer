@@ -5,7 +5,7 @@ test("A2 Day 17 replaces the old A1 modal-verbs link with the pharmacy grammar n
     {
       day: 17,
       chapter: "6.17",
-      topic: "In die Apotheke gehen 6.17",
+      topic: "In die Apotheke gehen 6.17 (Exercise)",
       assignment: true,
       lesen_hören: {
         grammarbook_link: "/campus/course/modal-verbs-day-14-3-6",

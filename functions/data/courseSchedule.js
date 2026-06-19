@@ -280,7 +280,7 @@ const A2_SCHEDULE = [
   },
   {
     day: 17,
-    topic: "In die Apotheke gehen 6.17",
+    topic: "In die Apotheke gehen 6.17 (Exercise)",
     chapter: "6.17",
     goal: "Learn phrases for the pharmacy.",
     assignment: true,

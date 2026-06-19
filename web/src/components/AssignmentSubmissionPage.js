@@ -7,7 +7,6 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
-import { getCurriculumEntriesForLevel } from "../data/germanAssignmentCatalog";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress } from "../utils/assignmentProgress";
 import { getAccessibleLevels, normalizeCourseLevel } from "../utils/levelAccess";
@@ -327,6 +326,47 @@ const toChapterSortValue = (chapter) => {
   return parts.reduce((acc, part, index) => acc + part / 10 ** (index * 2), 0);
 };
 
+
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+const getCourseScheduleEntriesForSubmitLevel = (level) => {
+  const normalizedLevel = normalizeCourseLevel(level);
+  const levelSchedule = courseSchedules[normalizedLevel] || [];
+
+  return levelSchedule.flatMap((lesson) => {
+    if (!lesson || typeof lesson !== "object") return [];
+
+    const day = Number(lesson.day || lesson.dayNumber || 0);
+    if (!Number.isFinite(day) || day < 0) return [];
+
+    const nestedAssignments = [
+      ...toLessonArray(lesson.lesen_hören),
+      ...toLessonArray(lesson.schreiben_sprechen),
+    ].filter((entry) => entry && typeof entry === "object" && entry.assignment === true);
+    const sourceEntries = nestedAssignments.length ? nestedAssignments : [lesson];
+
+    return sourceEntries.map((entry) => {
+      const chapter = String(entry.chapter || lesson.chapter || "").trim();
+      const assignmentId = entry.assignmentId || entry.assignment_id || lesson.assignmentId || lesson.assignment_id || null;
+      const topic = String(
+        entry.assignmentTitle || entry.title || entry.topic || lesson.assignmentTitle || lesson.title || lesson.topic || ""
+      ).trim();
+
+      return {
+        ...entry,
+        assignmentDay: day,
+        day,
+        chapter,
+        topic,
+        assignment_id: assignmentId,
+        assignment: entry.assignment === true || lesson.assignment === true,
+        progressionEligible: entry.progressionEligible ?? lesson.progressionEligible,
+        mode: entry.mode || lesson.mode,
+      };
+    });
+  });
+};
+
 const parseDayFromTitle = (title) => {
   const dayMatch = /^.*?\bday\s*(\d+)/i.exec(title || "");
   return dayMatch?.[1] ? Number(dayMatch[1]) : null;
@@ -471,8 +511,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     () =>
       [selectedSubmitLevel].flatMap((dictionaryLevel) => {
         const levelSchedule = courseSchedules[dictionaryLevel] || [];
-        const curriculumEntries = getCurriculumEntriesForLevel(dictionaryLevel);
-        const entriesByDay = curriculumEntries.reduce((acc, entry) => {
+        const courseEntries = getCourseScheduleEntriesForSubmitLevel(dictionaryLevel);
+        const entriesByDay = courseEntries.reduce((acc, entry) => {
           const day = Number(entry?.assignmentDay);
           if (!Number.isFinite(day) || day < 0) return acc;
           if (!acc[day]) acc[day] = [];

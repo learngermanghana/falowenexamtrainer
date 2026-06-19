@@ -52,7 +52,7 @@ export const LESSON_RADIO_DICTIONARY = {
     },
     17: {
       key: "a2-day17-in-die-apotheke-gehen-falowen-radio",
-      title: "In die Apotheke gehen 6.17",
+      title: "In die Apotheke gehen 6.17 (Exercise)",
       youtubeId: "kp7KvFmaRuo",
       duration: "",
       instruction:
