@@ -1,8 +1,10 @@
 import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDictionary";
 
 test.each([
+  [5, "NWRCe0wCSb4"],
+  [6, "ql8aR2F6tfU"],
   [9, "BD663tMiWpg"],
-  [10, "0_iGhcuysag"],
+  [10, "vpSwGAtqIlU"],
   [11, "hsR31V7Fb4U"],
   [14, "HJ60GX0pbiI"],
   [15, "WbsTFqIT058"],
@@ -14,6 +16,15 @@ test.each([
   [27, "XLyXDfsM-HY"],
 ])("A2 Day %i radio remains available", (day, id) =>
   expect(getLessonRadioResource("A2", day).youtubeId).toBe(id),
+);
+
+test("B1 Day 1 Traumwelten radio remains available", () =>
+  expect(getLessonRadioResource("B1", 1)).toEqual(
+    expect.objectContaining({
+      title: "Traumwelten (Übung) 1.1",
+      youtubeId: "PxJzLtdfJzA",
+    }),
+  ),
 );
 
 test("B2 Day 1 radio remains available", () =>
@@ -61,6 +72,8 @@ test.each([
   ["/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook", { level: "A2", day: 26 }],
   ["/campus/course/lesson/A2/27", { level: "A2", day: 27 }],
   ["/campus/course/a2-day-27-digitale-kommunikation-workbook", { level: "A2", day: 27 }],
+  ["/campus/course/lesson/B1/1", { level: "B1", day: 1 }],
+  ["/campus/course/b1-day-1-traumwelten-workbook", { level: "B1", day: 1 }],
   ["/campus/course/lesson/B2/1", { level: "B2", day: 1 }],
   ["/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook", { level: "B2", day: 1 }],
   ["/campus/course/lesson/C1/2", { level: "C1", day: 2 }],

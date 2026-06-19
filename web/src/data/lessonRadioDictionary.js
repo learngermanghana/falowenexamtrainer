@@ -76,6 +76,16 @@ export const LESSON_RADIO_DICTIONARY = {
     },
     ...ADDITIONAL_A2_RADIO_ENTRIES,
   },
+  B1: {
+    1: {
+      key: "b1-day1-traumwelten-falowen-radio",
+      title: "Traumwelten (Übung) 1.1",
+      youtubeId: "PxJzLtdfJzA",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Traumwelten ein. Danach gehst du weiter zum Lernteil.",
+    },
+  },
   B2: {
     1: {
       key: "b2-day1-persoenliche-identitaet-falowen-radio",

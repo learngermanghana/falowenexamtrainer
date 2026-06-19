@@ -23,6 +23,22 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Treffen vereinbaren ein. Danach gehst du weiter zu Teil 1.",
   },
+  5: {
+    key: "a2-day5-freizeit-falowen-radio",
+    title: "Was machst du in deiner Freizeit? 2.5",
+    youtubeId: "NWRCe0wCSb4",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Freizeit ein. Danach gehst du weiter zu Teil 1.",
+  },
+  6: {
+    key: "a2-day6-moebel-und-raeume-falowen-radio",
+    title: "Möbel und Räume kennenlernen 3.6",
+    youtubeId: "ql8aR2F6tfU",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Möbel und Räume ein. Danach gehst du weiter zu Teil 1.",
+  },
   12: {
     key: "a2-day12-mein-traumberuf-falowen-radio",
     title: "Mein Traumberuf 5.12",
