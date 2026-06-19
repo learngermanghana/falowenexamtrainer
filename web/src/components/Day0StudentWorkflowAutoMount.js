@@ -1,13 +1,9 @@
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocation } from "react-router-dom";
-import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
+import Day0StudentWorkflowUpgrade, { DAY0_PATH_CONFIG } from "./Day0StudentWorkflowUpgrade";
 
-const SUPPORTED_DAY0_PATHS = new Set([
-  "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
-  "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
-  "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
-]);
+const SUPPORTED_DAY0_PATHS = new Set(DAY0_PATH_CONFIG.map((item) => item.match));
 
 const Day0StudentWorkflowAutoMount = () => {
   const location = useLocation();
