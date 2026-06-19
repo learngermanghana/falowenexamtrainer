@@ -31,7 +31,22 @@ const C1Day13MehrsprachigkeitWorkbookPage = () => {
         <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
       </section>
 
-      {activeTab === "sprechen" && <section style={card}><h2 style={{ margin: 0 }}>Sprechen</h2><RouteSpeakingMindMap /><p style={{ margin: 0 }}>Diskutiere: <strong>Sollten Schulen mehrsprachige Kompetenzen systematisch fördern?</strong></p><ul style={listSpacing}><li>Nenne Chancen für Individuum und Gesellschaft.</li><li>Berücksichtige mögliche Herausforderungen im Bildungssystem.</li><li>Beziehe ein Gegenargument ein und entkräfte es.</li><li>Schließe mit einer klaren Position.</li></ul><SpeakingPracticeTimerCard /></section>}
+      {activeTab === "sprechen" && (
+        <section style={card}>
+          <h2 style={{ margin: 0 }}>Sprechen</h2>
+          <RouteSpeakingMindMap />
+          <p style={{ margin: 0 }}>
+            Diskutiere: <strong>Sollten Schulen mehrsprachige Kompetenzen systematisch fördern?</strong>
+          </p>
+          <ul style={listSpacing}>
+            <li>Nenne Chancen für Individuum und Gesellschaft.</li>
+            <li>Berücksichtige mögliche Herausforderungen im Bildungssystem.</li>
+            <li>Beziehe ein Gegenargument ein und entkräfte es.</li>
+            <li>Schließe mit einer klaren Position.</li>
+          </ul>
+          <SpeakingPracticeTimerCard />
+        </section>
+      )}
 
       {activeTab === "schreiben" && <section style={card}><h2 style={{ margin: 0 }}>Schreiben</h2><p style={{ margin: 0 }}><strong>Genre-Auswahl: Meinungsessay / Erörterung.</strong> {/* Thema "Mehrsprachigkeit" ist gesellschaftlich-bildungspolitisch und verlangt Abwägen von Positionen statt institutioneller Anfrage. */}</p><p style={{ margin: 0 }}><strong>Situation:</strong> Du schreibst für ein Online-Magazin einen C1-Meinungsbeitrag zur Frage, welche Rolle Mehrsprachigkeit in Schule, Arbeitsmarkt und öffentlichem Leben spielen sollte (220–280 Wörter).</p><p style={{ margin: 0 }}><strong>Pflichtpunkte (Stichpunkte):</strong></p><ul style={listSpacing}><li>zwei zentrale Vorteile von Mehrsprachigkeit mit Beispiel</li><li>mindestens eine reale Herausforderung (z. B. Ressourcen, Unterrichtsqualität, soziale Ungleichheit)</li><li>eine kritisch-distanzierte Einordnung einer fremden Position in indirekter Rede</li><li>eigene, begründete Schlussposition mit konkretem Vorschlag</li></ul><p style={{ margin: 0 }}><strong>Register/Ton:</strong> sachlich, argumentativ, differenziert (C1).</p><p style={{ margin: 0 }}><strong>Struktur:</strong> Einleitung (These + Kontext) · Hauptteil (Pro/Contra + Belege) · Schluss (Bewertung + Ausblick).</p><p style={{ margin: 0 }}><strong>Self-Check:</strong></p><ul style={listSpacing}><li>Kohärenz: Sind Argumente logisch verknüpft?</li><li>Register: Ist der Stil durchgehend formell-sachlich?</li><li>Grammatik: Nutze ich Konjunktiv I/II korrekt zur Distanzierung?</li><li>Wortschatz: Verwende ich präzise C1-Ausdrücke?</li><li>Aufgabenbezug: Habe ich alle Pflichtpunkte abgedeckt?</li></ul></section>}
 
