@@ -61,6 +61,12 @@ jobs:
           CI: true
         run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
 
+      - name: Test course titles and Day 0 workflow
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js src/components/Day0StudentWorkflowUpgrade.test.js
+
       - name: Build web app
         working-directory: web
         run: npm run build
