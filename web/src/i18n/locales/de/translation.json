@@ -44,7 +44,8 @@
       "results": "Ergebnisse",
       "discussion": "Klassendiskussion",
       "account": "Konto",
-      "attendance": "Anwesenheit"
+      "attendance": "Anwesenheit",
+      "classMembers": "Klassenmitglieder"
     },
     "sections": {
       "courseBook": "Kursbuch",
@@ -58,7 +59,8 @@
       "speechFrench": "Französisches Sprechtraining",
       "vocab": "Vokabeltraining",
       "vocabFrench": "Französisches Vokabeltraining",
-      "attendance": "Anwesenheit"
+      "attendance": "Anwesenheit",
+      "classMembers": "Klassenmitglieder"
     },
     "examTabs": {
       "overview": "Überblick",

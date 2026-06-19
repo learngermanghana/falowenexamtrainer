@@ -195,7 +195,7 @@ const getTabStructure = (program, t) => {
         { key: "course", label: t("appNav.sections.courseBook") },
         { key: "examFile", label: t("appNav.sections.examFile") },
         { key: "attendance", label: t("appNav.sections.attendance") },
-        { key: "classMembers", label: "Class Members" },
+        { key: "classMembers", label: t("appNav.sections.classMembers") },
       ],
     },
     {
@@ -295,6 +295,7 @@ function App() {
       results: isEnrolled || isStaff,
       vocab: true,
       discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
+      classMembers: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
       "tutor-marking": isStaff,
     }),
@@ -1051,6 +1052,7 @@ const LegacyAttendanceRedirect = () => {
 
 const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const activeMainTabConfig = useMemo(
     () => getMainTabForSection("course", tabStructure),
@@ -1092,16 +1094,21 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
           style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
         >
           {activeMainTabConfig.sections
-            .filter((subTab) => subTab.key === "classMembers" ? allowedSections.course : allowedSections[subTab.key])
-            .map((subTab) => (
-              <button
-                key={subTab.key}
-                style={subTab.key === "course" ? styles.navButtonActive : styles.navButton}
-                onClick={() => navigate(subTab.key === "submit" ? "/campus/course?submitWork=1" : subTab.key === "classMembers" ? "/campus/course?classMembers=1" : `/campus/${subTab.key}`)}
-              >
-                {subTab.label}
-              </button>
-            ))}
+            .filter((subTab) => allowedSections[subTab.key])
+            .map((subTab) => {
+              const searchParams = new URLSearchParams(location.search || "");
+              const isClassMembersActive = searchParams.get("classMembers") === "1";
+              const isActive = subTab.key === "classMembers" ? isClassMembersActive : subTab.key === "course" && !isClassMembersActive;
+              return (
+                <button
+                  key={subTab.key}
+                  style={isActive ? styles.navButtonActive : styles.navButton}
+                  onClick={() => navigate(subTab.key === "submit" ? "/campus/course?submitWork=1" : subTab.key === "classMembers" ? "/campus/course?classMembers=1" : `/campus/${subTab.key}`)}
+                >
+                  {subTab.label}
+                </button>
+              );
+            })}
         </div>
       ) : null}
     </>
@@ -1208,7 +1215,7 @@ const CampusArea = ({
           style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
         >
           {activeMainTabConfig.sections
-            .filter((subTab) => subTab.key === "classMembers" ? allowedSections.course : allowedSections[subTab.key])
+            .filter((subTab) => allowedSections[subTab.key])
             .map((subTab) => {
               const searchParams = new URLSearchParams(location.search || "");
               const isClassMembersActive = resolvedSection === "course" && searchParams.get("classMembers") === "1";
