@@ -1,6 +1,7 @@
 import React, { Fragment, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import { getRouteSpeakingMindMap } from "../data/speakingMindMaps/routeMindMaps";
 import SpeakingMindMap from "./SpeakingMindMap";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
@@ -39,7 +40,7 @@ const routeSpeakingMindMap = () => {
     return getA2SpeakingMindMap(1);
   }
 
-  return null;
+  return getRouteSpeakingMindMap(path);
 };
 
 const practiceConfig = {

@@ -3,6 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import RouteSpeakingMindMap from "./RouteSpeakingMindMap";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -185,6 +186,7 @@ const C1Day1WillkommenSelbstlernstartWorkbookPage = () => {
         <div style={card}>
           <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80" alt="Professional learners discussing goals in a study group" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+        <RouteSpeakingMindMap />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Thema: <strong>Stell dich vor und erkläre, warum du Deutsch auf C1 lernst.</strong>
           </p>

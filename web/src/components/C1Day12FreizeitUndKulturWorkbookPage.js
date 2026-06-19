@@ -3,6 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import RouteSpeakingMindMap from "./RouteSpeakingMindMap";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1600&q=80";
@@ -80,6 +81,7 @@ const C1Day12FreizeitUndKulturWorkbookPage = () => {
       {activeTab === "sprechen" && (
         <div style={card}>
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Self-Practice</h2>
+        <RouteSpeakingMindMap />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Bereite eine strukturierte C1-Antwort auf folgende Leitfrage vor:
           </p>

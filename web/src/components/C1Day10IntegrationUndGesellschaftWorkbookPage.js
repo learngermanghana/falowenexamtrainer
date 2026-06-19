@@ -3,6 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import RouteSpeakingMindMap from "./RouteSpeakingMindMap";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -54,6 +55,7 @@ const C1Day10IntegrationUndGesellschaftWorkbookPage = () => {
       {activeTab === "sprechen" && <div style={card}>
         <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80" alt="Community discussion about integration in a city" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h2 style={sectionTitle}>Teil 1 (Sprechen) · Self-Practice</h2>
+        <RouteSpeakingMindMap />
         <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, you reflect independently on the topic Integration und Gesellschaft. First, think through the question below on your own. Then use the speaking self-practice tool to organize your ideas, expand your vocabulary, and speak more fluently.</p>
         <p style={{ margin: 0 }}><strong>Zentrales Thema:</strong> Integration und Gesellschaft</p>
         <h3 style={sectionTitle}>Leitfrage (C1)</h3>
