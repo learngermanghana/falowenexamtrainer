@@ -2,31 +2,43 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 
-const day0PathConfig = [
-  {
-    match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
-    level: "A1",
+const levelConfigs = {
+  A1: {
+    mode: "Tutor-guided",
     video: {
       id: "qPwxBYlu3CE",
       url: "https://youtu.be/qPwxBYlu3CE",
-      title: "A1 Orientation AI video",
-      description:
-        "Watch this A1 orientation video first, then continue with the Day 0 guide and workbook.",
+      title: "A1 orientation video",
     },
   },
-  {
-    match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
-    level: "A2",
+  A2: {
+    mode: "Tutor-guided",
     video: {
       id: "mY0ArOMOV9Y",
       url: "https://youtu.be/mY0ArOMOV9Y",
-      title: "A2 Day 0 orientation video",
-      description:
-        "Watch this A2 orientation video first so you understand how to use the workbook, submit assignments, check attendance, and prepare before Day 1.",
+      title: "A2 orientation video",
     },
   },
-  { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
-];
+  B1: { mode: "Tutor-guided" },
+  B2: { mode: "Self-learning" },
+  C1: { mode: "Self-learning" },
+};
+
+const pathToLevel = new Map([
+  ["/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", "A1"],
+  ["/campus/course/a2-day-0-orientation-and-knowledge-test-workbook", "A2"],
+  ["/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", "B1"],
+  ["/campus/course/b2-day-0-orientation-and-knowledge-test-workbook", "B2"],
+  ["/campus/course/b2-day-0-progression-workbook", "B2"],
+  ["/campus/course/b2-self-learning/day-0", "B2"],
+  ["/campus/course/c1-day-0-progression-workbook", "C1"],
+  ["/campus/course/c1-self-learning/day-0", "C1"],
+  ["/campus/course/lesson/A1/0", "A1"],
+  ["/campus/course/lesson/A2/0", "A2"],
+  ["/campus/course/lesson/B1/0", "B1"],
+  ["/campus/course/lesson/B2/0", "B2"],
+  ["/campus/course/lesson/C1/0", "C1"],
+]);
 
 const palette = {
   page: "#f6f1e9",
@@ -35,24 +47,11 @@ const palette = {
   muted: "#6f6a80",
   amber: "#d97706",
   amberSoft: "#fed7aa",
-  navy: "#262b5f",
-  blue: "#2563eb",
   border: "#eadfd0",
 };
 
-const getYouTubeEmbedUrl = (videoId = "") =>
-  `https://www.youtube-nocookie.com/embed/${videoId}`;
-
 const List = ({ children }) => (
-  <ul
-    style={{
-      margin: 0,
-      paddingLeft: 20,
-      display: "grid",
-      gap: 6,
-      lineHeight: 1.65,
-    }}
-  >
+  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, lineHeight: 1.65 }}>
     {children}
   </ul>
 );
@@ -61,7 +60,6 @@ const Pill = ({ children }) => (
   <span
     style={{
       display: "inline-flex",
-      alignItems: "center",
       width: "fit-content",
       border: `1px solid ${palette.border}`,
       borderRadius: 999,
@@ -94,7 +92,6 @@ const Box = ({ title, children, tone = "cream", icon = "" }) => {
         background: selected.bg,
         display: "grid",
         gap: 10,
-        boxShadow: "0 8px 20px rgba(120, 53, 15, 0.05)",
       }}
     >
       <h3 style={{ margin: 0, color: selected.title }}>
@@ -106,7 +103,7 @@ const Box = ({ title, children, tone = "cream", icon = "" }) => {
   );
 };
 
-const ResourceCard = ({ number, icon, title, children }) => (
+const ResourceCard = ({ number, title, children }) => (
   <article
     style={{
       border: `1px solid ${palette.border}`,
@@ -116,7 +113,6 @@ const ResourceCard = ({ number, icon, title, children }) => (
       display: "grid",
       gridTemplateColumns: "34px minmax(0, 1fr)",
       gap: 10,
-      alignItems: "start",
     }}
   >
     <span
@@ -124,77 +120,99 @@ const ResourceCard = ({ number, icon, title, children }) => (
         width: 34,
         height: 34,
         borderRadius: "50%",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
+        display: "grid",
+        placeItems: "center",
         background: "#fff7ed",
         border: `1px solid ${palette.amberSoft}`,
         fontWeight: 900,
         color: palette.amber,
-        fontSize: 13,
       }}
     >
       {number}
     </span>
-    <div style={{ display: "grid", gap: 5, minWidth: 0 }}>
-      <strong style={{ color: palette.ink, fontSize: 15, lineHeight: 1.25 }}>
-        {icon} {title}
-      </strong>
-      <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>
-        {children}
-      </p>
+    <div style={{ display: "grid", gap: 4 }}>
+      <strong>{title}</strong>
+      <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.5 }}>{children}</p>
     </div>
   </article>
 );
 
-const OrientationVideoBox = ({ video }) => {
+const OrientationVideo = ({ video }) => {
   if (!video?.id) return null;
-
   return (
-    <Box title="Start here: Watch the Day 0 orientation video" tone="green" icon="▶️">
-      <p style={{ margin: 0, lineHeight: 1.65 }}>{video.description}</p>
-
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          paddingTop: "56.25%",
-          borderRadius: 14,
-          overflow: "hidden",
-          background: "#000",
-          boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
-        }}
-      >
+    <Box title="Watch the Day 0 orientation video" tone="green" icon="▶️">
+      <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#000" }}>
         <iframe
           title={video.title}
-          src={getYouTubeEmbedUrl(video.id)}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            border: 0,
-          }}
+          src={`https://www.youtube-nocookie.com/embed/${video.id}`}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       </div>
-
-      <p style={{ margin: 0, lineHeight: 1.65 }}>
-        If the video does not load, open it here:{" "}
-        <a href={video.url} target="_blank" rel="noreferrer">
-          watch on YouTube
-        </a>
-        .
+      <p style={{ margin: 0 }}>
+        Video not loading? <a href={video.url} target="_blank" rel="noreferrer">Watch it on YouTube</a>.
       </p>
     </Box>
   );
 };
 
+const TutorGuidedWorkflow = ({ level }) => (
+  <>
+    <Box title="2. Open the workbook and use its tabs" tone="blue" icon="📝">
+      {level === "A1" ? (
+        <List>
+          <li><strong>Assignment</strong> contains the work connected to the lesson.</li>
+          <li><strong>Submit</strong> is where you send only the final tutor-marked answers.</li>
+          <li>Self-practice workbooks do not need submission.</li>
+        </List>
+      ) : (
+        <List>
+          <li><strong>Teil 1 · Sprechen</strong> is speaking preparation and class practice.</li>
+          <li><strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong> contain the main workbook tasks.</li>
+          <li><strong>Ref</strong> contains reference answers or useful support.</li>
+          <li><strong>Submit</strong> is inside the same workbook and automatically uses the correct assignment number.</li>
+        </List>
+      )}
+    </Box>
+
+    <Box title="3. Submit inside the workbook" tone="green" icon="📤">
+      <p style={{ margin: 0, lineHeight: 1.65 }}>
+        The old Submit Assignment page is no longer the student workflow. Open the correct lesson workbook and use its
+        <strong> Submit</strong> tab. Save drafts there and submit only clean final answers.
+      </p>
+    </Box>
+  </>
+);
+
+const SelfLearningWorkflow = ({ level }) => (
+  <>
+    <Box title={`2. Use the ${level} self-learning tabs`} tone="blue" icon="🧭">
+      <List>
+        <li><strong>Learn</strong>: understand the topic, grammar focus and useful expressions.</li>
+        <li><strong>Speak</strong>: practise a structured answer aloud and improve it with Falowen AI.</li>
+        <li><strong>Write</strong>: build and improve your text. Use Analyse My Text before Day 20 and Mark My Letter from Day 20.</li>
+        <li><strong>Finish</strong>: complete reading, listening, vocabulary and the lesson check.</li>
+        <li><strong>Ref</strong>: save useful phrases, structures and examples for later lessons.</li>
+      </List>
+    </Box>
+
+    <Box title="3. Complete honestly—no tutor upload" tone="green" icon="✅">
+      <p style={{ margin: 0, lineHeight: 1.65 }}>
+        B2 and C1 are self-learning tracks. There is no tutor Submit tab for normal lessons. Improve your own work after AI feedback,
+        choose your confidence level honestly and mark the lesson complete only after finishing the main activities.
+      </p>
+    </Box>
+  </>
+);
+
 const Day0StudentWorkflowUpgrade = () => {
   const location = useLocation();
-  const config = day0PathConfig.find((item) => location.pathname === item.match);
+  const level = pathToLevel.get(location.pathname);
+  const config = levelConfigs[level];
   if (!config) return null;
+
+  const isSelfLearning = config.mode === "Self-learning";
 
   return (
     <section
@@ -204,121 +222,58 @@ const Day0StudentWorkflowUpgrade = () => {
         gap: 12,
         border: `1px solid ${palette.amberSoft}`,
         background: `linear-gradient(180deg, ${palette.card} 0%, ${palette.page} 100%)`,
-        boxShadow: "0 16px 36px rgba(120, 53, 15, 0.08)",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 10,
-          flexWrap: "wrap",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 5 }}>
-          <Pill>Updated Day 0 guide</Pill>
-          <h2 style={{ margin: 0, color: palette.ink }}>
-            {config.level} Student Workflow
-          </h2>
+          <Pill>New Falowen app structure</Pill>
+          <h2 style={{ margin: 0, color: palette.ink }}>{level} Day 0 Student Workflow</h2>
           <p style={{ margin: 0, color: palette.muted, lineHeight: 1.5 }}>
-            Read this before Day 1 so you understand the new Course Book style, tutor videos,
-            AI videos, workbook practice, and assignment submission.
+            Read this before Day 1. Your Course Book is the starting point, and your workbook now contains the correct practice and completion tools.
           </p>
         </div>
-        <span style={{ ...styles.badge, background: "#ffedd5", color: "#9a3412" }}>
-          Read before Day 1
-        </span>
+        <span style={{ ...styles.badge, background: "#ffedd5", color: "#9a3412" }}>{config.mode}</span>
       </div>
 
-      <OrientationVideoBox video={config.video} />
+      <OrientationVideo video={config.video} />
 
-      <Box title="1. Start from the Course Book" icon="📚">
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          The Course Book is the main learning path. Open the day, read the instruction,
-          use the resources in order, then complete the workbook and submit only the required final answers.
-        </p>
-        <List>
-          <li><strong>Teil 1 · Sprechen</strong> is preparation and class practice.</li>
-          <li><strong>Teil 2 · Schreiben</strong> is writing practice and assignment work.</li>
-          <li><strong>Teil 3 · Lesen</strong> is reading practice and assignment work.</li>
-          <li><strong>Teil 4 · Hören</strong> is listening practice and assignment work.</li>
-        </List>
-      </Box>
-
-      <Box title="2. Tutor video and AI video" tone="amber" icon="🎬">
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Some course days may show both a <strong>tutor video</strong> and an <strong>AI video</strong>.
-          They are learning resources, not separate submissions. Use them before the grammar book and workbook.
-        </p>
+      <Box title="1. Follow one clear learning path" icon="📚">
         <div style={{ display: "grid", gap: 8 }}>
-          <ResourceCard number="1" icon="🎬" title="Tutor video">
-            Watch this first when it is available. It is the teacher or tutor explanation and normally gives the class-style explanation, pronunciation help, examples, and guidance for the task.
-          </ResourceCard>
-          <ResourceCard number="2" icon="🤖" title="AI video">
-            Use this for revision, a second explanation, and self-study. It helps you understand the topic again, but it does not replace attendance, tutor guidance, or your own practice.
-          </ResourceCard>
-          <ResourceCard number="3" icon="📘" title="Grammar book">
-            Read the rule, examples, and useful language after watching the video support. This helps you understand why the answers are correct.
-          </ResourceCard>
-          <ResourceCard number="4" icon="📝" title="Workbook">
-            Complete the tasks carefully. Use the workbook to prepare clean final answers before submitting.
-          </ResourceCard>
-          <ResourceCard number="5" icon="✅" title="Submit tab">
-            Submit only the required final assignment parts in the Submit tab. Do not submit rough notes or unfinished practice answers.
+          <ResourceCard number="1" title="Course Book">Open the correct day and read its goal and instruction.</ResourceCard>
+          <ResourceCard number="2" title="Falowen Radio">When a radio episode is available, it appears before the workbook. Listen, then continue.</ResourceCard>
+          <ResourceCard number="3" title="Videos and grammar">Use the tutor or AI video and grammar notes when they are available.</ResourceCard>
+          <ResourceCard number="4" title="Workbook">Complete the lesson tasks in the workbook instead of using a separate assignment page.</ResourceCard>
+          <ResourceCard number="5" title={isSelfLearning ? "Finish and record progress" : "Submit or save a draft"}>
+            {isSelfLearning
+              ? "Use the self-learning completion tools and confidence level."
+              : "Use the Submit tab inside the same workbook for tutor-marked work."}
           </ResourceCard>
         </div>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Simple rule: <strong>Instruction → tutor video → AI video → grammar book → workbook → submit</strong>.
-          If one video is not available, continue with the next resource.
+          <strong>Course Book → Radio when available → lesson resources → workbook → {isSelfLearning ? "Finish" : "Submit"}</strong>
         </p>
       </Box>
 
-      <Box title="3. How to submit" tone="green" icon="📤">
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Use the course lesson pages for practice, but submit final assignment answers in the <strong>Submit</strong> tab.
-        </p>
-        {config.level === "A1" ? (
-          <p style={{ margin: 0, lineHeight: 1.65 }}>
-            In A1, the main submitted assignment parts are usually <strong>Lesen</strong> and <strong>Hören</strong>.
-            Schreiben and Sprechen are practical training tasks, but students should still complete them seriously.
-          </p>
-        ) : (
-          <p style={{ margin: 0, lineHeight: 1.65 }}>
-            In {config.level}, submit <strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong>.
-            Teil 1 is for class speaking preparation.
-          </p>
-        )}
-      </Box>
+      {isSelfLearning ? <SelfLearningWorkflow level={level} /> : <TutorGuidedWorkflow level={level} />}
 
-      <Box title="4. How to use Falowen AI" icon="🤖">
+      <Box title="4. Use the rest of Falowen" tone="amber" icon="🤖">
         <List>
-          <li>Use AI tools to practise before submitting final work.</li>
-          <li>Use <strong>Mark My Letter</strong> to check writing and improve structure.</li>
-          <li>Use the speaking coach to practise your answer before class.</li>
-          <li>Use grammar help when you do not understand a rule.</li>
-          <li>Do not copy AI blindly. Improve your own work and submit your clean final version.</li>
+          <li><strong>Study Buddy</strong> helps you find the next lesson and important shortcuts.</li>
+          <li><strong>Results</strong> shows tutor scores and feedback for A1–B1 work.</li>
+          <li><strong>Study calendar</strong> helps you stay consistent.</li>
+          <li><strong>Exams room</strong> is for exam-style reading, listening, speaking and writing practice.</li>
+          <li>Enable notifications so you receive score updates and important announcements.</li>
         </List>
       </Box>
 
-      <Box title="5. Scores, pass mark and certificate" tone="amber" icon="🏅">
+      <Box title="5. Day 0 completion check" icon="🎯">
         <List>
-          <li>Check your marked work in the <strong>Results</strong> page.</li>
-          <li>The pass mark for assignments is <strong>60%</strong>.</li>
-          <li>To complete the course properly, students must complete all required assignments and pass them.</li>
-          <li>Certificates are emailed to students after course completion, when required assignments are completed and passed.</li>
-          <li>The certificate is not automatic just for attending class; assignment completion and pass marks matter.</li>
+          <li>I know that the Course Book is my starting point.</li>
+          <li>I know that Falowen Radio appears before selected workbooks.</li>
+          <li>I know where the workbook tabs are and which work requires submission.</li>
+          <li>I know that the old student Submit Assignment page is no longer the main workflow.</li>
+          <li>I am ready to open Day 1.</li>
         </List>
-      </Box>
-
-      <Box title="6. Enable notifications" icon="🔔">
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Open <strong>Account → Notifications</strong> and enable notifications on your device.
-          This helps you receive score updates, payment reminders and important announcements.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          On iPhone, add Falowen to your Home Screen first, open it from the Home Screen icon, then enable notifications.
-        </p>
       </Box>
     </section>
   );
