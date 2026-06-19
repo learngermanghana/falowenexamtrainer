@@ -1,3 +1,8 @@
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import {
+  hasOnlyInAppWorkbookRoutesForLevel,
+  resolveInAppWorkbookRoute,
+} from "../data/inAppWorkbookRoutes";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
 describe("AutoWorkbookStartGuide route matching", () => {
@@ -40,5 +45,25 @@ describe("AutoWorkbookStartGuide route matching", () => {
       entry,
       resource: writingResource,
     });
+  });
+
+  test.each(["A1", "A2"])("%s configured workbook routes stay inside Falowen", (level) => {
+    expect(hasOnlyInAppWorkbookRoutesForLevel(level)).toBe(true);
+  });
+
+  test("replaces an external A1 assignment route with the configured in-app workbook", () => {
+    expect(
+      resolveInAppWorkbookRoute({
+        level: "A1",
+        day: 4,
+        chapter: "2",
+        fallback: "https://example.org/workbook",
+      })
+    ).toBe("/campus/course/a1-day-4-numbers-for-beginners-workbook");
+  });
+
+  test("assignment dictionary exposes the in-app A1 workbook", () => {
+    const entry = getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-5", assignmentDay: 9 });
+    expect(entry.workbookRoute).toBe("/campus/course/a1-chapter-5-german-cases-workbook");
   });
 });
