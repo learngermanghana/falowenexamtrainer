@@ -66,5 +66,44 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
     ],
   };
 
+  a1[22] = {
+    videoResources: [
+      {
+        key: "a1-day22-health-ai-video",
+        chapter: "14.1",
+        title: "A1 Day 22 · Health · AI video",
+        description:
+          "AI video lesson for health vocabulary, body parts and describing simple symptoms in German.",
+        url: "https://youtu.be/U2pns6E1_yE",
+      },
+    ],
+  };
+
+  a1[23] = {
+    videoResources: [
+      {
+        key: "a1-day23-dative-accusative-verbs-ai-video",
+        chapter: "14.2",
+        title: "A1 Day 23 · Dative and Accusative Verbs · AI video",
+        description:
+          "AI video lesson for recognizing dative and accusative verbs and using the correct German cases.",
+        url: "https://youtu.be/V4RxPYSPwhg",
+      },
+    ],
+  };
+
+  a1[24] = {
+    videoResources: [
+      {
+        key: "a1-day24-conjunctions-ai-video",
+        chapter: "5.10",
+        title: "A1 Day 24 · Conjunctions · AI video",
+        description:
+          "AI video lesson for connecting ideas with German conjunctions in short exam-ready sentences and letters.",
+        url: "https://youtu.be/gprBXwwAT-o",
+      },
+    ],
+  };
+
   return dictionary;
 };

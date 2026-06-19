@@ -7,6 +7,22 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Personen beschreiben ein. Danach gehst du weiter zu Teil 1.",
   },
+  3: {
+    key: "a2-day3-dinge-personen-vergleichen-falowen-radio",
+    title: "Dinge und Personen vergleichen 1.3",
+    youtubeId: "wpGj-ZcZVv0",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Dinge und Personen vergleichen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  4: {
+    key: "a2-day4-wo-moechten-wir-uns-treffen-falowen-radio",
+    title: "Wo möchten wir uns treffen? 2.4",
+    youtubeId: "JsZBblW70C8",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Treffen vereinbaren ein. Danach gehst du weiter zu Teil 1.",
+  },
   12: {
     key: "a2-day12-mein-traumberuf-falowen-radio",
     title: "Mein Traumberuf 5.12",
