@@ -1428,7 +1428,6 @@ exports.submitAssignmentResubmission = onCall(
       buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
     );
     const submissionsRef = db.collection("submissions");
-    const scoresRef = db.collection("scores").doc(`${counterRef.id}__auto60`);
 
     const result = await db.runTransaction(async (transaction) => {
       const counterSnap = await transaction.get(counterRef);
@@ -1456,33 +1455,11 @@ exports.submitAssignmentResubmission = onCall(
       }
 
       if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
-        transaction.set(scoresRef, {
-          studentId: authUid,
-          studentEmail: normalizeCallableText(input.studentEmail, 240),
-          studentCode: normalizeCallableText(input.studentCode, 120),
-          studentName: normalizeCallableText(input.studentName, 240),
-          assignmentId: selectedAssignmentId,
-          canonicalAssignmentKey,
-          assignmentKey: canonicalAssignmentKey,
-          level,
-          score: PASS_THRESHOLD_SCORE,
-          passed: true,
-          status: "passed",
-          reviewStatus: "auto_late_mark",
-          source: "resubmission_attempt_limit",
-          attempts,
-          maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
-          createdAt: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp(),
-        }, { merge: true });
         transaction.set(counterRef, {
           attempts,
-          passed: true,
-          finalScore: PASS_THRESHOLD_SCORE,
-          scoreId: scoresRef.id,
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
-        return { limitReached: true, scoreId: scoresRef.id, attempt: attempts, maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS, score: PASS_THRESHOLD_SCORE };
+        return { limitReached: true, attempt: attempts, maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS };
       }
 
       const nextAttempt = attempts + 1;
@@ -1514,42 +1491,16 @@ exports.submitAssignmentResubmission = onCall(
         assignmentId: selectedAssignmentId,
         level,
         attempts: nextAttempt,
-        passed: nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS,
-        finalScore: nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS ? PASS_THRESHOLD_SCORE : null,
-        scoreId: nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS ? scoresRef.id : null,
+        passed: false,
         lastSubmissionId: submissionRef.id,
         updatedAt: FieldValue.serverTimestamp(),
         createdAt: counterSnap.exists ? counterSnap.data()?.createdAt || FieldValue.serverTimestamp() : FieldValue.serverTimestamp(),
       }, { merge: true });
-      if (nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
-        transaction.set(scoresRef, {
-          studentId: authUid,
-          studentEmail: normalizeCallableText(input.studentEmail, 240),
-          studentCode: normalizeCallableText(input.studentCode, 120),
-          studentName: normalizeCallableText(input.studentName, 240),
-          assignmentId: selectedAssignmentId,
-          canonicalAssignmentKey,
-          assignmentKey: canonicalAssignmentKey,
-          level,
-          score: PASS_THRESHOLD_SCORE,
-          passed: true,
-          status: "passed",
-          reviewStatus: "auto_late_mark",
-          source: "resubmission_attempt_limit",
-          attempts: nextAttempt,
-          maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
-          submissionId: submissionRef.id,
-          createdAt: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp(),
-        }, { merge: true });
-      }
 
       return {
         submissionId: submissionRef.id,
         attempt: nextAttempt,
         maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
-        finalScoreRecorded: nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS,
-        score: nextAttempt >= MAX_TOTAL_SUBMISSION_ATTEMPTS ? PASS_THRESHOLD_SCORE : null,
       };
     });
 

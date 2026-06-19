@@ -2079,7 +2079,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (resubmissionLimitReached) {
       setResubmissionStatus({
         loading: false,
-        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total. Reopen this page or contact school support so the late mark of ${PASS_THRESHOLD_SCORE} can be recorded securely.`,
+        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total. Your teacher will mark and save the final submitted attempt.`,
         success: "",
       });
       return;
@@ -2141,7 +2141,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       if (result.limitReached) {
         setResubmissionStatus({
           loading: false,
-          error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. A late mark of ${PASS_THRESHOLD_SCORE} has been recorded.`,
+          error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. Your teacher will mark and save the final submitted attempt.`,
           success: "",
         });
         return;
@@ -2150,9 +2150,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       setResubmissionStatus({
         loading: false,
         error: "",
-        success: result.finalScoreRecorded
-          ? `Final resubmission sent. Attempts used: ${result.attempt}/3. A late mark of ${PASS_THRESHOLD_SCORE} has been recorded.`
-          : `Resubmission sent successfully. Attempts used: ${result.attempt || selectedResubmissionCount + 2}/3. Read your teacher comments and apply fixes before your next attempt if needed.`,
+        success: `Resubmission sent successfully. Attempts used: ${result.attempt || selectedResubmissionCount + 2}/3. Your teacher will mark and save the submitted work.`,
       });
       triggerInteractionFeedback({
         sound: "success",
@@ -2511,11 +2509,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 : `Resubmissions left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, submission is blocked and a flat score of {PASS_THRESHOLD_SCORE} is recorded by the secure backend.
+              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, further resubmission is blocked so your teacher can mark and save the final attempt.
             </p>
             {resubmissionLimitReached ? (
               <InfoBox tone="warning">
-                Submission is blocked because this work already has {MAX_TOTAL_SUBMISSION_ATTEMPTS} total submissions. A flat score of {PASS_THRESHOLD_SCORE} will be awarded.
+                Submission is blocked because this work already has {MAX_TOTAL_SUBMISSION_ATTEMPTS} total submissions. Your teacher will mark and save the final submitted attempt.
               </InfoBox>
             ) : null}
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
