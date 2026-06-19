@@ -52,11 +52,23 @@ jobs:
           CI: true
         run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
-      - name: Test course title catalogue
+      - name: Test catalogue dictionary entries
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="getAssignmentDictionaryEntry"
+
+      - name: Test catalogue display titles
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="assignment display helpers"
+
+      - name: Test catalogue progression
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="progression sequence"
 
       - name: Test Day 0 workflow
         working-directory: web
