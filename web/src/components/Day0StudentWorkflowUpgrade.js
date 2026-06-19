@@ -26,6 +26,8 @@ const day0PathConfig = [
     },
   },
   { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
+  { match: "/campus/course/b2-day-0-self-learning-orientation-workbook", level: "B2", selfLearning: true },
+  { match: "/campus/course/c1-day-0-progression-workbook", level: "C1", selfLearning: true },
 ];
 
 const palette = {
@@ -270,23 +272,36 @@ const Day0StudentWorkflowUpgrade = () => {
         </div>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
           Simple rule: <strong>Instruction → tutor video → AI video → grammar book → workbook → submit</strong>.
-          If one video is not available, continue with the next resource.
+          If one video is not available, continue with the next resource. For A2, B1, B2 and C1,
+          Falowen Radio may appear before the lesson tabs. Listen first because it prepares your ears,
+          vocabulary and topic ideas before you open Learn, Speak, Write and Finish.
         </p>
       </Box>
 
-      <Box title="3. How to submit" tone="green" icon="📤">
+      <Box title="3. How to submit in the Course Book" tone="green" icon="📤">
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Use the course lesson pages for practice, but submit final assignment answers in the <strong>Submit</strong> tab.
+          Submission is now inside the <strong>Course Book</strong>. Open the day, finish the workbook, then use
+          the lesson Submit area for required final answers. Do not use old Google Drive submission links.
         </p>
         {config.level === "A1" ? (
           <p style={{ margin: 0, lineHeight: 1.65 }}>
-            In A1, the main submitted assignment parts are usually <strong>Lesen</strong> and <strong>Hören</strong>.
-            Schreiben and Sprechen are practical training tasks, but students should still complete them seriously.
+            <strong>A1:</strong> follow the beginner Lesen/Hören route. The main submitted assignment parts are usually
+            <strong> Lesen</strong> and <strong>Hören</strong>; Schreiben and Sprechen are still important practice for confidence.
+          </p>
+        ) : config.level === "A2" ? (
+          <p style={{ margin: 0, lineHeight: 1.65 }}>
+            <strong>A2:</strong> work through the four-part workbook. Teil 1 Sprechen prepares class speaking, while
+            Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören are the final parts students should submit in the Course Book.
+          </p>
+        ) : config.level === "B1" ? (
+          <p style={{ margin: 0, lineHeight: 1.65 }}>
+            <strong>B1:</strong> answers must be fuller than A2. Use the workbook for speaking preparation, then submit the
+            required writing, reading and listening parts in the Course Book with clear reasons and examples.
           </p>
         ) : (
           <p style={{ margin: 0, lineHeight: 1.65 }}>
-            In {config.level}, submit <strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong>.
-            Teil 1 is for class speaking preparation.
+            <strong>{config.level}:</strong> this is a self-learning structure. Use Falowen Radio first when available, study
+            the AI video and notes, practise speaking/writing with Falowen AI, and complete the workbook inside the Course Book.
           </p>
         )}
       </Box>
