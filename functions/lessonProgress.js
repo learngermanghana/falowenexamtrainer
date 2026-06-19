@@ -5,6 +5,19 @@ const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 const REGION = "europe-west1";
 const PASS_MARK = 60;
 
+const PASS_STATUSES = new Set(["approved", "pass", "passed", "complete", "completed"]);
+
+const normalizeCounterDocPart = (value = "") =>
+  String(value || "").replace(/[^a-zA-Z0-9._-]/g, "_");
+
+const buildAttemptCounterId = ({ studentId, canonicalAssignmentKey }) =>
+  `${normalizeCounterDocPart(studentId)}__${normalizeCounterDocPart(canonicalAssignmentKey)}`.slice(0, 300);
+
+const isPassingScoreData = (data = {}, score = null) => {
+  if (typeof score === "number") return score >= PASS_MARK;
+  return PASS_STATUSES.has(normalizeLower(data.reviewStatus || data.result || data.status || data.passedStatus));
+};
+
 const getAdmin = () => {
   if (!admin.apps.length) admin.initializeApp();
   return admin;
@@ -180,6 +193,89 @@ const upsertSubmissionProgress = async ({ data = {}, params = {}, submissionId =
   return null;
 };
 
+const findSubmissionForScore = async ({ data = {}, studentCodeKey = "", assignmentId = "" }) => {
+  const submissionId = normalizeString(data.submissionId || data.lastSubmissionId || data.submission_id);
+  if (submissionId) {
+    const snap = await db().collection("submissions").doc(submissionId).get();
+    if (snap.exists) return { id: snap.id, data: snap.data() || {} };
+  }
+
+  if (!studentCodeKey || !assignmentId) return null;
+
+  const snapshot = await db()
+    .collection("submissions")
+    .where("studentCode", "==", studentCodeKey)
+    .where("canonicalAssignmentKey", "==", assignmentId)
+    .limit(10)
+    .get();
+
+  if (snapshot.empty) return null;
+
+  const docs = snapshot.docs
+    .map((doc) => ({ id: doc.id, data: doc.data() || {} }))
+    .sort((a, b) => {
+      const aMs = toMillis(a.data.submittedAt || a.data.resubmittedAt || a.data.createdAt || a.data.updatedAt);
+      const bMs = toMillis(b.data.submittedAt || b.data.resubmittedAt || b.data.createdAt || b.data.updatedAt);
+      return bMs - aMs;
+    });
+
+  return docs[0] || null;
+};
+
+const upsertAttemptCounterFromScore = async ({ data = {}, attemptId = "" }) => {
+  const score = toNumber(data.score ?? data.finalScore ?? data.mark ?? data.grade);
+  const level = resolveLevel(data);
+  const studentCode = resolveStudentCode(data);
+  const assignmentId = resolveAssignmentId(data, level);
+
+  if (!assignmentId || typeof score !== "number") return null;
+
+  const studentCodeKey = normalizeLower(studentCode);
+  const submission = await findSubmissionForScore({ data, studentCodeKey, assignmentId });
+  const submissionData = submission?.data || {};
+  const studentId = normalizeString(data.studentId || data.uid || submissionData.studentId || submissionData.uid);
+
+  if (!studentId) {
+    console.warn("attempt counter score skipped: missing studentId", { attemptId, studentCode, assignmentId });
+    return null;
+  }
+
+  const counterRef = db().collection("submissionAttemptCounters").doc(
+    buildAttemptCounterId({ studentId, canonicalAssignmentKey: assignmentId })
+  );
+  const passed = isPassingScoreData(data, score);
+
+  await db().runTransaction(async (transaction) => {
+    const counterSnap = await transaction.get(counterRef);
+    const existing = counterSnap.exists ? counterSnap.data() || {} : {};
+    const previousBest = toNumber(existing.bestScore);
+    const bestScore = typeof previousBest === "number" ? Math.max(previousBest, score) : score;
+    const scoredAttempt = Number(data.attempt || data.attemptNumber || submissionData.attempt || submissionData.attemptNumber || 0);
+    const attempts = Math.max(Number(existing.attempts || 0), scoredAttempt || 0);
+
+    transaction.set(
+      counterRef,
+      {
+        studentId,
+        canonicalAssignmentKey: assignmentId,
+        assignmentId,
+        level,
+        attempts,
+        passed: Boolean(existing.passed) || passed,
+        latestScore: score,
+        bestScore,
+        lastScoreId: attemptId,
+        lastSubmissionId: submission?.id || existing.lastSubmissionId || "",
+        updatedAt: FieldValue.serverTimestamp(),
+        createdAt: existing.createdAt || FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  });
+
+  return null;
+};
+
 const upsertScoreProgress = async ({ data = {}, attemptId = "" }) => {
   const score = toNumber(data.score ?? data.finalScore ?? data.mark ?? data.grade);
   const level = resolveLevel(data);
@@ -262,7 +358,12 @@ exports.onScoreWrittenUpdateLessonProgress = onDocumentWritten(
   async (event) => {
     if (!event.data?.after?.exists) return null;
     const data = event.data.after.data() || {};
-    return upsertScoreProgress({ data, attemptId: event.params.attemptId || "" });
+    const attemptId = event.params.attemptId || "";
+    await Promise.all([
+      upsertScoreProgress({ data, attemptId }),
+      upsertAttemptCounterFromScore({ data, attemptId }),
+    ]);
+    return null;
   }
 );
 
