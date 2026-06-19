@@ -18,8 +18,6 @@ const DAY0_AI_ORIENTATION_VIDEO = {
     "Watch this AI orientation first, then scroll down to read the guide and open the workbook.",
 };
 
-const toLessonArray = (value) =>
-  Array.isArray(value) ? value : value ? [value] : [];
 const normalizeLevel = (level = "") =>
   String(level || "")
     .trim()
@@ -83,19 +81,6 @@ const resourceButtonStyle = {
   fontSize: 13,
   fontWeight: 800,
   lineHeight: 1.15,
-};
-
-const lessonResourceEntries = (entry = {}) => {
-  const nestedResources = [
-    ...toLessonArray(entry.schreiben_sprechen),
-    ...toLessonArray(entry.lesen_hören),
-  ].filter(Boolean);
-  const resources = nestedResources.length ? nestedResources : [entry];
-
-  return resources.map((resource) => ({
-    ...resource,
-    chapter: resource?.chapter || entry?.chapter || null,
-  }));
 };
 
 const isTeacherVideo = (resource = {}) =>
