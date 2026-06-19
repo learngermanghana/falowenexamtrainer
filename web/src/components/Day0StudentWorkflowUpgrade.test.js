@@ -14,7 +14,7 @@ describe("Day 0 student workflow", () => {
 
     expect(screen.getByText("A2 Day 0 Orientation")).toBeInTheDocument();
     expect(screen.getByText(/Teil 1 → Teil 2 → Teil 3 → Teil 4 → Ref → Submit/)).toBeInTheDocument();
-    expect(screen.getByText(/standalone Submit Assignment/)).toBeInTheDocument();
+    expect(screen.getByText("Submit Assignment")).toBeInTheDocument();
   });
 
   test("shows the self-learning Write and Analyse workflow for B2", () => {
