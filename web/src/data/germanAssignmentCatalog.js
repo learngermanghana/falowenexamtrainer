@@ -1,19 +1,12 @@
 import {
-  CURRICULUM_ENTRIES,
-  CURRICULUM_BY_LEVEL,
-  getCurriculumEntriesForLevel,
+  CURRICULUM_ENTRIES as RAW_CURRICULUM_ENTRIES,
+  CURRICULUM_BY_LEVEL as RAW_CURRICULUM_BY_LEVEL,
+  getCurriculumEntriesForLevel as getRawCurriculumEntriesForLevel,
   normalizeLevel,
 } from "./curriculumManifest";
+import { resolveInAppWorkbookRoute } from "./inAppWorkbookRoutes";
 
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
-const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
-  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
-);
-
-if (a1Day5Entry) {
-  a1Day5Entry.topic = A1_DAY_5_TITLE;
-  a1Day5Entry.title = A1_DAY_5_TITLE;
-}
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
@@ -48,7 +41,79 @@ const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
   return normalizeChapter(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
 };
 
-export { CURRICULUM_ENTRIES };
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+const sanitizeResource = (resource = {}, entry = {}, level = entry.level) => {
+  const normalizedLevel = normalizeLevel(level);
+  const day = Number(entry.assignmentDay ?? entry.day ?? 0);
+  const chapter = resource.chapter || entry.chapter;
+  const route = resolveInAppWorkbookRoute({
+    level: normalizedLevel,
+    day,
+    chapter,
+    fallback: resource.workbookRoute || resource.workbook_link,
+  });
+
+  return {
+    ...resource,
+    ...(route ? { workbookRoute: route, workbook_link: route } : {}),
+  };
+};
+
+const sanitizeCurriculumEntry = (entry = {}, level = entry.level) => {
+  const normalizedLevel = normalizeLevel(level);
+  const day = Number(entry.assignmentDay ?? entry.day ?? 0);
+  const route = resolveInAppWorkbookRoute({
+    level: normalizedLevel,
+    day,
+    chapter: entry.chapter,
+    fallback: entry.workbookRoute || entry.workbook_link,
+  });
+  const resources = toArray(entry.resources).map((resource) =>
+    sanitizeResource(resource, entry, normalizedLevel)
+  );
+  const lesenHoeren = toArray(entry.lesen_hören).map((resource) =>
+    sanitizeResource(resource, entry, normalizedLevel)
+  );
+  const schreibenSprechen = toArray(entry.schreiben_sprechen).map((resource) =>
+    sanitizeResource(resource, entry, normalizedLevel)
+  );
+
+  return {
+    ...entry,
+    ...(route ? { workbookRoute: route, workbook_link: route } : {}),
+    ...(resources.length ? { resources } : {}),
+    ...(lesenHoeren.length
+      ? { lesen_hören: Array.isArray(entry.lesen_hören) ? lesenHoeren : lesenHoeren[0] }
+      : {}),
+    ...(schreibenSprechen.length
+      ? {
+          schreiben_sprechen: Array.isArray(entry.schreiben_sprechen)
+            ? schreibenSprechen
+            : schreibenSprechen[0],
+        }
+      : {}),
+  };
+};
+
+export const CURRICULUM_ENTRIES = RAW_CURRICULUM_ENTRIES.map((entry) =>
+  sanitizeCurriculumEntry(entry, entry.level)
+);
+
+const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
+  if (!acc[entry.level]) acc[entry.level] = [];
+  acc[entry.level].push(entry);
+  return acc;
+}, {});
+
+const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
+  (entry) => Number(entry.assignmentDay) === 5 && ["1.2", "1.3"].includes(String(entry.chapter))
+);
+
+if (a1Day5Entry) {
+  a1Day5Entry.topic = A1_DAY_5_TITLE;
+  a1Day5Entry.title = A1_DAY_5_TITLE;
+}
 
 export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
   Object.entries(CURRICULUM_BY_LEVEL).map(([level, entries]) => [
@@ -62,7 +127,15 @@ export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
   ])
 );
 
-export { getCurriculumEntriesForLevel };
+export const getCurriculumEntriesForLevel = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (!normalizedLevel) return [];
+  const entries = CURRICULUM_BY_LEVEL[normalizedLevel];
+  if (entries) return [...entries];
+  return getRawCurriculumEntriesForLevel(normalizedLevel).map((entry) =>
+    sanitizeCurriculumEntry(entry, normalizedLevel)
+  );
+};
 
 export const getCurriculumEntriesByDayForLevel = (level) => {
   const entries = getCurriculumEntriesForLevel(level);
@@ -113,7 +186,7 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   const entry = prioritized[0] || null;
   return entry
     ? {
-        ...entry,
+        ...sanitizeCurriculumEntry(entry, normalizedLevel),
         assignment: entry.assignment === true,
         canonicalAssignmentId: entry.assignment_id,
       }
