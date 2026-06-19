@@ -1,9 +1,9 @@
 name: Course Book entry tests
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/standardize-course-book-entries
+      - main
 
 jobs:
   focused-tests:
