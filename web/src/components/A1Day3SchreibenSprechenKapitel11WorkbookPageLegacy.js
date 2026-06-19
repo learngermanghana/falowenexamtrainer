@@ -110,63 +110,63 @@ const wWordQuestions = [
     stem: "1. ___ ist das?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Was",
-    response: "Was ist das? – Das ist ein Ball.",
+    response: "Das ist ein Ball.",
   },
   {
     id: 2,
     stem: "2. ___ ist Martin?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wo",
-    response: "Wo ist Martin? – Martin ist in Ghana.",
+    response: "Martin ist in Ghana.",
   },
   {
     id: 3,
     stem: "3. ___ ist der Ball?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
-    response: "Wie ist der Ball? – Der Ball ist klein.",
+    response: "Der Ball ist klein.",
   },
   {
     id: 4,
     stem: "4. ___ ist das?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wer",
-    response: "Wer ist das? – Das ist Martin.",
+    response: "Das ist Martin.",
   },
   {
     id: 5,
     stem: "5. ___ spielt mit dem Ball?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wer",
-    response: "Wer spielt mit dem Ball? – Martin spielt mit dem Ball.",
+    response: "Martin spielt mit dem Ball.",
   },
   {
     id: 6,
     stem: "6. ___ heißt du?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
-    response: "Wie heißt du? – Ich heiße Felix.",
+    response: "Ich heiße Felix.",
   },
   {
     id: 7,
     stem: "7. ___ wohnt deine Mutter?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wo",
-    response: "Wo wohnt deine Mutter? – Meine Mutter wohnt in Berlin.",
+    response: "Meine Mutter wohnt in Berlin.",
   },
   {
     id: 8,
     stem: "8. ___ ist dein Job?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Was",
-    response: "Was ist dein Job? – Ich bin Lehrer.",
+    response: "Ich bin Lehrer.",
   },
   {
     id: 9,
     stem: "9. ___ heißt deine Mutter?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
-    response: "Wie heißt deine Mutter? – Sie heißt Anna.",
+    response: "Sie heißt Anna.",
   },
 ];
 
@@ -485,7 +485,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <strong>Usage:</strong> For objects and things.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Example:</strong> Was ist das? – Das ist ein Ball.
+            <strong>Example:</strong> Das ist ein Ball.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Purpose:</strong> To ask about an object or thing.
@@ -498,7 +498,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <strong>Usage:</strong> For places and positions.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Example:</strong> Wo ist Martin? – Martin ist in Ghana.
+            <strong>Example:</strong> Martin ist in Ghana.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Purpose:</strong> To ask about the location or position of someone or something.
@@ -511,7 +511,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <strong>Usage:</strong> For states or characteristics.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Example:</strong> Wie ist der Ball? – Der Ball ist klein.
+            <strong>Example:</strong> Der Ball ist klein.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Purpose:</strong> To ask about the condition or characteristic of something.
@@ -524,7 +524,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <strong>Usage:</strong> For people.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Example:</strong> Wer ist das? – Das ist Martin.
+            <strong>Example:</strong> Das ist Martin.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Purpose:</strong> To ask about a person.
@@ -668,6 +668,20 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <li>Country: das Land</li>
             <li>To come from: kommen aus</li>
           </ul>
+        </div>
+
+        <div style={{ ...subCardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <strong>Next step: Save your biography</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            After you finish writing your introduction, go to the Class Members page and paste what you wrote as your
+            biography so your classmates can read it.
+          </p>
+          <a
+            href="/campus/course?classMembers=1"
+            style={{ ...styles.button, width: "fit-content", textDecoration: "none", display: "inline-block" }}
+          >
+            Go to Class Members
+          </a>
         </div>
       </section>
 
