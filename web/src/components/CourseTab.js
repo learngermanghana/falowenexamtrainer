@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
@@ -9,7 +9,6 @@ import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/ger
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
@@ -540,6 +539,7 @@ const readPracticeProgress = (key) => {
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { studentProfile, user } = useAuth();
   const resolvedStudentLevel = normalizeLevel(studentProfile?.level) || normalizeLevel(studentProfile?.className);
   const resolvedDefaultLevel = resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
@@ -573,6 +573,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   });
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
   const [courseSubmitOpen, setCourseSubmitOpen] = useState(false);
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search || "");
+    if (query.get("submitWork") === "1") {
+      setCourseSubmitOpen(true);
+    }
+  }, [location.search]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
@@ -820,9 +827,19 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     Close
                   </button>
                 </div>
-                <div className="course-book-drawer-submission-page">
-                  <style>{`.course-book-drawer-submission-page > div > section:first-child { display: none !important; }`} </style>
-                  <AssignmentSubmissionPage submissionContext={{ level: selectedCourseLevel }} />
+                <div style={{ display: "grid", gap: 12 }}>
+                  <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+                    Submissions now live inside each workbook in the Course Book. Open the assignment workbook for your lesson, then use its
+                    <strong> Submit</strong> tab. Falowen will automatically select the correct assignment number so you only type your final answers and submit.
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button type="button" style={styles.primaryButton} onClick={() => nextLesson && openLesson(nextLesson)}>
+                      Open next lesson
+                    </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { setActiveFilter("assignments"); setCourseSubmitOpen(false); }}>
+                      Show assignment lessons
+                    </button>
+                  </div>
                 </div>
               </section>
             </div>
