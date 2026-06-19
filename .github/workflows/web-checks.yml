@@ -52,12 +52,6 @@ jobs:
           CI: true
         run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
-      - name: Test A2 and B1 workbook navigation
-        working-directory: web
-        env:
-          CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
-
       - name: Test course titles and Day 0 workflow
         working-directory: web
         env:
@@ -67,6 +61,12 @@ jobs:
       - name: Build web app
         working-directory: web
         run: npm run build
+
+      - name: Test A2 and B1 workbook navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
 
       - name: Check curriculum manifest sync
         run: npm run check:curriculum-sync
