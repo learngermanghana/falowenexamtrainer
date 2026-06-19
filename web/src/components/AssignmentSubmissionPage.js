@@ -18,7 +18,9 @@ import {
   db,
   doc,
   getDoc,
+  functions,
   getDocs,
+  httpsCallable,
   limit,
   orderBy,
   query,
@@ -1278,6 +1280,35 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel, selectedCanonicalAssignmentKey, selectedChapterKey]
   );
 
+  useEffect(() => {
+    const loadSelectedAssignmentAttempts = async () => {
+      if (!db || !user?.uid || !selectedCanonicalAssignmentKey) return;
+
+      try {
+        const snapshot = await getDocs(
+          query(
+            collection(db, SUBMISSION_COLLECTION),
+            where("studentId", "==", user.uid),
+            where("canonicalAssignmentKey", "==", selectedCanonicalAssignmentKey),
+            limit(50)
+          )
+        );
+        const selectedEntries = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        if (!selectedEntries.length) return;
+
+        setRecentSubmissions((current) => {
+          const byId = new Map(current.map((entry) => [entry.id, entry]));
+          selectedEntries.forEach((entry) => byId.set(entry.id, entry));
+          return Array.from(byId.values());
+        });
+      } catch (error) {
+        console.error("Failed to load selected assignment attempts", error);
+      }
+    };
+
+    loadSelectedAssignmentAttempts();
+  }, [selectedCanonicalAssignmentKey, user?.uid]);
+
   const selectedResubmissionCount = useMemo(() => {
     return recentSubmissions.reduce((count, entry) => {
       if (safeLower(entry?.status) !== "resubmitted") return count;
@@ -2027,7 +2058,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (!db || !user?.uid || !isSelectedLocked) {
+    if (!db || !functions || !user?.uid || !isSelectedLocked) {
       setResubmissionStatus({
         loading: false,
         error: "Resubmission is only available after your first submission is locked.",
@@ -2048,7 +2079,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (resubmissionLimitReached) {
       setResubmissionStatus({
         loading: false,
-        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total, so a late mark of ${PASS_THRESHOLD_SCORE} is applied.`,
+        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total. Reopen this page or contact school support so the late mark of ${PASS_THRESHOLD_SCORE} can be recorded securely.`,
         success: "",
       });
       return;
@@ -2103,12 +2134,25 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         updatedAt: serverTimestamp(),
       };
 
-      await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
+      const submitAssignmentResubmission = httpsCallable(functions, "submitAssignmentResubmission");
+      const response = await submitAssignmentResubmission(payload);
+      const result = response?.data || {};
+
+      if (result.limitReached) {
+        setResubmissionStatus({
+          loading: false,
+          error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. A late mark of ${PASS_THRESHOLD_SCORE} has been recorded.`,
+          success: "",
+        });
+        return;
+      }
 
       setResubmissionStatus({
         loading: false,
         error: "",
-        success: `Resubmission sent successfully. Attempts used: ${selectedResubmissionCount + 2}/3. Read your teacher comments and apply fixes before your next attempt if needed.`,
+        success: result.finalScoreRecorded
+          ? `Final resubmission sent. Attempts used: ${result.attempt}/3. A late mark of ${PASS_THRESHOLD_SCORE} has been recorded.`
+          : `Resubmission sent successfully. Attempts used: ${result.attempt || selectedResubmissionCount + 2}/3. Read your teacher comments and apply fixes before your next attempt if needed.`,
       });
       triggerInteractionFeedback({
         sound: "success",
@@ -2467,7 +2511,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 : `Resubmissions left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, submission is blocked and a flat score of {PASS_THRESHOLD_SCORE} will be awarded.
+              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, submission is blocked and a flat score of {PASS_THRESHOLD_SCORE} is recorded by the secure backend.
             </p>
             {resubmissionLimitReached ? (
               <InfoBox tone="warning">
