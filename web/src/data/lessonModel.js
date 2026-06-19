@@ -2,6 +2,7 @@ import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+import { resolveInAppWorkbookRoute } from "./inAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
 
@@ -52,19 +53,32 @@ const normalizeResourceGroups = (rawLesson, level, day) => {
   const entries = nested.length ? nested : [rawLesson];
   const internal = INTERNAL_RESOURCE_ROUTES[level]?.[day] || {};
 
-  return entries.map((entry) => ({
-    chapter: entry.chapter || rawLesson.chapter || null,
-    grammarBook: resource(internal.grammarBook || firstString(
-      entry.grammarbook_link,
-      entry.grammar_link,
-      rawLesson.grammarbook_link,
-      rawLesson.grammar_link,
-    )),
-    workbook: resource(internal.workbook || firstString(
+  return entries.map((entry) => {
+    const chapter = entry.chapter || rawLesson.chapter || null;
+    const workbookFallback = internal.workbook || firstString(
       entry.workbook_link,
       rawLesson.workbook_link,
-    )),
-  }));
+      entry.workbookRoute,
+      rawLesson.workbookRoute,
+    );
+    const workbookRoute = resolveInAppWorkbookRoute({
+      level,
+      day,
+      chapter,
+      fallback: workbookFallback,
+    });
+
+    return {
+      chapter,
+      grammarBook: resource(internal.grammarBook || firstString(
+        entry.grammarbook_link,
+        entry.grammar_link,
+        rawLesson.grammarbook_link,
+        rawLesson.grammar_link,
+      )),
+      workbook: resource(workbookRoute),
+    };
+  });
 };
 
 export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level) => {
