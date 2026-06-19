@@ -1081,7 +1081,7 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
               <button
                 key={subTab.key}
                 style={subTab.key === "course" ? styles.navButtonActive : styles.navButton}
-                onClick={() => navigate(`/campus/${subTab.key}`)}
+                onClick={() => navigate(subTab.key === "submit" ? "/campus/course?submitWork=1" : `/campus/${subTab.key}`)}
               >
                 {subTab.label}
               </button>
@@ -1120,6 +1120,10 @@ const CampusArea = ({
   );
 
   useEffect(() => {
+    if (resolvedSection === "submit") {
+      navigate("/campus/course?submitWork=1", { replace: true });
+      return;
+    }
     if (!section || section !== resolvedSection) {
       navigate(`/campus/${resolvedSection}`, { replace: true });
     }
@@ -1143,6 +1147,10 @@ const CampusArea = ({
   };
 
   const handleSubTabClick = (sectionKey) => {
+    if (sectionKey === "submit") {
+      navigate("/campus/course?submitWork=1");
+      return;
+    }
     navigate(`/campus/${sectionKey}`);
   };
 
