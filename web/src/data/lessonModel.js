@@ -2,6 +2,7 @@ import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
 
@@ -13,96 +14,70 @@ export const LEVEL_CAPABILITIES = Object.freeze({
   C1: { radio: true, fourPartWorkbook: false, tutorSubmission: false, selfAssessment: true },
 });
 
-const normalizeLevel = (level = "") => String(level).trim().toUpperCase();
-const firstString = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || null;
-const firstEntry = (raw = {}) => {
-  const nested = [raw.schreiben_sprechen, raw.lesen_hören].flat().filter(Boolean);
-  return nested[0] || raw;
-};
-const resource = (url, extra = {}) => url ? { url, ...extra } : null;
-const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
-const mergeVideoResources = (...groups) => {
+const levelKey = (value = "") => String(value).trim().toUpperCase();
+const first = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || null;
+const list = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const link = (url, extra = {}) => (url ? { url, ...extra } : null);
+const firstLesson = (raw = {}) => [raw.schreiben_sprechen, raw.lesen_hören].flat().filter(Boolean)[0] || raw;
+const mergeVideos = (...groups) => {
   const seen = new Set();
-  return groups.flat().filter((item) => {
-    const url = item?.url;
-    if (!url || seen.has(url)) return false;
-    seen.add(url);
-    return true;
+  return groups.flat().filter((item) => item?.url && !seen.has(item.url) && seen.add(item.url));
+};
+const INTERNAL = {
+  A2: { 17: { grammarBook: "/campus/course/a2-day-17-in-die-apotheke-grammar-notes.html" } },
+  B1: { 1: { grammarBook: "/campus/course/lesson/B1/1?view=grammar", workbook: "/campus/course/lesson/B1/1?view=workbook" } },
+};
+
+const resourceGroups = (raw, level, day) => {
+  const nested = [...list(raw.schreiben_sprechen), ...list(raw.lesen_hören)].filter(Boolean);
+  const entries = nested.length ? nested : [raw];
+  const internal = INTERNAL[level]?.[day] || {};
+  return entries.map((entry) => {
+    const chapter = entry.chapter || raw.chapter || null;
+    const workbook = resolveStrictInAppWorkbookRoute({
+      level,
+      day,
+      chapter,
+      fallback: internal.workbook || first(entry.workbook_link, raw.workbook_link, entry.workbookRoute, raw.workbookRoute),
+    });
+    return {
+      chapter,
+      grammarBook: link(internal.grammarBook || first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link)),
+      workbook: link(workbook),
+    };
   });
-};
-const INTERNAL_RESOURCE_ROUTES = {
-  A2: {
-    17: {
-      grammarBook: "/campus/course/a2-day-17-in-die-apotheke-grammar-notes.html",
-    },
-  },
-  B1: {
-    1: {
-      grammarBook: "/campus/course/lesson/B1/1?view=grammar",
-      workbook: "/campus/course/lesson/B1/1?view=workbook",
-    },
-  },
-};
-
-const normalizeResourceGroups = (rawLesson, level, day) => {
-  const nested = [
-    ...toArray(rawLesson.schreiben_sprechen),
-    ...toArray(rawLesson.lesen_hören),
-  ].filter(Boolean);
-  const entries = nested.length ? nested : [rawLesson];
-  const internal = INTERNAL_RESOURCE_ROUTES[level]?.[day] || {};
-
-  return entries.map((entry) => ({
-    chapter: entry.chapter || rawLesson.chapter || null,
-    grammarBook: resource(internal.grammarBook || firstString(
-      entry.grammarbook_link,
-      entry.grammar_link,
-      rawLesson.grammarbook_link,
-      rawLesson.grammar_link,
-    )),
-    workbook: resource(internal.workbook || firstString(
-      entry.workbook_link,
-      rawLesson.workbook_link,
-    )),
-  }));
 };
 
 export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level) => {
-  const level = normalizeLevel(requestedLevel);
+  const level = levelKey(requestedLevel);
   const day = Number(rawLesson.day ?? rawLesson.assignmentDay ?? 0);
-  const primary = firstEntry(rawLesson);
+  const primary = firstLesson(rawLesson);
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
-  const videos = mergeVideoResources(
-    getLessonVideoResources(level, day, rawLesson),
-    getAdditionalLessonVideoResources(level, day),
-  );
-  const teacherVideo = videos.find((item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher")) || null;
-  const aiVideo = videos.find((item) => !`${item.key} ${item.title}`.toLowerCase().includes("teacher")) || null;
-  const radio = capabilities.radio ? getLessonRadioResource(level, day) : null;
+  const videos = mergeVideos(getLessonVideoResources(level, day, rawLesson), getAdditionalLessonVideoResources(level, day));
+  const isTeacher = (item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher");
+  const groups = resourceGroups(rawLesson, level, day);
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
-  const resourceGroups = normalizeResourceGroups(rawLesson, level, day);
-  const firstResourceGroup = resourceGroups[0] || {};
-
   return {
-    level, day,
+    level,
+    day,
     topic: rawLesson.topic || rawLesson.title || `Day ${day}`,
     chapter: rawLesson.chapter || primary.chapter || null,
     lessonType: capabilities.fourPartWorkbook ? "fourPartWorkbook" : capabilities.selfAssessment ? "selfLearning" : "guided",
     capabilities,
     resources: {
-      falowenRadio: radio,
-      teacherVideo,
-      aiVideo,
-      grammarBook: firstResourceGroup.grammarBook || null,
-      workbook: firstResourceGroup.workbook || null,
+      falowenRadio: capabilities.radio ? getLessonRadioResource(level, day) : null,
+      teacherVideo: videos.find(isTeacher) || null,
+      aiVideo: videos.find((item) => !isTeacher(item)) || null,
+      grammarBook: groups[0]?.grammarBook || null,
+      workbook: groups[0]?.workbook || null,
       videos,
-      resourceGroups,
+      resourceGroups: groups,
     },
     submission: { enabled: capabilities.tutorSubmission && Boolean(rawLesson.assignment || assignmentId), assignmentId },
     raw: rawLesson,
   };
 };
 
-export const normalizeA1Lesson = (rawLesson = {}) => normalizeLesson(rawLesson, "A1");
-export const normalizeA2B1Lesson = (rawLesson = {}, level = rawLesson.level || "A2") => normalizeLesson(rawLesson, level);
-export const normalizeB2C1Lesson = (rawLesson = {}, level = rawLesson.level || "B2") => normalizeLesson(rawLesson, level);
+export const normalizeA1Lesson = (raw = {}) => normalizeLesson(raw, "A1");
+export const normalizeA2B1Lesson = (raw = {}, level = raw.level || "A2") => normalizeLesson(raw, level);
+export const normalizeB2C1Lesson = (raw = {}, level = raw.level || "B2") => normalizeLesson(raw, level);

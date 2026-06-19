@@ -1,3 +1,6 @@
+import { courseSchedules } from "../data/courseSchedule";
+import { hasOnlyInAppWorkbookRoutesForLevel } from "../data/inAppWorkbookRoutes";
+import { normalizeLesson } from "../data/lessonModel";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
 describe("AutoWorkbookStartGuide route matching", () => {
@@ -24,21 +27,29 @@ describe("AutoWorkbookStartGuide route matching", () => {
       lesen_hören: [readingResource],
       schreiben_sprechen: writingResource,
     };
-
     const index = buildWorkbookRouteIndex({ A1: [entry] });
-
     expect(index.get("/campus/course/direct-workbook")).toEqual({ level: "A1", day: 7, entry, resource: entry });
-    expect(index.get("/campus/course/reading-workbook")).toEqual({
-      level: "A1",
-      day: 7,
-      entry,
-      resource: readingResource,
+    expect(index.get("/campus/course/reading-workbook")).toEqual({ level: "A1", day: 7, entry, resource: readingResource });
+    expect(index.get("/campus/course/writing-workbook")).toEqual({ level: "A1", day: 7, entry, resource: writingResource });
+  });
+
+  test.each(["A1", "A2"])("%s configured routes are internal", (level) => {
+    expect(hasOnlyInAppWorkbookRoutesForLevel(level)).toBe(true);
+  });
+
+  test.each(["A1", "A2"])("%s lesson workbook buttons never expose external routes", (level) => {
+    (courseSchedules[level] || []).forEach((entry) => {
+      normalizeLesson(entry, level).resources.resourceGroups.forEach((group) => {
+        if (group.workbook?.url) expect(group.workbook.url).toMatch(/^\/campus\/course\//);
+      });
     });
-    expect(index.get("/campus/course/writing-workbook")).toEqual({
-      level: "A1",
-      day: 7,
-      entry,
-      resource: writingResource,
-    });
+  });
+
+  test("live route index includes the corrected A1 workbook routes", () => {
+    const index = buildWorkbookRouteIndex();
+    expect(index.has("/campus/course/a1-day-4-numbers-for-beginners-workbook")).toBe(true);
+    expect(index.has("/campus/course/a1-chapter-3-asking-about-prices-workbook")).toBe(true);
+    expect(index.has("/campus/course/a1-chapter-5-german-cases-workbook")).toBe(true);
+    expect(index.has("/campus/course/a1-day-10-objects-colors-possessive-articles-workbook")).toBe(true);
   });
 });
