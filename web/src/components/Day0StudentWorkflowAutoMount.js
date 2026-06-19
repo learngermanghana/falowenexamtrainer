@@ -7,6 +7,16 @@ const SUPPORTED_DAY0_PATHS = new Set([
   "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
   "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
   "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+  "/campus/course/b2-day-0-orientation-and-knowledge-test-workbook",
+  "/campus/course/b2-day-0-progression-workbook",
+  "/campus/course/b2-self-learning/day-0",
+  "/campus/course/c1-day-0-progression-workbook",
+  "/campus/course/c1-self-learning/day-0",
+  "/campus/course/lesson/A1/0",
+  "/campus/course/lesson/A2/0",
+  "/campus/course/lesson/B1/0",
+  "/campus/course/lesson/B2/0",
+  "/campus/course/lesson/C1/0",
 ]);
 
 const Day0StudentWorkflowAutoMount = () => {
