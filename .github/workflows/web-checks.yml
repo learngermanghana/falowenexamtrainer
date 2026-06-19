@@ -30,50 +30,57 @@ jobs:
 
       - name: Test speaking tools
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
 
       - name: Test inline course submissions
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/components/CourseLessonInlineSubmission.test.js
 
       - name: Test workbook route matching
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
 
       - name: Test workbook tabs and lock identities
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
-      - name: Test catalogue dictionary entries
+      - name: Test A1 Day 2 dictionary entry
         working-directory: web
-        env:
-          CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="getAssignmentDictionaryEntry"
+        env: { CI: true }
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="resolves A1 day 2"
+
+      - name: Test A1 Day 3 practical dictionary entry
+        working-directory: web
+        env: { CI: true }
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="keeps A1 day 3"
+
+      - name: Test A1 12.3 dictionary entry
+        working-directory: web
+        env: { CI: true }
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="keeps 12.3"
+
+      - name: Test noisy chapter dictionary entry
+        working-directory: web
+        env: { CI: true }
+        run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="normalizes chapter labels"
 
       - name: Test catalogue display titles
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="assignment display helpers"
 
       - name: Test catalogue progression
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/data/germanAssignmentCatalog.test.js --testNamePattern="progression sequence"
 
       - name: Test Day 0 workflow
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/components/Day0StudentWorkflowUpgrade.test.js
 
       - name: Build web app
@@ -82,8 +89,7 @@ jobs:
 
       - name: Test A2 and B1 workbook navigation
         working-directory: web
-        env:
-          CI: true
+        env: { CI: true }
         run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
 
       - name: Check curriculum manifest sync
