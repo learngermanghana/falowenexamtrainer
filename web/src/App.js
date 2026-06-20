@@ -15,6 +15,7 @@ import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import AttendanceTab from "./components/AttendanceTab";
+import ClassMembersTab from "./components/ClassMembersTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
@@ -188,16 +189,10 @@ const getTabStructure = (program, t) => {
   const vocabLabel = isFrenchProgram ? t("appNav.sections.vocabFrench") : t("appNav.sections.vocab");
 
   return [
-    {
-      key: "myCourse",
-      label: t("appNav.tabs.course"),
-      sections: [
-        { key: "course", label: t("appNav.sections.courseBook") },
-        { key: "examFile", label: t("appNav.sections.examFile") },
-        { key: "attendance", label: t("appNav.sections.attendance") },
-        { key: "classMembers", label: t("appNav.sections.classMembers") },
-      ],
-    },
+    { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
+    { key: "examFile", label: t("appNav.sections.examFile"), section: "examFile" },
+    { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
+    { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
     {
       key: "vocab",
       label: vocabLabel,
@@ -1267,6 +1262,7 @@ const CampusArea = ({
       ) : null}
       {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
       {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
+      {resolvedSection === "classMembers" && allowedSections.classMembers ? <ClassMembersTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
