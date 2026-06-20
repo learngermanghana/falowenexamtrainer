@@ -11,6 +11,7 @@ import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { expandCourseBookEntries } from "../utils/courseBookEntries";
+import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
@@ -167,6 +168,9 @@ const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
   const taskCount = Number(dayTaskCounts[String(day)] || 0);
   return chapter && taskCount > 1 ? `Day ${day} ${chapter}` : `Day ${day}`;
 };
+
+const getCourseBookEntryTitle = (entry = {}) =>
+  String(entry.lessonTitle || entry.topic || entry.title || entry.chapter || `Day ${getCourseBookDisplayDay(entry)}`).trim();
 
 const formatCourseBookInstruction = (instruction = "") =>
   String(instruction || "")
@@ -644,7 +648,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const schedule = useMemo(() => {
     const seenByDay = {};
-    const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || []);
+    const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || [], { level: selectedCourseLevel });
     return sortByDay(
       expandedEntries.map((entry) => {
         const dayKey = String(getCourseBookDisplayDay(entry) || "");
@@ -690,13 +694,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(String(selectedCourseLevel || "").toUpperCase());
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
-  const assignmentCount = decoratedSchedule.filter((entry) => entry.isTutorMarked).length;
-  const completedCount = decoratedSchedule.filter((entry) => entry.status === "passed").length;
-  const progressPercent = decoratedSchedule.length ? Math.round((completedCount / decoratedSchedule.length) * 100) : 0;
-  const nextLesson =
-    decoratedSchedule.find((entry) => !entry.isMilestone && !["passed", "submitted", "resubmitted"].includes(entry.status)) ||
-    decoratedSchedule.find((entry) => !entry.isMilestone) ||
-    decoratedSchedule[0];
+  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
+  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;
+  const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
+  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);
+  const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
+  const followingLesson = nextLessonIndex >= 0 ? courseLessons.slice(nextLessonIndex + 1).find((entry) => !isCourseBookEntryComplete(entry, practiceProgress)) || null : null;
+  const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
+  const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
+  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
 
   const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);
   const practicalCompletedCount = practiceEntries.filter((entry) => practiceProgress[entry.assignmentKey]?.completed).length;
@@ -720,7 +727,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const groupedLessons = useMemo(() => groupLessonsByWeek(visibleLessons), [visibleLessons]);
   const weekEntries = Object.entries(groupedLessons);
 
-  const persistPracticeProgress = async (assignmentKey, nextValue) => {
+  const persistPracticeProgress = async (entry, nextValue) => {
+    const assignmentKey = entry?.assignmentKey;
     if (!db || !studentCode || !assignmentKey) return;
     const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
     await setDoc(
@@ -729,6 +737,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         studentCode,
         level: selectedCourseLevel,
         assignmentKey,
+        entryId: entry.assignmentId || entry.assignment_id || null,
+        displayDay: getCourseBookDisplayDay(entry),
+        chapter: entry.displayChapter || entry.chapter || null,
+        lessonTitle: getCourseBookEntryTitle(entry),
         ...nextValue,
         updatedAt: serverTimestamp(),
       },
@@ -742,7 +754,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       const nextValue = { ...(prev[assignmentKey] || {}), ...updates, updatedAt: new Date().toISOString() };
       const next = { ...prev, [assignmentKey]: nextValue };
       if (typeof window !== "undefined") window.localStorage.setItem(practiceStorageKey, JSON.stringify(next));
-      persistPracticeProgress(assignmentKey, nextValue).catch((error) => console.warn("Could not save practice progress", error));
+      persistPracticeProgress(entry, nextValue).catch((error) => console.warn("Could not save practice progress", error));
       return next;
     });
   };
@@ -863,7 +875,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <div style={courseBookStyles.progressShell}>
                 <div style={{ ...courseBookStyles.progressFill, width: `${progressPercent}%` }} />
               </div>
-              <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {decoratedSchedule.length} lessons passed</p>
+              <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseLessons.length} lessons completed</p>
             </div>
           </section>
 
@@ -918,17 +930,48 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           ) : null}
 
           {nextLesson ? (
-            <section style={courseBookStyles.nextCard}>
-              <div>
-                <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>Next lesson</p>
-                <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>{getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLesson.topic}</h3>
-                <p style={{ ...styles.helperText, margin: 0 }}>{nextLesson.grammar_topic || nextLesson.chapter || "Open this lesson to continue."}</p>
-              </div>
-              <button type="button" style={styles.primaryButton} onClick={() => openLesson(nextLesson)}>
-                Open next lesson
-              </button>
-            </section>
-          ) : null}
+              <section style={courseBookStyles.nextCard}>
+                <div style={{ display: "grid", gap: 5, minWidth: 0 }}>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>
+                    {nextLesson.isTutorMarked ? "Next assignment" : "Next self-study lesson"}
+                  </p>
+                  <h3 style={{ margin: 0, color: "#0f172a" }}>
+                    {getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLessonTitle}
+                  </h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    {nextLesson.isTutorMarked
+                      ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
+                      : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
+                  </p>
+                  {!nextLesson.isTutorMarked ? (
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "#334155", fontWeight: 800 }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(nextPracticeState.completed)}
+                        onChange={(event) => updatePracticeEntry(nextLesson, { completed: event.target.checked })}
+                      />
+                      Mark “{nextLessonTitle}” as complete
+                    </label>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  style={styles.primaryButton}
+                  aria-label={`Open ${nextLessonTitle}`}
+                  onClick={() => openLesson(nextLesson)}
+                >
+                  Open: {nextLessonTitle}
+                </button>
+              </section>
+            ) : (
+              <section style={courseBookStyles.nextCard}>
+                <div>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
+                  <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Review earlier lessons or continue to exam preparation.</p>
+                </div>
+              </section>
+            )}
 
           <section style={courseBookStyles.toolbar}>
             <div style={courseBookStyles.toolbarTop}>

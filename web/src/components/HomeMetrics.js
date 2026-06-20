@@ -107,14 +107,18 @@ const getDictionaryEntries = (entry = {}, level = "") => {
 };
 
 const buildDictionaryLabel = (entry = {}, level = "") => {
+  if (entry?.label && entry?.displayDay !== undefined) return entry.label;
+
   const scheduleEntries = getDictionaryEntries(entry, level);
   const topics = scheduleEntries.map((scheduleEntry) => scheduleEntry?.topic || "").filter(Boolean);
-
   if (!topics.length) return entry?.label || "";
 
-  const dictionaryDay = Number(scheduleEntries[0]?.assignmentDay || 0);
-  const day = dictionaryDay || Number(entry?.dayNumber);
-  const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}: ` : "";
+  const firstEntry = scheduleEntries[0] || {};
+  const day = Number(firstEntry.displayDay ?? entry?.displayDay ?? firstEntry.assignmentDay ?? entry?.dayNumber);
+  const chapters = Array.from(
+    new Set(scheduleEntries.map((scheduleEntry) => scheduleEntry?.displayChapter || scheduleEntry?.chapter || "").filter(Boolean))
+  );
+  const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}${chapters.length ? ` ${chapters.join(" + ")}` : ""}: ` : "";
   const mergedTopic = Array.from(new Set(topics)).join(" + ");
   return `${dayPrefix}${mergedTopic}`.trim();
 };
@@ -328,6 +332,24 @@ const HomeMetrics = ({ studentProfile }) => {
     return ids.length ? ids.join(", ") : "";
   }, [assignmentStats]);
 
+  const nextRecommendationHelper = useMemo(() => {
+    if (blocked) {
+      return failedIdentifiersText
+        ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+        : t("homeMetrics.nextRecommendation.blocked");
+    }
+    if (nextObj?.selfStudy) {
+      return t("homeMetrics.nextRecommendation.selfStudyHelper", {
+        title: nextObj.title || nextObj.label,
+        defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
+      });
+    }
+    if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
+      return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
+    }
+    return t("homeMetrics.nextRecommendation.defaultHelper");
+  }, [blocked, failedIdentifiersText, nextObj, t]);
+
   const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
   const qualificationMinimum = leaderboard?.qualificationMinimum ?? 3;
   const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
@@ -365,7 +387,7 @@ const HomeMetrics = ({ studentProfile }) => {
     [t]
   );
 
-  const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Assignments you jumped or skipped earlier in the schedule." }), [t]);
+  const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Earlier tutor assignments or self-study lessons you skipped in the visible Course Book order." }), [t]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -431,15 +453,7 @@ const HomeMetrics = ({ studentProfile }) => {
         <StatCard
           label={t("homeMetrics.nextRecommendation.label")}
           value={recommendedNext}
-          helper={
-            blocked
-              ? failedIdentifiersText
-                ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
-                : t("homeMetrics.nextRecommendation.blocked")
-              : nextObj?.goal && !isPassingScoreGoal(nextObj.goal)
-              ? t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal })
-              : t("homeMetrics.nextRecommendation.defaultHelper")
-          }
+          helper={nextRecommendationHelper}
           tone="warning"
         />
         <StatCard

@@ -1097,11 +1097,12 @@
       "blocked": "Complete failed tasks to unlock the next recommendation.",
       "blockedWithIds": "Complete failed tasks ({{items}}) to unlock the next recommendation.",
       "goal": "{{goal}}",
-      "defaultHelper": "Keep going with your next recommended task."
+      "defaultHelper": "Keep going with your next recommended task.",
+      "selfStudyHelper": "Schließe diese Selbstlernlektion ab und markiere sie im Kursbuch als abgeschlossen, um den nächsten Inhalt freizuschalten."
     },
     "missed": {
       "label": "Missed items",
-      "helper": "Missed items are only those before your last fully completed day."
+      "helper": "Frühere Tutor-Aufgaben oder Selbstlernlektionen, die du in der sichtbaren Kursbuch-Reihenfolge übersprungen hast."
     },
     "failed": {
       "label": "Failed items",
