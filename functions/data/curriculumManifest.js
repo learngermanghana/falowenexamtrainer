@@ -288,7 +288,7 @@ const CANONICAL_CURRICULUM = [
     "title": "Personal Information, Articles, Adjectives and W-Questions",
     "assignmentId": "A1-1.3",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "",
+    "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
     "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
     "video": "https://youtu.be/aQNXQlTJMBA",
     "submissionRequired": false,
@@ -298,7 +298,7 @@ const CANONICAL_CURRICULUM = [
         "chapter": "1.3",
         "title": "Personal Information, Articles, Adjectives and W-Questions",
         "video": "https://youtu.be/aQNXQlTJMBA",
-        "grammarPage": "",
+        "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
         "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
         "submissionRequired": false
       }
