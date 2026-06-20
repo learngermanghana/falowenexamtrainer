@@ -33,6 +33,10 @@ jobs:
               lines.append(line[10:] if line.startswith('          ') else line)
           script = '\n'.join(lines) + '\n'
           script = script.replace("'''.replace(/^          /gm, \"\"))", "'''.replace(\"\\n          \", \"\\n\"))")
+          script = script.replace(
+              "replace_once(course_tab, old_persist, new_persist)",
+              "regex_once(course_tab, r'  const persistPracticeProgress = async \\(assignmentKey, nextValue\\) => \\{.*?\\n  \\};', new_persist.rstrip())",
+          )
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
