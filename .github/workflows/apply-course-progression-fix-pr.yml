@@ -31,7 +31,9 @@ jobs:
               if line.startswith('      - name:'):
                   break
               lines.append(line[10:] if line.startswith('          ') else line)
-          Path('/tmp/apply-course-progression.sh').write_text('\n'.join(lines) + '\n')
+          script = '\n'.join(lines) + '\n'
+          script = script.replace("'''.replace(/^          /gm, \"\"))", "'''.replace(\"\\n          \", \"\\n\"))")
+          Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
           bash /tmp/apply-course-progression.sh 2>&1 | tee /tmp/course-progression-patch.log
