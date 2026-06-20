@@ -915,6 +915,7 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/aQNXQlTJMBA",
         youtube_link: "https://youtu.be/aQNXQlTJMBA",
+        grammarbook_link: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
         workbook_link: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
         assignment: false,
       },
