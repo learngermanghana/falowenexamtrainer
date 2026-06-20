@@ -65,9 +65,7 @@ function formatTime(value, locale, timeZone = GHANA_TIMEZONE) {
 
 function formatRange(session, locale, timeZone = GHANA_TIMEZONE) {
   if (!session) return "-";
-  const start = formatTime(session.startsAt, locale, timeZone);
-  const end = formatTime(session.endsAt, locale, timeZone);
-  return `${start}–${end}`;
+  return `${formatTime(session.startsAt, locale, timeZone)}–${formatTime(session.endsAt, locale, timeZone)}`;
 }
 
 function sameGhanaDate(left, right = new Date()) {
@@ -82,18 +80,12 @@ function sameGhanaDate(left, right = new Date()) {
 }
 
 function sessionTopic(session, fallback = "Live class") {
-  return String(
-    session?.topic ||
-    (session?.assignmentIds || []).join(", ") ||
-    fallback,
-  ).trim();
+  return String(session?.topic || (session?.assignmentIds || []).join(", ") || fallback).trim();
 }
 
 function formatCanonicalSchedule(rules = []) {
   if (!rules.length) return "Class dates are managed by Falowen Admin.";
-  return rules
-    .map((rule) => `${rule.day || "Day"} ${rule.startTime || ""}`.trim())
-    .join(" · ");
+  return rules.map((rule) => `${rule.day || "Day"} ${rule.startTime || ""}`.trim()).join(" · ");
 }
 
 function countdownLabel(value, now) {
@@ -167,7 +159,7 @@ function downloadCanonicalCalendar(summary) {
   URL.revokeObjectURL(url);
 }
 
-function StaticClassCard({ selectedClass, classDetails, locale, now }) {
+function StaticClassCard({ selectedClass, classDetails, now }) {
   const nextClass = findNextClassSession(selectedClass, now);
   const completedToday = findArchivedTodayClassSession(selectedClass, now);
   const scheduleSummary = formatScheduleSummary(classDetails?.schedule);
@@ -182,9 +174,7 @@ function StaticClassCard({ selectedClass, classDetails, locale, now }) {
       <section style={{ ...infoCardStyle, background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderColor: "#bfdbfe" }}>
         <h3 style={{ margin: 0 }}>{selectedClass}</h3>
         <p style={{ ...styles.helperText, margin: 0 }}>{scheduleSummary}</p>
-        {classDetails?.startDate && classDetails?.endDate ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>{classDetails.startDate} → {classDetails.endDate}</p>
-        ) : null}
+        {classDetails?.startDate && classDetails?.endDate ? <p style={{ ...styles.helperText, margin: 0 }}>{classDetails.startDate} → {classDetails.endDate}</p> : null}
         <a href={ZOOM_DETAILS.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a>
         <div style={zoomDetailsStyle}>
           <strong>Zoom details</strong>
@@ -266,14 +256,18 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
   }, [initialClassId, program, selectedClass]);
 
   const classDetails = resolvedCatalog[selectedClass];
-  const studentClassLocked = Boolean(initialClassName);
+  const studentClassLocked = Boolean(initialClassName || initialClassId);
   const nextSession = canonicalSummary?.nextSession || null;
   const completedSession = canonicalSummary?.latestCompletedSession || null;
   const cancelledSessions = canonicalSummary?.cancelledSessions?.filter((session) => {
     const start = asDate(session.startsAt)?.getTime() || 0;
     return start >= now.getTime() - 7 * 24 * 60 * 60 * 1000;
   }).slice(0, 3) || [];
-  const zoom = canonicalSummary?.zoom?.url ? canonicalSummary.zoom : (!canonicalSummary?.klass?.zoomProfileId ? ZOOM_DETAILS : canonicalSummary?.zoom || {});
+  const zoom = canonicalSummary?.zoom?.url
+    ? canonicalSummary.zoom
+    : !canonicalSummary?.klass?.zoomProfileId
+    ? ZOOM_DETAILS
+    : canonicalSummary?.zoom || {};
   const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const ghanaNextTime = nextSession ? formatRange(nextSession, locale, GHANA_TIMEZONE) : "";
   const deviceNextTime = nextSession ? formatRange(nextSession, locale, deviceTimeZone) : "";
@@ -382,7 +376,7 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
       ) : canonicalStatus === "loading" ? (
         <section style={infoCardStyle}><span style={styles.helperText}>Loading the latest class schedule…</span></section>
       ) : classDetails ? (
-        <StaticClassCard selectedClass={selectedClass} classDetails={classDetails} locale={locale} now={now} />
+        <StaticClassCard selectedClass={selectedClass} classDetails={classDetails} now={now} />
       ) : (
         <section style={{ ...infoCardStyle, background: "#fef2f2", borderColor: "#fecaca" }}>
           <strong>Class schedule unavailable</strong>
