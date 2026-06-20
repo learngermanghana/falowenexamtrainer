@@ -81,6 +81,8 @@ export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) =>
 
   if (!correction) return entry;
 
+  // Only patch the current entry. Nested Day 3 resources are normalized separately,
+  // so Kapitel 1.1 and Kapitel 1.2 cannot overwrite one another.
   return {
     ...entry,
     chapter: correction.chapter,
@@ -94,12 +96,6 @@ export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) =>
     grammarPage: correction.grammarPage,
     grammarbook_link: correction.grammarPage || null,
     grammar_link: correction.grammarPage || null,
-    lesen_hören: Array.isArray(entry.lesen_hören)
-      ? entry.lesen_hören.map((resource) => patchResource(resource, correction))
-      : patchResource(entry.lesen_hören, correction),
-    schreiben_sprechen: Array.isArray(entry.schreiben_sprechen)
-      ? entry.schreiben_sprechen.map((resource) => patchResource(resource, correction))
-      : patchResource(entry.schreiben_sprechen, correction),
   };
 };
 
