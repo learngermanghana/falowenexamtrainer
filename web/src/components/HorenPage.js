@@ -4,6 +4,7 @@ import { styles } from "../styles";
 
 const HorenPage = () => {
   const { t } = useTranslation();
+  const day2GermanAlphabetUrl = "https://youtu.be/pCQVdJGsvtk";
   const horenPlaylistUrl =
     "https://www.youtube.com/watch?list=PLg78ckjpHfZy5lkbq8bw26rLXkZ8jLRUN&v=H2eUgxXfkS4&feature=youtu.be";
   const horenThumbnailUrl = "https://i.ytimg.com/vi/H2eUgxXfkS4/hqdefault.jpg";
@@ -16,12 +17,14 @@ const HorenPage = () => {
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
         <a
-          href="https://drive.google.com/file/d/1TuJKu6c3_KKMX4tp2neummtKieHP59_G/view?usp=sharing"
+          href={day2GermanAlphabetUrl}
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}
         >
-          {t("horenPage.actions.openSamples")}
+          {t("horenPage.actions.day2GermanAlphabet", {
+            defaultValue: "Open Day 2 German Alphabet Hören on YouTube",
+          })}
         </a>
         <a
           href={horenPlaylistUrl}
@@ -54,7 +57,9 @@ const HorenPage = () => {
           style={{ width: "100%", height: "auto", display: "block" }}
           loading="lazy"
         />
-        <div style={{ padding: "0 10px 10px", color: "#1f2937", fontWeight: 600 }}>{t("horenPage.actions.playlist")}</div>
+        <div style={{ padding: "0 10px 10px", color: "#1f2937", fontWeight: 600 }}>
+          {t("horenPage.actions.playlist")}
+        </div>
       </a>
     </section>
   );
