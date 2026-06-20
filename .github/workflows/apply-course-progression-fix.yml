@@ -1,0 +1,639 @@
+name: Apply course progression fix
+
+on:
+  push:
+    branches:
+      - fix/home-metrics-course-progression
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/home-metrics-course-progression
+          fetch-depth: 0
+
+      - name: Apply progression changes
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(path, old, new):
+              text = path.read_text()
+              if new in text:
+                  return False
+              if old not in text:
+                  raise SystemExit(f"Missing replacement target in {path}: {old[:120]!r}")
+              path.write_text(text.replace(old, new, 1))
+              return True
+
+          def regex_once(path, pattern, replacement):
+              text = path.read_text()
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count == 0:
+                  if replacement.strip() in text:
+                      return False
+                  raise SystemExit(f"Missing regex target in {path}: {pattern[:120]!r}")
+              path.write_text(updated)
+              return True
+
+          course_tab = Path("web/src/components/CourseTab.js")
+          helper_anchor = '''const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
+            const day = getCourseBookDisplayDay(entry);
+            const chapter = String(entry.displayChapter || entry.chapter || "").trim();
+            const taskCount = Number(dayTaskCounts[String(day)] || 0);
+            return chapter && taskCount > 1 ? `Day ${day} ${chapter}` : `Day ${day}`;
+          };
+'''
+          helper_replacement = helper_anchor + '''
+          const COMPLETED_TUTOR_STATUSES = new Set(["passed", "submitted", "resubmitted"]);
+
+          export const isCourseBookEntryComplete = (entry = {}, practiceProgress = {}) => {
+            if (!entry || entry.isMilestone || isMilestoneEntry(entry)) return false;
+            const tutorMarked = entry.isTutorMarked ?? entry.tutorMarked ?? hasTutorMarkedWork(entry);
+            if (tutorMarked) return COMPLETED_TUTOR_STATUSES.has(entry.status);
+            return Boolean(practiceProgress?.[entry.assignmentKey]?.completed);
+          };
+
+          export const getNextCourseBookEntry = (entries = [], practiceProgress = {}) =>
+            entries.find((entry) => !entry?.isMilestone && !isCourseBookEntryComplete(entry, practiceProgress)) || null;
+
+          const getCourseBookEntryTitle = (entry = {}) =>
+            String(entry.lessonTitle || entry.topic || entry.title || entry.chapter || `Day ${getCourseBookDisplayDay(entry)}`).trim();
+'''
+          replace_once(course_tab, helper_anchor, helper_replacement)
+
+          replace_once(
+              course_tab,
+              'const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || []);',
+              'const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || [], { level: selectedCourseLevel });'
+          )
+
+          old_progress = '''  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(String(selectedCourseLevel || "").toUpperCase());
+            const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
+            const assignmentCount = decoratedSchedule.filter((entry) => entry.isTutorMarked).length;
+            const completedCount = decoratedSchedule.filter((entry) => entry.status === "passed").length;
+            const progressPercent = decoratedSchedule.length ? Math.round((completedCount / decoratedSchedule.length) * 100) : 0;
+            const nextLesson =
+              decoratedSchedule.find((entry) => !entry.isMilestone && !["passed", "submitted", "resubmitted"].includes(entry.status)) ||
+              decoratedSchedule.find((entry) => !entry.isMilestone) ||
+              decoratedSchedule[0];
+'''
+          new_progress = '''  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(String(selectedCourseLevel || "").toUpperCase());
+            const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
+            const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+            const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
+            const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;
+            const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
+            const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);
+            const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
+            const followingLesson = nextLessonIndex >= 0 ? courseLessons.slice(nextLessonIndex + 1).find((entry) => !isCourseBookEntryComplete(entry, practiceProgress)) || null : null;
+            const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
+            const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
+            const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
+'''
+          replace_once(course_tab, old_progress, new_progress)
+
+          old_persist = '''  const persistPracticeProgress = async (assignmentKey, nextValue) => {
+            if (!db || !studentCode || !assignmentKey) return;
+            const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
+            await setDoc(
+              doc(db, "coursePracticeProgress", docId),
+              {
+                studentCode,
+                level: selectedCourseLevel,
+                assignmentKey,
+                ...nextValue,
+                updatedAt: serverTimestamp(),
+              },
+              { merge: true }
+            );
+          };
+'''
+          new_persist = '''  const persistPracticeProgress = async (entry, nextValue) => {
+            const assignmentKey = entry?.assignmentKey;
+            if (!db || !studentCode || !assignmentKey) return;
+            const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
+            await setDoc(
+              doc(db, "coursePracticeProgress", docId),
+              {
+                studentCode,
+                level: selectedCourseLevel,
+                assignmentKey,
+                entryId: entry.assignmentId || entry.assignment_id || null,
+                displayDay: getCourseBookDisplayDay(entry),
+                chapter: entry.displayChapter || entry.chapter || null,
+                lessonTitle: getCourseBookEntryTitle(entry),
+                ...nextValue,
+                updatedAt: serverTimestamp(),
+              },
+              { merge: true }
+            );
+          };
+'''
+          replace_once(course_tab, old_persist, new_persist)
+          replace_once(
+              course_tab,
+              'persistPracticeProgress(assignmentKey, nextValue).catch((error) => console.warn("Could not save practice progress", error));',
+              'persistPracticeProgress(entry, nextValue).catch((error) => console.warn("Could not save practice progress", error));'
+          )
+
+          old_next_card = '''          {nextLesson ? (
+                        <section style={courseBookStyles.nextCard}>
+                          <div>
+                            <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>Next lesson</p>
+                            <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>{getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLesson.topic}</h3>
+                            <p style={{ ...styles.helperText, margin: 0 }}>{nextLesson.grammar_topic || nextLesson.chapter || "Open this lesson to continue."}</p>
+                          </div>
+                          <button type="button" style={styles.primaryButton} onClick={() => openLesson(nextLesson)}>
+                            Open next lesson
+                          </button>
+                        </section>
+                      ) : null}
+'''
+          new_next_card = '''          {nextLesson ? (
+                        <section style={courseBookStyles.nextCard}>
+                          <div style={{ display: "grid", gap: 5, minWidth: 0 }}>
+                            <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>
+                              {nextLesson.isTutorMarked ? "Next assignment" : "Next self-study lesson"}
+                            </p>
+                            <h3 style={{ margin: 0, color: "#0f172a" }}>
+                              {getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLessonTitle}
+                            </h3>
+                            <p style={{ ...styles.helperText, margin: 0 }}>
+                              {nextLesson.isTutorMarked
+                                ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
+                                : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
+                            </p>
+                            {!nextLesson.isTutorMarked ? (
+                              <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "#334155", fontWeight: 800 }}>
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(nextPracticeState.completed)}
+                                  onChange={(event) => updatePracticeEntry(nextLesson, { completed: event.target.checked })}
+                                />
+                                Mark “{nextLessonTitle}” as complete
+                              </label>
+                            ) : null}
+                          </div>
+                          <button
+                            type="button"
+                            style={styles.primaryButton}
+                            aria-label={`Open ${nextLessonTitle}`}
+                            onClick={() => openLesson(nextLesson)}
+                          >
+                            Open: {nextLessonTitle}
+                          </button>
+                        </section>
+                      ) : (
+                        <section style={courseBookStyles.nextCard}>
+                          <div>
+                            <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
+                            <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
+                            <p style={{ ...styles.helperText, margin: 0 }}>Review earlier lessons or continue to exam preparation.</p>
+                          </div>
+                        </section>
+                      )}
+'''
+          replace_once(course_tab, old_next_card, new_next_card)
+          replace_once(
+              course_tab,
+              '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {decoratedSchedule.length} lessons passed</p>',
+              '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseLessons.length} lessons completed</p>'
+          )
+
+          course_test = Path("web/src/components/CourseTab.status.test.js")
+          replace_once(
+              course_test,
+              '  getAutoStatusForEntry,\n',
+              '  getAutoStatusForEntry,\n  getNextCourseBookEntry,\n  isCourseBookEntryComplete,\n'
+          )
+          test_block = '''
+
+          describe("course book next lesson progression", () => {
+            const entries = [
+              { assignmentKey: "A1-0.1", topic: "Greetings", isTutorMarked: true, status: "passed", isMilestone: false },
+              { assignmentKey: "A1-DAY-3-PRACTICE-1.1", topic: "Pronouns self-study", isTutorMarked: false, status: "notStarted", isMilestone: false },
+              { assignmentKey: "A1-1.2", topic: "Introducing Yourself", isTutorMarked: true, status: "notStarted", isMilestone: false },
+            ];
+
+            it("stops at an incomplete self-study lesson", () => {
+              expect(getNextCourseBookEntry(entries, {})).toMatchObject({ assignmentKey: "A1-DAY-3-PRACTICE-1.1" });
+              expect(isCourseBookEntryComplete(entries[1], {})).toBe(false);
+            });
+
+            it("unlocks the next assignment after self-study is marked complete", () => {
+              const practiceProgress = { "A1-DAY-3-PRACTICE-1.1": { completed: true } };
+              expect(isCourseBookEntryComplete(entries[1], practiceProgress)).toBe(true);
+              expect(getNextCourseBookEntry(entries, practiceProgress)).toMatchObject({ assignmentKey: "A1-1.2" });
+            });
+          });
+'''
+          if 'describe("course book next lesson progression"' not in course_test.read_text():
+              course_test.write_text(course_test.read_text().rstrip() + test_block + "\n")
+
+          home_metrics = Path("web/src/components/HomeMetrics.js")
+          old_label = '''const buildDictionaryLabel = (entry = {}, level = "") => {
+            const scheduleEntries = getDictionaryEntries(entry, level);
+            const topics = scheduleEntries.map((scheduleEntry) => scheduleEntry?.topic || "").filter(Boolean);
+
+            if (!topics.length) return entry?.label || "";
+
+            const dictionaryDay = Number(scheduleEntries[0]?.assignmentDay || 0);
+            const day = dictionaryDay || Number(entry?.dayNumber);
+            const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}: ` : "";
+            const mergedTopic = Array.from(new Set(topics)).join(" + ");
+            return `${dayPrefix}${mergedTopic}`.trim();
+          };
+'''
+          new_label = '''const buildDictionaryLabel = (entry = {}, level = "") => {
+            if (entry?.label && entry?.displayDay !== undefined) return entry.label;
+
+            const scheduleEntries = getDictionaryEntries(entry, level);
+            const topics = scheduleEntries.map((scheduleEntry) => scheduleEntry?.topic || "").filter(Boolean);
+            if (!topics.length) return entry?.label || "";
+
+            const firstEntry = scheduleEntries[0] || {};
+            const day = Number(firstEntry.displayDay ?? entry?.displayDay ?? firstEntry.assignmentDay ?? entry?.dayNumber);
+            const chapters = Array.from(
+              new Set(scheduleEntries.map((scheduleEntry) => scheduleEntry?.displayChapter || scheduleEntry?.chapter || "").filter(Boolean))
+            );
+            const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}${chapters.length ? ` ${chapters.join(" + ")}` : ""}: ` : "";
+            const mergedTopic = Array.from(new Set(topics)).join(" + ");
+            return `${dayPrefix}${mergedTopic}`.trim();
+          };
+'''
+          replace_once(home_metrics, old_label, new_label)
+
+          helper_anchor_home = '''  const failedIdentifiersText = useMemo(() => {
+            const ids = assignmentStats?.failedIdentifiers || [];
+            return ids.length ? ids.join(", ") : "";
+          }, [assignmentStats]);
+'''
+          helper_replacement_home = helper_anchor_home + '''
+
+            const nextRecommendationHelper = useMemo(() => {
+              if (blocked) {
+                return failedIdentifiersText
+                  ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+                  : t("homeMetrics.nextRecommendation.blocked");
+              }
+              if (nextObj?.selfStudy) {
+                return t("homeMetrics.nextRecommendation.selfStudyHelper", {
+                  title: nextObj.title || nextObj.label,
+                  defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
+                });
+              }
+              if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
+                return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
+              }
+              return t("homeMetrics.nextRecommendation.defaultHelper");
+            }, [blocked, failedIdentifiersText, nextObj, t]);
+'''
+          replace_once(home_metrics, helper_anchor_home, helper_replacement_home)
+
+          old_helper_jsx = '''          helper={
+                    blocked
+                      ? failedIdentifiersText
+                        ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+                        : t("homeMetrics.nextRecommendation.blocked")
+                      : nextObj?.goal && !isPassingScoreGoal(nextObj.goal)
+                      ? t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal })
+                      : t("homeMetrics.nextRecommendation.defaultHelper")
+                  }
+'''
+          replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\n')
+          replace_once(
+              home_metrics,
+              'const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Assignments you jumped or skipped earlier in the schedule." }), [t]);',
+              'const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Earlier tutor assignments or self-study lessons you skipped in the visible Course Book order." }), [t]);'
+          )
+
+          for locale, helper in [
+              ("en", "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item."),
+              ("de", "Schließe diese Selbstlernlektion ab und markiere sie im Kursbuch als abgeschlossen, um den nächsten Inhalt freizuschalten."),
+              ("fr", "Terminez cette leçon en autonomie et marquez-la comme terminée dans le manuel pour débloquer l’élément suivant."),
+          ]:
+              path = Path(f"web/src/i18n/locales/{locale}/translation.json")
+              text = path.read_text()
+              if '"selfStudyHelper"' not in text:
+                  text = text.replace(
+                      '"defaultHelper": "Keep going with your next recommended task."' if locale == "en" else ('"defaultHelper": "Mach mit der nächsten empfohlenen Aufgabe weiter."' if locale == "de" else '"defaultHelper": "Continuez avec la prochaine tâche recommandée."'),
+                      ('"defaultHelper": "Keep going with your next recommended task.",\n      "selfStudyHelper": "' + helper + '"') if locale == "en" else (( '"defaultHelper": "Mach mit der nächsten empfohlenen Aufgabe weiter.",\n      "selfStudyHelper": "' + helper + '"') if locale == "de" else ('"defaultHelper": "Continuez avec la prochaine tâche recommandée.",\n      "selfStudyHelper": "' + helper + '"')),
+                      1,
+                  )
+              path.write_text(text)
+
+          plan_file = Path("functions/functionz/routes/scoresSummaryCoursePlan.js")
+          plan_file.write_text(r'''"use strict";
+
+          const { getCurriculumEntriesForLevel, normalizeLevel } = require("../../data/curriculumManifest");
+
+          const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+          const normalizePracticeKey = (value = "") => String(value || "").trim().toUpperCase();
+          const sanitizePracticeChapter = (value = "") =>
+            String(value || "")
+              .trim()
+              .replace(/[^a-z0-9._-]/gi, "-");
+
+          const buildCourseItemLabel = (entry = {}) => {
+            const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
+            const displayChapter = String(entry.displayChapter || entry.chapter || "").trim();
+            const title = String(entry.topic || entry.title || "Lesson").trim();
+            const prefix = displayDay > 0 ? `Day ${displayDay}${displayChapter ? ` ${displayChapter}` : ""}` : displayChapter;
+            return `${prefix ? `${prefix}: ` : ""}${title}`.trim();
+          };
+
+          const getPracticeKeysForEntry = (entry = {}, level = "") => {
+            const normalizedLevel = normalizeLevel(level || entry.level || "") || String(level || entry.level || "").toUpperCase();
+            const assignmentId = normalizePracticeKey(entry.assignment_id || entry.assignmentId || entry.canonicalAssignmentId);
+            const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
+            const assignmentDay = Number(entry.assignmentDay ?? entry.day ?? displayDay);
+            const chapter = sanitizePracticeChapter(entry.displayChapter || entry.chapter || "");
+            return Array.from(
+              new Set(
+                [
+                  assignmentId,
+                  normalizedLevel && displayDay && chapter ? `${normalizedLevel}-DAY-${displayDay}-PRACTICE-${chapter}` : "",
+                  normalizedLevel && assignmentDay && chapter ? `${normalizedLevel}-DAY-${assignmentDay}-PRACTICE-${chapter}` : "",
+                ]
+                  .map(normalizePracticeKey)
+                  .filter(Boolean)
+              )
+            );
+          };
+
+          const getAssignmentSummary = (level = "A1") => {
+            const normalizedLevel = normalizeLevel(level || "A1") || "A1";
+            const entries = getCurriculumEntriesForLevel(normalizedLevel)
+              .filter((entry) => {
+                const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
+                const hasResource = Boolean(
+                  entry.workbookRoute ||
+                    entry.video ||
+                    toArray(entry.resources).some((resource) => resource?.workbookRoute || resource?.workbook_link || resource?.video || resource?.youtube_link)
+                );
+                return displayDay > 0 && Boolean(entry.chapter) && Boolean(entry.title || entry.topic) && hasResource;
+              })
+              .sort((a, b) => {
+                const orderDiff = Number(a.assignmentDay ?? a.day ?? 0) - Number(b.assignmentDay ?? b.day ?? 0);
+                if (orderDiff !== 0) return orderDiff;
+                return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
+              });
+
+            const lessons = entries.map((entry, index) => {
+              const submissionRequired = Boolean(entry.submissionRequired ?? entry.assignment);
+              const assignmentId = normalizePracticeKey(entry.assignment_id || entry.assignmentId || entry.canonicalAssignmentId);
+              const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
+              const displayChapter = String(entry.displayChapter || entry.chapter || "").trim();
+              const title = String(entry.topic || entry.title || "Lesson").trim();
+              const selfStudy = !submissionRequired;
+              return {
+                order: index,
+                assignmentDay: Number(entry.assignmentDay ?? entry.day ?? 0),
+                dayNumber: displayDay,
+                displayDay,
+                displayChapter,
+                title,
+                goal: String(entry.goal || "").trim(),
+                label: buildCourseItemLabel(entry),
+                assignmentId,
+                identifiers: submissionRequired && assignmentId ? [assignmentId] : [],
+                submissionRequired,
+                selfStudy,
+                practiceKeys: selfStudy ? getPracticeKeysForEntry(entry, normalizedLevel) : [],
+              };
+            });
+
+            return {
+              lessons,
+              plannedSet: new Set(lessons.flatMap((lesson) => lesson.identifiers)),
+              totalCourseItems: lessons.length,
+            };
+          };
+
+          module.exports = {
+            buildCourseItemLabel,
+            getAssignmentSummary,
+            getPracticeKeysForEntry,
+            normalizePracticeKey,
+          };
+          '''.replace(/^          /gm, ""))
+
+          plan_test = Path("functions/functionz/routes/scoresSummaryCoursePlan.test.js")
+          plan_test.write_text(r'''"use strict";
+
+          const test = require("node:test");
+          const assert = require("node:assert/strict");
+          const { getAssignmentSummary } = require("./scoresSummaryCoursePlan");
+
+          test("A1 split tasks use visible Course Book days and chapters", () => {
+            const { lessons, plannedSet } = getAssignmentSummary("A1");
+            const alphabet = lessons.find((item) => item.assignmentId === "A1-0.2");
+            const pronouns = lessons.find((item) => item.assignmentId === "A1-1.1" && item.submissionRequired);
+
+            assert.equal(alphabet.displayDay, 2);
+            assert.equal(pronouns.displayDay, 2);
+            assert.match(alphabet.label, /^Day 2 0\.2:/);
+            assert.match(pronouns.label, /^Day 2 1\.1:/);
+            assert.equal(plannedSet.has("A1-0.2"), true);
+            assert.equal(plannedSet.has("A1-1.1"), true);
+          });
+
+          test("A1 self-study items expose completion keys for Course Book progress", () => {
+            const { lessons } = getAssignmentSummary("A1");
+            const practice = lessons.find((item) => item.assignmentId === "A1-1.1-PRACTICE");
+
+            assert.ok(practice);
+            assert.equal(practice.selfStudy, true);
+            assert.equal(practice.submissionRequired, false);
+            assert.equal(practice.displayDay, 3);
+            assert.ok(practice.practiceKeys.includes("A1-1.1-PRACTICE"));
+            assert.ok(practice.practiceKeys.includes("A1-DAY-3-PRACTICE-1.1"));
+          });
+          '''.replace(/^          /gm, ""))
+
+          scores = Path("functions/functionz/routes/scoresSummary.js")
+          replace_once(
+              scores,
+              '''const {
+            getCurriculumEntriesForLevel,
+            normalizeLevel,
+          } = require("../../data/curriculumManifest");
+''',
+              '''const { normalizeLevel } = require("../../data/curriculumManifest");
+          const { getAssignmentSummary, normalizePracticeKey } = require("./scoresSummaryCoursePlan");
+'''
+          )
+          regex_once(
+              scores,
+              r'\nconst getAssignmentSummary = \(level = "A1"\) => \{.*?\n\};\n\n/\* ------------------------ Streak \+ auth helpers ------------------------ \*/',
+              '\n/* ------------------------ Streak + auth helpers ------------------------ */'
+          )
+
+          load_anchor = '''const maybeRequireAuth = async (req) => {
+            const authHeader = String(req.headers.authorization || "").trim();
+            if (!authHeader) return null;
+            return requireAuth(req);
+          };
+'''
+          load_replacement = load_anchor + '''
+          const loadCompletedPracticeKeys = async ({ db, studentCode, level }) => {
+            if (!db || !studentCode) return new Set();
+            try {
+              const snapshot = await db.collection("coursePracticeProgress").where("studentCode", "==", studentCode).get();
+              const normalizedLevel = normalizeLevel(level || "");
+              const completed = new Set();
+              snapshot.forEach((docSnap) => {
+                const data = docSnap.data() || {};
+                const rowLevel = normalizeLevel(data.level || "");
+                if (rowLevel && normalizedLevel && rowLevel !== normalizedLevel) return;
+                if (data.completed !== true) return;
+                [data.assignmentKey, data.entryId, data.assignmentId, data.canonicalAssignmentId]
+                  .map(normalizePracticeKey)
+                  .filter(Boolean)
+                  .forEach((key) => completed.add(key));
+              });
+              return completed;
+            } catch (error) {
+              console.warn("Could not load course self-study progress", error?.message || error);
+              return new Set();
+            }
+          };
+'''
+          replace_once(scores, load_anchor, load_replacement)
+
+          replace_once(
+              scores,
+              'const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);\n    const totalAssignments = plannedSet.size;',
+              'const { lessons: plannedLessons, plannedSet, totalCourseItems } = getAssignmentSummary(level);\n    const totalAssignments = plannedSet.size;\n    const completedPracticeKeys = await loadCompletedPracticeKeys({ db, studentCode, level });'
+          )
+
+          regex_once(
+              scores,
+              r'\n    if \(!mine\.length\) \{.*?\n    \}\n\n    const bestById',
+              '\n    const bestById'
+          )
+
+          old_status = '''    const lessonStatus = plannedLessons.map((l) => {
+              const isCompleted = l.identifiers.every((id) => passed.has(id));
+              const hasFailed = l.identifiers.some((id) => failed.has(id));
+              return { ...l, isCompleted, hasFailed };
+            });
+'''
+          new_status = '''    const lessonStatus = plannedLessons.map((l) => {
+              const isCompleted = l.selfStudy
+                ? (l.practiceKeys || []).some((key) => completedPracticeKeys.has(normalizePracticeKey(key)))
+                : l.identifiers.length > 0 && l.identifiers.every((id) => passed.has(id));
+              const hasFailed = !l.selfStudy && l.identifiers.some((id) => failed.has(id));
+              return { ...l, isCompleted, hasFailed };
+            });
+'''
+          replace_once(scores, old_status, new_status)
+
+          old_missed_map = '''      .map((l) => ({
+                label: l.label,
+                identifiers: l.identifiers,
+                dayNumber: l.dayNumber,
+                goal: l.goal,
+              }));
+'''
+          new_missed_map = '''      .map((l) => ({
+                label: l.label,
+                identifiers: l.identifiers,
+                dayNumber: l.dayNumber,
+                displayDay: l.displayDay,
+                displayChapter: l.displayChapter,
+                title: l.title,
+                goal: l.goal,
+                assignmentId: l.assignmentId,
+                selfStudy: l.selfStudy,
+                submissionRequired: l.submissionRequired,
+                practiceKeys: l.practiceKeys,
+              }));
+'''
+          replace_once(scores, old_missed_map, new_missed_map)
+
+          old_next = '''        nextRecommendation = {
+                  label: firstIncomplete.label,
+                  identifiers: firstIncomplete.identifiers,
+                  dayNumber: firstIncomplete.dayNumber,
+                  goal: firstIncomplete.goal,
+                };
+'''
+          new_next = '''        nextRecommendation = {
+                  label: firstIncomplete.label,
+                  identifiers: firstIncomplete.identifiers,
+                  dayNumber: firstIncomplete.dayNumber,
+                  displayDay: firstIncomplete.displayDay,
+                  displayChapter: firstIncomplete.displayChapter,
+                  title: firstIncomplete.title,
+                  goal: firstIncomplete.goal,
+                  assignmentId: firstIncomplete.assignmentId,
+                  selfStudy: firstIncomplete.selfStudy,
+                  submissionRequired: firstIncomplete.submissionRequired,
+                  practiceKeys: firstIncomplete.practiceKeys,
+                };
+'''
+          replace_once(scores, old_next, new_next)
+          replace_once(
+              scores,
+              '''        totalAssignments,
+                submittedCount,
+                completedCount: completedAssignments.length,
+''',
+              '''        totalAssignments,
+                totalCourseItems,
+                submittedCount,
+                completedCount: completedAssignments.length,
+                completedPracticeCount: lessonStatus.filter((lesson) => lesson.selfStudy && lesson.isCompleted).length,
+'''
+          )
+          replace_once(
+              scores,
+              'module.exports = { scoresSummaryHandler };',
+              'module.exports = { scoresSummaryHandler, loadCompletedPracticeKeys };'
+          )
+          PY
+
+      - name: Use Node.js 18 for web tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --no-audit --no-fund
+
+      - name: Test Course Book progression
+        working-directory: web
+        run: npm test -- --runInBand src/components/CourseTab.status.test.js src/utils/courseBookEntries.test.js
+
+      - name: Use Node.js 22 for functions tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test Home metrics course plan
+        working-directory: functions
+        run: node --test functionz/routes/scoresSummaryCoursePlan.test.js
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/CourseTab.js web/src/components/CourseTab.status.test.js web/src/components/HomeMetrics.js web/src/i18n/locales/en/translation.json web/src/i18n/locales/de/translation.json web/src/i18n/locales/fr/translation.json functions/functionz/routes/scoresSummary.js functions/functionz/routes/scoresSummaryCoursePlan.js functions/functionz/routes/scoresSummaryCoursePlan.test.js
+          if git diff --cached --quiet; then
+            echo "No progression changes to commit."
+            exit 0
+          fi
+          git commit -m "Align Home metrics and Course Book progression"
+          git push origin HEAD:fix/home-metrics-course-progression
