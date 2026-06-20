@@ -45,6 +45,10 @@ jobs:
               "replace_once(home_metrics, helper_anchor_home, helper_replacement_home)",
               "regex_once(home_metrics, r'  const failedIdentifiersText = useMemo\\(\\(\\) => \\{.*?\\n  \\}, \\[assignmentStats\\]\\);', helper_replacement_home.rstrip())",
           )
+          script = script.replace(
+              "replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\\n')",
+              "regex_once(home_metrics, r'          helper=\\{\\n            blocked.*?\\n          \\}\\n', '          helper={nextRecommendationHelper}\\n')",
+          )
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
