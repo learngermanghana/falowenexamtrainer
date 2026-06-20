@@ -4,6 +4,8 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
+const DAY_2_GERMAN_ALPHABET_YOUTUBE_URL = "https://youtu.be/pCQVdJGsvtk";
+
 const cardStyle = {
   ...styles.card,
   display: "grid",
@@ -61,7 +63,6 @@ const questions = [
 ];
 
 const A1Day2Kapitel11WorkbookPage = () => {
-
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
@@ -105,11 +106,11 @@ const A1Day2Kapitel11WorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Hörverstehen (Listening Comprehension) Exercise:</strong> Introducing Yourself, Alphabet, and Introducing a
           Friend.
-          <br />Listen to the audio and answer the questions below.
+          <br />Watch and listen to the YouTube lesson, then answer the questions below.
         </p>
         <CoursebookAudioPlayer
-          url="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
-          linkLabel="Open Hören Material (Google Drive)"
+          url={DAY_2_GERMAN_ALPHABET_YOUTUBE_URL}
+          linkLabel="Open Day 2 German Alphabet Hören on YouTube"
           linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
         />
         {questions.map((question) => (
@@ -140,4 +141,5 @@ const A1Day2Kapitel11WorkbookPage = () => {
   );
 };
 
+export { DAY_2_GERMAN_ALPHABET_YOUTUBE_URL };
 export default A1Day2Kapitel11WorkbookPage;
