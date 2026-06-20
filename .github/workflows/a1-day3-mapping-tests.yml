@@ -1,0 +1,27 @@
+name: A1 Day 3 mapping tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  focused-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test A1 Day 3 Course Book mapping
+        run: npm test -- --runInBand src/utils/courseBookEntries.test.js
