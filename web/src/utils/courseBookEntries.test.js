@@ -1,3 +1,5 @@
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import { A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE } from "../data/courseBookCurriculumCorrections";
 import {
   COURSE_BOOK_ASSESSMENT_TYPES,
   COURSE_BOOK_RESOURCE_TYPES,
@@ -104,6 +106,90 @@ describe("course book task entries", () => {
         tutorMarked: false,
         selfPractice: true,
         submissionRequired: false,
+      })
+    );
+  });
+
+  it("corrects the swapped A1 Day 3 titles and the Kapitel 1.2 grammar route", () => {
+    const day3WithLegacyMismatch = {
+      day: 3,
+      displayDay: 3,
+      chapter: "1.1",
+      topic: "Personal Pronouns and Verb Conjugation",
+      assignmentId: "A1-1.1",
+      schreiben_sprechen: {
+        chapter: "1.1",
+        title: "Personal Pronouns and Verb Conjugation",
+        assignment: false,
+        assignmentId: "A1-1.1",
+        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
+        workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+      },
+      lesen_hören: {
+        chapter: "1.2",
+        title: "Personal Information, Articles, Adjectives and W-Questions",
+        assignment: true,
+        assignmentId: "A1-1.2",
+        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
+        workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+      },
+    };
+
+    const entries = expandCourseBookEntries([day3WithLegacyMismatch], { level: "A1" });
+    const chapter11 = entries.find((entry) => entry.chapter === "1.1");
+    const chapter12 = entries.find((entry) => entry.chapter === "1.2");
+
+    expect(chapter11).toEqual(
+      expect.objectContaining({
+        topic: "Personal Information, Articles, Adjectives and W-Questions",
+        lessonTitle: "Personal Information, Articles, Adjectives and W-Questions",
+        assignmentId: "A1-1.1-practice",
+        assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
+        grammarbook_link: null,
+      })
+    );
+    expect(chapter11.schreiben_sprechen).toEqual(
+      expect.objectContaining({
+        title: "Personal Information, Articles, Adjectives and W-Questions",
+        assignmentId: "A1-1.1-practice",
+        grammarbook_link: null,
+      })
+    );
+
+    expect(chapter12).toEqual(
+      expect.objectContaining({
+        topic: "Personal Pronouns and Verb Conjugation",
+        lessonTitle: "Personal Pronouns and Verb Conjugation",
+        assignmentId: "A1-1.2",
+        assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
+        grammarbook_link: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
+      })
+    );
+    expect(chapter12.lesen_hören).toEqual(
+      expect.objectContaining({
+        title: "Personal Pronouns and Verb Conjugation",
+        assignmentId: "A1-1.2",
+        grammarbook_link: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
+      })
+    );
+  });
+
+  it("returns the corrected Day 3 titles from the assignment dictionary", () => {
+    expect(
+      getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.1-practice" })
+    ).toEqual(
+      expect.objectContaining({
+        assignment_id: "A1-1.1-practice",
+        title: "Personal Information, Articles, Adjectives and W-Questions",
+        grammarPage: "",
+      })
+    );
+
+    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
+      expect.objectContaining({
+        assignment_id: "A1-1.2",
+        title: "Personal Pronouns and Verb Conjugation",
+        grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
       })
     );
   });
