@@ -1,3 +1,5 @@
+import { applyCourseBookCurriculumCorrection } from "../data/courseBookCurriculumCorrections";
+
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
 const TASK_SECTIONS = ["schreiben_sprechen", "lesen_hören"];
@@ -193,21 +195,24 @@ export const normalizeCourseBookEntry = (entry = {}, options = {}) => {
   const lessonTitle = getLessonTitle(entry, parentEntry, displayDay);
   const resourceType = getResourceType(entry, options.resourceType);
 
-  const normalized = {
-    ...entry,
-    day,
-    displayDay,
-    chapter,
-    displayChapter,
-    assignmentId,
-    assignment_id: assignmentId,
-    lessonTitle,
-    resourceType,
-    assessmentType,
-    tutorMarked,
-    selfPractice: !tutorMarked,
-    submissionRequired: tutorMarked,
-  };
+  const normalized = applyCourseBookCurriculumCorrection(
+    {
+      ...entry,
+      day,
+      displayDay,
+      chapter,
+      displayChapter,
+      assignmentId,
+      assignment_id: assignmentId,
+      lessonTitle,
+      resourceType,
+      assessmentType,
+      tutorMarked,
+      selfPractice: !tutorMarked,
+      submissionRequired: tutorMarked,
+    },
+    { level, displayDay, chapter, assignmentId }
+  );
 
   if (options.normalizeResources === false) return normalized;
 
