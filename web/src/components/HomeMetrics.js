@@ -332,26 +332,25 @@ const HomeMetrics = ({ studentProfile }) => {
   return ids.length ? ids.join(", ") : "";
 }, [assignmentStats]);
 
+const nextRecommendationHelper = useMemo(() => {
+  if (blocked) {
+    return failedIdentifiersText
+      ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+      : t("homeMetrics.nextRecommendation.blocked");
+  }
+  if (nextObj?.selfStudy) {
+    return t("homeMetrics.nextRecommendation.selfStudyHelper", {
+      title: nextObj.title || nextObj.label,
+      defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
+    });
+  }
+  if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
+    return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
+  }
+  return t("homeMetrics.nextRecommendation.defaultHelper");
+}, [blocked, failedIdentifiersText, nextObj, t]);
 
-  const nextRecommendationHelper = useMemo(() => {
-    if (blocked) {
-      return failedIdentifiersText
-        ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
-        : t("homeMetrics.nextRecommendation.blocked");
-    }
-    if (nextObj?.selfStudy) {
-      return t("homeMetrics.nextRecommendation.selfStudyHelper", {
-        title: nextObj.title || nextObj.label,
-        defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
-      });
-    }
-    if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
-      return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
-    }
-    return t("homeMetrics.nextRecommendation.defaultHelper");
-  }, [blocked, failedIdentifiersText, nextObj, t]);
-
-  const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
+const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
   const qualificationMinimum = leaderboard?.qualificationMinimum ?? 3;
   const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
   const leaderboardUpdatedLabel = useMemo(() => {

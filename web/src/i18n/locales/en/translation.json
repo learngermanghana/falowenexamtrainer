@@ -1208,7 +1208,7 @@
     },
     "missed": {
       "label": "Missed items",
-      "helper": "Missed items are only those before your last fully completed day."
+      "helper": "Earlier tutor assignments or self-study lessons you skipped in the visible Course Book order."
     },
     "failed": {
       "label": "Failed items",

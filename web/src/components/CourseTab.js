@@ -748,7 +748,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
 };
 
-  const updatePracticeEntry = (entry, updates) => {
+const updatePracticeEntry = (entry, updates) => {
     const assignmentKey = entry.assignmentKey;
     setPracticeProgress((prev) => {
       const nextValue = { ...(prev[assignmentKey] || {}), ...updates, updatedAt: new Date().toISOString() };
