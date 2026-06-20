@@ -22,6 +22,7 @@ describe("getAssignmentDictionaryEntry", () => {
       mode: "Lesen & Hören",
       assignment: true,
       assignmentDay: 2,
+      title: "Personal Pronouns and Verb Conjugation",
     });
   });
 
@@ -71,14 +72,32 @@ describe("getAssignmentDictionaryEntry", () => {
       assignment: true,
     });
   });
-
 });
 
 describe("assignment display helpers", () => {
   test("resolves title + mode", () => {
     const entry = getAssignmentDictionaryEntry({ level: "A2", assignmentId: "A2-3.7" });
-    expect(getAssignmentDisplayTitle(entry, { preferEnglish: true })).toBe("Looking for an Apartment");
+    expect(getAssignmentDisplayTitle(entry, { preferEnglish: true })).toBe("Eine Wohnung suchen (Übung) 3.7");
     expect(getAssignmentDisplayType(entry)).toBe("Lesen & Hören");
+  });
+
+  test("keeps the combined A1 Day 2 title concise", () => {
+    const entry = getCurriculumEntriesForLevel("A1").find(
+      (candidate) => Number(candidate.assignmentDay) === 2
+    );
+
+    expect(getAssignmentDisplayTitle(entry)).toBe(
+      "German Alphabet + Personal Pronouns and Verb Conjugation"
+    );
+  });
+
+  test("removes repeated plus-separated title segments", () => {
+    expect(
+      getAssignmentDisplayTitle({
+        topic:
+          "German Alphabet + Personal Pronouns and Verb Conjugation + German Alphabet + Personal Pronouns and Verb Conjugation",
+      })
+    ).toBe("German Alphabet + Personal Pronouns and Verb Conjugation");
   });
 });
 

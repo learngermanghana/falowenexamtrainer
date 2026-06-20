@@ -5,15 +5,43 @@ import {
   normalizeLevel,
 } from "./curriculumManifest";
 
+const A1_DAY_2_TITLE = "German Alphabet + Personal Pronouns and Verb Conjugation";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
-const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
-  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
-);
 
-if (a1Day5Entry) {
-  a1Day5Entry.topic = A1_DAY_5_TITLE;
-  a1Day5Entry.title = A1_DAY_5_TITLE;
-}
+const normalizeRepeatedTitle = (value) => {
+  const parts = String(value || "")
+    .split(/\s*\+\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const seen = new Set();
+
+  return parts
+    .filter((part) => {
+      const key = part.toLowerCase().replace(/[^a-z0-9äöüß]+/gi, " ").trim();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(" + ");
+};
+
+const applyCourseTitleCorrections = () => {
+  const a1Entries = CURRICULUM_BY_LEVEL.A1 || [];
+  const day2 = a1Entries.find((entry) => Number(entry.assignmentDay) === 2);
+  const day5 = a1Entries.find((entry) => Number(entry.assignmentDay) === 5);
+
+  if (day2) {
+    day2.topic = A1_DAY_2_TITLE;
+    day2.title = A1_DAY_2_TITLE;
+  }
+
+  if (day5) {
+    day5.topic = A1_DAY_5_TITLE;
+    day5.title = A1_DAY_5_TITLE;
+  }
+};
+
+applyCourseTitleCorrections();
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
@@ -48,10 +76,84 @@ const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
   return normalizeChapter(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
 };
 
+const resolveResourceMode = (resource = {}, parent = {}) => {
+  const kind = String(resource.kind || "").trim().toLowerCase();
+  if (kind === "schreiben_sprechen") return "Schreiben & Sprechen";
+  if (kind === "lesen_hören" || kind === "lesen_hoeren") return "Lesen & Hören";
+  return String(resource.mode || resource.assignmentType || parent.mode || parent.assignmentType || "Lesen & Hören").trim();
+};
+
+const expandResourceEntries = (parent = {}) => {
+  const resources = Array.isArray(parent.resources) ? parent.resources : [];
+  if (!resources.length) return [];
+
+  const level = normalizeLevel(parent.level);
+  const assignmentDay = Number(parent.assignmentDay ?? parent.day ?? 0);
+
+  return resources.map((resource, resourceIndex) => {
+    const chapter = String(resource.chapter || parent.chapter || "").trim();
+    const assignment = Boolean(resource.submissionRequired ?? resource.assignment ?? false);
+    const assignmentId =
+      toCanonicalAssignmentId({
+        level,
+        assignmentId: resource.assignmentId || resource.assignment_id,
+        chapter,
+      }) || String(parent.assignment_id || parent.assignmentId || "").trim();
+    const title = normalizeRepeatedTitle(resource.title || parent.title || parent.topic || "");
+    const mode = resolveResourceMode(resource, parent);
+
+    return {
+      ...parent,
+      ...resource,
+      level,
+      assignmentDay,
+      day: assignmentDay,
+      parentChapter: parent.chapter,
+      parentAssignmentId: parent.assignment_id || parent.assignmentId || "",
+      chapter,
+      topic: title,
+      title,
+      mode,
+      type: mode,
+      assignmentType: mode,
+      assignment,
+      submissionRequired: assignment,
+      progressionEligible: assignment && parent.progressionEligible !== false,
+      assignmentId,
+      assignment_id: assignmentId,
+      canonicalAssignmentId: assignmentId,
+      resourceIndex,
+      resourceScoped: true,
+    };
+  });
+};
+
+const RESOURCE_ENTRIES_BY_LEVEL = Object.fromEntries(
+  Object.entries(CURRICULUM_BY_LEVEL).map(([level, entries]) => [
+    level,
+    entries.flatMap(expandResourceEntries),
+  ])
+);
+
+const LOOKUP_ENTRIES_BY_LEVEL = Object.fromEntries(
+  Object.entries(CURRICULUM_BY_LEVEL).map(([level, entries]) => [
+    level,
+    [
+      ...(RESOURCE_ENTRIES_BY_LEVEL[level] || []),
+      ...entries.map((entry) => ({
+        ...entry,
+        topic: normalizeRepeatedTitle(entry.topic || entry.title),
+        title: normalizeRepeatedTitle(entry.title || entry.topic),
+        resourceScoped: false,
+      })),
+    ],
+  ])
+);
+
 export { CURRICULUM_ENTRIES };
 
 export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
-  Object.entries(CURRICULUM_BY_LEVEL).map(([level, entries]) => [
+  Object.entries(LOOKUP_ENTRIES_BY_LEVEL).map(([level, entries]) => [
     level,
     Object.fromEntries(
       entries.map((entry, index) => [
@@ -77,7 +179,8 @@ export const getCurriculumEntriesByDayForLevel = (level) => {
 
 const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
   const entry = entryParam || {};
-  return String(entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "").trim();
+  const rawTitle = entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "";
+  return normalizeRepeatedTitle(rawTitle);
 };
 
 const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
@@ -97,15 +200,16 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   const modeToken = String(mode || "").trim();
   const dayToken = Number(assignmentDay || 0);
 
-  const matches = (CURRICULUM_BY_LEVEL[normalizedLevel] || []).filter((entry) => {
+  const matches = (LOOKUP_ENTRIES_BY_LEVEL[normalizedLevel] || []).filter((entry) => {
     if (canonicalId && entry.assignment_id !== canonicalId) return false;
-    if (!canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
+    if (!canonicalId && chapterToken && normalizeChapter(entry.chapter) !== chapterToken) return false;
     if (modeToken && entry.mode !== modeToken) return false;
     if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
     return true;
   });
 
   const prioritized = matches.sort((a, b) => {
+    if (a.resourceScoped !== b.resourceScoped) return a.resourceScoped ? -1 : 1;
     if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
     return Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
   });
@@ -114,6 +218,8 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   return entry
     ? {
         ...entry,
+        topic: normalizeRepeatedTitle(entry.topic || entry.title),
+        title: normalizeRepeatedTitle(entry.title || entry.topic),
         assignment: entry.assignment === true,
         canonicalAssignmentId: entry.assignment_id,
       }
@@ -121,20 +227,25 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
 };
 
 export const getAssignmentSequenceForLevel = (level, { includePractical = true } = {}) => {
-  const entries = getCurriculumEntriesForLevel(level)
-    .filter((entry) => includePractical || entry.progressionEligible === true)
-    .sort((a, b) => {
-      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
-      if (dayDiff !== 0) return dayDiff;
-      if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
-      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
-    });
+  const normalizedLevel = normalizeLevel(level);
+  const entries = includePractical
+    ? getCurriculumEntriesForLevel(normalizedLevel)
+    : (RESOURCE_ENTRIES_BY_LEVEL[normalizedLevel] || []).filter(
+        (entry) => entry.assignment === true && entry.progressionEligible === true
+      );
 
-  if (includePractical) return entries;
+  const sorted = [...entries].sort((a, b) => {
+    const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+    if (dayDiff !== 0) return dayDiff;
+    if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
+    return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
+  });
+
+  if (includePractical) return sorted;
 
   const seen = new Set();
-  return entries.filter((entry) => {
-    if (seen.has(entry.assignment_id)) return false;
+  return sorted.filter((entry) => {
+    if (!entry.assignment_id || seen.has(entry.assignment_id)) return false;
     seen.add(entry.assignment_id);
     return true;
   });
