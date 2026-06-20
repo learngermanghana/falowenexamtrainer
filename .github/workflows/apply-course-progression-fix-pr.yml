@@ -23,7 +23,6 @@ jobs:
         run: |
           python <<'PY'
           from pathlib import Path
-          import re
           source = Path('.github/workflows/apply-course-progression-fix.yml').read_text().splitlines()
           start = next(i for i, line in enumerate(source) if line.strip() == '- name: Apply progression changes')
           run_line = next(i for i in range(start + 1, len(source)) if source[i].strip() == 'run: |')
@@ -62,17 +61,17 @@ jobs:
               "replace_once(scores, old_next, new_next)",
               "regex_once(scores, r'        nextRecommendation = \\{\\n          label: firstIncomplete\\.label,.*?\\n        \\};', new_next.rstrip())",
           )
-          response_patch = re.compile(
-              r"replace_once\(\n\s+scores,\n\s+'''        totalAssignments,.*?completedCount: completedAssignments\.length,\n\s+''',\n\s+'''        totalAssignments,.*?completedPracticeCount:.*?\n\s+'''\n\s+\)",
-              re.S,
-          )
-          script, count = response_patch.subn(
-              lambda _: "regex_once(scores, r'        totalAssignments,\\n        submittedCount,\\n        completedCount: completedAssignments\\.length,', '        totalAssignments,\\n        totalCourseItems,\\n        submittedCount,\\n        completedCount: completedAssignments.length,\\n        completedPracticeCount: lessonStatus.filter((lesson) => lesson.selfStudy && lesson.isCompleted).length,')",
-              script,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('Could not normalize the score summary response patch')
+          marker = 'completedPracticeCount: lessonStatus.filter'
+          marker_pos = script.find(marker)
+          if marker_pos < 0:
+              raise SystemExit('Could not find score summary response marker')
+          block_start = script.rfind('replace_once(', 0, marker_pos)
+          block_end = script.find('\n)', marker_pos)
+          if block_start < 0 or block_end < 0:
+              raise SystemExit('Could not locate score summary response replacement block')
+          block_end += 2
+          robust_response_patch = "regex_once(scores, r'        totalAssignments,\\n        submittedCount,\\n        completedCount: completedAssignments\\.length,', '        totalAssignments,\\n        totalCourseItems,\\n        submittedCount,\\n        completedCount: completedAssignments.length,\\n        completedPracticeCount: lessonStatus.filter((lesson) => lesson.selfStudy && lesson.isCompleted).length,')"
+          script = script[:block_start] + robust_response_patch + script[block_end:]
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
