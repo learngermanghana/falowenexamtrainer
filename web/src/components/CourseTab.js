@@ -728,27 +728,27 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const weekEntries = Object.entries(groupedLessons);
 
   const persistPracticeProgress = async (entry, nextValue) => {
-  const assignmentKey = entry?.assignmentKey;
-  if (!db || !studentCode || !assignmentKey) return;
-  const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
-  await setDoc(
-    doc(db, "coursePracticeProgress", docId),
-    {
-      studentCode,
-      level: selectedCourseLevel,
-      assignmentKey,
-      entryId: entry.assignmentId || entry.assignment_id || null,
-      displayDay: getCourseBookDisplayDay(entry),
-      chapter: entry.displayChapter || entry.chapter || null,
-      lessonTitle: getCourseBookEntryTitle(entry),
-      ...nextValue,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
-};
+    const assignmentKey = entry?.assignmentKey;
+    if (!db || !studentCode || !assignmentKey) return;
+    const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
+    await setDoc(
+      doc(db, "coursePracticeProgress", docId),
+      {
+        studentCode,
+        level: selectedCourseLevel,
+        assignmentKey,
+        entryId: entry.assignmentId || entry.assignment_id || null,
+        displayDay: getCourseBookDisplayDay(entry),
+        chapter: entry.displayChapter || entry.chapter || null,
+        lessonTitle: getCourseBookEntryTitle(entry),
+        ...nextValue,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
 
-const updatePracticeEntry = (entry, updates) => {
+  const updatePracticeEntry = (entry, updates) => {
     const assignmentKey = entry.assignmentKey;
     setPracticeProgress((prev) => {
       const nextValue = { ...(prev[assignmentKey] || {}), ...updates, updatedAt: new Date().toISOString() };

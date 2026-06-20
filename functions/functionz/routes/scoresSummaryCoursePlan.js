@@ -43,8 +43,14 @@ const getAssignmentSummary = (level = "A1") => {
       const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
       const hasResource = Boolean(
         entry.workbookRoute ||
-entry.video ||
-toArray(entry.resources).some((resource) => resource?.workbookRoute || resource?.workbook_link || resource?.video || resource?.youtube_link)
+          entry.video ||
+          toArray(entry.resources).some(
+            (resource) =>
+              resource?.workbookRoute ||
+              resource?.workbook_link ||
+              resource?.video ||
+              resource?.youtube_link
+          )
       );
       return displayDay > 0 && Boolean(entry.chapter) && Boolean(entry.title || entry.topic) && hasResource;
     })
