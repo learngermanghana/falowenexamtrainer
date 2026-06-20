@@ -123,14 +123,13 @@ jobs:
 const isMilestoneEntry = (entry = {}) =>
   Boolean(entry?.isMilestone || entry?.completion || /course completed/i.test(String(entry?.topic || "")));
 
-const isTutorMarkedEntry = (entry = {}) =>
-  Boolean(
-    entry?.isTutorMarked ??
-      entry?.tutorMarked ??
-      entry?.submissionRequired ??
-      entry?.assessmentType === "tutor-marked" ??
-      entry?.assignment
-  );
+const isTutorMarkedEntry = (entry = {}) => {
+  if (entry?.isTutorMarked !== undefined) return Boolean(entry.isTutorMarked);
+  if (entry?.tutorMarked !== undefined) return Boolean(entry.tutorMarked);
+  if (entry?.submissionRequired !== undefined) return Boolean(entry.submissionRequired);
+  if (entry?.assessmentType) return entry.assessmentType === "tutor-marked";
+  return Boolean(entry?.assignment);
+};
 
 export const isCourseBookEntryComplete = (entry = {}, practiceProgress = {}) => {
   if (!entry || isMilestoneEntry(entry)) return false;
@@ -183,14 +182,7 @@ describe("course book next lesson progression", () => {
           npm test -- --runInBand src/utils/courseBookProgression.test.js src/utils/courseBookEntries.test.js 2>&1 | tee /tmp/course-book-tests.log
           status=${PIPESTATUS[0]}
           if [ "$status" -eq 0 ]; then
-            node <<'NODE'
-          const fs = require('fs');
-          const parser = require('@babel/parser');
-          for (const file of ['src/components/CourseTab.js', 'src/components/HomeMetrics.js']) {
-            parser.parse(fs.readFileSync(file, 'utf8'), { sourceType: 'module', plugins: ['jsx', 'optionalChaining'] });
-            console.log(`Parsed ${file}`);
-          }
-          NODE
+            node -e 'const fs=require("fs"); const parser=require("@babel/parser"); for (const file of ["src/components/CourseTab.js","src/components/HomeMetrics.js"]) { parser.parse(fs.readFileSync(file,"utf8"), {sourceType:"module", plugins:["jsx","optionalChaining"]}); console.log("Parsed " + file); }'
             status=$?
           fi
           exit "$status"
