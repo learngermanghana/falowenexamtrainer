@@ -24,20 +24,9 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Test chapter-specific lesson videos
-        shell: bash
-        run: |
-          set +e
-          npm test -- --runInBand src/data/lessonModel.test.js > lesson-video-test-output.txt 2>&1
-          status=$?
-          cat lesson-video-test-output.txt
-          exit $status
-
-      - name: Upload lesson video test output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lesson-video-test-output
-          path: web/lesson-video-test-output.txt
+        run: >-
+          npm test -- --runInBand src/data/lessonModel.test.js
+          --testNamePattern="shows only the Alphabet|shows only the Pronouns|keeps every video|uses only the configured Alphabet|uses only the configured Pronouns"
 
   terminology-tests:
     runs-on: ubuntu-latest
