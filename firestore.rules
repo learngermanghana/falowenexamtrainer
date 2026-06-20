@@ -13,7 +13,8 @@ service cloud.firestore {
       return signedIn() && (
         request.auth.token.admin == true ||
         request.auth.token.role == 'admin' ||
-        request.auth.token.role == 'tutor'
+        request.auth.token.role == 'tutor' ||
+        request.auth.token.email == 'moxflex@gmail.com'
       );
     }
 
@@ -81,6 +82,31 @@ service cloud.firestore {
       allow delete: if ownsResource();
     }
 
+    // Canonical live-class records are readable by signed-in students.
+    // Only admins and tutors can change scheduling and communication records.
+    match /classes/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /classSessions/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /zoomProfiles/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /calendarFeeds/{document=**} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+    match /auditLogs/{document=**} {
+      allow read, write: if isStaff();
+    }
+    match /emailQueue/{document=**} {
+      allow read, write: if isStaff();
+    }
+
     // Existing Falowen collections that previously used the authenticated
     // fallback are listed explicitly so they cannot override private writing
     // and user-document rules.
@@ -91,7 +117,6 @@ service cloud.firestore {
     match /attendance/{document=**} { allow read, write: if signedIn(); }
     match /class_board/{document=**} { allow read, write: if signedIn(); }
     match /class_lesson_notes/{document=**} { allow read, write: if signedIn(); }
-    match /classes/{document=**} { allow read, write: if signedIn(); }
     match /grammarQuestions/{document=**} { allow read, write: if signedIn(); }
     match /group_discussion/{document=**} { allow read, write: if signedIn(); }
     match /language/{document=**} { allow read, write: if signedIn(); }

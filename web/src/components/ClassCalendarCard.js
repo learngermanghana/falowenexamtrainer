@@ -1,19 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
 import { frenchClassCatalog } from "../data/french/classCatalog";
 import {
   downloadClassCalendar,
-  buildGhanaDateTime,
-  GHANA_TIMEZONE,
-  findTodayClassSession,
   findArchivedTodayClassSession,
   findNextClassSession,
   formatScheduleSummary,
 } from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
-import { formatPercent } from "../lib/formatters";
+import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
+
+const GHANA_TIMEZONE = "Africa/Accra";
 
 const infoCardStyle = {
   border: "1px solid #e5e7eb",
@@ -34,325 +33,356 @@ const zoomDetailsStyle = {
   gap: 4,
 };
 
-const ClassCalendarCard = ({ id, initialClassName, program }) => {
-  const { i18n, t } = useTranslation();
-  const locale = i18n.language;
-  const resolvedCatalog = useMemo(
-    () => (program === "french" ? frenchClassCatalog : classCatalog),
-    [program]
+function asDate(value) {
+  if (!value) return null;
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDate(value, locale, options = {}) {
+  const date = asDate(value);
+  if (!date) return "-";
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: GHANA_TIMEZONE,
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    ...options,
+  }).format(date);
+}
+
+function formatTime(value, locale, timeZone = GHANA_TIMEZONE) {
+  const date = asDate(value);
+  if (!date) return "-";
+  return new Intl.DateTimeFormat(locale, {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
+function formatRange(session, locale, timeZone = GHANA_TIMEZONE) {
+  if (!session) return "-";
+  return `${formatTime(session.startsAt, locale, timeZone)}–${formatTime(session.endsAt, locale, timeZone)}`;
+}
+
+function sameGhanaDate(left, right = new Date()) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: GHANA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const leftDate = asDate(left);
+  return Boolean(leftDate && formatter.format(leftDate) === formatter.format(right));
+}
+
+function sessionTopic(session, fallback = "Live class") {
+  return String(session?.topic || (session?.assignmentIds || []).join(", ") || fallback).trim();
+}
+
+function formatCanonicalSchedule(rules = []) {
+  if (!rules.length) return "Class dates are managed by Falowen Admin.";
+  return rules.map((rule) => `${rule.day || "Day"} ${rule.startTime || ""}`.trim()).join(" · ");
+}
+
+function countdownLabel(value, now) {
+  const start = asDate(value);
+  if (!start) return "";
+  const minutes = Math.max(0, Math.ceil((start.getTime() - now.getTime()) / 60000));
+  if (minutes === 0) return "Starting now";
+  if (minutes < 60) return `Starts in ${minutes} minute${minutes === 1 ? "" : "s"}`;
+  const hours = Math.ceil(minutes / 60);
+  if (hours < 24) return `Starts in ${hours} hour${hours === 1 ? "" : "s"}`;
+  const days = Math.ceil(hours / 24);
+  return `Starts in ${days} day${days === 1 ? "" : "s"}`;
+}
+
+function canJoinSession(session, now) {
+  const start = asDate(session?.startsAt)?.getTime();
+  const end = asDate(session?.endsAt)?.getTime();
+  if (!start) return false;
+  const current = now.getTime();
+  return current >= start - 15 * 60000 && current <= (end || start + 2 * 60 * 60000) + 15 * 60000;
+}
+
+function escapeIcs(value) {
+  return String(value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function toIcsDate(value) {
+  const date = asDate(value);
+  if (!date) return "";
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+
+function downloadCanonicalCalendar(summary) {
+  if (!summary?.klass) return;
+  const events = summary.sessions
+    .filter((session) => session.startsAt && session.endsAt)
+    .map((session) => [
+      "BEGIN:VEVENT",
+      `UID:${escapeIcs(session.id)}@falowen.app`,
+      `SEQUENCE:${Number(session.sequence || 0)}`,
+      `DTSTAMP:${toIcsDate(new Date())}`,
+      `DTSTART:${toIcsDate(session.startsAt)}`,
+      `DTEND:${toIcsDate(session.endsAt)}`,
+      `SUMMARY:${escapeIcs(`${summary.klass.name}: ${sessionTopic(session)}`)}`,
+      `DESCRIPTION:${escapeIcs(session.cancellationReason || "Falowen live class")}`,
+      session.status === "cancelled" ? "STATUS:CANCELLED" : "STATUS:CONFIRMED",
+      "END:VEVENT",
+    ].join("\r\n"));
+
+  const content = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Falowen//Live Classes//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    ...events,
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${summary.klass.slug || "falowen-class"}.ics`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function StaticClassCard({ selectedClass, classDetails, now }) {
+  const nextClass = findNextClassSession(selectedClass, now);
+  const completedToday = findArchivedTodayClassSession(selectedClass, now);
+  const scheduleSummary = formatScheduleSummary(classDetails?.schedule);
+
+  return (
+    <>
+      <section style={{ ...infoCardStyle, background: "#fffbeb", borderColor: "#fde68a" }}>
+        <strong>Legacy timetable</strong>
+        <span style={styles.helperText}>This class has not yet been migrated to Live Classes in Falowen Admin. Existing dates remain available during the migration.</span>
+      </section>
+
+      <section style={{ ...infoCardStyle, background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderColor: "#bfdbfe" }}>
+        <h3 style={{ margin: 0 }}>{selectedClass}</h3>
+        <p style={{ ...styles.helperText, margin: 0 }}>{scheduleSummary}</p>
+        {classDetails?.startDate && classDetails?.endDate ? <p style={{ ...styles.helperText, margin: 0 }}>{classDetails.startDate} → {classDetails.endDate}</p> : null}
+        <a href={ZOOM_DETAILS.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a>
+        <div style={zoomDetailsStyle}>
+          <strong>Zoom details</strong>
+          <span>Meeting ID: {ZOOM_DETAILS.meetingId} · Passcode: {ZOOM_DETAILS.passcode}</span>
+        </div>
+      </section>
+
+      {completedToday ? (
+        <section style={{ ...infoCardStyle, background: "#f1f5f9", borderColor: "#cbd5e1" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+            <strong>Earlier today</strong>
+            <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Completed</span>
+          </div>
+          <p style={{ ...styles.helperText, margin: 0 }}>{completedToday.weekday}, {completedToday.date} · {completedToday.startTime}–{completedToday.endTime} Ghana time</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{completedToday.titles?.join("; ") || "Today’s class has ended."}</p>
+        </section>
+      ) : null}
+
+      {nextClass ? (
+        <section style={{ ...infoCardStyle, borderColor: "#dbeafe" }}>
+          <strong>Next live class</strong>
+          <p style={{ ...styles.helperText, margin: 0 }}>{nextClass.weekday}, {nextClass.date} · {nextClass.startTime}–{nextClass.endTime} Ghana time</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{nextClass.titles?.join("; ") || "Lesson details will appear here."}</p>
+        </section>
+      ) : <p style={styles.helperText}>No upcoming class is listed.</p>}
+
+      <button type="button" style={styles.primaryButton} onClick={() => downloadClassCalendar(selectedClass)}>Download class calendar</button>
+      {classDetails?.docUrl ? <a href={classDetails.docUrl} target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>Open course materials</a> : null}
+    </>
   );
-  const catalogEntries = useMemo(() => Object.keys(resolvedCatalog), [resolvedCatalog]);
-  const selectId = useMemo(() => (id ? `${id}-class-select` : "class-calendar-select"), [id]);
-  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
-  const dateFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
-    [locale]
-  );
-  const formatTimeUnit = useCallback(
-    (unit, count) => t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) }),
-    [numberFormatter, t]
-  );
+}
+
+const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) => {
+  const { i18n } = useTranslation();
+  const locale = i18n.language || "en";
+  const resolvedCatalog = useMemo(() => program === "french" ? frenchClassCatalog : classCatalog, [program]);
+  const availableClasses = useMemo(() => {
+    const names = Object.keys(resolvedCatalog);
+    if (initialClassName && !names.includes(initialClassName)) return [initialClassName, ...names];
+    return names;
+  }, [initialClassName, resolvedCatalog]);
   const defaultClass = useMemo(() => {
-    if (initialClassName && catalogEntries.includes(initialClassName)) return initialClassName;
+    if (initialClassName) return initialClassName;
     const stored = loadPreferredClass();
-    if (stored && catalogEntries.includes(stored)) return stored;
-    return catalogEntries[0];
-  }, [catalogEntries, initialClassName]);
+    return stored && availableClasses.includes(stored) ? stored : availableClasses[0] || "";
+  }, [availableClasses, initialClassName]);
 
   const [selectedClass, setSelectedClass] = useState(defaultClass);
+  const [canonicalStatus, setCanonicalStatus] = useState("loading");
+  const [canonicalSummary, setCanonicalSummary] = useState(null);
   const [now, setNow] = useState(new Date());
-
-  const classDetails = resolvedCatalog[selectedClass];
-  const isStudentClassLocked = Boolean(initialClassName && catalogEntries.includes(initialClassName));
-  const nextClass = useMemo(() => findNextClassSession(selectedClass, now), [now, selectedClass]);
-  const todayClass = useMemo(() => findTodayClassSession(selectedClass, now), [now, selectedClass]);
-  const archivedTodayClass = useMemo(
-    () => findArchivedTodayClassSession(selectedClass, now),
-    [now, selectedClass]
-  );
-  const timeline = useMemo(() => {
-    if (!classDetails?.startDate || !classDetails?.endDate) return null;
-
-    const start = new Date(`${classDetails.startDate}T00:00:00`);
-    const end = new Date(`${classDetails.endDate}T23:59:59`);
-    const nowTime = now.getTime();
-    const dayMs = 24 * 60 * 60 * 1000;
-
-    const totalDuration = Math.max(end - start, dayMs);
-    const elapsed = Math.min(Math.max(nowTime - start, 0), totalDuration);
-    const percentComplete = Math.round((elapsed / totalDuration) * 100);
-    const daysUntilStart = Math.max(0, Math.ceil((start - nowTime) / dayMs));
-    const daysUntilEnd = Math.max(0, Math.ceil((end - nowTime) / dayMs));
-
-    let status;
-    if (nowTime < start) {
-      status = t("classCalendar.status.startsIn", { time: formatTimeUnit("day", daysUntilStart) });
-    } else if (nowTime > end) {
-      status = t("classCalendar.status.courseFinished");
-    } else {
-      status = t("classCalendar.status.timeLeft", { time: formatTimeUnit("day", daysUntilEnd) });
-    }
-
-    return { percentComplete, daysUntilStart, daysUntilEnd, status };
-  }, [classDetails?.endDate, classDetails?.startDate, formatTimeUnit, now, t]);
-
-  const minutesUntil = useMemo(() => {
-    if (!nextClass?.startDateTime) return null;
-    return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
-  }, [nextClass?.startDateTime, now]);
-
-  const joinWindowMinutes = 15;
-  const canJoinNextClass = minutesUntil !== null && minutesUntil <= joinWindowMinutes;
-  const showCalendarCta = minutesUntil !== null && minutesUntil > joinWindowMinutes;
-
-  const timeUntilDisplay = useMemo(() => {
-    if (minutesUntil === null) return null;
-    const minutesInDay = 24 * 60;
-    if (minutesUntil === 0) {
-      return { badge: t("classCalendar.badge.startingNow"), detail: t("classCalendar.detail.startingNow") };
-    }
-    if (minutesUntil >= minutesInDay) {
-      const daysUntil = Math.ceil(minutesUntil / minutesInDay);
-      const timeLabel = formatTimeUnit("day", daysUntil);
-      return {
-        badge: t("classCalendar.badge.timeLeft", { time: timeLabel }),
-        detail: t("classCalendar.detail.startsIn", { time: timeLabel }),
-      };
-    }
-    const timeLabel = formatTimeUnit("minute", minutesUntil);
-    return {
-      badge: t("classCalendar.badge.timeLeft", { time: timeLabel }),
-      detail: t("classCalendar.detail.startsIn", { time: timeLabel }),
-    };
-  }, [formatTimeUnit, minutesUntil, t]);
-
-  const nextClassTimes = useMemo(() => {
-    if (!nextClass?.date || !nextClass?.startTime) return null;
-    const start = buildGhanaDateTime(nextClass.date, nextClass.startTime);
-    const end = nextClass.endTime ? buildGhanaDateTime(nextClass.date, nextClass.endTime) : null;
-    if (!start) return null;
-
-    const ghanaFormatter = new Intl.DateTimeFormat("en-GB", {
-      timeZone: GHANA_TIMEZONE,
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const localFormatter = new Intl.DateTimeFormat(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    const ghanaRange = `${ghanaFormatter.format(start)}${end ? `–${ghanaFormatter.format(end)}` : ""}`;
-    const localRange = `${localFormatter.format(start)}${end ? `–${localFormatter.format(end)}` : ""}`;
-    return { ghanaRange, localRange };
-  }, [locale, nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
-
-  const archivedTodayTimes = useMemo(() => {
-    if (!archivedTodayClass?.date || !archivedTodayClass?.startTime) return null;
-    const start = buildGhanaDateTime(archivedTodayClass.date, archivedTodayClass.startTime);
-    const end = archivedTodayClass.endTime ? buildGhanaDateTime(archivedTodayClass.date, archivedTodayClass.endTime) : null;
-    if (!start) return null;
-
-    const formatter = new Intl.DateTimeFormat("en-GB", {
-      timeZone: GHANA_TIMEZONE,
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `${formatter.format(start)}${end ? `–${formatter.format(end)}` : ""}`;
-  }, [archivedTodayClass?.date, archivedTodayClass?.endTime, archivedTodayClass?.startTime]);
-
-  const isNextClassToday = Boolean(todayClass && nextClass && todayClass.date === nextClass.date);
-  const shouldShowNextClass = Boolean(nextClass && !isNextClassToday);
 
   useEffect(() => setSelectedClass(defaultClass), [defaultClass]);
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(timer);
+    const timer = window.setInterval(() => setNow(new Date()), 60000);
+    return () => window.clearInterval(timer);
   }, []);
 
-  const handleChange = (event) => {
+  useEffect(() => {
+    setCanonicalSummary(null);
+    if (program === "french" || (!selectedClass && !initialClassId)) {
+      setCanonicalStatus("unavailable");
+      return undefined;
+    }
+    setCanonicalStatus("loading");
+    return subscribeCanonicalLiveClass({
+      classId: initialClassId,
+      className: selectedClass,
+      onChange: (summary) => {
+        setCanonicalSummary(summary);
+        setCanonicalStatus("ready");
+      },
+      onUnavailable: () => setCanonicalStatus("unavailable"),
+      onError: (error) => {
+        console.warn("Canonical live class data is unavailable", error);
+        setCanonicalStatus("unavailable");
+      },
+    });
+  }, [initialClassId, program, selectedClass]);
+
+  const classDetails = resolvedCatalog[selectedClass];
+  const studentClassLocked = Boolean(initialClassName || initialClassId);
+  const nextSession = canonicalSummary?.nextSession || null;
+  const completedSession = canonicalSummary?.latestCompletedSession || null;
+  const cancelledSessions = canonicalSummary?.cancelledSessions?.filter((session) => {
+    const start = asDate(session.startsAt)?.getTime() || 0;
+    return start >= now.getTime() - 7 * 24 * 60 * 60 * 1000;
+  }).slice(0, 3) || [];
+  const zoom = canonicalSummary?.zoom?.url
+    ? canonicalSummary.zoom
+    : !canonicalSummary?.klass?.zoomProfileId
+    ? ZOOM_DETAILS
+    : canonicalSummary?.zoom || {};
+  const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const ghanaNextTime = nextSession ? formatRange(nextSession, locale, GHANA_TIMEZONE) : "";
+  const deviceNextTime = nextSession ? formatRange(nextSession, locale, deviceTimeZone) : "";
+  const showDeviceTime = Boolean(deviceNextTime && deviceTimeZone !== GHANA_TIMEZONE && deviceNextTime !== ghanaNextTime);
+
+  const handleClassChange = (event) => {
     const value = event.target.value;
     setSelectedClass(value);
     savePreferredClass(value);
   };
 
-  if (!classDetails) return null;
-
-  const formatDateLabel = (value) => {
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? value : dateFormatter.format(parsed);
-  };
-
-  const joinLiveClassLabel = t("classCalendar.actions.joinLiveClass", { defaultValue: "Join live class" });
-  const downloadClassCalendarLabel = t("classCalendar.actions.downloadClassCalendar", { defaultValue: "Download class calendar" });
-  const quickHelper = t("classCalendar.shortHelper", { defaultValue: "Use this page to join Zoom and add your class dates to your calendar." });
-  const scheduleSummary = formatScheduleSummary(classDetails.schedule);
-
   return (
     <div id={id} style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.heading")}</h2>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{quickHelper}</p>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Live class access & calendar</h2>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Class dates, cancellations, Zoom access, curriculum and progress in one place.</p>
         </div>
-        <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>{t("classCalendar.zoomReady")}</span>
-      </div>
-
-      <section
-        style={{
-          ...infoCardStyle,
-          background: "linear-gradient(135deg, #eff6ff, #ffffff)",
-          borderColor: "#bfdbfe",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "flex-start" }}>
-          <div style={{ minWidth: 0 }}>
-            <span style={{ ...styles.helperText, margin: 0, fontWeight: 800, color: "#1e40af" }}>Your class</span>
-            {isStudentClassLocked ? (
-              <h3 style={{ margin: "4px 0 0", fontSize: 22, color: "#0f172a" }}>{selectedClass}</h3>
-            ) : (
-              <select id={selectId} style={{ ...styles.select, marginTop: 6 }} value={selectedClass} onChange={handleChange}>
-                {catalogEntries.map((entry) => (
-                  <option key={entry} value={entry}>{entry}</option>
-                ))}
-              </select>
-            )}
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{scheduleSummary}</p>
-          </div>
-          {classDetails.startDate && classDetails.endDate ? (
-            <div style={{ textAlign: "right" }}>
-              <span style={{ ...styles.badge, background: "#e0f2fe", color: "#0f172a" }}>
-                {formatDateLabel(classDetails.startDate)} → {formatDateLabel(classDetails.endDate)}
-              </span>
-            </div>
-          ) : null}
-        </div>
-
-        <a
-          href={ZOOM_DETAILS.url}
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center", width: "fit-content" }}
-        >
-          {joinLiveClassLabel}
-        </a>
-
-        <div style={zoomDetailsStyle}>
-          <strong>Zoom details</strong>
-          <span>{t("classCalendar.zoomDetails", { meetingId: ZOOM_DETAILS.meetingId, passcode: ZOOM_DETAILS.passcode })}</span>
-        </div>
-      </section>
-
-      {timeline ? (
-        <section style={infoCardStyle}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <strong>{timeline.status}</strong>
-            <span style={styles.badge}>{t("classCalendar.percentDone", { percent: formatPercent(timeline.percentComplete / 100, { locale }) })}</span>
-          </div>
-          <div style={{ position: "relative", height: 10, background: "#e5e7eb", borderRadius: 999 }}>
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: `${timeline.percentComplete}%`,
-                background: "linear-gradient(90deg, #2563eb, #7c3aed)",
-                borderRadius: 999,
-                transition: "width 0.3s ease",
-              }}
-            />
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {timeline.daysUntilStart > 0
-              ? t("classCalendar.timeline.untilKickoff", { time: formatTimeUnit("day", timeline.daysUntilStart) })
-              : timeline.daysUntilEnd > 0
-              ? t("classCalendar.timeline.untilGraduation", { time: formatTimeUnit("day", timeline.daysUntilEnd) })
-              : t("classCalendar.timeline.finished")}
-          </p>
-        </section>
-      ) : null}
-
-      {todayClass ? (
-        <section style={{ ...infoCardStyle, borderColor: "#93c5fd", background: "#eff6ff" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.today.title")}</h3>
-            <span style={styles.badge}>{t("classCalendar.today.badge")}</span>
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {todayClass.weekday}, {formatDateLabel(todayClass.date)} · {todayClass.startTime}–{todayClass.endTime}
-          </p>
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("classCalendar.today.chapters", { chapters: todayClass.titles?.join("; ") })}</p>
-          <a href={ZOOM_DETAILS.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center", width: "fit-content" }}>
-            {joinLiveClassLabel}
-          </a>
-        </section>
-      ) : null}
-
-      {archivedTodayClass ? (
-        <section style={{ ...infoCardStyle, background: "#f1f5f9", borderColor: "#cbd5e1" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Ended today</h3>
-            <span style={{ ...styles.badge, background: "#e2e8f0", color: "#334155" }}>Archived</span>
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {archivedTodayClass.weekday}, {formatDateLabel(archivedTodayClass.date)} · {archivedTodayTimes || `${archivedTodayClass.startTime}–${archivedTodayClass.endTime}`} GMT
-          </p>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {archivedTodayClass.titles?.join("; ") || "Today’s live class has ended. The next upcoming class will show below when available."}
-          </p>
-        </section>
-      ) : null}
-
-      {shouldShowNextClass ? (
-        <section style={{ ...infoCardStyle, borderColor: "#dbeafe" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.next.title")}</h3>
-            {timeUntilDisplay?.badge ? <span style={styles.badge}>{timeUntilDisplay.badge}</span> : null}
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {nextClass.weekday}, {formatDateLabel(nextClass.date)} · {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`} {t("classCalendar.next.timezone")}
-          </p>
-          {nextClassTimes?.localRange ? (
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("classCalendar.next.localTime", { time: nextClassTimes.localRange })}</p>
-          ) : null}
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("classCalendar.next.chapters", { chapters: nextClass.titles?.join("; ") })}</p>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            {canJoinNextClass ? (
-              <a href={ZOOM_DETAILS.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}>
-                {joinLiveClassLabel}
-              </a>
-            ) : null}
-            {showCalendarCta ? (
-              <button type="button" style={styles.secondaryButton} onClick={() => downloadClassCalendar(selectedClass)}>
-                {t("classCalendar.actions.addToCalendar")}
-              </button>
-            ) : null}
-            {timeUntilDisplay?.detail ? <span style={{ ...styles.helperText, margin: 0 }}>{timeUntilDisplay.detail}</span> : null}
-          </div>
-        </section>
-      ) : null}
-
-      {!nextClass ? <div style={{ ...styles.helperText, margin: 0 }}>{t("classCalendar.empty")}</div> : null}
-
-      <div style={{ display: "grid", gap: 6 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <button style={styles.primaryButton} type="button" onClick={() => downloadClassCalendar(selectedClass)}>
-            {downloadClassCalendarLabel}
-          </button>
-          {classDetails.docUrl ? (
-            <a href={classDetails.docUrl} style={{ ...styles.secondaryButton, textDecoration: "none" }} target="_blank" rel="noreferrer">
-              {t("classCalendar.actions.openMaterials")}
-            </a>
-          ) : null}
-        </div>
-        <span style={{ ...styles.helperText, margin: 0 }}>
-          Adds your class dates to your calendar. Android users can import the file into Google Calendar.
+        <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
+          {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Checking schedule…" : "Legacy schedule"}
         </span>
       </div>
+
+      <section style={infoCardStyle}>
+        <label htmlFor={`${id || "class-calendar"}-select`} style={{ fontWeight: 700 }}>Your class</label>
+        {studentClassLocked ? (
+          <h3 style={{ margin: 0 }}>{selectedClass}</h3>
+        ) : (
+          <select id={`${id || "class-calendar"}-select`} style={styles.select} value={selectedClass} onChange={handleClassChange}>
+            {availableClasses.map((name) => <option key={name} value={name}>{name}</option>)}
+          </select>
+        )}
+      </section>
+
+      {canonicalStatus === "ready" && canonicalSummary ? (
+        <>
+          <section style={{ ...infoCardStyle, background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderColor: "#bfdbfe" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <div>
+                <h3 style={{ margin: 0 }}>{canonicalSummary.klass.name}</h3>
+                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{formatCanonicalSchedule(canonicalSummary.klass.scheduleRules)}</p>
+              </div>
+              <span style={styles.badge}>{canonicalSummary.klass.status || "active"}</span>
+            </div>
+            {canonicalSummary.klass.startDate && canonicalSummary.klass.endDate ? <p style={{ ...styles.helperText, margin: 0 }}>{canonicalSummary.klass.startDate} → {canonicalSummary.klass.endDate}</p> : null}
+            {zoom.url ? <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a> : <p style={{ ...styles.helperText, margin: 0 }}>Zoom has not yet been assigned by the administrator.</p>}
+            {(zoom.meetingId || zoom.passcode) ? (
+              <div style={zoomDetailsStyle}>
+                <strong>Zoom details</strong>
+                <span>{zoom.meetingId ? `Meeting ID: ${zoom.meetingId}` : ""}{zoom.meetingId && zoom.passcode ? " · " : ""}{zoom.passcode ? `Passcode: ${zoom.passcode}` : ""}</span>
+              </div>
+            ) : null}
+          </section>
+
+          <section style={infoCardStyle}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+              <strong>Course progress</strong>
+              <span style={styles.badge}>{canonicalSummary.progress}%</span>
+            </div>
+            <div style={{ height: 10, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ width: `${canonicalSummary.progress}%`, height: "100%", background: "linear-gradient(90deg, #2563eb, #7c3aed)" }} />
+            </div>
+            <p style={{ ...styles.helperText, margin: 0 }}>{canonicalSummary.completedCount} of {canonicalSummary.totalCount} non-cancelled sessions completed.</p>
+          </section>
+
+          {cancelledSessions.map((session) => (
+            <section key={session.id} style={{ ...infoCardStyle, background: "#fef2f2", borderColor: "#fecaca" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                <strong>Class cancelled</strong>
+                <span style={{ ...styles.badge, background: "#fee2e2", color: "#991b1b" }}>Cancelled</span>
+              </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{formatDate(session.startsAt, locale)} · {formatRange(session, locale)} Ghana time</p>
+              <p style={{ margin: 0 }}>{session.cancellationReason || "This class session was cancelled by the administrator."}</p>
+            </section>
+          ))}
+
+          {completedSession ? (
+            <section style={{ ...infoCardStyle, background: "#f1f5f9", borderColor: "#cbd5e1" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                <strong>{sameGhanaDate(completedSession.startsAt, now) ? "Earlier today" : "Latest completed class"}</strong>
+                <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Completed</span>
+              </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{formatDate(completedSession.startsAt, locale)} · {formatRange(completedSession, locale)} Ghana time</p>
+              <p style={{ ...styles.helperText, margin: 0 }}>{sessionTopic(completedSession)}</p>
+            </section>
+          ) : null}
+
+          {nextSession ? (
+            <section style={{ ...infoCardStyle, borderColor: "#93c5fd", background: "#eff6ff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
+                <span style={styles.badge}>{countdownLabel(nextSession.startsAt, now)}</span>
+              </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{formatDate(nextSession.startsAt, locale)} · {ghanaNextTime} Ghana time</p>
+              {showDeviceTime ? <p style={{ ...styles.helperText, margin: 0 }}>Device time: {deviceNextTime} ({deviceTimeZone})</p> : null}
+              <p style={{ ...styles.helperText, margin: 0 }}>{sessionTopic(nextSession)}</p>
+              {canJoinSession(nextSession, now) && zoom.url ? <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a> : null}
+            </section>
+          ) : <p style={styles.helperText}>No upcoming non-cancelled session is scheduled.</p>}
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={styles.primaryButton} onClick={() => downloadCanonicalCalendar(canonicalSummary)}>Download class calendar</button>
+            {canonicalSummary.klass.classUrl ? <a href={canonicalSummary.klass.classUrl} style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open class page</a> : null}
+          </div>
+        </>
+      ) : canonicalStatus === "loading" ? (
+        <section style={infoCardStyle}><span style={styles.helperText}>Loading the latest class schedule…</span></section>
+      ) : classDetails ? (
+        <StaticClassCard selectedClass={selectedClass} classDetails={classDetails} now={now} />
+      ) : (
+        <section style={{ ...infoCardStyle, background: "#fef2f2", borderColor: "#fecaca" }}>
+          <strong>Class schedule unavailable</strong>
+          <span style={styles.helperText}>Ask the administrator to create “{selectedClass}” under Live Classes.</span>
+        </section>
+      )}
     </div>
   );
 };
