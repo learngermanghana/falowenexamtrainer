@@ -82,9 +82,8 @@ service cloud.firestore {
       allow delete: if ownsResource();
     }
 
-    // Canonical live-class records are readable by enrolled, signed-in users.
-    // Only admins and tutors can change class definitions, sessions, Zoom rooms,
-    // or calendar feed metadata.
+    // Canonical live-class records are readable by signed-in students.
+    // Only admins and tutors can change scheduling and communication records.
     match /classes/{document=**} {
       allow read: if signedIn();
       allow write: if isStaff();
@@ -100,6 +99,12 @@ service cloud.firestore {
     match /calendarFeeds/{document=**} {
       allow read: if signedIn();
       allow write: if isStaff();
+    }
+    match /auditLogs/{document=**} {
+      allow read, write: if isStaff();
+    }
+    match /emailQueue/{document=**} {
+      allow read, write: if isStaff();
     }
 
     // Existing Falowen collections that previously used the authenticated
