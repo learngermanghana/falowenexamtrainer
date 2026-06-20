@@ -33,7 +33,17 @@ jobs:
               lines.append(line[10:] if line.startswith('          ') else line)
           Path('/tmp/apply-course-progression.sh').write_text('\n'.join(lines) + '\n')
           PY
-          bash /tmp/apply-course-progression.sh
+          set +e
+          bash /tmp/apply-course-progression.sh 2>&1 | tee /tmp/course-progression-patch.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+
+      - name: Upload patch diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-progression-patch-diagnostics
+          path: /tmp/course-progression-patch.log
 
       - name: Use Node.js 18 for web tests
         uses: actions/setup-node@v4
