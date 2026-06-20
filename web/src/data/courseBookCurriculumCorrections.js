@@ -81,8 +81,6 @@ export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) =>
 
   if (!correction) return entry;
 
-  // Only patch the current entry. Nested Day 3 resources are normalized separately,
-  // so Kapitel 1.1 and Kapitel 1.2 cannot overwrite one another.
   return {
     ...entry,
     chapter: correction.chapter,
