@@ -15,6 +15,7 @@ export const LEVEL_CAPABILITIES = Object.freeze({
 });
 
 const levelKey = (value = "") => String(value).trim().toUpperCase();
+const chapterKey = (value = "") => String(value || "").trim();
 const first = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || null;
 const list = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const link = (url, extra = {}) => (url ? { url, ...extra } : null);
@@ -48,14 +49,31 @@ const resourceGroups = (raw, level, day) => {
   });
 };
 
+export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
+  const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
+
+  // A full-day lesson may intentionally contain more than one chapter. Only narrow
+  // the video list when the user opened a chapter-specific Course Book entry.
+  if (selectedChapters.size !== 1) return videos;
+
+  return videos.filter((video) => {
+    const videoChapter = chapterKey(video?.chapter);
+    return !videoChapter || selectedChapters.has(videoChapter);
+  });
+};
+
 export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level) => {
   const level = levelKey(requestedLevel);
   const day = Number(rawLesson.day ?? rawLesson.assignmentDay ?? 0);
   const primary = firstLesson(rawLesson);
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
-  const videos = mergeVideos(getLessonVideoResources(level, day, rawLesson), getAdditionalLessonVideoResources(level, day));
-  const isTeacher = (item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher");
   const groups = resourceGroups(rawLesson, level, day);
+  const allVideos = mergeVideos(
+    getLessonVideoResources(level, day, rawLesson),
+    getAdditionalLessonVideoResources(level, day),
+  );
+  const videos = scopeLessonVideosToSelectedChapters(allVideos, groups);
+  const isTeacher = (item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher");
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,
@@ -80,4 +98,4 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
 
 export const normalizeA1Lesson = (raw = {}) => normalizeLesson(raw, "A1");
 export const normalizeA2B1Lesson = (raw = {}, level = raw.level || "A2") => normalizeLesson(raw, level);
-export const normalizeB2C1Lesson = (raw = {}, level = raw.level || "B2") => normalizeLesson(raw, level);
+export const normalizeB2C1Lesson = (raw = {}, level = raw.level || "B2") => normalizeLesson(raw, level || "B2");
