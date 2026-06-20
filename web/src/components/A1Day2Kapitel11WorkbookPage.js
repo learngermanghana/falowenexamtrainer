@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const DAY_2_GERMAN_ALPHABET_YOUTUBE_URL = "https://youtu.be/pCQVdJGsvtk";
+const DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/pCQVdJGsvtk";
 
 const cardStyle = {
   ...styles.card,
@@ -23,6 +24,13 @@ const imageStyle = {
   borderRadius: 10,
   maxHeight: 260,
   objectFit: "cover",
+};
+
+const videoPreviewStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 10,
 };
 
 const questionBoxStyle = {
@@ -108,6 +116,13 @@ const A1Day2Kapitel11WorkbookPage = () => {
           Friend.
           <br />Watch and listen to the YouTube lesson, then answer the questions below.
         </p>
+        <iframe
+          title="Day 2 German Alphabet Hören video"
+          src={DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL}
+          style={videoPreviewStyle}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
         <CoursebookAudioPlayer
           url={DAY_2_GERMAN_ALPHABET_YOUTUBE_URL}
           linkLabel="Open Day 2 German Alphabet Hören on YouTube"
@@ -141,5 +156,5 @@ const A1Day2Kapitel11WorkbookPage = () => {
   );
 };
 
-export { DAY_2_GERMAN_ALPHABET_YOUTUBE_URL };
+export { DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL, DAY_2_GERMAN_ALPHABET_YOUTUBE_URL };
 export default A1Day2Kapitel11WorkbookPage;
