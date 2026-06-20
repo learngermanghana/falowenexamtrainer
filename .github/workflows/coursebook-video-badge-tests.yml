@@ -24,7 +24,10 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Test chapter-specific lesson videos
-        run: npm test -- --runInBand src/data/lessonModel.test.js
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test -- --runInBand src/data/lessonModel.test.js 2>&1 | tail -n 100
 
   terminology-tests:
     runs-on: ubuntu-latest
@@ -44,4 +47,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Test Course Book badge wording
-        run: npm test -- --runInBand src/components/CourseBookTerminologyInjector.test.js
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test -- --runInBand src/components/CourseBookTerminologyInjector.test.js 2>&1 | tail -n 100
