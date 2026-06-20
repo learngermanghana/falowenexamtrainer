@@ -26,8 +26,18 @@ jobs:
       - name: Test chapter-specific lesson videos
         shell: bash
         run: |
-          set -o pipefail
-          npm test -- --runInBand src/data/lessonModel.test.js 2>&1 | tail -n 100
+          set +e
+          npm test -- --runInBand src/data/lessonModel.test.js > lesson-video-test-output.txt 2>&1
+          status=$?
+          cat lesson-video-test-output.txt
+          exit $status
+
+      - name: Upload lesson video test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesson-video-test-output
+          path: web/lesson-video-test-output.txt
 
   terminology-tests:
     runs-on: ubuntu-latest
@@ -47,7 +57,4 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Test Course Book badge wording
-        shell: bash
-        run: |
-          set -o pipefail
-          npm test -- --runInBand src/components/CourseBookTerminologyInjector.test.js 2>&1 | tail -n 100
+        run: npm test -- --runInBand src/components/CourseBookTerminologyInjector.test.js
