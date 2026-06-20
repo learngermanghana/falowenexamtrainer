@@ -96,8 +96,27 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Test Course Book progression
+        shell: bash
         working-directory: web
-        run: npm test -- --runInBand src/components/CourseTab.status.test.js src/utils/courseBookEntries.test.js
+        run: |
+          set +e
+          npm test -- --runInBand src/components/CourseTab.status.test.js src/utils/courseBookEntries.test.js 2>&1 | tee /tmp/course-book-tests.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+
+      - name: Upload Course Book test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-book-test-diagnostics
+          path: |
+            /tmp/course-book-tests.log
+            web/src/components/CourseTab.js
+            web/src/components/CourseTab.status.test.js
+            web/src/components/HomeMetrics.js
+            functions/functionz/routes/scoresSummary.js
+            functions/functionz/routes/scoresSummaryCoursePlan.js
+            functions/functionz/routes/scoresSummaryCoursePlan.test.js
 
       - name: Use Node.js 22 for functions tests
         uses: actions/setup-node@v4
