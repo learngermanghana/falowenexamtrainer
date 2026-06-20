@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  focused-tests:
+  lesson-video-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,5 +23,25 @@ jobs:
       - name: Install web dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Test Course Book video scoping and terminology
-        run: npm test -- --runInBand src/data/lessonModel.test.js src/components/CourseBookTerminologyInjector.test.js
+      - name: Test chapter-specific lesson videos
+        run: npm test -- --runInBand src/data/lessonModel.test.js
+
+  terminology-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test Course Book badge wording
+        run: npm test -- --runInBand src/components/CourseBookTerminologyInjector.test.js
