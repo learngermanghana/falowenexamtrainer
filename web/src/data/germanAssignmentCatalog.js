@@ -4,16 +4,9 @@ import {
   getCurriculumEntriesForLevel,
   normalizeLevel,
 } from "./curriculumManifest";
+import { applyAssignmentCatalogCurriculumCorrections } from "./courseBookCurriculumCorrections";
 
-const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
-const a1Day5Entry = (CURRICULUM_BY_LEVEL.A1 || []).find(
-  (entry) => Number(entry.assignmentDay) === 5 && String(entry.chapter) === "1.2"
-);
-
-if (a1Day5Entry) {
-  a1Day5Entry.topic = A1_DAY_5_TITLE;
-  a1Day5Entry.title = A1_DAY_5_TITLE;
-}
+applyAssignmentCatalogCurriculumCorrections(CURRICULUM_BY_LEVEL.A1 || []);
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
@@ -92,14 +85,24 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   const normalizedLevel = normalizeLevel(level);
   if (!normalizedLevel) return null;
 
+  const entries = CURRICULUM_BY_LEVEL[normalizedLevel] || [];
+  const explicitAssignmentId = String(assignmentId || "").trim().toUpperCase();
+  const exactAssignmentMatches = explicitAssignmentId
+    ? entries.filter(
+        (entry) =>
+          String(entry.assignment_id || entry.assignmentId || "").trim().toUpperCase() ===
+          explicitAssignmentId
+      )
+    : [];
   const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter });
   const chapterToken = normalizeChapter(chapter);
   const modeToken = String(mode || "").trim();
   const dayToken = Number(assignmentDay || 0);
 
-  const matches = (CURRICULUM_BY_LEVEL[normalizedLevel] || []).filter((entry) => {
-    if (canonicalId && entry.assignment_id !== canonicalId) return false;
-    if (!canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
+  const sourceEntries = exactAssignmentMatches.length ? exactAssignmentMatches : entries;
+  const matches = sourceEntries.filter((entry) => {
+    if (!exactAssignmentMatches.length && canonicalId && entry.assignment_id !== canonicalId) return false;
+    if (!exactAssignmentMatches.length && !canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
     if (modeToken && entry.mode !== modeToken) return false;
     if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
     return true;
