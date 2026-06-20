@@ -88,4 +88,26 @@ describe("canonical lesson model", () => {
       ])
     ).toEqual(chapterVideos);
   });
+  test("uses only the configured Alphabet video for A1 Day 2 Kapitel 0.2", () => {
+    const lesson = normalizeA1Lesson({
+      day: 2,
+      chapter: "0.2",
+      lesen_hören: { chapter: "0.2" },
+    });
+    const titles = lesson.resources.videos.map((video) => video.title);
+
+    expect(titles).toContain("Kapitel 0.2 · Alphabet · AI video");
+    expect(titles).not.toContain("Kapitel 1.1 · Pronouns & Verb Conjugation · AI video");
+  });
+  test("uses only the configured Pronouns video for A1 Day 2 Kapitel 1.1", () => {
+    const lesson = normalizeA1Lesson({
+      day: 2,
+      chapter: "1.1",
+      lesen_hören: { chapter: "1.1" },
+    });
+    const titles = lesson.resources.videos.map((video) => video.title);
+
+    expect(titles).toContain("Kapitel 1.1 · Pronouns & Verb Conjugation · AI video");
+    expect(titles).not.toContain("Kapitel 0.2 · Alphabet · AI video");
+  });
 });
