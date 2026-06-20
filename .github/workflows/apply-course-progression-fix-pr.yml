@@ -41,6 +41,10 @@ jobs:
               "replace_once(course_tab, old_next_card, new_next_card)",
               "regex_once(course_tab, r'          \\{nextLesson \\? \\(.*?\\n          \\) : null\\}\\n', new_next_card.rstrip() + '\\n')",
           )
+          script = script.replace(
+              "replace_once(home_metrics, helper_anchor_home, helper_replacement_home)",
+              "regex_once(home_metrics, r'  const failedIdentifiersText = useMemo\\(\\(\\) => \\{.*?\\n  \\}, \\[assignmentStats\\]\\);', helper_replacement_home.rstrip())",
+          )
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
