@@ -308,19 +308,338 @@ const buildStreakDays = (attemptDatesMs = []) => {
   const daySet = new Set(
     attemptDatesMs
       .filter((ms) => ms > 0)
-      .map((lesson) => ({
-        label: lesson.label,
-        identifiers: lesson.identifiers,
-        dayNumber: lesson.dayNumber,
-        displayDay: lesson.displayDay,
-        displayChapter: lesson.displayChapter,
-        title: lesson.title,
-        goal: lesson.goal,
-        assignmentId: lesson.assignmentId,
-        selfStudy: lesson.selfStudy,
-        submissionRequired: lesson.submissionRequired,
-        practiceKeys: lesson.practiceKeys,
-      }));
+      .map((ms) => new Date(ms).toISOString().slice(0, 10))
+  );
+
+  if (!daySet.size) return 0;
+
+  const today = new Date();
+  let streak = 0;
+
+  for (;;) {
+    const dayKey = today.toISOString().slice(0, 10);
+    if (!daySet.has(dayKey)) break;
+    streak += 1;
+    today.setDate(today.getDate() - 1);
+  }
+
+  return streak;
+};
+
+const requireAuth = async (req) => {
+  const authHeader = req.headers.authorization || "";
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  if (!match?.[1]) throw new Error("Missing Authorization Bearer token.");
+  const decoded = await admin.auth().verifyIdToken(match[1]);
+  return decoded;
+};
+
+const maybeRequireAuth = async (req) => {
+  const authHeader = String(req.headers.authorization || "").trim();
+  if (!authHeader) return null;
+  return requireAuth(req);
+};
+
+const loadCompletedPracticeKeys = async ({ db, studentCode, level }) => {
+  if (!db || !studentCode) return new Set();
+  try {
+    const snapshot = await db.collection("coursePracticeProgress").where("studentCode", "==", studentCode).get();
+    const normalizedLevel = normalizeLevel(level || "");
+    const completed = new Set();
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      const rowLevel = normalizeLevel(data.level || "");
+      if (rowLevel && normalizedLevel && rowLevel !== normalizedLevel) return;
+      if (data.completed !== true) return;
+      [data.assignmentKey, data.entryId, data.assignmentId, data.canonicalAssignmentId]
+        .map(normalizePracticeKey)
+        .filter(Boolean)
+        .forEach((key) => completed.add(key));
+    });
+    return completed;
+  } catch (error) {
+    console.warn("Could not load course self-study progress", error?.message || error);
+    return new Set();
+  }
+};
+
+/* ----------------------------- Main handler ----------------------------- */
+
+const scoresSummaryHandler = async (req, res) => {
+  try {
+    const includeDebug = String(req.query.debug || "").trim() === "1";
+
+    let decoded = null;
+    if (!includeDebug) {
+      decoded = await maybeRequireAuth(req);
+    }
+
+    const studentCode = String(req.query.studentCode || "").trim();
+    const normalizedStudentCode = normalizeStudentCode(studentCode);
+    if (!studentCode) return res.status(400).json({ error: "studentCode is required" });
+
+    const db = admin.firestore();
+    const studentSnap = await db.collection("students").doc(studentCode).get();
+    if (!studentSnap.exists) return res.status(404).json({ error: "Student not found" });
+
+    const student = studentSnap.data() || {};
+    if (!includeDebug && decoded?.uid && student.uid && student.uid !== decoded.uid) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    const level = normalizeLevel(student.level || student.course || "A1") || "A1";
+
+    // Build schedule targets
+    const { lessons: plannedLessons, plannedSet, totalCourseItems } = getAssignmentSummary(level);
+    const totalAssignments = plannedSet.size;
+    const completedPracticeKeys = await loadCompletedPracticeKeys({ db, studentCode, level });
+    const labelByIdentifier = new Map();
+    plannedLessons.forEach((lesson) => {
+      lesson.identifiers.forEach((identifier) => {
+        if (!labelByIdentifier.has(identifier)) {
+          labelByIdentifier.set(identifier, lesson.label);
+        }
+      });
+    });
+
+    const CSV_URL =
+      process.env.SCORES_SHEET_PUBLISHED_CSV_URL ||
+      process.env.RESULTS_SHEET_PUBLISHED_CSV_URL ||
+      "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
+
+    if (!CSV_URL || CSV_URL.includes("PASTE_YOUR")) {
+      return res.status(503).json({
+        error: "Score sheet URL is not configured",
+        missingEnv: "SCORES_SHEET_PUBLISHED_CSV_URL or RESULTS_SHEET_PUBLISHED_CSV_URL",
+      });
+    }
+
+    const csvRes = await fetch(CSV_URL);
+    if (!csvRes.ok) return res.status(502).json({ error: `CSV fetch failed (${csvRes.status})` });
+
+    const csvText = await csvRes.text();
+    const rows = parseCsv(csvText);
+    if (!rows.length) {
+      return res.json({ student: null });
+    }
+
+    const header = rows[0];
+    const idx = {
+      studentCode: findIndexByHeader(header, [
+        "studentno",
+        "student.no",
+        "student no",
+        "studentcode",
+        "student code",
+        "code",
+      ]),
+      name: findIndexByHeader(header, ["name", "studentname", "student name"]),
+      assignment: findIndexByHeader(header, ["assignment", "task", "topic", "day", "title"]),
+      assignmentId: findIndexByHeader(header, ["assignment_id", "assignmentid", "assgnment_id", "assgnmentid"]),
+      score: findIndexByHeader(header, ["score", "mark", "marks", "result"]),
+      date: findIndexByHeader(header, ["date", "timestamp", "createdat", "created_at", "time"]),
+      comments: findIndexByHeader(header, ["comments", "feedback", "comment"]),
+      level: findIndexByHeader(header, ["level", "cefr", "lvl"]),
+      link: findIndexByHeader(header, ["link", "url"]),
+    };
+
+    if (idx.studentCode === -1) {
+      return res.status(500).json({ error: "Score sheet missing Student No / StudentCode column." });
+    }
+
+    const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
+    const resolveIdentifier = (row) => {
+      const explicitId = get(row, idx.assignmentId);
+      const assignmentText = get(row, idx.assignment);
+
+      // Migration safety notes:
+      // - canonical-only operation requires score rows to include assignment_id in canonical LEVEL-CHAPTER form.
+      // - this fallback parser remains for legacy sheet rows where only assignment text/title was stored.
+      // - once historical sheet rows are backfilled with canonical assignment_id values, bestIdentifier parsing can be removed.
+      if (explicitId) {
+        const matchedExplicitId = mapToPlannedIdentifier(explicitId, plannedSet);
+        if (matchedExplicitId) return matchedExplicitId;
+      }
+
+      const bestIdentifier = chooseBestIdentifier({ assignmentText, explicitId, plannedSet });
+      return mapToPlannedIdentifier(bestIdentifier, plannedSet) || bestIdentifier;
+    };
+
+    const leaderboardEntries = new Map();
+    rows.slice(1).forEach((row) => {
+      const rowStudentCode = get(row, idx.studentCode);
+      if (!rowStudentCode) return;
+      const rowLevel = normalizeLevel(get(row, idx.level) || "");
+      if (rowLevel && rowLevel !== level) return;
+
+      const identifier = resolveIdentifier(row);
+      if (!identifier) return;
+
+      const scoreNum = parseScoreValue(get(row, idx.score));
+      if (!Number.isFinite(scoreNum)) return;
+
+      const key = normalizeStudentCode(rowStudentCode);
+      const current = leaderboardEntries.get(key) || {
+        studentCode: rowStudentCode,
+        name: get(row, idx.name) || "",
+        bestScores: new Map(),
+      };
+
+      if (!current.name && get(row, idx.name)) current.name = get(row, idx.name);
+
+      const previousScore = current.bestScores.get(identifier);
+      if (!Number.isFinite(previousScore) || scoreNum > previousScore) {
+        current.bestScores.set(identifier, scoreNum);
+      }
+
+      leaderboardEntries.set(key, current);
+    });
+
+    const qualificationMinimum = 3;
+
+    const leaderboard = Array.from(leaderboardEntries.values())
+      .map((entry) => {
+        const scores = Array.from(entry.bestScores.values());
+        const submittedCount = scores.length;
+        const passedScores = scores.filter((value) => value >= PASS_MARK);
+        const failedScores = scores.filter((value) => value < PASS_MARK);
+        const passedCount = passedScores.length;
+        const totalScore = Math.round(passedScores.reduce((sum, value) => sum + value, 0) * 10) / 10;
+        return {
+          studentCode: entry.studentCode,
+          name: anonymizeDisplayName(entry.name, entry.studentCode),
+          submittedCount,
+          completedCount: passedCount,
+          passedCount,
+          failedCount: failedScores.length,
+          totalScore,
+          expectedPoints: totalAssignments * 100,
+        };
+      })
+      .filter((entry) => entry.completedCount >= qualificationMinimum)
+      .sort((a, b) => {
+        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+        if (b.completedCount !== a.completedCount) return b.completedCount - a.completedCount;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      })
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
+
+    const mine = rows
+      .slice(1)
+      .filter((r) => normalizeStudentCode(get(r, idx.studentCode)) === normalizedStudentCode)
+      .map((r) => {
+        const assignment = get(r, idx.assignment);
+        const scoreNum = parseScoreValue(get(r, idx.score));
+        const dateRaw = get(r, idx.date);
+        const dateMs = parseDateMs(dateRaw);
+        const rowLevel = get(r, idx.level) || "";
+        const identifier = resolveIdentifier(r);
+
+        return {
+          assignment: assignment || "",
+          identifier,
+          score: Number.isFinite(scoreNum) ? scoreNum : null,
+          dateRaw,
+          dateMs,
+          level: rowLevel,
+          comments: get(r, idx.comments) || "",
+          link: get(r, idx.link) || "",
+        };
+      })
+      .filter((row) => {
+        const rowLevel = normalizeLevel(row.level || "");
+        if (!rowLevel) return true;
+        return rowLevel === level;
+      });
+
+    const debugRowsForStudent = includeDebug
+      ? rows
+          .slice(1)
+          .filter((r) => normalizeStudentCode(get(r, idx.studentCode)) === normalizedStudentCode)
+          .map((r) => {
+            const assignment = get(r, idx.assignment);
+            const explicitId = get(r, idx.assignmentId);
+            const resolvedIdentifier = resolveIdentifier(r);
+            const rawLevel = get(r, idx.level) || "";
+            const normalizedRowLevel = normalizeLevel(rawLevel);
+            const levelMatches = !normalizedRowLevel || normalizedRowLevel === level;
+
+            return {
+              assignment,
+              explicitId,
+              resolvedIdentifier,
+              score: parseScoreValue(get(r, idx.score)),
+              date: get(r, idx.date),
+              rawLevel,
+              normalizedRowLevel,
+              levelMatches,
+            };
+          })
+      : [];
+
+    const bestById = new Map();
+    for (const row of mine) {
+      if (!row.identifier) continue;
+      if (!plannedSet.has(row.identifier)) continue;
+      if (!Number.isFinite(row.score)) continue;
+
+      const prev = bestById.get(row.identifier);
+      const prevScore = prev?.score ?? -Infinity;
+      const currScore = row.score ?? -Infinity;
+
+      const shouldReplace =
+        currScore > prevScore ||
+        (currScore === prevScore && (row.dateMs || 0) > (prev?.dateMs || 0));
+
+      if (!prev || shouldReplace) bestById.set(row.identifier, row);
+    }
+
+    const passed = new Set();
+    const failed = new Set();
+    const submittedCount = bestById.size;
+
+    for (const [id, best] of bestById.entries()) {
+      if ((best.score ?? -Infinity) >= PASS_MARK) passed.add(id);
+      else failed.add(id);
+    }
+
+    const lessonStatus = plannedLessons.map((l) => {
+    const isCompleted = l.selfStudy
+      ? (l.practiceKeys || []).some((key) => completedPracticeKeys.has(normalizePracticeKey(key)))
+      : l.identifiers.length > 0 && l.identifiers.every((id) => passed.has(id));
+    const hasFailed = !l.selfStudy && l.identifiers.some((id) => failed.has(id));
+    return { ...l, isCompleted, hasFailed };
+  });
+
+    const lessonStatusByDay = [...lessonStatus].sort((a, b) => {
+      const dayDiff = Number(a.dayNumber || 0) - Number(b.dayNumber || 0);
+      if (dayDiff !== 0) return dayDiff;
+      return Number(a.order || 0) - Number(b.order || 0);
+    });
+
+    const furthestCompletedLessonIndex = lessonStatusByDay.reduce((maxIndex, lesson, index) => {
+      if (!lesson.isCompleted || lesson.hasFailed) return maxIndex;
+      return Math.max(maxIndex, index);
+    }, -1);
+
+    const missedAssignments = lessonStatusByDay
+      .filter((l, index) => {
+        if (l.isCompleted || l.hasFailed) return false;
+        return index < furthestCompletedLessonIndex;
+      })
+      .map((l) => ({
+      label: l.label,
+      identifiers: l.identifiers,
+      dayNumber: l.dayNumber,
+      displayDay: l.displayDay,
+      displayChapter: l.displayChapter,
+      title: l.title,
+      goal: l.goal,
+      assignmentId: l.assignmentId,
+      selfStudy: l.selfStudy,
+      submissionRequired: l.submissionRequired,
+      practiceKeys: l.practiceKeys,
+    }));
 
     const jumpedAssignments = missedAssignments;
 
@@ -358,18 +677,18 @@ const buildStreakDays = (attemptDatesMs = []) => {
       const firstIncomplete = lessonStatusByDay.find((l) => !l.isCompleted);
       if (firstIncomplete) {
         nextRecommendation = {
-          label: firstIncomplete.label,
-          identifiers: firstIncomplete.identifiers,
-          dayNumber: firstIncomplete.dayNumber,
-          displayDay: firstIncomplete.displayDay,
-          displayChapter: firstIncomplete.displayChapter,
-          title: firstIncomplete.title,
-          goal: firstIncomplete.goal,
-          assignmentId: firstIncomplete.assignmentId,
-          selfStudy: firstIncomplete.selfStudy,
-          submissionRequired: firstIncomplete.submissionRequired,
-          practiceKeys: firstIncomplete.practiceKeys,
-        };
+        label: firstIncomplete.label,
+        identifiers: firstIncomplete.identifiers,
+        dayNumber: firstIncomplete.dayNumber,
+        displayDay: firstIncomplete.displayDay,
+        displayChapter: firstIncomplete.displayChapter,
+        title: firstIncomplete.title,
+        goal: firstIncomplete.goal,
+        assignmentId: firstIncomplete.assignmentId,
+        selfStudy: firstIncomplete.selfStudy,
+        submissionRequired: firstIncomplete.submissionRequired,
+        practiceKeys: firstIncomplete.practiceKeys,
+      };
       }
     }
 
