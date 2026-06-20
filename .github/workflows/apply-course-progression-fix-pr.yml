@@ -1,4 +1,4 @@
-name: Clean course progression implementation
+name: Final course progression cleanup
 
 on:
   pull_request:
@@ -19,148 +19,53 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Clean generated source blocks
+      - name: Clean source blocks
         shell: bash
+        env:
+          COURSE_B64: ICBjb25zdCBwZXJzaXN0UHJhY3RpY2VQcm9ncmVzcyA9IGFzeW5jIChlbnRyeSwgbmV4dFZhbHVlKSA9PiB7CiAgICBjb25zdCBhc3NpZ25tZW50S2V5ID0gZW50cnk/LmFzc2lnbm1lbnRLZXk7CiAgICBpZiAoIWRiIHx8ICFzdHVkZW50Q29kZSB8fCAhYXNzaWdubWVudEtleSkgcmV0dXJuOwogICAgY29uc3QgZG9jSWQgPSBgJHtTdHJpbmcoc3R1ZGVudENvZGUpLnRvTG93ZXJDYXNlKCl9XyR7U3RyaW5nKHNlbGVjdGVkQ291cnNlTGV2ZWwpLnRvTG93ZXJDYXNlKCl9XyR7U3RyaW5nKGFzc2lnbm1lbnRLZXkpLnRvTG93ZXJDYXNlKCkucmVwbGFjZSgvW15hLXowLTkuXy1dL2csICJfIil9YDsKICAgIGF3YWl0IHNldERvYygKICAgICAgZG9jKGRiLCAiY291cnNlUHJhY3RpY2VQcm9ncmVzcyIsIGRvY0lkKSwKICAgICAgewogICAgICAgIHN0dWRlbnRDb2RlLAogICAgICAgIGxldmVsOiBzZWxlY3RlZENvdXJzZUxldmVsLAogICAgICAgIGFzc2lnbm1lbnRLZXksCiAgICAgICAgZW50cnlJZDogZW50cnkuYXNzaWdubWVudElkIHx8IGVudHJ5LmFzc2lnbm1lbnRfaWQgfHwgbnVsbCwKICAgICAgICBkaXNwbGF5RGF5OiBnZXRDb3Vyc2VCb29rRGlzcGxheURheShlbnRyeSksCiAgICAgICAgY2hhcHRlcjogZW50cnkuZGlzcGxheUNoYXB0ZXIgfHwgZW50cnkuY2hhcHRlciB8fCBudWxsLAogICAgICAgIGxlc3NvblRpdGxlOiBnZXRDb3Vyc2VCb29rRW50cnlUaXRsZShlbnRyeSksCiAgICAgICAgLi4ubmV4dFZhbHVlLAogICAgICAgIHVwZGF0ZWRBdDogc2VydmVyVGltZXN0YW1wKCksCiAgICAgIH0sCiAgICAgIHsgbWVyZ2U6IHRydWUgfQogICAgKTsKICB9OwoKICBjb25zdCB1cGRhdGVQcmFjdGljZUVudHJ5
+          HOME_B64: ICBjb25zdCBmYWlsZWRJZGVudGlmaWVyc1RleHQgPSB1c2VNZW1vKCgpID0+IHsKICAgIGNvbnN0IGlkcyA9IGFzc2lnbm1lbnRTdGF0cz8uZmFpbGVkSWRlbnRpZmllcnMgfHwgW107CiAgICByZXR1cm4gaWRzLmxlbmd0aCA/IGlkcy5qb2luKCIsICIpIDogIiI7CiAgfSwgW2Fzc2lnbm1lbnRTdGF0c10pOwoKICBjb25zdCBuZXh0UmVjb21tZW5kYXRpb25IZWxwZXIgPSB1c2VNZW1vKCgpID0+IHsKICAgIGlmIChibG9ja2VkKSB7CiAgICAgIHJldHVybiBmYWlsZWRJZGVudGlmaWVyc1RleHQKICAgICAgICA/IHQoImhvbWVNZXRyaWNzLm5leHRSZWNvbW1lbmRhdGlvbi5ibG9ja2VkV2l0aElkcyIsIHsgaXRlbXM6IGZhaWxlZElkZW50aWZpZXJzVGV4dCB9KQogICAgICAgIDogdCgiaG9tZU1ldHJpY3MubmV4dFJlY29tbWVuZGF0aW9uLmJsb2NrZWQiKTsKICAgIH0KICAgIGlmIChuZXh0T2JqPy5zZWxmU3R1ZHkpIHsKICAgICAgcmV0dXJuIHQoImhvbWVNZXRyaWNzLm5leHRSZWNvbW1lbmRhdGlvbi5zZWxmU3R1ZHlIZWxwZXIiLCB7CiAgICAgICAgdGl0bGU6IG5leHRPYmoudGl0bGUgfHwgbmV4dE9iai5sYWJlbCwKICAgICAgICBkZWZhdWx0VmFsdWU6ICJDb21wbGV0ZSB0aGlzIHNlbGYtc3R1ZHkgbGVzc29uIGFuZCBtYXJrIGl0IGNvbXBsZXRlIGluIHRoZSBDb3Vyc2UgQm9vayB0byB1bmxvY2sgdGhlIG5leHQgaXRlbS4iLAogICAgICB9KTsKICAgIH0KICAgIGlmIChuZXh0T2JqPy5nb2FsICYmICFpc1Bhc3NpbmdTY29yZUdvYWwobmV4dE9iai5nb2FsKSkgewogICAgICByZXR1cm4gdCgiaG9tZU1ldHJpY3MubmV4dFJlY29tbWVuZGF0aW9uLmdvYWwiLCB7IGdvYWw6IG5leHRPYmouZ29hbCB9KTsKICAgIH0KICAgIHJldHVybiB0KCJob21lTWV0cmljcy5uZXh0UmVjb21tZW5kYXRpb24uZGVmYXVsdEhlbHBlciIpOwogIH0sIFtibG9ja2VkLCBmYWlsZWRJZGVudGlmaWVyc1RleHQsIG5leHRPYmosIHRdKTsKCiAgY29uc3QgbGVhZGVyYm9hcmRSb3dz
+          STATUS_B64: ICAgIGNvbnN0IGxlc3NvblN0YXR1cyA9IHBsYW5uZWRMZXNzb25zLm1hcCgobGVzc29uKSA9PiB7CiAgICAgIGNvbnN0IGlzQ29tcGxldGVkID0gbGVzc29uLnNlbGZTdHVkeQogICAgICAgID8gKGxlc3Nvbi5wcmFjdGljZUtleXMgfHwgW10pLnNvbWUoKGtleSkgPT4gY29tcGxldGVkUHJhY3RpY2VLZXlzLmhhcyhub3JtYWxpemVQcmFjdGljZUtleShrZXkpKSkKICAgICAgICA6IGxlc3Nvbi5pZGVudGlmaWVycy5sZW5ndGggPiAwICYmIGxlc3Nvbi5pZGVudGlmaWVycy5ldmVyeSgoaWQpID0+IHBhc3NlZC5oYXMoaWQpKTsKICAgICAgY29uc3QgaGFzRmFpbGVkID0gIWxlc3Nvbi5zZWxmU3R1ZHkgJiYgbGVzc29uLmlkZW50aWZpZXJzLnNvbWUoKGlkKSA9PiBmYWlsZWQuaGFzKGlkKSk7CiAgICAgIHJldHVybiB7IC4uLmxlc3NvbiwgaXNDb21wbGV0ZWQsIGhhc0ZhaWxlZCB9OwogICAgfSk7
+          MISSED_B64: ICAgICAgLm1hcCgobGVzc29uKSA9PiAoewogICAgICAgIGxhYmVsOiBsZXNzb24ubGFiZWwsCiAgICAgICAgaWRlbnRpZmllcnM6IGxlc3Nvbi5pZGVudGlmaWVycywKICAgICAgICBkYXlOdW1iZXI6IGxlc3Nvbi5kYXlOdW1iZXIsCiAgICAgICAgZGlzcGxheURheTogbGVzc29uLmRpc3BsYXlEYXksCiAgICAgICAgZGlzcGxheUNoYXB0ZXI6IGxlc3Nvbi5kaXNwbGF5Q2hhcHRlciwKICAgICAgICB0aXRsZTogbGVzc29uLnRpdGxlLAogICAgICAgIGdvYWw6IGxlc3Nvbi5nb2FsLAogICAgICAgIGFzc2lnbm1lbnRJZDogbGVzc29uLmFzc2lnbm1lbnRJZCwKICAgICAgICBzZWxmU3R1ZHk6IGxlc3Nvbi5zZWxmU3R1ZHksCiAgICAgICAgc3VibWlzc2lvblJlcXVpcmVkOiBsZXNzb24uc3VibWlzc2lvblJlcXVpcmVkLAogICAgICAgIHByYWN0aWNlS2V5czogbGVzc29uLnByYWN0aWNlS2V5cywKICAgICAgfSkpOw==
+          NEXT_B64: ICAgICAgICBuZXh0UmVjb21tZW5kYXRpb24gPSB7CiAgICAgICAgICBsYWJlbDogZmlyc3RJbmNvbXBsZXRlLmxhYmVsLAogICAgICAgICAgaWRlbnRpZmllcnM6IGZpcnN0SW5jb21wbGV0ZS5pZGVudGlmaWVycywKICAgICAgICAgIGRheU51bWJlcjogZmlyc3RJbmNvbXBsZXRlLmRheU51bWJlciwKICAgICAgICAgIGRpc3BsYXlEYXk6IGZpcnN0SW5jb21wbGV0ZS5kaXNwbGF5RGF5LAogICAgICAgICAgZGlzcGxheUNoYXB0ZXI6IGZpcnN0SW5jb21wbGV0ZS5kaXNwbGF5Q2hhcHRlciwKICAgICAgICAgIHRpdGxlOiBmaXJzdEluY29tcGxldGUudGl0bGUsCiAgICAgICAgICBnb2FsOiBmaXJzdEluY29tcGxldGUuZ29hbCwKICAgICAgICAgIGFzc2lnbm1lbnRJZDogZmlyc3RJbmNvbXBsZXRlLmFzc2lnbm1lbnRJZCwKICAgICAgICAgIHNlbGZTdHVkeTogZmlyc3RJbmNvbXBsZXRlLnNlbGZTdHVkeSwKICAgICAgICAgIHN1Ym1pc3Npb25SZXF1aXJlZDogZmlyc3RJbmNvbXBsZXRlLnN1Ym1pc3Npb25SZXF1aXJlZCwKICAgICAgICAgIHByYWN0aWNlS2V5czogZmlyc3RJbmNvbXBsZXRlLnByYWN0aWNlS2V5cywKICAgICAgICB9Ow==
+          PLAN_B64: ICAgICAgY29uc3QgaGFzUmVzb3VyY2UgPSBCb29sZWFuKAogICAgICAgIGVudHJ5Lndvcmtib29rUm91dGUgfHwKICAgICAgICAgIGVudHJ5LnZpZGVvIHx8CiAgICAgICAgICB0b0FycmF5KGVudHJ5LnJlc291cmNlcykuc29tZSgKICAgICAgICAgICAgKHJlc291cmNlKSA9PgogICAgICAgICAgICAgIHJlc291cmNlPy53b3JrYm9va1JvdXRlIHx8CiAgICAgICAgICAgICAgcmVzb3VyY2U/Lndvcmtib29rX2xpbmsgfHwKICAgICAgICAgICAgICByZXNvdXJjZT8udmlkZW8gfHwKICAgICAgICAgICAgICByZXNvdXJjZT8ueW91dHViZV9saW5rCiAgICAgICAgICApCiAgICAgICk7
         run: |
           python <<'PY'
-          from pathlib import Path
+          import base64
+          import os
           import re
+          from pathlib import Path
 
-          def regex_once(path, pattern, replacement):
+          def decoded(name):
+              return base64.b64decode(os.environ[name]).decode()
+
+          def replace(path, pattern, replacement):
               text = path.read_text()
               updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
               if count != 1:
-                  raise SystemExit(f"Expected one formatting replacement in {path}, got {count}")
+                  raise SystemExit(f"Expected one cleanup replacement in {path}, got {count}")
               path.write_text(updated)
 
-          course_tab = Path("web/src/components/CourseTab.js")
-          regex_once(
-              course_tab,
-              r"  const persistPracticeProgress = async \(entry, nextValue\) => \{.*?\n\};\n\n  const updatePracticeEntry",
-              '''  const persistPracticeProgress = async (entry, nextValue) => {
-            const assignmentKey = entry?.assignmentKey;
-            if (!db || !studentCode || !assignmentKey) return;
-            const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
-            await setDoc(
-              doc(db, "coursePracticeProgress", docId),
-              {
-                studentCode,
-                level: selectedCourseLevel,
-                assignmentKey,
-                entryId: entry.assignmentId || entry.assignment_id || null,
-                displayDay: getCourseBookDisplayDay(entry),
-                chapter: entry.displayChapter || entry.chapter || null,
-                lessonTitle: getCourseBookEntryTitle(entry),
-                ...nextValue,
-                updatedAt: serverTimestamp(),
-              },
-              { merge: true }
-            );
-          };
-
-          const updatePracticeEntry'''
+          replace(
+              Path("web/src/components/CourseTab.js"),
+              r"  const persistPracticeProgress = async \(entry, nextValue\) => \{.*?\n\s*const updatePracticeEntry",
+              decoded("COURSE_B64"),
           )
-
-          home = Path("web/src/components/HomeMetrics.js")
-          regex_once(
-              home,
-              r"  const failedIdentifiersText = useMemo\(\(\) => \{.*?\n  const leaderboardRows",
-              '''  const failedIdentifiersText = useMemo(() => {
-            const ids = assignmentStats?.failedIdentifiers || [];
-            return ids.length ? ids.join(", ") : "";
-          }, [assignmentStats]);
-
-          const nextRecommendationHelper = useMemo(() => {
-            if (blocked) {
-              return failedIdentifiersText
-                ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
-                : t("homeMetrics.nextRecommendation.blocked");
-            }
-            if (nextObj?.selfStudy) {
-              return t("homeMetrics.nextRecommendation.selfStudyHelper", {
-                title: nextObj.title || nextObj.label,
-                defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
-              });
-            }
-            if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
-              return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
-            }
-            return t("homeMetrics.nextRecommendation.defaultHelper");
-          }, [blocked, failedIdentifiersText, nextObj, t]);
-
-          const leaderboardRows'''
+          replace(
+              Path("web/src/components/HomeMetrics.js"),
+              r"  const failedIdentifiersText = useMemo\(\(\) => \{.*?\n\s*const leaderboardRows",
+              decoded("HOME_B64"),
           )
-
           scores = Path("functions/functionz/routes/scoresSummary.js")
-          regex_once(
-              scores,
-              r"    const lessonStatus = plannedLessons\.map\(\(l\) => \{.*?\n  \}\);",
-              '''    const lessonStatus = plannedLessons.map((l) => {
-              const isCompleted = l.selfStudy
-                ? (l.practiceKeys || []).some((key) => completedPracticeKeys.has(normalizePracticeKey(key)))
-                : l.identifiers.length > 0 && l.identifiers.every((id) => passed.has(id));
-              const hasFailed = !l.selfStudy && l.identifiers.some((id) => failed.has(id));
-              return { ...l, isCompleted, hasFailed };
-            });'''
-          )
-          regex_once(
-              scores,
-              r"      \.map\(\(l\) => \(\{\n      label: l\.label,.*?\n    \}\)\);",
-              '''      .map((l) => ({
-                label: l.label,
-                identifiers: l.identifiers,
-                dayNumber: l.dayNumber,
-                displayDay: l.displayDay,
-                displayChapter: l.displayChapter,
-                title: l.title,
-                goal: l.goal,
-                assignmentId: l.assignmentId,
-                selfStudy: l.selfStudy,
-                submissionRequired: l.submissionRequired,
-                practiceKeys: l.practiceKeys,
-              }));'''
-          )
-          regex_once(
-              scores,
-              r"        nextRecommendation = \{\n        label: firstIncomplete\.label,.*?\n      \};",
-              '''        nextRecommendation = {
-                  label: firstIncomplete.label,
-                  identifiers: firstIncomplete.identifiers,
-                  dayNumber: firstIncomplete.dayNumber,
-                  displayDay: firstIncomplete.displayDay,
-                  displayChapter: firstIncomplete.displayChapter,
-                  title: firstIncomplete.title,
-                  goal: firstIncomplete.goal,
-                  assignmentId: firstIncomplete.assignmentId,
-                  selfStudy: firstIncomplete.selfStudy,
-                  submissionRequired: firstIncomplete.submissionRequired,
-                  practiceKeys: firstIncomplete.practiceKeys,
-                };'''
+          replace(scores, r"    const lessonStatus = plannedLessons\.map\(.*?\n\s*\}\);", decoded("STATUS_B64"))
+          replace(scores, r"      \.map\(\(.*?\) => \(\{\n\s*label: .*?\n\s*\}\)\);", decoded("MISSED_B64"))
+          replace(scores, r"        nextRecommendation = \{\n\s*label: firstIncomplete\.label,.*?\n\s*\};", decoded("NEXT_B64"))
+          replace(
+              Path("functions/functionz/routes/scoresSummaryCoursePlan.js"),
+              r"      const hasResource = Boolean\(.*?\n\s*\);",
+              decoded("PLAN_B64"),
           )
 
-          plan = Path("functions/functionz/routes/scoresSummaryCoursePlan.js")
-          text = plan.read_text()
-          text = text.replace(
-              '''      const hasResource = Boolean(
-                entry.workbookRoute ||
-          entry.video ||
-          toArray(entry.resources).some((resource) => resource?.workbookRoute || resource?.workbook_link || resource?.video || resource?.youtube_link)
-              );''',
-              '''      const hasResource = Boolean(
-                entry.workbookRoute ||
-                  entry.video ||
-                  toArray(entry.resources).some(
-                    (resource) =>
-                      resource?.workbookRoute ||
-                      resource?.workbook_link ||
-                      resource?.video ||
-                      resource?.youtube_link
-                  )
-              );'''
-          )
-          plan.write_text(text)
-
-          locale_updates = {
+          updates = {
               "en": (
                   '"helper": "Missed items are only those before your last fully completed day."',
                   '"helper": "Earlier tutor assignments or self-study lessons you skipped in the visible Course Book order."',
@@ -177,13 +82,13 @@ jobs:
                   '"selfStudyHelper": "Termine cette leçon en autonomie et marque-la comme terminée dans le manuel pour débloquer l’élément suivant."',
               ),
           }
-          for locale, (old_helper, new_helper, self_study_line) in locale_updates.items():
+          for locale, (old, new, self_study) in updates.items():
               path = Path(f"web/src/i18n/locales/{locale}/translation.json")
-              text = path.read_text().replace(old_helper, new_helper, 1)
-              if self_study_line and '"selfStudyHelper"' not in text:
+              text = path.read_text().replace(old, new, 1)
+              if self_study and '"selfStudyHelper"' not in text:
                   text = text.replace(
                       '"defaultHelper": "Keep going with your next recommended task."',
-                      '"defaultHelper": "Keep going with your next recommended task.",\n      ' + self_study_line,
+                      '"defaultHelper": "Keep going with your next recommended task.",\n      ' + self_study,
                       1,
                   )
               path.write_text(text)
@@ -213,7 +118,7 @@ jobs:
         working-directory: functions
         run: node --test functionz/routes/scoresSummaryCoursePlan.test.js
 
-      - name: Commit cleaned implementation
+      - name: Commit final cleanup
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -221,5 +126,5 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "Clean course progression implementation"
+          git commit -m "Finalize course progression source cleanup"
           git push origin HEAD:${{ github.head_ref }}
