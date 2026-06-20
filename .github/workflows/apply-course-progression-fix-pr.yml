@@ -49,6 +49,18 @@ jobs:
               "replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\\n')",
               "regex_once(home_metrics, r'          helper=\\{\\n            blocked.*?\\n          \\}\\n', '          helper={nextRecommendationHelper}\\n')",
           )
+          script = script.replace(
+              "replace_once(scores, old_status, new_status)",
+              "regex_once(scores, r'    const lessonStatus = plannedLessons\\.map\\(\\(l\\) => \\{.*?\\n    \\}\\);', new_status.rstrip())",
+          )
+          script = script.replace(
+              "replace_once(scores, old_missed_map, new_missed_map)",
+              "regex_once(scores, r'      \\.map\\(\\(l\\) => \\(\\{\\n        label: l\\.label,.*?\\n      \\}\\)\\);', new_missed_map.rstrip())",
+          )
+          script = script.replace(
+              "replace_once(scores, old_next, new_next)",
+              "regex_once(scores, r'        nextRecommendation = \\{\\n          label: firstIncomplete\\.label,.*?\\n        \\};', new_next.rstrip())",
+          )
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
           set +e
