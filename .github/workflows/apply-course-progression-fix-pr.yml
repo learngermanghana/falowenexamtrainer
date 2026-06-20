@@ -1,0 +1,71 @@
+name: Apply course progression fix PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Extract and run patch script
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/apply-course-progression-fix.yml').read_text().splitlines()
+          start = next(i for i, line in enumerate(source) if line.strip() == '- name: Apply progression changes')
+          run_line = next(i for i in range(start + 1, len(source)) if source[i].strip() == 'run: |')
+          lines = []
+          for line in source[run_line + 1:]:
+              if line.startswith('      - name:'):
+                  break
+              lines.append(line[10:] if line.startswith('          ') else line)
+          Path('/tmp/apply-course-progression.sh').write_text('\n'.join(lines) + '\n')
+          PY
+          bash /tmp/apply-course-progression.sh
+
+      - name: Use Node.js 18 for web tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --no-audit --no-fund
+
+      - name: Test Course Book progression
+        working-directory: web
+        run: npm test -- --runInBand src/components/CourseTab.status.test.js src/utils/courseBookEntries.test.js
+
+      - name: Use Node.js 22 for functions tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test Home metrics course plan
+        working-directory: functions
+        run: node --test functionz/routes/scoresSummaryCoursePlan.test.js
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/CourseTab.js web/src/components/CourseTab.status.test.js web/src/components/HomeMetrics.js web/src/i18n/locales/en/translation.json web/src/i18n/locales/de/translation.json web/src/i18n/locales/fr/translation.json functions/functionz/routes/scoresSummary.js functions/functionz/routes/scoresSummaryCoursePlan.js functions/functionz/routes/scoresSummaryCoursePlan.test.js
+          if git diff --cached --quiet; then
+            echo "No progression changes to commit."
+            exit 0
+          fi
+          git commit -m "Align Home metrics and Course Book progression"
+          git push origin HEAD:${{ github.head_ref }}
