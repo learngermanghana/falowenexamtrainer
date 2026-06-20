@@ -34,34 +34,13 @@ jobs:
               lines.append(line[10:] if line.startswith('          ') else line)
           script = '\n'.join(lines) + '\n'
           script = script.replace("'''.replace(/^          /gm, \"\"))", "'''.replace(\"\\n          \", \"\\n\"))")
-          script = script.replace(
-              "replace_once(course_tab, old_persist, new_persist)",
-              "regex_once(course_tab, r'  const persistPracticeProgress = async \\(assignmentKey, nextValue\\) => \\{.*?\\n  \\};', new_persist.rstrip())",
-          )
-          script = script.replace(
-              "replace_once(course_tab, old_next_card, new_next_card)",
-              "regex_once(course_tab, r'          \\{nextLesson \\? \\(.*?\\n          \\) : null\\}\\n', new_next_card.rstrip() + '\\n')",
-          )
-          script = script.replace(
-              "replace_once(home_metrics, helper_anchor_home, helper_replacement_home)",
-              "regex_once(home_metrics, r'  const failedIdentifiersText = useMemo\\(\\(\\) => \\{.*?\\n  \\}, \\[assignmentStats\\]\\);', helper_replacement_home.rstrip())",
-          )
-          script = script.replace(
-              "replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\\n')",
-              "regex_once(home_metrics, r'          helper=\\{\\n            blocked.*?\\n          \\}\\n', '          helper={nextRecommendationHelper}\\n')",
-          )
-          script = script.replace(
-              "replace_once(scores, old_status, new_status)",
-              "regex_once(scores, r'    const lessonStatus = plannedLessons\\.map\\(\\(l\\) => \\{.*?\\n    \\}\\);', new_status.rstrip())",
-          )
-          script = script.replace(
-              "replace_once(scores, old_missed_map, new_missed_map)",
-              "regex_once(scores, r'      \\.map\\(\\(l\\) => \\(\\{\\n        label: l\\.label,.*?\\n      \\}\\)\\);', new_missed_map.rstrip())",
-          )
-          script = script.replace(
-              "replace_once(scores, old_next, new_next)",
-              "regex_once(scores, r'        nextRecommendation = \\{\\n          label: firstIncomplete\\.label,.*?\\n        \\};', new_next.rstrip())",
-          )
+          script = script.replace("replace_once(course_tab, old_persist, new_persist)", "regex_once(course_tab, r'  const persistPracticeProgress = async \\(assignmentKey, nextValue\\) => \\{.*?\\n  \\};', new_persist.rstrip())")
+          script = script.replace("replace_once(course_tab, old_next_card, new_next_card)", "regex_once(course_tab, r'          \\{nextLesson \\? \\(.*?\\n          \\) : null\\}\\n', new_next_card.rstrip() + '\\n')")
+          script = script.replace("replace_once(home_metrics, helper_anchor_home, helper_replacement_home)", "regex_once(home_metrics, r'  const failedIdentifiersText = useMemo\\(\\(\\) => \\{.*?\\n  \\}, \\[assignmentStats\\]\\);', helper_replacement_home.rstrip())")
+          script = script.replace("replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\\n')", "regex_once(home_metrics, r'          helper=\\{\\n            blocked.*?\\n          \\}\\n', '          helper={nextRecommendationHelper}\\n')")
+          script = script.replace("replace_once(scores, old_status, new_status)", "regex_once(scores, r'    const lessonStatus = plannedLessons\\.map\\(\\(l\\) => \\{.*?\\n    \\}\\);', new_status.rstrip())")
+          script = script.replace("replace_once(scores, old_missed_map, new_missed_map)", "regex_once(scores, r'      \\.map\\(\\(l\\) => \\(\\{\\n        label: l\\.label,.*?\\n      \\}\\)\\);', new_missed_map.rstrip())")
+          script = script.replace("replace_once(scores, old_next, new_next)", "regex_once(scores, r'        nextRecommendation = \\{\\n          label: firstIncomplete\\.label,.*?\\n        \\};', new_next.rstrip())")
           marker = 'completedPracticeCount: lessonStatus.filter'
           marker_pos = script.find(marker)
           if marker_pos < 0:
@@ -75,95 +54,35 @@ jobs:
           script = script[:block_start] + robust_response_patch + script[block_end:]
           Path('/tmp/apply-course-progression.sh').write_text(script)
           PY
-          set +e
-          bash /tmp/apply-course-progression.sh 2>&1 | tee /tmp/course-progression-patch.log
-          status=${PIPESTATUS[0]}
-          exit "$status"
-
-      - name: Upload patch diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: course-progression-patch-diagnostics
-          path: /tmp/course-progression-patch.log
+          bash /tmp/apply-course-progression.sh
 
       - name: Move progression logic to a pure utility
         shell: bash
+        env:
+          UTILITY_B64: Y29uc3QgQ09NUExFVEVEX1RVVE9SX1NUQVRVU0VTID0gbmV3IFNldChbInBhc3NlZCIsICJzdWJtaXR0ZWQiLCAicmVzdWJtaXR0ZWQiXSk7Cgpjb25zdCBpc01pbGVzdG9uZUVudHJ5ID0gKGVudHJ5ID0ge30pID0+CiAgQm9vbGVhbihlbnRyeT8uaXNNaWxlc3RvbmUgfHwgZW50cnk/LmNvbXBsZXRpb24gfHwgL2NvdXJzZSBjb21wbGV0ZWQvaS50ZXN0KFN0cmluZyhlbnRyeT8udG9waWMgfHwgIiIpKSk7Cgpjb25zdCBpc1R1dG9yTWFya2VkRW50cnkgPSAoZW50cnkgPSB7fSkgPT4gewogIGlmIChlbnRyeT8uaXNUdXRvck1hcmtlZCAhPT0gdW5kZWZpbmVkKSByZXR1cm4gQm9vbGVhbihlbnRyeS5pc1R1dG9yTWFya2VkKTsKICBpZiAoZW50cnk/LnR1dG9yTWFya2VkICE9PSB1bmRlZmluZWQpIHJldHVybiBCb29sZWFuKGVudHJ5LnR1dG9yTWFya2VkKTsKICBpZiAoZW50cnk/LnN1Ym1pc3Npb25SZXF1aXJlZCAhPT0gdW5kZWZpbmVkKSByZXR1cm4gQm9vbGVhbihlbnRyeS5zdWJtaXNzaW9uUmVxdWlyZWQpOwogIGlmIChlbnRyeT8uYXNzZXNzbWVudFR5cGUpIHJldHVybiBlbnRyeS5hc3Nlc3NtZW50VHlwZSA9PT0gInR1dG9yLW1hcmtlZCI7CiAgcmV0dXJuIEJvb2xlYW4oZW50cnk/LmFzc2lnbm1lbnQpOwp9OwoKZXhwb3J0IGNvbnN0IGlzQ291cnNlQm9va0VudHJ5Q29tcGxldGUgPSAoZW50cnkgPSB7fSwgcHJhY3RpY2VQcm9ncmVzcyA9IHt9KSA9PiB7CiAgaWYgKCFlbnRyeSB8fCBpc01pbGVzdG9uZUVudHJ5KGVudHJ5KSkgcmV0dXJuIGZhbHNlOwogIGlmIChpc1R1dG9yTWFya2VkRW50cnkoZW50cnkpKSByZXR1cm4gQ09NUExFVEVEX1RVVE9SX1NUQVRVU0VTLmhhcyhlbnRyeS5zdGF0dXMpOwogIHJldHVybiBCb29sZWFuKHByYWN0aWNlUHJvZ3Jlc3M/LltlbnRyeS5hc3NpZ25tZW50S2V5XT8uY29tcGxldGVkKTsKfTsKCmV4cG9ydCBjb25zdCBnZXROZXh0Q291cnNlQm9va0VudHJ5ID0gKGVudHJpZXMgPSBbXSwgcHJhY3RpY2VQcm9ncmVzcyA9IHt9KSA9PgogIGVudHJpZXMuZmluZCgoZW50cnkpID0+ICFpc01pbGVzdG9uZUVudHJ5KGVudHJ5KSAmJiAhaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZShlbnRyeSwgcHJhY3RpY2VQcm9ncmVzcykpIHx8IG51bGw7Cg==
+          TEST_B64: aW1wb3J0IHsgZ2V0TmV4dENvdXJzZUJvb2tFbnRyeSwgaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZSB9IGZyb20gIi4vY291cnNlQm9va1Byb2dyZXNzaW9uIjsKCmRlc2NyaWJlKCJjb3Vyc2UgYm9vayBuZXh0IGxlc3NvbiBwcm9ncmVzc2lvbiIsICgpID0+IHsKICBjb25zdCBlbnRyaWVzID0gWwogICAgeyBhc3NpZ25tZW50S2V5OiAiQTEtMC4xIiwgdG9waWM6ICJHcmVldGluZ3MiLCBpc1R1dG9yTWFya2VkOiB0cnVlLCBzdGF0dXM6ICJwYXNzZWQiLCBpc01pbGVzdG9uZTogZmFsc2UgfSwKICAgIHsgYXNzaWdubWVudEtleTogIkExLURBWS0zLVBSQUNUSUNFLTEuMSIsIHRvcGljOiAiUHJvbm91bnMgc2VsZi1zdHVkeSIsIGlzVHV0b3JNYXJrZWQ6IGZhbHNlLCBzdGF0dXM6ICJub3RTdGFydGVkIiwgaXNNaWxlc3RvbmU6IGZhbHNlIH0sCiAgICB7IGFzc2lnbm1lbnRLZXk6ICJBMS0xLjIiLCB0b3BpYzogIkludHJvZHVjaW5nIFlvdXJzZWxmIiwgaXNUdXRvck1hcmtlZDogdHJ1ZSwgc3RhdHVzOiAibm90U3RhcnRlZCIsIGlzTWlsZXN0b25lOiBmYWxzZSB9LAogIF07CgogIGl0KCJzdG9wcyBhdCBhbiBpbmNvbXBsZXRlIHNlbGYtc3R1ZHkgbGVzc29uIiwgKCkgPT4gewogICAgZXhwZWN0KGdldE5leHRDb3Vyc2VCb29rRW50cnkoZW50cmllcywge30pKS50b01hdGNoT2JqZWN0KHsgYXNzaWdubWVudEtleTogIkExLURBWS0zLVBSQUNUSUNFLTEuMSIgfSk7CiAgICBleHBlY3QoaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZShlbnRyaWVzWzFdLCB7fSkpLnRvQmUoZmFsc2UpOwogIH0pOwoKICBpdCgidW5sb2NrcyB0aGUgbmV4dCBhc3NpZ25tZW50IGFmdGVyIHNlbGYtc3R1ZHkgaXMgbWFya2VkIGNvbXBsZXRlIiwgKCkgPT4gewogICAgY29uc3QgcHJhY3RpY2VQcm9ncmVzcyA9IHsgIkExLURBWS0zLVBSQUNUSUNFLTEuMSI6IHsgY29tcGxldGVkOiB0cnVlIH0gfTsKICAgIGV4cGVjdChpc0NvdXJzZUJvb2tFbnRyeUNvbXBsZXRlKGVudHJpZXNbMV0sIHByYWN0aWNlUHJvZ3Jlc3MpKS50b0JlKHRydWUpOwogICAgZXhwZWN0KGdldE5leHRDb3Vyc2VCb29rRW50cnkoZW50cmllcywgcHJhY3RpY2VQcm9ncmVzcykpLnRvTWF0Y2hPYmplY3QoeyBhc3NpZ25tZW50S2V5OiAiQTEtMS4yIiB9KTsKICB9KTsKfSk7Cg==
         run: |
           python <<'PY'
-          from pathlib import Path
+          import base64
+          import os
           import re
-
+          from pathlib import Path
           course_tab = Path('web/src/components/CourseTab.js')
           text = course_tab.read_text()
           import_line = 'import { expandCourseBookEntries } from "../utils/courseBookEntries";'
           progression_import = 'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";'
           if progression_import not in text:
               text = text.replace(import_line, import_line + '\n' + progression_import, 1)
-          text, count = re.subn(
-              r'const COMPLETED_TUTOR_STATUSES = new Set\(\[.*?\nconst getCourseBookEntryTitle',
-              'const getCourseBookEntryTitle',
-              text,
-              count=1,
-              flags=re.S,
-          )
+          text, count = re.subn(r'const COMPLETED_TUTOR_STATUSES = new Set\(\[.*?\nconst getCourseBookEntryTitle', 'const getCourseBookEntryTitle', text, count=1, flags=re.S)
           if count != 1 and 'export const isCourseBookEntryComplete' in text:
               raise SystemExit('Could not extract Course Book progression helpers')
           course_tab.write_text(text)
-
           old_test = Path('web/src/components/CourseTab.status.test.js')
-          test_text = old_test.read_text()
-          test_text = test_text.replace('  getNextCourseBookEntry,\n', '')
-          test_text = test_text.replace('  isCourseBookEntryComplete,\n', '')
+          test_text = old_test.read_text().replace('  getNextCourseBookEntry,\n', '').replace('  isCourseBookEntryComplete,\n', '')
           test_text = re.sub(r'\n\s*describe\("course book next lesson progression".*?\n\s*\}\);\s*$', '\n', test_text, flags=re.S)
           old_test.write_text(test_text)
-
-          utility = Path('web/src/utils/courseBookProgression.js')
-          utility.write_text('''const COMPLETED_TUTOR_STATUSES = new Set(["passed", "submitted", "resubmitted"]);
-
-const isMilestoneEntry = (entry = {}) =>
-  Boolean(entry?.isMilestone || entry?.completion || /course completed/i.test(String(entry?.topic || "")));
-
-const isTutorMarkedEntry = (entry = {}) => {
-  if (entry?.isTutorMarked !== undefined) return Boolean(entry.isTutorMarked);
-  if (entry?.tutorMarked !== undefined) return Boolean(entry.tutorMarked);
-  if (entry?.submissionRequired !== undefined) return Boolean(entry.submissionRequired);
-  if (entry?.assessmentType) return entry.assessmentType === "tutor-marked";
-  return Boolean(entry?.assignment);
-};
-
-export const isCourseBookEntryComplete = (entry = {}, practiceProgress = {}) => {
-  if (!entry || isMilestoneEntry(entry)) return false;
-  if (isTutorMarkedEntry(entry)) return COMPLETED_TUTOR_STATUSES.has(entry.status);
-  return Boolean(practiceProgress?.[entry.assignmentKey]?.completed);
-};
-
-export const getNextCourseBookEntry = (entries = [], practiceProgress = {}) =>
-  entries.find((entry) => !isMilestoneEntry(entry) && !isCourseBookEntryComplete(entry, practiceProgress)) || null;
-''')
-
-          utility_test = Path('web/src/utils/courseBookProgression.test.js')
-          utility_test.write_text('''import { getNextCourseBookEntry, isCourseBookEntryComplete } from "./courseBookProgression";
-
-describe("course book next lesson progression", () => {
-  const entries = [
-    { assignmentKey: "A1-0.1", topic: "Greetings", isTutorMarked: true, status: "passed", isMilestone: false },
-    { assignmentKey: "A1-DAY-3-PRACTICE-1.1", topic: "Pronouns self-study", isTutorMarked: false, status: "notStarted", isMilestone: false },
-    { assignmentKey: "A1-1.2", topic: "Introducing Yourself", isTutorMarked: true, status: "notStarted", isMilestone: false },
-  ];
-
-  it("stops at an incomplete self-study lesson", () => {
-    expect(getNextCourseBookEntry(entries, {})).toMatchObject({ assignmentKey: "A1-DAY-3-PRACTICE-1.1" });
-    expect(isCourseBookEntryComplete(entries[1], {})).toBe(false);
-  });
-
-  it("unlocks the next assignment after self-study is marked complete", () => {
-    const practiceProgress = { "A1-DAY-3-PRACTICE-1.1": { completed: true } };
-    expect(isCourseBookEntryComplete(entries[1], practiceProgress)).toBe(true);
-    expect(getNextCourseBookEntry(entries, practiceProgress)).toMatchObject({ assignmentKey: "A1-1.2" });
-  });
-});
-''')
+          Path('web/src/utils/courseBookProgression.js').write_bytes(base64.b64decode(os.environ['UTILITY_B64']))
+          Path('web/src/utils/courseBookProgression.test.js').write_bytes(base64.b64decode(os.environ['TEST_B64']))
           PY
 
       - name: Use Node.js 18 for web tests
@@ -176,32 +95,11 @@ describe("course book next lesson progression", () => {
         run: npm install --no-audit --no-fund
 
       - name: Test Course Book progression
-        shell: bash
         working-directory: web
+        shell: bash
         run: |
-          set +e
-          npm test -- --runInBand src/utils/courseBookProgression.test.js src/utils/courseBookEntries.test.js 2>&1 | tee /tmp/course-book-tests.log
-          status=${PIPESTATUS[0]}
-          if [ "$status" -eq 0 ]; then
-            node -e 'const fs=require("fs"); const parser=require("@babel/parser"); for (const file of ["src/components/CourseTab.js","src/components/HomeMetrics.js"]) { parser.parse(fs.readFileSync(file,"utf8"), {sourceType:"module", plugins:["jsx","optionalChaining"]}); console.log("Parsed " + file); }'
-            status=$?
-          fi
-          exit "$status"
-
-      - name: Upload Course Book test diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: course-book-test-diagnostics
-          path: |
-            /tmp/course-book-tests.log
-            web/src/components/CourseTab.js
-            web/src/components/HomeMetrics.js
-            web/src/utils/courseBookProgression.js
-            web/src/utils/courseBookProgression.test.js
-            functions/functionz/routes/scoresSummary.js
-            functions/functionz/routes/scoresSummaryCoursePlan.js
-            functions/functionz/routes/scoresSummaryCoursePlan.test.js
+          npm test -- --runInBand src/utils/courseBookProgression.test.js src/utils/courseBookEntries.test.js
+          node -e 'const fs=require("fs"); const parser=require("@babel/parser"); for (const file of ["src/components/CourseTab.js","src/components/HomeMetrics.js"]) { parser.parse(fs.readFileSync(file,"utf8"), {sourceType:"module", plugins:["jsx","optionalChaining"]}); console.log("Parsed " + file); }'
 
       - name: Use Node.js 22 for functions tests
         uses: actions/setup-node@v4
@@ -213,7 +111,6 @@ describe("course book next lesson progression", () => {
         run: node --test functionz/routes/scoresSummaryCoursePlan.test.js
 
       - name: Commit generated changes
-        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
