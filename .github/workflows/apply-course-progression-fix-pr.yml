@@ -1,4 +1,4 @@
-name: Apply course progression fix PR
+name: Clean course progression implementation
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  patch-test-commit:
+  clean-test-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout feature branch
@@ -19,73 +19,177 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Extract and run patch script
+      - name: Clean generated source blocks
         shell: bash
         run: |
           python <<'PY'
           from pathlib import Path
-          source = Path('.github/workflows/apply-course-progression-fix.yml').read_text().splitlines()
-          start = next(i for i, line in enumerate(source) if line.strip() == '- name: Apply progression changes')
-          run_line = next(i for i in range(start + 1, len(source)) if source[i].strip() == 'run: |')
-          lines = []
-          for line in source[run_line + 1:]:
-              if line.startswith('      - name:'):
-                  break
-              lines.append(line[10:] if line.startswith('          ') else line)
-          script = '\n'.join(lines) + '\n'
-          script = script.replace("'''.replace(/^          /gm, \"\"))", "'''.replace(\"\\n          \", \"\\n\"))")
-          script = script.replace("replace_once(course_tab, old_persist, new_persist)", "regex_once(course_tab, r'  const persistPracticeProgress = async \\(assignmentKey, nextValue\\) => \\{.*?\\n  \\};', new_persist.rstrip())")
-          script = script.replace("replace_once(course_tab, old_next_card, new_next_card)", "regex_once(course_tab, r'          \\{nextLesson \\? \\(.*?\\n          \\) : null\\}\\n', new_next_card.rstrip() + '\\n')")
-          script = script.replace("replace_once(home_metrics, helper_anchor_home, helper_replacement_home)", "regex_once(home_metrics, r'  const failedIdentifiersText = useMemo\\(\\(\\) => \\{.*?\\n  \\}, \\[assignmentStats\\]\\);', helper_replacement_home.rstrip())")
-          script = script.replace("replace_once(home_metrics, old_helper_jsx, '          helper={nextRecommendationHelper}\\n')", "regex_once(home_metrics, r'          helper=\\{\\n            blocked.*?\\n          \\}\\n', '          helper={nextRecommendationHelper}\\n')")
-          script = script.replace("replace_once(scores, old_status, new_status)", "regex_once(scores, r'    const lessonStatus = plannedLessons\\.map\\(\\(l\\) => \\{.*?\\n    \\}\\);', new_status.rstrip())")
-          script = script.replace("replace_once(scores, old_missed_map, new_missed_map)", "regex_once(scores, r'      \\.map\\(\\(l\\) => \\(\\{\\n        label: l\\.label,.*?\\n      \\}\\)\\);', new_missed_map.rstrip())")
-          script = script.replace("replace_once(scores, old_next, new_next)", "regex_once(scores, r'        nextRecommendation = \\{\\n          label: firstIncomplete\\.label,.*?\\n        \\};', new_next.rstrip())")
-          marker = 'completedPracticeCount: lessonStatus.filter'
-          marker_pos = script.find(marker)
-          if marker_pos < 0:
-              raise SystemExit('Could not find score summary response marker')
-          block_start = script.rfind('replace_once(', 0, marker_pos)
-          block_end = script.find('\n)', marker_pos)
-          if block_start < 0 or block_end < 0:
-              raise SystemExit('Could not locate score summary response replacement block')
-          block_end += 2
-          robust_response_patch = "regex_once(scores, r'        totalAssignments,\\n        submittedCount,\\n        completedCount: completedAssignments\\.length,', '        totalAssignments,\\n        totalCourseItems,\\n        submittedCount,\\n        completedCount: completedAssignments.length,\\n        completedPracticeCount: lessonStatus.filter((lesson) => lesson.selfStudy && lesson.isCompleted).length,')"
-          script = script[:block_start] + robust_response_patch + script[block_end:]
-          Path('/tmp/apply-course-progression.sh').write_text(script)
-          PY
-          bash /tmp/apply-course-progression.sh
-
-      - name: Move progression logic to a pure utility
-        shell: bash
-        env:
-          UTILITY_B64: Y29uc3QgQ09NUExFVEVEX1RVVE9SX1NUQVRVU0VTID0gbmV3IFNldChbInBhc3NlZCIsICJzdWJtaXR0ZWQiLCAicmVzdWJtaXR0ZWQiXSk7Cgpjb25zdCBpc01pbGVzdG9uZUVudHJ5ID0gKGVudHJ5ID0ge30pID0+CiAgQm9vbGVhbihlbnRyeT8uaXNNaWxlc3RvbmUgfHwgZW50cnk/LmNvbXBsZXRpb24gfHwgL2NvdXJzZSBjb21wbGV0ZWQvaS50ZXN0KFN0cmluZyhlbnRyeT8udG9waWMgfHwgIiIpKSk7Cgpjb25zdCBpc1R1dG9yTWFya2VkRW50cnkgPSAoZW50cnkgPSB7fSkgPT4gewogIGlmIChlbnRyeT8uaXNUdXRvck1hcmtlZCAhPT0gdW5kZWZpbmVkKSByZXR1cm4gQm9vbGVhbihlbnRyeS5pc1R1dG9yTWFya2VkKTsKICBpZiAoZW50cnk/LnR1dG9yTWFya2VkICE9PSB1bmRlZmluZWQpIHJldHVybiBCb29sZWFuKGVudHJ5LnR1dG9yTWFya2VkKTsKICBpZiAoZW50cnk/LnN1Ym1pc3Npb25SZXF1aXJlZCAhPT0gdW5kZWZpbmVkKSByZXR1cm4gQm9vbGVhbihlbnRyeS5zdWJtaXNzaW9uUmVxdWlyZWQpOwogIGlmIChlbnRyeT8uYXNzZXNzbWVudFR5cGUpIHJldHVybiBlbnRyeS5hc3Nlc3NtZW50VHlwZSA9PT0gInR1dG9yLW1hcmtlZCI7CiAgcmV0dXJuIEJvb2xlYW4oZW50cnk/LmFzc2lnbm1lbnQpOwp9OwoKZXhwb3J0IGNvbnN0IGlzQ291cnNlQm9va0VudHJ5Q29tcGxldGUgPSAoZW50cnkgPSB7fSwgcHJhY3RpY2VQcm9ncmVzcyA9IHt9KSA9PiB7CiAgaWYgKCFlbnRyeSB8fCBpc01pbGVzdG9uZUVudHJ5KGVudHJ5KSkgcmV0dXJuIGZhbHNlOwogIGlmIChpc1R1dG9yTWFya2VkRW50cnkoZW50cnkpKSByZXR1cm4gQ09NUExFVEVEX1RVVE9SX1NUQVRVU0VTLmhhcyhlbnRyeS5zdGF0dXMpOwogIHJldHVybiBCb29sZWFuKHByYWN0aWNlUHJvZ3Jlc3M/LltlbnRyeS5hc3NpZ25tZW50S2V5XT8uY29tcGxldGVkKTsKfTsKCmV4cG9ydCBjb25zdCBnZXROZXh0Q291cnNlQm9va0VudHJ5ID0gKGVudHJpZXMgPSBbXSwgcHJhY3RpY2VQcm9ncmVzcyA9IHt9KSA9PgogIGVudHJpZXMuZmluZCgoZW50cnkpID0+ICFpc01pbGVzdG9uZUVudHJ5KGVudHJ5KSAmJiAhaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZShlbnRyeSwgcHJhY3RpY2VQcm9ncmVzcykpIHx8IG51bGw7Cg==
-          TEST_B64: aW1wb3J0IHsgZ2V0TmV4dENvdXJzZUJvb2tFbnRyeSwgaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZSB9IGZyb20gIi4vY291cnNlQm9va1Byb2dyZXNzaW9uIjsKCmRlc2NyaWJlKCJjb3Vyc2UgYm9vayBuZXh0IGxlc3NvbiBwcm9ncmVzc2lvbiIsICgpID0+IHsKICBjb25zdCBlbnRyaWVzID0gWwogICAgeyBhc3NpZ25tZW50S2V5OiAiQTEtMC4xIiwgdG9waWM6ICJHcmVldGluZ3MiLCBpc1R1dG9yTWFya2VkOiB0cnVlLCBzdGF0dXM6ICJwYXNzZWQiLCBpc01pbGVzdG9uZTogZmFsc2UgfSwKICAgIHsgYXNzaWdubWVudEtleTogIkExLURBWS0zLVBSQUNUSUNFLTEuMSIsIHRvcGljOiAiUHJvbm91bnMgc2VsZi1zdHVkeSIsIGlzVHV0b3JNYXJrZWQ6IGZhbHNlLCBzdGF0dXM6ICJub3RTdGFydGVkIiwgaXNNaWxlc3RvbmU6IGZhbHNlIH0sCiAgICB7IGFzc2lnbm1lbnRLZXk6ICJBMS0xLjIiLCB0b3BpYzogIkludHJvZHVjaW5nIFlvdXJzZWxmIiwgaXNUdXRvck1hcmtlZDogdHJ1ZSwgc3RhdHVzOiAibm90U3RhcnRlZCIsIGlzTWlsZXN0b25lOiBmYWxzZSB9LAogIF07CgogIGl0KCJzdG9wcyBhdCBhbiBpbmNvbXBsZXRlIHNlbGYtc3R1ZHkgbGVzc29uIiwgKCkgPT4gewogICAgZXhwZWN0KGdldE5leHRDb3Vyc2VCb29rRW50cnkoZW50cmllcywge30pKS50b01hdGNoT2JqZWN0KHsgYXNzaWdubWVudEtleTogIkExLURBWS0zLVBSQUNUSUNFLTEuMSIgfSk7CiAgICBleHBlY3QoaXNDb3Vyc2VCb29rRW50cnlDb21wbGV0ZShlbnRyaWVzWzFdLCB7fSkpLnRvQmUoZmFsc2UpOwogIH0pOwoKICBpdCgidW5sb2NrcyB0aGUgbmV4dCBhc3NpZ25tZW50IGFmdGVyIHNlbGYtc3R1ZHkgaXMgbWFya2VkIGNvbXBsZXRlIiwgKCkgPT4gewogICAgY29uc3QgcHJhY3RpY2VQcm9ncmVzcyA9IHsgIkExLURBWS0zLVBSQUNUSUNFLTEuMSI6IHsgY29tcGxldGVkOiB0cnVlIH0gfTsKICAgIGV4cGVjdChpc0NvdXJzZUJvb2tFbnRyeUNvbXBsZXRlKGVudHJpZXNbMV0sIHByYWN0aWNlUHJvZ3Jlc3MpKS50b0JlKHRydWUpOwogICAgZXhwZWN0KGdldE5leHRDb3Vyc2VCb29rRW50cnkoZW50cmllcywgcHJhY3RpY2VQcm9ncmVzcykpLnRvTWF0Y2hPYmplY3QoeyBhc3NpZ25tZW50S2V5OiAiQTEtMS4yIiB9KTsKICB9KTsKfSk7Cg==
-        run: |
-          python <<'PY'
-          import base64
-          import os
           import re
-          from pathlib import Path
-          course_tab = Path('web/src/components/CourseTab.js')
-          text = course_tab.read_text()
-          import_line = 'import { expandCourseBookEntries } from "../utils/courseBookEntries";'
-          progression_import = 'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";'
-          if progression_import not in text:
-              text = text.replace(import_line, import_line + '\n' + progression_import, 1)
-          text, count = re.subn(r'const COMPLETED_TUTOR_STATUSES = new Set\(\[.*?\nconst getCourseBookEntryTitle', 'const getCourseBookEntryTitle', text, count=1, flags=re.S)
-          if count != 1 and 'export const isCourseBookEntryComplete' in text:
-              raise SystemExit('Could not extract Course Book progression helpers')
-          course_tab.write_text(text)
-          old_test = Path('web/src/components/CourseTab.status.test.js')
-          test_text = old_test.read_text().replace('  getNextCourseBookEntry,\n', '').replace('  isCourseBookEntryComplete,\n', '')
-          test_text = re.sub(r'\n\s*describe\("course book next lesson progression".*?\n\s*\}\);\s*$', '\n', test_text, flags=re.S)
-          old_test.write_text(test_text)
-          Path('web/src/utils/courseBookProgression.js').write_bytes(base64.b64decode(os.environ['UTILITY_B64']))
-          Path('web/src/utils/courseBookProgression.test.js').write_bytes(base64.b64decode(os.environ['TEST_B64']))
+
+          def regex_once(path, pattern, replacement):
+              text = path.read_text()
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f"Expected one formatting replacement in {path}, got {count}")
+              path.write_text(updated)
+
+          course_tab = Path("web/src/components/CourseTab.js")
+          regex_once(
+              course_tab,
+              r"  const persistPracticeProgress = async \(entry, nextValue\) => \{.*?\n\};\n\n  const updatePracticeEntry",
+              '''  const persistPracticeProgress = async (entry, nextValue) => {
+            const assignmentKey = entry?.assignmentKey;
+            if (!db || !studentCode || !assignmentKey) return;
+            const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
+            await setDoc(
+              doc(db, "coursePracticeProgress", docId),
+              {
+                studentCode,
+                level: selectedCourseLevel,
+                assignmentKey,
+                entryId: entry.assignmentId || entry.assignment_id || null,
+                displayDay: getCourseBookDisplayDay(entry),
+                chapter: entry.displayChapter || entry.chapter || null,
+                lessonTitle: getCourseBookEntryTitle(entry),
+                ...nextValue,
+                updatedAt: serverTimestamp(),
+              },
+              { merge: true }
+            );
+          };
+
+          const updatePracticeEntry'''
+          )
+
+          home = Path("web/src/components/HomeMetrics.js")
+          regex_once(
+              home,
+              r"  const failedIdentifiersText = useMemo\(\(\) => \{.*?\n  const leaderboardRows",
+              '''  const failedIdentifiersText = useMemo(() => {
+            const ids = assignmentStats?.failedIdentifiers || [];
+            return ids.length ? ids.join(", ") : "";
+          }, [assignmentStats]);
+
+          const nextRecommendationHelper = useMemo(() => {
+            if (blocked) {
+              return failedIdentifiersText
+                ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+                : t("homeMetrics.nextRecommendation.blocked");
+            }
+            if (nextObj?.selfStudy) {
+              return t("homeMetrics.nextRecommendation.selfStudyHelper", {
+                title: nextObj.title || nextObj.label,
+                defaultValue: "Complete this self-study lesson and mark it complete in the Course Book to unlock the next item.",
+              });
+            }
+            if (nextObj?.goal && !isPassingScoreGoal(nextObj.goal)) {
+              return t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal });
+            }
+            return t("homeMetrics.nextRecommendation.defaultHelper");
+          }, [blocked, failedIdentifiersText, nextObj, t]);
+
+          const leaderboardRows'''
+          )
+
+          scores = Path("functions/functionz/routes/scoresSummary.js")
+          regex_once(
+              scores,
+              r"    const lessonStatus = plannedLessons\.map\(\(l\) => \{.*?\n  \}\);",
+              '''    const lessonStatus = plannedLessons.map((l) => {
+              const isCompleted = l.selfStudy
+                ? (l.practiceKeys || []).some((key) => completedPracticeKeys.has(normalizePracticeKey(key)))
+                : l.identifiers.length > 0 && l.identifiers.every((id) => passed.has(id));
+              const hasFailed = !l.selfStudy && l.identifiers.some((id) => failed.has(id));
+              return { ...l, isCompleted, hasFailed };
+            });'''
+          )
+          regex_once(
+              scores,
+              r"      \.map\(\(l\) => \(\{\n      label: l\.label,.*?\n    \}\)\);",
+              '''      .map((l) => ({
+                label: l.label,
+                identifiers: l.identifiers,
+                dayNumber: l.dayNumber,
+                displayDay: l.displayDay,
+                displayChapter: l.displayChapter,
+                title: l.title,
+                goal: l.goal,
+                assignmentId: l.assignmentId,
+                selfStudy: l.selfStudy,
+                submissionRequired: l.submissionRequired,
+                practiceKeys: l.practiceKeys,
+              }));'''
+          )
+          regex_once(
+              scores,
+              r"        nextRecommendation = \{\n        label: firstIncomplete\.label,.*?\n      \};",
+              '''        nextRecommendation = {
+                  label: firstIncomplete.label,
+                  identifiers: firstIncomplete.identifiers,
+                  dayNumber: firstIncomplete.dayNumber,
+                  displayDay: firstIncomplete.displayDay,
+                  displayChapter: firstIncomplete.displayChapter,
+                  title: firstIncomplete.title,
+                  goal: firstIncomplete.goal,
+                  assignmentId: firstIncomplete.assignmentId,
+                  selfStudy: firstIncomplete.selfStudy,
+                  submissionRequired: firstIncomplete.submissionRequired,
+                  practiceKeys: firstIncomplete.practiceKeys,
+                };'''
+          )
+
+          plan = Path("functions/functionz/routes/scoresSummaryCoursePlan.js")
+          text = plan.read_text()
+          text = text.replace(
+              '''      const hasResource = Boolean(
+                entry.workbookRoute ||
+          entry.video ||
+          toArray(entry.resources).some((resource) => resource?.workbookRoute || resource?.workbook_link || resource?.video || resource?.youtube_link)
+              );''',
+              '''      const hasResource = Boolean(
+                entry.workbookRoute ||
+                  entry.video ||
+                  toArray(entry.resources).some(
+                    (resource) =>
+                      resource?.workbookRoute ||
+                      resource?.workbook_link ||
+                      resource?.video ||
+                      resource?.youtube_link
+                  )
+              );'''
+          )
+          plan.write_text(text)
+
+          locale_updates = {
+              "en": (
+                  '"helper": "Missed items are only those before your last fully completed day."',
+                  '"helper": "Earlier tutor assignments or self-study lessons you skipped in the visible Course Book order."',
+                  None,
+              ),
+              "de": (
+                  '"helper": "Missed items are only those before your last fully completed day."',
+                  '"helper": "Frühere Tutor-Aufgaben oder Selbstlernlektionen, die du in der sichtbaren Kursbuch-Reihenfolge übersprungen hast."',
+                  '"selfStudyHelper": "Schließe diese Selbstlernlektion ab und markiere sie im Kursbuch als abgeschlossen, um den nächsten Inhalt freizuschalten."',
+              ),
+              "fr": (
+                  '"helper": "Missed items are only those before your last fully completed day."',
+                  '"helper": "Devoirs avec tuteur ou leçons en autonomie précédents que tu as sautés dans l’ordre visible du manuel."',
+                  '"selfStudyHelper": "Termine cette leçon en autonomie et marque-la comme terminée dans le manuel pour débloquer l’élément suivant."',
+              ),
+          }
+          for locale, (old_helper, new_helper, self_study_line) in locale_updates.items():
+              path = Path(f"web/src/i18n/locales/{locale}/translation.json")
+              text = path.read_text().replace(old_helper, new_helper, 1)
+              if self_study_line and '"selfStudyHelper"' not in text:
+                  text = text.replace(
+                      '"defaultHelper": "Keep going with your next recommended task."',
+                      '"defaultHelper": "Keep going with your next recommended task.",\n      ' + self_study_line,
+                      1,
+                  )
+              path.write_text(text)
           PY
 
-      - name: Use Node.js 18 for web tests
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -96,12 +200,11 @@ jobs:
 
       - name: Test Course Book progression
         working-directory: web
-        shell: bash
         run: |
           npm test -- --runInBand src/utils/courseBookProgression.test.js src/utils/courseBookEntries.test.js
-          node -e 'const fs=require("fs"); const parser=require("@babel/parser"); for (const file of ["src/components/CourseTab.js","src/components/HomeMetrics.js"]) { parser.parse(fs.readFileSync(file,"utf8"), {sourceType:"module", plugins:["jsx","optionalChaining"]}); console.log("Parsed " + file); }'
+          node -e 'const fs=require("fs"); const parser=require("@babel/parser"); for (const file of ["src/components/CourseTab.js","src/components/HomeMetrics.js"]) { parser.parse(fs.readFileSync(file,"utf8"), {sourceType:"module", plugins:["jsx","optionalChaining"]}); }'
 
-      - name: Use Node.js 22 for functions tests
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -110,14 +213,13 @@ jobs:
         working-directory: functions
         run: node --test functionz/routes/scoresSummaryCoursePlan.test.js
 
-      - name: Commit generated changes
+      - name: Commit cleaned implementation
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/src/components/CourseTab.js web/src/components/CourseTab.status.test.js web/src/components/HomeMetrics.js web/src/utils/courseBookProgression.js web/src/utils/courseBookProgression.test.js web/src/i18n/locales/en/translation.json web/src/i18n/locales/de/translation.json web/src/i18n/locales/fr/translation.json functions/functionz/routes/scoresSummary.js functions/functionz/routes/scoresSummaryCoursePlan.js functions/functionz/routes/scoresSummaryCoursePlan.test.js
+          git add web/src/components/CourseTab.js web/src/components/HomeMetrics.js web/src/i18n/locales/en/translation.json web/src/i18n/locales/de/translation.json web/src/i18n/locales/fr/translation.json functions/functionz/routes/scoresSummary.js functions/functionz/routes/scoresSummaryCoursePlan.js
           if git diff --cached --quiet; then
-            echo "No progression changes to commit."
             exit 0
           fi
-          git commit -m "Align Home metrics and Course Book progression"
+          git commit -m "Clean course progression implementation"
           git push origin HEAD:${{ github.head_ref }}
