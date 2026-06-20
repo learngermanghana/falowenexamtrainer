@@ -9,6 +9,7 @@ import SubmitSuccessScreenInjector from './components/SubmitSuccessScreenInjecto
 import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
+import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -25,6 +26,7 @@ root.render(
           <MobileHeaderMenuInjector />
           <SubmitPageLevelGuidanceInjector />
           <SubmitSuccessScreenInjector />
+          <CourseBookTerminologyInjector />
           <App />
         </ToastProvider>
       </AuthProvider>

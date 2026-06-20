@@ -1,4 +1,16 @@
-import { LEVEL_CAPABILITIES, normalizeA1Lesson, normalizeA2B1Lesson, normalizeB2C1Lesson } from "./lessonModel";
+import {
+  LEVEL_CAPABILITIES,
+  normalizeA1Lesson,
+  normalizeA2B1Lesson,
+  normalizeB2C1Lesson,
+  scopeLessonVideosToSelectedChapters,
+} from "./lessonModel";
+
+const chapterVideos = [
+  { key: "alphabet-ai", chapter: "0.2", title: "Kapitel 0.2 Alphabet AI video", url: "alphabet" },
+  { key: "pronouns-ai", chapter: "1.1", title: "Kapitel 1.1 Pronouns AI video", url: "pronouns" },
+  { key: "teacher-shared", chapter: null, title: "Teacher explanation", url: "teacher" },
+];
 
 describe("canonical lesson model", () => {
   test("preserves A1 teacher video behavior and legacy links", () => {
@@ -55,5 +67,47 @@ describe("canonical lesson model", () => {
   test("promotes a generic A2 video to the canonical AI fallback", () => {
     const lesson = normalizeA2B1Lesson({ day: 23, video: "generic" }, "A2");
     expect(lesson.resources.aiVideo).toEqual(expect.objectContaining({ url: "generic" }));
+  });
+  test("shows only the Alphabet AI video on the Kapitel 0.2 page", () => {
+    expect(scopeLessonVideosToSelectedChapters(chapterVideos, [{ chapter: "0.2" }])).toEqual([
+      chapterVideos[0],
+      chapterVideos[2],
+    ]);
+  });
+  test("shows only the Pronouns AI video on the Kapitel 1.1 page", () => {
+    expect(scopeLessonVideosToSelectedChapters(chapterVideos, [{ chapter: "1.1" }])).toEqual([
+      chapterVideos[1],
+      chapterVideos[2],
+    ]);
+  });
+  test("keeps every video for a full multi-chapter day", () => {
+    expect(
+      scopeLessonVideosToSelectedChapters(chapterVideos, [
+        { chapter: "0.2" },
+        { chapter: "1.1" },
+      ])
+    ).toEqual(chapterVideos);
+  });
+  test("uses only the configured Alphabet video for A1 Day 2 Kapitel 0.2", () => {
+    const lesson = normalizeA1Lesson({
+      day: 2,
+      chapter: "0.2",
+      lesen_hören: { chapter: "0.2" },
+    });
+    const titles = lesson.resources.videos.map((video) => video.title);
+
+    expect(titles).toContain("Kapitel 0.2 · Alphabet · AI video");
+    expect(titles).not.toContain("Kapitel 1.1 · Pronouns & Verb Conjugation · AI video");
+  });
+  test("uses only the configured Pronouns video for A1 Day 2 Kapitel 1.1", () => {
+    const lesson = normalizeA1Lesson({
+      day: 2,
+      chapter: "1.1",
+      lesen_hören: { chapter: "1.1" },
+    });
+    const titles = lesson.resources.videos.map((video) => video.title);
+
+    expect(titles).toContain("Kapitel 1.1 · Pronouns & Verb Conjugation · AI video");
+    expect(titles).not.toContain("Kapitel 0.2 · Alphabet · AI video");
   });
 });
