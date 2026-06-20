@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import A1Day2Kapitel11WorkbookPage, {
+  DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL,
   DAY_2_GERMAN_ALPHABET_YOUTUBE_URL,
 } from "./A1Day2Kapitel11WorkbookPage";
 
@@ -9,6 +10,11 @@ test("uses the Day 2 German Alphabet YouTube lesson for Hören", () => {
     <MemoryRouter>
       <A1Day2Kapitel11WorkbookPage />
     </MemoryRouter>,
+  );
+
+  expect(screen.getByTitle("Day 2 German Alphabet Hören video")).toHaveAttribute(
+    "src",
+    DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL,
   );
 
   expect(
