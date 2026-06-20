@@ -2,10 +2,8 @@
 
 const admin = require("firebase-admin");
 
-const {
-  getCurriculumEntriesForLevel,
-  normalizeLevel,
-} = require("../../data/curriculumManifest");
+const { normalizeLevel } = require("../../data/curriculumManifest");
+const { getAssignmentSummary, normalizePracticeKey } = require("./scoresSummaryCoursePlan");
 
 // If you're on Node 18+ in Firebase Functions, global fetch exists.
 // If not, uncomment the next line and install node-fetch@2.
@@ -304,71 +302,6 @@ const shouldSkipNestedMajorOnlyAssignmentId = ({ level = "", lesson = {}, rawVal
   return lessonHasDecimalIdentifier(lesson);
 };
 
-const getAssignmentSummary = (level = "A1") => {
-  const normalizedLevel = normalizeLevel(level || "A1") || "A1";
-  const entries = getCurriculumEntriesForLevel(normalizedLevel)
-    .filter((entry) => entry.progressionEligible === true)
-    .sort((a, b) => {
-      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
-      if (dayDiff !== 0) return dayDiff;
-      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
-    });
-
-  const byDay = new Map();
-  entries.forEach((entry) => {
-    const dayNumber = Number(entry.assignmentDay || 0);
-    if (!dayNumber) return;
-    if (!byDay.has(dayNumber)) {
-      byDay.set(dayNumber, {
-        dayNumber,
-        order: byDay.size,
-        goal: String(entry.goal || "").trim(),
-        topics: new Set(),
-        identifiers: [],
-      });
-    }
-    const bucket = byDay.get(dayNumber);
-    const canonicalId = String(entry.assignment_id || entry.canonicalAssignmentId || "").trim().toUpperCase();
-    if (canonicalId) bucket.identifiers.push(canonicalId);
-    if (entry.topic) bucket.topics.add(String(entry.topic).trim());
-    if (!bucket.goal && entry.goal) bucket.goal = String(entry.goal || "").trim();
-  });
-
-  const lessons = Array.from(byDay.values()).map((bucket, index) => {
-    const identifiers = Array.from(new Set(bucket.identifiers));
-    const topics = Array.from(bucket.topics).filter(Boolean);
-    const displayTitle = ensureTitleHasIdentifier(topics.join(" + "), identifiers);
-    return {
-      order: index,
-      dayNumber: bucket.dayNumber,
-      goal: bucket.goal,
-      label: `Day ${bucket.dayNumber}: ${displayTitle || `Assignment ${identifiers.join(", ")}`}`.trim(),
-      identifiers,
-    };
-  });
-
-  const plannedSet = new Set(lessons.flatMap((lesson) => lesson.identifiers));
-  if (plannedSet.size > 0) {
-    return { lessons, plannedSet };
-  }
-
-  if (ENABLE_LEGACY_PROGRESSION_PLAN_FALLBACK) {
-    const fallbackLessons = (LEGACY_LEVEL_PROGRESSION_PLAN[normalizedLevel] || []).map((lesson, index) => ({
-      order: index,
-      dayNumber: lesson.dayNumber,
-      label: lesson.label,
-      goal: lesson.goal || "",
-      identifiers: lesson.identifiers || [],
-    }));
-    return {
-      lessons: fallbackLessons,
-      plannedSet: new Set(fallbackLessons.flatMap((lesson) => lesson.identifiers)),
-    };
-  }
-
-  return { lessons: [], plannedSet: new Set() };
-};
-
 /* ------------------------ Streak + auth helpers ------------------------ */
 
 const buildStreakDays = (attemptDatesMs = []) => {
@@ -407,6 +340,29 @@ const maybeRequireAuth = async (req) => {
   return requireAuth(req);
 };
 
+const loadCompletedPracticeKeys = async ({ db, studentCode, level }) => {
+  if (!db || !studentCode) return new Set();
+  try {
+    const snapshot = await db.collection("coursePracticeProgress").where("studentCode", "==", studentCode).get();
+    const normalizedLevel = normalizeLevel(level || "");
+    const completed = new Set();
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      const rowLevel = normalizeLevel(data.level || "");
+      if (rowLevel && normalizedLevel && rowLevel !== normalizedLevel) return;
+      if (data.completed !== true) return;
+      [data.assignmentKey, data.entryId, data.assignmentId, data.canonicalAssignmentId]
+        .map(normalizePracticeKey)
+        .filter(Boolean)
+        .forEach((key) => completed.add(key));
+    });
+    return completed;
+  } catch (error) {
+    console.warn("Could not load course self-study progress", error?.message || error);
+    return new Set();
+  }
+};
+
 /* ----------------------------- Main handler ----------------------------- */
 
 const scoresSummaryHandler = async (req, res) => {
@@ -434,8 +390,9 @@ const scoresSummaryHandler = async (req, res) => {
     const level = normalizeLevel(student.level || student.course || "A1") || "A1";
 
     // Build schedule targets
-    const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
+    const { lessons: plannedLessons, plannedSet, totalCourseItems } = getAssignmentSummary(level);
     const totalAssignments = plannedSet.size;
+    const completedPracticeKeys = await loadCompletedPracticeKeys({ db, studentCode, level });
     const labelByIdentifier = new Map();
     plannedLessons.forEach((lesson) => {
       lesson.identifiers.forEach((identifier) => {
@@ -620,40 +577,6 @@ const scoresSummaryHandler = async (req, res) => {
           })
       : [];
 
-    if (!mine.length) {
-      return res.json({
-        student: {
-          completedAssignments: [],
-          missedAssignments: [],
-          jumpedAssignments: [],
-          failedAssignments: [],
-          failedIdentifiers: [],
-          nextRecommendation: null,
-          recommendationBlocked: false,
-          lastAssignment: "",
-          weekAssignments: 0,
-          weekAttempts: 0,
-          streakDays: 0,
-          retriesThisWeek: 0,
-          totalAssignments,
-        },
-        ...(includeDebug
-          ? {
-              debug: {
-                includeDebug,
-                csvUrlConfigured: Boolean(CSV_URL),
-                level,
-                studentCode,
-                plannedIdentifiers: Array.from(plannedSet),
-                matchedRowsBeforeLevelFilter: debugRowsForStudent.length,
-                matchedRowsAfterLevelFilter: 0,
-                rowsForStudent: debugRowsForStudent,
-              },
-            }
-          : {}),
-      });
-    }
-
     const bestById = new Map();
     for (const row of mine) {
       if (!row.identifier) continue;
@@ -681,10 +604,12 @@ const scoresSummaryHandler = async (req, res) => {
     }
 
     const lessonStatus = plannedLessons.map((l) => {
-      const isCompleted = l.identifiers.every((id) => passed.has(id));
-      const hasFailed = l.identifiers.some((id) => failed.has(id));
-      return { ...l, isCompleted, hasFailed };
-    });
+    const isCompleted = l.selfStudy
+      ? (l.practiceKeys || []).some((key) => completedPracticeKeys.has(normalizePracticeKey(key)))
+      : l.identifiers.length > 0 && l.identifiers.every((id) => passed.has(id));
+    const hasFailed = !l.selfStudy && l.identifiers.some((id) => failed.has(id));
+    return { ...l, isCompleted, hasFailed };
+  });
 
     const lessonStatusByDay = [...lessonStatus].sort((a, b) => {
       const dayDiff = Number(a.dayNumber || 0) - Number(b.dayNumber || 0);
@@ -703,11 +628,18 @@ const scoresSummaryHandler = async (req, res) => {
         return index < furthestCompletedLessonIndex;
       })
       .map((l) => ({
-        label: l.label,
-        identifiers: l.identifiers,
-        dayNumber: l.dayNumber,
-        goal: l.goal,
-      }));
+      label: l.label,
+      identifiers: l.identifiers,
+      dayNumber: l.dayNumber,
+      displayDay: l.displayDay,
+      displayChapter: l.displayChapter,
+      title: l.title,
+      goal: l.goal,
+      assignmentId: l.assignmentId,
+      selfStudy: l.selfStudy,
+      submissionRequired: l.submissionRequired,
+      practiceKeys: l.practiceKeys,
+    }));
 
     const jumpedAssignments = missedAssignments;
 
@@ -745,11 +677,18 @@ const scoresSummaryHandler = async (req, res) => {
       const firstIncomplete = lessonStatusByDay.find((l) => !l.isCompleted);
       if (firstIncomplete) {
         nextRecommendation = {
-          label: firstIncomplete.label,
-          identifiers: firstIncomplete.identifiers,
-          dayNumber: firstIncomplete.dayNumber,
-          goal: firstIncomplete.goal,
-        };
+        label: firstIncomplete.label,
+        identifiers: firstIncomplete.identifiers,
+        dayNumber: firstIncomplete.dayNumber,
+        displayDay: firstIncomplete.displayDay,
+        displayChapter: firstIncomplete.displayChapter,
+        title: firstIncomplete.title,
+        goal: firstIncomplete.goal,
+        assignmentId: firstIncomplete.assignmentId,
+        selfStudy: firstIncomplete.selfStudy,
+        submissionRequired: firstIncomplete.submissionRequired,
+        practiceKeys: firstIncomplete.practiceKeys,
+      };
       }
     }
 
@@ -803,8 +742,10 @@ const scoresSummaryHandler = async (req, res) => {
         streakDays,
         retriesThisWeek,
         totalAssignments,
+        totalCourseItems,
         submittedCount,
         completedCount: completedAssignments.length,
+        completedPracticeCount: lessonStatus.filter((lesson) => lesson.selfStudy && lesson.isCompleted).length,
         pointsEarned,
         expectedPoints: totalAssignments * 100,
       },
@@ -834,4 +775,4 @@ const scoresSummaryHandler = async (req, res) => {
   }
 };
 
-module.exports = { scoresSummaryHandler };
+module.exports = { scoresSummaryHandler, loadCompletedPracticeKeys };
