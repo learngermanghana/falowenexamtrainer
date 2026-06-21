@@ -68,7 +68,12 @@ describe("A2 and B1 course books", () => {
 
     expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("four workbook parts");
     expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("Ref");
-    expect(screen.getByText(/Submit tab in the Course Book/i)).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) =>
+        element?.tagName === "P" &&
+        element.textContent.includes("Submit tab in the Course Book")
+      )
+    ).toBeInTheDocument();
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
