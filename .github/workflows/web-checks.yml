@@ -31,6 +31,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
+      - name: Test A1 curriculum cards
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
+
       - name: Test speaking tools
         working-directory: web
         env:
