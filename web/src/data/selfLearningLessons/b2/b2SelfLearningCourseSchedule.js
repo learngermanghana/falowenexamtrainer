@@ -33,9 +33,9 @@ export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
   makeB2ScheduleEntry({
     day: 2,
     chapter: "1.2",
-    topic: "Alltag und Zeitmanagement",
-    goal: "Routinen, Prioritäten und Produktivität beschreiben.",
-    grammar_topic: "Temporale Konnektoren, Nebensätze und klare Reihenfolge im Tagesablauf",
+    topic: "Beziehungen und Kommunikation",
+    goal: "Beziehungstypen, Kommunikationsstrategien und höfliche Reaktionen diskutieren.",
+    grammar_topic: "Konjunktiv II (höfliche Bitten & hypothetische Situationen)",
   }),
   makeB2ScheduleEntry({
     day: 3,
