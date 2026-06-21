@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 import {
   getStandardBrainMap,
   getStandardLessonStorageKey,
@@ -160,7 +161,9 @@ export const shouldShowStandardRadioGate = (falowenRadio) => Boolean(falowenRadi
 
 export default function StandardFourStageLessonPage({ lesson, canonicalLesson = null }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
+  const { studentProfile, user } = useAuth();
   const radio = canonicalLesson?.resources?.falowenRadio || null;
   const [entered, setEntered] = useState(() => !shouldShowStandardRadioGate(radio));
   const [active, setActive] = useState("learn");
@@ -168,9 +171,9 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
     try {
-      return { learnDone: false, speakDone: false, reflection: "", completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
+      return { learnDone: false, speakDone: false, aiWritingDone: false, confidence: "", reflection: "", completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
     } catch {
-      return { learnDone: false, speakDone: false, reflection: "", completed: false };
+      return { learnDone: false, speakDone: false, aiWritingDone: false, confidence: "", reflection: "", completed: false };
     }
   });
 
@@ -196,14 +199,30 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
   const grammarExamples = (lesson.grammarLesson?.examples || []).slice(0, 5);
   const grammarUrl = canonicalLesson?.resources?.grammarBook?.url || lesson.resources?.grammarBook?.url || "";
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
-  const finishReady = progress.learnDone && progress.speakDone && writing.complete;
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
+  const effectiveWritingComplete = fullEssay ? progress.aiWritingDone : writing.complete;
+  const finishRequirements = [
+    { key: "learn", label: "tick ‘I reviewed the video and grammar’ on Learn", complete: progress.learnDone },
+    { key: "speak", label: "tick the speaking practice checkbox on Speak", complete: progress.speakDone },
+    { key: "write", label: fullEssay ? "tick that you used AI Analyse / Mark My Letter on Write" : "complete the guided writing questions on Write", complete: effectiveWritingComplete },
+    { key: "confidence", label: "choose your confidence level on this Finish page", complete: Boolean(progress.confidence) },
+  ];
+  const missingRequirements = finishRequirements.filter((item) => !item.complete);
+  const finishReady = missingRequirements.length === 0;
 
   const finish = () => {
     if (!finishReady) return;
-    setProgress((old) => ({ ...old, completed: true, completedAt: new Date().toISOString() }));
+    const completedAt = new Date().toISOString();
+    setProgress((old) => ({ ...old, completed: true, completedAt }));
+    const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "student";
+    const assignmentKey = location.state?.assignmentKey;
+    if (assignmentKey && typeof window !== "undefined") {
+      const practiceStorageKey = `coursePracticeProgress:${studentCode}:${lesson.level}`;
+      const saved = JSON.parse(window.localStorage.getItem(practiceStorageKey) || "{}");
+      window.localStorage.setItem(practiceStorageKey, JSON.stringify({ ...saved, [assignmentKey]: { ...(saved[assignmentKey] || {}), completed: true, confidence: progress.confidence, completedAt, updatedAt: completedAt } }));
+    }
     showToast(`${lesson.level} Day ${lesson.day} completed. Your progress was saved.`, "success");
   };
 
@@ -260,7 +279,10 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
         <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
           <NoteBox><strong>Task:</strong> {lesson.writingTopic || `Schreibe einen Text zum Thema „${lesson.title}“.`}</NoteBox>
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
-          {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+          {fullEssay ? (<>
+            <EmbeddedWritingPracticePanel />
+            <label style={fieldLabel}><input type="checkbox" checked={Boolean(progress.aiWritingDone)} onChange={(e) => setProgress((old) => ({ ...old, aiWritingDone: e.target.checked }))} />I used AI Analyse / Mark My Letter, reviewed the highlighted errors and improved my text.</label>
+          </>) : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
         </WritingCheatSheetTabs>
       </Section> : null}
 
@@ -270,10 +292,11 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           <ProgressCard label="Learn" complete={progress.learnDone} detail="Video and grammar reviewed" />
           <ProgressCard label="Speak" complete={progress.speakDone} detail={isCompactC1(lesson) ? "Speaking practice completed" : "Brain-map speaking practice completed"} />
-          <ProgressCard label="Write" complete={writing.complete} detail={`${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
+          <ProgressCard label="Write" complete={effectiveWritingComplete} detail={fullEssay ? "AI analysis reviewed and errors improved" : `${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
         </div>
+        <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose this here so you do not have to mark confidence again in the Course Book.</span><select value={progress.confidence || ""} onChange={(e) => setProgress((old) => ({ ...old, confidence: e.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
         <label style={{ display: "grid", gap: 7 }}><strong>Short reflection</strong><span style={{ color: "#64748b", fontSize: 13 }}>What did you learn, and what should you improve next?</span><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
-        {!finishReady ? <NoteBox tone="amber">Complete Learn, Speak and the guided writing task before finishing this lesson.</NoteBox> : null}
+        {!finishReady ? <NoteBox tone="amber"><strong>Mark complete is blocked because:</strong><ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>{missingRequirements.map((item) => <li key={item.key}>{item.label}</li>)}</ul></NoteBox> : null}
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="button" style={{ ...styles.primaryButton, opacity: finishReady ? 1 : .5 }} disabled={!finishReady} onClick={finish}>{progress.completed ? "Mark complete again" : "Mark lesson complete"}</button>
