@@ -36,6 +36,27 @@ describe("course book task entries", () => {
     expect(entries[1].lesen_hören.chapter).toBe("1.1");
   });
 
+  it("gives the two A1 Day 2 cards their own chapters and titles when legacy tasks inherit the parent title", () => {
+    const legacyDay2 = {
+      day: 2,
+      topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
+      chapter: "0.2_1.1",
+      lesen_hören: [
+        { chapter: "0.2", assignment: true },
+        { chapter: "1.1", assignment: true },
+      ],
+    };
+
+    const entries = expandCourseBookEntries([legacyDay2], { level: "A1" });
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Verb Conjugation",
+    ]);
+    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
+  });
+
   it("keeps a single-task day as one card while adding the canonical fields", () => {
     const day4 = { day: 4, topic: "Numbers", chapter: "2", assignment: true, assignmentId: "A1-2" };
     const entries = expandCourseBookEntries([day4]);
@@ -172,6 +193,59 @@ describe("course book task entries", () => {
         grammarbook_link: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
       })
     );
+  });
+
+  it("separates legacy A1 Day 16 cards that both used chapter 7", () => {
+    const legacyDay16 = {
+      day: 16,
+      displayDay: 16,
+      chapter: "7",
+      topic: "Prepositions and Separable Verbs",
+      lesen_hören: [
+        {
+          chapter: "7",
+          title: "Basic Prepositions",
+          assignment: true,
+          grammarbook_link: "/basic-prepositions",
+        },
+        {
+          chapter: "7",
+          title: "Separable Verbs",
+          assignment: true,
+          grammarbook_link: "/separable-verbs",
+        },
+      ],
+    };
+
+    const entries = expandCourseBookEntries([legacyDay16], { level: "A1" });
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["7.1", "7.2"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual(["Basic Prepositions", "Separable Verbs"]);
+    expect(entries.map((entry) => entry.grammarbook_link)).toEqual([
+      "/basic-prepositions",
+      "/separable-verbs",
+    ]);
+  });
+
+  it("separates legacy A1 Day 18 cards that both used chapter 9", () => {
+    const legacyDay18 = {
+      day: 18,
+      displayDay: 18,
+      chapter: "9",
+      topic: "Imperative and Directions",
+      lesen_hören: [
+        { chapter: "9", title: "The Imperative in German", assignment: true },
+        { chapter: "9", title: "Transport and Giving Directions", assignment: true },
+      ],
+    };
+
+    const entries = expandCourseBookEntries([legacyDay18], { level: "A1" });
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["9.1", "9.2"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
+      "The Imperative in German",
+      "Transport and Giving Directions",
+    ]);
   });
 
   it("returns the corrected Day 3 titles from the assignment dictionary", () => {
