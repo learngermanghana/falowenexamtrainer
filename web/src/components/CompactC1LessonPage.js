@@ -26,6 +26,21 @@ const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 const tabs = ["learn", "speak", "write", "finish", "references"];
 const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 
+const C1_DAY3_WRITING_CHEAT_SHEET = [
+  { phrase: "nicht nur …, sondern auch", meaning: "not only … but also" },
+  { phrase: "aus diesem Grund", meaning: "for this reason" },
+  { phrase: "darüber hinaus", meaning: "furthermore / beyond that" },
+  { phrase: "einerseits …, andererseits", meaning: "on the one hand … on the other hand" },
+  { phrase: "zwar …, aber", meaning: "admittedly … but / although … but" },
+  { phrase: "dennoch", meaning: "nevertheless / nonetheless" },
+  { phrase: "folglich", meaning: "consequently / therefore" },
+  { phrase: "insofern …, als", meaning: "insofar as" },
+  { phrase: "sofern", meaning: "provided that / as long as" },
+  { phrase: "während", meaning: "whereas / while" },
+  { phrase: "indem", meaning: "by / by means of" },
+  { phrase: "je …, desto / umso", meaning: "the … the" },
+];
+
 const Section = ({ title, children }) => (
   <section style={card}>
     <h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>
@@ -68,6 +83,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const radio = canonicalLesson?.resources?.falowenRadio || null;
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
+  const [writeView, setWriteView] = useState("task");
   const [writing, setWriting] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
@@ -79,6 +95,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   });
 
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
+  useEffect(() => setWriteView("task"), [lesson.day, lesson.level]);
 
   if (!entered && radio) {
     return (
@@ -105,6 +122,10 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
+  const writingCheatSheet =
+    String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 3
+      ? C1_DAY3_WRITING_CHEAT_SHEET
+      : [];
 
   const finish = () => {
     if (!finishReady) return;
@@ -166,9 +187,29 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
       </Section> : null}
 
       {active === "write" ? <Section title="Guided writing builder">
-        <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
-        <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
-        {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+        {writingCheatSheet.length ? (
+          <div role="tablist" aria-label="C1 writing support" style={{ display: "flex", gap: 8, flexWrap: "wrap", padding: 6, border: "1px solid #dbeafe", borderRadius: 14, background: "#eff6ff" }}>
+            <button type="button" role="tab" aria-selected={writeView === "task"} onClick={() => setWriteView("task")} style={{ ...(writeView === "task" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}>Schreiben Task</button>
+            <button type="button" role="tab" aria-selected={writeView === "cheatSheet"} onClick={() => setWriteView("cheatSheet")} style={{ ...(writeView === "cheatSheet" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}>Cheat Sheet</button>
+          </div>
+        ) : null}
+
+        {!writingCheatSheet.length || writeView === "task" ? <>
+          <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
+          <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
+          {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+        </> : null}
+
+        {writingCheatSheet.length && writeView === "cheatSheet" ? (
+          <div style={{ display: "grid", gap: 8 }}>
+            {writingCheatSheet.map((item) => (
+              <div key={item.phrase} style={{ display: "grid", gridTemplateColumns: "minmax(180px, .8fr) minmax(180px, 1.2fr)", gap: 12, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, background: "#f8fafc" }}>
+                <strong style={{ color: "#0f172a" }}>{item.phrase}</strong>
+                <span style={{ color: "#475569" }}>{item.meaning}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </Section> : null}
 
       {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
