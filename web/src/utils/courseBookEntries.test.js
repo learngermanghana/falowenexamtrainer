@@ -36,6 +36,30 @@ describe("course book task entries", () => {
     expect(entries[1].lesen_hören.chapter).toBe("1.1");
   });
 
+  it("gives A1 Day 2 inherited child cards the correct individual titles", () => {
+    const entries = expandCourseBookEntries(
+      [
+        {
+          day: 2,
+          topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
+          chapter: "0.2_1.1",
+          lesen_hören: [
+            { chapter: "0.2", assignment: true },
+            { chapter: "1.1", assignment: true },
+          ],
+        },
+      ],
+      { level: "A1" }
+    );
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Verb Conjugation",
+    ]);
+    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
+  });
+
   it("keeps a single-task day as one card while adding the canonical fields", () => {
     const day4 = { day: 4, topic: "Numbers", chapter: "2", assignment: true, assignmentId: "A1-2" };
     const entries = expandCourseBookEntries([day4]);
@@ -170,6 +194,68 @@ describe("course book task entries", () => {
         title: "Personal Pronouns and Verb Conjugation",
         assignmentId: "A1-1.2",
         grammarbook_link: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
+      })
+    );
+  });
+
+  it("corrects A1 Day 16 to chapter 9 Negation and chapter 10 Food", () => {
+    const entries = expandCourseBookEntries(
+      [
+        {
+          day: 16,
+          displayDay: 16,
+          chapter: "7",
+          topic: "Legacy Day 16",
+          lesen_hören: [
+            { chapter: "7", title: "Basic Prepositions", assignment: true },
+            { chapter: "7", title: "Separable Verbs", assignment: true },
+          ],
+        },
+      ],
+      { level: "A1" }
+    );
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["9", "10"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual(["Negation", "Food"]);
+    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-9", "A1-10"]);
+    expect(entries.every((entry) => entry.tutorMarked)).toBe(true);
+  });
+
+  it("corrects A1 Day 18 while preserving tutor-marked and practical task modes", () => {
+    const entries = expandCourseBookEntries(
+      [
+        {
+          day: 18,
+          displayDay: 18,
+          chapter: "9",
+          topic: "Legacy Day 18",
+          lesen_hören: [
+            { chapter: "9", title: "The Imperative in German", assignment: true },
+            { chapter: "9", title: "Transport and Giving Directions", assignment: false },
+          ],
+        },
+      ],
+      { level: "A1" }
+    );
+
+    const chapter121 = entries.find((entry) => entry.displayChapter === "12.1");
+    const chapter122 = entries.find((entry) => entry.displayChapter === "12.2");
+
+    expect(chapter121).toEqual(
+      expect.objectContaining({
+        lessonTitle: "Two Case Prepositions",
+        assignmentId: "A1-12.1",
+        assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
+        tutorMarked: true,
+      })
+    );
+    expect(chapter122).toEqual(
+      expect.objectContaining({
+        lessonTitle: "Dative Prepositions",
+        assignmentId: "A1-12.2-practice",
+        assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
+        tutorMarked: false,
+        selfPractice: true,
       })
     );
   });
