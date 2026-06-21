@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import {
   loadWritingAttempts,
   loadWritingProgress,
@@ -19,6 +20,24 @@ const countWords = (text = "") =>
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
+
+const WORD_MILESTONE_LABELS = [
+  { threshold: 0, label: "Start writing", color: "#64748b" },
+  { threshold: 0.35, label: "Good", color: "#2563eb" },
+  { threshold: 0.65, label: "Keep going", color: "#7c3aed" },
+  { threshold: 0.9, label: "Almost done", color: "#d97706" },
+  { threshold: 1, label: "Milestone reached", color: "#15803d" },
+];
+
+const getWordMilestone = (words = 0, minimumWords = 1) => {
+  const progress = Math.max(0, Math.min(words / Math.max(minimumWords, 1), 1));
+  return WORD_MILESTONE_LABELS.reduce((current, milestone) =>
+    progress >= milestone.threshold ? milestone : current,
+  WORD_MILESTONE_LABELS[0]);
+};
+
+const getMilestoneMessage = (question, index) =>
+  `Question ${index + 1} word goal reached: ${question.minimumWords}+ words. You can keep typing if you prefer.`;
 
 const emptyState = () => ({
   answers: {},
@@ -82,6 +101,8 @@ export default function GuidedWritingWorkspace({
   onStatusChange,
 }) {
   const { user, idToken, studentProfile } = useAuth();
+  const { showToast } = useToast();
+  const reachedMilestonesRef = useRef(new Set());
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || userId;
@@ -111,6 +132,10 @@ export default function GuidedWritingWorkspace({
         words: countWords(state.answers[question.id]),
         complete:
           countWords(state.answers[question.id]) >= question.minimumWords,
+        milestone: getWordMilestone(
+          countWords(state.answers[question.id]),
+          question.minimumWords,
+        ),
       })),
     [config.questions, state.answers],
   );
@@ -153,6 +178,14 @@ export default function GuidedWritingWorkspace({
     onStatusChange,
     questions.length,
   ]);
+
+  useEffect(() => {
+    questions.forEach((question, index) => {
+      if (!question.complete || reachedMilestonesRef.current.has(question.id)) return;
+      reachedMilestonesRef.current.add(question.id);
+      showToast(getMilestoneMessage(question, index), "success", { playSound: true });
+    });
+  }, [questions, showToast]);
 
   useEffect(() => {
     let active = true;
@@ -381,9 +414,14 @@ export default function GuidedWritingWorkspace({
               <strong>
                 Question {index + 1} of 5 · {question.section}
               </strong>
-              <span>
-                {question.words}/{question.minimumWords} words{" "}
-                {question.complete ? "✓" : ""}
+              <span
+                style={{
+                  color: question.milestone.color,
+                  fontWeight: 900,
+                }}
+              >
+                {question.milestone.label}
+                {question.complete ? " ✓" : ""}
               </span>
             </div>
             <h4 style={{ margin: 0 }}>{question.question}</h4>
@@ -419,11 +457,38 @@ export default function GuidedWritingWorkspace({
                 font: "inherit",
               }}
             />
-            <small>
-              {question.complete
-                ? "Section completed."
-                : `Add ${Math.max(question.minimumWords - question.words, 0)} more words.`}
-            </small>
+            <div style={{ display: "grid", gap: 6 }}>
+              <div
+                aria-label={`Question ${index + 1} word progress`}
+                aria-valuemin={0}
+                aria-valuemax={question.minimumWords}
+                aria-valuenow={Math.min(question.words, question.minimumWords)}
+                role="progressbar"
+                style={{
+                  height: 10,
+                  overflow: "hidden",
+                  borderRadius: 999,
+                  background: "#e2e8f0",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.min((question.words / Math.max(question.minimumWords, 1)) * 100, 100)}%`,
+                    height: "100%",
+                    borderRadius: 999,
+                    background: question.complete
+                      ? "linear-gradient(90deg,#22c55e,#16a34a)"
+                      : "linear-gradient(90deg,#818cf8,#f59e0b)",
+                    transition: "width 180ms ease",
+                  }}
+                />
+              </div>
+              <small>
+                {question.words}/{question.minimumWords} words · {question.complete
+                  ? "Goal reached — you can still type more if you prefer."
+                  : `Add ${Math.max(question.minimumWords - question.words, 0)} more words.`}
+              </small>
+            </div>
           </article>
         ))}
       </div>
