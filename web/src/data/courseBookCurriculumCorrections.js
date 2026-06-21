@@ -173,9 +173,10 @@ const taskIsPractice = (entry = {}) =>
 
 const correctedAssignmentId = (entry, correction) => {
   if (!correction?.assignmentId) return null;
-  return taskIsPractice(entry)
-    ? `${correction.assignmentId}-practice`
-    : correction.assignmentId;
+  if (!taskIsPractice(entry)) return correction.assignmentId;
+  return /-practice$/i.test(correction.assignmentId)
+    ? correction.assignmentId
+    : `${correction.assignmentId}-practice`;
 };
 
 const patchResource = (resource, correction) => {
