@@ -27,6 +27,10 @@ describe("course book task entries", () => {
       "German Alphabet",
       "Personal Pronouns and Verb Conjugation",
     ]);
+    expect(entries.map((entry) => entry.topic)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Verb Conjugation",
+    ]);
     expect(entries.every((entry) => entry.day === 2 && entry.displayDay === 2)).toBe(true);
     expect(entries.every((entry) => entry.resourceType === COURSE_BOOK_RESOURCE_TYPES.readingListening)).toBe(true);
     expect(entries.every((entry) => entry.assessmentType === COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked)).toBe(true);
@@ -53,6 +57,10 @@ describe("course book task entries", () => {
       "Personal Pronouns and Verb Conjugation",
     ]);
     expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
+    expect(entries.map((entry) => entry.topic)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Verb Conjugation",
+    ]);
   });
 
   it("keeps a single-task day as one card while adding canonical fields", () => {
@@ -143,6 +151,7 @@ describe("course book task entries", () => {
 
     expect(chapter11).toEqual(expect.objectContaining({
       lessonTitle: "Personal Information, Articles, Adjectives and W-Questions",
+      topic: "Personal Information, Articles, Adjectives and W-Questions",
       assignmentId: "A1-1.1-practice",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
       tutorMarked: false,
@@ -151,6 +160,7 @@ describe("course book task entries", () => {
     }));
     expect(chapter12).toEqual(expect.objectContaining({
       lessonTitle: "Personal Pronouns and Verb Conjugation",
+      topic: "Personal Pronouns and Verb Conjugation",
       assignmentId: "A1-1.2",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
       tutorMarked: true,

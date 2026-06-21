@@ -543,7 +543,14 @@ const normalizeSearchText = (value) => String(value || "").trim().toLowerCase();
 const lessonMatchesSearch = (entry, searchTerm) => {
   const query = normalizeSearchText(searchTerm);
   if (!query) return true;
-  const haystack = [entry.topic, entry.chapter, entry.grammar_topic, entry.goal, entry.instruction]
+  const haystack = [
+    getCourseBookEntryTitle(entry),
+    entry.topic,
+    entry.chapter,
+    entry.grammar_topic,
+    entry.goal,
+    entry.instruction,
+  ]
     .map((value) => String(value || "").toLowerCase())
     .join(" ");
   return haystack.includes(query);
@@ -1009,7 +1016,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           <div style={courseBookStyles.lessonMain}>
                             <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
                             <div style={{ minWidth: 0 }}>
-                              <h3 style={courseBookStyles.lessonTitle}>{entry.topic}</h3>
+                              <h3 style={courseBookStyles.lessonTitle}>{getCourseBookEntryTitle(entry)}</h3>
                               <div style={courseBookStyles.lessonMeta}>
                                 {isCurrent ? <span style={{ ...courseBookStyles.chip, background: "#dbeafe", borderColor: "#93c5fd", color: "#1d4ed8" }}>Current</span> : null}
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
