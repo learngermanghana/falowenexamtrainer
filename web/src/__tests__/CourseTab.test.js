@@ -5,6 +5,12 @@ const mockGetDocs = jest.fn();
 const mockFetchResults = jest.fn();
 const mockGetDoc = jest.fn();
 const mockSetDoc = jest.fn();
+const mockNavigate = jest.fn();
+
+jest.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ search: "" }),
+}));
 
 jest.mock("../firebase", () => ({
   db: {},
@@ -162,6 +168,27 @@ jest.mock("../data/courseSchedule", () => ({
   },
 }));
 
+
+const mockCanonicalA1Entries = [
+  { id: "A1-Tutorial", level: "A1", day: 0, chapter: "Tutorial", topic: "Tutorial", assignmentId: "A1-Tutorial", kind: "lesen_hören", assignment: false, submissionRequired: false, progressionEligible: false, workbookRoute: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", schreiben_sprechen: { chapter: "Tutorial", assignment: false, workbook_link: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" } },
+  { id: "A1-0.1", level: "A1", day: 1, chapter: "0.1", topic: "Greetings and Asking About Well-being", assignmentId: "A1-0.1", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "0.1", assignment: true, assignmentId: "A1-0.1" }] },
+  { id: "A1-0.2", level: "A1", day: 2, chapter: "0.2", topic: "German Alphabet", assignmentId: "A1-0.2", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "0.2", assignment: true, assignmentId: "A1-0.2" }] },
+  { id: "A1-1.1", level: "A1", day: 2, chapter: "1.1", topic: "Personal Pronouns and Verb Conjugation", assignmentId: "A1-1.1", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "1.1", assignment: true, assignmentId: "A1-1.1" }] },
+  { id: "A1-1.1-practice", level: "A1", day: 3, chapter: "1.1", topic: "Personal Information, Articles, Adjectives and W-Questions", assignmentId: "A1-1.1-practice", kind: "schreiben_sprechen", assignment: false, submissionRequired: false, progressionEligible: false, schreiben_sprechen: [{ chapter: "1.1", assignment: false, assignmentId: "A1-1.1-practice" }] },
+  { id: "A1-1.2", level: "A1", day: 3, chapter: "1.2", topic: "Personal Pronouns and Verb Conjugation", assignmentId: "A1-1.2", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "1.2", assignment: true, assignmentId: "A1-1.2" }] },
+  { id: "A1-2", level: "A1", day: 4, chapter: "2", topic: "Numbers", assignmentId: "A1-2", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "2", assignment: true, assignmentId: "A1-2" }] },
+  { id: "A1-1.3", level: "A1", day: 5, chapter: "1.3", topic: "Introducing Yourself and Articles", assignmentId: "A1-1.3", kind: "schreiben_sprechen", assignment: false, submissionRequired: false, progressionEligible: false, workbookRoute: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook", schreiben_sprechen: [{ chapter: "1.3", assignment: false, assignmentId: "A1-1.3", workbook_link: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook" }] },
+  { id: "A1-2.3", level: "A1", day: 6, chapter: "2.3", topic: "Family and Hobbies", assignmentId: "A1-2.3", kind: "schreiben_sprechen", assignment: false, submissionRequired: false, progressionEligible: false, schreiben_sprechen: [{ chapter: "2.3", assignment: false, assignmentId: "A1-2.3" }] },
+  { id: "A1-3", level: "A1", day: 7, chapter: "3", topic: "Asking Prices", assignmentId: "A1-3", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "3", assignment: true, assignmentId: "A1-3" }] },
+  { id: "A1-4", level: "A1", day: 8, chapter: "4", topic: "Countries and Languages", assignmentId: "A1-4", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "4", assignment: true, assignmentId: "A1-4" }] },
+  { id: "A1-5", level: "A1", day: 9, chapter: "5", topic: "German Cases", assignmentId: "A1-5", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "5", assignment: true, assignmentId: "A1-5" }] },
+  { id: "A1-7", level: "A1", day: 11, chapter: "7", topic: "Understanding Time", assignmentId: "A1-7", kind: "lesen_hören", assignment: true, submissionRequired: true, progressionEligible: true, lesen_hören: [{ chapter: "7", assignment: true, assignmentId: "A1-7" }] },
+];
+
+jest.mock("../data/curriculumManifest", () => ({
+  getCurriculumEntriesForLevel: jest.fn((level) => (String(level).toUpperCase() === "A1" ? mockCanonicalA1Entries : [])),
+}));
+
 import CourseTab from "../components/CourseTab";
 
 describe("CourseTab", () => {
@@ -174,8 +201,66 @@ describe("CourseTab", () => {
       data: () => ({}),
     });
     mockSetDoc.mockResolvedValue(undefined);
+    mockNavigate.mockClear();
   });
 
+
+
+  it("renders A1 from canonical identities without duplicate legacy split cards", async () => {
+    render(<CourseTab defaultLevel="A1" />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText("German Alphabet")).toHaveLength(1);
+    });
+
+    expect(screen.getAllByText("Personal Information, Articles, Adjectives and W-Questions")).toHaveLength(1);
+    expect(screen.getAllByText("Introducing Yourself and Articles")).toHaveLength(1);
+    expect(screen.queryByText("German Alphabet + Personal Pronouns and Verb Conjugation")).not.toBeInTheDocument();
+    expect(screen.queryByText("Personal Pronouns and Verb Conjugation + Introducing Yourself")).not.toBeInTheDocument();
+
+    const lessonCards = screen.getAllByRole("article");
+    expect(lessonCards.slice(0, 9).map((card) => {
+      const title = within(card).getByRole("heading", { level: 3 }).textContent;
+      return mockCanonicalA1Entries.find((entry) => entry.topic === title)?.id;
+    })).toEqual([
+      "A1-Tutorial",
+      "A1-0.1",
+      "A1-0.2",
+      "A1-1.1",
+      "A1-1.1-practice",
+      "A1-1.2",
+      "A1-2",
+      "A1-1.3",
+      "A1-2.3",
+    ]);
+
+    const practiceCard = screen.getByText("Personal Information, Articles, Adjectives and W-Questions").closest("article");
+    const day5Card = screen.getByText("Introducing Yourself and Articles").closest("article");
+    const day2Chapter11Card = lessonCards.find((card) => within(card).queryByText("Day 2 1.1"));
+    const day3Chapter12Card = lessonCards.find((card) => within(card).queryByText("Day 3 1.2"));
+
+    expect(within(practiceCard).getByText("Self-learning")).toBeInTheDocument();
+    expect(within(day5Card).getByText("Self-learning")).toBeInTheDocument();
+    expect(within(practiceCard).queryByText("Tutor-marked")).not.toBeInTheDocument();
+    expect(within(day5Card).queryByText("Tutor-marked")).not.toBeInTheDocument();
+    expect(within(day2Chapter11Card).getByText("Tutor-marked")).toBeInTheDocument();
+    expect(within(day3Chapter12Card).getByText("Tutor-marked")).toBeInTheDocument();
+    expect(screen.getByText("Practical completed: 0/4")).toBeInTheDocument();
+    expect(screen.getByText("Assignments").nextElementSibling).toHaveTextContent("9");
+
+    fireEvent.click(within(day5Card).getByRole("button", { name: "Open Lesson" }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/campus/course/lesson/A1/5?chapter=1.3",
+      expect.objectContaining({
+        state: expect.objectContaining({
+          entry: expect.objectContaining({
+            id: "A1-1.3",
+            workbookRoute: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
+          }),
+        }),
+      })
+    );
+  });
 
   it("shows chapter suffixes only when a day has multiple course-book tasks", async () => {
     render(<CourseTab defaultLevel="A1" />);
@@ -257,7 +342,7 @@ describe("CourseTab", () => {
     fireEvent.change(confidenceSelect, { target: { value: "high" } });
 
     expect(within(card).getByText("Self-marked complete")).toBeInTheDocument();
-    expect(screen.getByText("Practical completed: 1/5")).toBeInTheDocument();
+    expect(screen.getByText("Practical completed: 1/4")).toBeInTheDocument();
     await waitFor(() => {
       expect(mockSetDoc).toHaveBeenCalled();
     });
