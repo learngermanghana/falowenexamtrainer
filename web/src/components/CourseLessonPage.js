@@ -5,6 +5,7 @@ import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbo
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
+export { LessonResourcesHub } from "./CourseLessonPageLegacy";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
