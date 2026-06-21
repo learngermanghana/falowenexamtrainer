@@ -84,6 +84,36 @@ code {
   }
 }
 
+/*
+ * Several lesson pages still render their stage navigation with inline
+ * sticky grid styles. On small screens that grid wraps into multiple rows
+ * and covers the lesson while the student scrolls. Keep it in the normal
+ * document flow and make the stages horizontally scrollable instead.
+ */
+@media (max-width: 768px) {
+  div[style*="position: sticky"][style*="minmax(120px"] {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+    display: flex !important;
+    grid-template-columns: none !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    background: #f8fafc !important;
+  }
+
+  div[style*="position: sticky"][style*="minmax(120px"] > button {
+    flex: 0 0 auto !important;
+    min-width: 118px;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+}
+
 .onboarding-page {
   min-height: 100vh;
   display: grid;
