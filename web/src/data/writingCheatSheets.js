@@ -44,12 +44,113 @@ export const C1_WRITING_CHEAT_SHEET = [
   },
 ];
 
+export const B2_WRITING_CHEAT_SHEET = [
+  {
+    id: "b2-argument-linkers",
+    title: "B2 argument linkers",
+    items: [
+      { phrase: "meiner Ansicht nach", meaning: "in my view" },
+      { phrase: "aus meiner Sicht", meaning: "from my point of view" },
+      { phrase: "ein wesentlicher Vorteil ist", meaning: "a key advantage is" },
+      { phrase: "ein möglicher Nachteil besteht darin, dass", meaning: "one possible disadvantage is that" },
+      { phrase: "im Vergleich zu", meaning: "compared with" },
+      { phrase: "im Gegensatz dazu", meaning: "in contrast to that" },
+      { phrase: "außerdem", meaning: "besides / furthermore" },
+      { phrase: "deshalb / daher", meaning: "therefore / for that reason" },
+      { phrase: "trotzdem", meaning: "nevertheless / even so" },
+      { phrase: "abschließend lässt sich sagen, dass", meaning: "in conclusion, it can be said that" },
+    ],
+  },
+  {
+    id: "b2-formal-writing-phrases",
+    title: "B2 formal writing phrases",
+    items: [
+      { phrase: "ich möchte auf … eingehen", meaning: "I would like to address …" },
+      { phrase: "das Thema betrifft viele Menschen", meaning: "the topic affects many people" },
+      { phrase: "es stellt sich die Frage, ob", meaning: "the question arises whether" },
+      { phrase: "ein Beispiel dafür ist", meaning: "an example of this is" },
+      { phrase: "diese Entwicklung hat zur Folge, dass", meaning: "this development results in" },
+      { phrase: "eine mögliche Lösung wäre", meaning: "one possible solution would be" },
+      { phrase: "man sollte berücksichtigen, dass", meaning: "one should take into account that" },
+      { phrase: "ich bin davon überzeugt, dass", meaning: "I am convinced that" },
+    ],
+  },
+];
+
+export const B1_WRITING_CHEAT_SHEET = [
+  {
+    id: "b1-connectors",
+    title: "B1 connectors",
+    items: [
+      { phrase: "zuerst / danach / zum Schluss", meaning: "first / after that / finally" },
+      { phrase: "weil", meaning: "because" },
+      { phrase: "denn", meaning: "because / for" },
+      { phrase: "deshalb", meaning: "therefore" },
+      { phrase: "wenn", meaning: "if / when" },
+      { phrase: "obwohl", meaning: "although" },
+      { phrase: "außerdem", meaning: "besides / furthermore" },
+      { phrase: "zum Beispiel", meaning: "for example" },
+    ],
+  },
+  {
+    id: "b1-message-phrases",
+    title: "B1 message phrases",
+    items: [
+      { phrase: "vielen Dank für deine/Ihre Nachricht", meaning: "thank you for your message" },
+      { phrase: "ich schreibe dir/Ihnen, weil", meaning: "I am writing to you because" },
+      { phrase: "könntest du / könnten Sie bitte", meaning: "could you please" },
+      { phrase: "ich schlage vor, dass", meaning: "I suggest that" },
+      { phrase: "ich würde gern", meaning: "I would like to" },
+      { phrase: "leider kann ich nicht", meaning: "unfortunately I cannot" },
+      { phrase: "ich freue mich auf deine/Ihre Antwort", meaning: "I look forward to your reply" },
+    ],
+  },
+];
+
+export const A2_WRITING_CHEAT_SHEET = [
+  {
+    id: "a2-basic-connectors",
+    title: "A2 basic connectors",
+    items: [
+      { phrase: "und / aber / oder", meaning: "and / but / or" },
+      { phrase: "weil", meaning: "because" },
+      { phrase: "denn", meaning: "because / for" },
+      { phrase: "dann", meaning: "then" },
+      { phrase: "danach", meaning: "after that" },
+      { phrase: "heute / morgen / gestern", meaning: "today / tomorrow / yesterday" },
+      { phrase: "um … Uhr", meaning: "at … o’clock" },
+      { phrase: "zum Beispiel", meaning: "for example" },
+    ],
+  },
+  {
+    id: "a2-short-message-phrases",
+    title: "A2 short message phrases",
+    items: [
+      { phrase: "Liebe/Lieber …", meaning: "Dear …" },
+      { phrase: "Hallo …", meaning: "Hello …" },
+      { phrase: "wie geht es dir?", meaning: "how are you?" },
+      { phrase: "ich habe eine Frage", meaning: "I have a question" },
+      { phrase: "kannst du bitte", meaning: "can you please" },
+      { phrase: "ich möchte gern", meaning: "I would like to" },
+      { phrase: "vielen Dank", meaning: "many thanks" },
+      { phrase: "bis bald", meaning: "see you soon" },
+    ],
+  },
+];
+
+const WRITING_CHEAT_SHEETS_BY_LEVEL = {
+  A2: A2_WRITING_CHEAT_SHEET,
+  B1: B1_WRITING_CHEAT_SHEET,
+  B2: B2_WRITING_CHEAT_SHEET,
+  C1: C1_WRITING_CHEAT_SHEET,
+};
+
 export const getWritingCheatSheet = (level, day) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const normalizedDay = Number(day);
 
-  if (normalizedLevel === "C1" && normalizedDay >= 1 && normalizedDay <= 28) {
-    return C1_WRITING_CHEAT_SHEET;
+  if (normalizedDay >= 1 && normalizedDay <= 28) {
+    return WRITING_CHEAT_SHEETS_BY_LEVEL[normalizedLevel] || [];
   }
 
   return [];
