@@ -71,7 +71,7 @@ const auditA1CourseBookCards = ({ checkGeneratedModule = true } = {}) => {
     if (!chapter) errors.push(`${label}: missing chapter`);
     if (!title) errors.push(`${label}: missing title`);
     if (!lessonId) errors.push(`${label}: missing lessonId`);
-    if (!assignmentId) errors.push(`${label}: missing assignmentId`);
+    if (Boolean(card.submissionRequired) && !assignmentId) errors.push(`${label}: missing assignmentId`);
     if (!ALLOWED_ASSESSMENT_TYPES.has(assessmentType)) errors.push(`${label}: assessmentType must be tutor-marked or self-practice`);
     if (!ALLOWED_RESOURCE_SECTIONS.has(resourceSection)) errors.push(`${label}: invalid resourceSection ${resourceSection || '(empty)'}`);
     if (chapter.includes('_')) errors.push(`${label}: chapter must identify one card, not a combined chapter`);

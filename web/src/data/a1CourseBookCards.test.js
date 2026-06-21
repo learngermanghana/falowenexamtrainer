@@ -6,7 +6,7 @@ describe("authoritative A1 course-book cards", () => {
     const dayChapters = A1_COURSE_BOOK_CARDS.map(
       (card) => `${card.displayDay}:${card.chapter}`
     );
-    const assignmentIds = A1_COURSE_BOOK_CARDS.map((card) => card.assignmentId);
+    const assignmentIds = A1_COURSE_BOOK_CARDS.map((card) => card.assignmentId).filter(Boolean);
 
     expect(A1_COURSE_BOOK_CARDS).toHaveLength(29);
     expect(new Set(dayChapters).size).toBe(dayChapters.length);
