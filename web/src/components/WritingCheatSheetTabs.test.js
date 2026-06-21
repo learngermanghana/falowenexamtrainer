@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 
 const TaskContent = () => <div data-testid="writing-task">Existing writing content and progress callbacks</div>;
+
+const getElementById = (container, id) => container.querySelector(`[id="${id}"]`);
 
 const StatefulTaskContent = ({ onMount }) => {
   const [text, setText] = useState("");
@@ -53,25 +55,50 @@ test("keeps stateful writing task mounted while switching to and from the cheat 
   const taskPanel = screen.getByRole("tabpanel", { name: "Schreiben Task" });
   const input = screen.getByLabelText("Draft");
 
-  expect(taskTab).toHaveAttribute("id", "writing-task-tab");
-  expect(taskTab).toHaveAttribute("aria-controls", "writing-task-panel");
-  expect(taskPanel).toHaveAttribute("id", "writing-task-panel");
-  expect(taskPanel).toHaveAttribute("aria-labelledby", "writing-task-tab");
-  expect(cheatSheetTab).toHaveAttribute("id", "writing-cheat-sheet-tab");
-  expect(cheatSheetTab).toHaveAttribute("aria-controls", "writing-cheat-sheet-panel");
+  expect(taskTab).toHaveAttribute("aria-controls", taskPanel.id);
+  expect(taskPanel).toHaveAttribute("aria-labelledby", taskTab.id);
+  expect(cheatSheetTab).toHaveAttribute("aria-controls");
 
   userEvent.type(input, "Meine Antwort bleibt erhalten.");
   expect(input).toHaveValue("Meine Antwort bleibt erhalten.");
 
   userEvent.click(cheatSheetTab);
   const cheatSheetPanel = screen.getByRole("tabpanel", { name: "Cheat Sheet" });
-  expect(cheatSheetPanel).toHaveAttribute("id", "writing-cheat-sheet-panel");
-  expect(cheatSheetPanel).toHaveAttribute("aria-labelledby", "writing-cheat-sheet-tab");
+  expect(cheatSheetTab).toHaveAttribute("aria-controls", cheatSheetPanel.id);
+  expect(cheatSheetPanel).toHaveAttribute("aria-labelledby", cheatSheetTab.id);
   expect(taskPanel).not.toBeVisible();
 
   userEvent.click(taskTab);
   expect(screen.getByLabelText("Draft")).toHaveValue("Meine Antwort bleibt erhalten.");
   expect(handleMount).toHaveBeenCalledTimes(1);
+});
+
+test("generates unique tab and panel IDs for each component instance", () => {
+  const { container } = render(
+    <div>
+      <WritingCheatSheetTabs level="C1" day={1}><TaskContent /></WritingCheatSheetTabs>
+      <WritingCheatSheetTabs level="C1" day={2}><TaskContent /></WritingCheatSheetTabs>
+    </div>
+  );
+
+  const tablists = screen.getAllByRole("tablist", { name: "Writing support" });
+
+  tablists.forEach((tablist) => {
+    const taskTab = within(tablist).getByRole("tab", { name: "Schreiben Task" });
+    const cheatSheetTab = within(tablist).getByRole("tab", { name: "Cheat Sheet" });
+    const taskPanel = getElementById(container, taskTab.getAttribute("aria-controls"));
+
+    expect(taskTab).toHaveAttribute("aria-controls", taskPanel.id);
+    expect(taskPanel).toHaveAttribute("aria-labelledby", taskTab.id);
+
+    userEvent.click(cheatSheetTab);
+    const cheatSheetPanel = getElementById(container, cheatSheetTab.getAttribute("aria-controls"));
+    expect(cheatSheetTab).toHaveAttribute("aria-controls", cheatSheetPanel.id);
+    expect(cheatSheetPanel).toHaveAttribute("aria-labelledby", cheatSheetTab.id);
+  });
+
+  const ids = Array.from(container.querySelectorAll("[id]"), (element) => element.id);
+  expect(new Set(ids).size).toBe(ids.length);
 });
 
 test("returns normal task content without sub-tabs when no cheat sheet exists", () => {
