@@ -2,15 +2,15 @@ import fs from "fs";
 import path from "path";
 import { render, screen } from "@testing-library/react";
 import { LessonResourcesHub } from "./CourseLessonPage";
+import { getLessonVideoResources, shouldShowTeacherLectureVideo } from "../data/lessonVideoDictionary";
 
 const canonicalLesson = (resources) => ({ resources });
+const videoLesson = (videos) => canonicalLesson({ videos, resourceGroups: [] });
+const aiOverride = (lesson, aiOverrideUrl) => ({ ...lesson, aiVideo: aiOverrideUrl });
 
 describe("canonical lesson resources", () => {
   test("CourseLessonPage does not resolve videos separately", () => {
-    const source = fs.readFileSync(
-      path.join(__dirname, "CourseLessonPage.js"),
-      "utf8",
-    );
+    const source = fs.readFileSync(path.join(__dirname, "CourseLessonPage.js"), "utf8");
     expect(source).not.toContain('import { getLessonVideoResources }');
     expect(source).not.toMatch(/getLessonVideoResources\s*\(/);
   });
@@ -24,11 +24,7 @@ describe("canonical lesson resources", () => {
             { key: "ai-grammar-video", title: "AI grammar video", url: "ai" },
           ],
           resourceGroups: [
-            {
-              chapter: "1",
-              grammarBook: { url: "grammar" },
-              workbook: { url: "workbook" },
-            },
+            { chapter: "1", grammarBook: { url: "grammar" }, workbook: { url: "workbook" } },
             { chapter: "2", grammarBook: null, workbook: null },
           ],
         })}
@@ -37,8 +33,8 @@ describe("canonical lesson resources", () => {
 
     expect(screen.getByText("Kapitel 1 grammar book")).toBeInTheDocument();
     expect(screen.getByText("Kapitel 1 workbook")).toBeInTheDocument();
-    expect(screen.getByText("Teacher explanation")).toBeInTheDocument();
-    expect(screen.getByText("AI grammar video")).toBeInTheDocument();
+    expect(screen.getByText("Kapitel 1 teacher lecture video")).toBeInTheDocument();
+    expect(screen.getByText("Kapitel 1 AI grammar video")).toBeInTheDocument();
     expect(screen.queryByText("Kapitel 2 grammar book")).not.toBeInTheDocument();
   });
 
@@ -60,5 +56,69 @@ describe("canonical lesson resources", () => {
 
     const links = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
     expect(links).toEqual(["grammar-2", "chapter-2", "grammar-1", "chapter-1"]);
+  });
+});
+
+describe("lesson video visibility policy", () => {
+  test("A1 with both videos renders teacher first and AI second with different URLs", () => {
+    render(<LessonResourcesHub lesson={videoLesson([
+      { key: "teacher-explanation", url: "https://example.com/teacher" },
+      { key: "ai-grammar-video", url: "https://example.com/ai" },
+    ])} />);
+
+    expect(screen.getByText("Teacher Lecture")).toBeInTheDocument();
+    expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
+    const links = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(links).toEqual(["https://example.com/teacher", "https://example.com/ai"]);
+    expect(links[0]).not.toBe(links[1]);
+  });
+
+  test("A1 with only teacher video renders only teacher section", () => {
+    render(<LessonResourcesHub lesson={videoLesson([{ key: "teacher-explanation", url: "teacher-only" }])} />);
+    expect(screen.getByText("Teacher Lecture")).toBeInTheDocument();
+    expect(screen.queryByText("AI Grammar Explainer")).not.toBeInTheDocument();
+  });
+
+  test("A1 with only AI video renders AI without empty teacher section", () => {
+    render(<LessonResourcesHub lesson={videoLesson([{ key: "ai-grammar-video", url: "ai-only" }])} />);
+    expect(screen.queryByText("Teacher Lecture")).not.toBeInTheDocument();
+    expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
+  });
+
+  test.each(["A2", "B1", "B2", "C1"])("%s hides teacher lecture but keeps AI video", (level) => {
+    expect(shouldShowTeacherLectureVideo(level)).toBe(false);
+    const resources = getLessonVideoResources(level, 99, {
+      day: 99,
+      teacherVideo: "teacher-url",
+      aiVideo: "ai-url",
+    });
+    expect(resources.map((resource) => resource.url)).toEqual(["ai-url"]);
+    render(<LessonResourcesHub lesson={videoLesson(resources)} />);
+    expect(screen.queryByText("Teacher Lecture")).not.toBeInTheDocument();
+    expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
+  });
+
+  test("AI override only sets aiVideo and preserves teacher URL fields", () => {
+    const lesson = {
+      teacherVideo: "teacher-field",
+      video: "video-field",
+      youtube_link: "youtube-field",
+    };
+    expect(aiOverride(lesson, "ai-field")).toEqual({
+      teacherVideo: "teacher-field",
+      video: "video-field",
+      youtube_link: "youtube-field",
+      aiVideo: "ai-field",
+    });
+  });
+
+  test("duplicate AI and tutor URLs render only one player", () => {
+    render(<LessonResourcesHub lesson={videoLesson([
+      { key: "teacher-explanation", url: "same-url" },
+      { key: "ai-grammar-video", url: "same-url" },
+    ])} />);
+    expect(screen.getAllByRole("link", { name: /Watch .* video/i })).toHaveLength(1);
+    expect(screen.getByText("Teacher Lecture")).toBeInTheDocument();
+    expect(screen.queryByText("AI Grammar Explainer")).not.toBeInTheDocument();
   });
 });

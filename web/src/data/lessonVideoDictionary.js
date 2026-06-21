@@ -3,6 +3,9 @@ const normalizeLevel = (level = "") =>
     .trim()
     .toUpperCase();
 
+export const shouldShowTeacherLectureVideo = (level) =>
+  String(level || "").trim().toUpperCase() === "A1";
+
 const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
   key: "a1-day0-orientation-video",
   title: "A1 Orientation AI video",
@@ -434,7 +437,7 @@ const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
-  const showTeacherVideos = normalizedLevel === "A1" && dayKey !== "0";
+  const showTeacherVideos = shouldShowTeacherLectureVideo(normalizedLevel) && dayKey !== "0";
   const dictionaryEntry =
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);

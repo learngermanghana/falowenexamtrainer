@@ -20,7 +20,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/a1-day0-tutorial"
   },
   {
     "id": "A1-0.1",
@@ -37,7 +38,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/CqFbBQG9M3U",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/CqFbBQG9M3U"
   },
   {
     "id": "A1-0.2",
@@ -54,7 +56,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/uhFgKp4WVEc",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/uhFgKp4WVEc"
   },
   {
     "id": "A1-1.1",
@@ -71,7 +74,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/AjsnO1hxDs4",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/AjsnO1hxDs4"
   },
   {
     "id": "A1-1.1-practice",
@@ -88,7 +92,8 @@ const lessonCatalog = Object.freeze([
     "progressionEligible": false,
     "grammarPage": "",
     "contentStatus": "published",
-    "assignmentId": "A1-1.1-practice"
+    "assignmentId": "A1-1.1-practice",
+    "teacherVideo": "https://youtu.be/iZDv1rcYWsQ"
   },
   {
     "id": "A1-1.2",
@@ -121,7 +126,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/lN7xxSbkPZ4",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/lN7xxSbkPZ4"
   },
   {
     "id": "A1-1.3",
@@ -138,7 +144,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/aQNXQlTJMBA",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/aQNXQlTJMBA"
   },
   {
     "id": "A1-2.3",
@@ -154,7 +161,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/_WdlEcKXuVg",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/_WdlEcKXuVg"
   },
   {
     "id": "A1-3",
@@ -171,7 +179,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/Ioq0_bNJ1bE",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/Ioq0_bNJ1bE"
   },
   {
     "id": "A1-4",
@@ -188,7 +197,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/p3xFdekEZPg",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/p3xFdekEZPg"
   },
   {
     "id": "A1-5",
@@ -205,7 +215,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0"
   },
   {
     "id": "A1-6",
@@ -222,7 +233,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/sDL5z3lsITk",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/sDL5z3lsITk"
   },
   {
     "id": "A1-7",
@@ -239,7 +251,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/qrkQJc5kQJQ",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/qrkQJc5kQJQ"
   },
   {
     "id": "A1-8",
@@ -256,7 +269,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/hLpPFOthVkU",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/hLpPFOthVkU"
   },
   {
     "id": "A1-3.5",
@@ -272,7 +286,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/eqSc_5p5uyQ",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/eqSc_5p5uyQ"
   },
   {
     "id": "A1-3.6",
@@ -288,7 +303,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/vMfOb_nPRNc",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/vMfOb_nPRNc"
   },
   {
     "id": "A1-4.7",
@@ -304,7 +320,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/o9nn_hSDzw8",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/o9nn_hSDzw8"
   },
   {
     "id": "A1-9",
@@ -321,7 +338,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/yYIjI6P-qmw",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/yYIjI6P-qmw"
   },
   {
     "id": "A1-10",
@@ -353,7 +371,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/9wvr4iwGsIc",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/9wvr4iwGsIc"
   },
   {
     "id": "A1-12.1",
@@ -370,7 +389,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/-vTEvx9a8Ts",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/-vTEvx9a8Ts"
   },
   {
     "id": "A1-12.2",
@@ -402,7 +422,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/ZfXw4fRQ0Tg",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/ZfXw4fRQ0Tg"
   },
   {
     "id": "A1-12.3",
@@ -418,7 +439,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/JtgoO2fmOpU",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/JtgoO2fmOpU"
   },
   {
     "id": "A1-13",
@@ -435,7 +457,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/ijEY8XVrsZs",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/ijEY8XVrsZs"
   },
   {
     "id": "A1-14.1",
@@ -452,7 +475,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/hktvDESwX3k",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/hktvDESwX3k"
   },
   {
     "id": "A1-14.2",
@@ -469,7 +493,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/J98JJU2v4Uw",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/J98JJU2v4Uw"
   },
   {
     "id": "A1-5.10",
@@ -485,7 +510,8 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/8l1LiXGYqFA",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "teacherVideo": "https://youtu.be/8l1LiXGYqFA"
   },
   {
     "id": "A2-Tutorial",
@@ -2185,8 +2211,10 @@ const toLegacyResource = (lesson = {}) => {
     kind: lesson.kind,
     chapter: lesson.chapter,
     title: lesson.title,
-    video: lesson.video || "",
-    youtube_link: lesson.video || null,
+    video: lesson.teacherVideo || lesson.video || "",
+    youtube_link: lesson.teacherVideo || lesson.video || null,
+    teacherVideo: lesson.teacherVideo || lesson.video || null,
+    aiVideo: lesson.aiVideo || lesson.ai_video || lesson.grammarExplainerVideo || null,
     grammarPage: lesson.grammarPage || "",
     grammarbook_link: lesson.grammarPage || null,
     grammar_link: lesson.grammarPage || null,
@@ -2220,7 +2248,10 @@ const toLegacyCurriculumEntry = (lesson = {}) => {
     assignment_id: assignmentId,
     grammarPage: lesson.grammarPage || "",
     workbookRoute: lesson.workbookRoute || "",
-    video: lesson.video || "",
+    video: lesson.teacherVideo || lesson.video || "",
+    youtube_link: lesson.teacherVideo || lesson.video || null,
+    teacherVideo: lesson.teacherVideo || lesson.video || null,
+    aiVideo: lesson.aiVideo || lesson.ai_video || lesson.grammarExplainerVideo || null,
     resources: [resource],
     lesen_hören: lesson.kind !== "schreiben_sprechen" && lesson.submissionRequired ? [resource] : [],
     schreiben_sprechen: practiceResources.length ? practiceResources : { grammar_link: lesson.grammarPage || null, workbook_link: lesson.workbookRoute || null, assignment: false },

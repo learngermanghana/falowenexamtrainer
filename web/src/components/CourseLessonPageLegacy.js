@@ -153,10 +153,10 @@ const LessonResourceCard = ({
 const LessonVideoCard = ({ video, number, chapterLabel }) => {
   const teacherVideo = isTeacherVideo(video);
   const fallbackTitle = teacherVideo
-    ? "Teacher lecture video"
-    : "AI lecture / grammar video";
-  const title = video.title || fallbackTitle;
-  const displayTitle = chapterLabel && !title.includes(chapterLabel)
+    ? "Teacher Lecture"
+    : "AI Grammar Explainer";
+  const title = fallbackTitle;
+  const displayTitle = chapterLabel && !String(video.title || "").includes(chapterLabel)
     ? `${chapterLabel} ${teacherVideo ? "teacher lecture video" : "AI grammar video"}`
     : title;
 
@@ -169,8 +169,8 @@ const LessonVideoCard = ({ video, number, chapterLabel }) => {
       description={
         video.description ||
         (teacherVideo
-          ? "Recorded class explanation from the teacher."
-          : "AI explanation for revision and self-study.")
+          ? "Watch the tutor’s lesson explanation before completing the activities."
+          : "Use this additional explanation to review the grammar in another way.")
       }
       actionLabel={teacherVideo ? "Watch teacher video" : "Watch AI video"}
       url={video.url}
@@ -242,9 +242,14 @@ const OrientationAiVideoHero = () => (
 export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
   const resources = lesson?.resources || {};
   const hiddenVideoUrls = new Set(hideVideoUrls);
-  const videoResources = (resources.videos || []).filter(
-    (video) => !hiddenVideoUrls.has(video.url),
-  );
+  const seenVideoUrls = new Set();
+  const videoResources = (resources.videos || []).filter((video) => {
+    if (!video?.url || hiddenVideoUrls.has(video.url) || seenVideoUrls.has(video.url)) {
+      return false;
+    }
+    seenVideoUrls.add(video.url);
+    return true;
+  });
   const lessonResources = (resources.resourceGroups || []).filter(
     (resource) => resource.grammarBook || resource.workbook,
   );
