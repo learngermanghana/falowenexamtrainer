@@ -13,15 +13,6 @@ on:
 jobs:
   a1-curriculum:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - test_path: src/data/a1CourseBookCards.test.js
-            artifact_name: a1-card-source-test-log
-          - test_path: src/utils/courseBookEntries.test.js
-            artifact_name: a1-entry-expansion-test-log
-    name: A1 curriculum · ${{ matrix.test_path }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,24 +31,11 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
-      - name: Run A1 regression test
+      - name: Test A1 curriculum source and card expansion
         working-directory: web
         env:
           CI: true
-        run: |
-          set +e
-          npm test -- --watchAll=false --runInBand --runTestsByPath ${{ matrix.test_path }} > ../${{ matrix.artifact_name }}.log 2>&1
-          status=$?
-          cat ../${{ matrix.artifact_name }}.log
-          exit $status
-
-      - name: Upload A1 test log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_name }}.log
-          retention-days: 2
+        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
 
   regression-tests:
     runs-on: ubuntu-latest
@@ -104,20 +82,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: |
-          set +e
-          npm test -- --watchAll=false --runInBand --runTestsByPath src/components/A2B1CourseBook.test.js > ../a2-b1-workbook-test-log.log 2>&1
-          status=$?
-          cat ../a2-b1-workbook-test-log.log
-          exit $status
-
-      - name: Upload A2 B1 test log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: a2-b1-workbook-test-log
-          path: a2-b1-workbook-test-log.log
-          retention-days: 2
+        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/components/A2B1CourseBook.test.js
 
   build:
     runs-on: ubuntu-latest
