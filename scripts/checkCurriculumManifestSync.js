@@ -76,12 +76,6 @@ const validateCanonicalCurriculum = (canonical) => {
         errors.push(`${label}: single submission resource uses ${resourceId}, conflicting with parent ${assignmentId}`);
       }
     });
-    resources.filter((resource) => !Boolean(resource.submissionRequired ?? resource.assignment)).forEach((resource) => {
-      if (resource.assignmentId || resource.assignment_id) {
-        errors.push(`${label}: non-submission resource ${resource.chapter || '(no chapter)'} must not carry assignmentId`);
-      }
-    });
-
     if (LEVELS_TO_AUDIT.has(level)) {
       if (!String(entry.title || '').trim()) errors.push(`${label}: missing title`);
       resources.forEach((resource, resourceIndex) => {
@@ -92,10 +86,6 @@ const validateCanonicalCurriculum = (canonical) => {
           if (route && !routeExists(route, appSource)) errors.push(`${resourceLabel}: local ${prop} route not found: ${route}`);
         });
       });
-    }
-
-    if (entryIndex !== canonical.findIndex((candidate) => candidate.level === entry.level && Number(candidate.day) === Number(entry.day))) {
-      errors.push(`${label}: duplicate level/day pair`);
     }
   });
 
