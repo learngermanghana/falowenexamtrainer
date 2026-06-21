@@ -6,6 +6,58 @@ import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
+// react-router-dom v7 is resolved by the production bundler, but the legacy
+// react-scripts Jest resolver cannot load its package exports under Node 18.
+// This small test-only router preserves the APIs used by these components.
+jest.mock(
+  "react-router-dom",
+  () => {
+    const React = require("react");
+    const LocationContext = React.createContext({
+      pathname: "/",
+      search: "",
+      hash: "",
+      state: null,
+      key: "test",
+    });
+
+    const MemoryRouter = ({ children, initialEntries = ["/"] }) => {
+      const rawEntry = initialEntries[0] || "/";
+      const entry = typeof rawEntry === "string" ? rawEntry : rawEntry.pathname || "/";
+      const parsed = new URL(entry, "https://falowen.test");
+      const location = {
+        pathname: parsed.pathname,
+        search: parsed.search,
+        hash: parsed.hash,
+        state: typeof rawEntry === "object" ? rawEntry.state || null : null,
+        key: "test",
+      };
+      return React.createElement(LocationContext.Provider, { value: location }, children);
+    };
+
+    const Link = ({ children, to = "#", ...props }) =>
+      React.createElement(
+        "a",
+        { ...props, href: typeof to === "string" ? to : to.pathname || "#" },
+        children
+      );
+
+    return {
+      MemoryRouter,
+      BrowserRouter: MemoryRouter,
+      HashRouter: MemoryRouter,
+      Router: MemoryRouter,
+      Link,
+      NavLink: Link,
+      useLocation: () => React.useContext(LocationContext),
+      useNavigate: () => jest.fn(),
+      useParams: () => ({}),
+      useSearchParams: () => [new URLSearchParams(), jest.fn()],
+    };
+  },
+  { virtual: true }
+);
+
 jest.mock("./WorkbookReadAloudInjector", () => () => null);
 jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
@@ -41,7 +93,6 @@ describe("A2 and B1 course books", () => {
       "Submit",
     ]);
   });
-
 
   test("detects native workbook tabs only when at least three recognized buttons share a row", () => {
     const pageRoot = document.createElement("div");
