@@ -221,7 +221,7 @@ describe("course book task entries", () => {
 
     expect(entries.map((entry) => entry.displayChapter)).toEqual(["7.1", "7.2"]);
     expect(entries.map((entry) => entry.lessonTitle)).toEqual(["Basic Prepositions", "Separable Verbs"]);
-    expect(entries.map((entry) => entry.grammarbook_link)).toEqual([
+    expect(entries.map((entry) => entry.lesen_hören.grammarbook_link)).toEqual([
       "/basic-prepositions",
       "/separable-verbs",
     ]);
