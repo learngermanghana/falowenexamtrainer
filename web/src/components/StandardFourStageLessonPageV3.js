@@ -77,12 +77,14 @@ const embedUrl = (url = "") => {
 
 const matches = (lesson, level, day) => String(lesson?.level || "").toUpperCase() === level && Number(lesson?.day) === day;
 const isB2Day1 = (lesson) => matches(lesson, "B2", 1);
+const isB2Day2 = (lesson) => matches(lesson, "B2", 2);
 const isC1Day1 = (lesson) => matches(lesson, "C1", 1);
 const isC1Day2 = (lesson) => matches(lesson, "C1", 2);
 const isC1Day4 = (lesson) => matches(lesson, "C1", 4);
 const isC1Day5 = (lesson) => matches(lesson, "C1", 5);
 const isC1Day6 = (lesson) => matches(lesson, "C1", 6);
 const isCompactC1 = (lesson) => isC1Day1(lesson) || isC1Day2(lesson) || isC1Day4(lesson) || isC1Day5(lesson) || isC1Day6(lesson);
+const isCompactSpeakingLesson = (lesson) => isB2Day1(lesson) || isB2Day2(lesson) || isCompactC1(lesson);
 
 const c1Questions = {
   1: "Wie kann man einen realistischen und zugleich flexiblen Lernweg planen, um ein anspruchsvolles Sprachziel zu erreichen?",
@@ -91,6 +93,16 @@ const c1Questions = {
   5: "Welche Schritte und Bedingungen sind notwendig, damit berufliche Weiterentwicklung langfristig gelingt?",
   6: "Wie können Menschen und Institutionen einen gesunden Lebensstil fördern, ohne unterschiedliche Lebensrealitäten zu ignorieren?",
 };
+
+export const b2Day2SpeakingQuestion = "Was macht gute Kommunikation in Beziehungen aus, und wie kann man auf Missverständnisse höflich und lösungsorientiert reagieren?";
+export const b2Day2SpeakingTopics = [
+  { title: "Beziehungstypen", keywords: ["Freundschaft", "Familie", "Partnerschaft", "Nachbarschaft", "Arbeitsbeziehungen", "digitale Kontakte"] },
+  { title: "Gute Kommunikation", keywords: ["aktives Zuhören", "Respekt", "Ehrlichkeit", "Empathie", "klare Erwartungen", "ruhiger Ton"] },
+  { title: "Missverständnisse und Konflikte", keywords: ["unausgesprochene Erwartungen", "falscher Ton", "digitale Nachrichten", "Vorurteile", "Stress", "fehlende Rückfragen"] },
+  { title: "Höfliche Reaktionen", keywords: ["Könntest du ...?", "Würdest du ...?", "Es wäre hilfreich, wenn ...", "Ich würde gern verstehen ...", "sachliche Kritik", "Ich-Botschaften"] },
+  { title: "Hypothetische Lösungen", keywords: ["wenn-Sätze", "würde", "könnte", "wäre", "Kompromiss", "persönliches Gespräch"] },
+  { title: "Vorteile respektvoller Kommunikation", keywords: ["Vertrauen", "weniger Konflikte", "stabile Beziehungen", "gegenseitiges Verständnis", "schnellere Lösungen", "emotionale Sicherheit"] },
+];
 
 const CompactSpeakingPoints = ({ question, branches = [] }) => (
   <div style={{ display: "grid", gap: 12 }}>
@@ -112,6 +124,7 @@ const CompactSpeakingPoints = ({ question, branches = [] }) => (
 const SpeakingBuilder = ({ lesson }) => {
   const rich = lesson.speakingBuilder?.branches;
   if (isB2Day1(lesson)) return <SpeakingPoints />;
+  if (isB2Day2(lesson)) return <CompactSpeakingPoints question={b2Day2SpeakingQuestion} branches={b2Day2SpeakingTopics} />;
   if (isCompactC1(lesson)) {
     const branches = isC1Day2(lesson) ? c1Day2LearningSpeakingGuide.speaking.branches : rich;
     return <CompactSpeakingPoints question={c1Questions[Number(lesson.day)]} branches={branches} />;
@@ -272,7 +285,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
       {active === "speak" ? <Section title="Speaking builder">
         <SpeakingBuilder lesson={lesson} />
         <EmbeddedSpeechPracticePanel />
-        <label style={fieldLabel}><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} />{isCompactC1(lesson) ? "I completed a speaking practice." : "I used the brain map and completed a speaking practice."}</label>
+        <label style={fieldLabel}><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} />{isCompactSpeakingLesson(lesson) ? "I completed a speaking practice." : "I used the brain map and completed a speaking practice."}</label>
       </Section> : null}
 
       {active === "write" ? <Section title="Guided writing builder">
@@ -291,7 +304,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
       {active === "finish" ? <Section title={`Finish ${lesson.level} Day ${lesson.day}`}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           <ProgressCard label="Learn" complete={progress.learnDone} detail="Video and grammar reviewed" />
-          <ProgressCard label="Speak" complete={progress.speakDone} detail={isCompactC1(lesson) ? "Speaking practice completed" : "Brain-map speaking practice completed"} />
+          <ProgressCard label="Speak" complete={progress.speakDone} detail={isCompactSpeakingLesson(lesson) ? "Speaking practice completed" : "Brain-map speaking practice completed"} />
           <ProgressCard label="Write" complete={effectiveWritingComplete} detail={fullEssay ? "AI analysis reviewed and errors improved" : `${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
         </div>
         <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose this here so you do not have to mark confidence again in the Course Book.</span><select value={progress.confidence || ""} onChange={(e) => setProgress((old) => ({ ...old, confidence: e.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
