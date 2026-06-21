@@ -8,8 +8,8 @@ import { collection, doc, getDoc, getDocs } from "../firebase";
 jest.mock("../firebase", () => ({
   db: {},
   isFirebaseConfigured: true,
-  collection: jest.fn((...segments) => ({ type: "collection", segments })),
-  doc: jest.fn((...segments) => ({ type: "doc", segments })),
+  collection: jest.fn(),
+  doc: jest.fn(),
   getDocs: jest.fn(),
   getDoc: jest.fn(),
 }));
@@ -159,6 +159,8 @@ describe("filterAttendanceRecordsForReporting", () => {
 describe("fetchAttendanceRecords", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    collection.mockImplementation((...segments) => ({ type: "collection", segments }));
+    doc.mockImplementation((...segments) => ({ type: "doc", segments }));
   });
 
   it("falls back to a normalized student-code checkin when the uid checkin is missing", async () => {
@@ -198,10 +200,6 @@ describe("fetchAttendanceRecords", () => {
       now: "2026-03-26T23:59:59Z",
     });
 
-    console.log(
-      "attendance checkin candidates",
-      getDoc.mock.calls.map(([ref]) => ref?.segments?.[ref.segments.length - 1])
-    );
     expect(collection).toHaveBeenCalled();
     expect(doc).toHaveBeenCalled();
     expect(result.records).toHaveLength(1);
