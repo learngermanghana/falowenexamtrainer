@@ -5,7 +5,7 @@ export const A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE =
 
 // Kept for backwards compatibility with callers that imported the old
 // corrections array. The authoritative values now come from one source:
-// shared/a1CourseBookCards.json.
+// the generated canonical A1 course-book cards.
 export const COURSE_BOOK_CURRICULUM_CORRECTIONS = A1_COURSE_BOOK_CARDS;
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();

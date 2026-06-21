@@ -86,8 +86,9 @@ const lessonCatalog = Object.freeze([
     "video": "https://youtu.be/iZDv1rcYWsQ",
     "submissionRequired": false,
     "progressionEligible": false,
-    "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
-    "contentStatus": "published"
+    "grammarPage": "",
+    "contentStatus": "published",
+    "assignmentId": "A1-1.1-practice"
   },
   {
     "id": "A1-1.2",
@@ -95,7 +96,7 @@ const lessonCatalog = Object.freeze([
     "sequence": 6,
     "day": 3,
     "chapter": "1.2",
-    "title": "Pronouns and Verb Conjugation",
+    "title": "Personal Pronouns and Verb Conjugation",
     "assignmentId": "A1-1.2",
     "assignmentType": "Lesen & Hören",
     "kind": "lesen_hören",
@@ -2171,6 +2172,8 @@ const getLessonsByLevel = (level) => {
   return sortLessonsBySequence(lessonCatalog.filter((lesson) => lesson.level === normalizedLevel));
 };
 
+const getLessonById = (id) => lessonCatalog.find((lesson) => lesson.id === String(id || "").trim()) || null;
+
 const getLessonDisplayData = (lesson = {}) => ({
   displayDay: lesson.day,
   displayChapter: lesson.chapter,
@@ -2274,4 +2277,4 @@ const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
 }, {});
 const getCurriculumEntriesForLevel = (level) => getLessonsByLevel(level).map(toLegacyCurriculumEntry);
 
-export { COURSE_LEVELS, LESSON_RESOURCE_KINDS, lessonCatalog, getLessonsByLevel, getLessonDisplayData, toLegacyResource, toLegacyCurriculumEntry, validateLessonCatalog, CURRICULUM_ENTRIES, CURRICULUM_BY_LEVEL, getCurriculumEntriesForLevel, normalizeLevel };
+export { COURSE_LEVELS, LESSON_RESOURCE_KINDS, lessonCatalog, getLessonsByLevel, getLessonById, getLessonDisplayData, toLegacyResource, toLegacyCurriculumEntry, validateLessonCatalog, CURRICULUM_ENTRIES, CURRICULUM_BY_LEVEL, getCurriculumEntriesForLevel, normalizeLevel };

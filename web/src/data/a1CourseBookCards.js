@@ -14,8 +14,8 @@ const A1_COURSE_BOOK_CARDS = Object.freeze(getLessonsByLevel("A1").map((lesson) 
   resourceSection: lesson.kind || "lesen_hören",
   submissionRequired: lesson.submissionRequired,
   progressionEligible: lesson.progressionEligible,
-  ...(lesson.grammarPage ? { grammarPage: lesson.grammarPage } : {}),
-  ...(lesson.workbookRoute ? { workbookRoute: lesson.workbookRoute } : {}),
+  ...(Object.prototype.hasOwnProperty.call(lesson, "grammarPage") ? { grammarPage: lesson.grammarPage || "" } : {}),
+  ...(Object.prototype.hasOwnProperty.call(lesson, "workbookRoute") ? { workbookRoute: lesson.workbookRoute || "" } : {}),
 })));
 const normalizeA1Token=(value="")=>String(value||"").trim().toLowerCase().replace(/\s+/g," ");
 const getA1CourseBookCard=({displayDay,chapter,assignmentId,title}={})=>{

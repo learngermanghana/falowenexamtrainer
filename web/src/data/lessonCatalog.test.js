@@ -1,4 +1,5 @@
 import {
+  getLessonById,
   getLessonDisplayData,
   getLessonsByLevel,
   lessonCatalog,
@@ -6,7 +7,7 @@ import {
   validateLessonCatalog,
 } from "./lessonCatalog";
 
-const findLesson = (id) => lessonCatalog.find((lesson) => lesson.id === id);
+const findLesson = (id) => getLessonById(id);
 
 describe("lessonCatalog canonical curriculum", () => {
   test("keeps A1 early lessons in original student-facing order without display duplicates", () => {
@@ -16,7 +17,7 @@ describe("lessonCatalog canonical curriculum", () => {
       { id: "A1-0.2", sequence: 3, day: 2, chapter: "0.2", title: "German Alphabet" },
       { id: "A1-1.1", sequence: 4, day: 2, chapter: "1.1", title: "Personal Pronouns and Verb Conjugation" },
       { id: "A1-1.1-practice", sequence: 5, day: 3, chapter: "1.1", title: "Personal Information, Articles, Adjectives and W-Questions" },
-      { id: "A1-1.2", sequence: 6, day: 3, chapter: "1.2", title: "Pronouns and Verb Conjugation" },
+      { id: "A1-1.2", sequence: 6, day: 3, chapter: "1.2", title: "Personal Pronouns and Verb Conjugation" },
     ]);
   });
 
@@ -51,6 +52,15 @@ describe("lessonCatalog canonical curriculum", () => {
     });
   });
 
+  test("orders the distinct A1 Day 2 and Day 3 records by explicit sequence", () => {
+    const ids = getLessonsByLevel("A1").map((lesson) => lesson.id);
+    expect(ids.slice(ids.indexOf("A1-1.1"), ids.indexOf("A1-1.2") + 1)).toEqual([
+      "A1-1.1",
+      "A1-1.1-practice",
+      "A1-1.2",
+    ]);
+  });
+
   test("preserves final assignment IDs for A2 and B1", () => {
     expect(getLessonsByLevel("A2").at(-1)).toMatchObject({ assignmentId: "A2-10.28", chapter: "10.28", day: 28 });
     expect(getLessonsByLevel("B1").at(-1)).toMatchObject({ assignmentId: "B1-10.28", chapter: "10.28", day: 28 });
@@ -66,9 +76,45 @@ describe("lessonCatalog canonical curriculum", () => {
   test("verifies exact early A1 canonical records", () => {
     expect(findLesson("A1-0.2")).toMatchObject({ assignmentId: "A1-0.2", chapter: "0.2", title: "German Alphabet" });
     expect(findLesson("A1-1.1")).toMatchObject({ assignmentId: "A1-1.1", day: 2, chapter: "1.1", title: "Personal Pronouns and Verb Conjugation", submissionRequired: true, progressionEligible: true });
-    expect(findLesson("A1-1.2")).toMatchObject({ assignmentId: "A1-1.2", chapter: "1.2", title: "Pronouns and Verb Conjugation", submissionRequired: true, progressionEligible: true });
-    expect(findLesson("A1-1.1-practice")).toMatchObject({ id: "A1-1.1-practice", day: 3, chapter: "1.1", title: "Personal Information, Articles, Adjectives and W-Questions", workbookRoute: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook", submissionRequired: false, progressionEligible: false });
-    expect(findLesson("A1-1.1-practice").assignmentId).toBeUndefined();
+    expect(findLesson("A1-1.1-practice")).toMatchObject({
+      day: 3,
+      chapter: "1.1",
+      title: "Personal Information, Articles, Adjectives and W-Questions",
+      assignmentId: "A1-1.1-practice",
+      grammarPage: "",
+      workbookRoute: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+      submissionRequired: false,
+      progressionEligible: false,
+    });
+    expect(findLesson("A1-1.2")).toMatchObject({
+      day: 3,
+      chapter: "1.2",
+      title: "Personal Pronouns and Verb Conjugation",
+      assignmentId: "A1-1.2",
+      grammarPage: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
+      workbookRoute: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+      submissionRequired: true,
+      progressionEligible: true,
+    });
+  });
+
+  test("resolves direct Day 3 workbook and grammar routes to the correct canonical lesson", () => {
+    const lessonForRoute = (route) => getLessonsByLevel("A1").find(
+      (lesson) => lesson.workbookRoute === route || lesson.grammarPage === route
+    );
+
+    expect(lessonForRoute("/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook")).toMatchObject({
+      id: "A1-1.1-practice",
+      title: "Personal Information, Articles, Adjectives and W-Questions",
+    });
+    expect(lessonForRoute("/campus/course/a1-day-3-pronouns-introducing-yourself-workbook")).toMatchObject({
+      id: "A1-1.2",
+      title: "Personal Pronouns and Verb Conjugation",
+    });
+    expect(lessonForRoute("/campus/course/a1-day-3-kapitel-1-2-grammar-notes")).toMatchObject({
+      id: "A1-1.2",
+      title: "Personal Pronouns and Verb Conjugation",
+    });
   });
 
   test("display fields are generated from canonical day and chapter", () => {
