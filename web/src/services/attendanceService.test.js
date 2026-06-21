@@ -198,6 +198,10 @@ describe("fetchAttendanceRecords", () => {
       now: "2026-03-26T23:59:59Z",
     });
 
+    console.log(
+      "attendance checkin candidates",
+      getDoc.mock.calls.map(([ref]) => ref?.segments?.[ref.segments.length - 1])
+    );
     expect(collection).toHaveBeenCalled();
     expect(doc).toHaveBeenCalled();
     expect(result.records).toHaveLength(1);
