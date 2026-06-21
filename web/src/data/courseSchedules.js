@@ -1,4 +1,5 @@
 import { classCatalog } from "./classCatalog";
+import { courseSchedules } from "./courseSchedule";
 import {
   getAssignmentDictionaryEntry,
   getAssignmentDisplayTitle,
@@ -98,6 +99,75 @@ const buildScheduleForClass = (className, meta = {}) => {
     generatedNote: "Generated from class metadata and centralized germanAssignmentCatalog curriculum.",
   };
 };
+
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+const splitMultiAssignmentDaysForCourseBook = (schedules = {}) => {
+  Object.entries(schedules).forEach(([level, entries]) => {
+    if (!Array.isArray(entries)) return;
+
+    const expandedEntries = entries.flatMap((entry) => {
+      if (!entry || typeof entry !== "object") return [entry];
+
+      const assignmentTasks = [
+        ...toLessonArray(entry.lesen_hören).map((lesson) => ({ collection: "lesen_hören", lesson })),
+        ...toLessonArray(entry.schreiben_sprechen).map((lesson) => ({ collection: "schreiben_sprechen", lesson })),
+      ].filter(({ lesson }) => lesson?.assignment === true);
+
+      if (assignmentTasks.length <= 1) return [entry];
+
+      return assignmentTasks.map(({ collection, lesson }) => {
+        const dictionaryEntry =
+          getAssignmentDictionaryEntry({
+            level,
+            assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.assignmentKey,
+            chapter: lesson.chapter,
+            assignmentDay: entry.day,
+          }) || lesson;
+        const chapter = dictionaryEntry.chapter || lesson.chapter || entry.chapter;
+        const assignmentId =
+          dictionaryEntry.assignment_id ||
+          dictionaryEntry.assignmentId ||
+          lesson.assignmentId ||
+          lesson.assignment_id ||
+          lesson.assignmentKey ||
+          null;
+        const title =
+          getAssignmentDisplayTitle(dictionaryEntry, { preferEnglish: true }) ||
+          lesson.title ||
+          lesson.topic ||
+          entry.topic;
+        const taskLesson = {
+          ...lesson,
+          chapter,
+          assignment: true,
+          assignmentId,
+          assignment_id: assignmentId,
+        };
+
+        return {
+          ...entry,
+          displayDay: entry.day,
+          displayChapter: chapter,
+          topic: title,
+          title,
+          chapter,
+          assignment: true,
+          assignmentId,
+          assignment_id: assignmentId,
+          instruction: lesson.instruction || "Watch the video, review the grammar notes, and complete this workbook task.",
+          grammar_topic: dictionaryEntry.grammar_topic || lesson.grammar_topic || title,
+          lesen_hören: collection === "lesen_hören" ? [taskLesson] : undefined,
+          schreiben_sprechen: collection === "schreiben_sprechen" ? [taskLesson] : undefined,
+        };
+      });
+    });
+
+    entries.splice(0, entries.length, ...expandedEntries);
+  });
+};
+
+splitMultiAssignmentDaysForCourseBook(courseSchedules);
 
 export const courseSchedulesByName = Object.fromEntries(
   Object.entries(classCatalog)
