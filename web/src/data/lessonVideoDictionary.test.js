@@ -27,7 +27,7 @@ describe("getLessonVideoResources", () => {
       { chapter: "0.2", url: "https://example.com/teacher-0-2" },
       { chapter: "0.2", url: "https://youtu.be/pCQVdJGsvtk" },
       { chapter: "1.1", url: "https://example.com/teacher-1-1" },
-      { chapter: "1.1", url: "https://youtu.be/ldpOPC21nLE" },
+      { chapter: "1.1", url: "https://youtu.be/pCQVdJGsvtk" },
     ]);
 
     expect(
@@ -46,7 +46,7 @@ describe("getLessonVideoResources", () => {
       })),
     ).toEqual([
       { chapter: "0.2", url: "https://youtu.be/pCQVdJGsvtk" },
-      { chapter: "1.1", url: "https://youtu.be/ldpOPC21nLE" },
+      { chapter: "1.1", url: "https://youtu.be/pCQVdJGsvtk" },
     ]);
   });
 

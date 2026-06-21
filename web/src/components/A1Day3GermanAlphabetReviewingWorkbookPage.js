@@ -3,7 +3,6 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 
@@ -35,32 +34,15 @@ const questionBoxStyle = {
   background: "#fff",
 };
 
+const DAY_2_ALPHABET_HOREN_YOUTUBE_URL = "https://youtu.be/DeE6LKXyLWs";
+const DAY_2_ALPHABET_HOREN_EMBED_URL = "https://www.youtube.com/embed/DeE6LKXyLWs";
+
 const listeningItems = [
-  {
-    number: 1,
-    prompt: "W _ _ s _ _ r",
-    link: "https://drive.google.com/file/d/1fPjvzp0V05rNSohX7juS0qqvvcMHGmLb/view?usp=sharing",
-  },
-  {
-    number: 2,
-    prompt: "K _ _ f _",
-    link: "https://drive.google.com/file/d/1Kvd8GeoQ8Dv30ySvYfVEtXKK_bqoqQJ-/view?usp=sharing",
-  },
-  {
-    number: 3,
-    prompt: "B _ _ _ _ _",
-    link: "https://drive.google.com/file/d/1v1YEj3qD0aSO0fiFHkq312Ek_lU6HzkM/view?usp=sharing",
-  },
-  {
-    number: 4,
-    prompt: "S _ _ _ _ _",
-    link: "https://drive.google.com/file/d/1MZ1hCy0aXGJbj3aLEsHfnXuxI6xLXxlI/view?usp=sharing",
-  },
-  {
-    number: 5,
-    prompt: "T _ _ _ _",
-    link: "https://drive.google.com/file/d/1n0r_1mLeWPINZSADyFeU7o6pZ8C9FfWG/view?usp=sharing",
-  },
+  { number: 1, prompt: "W _ _ s _ _ r" },
+  { number: 2, prompt: "K _ _ f _" },
+  { number: 3, prompt: "B _ _ _ _" },
+  { number: 4, prompt: "S _ _ _ _ _" },
+  { number: 5, prompt: "T _ _ _ _" },
 ];
 
 const questions = [
@@ -108,6 +90,13 @@ const listeningBoxStyle = {
   display: "grid",
   gap: 8,
   background: "#fff",
+};
+
+const videoPreviewStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 10,
 };
 
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
@@ -222,13 +211,30 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
         <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instruction:</strong> Listen to each audio from Google Drive. Each question has its own audio link. Write
-          the missing letters to complete the word, then return and submit your answers.
+          <strong>Instruction:</strong> Watch and listen to the embedded YouTube Hören video. Write the missing letters to
+          complete each word, then return and submit your answers.
         </p>
 
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören from Google Drive, then return to submit answers.
+          Complete Hören with the YouTube video below, then return to submit answers.
         </p>
+
+        <iframe
+          title="A1 Day 2 German Alphabet Hören video"
+          src={DAY_2_ALPHABET_HOREN_EMBED_URL}
+          style={videoPreviewStyle}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+
+        <a
+          href={DAY_2_ALPHABET_HOREN_YOUTUBE_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören video on YouTube
+        </a>
 
         <div style={{ display: "grid", gap: 12 }}>
           {listeningItems.map((item) => (
@@ -236,12 +242,6 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
               <strong style={{ fontSize: 16 }}>
                 {item.number}. {item.prompt}
               </strong>
-
-              <CoursebookAudioPlayer
-                url={item.link}
-                linkLabel={`Open Audio ${item.number}`}
-                linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-              />
             </div>
           ))}
         </div>
