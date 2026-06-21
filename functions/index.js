@@ -17,7 +17,12 @@ const getAdmin = () => {
   return admin;
 };
 
-setGlobalOptions({ maxInstances: 10 });
+// Keep the aggregate Cloud Run CPU reservation low enough for projects with
+// constrained regional CPU quota. Firebase v2 defaults each function to 1 CPU;
+// using the gen 1 CPU profile gives lightweight background triggers fractional
+// CPU, and limiting instances prevents deployment from reserving 10 CPUs per
+// function across the full codebase.
+setGlobalOptions({ cpu: "gcf_gen1", maxInstances: 2 });
 
 const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON_B64");
 const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
