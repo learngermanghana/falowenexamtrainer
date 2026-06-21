@@ -58,7 +58,20 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/services/attendanceService.test.js
+        run: |
+          set +e
+          npm test -- --watchAll=false --runInBand --runTestsByPath src/services/attendanceService.test.js > ../attendance-test.log 2>&1
+          status=$?
+          cat ../attendance-test.log
+          exit $status
+
+      - name: Upload attendance test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: attendance-test-log
+          path: attendance-test.log
+          retention-days: 2
 
       - name: Test speaking tools
         working-directory: web
