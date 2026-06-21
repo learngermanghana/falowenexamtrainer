@@ -1,11 +1,15 @@
-import { fetchAttendanceRecords, formatAttendanceRecord } from "./attendanceService";
+import {
+  fetchAttendanceRecords,
+  filterAttendanceRecordsForReporting,
+  formatAttendanceRecord,
+} from "./attendanceService";
 import { collection, doc, getDoc, getDocs } from "../firebase";
 
 jest.mock("../firebase", () => ({
   db: {},
   isFirebaseConfigured: true,
-  collection: jest.fn((...segments) => ({ type: "collection", segments })),
-  doc: jest.fn((...segments) => ({ type: "doc", segments })),
+  collection: jest.fn(),
+  doc: jest.fn(),
   getDocs: jest.fn(),
   getDoc: jest.fn(),
 }));
@@ -68,12 +72,98 @@ describe("formatAttendanceRecord", () => {
   });
 });
 
+describe("filterAttendanceRecordsForReporting", () => {
+  const pastPresent = {
+    id: "2026-06-10",
+    date: "2026-06-10",
+    title: "Live class",
+    marked: true,
+    present: true,
+  };
+  const pastAbsent = {
+    id: "2026-06-11",
+    date: "2026-06-11",
+    title: "Live class",
+    marked: true,
+    present: false,
+  };
+  const futureAbsent = {
+    id: "2026-07-10",
+    date: "2026-07-10",
+    title: "Future live class",
+    marked: true,
+    present: false,
+  };
+
+  it("does not count a future session even when it was pre-marked absent", () => {
+    const records = filterAttendanceRecordsForReporting(
+      [pastPresent, pastAbsent, futureAbsent],
+      { now: "2026-06-21T12:00:00Z" }
+    );
+
+    expect(records.map((record) => record.id)).toEqual(["2026-06-10", "2026-06-11"]);
+  });
+
+  it("uses the class start and end dates from the class catalogue", () => {
+    const records = filterAttendanceRecordsForReporting(
+      [
+        { ...pastAbsent, id: "2026-06-01", date: "2026-06-01" },
+        { ...pastPresent, id: "2026-06-12", date: "2026-06-12" },
+        { ...pastAbsent, id: "2026-08-08", date: "2026-08-08" },
+      ],
+      {
+        className: "A1 Munich Klasse",
+        now: "2026-09-01T12:00:00Z",
+      }
+    );
+
+    expect(records.map((record) => record.id)).toEqual(["2026-06-12"]);
+  });
+
+  it("removes self-practice lessons from live-class attendance", () => {
+    const records = filterAttendanceRecordsForReporting(
+      [
+        pastPresent,
+        {
+          id: "practice",
+          date: "2026-06-09",
+          title: "Day 0 Tutorial - Self-practice only",
+          marked: true,
+          present: false,
+        },
+      ],
+      { now: "2026-06-21T12:00:00Z" }
+    );
+
+    expect(records).toEqual([pastPresent]);
+  });
+
+  it("waits until the end of a date-only session before counting it", () => {
+    const records = filterAttendanceRecordsForReporting(
+      [
+        {
+          id: "today",
+          date: "2026-06-21",
+          title: "Today's class",
+          marked: true,
+          present: false,
+        },
+      ],
+      { now: "2026-06-21T12:00:00Z" }
+    );
+
+    expect(records).toEqual([]);
+  });
+});
+
 describe("fetchAttendanceRecords", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    collection.mockImplementation((...segments) => ({ type: "collection", segments }));
+    doc.mockImplementation((...segments) => ({ type: "doc", segments }));
   });
 
-  it("falls back to student-code checkin document ids when uid checkin is missing", async () => {
+  it("falls back to a normalized student-code checkin when the uid checkin is missing", async () => {
     getDocs.mockResolvedValue({
       docs: [
         {
@@ -90,15 +180,13 @@ describe("fetchAttendanceRecords", () => {
 
     getDoc.mockImplementation(async (ref) => {
       const docId = ref?.segments?.[ref.segments.length - 1];
-      if (docId === "uid-does-not-exist") {
-        return { exists: () => false };
-      }
-      if (docId === "DeborahERZUAH225") {
+      if (docId === "uid-does-not-exist") return { exists: () => false };
+      if (String(docId || "").toLowerCase() === "deboraherzuah225") {
         return {
           exists: () => true,
           data: () => ({
             attended: true,
-            checkedInAt: "2026-02-25T13:35:50.000Z",
+            checkedInAt: "2026-03-25T13:35:50.000Z",
           }),
         };
       }
@@ -109,6 +197,7 @@ describe("fetchAttendanceRecords", () => {
       className: "A1 Stuttgart Klasse",
       studentCode: "DeborahERZUAH225",
       studentUid: "uid-does-not-exist",
+      now: "2026-03-26T23:59:59Z",
     });
 
     expect(collection).toHaveBeenCalled();
@@ -117,5 +206,37 @@ describe("fetchAttendanceRecords", () => {
     expect(result.records[0].present).toBe(true);
     expect(result.records[0].status).toBe("Present");
     expect(result.sessions).toBe(1);
+  });
+
+  it("excludes future Firestore sessions from the returned records and totals", async () => {
+    getDocs.mockResolvedValue({
+      docs: [
+        {
+          id: "2026-06-20",
+          data: () => ({
+            title: "Completed class",
+            students: { Student001: { present: true } },
+          }),
+        },
+        {
+          id: "2026-07-20",
+          data: () => ({
+            title: "Future class",
+            students: { Student001: { present: false } },
+          }),
+        },
+      ],
+    });
+    getDoc.mockResolvedValue({ exists: () => false });
+
+    const result = await fetchAttendanceRecords({
+      className: "Unknown Test Class",
+      studentCode: "Student001",
+      now: "2026-06-21T12:00:00Z",
+    });
+
+    expect(result.records.map((record) => record.id)).toEqual(["2026-06-20"]);
+    expect(result.sessions).toBe(1);
+    expect(result.excludedSessions).toBe(1);
   });
 });
