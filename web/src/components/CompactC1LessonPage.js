@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -7,6 +7,7 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 import {
   getStandardLessonStorageKey,
   getStandardWritingCloudField,
@@ -66,7 +67,9 @@ const embedUrl = (url = "") => {
 
 export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
+  const { studentProfile, user } = useAuth();
   const radio = canonicalLesson?.resources?.falowenRadio || null;
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
@@ -74,9 +77,9 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
     try {
-      return { learnDone: false, speakDone: false, reflection: "", completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
+      return { learnDone: false, speakDone: false, aiWritingDone: false, confidence: "", reflection: "", completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
     } catch {
-      return { learnDone: false, speakDone: false, reflection: "", completed: false };
+      return { learnDone: false, speakDone: false, aiWritingDone: false, confidence: "", reflection: "", completed: false };
     }
   });
 
@@ -103,13 +106,29 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const branches = lesson.speakingBuilder?.branches || [];
   const grammarUrl = canonicalLesson?.resources?.grammarBook?.url || lesson.resources?.grammarBook?.url || "";
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
-  const finishReady = progress.learnDone && progress.speakDone && writing.complete;
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
+  const effectiveWritingComplete = fullEssay ? progress.aiWritingDone : writing.complete;
+  const finishRequirements = [
+    { key: "learn", label: "tick the grammar review checkbox on Learn", complete: progress.learnDone },
+    { key: "speak", label: "tick the speaking practice checkbox on Speak", complete: progress.speakDone },
+    { key: "write", label: fullEssay ? "tick that you used AI Analyse / Mark My Letter on Write" : "complete the guided writing questions on Write", complete: effectiveWritingComplete },
+    { key: "confidence", label: "choose your confidence level on this Finish page", complete: Boolean(progress.confidence) },
+  ];
+  const missingRequirements = finishRequirements.filter((item) => !item.complete);
+  const finishReady = missingRequirements.length === 0;
   const finish = () => {
     if (!finishReady) return;
-    setProgress((old) => ({ ...old, completed: true, completedAt: new Date().toISOString() }));
+    const completedAt = new Date().toISOString();
+    setProgress((old) => ({ ...old, completed: true, completedAt }));
+    const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "student";
+    const assignmentKey = location.state?.assignmentKey;
+    if (assignmentKey && typeof window !== "undefined") {
+      const practiceStorageKey = `coursePracticeProgress:${studentCode}:${lesson.level}`;
+      const saved = JSON.parse(window.localStorage.getItem(practiceStorageKey) || "{}");
+      window.localStorage.setItem(practiceStorageKey, JSON.stringify({ ...saved, [assignmentKey]: { ...(saved[assignmentKey] || {}), completed: true, confidence: progress.confidence, completedAt, updatedAt: completedAt } }));
+    }
     showToast(`${lesson.level} Day ${lesson.day} completed. Your progress was saved.`, "success");
   };
 
@@ -170,7 +189,10 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
         <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
           <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
-          {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+          {fullEssay ? (<>
+            <EmbeddedWritingPracticePanel />
+            <label style={{ fontWeight: 800 }}><input type="checkbox" checked={Boolean(progress.aiWritingDone)} onChange={(event) => setProgress((old) => ({ ...old, aiWritingDone: event.target.checked }))} /> I used AI Analyse / Mark My Letter, reviewed the highlighted errors and improved my text.</label>
+          </>) : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
         </WritingCheatSheetTabs>
       </Section> : null}
 
@@ -179,9 +201,10 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
       {active === "finish" ? <Section title={`Finish ${lesson.level} Day ${lesson.day}`}>
         <p><strong>Learn:</strong> {progress.learnDone ? "Complete" : "Not complete"}</p>
         <p><strong>Speak:</strong> {progress.speakDone ? "Complete" : "Not complete"}</p>
-        <p><strong>Write:</strong> {writing.complete ? "Complete" : "Not complete"} · {writing.wordCount} words</p>
+        <p><strong>Write:</strong> {effectiveWritingComplete ? "Complete" : "Not complete"} · {fullEssay ? "AI analysis reviewed" : `${writing.wordCount} words`}</p>
+        <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose this here so you do not have to mark confidence again in the Course Book.</span><select value={progress.confidence || ""} onChange={(event) => setProgress((old) => ({ ...old, confidence: event.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
         <textarea value={progress.reflection} onChange={(event) => setProgress((old) => ({ ...old, reflection: event.target.value }))} placeholder="Short reflection" style={{ minHeight: 110, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit" }} />
-        {!finishReady ? <NoteBox tone="amber">Complete Learn, Speak and Write before finishing.</NoteBox> : null}
+        {!finishReady ? <NoteBox tone="amber"><strong>Mark complete is blocked because:</strong><ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>{missingRequirements.map((item) => <li key={item.key}>{item.label}</li>)}</ul></NoteBox> : null}
         {progress.completed ? <NoteBox tone="green">Lesson completed and saved.</NoteBox> : null}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="button" style={{ ...styles.primaryButton, opacity: finishReady ? 1 : .5 }} disabled={!finishReady} onClick={finish}>Mark lesson complete</button>
