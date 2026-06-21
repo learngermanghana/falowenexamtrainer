@@ -11,7 +11,7 @@ on:
       - ".github/workflows/web-checks.yml"
 
 jobs:
-  test-and-build:
+  a1-curriculum:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,8 +24,31 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Check curriculum manifest sync
-        run: npm run check:curriculum-sync
+      - name: Audit A1 curriculum
+        run: npm run audit:a1-curriculum
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test A1 curriculum source and card expansion
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
+
+  regression-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install web dependencies
         working-directory: web
@@ -59,8 +82,37 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
+        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/components/A2B1CourseBook.test.js
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Audit A1 curriculum
+        run: npm run audit:a1-curriculum
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build web app
         working-directory: web
         run: npm run build
+
+  curriculum-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check curriculum manifest sync
+        run: node scripts/checkCurriculumManifestSync.js

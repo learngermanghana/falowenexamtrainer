@@ -1,116 +1,12 @@
+import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards";
+
 export const A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE =
   "/campus/course/a1-day-3-kapitel-1-2-grammar-notes";
 
-export const COURSE_BOOK_CURRICULUM_CORRECTIONS = Object.freeze([
-  Object.freeze({
-    level: "A1",
-    displayDay: 2,
-    chapter: "0.2",
-    assignmentId: "A1-0.2",
-    title: "German Alphabet",
-    grammarPage: "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 2,
-    chapter: "1.1",
-    assignmentId: "A1-1.1",
-    title: "Personal Pronouns and Verb Conjugation",
-    grammarPage: "/campus/course/singular-pronouns-verb-conjugation-day-2",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 3,
-    chapter: "1.1",
-    assignmentId: "A1-1.1-practice",
-    title: "Personal Information, Articles, Adjectives and W-Questions",
-    grammarPage: "",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 3,
-    chapter: "1.2",
-    assignmentId: "A1-1.2",
-    title: "Personal Pronouns and Verb Conjugation",
-    grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
-  }),
-
-  // Day 16 appeared in older course-book data as chapter 7 with unrelated
-  // titles. Match those stale labels and move each card to its real chapter.
-  Object.freeze({
-    level: "A1",
-    displayDay: 16,
-    matchChapter: "7",
-    matchTitle: "Basic Prepositions",
-    chapter: "9",
-    assignmentId: "A1-9",
-    title: "Negation",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 16,
-    matchChapter: "7",
-    matchTitle: "Separable Verbs",
-    chapter: "10",
-    assignmentId: "A1-10",
-    title: "Food",
-  }),
-  // Also correct the current source shape, where the chapters are right but
-  // both child cards can inherit the parent title "Food and Negation".
-  Object.freeze({
-    level: "A1",
-    displayDay: 16,
-    matchChapter: "9",
-    chapter: "9",
-    assignmentId: "A1-9",
-    title: "Negation",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 16,
-    matchChapter: "10",
-    chapter: "10",
-    assignmentId: "A1-10",
-    title: "Food",
-  }),
-
-  // Day 18 also had stale chapter-9 labels. Correct both the stale and current
-  // shapes while preserving each task's own practice/tutor-marked status.
-  Object.freeze({
-    level: "A1",
-    displayDay: 18,
-    matchChapter: "9",
-    matchTitle: "The Imperative in German",
-    chapter: "12.1",
-    assignmentId: "A1-12.1",
-    title: "Two Case Prepositions",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 18,
-    matchChapter: "9",
-    matchTitle: "Transport and Giving Directions",
-    chapter: "12.2",
-    assignmentId: "A1-12.2",
-    title: "Dative Prepositions",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 18,
-    matchChapter: "12.1",
-    chapter: "12.1",
-    assignmentId: "A1-12.1",
-    title: "Two Case Prepositions",
-  }),
-  Object.freeze({
-    level: "A1",
-    displayDay: 18,
-    matchChapter: "12.2",
-    chapter: "12.2",
-    assignmentId: "A1-12.2",
-    title: "Dative Prepositions",
-  }),
-]);
+// Kept for backwards compatibility with callers that imported the old
+// corrections array. The authoritative values now come from one source:
+// shared/a1CourseBookCards.json.
+export const COURSE_BOOK_CURRICULUM_CORRECTIONS = A1_COURSE_BOOK_CARDS;
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
@@ -122,11 +18,85 @@ const normalizeTitle = (value = "") =>
     .replace(/\s+/g, " ");
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
-const getCorrectionMatchChapter = (correction = {}) =>
-  normalizeChapter(correction.matchChapter || correction.chapter);
+const getEntryTitle = (entry = {}) =>
+  entry.lessonTitle || entry.topic || entry.title || entry.assignmentTitle || "";
 
-const correctionTitleMatches = (correction = {}, title = "") =>
-  !correction.matchTitle || normalizeTitle(correction.matchTitle) === normalizeTitle(title);
+const isTutorMarkedCard = (card) => card?.assessmentType === "tutor-marked";
+
+const cardMatchesResource = (resource = {}, card = {}) => {
+  const chapter = normalizeChapter(resource.displayChapter || resource.chapter);
+  const assignmentId = normalizeAssignmentId(
+    resource.assignmentId || resource.assignment_id || resource.assignmentKey
+  );
+  const title = normalizeTitle(getEntryTitle(resource));
+
+  if (chapter === normalizeChapter(card.chapter)) return true;
+  if (assignmentId && assignmentId === normalizeAssignmentId(card.assignmentId)) return true;
+
+  return (card.legacyMatches || []).some(
+    (match) =>
+      chapter === normalizeChapter(match.chapter) &&
+      (!match.title || title === normalizeTitle(match.title))
+  );
+};
+
+const applyCardIdentity = (entry = {}, card = {}) => {
+  if (!entry || typeof entry !== "object" || !card) return entry;
+
+  const tutorMarked = isTutorMarkedCard(card);
+  const patched = {
+    ...entry,
+    level: entry.level || "A1",
+    lessonId: card.lessonId,
+    courseBookId: card.lessonId,
+    chapter: card.chapter,
+    displayChapter: card.chapter,
+    displayDay: Number(card.displayDay),
+    displayLabel: card.displayLabel,
+    title: card.title,
+    topic: card.title,
+    lessonTitle: card.title,
+    assignmentTitle: card.title,
+    assignmentId: card.assignmentId,
+    assignment_id: card.assignmentId,
+    resourceSection: card.resourceSection,
+    courseBookTaskSection: card.resourceSection,
+    assessmentType: card.assessmentType,
+    assignment: tutorMarked,
+    tutorMarked,
+    selfPractice: !tutorMarked,
+    submissionRequired: Boolean(card.submissionRequired),
+    progressionEligible: Boolean(card.progressionEligible),
+  };
+
+  ["grammarPage", "workbookRoute", "video"].forEach((field) => {
+    if (hasOwn(card, field)) patched[field] = card[field];
+  });
+
+  if (hasOwn(card, "grammarPage")) {
+    patched.grammarbook_link = card.grammarPage || null;
+    patched.grammar_link = card.grammarPage || null;
+  }
+  if (hasOwn(card, "workbookRoute")) {
+    patched.workbook_link = card.workbookRoute || null;
+  }
+
+  return patched;
+};
+
+const patchResourceCollection = (value, card) => {
+  if (!value) return value;
+  if (Array.isArray(value)) {
+    const matchingIndexes = value
+      .map((resource, index) => (cardMatchesResource(resource, card) ? index : -1))
+      .filter((index) => index >= 0);
+    if (!matchingIndexes.length && value.length === 1) return [applyCardIdentity(value[0], card)];
+    return value.map((resource, index) =>
+      matchingIndexes.includes(index) ? applyCardIdentity(resource, card) : resource
+    );
+  }
+  return cardMatchesResource(value, card) ? applyCardIdentity(value, card) : value;
+};
 
 export const getCourseBookCurriculumCorrection = ({
   level,
@@ -135,180 +105,106 @@ export const getCourseBookCurriculumCorrection = ({
   assignmentId,
   title,
 } = {}) => {
-  const normalizedLevel = normalizeLevel(level);
-  const normalizedChapter = normalizeChapter(chapter);
-  const normalizedAssignmentId = normalizeAssignmentId(assignmentId);
-  const normalizedDisplayDay = Number(displayDay);
-  const candidates = COURSE_BOOK_CURRICULUM_CORRECTIONS.filter(
-    (correction) => correction.level === normalizedLevel
-  );
-
-  const locationMatch = candidates.find(
-    (correction) =>
-      Number(correction.displayDay) === normalizedDisplayDay &&
-      getCorrectionMatchChapter(correction) === normalizedChapter &&
-      correctionTitleMatches(correction, title)
-  );
-  if (locationMatch) return locationMatch;
-
-  return (
-    candidates.find(
-      (correction) =>
-        normalizedAssignmentId &&
-        correction.assignmentId &&
-        normalizeAssignmentId(correction.assignmentId) === normalizedAssignmentId &&
-        (!Number.isFinite(normalizedDisplayDay) ||
-          !Number.isFinite(Number(correction.displayDay)) ||
-          Number(correction.displayDay) === normalizedDisplayDay)
-    ) || null
-  );
-};
-
-const taskIsPractice = (entry = {}) =>
-  entry.assignment === false ||
-  entry.tutorMarked === false ||
-  entry.selfPractice === true ||
-  entry.assessmentType === "self-practice" ||
-  entry.submissionRequired === false;
-
-const correctedAssignmentId = (entry, correction) => {
-  if (!correction?.assignmentId) return null;
-  if (!taskIsPractice(entry)) return correction.assignmentId;
-  return /-practice$/i.test(correction.assignmentId)
-    ? correction.assignmentId
-    : `${correction.assignmentId}-practice`;
-};
-
-const patchResource = (resource, correction) => {
-  if (!resource || typeof resource !== "object" || !correction) return resource;
-
-  const patched = {
-    ...resource,
-    chapter: correction.chapter,
-    displayChapter: correction.chapter,
-    title: correction.title,
-    topic: correction.title,
-    assignmentTitle: correction.title,
-  };
-
-  if (hasOwn(correction, "grammarPage")) {
-    patched.grammarPage = correction.grammarPage;
-    patched.grammarbook_link = correction.grammarPage || null;
-    patched.grammar_link = correction.grammarPage || null;
-  }
-
-  const assignmentId = correctedAssignmentId(resource, correction);
-  if (assignmentId) {
-    patched.assignmentId = assignmentId;
-    patched.assignment_id = assignmentId;
-  }
-
-  return patched;
+  if (normalizeLevel(level) !== "A1") return null;
+  return getA1CourseBookCard({ displayDay, chapter, assignmentId, title });
 };
 
 export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) => {
   if (!entry || typeof entry !== "object") return entry;
 
-  const correction = getCourseBookCurriculumCorrection({
-    level: context.level || entry.level || entry.courseLevel || entry.course,
+  const level = normalizeLevel(context.level || entry.level || entry.courseLevel || entry.course);
+  if (level !== "A1") return entry;
+
+  const card = getA1CourseBookCard({
     displayDay: context.displayDay ?? entry.displayDay ?? entry.day,
     chapter: context.chapter || entry.displayChapter || entry.chapter,
     assignmentId:
       context.assignmentId || entry.assignmentId || entry.assignment_id || entry.assignmentKey,
-    title:
-      context.title ||
-      entry.lessonTitle ||
-      entry.topic ||
-      entry.title ||
-      entry.assignmentTitle,
+    title: context.title || getEntryTitle(entry),
   });
 
-  if (!correction) return entry;
+  return card ? applyCardIdentity(entry, card) : entry;
+};
 
-  const patched = {
-    ...entry,
-    chapter: correction.chapter,
-    displayChapter: correction.chapter,
-    title: correction.title,
-    topic: correction.title,
-    lessonTitle: correction.title,
-    assignmentTitle: correction.title,
-  };
+const createCatalogEntry = (card) => {
+  const tutorMarked = isTutorMarkedCard(card);
+  const resource = applyCardIdentity(
+    {
+      kind: card.resourceSection,
+      grammarPage: card.grammarPage || "",
+      workbookRoute: card.workbookRoute || "",
+      video: card.video || "",
+    },
+    card
+  );
 
-  const assignmentId = correctedAssignmentId(entry, correction);
-  if (assignmentId) {
-    patched.assignmentId = assignmentId;
-    patched.assignment_id = assignmentId;
-  }
-
-  if (hasOwn(correction, "grammarPage")) {
-    patched.grammarPage = correction.grammarPage;
-    patched.grammarbook_link = correction.grammarPage || null;
-    patched.grammar_link = correction.grammarPage || null;
-  }
-
-  return patched;
+  return applyCardIdentity(
+    {
+      level: "A1",
+      day: Number(card.displayDay),
+      assignmentDay: Number(card.displayDay),
+      resources: [resource],
+      lesen_hören: card.resourceSection === "lesen_hören" ? [resource] : [],
+      schreiben_sprechen: card.resourceSection === "schreiben_sprechen" ? [resource] : [],
+      primaryResource: resource,
+      mode: card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
+      type: card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
+      assignmentType:
+        card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
+      assignment: tutorMarked,
+    },
+    card
+  );
 };
 
 export const applyAssignmentCatalogCurriculumCorrections = (entries = []) => {
-  COURSE_BOOK_CURRICULUM_CORRECTIONS.forEach((correction) => {
+  A1_COURSE_BOOK_CARDS.forEach((card) => {
     const entry = entries.find((candidate) => {
-      const candidateDay = Number(candidate.displayDay ?? candidate.assignmentDay ?? candidate.day);
-      const candidateChapter = normalizeChapter(candidate.displayChapter || candidate.chapter);
-      const candidateTitle =
-        candidate.lessonTitle || candidate.topic || candidate.title || candidate.assignmentTitle;
-      const assignmentMatches =
-        correction.assignmentId &&
-        normalizeAssignmentId(candidate.assignment_id || candidate.assignmentId) ===
-          normalizeAssignmentId(correction.assignmentId) &&
-        (!Number.isFinite(candidateDay) || candidateDay === Number(correction.displayDay));
-      const locationMatches =
-        candidateDay === Number(correction.displayDay) &&
-        candidateChapter === getCorrectionMatchChapter(correction) &&
-        correctionTitleMatches(correction, candidateTitle);
+      const level = normalizeLevel(candidate.level || candidate.courseLevel || candidate.course);
+      if (level && level !== "A1") return false;
 
-      return locationMatches || assignmentMatches;
+      const candidateDay = Number(
+        candidate.displayDay ?? candidate.assignmentDay ?? candidate.day
+      );
+      const candidateChapter = normalizeChapter(
+        candidate.displayChapter || candidate.chapter
+      );
+      const candidateAssignmentId = normalizeAssignmentId(
+        candidate.assignment_id || candidate.assignmentId
+      );
+
+      return (
+        (candidateDay === Number(card.displayDay) && candidateChapter === card.chapter) ||
+        (candidateAssignmentId &&
+          candidateAssignmentId === normalizeAssignmentId(card.assignmentId) &&
+          (!Number.isFinite(candidateDay) || candidateDay === Number(card.displayDay))) ||
+        (candidateDay === Number(card.displayDay) &&
+          (card.legacyMatches || []).some(
+            (match) =>
+              candidateChapter === normalizeChapter(match.chapter) &&
+              (!match.title || normalizeTitle(getEntryTitle(candidate)) === normalizeTitle(match.title))
+          ))
+      );
     });
 
-    if (!entry) return;
-
-    const updates = {
-      chapter: correction.chapter,
-      displayChapter: correction.chapter,
-      title: correction.title,
-      topic: correction.title,
-    };
-
-    if (hasOwn(correction, "grammarPage")) {
-      updates.grammarPage = correction.grammarPage;
+    if (!entry) {
+      entries.push(createCatalogEntry(card));
+      return;
     }
 
-    const assignmentId = correctedAssignmentId(entry, correction);
-    if (assignmentId) {
-      updates.assignment_id = assignmentId;
-      updates.assignmentId = assignmentId;
-    }
-
-    Object.assign(entry, updates);
+    Object.assign(entry, applyCardIdentity(entry, card));
 
     if (Array.isArray(entry.resources)) {
-      entry.resources = entry.resources.map((resource) => patchResource(resource, correction));
+      entry.resources = patchResourceCollection(entry.resources, card);
     }
-
     if (entry.primaryResource && typeof entry.primaryResource === "object") {
-      entry.primaryResource = patchResource(entry.primaryResource, correction);
+      entry.primaryResource = applyCardIdentity(entry.primaryResource, card);
     }
-
     if (entry.lesen_hören) {
-      entry.lesen_hören = Array.isArray(entry.lesen_hören)
-        ? entry.lesen_hören.map((resource) => patchResource(resource, correction))
-        : patchResource(entry.lesen_hören, correction);
+      entry.lesen_hören = patchResourceCollection(entry.lesen_hören, card);
     }
-
     if (entry.schreiben_sprechen) {
-      entry.schreiben_sprechen = Array.isArray(entry.schreiben_sprechen)
-        ? entry.schreiben_sprechen.map((resource) => patchResource(resource, correction))
-        : patchResource(entry.schreiben_sprechen, correction);
+      entry.schreiben_sprechen = patchResourceCollection(entry.schreiben_sprechen, card);
     }
   });
 

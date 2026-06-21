@@ -26,8 +26,9 @@
   },
   "scripts": {
     "sync:classes": "node scripts/sync-class-brochure-data.mjs",
-    "prestart": "npm run sync:classes",
-    "prebuild": "npm run sync:classes",
+    "audit:a1-curriculum": "node ../scripts/auditA1CourseBook.js",
+    "prestart": "npm run audit:a1-curriculum && npm run sync:classes",
+    "prebuild": "npm run audit:a1-curriculum && npm run sync:classes",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
