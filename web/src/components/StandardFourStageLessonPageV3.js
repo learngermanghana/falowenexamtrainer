@@ -12,6 +12,7 @@ import {
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
+import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 import { SpeakingPoints } from "./B2Day1IdentityPilotLessonPage";
@@ -256,9 +257,11 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
       </Section> : null}
 
       {active === "write" ? <Section title="Guided writing builder">
-        <NoteBox><strong>Task:</strong> {lesson.writingTopic || `Schreibe einen Text zum Thema „${lesson.title}“.`}</NoteBox>
-        <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
-        {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+        <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
+          <NoteBox><strong>Task:</strong> {lesson.writingTopic || `Schreibe einen Text zum Thema „${lesson.title}“.`}</NoteBox>
+          <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
+          {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
+        </WritingCheatSheetTabs>
       </Section> : null}
 
       {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
