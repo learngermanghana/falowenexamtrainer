@@ -45,6 +45,15 @@ test("cheat sheet tab renders the shared general C1 sheet", () => {
   expect(screen.getByText("not only … but also")).toBeInTheDocument();
 });
 
+test("cheat sheet tab renders lower-level sheets with the same renderer", () => {
+  render(<WritingCheatSheetTabs level="B2" day={3}><TaskContent /></WritingCheatSheetTabs>);
+
+  userEvent.click(screen.getByRole("tab", { name: "Cheat Sheet" }));
+
+  expect(screen.getByText("B2 argument linkers")).toBeInTheDocument();
+  expect(screen.getByText("meiner Ansicht nach")).toBeInTheDocument();
+});
+
 test("keeps stateful writing task mounted while switching to and from the cheat sheet", () => {
   const handleMount = jest.fn();
 
@@ -102,7 +111,7 @@ test("generates unique tab and panel IDs for each component instance", () => {
 });
 
 test("returns normal task content without sub-tabs when no cheat sheet exists", () => {
-  render(<WritingCheatSheetTabs level="B2" day={3}><TaskContent /></WritingCheatSheetTabs>);
+  render(<WritingCheatSheetTabs level="A1" day={3}><TaskContent /></WritingCheatSheetTabs>);
 
   expect(screen.queryByRole("tab", { name: "Schreiben Task" })).not.toBeInTheDocument();
   expect(screen.queryByRole("tab", { name: "Cheat Sheet" })).not.toBeInTheDocument();

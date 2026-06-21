@@ -1,4 +1,4 @@
-import { C1_WRITING_CHEAT_SHEET, getWritingCheatSheet } from "./writingCheatSheets";
+import { A2_WRITING_CHEAT_SHEET, B1_WRITING_CHEAT_SHEET, B2_WRITING_CHEAT_SHEET, C1_WRITING_CHEAT_SHEET, getWritingCheatSheet } from "./writingCheatSheets";
 
 const requiredSections = [
   {
@@ -71,8 +71,35 @@ test("getWritingCheatSheet returns the C1 sheet for days 1 through 28 only", () 
   expect(getWritingCheatSheet("C1", 29)).toEqual([]);
 });
 
-test("getWritingCheatSheet returns no sheet for other levels", () => {
-  ["A1", "A2", "B1", "B2", ""].forEach((level) => {
+test("getWritingCheatSheet returns level-specific A2, B1, B2, and C1 sheets for days 1 through 28", () => {
+  const expectedByLevel = {
+    A2: A2_WRITING_CHEAT_SHEET,
+    B1: B1_WRITING_CHEAT_SHEET,
+    B2: B2_WRITING_CHEAT_SHEET,
+    C1: C1_WRITING_CHEAT_SHEET,
+  };
+
+  Object.entries(expectedByLevel).forEach(([level, expectedSheet]) => {
+    for (let day = 1; day <= 28; day += 1) {
+      expect(getWritingCheatSheet(level, day)).toBe(expectedSheet);
+    }
+
+    expect(getWritingCheatSheet(level, 0)).toEqual([]);
+    expect(getWritingCheatSheet(level, 29)).toEqual([]);
+  });
+});
+
+test("lower levels use separate cheat sheet arrays", () => {
+  expect(A2_WRITING_CHEAT_SHEET).not.toBe(B1_WRITING_CHEAT_SHEET);
+  expect(B1_WRITING_CHEAT_SHEET).not.toBe(B2_WRITING_CHEAT_SHEET);
+  expect(B2_WRITING_CHEAT_SHEET).not.toBe(C1_WRITING_CHEAT_SHEET);
+  expect(A2_WRITING_CHEAT_SHEET[0].title).toBe("A2 basic connectors");
+  expect(B1_WRITING_CHEAT_SHEET[0].title).toBe("B1 connectors");
+  expect(B2_WRITING_CHEAT_SHEET[0].title).toBe("B2 argument linkers");
+});
+
+test("getWritingCheatSheet returns no sheet for unsupported levels", () => {
+  ["A1", "C2", ""].forEach((level) => {
     expect(getWritingCheatSheet(level, 3)).toEqual([]);
   });
 });
