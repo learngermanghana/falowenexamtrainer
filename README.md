@@ -1,4 +1,4 @@
-# Falowen Language Hub
+# Falowen Language Hub.
 Falowen Exam Coach is a two-part application that helps learners practice spoken German exam tasks. The backend (Express + OpenAI) evaluates answers and stores lightweight history, while the frontend (React) guides users through placement and speaking practice.
 
 ## Repository structure
