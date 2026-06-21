@@ -181,7 +181,7 @@ describe("fetchAttendanceRecords", () => {
     getDoc.mockImplementation(async (ref) => {
       const docId = ref?.segments?.[ref.segments.length - 1];
       if (docId === "uid-does-not-exist") return { exists: () => false };
-      if (String(docId || "").toLowerCase() === "deboraherzuaH225".toLowerCase()) {
+      if (String(docId || "").toLowerCase() === "deboraherzuah225") {
         return {
           exists: () => true,
           data: () => ({
