@@ -34,37 +34,81 @@ export const COURSE_BOOK_CURRICULUM_CORRECTIONS = Object.freeze([
     title: "Personal Pronouns and Verb Conjugation",
     grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
   }),
+
+  // Day 16 appeared in older course-book data as chapter 7 with unrelated
+  // titles. Match those stale labels and move each card to its real chapter.
   Object.freeze({
     level: "A1",
     displayDay: 16,
     matchChapter: "7",
     matchTitle: "Basic Prepositions",
-    chapter: "7.1",
-    title: "Basic Prepositions",
+    chapter: "9",
+    assignmentId: "A1-9",
+    title: "Negation",
   }),
   Object.freeze({
     level: "A1",
     displayDay: 16,
     matchChapter: "7",
     matchTitle: "Separable Verbs",
-    chapter: "7.2",
-    title: "Separable Verbs",
+    chapter: "10",
+    assignmentId: "A1-10",
+    title: "Food",
   }),
+  // Also correct the current source shape, where the chapters are right but
+  // both child cards can inherit the parent title "Food and Negation".
+  Object.freeze({
+    level: "A1",
+    displayDay: 16,
+    matchChapter: "9",
+    chapter: "9",
+    assignmentId: "A1-9",
+    title: "Negation",
+  }),
+  Object.freeze({
+    level: "A1",
+    displayDay: 16,
+    matchChapter: "10",
+    chapter: "10",
+    assignmentId: "A1-10",
+    title: "Food",
+  }),
+
+  // Day 18 also had stale chapter-9 labels. Correct both the stale and current
+  // shapes while preserving each task's own practice/tutor-marked status.
   Object.freeze({
     level: "A1",
     displayDay: 18,
     matchChapter: "9",
     matchTitle: "The Imperative in German",
-    chapter: "9.1",
-    title: "The Imperative in German",
+    chapter: "12.1",
+    assignmentId: "A1-12.1",
+    title: "Two Case Prepositions",
   }),
   Object.freeze({
     level: "A1",
     displayDay: 18,
     matchChapter: "9",
     matchTitle: "Transport and Giving Directions",
-    chapter: "9.2",
-    title: "Transport and Giving Directions",
+    chapter: "12.2",
+    assignmentId: "A1-12.2",
+    title: "Dative Prepositions",
+  }),
+  Object.freeze({
+    level: "A1",
+    displayDay: 18,
+    matchChapter: "12.1",
+    chapter: "12.1",
+    assignmentId: "A1-12.1",
+    title: "Two Case Prepositions",
+  }),
+  Object.freeze({
+    level: "A1",
+    displayDay: 18,
+    matchChapter: "12.2",
+    chapter: "12.2",
+    assignmentId: "A1-12.2",
+    title: "Dative Prepositions",
   }),
 ]);
 
@@ -120,6 +164,20 @@ export const getCourseBookCurriculumCorrection = ({
   );
 };
 
+const taskIsPractice = (entry = {}) =>
+  entry.assignment === false ||
+  entry.tutorMarked === false ||
+  entry.selfPractice === true ||
+  entry.assessmentType === "self-practice" ||
+  entry.submissionRequired === false;
+
+const correctedAssignmentId = (entry, correction) => {
+  if (!correction?.assignmentId) return null;
+  return taskIsPractice(entry)
+    ? `${correction.assignmentId}-practice`
+    : correction.assignmentId;
+};
+
 const patchResource = (resource, correction) => {
   if (!resource || typeof resource !== "object" || !correction) return resource;
 
@@ -138,9 +196,10 @@ const patchResource = (resource, correction) => {
     patched.grammar_link = correction.grammarPage || null;
   }
 
-  if (correction.assignmentId) {
-    patched.assignmentId = correction.assignmentId;
-    patched.assignment_id = correction.assignmentId;
+  const assignmentId = correctedAssignmentId(resource, correction);
+  if (assignmentId) {
+    patched.assignmentId = assignmentId;
+    patched.assignment_id = assignmentId;
   }
 
   return patched;
@@ -175,9 +234,10 @@ export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) =>
     assignmentTitle: correction.title,
   };
 
-  if (correction.assignmentId) {
-    patched.assignmentId = correction.assignmentId;
-    patched.assignment_id = correction.assignmentId;
+  const assignmentId = correctedAssignmentId(entry, correction);
+  if (assignmentId) {
+    patched.assignmentId = assignmentId;
+    patched.assignment_id = assignmentId;
   }
 
   if (hasOwn(correction, "grammarPage")) {
@@ -222,9 +282,10 @@ export const applyAssignmentCatalogCurriculumCorrections = (entries = []) => {
       updates.grammarPage = correction.grammarPage;
     }
 
-    if (correction.assignmentId) {
-      updates.assignment_id = correction.assignmentId;
-      updates.assignmentId = correction.assignmentId;
+    const assignmentId = correctedAssignmentId(entry, correction);
+    if (assignmentId) {
+      updates.assignment_id = assignmentId;
+      updates.assignmentId = assignmentId;
     }
 
     Object.assign(entry, updates);
