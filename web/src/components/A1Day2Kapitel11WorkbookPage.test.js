@@ -1,27 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import A1Day2Kapitel11WorkbookPage, {
-  DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL,
-  DAY_2_GERMAN_ALPHABET_YOUTUBE_URL,
-} from "./A1Day2Kapitel11WorkbookPage";
+import A1Day2Kapitel11WorkbookPage from "./A1Day2Kapitel11WorkbookPage";
 
-test("uses the Day 2 German Alphabet YouTube lesson for Hören", () => {
+const KAPITEL_1_1_HOREN_GOOGLE_DRIVE_URL =
+  "https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing";
+
+test("uses the Kapitel 1.1 Google Drive Hören material", () => {
   render(
     <MemoryRouter>
       <A1Day2Kapitel11WorkbookPage />
     </MemoryRouter>,
   );
 
-  expect(screen.getByTitle("Day 2 German Alphabet Hören video")).toHaveAttribute(
-    "src",
-    DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL,
-  );
-
+  expect(screen.getByText(/Listen to the audio and answer the questions below/i)).toBeInTheDocument();
   expect(
     screen.getByRole("link", {
-      name: "Open Day 2 German Alphabet Hören on YouTube",
+      name: "Open Hören Material (Google Drive)",
     }),
-  ).toHaveAttribute("href", DAY_2_GERMAN_ALPHABET_YOUTUBE_URL);
+  ).toHaveAttribute("href", KAPITEL_1_1_HOREN_GOOGLE_DRIVE_URL);
 
-  expect(screen.queryByText(/Google Drive/i)).not.toBeInTheDocument();
+  expect(screen.queryByTitle("Day 2 German Alphabet Hören video")).not.toBeInTheDocument();
 });

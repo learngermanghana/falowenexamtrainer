@@ -4,8 +4,6 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
-const DAY_2_GERMAN_ALPHABET_YOUTUBE_URL = "https://youtu.be/pCQVdJGsvtk";
-const DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/pCQVdJGsvtk";
 
 const cardStyle = {
   ...styles.card,
@@ -24,13 +22,6 @@ const imageStyle = {
   borderRadius: 10,
   maxHeight: 260,
   objectFit: "cover",
-};
-
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
 };
 
 const questionBoxStyle = {
@@ -114,18 +105,11 @@ const A1Day2Kapitel11WorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Hörverstehen (Listening Comprehension) Exercise:</strong> Introducing Yourself, Alphabet, and Introducing a
           Friend.
-          <br />Watch and listen to the YouTube lesson, then answer the questions below.
+          <br />Listen to the audio and answer the questions below.
         </p>
-        <iframe
-          title="Day 2 German Alphabet Hören video"
-          src={DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL}
-          style={videoPreviewStyle}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
         <CoursebookAudioPlayer
-          url={DAY_2_GERMAN_ALPHABET_YOUTUBE_URL}
-          linkLabel="Open Day 2 German Alphabet Hören on YouTube"
+          url="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
+          linkLabel="Open Hören Material (Google Drive)"
           linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
         />
         {questions.map((question) => (
@@ -156,5 +140,4 @@ const A1Day2Kapitel11WorkbookPage = () => {
   );
 };
 
-export { DAY_2_GERMAN_ALPHABET_YOUTUBE_EMBED_URL, DAY_2_GERMAN_ALPHABET_YOUTUBE_URL };
 export default A1Day2Kapitel11WorkbookPage;
