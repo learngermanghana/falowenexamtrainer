@@ -28,7 +28,7 @@ describe("getAssignmentDictionaryEntry", () => {
   test("keeps A1 day 3 1.1 writing/speaking as practical-only", () => {
     const entry = getAssignmentDictionaryEntry({
       level: "A1",
-      assignmentId: "A1-1.1",
+      assignmentId: "A1-1.1-practice",
       mode: "Schreiben & Sprechen",
       assignmentDay: 3,
     });
@@ -102,6 +102,7 @@ describe("progression sequence", () => {
       ])
     );
     expect(a1Progression).not.toContain("A1-1");
+    expect(a1Progression).not.toContain("A1-1.1-practice");
     expect(a1Progression).not.toContain("A1-5.9");
   });
 
@@ -119,6 +120,7 @@ describe("progression sequence", () => {
   test("valid progression identifier set does not include bogus identifiers", () => {
     const valid = getValidProgressionIdentifiersForLevel("A1");
     expect(valid.has("A1-1")).toBe(false);
+    expect(valid.has("A1-1.1-practice")).toBe(false);
     expect(valid.has("A1-12.3")).toBe(true);
   });
 });

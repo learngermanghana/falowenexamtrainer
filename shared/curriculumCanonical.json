@@ -79,8 +79,9 @@
     "video": "https://youtu.be/iZDv1rcYWsQ",
     "submissionRequired": false,
     "progressionEligible": false,
-    "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
-    "contentStatus": "published"
+    "grammarPage": "",
+    "contentStatus": "published",
+    "assignmentId": "A1-1.1-practice"
   },
   {
     "id": "A1-1.2",
@@ -88,7 +89,7 @@
     "sequence": 6,
     "day": 3,
     "chapter": "1.2",
-    "title": "Pronouns and Verb Conjugation",
+    "title": "Personal Pronouns and Verb Conjugation",
     "assignmentId": "A1-1.2",
     "assignmentType": "Lesen & H\u00f6ren",
     "kind": "lesen_h\u00f6ren",
