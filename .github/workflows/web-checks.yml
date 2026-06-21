@@ -59,7 +59,7 @@ jobs:
           path: ${{ matrix.artifact_name }}.log
           retention-days: 2
 
-  test-and-build:
+  regression-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -71,9 +71,6 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: web/package-lock.json
-
-      - name: Audit A1 curriculum
-        run: npm run audit:a1-curriculum
 
       - name: Install web dependencies
         working-directory: web
@@ -109,9 +106,35 @@ jobs:
           CI: true
         run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Audit A1 curriculum
+        run: npm run audit:a1-curriculum
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
       - name: Build web app
         working-directory: web
         run: npm run build
+
+  curriculum-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Check curriculum manifest sync
         run: node scripts/checkCurriculumManifestSync.js
