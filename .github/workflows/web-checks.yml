@@ -16,9 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_path:
-          - src/data/a1CourseBookCards.test.js
-          - src/utils/courseBookEntries.test.js
+        include:
+          - test_path: src/data/a1CourseBookCards.test.js
+            artifact_name: a1-card-source-test-log
+          - test_path: src/utils/courseBookEntries.test.js
+            artifact_name: a1-entry-expansion-test-log
     name: A1 curriculum · ${{ matrix.test_path }}
     steps:
       - name: Checkout repository
@@ -42,7 +44,20 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runInBand --runTestsByPath ${{ matrix.test_path }}
+        run: |
+          set +e
+          npm test -- --watchAll=false --runInBand --runTestsByPath ${{ matrix.test_path }} > ../${{ matrix.artifact_name }}.log 2>&1
+          status=$?
+          cat ../${{ matrix.artifact_name }}.log
+          exit $status
+
+      - name: Upload A1 test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}.log
+          retention-days: 2
 
   test-and-build:
     runs-on: ubuntu-latest
