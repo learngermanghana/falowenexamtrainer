@@ -161,7 +161,7 @@ describe("fetchAttendanceRecords", () => {
     jest.clearAllMocks();
   });
 
-  it("falls back to student-code checkin document ids when uid checkin is missing", async () => {
+  it("falls back to a normalized student-code checkin when the uid checkin is missing", async () => {
     getDocs.mockResolvedValue({
       docs: [
         {
@@ -179,7 +179,7 @@ describe("fetchAttendanceRecords", () => {
     getDoc.mockImplementation(async (ref) => {
       const docId = ref?.segments?.[ref.segments.length - 1];
       if (docId === "uid-does-not-exist") return { exists: () => false };
-      if (docId === "DeborahERZUAH225") {
+      if (String(docId || "").toLowerCase() === "deboraherzuaH225".toLowerCase()) {
         return {
           exists: () => true,
           data: () => ({
