@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
+import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
 import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/germanAssignmentCatalog";
@@ -150,6 +151,32 @@ const buildLevelSchedules = () => {
 };
 
 const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
+
+export const dedupeCourseBookEntries = (entries = []) => {
+  const seen = new Set();
+
+  return entries.filter((entry) => {
+    const key =
+      entry.id ||
+      entry.assignmentId ||
+      entry.assignment_id ||
+      `${entry.level}-${entry.day}-${entry.chapter}-${entry.kind}`;
+
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const getCourseBookSchedule = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+
+  if (normalizedLevel === "A1") {
+    return getCurriculumEntriesForLevel("A1");
+  }
+
+  return mergedCourseSchedules[normalizedLevel] || [];
+};
 
 export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
   resolveAssignmentCanonicalKey({
@@ -655,7 +682,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const schedule = useMemo(() => {
     const seenByDay = {};
-    const expandedEntries = expandCourseBookEntries(schedules[selectedCourseLevel] || [], { level: selectedCourseLevel });
+    const sourceEntries = isFrenchProgram ? schedules[selectedCourseLevel] || [] : getCourseBookSchedule(selectedCourseLevel);
+    const expandedEntries = dedupeCourseBookEntries(expandCourseBookEntries(sourceEntries, { level: selectedCourseLevel }));
     return sortByDay(
       expandedEntries.map((entry) => {
         const dayKey = String(getCourseBookDisplayDay(entry) || "");
@@ -663,7 +691,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         return { ...entry, occurrence: seenByDay[dayKey] };
       })
     );
-  }, [schedules, selectedCourseLevel]);
+  }, [isFrenchProgram, schedules, selectedCourseLevel]);
 
   const dayTaskCounts = useMemo(
     () =>

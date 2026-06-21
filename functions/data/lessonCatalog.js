@@ -129,7 +129,7 @@ const lessonCatalog = Object.freeze([
     "sequence": 8,
     "day": 5,
     "chapter": "1.3",
-    "title": "Personal Information, Articles, Adjectives and W-Questions",
+    "title": "Introducing Yourself and Articles",
     "assignmentId": "A1-1.3",
     "assignmentType": "Schreiben & Sprechen",
     "kind": "schreiben_sprechen",
