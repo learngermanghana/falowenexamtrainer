@@ -104,7 +104,20 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/A2B1CourseBook.test.js
+        run: |
+          set +e
+          npm test -- --watchAll=false --runInBand --runTestsByPath src/components/A2B1CourseBook.test.js > ../a2-b1-workbook-test-log.log 2>&1
+          status=$?
+          cat ../a2-b1-workbook-test-log.log
+          exit $status
+
+      - name: Upload A2 B1 test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-b1-workbook-test-log
+          path: a2-b1-workbook-test-log.log
+          retention-days: 2
 
   build:
     runs-on: ubuntu-latest
