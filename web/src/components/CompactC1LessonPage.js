@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
+import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { useToast } from "../context/ToastContext";
 import {
@@ -26,51 +27,6 @@ const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 const tabs = ["learn", "speak", "write", "finish", "references"];
 const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 
-export const C1_DAY3_WRITING_CHEAT_SHEET = [
-  {
-    id: "recommended-linking-expressions",
-    title: "Recommended linking expressions",
-    items: [
-      { phrase: "nicht nur …, sondern auch", meaning: "not only … but also" },
-      { phrase: "aus diesem Grund", meaning: "for this reason" },
-      { phrase: "darüber hinaus", meaning: "furthermore / beyond that" },
-      { phrase: "insbesondere", meaning: "in particular / especially" },
-      { phrase: "einerseits …, andererseits", meaning: "on the one hand … on the other hand" },
-      { phrase: "zwar …, aber", meaning: "admittedly … but / although … but" },
-      { phrase: "dennoch", meaning: "nevertheless / nonetheless" },
-      { phrase: "folglich", meaning: "consequently / therefore" },
-      { phrase: "insofern …, als", meaning: "insofar as" },
-      { phrase: "sofern", meaning: "provided that / as long as" },
-      { phrase: "während", meaning: "whereas / while" },
-      { phrase: "indem", meaning: "by / by means of" },
-      { phrase: "je …, desto / umso", meaning: "the … the" },
-    ],
-  },
-  {
-    id: "useful-verbs-and-phrases",
-    title: "Useful verbs and phrases",
-    items: [
-      { phrase: "etwas verbessern", meaning: "to improve something" },
-      { phrase: "etwas fördern", meaning: "to promote / support something" },
-      { phrase: "etwas stärken", meaning: "to strengthen something" },
-      { phrase: "etwas beeinträchtigen", meaning: "to impair / negatively affect something" },
-      { phrase: "etwas schädigen", meaning: "to damage / harm something" },
-      { phrase: "zu etwas führen", meaning: "to lead to something" },
-      { phrase: "etwas verursachen", meaning: "to cause something" },
-      { phrase: "etwas bewirken", meaning: "to bring about / produce an effect" },
-      { phrase: "etwas ermöglichen", meaning: "to enable something" },
-      { phrase: "etwas verhindern", meaning: "to prevent something" },
-      { phrase: "etwas verringern / reduzieren", meaning: "to reduce something" },
-      { phrase: "einer Entwicklung entgegenwirken", meaning: "to counteract a development" },
-      { phrase: "Maßnahmen ergreifen", meaning: "to take measures / take action" },
-      { phrase: "etwas durchführen", meaning: "to carry out / conduct something" },
-      { phrase: "etwas umsetzen", meaning: "to implement / put something into practice" },
-      { phrase: "einen Beitrag leisten", meaning: "to make a contribution" },
-      { phrase: "sich positiv auf etwas auswirken", meaning: "to have a positive effect on something" },
-      { phrase: "sich negativ auf etwas auswirken", meaning: "to have a negative effect on something" },
-    ],
-  },
-];
 
 const Section = ({ title, children }) => (
   <section style={card}>
@@ -114,7 +70,6 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const radio = canonicalLesson?.resources?.falowenRadio || null;
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
-  const [writeView, setWriteView] = useState("task");
   const [writing, setWriting] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
@@ -126,7 +81,6 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   });
 
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
-  useEffect(() => setWriteView("task"), [lesson.day, lesson.level]);
 
   if (!entered && radio) {
     return (
@@ -153,11 +107,6 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
-  const writingCheatSheet =
-    String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 3
-      ? C1_DAY3_WRITING_CHEAT_SHEET
-      : [];
-
   const finish = () => {
     if (!finishReady) return;
     setProgress((old) => ({ ...old, completed: true, completedAt: new Date().toISOString() }));
@@ -218,36 +167,11 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
       </Section> : null}
 
       {active === "write" ? <Section title="Guided writing builder">
-        {writingCheatSheet.length ? (
-          <div role="tablist" aria-label="C1 writing support" style={{ display: "flex", gap: 8, flexWrap: "wrap", padding: 6, border: "1px solid #dbeafe", borderRadius: 14, background: "#eff6ff" }}>
-            <button type="button" role="tab" aria-selected={writeView === "task"} onClick={() => setWriteView("task")} style={{ ...(writeView === "task" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}>Schreiben Task</button>
-            <button type="button" role="tab" aria-selected={writeView === "cheatSheet"} onClick={() => setWriteView("cheatSheet")} style={{ ...(writeView === "cheatSheet" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}>Cheat Sheet</button>
-          </div>
-        ) : null}
-
-        {!writingCheatSheet.length || writeView === "task" ? <>
+        <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
           <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
           {fullEssay ? <EmbeddedWritingPracticePanel /> : <GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={setWriting} />}
-        </> : null}
-
-        {writingCheatSheet.length && writeView === "cheatSheet" ? (
-          <div style={{ display: "grid", gap: 16 }}>
-            {writingCheatSheet.map((section) => (
-              <section key={section.id} style={{ display: "grid", gap: 10 }}>
-                <h3 style={{ margin: 0, fontSize: "1rem", color: "#1e3a8a" }}>{section.title}</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))", gap: 8 }}>
-                  {section.items.map((item) => (
-                    <div key={`${section.id}-${item.phrase}`} style={{ display: "grid", gridTemplateColumns: "minmax(0, .8fr) minmax(0, 1.2fr)", gap: 12, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, background: "#f8fafc" }}>
-                      <strong style={{ color: "#0f172a" }}>{item.phrase}</strong>
-                      <span style={{ color: "#475569" }}>{item.meaning}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : null}
+        </WritingCheatSheetTabs>
       </Section> : null}
 
       {active === "references" ? <WorkbookReferenceAnswers level={lesson.level} lesson={lesson} workbookId={`${lesson.level}-day-${lesson.day}`} /> : null}
