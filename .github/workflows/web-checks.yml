@@ -11,6 +11,39 @@ on:
       - ".github/workflows/web-checks.yml"
 
 jobs:
+  a1-curriculum:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_path:
+          - src/data/a1CourseBookCards.test.js
+          - src/utils/courseBookEntries.test.js
+    name: A1 curriculum · ${{ matrix.test_path }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Audit A1 curriculum
+        run: npm run audit:a1-curriculum
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Run A1 regression test
+        working-directory: web
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --runInBand --runTestsByPath ${{ matrix.test_path }}
+
   test-and-build:
     runs-on: ubuntu-latest
     steps:
@@ -30,12 +63,6 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-
-      - name: Test A1 curriculum cards
-        working-directory: web
-        env:
-          CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
 
       - name: Test speaking tools
         working-directory: web
