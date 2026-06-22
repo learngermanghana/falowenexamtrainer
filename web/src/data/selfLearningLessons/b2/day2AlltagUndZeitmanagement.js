@@ -10,7 +10,7 @@ const b2Day2AlltagUndZeitmanagement = makeLesson({
   videoResource: {
     title: "B2 AI lesson video: Beziehungen und Kommunikation",
     description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
-    url: "https://youtu.be/gCzZnddwC_c",
+    url: "https://youtu.be/ZfCAaLGV2c4",
   },
   grammarFocus: "Konjunktiv II (höfliche Bitten & hypothetische Situationen)",
   objectives: [

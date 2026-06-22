@@ -5,7 +5,7 @@ export const LESSON_RADIO_DICTIONARY = {
     10: {
       key: "a2-day10-tourismus-traditionelle-feste-falowen-radio",
       title: "Tourismus und Traditionelle Feste 4.10",
-      youtubeId: "vpSwGAtqIlU",
+      youtubeId: "yOfTCQDn_JM",
       duration: "",
       instruction:
         "Höre einfach zu und stimme dich auf das Thema Tourismus und traditionelle Feste ein. Danach gehst du weiter zu Teil 1.",
@@ -94,6 +94,14 @@ export const LESSON_RADIO_DICTIONARY = {
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
+    },
+    2: {
+      key: "b2-day2-beziehungen-kommunikation-falowen-radio",
+      title: "Beziehungen und Kommunikation",
+      youtubeId: "ZfCAaLGV2c4",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Beziehungen und Kommunikation ein. Danach gehst du weiter zum Lernteil.",
     },
   },
   C1: {

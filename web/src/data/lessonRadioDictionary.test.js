@@ -5,7 +5,7 @@ test.each([
   [6, "ql8aR2F6tfU"],
   [8, "dC8nKSyCE8g"],
   [9, "BD663tMiWpg"],
-  [10, "vpSwGAtqIlU"],
+  [10, "yOfTCQDn_JM"],
   [11, "hsR31V7Fb4U"],
   [14, "HJ60GX0pbiI"],
   [15, "WbsTFqIT058"],
@@ -33,6 +33,15 @@ test("B2 Day 1 radio remains available", () =>
     expect.objectContaining({
       title: "Persönliche Identität und Selbstverständnis",
       youtubeId: "0lTNin1NTgc",
+    }),
+  ),
+);
+
+test("B2 Day 2 radio remains available", () =>
+  expect(getLessonRadioResource("B2", 2)).toEqual(
+    expect.objectContaining({
+      title: "Beziehungen und Kommunikation",
+      youtubeId: "ZfCAaLGV2c4",
     }),
   ),
 );
@@ -90,7 +99,7 @@ test.each([
 test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", () =>
   expect(getLessonRadioResource("A2", 10)).toEqual(expect.objectContaining({
     title: "Tourismus und Traditionelle Feste 4.10",
-    youtubeId: "vpSwGAtqIlU",
+    youtubeId: "yOfTCQDn_JM",
   })),
 );
 
