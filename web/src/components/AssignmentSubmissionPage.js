@@ -74,6 +74,30 @@ const normalizeIdPart = (value) =>
 
 const safeLower = (v) => String(v || "").toLowerCase();
 
+const stringifyErrorDetails = (details) => {
+  if (details === undefined || details === null || details === "") return "";
+  if (typeof details === "string") return details;
+
+  try {
+    return JSON.stringify(details);
+  } catch (_error) {
+    return String(details);
+  }
+};
+
+const getExactErrorMessage = (error, fallbackMessage) => {
+  const parts = [];
+  const code = error?.code || error?.name || "";
+  const message = error?.message || "";
+  const details = stringifyErrorDetails(error?.details);
+
+  if (code) parts.push(`[${code}]`);
+  if (message) parts.push(message);
+  if (details) parts.push(`Details: ${details}`);
+
+  return parts.length ? `${fallbackMessage} ${parts.join(" ")}` : fallbackMessage;
+};
+
 const normalizeAssignmentIdentity = (value) => String(value || "").toLowerCase().replace(/\s+/g, "").replace(/_/g, "-").trim();
 
 const normalizeSubmissionText = (value) =>
@@ -2284,7 +2308,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       );
     } catch (error) {
       console.error("Failed to save resubmission", error);
-      setResubmissionStatus({ loading: false, error: "Could not save your resubmission.", success: "" });
+      setResubmissionStatus({
+        loading: false,
+        error: getExactErrorMessage(error, "Could not save your resubmission."),
+        success: "",
+      });
     }
   };
 
