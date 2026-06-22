@@ -1,16 +1,150 @@
+import { getCurriculumEntriesForLevel } from "./curriculumManifest";
+
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const clean = (value = "") => String(value || "").trim();
+
+const isTeacherResource = (resource = {}) =>
+  `${resource.key || ""} ${resource.title || ""}`.toLowerCase().includes("teacher");
+
+const normalizeExistingVideoResources = (entry = {}, day = 0) => {
+  const resources = toArray(entry.videoResources || entry.video_resources || entry.videos)
+    .map((resource, index) => {
+      if (typeof resource === "string") {
+        return {
+          key: `a1-day${day}-video-${index + 1}`,
+          chapter: entry.chapter || null,
+          title: index === 0 ? "Teacher lecture" : "AI grammar video",
+          description: "Watch this video before continuing with the grammar and workbook.",
+          url: clean(resource),
+        };
+      }
+      const url = clean(resource?.url || resource?.href || resource?.youtube_link || resource?.video);
+      return url ? { ...resource, url } : null;
+    })
+    .filter(Boolean);
+
+  const teacherUrl = clean(
+    entry.teacher_video ||
+      entry.teacherVideo ||
+      entry.teacher_lecture_url ||
+      entry.teacherLectureUrl ||
+      entry.teacher_explanation_url ||
+      entry.teacherExplanationUrl
+  );
+  const aiUrl = clean(
+    entry.ai_grammar_video ||
+      entry.aiGrammarVideo ||
+      entry.ai_grammar_video_url ||
+      entry.aiGrammarVideoUrl ||
+      entry.ai_video ||
+      entry.aiVideo
+  );
+
+  if (teacherUrl) {
+    resources.push({
+      key: `a1-day${day}-teacher-video`,
+      chapter: entry.chapter || null,
+      title: "Teacher lecture",
+      description: "Recorded A1 teacher explanation for this lesson.",
+      url: teacherUrl,
+    });
+  }
+  if (aiUrl) {
+    resources.push({
+      key: `a1-day${day}-ai-grammar-video`,
+      chapter: entry.chapter || null,
+      title: "AI grammar video",
+      description: "AI explanation for revision and self-study.",
+      url: aiUrl,
+    });
+  }
+
+  return resources;
+};
+
+const getCanonicalTeacherResourcesByDay = () => {
+  const groupedByDayAndUrl = new Map();
+
+  getCurriculumEntriesForLevel("A1")
+    .filter((entry) => Number(entry?.day) > 0 && entry?.contentStatus !== "planned")
+    .forEach((entry) => {
+      const url = clean(entry.teacherVideo || entry.video || entry.youtube_link);
+      if (!url) return;
+
+      const day = Number(entry.day);
+      const key = `${day}::${url}`;
+      const current = groupedByDayAndUrl.get(key) || {
+        day,
+        url,
+        chapters: new Set(),
+        titles: new Set(),
+      };
+      if (clean(entry.chapter)) current.chapters.add(clean(entry.chapter));
+      if (clean(entry.title || entry.topic)) current.titles.add(clean(entry.title || entry.topic));
+      groupedByDayAndUrl.set(key, current);
+    });
+
+  const byDay = new Map();
+  groupedByDayAndUrl.forEach(({ day, url, chapters, titles }) => {
+    const chapterList = [...chapters];
+    const chapter = chapterList.length === 1 ? chapterList[0] : null;
+    const title = [...titles][0] || `A1 Day ${day}`;
+    const resource = {
+      key: `a1-day${day}-${chapter || "lesson"}-teacher-video`,
+      chapter,
+      title: chapter
+        ? `Kapitel ${chapter} · ${title} · Teacher lecture`
+        : `A1 Day ${day} · Teacher lecture`,
+      description: chapter
+        ? `Recorded A1 teacher explanation for Kapitel ${chapter}.`
+        : "Recorded A1 teacher explanation covering this lesson.",
+      url,
+    };
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day).push(resource);
+  });
+
+  return byDay;
+};
+
+const mergeUniqueResources = (...groups) => {
+  const seen = new Set();
+  return groups
+    .flat()
+    .filter(Boolean)
+    .filter((resource) => {
+      const url = clean(resource.url);
+      if (!url || seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    })
+    .sort((left, right) => Number(!isTeacherResource(left)) - Number(!isTeacherResource(right)));
+};
+
+const standardizeA1TeacherVideos = (a1 = {}) => {
+  const canonicalTeachers = getCanonicalTeacherResourcesByDay();
+  const days = new Set([
+    ...Object.keys(a1).map(Number).filter(Number.isFinite),
+    ...canonicalTeachers.keys(),
+  ]);
+
+  days.forEach((day) => {
+    if (day === 0) return;
+    const existing = a1[day] || {};
+    const existingResources = normalizeExistingVideoResources(existing, day);
+    const teacherResources = canonicalTeachers.get(day) || [];
+    a1[day] = {
+      ...existing,
+      videoResources: mergeUniqueResources(teacherResources, existingResources),
+    };
+  });
+};
+
 export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   const a1 = dictionary.A1 || (dictionary.A1 = {});
 
   a1[2] = {
     videoResources: [
-      {
-        key: "a1-day2-kapitel-0-2-teacher-video",
-        chapter: "0.2",
-        title: "Kapitel 0.2 · Alphabet · Teacher lecture",
-        description:
-          "Recorded A1 teacher explanation for the German alphabet, letter names, umlauts and spelling practice.",
-        url: "https://youtu.be/uhFgKp4WVEc",
-      },
       {
         key: "a1-day2-kapitel-0-2-alphabet-ai-video",
         chapter: "0.2",
@@ -18,14 +152,6 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
         description:
           "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
         url: "https://youtu.be/pCQVdJGsvtk",
-      },
-      {
-        key: "a1-day2-kapitel-1-1-teacher-video",
-        chapter: "1.1",
-        title: "Kapitel 1.1 · Pronouns & Verb Conjugation · Teacher lecture",
-        description:
-          "Recorded A1 teacher explanation for subject pronouns and basic verb conjugation.",
-        url: "https://youtu.be/AjsnO1hxDs4",
       },
       {
         key: "a1-day2-kapitel-1-1-pronouns-conjugation-ai-video",
@@ -134,5 +260,13 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
     ],
   };
 
+  standardizeA1TeacherVideos(a1);
   return dictionary;
+};
+
+export const __TESTING__ = {
+  getCanonicalTeacherResourcesByDay,
+  mergeUniqueResources,
+  normalizeExistingVideoResources,
+  standardizeA1TeacherVideos,
 };
