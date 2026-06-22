@@ -598,8 +598,15 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
           </p>
 
           <CoursebookAudioPlayer
-            url="https://drive.google.com/file/d/1P2gWG8eZ12BuqDRi0VL8VwVnhJvP-l2Y/view?usp=sharing"
+            url="https://youtu.be/yOfTCQDn_JM"
             linkLabel="Open listening audio"
+          />
+          <iframe
+            title="Listening audio for Tourismus und Traditionelle Feste"
+            src="https://www.youtube.com/embed/yOfTCQDn_JM"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={videoPreviewStyle}
           />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
@@ -612,20 +619,6 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             </div>
           ))}
 
-          <h3 style={sectionTitle}>Recommended Video</h3>
-          <p style={{ margin: 0 }}>
-            Deutsche Welle — Oktoberfest: {" "}
-            <a href="https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q" target="_blank" rel="noreferrer">
-              https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q
-            </a>
-          </p>
-          <iframe
-            title="Recommended video for Tourismus und Traditionelle Feste"
-            src="https://www.youtube.com/embed/vpSwGAtqIlU"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={videoPreviewStyle}
-          />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
