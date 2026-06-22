@@ -14,6 +14,18 @@ const BACK_TO_WORKBOOK_ATTRIBUTE = "data-falowen-back-to-workbook";
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "");
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
 
+const setAttributeIfChanged = (element, name, value) => {
+  if (!element || element.getAttribute(name) === value) return false;
+  element.setAttribute(name, value);
+  return true;
+};
+
+const removeAttributeIfPresent = (element, name) => {
+  if (!element?.hasAttribute(name)) return false;
+  element.removeAttribute(name);
+  return true;
+};
+
 const getWorkbookTabKey = (label = "") => {
   const normalized = normalizeText(label);
   if (/teil\s*1\b/.test(normalized)) return "teil1";
@@ -89,19 +101,23 @@ const applyWorkbookTabDeduplication = (root = document) => {
   }
 
   const navigationHeader = injectedNavigation.firstElementChild;
-  if (navigationHeader) navigationHeader.style.display = "none";
+  if (navigationHeader && navigationHeader.style.display !== "none") {
+    navigationHeader.style.display = "none";
+  }
 
   const submissionPanel = Array.from(injectedNavigation.children).slice(1)[0] || null;
   if (!submissionPanel) {
-    injectedNavigation.style.display = "none";
+    if (injectedNavigation.style.display !== "none") injectedNavigation.style.display = "none";
     return;
   }
 
-  injectedNavigation.style.display = "grid";
-  injectedNavigation.style.margin = "0";
-  injectedNavigation.style.padding = "0";
-  injectedNavigation.style.border = "0";
-  injectedNavigation.style.background = "transparent";
+  Object.assign(injectedNavigation.style, {
+    display: "grid",
+    margin: "0",
+    padding: "0",
+    border: "0",
+    background: "transparent",
+  });
 
   if (!submissionPanel.querySelector(`[${BACK_TO_WORKBOOK_ATTRIBUTE}]`)) {
     const backButton = document.createElement("button");
@@ -137,19 +153,31 @@ const applyA1ResourceFixes = (root = document) => {
   const pathname = normalizePath(window.location.pathname);
 
   if (pathname === DAY16_WORKBOOK_PATH) {
+    const targetSrc = `https://www.youtube.com/embed/${DAY16_HOREN_VIDEO_ID}`;
+    const targetTitle = "A1 Day 16 Hören: Einkaufen im Supermarkt";
+    const targetHref = `https://youtu.be/${DAY16_HOREN_VIDEO_ID}`;
+
     root.querySelectorAll("iframe").forEach((frame) => {
       const title = String(frame.getAttribute("title") || "").toLowerCase();
       const src = String(frame.getAttribute("src") || "");
-      if (!title.includes("hören") && !src.includes("8xybaJbs89I")) return;
-      frame.setAttribute("src", `https://www.youtube.com/embed/${DAY16_HOREN_VIDEO_ID}`);
-      frame.setAttribute("title", "A1 Day 16 Hören: Einkaufen im Supermarkt");
+      if (!title.includes("hören") && !src.includes("8xybaJbs89I") && !src.includes(DAY16_HOREN_VIDEO_ID)) {
+        return;
+      }
+      setAttributeIfChanged(frame, "src", targetSrc);
+      setAttributeIfChanged(frame, "title", targetTitle);
     });
 
     root.querySelectorAll("a").forEach((link) => {
       const text = String(link.textContent || "").trim().toLowerCase();
       const href = String(link.getAttribute("href") || "");
-      if (text !== "open hören video on youtube" && !href.includes("8xybaJbs89I")) return;
-      link.setAttribute("href", `https://youtu.be/${DAY16_HOREN_VIDEO_ID}`);
+      if (
+        text !== "open hören video on youtube" &&
+        !href.includes("8xybaJbs89I") &&
+        !href.includes(DAY16_HOREN_VIDEO_ID)
+      ) {
+        return;
+      }
+      setAttributeIfChanged(link, "href", targetHref);
     });
   }
 
@@ -161,9 +189,9 @@ const applyA1ResourceFixes = (root = document) => {
       const isOldDriveWorkbook = href.includes(OLD_DAY17_WORKBOOK_DRIVE_ID);
       const isChapter11WorkbookAction = text.includes("open workbook") && cardText.includes("Kapitel 11");
       if (!isOldDriveWorkbook && !isChapter11WorkbookAction) return;
-      link.setAttribute("href", DAY17_WORKBOOK_PATH);
-      link.removeAttribute("target");
-      link.removeAttribute("rel");
+      setAttributeIfChanged(link, "href", DAY17_WORKBOOK_PATH);
+      removeAttributeIfPresent(link, "target");
+      removeAttributeIfPresent(link, "rel");
     });
   }
 };
@@ -189,16 +217,24 @@ export default function CourseBookTerminologyInjector() {
   useEffect(() => {
     replaceCourseBookTerminology(document);
 
+    let scheduled = false;
     const observer = new MutationObserver(() => {
-      replaceCourseBookTerminology(document);
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(() => {
+        scheduled = false;
+        replaceCourseBookTerminology(document);
+      });
     });
 
+    // Observe structure changes only. Watching href/src attributes while also
+    // rewriting them caused a self-triggering loop that repeatedly reloaded the
+    // Day 16 Hören iframe and left the workbook stuck on Loading.
     observer.observe(document.body, {
       childList: true,
       subtree: true,
-      attributes: true,
-      attributeFilter: ["href", "src"],
     });
+
     return () => observer.disconnect();
   }, [location.pathname, location.search]);
 
