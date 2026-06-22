@@ -2,7 +2,6 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const card = {
   ...styles.card,
@@ -81,18 +80,19 @@ const teil2Questions = [
   },
 ];
 
+const horenVideoUrl = "https://youtu.be/WiPw0t8Geh4";
+const horenVideoEmbedUrl = "https://www.youtube.com/embed/WiPw0t8Geh4";
+
 const horenAssignments = [
   {
     number: 1,
     title: "Passage 1: Die Wohnung",
-    link: "https://drive.google.com/file/d/1Z4ueUp1mbCFxilsra3gpievmSyGisUOk/view?usp=sharing",
     question: "Wie viele Zimmer hat die Wohnung?",
     options: ["a) Drei", "b) Vier", "c) Fünf", "d) Sechs"],
   },
   {
     number: 2,
     title: "Passage 2: Das Wohnzimmer",
-    link: "https://drive.google.com/file/d/1wpsf_9wk4YAyiR7F36R4oa5yM9OkdR2_/view?usp=sharing",
     question: "Was steht im Wohnzimmer?",
     options: [
       "a) Ein Bett und ein Schrank",
@@ -104,7 +104,6 @@ const horenAssignments = [
   {
     number: 3,
     title: "Passage 3: Die Küche",
-    link: "https://drive.google.com/file/d/106A8H3P2_mWDOdaNZ4WXWZX9jTM4yEQF/view?usp=sharing",
     question: "Was gibt es in der Küche?",
     options: [
       "a) Ein Sofa und einen Fernseher",
@@ -116,14 +115,12 @@ const horenAssignments = [
   {
     number: 4,
     title: "Passage 4: Das Schlafzimmer",
-    link: "https://drive.google.com/file/d/1u_A6UFrWHSJ__itLh1uUzo8nswQt1rPu/view",
     question: "Welches Möbelstück steht im Schlafzimmer?",
     options: ["a) Ein Sofa", "b) Ein Herd", "c) Ein großes Bett", "d) Ein Fernseher"],
   },
   {
     number: 5,
     title: "Passage 5: Das Badezimmer",
-    link: "https://drive.google.com/file/d/1T0ofiHOcO3XHmOSNB4lc6hBuAtQwDKyJ/view?usp=sharing",
     question: "Was gibt es im Badezimmer?",
     options: [
       "a) Ein Sofa und einen Tisch",
@@ -135,7 +132,6 @@ const horenAssignments = [
   {
     number: 6,
     title: "Passage 6: Der Balkon",
-    link: "https://drive.google.com/file/d/1JHygUNvs1UdtRSxAoLr85qHu_UqpRPoF/view?usp=sharing",
     question: "Wie ist der Balkon beschrieben?",
     options: ["a) Groß und leer", "b) Klein und schön", "c) Groß und schön", "d) Klein und leer"],
     extraQuestion: {
@@ -256,16 +252,44 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
           Listen to the following short passages about an apartment. After listening, answer the multiple-choice
           questions that follow.
         </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Complete Hören from Google Drive, then return to submit answers.</p>
+        <div style={{ display: "grid", gap: 8 }}>
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              paddingTop: "56.25%",
+              borderRadius: 12,
+              overflow: "hidden",
+              background: "#111827",
+            }}
+          >
+            <iframe
+              src={horenVideoEmbedUrl}
+              title="Teil 3 Hören: Die Wohnung"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                border: 0,
+              }}
+            />
+          </div>
+          <a
+            href={horenVideoUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+          >
+            Open Hören video on YouTube
+          </a>
+        </div>
 
         {horenAssignments.map((assignment) => (
           <div key={assignment.number} style={questionBlock}>
             <p style={{ margin: 0, fontWeight: 700 }}>{assignment.title}</p>
-            <CoursebookAudioPlayer
-              url={assignment.link}
-              linkLabel={`Open Hören Material (Google Drive) — Assignment ${assignment.number}`}
-              linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-            />
             <p style={{ margin: 0, fontWeight: 700 }}>{assignment.number}. {assignment.question}</p>
             {assignment.options.map((option) => (
               <p key={option} style={optionLine}>
