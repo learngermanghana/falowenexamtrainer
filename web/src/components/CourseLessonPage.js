@@ -14,6 +14,9 @@ export { LessonResourcesHub };
 const A1_DAY_3_TITLE = "German Subject Pronouns, Verb Conjugation and Introducing Yourself";
 const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
 const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questions";
+const A1_DAY_17_ASSIGNMENT_ID = "A1-11";
+const A1_DAY_17_WORKBOOK_ROUTE = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
+const A1_DAY_17_GRAMMAR_ROUTE = "/campus/course/directions-imperative-11";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -71,10 +74,41 @@ const decorateA1Day5Lesson = (lesson) => {
     "Complete the six self-practice sections: articles, adjectives, personal information, mini dialogues, W-words and scrambled sentences. Finish by writing a short personal introduction and use the answer guides for self-check.";
 };
 
+const decorateA1Day17Lesson = (lesson) => {
+  if (!lesson || Number(lesson.day) !== 17) return;
+
+  lesson.assignment = true;
+  lesson.assignmentId = A1_DAY_17_ASSIGNMENT_ID;
+  lesson.assignment_id = A1_DAY_17_ASSIGNMENT_ID;
+  lesson.canonicalAssignmentId = A1_DAY_17_ASSIGNMENT_ID;
+  lesson.instruction =
+    "Open the in-app Kapitel 11 workbook, complete all Lesen, Hören and Schreiben tasks, then use the Submit tab to send your final answers for tutor marking.";
+
+  let assignment = Array.isArray(lesson.lesen_hören)
+    ? lesson.lesen_hören.find((resource) => String(resource?.chapter || "11") === "11")
+    : lesson.lesen_hören;
+
+  if (!assignment) {
+    assignment = {};
+    lesson.lesen_hören = assignment;
+  }
+
+  assignment.chapter = "11";
+  assignment.assignment = true;
+  assignment.assignmentId = A1_DAY_17_ASSIGNMENT_ID;
+  assignment.assignment_id = A1_DAY_17_ASSIGNMENT_ID;
+  assignment.canonicalAssignmentId = A1_DAY_17_ASSIGNMENT_ID;
+  assignment.resourceRole = "assignment";
+  assignment.grammarbook_link = A1_DAY_17_GRAMMAR_ROUTE;
+  assignment.workbook_link = A1_DAY_17_WORKBOOK_ROUTE;
+};
+
 const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
 const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 5);
+const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
 decorateA1Day3Lesson(scheduleDay3);
 decorateA1Day5Lesson(scheduleDay5);
+decorateA1Day17Lesson(scheduleDay17);
 
 const replaceText = (element, text) => {
   if (element && element.textContent !== text) element.textContent = text;
@@ -121,7 +155,6 @@ const labelA1Day3Resources = (root) => {
   });
 };
 
-
 export default function CourseLessonPage() {
   const rootRef = useRef(null);
   const location = useLocation();
@@ -130,8 +163,10 @@ export default function CourseLessonPage() {
   const day = Number(location.state?.day ?? params.day ?? 0);
   const isA1Day3 = level === "A1" && day === 3;
   const isA1Day5 = level === "A1" && day === 5;
+  const isA1Day17 = level === "A1" && day === 17;
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
+  if (isA1Day17) decorateA1Day17Lesson(location.state?.entry);
 
   useEffect(() => {
     const context = getPublicFunnelContext();
