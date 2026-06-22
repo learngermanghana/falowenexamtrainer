@@ -744,7 +744,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         ? {
             pageTitle: "Aufgabe einreichen",
             pageHelper:
-              "Schreibe deine Lösung unten als Text. Klasse, Niveau, Schülercode und E-Mail werden automatisch ergänzt, um Fehler zu vermeiden. Scrolle nach unten und tippe deine Antworten direkt ein — du lädst keine Datei hoch.",
+              "Schreibe oder füge deine Antwort unten ein. Deine Schülerdaten werden automatisch ergänzt.",
             orientationOnly: "Nur Orientierungstag",
             statusSubmittable: "Diese Aufgabe ist einreichbar",
             statusNotSubmittable: "Diese Aufgabe ist nicht einreichbar",
@@ -755,7 +755,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         : {
             pageTitle: "Submit Assignment",
             pageHelper:
-              "Write your solution below as text. Your class, level, student code, and email are auto-filled to avoid mistakes. Scroll down and type your answers directly — you do not upload a file.",
+              "Type or paste your answer below. Your student details are added automatically.",
             orientationOnly: "Orientation only",
             statusSubmittable: "This assignment is submittable",
             statusNotSubmittable: "This assignment is not submittable",
@@ -2220,9 +2220,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                   </option>
                 ))}
               </select>
-              <span style={styles.helperText}>
-                Choose the level you want to submit for. You can submit for your current level and previous levels only.
-              </span>
+              {accessibleSubmitLevels.length > 1 ? (
+                <span style={styles.helperText}>Choose the level for this submission.</span>
+              ) : null}
             </div>
 
             <div style={{ ...styles.field, margin: 0 }}>
@@ -2246,14 +2246,14 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               {isAssignmentContextLocked && requestedAssignmentMatch ? (
                 <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
                   <span style={styles.helperText}>
-                    Opened from course/workbook link. Assignment locked to <strong>{requestedAssignmentMatch.label}</strong> to prevent wrong-chapter submissions.
+                    Selected from your workbook: <strong>{requestedAssignmentMatch.label}</strong>
                   </span>
                   <button
                     type="button"
                     style={{ ...styles.secondaryButton, width: "fit-content", padding: "8px 12px" }}
                     onClick={() => setAssignmentSelectionUnlocked(true)}
                   >
-                    Choose a different assignment instead
+                    Change assignment
                   </button>
                 </div>
               ) : selectedAssignmentPassed ? (
@@ -2287,14 +2287,15 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 </p>
               ) : null}
               {assignmentRequiredDaysLabel ? (
-                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  Assignment-required days from the course book: {assignmentRequiredDaysLabel}
-                </p>
+                <details style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                  <summary style={{ cursor: "pointer", padding: "6px 0" }}>View required assignment days</summary>
+                  <div style={{ marginTop: 4 }}>{assignmentRequiredDaysLabel}</div>
+                </details>
               ) : null}
             </div>
 
-            <div style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Your details</span>
+            <details style={{ ...styles.field, margin: 0 }}>
+              <summary style={{ ...styles.label, cursor: "pointer", padding: "8px 0" }}>Student details</summary>
               <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
                 <div>
                   <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
@@ -2303,7 +2304,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 <span style={styles.badge}>{studentCode || "No code"}</span>
               </div>
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Class: {studentProfile?.className || "–"}</p>
-            </div>
+            </details>
           </div>
 
           <div>
@@ -2319,9 +2320,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               <div style={{ fontWeight: 700 }}>
                 {selectedAssignmentEligibility.submittable ? uiText.statusSubmittable : uiText.statusNotSubmittable}
               </div>
-              <div style={styles.helperText}>
-                {uiText.reasonLabel}: {!hasSelectedAssignment ? "Scroll up to select assignment number." : selectedAssignmentEligibility.reason}
-              </div>
+              {!selectedAssignmentEligibility.submittable ? (
+                <div style={styles.helperText}>
+                  {uiText.reasonLabel}: {!hasSelectedAssignment ? "Select assignment number." : selectedAssignmentEligibility.reason}
+                </div>
+              ) : null}
             </div>
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={{ ...styles.label, display: "flex", alignItems: "center", gap: 8 }}>
@@ -2362,20 +2365,17 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 ))}
               </div>
               <span style={styles.helperText}>
-                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
-              </span>
-              <span style={styles.helperText}>
-                {formatCharacterCount(form.submissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} · {form.submissionText.length < MIN_SUBMISSION_CHARACTERS ? `Need ${MIN_SUBMISSION_CHARACTERS} minimum to submit.` : "Minimum reached."}
+                {formatCharacterCount(form.submissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} · {form.submissionText.length < MIN_SUBMISSION_CHARACTERS ? `Minimum ${MIN_SUBMISSION_CHARACTERS}` : "Ready to submit"}
               </span>
             </label>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
               <span style={styles.helperText}>
                 {hasDraftForSelection && selectedDraft?.updatedAt
                   ? `Draft updated ${formatDate(selectedDraft.updatedAt)}`
-                  : "Drafts save automatically while you type."}
+                  : "Saved automatically"}
               </span>
               {autosaveStatus.state === "saving" ? (
-                <span style={styles.helperText}>Autosaving ...</span>
+                <span style={styles.helperText}>Autosaving…</span>
               ) : autosaveStatus.state === "saved" ? (
                 <span style={styles.helperText}>Autosaved {formatDate(autosaveStatus.savedAt)}</span>
               ) : null}
@@ -2390,21 +2390,19 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay || !hasSelectedAssignment}
             />
             <span style={{ ...styles.label, margin: 0 }}>
-              I confirm I am submitting {selectedAssignmentChapter ? `Chapter ${selectedAssignmentChapter}` : "this assignment"}
-              {selectedCanonicalAssignmentKey ? ` (${selectedCanonicalAssignmentKey})` : ""}.
+              I checked that this is the correct assignment.
             </span>
           </label>
 
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>{isGerman ? "Einreichungsübersicht" : "Submission summary"}</div>
-            <div style={styles.helperText}>Assignment: {form.assignmentTitle || "–"}</div>
-            <div style={styles.helperText}>Day: {hasSelectedAssignment && (selectedDayNumber || selectedDayNumber === 0) ? selectedDayNumber : "–"}</div>
-            <div style={styles.helperText}>Chapter: {selectedAssignmentChapter || "–"}</div>
-            <div style={styles.helperText}>Canonical ID: {selectedCanonicalAssignmentKey || selectedAssignmentId || "–"}</div>
-            <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
-            <div style={styles.helperText}>Submission level: {selectedAssignmentLevel}</div>
-            <div style={styles.helperText}>Student code: {studentCode || "–"}</div>
-          </div>
+          <details style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
+            <summary style={{ fontWeight: 700, cursor: "pointer", padding: "4px 0" }}>Review details</summary>
+            <div style={{ marginTop: 6 }}>
+              <div style={styles.helperText}>Day: {hasSelectedAssignment && (selectedDayNumber || selectedDayNumber === 0) ? selectedDayNumber : "–"}</div>
+              <div style={styles.helperText}>Chapter: {selectedAssignmentChapter || "–"}</div>
+              <div style={styles.helperText}>Submission level: {selectedAssignmentLevel}</div>
+              <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
+            </div>
+          </details>
 
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <button
@@ -2424,7 +2422,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
 
-            <span style={styles.helperText}>Drafts can be saved anytime. Submission is locked after the first confirmed send.</span>
+            <span style={styles.helperText}>Your first confirmed submission is final.</span>
             {isSelectedLocked && !selectedAssignmentPassed ? (
               <span style={{ ...styles.helperText, color: "#b45309" }}>
                 Locked: you already submitted this assignment.
@@ -2437,7 +2435,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             ) : null}
             {submissionCooldownRemainingMs > 0 ? (
               <span style={{ ...styles.helperText, color: "#b45309" }}>
-                Anti-spam cooldown: wait {submissionCooldownLabel} before submitting.
+                You can submit again in {submissionCooldownLabel}.
               </span>
             ) : null}
           </div>
@@ -2485,18 +2483,16 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
           <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed && !resubmissionLimitReached ? "Available" : "Not available"}</span>
         </div>
 
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: !isSelectedLocked ? "#ecfdf5" : "#f9fafb" }}>
-            <strong>{isGerman ? "Noch nicht eingereicht" : "Not submitted yet"}</strong>
-            <div style={styles.helperText}>{!isSelectedLocked ? (isGerman ? "Aktueller Status" : "Current state") : ""}</div>
+        {isSelectedLocked && !selectedAssignmentPassed ? (
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+            <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#f9fafb" }}>
+              <strong>{isGerman ? "Eingereicht – wartet auf Korrektur" : "Submitted – awaiting review"}</strong>
+            </div>
+            <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#ecfdf5" }}>
+              <strong>{isGerman ? "Wiedereinreichung freigeschaltet" : "Resubmission unlocked"}</strong>
+            </div>
           </div>
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: isSelectedLocked && !resubmissionStatus.success ? "#fff7ed" : "#f9fafb" }}>
-            <strong>{isGerman ? "Eingereicht – wartet auf Korrektur" : "Submitted – awaiting review"}</strong>
-          </div>
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: isSelectedLocked ? "#ecfdf5" : "#f9fafb" }}>
-            <strong>{isGerman ? "Wiedereinreichung freigeschaltet" : "Resubmission unlocked"}</strong>
-          </div>
-        </div>
+        ) : null}
 
         {isSelectedLocked && !selectedAssignmentPassed ? (
           <>
@@ -2577,7 +2573,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </p>
             {submissionCooldownRemainingMs > 0 ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#b45309" }}>
-                Anti-spam cooldown active: wait {submissionCooldownLabel} before submitting again.
+                You can submit again in {submissionCooldownLabel}.
               </p>
             ) : null}
           </>
@@ -2585,10 +2581,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
           <p style={{ ...styles.helperText, margin: 0 }}>
             {selectedAssignmentPassed
               ? `Great news: you have passed this assignment with a score of at least ${PASS_THRESHOLD_SCORE}%. Resubmission is disabled because no further work is needed.`
-              : <>
-                  Resubmission is only available after you submit <strong>this selected assignment</strong>.  
-                  If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
-                </>}
+              : "Available after your work has been reviewed."}
           </p>
         )}
       </div>
@@ -2616,21 +2609,27 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 gap: 4,
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <strong>{entry.assignmentTitle || entry.title || "Submission"}</strong>
                 <span style={styles.levelPill}>{entry.level || selectedSubmitLevel}</span>
               </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>Class: {entry.className || "–"}</div>
-              <div style={{ ...styles.helperText, margin: 0 }}>Saved: {formatDate(entry.createdAt)}</div>
               <div style={{ ...styles.helperText, margin: 0 }}>
                 Status: {safeLower(entry.status) === "resubmitted" ? "pending" : getFeedbackFromSubmission(entry) ? "marked" : "pending"}
               </div>
-              {entry.submissionText ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>
-                  Preview: {String(entry.submissionText).slice(0, 110)}
-                  {String(entry.submissionText).length > 110 ? "..." : ""}
+              <div style={{ ...styles.helperText, margin: 0 }}>Saved: {formatDate(entry.createdAt)}</div>
+              <details style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                <summary style={{ cursor: "pointer", padding: "6px 0" }}>View submission</summary>
+                <div style={{ display: "grid", gap: 4, marginTop: 4 }}>
+                  <div>Class: {entry.className || "–"}</div>
+                  {getFeedbackFromSubmission(entry) ? <div>Improvement summary: {getFeedbackFromSubmission(entry)}</div> : null}
+                  {entry.submissionText ? (
+                    <div>
+                      Preview: {String(entry.submissionText).slice(0, 110)}
+                      {String(entry.submissionText).length > 110 ? "..." : ""}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              </details>
               {getFeedbackFromSubmission(entry) ? (
                 <button
                   type="button"
