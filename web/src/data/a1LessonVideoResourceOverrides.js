@@ -4,12 +4,28 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   a1[2] = {
     videoResources: [
       {
+        key: "a1-day2-kapitel-0-2-teacher-video",
+        chapter: "0.2",
+        title: "Kapitel 0.2 · Alphabet · Teacher lecture",
+        description:
+          "Recorded A1 teacher explanation for the German alphabet, letter names, umlauts and spelling practice.",
+        url: "https://youtu.be/uhFgKp4WVEc",
+      },
+      {
         key: "a1-day2-kapitel-0-2-alphabet-ai-video",
         chapter: "0.2",
         title: "Kapitel 0.2 · Alphabet · AI video",
         description:
           "AI video lesson for the German alphabet, letter names, umlauts and spelling practice.",
         url: "https://youtu.be/pCQVdJGsvtk",
+      },
+      {
+        key: "a1-day2-kapitel-1-1-teacher-video",
+        chapter: "1.1",
+        title: "Kapitel 1.1 · Pronouns & Verb Conjugation · Teacher lecture",
+        description:
+          "Recorded A1 teacher explanation for subject pronouns and basic verb conjugation.",
+        url: "https://youtu.be/AjsnO1hxDs4",
       },
       {
         key: "a1-day2-kapitel-1-1-pronouns-conjugation-ai-video",
