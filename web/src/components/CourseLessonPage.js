@@ -17,6 +17,7 @@ const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questio
 const A1_DAY_17_ASSIGNMENT_ID = "A1-11";
 const A1_DAY_17_WORKBOOK_ROUTE = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 const A1_DAY_17_GRAMMAR_ROUTE = "/campus/course/directions-imperative-11";
+const A2_DAY_11_GRAMMAR_ROUTE = "/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -103,6 +104,26 @@ const decorateA1Day17Lesson = (lesson) => {
   assignment.workbook_link = A1_DAY_17_WORKBOOK_ROUTE;
 };
 
+const decorateA2Day11Lesson = (lesson) => {
+  if (!lesson || Number(lesson.day) !== 11) return;
+
+  lesson.grammar_topic = "Comparative forms (Komparativ & Superlativ)";
+  lesson.grammarbook_link = A2_DAY_11_GRAMMAR_ROUTE;
+  lesson.grammarPage = A2_DAY_11_GRAMMAR_ROUTE;
+
+  const resources = [
+    ...toArray(lesson.lesen_hören),
+    ...toArray(lesson.schreiben_sprechen),
+  ];
+
+  resources.forEach((resource) => {
+    if (!resource || String(resource.chapter || lesson.chapter || "") !== "4.11") return;
+    resource.grammarbook_link = A2_DAY_11_GRAMMAR_ROUTE;
+    resource.grammar_link = A2_DAY_11_GRAMMAR_ROUTE;
+    resource.grammarPage = A2_DAY_11_GRAMMAR_ROUTE;
+  });
+};
+
 const syncA2LessonFromSchedule = (lesson, day) => {
   if (!lesson) return;
   const canonicalLesson = (courseSchedules.A2 || []).find(
@@ -113,14 +134,17 @@ const syncA2LessonFromSchedule = (lesson, day) => {
   // Course Book cards can carry an older dictionary snapshot in router state.
   // Always let the current A2 schedule win so grammar/workbook links stay in-app.
   Object.assign(lesson, canonicalLesson);
+  if (Number(day) === 11) decorateA2Day11Lesson(lesson);
 };
 
 const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
 const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 5);
 const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
+const scheduleA2Day11 = (courseSchedules.A2 || []).find((entry) => Number(entry.day) === 11);
 decorateA1Day3Lesson(scheduleDay3);
 decorateA1Day5Lesson(scheduleDay5);
 decorateA1Day17Lesson(scheduleDay17);
+decorateA2Day11Lesson(scheduleA2Day11);
 
 const replaceText = (element, text) => {
   if (element && element.textContent !== text) element.textContent = text;
