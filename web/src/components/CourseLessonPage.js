@@ -5,11 +5,11 @@ import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbo
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
-export { LessonResourcesHub } from "./CourseLessonPageLegacy";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
 } from "../lib/publicFunnelTracking";
+export { LessonResourcesHub } from "./CourseLessonPageLegacy";
 
 const A1_DAY_3_TITLE = "German Subject Pronouns, Verb Conjugation and Introducing Yourself";
 const A1_DAY_3_ASSIGNMENT_ID = "A1-1.2";
