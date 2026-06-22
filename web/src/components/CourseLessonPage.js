@@ -103,6 +103,18 @@ const decorateA1Day17Lesson = (lesson) => {
   assignment.workbook_link = A1_DAY_17_WORKBOOK_ROUTE;
 };
 
+const syncA2LessonFromSchedule = (lesson, day) => {
+  if (!lesson) return;
+  const canonicalLesson = (courseSchedules.A2 || []).find(
+    (entry) => Number(entry?.day) === Number(day)
+  );
+  if (!canonicalLesson) return;
+
+  // Course Book cards can carry an older dictionary snapshot in router state.
+  // Always let the current A2 schedule win so grammar/workbook links stay in-app.
+  Object.assign(lesson, canonicalLesson);
+};
+
 const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
 const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 5);
 const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
@@ -167,6 +179,7 @@ export default function CourseLessonPage() {
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
   if (isA1Day17) decorateA1Day17Lesson(location.state?.entry);
+  if (level === "A2") syncA2LessonFromSchedule(location.state?.entry, day);
 
   useEffect(() => {
     const context = getPublicFunnelContext();
