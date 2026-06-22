@@ -4,4 +4,5 @@ module.exports = {
   roots: ["<rootDir>/functions/functionz/__tests__", "<rootDir>/functions/functionz/tests"],
   testMatch: ["**/?(*.)+(test).[jt]s?(x)"],
   clearMocks: true,
+  transformIgnorePatterns: ["/node_modules/"],
 };
