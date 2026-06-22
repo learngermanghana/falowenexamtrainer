@@ -61,6 +61,15 @@ test("A1 Day 4 keeps only Kapitel 2 German Numbers AI video", () => {
   expect(lesson.resources.videos.some((video) => video.title === "Kapitel 2 · Zahlen · AI video")).toBe(false);
 });
 
+
+test("A1 Day 17 uses the requested Instructions AI video", () => {
+  expectRequestedAiVideo(17, {
+    chapter: "11",
+    title: "A1 Day 17 · Instructions · AI video",
+    url: "https://youtu.be/8xybaJbs89I",
+  });
+});
+
 test("A1 Day 19 uses the requested Goethe A1 Speaking Practice AI video", () => {
   expectRequestedAiVideo(19, {
     title: "A1 Day 19 · Goethe A1 Speaking Practice · AI video",
