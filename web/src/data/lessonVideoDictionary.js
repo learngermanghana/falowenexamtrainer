@@ -110,6 +110,18 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    11: {
+      videoResources: [
+        {
+          key: "a1-day11-understanding-time-ai-video",
+          chapter: "7",
+          title: "A1 Day 11 · Understanding Time · AI video",
+          description:
+            "AI video lesson for understanding time in German.",
+          url: "https://youtu.be/xesl04zaQ1E",
+        },
+      ],
+    },
     12: {
       videoResources: [
         {
@@ -119,14 +131,6 @@ export const LESSON_VIDEO_DICTIONARY = {
           description:
             "AI video lesson for using the 24-hour clock and dates in German.",
           url: "https://youtu.be/ZE24QSbGaSo",
-        },
-        {
-          key: "a1-day12-24-hour-clock-dates-ai-video-2",
-          chapter: "8",
-          title: "A1 Day 12 · The 24 Hour Clock and Dates · AI video 2",
-          description:
-            "Additional AI video support for the 24-hour clock and dates lesson.",
-          url: "https://youtu.be/xesl04zaQ1E",
         },
       ],
     },
