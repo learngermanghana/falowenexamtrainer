@@ -774,7 +774,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-5-freizeit-workbook" element={<A2Day5FreizeitWorkbookPage />} />
           <Route path="/campus/course/a2-day-6-moebel-und-raeume-workbook" element={<A2Day6MoebelRaeumeWorkbookPage />} />
           <Route path="/campus/course/a2-day-7-eine-wohnung-suchen-workbook" element={<A2Day7WohnungSuchenWorkbookPage />} />
-          <Route path="/campus/course/a2-day-8-rezepte-und-essen-workbook" element={<A2Day8RezepteUndEssenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-8-rezepte-und-essen-workbook" element={withRadioWorkbookGate("A2", 8, <A2Day8RezepteUndEssenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-9-urlaub-workbook" element={withRadioWorkbookGate("A2", 9, <A2Day9UrlaubWorkbookPage />)} />
           <Route
             path="/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook"

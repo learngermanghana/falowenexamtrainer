@@ -121,6 +121,22 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Nachrichten, Quellenkritik und digitale Verantwortung ein. Danach gehst du weiter zum Lernteil.",
     },
+    4: {
+      key: "c1-day4-beziehungen-teamarbeit-falowen-radio",
+      title: "Beziehungen und Teamarbeit",
+      youtubeId: "Vl3mmytfrRk",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Beziehungen und Teamarbeit ein. Danach gehst du weiter zum Lernteil.",
+    },
+    5: {
+      key: "c1-day5-berufliche-entwicklung-falowen-radio",
+      title: "Berufliche Entwicklung",
+      youtubeId: "69FO0zn9ZvA",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf berufliche Entwicklung ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
 };
 

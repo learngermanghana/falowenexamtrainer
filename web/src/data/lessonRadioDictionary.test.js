@@ -3,6 +3,7 @@ import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDiction
 test.each([
   [5, "NWRCe0wCSb4"],
   [6, "ql8aR2F6tfU"],
+  [8, "dC8nKSyCE8g"],
   [9, "BD663tMiWpg"],
   [10, "vpSwGAtqIlU"],
   [11, "hsR31V7Fb4U"],
@@ -64,6 +65,10 @@ test("C1 Day 3 uses the requested Medien und Informationskompetenz radio", () =>
 );
 
 test.each([
+  ["/campus/course/lesson/C1/4", { level: "C1", day: 4 }],
+  ["/campus/course/lesson/C1/5", { level: "C1", day: 5 }],
+  ["/campus/course/lesson/A2/8", { level: "A2", day: 8 }],
+  ["/campus/course/a2-day-8-rezepte-und-essen-workbook", { level: "A2", day: 8 }],
   ["/campus/course/lesson/A2/15", { level: "A2", day: 15 }],
   ["/campus/course/a2-day-15-mein-lieblingssport-workbook", { level: "A2", day: 15 }],
   ["/campus/course/lesson/A2/16", { level: "A2", day: 16 }],
@@ -87,4 +92,13 @@ test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", 
     title: "Tourismus und Traditionelle Feste 4.10",
     youtubeId: "vpSwGAtqIlU",
   })),
+);
+
+test.each([
+  [4, "Beziehungen und Teamarbeit", "Vl3mmytfrRk"],
+  [5, "Berufliche Entwicklung", "69FO0zn9ZvA"],
+])("C1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
+  expect(getLessonRadioResource("C1", day)).toEqual(
+    expect.objectContaining({ title, youtubeId }),
+  ),
 );

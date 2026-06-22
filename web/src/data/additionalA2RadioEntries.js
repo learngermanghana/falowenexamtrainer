@@ -39,6 +39,14 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Möbel und Räume ein. Danach gehst du weiter zu Teil 1.",
   },
+  8: {
+    key: "a2-day8-rezepte-und-essen-falowen-radio",
+    title: "Rezepte und Essen (Exercise) 3.8",
+    youtubeId: "dC8nKSyCE8g",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Rezepte und Essen ein. Danach gehst du weiter zu Teil 1.",
+  },
   12: {
     key: "a2-day12-mein-traumberuf-falowen-radio",
     title: "Mein Traumberuf 5.12",
