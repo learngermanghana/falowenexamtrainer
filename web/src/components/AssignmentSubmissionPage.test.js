@@ -405,6 +405,10 @@ Teil :4
     expect(payload).not.toHaveProperty("resubmittedAt");
   });
 
+  it("strips exact Falowen helper lines and null characters before callable resubmission payloads", () => {
+    expect(__TESTING__.stripFalowenUiTextAndNulls("Resubmission unlocked\nMeine Antwort\u0000\nCorrected text")).toBe("Meine Antwort");
+  });
+
   it("detects accidental pasted Falowen interface text", () => {
     expect(__TESTING__.appearsToContainFalowenUiText("Resubmission unlocked\nCorrected text\nReview details")).toBe(true);
     expect(__TESTING__.appearsToContainFalowenUiText("Meine richtige Antwort steht hier.")).toBe(false);
