@@ -40,6 +40,19 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   // prevents two different numbers videos from appearing in the lesson hub.
   a1[4] = { videoResources: [] };
 
+  a1[17] = {
+    videoResources: [
+      {
+        key: "a1-day17-instructions-directions-ai-video",
+        chapter: "11",
+        title: "A1 Day 17 · Instructions and Directions · AI video",
+        description:
+          "AI grammar video for understanding German instructions, directions and imperative forms.",
+        url: "https://youtu.be/8xybaJbs89I",
+      },
+    ],
+  };
+
   a1[19] = {
     videoResources: [
       {
