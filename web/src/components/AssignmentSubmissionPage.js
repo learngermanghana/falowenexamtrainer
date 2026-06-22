@@ -397,9 +397,11 @@ const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
 const toNumericScore = (value) => {
+  if (value === null || value === undefined) return null;
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
     const normalized = value.replace("%", "").trim();
+    if (!normalized) return null;
     const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : null;
   }
@@ -1346,11 +1348,35 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return ["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus);
   }, [isSameSelectedAssignment, latestSelectedAssignmentScore, recentSubmissions]);
 
+  const hasSelectedAssignmentScore =
+    latestSelectedAssignmentScore !== null &&
+    latestSelectedAssignmentScore !== undefined &&
+    String(latestSelectedAssignmentScore).trim() !== "" &&
+    Number.isFinite(Number(latestSelectedAssignmentScore));
+  const numericSelectedAssignmentScore = hasSelectedAssignmentScore ? Number(latestSelectedAssignmentScore) : null;
+  const selectedAssignmentFailed =
+    hasSelectedAssignmentScore && numericSelectedAssignmentScore < PASS_THRESHOLD_SCORE;
+  const selectedAssignmentPassedByScore =
+    hasSelectedAssignmentScore && numericSelectedAssignmentScore >= PASS_THRESHOLD_SCORE;
+  const isAwaitingSelectedAssignmentReview = isSelectedLocked && !hasSelectedAssignmentScore;
+
   const remainingResubmissions = Math.max(
     0,
     Math.min(MAX_RESUBMISSION_TRIES - selectedResubmissionCount, MAX_TOTAL_SUBMISSION_ATTEMPTS - selectedSubmissionAttemptCount)
   );
   const resubmissionLimitReached = selectedSubmissionAttemptCount >= MAX_TOTAL_SUBMISSION_ATTEMPTS || remainingResubmissions === 0;
+  const canShowResubmissionForm = isSelectedLocked && selectedAssignmentFailed;
+  const resubmissionBadgeLabel = !isSelectedLocked
+    ? "Not available"
+    : isAwaitingSelectedAssignmentReview
+    ? "Awaiting review"
+    : selectedAssignmentPassedByScore
+    ? "Not required"
+    : selectedAssignmentFailed && resubmissionLimitReached
+    ? "Limit reached"
+    : selectedAssignmentFailed
+    ? "Available"
+    : "Not available";
 
   useEffect(() => {
     setConfirmationLocked(isSelectedLocked);
@@ -1531,9 +1557,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   }, [form.assignmentTitle, mergedProgressByTitle]);
 
   const selectedAssignmentPassed =
-    typeof latestSelectedAssignmentScore === "number"
-      ? latestSelectedAssignmentScore >= PASS_THRESHOLD_SCORE
-      : selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
+    selectedAssignmentPassedByScore || selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
 
   const assignmentProgressSnapshot = useMemo(() => {
     const total = decoratedAssignmentOptions.length;
@@ -1885,6 +1909,17 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
+    if (!selectedAssignmentFailed) {
+      setResubmissionStatus({
+        loading: false,
+        error: hasSelectedAssignmentScore
+          ? "This assignment is already passed, so resubmission draft saving is disabled."
+          : "Resubmission drafts become available only after tutor review if your score is below 60%.",
+        success: "",
+      });
+      return;
+    }
+
     if (!trimmedResubmission && !trimmedImprovement) {
       setResubmissionStatus({
         loading: false,
@@ -2067,10 +2102,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (selectedAssignmentPassed) {
+    if (!selectedAssignmentFailed) {
       setResubmissionStatus({
         loading: false,
-        error: "This assignment is already passed, so resubmission is disabled.",
+        error: hasSelectedAssignmentScore
+          ? "This assignment is already passed, so resubmission is disabled."
+          : "Resubmission will become available only after tutor review if your score is below 60%.",
         success: "",
       });
       return;
@@ -2274,7 +2311,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                   >
                     {(isGerman ? "Eingereicht am" : "Submitted on")} {formatDate(selectedLockInfo?.lockedAt || selectedPreview?.createdAt)}
                   </span>
-                  <span style={styles.helperText}>This assignment is locked. Resubmission is available for THIS assignment only.</span>
+                  <span style={styles.helperText}>
+                    {selectedAssignmentFailed
+                      ? "This assignment is locked. Resubmission is available for THIS assignment only."
+                      : "This assignment is locked. Resubmission depends on tutor review and score."}
+                  </span>
                 </div>
               ) : (
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
@@ -2480,13 +2521,13 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed && !resubmissionLimitReached ? "Available" : "Not available"}</span>
+          <span style={styles.badge}>{resubmissionBadgeLabel}</span>
         </div>
 
-        {isSelectedLocked && !selectedAssignmentPassed ? (
+        {canShowResubmissionForm ? (
           <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
             <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#f9fafb" }}>
-              <strong>{isGerman ? "Eingereicht – wartet auf Korrektur" : "Submitted – awaiting review"}</strong>
+              <strong>{isGerman ? "Überprüft" : "Reviewed"}</strong>
             </div>
             <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#ecfdf5" }}>
               <strong>{isGerman ? "Wiedereinreichung freigeschaltet" : "Resubmission unlocked"}</strong>
@@ -2494,7 +2535,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
           </div>
         ) : null}
 
-        {isSelectedLocked && !selectedAssignmentPassed ? (
+        {canShowResubmissionForm ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
               You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.
@@ -2578,11 +2619,26 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             ) : null}
           </>
         ) : (
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {selectedAssignmentPassed
-              ? `Great news: you have passed this assignment with a score of at least ${PASS_THRESHOLD_SCORE}%. Resubmission is disabled because no further work is needed.`
-              : "Available after your work has been reviewed."}
-          </p>
+          <div style={{ display: "grid", gap: 6 }}>
+            <strong>
+              {!isSelectedLocked
+                ? "Available after your work has been reviewed."
+                : isAwaitingSelectedAssignmentReview
+                ? "Awaiting tutor review"
+                : selectedAssignmentPassedByScore
+                ? "Not required"
+                : "Available after your work has been reviewed."}
+            </strong>
+            {isSelectedLocked ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                {isAwaitingSelectedAssignmentReview
+                  ? `Resubmission will become available only if your score is below ${PASS_THRESHOLD_SCORE}%.`
+                  : selectedAssignmentPassedByScore
+                  ? "You passed this assignment."
+                  : "Available after your work has been reviewed."}
+              </p>
+            ) : null}
+          </div>
         )}
       </div>
 
