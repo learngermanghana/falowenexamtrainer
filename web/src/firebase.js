@@ -175,6 +175,18 @@ const unregisterMessagingServiceWorker = async () => {
   return unregisteringMessagingServiceWorkerPromise;
 };
 
+const isIosDevice = () => {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+  const platform = navigator.platform || "";
+  const userAgent = navigator.userAgent || "";
+  return /iPad|iPhone|iPod/.test(platform || userAgent) || (platform === "MacIntel" && navigator.maxTouchPoints > 1);
+};
+
+const isRunningStandalone = () => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator?.standalone === true;
+};
+
 const assertFirebaseReady = () => {
   if (!isFirebaseConfigured || !app) {
     throw missingConfigError;
@@ -201,7 +213,10 @@ const requestMessagingToken = async (shouldRetry = true) => {
   assertFirebaseReady();
   const supported = await isSupported().catch(() => false);
   if (!supported) {
-    throw new Error("Browser does not support Firebase Cloud Messaging.");
+    if (isIosDevice() && !isRunningStandalone()) {
+      throw new Error("On iPhone, add Falowen to your Home Screen and open it from that app icon before enabling push notifications.");
+    }
+    throw new Error("This browser does not support Firebase Cloud Messaging. Please use Chrome/Edge on Android or the installed Home Screen app on iPhone.");
   }
 
   const permission = await ensureNotificationPermission();

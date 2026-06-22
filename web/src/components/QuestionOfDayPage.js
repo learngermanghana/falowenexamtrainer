@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
@@ -546,11 +547,17 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
   );
 };
 
+const resolveRequestedTab = (search = "") => {
+  const requested = new URLSearchParams(search || "").get("tab");
+  return ["questions", "submit", "feedback"].includes(requested) ? requested : "questions";
+};
+
 const QuestionOfDayPage = () => {
+  const location = useLocation();
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
   const activeLevel = String(level || "A1").toUpperCase();
-  const [activeTab, setActiveTab] = useState("questions");
+  const [activeTab, setActiveTab] = useState(() => resolveRequestedTab(location.search));
   const [practised, setPractised] = useState(() => readWarmupStatus(activeLevel).practised);
   const [submittedToTutor, setSubmittedToTutor] = useState(() => readWarmupStatus(activeLevel).submittedToTutor);
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(activeLevel));
@@ -571,9 +578,9 @@ const QuestionOfDayPage = () => {
     setWarmupAnswer(readWarmupAnswer(activeLevel));
     setSubmitState({ loading: false, success: "", error: "" });
     setLetterType("");
-    setActiveTab("questions");
+    setActiveTab(resolveRequestedTab(location.search));
     setChecklistState(PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {}));
-  }, [activeLevel]);
+  }, [activeLevel, location.search]);
 
   useEffect(() => {
     const unsubscribe = subscribeTutorReviewsForStudent(

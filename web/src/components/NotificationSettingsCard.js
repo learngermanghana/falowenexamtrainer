@@ -35,7 +35,7 @@ const statusCopy = {
   },
   idle: {
     label: "Not enabled yet",
-    detail: "Enable notifications to receive class notes, score updates and important reminders.",
+    detail: "Enable notifications to receive score updates, attendance updates and important reminders.",
     tone: "info",
   },
 };
@@ -68,7 +68,11 @@ const NotificationSettingsCard = () => {
     try {
       const token = await enableNotifications();
       setBrowserPermission(getBrowserPermission());
-      setMessage(token ? "Notifications are enabled for this device." : "Notification permission was not completed. Check your browser settings and try again.");
+      setMessage(
+        token
+          ? "Notifications are enabled for this device."
+          : "Notification permission was not completed. On iPhone, open Falowen from the Home Screen app icon first, then tap Enable notifications again."
+      );
     } catch (error) {
       setBrowserPermission(getBrowserPermission());
       setMessage(error instanceof Error ? error.message : "Could not enable notifications. Please try again.");
@@ -81,7 +85,7 @@ const NotificationSettingsCard = () => {
     <section style={styles.card}>
       <h2 style={styles.sectionTitle}>Notification setup</h2>
       <p style={styles.helperText}>
-        Turn this on to receive class notes, student questions, score updates, attendance updates and announcements even when Falowen is not open.
+        Turn this on to receive student questions, score updates, attendance updates and announcements even when Falowen is not open.
       </p>
 
       <div style={{ border: `1px solid ${toneStyle.border}`, background: toneStyle.background, color: toneStyle.color, borderRadius: 12, padding: 12, display: "grid", gap: 6 }}>
