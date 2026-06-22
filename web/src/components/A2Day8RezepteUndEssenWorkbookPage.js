@@ -432,15 +432,18 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
           </p>
 
           <p style={{ margin: 0 }}>
-            <strong>Audio Link:</strong>{" "}
-            <a
-              href="https://drive.google.com/file/d/1oPqOjmHtocxUZFRfuhi-pUZKgFZy-kyQ/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open listening audio
+            <strong>Hören Video:</strong>{" "}
+            <a href="https://youtu.be/Y6G1TTSQyKA" target="_blank" rel="noreferrer">
+              Open listening video
             </a>
           </p>
+          <iframe
+            title="Teil 4 Hören: Rezepte und Essen"
+            src="https://www.youtube.com/embed/Y6G1TTSQyKA"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={videoPreviewStyle}
+          />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question) => (

@@ -6,7 +6,7 @@ describe("additional A1 AI lesson videos", () => {
   test("Day 16 uses the Food and Negation + Food and Daily Life video", () => {
     expect(getAdditionalLessonVideoResources("A1", 16)).toEqual([
       expect.objectContaining({
-        chapter: "9_10",
+        chapter: "9",
         title: "A1 Day 16 · Food and Negation + Food and Daily Life · AI video",
         url: "https://youtu.be/AbgxP6beek4?si=PJax7B2CUyC8PiDq",
       }),
