@@ -2066,8 +2066,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const handleResubmit = async () => {
     setResubmissionStatus({ loading: true, error: "", success: "" });
 
+    // Resubmissions must come only from React state bound to the textarea.
+    // Do not read from innerText/the DOM here: doing so can include page labels
+    // such as "Resubmission unlocked" in the submitted answer.
     const correctedText = String(resubmissionText || "").trim();
-    const trimmedImprovement = resubmissionImprovement.trim();
+    const trimmedImprovement = String(resubmissionImprovement || "").trim();
 
     if (!correctedText) {
       setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
@@ -2229,11 +2232,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         previousSubmissionText: selectedPreview?.submissionText || "",
         originalSubmittedAt: normalizeSerializableTimestamp(selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null),
         status: "resubmitted",
-        ...buildAttemptMetadata({
-          attempt: selectedResubmissionCount + 2,
-          isResubmission: true,
-          previousScore: latestSelectedAssignmentScore,
-        }),
+        attempt: selectedResubmissionCount + 2,
+        attemptNumber: selectedResubmissionCount + 2,
+        isResubmission: true,
+        reviewStatus: "pending_review",
+        previousScore: latestSelectedAssignmentScore,
       };
 
       const submitAssignmentResubmission = httpsCallable(functions, "submitAssignmentResubmission");
