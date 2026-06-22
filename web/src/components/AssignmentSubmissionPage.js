@@ -46,6 +46,28 @@ const MAX_ASSIGNMENT_DAY_BY_LEVEL = { A1: 22, A2: 28, B1: 28 };
 const PASS_THRESHOLD_SCORE = 60;
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
+const formatCooldownDuration = (milliseconds) => {
+  const totalSecondsRemaining = Math.max(0, Math.ceil(Number(milliseconds || 0) / 1000));
+  const minutesRemaining = Math.floor(totalSecondsRemaining / 60);
+  const secondsRemaining = totalSecondsRemaining % 60;
+  if (minutesRemaining > 0) {
+    return `${minutesRemaining} minute${minutesRemaining === 1 ? "" : "s"} ${secondsRemaining} second${secondsRemaining === 1 ? "" : "s"}`;
+  }
+  return `${totalSecondsRemaining} second${totalSecondsRemaining === 1 ? "" : "s"}`;
+};
+
+const getCooldownDetailsFromError = (error) => {
+  const details = error?.details || {};
+  if (details?.code !== "RESUBMISSION_COOLDOWN" && error?.code !== "resource-exhausted") return null;
+  const remainingSeconds = Number(details.remainingSeconds);
+  const nextAllowedAt = details.nextAllowedAt || null;
+  const remainingMs = Number.isFinite(remainingSeconds)
+    ? remainingSeconds * 1000
+    : Math.max(0, new Date(nextAllowedAt || 0).getTime() - Date.now());
+  if (!remainingMs) return null;
+  return { nextAllowedAt, remainingMs };
+};
+
 const formatDate = (timestamp) => {
   if (!timestamp) return "–";
 
@@ -801,6 +823,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
   const [recentSubmissions, setRecentSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [cooldownNow, setCooldownNow] = useState(() => Date.now());
 
   const [lockedChapters, setLockedChapters] = useState(new Set());
   const [lockInfoByChapterKey, setLockInfoByChapterKey] = useState({}); // { [chapterKey]: { lockedAt, assignmentTitle } }
@@ -1683,7 +1706,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       const statusLabel = safeLower(item?.status);
       if (!["submitted", "resubmitted"].includes(statusLabel)) return acc;
 
-      const itemDate = toDateValue(item.createdAt || item.updatedAt);
+      const itemDate = toDateValue(item.resubmittedAt || item.submittedAt || item.createdAt || item.updatedAt);
       if (!itemDate) return acc;
       if (!acc || itemDate > acc) return itemDate;
       return acc;
@@ -1692,20 +1715,54 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return latest;
   }, [recentSubmissions]);
 
-  const submissionCooldownRemainingMs = useMemo(() => {
-    if (!latestSubmissionActionAt) return 0;
-    const elapsed = Date.now() - latestSubmissionActionAt.getTime();
-    const boundedElapsed = Math.max(0, elapsed);
-    return Math.max(0, Math.min(ACTION_COOLDOWN_MS, ACTION_COOLDOWN_MS - boundedElapsed));
+  const nextAllowedSubmissionAt = useMemo(() => {
+    if (!latestSubmissionActionAt) return null;
+    return new Date(latestSubmissionActionAt.getTime() + ACTION_COOLDOWN_MS);
   }, [latestSubmissionActionAt]);
+
+  const submissionCooldownRemainingMs = useMemo(() => {
+    if (!nextAllowedSubmissionAt) return 0;
+    return Math.max(0, nextAllowedSubmissionAt.getTime() - cooldownNow);
+  }, [cooldownNow, nextAllowedSubmissionAt]);
 
   const submissionCooldownLabel = useMemo(() => {
     if (!submissionCooldownRemainingMs) return "";
-    const totalSecondsRemaining = Math.ceil(submissionCooldownRemainingMs / 1000);
-    const minutesRemaining = Math.floor(totalSecondsRemaining / 60);
-    const secondsRemaining = totalSecondsRemaining % 60;
-    return minutesRemaining > 0 ? `${minutesRemaining}m ${secondsRemaining}s` : `${secondsRemaining}s`;
+    return formatCooldownDuration(submissionCooldownRemainingMs);
   }, [submissionCooldownRemainingMs]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCooldownNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const cooldownWasActiveRef = useRef(false);
+
+  useEffect(() => {
+    const wasActive = cooldownWasActiveRef.current;
+    cooldownWasActiveRef.current = submissionCooldownRemainingMs > 0;
+    if (!wasActive || submissionCooldownRemainingMs > 0 || !db || !user?.uid) return;
+
+    const refreshAfterCooldown = async () => {
+      try {
+        const submissionsRef = collection(db, SUBMISSION_COLLECTION);
+        const snapshot = await getDocs(
+          query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
+        );
+        setRecentSubmissions(
+          snapshot.docs
+            .map((entry) => ({ id: entry.id, ...entry.data() }))
+            .filter((entry) => {
+              const entryLevel = normalizeLevel(entry.level || selectedSubmitLevel);
+              return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
+            })
+        );
+        setStatus((prev) => (prev.error ? prev : { ...prev, success: "You can now resubmit this assignment." }));
+      } catch (error) {
+        console.error("Failed to refresh submissions after cooldown", error);
+      }
+    };
+
+    refreshAfterCooldown();
+  }, [accessibleSubmitLevels, selectedSubmitLevel, submissionCooldownRemainingMs, user?.uid]);
 
   const handleSubmitLevelChange = (event) => {
     const nextLevel = normalizeCourseLevel(event.target.value);
@@ -1906,7 +1963,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (submissionCooldownRemainingMs > 0) {
       setStatus({
         loading: false,
-        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
+        error: `Your previous submission was received. You can submit another version in ${submissionCooldownLabel}.`,
         success: "",
       });
       return;
@@ -2232,7 +2289,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (submissionCooldownRemainingMs > 0) {
       setResubmissionStatus({
         loading: false,
-        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
+        error: `Your previous submission was received. You can submit another version in ${submissionCooldownLabel}.`,
         success: "",
       });
       return;
@@ -2316,6 +2373,16 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       );
     } catch (error) {
       console.error("Failed to save resubmission", error);
+      const cooldownDetails = getCooldownDetailsFromError(error);
+      if (cooldownDetails) {
+        setCooldownNow(Date.now());
+        setResubmissionStatus({
+          loading: false,
+          error: `Your previous submission was received. You can submit another version in ${formatCooldownDuration(cooldownDetails.remainingMs)}.`,
+          success: "",
+        });
+        return;
+      }
       setResubmissionStatus({
         loading: false,
         error: getExactErrorMessage(error, "Could not save your resubmission."),
@@ -2580,7 +2647,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             ) : null}
             {submissionCooldownRemainingMs > 0 ? (
               <span style={{ ...styles.helperText, color: "#b45309" }}>
-                You can submit again in {submissionCooldownLabel}.
+                You can resubmit in {submissionCooldownLabel}.
               </span>
             ) : null}
           </div>
@@ -2701,7 +2768,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 type="button"
                 style={styles.primaryButton}
                 onClick={handleResubmit}
-                disabled={resubmissionStatus.loading || resubmissionLimitReached}
+                disabled={resubmissionStatus.loading || resubmissionLimitReached || submissionCooldownRemainingMs > 0}
               >
                 {resubmissionStatus.loading ? "Saving ..." : "Submit resubmission"}
               </button>
@@ -2718,7 +2785,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </p>
             {submissionCooldownRemainingMs > 0 ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#b45309" }}>
-                You can submit again in {submissionCooldownLabel}.
+                You can resubmit in {submissionCooldownLabel}.
               </p>
             ) : null}
           </>
