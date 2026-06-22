@@ -1,7 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
+const resubmissionFixRunner = path.join(repoRoot, 'scripts/run_resubmission_fix.py');
+
+// The course-book audit already runs before both `start` and `build`.
+// Apply the idempotent source fix first so local development and deployments
+// always use the corrected cooldown and assignment-status logic.
+execFileSync(process.env.PYTHON || 'python3', [resubmissionFixRunner], {
+  cwd: repoRoot,
+  stdio: 'inherit',
+});
+
 const canonicalPath = path.join(repoRoot, 'shared/curriculumCanonical.json');
 const webModulePath = path.join(repoRoot, 'web/src/data/a1CourseBookCards.js');
 
