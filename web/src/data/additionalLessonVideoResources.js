@@ -15,7 +15,7 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
     16: [
       {
         key: "a1-day16-food-negation-daily-life-ai-video",
-        chapter: "9_10",
+        chapter: "9",
         title: "A1 Day 16 · Food and Negation + Food and Daily Life · AI video",
         description:
           "AI video lesson for food vocabulary, negation and talking about food in daily life.",
