@@ -1413,7 +1413,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const rawSelectedScore = latestSelectedAssignmentScore;
   const {
     hasSelectedAssignmentScore,
-    numericSelectedAssignmentScore,
     selectedAssignmentFailed,
     selectedAssignmentPassed: selectedAssignmentPassedByScore,
     isAwaitingSelectedAssignmentReview,
