@@ -2,7 +2,6 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const cardStyle = {
   ...styles.card,
@@ -21,6 +20,13 @@ const imageStyle = {
   borderRadius: 10,
   maxHeight: 320,
   objectFit: "cover",
+};
+
+const videoPreviewStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 12,
 };
 
 const questionBoxStyle = {
@@ -156,13 +162,23 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 2 · Hören</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete Hören from Google Drive, then return to submit answers.
+          Complete Hören with the embedded YouTube video below, then return to submit answers.
         </p>
-        <CoursebookAudioPlayer
-          url="https://drive.google.com/file/d/12RITYz1tYLee-FMw9WFzAD9YrtqrjwmC/view?usp=sharing"
-          linkLabel="Open Hören Material (Google Drive)"
-          linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+        <iframe
+          src="https://www.youtube.com/embed/8xybaJbs89I"
+          title="A1 Day 16 Kapitel 10 Hören video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          style={videoPreviewStyle}
         />
+        <a
+          href="https://youtu.be/8xybaJbs89I"
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+        >
+          Open Hören video on YouTube
+        </a>
         <p style={{ margin: "8px 0 0", fontWeight: 600 }}>B) Hören Fragen (Multiple Choice)</p>
         {listeningQuestions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>

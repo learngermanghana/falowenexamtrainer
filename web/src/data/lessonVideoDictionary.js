@@ -163,6 +163,17 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    17: {
+      videoResources: [
+        {
+          key: "a1-day17-instructions-ai-video",
+          chapter: "11",
+          title: "A1 Day 17 · Instructions · AI video",
+          description: "AI video lesson for Kapitel 11 instructions and imperatives.",
+          url: "https://youtu.be/8xybaJbs89I",
+        },
+      ],
+    },
     20: {
       ai_grammar_video: "https://youtu.be/mTwDMOAEMTU",
     },
