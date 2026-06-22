@@ -19,6 +19,15 @@ export const LEVEL_CAPABILITIES = Object.freeze({
 
 const levelKey = (value = "") => String(value).trim().toUpperCase();
 const chapterKey = (value = "") => String(value || "").trim();
+const chapterAliases = (value = "") => {
+  const normalized = chapterKey(value);
+  if (!normalized) return [];
+  const aliases = normalized
+    .split(/[_/,;&]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return aliases.length ? aliases : [normalized];
+};
 const first = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || null;
 const list = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const link = (url, extra = {}) => (url ? { url, ...extra } : null);
@@ -68,12 +77,12 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   if (level !== "A1") return videos;
 
   const singleGroupChapter = groups.length === 1 ? chapterKey(groups[0]?.chapter) : "";
-  const chaptersWithTeacher = new Set(
-    videos
-      .filter(isTeacherVideo)
-      .map((video) => chapterKey(video.chapter) || singleGroupChapter)
-      .filter(Boolean)
-  );
+  const chaptersWithTeacher = new Set();
+  videos.filter(isTeacherVideo).forEach((video) => {
+    const aliases = chapterAliases(video.chapter || singleGroupChapter);
+    aliases.forEach((chapter) => chaptersWithTeacher.add(chapter));
+  });
+
   const existingUrls = new Set(videos.map((video) => video?.url).filter(Boolean));
   const missingTeacherVideos = getA1TeacherVideoResources(day).filter((video) => {
     const chapter = chapterKey(video.chapter);
@@ -91,8 +100,8 @@ export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) =>
   if (selectedChapters.size !== 1) return videos;
 
   return videos.filter((video) => {
-    const videoChapter = chapterKey(video?.chapter);
-    return !videoChapter || selectedChapters.has(videoChapter);
+    const videoChapters = chapterAliases(video?.chapter);
+    return !videoChapters.length || videoChapters.some((chapter) => selectedChapters.has(chapter));
   });
 };
 
