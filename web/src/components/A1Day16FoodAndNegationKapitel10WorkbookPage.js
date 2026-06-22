@@ -116,7 +116,8 @@ const vocabList = {
 const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const requestedTab = new URLSearchParams(location.search || "").get("workbookTab");
+  const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
+  const requestedTab = searchParams.get("workbookTab");
   const [activeTab, setActiveTab] = useState(requestedTab === "submit" ? "submit" : "assignment");
   const assignmentKey = useMemo(() => {
     const foodAssignment = getInlineCourseAssignments(LEVEL, DAY).find(
@@ -129,16 +130,43 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
     setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
   }, [requestedTab]);
 
+  useEffect(() => {
+    if (requestedTab !== "submit") return;
+    if (searchParams.get("assignmentKey") === assignmentKey && searchParams.get("level") === LEVEL) return;
+
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("workbookTab", "submit");
+    nextSearch.set("assignmentKey", assignmentKey);
+    nextSearch.set("level", LEVEL);
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+      },
+      { replace: true, state: { ...(location.state || {}), level: LEVEL, assignmentKey, canonicalAssignmentKey: assignmentKey } }
+    );
+  }, [assignmentKey, location.pathname, location.search, location.state, navigate, requestedTab, searchParams]);
+
   const openTab = (tabKey) => {
     setActiveTab(tabKey);
     const search = new URLSearchParams(location.search || "");
     search.set("workbookTab", tabKey);
+    search.set("assignmentKey", assignmentKey);
+    search.set("level", LEVEL);
     navigate(
       {
         pathname: location.pathname,
         search: `?${search.toString()}`,
       },
-      { replace: true, state: location.state }
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: LEVEL,
+          assignmentKey,
+          canonicalAssignmentKey: assignmentKey,
+        },
+      }
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
