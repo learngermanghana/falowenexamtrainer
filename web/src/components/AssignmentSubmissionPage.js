@@ -352,6 +352,18 @@ const FALOWEN_UI_TEXT_PHRASES = [
   "Review details",
 ];
 
+const stripFalowenUiTextAndNulls = (value) => {
+  const withoutNulls = String(value || "").replace(/\u0000/g, "");
+  return withoutNulls
+    .split(/\r?\n/)
+    .filter((line) => {
+      const normalizedLine = line.trim().toLowerCase();
+      return !FALOWEN_UI_TEXT_PHRASES.some((phrase) => normalizedLine === phrase.toLowerCase());
+    })
+    .join("\n")
+    .trim();
+};
+
 const appearsToContainFalowenUiText = (value) => {
   const normalized = String(value || "").toLowerCase();
   const matches = FALOWEN_UI_TEXT_PHRASES.filter((phrase) => normalized.includes(phrase.toLowerCase()));
@@ -2093,8 +2105,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     // Resubmissions must come only from React state bound to the textarea.
     // Do not read from innerText/the DOM here: doing so can include page labels
     // such as "Resubmission unlocked" in the submitted answer.
-    const correctedText = String(resubmissionText || "").trim();
-    const trimmedImprovement = String(resubmissionImprovement || "").trim();
+    const correctedText = stripFalowenUiTextAndNulls(resubmissionText);
+    const trimmedImprovement = stripFalowenUiTextAndNulls(resubmissionImprovement);
 
     if (!correctedText) {
       setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
@@ -2254,12 +2266,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         workContent: correctedText,
         improvementSummary: trimmedImprovement,
         previousSubmissionText: selectedPreview?.submissionText || "",
-        originalSubmittedAt: normalizeSerializableTimestamp(selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null),
-        status: "resubmitted",
         attempt: selectedResubmissionCount + 2,
         attemptNumber: selectedResubmissionCount + 2,
-        isResubmission: true,
-        reviewStatus: "pending_review",
         previousScore: latestSelectedAssignmentScore,
       };
 
@@ -2814,6 +2822,7 @@ export const __TESTING__ = {
   getLatestSubmissionScore,
   isSubmissionAttemptStatus,
   deriveResubmissionAccessState,
+  stripFalowenUiTextAndNulls,
   appearsToContainFalowenUiText,
   normalizeSerializableTimestamp,
   buildSubmissionFingerprint,
