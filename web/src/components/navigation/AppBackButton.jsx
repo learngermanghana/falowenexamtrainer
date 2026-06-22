@@ -19,6 +19,16 @@ const normalizeInAppPath = (value = "") => {
   }
 };
 
+const isCourseLessonHub = (pathname = "", search = "") => {
+  const normalizedPath = normalizeInAppPath(pathname);
+  if (!/^\/campus\/course\/lesson\/[^/]+\/[^/]+$/i.test(normalizedPath)) return false;
+
+  // B1 grammar/workbook pages reuse the lesson route with ?view=... and must
+  // still return to their lesson hub first. A normal lesson hub, including a
+  // ?chapter=... URL, should go directly to the main Course Book.
+  return !new URLSearchParams(search || "").has("view");
+};
+
 const addCanonicalGrammarReturns = (index, level, entries) => {
   entries.forEach(({ day, chapter, route }) => {
     const pathname = normalizeInAppPath(route);
@@ -118,6 +128,14 @@ const AppBackButton = ({
   const handleBack = () => {
     if (onBack) {
       onBack();
+      return;
+    }
+
+    // Workbook/grammar page -> exact lesson hub. Lesson hub -> main Course Book.
+    // This avoids navigating back to an identical lesson-history entry, which
+    // made the button appear unresponsive after returning from a workbook.
+    if (isCourseLessonHub(location.pathname, location.search)) {
+      navigate(fallbackPath, { replace: true });
       return;
     }
 
