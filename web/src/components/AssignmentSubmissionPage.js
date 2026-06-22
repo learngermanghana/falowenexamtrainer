@@ -353,7 +353,7 @@ const FALOWEN_UI_TEXT_PHRASES = [
 ];
 
 const stripFalowenUiTextAndNulls = (value) => {
-  const withoutNulls = String(value || "").replace(/\u0000/g, "");
+  const withoutNulls = String(value || "").split(String.fromCharCode(0)).join("");
   return withoutNulls
     .split(/\r?\n/)
     .filter((line) => {
