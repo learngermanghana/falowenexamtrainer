@@ -66,6 +66,8 @@ jest.mock("./ExamReadinessBadge", () => () => <div>badge</div>);
 
 jest.mock("../firebase", () => ({
   db: {},
+  functions: {},
+  httpsCallable: jest.fn(() => jest.fn(() => Promise.resolve({ data: { attempt: 2 } }))),
   serverTimestamp: jest.fn(() => ({ seconds: 1 })),
   collection: jest.fn(() => ({})),
   query: jest.fn(() => ({})),
@@ -315,13 +317,11 @@ Teil :4
     expect(payload.workContent).toBe(payload.submissionText);
   });
 
-  it("builds queue-compatible metadata for a failed assignment resubmission", () => {
-    const timestamp = { seconds: 2 };
+  it("builds queue-compatible metadata for a failed assignment resubmission without client timestamps", () => {
     const metadata = __TESTING__.buildAttemptMetadata({
       attempt: 2,
       isResubmission: true,
       previousScore: 42,
-      timestamp,
     });
 
     expect(metadata).toEqual({
@@ -329,10 +329,10 @@ Teil :4
       attemptNumber: 2,
       isResubmission: true,
       reviewStatus: "pending_review",
-      submittedAt: timestamp,
-      resubmittedAt: timestamp,
       previousScore: 42,
     });
+    expect(metadata).not.toHaveProperty("submittedAt");
+    expect(metadata).not.toHaveProperty("resubmittedAt");
   });
 
   it("uses the latest marked score when deciding whether resubmission is allowed", () => {
@@ -350,6 +350,70 @@ Teil :4
     expect(__TESTING__.getSubmissionScore({ score: "59%" })).toBe(59);
     expect(__TESTING__.getSubmissionScore({ previousScore: 45 })).toBe(45);
     expect(__TESTING__.getSubmissionScore({ score: "not marked" })).toBeNull();
+  });
+
+  it("derives resubmission visibility from only the selected assignment score", () => {
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: null, isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: false,
+      isAwaitingSelectedAssignmentReview: true,
+      selectedAssignmentFailed: false,
+      canAccessResubmission: false,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: "", isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: false,
+      isAwaitingSelectedAssignmentReview: true,
+      selectedAssignmentFailed: false,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: 45, isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: true,
+      selectedAssignmentFailed: true,
+      canAccessResubmission: true,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: "45", isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: true,
+      selectedAssignmentFailed: true,
+      canAccessResubmission: true,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: 60, isSelectedLocked: true })).toMatchObject({
+      selectedAssignmentPassed: true,
+      canAccessResubmission: false,
+    });
+  });
+
+  it("keeps corrected text payload fields free from Falowen page helper text", () => {
+    const correctedText = "Meine korrigierte Antwort enthält nur die neue Schülerantwort und keine Seitentexte.";
+    const payload = {
+      submissionText: correctedText,
+      answer: correctedText,
+      workContent: correctedText,
+      submissionFingerprint: __TESTING__.buildSubmissionFingerprint({
+        assignmentTitle: TUTOR_ASSIGNMENT_LABEL,
+        chapterKey: "chapter-1.1",
+        submissionText: correctedText,
+      }),
+      ...__TESTING__.buildAttemptMetadata({ attempt: 2, isResubmission: true, previousScore: 45 }),
+    };
+
+    ["Resubmission unlocked", "Resubmissions left", "First submission is #1", "You can resubmit", "Corrected text", "Submitted preview", "Review details"].forEach((phrase) => {
+      expect(payload.submissionText).not.toContain(phrase);
+      expect(payload.answer).not.toContain(phrase);
+      expect(payload.workContent).not.toContain(phrase);
+    });
+    expect(payload).not.toHaveProperty("createdAt");
+    expect(payload).not.toHaveProperty("updatedAt");
+    expect(payload).not.toHaveProperty("submittedAt");
+    expect(payload).not.toHaveProperty("resubmittedAt");
+  });
+
+  it("detects accidental pasted Falowen interface text", () => {
+    expect(__TESTING__.appearsToContainFalowenUiText("Resubmission unlocked\nCorrected text\nReview details")).toBe(true);
+    expect(__TESTING__.appearsToContainFalowenUiText("Meine richtige Antwort steht hier.")).toBe(false);
+  });
+
+  it("normalizes Firestore timestamps before callable payloads", () => {
+    expect(__TESTING__.normalizeSerializableTimestamp({ seconds: 10, nanoseconds: 5 })).toEqual({ seconds: 10, nanoseconds: 5 });
+    expect(__TESTING__.normalizeSerializableTimestamp({ toMillis: () => 1234 })).toBe(1234);
+    expect(__TESTING__.normalizeSerializableTimestamp({ _methodName: "serverTimestamp" })).toBeNull();
   });
 
   it("falls back to auth display name when student profile name is missing", () => {
