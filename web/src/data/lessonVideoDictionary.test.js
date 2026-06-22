@@ -80,10 +80,19 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("returns both configured A1 Day 12 AI videos for the 24 hour clock and dates", () => {
+  test("returns the configured A1 Day 11 Understanding Time AI video", () => {
+    expect(getLessonVideoResources("A1", 11)).toEqual([
+      expect.objectContaining({
+        chapter: "7",
+        title: "A1 Day 11 · Understanding Time · AI video",
+        url: "https://youtu.be/xesl04zaQ1E",
+      }),
+    ]);
+  });
+
+  test("returns only the configured A1 Day 12 AI video for the 24 hour clock and dates", () => {
     expect(getLessonVideoResources("A1", 12).map((resource) => resource.url)).toEqual([
       "https://youtu.be/ZE24QSbGaSo",
-      "https://youtu.be/xesl04zaQ1E",
     ]);
   });
 
