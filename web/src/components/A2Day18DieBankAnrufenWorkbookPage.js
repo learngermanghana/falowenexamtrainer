@@ -449,15 +449,15 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
             Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
           </p>
           <p style={{ margin: 0 }}>
-            Audio:{" "}
-            <a
-              href="https://drive.google.com/file/d/16SL5aRG9nQnQiu6_YwxDi5qd0bUzNlTM/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
-            </a>
+            Video: <a href="https://youtu.be/cHKVQOLWv7c" target="_blank" rel="noreferrer">Open Teil 4 video</a>
           </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/cHKVQOLWv7c"
+            title="Die Bank anrufen - Teil 4 listening video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
@@ -468,17 +468,6 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <p style={{ margin: 0 }}>
-            Embedded audio preview:
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://drive.google.com/file/d/16SL5aRG9nQnQiu6_YwxDi5qd0bUzNlTM/preview"
-            title="Die Bank anrufen - Teil 4 listening audio"
-            allow="autoplay"
-            allowFullScreen
-          />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
