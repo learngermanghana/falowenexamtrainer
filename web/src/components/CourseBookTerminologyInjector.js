@@ -6,6 +6,9 @@ const DAY17_LESSON_PATH = "/campus/course/lesson/A1/17";
 const DAY17_WORKBOOK_PATH = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 const DAY16_HOREN_VIDEO_ID = "Q5oOWNvZ8X4";
 const OLD_DAY17_WORKBOOK_DRIVE_ID = "17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A";
+const A2_DAY11_LESSON_PATH = "/campus/course/lesson/A2/11";
+const A2_DAY11_GRAMMAR_ROUTE = "/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes";
+const OLD_A2_DAY11_GRAMMAR_DRIVE_ID = "19I7oOHX8r4daxXmx38mNMaZO10AXHEFu";
 const WORKBOOK_NAV_SELECTOR = '[aria-label="Workbook assignment navigation"]';
 const OFFICIAL_SUBMIT_ATTRIBUTE = "data-falowen-workbook-submit-tab";
 const SYNTHETIC_SUBMIT_ATTRIBUTE = "data-falowen-workbook-submit-proxy";
@@ -196,6 +199,27 @@ const applyA1ResourceFixes = (root = document) => {
   }
 };
 
+const applyA2ResourceFixes = (root = document) => {
+  if (!root?.querySelectorAll || typeof window === "undefined") return;
+  const pathname = normalizePath(window.location.pathname);
+  if (pathname !== A2_DAY11_LESSON_PATH) return;
+
+  root.querySelectorAll("a").forEach((link) => {
+    const href = String(link.getAttribute("href") || "");
+    const text = normalizeText(link.textContent);
+    const cardText = normalizeText(link.closest("article")?.textContent);
+    const isOldDriveGrammar = href.includes(OLD_A2_DAY11_GRAMMAR_DRIVE_ID);
+    const isGrammarBookAction =
+      (text.includes("grammar") || text.includes("grammatik")) &&
+      (cardText.includes("4.11") || cardText.includes("verkehrsmittel"));
+
+    if (!isOldDriveGrammar && !isGrammarBookAction) return;
+    setAttributeIfChanged(link, "href", A2_DAY11_GRAMMAR_ROUTE);
+    removeAttributeIfPresent(link, "target");
+    removeAttributeIfPresent(link, "rel");
+  });
+};
+
 export const replaceCourseBookTerminology = (root = document) => {
   if (!root?.querySelectorAll) return 0;
 
@@ -206,6 +230,7 @@ export const replaceCourseBookTerminology = (root = document) => {
     replacements += 1;
   });
   applyA1ResourceFixes(root);
+  applyA2ResourceFixes(root);
   applyWorkbookTabDeduplication(root);
 
   return replacements;
