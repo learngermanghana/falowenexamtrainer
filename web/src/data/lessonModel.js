@@ -2,6 +2,7 @@ import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
@@ -29,6 +30,12 @@ const INTERNAL = {
   B1: { 1: { grammarBook: "/campus/course/lesson/B1/1?view=grammar", workbook: "/campus/course/lesson/B1/1?view=workbook" } },
 };
 
+const getCanonicalGrammarBook = ({ level, day, chapter }) => {
+  if (level === "A1") return getA1GrammarRoute({ day, chapter });
+  if (level === "A2") return getA2GrammarRoute({ day, chapter });
+  return "";
+};
+
 const resourceGroups = (raw, level, day) => {
   const nested = [...list(raw.schreiben_sprechen), ...list(raw.lesen_hören)].filter(Boolean);
   const entries = nested.length ? nested : [raw];
@@ -41,11 +48,11 @@ const resourceGroups = (raw, level, day) => {
       chapter,
       fallback: internal.workbook || first(entry.workbook_link, raw.workbook_link, entry.workbookRoute, raw.workbookRoute),
     });
-    const a2GrammarBook = level === "A2" ? getA2GrammarRoute({ day, chapter }) : "";
+    const canonicalGrammarBook = getCanonicalGrammarBook({ level, day, chapter });
     return {
       chapter,
       grammarBook: link(
-        a2GrammarBook ||
+        canonicalGrammarBook ||
           internal.grammarBook ||
           first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link)
       ),
