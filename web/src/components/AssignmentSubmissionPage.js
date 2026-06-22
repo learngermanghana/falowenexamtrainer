@@ -33,6 +33,8 @@ const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 80;
+const MIN_SUBMISSION_WORDS = 20;
+const MIN_RESUBMISSION_IMPROVEMENT_WORDS = 8;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
 const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
 const MIN_RESUBMISSION_NEW_WORDS = 8;
@@ -429,6 +431,46 @@ const levelMatches = (entryLevel, selectedLevel) => {
 };
 
 const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
+
+const countWords = (value) => tokenizeSubmission(value).length;
+
+const getMinimumWordProgress = (value, minimumWords) => {
+  const wordCount = countWords(value);
+  const target = Math.max(1, Number(minimumWords) || 1);
+  return {
+    wordCount,
+    wordsRemaining: Math.max(0, target - wordCount),
+    percent: Math.min(100, Math.round((wordCount / target) * 100)),
+  };
+};
+
+const WordProgress = ({ value, minimumWords, label = "Minimum word target" }) => {
+  const progress = getMinimumWordProgress(value, minimumWords);
+  const isReady = progress.wordsRemaining === 0;
+
+  return (
+    <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
+      <div
+        aria-label={`${label}: ${progress.wordCount} of ${minimumWords} words`}
+        style={{ height: 8, overflow: "hidden", borderRadius: 999, background: "#e5e7eb" }}
+      >
+        <div
+          style={{
+            width: `${progress.percent}%`,
+            height: "100%",
+            borderRadius: 999,
+            background: isReady ? "#16a34a" : "#2563eb",
+            transition: "width 160ms ease",
+          }}
+        />
+      </div>
+      <span style={styles.helperText}>
+        {progress.wordCount} / {minimumWords} words · {isReady ? "Word target reached" : `${progress.wordsRemaining} word${progress.wordsRemaining === 1 ? "" : "s"} left`}
+      </span>
+    </div>
+  );
+};
+
 
 const toChapterSortValue = (chapter) => {
   const token = String(chapter || "").trim();
@@ -884,6 +926,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const autosaveTimerRef = useRef(null);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
   const submissionTextRef = useRef(null);
+  const resubmissionTextRef = useRef(null);
+  const resubmissionImprovementRef = useRef(null);
 
   const buildChapterKey = useCallback(
     (title) => {
@@ -1806,33 +1850,45 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     if (field === "confirmed") setStatus((prev) => ({ ...prev, error: "" }));
   };
 
-  const insertSubmissionCharacter = useCallback((character) => {
-    setForm((previousForm) => {
-      const currentValue = String(previousForm?.submissionText || "");
-      const inputElement = submissionTextRef.current;
-      const hasCursor = inputElement && typeof inputElement.selectionStart === "number";
-      if (!hasCursor) {
-        return { ...previousForm, submissionText: `${currentValue}${character}` };
-      }
+  const insertCharacterAtCursor = useCallback((character, inputRef, applyValue) => {
+    const inputElement = inputRef.current;
+    const start = inputElement && typeof inputElement.selectionStart === "number" ? inputElement.selectionStart : null;
+    const end = inputElement && typeof inputElement.selectionEnd === "number" ? inputElement.selectionEnd : null;
 
-      const start = inputElement.selectionStart;
-      const end = inputElement.selectionEnd;
-      return {
-        ...previousForm,
-        submissionText: `${currentValue.slice(0, start)}${character}${currentValue.slice(end)}`,
-      };
+    applyValue((currentValue) => {
+      const text = String(currentValue || "");
+      if (start === null || end === null) return `${text}${character}`;
+      return `${text.slice(0, start)}${character}${text.slice(end)}`;
     });
 
     window.requestAnimationFrame(() => {
-      const inputElement = submissionTextRef.current;
       if (!inputElement) return;
-      const start = typeof inputElement.selectionStart === "number" ? inputElement.selectionStart : inputElement.value.length;
-      const end = typeof inputElement.selectionEnd === "number" ? inputElement.selectionEnd : inputElement.value.length;
-      const cursorPosition = Math.max(start, end) + character.length;
+      const cursorPosition = (start === null || end === null ? inputElement.value.length : Math.max(start, end)) + character.length;
       inputElement.focus();
       inputElement.setSelectionRange(cursorPosition, cursorPosition);
     });
   }, []);
+
+  const insertSubmissionCharacter = useCallback((character) => {
+    insertCharacterAtCursor(character, submissionTextRef, (buildNextValue) => {
+      setForm((previousForm) => ({
+        ...previousForm,
+        submissionText: buildNextValue(previousForm?.submissionText),
+      }));
+    });
+  }, [insertCharacterAtCursor]);
+
+  const insertResubmissionCharacter = useCallback((character) => {
+    insertCharacterAtCursor(character, resubmissionTextRef, (buildNextValue) => {
+      setResubmissionText((currentValue) => buildNextValue(currentValue));
+    });
+  }, [insertCharacterAtCursor]);
+
+  const insertImprovementCharacter = useCallback((character) => {
+    insertCharacterAtCursor(character, resubmissionImprovementRef, (buildNextValue) => {
+      setResubmissionImprovement((currentValue) => buildNextValue(currentValue));
+    });
+  }, [insertCharacterAtCursor]);
 
   const hasSelectedAssignment = Boolean(form.assignmentTitle);
   const selectedDayNumber = selectedAssignmentDay;
@@ -2562,6 +2618,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 }
                 disabled={isSelectedLocked || !hasSelectedAssignment}
               />
+              <WordProgress value={form.submissionText} minimumWords={MIN_SUBMISSION_WORDS} />
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
                 {GERMAN_SPECIAL_CHARACTERS.map((character) => (
@@ -2731,6 +2788,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Corrected text</span>
               <textarea
+                ref={resubmissionTextRef}
                 value={resubmissionText}
                 onChange={(event) => setResubmissionText(event.target.value)}
                 maxLength={dynamicMaxSubmissionCharacters}
@@ -2738,21 +2796,52 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 placeholder="Paste your corrected letter/text here."
                 disabled={resubmissionLimitReached}
               />
+              <WordProgress value={resubmissionText} minimumWords={MIN_SUBMISSION_WORDS} />
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
               </span>
+              <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                {GERMAN_SPECIAL_CHARACTERS.map((character) => (
+                  <button
+                    key={character}
+                    type="button"
+                    style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
+                    onClick={() => insertResubmissionCharacter(character)}
+                    disabled={resubmissionLimitReached}
+                  >
+                    {character}
+                  </button>
+                ))}
+              </div>
             </label>
 
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>What did you improve in this submission? *</span>
               <textarea
+                ref={resubmissionImprovementRef}
                 value={resubmissionImprovement}
                 onChange={(event) => setResubmissionImprovement(event.target.value)}
                 style={{ ...styles.textArea, minHeight: 120 }}
                 placeholder="Example: I fixed verb placement in Nebensätze, corrected article endings, and rewrote the opening paragraph to match the prompt."
                 disabled={resubmissionLimitReached}
               />
+              <WordProgress value={resubmissionImprovement} minimumWords={MIN_RESUBMISSION_IMPROVEMENT_WORDS} />
               <span style={styles.helperText}>Add at least {MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS} characters.</span>
+              <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                {GERMAN_SPECIAL_CHARACTERS.map((character) => (
+                  <button
+                    key={character}
+                    type="button"
+                    style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
+                    onClick={() => insertImprovementCharacter(character)}
+                    disabled={resubmissionLimitReached}
+                  >
+                    {character}
+                  </button>
+                ))}
+              </div>
             </label>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>

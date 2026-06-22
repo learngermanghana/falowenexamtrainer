@@ -410,16 +410,13 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
           </p>
-          <p style={{ margin: 0 }}>
-            Audio link:{" "}
-            <a
-              href="https://drive.google.com/file/d/1m973krkBWyWPkvdhXEcPzpIoYoKiuqRu/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
-            </a>
-          </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/cpiYNbbIvr4"
+            title="Teil 4 Hören audio"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
@@ -433,19 +430,6 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
             </div>
           ))}
 
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/RkvfRiPCZI4" target="_blank" rel="noreferrer">
-              Verkehrsmittel im Vergleich (A2)
-            </a>
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/RkvfRiPCZI4"
-            title="Verkehrsmittel im Vergleich (A2)"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
