@@ -30,7 +30,7 @@ test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
       expect.objectContaining({
         chapter: "1.1",
         title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
-        url: "https://youtu.be/pCQVdJGsvtk",
+        url: "https://youtu.be/kqagu9qsOcc",
       }),
     ]),
   );

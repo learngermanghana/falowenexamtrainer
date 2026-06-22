@@ -103,11 +103,29 @@ describe("canonical lesson model", () => {
     const lesson = normalizeA1Lesson({
       day: 2,
       chapter: "1.1",
-      lesen_hören: { chapter: "1.1" },
+      lesen_hören: { chapter: "1.1", video: "https://youtu.be/AjsnO1hxDs4" },
     });
-    const titles = lesson.resources.videos.map((video) => video.title);
+    const videos = lesson.resources.videos.map((video) => ({
+      title: video.title,
+      url: video.url,
+    }));
 
-    expect(titles).toContain("Kapitel 1.1 · Pronouns & Verb Conjugation · AI video");
-    expect(titles).not.toContain("Kapitel 0.2 · Alphabet · AI video");
+    expect(videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "Teacher explanation",
+          url: "https://youtu.be/AjsnO1hxDs4",
+        }),
+        expect.objectContaining({
+          title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
+          url: "https://youtu.be/kqagu9qsOcc",
+        }),
+      ]),
+    );
+    expect(videos).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ title: "Kapitel 0.2 · Alphabet · AI video" }),
+      ]),
+    );
   });
 });
