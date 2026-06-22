@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { A1_GRAMMAR_ROUTE_ENTRIES } from "../../data/a1GrammarRoutes";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../../data/a2GrammarRoutes";
 import { courseSchedules } from "../../data/courseSchedule";
 import "./AppBackButton.css";
@@ -16,6 +17,17 @@ const normalizeInAppPath = (value = "") => {
   } catch (_error) {
     return "";
   }
+};
+
+const addCanonicalGrammarReturns = (index, level, entries) => {
+  entries.forEach(({ day, chapter, route }) => {
+    const pathname = normalizeInAppPath(route);
+    if (!pathname) return;
+    index.set(
+      pathname,
+      `/campus/course/lesson/${level}/${Number(day)}?chapter=${encodeURIComponent(chapter)}`
+    );
+  });
 };
 
 const buildLessonReturnIndex = () => {
@@ -52,17 +64,10 @@ const buildLessonReturnIndex = () => {
     });
   });
 
-  // The curriculum dictionary still contains legacy Drive URLs for some A2
-  // grammar books. Index the canonical in-app routes directly so Back always
-  // returns to the exact A2 lesson and chapter.
-  A2_GRAMMAR_ROUTE_ENTRIES.forEach(({ day, chapter, route }) => {
-    const pathname = normalizeInAppPath(route);
-    if (!pathname) return;
-    index.set(
-      pathname,
-      `/campus/course/lesson/A2/${Number(day)}?chapter=${encodeURIComponent(chapter)}`
-    );
-  });
+  // The generated curriculum still contains legacy Drive URLs for a few A1
+  // and several A2 grammar books. Index the canonical in-app routes directly.
+  addCanonicalGrammarReturns(index, "A1", A1_GRAMMAR_ROUTE_ENTRIES);
+  addCanonicalGrammarReturns(index, "A2", A2_GRAMMAR_ROUTE_ENTRIES);
 
   return index;
 };
