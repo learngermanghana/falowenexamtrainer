@@ -3,6 +3,7 @@ import { useLocation, useParams } from "react-router-dom";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbookPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
+import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy, { LessonResourcesHub } from "./CourseLessonPageLegacy";
@@ -124,10 +125,11 @@ const syncA2LessonFromSchedule = (lesson, day) => {
 const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
 const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 5);
 const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
+(courseSchedules.A1 || []).forEach((entry) => applyA1GrammarRouteToLesson(entry, entry?.day));
+(courseSchedules.A2 || []).forEach((entry) => applyA2GrammarRouteToLesson(entry, entry?.day));
 decorateA1Day3Lesson(scheduleDay3);
 decorateA1Day5Lesson(scheduleDay5);
 decorateA1Day17Lesson(scheduleDay17);
-(courseSchedules.A2 || []).forEach((entry) => applyA2GrammarRouteToLesson(entry, entry?.day));
 
 const replaceText = (element, text) => {
   if (element && element.textContent !== text) element.textContent = text;
@@ -183,6 +185,7 @@ export default function CourseLessonPage() {
   const isA1Day3 = level === "A1" && day === 3;
   const isA1Day5 = level === "A1" && day === 5;
   const isA1Day17 = level === "A1" && day === 17;
+  if (level === "A1") applyA1GrammarRouteToLesson(location.state?.entry, day);
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
   if (isA1Day17) decorateA1Day17Lesson(location.state?.entry);
