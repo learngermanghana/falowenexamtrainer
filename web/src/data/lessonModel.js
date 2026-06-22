@@ -2,6 +2,7 @@ import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
@@ -25,7 +26,6 @@ const mergeVideos = (...groups) => {
   return groups.flat().filter((item) => item?.url && !seen.has(item.url) && seen.add(item.url));
 };
 const INTERNAL = {
-  A2: { 17: { grammarBook: "/campus/course/a2-day-17-in-die-apotheke-grammar-notes.html" } },
   B1: { 1: { grammarBook: "/campus/course/lesson/B1/1?view=grammar", workbook: "/campus/course/lesson/B1/1?view=workbook" } },
 };
 
@@ -41,9 +41,14 @@ const resourceGroups = (raw, level, day) => {
       chapter,
       fallback: internal.workbook || first(entry.workbook_link, raw.workbook_link, entry.workbookRoute, raw.workbookRoute),
     });
+    const a2GrammarBook = level === "A2" ? getA2GrammarRoute({ day, chapter }) : "";
     return {
       chapter,
-      grammarBook: link(internal.grammarBook || first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link)),
+      grammarBook: link(
+        a2GrammarBook ||
+          internal.grammarBook ||
+          first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link)
+      ),
       workbook: link(workbook),
     };
   });
