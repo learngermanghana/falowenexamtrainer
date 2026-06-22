@@ -306,6 +306,59 @@ const toDateValue = (timestamp) => {
   return Number.isNaN(fallback.getTime()) ? null : fallback;
 };
 
+const normalizeSerializableTimestamp = (timestamp) => {
+  if (!timestamp) return null;
+  if (typeof timestamp?.toMillis === "function") return timestamp.toMillis();
+  if (typeof timestamp?.toDate === "function") return timestamp.toDate().toISOString();
+  if (Number.isFinite(timestamp?.seconds)) {
+    return { seconds: Number(timestamp.seconds), nanoseconds: Number(timestamp.nanoseconds || 0) };
+  }
+  if (timestamp instanceof Date) return timestamp.toISOString();
+  if (["string", "number"].includes(typeof timestamp)) return timestamp;
+  return null;
+};
+
+const FALOWEN_UI_TEXT_PHRASES = [
+  "Resubmission unlocked",
+  "Resubmissions left",
+  "First submission is #1",
+  "You can resubmit",
+  "Corrected text",
+  "Submitted preview",
+  "Review details",
+];
+
+const appearsToContainFalowenUiText = (value) => {
+  const normalized = String(value || "").toLowerCase();
+  const matches = FALOWEN_UI_TEXT_PHRASES.filter((phrase) => normalized.includes(phrase.toLowerCase()));
+  return matches.length >= 2;
+};
+
+const deriveResubmissionAccessState = ({ rawSelectedScore, isSelectedLocked }) => {
+  const hasSelectedAssignmentScore =
+    rawSelectedScore !== null &&
+    rawSelectedScore !== undefined &&
+    String(rawSelectedScore).trim() !== "" &&
+    Number.isFinite(Number(rawSelectedScore));
+  const numericSelectedAssignmentScore = hasSelectedAssignmentScore ? Number(rawSelectedScore) : null;
+  const selectedAssignmentFailed =
+    hasSelectedAssignmentScore && Number(rawSelectedScore) < PASS_THRESHOLD_SCORE;
+  const selectedAssignmentPassed =
+    hasSelectedAssignmentScore && Number(rawSelectedScore) >= PASS_THRESHOLD_SCORE;
+  const isAwaitingSelectedAssignmentReview = Boolean(isSelectedLocked && !hasSelectedAssignmentScore);
+  const canAccessResubmission = Boolean(isSelectedLocked && selectedAssignmentFailed);
+
+  return {
+    rawSelectedScore,
+    hasSelectedAssignmentScore,
+    numericSelectedAssignmentScore,
+    selectedAssignmentFailed,
+    selectedAssignmentPassed,
+    isAwaitingSelectedAssignmentReview,
+    canAccessResubmission,
+  };
+};
+
 const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 
 const normalizeLevel = (level) => normalizeCourseLevel(level) || "GENERAL";
@@ -433,8 +486,8 @@ const buildAttemptMetadata = ({ attempt = 1, isResubmission = false, previousSco
   attemptNumber: attempt,
   isResubmission,
   reviewStatus: "pending_review",
-  submittedAt: timestamp,
-  ...(isResubmission ? { resubmittedAt: timestamp } : {}),
+  ...(timestamp ? { submittedAt: timestamp } : {}),
+  ...(isResubmission && timestamp ? { resubmittedAt: timestamp } : {}),
   ...(typeof previousScore === "number" ? { previousScore } : {}),
 });
 
@@ -1245,14 +1298,23 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       setStatus((prev) => ({ ...prev, error: "", success: "" }));
       setCopyStatus("");
       setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
-      setResubmissionText("");
-      setResubmissionImprovement("");
+      const draftCanonicalKey = draft?.canonicalAssignmentKey || draft?.assignmentKey || "";
+      const selectedKey = selectedCanonicalAssignmentKey || selectedAssignmentId || "";
+      const hasValidResubmissionDraft =
+        draft?.status === "resubmission_draft" &&
+        draftCanonicalKey &&
+        selectedKey &&
+        normalizeAssignmentIdentity(draftCanonicalKey) === normalizeAssignmentIdentity(selectedKey);
+      setResubmissionText(hasValidResubmissionDraft ? String(draft.resubmissionText || "") : "");
+      setResubmissionImprovement(hasValidResubmissionDraft ? String(draft.resubmissionImprovement || "") : "");
       setResubmissionStatus({ loading: false, error: "", success: "" });
     }
 
   }, [
     draftsByAssignment,
     form.assignmentTitle,
+    selectedAssignmentId,
+    selectedCanonicalAssignmentKey,
   ]);
 
   // Locked state for currently selected assignment.
@@ -1348,24 +1410,22 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return ["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus);
   }, [isSameSelectedAssignment, latestSelectedAssignmentScore, recentSubmissions]);
 
-  const hasSelectedAssignmentScore =
-    latestSelectedAssignmentScore !== null &&
-    latestSelectedAssignmentScore !== undefined &&
-    String(latestSelectedAssignmentScore).trim() !== "" &&
-    Number.isFinite(Number(latestSelectedAssignmentScore));
-  const numericSelectedAssignmentScore = hasSelectedAssignmentScore ? Number(latestSelectedAssignmentScore) : null;
-  const selectedAssignmentFailed =
-    hasSelectedAssignmentScore && numericSelectedAssignmentScore < PASS_THRESHOLD_SCORE;
-  const selectedAssignmentPassedByScore =
-    hasSelectedAssignmentScore && numericSelectedAssignmentScore >= PASS_THRESHOLD_SCORE;
-  const isAwaitingSelectedAssignmentReview = isSelectedLocked && !hasSelectedAssignmentScore;
+  const rawSelectedScore = latestSelectedAssignmentScore;
+  const {
+    hasSelectedAssignmentScore,
+    numericSelectedAssignmentScore,
+    selectedAssignmentFailed,
+    selectedAssignmentPassed: selectedAssignmentPassedByScore,
+    isAwaitingSelectedAssignmentReview,
+    canAccessResubmission,
+  } = deriveResubmissionAccessState({ rawSelectedScore, isSelectedLocked });
 
   const remainingResubmissions = Math.max(
     0,
     Math.min(MAX_RESUBMISSION_TRIES - selectedResubmissionCount, MAX_TOTAL_SUBMISSION_ATTEMPTS - selectedSubmissionAttemptCount)
   );
   const resubmissionLimitReached = selectedSubmissionAttemptCount >= MAX_TOTAL_SUBMISSION_ATTEMPTS || remainingResubmissions === 0;
-  const canShowResubmissionForm = isSelectedLocked && selectedAssignmentFailed;
+  const canShowResubmissionForm = canAccessResubmission;
   const resubmissionBadgeLabel = !isSelectedLocked
     ? "Not available"
     : isAwaitingSelectedAssignmentReview
@@ -1901,7 +1961,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const handleSaveResubmissionDraft = async () => {
     setResubmissionStatus({ loading: true, error: "", success: "" });
 
-    const trimmedResubmission = resubmissionText.trim();
+    const correctedText = resubmissionText.trim();
     const trimmedImprovement = resubmissionImprovement.trim();
 
     if (!db || !user?.uid || !form.assignmentTitle) {
@@ -1920,7 +1980,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (!trimmedResubmission && !trimmedImprovement) {
+    if (!correctedText && !trimmedImprovement) {
       setResubmissionStatus({
         loading: false,
         error: "Add corrected text or an improvement summary before saving a draft.",
@@ -1953,7 +2013,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         studentName,
         className: studentProfile?.className || "",
         status: "resubmission_draft",
-        resubmissionText: trimmedResubmission,
+        resubmissionText: correctedText,
         resubmissionImprovement: trimmedImprovement,
         createdAt: existingDraft?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -2007,11 +2067,20 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const handleResubmit = async () => {
     setResubmissionStatus({ loading: true, error: "", success: "" });
 
-    const trimmedResubmission = resubmissionText.trim();
+    const correctedText = String(resubmissionText || "").trim();
     const trimmedImprovement = resubmissionImprovement.trim();
 
-    if (!trimmedResubmission) {
+    if (!correctedText) {
       setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
+      return;
+    }
+
+    if (appearsToContainFalowenUiText(correctedText)) {
+      setResubmissionStatus({
+        loading: false,
+        error: "Your corrected text appears to include page instructions. Paste only the corrected answer from the textarea.",
+        success: "",
+      });
       return;
     }
 
@@ -2024,7 +2093,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (trimmedResubmission.length < MIN_SUBMISSION_CHARACTERS) {
+    if (correctedText.length < MIN_SUBMISSION_CHARACTERS) {
       setResubmissionStatus({
         loading: false,
         error: `Please add a fuller corrected text (${MIN_SUBMISSION_CHARACTERS}+ characters).`,
@@ -2033,7 +2102,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (trimmedResubmission.length > dynamicMaxSubmissionCharacters) {
+    if (correctedText.length > dynamicMaxSubmissionCharacters) {
       setResubmissionStatus({
         loading: false,
         error: `Your corrected text is too long for this task (${formatCharacterCount(dynamicMaxSubmissionCharacters)} characters max for now).`,
@@ -2053,7 +2122,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
     const resubmissionDiff = buildResubmissionDiff({
       previousSubmissionText: selectedPreview?.submissionText || "",
-      currentSubmissionText: trimmedResubmission,
+      currentSubmissionText: correctedText,
     });
 
     const hasStrongTextEdits =
@@ -2084,7 +2153,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (hasMatchingRecentSubmission(trimmedResubmission, { includeResubmitted: true })) {
+    if (hasMatchingRecentSubmission(correctedText, { includeResubmitted: true })) {
       setResubmissionStatus({
         loading: false,
         error: "This corrected text is the same as a recent submission. Please make it unique before resubmitting.",
@@ -2152,23 +2221,20 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         submissionFingerprint: buildSubmissionFingerprint({
           assignmentTitle: form.assignmentTitle,
           chapterKey: selectedChapterKey,
-          submissionText: trimmedResubmission,
+          submissionText: correctedText,
         }),
-        submissionText: trimmedResubmission,
-        answer: trimmedResubmission,
-        workContent: trimmedResubmission,
+        submissionText: correctedText,
+        answer: correctedText,
+        workContent: correctedText,
         improvementSummary: trimmedImprovement,
         previousSubmissionText: selectedPreview?.submissionText || "",
-        originalSubmittedAt: selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null,
+        originalSubmittedAt: normalizeSerializableTimestamp(selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null),
         status: "resubmitted",
         ...buildAttemptMetadata({
           attempt: selectedResubmissionCount + 2,
           isResubmission: true,
           previousScore: latestSelectedAssignmentScore,
-          timestamp: serverTimestamp(),
         }),
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
       };
 
       const submitAssignmentResubmission = httpsCallable(functions, "submitAssignmentResubmission");
@@ -2717,6 +2783,10 @@ export const __TESTING__ = {
   getSubmissionScore,
   getLatestSubmissionScore,
   isSubmissionAttemptStatus,
+  deriveResubmissionAccessState,
+  appearsToContainFalowenUiText,
+  normalizeSerializableTimestamp,
+  buildSubmissionFingerprint,
 };
 
 export default AssignmentSubmissionPage;

@@ -1409,107 +1409,193 @@ exports.onExamTutorReviewCreated = onDocumentCreated(
   }
 );
 
+const toFiniteNumberOrNull = (value) => {
+  if (value === null || value === undefined || String(value).trim?.() === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const omitUndefinedFields = (object) => Object.fromEntries(
+  Object.entries(object).filter(([, value]) => value !== undefined)
+);
+
 exports.submitAssignmentResubmission = onCall(
   { region: "europe-west1" },
   async (request) => {
     const authUid = request.auth?.uid || "";
-    if (!authUid) {
-      throw new HttpsError("unauthenticated", "Please sign in before resubmitting work.");
-    }
+    const data = request.data || {};
 
-    const input = request.data || {};
-    const canonicalAssignmentKey = normalizeCallableText(input.canonicalAssignmentKey || input.assignmentKey || input.assignmentId, 160);
-    const selectedAssignmentId = normalizeCallableText(input.assignmentId || canonicalAssignmentKey, 160);
-    const level = normalizeCallableText(input.level, 20).toUpperCase();
-    const submissionText = normalizeCallableText(input.submissionText);
-    const improvementSummary = normalizeCallableText(input.improvementSummary, 2000);
+    try {
+      if (!authUid) {
+        throw new HttpsError("unauthenticated", "Please sign in before resubmitting work.");
+      }
 
-    if (!canonicalAssignmentKey || !selectedAssignmentId || !submissionText || !improvementSummary) {
-      throw new HttpsError("invalid-argument", "Missing assignment, corrected text, or improvement summary.");
-    }
+      const canonicalAssignmentKey = normalizeCallableText(data.canonicalAssignmentKey || data.assignmentKey || data.assignmentId, 160);
+      const selectedAssignmentId = normalizeCallableText(data.assignmentId || canonicalAssignmentKey, 160);
+      const correctedText = normalizeCallableText(data.submissionText);
+      const improvementSummary = normalizeCallableText(data.improvementSummary, 2000);
+      const previousScore = toFiniteNumberOrNull(data.previousScore);
+      const requestedAttempt = toFiniteNumberOrNull(data.attempt);
+      const requestedAttemptNumber = toFiniteNumberOrNull(data.attemptNumber);
+      const level = normalizeCallableText(data.level, 20).toUpperCase();
 
-    const db = getAdmin().firestore();
-    const counterRef = db.collection("submissionAttemptCounters").doc(
-      buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
-    );
-    const submissionsRef = db.collection("submissions");
+      if (!canonicalAssignmentKey || !selectedAssignmentId) {
+        throw new HttpsError("invalid-argument", "Missing assignment details for resubmission.");
+      }
+      if (!correctedText) {
+        throw new HttpsError("invalid-argument", "Corrected text is required.");
+      }
+      if (correctedText.length < 80) {
+        throw new HttpsError("invalid-argument", "Corrected text is too short.");
+      }
+      if (!improvementSummary || improvementSummary.length < 25) {
+        throw new HttpsError("invalid-argument", "Please explain what you improved in this resubmission.");
+      }
+      if (previousScore === null) {
+        throw new HttpsError("failed-precondition", "A reviewed score is required before resubmitting.");
+      }
+      if (previousScore >= PASS_THRESHOLD_SCORE) {
+        throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
+      }
 
-    const result = await db.runTransaction(async (transaction) => {
-      const counterSnap = await transaction.get(counterRef);
-      let attempts = Number(counterSnap.data()?.attempts || 0);
-      let passed = counterSnap.data()?.passed === true;
+      const db = getAdmin().firestore();
+      const counterRef = db.collection("submissionAttemptCounters").doc(
+        buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
+      );
+      const submissionsRef = db.collection("submissions");
+      const now = FieldValue.serverTimestamp();
 
-      if (!counterSnap.exists) {
+      const result = await db.runTransaction(async (transaction) => {
+        const counterSnap = await transaction.get(counterRef);
+        let attempts = Number(counterSnap.data()?.attempts || 0);
+        let passed = counterSnap.data()?.passed === true;
+        let hasSubmittedOrLockedAssignment = attempts > 0;
+        let hasMatchingFailedScore = false;
+
         const existingSnap = await transaction.get(
           submissionsRef
             .where("studentId", "==", authUid)
             .where("canonicalAssignmentKey", "==", canonicalAssignmentKey)
             .limit(50)
         );
-        attempts = 0;
-        passed = false;
+
+        if (!counterSnap.exists) {
+          attempts = 0;
+          passed = false;
+        }
+
         existingSnap.forEach((docSnap) => {
-          const data = docSnap.data() || {};
-          if (countSubmissionAttemptDoc(data)) attempts += 1;
-          if (isPassedSubmissionDoc(data)) passed = true;
+          const existing = docSnap.data() || {};
+          if (countSubmissionAttemptDoc(existing)) {
+            hasSubmittedOrLockedAssignment = true;
+            if (!counterSnap.exists) attempts += 1;
+          }
+          const score = getScoreValue(existing);
+          if (typeof score === "number") {
+            if (score >= PASS_THRESHOLD_SCORE) passed = true;
+            if (score === previousScore && score < PASS_THRESHOLD_SCORE) hasMatchingFailedScore = true;
+          }
+          if (isPassedSubmissionDoc(existing)) passed = true;
+          const existingFingerprint = normalizeCallableText(existing.submissionFingerprint, 400);
+          const incomingFingerprint = normalizeCallableText(data.submissionFingerprint, 400);
+          if (incomingFingerprint && existingFingerprint && incomingFingerprint === existingFingerprint) {
+            throw new HttpsError("failed-precondition", "This corrected text has already been submitted for this assignment.");
+          }
         });
-      }
 
-      if (passed) {
-        throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
-      }
+        if (!hasSubmittedOrLockedAssignment) {
+          throw new HttpsError("failed-precondition", "Submit and receive review for this assignment before resubmitting.");
+        }
+        if (passed) {
+          throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
+        }
+        if (!hasMatchingFailedScore) {
+          throw new HttpsError("failed-precondition", "The reviewed score does not match this assignment.");
+        }
 
-      if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
+        if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
+          transaction.set(counterRef, {
+            attempts,
+            updatedAt: now,
+          }, { merge: true });
+          throw new HttpsError("resource-exhausted", "You have used all resubmissions for this assignment.");
+        }
+
+        const nextAttempt = attempts + 1;
+        const submissionRef = submissionsRef.doc();
+        const submissionDocument = omitUndefinedFields({
+          title: normalizeCallableText(data.title, 500),
+          assignmentTitle: normalizeCallableText(data.assignmentTitle, 500),
+          assignmentKey: canonicalAssignmentKey,
+          canonicalAssignmentKey,
+          assignmentId: selectedAssignmentId,
+          assignment_id: selectedAssignmentId,
+          chapter: normalizeCallableText(data.chapter, 80),
+          chapterKey: normalizeCallableText(data.chapterKey, 160),
+          day: toFiniteNumberOrNull(data.day),
+          level,
+          className: normalizeCallableText(data.className, 200),
+          studentId: authUid,
+          studentEmail: normalizeCallableText(data.studentEmail, 320),
+          studentCode: normalizeCallableText(data.studentCode, 120),
+          studentName: normalizeCallableText(data.studentName, 200),
+          studentScopeKey: normalizeCallableText(data.studentScopeKey, 300),
+          submissionFingerprint: normalizeCallableText(data.submissionFingerprint, 400),
+          submissionText: correctedText,
+          answer: correctedText,
+          workContent: correctedText,
+          improvementSummary,
+          previousSubmissionText: normalizeCallableText(data.previousSubmissionText),
+          previousScore,
+          originalSubmittedAt: data.originalSubmittedAt ?? null,
+          attempt: requestedAttempt || nextAttempt,
+          attemptNumber: requestedAttemptNumber || requestedAttempt || nextAttempt,
+          isResubmission: true,
+          reviewStatus: "pending_review",
+          status: "resubmitted",
+          createdAt: now,
+          updatedAt: now,
+          submittedAt: now,
+          resubmittedAt: now,
+        });
+
+        transaction.set(submissionRef, submissionDocument);
         transaction.set(counterRef, {
-          attempts,
-          updatedAt: FieldValue.serverTimestamp(),
+          studentId: authUid,
+          canonicalAssignmentKey,
+          assignmentId: selectedAssignmentId,
+          level,
+          attempts: nextAttempt,
+          passed: false,
+          lastSubmissionId: submissionRef.id,
+          updatedAt: now,
+          createdAt: counterSnap.exists ? counterSnap.data()?.createdAt || now : now,
         }, { merge: true });
-        return { limitReached: true, attempt: attempts, maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS };
-      }
 
-      const nextAttempt = attempts + 1;
-      const submissionRef = submissionsRef.doc();
-      transaction.set(submissionRef, {
-        ...input,
-        studentId: authUid,
-        assignmentId: selectedAssignmentId,
-        assignment_id: selectedAssignmentId,
-        assignmentKey: canonicalAssignmentKey,
-        canonicalAssignmentKey,
-        submissionText,
-        answer: submissionText,
-        workContent: submissionText,
-        improvementSummary,
-        status: "resubmitted",
-        reviewStatus: "pending_review",
-        isResubmission: true,
-        attempt: nextAttempt,
-        attemptNumber: nextAttempt,
-        submittedAt: FieldValue.serverTimestamp(),
-        resubmittedAt: FieldValue.serverTimestamp(),
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
+        return {
+          submissionId: submissionRef.id,
+          attempt: nextAttempt,
+          maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
+        };
       });
-      transaction.set(counterRef, {
+
+      return result;
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+
+      console.error("submitAssignmentResubmission failed", {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
         studentId: authUid,
-        canonicalAssignmentKey,
-        assignmentId: selectedAssignmentId,
-        level,
-        attempts: nextAttempt,
-        passed: false,
-        lastSubmissionId: submissionRef.id,
-        updatedAt: FieldValue.serverTimestamp(),
-        createdAt: counterSnap.exists ? counterSnap.data()?.createdAt || FieldValue.serverTimestamp() : FieldValue.serverTimestamp(),
-      }, { merge: true });
+        assignmentKey: data?.canonicalAssignmentKey || data?.assignmentKey,
+      });
 
-      return {
-        submissionId: submissionRef.id,
-        attempt: nextAttempt,
-        maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
-      };
-    });
-
-    return result;
+      throw new HttpsError(
+        "internal",
+        "Could not save your resubmission. Please try again."
+      );
+    }
   }
 );
 
