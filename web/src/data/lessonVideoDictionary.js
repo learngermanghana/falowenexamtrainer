@@ -220,7 +220,7 @@ export const LESSON_VIDEO_DICTIONARY = {
       ai_grammar_video: "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR",
     },
     17: {
-      ai_grammar_video: "https://youtu.be/0p28KQE2A8c",
+      ai_grammar_video: "https://youtu.be/8xybaJbs89I",
     },
     18: {
       ai_grammar_video: "https://youtu.be/jdhvRlRMiIc",
