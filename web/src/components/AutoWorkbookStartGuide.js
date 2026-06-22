@@ -10,6 +10,7 @@ const workbookRouteIndex = buildWorkbookRouteIndex();
 const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
   "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
+  "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
 ]);
 
 const AutoWorkbookStartGuide = () => {
