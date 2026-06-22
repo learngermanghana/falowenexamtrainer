@@ -46,7 +46,7 @@ export const LESSON_VIDEO_DICTIONARY = {
           title: "Kapitel 1.1 · Pronouns & Verb Conjugation · AI video",
           description:
             "AI video lesson for German subject pronouns and basic verb conjugation.",
-          url: "https://youtu.be/pCQVdJGsvtk",
+          url: "https://youtu.be/kqagu9qsOcc",
         },
       ],
     },
