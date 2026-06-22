@@ -25,14 +25,12 @@ const FILTERS = [
   { key: "assignments", label: "Assignments" },
   { key: "feedback", label: "Feedback" },
   { key: "account", label: "Account" },
-  { key: "classNotes", label: "Class Notes" },
 ];
 
 const TYPE_STYLES = {
   assignments: { icon: "📤", label: "Assignment", bg: "#ecfeff", color: "#0e7490" },
   feedback: { icon: "📝", label: "Feedback", bg: "#eef2ff", color: "#3730a3" },
   account: { icon: "⚠️", label: "Account", bg: "#fffbeb", color: "#92400e" },
-  classNotes: { icon: "📌", label: "Class Notes", bg: "#f0fdf4", color: "#166534" },
   class: { icon: "👥", label: "Class", bg: "#f5f3ff", color: "#6d28d9" },
   update: { icon: "🔔", label: "Update", bg: "#f8fafc", color: "#334155" },
 };
@@ -63,7 +61,6 @@ const resolveCategory = (item = {}) => {
   const dataType = safeText(item?.data?.type || item?.data?.category || item?.data?.kind || item?.data?.event);
   const haystack = `${safeText(item.type)} ${safeText(item.title)} ${safeText(item.body)} ${dataType}`;
 
-  if (/class\s*notes?|notes?|vocabulary|correction|reminder/.test(haystack)) return "classNotes";
   if (/payment|contract|account|login|password|reactivat|expired|balance|fee/.test(haystack)) return "account";
   if (/feedback|score|result|marked|marking|teacher|tutor|comment|correction/.test(haystack)) return "feedback";
   if (/assignment|submission|submitted|resubmission|draft|homework|task/.test(haystack)) return "assignments";
@@ -83,8 +80,6 @@ const resolveAction = (item = {}) => {
       return { label: "Open results", route: "/campus/results" };
     case "account":
       return { label: "Open account", route: "/campus/account" };
-    case "classNotes":
-      return { label: "Open course", route: "/campus/course" };
     case "class":
       return { label: "Open class area", route: "/campus/discussion" };
     default:
@@ -265,7 +260,7 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   const unreadCount = useMemo(() => (items || []).filter((it) => Number(it?.timestamp || 0) > seenAt).length, [items, seenAt]);
 
   const countsByFilter = useMemo(() => {
-    const base = { unread: unreadCount, all: items.length, assignments: 0, feedback: 0, account: 0, classNotes: 0 };
+    const base = { unread: unreadCount, all: items.length, assignments: 0, feedback: 0, account: 0 };
     (items || []).forEach((item) => {
       const category = resolveCategory(item);
       if (base[category] !== undefined) base[category] += 1;
@@ -381,11 +376,17 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
 
   const handleEnablePush = async () => {
     if (!onEnablePush) return;
+    setError("");
     try {
-      await onEnablePush();
+      const token = await onEnablePush();
+      if (!token) {
+        setError(
+          "Push was not enabled. On iPhone, open Falowen from the Home Screen app icon first, then tap Enable push alerts again. If a permission prompt appears, choose Allow."
+        );
+      }
     } catch (e) {
       console.error("Enable push failed", e);
-      setError("Could not enable push notifications. Please try again.");
+      setError(e?.message || "Could not enable push notifications. Please try again.");
     }
   };
 
@@ -517,7 +518,7 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
 
           {!loading && !visibleItems.length && !error ? (
             <div style={{ fontSize: 14, color: "#6b7280", border: "1px dashed #e5e7eb", borderRadius: 12, padding: 12, background: "#f9fafb" }}>
-              Nothing in this section yet. Assignment updates, tutor feedback, class notes and account reminders will appear here.
+              Nothing in this section yet. Assignment updates, tutor feedback and account reminders will appear here.
             </div>
           ) : null}
 
