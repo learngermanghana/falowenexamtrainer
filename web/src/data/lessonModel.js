@@ -3,6 +3,7 @@ import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoD
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
@@ -26,6 +27,8 @@ const mergeVideos = (...groups) => {
   const seen = new Set();
   return groups.flat().filter((item) => item?.url && !seen.has(item.url) && seen.add(item.url));
 };
+const isTeacherVideo = (item = {}) =>
+  `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
 const INTERNAL = {
   B1: { 1: { grammarBook: "/campus/course/lesson/B1/1?view=grammar", workbook: "/campus/course/lesson/B1/1?view=workbook" } },
 };
@@ -61,6 +64,25 @@ const resourceGroups = (raw, level, day) => {
   });
 };
 
+const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => {
+  if (level !== "A1") return videos;
+
+  const singleGroupChapter = groups.length === 1 ? chapterKey(groups[0]?.chapter) : "";
+  const chaptersWithTeacher = new Set(
+    videos
+      .filter(isTeacherVideo)
+      .map((video) => chapterKey(video.chapter) || singleGroupChapter)
+      .filter(Boolean)
+  );
+  const existingUrls = new Set(videos.map((video) => video?.url).filter(Boolean));
+  const missingTeacherVideos = getA1TeacherVideoResources(day).filter((video) => {
+    const chapter = chapterKey(video.chapter);
+    return !existingUrls.has(video.url) && !chaptersWithTeacher.has(chapter);
+  });
+
+  return mergeVideos(missingTeacherVideos, videos);
+};
+
 export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
   const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
 
@@ -80,12 +102,17 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
   const primary = firstLesson(rawLesson);
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
   const groups = resourceGroups(rawLesson, level, day);
-  const allVideos = mergeVideos(
+  const configuredVideos = mergeVideos(
     getLessonVideoResources(level, day, rawLesson),
     getAdditionalLessonVideoResources(level, day),
   );
+  const allVideos = addMissingA1TeacherVideos({
+    level,
+    day,
+    videos: configuredVideos,
+    groups,
+  });
   const videos = scopeLessonVideosToSelectedChapters(allVideos, groups);
-  const isTeacher = (item) => `${item.key} ${item.title}`.toLowerCase().includes("teacher");
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,
@@ -96,8 +123,8 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     capabilities,
     resources: {
       falowenRadio: capabilities.radio ? getLessonRadioResource(level, day) : null,
-      teacherVideo: videos.find(isTeacher) || null,
-      aiVideo: videos.find((item) => !isTeacher(item)) || null,
+      teacherVideo: videos.find(isTeacherVideo) || null,
+      aiVideo: videos.find((item) => !isTeacherVideo(item)) || null,
       grammarBook: groups[0]?.grammarBook || null,
       workbook: groups[0]?.workbook || null,
       videos,
