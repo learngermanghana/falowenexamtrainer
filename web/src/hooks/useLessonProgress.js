@@ -154,21 +154,19 @@ const buildBucketStatus = ({ assignmentId, submissions = [], results = [] }) => 
   const bestScore = scoredResults.length ? Math.max(...scoredResults.map((entry) => entry.score)) : null;
   const latestScore = toNumber(latestResult?.score ?? latestResult?.finalScore ?? latestResult?.mark ?? latestResult?.grade);
   const normalizedLatestResultStatus = normalizeLower(latestResult?.status || latestResult?.result || latestResult?.reviewStatus || "");
-  const hasPendingSubmission = Boolean(latestSubmission && (!latestResult || latestSubmissionMillis >= latestResultMillis));
+  const hasPendingSubmission = Boolean(latestSubmission && scoredResults.length === 0);
 
   let status = "not_started";
   if (hasPendingSubmission) {
     status = normalizeLower(latestSubmission?.status) === "resubmitted" || Number(latestSubmission?.attempt || latestSubmission?.attemptNumber || 1) > 1
       ? "resubmitted"
       : "submitted";
-  } else if (typeof latestScore === "number") {
-    status = latestScore >= PASS_MARK ? "passed" : "failed";
+  } else if (typeof bestScore === "number") {
+    status = bestScore >= PASS_MARK ? "passed" : "failed";
   } else if (["passed", "pass", "approved", "complete", "completed"].includes(normalizedLatestResultStatus)) {
     status = "passed";
-  } else if (["failed", "fail", "redo_required", "needs_correction"].includes(normalizedLatestResultStatus)) {
+  } else if (["failed", "fail", "redo_required", "needs_correction", "needs_improvement"].includes(normalizedLatestResultStatus)) {
     status = "failed";
-  } else if (latestSubmission) {
-    status = normalizeLower(latestSubmission?.status) === "resubmitted" ? "resubmitted" : "submitted";
   }
 
   const passed = status === "passed";

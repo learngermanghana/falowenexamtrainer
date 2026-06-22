@@ -53,6 +53,7 @@ const getStudentAppender = () => {
 const MAX_RESUBMISSION_TRIES = 2;
 const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
 const PASS_THRESHOLD_SCORE = 60;
+const RESUBMISSION_COOLDOWN_MS = 10 * 60 * 1000;
 const RESUBMISSION_ATTEMPT_STATUSES = new Set(["submitted", "resubmitted", "pending_review", "pending", "awaiting_review", "passed", "failed"]);
 const PASS_STATUSES = new Set(["approved", "pass", "passed", "complete", "completed"]);
 
@@ -76,6 +77,42 @@ const appearsToContainFalowenUiText = (value) => {
   const normalized = normalizeCallableText(value).toLowerCase();
   if (!normalized) return false;
   return FALOWEN_UI_TEXT_PHRASES.filter((phrase) => normalized.includes(phrase)).length >= 2;
+};
+
+
+const timestampToMillis = (value) => {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (typeof value.toDate === "function") {
+    const date = value.toDate();
+    return Number.isFinite(date?.getTime?.()) ? date.getTime() : 0;
+  }
+  if (Number.isFinite(value.seconds)) return Number(value.seconds) * 1000 + Math.floor(Number(value.nanoseconds || 0) / 1000000);
+  if (value instanceof Date) return Number.isFinite(value.getTime()) ? value.getTime() : 0;
+  if (typeof value === "number") return value > 100000000000 ? value : value * 1000;
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getSubmissionTimestampMillis = (data = {}) =>
+  Math.max(
+    timestampToMillis(data.resubmittedAt),
+    timestampToMillis(data.submittedAt),
+    timestampToMillis(data.createdAt),
+    timestampToMillis(data.updatedAt),
+    timestampToMillis(data.timestamp)
+  );
+
+const buildCooldownError = ({ latestSubmissionMillis, nowMillis = Date.now() }) => {
+  const nextAllowedMillis = latestSubmissionMillis + RESUBMISSION_COOLDOWN_MS;
+  const remainingSeconds = Math.max(0, Math.ceil((nextAllowedMillis - nowMillis) / 1000));
+  return new HttpsError("resource-exhausted", "Please wait before submitting again.", {
+    success: false,
+    code: "RESUBMISSION_COOLDOWN",
+    message: "Please wait before submitting again.",
+    nextAllowedAt: new Date(nextAllowedMillis).toISOString(),
+    remainingSeconds,
+  });
 };
 
 const isFirestoreServerTimestampSentinel = (value) =>
@@ -1614,10 +1651,13 @@ exports.submitAssignmentResubmission = onCall(
           passed = false;
         }
 
+        let latestSubmissionMillis = 0;
+
         existingSnap.forEach((docSnap) => {
           const existing = docSnap.data() || {};
           if (countSubmissionAttemptDoc(existing)) {
             hasSubmittedOrLockedAssignment = true;
+            latestSubmissionMillis = Math.max(latestSubmissionMillis, getSubmissionTimestampMillis(existing));
             if (!counterSnap.exists) attempts += 1;
           }
           const score = getScoreValue(existing);
@@ -1649,6 +1689,10 @@ exports.submitAssignmentResubmission = onCall(
             updatedAt: now,
           }, { merge: true });
           throw new HttpsError("resource-exhausted", "You have used all resubmissions for this assignment.");
+        }
+
+        if (latestSubmissionMillis > 0 && Date.now() < latestSubmissionMillis + RESUBMISSION_COOLDOWN_MS) {
+          throw buildCooldownError({ latestSubmissionMillis });
         }
 
         const nextAttempt = attempts + 1;
