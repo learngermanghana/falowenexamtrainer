@@ -56,7 +56,48 @@ const PASS_THRESHOLD_SCORE = 60;
 const RESUBMISSION_ATTEMPT_STATUSES = new Set(["submitted", "resubmitted", "pending_review", "pending", "awaiting_review", "passed", "failed"]);
 const PASS_STATUSES = new Set(["approved", "pass", "passed", "complete", "completed"]);
 
-const normalizeCallableText = (value, maxLength = 12000) => String(value || "").trim().slice(0, maxLength);
+const normalizeCallableText = (value, maxLength = 12000) => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return "";
+  return String(value).trim().slice(0, maxLength);
+};
+
+const FALOWEN_UI_TEXT_PHRASES = [
+  "resubmission unlocked",
+  "resubmissions left",
+  "first submission is #1",
+  "you can resubmit",
+  "corrected text",
+  "submitted preview",
+  "review details",
+];
+
+const appearsToContainFalowenUiText = (value) => {
+  const normalized = normalizeCallableText(value).toLowerCase();
+  if (!normalized) return false;
+  return FALOWEN_UI_TEXT_PHRASES.filter((phrase) => normalized.includes(phrase)).length >= 2;
+};
+
+const isFirestoreServerTimestampSentinel = (value) =>
+  Boolean(
+    value &&
+    typeof value === "object" &&
+    (value._methodName === "serverTimestamp" ||
+      value._delegate?._methodName === "serverTimestamp" ||
+      value.methodName === "serverTimestamp")
+  );
+
+const normalizeClientTimestamp = (value) => {
+  if (!value || isFirestoreServerTimestampSentinel(value)) return null;
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (typeof value === "object" && Number.isFinite(value.seconds)) {
+    return {
+      seconds: Number(value.seconds),
+      nanoseconds: Number(value.nanoseconds || 0),
+    };
+  }
+  return null;
+};
 
 const countSubmissionAttemptDoc = (data = {}) => {
   const status = normalizeValue(data.status || data.reviewStatus || data.result);
@@ -1432,7 +1473,7 @@ exports.submitAssignmentResubmission = onCall(
 
       const canonicalAssignmentKey = normalizeCallableText(data.canonicalAssignmentKey || data.assignmentKey || data.assignmentId, 160);
       const selectedAssignmentId = normalizeCallableText(data.assignmentId || canonicalAssignmentKey, 160);
-      const correctedText = normalizeCallableText(data.submissionText);
+      const correctedText = normalizeCallableText(data.submissionText || data.answer || data.workContent);
       const improvementSummary = normalizeCallableText(data.improvementSummary, 2000);
       const previousScore = toFiniteNumberOrNull(data.previousScore);
       const requestedAttempt = toFiniteNumberOrNull(data.attempt);
@@ -1444,6 +1485,9 @@ exports.submitAssignmentResubmission = onCall(
       }
       if (!correctedText) {
         throw new HttpsError("invalid-argument", "Corrected text is required.");
+      }
+      if (appearsToContainFalowenUiText(correctedText)) {
+        throw new HttpsError("invalid-argument", "Corrected text appears to include page instructions. Submit only the corrected answer text.");
       }
       if (correctedText.length < 80) {
         throw new HttpsError("invalid-argument", "Corrected text is too short.");
@@ -1547,7 +1591,9 @@ exports.submitAssignmentResubmission = onCall(
           improvementSummary,
           previousSubmissionText: normalizeCallableText(data.previousSubmissionText),
           previousScore,
-          originalSubmittedAt: data.originalSubmittedAt ?? null,
+          // Callable clients must not provide Firestore sentinels. Persist only
+          // simple timestamp snapshots, and always create write timestamps here.
+          originalSubmittedAt: normalizeClientTimestamp(data.originalSubmittedAt),
           attempt: requestedAttempt || nextAttempt,
           attemptNumber: requestedAttemptNumber || requestedAttempt || nextAttempt,
           isResubmission: true,
