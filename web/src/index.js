@@ -10,6 +10,7 @@ import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
+import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -27,6 +28,7 @@ root.render(
           <SubmitPageLevelGuidanceInjector />
           <SubmitSuccessScreenInjector />
           <CourseBookTerminologyInjector />
+          <LockedSubmissionCardCompactor />
           <App />
         </ToastProvider>
       </AuthProvider>
