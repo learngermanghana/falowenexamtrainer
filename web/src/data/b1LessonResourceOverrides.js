@@ -11,6 +11,11 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     workbook: "/campus/course/lesson/B1/2?view=workbook",
     aiVideo: "https://youtu.be/Skl0FjF5JBg",
   }),
+  3: Object.freeze({
+    chapter: "1.3",
+    grammarBook: "/campus/course/lesson/B1/3?view=grammar",
+    workbook: "/campus/course/lesson/B1/3?view=workbook",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
