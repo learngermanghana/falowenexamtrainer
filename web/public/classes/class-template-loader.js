@@ -96,16 +96,39 @@
 
   function expandClassData(data) {
     const defaults = data.classDefaults || {};
-    return { ...data, classes: Array.isArray(data.classes) ? data.classes.map((item) => expandClass(item, defaults)) : [] };
+    return {
+      ...data,
+      catalogSource: data.catalogSource || "static",
+      classes: Array.isArray(data.classes) ? data.classes.map((item) => expandClass(item, defaults)) : [],
+    };
+  }
+
+  function selfLearningClasses(staticData) {
+    return (staticData.classes || []).filter((item) => item.availability === "always");
   }
 
   function mergeLiveClasses(staticData, liveData) {
     const defaults = staticData.classDefaults || {};
     const liveClasses = Array.isArray(liveData?.classes) ? liveData.classes.map((item) => expandClass(item, defaults)) : [];
-    const selfLearning = (staticData.classes || []).filter((item) => item.availability === "always");
+    const selfLearning = selfLearningClasses(staticData);
     const used = new Set(liveClasses.flatMap((item) => [item.id, item.slug, item.title].filter(Boolean)));
     const retained = selfLearning.filter((item) => ![item.id, item.slug, item.title].some((value) => used.has(value)));
-    return { ...staticData, classes: [...liveClasses, ...retained] };
+    return {
+      ...staticData,
+      catalogSource: "firestore",
+      catalogGeneratedAt: liveData?.generatedAt || "",
+      classes: [...liveClasses, ...retained],
+    };
+  }
+
+  function safeFallback(staticData, reason) {
+    console.warn("Live Falowen class catalogue unavailable", reason);
+    return {
+      ...staticData,
+      catalogSource: "fallback",
+      catalogError: String(reason?.message || reason || "Live class API unavailable"),
+      classes: selfLearningClasses(staticData),
+    };
   }
 
   window.fetch = function patchedFetch(resource, init) {
@@ -118,10 +141,12 @@
           const liveResponse = await originalFetch("/api/public/classes", { cache: "no-store" });
           if (!liveResponse.ok) throw new Error(`Public class API returned ${liveResponse.status}`);
           const merged = mergeLiveClasses(staticData, await liveResponse.json());
-          return new Response(JSON.stringify(merged), { status: 200, headers: { "content-type": "application/json" } });
+          window.__falowenClassCatalogSource = "firestore";
+          return new Response(JSON.stringify(merged), { status: 200, headers: { "content-type": "application/json", "x-falowen-class-source": "firestore" } });
         } catch (liveError) {
-          console.warn("Using fallback class catalogue", liveError);
-          return new Response(JSON.stringify(staticData), { status: response.status, headers: { "content-type": "application/json" } });
+          const fallback = safeFallback(staticData, liveError);
+          window.__falowenClassCatalogSource = "fallback";
+          return new Response(JSON.stringify(fallback), { status: 200, headers: { "content-type": "application/json", "x-falowen-class-source": "fallback" } });
         }
       } catch (error) {
         return response;
