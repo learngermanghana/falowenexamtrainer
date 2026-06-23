@@ -54,7 +54,7 @@ describe("B1 canonical lesson resources", () => {
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
-  test("B1 Day 1 and Day 2 use the requested AI grammar videos", () => {
+  test("B1 Days 1 to 3 use the requested AI grammar videos", () => {
     const dictionary = { B1: {} };
     applyB1LessonVideoOverrides(dictionary);
 
@@ -70,11 +70,21 @@ describe("B1 canonical lesson resources", () => {
         url: "https://youtu.be/Skl0FjF5JBg",
       }),
     ]);
+    expect(dictionary.B1[3].videoResources).toEqual([
+      expect.objectContaining({
+        chapter: "1.3",
+        title: "B1 Day 3 · Erfolgsgeschichten · AI grammar video",
+        url: "https://youtu.be/n6eCMJRWTy8",
+      }),
+    ]);
     expect(getB1LessonResourceOverride(1).aiVideo).toBe(
       "https://youtu.be/_mmAtSzWbNo"
     );
     expect(getB1LessonResourceOverride(2).aiVideo).toBe(
       "https://youtu.be/Skl0FjF5JBg"
+    );
+    expect(getB1LessonResourceOverride(3).aiVideo).toBe(
+      "https://youtu.be/n6eCMJRWTy8"
     );
   });
 });
