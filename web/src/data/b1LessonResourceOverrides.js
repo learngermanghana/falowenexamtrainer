@@ -9,6 +9,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     chapter: "1.2",
     grammarBook: "/campus/course/lesson/B1/2?view=grammar",
     workbook: "/campus/course/lesson/B1/2?view=workbook",
+    aiVideo: "https://youtu.be/Skl0FjF5JBg",
   }),
 });
 
@@ -61,6 +62,8 @@ export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
 export const applyB1LessonVideoOverrides = (dictionary = {}) => {
   const b1 = dictionary.B1 || (dictionary.B1 = {});
   const dayOne = getB1LessonResourceOverride(1);
+  const dayTwo = getB1LessonResourceOverride(2);
+
   b1[1] = {
     ...(b1[1] || {}),
     videoResources: [
@@ -74,6 +77,21 @@ export const applyB1LessonVideoOverrides = (dictionary = {}) => {
       },
     ],
   };
+
+  b1[2] = {
+    ...(b1[2] || {}),
+    videoResources: [
+      {
+        key: "b1-day2-freunde-fuers-leben-ai-grammar-video",
+        chapter: dayTwo.chapter,
+        title: "B1 Day 2 · Freunde fürs Leben · AI grammar video",
+        description:
+          "AI grammar explanation for talking about friendship and past experiences.",
+        url: dayTwo.aiVideo,
+      },
+    ],
+  };
+
   return dictionary;
 };
 
