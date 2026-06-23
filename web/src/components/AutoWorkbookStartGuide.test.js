@@ -2,7 +2,10 @@ import { courseSchedules } from "../data/courseSchedule";
 import { hasOnlyInAppWorkbookRoutesForLevel } from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
-import { shouldRenderWorkbookGuide } from "./AutoWorkbookStartGuide";
+import {
+  SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
+  shouldRenderWorkbookGuide,
+} from "./AutoWorkbookStartGuide";
 
 describe("AutoWorkbookStartGuide route matching", () => {
   test("normalizes relative and Falowen-hosted in-app links", () => {
@@ -52,6 +55,44 @@ describe("AutoWorkbookStartGuide route matching", () => {
     expect(index.has("/campus/course/a1-chapter-3-asking-about-prices-workbook")).toBe(true);
     expect(index.has("/campus/course/a1-chapter-5-german-cases-workbook")).toBe(true);
     expect(index.has("/campus/course/a1-day-10-objects-colors-possessive-articles-workbook")).toBe(true);
+  });
+
+  test("A1 Day 2 Kapitel 1.1 uses its own Assignment and Submit tabs", () => {
+    expect(
+      SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(
+        "/campus/course/a1-day-2-kapitel-1-1-workbook"
+      )
+    ).toBe(true);
+  });
+
+  test("every tutor-marked A1 workbook route receives assignment/submission support", () => {
+    const index = buildWorkbookRouteIndex();
+    const assignmentWorkbookPaths = new Set();
+
+    (courseSchedules.A1 || []).forEach((entry) => {
+      const resources = [
+        entry,
+        ...(Array.isArray(entry.lesen_hören) ? entry.lesen_hören : entry.lesen_hören ? [entry.lesen_hören] : []),
+        ...(Array.isArray(entry.schreiben_sprechen)
+          ? entry.schreiben_sprechen
+          : entry.schreiben_sprechen
+            ? [entry.schreiben_sprechen]
+            : []),
+      ];
+
+      resources.forEach((resource) => {
+        if (resource?.assignment !== true) return;
+        const path = normalizeInAppPath(resource.workbook_link || resource.workbookRoute);
+        if (path) assignmentWorkbookPaths.add(path);
+      });
+    });
+
+    expect(assignmentWorkbookPaths.size).toBeGreaterThan(10);
+    assignmentWorkbookPaths.forEach((pathname) => {
+      const match = index.get(pathname);
+      expect(match).toBeTruthy();
+      expect(shouldRenderWorkbookGuide({ pathname, search: "", match })).toBe(true);
+    });
   });
 
   test("B1 lesson hub does not render workbook submission controls", () => {
