@@ -76,6 +76,7 @@
   "B1": {
     "1": { "*": "/campus/course/lesson/B1/1?view=workbook" },
     "2": { "*": "/campus/course/lesson/B1/2?view=workbook" },
+    "3": { "*": "/campus/course/lesson/B1/3?view=workbook" },
     "4": { "*": "/campus/course/b1-day-4-wohnung-suchen-workbook" },
     "20": { "*": "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" },
     "21": { "*": "/campus/course/b1-day-21-lebensformen-heute-workbook" },
