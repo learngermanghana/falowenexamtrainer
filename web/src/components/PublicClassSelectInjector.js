@@ -5,17 +5,24 @@ import {
   publicClassLabel,
 } from "../services/publicClassCatalogService";
 
+function optionsMatch(select, options) {
+  const current = Array.from(select.options).slice(1);
+  return current.length === options.length && current.every((option, index) =>
+    option.value === options[index].value && option.textContent === options[index].label,
+  );
+}
+
 function applyClasses(classes) {
   const select = document.getElementById("class-selection");
   if (!select || !classes.length) return false;
 
   const signature = classes.map((course) => `${course.id}:${course.startDate}:${course.registrationOpen}`).join("|");
-  if (select.dataset.publicClassSignature === signature) return true;
+  const options = classes.map((course) => ({ value: course.title, label: publicClassLabel(course) }));
+  if (select.dataset.publicClassSignature === signature && optionsMatch(select, options)) return true;
 
   const current = select.value;
   const requested = new URLSearchParams(window.location.search).get("class");
   const requestedName = requested ? findPublicClassName(classes, requested) : "";
-  const options = classes.map((course) => ({ value: course.title, label: publicClassLabel(course) }));
   const available = new Set(options.map((option) => option.value));
   const nextValue = available.has(current) ? current : available.has(requestedName) ? requestedName : "";
 
