@@ -106,7 +106,7 @@ export const LESSON_RADIO_DICTIONARY = {
     2: {
       key: "b2-day2-beziehungen-kommunikation-falowen-radio",
       title: "Beziehungen und Kommunikation",
-      youtubeId: "ZfCAaLGV2c4",
+      youtubeId: "OdfuQzJ_etM",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Beziehungen und Kommunikation ein. Danach gehst du weiter zum Lernteil.",
