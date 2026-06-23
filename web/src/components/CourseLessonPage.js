@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
+import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbookPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
@@ -28,6 +29,7 @@ const B1_WORKBOOK_PAGES = {
 };
 
 const B1_GRAMMAR_PAGES = {
+  1: B1Day1TraumweltGrammarNotesPage,
   2: B1Day2FreundeFuersLebenGrammarNotesPage,
 };
 
@@ -221,13 +223,14 @@ export default function CourseLessonPage() {
   if (level === "B1") {
     const query = new URLSearchParams(location.search);
     const dayNumber = Number(day);
+    const requestedView = query.get("view");
 
-    if (query.get("view") === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
+    if (requestedView === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
       const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
       return <GrammarPage />;
     }
 
-    if (B1_WORKBOOK_PAGES[dayNumber]) {
+    if (requestedView === "workbook" && B1_WORKBOOK_PAGES[dayNumber]) {
       const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
       return <WorkbookPage />;
     }
