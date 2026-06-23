@@ -13,14 +13,22 @@ const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
 ]);
 
+export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } = {}) => {
+  if (!match) return false;
+  const normalizedPathname = normalizeInAppPath(pathname);
+  const isB1LessonRoute = /^\/campus\/course\/lesson\/B1\/\d+$/i.test(normalizedPathname);
+  if (!isB1LessonRoute) return true;
+  return new URLSearchParams(search || "").get("view") === "workbook";
+};
+
 const AutoWorkbookStartGuide = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const hostRef = useRef(null);
   const normalizedPathname = normalizeInAppPath(pathname);
   const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
   const usesSelfManagedSubmissionTabs = SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname);
 
-  if (!match) return null;
+  if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
 
   return (
     <div
