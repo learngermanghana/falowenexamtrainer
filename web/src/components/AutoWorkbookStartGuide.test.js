@@ -68,6 +68,21 @@ describe("AutoWorkbookStartGuide route matching", () => {
     ).toBe(true);
   });
 
+  test("A1 Day 18 Kapitel 12.1 has a workbook view distinct from grammar notes", () => {
+    const route = getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.1" });
+    expect(route).toBe(
+      "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook"
+    );
+    expect(route).not.toBe(
+      "/campus/course/two-case-prepositions-wechselpraepositionen-day-18"
+    );
+    expect(
+      SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(
+        "/campus/course/two-case-prepositions-wechselpraepositionen-day-18"
+      )
+    ).toBe(true);
+  });
+
   test("A1 Day 18 Kapitel 12.2 has a workbook view distinct from grammar notes", () => {
     const route = getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.2" });
     expect(route).toBe(
@@ -83,21 +98,16 @@ describe("AutoWorkbookStartGuide route matching", () => {
     ).toBe(true);
   });
 
-  test("A1 Day 18 grammar page does not mount workbook controls", () => {
+  test.each([
+    "/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
+    "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
+  ])("A1 Day 18 grammar page %s does not mount workbook controls", (pathname) => {
     const match = { level: "A1", day: 18 };
     expect(
-      shouldRenderWorkbookGuide({
-        pathname: "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
-        search: "",
-        match,
-      })
+      shouldRenderWorkbookGuide({ pathname, search: "", match })
     ).toBe(false);
     expect(
-      shouldRenderWorkbookGuide({
-        pathname: "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
-        search: "?view=workbook",
-        match,
-      })
+      shouldRenderWorkbookGuide({ pathname, search: "?view=workbook", match })
     ).toBe(true);
   });
 
