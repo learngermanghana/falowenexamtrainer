@@ -9,6 +9,7 @@ import SubmitSuccessScreenInjector from './components/SubmitSuccessScreenInjecto
 import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
+import PublicClassSelectInjector from './components/PublicClassSelectInjector';
 import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
 import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
 import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingCheatSheetInjector';
@@ -25,6 +26,7 @@ root.render(
       <AuthProvider>
         <ToastProvider>
           <LandingPublicLanguageGuard />
+          <PublicClassSelectInjector />
           <MobileHeaderMenuInjector />
           <SubmitPageLevelGuidanceInjector />
           <SubmitSuccessScreenInjector />
