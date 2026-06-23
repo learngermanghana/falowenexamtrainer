@@ -15,6 +15,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     chapter: "1.3",
     grammarBook: "/campus/course/lesson/B1/3?view=grammar",
     workbook: "/campus/course/lesson/B1/3?view=workbook",
+    aiVideo: "https://youtu.be/n6eCMJRWTy8",
   }),
 });
 
@@ -68,6 +69,7 @@ export const applyB1LessonVideoOverrides = (dictionary = {}) => {
   const b1 = dictionary.B1 || (dictionary.B1 = {});
   const dayOne = getB1LessonResourceOverride(1);
   const dayTwo = getB1LessonResourceOverride(2);
+  const dayThree = getB1LessonResourceOverride(3);
 
   b1[1] = {
     ...(b1[1] || {}),
@@ -93,6 +95,20 @@ export const applyB1LessonVideoOverrides = (dictionary = {}) => {
         description:
           "AI grammar explanation for talking about friendship and past experiences.",
         url: dayTwo.aiVideo,
+      },
+    ],
+  };
+
+  b1[3] = {
+    ...(b1[3] || {}),
+    videoResources: [
+      {
+        key: "b1-day3-erfolgsgeschichten-ai-grammar-video",
+        chapter: dayThree.chapter,
+        title: "B1 Day 3 · Erfolgsgeschichten · AI grammar video",
+        description:
+          "AI grammar explanation for adjective endings and describing success stories.",
+        url: dayThree.aiVideo,
       },
     ],
   };
