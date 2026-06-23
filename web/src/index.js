@@ -11,6 +11,7 @@ import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard'
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
 import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
+import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingCheatSheetInjector';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -29,6 +30,7 @@ root.render(
           <SubmitSuccessScreenInjector />
           <CourseBookTerminologyInjector />
           <LockedSubmissionCardCompactor />
+          <B1WorkbookWritingCheatSheetInjector />
           <App />
         </ToastProvider>
       </AuthProvider>
