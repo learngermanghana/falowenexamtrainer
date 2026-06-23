@@ -2,8 +2,9 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
+const HOEREN_VIDEO_URL = "https://youtu.be/nih5h7B48NY";
+const HOEREN_EMBED_URL = "https://www.youtube.com/embed/nih5h7B48NY?rel=0";
 
 const cardStyle = {
   ...styles.card,
@@ -22,6 +23,13 @@ const imageStyle = {
   borderRadius: 10,
   maxHeight: 260,
   objectFit: "cover",
+};
+
+const videoStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 10,
 };
 
 const questionBoxStyle = {
@@ -101,16 +109,26 @@ const A1Day2Kapitel11WorkbookPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Questions</h2>
+        <h2 style={{ margin: 0 }}>Teil 2 · Hören</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Hörverstehen (Listening Comprehension) Exercise:</strong> Introducing Yourself, Alphabet, and Introducing a
           Friend.
-          <br />Listen to the audio and answer the questions below.
+          <br />Watch and listen to the video, then answer the questions below.
         </p>
-        <CoursebookAudioPlayer
-          url="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
-          linkLabel="Open Hören Material (Google Drive)"
-          linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        <a
+          href={HOEREN_VIDEO_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören video on YouTube
+        </a>
+        <iframe
+          title="A1 Day 2 Kapitel 1.1 Hören video"
+          src={HOEREN_EMBED_URL}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          style={videoStyle}
         />
         {questions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
