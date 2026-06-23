@@ -37,11 +37,11 @@ test("B2 Day 1 radio remains available", () =>
   ),
 );
 
-test("B2 Day 2 radio remains available", () =>
+test("B2 Day 2 Beziehungen und Kommunikation uses the requested radio", () =>
   expect(getLessonRadioResource("B2", 2)).toEqual(
     expect.objectContaining({
       title: "Beziehungen und Kommunikation",
-      youtubeId: "ZfCAaLGV2c4",
+      youtubeId: "OdfuQzJ_etM",
     }),
   ),
 );
