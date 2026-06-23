@@ -1,4 +1,29 @@
-import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassService";
+import {
+  buildCanonicalLiveClassSummary,
+  normalizeCurriculumIds,
+} from "./canonicalLiveClassService";
+
+describe("normalizeCurriculumIds", () => {
+  test("uses chapterIds when assignmentIds exists but is empty", () => {
+    expect(normalizeCurriculumIds({
+      assignmentIds: [],
+      chapterIds: ["a1-1.1", "A1-1.1"],
+    })).toEqual(["A1-1.1"]);
+  });
+
+  test("supports curriculumIds and the legacy singular assignment_id", () => {
+    expect(normalizeCurriculumIds({ curriculumIds: ["b1-2.3"] })).toEqual(["B1-2.3"]);
+    expect(normalizeCurriculumIds({ assignment_id: "a2-4.1" })).toEqual(["A2-4.1"]);
+  });
+
+  test("prefers the canonical assignmentIds when populated", () => {
+    expect(normalizeCurriculumIds({
+      assignmentIds: ["A1-3"],
+      chapterIds: ["A1-4"],
+      curriculumIds: ["A1-5"],
+    })).toEqual(["A1-3"]);
+  });
+});
 
 describe("buildCanonicalLiveClassSummary", () => {
   const klass = { id: "class-1", name: "A1 Munich Klasse" };
