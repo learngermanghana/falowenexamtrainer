@@ -1,5 +1,8 @@
 import { courseSchedules } from "../data/courseSchedule";
-import { hasOnlyInAppWorkbookRoutesForLevel } from "../data/inAppWorkbookRoutes";
+import {
+  getConfiguredInAppWorkbookRoute,
+  hasOnlyInAppWorkbookRoutesForLevel,
+} from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import {
@@ -62,6 +65,39 @@ describe("AutoWorkbookStartGuide route matching", () => {
       SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(
         "/campus/course/a1-day-2-kapitel-1-1-workbook"
       )
+    ).toBe(true);
+  });
+
+  test("A1 Day 18 Kapitel 12.2 has a workbook view distinct from grammar notes", () => {
+    const route = getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.2" });
+    expect(route).toBe(
+      "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook"
+    );
+    expect(route).not.toBe(
+      "/campus/course/a1-12-2-dative-articles-mit-bei-zu"
+    );
+    expect(
+      SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(
+        "/campus/course/a1-12-2-dative-articles-mit-bei-zu"
+      )
+    ).toBe(true);
+  });
+
+  test("A1 Day 18 grammar page does not mount workbook controls", () => {
+    const match = { level: "A1", day: 18 };
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
+        search: "",
+        match,
+      })
+    ).toBe(false);
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
+        search: "?view=workbook",
+        match,
+      })
     ).toBe(true);
   });
 
