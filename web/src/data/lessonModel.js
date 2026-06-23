@@ -39,7 +39,16 @@ const mergeVideos = (...groups) => {
 const isTeacherVideo = (item = {}) =>
   `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
 const INTERNAL = {
-  B1: { 1: { grammarBook: "/campus/course/lesson/B1/1?view=grammar", workbook: "/campus/course/lesson/B1/1?view=workbook" } },
+  B1: {
+    1: {
+      grammarBook: "/campus/course/lesson/B1/1?view=grammar",
+      workbook: "/campus/course/lesson/B1/1?view=workbook",
+    },
+    2: {
+      grammarBook: "/campus/course/lesson/B1/2?view=grammar",
+      workbook: "/campus/course/lesson/B1/2?view=workbook",
+    },
+  },
 };
 
 const getCanonicalGrammarBook = ({ level, day, chapter }) => {
