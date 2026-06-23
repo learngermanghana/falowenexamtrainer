@@ -1,1 +1,0 @@
-Compatibility changes for live-class curriculum metadata.
