@@ -13,21 +13,21 @@
   }
 
   function selectedSlug() {
+    var select = document.getElementById("leadClass");
+    if (select && select.value) return cleanSlug(select.value);
     var url = new URL(window.location.href);
     var fromQuery = url.searchParams.get("class") || url.searchParams.get("level") || url.searchParams.get("slug");
     if (fromQuery) return cleanSlug(fromQuery);
-    var select = document.getElementById("leadClass");
-    if (select && select.value) return cleanSlug(select.value);
     var match = window.location.pathname.match(/^\/classes\/([^/]+)\/?$/);
     return match ? match[1] : "";
   }
 
-  function formUrl(slug) {
-    return slug ? "/classes/?class=" + encodeURIComponent(slug) : "/classes/";
-  }
-
   function signupUrl(slug) {
     return slug ? "/signup/?class=" + encodeURIComponent(slug) : "/signup/";
+  }
+
+  function setText(element, value) {
+    if (element && element.textContent !== value) element.textContent = value;
   }
 
   function style() {
@@ -54,7 +54,7 @@
       "body.simple-classes-form .lead-actions{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}" +
       ".lead-register-now{width:100%;min-height:50px;background:#0f766e!important;border-color:#0f766e!important;color:#fff!important;text-decoration:none!important}" +
       "body.simple-classes-form .lead-help,body.simple-classes-form .lead-open-link,body.simple-classes-form .lead-small-actions{display:none!important}" +
-      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))}.simple-class-step{align-items:flex-start}.lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
+      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
     document.head.appendChild(tag);
   }
 
@@ -87,7 +87,8 @@
       if (whatsapp) actions.insertBefore(register, whatsapp);
       else actions.appendChild(register);
     }
-    register.href = signupUrl(selectedSlug());
+    var nextHref = signupUrl(selectedSlug());
+    if (register.getAttribute("href") !== nextHref) register.setAttribute("href", nextHref);
   }
 
   function removeTechnicalCopy() {
@@ -111,7 +112,7 @@
       .replace(/selected class information/gi, "class brochure")
       .replace(/class information/gi, "class brochure")
       .replace(/Saving enquiry/gi, "Saving your details");
-    if (next !== text) status.textContent = next;
+    setText(status, next);
   }
 
   function setupFormPage() {
@@ -120,19 +121,19 @@
     var eyebrow = document.querySelector(".hero .eyebrow");
     var title = document.querySelector(".hero h1");
     var text = document.querySelector(".hero p");
-    if (eyebrow) eyebrow.textContent = "FALOWEN GERMAN CLASSES";
-    if (title) title.textContent = "Choose the German class you want";
-    if (text) text.textContent = "Complete four simple steps to view the brochure for your preferred class.";
+    setText(eyebrow, "FALOWEN GERMAN CLASSES");
+    setText(title, "Choose the German class you want");
+    setText(text, "Complete four simple steps to view the brochure for your preferred class.");
     ensureSteps();
 
     var cardTitle = document.querySelector("#leadCaptureCard h2");
     var cardText = document.querySelector("#leadCaptureCard p");
     var submit = document.querySelector("#leadCaptureForm button[type='submit']");
     var classLabel = document.querySelector("label[for='leadClass']");
-    if (cardTitle) cardTitle.textContent = "Enter your details to continue";
-    if (cardText) cardText.textContent = "Choose your level and class, then open the brochure with the full class details.";
-    if (classLabel) classLabel.textContent = "German level and class";
-    if (submit && !submit.disabled) submit.textContent = "Save and view class brochure";
+    setText(cardTitle, "Enter your details to continue");
+    setText(cardText, "Choose your level and class, then open the brochure with the full class details.");
+    setText(classLabel, "German level and class");
+    if (submit && !submit.disabled) setText(submit, "Save and view class brochure");
 
     removeTechnicalCopy();
     ensureRegisterButton();
@@ -146,8 +147,9 @@
     if (leadCard) leadCard.remove();
     var slug = selectedSlug();
     document.querySelectorAll("a[href^='/signup'],a[href^='/classes/?class']").forEach(function (link) {
-      link.href = signupUrl(slug);
-      link.textContent = "Register Now";
+      var href = signupUrl(slug);
+      if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+      setText(link, "Register Now");
       link.removeAttribute("target");
       link.removeAttribute("rel");
     });
@@ -164,11 +166,5 @@
   document.addEventListener("change", function (event) {
     if (event.target && event.target.id === "leadClass") ensureRegisterButton();
   });
-
-  var observer = new MutationObserver(function () {
-    run();
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
-  window.setTimeout(function () { observer.disconnect(); }, 12000);
   [100, 350, 800, 1500, 2500, 5000].forEach(function (delay) { window.setTimeout(run, delay); });
 })();
