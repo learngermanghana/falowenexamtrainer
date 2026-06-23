@@ -4,6 +4,8 @@ import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbookPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
+import B1Day3ErfolgsgeschichtenWorkbookPage from "./B1Day3ErfolgsgeschichtenWorkbookPage";
+import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
@@ -27,11 +29,13 @@ const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : [])
 const B1_WORKBOOK_PAGES = {
   1: B1Day1TraumweltWorkbookPage,
   2: B1Day2FreundeFuersLebenWorkbookPage,
+  3: B1Day3ErfolgsgeschichtenWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
   1: B1Day1TraumweltGrammarNotesPage,
   2: B1Day2FreundeFuersLebenGrammarNotesPage,
+  3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
 };
 
 const decorateA1Day3Lesson = (lesson) => {
