@@ -182,6 +182,19 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   // prevents two different numbers videos from appearing in the lesson hub.
   a1[4] = { videoResources: [] };
 
+  a1[5] = {
+    videoResources: [
+      {
+        key: "a1-day5-kapitel-1-3-ai-video",
+        chapter: "1.3",
+        title: "A1 Day 5 · Kapitel 1.3 · AI video",
+        description:
+          "AI video lesson for articles, adjectives, personal information and W-questions in guided self-practice.",
+        url: "https://youtu.be/z7PpiIFJCu0",
+      },
+    ],
+  };
+
   a1[17] = {
     videoResources: [
       {
