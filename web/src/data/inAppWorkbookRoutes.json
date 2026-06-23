@@ -72,5 +72,19 @@
     "26": { "*": "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" },
     "27": { "*": "/campus/course/a2-day-27-digitale-kommunikation-workbook" },
     "28": { "*": "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" }
+  },
+  "B1": {
+    "1": { "*": "/campus/course/lesson/B1/1?view=workbook" },
+    "2": { "*": "/campus/course/lesson/B1/2?view=workbook" },
+    "4": { "*": "/campus/course/b1-day-4-wohnung-suchen-workbook" },
+    "20": { "*": "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" },
+    "21": { "*": "/campus/course/b1-day-21-lebensformen-heute-workbook" },
+    "22": { "*": "/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" },
+    "23": { "*": "/campus/course/b1-day-23-erstes-date-typische-situationen-workbook" },
+    "24": { "*": "/campus/course/b1-day-24-konsum-und-nachhaltigkeit-workbook" },
+    "25": { "*": "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook" },
+    "26": { "*": "/campus/course/b1-day-26-reiseprobleme-und-loesungen-workbook" },
+    "27": { "*": "/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook" },
+    "28": { "*": "/campus/course/b1-day-28-klimafreundlich-leben-workbook" }
   }
 }
