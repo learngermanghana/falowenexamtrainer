@@ -2,6 +2,7 @@ import { courseSchedules } from "../data/courseSchedule";
 import { hasOnlyInAppWorkbookRoutesForLevel } from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
+import { shouldRenderWorkbookGuide } from "./AutoWorkbookStartGuide";
 
 describe("AutoWorkbookStartGuide route matching", () => {
   test("normalizes relative and Falowen-hosted in-app links", () => {
@@ -33,7 +34,7 @@ describe("AutoWorkbookStartGuide route matching", () => {
     expect(index.get("/campus/course/writing-workbook")).toEqual({ level: "A1", day: 7, entry, resource: writingResource });
   });
 
-  test.each(["A1", "A2"])("%s configured routes are internal", (level) => {
+  test.each(["A1", "A2", "B1"])("%s configured routes are internal", (level) => {
     expect(hasOnlyInAppWorkbookRoutesForLevel(level)).toBe(true);
   });
 
@@ -51,5 +52,35 @@ describe("AutoWorkbookStartGuide route matching", () => {
     expect(index.has("/campus/course/a1-chapter-3-asking-about-prices-workbook")).toBe(true);
     expect(index.has("/campus/course/a1-chapter-5-german-cases-workbook")).toBe(true);
     expect(index.has("/campus/course/a1-day-10-objects-colors-possessive-articles-workbook")).toBe(true);
+  });
+
+  test("B1 lesson hub does not render workbook submission controls", () => {
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: "/campus/course/lesson/B1/2",
+        search: "",
+        match: { level: "B1", day: 2 },
+      })
+    ).toBe(false);
+  });
+
+  test("B1 workbook view renders the current A2-style submission controls", () => {
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: "/campus/course/lesson/B1/2",
+        search: "?view=workbook",
+        match: { level: "B1", day: 2 },
+      })
+    ).toBe(true);
+  });
+
+  test("B1 grammar view does not render workbook submission controls", () => {
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: "/campus/course/lesson/B1/2",
+        search: "?view=grammar",
+        match: { level: "B1", day: 2 },
+      })
+    ).toBe(false);
   });
 });
