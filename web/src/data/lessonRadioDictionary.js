@@ -85,6 +85,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Traumwelten ein. Danach gehst du weiter zum Lernteil.",
     },
+    2: {
+      key: "b1-day2-freunde-fuers-leben-falowen-radio",
+      title: "Freunde fürs Leben (Übung) 1.2",
+      youtubeId: "M9REWzH4zZs",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Freunde fürs Leben ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
   B2: {
     1: {
@@ -93,7 +101,7 @@ export const LESSON_RADIO_DICTIONARY = {
       youtubeId: "0lTNin1NTgc",
       duration: "",
       instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
+        "Höre aufmerksam zu und stimme dich auf realistische Lernziele und einen flexiblen Lernweg ein. Danach gehst du weiter zum Lernteil.",
     },
     2: {
       key: "b2-day2-beziehungen-kommunikation-falowen-radio",
