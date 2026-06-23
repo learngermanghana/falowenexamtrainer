@@ -101,7 +101,7 @@ export const LESSON_RADIO_DICTIONARY = {
       youtubeId: "0lTNin1NTgc",
       duration: "",
       instruction:
-        "Höre aufmerksam zu und stimme dich auf realistische Lernziele und einen flexiblen Lernweg ein. Danach gehst du weiter zum Lernteil.",
+        "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
     },
     2: {
       key: "b2-day2-beziehungen-kommunikation-falowen-radio",
