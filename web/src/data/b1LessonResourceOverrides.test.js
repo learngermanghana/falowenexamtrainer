@@ -28,7 +28,33 @@ describe("B1 canonical lesson resources", () => {
     );
   });
 
-  test("B1 Day 1 uses the requested AI grammar video", () => {
+  test("B1 Day 3 replaces legacy Drive resources with in-app pages", () => {
+    const lesson = {
+      day: 3,
+      chapter: "1.3",
+      assignment: true,
+      lesen_hören: {
+        chapter: "1.3",
+        assignment: true,
+        grammarbook_link: "https://drive.google.com/legacy-grammar",
+        workbook_link: "https://drive.google.com/legacy-workbook",
+      },
+    };
+
+    applyB1LessonResourceOverride(lesson);
+    const normalized = normalizeLesson(lesson, "B1");
+
+    expect(normalized.resources.grammarBook.url).toBe(
+      "/campus/course/lesson/B1/3?view=grammar"
+    );
+    expect(normalized.resources.workbook.url).toBe(
+      "/campus/course/lesson/B1/3?view=workbook"
+    );
+    expect(normalized.resources.grammarBook.url).not.toContain("drive.google.com");
+    expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
+  });
+
+  test("B1 Day 1 and Day 2 use the requested AI grammar videos", () => {
     const dictionary = { B1: {} };
     applyB1LessonVideoOverrides(dictionary);
 
@@ -38,8 +64,17 @@ describe("B1 canonical lesson resources", () => {
         url: "https://youtu.be/_mmAtSzWbNo",
       }),
     ]);
+    expect(dictionary.B1[2].videoResources).toEqual([
+      expect.objectContaining({
+        chapter: "1.2",
+        url: "https://youtu.be/Skl0FjF5JBg",
+      }),
+    ]);
     expect(getB1LessonResourceOverride(1).aiVideo).toBe(
       "https://youtu.be/_mmAtSzWbNo"
+    );
+    expect(getB1LessonResourceOverride(2).aiVideo).toBe(
+      "https://youtu.be/Skl0FjF5JBg"
     );
   });
 });
