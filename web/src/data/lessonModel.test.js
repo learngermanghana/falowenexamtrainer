@@ -56,9 +56,13 @@ describe("canonical lesson model", () => {
       expect.objectContaining({ chapter: "1", grammarBook: { url: "grammar-1" } }),
     ]);
 
-    const b1 = normalizeA2B1Lesson({ day: 1 }, "B1");
-    expect(b1.resources.grammarBook.url).toContain("?view=grammar");
-    expect(b1.resources.workbook.url).toContain("?view=workbook");
+    const b1Day1 = normalizeA2B1Lesson({ day: 1 }, "B1");
+    expect(b1Day1.resources.grammarBook.url).toBe("/campus/course/lesson/B1/1?view=grammar");
+    expect(b1Day1.resources.workbook.url).toBe("/campus/course/lesson/B1/1?view=workbook");
+
+    const b1Day2 = normalizeA2B1Lesson({ day: 2 }, "B1");
+    expect(b1Day2.resources.grammarBook.url).toBe("/campus/course/lesson/B1/2?view=grammar");
+    expect(b1Day2.resources.workbook.url).toBe("/campus/course/lesson/B1/2?view=workbook");
   });
   test("collapses exact duplicate resource groups for the same chapter", () => {
     const lesson = normalizeA1Lesson({
