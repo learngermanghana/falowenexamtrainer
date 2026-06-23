@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -8,12 +7,11 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
+  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "submit", label: "Submit" },
   { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "Ref" },
+  { key: "references", label: "5. Ref" },
 ];
 
 const card = { ...styles.card, display: "grid", gap: 12 };
@@ -58,9 +56,8 @@ const PreparedCheckbox = ({ checked, onChange }) => <label style={{ display: "in
 const QuestionList = ({ questions }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={question.stem} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{question.options.map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
 const B1Day2FreundeFuersLebenWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, submit: false, hoeren: false });
+  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
@@ -114,20 +111,12 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
         "Gemeinsame Interessen und Aktivitäten stärken die Freundschaft ebenfalls. Sie schaffen gemeinsame Erlebnisse und Erinnerungen, die die Freundschaft festigen. Allerdings müssen Freunde nicht immer alles gemeinsam machen. Respekt vor den individuellen Interessen und Freiheiten ist ebenso wichtig.",
         "Ehrlichkeit und Kommunikation sind ebenfalls entscheidend. Ein wahrer Freund sagt die Wahrheit, auch wenn es schwierig ist. Ehrliche Kommunikation hilft, Missverständnisse zu vermeiden und die Beziehung zu stärken.",
         "Schließlich ist Vergebung ein wesentlicher Bestandteil einer wahren Freundschaft. Jeder macht Fehler, und es ist wichtig, diese Fehler zu vergeben und hinter sich zu lassen. Eine Freundschaft, die auf Vergebung basiert, wird mit der Zeit stärker.",
-        "Insgesamt bedeutet es, ein wahrer Freund zu sein, sich gegenseitig zu vertrauen, zu unterstützen, gemeinsame Interessen zu pflegen, ehrlich zu kommunizieren und zu vergeben. Diese Elemente bilden die Grundlage für eine stabile und erfüllende Freundschaft."
-      ].map((paragraph) => <p key={paragraph.slice(0, 40)} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
+        "Insgesamt bedeutet es, ein wahrer Freund zu sein, sich gegenseitig zu vertrauen, zu unterstützen, gemeinsame Interessen zu pflegen, ehrlich zu kommunizieren und zu vergeben. Diese Elemente bilden die Grundlage für eine stabile und erfüllende Freundschaft.",
+      ].map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
       <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
       <QuestionList questions={lesenQuestions} />
       <WorkbookSubmissionReminder />
       <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
-    </div>}
-
-    {activeTab === "submit" && <div style={card}>
-      <h2 style={sectionTitle}>Submit</h2>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>Use the assignment submission area for your final answers for Teil 2, Teil 3 and Teil 4. Teil 1 is group discussion only and has no assignment submission.</p>
-      <WorkbookSubmissionReminder />
-      <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/course")}>Back to Course Book</button>
-      <PreparedCheckbox checked={prepared.submit} onChange={setPreparedFor("submit")} />
     </div>}
 
     {activeTab === "hoeren" && <div style={card}>
