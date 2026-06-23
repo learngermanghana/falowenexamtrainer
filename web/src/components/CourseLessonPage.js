@@ -6,6 +6,7 @@ import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbo
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
+import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
 import { courseSchedules } from "../data/courseSchedule";
 import CourseLessonPageLegacy, { LessonResourcesHub } from "./CourseLessonPageLegacy";
 import {
@@ -71,11 +72,24 @@ const decorateA1Day5Lesson = (lesson) => {
   if (!lesson || Number(lesson.day) !== 5) return;
 
   lesson.topic = A1_DAY_5_TITLE;
-  lesson.grammar_topic = "Definite articles, basic adjectives, personal information, W-questions and sentence structure";
+  lesson.grammar_topic = null;
   lesson.goal =
-    "Use der, die and das, describe people and things with basic adjectives, give personal information, form W-questions and build correct A1 sentences.";
+    "Use articles, adjectives, personal information and W-questions through guided self-practice.";
   lesson.instruction =
-    "Complete the six self-practice sections: articles, adjectives, personal information, mini dialogues, W-words and scrambled sentences. Finish by writing a short personal introduction and use the answer guides for self-check.";
+    "Complete the self-practice workbook and use the answer guides for self-check. This lesson has no separate grammar-notes resource and no assignment submission.";
+  lesson.assignment = false;
+  lesson.grammarbook_link = null;
+  lesson.grammar_link = null;
+  lesson.grammarPage = null;
+
+  [...toArray(lesson.schreiben_sprechen), ...toArray(lesson.lesen_hören)].forEach((resource) => {
+    if (!resource || typeof resource !== "object") return;
+    resource.assignment = false;
+    resource.resourceRole = "selfPractice";
+    resource.grammarbook_link = null;
+    resource.grammar_link = null;
+    resource.grammarPage = null;
+  });
 };
 
 const decorateA1Day17Lesson = (lesson) => {
@@ -117,9 +131,6 @@ const syncA2LessonFromSchedule = (lesson, day) => {
     return;
   }
 
-  // Course Book cards can carry an older dictionary snapshot in router state.
-  // Let the current schedule win, then replace any legacy Drive grammar URL
-  // with the canonical in-app A2 grammar route.
   Object.assign(lesson, canonicalLesson);
   applyA2GrammarRouteToLesson(lesson, day);
 };
@@ -129,6 +140,7 @@ const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day
 const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
 (courseSchedules.A1 || []).forEach((entry) => applyA1GrammarRouteToLesson(entry, entry?.day));
 (courseSchedules.A2 || []).forEach((entry) => applyA2GrammarRouteToLesson(entry, entry?.day));
+(courseSchedules.B1 || []).forEach((entry) => applyB1LessonResourceOverride(entry, entry?.day));
 decorateA1Day3Lesson(scheduleDay3);
 decorateA1Day5Lesson(scheduleDay5);
 decorateA1Day17Lesson(scheduleDay17);
@@ -188,6 +200,7 @@ export default function CourseLessonPage() {
   const isA1Day5 = level === "A1" && day === 5;
   const isA1Day17 = level === "A1" && day === 17;
   if (level === "A1") applyA1GrammarRouteToLesson(location.state?.entry, day);
+  if (level === "B1") applyB1LessonResourceOverride(location.state?.entry, day);
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
   if (isA1Day17) decorateA1Day17Lesson(location.state?.entry);
