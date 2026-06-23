@@ -35,7 +35,7 @@
     var tag = document.createElement("style");
     tag.id = "simpleClassFlowStyles";
     tag.textContent =
-      "body.simple-classes-form .page > section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard)," +
+      "body.simple-classes-form .page > section:not(.intro-video):not(.hero):not(.lead-capture-card):not(#studentReviewsCard)," +
       "body.simple-classes-form .page > .grid," +
       "body.simple-classes-form .page > .card:not(.lead-capture-card):not(#studentReviewsCard)," +
       "body.simple-classes-form #brochureToc," +
@@ -45,6 +45,8 @@
       "body.simple-classes-form #payment-agreement-section," +
       "body.simple-classes-form .hero-actions," +
       "body.simple-classes-form .footer{display:none!important}" +
+      "body.simple-classes-form .intro-video{display:block!important;margin:0 0 14px!important;border-radius:18px!important;overflow:hidden!important}" +
+      "body.simple-classes-form .intro-video iframe{display:block!important;width:100%!important;aspect-ratio:16/9!important;height:auto!important;border:0!important}" +
       "body.simple-classes-form .hero{padding:14px 16px;gap:10px}" +
       "body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)}" +
       "body.simple-classes-form .hero p{font-size:15px;line-height:1.55}" +
