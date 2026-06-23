@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import CourseInlineDiscussionPanel from "./CourseInlineDiscussionPanel";
+import { getDiscussionLesson } from "../utils/discussionLessons";
 
 import { styles } from "../styles";
 
@@ -42,24 +44,6 @@ const successBoxStyle = {
   ...boxBase,
   border: "1px solid #bbf7d0",
   background: "#f0fdf4",
-};
-
-const inputStyle = {
-  width: "100%",
-  minHeight: 48,
-  padding: "12px 14px",
-  borderRadius: 12,
-  border: "1px solid #d1d5db",
-  fontSize: 16,
-  lineHeight: 1.4,
-  boxSizing: "border-box",
-};
-
-const textareaStyle = {
-  ...inputStyle,
-  minHeight: 140,
-  resize: "vertical",
-  fontFamily: "inherit",
 };
 
 const chipWrapStyle = {
@@ -260,8 +244,6 @@ const MobileSectionLabel = ({ children }) => (
 
 const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
 
-  const [articlePractice, setArticlePractice] = useState("");
-
   const [wWordSelections, setWWordSelections] = useState(() =>
     wWordQuestions.reduce((acc, _, index) => {
       acc[index] = "";
@@ -269,33 +251,11 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
     }, {})
   );
 
-  const [adjectivePractice, setAdjectivePractice] = useState("");
-
-  const [dialoguePractice, setDialoguePractice] = useState("");
-  const [sentenceReorderAnswer, setSentenceReorderAnswer] = useState("");
-
-  const [aboutMe, setAboutMe] = useState("");
-
-  const articleScore = useMemo(() => {
-    return articleWords.filter((item) => articlePractice.toLowerCase().includes(`${item.article} ${item.noun}`.toLowerCase())).length;
-  }, [articlePractice]);
-
   const wWordScore = useMemo(() => {
     return wWordQuestions.filter(
       (question, index) => wWordSelections[index] === question.answer
     ).length;
   }, [wWordSelections]);
-
-  const completedSections = useMemo(() => {
-    let count = 0;
-    if (articlePractice.trim()) count += 1;
-    if (adjectivePractice.trim()) count += 1;
-    if (dialoguePractice.trim()) count += 1;
-    if (Object.values(wWordSelections).some(Boolean)) count += 1;
-    if (aboutMe.trim()) count += 1;
-    if (sentenceReorderAnswer.trim()) count += 1;
-    return count;
-  }, [articlePractice, adjectivePractice, dialoguePractice, wWordSelections, aboutMe, sentenceReorderAnswer]);
 
   const handleWWordChange = (index, value) => {
     setWWordSelections((prev) => ({ ...prev, [index]: value }));
@@ -325,15 +285,15 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           </h1>
 
           <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.6 }}>
-            Chapter 1.2 · Interactive workbook
+            Chapter 1.3 · Interactive workbook
           </p>
 
           <div style={infoBoxStyle}>
             <strong>Progress</strong>
             <div style={{ lineHeight: 1.7 }}>
-              <div>Completed sections: {completedSections}/6</div>
-              <div>Articles: {articleScore}/{articleWords.length}</div>
-              <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
+              <div>Practice sections: articles, adjectives, personal information, dialogue, W-words, and sentence order.</div>
+              <div>W-words checked on this page: {wWordScore}/{wWordQuestions.length}</div>
+              <div>One writing box is saved at the end for class discussion.</div>
             </div>
           </div>
         </div>
@@ -372,10 +332,8 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         </div>
 
         <div style={boxBase}>
-          <strong>Write the correct article</strong>
-          <p style={{ margin: 0, lineHeight: 1.7, color: "#4b5563" }}>Type der, die, or das. Then add if each noun is masculine, feminine, or neuter.</p>
-
-          <textarea value={articlePractice} onChange={(e) => setArticlePractice(e.target.value)} placeholder="Example:\nder Tisch - masculine\ndas Auto - neuter\ndie Lampe - feminine" style={textareaStyle} />
+          <strong>Article answers</strong>
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#4b5563" }}>Say each article aloud. Use the final class contribution box if your tutor asks you to write these.</p>
 
           <RevealAnswer buttonLabel="Show article answers">
             <div style={{ display: "grid", gap: 8, lineHeight: 1.7 }}>
@@ -414,9 +372,8 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         </div>
 
         <div style={boxBase}>
-          <strong>Write your own sentences</strong>
-
-          <textarea value={adjectivePractice} onChange={(e) => setAdjectivePractice(e.target.value)} placeholder="Write 3-5 adjective sentences here..." style={textareaStyle} />
+          <strong>Oral practice</strong>
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#4b5563" }}>Make 3–5 short adjective sentences aloud. Save only your final introduction in the class contribution box below.</p>
         </div>
       </SectionCard>
 
@@ -471,8 +428,6 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           </div>
         </div>
 
-        <textarea value={dialoguePractice} onChange={(e) => setDialoguePractice(e.target.value)} placeholder="Write the full mini dialogue here..." style={textareaStyle} />
-
         <div style={warningBoxStyle}>
           <strong>A1 statement rule</strong>
           <div style={{ lineHeight: 1.8 }}>
@@ -511,7 +466,6 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
             {sentenceReorderPhrases.map((phrase, index) => <div key={phrase}>{index + 1}. {phrase}</div>)}
           </div>
         </div>
-        <textarea value={sentenceReorderAnswer} onChange={(e) => setSentenceReorderAnswer(e.target.value)} placeholder="Write all corrected sentences here..." style={textareaStyle} />
         <RevealAnswer buttonLabel="Show scrambled sentence answers">
           <div style={{ lineHeight: 1.8 }}>
             <div>1. Ich heiße Anna. (Statement)</div>
@@ -618,16 +572,6 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           </div>
         </div>
 
-        <label style={{ display: "grid", gap: 8 }}>
-          <strong>My introduction</strong>
-          <textarea
-            value={aboutMe}
-            onChange={(e) => setAboutMe(e.target.value)}
-            placeholder="Ich heiße ... Ich komme aus ... Ich wohne in ..."
-            style={textareaStyle}
-          />
-        </label>
-
         <RevealAnswer buttonLabel="Show sample paragraph">
           <p style={{ margin: 0, lineHeight: 1.9 }}>
             Ich heiße Kojo Mensah. Ich komme aus Ghana. Ich wohne in Accra.
@@ -636,6 +580,14 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           </p>
         </RevealAnswer>
       </SectionCard>
+
+      <CourseInlineDiscussionPanel
+        lessonId={getDiscussionLesson({ level: "A1", day: 5, chapter: "1.3" }).id}
+        lessonLabel={getDiscussionLesson({ level: "A1", day: 5, chapter: "1.3" }).label}
+        title="Class contribution: write about yourself"
+        description="Use this one box for your final 6–8 German sentences. Your answer is saved to the class discussion, and this workbook shows only your own contribution."
+        contributionOnly
+      />
 
       <div style={{ ...successBoxStyle, gap: 12 }}>
         <h2 style={{ margin: 0, fontSize: 22 }}>Self-check</h2>
