@@ -16,6 +16,25 @@ function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeIdArray(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(
+    value
+      .map((item) => String(item || "").trim().toUpperCase())
+      .filter(Boolean),
+  )];
+}
+
+export function normalizeCurriculumIds(data = {}) {
+  const candidates = [
+    normalizeIdArray(data.assignmentIds),
+    normalizeIdArray(data.chapterIds),
+    normalizeIdArray(data.curriculumIds),
+    normalizeIdArray(data.assignment_id ? [data.assignment_id] : []),
+  ];
+  return candidates.find((ids) => ids.length) || [];
+}
+
 function toDate(value) {
   if (!value) return null;
   if (typeof value?.toDate === "function") return value.toDate();
@@ -30,16 +49,18 @@ function sessionTime(session, field) {
 
 function normalizeSession(snapshot) {
   const data = snapshot.data();
+  const assignmentIds = normalizeCurriculumIds(data);
   return {
     id: snapshot.id,
     ...data,
     startsAt: toDate(data.startsAt),
     endsAt: toDate(data.endsAt),
-    assignmentIds: Array.isArray(data.assignmentIds)
-      ? data.assignmentIds
-      : Array.isArray(data.chapterIds)
-      ? data.chapterIds
-      : [],
+    assignmentIds,
+    chapterIds: assignmentIds,
+    curriculumIds: assignmentIds,
+    curriculumIndex: Number(data.curriculumIndex || 0),
+    curriculumSource: String(data.curriculumSource || "").trim(),
+    curriculumVersion: Number(data.curriculumVersion || 0),
   };
 }
 
