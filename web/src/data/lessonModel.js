@@ -5,9 +5,14 @@ import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOver
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import {
+  applyB1LessonVideoOverrides,
+  getB1LessonResourceOverride,
+} from "./b1LessonResourceOverrides";
 import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
+applyB1LessonVideoOverrides(LESSON_VIDEO_DICTIONARY);
 
 export const LEVEL_CAPABILITIES = Object.freeze({
   A1: { radio: false, fourPartWorkbook: false, tutorSubmission: true, selfAssessment: false },
@@ -38,22 +43,13 @@ const mergeVideos = (...groups) => {
 };
 const isTeacherVideo = (item = {}) =>
   `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
-const INTERNAL = {
-  B1: {
-    1: {
-      grammarBook: "/campus/course/lesson/B1/1?view=grammar",
-      workbook: "/campus/course/lesson/B1/1?view=workbook",
-    },
-    2: {
-      grammarBook: "/campus/course/lesson/B1/2?view=grammar",
-      workbook: "/campus/course/lesson/B1/2?view=workbook",
-    },
-  },
-};
+
+const shouldHideGrammarBook = ({ level, day }) => level === "A1" && Number(day) === 5;
 
 const getCanonicalGrammarBook = ({ level, day, chapter }) => {
   if (level === "A1") return getA1GrammarRoute({ day, chapter });
   if (level === "A2") return getA2GrammarRoute({ day, chapter });
+  if (level === "B1") return getB1LessonResourceOverride(day)?.grammarBook || "";
   return "";
 };
 
@@ -97,23 +93,30 @@ export const dedupeResourceGroups = (groups = []) =>
 const resourceGroups = (raw, level, day) => {
   const nested = [...list(raw.schreiben_sprechen), ...list(raw.lesen_hören)].filter(Boolean);
   const entries = nested.length ? nested : [raw];
-  const internal = INTERNAL[level]?.[day] || {};
+  const b1Override = level === "B1" ? getB1LessonResourceOverride(day) : null;
+  const hideGrammarBook = shouldHideGrammarBook({ level, day });
+
   const groups = entries.map((entry) => {
-    const chapter = entry.chapter || raw.chapter || null;
+    const chapter = entry.chapter || raw.chapter || b1Override?.chapter || null;
     const workbook = resolveStrictInAppWorkbookRoute({
       level,
       day,
       chapter,
-      fallback: internal.workbook || first(entry.workbook_link, raw.workbook_link, entry.workbookRoute, raw.workbookRoute),
+      fallback:
+        b1Override?.workbook ||
+        first(entry.workbook_link, raw.workbook_link, entry.workbookRoute, raw.workbookRoute),
     });
-    const canonicalGrammarBook = getCanonicalGrammarBook({ level, day, chapter });
+    const canonicalGrammarBook = hideGrammarBook
+      ? ""
+      : getCanonicalGrammarBook({ level, day, chapter });
+    const grammarBook = hideGrammarBook
+      ? ""
+      : canonicalGrammarBook ||
+        first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link);
+
     return {
       chapter,
-      grammarBook: link(
-        canonicalGrammarBook ||
-          internal.grammarBook ||
-          first(entry.grammarbook_link, entry.grammar_link, raw.grammarbook_link, raw.grammar_link)
-      ),
+      grammarBook: link(grammarBook),
       workbook: link(workbook),
     };
   });
@@ -143,8 +146,6 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
 export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
   const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
 
-  // A full-day lesson may intentionally contain more than one chapter. Only narrow
-  // the video list when the user opened a chapter-specific Course Book entry.
   if (selectedChapters.size !== 1) return videos;
 
   return videos.filter((video) => {
