@@ -1,1 +1,0 @@
-Live-class curriculum compatibility is enabled for assignmentIds, chapterIds, curriculumIds, and legacy assignment_id.
