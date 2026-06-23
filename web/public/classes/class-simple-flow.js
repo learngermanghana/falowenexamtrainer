@@ -31,10 +31,7 @@
   }
 
   function style() {
-    if (document.getElementById("simpleClassFlowStyles")) return;
-    var tag = document.createElement("style");
-    tag.id = "simpleClassFlowStyles";
-    tag.textContent =
+    var cssText =
       "body.simple-classes-form .page > section:not(.intro-video):not(.hero):not(.lead-capture-card):not(#studentReviewsCard)," +
       "body.simple-classes-form .page > .grid," +
       "body.simple-classes-form .page > .card:not(.lead-capture-card):not(#studentReviewsCard)," +
@@ -45,19 +42,26 @@
       "body.simple-classes-form #payment-agreement-section," +
       "body.simple-classes-form .hero-actions," +
       "body.simple-classes-form .footer{display:none!important}" +
-      "body.simple-classes-form .intro-video{display:block!important;margin:0 0 14px!important;border-radius:18px!important;overflow:hidden!important}" +
+      "body.simple-classes-form .intro-video{display:block!important;margin:0 0 14px!important;border-radius:18px!important;overflow:hidden!important;background:#000!important}" +
       "body.simple-classes-form .intro-video iframe{display:block!important;width:100%!important;aspect-ratio:16/9!important;height:auto!important;border:0!important}" +
       "body.simple-classes-form .hero{padding:14px 16px;gap:10px}" +
       "body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)}" +
       "body.simple-classes-form .hero p{font-size:15px;line-height:1.55}" +
-      ".simple-class-steps{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}" +
-      ".simple-class-step{display:flex;align-items:center;gap:9px;border:1px solid #dbeafe;background:#f8fbff;border-radius:12px;padding:9px 10px;color:#1e293b;font-size:13px;font-weight:750;line-height:1.35}" +
+      ".simple-class-steps{display:grid!important;grid-template-columns:1fr;gap:8px;margin-top:10px}" +
+      ".simple-class-step{display:flex!important;align-items:center;gap:9px;border:1px solid #dbeafe;background:#f8fbff;border-radius:12px;padding:9px 10px;color:#1e293b;font-size:13px;font-weight:750;line-height:1.35}" +
       ".simple-class-step-number{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:999px;background:#1455f5;color:#fff;font-size:12px;font-weight:900}" +
       "body.simple-classes-form .lead-actions{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}" +
       ".lead-register-now{width:100%;min-height:50px;background:#0f766e!important;border-color:#0f766e!important;color:#fff!important;text-decoration:none!important}" +
       "body.simple-classes-form .lead-help,body.simple-classes-form .lead-open-link,body.simple-classes-form .lead-small-actions{display:none!important}" +
-      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
-    document.head.appendChild(tag);
+      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))!important}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
+
+    var tag = document.getElementById("simpleClassFlowStyles");
+    if (!tag) {
+      tag = document.createElement("style");
+      tag.id = "simpleClassFlowStyles";
+      document.head.appendChild(tag);
+    }
+    if (tag.textContent !== cssText) tag.textContent = cssText;
   }
 
   function ensureSteps() {
@@ -163,8 +167,30 @@
     setupDetailPage();
   }
 
+  function installCopyGuard() {
+    if (!isFormPage() || window.__falowenClassCopyGuard) return;
+    var root = document.querySelector(".page") || document.body;
+    if (!root) return;
+    window.__falowenClassCopyGuard = true;
+    var scheduled = false;
+    var observer = new MutationObserver(function () {
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(function () {
+        scheduled = false;
+        run();
+      });
+    });
+    observer.observe(root, { childList: true, subtree: true, characterData: true });
+    window.setTimeout(function () { observer.disconnect(); }, 10000);
+  }
+
   run();
-  window.addEventListener("load", run);
+  installCopyGuard();
+  window.addEventListener("load", function () {
+    run();
+    installCopyGuard();
+  });
   document.addEventListener("change", function (event) {
     if (event.target && event.target.id === "leadClass") ensureRegisterButton();
   });
