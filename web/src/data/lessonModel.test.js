@@ -1,4 +1,5 @@
 import {
+  dedupeResourceGroups,
   LEVEL_CAPABILITIES,
   normalizeA1Lesson,
   normalizeA2B1Lesson,
@@ -58,6 +59,43 @@ describe("canonical lesson model", () => {
     const b1 = normalizeA2B1Lesson({ day: 1 }, "B1");
     expect(b1.resources.grammarBook.url).toContain("?view=grammar");
     expect(b1.resources.workbook.url).toContain("?view=workbook");
+  });
+  test("collapses exact duplicate resource groups for the same chapter", () => {
+    const lesson = normalizeA1Lesson({
+      day: 17,
+      chapter: "11",
+      schreiben_sprechen: [{
+        chapter: "11",
+        grammarbook_link: "/campus/course/directions-imperative-11",
+        workbook_link: "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook",
+      }],
+      lesen_hören: [{
+        chapter: "11",
+        grammarbook_link: "/campus/course/directions-imperative-11",
+        workbook_link: "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook",
+      }],
+    });
+
+    expect(lesson.resources.resourceGroups).toHaveLength(1);
+    expect(lesson.resources.resourceGroups[0]).toEqual(expect.objectContaining({
+      chapter: "11",
+      grammarBook: { url: "/campus/course/directions-imperative-11" },
+      workbook: { url: "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook" },
+    }));
+  });
+  test("merges complementary grammar and workbook resources for one chapter", () => {
+    expect(dedupeResourceGroups([
+      { chapter: "4.11", grammarBook: { url: "grammar" }, workbook: null },
+      { chapter: "4.11", grammarBook: null, workbook: { url: "workbook" } },
+    ])).toEqual([
+      { chapter: "4.11", grammarBook: { url: "grammar" }, workbook: { url: "workbook" } },
+    ]);
+  });
+  test("keeps conflicting resources separate even when chapter labels match", () => {
+    expect(dedupeResourceGroups([
+      { chapter: "1", grammarBook: { url: "grammar-a" }, workbook: { url: "workbook-a" } },
+      { chapter: "1", grammarBook: { url: "grammar-b" }, workbook: { url: "workbook-b" } },
+    ])).toHaveLength(2);
   });
   test("uses an explicit AI video instead of a generic A2 fallback", () => {
     const lesson = normalizeA2B1Lesson({ day: 8, video: "generic", ai_video: "explicit-ai" }, "A2");
