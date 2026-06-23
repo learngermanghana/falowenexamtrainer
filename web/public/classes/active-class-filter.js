@@ -9,13 +9,15 @@
   }
 
   function isCourseOpen(course) {
-    if (!course) return false;
+    if (!course || course.publicVisible === false || course.registrationOpen === false) return false;
     if (course.availability === "always") return true;
     if (!course.startDate) return false;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const start = new Date(`${course.startDate}T00:00:00`);
+    const end = course.endDate ? new Date(`${course.endDate}T23:59:59`) : null;
+    if (course.status === "active" && (!end || end >= today)) return true;
     return start >= today;
   }
 
@@ -44,7 +46,8 @@
     const times = Array.isArray(course.meetingDays) && course.meetingDays.length
       ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
       : "Self-learning";
-    return `${course.title} · Starts ${formatDate(course.startDate)} · ${times}`;
+    const dateLabel = course.status === "active" ? `In progress until ${formatDate(course.endDate)}` : `Starts ${formatDate(course.startDate)}`;
+    return `${course.title} · ${dateLabel} · ${times}`;
   }
 
   function getActiveClasses(data) {
@@ -83,15 +86,13 @@
       .join("");
 
     select.dataset.activeFiltered = "true";
-    if (help) help.textContent = "Only upcoming classes and always-open self-learning classes are shown here.";
-
+    if (help) help.textContent = "Only classes currently open for registration are shown here.";
     if (!requestedIsActive && activeClasses[0]) {
       const nextUrl = `/classes/${activeClasses[0].slug}/`;
       window.history.replaceState(null, "", nextUrl);
       select.dispatchEvent(new Event("change", { bubbles: true }));
       if (status) status.textContent = "";
     }
-
     return true;
   }
 
