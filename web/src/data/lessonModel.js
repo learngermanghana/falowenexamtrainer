@@ -48,11 +48,48 @@ const getCanonicalGrammarBook = ({ level, day, chapter }) => {
   return "";
 };
 
+const resourceGroupUrl = (resource) => String(resource?.url || "").trim();
+
+const groupsAreCompatible = (left = {}, right = {}) => {
+  const leftChapter = chapterKey(left.chapter);
+  const rightChapter = chapterKey(right.chapter);
+  if (leftChapter !== rightChapter) return false;
+
+  const leftGrammar = resourceGroupUrl(left.grammarBook);
+  const rightGrammar = resourceGroupUrl(right.grammarBook);
+  const leftWorkbook = resourceGroupUrl(left.workbook);
+  const rightWorkbook = resourceGroupUrl(right.workbook);
+
+  const grammarCompatible = !leftGrammar || !rightGrammar || leftGrammar === rightGrammar;
+  const workbookCompatible = !leftWorkbook || !rightWorkbook || leftWorkbook === rightWorkbook;
+  return grammarCompatible && workbookCompatible;
+};
+
+export const dedupeResourceGroups = (groups = []) =>
+  groups.reduce((deduped, group) => {
+    if (!group) return deduped;
+
+    const matchIndex = deduped.findIndex((candidate) => groupsAreCompatible(candidate, group));
+    if (matchIndex === -1) {
+      deduped.push(group);
+      return deduped;
+    }
+
+    const current = deduped[matchIndex];
+    deduped[matchIndex] = {
+      ...current,
+      chapter: current.chapter || group.chapter || null,
+      grammarBook: current.grammarBook || group.grammarBook || null,
+      workbook: current.workbook || group.workbook || null,
+    };
+    return deduped;
+  }, []);
+
 const resourceGroups = (raw, level, day) => {
   const nested = [...list(raw.schreiben_sprechen), ...list(raw.lesen_hören)].filter(Boolean);
   const entries = nested.length ? nested : [raw];
   const internal = INTERNAL[level]?.[day] || {};
-  return entries.map((entry) => {
+  const groups = entries.map((entry) => {
     const chapter = entry.chapter || raw.chapter || null;
     const workbook = resolveStrictInAppWorkbookRoute({
       level,
@@ -71,6 +108,8 @@ const resourceGroups = (raw, level, day) => {
       workbook: link(workbook),
     };
   });
+
+  return dedupeResourceGroups(groups);
 };
 
 const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => {
