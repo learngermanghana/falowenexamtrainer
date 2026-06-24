@@ -2,12 +2,14 @@ import React, { useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
+import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import WorkbookContextSync from "./WorkbookContextSync";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 const A1_DAY18_CHAPTER121_PATH = "/campus/course/two-case-prepositions-wechselpraepositionen-day-18";
-const A1_DAY18_CHAPTER122_PATH = "/campus/course/a1-12-2-dative-articles-mit-bei-zu";
+const A1_DAY18_CHAPTER122_GRAMMAR_PATH = "/campus/course/a1-12-2-dative-articles-mit-bei-zu";
+const A1_DAY18_CHAPTER122_WORKBOOK_PATH = "/campus/course/a1-day-18-kapitel-12-2-workbook";
 const workbookRouteIndex = buildWorkbookRouteIndex();
 export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
@@ -15,7 +17,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
   A1_DAY18_CHAPTER121_PATH,
-  A1_DAY18_CHAPTER122_PATH,
+  A1_DAY18_CHAPTER122_WORKBOOK_PATH,
 ]);
 
 export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } = {}) => {
@@ -23,11 +25,12 @@ export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } 
   const normalizedPathname = normalizeInAppPath(pathname);
   const requestedView = new URLSearchParams(search || "").get("view");
 
-  if (
-    normalizedPathname === A1_DAY18_CHAPTER121_PATH ||
-    normalizedPathname === A1_DAY18_CHAPTER122_PATH
-  ) {
+  if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) {
     return requestedView === "workbook";
+  }
+
+  if (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH) {
+    return false;
   }
 
   const isB1LessonRoute = /^\/campus\/course\/lesson\/B1\/\d+$/i.test(normalizedPathname);
@@ -41,6 +44,10 @@ const AutoWorkbookStartGuide = () => {
   const normalizedPathname = normalizeInAppPath(pathname);
   const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
   const usesSelfManagedSubmissionTabs = SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname);
+
+  if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) {
+    return <A1Day18Kapitel122WorkbookPage />;
+  }
 
   if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
 
@@ -69,5 +76,6 @@ export default AutoWorkbookStartGuide;
 
 export const __TESTING__ = {
   A1_DAY18_CHAPTER121_PATH,
-  A1_DAY18_CHAPTER122_PATH,
+  A1_DAY18_CHAPTER122_GRAMMAR_PATH,
+  A1_DAY18_CHAPTER122_WORKBOOK_PATH,
 };
