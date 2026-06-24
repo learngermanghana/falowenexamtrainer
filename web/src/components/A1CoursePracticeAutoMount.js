@@ -18,6 +18,37 @@ const getPageContainer = () => {
   return main.querySelector("div[style*='display: grid']") || main.firstElementChild || main;
 };
 
+const replaceExactText = (root, selector, currentText, nextText) => {
+  Array.from(root.querySelectorAll(selector)).forEach((node) => {
+    if (String(node.textContent || "").trim() === currentText) {
+      node.textContent = nextText;
+    }
+  });
+};
+
+const prepareSpeakingLessonPage = (container) => {
+  const timerHeading = Array.from(container.querySelectorAll("h2")).find(
+    (heading) => String(heading.textContent || "").trim() === "Confidence Timer",
+  );
+  timerHeading?.closest("section")?.remove();
+
+  replaceExactText(container, "strong", "Timed Practice", "Exam Practice");
+  replaceExactText(container, "p", "30s / 60s / 90s", "practise directly here");
+  replaceExactText(container, "strong", "Real Exam Mode", "Full Exams Room");
+  replaceExactText(container, "p", "open Falowen", "available anytime");
+
+  Array.from(container.querySelectorAll("p")).forEach((paragraph) => {
+    const text = String(paragraph.textContent || "").trim();
+    if (
+      text ===
+      "Train with random speaking prompts, build confidence with a timed speaking drill, and move straight into Falowen real speaking practice."
+    ) {
+      paragraph.textContent =
+        "Watch the AI speaking lesson, revise the exam language, and practise the full Goethe A1 speaking flow directly on this page.";
+    }
+  });
+};
+
 const A1CoursePracticeAutoMount = () => {
   const location = useLocation();
 
@@ -30,6 +61,8 @@ const A1CoursePracticeAutoMount = () => {
     document.getElementById("falowen-a1-practice-mount")?.remove();
 
     const container = getPageContainer();
+    if (isSpeakingPage) prepareSpeakingLessonPage(container);
+
     const mount = document.createElement("div");
     mount.id = "falowen-a1-practice-mount";
     mount.style.margin = "16px 0";
