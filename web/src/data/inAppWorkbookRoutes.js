@@ -3,6 +3,7 @@ import routeConfig from "./inAppWorkbookRoutes.json";
 const GUARDED_LEVELS = new Set(["A1", "A2"]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
+const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-day-18-kapitel-12-2-workbook";
 
 export const normalizeFalowenCourseRoute = (value = "") => {
   const raw = String(value || "").trim();
@@ -18,9 +19,17 @@ export const normalizeFalowenCourseRoute = (value = "") => {
 };
 
 export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
-  const config = routeConfig?.[normalizeLevel(level)]?.[String(Number(day))];
+  const normalizedLevel = normalizeLevel(level);
+  const normalizedDay = String(Number(day));
+  const normalizedChapter = normalizeChapter(chapter);
+
+  if (normalizedLevel === "A1" && normalizedDay === "18" && normalizedChapter === "12.2") {
+    return A1_DAY18_CHAPTER122_WORKBOOK_ROUTE;
+  }
+
+  const config = routeConfig?.[normalizedLevel]?.[normalizedDay];
   if (!config) return "";
-  return config[normalizeChapter(chapter)] || config["*"] || "";
+  return config[normalizedChapter] || config["*"] || "";
 };
 
 export const resolveInAppWorkbookRoute = ({ level, day, chapter, fallback } = {}) => {
@@ -40,4 +49,4 @@ export const hasOnlyInAppWorkbookRoutesForLevel = (level) => {
   );
 };
 
-export { GUARDED_LEVELS };
+export { A1_DAY18_CHAPTER122_WORKBOOK_ROUTE, GUARDED_LEVELS };
