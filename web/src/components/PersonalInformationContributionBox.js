@@ -6,6 +6,7 @@ import {
   doc,
   getDocs,
   isFirebaseConfigured,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -29,12 +30,35 @@ const toMillis = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const responseTime = (item) =>
+  Math.max(
+    toMillis(item?.updatedAt),
+    toMillis(item?.editedAt),
+    toMillis(item?.createdAt),
+    Number(item?.createdAtMs || 0)
+  );
+
 const pickLatest = (items) =>
-  [...items].sort(
-    (left, right) =>
-      Math.max(toMillis(right.updatedAt), toMillis(right.editedAt), toMillis(right.createdAt), right.createdAtMs || 0) -
-      Math.max(toMillis(left.updatedAt), toMillis(left.editedAt), toMillis(left.createdAt), left.createdAtMs || 0)
-  )[0] || null;
+  [...items].sort((left, right) => responseTime(right) - responseTime(left))[0] || null;
+
+const dedupeContributions = (items) => {
+  const latestByStudent = new Map();
+
+  items.forEach((item) => {
+    if (!String(item?.text || "").trim()) return;
+    const identity = String(
+      item.responderUid || item.responderCode || item.author || item.id
+    ).toLowerCase();
+    const current = latestByStudent.get(identity);
+    if (!current || responseTime(item) >= responseTime(current)) {
+      latestByStudent.set(identity, item);
+    }
+  });
+
+  return Array.from(latestByStudent.values()).sort((left, right) =>
+    String(left.author || "Student").localeCompare(String(right.author || "Student"))
+  );
+};
 
 const safeIdPart = (value, fallback) =>
   String(value || fallback)
@@ -55,6 +79,9 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [contributions, setContributions] = useState([]);
+  const [areContributionsLoading, setAreContributionsLoading] = useState(false);
+  const [contributionsError, setContributionsError] = useState("");
 
   const responderCode = useMemo(
     () =>
@@ -214,6 +241,35 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
     user?.uid,
   ]);
 
+  useEffect(() => {
+    if (!threadId || !db) {
+      setContributions([]);
+      setAreContributionsLoading(false);
+      return undefined;
+    }
+
+    setAreContributionsLoading(true);
+    setContributionsError("");
+
+    return onSnapshot(
+      responsesCollectionRef(threadId),
+      (snapshot) => {
+        const nextContributions = snapshot.docs.map((entry) => ({
+          id: entry.id,
+          ...entry.data(),
+        }));
+        setContributions(dedupeContributions(nextContributions));
+        setAreContributionsLoading(false);
+        setContributionsError("");
+      },
+      (subscriptionError) => {
+        console.error("Failed to load class contributions", subscriptionError);
+        setAreContributionsLoading(false);
+        setContributionsError("Class contributions could not be loaded.");
+      }
+    );
+  }, [threadId]);
+
   const handleSave = async (event) => {
     event.preventDefault();
     const introduction = draft.trim();
@@ -271,44 +327,86 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
-      <textarea
-        className="day5-mobile-writing-box"
-        aria-label="Meine Vorstellung"
-        value={draft}
-        onChange={(event) => {
-          setDraft(event.target.value);
-          setIsDirty(true);
-          setStatus("");
-        }}
-        placeholder="Mein Vorname ist … Ich komme aus …"
-        autoCapitalize="sentences"
-        autoCorrect="on"
-        spellCheck
-        inputMode="text"
-        rows={10}
-        disabled={isLoading || isSaving}
-      />
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button
-          className="day5-writing-save-button"
-          type="submit"
-          style={styles.primaryButton}
-          disabled={isLoading || isSaving || !threadId}
-        >
-          {isSaving ? "Speichern…" : "Vorstellung speichern"}
-        </button>
-      </div>
-      {status ? (
-        <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
-          {status}
-        </p>
-      ) : null}
-      {error ? (
-        <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>
-          {error}
-        </p>
-      ) : null}
-    </form>
+    <div style={{ display: "grid", gap: 16 }}>
+      <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
+        <textarea
+          className="day5-mobile-writing-box"
+          aria-label="Meine Vorstellung"
+          value={draft}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            setIsDirty(true);
+            setStatus("");
+          }}
+          placeholder="Mein Vorname ist … Ich komme aus …"
+          autoCapitalize="sentences"
+          autoCorrect="on"
+          spellCheck
+          inputMode="text"
+          rows={10}
+          disabled={isLoading || isSaving}
+        />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            className="day5-writing-save-button"
+            type="submit"
+            style={styles.primaryButton}
+            disabled={isLoading || isSaving || !threadId}
+          >
+            {isSaving ? "Speichern…" : "Vorstellung speichern"}
+          </button>
+        </div>
+        {status ? (
+          <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
+            {status}
+          </p>
+        ) : null}
+        {error ? (
+          <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>
+            {error}
+          </p>
+        ) : null}
+      </form>
+
+      <section style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+          <strong>Class contributions</strong>
+          <span style={styles.badge}>{contributions.length}</span>
+        </div>
+
+        {areContributionsLoading ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>Loading contributions…</p>
+        ) : null}
+
+        {contributionsError ? (
+          <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>
+            {contributionsError}
+          </p>
+        ) : null}
+
+        {!areContributionsLoading && !contributionsError && contributions.length === 0 ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>No introductions yet.</p>
+        ) : null}
+
+        {contributions.map((contribution) => (
+          <article
+            key={contribution.id}
+            style={{
+              border: "1px solid #dbeafe",
+              borderRadius: 14,
+              padding: 14,
+              background: "#f8fbff",
+              display: "grid",
+              gap: 8,
+            }}
+          >
+            <strong style={{ fontSize: 15 }}>{contribution.author || "Student"}</strong>
+            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>
+              {contribution.text}
+            </p>
+          </article>
+        ))}
+      </section>
+    </div>
   );
 }
