@@ -33,6 +33,18 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
       },
     ],
   },
+  C1: {
+    5: [
+      {
+        key: "c1-day5-berufliche-entwicklung-ai-video",
+        chapter: "1.5",
+        title: "C1 Day 5 · Berufliche Entwicklung · AI video",
+        description:
+          "AI video lesson about professional development, career goals, continuing education and workplace support.",
+        url: "https://youtu.be/V6xRrkILD3M",
+      },
+    ],
+  },
 };
 
 export const getAdditionalLessonVideoResources = (level, day) => {
