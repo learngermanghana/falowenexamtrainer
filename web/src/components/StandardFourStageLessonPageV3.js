@@ -78,13 +78,14 @@ const embedUrl = (url = "") => {
 const matches = (lesson, level, day) => String(lesson?.level || "").toUpperCase() === level && Number(lesson?.day) === day;
 const isB2Day1 = (lesson) => matches(lesson, "B2", 1);
 const isB2Day2 = (lesson) => matches(lesson, "B2", 2);
+const isB2Day3 = (lesson) => matches(lesson, "B2", 3);
 const isC1Day1 = (lesson) => matches(lesson, "C1", 1);
 const isC1Day2 = (lesson) => matches(lesson, "C1", 2);
 const isC1Day4 = (lesson) => matches(lesson, "C1", 4);
 const isC1Day5 = (lesson) => matches(lesson, "C1", 5);
 const isC1Day6 = (lesson) => matches(lesson, "C1", 6);
 const isCompactC1 = (lesson) => isC1Day1(lesson) || isC1Day2(lesson) || isC1Day4(lesson) || isC1Day5(lesson) || isC1Day6(lesson);
-const isCompactSpeakingLesson = (lesson) => isB2Day1(lesson) || isB2Day2(lesson) || isCompactC1(lesson);
+const isCompactSpeakingLesson = (lesson) => isB2Day1(lesson) || isB2Day2(lesson) || isB2Day3(lesson) || isCompactC1(lesson);
 
 const c1Questions = {
   1: "Wie kann man einen realistischen und zugleich flexiblen Lernweg planen, um ein anspruchsvolles Sprachziel zu erreichen?",
@@ -102,6 +103,16 @@ export const b2Day2SpeakingTopics = [
   { title: "Höfliche Reaktionen", keywords: ["Könntest du ...?", "Würdest du ...?", "Es wäre hilfreich, wenn ...", "Ich würde gern verstehen ...", "sachliche Kritik", "Ich-Botschaften"] },
   { title: "Hypothetische Lösungen", keywords: ["wenn-Sätze", "würde", "könnte", "wäre", "Kompromiss", "persönliches Gespräch"] },
   { title: "Vorteile respektvoller Kommunikation", keywords: ["Vertrauen", "weniger Konflikte", "stabile Beziehungen", "gegenseitiges Verständnis", "schnellere Lösungen", "emotionale Sicherheit"] },
+];
+
+export const b2Day3SpeakingQuestion = "Wo sollte die Grenze zwischen öffentlichem und privatem Leben liegen, und wie kann man persönliche Informationen verantwortungsvoll schützen?";
+export const b2Day3SpeakingTopics = [
+  { title: "Öffentliche und private Bereiche", keywords: ["Arbeit", "Schule", "Familie", "Gesundheit", "Beziehungen", "Finanzen"] },
+  { title: "Soziale Medien", keywords: ["Fotos", "Storys", "Meinungen", "Reichweite", "Anerkennung", "digitaler Fußabdruck"] },
+  { title: "Prominente und Öffentlichkeit", keywords: ["Medieninteresse", "Vorbildfunktion", "Presse", "Familie", "Grenzen", "Respekt"] },
+  { title: "Risiken", keywords: ["Datenmissbrauch", "Cybermobbing", "Überwachung", "Vorurteile", "Arbeitgeber", "Sicherheitsrisiko"] },
+  { title: "Schutz und Lösungen", keywords: ["Privatsphäre-Einstellungen", "Einwilligung", "bewusste Auswahl", "Medienkompetenz", "Datenschutz", "persönliche Grenzen"] },
+  { title: "Ausgewogene Position", keywords: ["Balance", "Selbstbestimmung", "Verantwortung", "Kontext", "Offenheit", "Privatsphäre"] },
 ];
 
 const CompactSpeakingPoints = ({ question, branches = [] }) => (
@@ -125,6 +136,7 @@ const SpeakingBuilder = ({ lesson }) => {
   const rich = lesson.speakingBuilder?.branches;
   if (isB2Day1(lesson)) return <SpeakingPoints />;
   if (isB2Day2(lesson)) return <CompactSpeakingPoints question={b2Day2SpeakingQuestion} branches={b2Day2SpeakingTopics} />;
+  if (isB2Day3(lesson)) return <CompactSpeakingPoints question={b2Day3SpeakingQuestion} branches={b2Day3SpeakingTopics} />;
   if (isCompactC1(lesson)) {
     const branches = isC1Day2(lesson) ? c1Day2LearningSpeakingGuide.speaking.branches : rich;
     return <CompactSpeakingPoints question={c1Questions[Number(lesson.day)]} branches={branches} />;
