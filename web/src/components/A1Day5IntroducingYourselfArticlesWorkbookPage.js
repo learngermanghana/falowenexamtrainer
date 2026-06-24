@@ -58,6 +58,8 @@ const textareaStyle = {
 const heroImage =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80";
 
+const genderOptions = ["masculine", "feminine", "neuter"];
+
 const articleWords = [
   { noun: "Tisch", article: "der", english: "table", gender: "masculine" },
   { noun: "Auto", article: "das", english: "car", gender: "neuter" },
@@ -164,6 +166,7 @@ const RevealAnswer = ({ children, buttonLabel = "Show answer" }) => {
 };
 
 export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
+  const [articleGenderSelections, setArticleGenderSelections] = useState({});
   const [wWordSelections, setWWordSelections] = useState(() =>
     wWordQuestions.reduce((answers, _, index) => ({ ...answers, [index]: "" }), {})
   );
@@ -171,10 +174,16 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
     if (typeof window === "undefined") return "";
     return window.localStorage.getItem("a1-day5-scrambled-sentences") || "";
   });
+  const [saveStatus, setSaveStatus] = useState("saved");
 
   const discussionLesson = useMemo(
     () => getDiscussionLesson({ level: "A1", day: 5, chapter: "1.3" }),
     []
+  );
+
+  const articleScore = useMemo(
+    () => articleWords.filter((item) => articleGenderSelections[item.noun] === item.gender).length,
+    [articleGenderSelections]
   );
 
   const wWordScore = useMemo(
@@ -183,10 +192,31 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
   );
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("a1-day5-scrambled-sentences", sentenceDraft);
-    }
+    if (typeof window === "undefined") return undefined;
+
+    setSaveStatus("saving");
+    const timer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem("a1-day5-scrambled-sentences", sentenceDraft);
+        setSaveStatus("saved");
+      } catch (error) {
+        console.error("Could not save A1 Day 5 scrambled-sentence draft", error);
+        setSaveStatus("error");
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timer);
   }, [sentenceDraft]);
+
+  const saveStatusText =
+    saveStatus === "saving"
+      ? "Saving…"
+      : saveStatus === "error"
+        ? "Could not save on this device. Copy your answers before leaving."
+        : "✓ Saved on this device";
+
+  const saveStatusColor =
+    saveStatus === "saving" ? "#92400e" : saveStatus === "error" ? "#b91c1c" : "#166534";
 
   return (
     <div style={pageWrap}>
@@ -203,17 +233,18 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
           <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.3 · Interactive workbook</p>
           <p style={{ margin: 0, color: "#4b5563" }}>Articles · Adjectives · Personal information · Dialogues · W-questions · Sentence building</p>
           <div style={infoBoxStyle}>
-            <strong>Writing areas</strong>
+            <strong>Progress</strong>
             <div style={{ lineHeight: 1.7 }}>
-              <div>1. Your final self-introduction is saved to the class discussion in Teil 3.</div>
-              <div>2. Your scrambled-sentence practice is written in Teil 6 and saved on this device.</div>
-              <div>W-words checked on this page: {wWordScore}/{wWordQuestions.length}</div>
+              <div>Article genders: {articleScore}/{articleWords.length}</div>
+              <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
+              <div>Your final introduction is saved to class discussion in Teil 3.</div>
+              <div>Your scrambled-sentence practice is autosaved in Teil 6.</div>
             </div>
           </div>
         </div>
       </header>
 
-      <SectionCard title="Teil 1 · Articles" subtitle="Read each noun with its article. Then decide whether it is masculine, feminine, or neuter.">
+      <SectionCard title="Teil 1 · Articles" subtitle="Choose whether each noun is masculine, feminine, or neuter.">
         <div style={infoBoxStyle}>
           <strong>Quick guide</strong>
           <div style={{ lineHeight: 1.8 }}>
@@ -222,22 +253,63 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
             <div><strong>das</strong> = neuter</div>
           </div>
         </div>
-        <div style={boxBase}>
-          <strong>Vocabulary bank</strong>
-          <p style={{ margin: 0, color: "#4b5563" }}>For each word, say: masculine, feminine, or neuter.</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {articleWords.map((item) => (
-              <span key={item.noun} style={{ padding: "8px 12px", borderRadius: 999, border: "1px solid #d1d5db", background: "#f9fafb" }}>
-                <strong>{item.article} {item.noun}</strong> ({item.english})
-              </span>
-            ))}
-          </div>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          {articleWords.map((item, index) => {
+            const selectedGender = articleGenderSelections[item.noun];
+            const isCorrect = selectedGender === item.gender;
+
+            return (
+              <div key={item.noun} style={boxBase}>
+                <strong style={{ fontSize: 17 }}>
+                  {index + 1}. {item.article} {item.noun} <span style={{ color: "#64748b", fontWeight: 500 }}>({item.english})</span>
+                </strong>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {genderOptions.map((gender) => {
+                    const isSelected = selectedGender === gender;
+                    const selectedCorrectly = isSelected && gender === item.gender;
+                    const selectedIncorrectly = isSelected && gender !== item.gender;
+
+                    return (
+                      <button
+                        key={gender}
+                        type="button"
+                        onClick={() => setArticleGenderSelections((current) => ({ ...current, [item.noun]: gender }))}
+                        style={{
+                          ...styles.secondaryButton,
+                          padding: "9px 12px",
+                          borderRadius: 999,
+                          background: selectedCorrectly ? "#dcfce7" : selectedIncorrectly ? "#fee2e2" : isSelected ? "#eff6ff" : "#fff",
+                          borderColor: selectedCorrectly ? "#22c55e" : selectedIncorrectly ? "#ef4444" : "#cbd5e1",
+                          color: selectedCorrectly ? "#166534" : selectedIncorrectly ? "#991b1b" : "#0f172a",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {gender}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedGender ? (
+                  <div
+                    role="status"
+                    style={{
+                      padding: "9px 11px",
+                      borderRadius: 10,
+                      background: isCorrect ? "#f0fdf4" : "#fff7ed",
+                      color: isCorrect ? "#166534" : "#9a3412",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {isCorrect
+                      ? `✓ Correct — ${item.article} means ${item.gender}.`
+                      : `Try again. Look at the article “${item.article}”.`}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
-        <RevealAnswer buttonLabel="Show noun genders">
-          <div style={{ display: "grid", gap: 8 }}>
-            {articleWords.map((item) => <div key={item.noun}><strong>{item.article} {item.noun}</strong> — {item.gender}</div>)}
-          </div>
-        </RevealAnswer>
       </SectionCard>
 
       <SectionCard title="Teil 2 · Adjectives" subtitle="Use simple adjectives to describe people and things.">
@@ -367,11 +439,20 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
           <strong>Your corrected sentences</strong>
           <textarea
             value={sentenceDraft}
-            onChange={(event) => setSentenceDraft(event.target.value)}
+            onChange={(event) => {
+              setSaveStatus("saving");
+              setSentenceDraft(event.target.value);
+            }}
             placeholder="1. Ich heiße Anna. (Statement)\n2. Woher kommen Sie? (Question)\n..."
             style={textareaStyle}
           />
-          <span style={{ color: "#64748b", fontSize: 13 }}>Your practice is automatically saved on this device.</span>
+          <span
+            role="status"
+            aria-live="polite"
+            style={{ color: saveStatusColor, fontSize: 13, fontWeight: 700 }}
+          >
+            {saveStatusText}
+          </span>
         </label>
         <RevealAnswer buttonLabel="Show scrambled sentence answers">
           <div style={{ display: "grid", gap: 6 }}>
