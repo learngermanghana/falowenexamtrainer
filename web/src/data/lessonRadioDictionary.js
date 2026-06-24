@@ -111,6 +111,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Beziehungen und Kommunikation ein. Danach gehst du weiter zum Lernteil.",
     },
+    3: {
+      key: "b2-day3-oeffentliches-privates-leben-falowen-radio",
+      title: "Öffentliches Leben vs. Privatsphäre",
+      youtubeId: "wYwEi4myS2A",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema öffentliches Leben, Privatsphäre und persönliche Grenzen ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
   C1: {
     1: {
