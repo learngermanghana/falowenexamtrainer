@@ -12,4 +12,10 @@ describe("A1 Day 18 Kapitel 12.1 view routing", () => {
   test("accepts workbook navigation state as a fallback", () => {
     expect(__TESTING__.hasWorkbookView({ search: "", state: { view: "workbook" } })).toBe(true);
   });
+
+  test("accepts resourceView workbook navigation state", () => {
+    expect(
+      __TESTING__.hasWorkbookView({ search: "", state: { resourceView: "workbook" } })
+    ).toBe(true);
+  });
 });
