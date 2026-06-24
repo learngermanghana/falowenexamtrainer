@@ -9,7 +9,7 @@ const LEVEL = "A1";
 const DAY = 18;
 const CHAPTER = "12.2";
 const FALLBACK_ASSIGNMENT_KEY = "A1-12.2";
-const YOUTUBE_VIDEO_ID = "v31nnjSvc10";
+const YOUTUBE_VIDEO_ID = "eLLPA6ltEUg";
 
 const card = { ...styles.card, display: "grid", gap: 12 };
 const questionCard = {
