@@ -19,7 +19,6 @@ const questionCard = {
   gap: 6,
   background: "#fff",
 };
-const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.7 };
 
 const readingQuestions = [
   {
