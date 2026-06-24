@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
+import ScrambledSentencesContributionBox from "./ScrambledSentencesContributionBox";
 import { getDiscussionLesson } from "../utils/discussionLessons";
 import { styles } from "../styles";
 
@@ -37,16 +38,6 @@ const successBoxStyle = {
   ...boxBase,
   border: "1px solid #bbf7d0",
   background: "#f0fdf4",
-};
-
-const textareaStyle = {
-  ...styles.textArea,
-  width: "100%",
-  minHeight: 180,
-  boxSizing: "border-box",
-  fontFamily: "inherit",
-  fontSize: 16,
-  lineHeight: 1.6,
 };
 
 const heroImage =
@@ -165,11 +156,6 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
   const [wWordSelections, setWWordSelections] = useState(() =>
     wWordQuestions.reduce((answers, _, index) => ({ ...answers, [index]: "" }), {})
   );
-  const [sentenceDraft, setSentenceDraft] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return window.localStorage.getItem("a1-day5-scrambled-sentences") || "";
-  });
-  const [saveStatus, setSaveStatus] = useState("saved");
 
   const discussionLesson = useMemo(
     () => getDiscussionLesson({ level: "A1", day: 5, chapter: "1.3" }),
@@ -185,33 +171,6 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
     () => wWordQuestions.filter((question, index) => wWordSelections[index] === question.answer).length,
     [wWordSelections]
   );
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    setSaveStatus("saving");
-    const timer = window.setTimeout(() => {
-      try {
-        window.localStorage.setItem("a1-day5-scrambled-sentences", sentenceDraft);
-        setSaveStatus("saved");
-      } catch (error) {
-        console.error("Could not save A1 Day 5 scrambled-sentence draft", error);
-        setSaveStatus("error");
-      }
-    }, 500);
-
-    return () => window.clearTimeout(timer);
-  }, [sentenceDraft]);
-
-  const saveStatusText =
-    saveStatus === "saving"
-      ? "Saving…"
-      : saveStatus === "error"
-        ? "Could not save on this device. Copy your answers before leaving."
-        : "✓ Saved on this device";
-
-  const saveStatusColor =
-    saveStatus === "saving" ? "#92400e" : saveStatus === "error" ? "#b91c1c" : "#166534";
 
   return (
     <div style={pageWrap}>
@@ -233,7 +192,7 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
               <div>Article genders: {articleScore}/{articleWords.length}</div>
               <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
               <div>Your introduction in Teil 3 is saved to your class profile and class discussion.</div>
-              <div>Your scrambled-sentence practice is autosaved in Teil 6.</div>
+              <div>Your Teil 6 sentences are saved for your tutor and class after you post them.</div>
             </div>
           </div>
         </div>
@@ -398,6 +357,7 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
           <div style={{ lineHeight: 1.8 }}>
             <div>1. Statements: Subject + Verb + Other elements.</div>
             <div>2. W-questions: W-word + Verb + Pronoun.</div>
+            <div>3. Complete and post all sentences before viewing the class work and answer key.</div>
           </div>
         </div>
         <div style={boxBase}>
@@ -406,30 +366,12 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
             {sentenceReorderPhrases.map((phrase, index) => <div key={phrase}>{index + 1}. {phrase}</div>)}
           </div>
         </div>
-        <label style={{ display: "grid", gap: 8 }}>
-          <strong>Your corrected sentences</strong>
-          <textarea
-            value={sentenceDraft}
-            onChange={(event) => {
-              setSaveStatus("saving");
-              setSentenceDraft(event.target.value);
-            }}
-            placeholder={"1. Ich heiße Anna. (Statement)\n2. Woher kommen Sie? (Question)\n..."}
-            style={textareaStyle}
-          />
-          <span
-            role="status"
-            aria-live="polite"
-            style={{ color: saveStatusColor, fontSize: 13, fontWeight: 700 }}
-          >
-            {saveStatusText}
-          </span>
-        </label>
-        <RevealAnswer buttonLabel="Show scrambled sentence answers">
-          <div style={{ display: "grid", gap: 6 }}>
-            {sentenceAnswers.map((answer, index) => <div key={answer}>{index + 1}. {answer}</div>)}
-          </div>
-        </RevealAnswer>
+        <ScrambledSentencesContributionBox
+          lessonId={discussionLesson.id}
+          lessonLabel={discussionLesson.label}
+          answers={sentenceAnswers}
+          expectedCount={sentenceReorderPhrases.length}
+        />
       </SectionCard>
 
       <div style={successBoxStyle}>
