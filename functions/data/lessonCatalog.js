@@ -141,11 +141,11 @@ const lessonCatalog = Object.freeze([
     "kind": "schreiben_sprechen",
     "grammarPage": "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
     "workbookRoute": "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
-    "video": "https://youtu.be/aQNXQlTJMBA",
+    "video": "https://youtu.be/KuGq_0r0FCY",
     "submissionRequired": false,
     "progressionEligible": false,
     "contentStatus": "published",
-    "teacherVideo": "https://youtu.be/aQNXQlTJMBA"
+    "teacherVideo": "https://youtu.be/KuGq_0r0FCY"
   },
   {
     "id": "A1-2.3",
@@ -683,7 +683,7 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
-    "video": "https://youtu.be/vpSwGAtqIlU?si=N5Mhxk2hMA-a6S4q",
+    "video": "https://youtu.be/yOfTCQDn_JM",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1444,7 +1444,7 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1Mlt-cK6YqPuJe9iCWfqT9DOG9oKhJBdK/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1XCLW0y-MMyIu_bNO3EkKIgp-8QLKgEek/view?usp=sharing",
-    "video": "https://youtu.be/gCzZnddwC_c",
+    "video": "https://youtu.be/ZfCAaLGV2c4",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

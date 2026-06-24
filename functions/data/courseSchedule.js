@@ -570,8 +570,8 @@ const courseSchedules = {
       instruction: "Open the in-app self-practice workbook and review the answer guide for self-check.",
       assignment: false,
       schreiben_sprechen: {
-        video: "https://youtu.be/aQNXQlTJMBA",
-        youtube_link: "https://youtu.be/aQNXQlTJMBA",
+        video: "https://youtu.be/KuGq_0r0FCY",
+        youtube_link: "https://youtu.be/KuGq_0r0FCY",
         workbook_link: "/campus/course/a1-day-5-articles-adjectives-personal-information-workbook",
         assignment: false,
       },
