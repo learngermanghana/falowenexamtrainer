@@ -15,7 +15,7 @@ const updateDay5Heading = (root) => {
   }
 
   const subtitle = Array.from(root.querySelectorAll("p")).find((element) =>
-    element.textContent?.includes("Chapter 1.2 · Interactive workbook")
+    element.textContent?.includes("Chapter 1.3 · Interactive workbook")
   );
   if (subtitle && !root.querySelector("[data-day5-scope='true']")) {
     const scope = document.createElement("p");
