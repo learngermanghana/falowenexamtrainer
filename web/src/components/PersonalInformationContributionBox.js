@@ -12,6 +12,7 @@ import {
   where,
 } from "../firebase";
 import { styles } from "../styles";
+import "./MobileWritingTextarea.css";
 
 const postsCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "posts");
@@ -35,8 +36,13 @@ const pickLatest = (items) =>
       Math.max(toMillis(left.updatedAt), toMillis(left.editedAt), toMillis(left.createdAt), left.createdAtMs || 0)
   )[0] || null;
 
-const makeResponseId = (value) =>
-  `profile-${String(value || "student").replace(/[^a-zA-Z0-9._-]/g, "_")}`.slice(0, 300);
+const safeIdPart = (value, fallback) =>
+  String(value || fallback)
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .slice(0, 240);
+
+const makeResponseId = (value) => `profile-${safeIdPart(value, "student")}`;
+const makeThreadId = (lessonId) => `auto-${safeIdPart(lessonId, "day5-personal-information")}`;
 
 export default function PersonalInformationContributionBox({ lessonId, lessonLabel }) {
   const { user, studentProfile, saveStudentProfile } = useAuth();
@@ -90,11 +96,9 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
       }
 
       try {
+        const postsRef = postsCollectionRef(studentProfile.level, studentProfile.className);
         const threadSnapshot = await getDocs(
-          query(
-            postsCollectionRef(studentProfile.level, studentProfile.className),
-            where("lessonId", "==", lessonId)
-          )
+          query(postsRef, where("lessonId", "==", lessonId))
         );
 
         if (cancelled) return;
@@ -103,17 +107,47 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
           id: entry.id,
           ...entry.data(),
         }));
-        const selectedThread =
+        let selectedThread =
           pickLatest(threads.filter((thread) => thread.status !== "archived")) ||
           pickLatest(threads);
 
         if (!selectedThread) {
-          setThreadId("");
-          setError("This class contribution is not open yet.");
-          setIsLoading(false);
-          return;
+          const automaticThreadId = makeThreadId(lessonId);
+          const nowMs = Date.now();
+          await setDoc(
+            doc(postsRef, automaticThreadId),
+            {
+              level: studentProfile.level,
+              className: studentProfile.className,
+              lessonId,
+              lessonLabel: lessonLabel || lessonId,
+              topic: "Personal Information",
+              questionTitle: "Write about yourself",
+              instructions: "",
+              question: "Write a short German introduction with 6–8 sentences.",
+              extraLink: "",
+              timerDurationMinutes: 0,
+              timerExpiresAt: null,
+              createdAtMs: nowMs,
+              createdAt: serverTimestamp(),
+              createdBy: "Falowen",
+              createdByUid: null,
+              status: "open",
+              autoCreated: true,
+            },
+            { merge: true }
+          );
+          selectedThread = { id: automaticThreadId, status: "open" };
+        } else if (selectedThread.status === "archived") {
+          await setDoc(
+            doc(postsRef, selectedThread.id),
+            { status: "open", reopenedAt: serverTimestamp() },
+            { merge: true }
+          );
+          selectedThread = { ...selectedThread, status: "open" };
         }
 
+        if (cancelled) return;
         setThreadId(selectedThread.id);
 
         let existingResponses = [];
@@ -155,9 +189,9 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
           setDraft(existingResponse.text);
         }
       } catch (loadError) {
-        console.error("Failed to load personal information contribution", loadError);
+        console.error("Failed to prepare personal information contribution", loadError);
         if (!cancelled) {
-          setError("Your saved introduction could not be loaded. Please try again.");
+          setError("The writing box could not be prepared. Please reload and try again.");
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -169,8 +203,11 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
       cancelled = true;
     };
   }, [
+    isDirty,
     lessonId,
+    lessonLabel,
     responderCode,
+    studentProfile?.biography,
     studentProfile?.className,
     studentProfile?.id,
     studentProfile?.level,
@@ -188,7 +225,7 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
     }
 
     if (!threadId || !responseId) {
-      setError("This class contribution is not open yet.");
+      setError("The writing box is still loading. Please try again.");
       setStatus("");
       return;
     }
@@ -234,8 +271,9 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: "grid", gap: 10 }}>
+    <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
       <textarea
+        className="day5-mobile-writing-box"
         aria-label="Meine Vorstellung"
         value={draft}
         onChange={(event) => {
@@ -244,11 +282,16 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
           setStatus("");
         }}
         placeholder="Mein Vorname ist … Ich komme aus …"
-        style={{ ...styles.textArea, minHeight: 180, width: "100%", boxSizing: "border-box" }}
+        autoCapitalize="sentences"
+        autoCorrect="on"
+        spellCheck
+        inputMode="text"
+        rows={10}
         disabled={isLoading || isSaving}
       />
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <button
+          className="day5-writing-save-button"
           type="submit"
           style={styles.primaryButton}
           disabled={isLoading || isSaving || !threadId}
