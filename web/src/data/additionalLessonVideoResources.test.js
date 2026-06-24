@@ -23,6 +23,16 @@ describe("additional A1 AI lesson videos", () => {
     ]);
   });
 
+  test("Day 19 uses the Chapter 5.9 Goethe speaking practice AI video", () => {
+    expect(getAdditionalLessonVideoResources("A1", 19)).toEqual([
+      expect.objectContaining({
+        chapter: "5.9",
+        title: "A1 Day 19 · Goethe Speaking Practice · AI video",
+        url: "https://youtu.be/gprnEZtMUPM",
+      }),
+    ]);
+  });
+
   test("the additional AI video is exposed by the shared lesson model", () => {
     const lesson = normalizeLesson({
       level: "A1",
@@ -43,6 +53,33 @@ describe("additional A1 AI lesson videos", () => {
   });
 });
 
+describe("additional B2 AI grammar videos", () => {
+  test("Day 3 uses the Kontrast und Konzession grammar video", () => {
+    expect(getAdditionalLessonVideoResources("B2", 3)).toEqual([
+      expect.objectContaining({
+        chapter: "1.3",
+        title: "B2 Day 3 · Kontrast und Konzession · AI grammar video",
+        url: "https://youtu.be/cmKLSjWi4S0",
+      }),
+    ]);
+  });
+
+  test("the B2 Day 3 grammar video is exposed by the shared lesson model", () => {
+    const lesson = normalizeLesson({
+      level: "B2",
+      day: 3,
+      chapter: "1.3",
+      title: "Öffentliches vs. Privates Leben",
+    });
+
+    expect(lesson.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "1.3",
+        url: "https://youtu.be/cmKLSjWi4S0",
+      }),
+    );
+  });
+});
 
 describe("A1 AI lesson video overrides", () => {
   const dictionary = applyA1LessonVideoResourceOverrides({});
