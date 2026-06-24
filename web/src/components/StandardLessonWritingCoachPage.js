@@ -6,6 +6,8 @@ import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 
 const B2_DAY2_GRAMMAR_ROUTE = "/campus/course/lesson/B2/2?view=grammar";
 const B2_DAY2_WORKBOOK_ROUTE = "/campus/course/lesson/B2/2?view=workbook";
+const B2_DAY3_GRAMMAR_ROUTE = "/campus/course/lesson/B2/3?view=grammar";
+const B2_DAY3_WORKBOOK_ROUTE = "/campus/course/lesson/B2/3?view=workbook";
 
 export const shouldMountMarkMyLetter = () => false;
 
@@ -23,18 +25,22 @@ export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
     };
   }
 
-  if (level === "B2" && day === 2) {
+  if (level === "B2" && (day === 2 || day === 3)) {
+    const grammarRoute = day === 2 ? B2_DAY2_GRAMMAR_ROUTE : B2_DAY3_GRAMMAR_ROUTE;
+    const workbookRoute = day === 2 ? B2_DAY2_WORKBOOK_ROUTE : B2_DAY3_WORKBOOK_ROUTE;
+    const chapter = day === 2 ? "1.2" : "1.3";
+
     return {
       ...(canonicalLesson || {}),
       resources: {
         ...(canonicalLesson?.resources || {}),
-        grammarBook: { url: B2_DAY2_GRAMMAR_ROUTE },
-        workbook: { url: B2_DAY2_WORKBOOK_ROUTE },
+        grammarBook: { url: grammarRoute },
+        workbook: { url: workbookRoute },
         resourceGroups: [
           {
-            chapter: "1.2",
-            grammarBook: { url: B2_DAY2_GRAMMAR_ROUTE },
-            workbook: { url: B2_DAY2_WORKBOOK_ROUTE },
+            chapter,
+            grammarBook: { url: grammarRoute },
+            workbook: { url: workbookRoute },
           },
         ],
       },
@@ -98,5 +104,7 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
 export const __TESTING__ = {
   B2_DAY2_GRAMMAR_ROUTE,
   B2_DAY2_WORKBOOK_ROUTE,
+  B2_DAY3_GRAMMAR_ROUTE,
+  B2_DAY3_WORKBOOK_ROUTE,
   viewButtonLabel,
 };
