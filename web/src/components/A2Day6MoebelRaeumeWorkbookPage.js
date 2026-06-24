@@ -16,6 +16,7 @@ const tabs = [
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
   { key: "references", label: "5. Ref" },
+  { key: "submit", label: "Submit" },
 ];
 
 const card = {
@@ -520,6 +521,15 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
+        </div>
+      )}
+
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>After Falowen Radio and Teil 1–4, submit your required workbook answers in the assignment submission area.</p>
+          <WorkbookSubmissionReminder />
+          <a href="/campus/course?submitWork=1" style={styles.primaryButton}>Open submission area</a>
         </div>
       )}
 
