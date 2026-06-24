@@ -3,7 +3,7 @@ import routeConfig from "./inAppWorkbookRoutes.json";
 const GUARDED_LEVELS = new Set(["A1", "A2"]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
-const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-day-18-kapitel-12-2-workbook";
+const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook";
 
 export const normalizeFalowenCourseRoute = (value = "") => {
   const raw = String(value || "").trim();
