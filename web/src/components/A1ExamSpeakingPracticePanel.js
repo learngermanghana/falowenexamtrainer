@@ -184,7 +184,8 @@ const A1ExamSpeakingPracticePanel = () => (
           padding-left: 0 !important;
           padding-right: 0 !important;
         }
-        .a1-exam-speaking-only [role="tablist"] [role="tab"]:not(:first-child) {
+        .a1-exam-speaking-only [role="tablist"] [role="tab"]:not(:first-child),
+        .a1-exam-speaking-only > div > div > div:nth-of-type(2) > button:nth-of-type(2) {
           display: none !important;
         }
       `}</style>
