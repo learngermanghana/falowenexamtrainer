@@ -46,6 +46,15 @@ test("B2 Day 2 Beziehungen und Kommunikation uses the requested radio", () =>
   ),
 );
 
+test("B2 Day 3 Öffentliches Leben vs. Privatsphäre uses the requested radio", () =>
+  expect(getLessonRadioResource("B2", 3)).toEqual(
+    expect.objectContaining({
+      title: "Öffentliches Leben vs. Privatsphäre",
+      youtubeId: "wYwEi4myS2A",
+    }),
+  ),
+);
+
 test("C1 Day 2 Kultur und Identität radio remains available", () =>
   expect(getLessonRadioResource("C1", 2)).toEqual(
     expect.objectContaining({
@@ -90,6 +99,7 @@ test.each([
   ["/campus/course/b1-day-1-traumwelten-workbook", { level: "B1", day: 1 }],
   ["/campus/course/lesson/B2/1", { level: "B2", day: 1 }],
   ["/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook", { level: "B2", day: 1 }],
+  ["/campus/course/lesson/B2/3", { level: "B2", day: 3 }],
   ["/campus/course/lesson/C1/2", { level: "C1", day: 2 }],
   ["/campus/course/c1-day-2-kultur-und-identitaet-workbook", { level: "C1", day: 2 }],
 ])("detects radio route %s", (path, expected) =>
