@@ -9,7 +9,7 @@ const LEVEL = "A1";
 const DAY = 18;
 const CHAPTER = "12.2";
 const FALLBACK_ASSIGNMENT_KEY = "A1-12.2";
-const AUDIO_FILE_ID = "1CSYpnavow0VlBx607bhHeB0LE_NsIYLk";
+const YOUTUBE_VIDEO_ID = "v31nnjSvc10";
 
 const card = { ...styles.card, display: "grid", gap: 12 };
 const questionCard = {
@@ -17,7 +17,7 @@ const questionCard = {
   borderRadius: 12,
   padding: 12,
   display: "grid",
-  gap: 7,
+  gap: 9,
   background: "#fff",
 };
 
@@ -78,11 +78,15 @@ const listeningQuestions = [
 ];
 
 const QuestionList = ({ questions }) => (
-  <div style={{ display: "grid", gap: 10 }}>
+  <div style={{ display: "grid", gap: 12 }}>
     {questions.map((question, index) => (
       <div key={question.stem} style={questionCard}>
         <strong>{index + 1}. {question.stem}</strong>
-        {question.options.map((option) => <span key={option}>{option}</span>)}
+        <div style={{ display: "grid", gap: 7, paddingLeft: 4 }}>
+          {question.options.map((option) => (
+            <div key={option} style={{ lineHeight: 1.55 }}>{option}</div>
+          ))}
+        </div>
       </div>
     ))}
   </div>
@@ -131,8 +135,8 @@ const A1Day18Kapitel122WorkbookPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const audioViewUrl = `https://drive.google.com/file/d/${AUDIO_FILE_ID}/view?usp=sharing`;
-  const audioPreviewUrl = `https://drive.google.com/file/d/${AUDIO_FILE_ID}/preview`;
+  const youtubeViewUrl = `https://youtu.be/${YOUTUBE_VIDEO_ID}`;
+  const youtubeEmbedUrl = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`;
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -195,8 +199,10 @@ const A1Day18Kapitel122WorkbookPage = () => {
               ))}
               <div style={questionCard}>
                 <strong>5. Wie bezahlt Felix gerne beim Einkaufen?</strong>
-                <span>a) Barzahlung (cash)</span>
-                <span>b) Kreditkarte (credit card)</span>
+                <div style={{ display: "grid", gap: 7, paddingLeft: 4 }}>
+                  <div>a) Barzahlung (cash)</div>
+                  <div>b) Kreditkarte (credit card)</div>
+                </div>
               </div>
             </div>
           </section>
@@ -223,22 +229,25 @@ const A1Day18Kapitel122WorkbookPage = () => {
           <section style={card}>
             <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Hören Sie den Text und wählen Sie die richtige Antwort.
+              Sehen und hören Sie das Video. Wählen Sie danach die richtige Antwort.
             </p>
+            <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 12, overflow: "hidden", background: "#0f172a" }}>
+              <iframe
+                title="Kapitel 12.2 Hören video"
+                src={youtubeEmbedUrl}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+              />
+            </div>
             <a
-              href={audioViewUrl}
+              href={youtubeViewUrl}
               target="_blank"
               rel="noreferrer"
               style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
             >
-              Open audio
+              Open video on YouTube
             </a>
-            <iframe
-              title="Kapitel 12.2 Hören audio"
-              src={audioPreviewUrl}
-              allow="autoplay"
-              style={{ width: "100%", minHeight: 100, border: 0, borderRadius: 10 }}
-            />
             <QuestionList questions={listeningQuestions} />
           </section>
 
