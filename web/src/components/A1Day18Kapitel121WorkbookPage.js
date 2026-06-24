@@ -72,26 +72,11 @@ const adverts = [
 ];
 
 const listeningTasks = [
-  {
-    question: "Der Supermarkt hat täglich geöffnet.",
-    fileId: "1bSUZz3fshXDBt_mvBN3zGIfEfOkHXva2",
-  },
-  {
-    question: "Die Theoriestunden in der Fahrschule sind dienstags und donnerstags.",
-    fileId: "1CMPI53p3i7X1b8wpdroW39UFb8bcmlqP",
-  },
-  {
-    question: "Das Büro ist am Wochenende geschlossen.",
-    fileId: "14uUxUKkY5sTAWyqgSr7TL7Vm2MhtViPy",
-  },
-  {
-    question: "Der Englischkurs findet dreimal pro Woche statt.",
-    fileId: "1Ij-ZcJHJ1pyvFgs6FXMk6c77sAq4hozb",
-  },
-  {
-    question: "Das Fitnessstudio ist von 6 Uhr bis 22 Uhr geöffnet.",
-    fileId: "1WhFcEDp0o8-dQdh_XaJ_HBfpoi_Rulkt",
-  },
+  "Der Supermarkt hat täglich geöffnet.",
+  "Die Theoriestunden in der Fahrschule sind dienstags und donnerstags.",
+  "Das Büro ist am Wochenende geschlossen.",
+  "Der Englischkurs findet dreimal pro Woche statt.",
+  "Das Fitnessstudio ist von 6 Uhr bis 22 Uhr geöffnet.",
 ];
 
 const QuestionList = ({ questions }) => (
@@ -222,33 +207,22 @@ const A1Day18Kapitel121WorkbookPage = () => {
           <section style={card}>
             <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Listen to each audio, then decide whether the statement is Richtig or Falsch.
+              Watch the video, then decide whether each statement is Richtig or Falsch.
             </p>
-            {listeningTasks.map((task, index) => {
-              const viewUrl = `https://drive.google.com/file/d/${task.fileId}/view?usp=sharing`;
-              const previewUrl = `https://drive.google.com/file/d/${task.fileId}/preview`;
-              return (
-                <article key={task.fileId} style={questionCard}>
-                  <strong>{index + 1}. {task.question}</strong>
-                  <span>a) Richtig</span>
-                  <span>b) Falsch</span>
-                  <a
-                    href={viewUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-                  >
-                    Open audio {index + 1}
-                  </a>
-                  <iframe
-                    title={`Kapitel 12.1 Hören audio ${index + 1}`}
-                    src={previewUrl}
-                    allow="autoplay"
-                    style={{ width: "100%", minHeight: 90, border: 0, borderRadius: 10 }}
-                  />
-                </article>
-              );
-            })}
+            <iframe
+              title="Kapitel 12.1 Hören"
+              src="https://www.youtube.com/embed/m07lKGJAoF8"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{ width: "100%", minHeight: 315, border: 0, borderRadius: 10 }}
+            />
+            {listeningTasks.map((question, index) => (
+              <article key={question} style={questionCard}>
+                <strong>{index + 1}. {question}</strong>
+                <span>a) Richtig</span>
+                <span>b) Falsch</span>
+              </article>
+            ))}
           </section>
 
           <div style={{ ...card, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
