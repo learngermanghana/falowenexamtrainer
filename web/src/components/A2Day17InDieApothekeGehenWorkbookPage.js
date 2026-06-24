@@ -410,11 +410,15 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
           <p style={{ margin: 0 }}>
-            Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
+            Watch and listen to the video, then submit your answers in the assignment area (do not answer directly on this page).
           </p>
-          <p style={{ margin: 0 }}>
-            Audio: <a href="https://drive.google.com/file/d/1glr45HegifSYLrz0XpKCFFiAPfUW8RsB/view?usp=sharing" target="_blank" rel="noreferrer">Open Teil 4 audio</a>
-          </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/jgl__L4L9kE"
+            title="Teil 4 Hören · In die Apotheke gehen"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
@@ -425,20 +429,6 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/0p28KQE2A8c" target="_blank" rel="noreferrer">
-              In die Apotheke gehen – A2 Lesson Video
-            </a>
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/0p28KQE2A8c"
-            title="In die Apotheke gehen – A2 Lesson Video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
