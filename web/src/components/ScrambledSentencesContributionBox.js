@@ -114,7 +114,7 @@ export default function ScrambledSentencesContributionBox({
     return role === "tutor" || role === "admin" || studentProfile?.isTutor === true || email === "moxflex@gmail.com";
   }, [studentProfile?.email, studentProfile?.isTutor, studentProfile?.role, user?.email]);
 
-  const canViewClassWork = hasSubmitted || isTutor;
+  const canViewAnswers = hasSubmitted || isTutor;
   const completedAttempts = countAttempts(draft);
 
   useEffect(() => {
@@ -352,48 +352,46 @@ export default function ScrambledSentencesContributionBox({
         {error ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{error}</p> : null}
       </form>
 
-      {!canViewClassWork ? (
+      <section style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+          <strong>Class answers</strong>
+          <span style={styles.badge}>{contributions.length}</span>
+        </div>
+        {contributionsError ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{contributionsError}</p> : null}
+        {!contributionsError && contributions.length === 0 ? <p style={{ ...styles.helperText, margin: 0 }}>No answers posted yet.</p> : null}
+        {contributions.map((contribution) => (
+          <article
+            key={contribution.id}
+            style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#f8fbff", display: "grid", gap: 8 }}
+          >
+            <strong>{contribution.author || "Student"} posted</strong>
+            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>{contribution.text}</p>
+          </article>
+        ))}
+      </section>
+
+      {!canViewAnswers ? (
         <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 14, padding: 14 }}>
-          <strong>Post your own answers first.</strong>
+          <strong>Post your own answers to unlock the answer key.</strong>
           <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>
-            The class contributions and answer key will unlock after you complete and post all {expectedCount} sentences.
+            You can read your classmates’ posts now. Complete and post all {expectedCount} sentences to view the official answers.
           </p>
         </div>
       ) : (
-        <>
-          <section style={{ display: "grid", gap: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-              <strong>Class answers</strong>
-              <span style={styles.badge}>{contributions.length}</span>
+        <div style={{ display: "grid", gap: 10 }}>
+          <button
+            type="button"
+            style={{ ...styles.secondaryButton, width: "100%", minHeight: 50, borderRadius: 12 }}
+            onClick={() => setShowAnswers((current) => !current)}
+          >
+            {showAnswers ? "Hide scrambled sentence answers" : "Show scrambled sentence answers"}
+          </button>
+          {showAnswers ? (
+            <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 7 }}>
+              {answers.map((answer, index) => <div key={answer}>{index + 1}. {answer}</div>)}
             </div>
-            {contributionsError ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{contributionsError}</p> : null}
-            {!contributionsError && contributions.length === 0 ? <p style={{ ...styles.helperText, margin: 0 }}>No answers posted yet.</p> : null}
-            {contributions.map((contribution) => (
-              <article
-                key={contribution.id}
-                style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#f8fbff", display: "grid", gap: 8 }}
-              >
-                <strong>{contribution.author || "Student"} posted</strong>
-                <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>{contribution.text}</p>
-              </article>
-            ))}
-          </section>
-
-          <div style={{ display: "grid", gap: 10 }}>
-            <button
-              type="button"
-              style={{ ...styles.secondaryButton, width: "100%", minHeight: 50, borderRadius: 12 }}
-              onClick={() => setShowAnswers((current) => !current)}
-            >
-              {showAnswers ? "Hide scrambled sentence answers" : "Show scrambled sentence answers"}
-            </button>
-            {showAnswers ? (
-              <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 7 }}>
-                {answers.map((answer, index) => <div key={answer}>{index + 1}. {answer}</div>)}
-              </div>
-            ) : null}
-          </div>
-        </>
+          ) : null}
+        </div>
       )}
     </div>
   );
