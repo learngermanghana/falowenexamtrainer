@@ -1,0 +1,59 @@
+.day5-mobile-writing-box,
+textarea[placeholder^="1. Ich heiße Anna"] {
+  width: 100% !important;
+  min-height: 230px !important;
+  box-sizing: border-box !important;
+  padding: 16px !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-family: inherit !important;
+  font-size: 17px !important;
+  line-height: 1.65 !important;
+  letter-spacing: 0.01em;
+  resize: vertical;
+  caret-color: #2563eb;
+  scroll-margin-bottom: 45vh;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.day5-mobile-writing-box::placeholder,
+textarea[placeholder^="1. Ich heiße Anna"]::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.day5-mobile-writing-box:focus,
+textarea[placeholder^="1. Ich heiße Anna"]:focus {
+  outline: none !important;
+  border-color: #2563eb !important;
+  background: #f8fbff !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16) !important;
+}
+
+@media (max-width: 640px) {
+  .day5-mobile-writing-box,
+  textarea[placeholder^="1. Ich heiße Anna"] {
+    min-height: clamp(280px, 46vh, 430px) !important;
+    padding: 18px 16px 96px !important;
+    border-radius: 18px !important;
+    font-size: 18px !important;
+    line-height: 1.72 !important;
+    resize: none;
+  }
+
+  .day5-mobile-writing-box:focus,
+  textarea[placeholder^="1. Ich heiße Anna"]:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2), 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  .day5-writing-save-button {
+    width: 100% !important;
+    min-height: 54px !important;
+    font-size: 16px !important;
+    border-radius: 14px !important;
+  }
+}
