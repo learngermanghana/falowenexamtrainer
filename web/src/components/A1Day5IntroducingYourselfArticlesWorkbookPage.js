@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import CourseInlineDiscussionPanel from "./CourseInlineDiscussionPanel";
+import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
 import { getDiscussionLesson } from "../utils/discussionLessons";
 import { styles } from "../styles";
 
@@ -31,12 +31,6 @@ const infoBoxStyle = {
   ...boxBase,
   border: "1px solid #bfdbfe",
   background: "#eff6ff",
-};
-
-const warningBoxStyle = {
-  ...boxBase,
-  border: "1px solid #fde68a",
-  background: "#fffbeb",
 };
 
 const successBoxStyle = {
@@ -87,15 +81,16 @@ const adjectivePairs = [
 ];
 
 const personalInfoPrompts = [
-  { label: "Familienname", english: "family name / surname", starter: "Mein Familienname ist ...", starterEnglish: "My family name is ..." },
-  { label: "Vorname", english: "first name", starter: "Mein Vorname ist ...", starterEnglish: "My first name is ..." },
-  { label: "Herkunft", english: "origin", starter: "Ich komme aus ...", starterEnglish: "I come from ..." },
-  { label: "Geburtsort", english: "place of birth", starter: "Ich bin in ... geboren.", starterEnglish: "I was born in ..." },
-  { label: "Adresse", english: "address", starter: "Meine Adresse ist ...", starterEnglish: "My address is ..." },
-  { label: "Postleitzahl", english: "postal code / ZIP code", starter: "Meine Postleitzahl ist ...", starterEnglish: "My postal code is ..." },
-  { label: "Familienstand", english: "marital status", starter: "Ich bin ledig / verheiratet / geschieden / verwitwet.", starterEnglish: "I am single / married / divorced / widowed." },
-  { label: "Kinder", english: "children", starter: "Ich habe ... Kinder. / Ich habe keine Kinder.", starterEnglish: "I have ... children. / I do not have any children." },
-  { label: "Alter", english: "age", starter: "Ich bin ... Jahre alt.", starterEnglish: "I am ... years old." },
+  ["Familienname", "Mein Familienname ist …"],
+  ["Vorname", "Mein Vorname ist …"],
+  ["Herkunft", "Ich komme aus …"],
+  ["Geburtsort", "Ich bin in … geboren."],
+  ["Adresse", "Meine Adresse ist …"],
+  ["Postleitzahl", "Meine Postleitzahl ist …"],
+  ["Telefonnummer", "Meine Telefonnummer ist …"],
+  ["Familienstand", "Ich bin ledig / verheiratet / geschieden / verwitwet."],
+  ["Kinder", "Ich habe … Kinder. / Ich habe keine Kinder."],
+  ["Alter", "Ich bin … Jahre alt."],
 ];
 
 const wWordQuestions = [
@@ -237,7 +232,7 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
             <div style={{ lineHeight: 1.7 }}>
               <div>Article genders: {articleScore}/{articleWords.length}</div>
               <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
-              <div>Your final introduction is saved to class discussion in Teil 3.</div>
+              <div>Your introduction in Teil 3 is saved to your class profile and class discussion.</div>
               <div>Your scrambled-sentence practice is autosaved in Teil 6.</div>
             </div>
           </div>
@@ -332,41 +327,17 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
         <p style={{ margin: 0, color: "#4b5563" }}>Say 3–5 short adjective sentences aloud.</p>
       </SectionCard>
 
-      <SectionCard title="Teil 3 · Personal Information" subtitle="Use the sentence starters, then write your final 6–8 sentence introduction in the class contribution box.">
-        <div style={{ display: "grid", gap: 10 }}>
-          {personalInfoPrompts.map((item, index) => (
-            <div key={item.label} style={boxBase}>
-              <strong>{index + 1}. {item.label} <span style={{ color: "#6b7280", fontWeight: 500 }}>({item.english})</span></strong>
-              <div>{item.starter}</div>
-              <div style={{ color: "#4b5563" }}>{item.starterEnglish}</div>
+      <SectionCard title="Teil 3 · Personal Information" subtitle="Schreibe eine kurze Vorstellung mit 6–8 Sätzen.">
+        <div style={{ ...infoBoxStyle, gap: 8 }}>
+          {personalInfoPrompts.map(([label, starter], index) => (
+            <div key={label} style={{ lineHeight: 1.6 }}>
+              <strong>{index + 1}. {label}:</strong> {starter}
             </div>
           ))}
         </div>
-        <div style={warningBoxStyle}>
-          <strong>Common mistakes</strong>
-          <div style={{ lineHeight: 1.8 }}>
-            <div>✅ Ich bin 25 Jahre alt.</div>
-            <div>❌ Ich habe 25 Jahre.</div>
-            <div>✅ Ich komme aus Ghana.</div>
-            <div>❌ Ich komme von Ghana.</div>
-            <div>✅ Ich habe keine Kinder.</div>
-          </div>
-        </div>
-        <div style={boxBase}>
-          <strong>Final Task · Write About Yourself</strong>
-          <p style={{ margin: 0 }}>Write 6 to 8 sentences in German. Include your name, country, city, age, marital status, children and address.</p>
-          <RevealAnswer buttonLabel="Show sample paragraph">
-            <p style={{ margin: 0, lineHeight: 1.9 }}>
-              Ich heiße Kojo Mensah. Ich komme aus Ghana. Ich wohne in Accra. Ich bin 28 Jahre alt. Ich bin ledig. Ich habe keine Kinder. Meine Adresse ist 12 Mango Street.
-            </p>
-          </RevealAnswer>
-        </div>
-        <CourseInlineDiscussionPanel
+        <PersonalInformationContributionBox
           lessonId={discussionLesson.id}
           lessonLabel={discussionLesson.label}
-          title="Class contribution: write about yourself"
-          description="Write your final 6–8 German sentences here. Your contribution is saved to the A1 Day 5 class discussion."
-          contributionOnly
         />
       </SectionCard>
 
@@ -443,7 +414,7 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
               setSaveStatus("saving");
               setSentenceDraft(event.target.value);
             }}
-            placeholder="1. Ich heiße Anna. (Statement)\n2. Woher kommen Sie? (Question)\n..."
+            placeholder={"1. Ich heiße Anna. (Statement)\n2. Woher kommen Sie? (Question)\n..."}
             style={textareaStyle}
           />
           <span
