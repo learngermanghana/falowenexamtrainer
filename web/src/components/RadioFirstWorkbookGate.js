@@ -53,9 +53,13 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
     setHasEnteredWorkbook(true);
 
     if (typeof window !== "undefined") {
-      window.requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: "auto" });
-      });
+      const scrollToTop = () => window.scrollTo({ top: 0, behavior: "auto" });
+
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(scrollToTop);
+      } else {
+        scrollToTop();
+      }
     }
   };
 
