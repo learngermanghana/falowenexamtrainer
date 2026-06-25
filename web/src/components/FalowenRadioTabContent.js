@@ -8,6 +8,7 @@ const FalowenRadioTabContent = ({
   resource,
   onContinue,
   actionLabel = "Continue to Teil 1 · Sprechen →",
+  actionDisabled = false,
 }) => {
   const radio = resource || getLessonRadioResource(level, day) || {};
   const hasVideo = Boolean(String(radio.youtubeId || "").trim());
@@ -80,7 +81,14 @@ const FalowenRadioTabContent = ({
         <button
           type="button"
           onClick={onContinue}
-          style={{ ...styles.primaryButton, width: "fit-content" }}
+          disabled={actionDisabled}
+          aria-busy={actionDisabled ? "true" : undefined}
+          style={{
+            ...styles.primaryButton,
+            width: "fit-content",
+            opacity: actionDisabled ? 0.72 : 1,
+            cursor: actionDisabled ? "progress" : "pointer",
+          }}
         >
           {actionLabel}
         </button>
