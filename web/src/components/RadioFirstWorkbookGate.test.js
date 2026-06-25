@@ -1,4 +1,7 @@
-import { shouldShowRadioFirst } from "./RadioFirstWorkbookGate";
+import {
+  buildCompletedRadioSearch,
+  shouldShowRadioFirst,
+} from "./RadioFirstWorkbookGate";
 
 const A2_RADIO_DAYS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28];
 
@@ -12,4 +15,10 @@ test.each([["B2", 1], ["C1", 1]])("%s Day %i uses the standardized radio-first w
 
 test("an A2 workbook without a radio skips the radio-first gate", () => {
   expect(shouldShowRadioFirst("A2", 20)).toBe(false);
+});
+
+test("Continue records radio completion while preserving the existing query", () => {
+  expect(buildCompletedRadioSearch("")).toBe("?radio=done");
+  expect(buildCompletedRadioSearch("?view=workbook")).toBe("?view=workbook&radio=done");
+  expect(buildCompletedRadioSearch("?radio=done")).toBe("?radio=done");
 });
