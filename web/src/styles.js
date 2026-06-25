@@ -132,6 +132,9 @@ export const styles = {
     width: "100%",
     boxSizing: "border-box",
     display: "block",
+    backgroundColor: "#ffffff",
+    color: "#111827",
+    caretColor: "#111827",
   },
   // ✅ UPDATED (fix overflow)
   input: {
@@ -142,6 +145,9 @@ export const styles = {
     width: "100%",
     boxSizing: "border-box",
     display: "block",
+    backgroundColor: "#ffffff",
+    color: "#111827",
+    caretColor: "#111827",
   },
 
   primaryButton: {
@@ -259,6 +265,9 @@ export const styles = {
     resize: "vertical",
     minHeight: 120,
     boxSizing: "border-box",
+    backgroundColor: "#ffffff",
+    color: "#111827",
+    caretColor: "#111827",
   },
   pre: {
     background: "#111827",

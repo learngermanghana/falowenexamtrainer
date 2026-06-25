@@ -63,6 +63,20 @@ describe("SignUpPage", () => {
     jest.clearAllMocks();
   });
 
+  it("renders typed signup text with visible foreground and caret colors", async () => {
+    render(<SignUpPage onLogin={jest.fn()} />);
+
+    const nameInput = screen.getByPlaceholderText("Abigail Mensah");
+    await userEvent.type(nameInput, "Visible Student");
+
+    expect(nameInput).toHaveValue("Visible Student");
+    expect(nameInput).toHaveStyle({
+      backgroundColor: "#ffffff",
+      color: "#111827",
+      caretColor: "#111827",
+    });
+  });
+
   it("defaults to the full fee and lists part payment second", () => {
     render(<SignUpPage onLogin={jest.fn()} />);
 
