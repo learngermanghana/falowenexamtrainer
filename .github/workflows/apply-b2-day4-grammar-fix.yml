@@ -1,0 +1,39 @@
+name: Apply B2 Day 4 grammar fix
+
+on:
+  push:
+    branches: [fix-b1-day4-workbook-and-beruf-grammar]
+    paths:
+      - .github/workflows/apply-b2-day4-grammar-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update canonical curriculum
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'shared/curriculumCanonical.json';
+          const lessons = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const lesson = lessons.find((item) => item.id === 'B2-1.4');
+          if (!lesson) throw new Error('B2-1.4 not found');
+          lesson.grammar_topic = 'Finalsätze mit damit / um ... zu';
+          fs.writeFileSync(file, JSON.stringify(lessons, null, 2) + '\n');
+          NODE
+          npm run sync:curriculum
+
+      - name: Commit generated curriculum
+        run: |
+          git config user.name "Falowen Update Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add shared/curriculumCanonical.json web/src/data/lessonCatalog.js functions/data/lessonCatalog.js web/src/data/curriculumManifest.js functions/data/curriculumManifest.js web/src/data/a1CourseBookCards.js
+          git commit -m "Correct B2 Day 4 grammar description"
+          git push
