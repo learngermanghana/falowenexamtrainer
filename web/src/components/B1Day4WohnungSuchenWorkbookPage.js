@@ -42,11 +42,28 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
+const NoteBox = ({ children, tone = "blue" }) => {
+  const tones = {
+    blue: { border: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a" },
+    green: { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" },
+    amber: { border: "#fde68a", background: "#fffbeb", color: "#92400e" },
+  };
+  const selected = tones[tone] || tones.blue;
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${selected.border}`,
+        background: selected.background,
+        color: selected.color,
+        borderRadius: 12,
+        padding: 14,
+        lineHeight: 1.7,
+      }}
+    >
+      {children}
+    </div>
+  );
 };
 
 const lesenQuestions = [
@@ -56,12 +73,15 @@ const lesenQuestions = [
       "A) Wegen der vielen Neubauten",
       "B) Wegen des Mangels an bezahlbarem Wohnraum",
       "C) Wegen der hohen Gehälter",
-      "D) Wegen der niedrigen Nachfrage",
     ],
   },
   {
     stem: "2. Was führt zu einer geringeren Chance auf eine Zusage?",
-    options: ["A) Hohe Nachfrage nach Wohnungen", "B) Geringe Anzahl von Vermietern", "C) Zentrale Lage", "D) Kurze Bewerbungen"],
+    options: [
+      "A) Hohe Nachfrage nach Wohnungen",
+      "B) Geringe Anzahl von Vermietern",
+      "C) Zentrale Lage",
+    ],
   },
   {
     stem: "3. Warum kaufen Investoren Wohnungen auf?",
@@ -69,7 +89,6 @@ const lesenQuestions = [
       "A) Um sie zu renovieren",
       "B) Um sie als Ferienwohnungen oder Luxusapartments zu nutzen",
       "C) Um sie günstig zu vermieten",
-      "D) Um sie ungenutzt zu lassen",
     ],
   },
   {
@@ -78,7 +97,6 @@ const lesenQuestions = [
       "A) Erhöhung der Mieten",
       "B) Einführung der Mietpreisbremse und Neubauprogramme",
       "C) Schließung von Altbauwohnungen",
-      "D) Verbot von Umzügen",
     ],
   },
   {
@@ -87,35 +105,42 @@ const lesenQuestions = [
       "A) Wegen der Nähe zu Schulen und Kindergärten",
       "B) Wegen der größeren Wohnungsgröße",
       "C) Wegen der besseren Verkehrsanbindung",
-      "D) Wegen kürzerer Mietverträge",
     ],
   },
   {
     stem: "6. Welche Eigenschaft ist laut dem Text bei der Wohnungssuche wichtig?",
-    options: ["A) Geduld und Flexibilität", "B) Hohes Einkommen", "C) Zentralität der Wohnung", "D) Viele Möbel"],
+    options: [
+      "A) Geduld und Flexibilität",
+      "B) Hohes Einkommen",
+      "C) Zentralität der Wohnung",
+    ],
   },
   {
     stem: "7. Was lässt sich zusammenfassend über die Wohnungssuche sagen?",
-    options: ["A) Sie ist einfach und schnell erledigt.", "B) Sie erfordert Zeit und Geduld.", "C) Sie ist nur für Investoren interessant.", "D) Sie ist ohne Kompromisse möglich."],
+    options: [
+      "A) Sie ist einfach und schnell erledigt.",
+      "B) Sie erfordert Zeit und Geduld.",
+      "C) Sie ist nur für Investoren interessant.",
+    ],
   },
 ];
 
 const hoerenQuestions = [
   {
     stem: "1. Wie hoch ist die Miete?",
-    options: ["A) 850 Euro", "B) 950 Euro", "C) 1050 Euro", "D) 750 Euro"],
+    options: ["A) 850 Euro", "B) 950 Euro", "C) 1050 Euro"],
   },
   {
     stem: "2. Was kosten die Nebenkosten?",
-    options: ["A) 100 Euro", "B) 150 Euro", "C) 200 Euro", "D) 250 Euro"],
+    options: ["A) 100 Euro", "B) 150 Euro", "C) 200 Euro"],
   },
   {
     stem: "3. Ist die Wohnung möbliert?",
-    options: ["A) Ja", "B) Nein", "C) Teilweise", "D) Nur die Küche"],
+    options: ["A) Ja", "B) Nein", "C) Teilweise"],
   },
   {
     stem: "4. Welche Haustiere sind erlaubt?",
-    options: ["A) Hunde", "B) Kleine Haustiere", "C) Keine Haustiere", "D) Nur Katzen"],
+    options: ["A) Hunde", "B) Kleine Haustiere", "C) Keine Haustiere"],
   },
   {
     stem: "5. Was sagt der Vermieter über die Verkehrsanbindung?",
@@ -123,7 +148,6 @@ const hoerenQuestions = [
       "A) Es gibt keine öffentlichen Verkehrsmittel in der Nähe.",
       "B) Es gibt eine U-Bahn-Station und mehrere Bushaltestellen in der Nähe.",
       "C) Es gibt nur eine Bushaltestelle in der Nähe.",
-      "D) Es gibt nur einen Bahnhof in der Nähe.",
     ],
   },
 ];
@@ -161,18 +185,24 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
   });
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const setPreparedFor = (tabKey) => (event) =>
+    setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Day 4 Workbook · Wohnung suchen (Übung) 2.4</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          B1 · Day 4 Workbook · Wohnung suchen (Übung) 2.4
+        </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: speaking, writing, reading, and listening practice focused on apartment search in German.
+          Beschreibe Wohnungsmöglichkeiten, vergleiche Suchmethoden und begründe deine Meinung mit klaren B1-Strukturen.
         </p>
+
+        <NoteBox>
+          <strong>Grammar focus:</strong> zweiteilige Konnektoren – <em>sowohl … als auch, nicht nur … sondern auch, zwar … aber, einerseits … andererseits, entweder … oder</em> und <em>weder … noch</em>.
+        </NoteBox>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => (
@@ -193,90 +223,107 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
         <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1600&q=80"
-            alt="People discussing apartment options together"
+            alt="Wohnungen in einer Großstadt"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
 
-          <h3 style={sectionTitle}>Central Topic</h3>
-          <p style={{ margin: 0 }}>
-            <strong>Wohnung suchen</strong> (Searching for an Apartment)
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Tauscht euch in der Gruppe über Wohnungssuche, Wohnformen, wichtige Kriterien und mögliche Kompromisse aus.
           </p>
 
-          <h3 style={sectionTitle}>Main Branches &amp; Sub-Branches</h3>
+          <h3 style={sectionTitle}>Zentrales Thema</h3>
+          <p style={{ margin: 0 }}>
+            <strong>Wohnung suchen</strong>
+          </p>
+
+          <h3 style={sectionTitle}>Wortschatzfelder</h3>
           <ol style={listSpacing}>
             <li>
-              <strong>Wohnungsarten (Types of Apartments)</strong>
+              <strong>Wohnungsarten</strong>
               <ul style={listSpacing}>
-                <li>Mietwohnung (Rental apartment)</li>
-                <li>Eigentumswohnung (Owned apartment)</li>
-                <li>WG (Wohngemeinschaft – Shared apartment)</li>
-                <li>Einzimmerwohnung (One-room apartment/studio)</li>
-                <li>Mehrfamilienhaus (Multi-family house)</li>
+                <li>Mietwohnung</li>
+                <li>Eigentumswohnung</li>
+                <li>WG / Wohngemeinschaft</li>
+                <li>Einzimmerwohnung</li>
+                <li>Mehrfamilienhaus</li>
               </ul>
             </li>
             <li>
-              <strong>Wohnungssuche (Apartment Search)</strong>
+              <strong>Wohnungssuche</strong>
               <ul style={listSpacing}>
-                <li>Online-Portale (Online portals: Immobilienscout24, eBay Kleinanzeigen)</li>
-                <li>Zeitungsanzeigen (Newspaper ads)</li>
-                <li>Immobilienmakler (Real estate agents)</li>
-                <li>Mundpropaganda (Word of mouth)</li>
-                <li>Aushänge in Supermärkten (Notices in supermarkets)</li>
+                <li>Online-Portale</li>
+                <li>Zeitungsanzeigen</li>
+                <li>Immobilienmakler</li>
+                <li>Mundpropaganda</li>
+                <li>Aushänge in Supermärkten</li>
               </ul>
             </li>
             <li>
-              <strong>Kriterien &amp; Anforderungen (Criteria &amp; Requirements)</strong>
+              <strong>Kriterien und Anforderungen</strong>
               <ul style={listSpacing}>
-                <li>Mietpreis (Rent price)</li>
-                <li>Kaution (Deposit)</li>
-                <li>Nebenkosten (Additional costs)</li>
-                <li>Lage (Location)</li>
-                <li>Verkehrsanbindung (Transport connections)</li>
-                <li>Einkaufsmöglichkeiten (Shopping facilities)</li>
-                <li>Haustiere erlaubt? (Pets allowed?)</li>
+                <li>Mietpreis, Kaution und Nebenkosten</li>
+                <li>Lage und Verkehrsanbindung</li>
+                <li>Einkaufsmöglichkeiten</li>
+                <li>Wohnungsgröße und Ausstattung</li>
+                <li>Haustiere erlaubt?</li>
               </ul>
             </li>
             <li>
-              <strong>Besichtigung &amp; Vertrag (Viewing &amp; Contract)</strong>
+              <strong>Besichtigung und Vertrag</strong>
               <ul style={listSpacing}>
-                <li>Besichtigungstermin vereinbaren (Schedule a viewing)</li>
-                <li>Fragen stellen (Ask questions)</li>
-                <li>Mietvertrag prüfen (Check rental contract)</li>
-                <li>Kündigungsfrist (Notice period)</li>
-                <li>Mieterschutz (Tenant protection)</li>
+                <li>Besichtigungstermin vereinbaren</li>
+                <li>Fragen stellen</li>
+                <li>Mietvertrag prüfen</li>
+                <li>Kündigungsfrist</li>
+                <li>Mieterschutz</li>
               </ul>
             </li>
             <li>
-              <strong>Einzug &amp; Einrichtung (Moving In &amp; Furnishing)</strong>
+              <strong>Einzug und Einrichtung</strong>
               <ul style={listSpacing}>
-                <li>Umzugsplanung (Moving plan)</li>
-                <li>Möbel kaufen (Buying furniture)</li>
-                <li>Nachbarn kennenlernen (Getting to know neighbors)</li>
-                <li>Anmeldung beim Einwohnermeldeamt (Registering at the residents&apos; office)</li>
-                <li>Internet und Strom anmelden (Setting up internet and electricity)</li>
+                <li>Umzug planen und Möbel kaufen</li>
+                <li>Nachbarn kennenlernen</li>
+                <li>sich beim Einwohnermeldeamt anmelden</li>
+                <li>Internet und Strom anmelden</li>
               </ul>
             </li>
           </ol>
 
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Frage des Tages:</strong> Was sind die wichtigsten Punkte, wenn man eine Wohnung sucht?
-          </p>
+          <NoteBox tone="green">
+            <strong>Hauptfrage für die Diskussion:</strong><br />
+            Welche Methode ist bei der Wohnungssuche erfolgreicher: Online-Portale oder persönliche Kontakte? Begründe deine Meinung, nenne Vor- und Nachteile und gib ein konkretes Beispiel.
+          </NoteBox>
+
+          <h3 style={sectionTitle}>Weitere Diskussionsfragen</h3>
+          <ul style={listSpacing}>
+            <li>Welche drei Kriterien sind für dich bei einer Wohnung unverzichtbar?</li>
+            <li>Welche Kompromisse würdest du bei einer schwierigen Wohnungssuche eingehen?</li>
+            <li>Welche Vor- und Nachteile hat eine WG im Vergleich zu einer eigenen Wohnung?</li>
+            <li>Welche Fragen sollte man bei einer Besichtigung unbedingt stellen?</li>
+            <li>Ist eine zentrale Lage wichtiger als eine günstige Miete?</li>
+          </ul>
+
+          <h3 style={sectionTitle}>B1-Sprechstruktur</h3>
+          <ol style={listSpacing}>
+            <li><strong>Meinung:</strong> Meiner Meinung nach …</li>
+            <li><strong>Begründung:</strong> Der wichtigste Grund dafür ist, dass …</li>
+            <li><strong>Beispiel:</strong> Ein gutes Beispiel dafür ist …</li>
+            <li><strong>Gegenseite:</strong> Einerseits …, andererseits …</li>
+            <li><strong>Schluss:</strong> Deshalb würde ich …</li>
+          </ol>
+
+          <NoteBox tone="amber">
+            Verwende in deiner Antwort mindestens zwei zweiteilige Konnektoren. Sprich 60 bis 90 Sekunden und entwickle deine Idee über einen einzelnen Satz hinaus.
+          </NoteBox>
+
           <SpeakingPracticeTimerCard storageKey="b1-day4-sprechen-group-practice" />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Aufgabenstellung:</strong> Schreibe einen kurzen Text oder bereite eine mündliche Antwort vor. Nutze diese
-            Struktur: 1) Einleitung, 2) Vorteile, 3) Nachteile, 4) Deine Meinung.
-          </p>
+          <CourseInlinePracticePanel type="speaking" />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group practice and has no assignment submission.
+            Teil 1 is group practice only and has no assignment submission.
           </p>
-
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -285,11 +332,12 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
         <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Student writing a reflective response"
+            alt="Studentin schreibt einen Meinungsbeitrag"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
+
+          <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Thema: <strong>Wohnung suchen und persönliche Kontakte</strong>
           </p>
@@ -297,26 +345,39 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             Sie haben im Fernsehen eine Diskussionssendung zum Thema „Wohnung suchen und persönliche Kontakte“ gesehen.
             Im Online-Gästebuch der Sendung finden Sie folgende Meinung:
           </p>
+
           <div style={questionCardStyle}>
             <strong>Tanja:</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Ich finde es wichtig, dass man beim Wohnungssuchen persönliche Kontakte nutzt. Aber heute suchen viele
-              online, und oft haben sie keinen direkten Kontakt mit Vermietern oder Mitbewohnern. Meiner Meinung nach
-              kann das die Wohnungssuche schwieriger machen, weil persönliche Empfehlungen oft hilfreicher sind als
-              anonyme Online-Anzeigen.“
+              „Ich finde es wichtig, dass man bei der Wohnungssuche persönliche Kontakte nutzt. Heute suchen jedoch viele Menschen online und haben dabei oft keinen direkten Kontakt zu Vermietern oder möglichen Mitbewohnern. Meiner Meinung nach kann das die Wohnungssuche schwieriger machen, weil persönliche Empfehlungen häufig hilfreicher sind als anonyme Online-Anzeigen.“
             </p>
           </div>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Schreiben Sie nun Ihre Meinung zum Thema (circa 80 Wörter).
+            Schreiben Sie nun Ihre Meinung zum Thema. Schreiben Sie circa <strong>80 Wörter</strong>.
           </p>
+
+          <h3 style={sectionTitle}>Schreibplan</h3>
+          <ol style={listSpacing}>
+            <li>Führen Sie kurz in das Thema ein.</li>
+            <li>Sagen Sie klar, ob Sie Tanjas Meinung zustimmen.</li>
+            <li>Nennen Sie mindestens einen Vorteil persönlicher Kontakte.</li>
+            <li>Nennen Sie mindestens einen Vorteil oder Nachteil von Online-Portalen.</li>
+            <li>Geben Sie ein Beispiel oder eine persönliche Erfahrung.</li>
+            <li>Formulieren Sie einen klaren Schluss.</li>
+          </ol>
+
+          <NoteBox tone="green">
+            <strong>Sprachziel:</strong> Verwenden Sie mindestens zwei verschiedene zweiteilige Konnektoren, zum Beispiel:<br />
+            „Sowohl Online-Portale als auch persönliche Kontakte können hilfreich sein.“<br />
+            „Online-Portale bieten zwar viele Anzeigen, aber die Konkurrenz ist groß.“
+          </NoteBox>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Writing practice before submission</strong>
-
-            <CourseInlinePracticePanel
-              type="writing"
-            />
+            <CourseInlinePracticePanel type="writing" />
           </div>
+
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -326,41 +387,28 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
         <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
-            alt="Reading practice materials on a desk"
+            alt="Lesetext und Notizen"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen) · Exercise</h2>
+
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
           <h3 style={sectionTitle}>Die Herausforderungen der Wohnungssuche in Großstädten</h3>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In vielen Großstädten Deutschlands wird die Wohnungssuche zu einer echten Herausforderung. Es gibt viele
-            Gründe dafür, warum es schwierig ist, eine passende Wohnung zu finden. Einer der Hauptgründe ist der Mangel
-            an bezahlbarem Wohnraum. Besonders in beliebten Vierteln sind die Mieten in den letzten Jahren stark
-            gestiegen. Viele Menschen müssen sich daher mit kleineren Wohnungen oder einer Wohnung in weniger zentralen
-            Lagen zufriedengeben.
+            In vielen Großstädten Deutschlands wird die Wohnungssuche zu einer echten Herausforderung. Es gibt viele Gründe dafür, warum es schwierig ist, eine passende Wohnung zu finden. Einer der Hauptgründe ist der Mangel an bezahlbarem Wohnraum. Besonders in beliebten Vierteln sind die Mieten in den letzten Jahren stark gestiegen. Viele Menschen müssen sich daher mit kleineren Wohnungen oder mit einer Wohnung in weniger zentraler Lage zufriedengeben.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein weiteres Problem ist die hohe Nachfrage nach Wohnungen. In Städten wie Berlin, München oder Hamburg gibt
-            es mehr Wohnungssuchende als verfügbare Wohnungen. Dies führt dazu, dass viele Interessenten sich um eine
-            Wohnung bewerben, was die Chancen auf eine Zusage reduziert. Oftmals entscheiden Vermieter sich für Bewerber
-            mit höherem Einkommen oder sicherem Arbeitsplatz.
+            Ein weiteres Problem ist die hohe Nachfrage nach Wohnungen. In Städten wie Berlin, München oder Hamburg gibt es mehr Wohnungssuchende als verfügbare Wohnungen. Dies führt dazu, dass sich viele Interessenten um dieselbe Wohnung bewerben, was die Chancen auf eine Zusage reduziert. Oft entscheiden sich Vermieter für Bewerber mit höherem Einkommen oder einem sicheren Arbeitsplatz.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein weiterer Punkt ist der Konkurrenzdruck durch Investoren. Viele Wohnungen werden von Investoren aufgekauft
-            und als Ferienwohnungen oder Luxusapartments genutzt, was den Markt für normale Mieter weiter verknappt. Die
-            Politik versucht, durch verschiedene Maßnahmen wie Mietpreisbremse und Neubauprogramme gegenzusteuern, aber
-            die Wirkung dieser Maßnahmen ist umstritten.
+            Hinzu kommt der Konkurrenzdruck durch Investoren. Viele Wohnungen werden von Investoren aufgekauft und anschließend als Ferienwohnungen oder Luxusapartments genutzt. Dadurch wird der Markt für normale Mieter zusätzlich verkleinert. Die Politik versucht, mit Maßnahmen wie der Mietpreisbremse und Neubauprogrammen gegenzusteuern, doch die Wirkung dieser Maßnahmen ist umstritten.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Neben diesen äußeren Faktoren spielen auch persönliche Umstände eine Rolle. Wer zum Beispiel auf eine
-            bestimmte Wohnungsgröße oder -ausstattung angewiesen ist, hat es oft schwerer, etwas Passendes zu finden.
-            Familien mit Kindern bevorzugen oft Wohnungen in der Nähe von Schulen und Kindergärten, während junge
-            Berufstätige oft eine Wohnung in der Nähe ihres Arbeitsplatzes suchen.
+            Neben diesen äußeren Faktoren spielen persönliche Umstände eine wichtige Rolle. Wer zum Beispiel auf eine bestimmte Wohnungsgröße oder Ausstattung angewiesen ist, hat es oft schwerer, etwas Passendes zu finden. Familien mit Kindern bevorzugen häufig Wohnungen in der Nähe von Schulen und Kindergärten, während junge Berufstätige oft eine Wohnung in der Nähe ihres Arbeitsplatzes suchen.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Zusammenfassend lässt sich sagen, dass die Wohnungssuche in Großstädten eine komplexe Aufgabe ist, die viel
-            Zeit und Geduld erfordert. Es ist wichtig, flexibel zu bleiben und gegebenenfalls Kompromisse einzugehen, um
-            eine passende Wohnung zu finden.
+            Zusammenfassend lässt sich sagen, dass die Wohnungssuche in Großstädten eine komplexe Aufgabe ist, die viel Zeit und Geduld erfordert. Es ist wichtig, flexibel zu bleiben und gegebenenfalls Kompromisse einzugehen, um eine passende Wohnung zu finden.
           </p>
 
           <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
@@ -375,10 +423,6 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             ))}
           </div>
 
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your selected answers in the assignment submission area, not directly on this page.
-          </p>
-
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
@@ -388,33 +432,20 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
         <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
-            alt="Learner listening with headphones"
+            alt="Lernende Person hört einen Wohnungstext"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
+
+          <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Recommended video: {" "}
-            <a href="https://youtu.be/kR8SmSY99c8" target="_blank" rel="noreferrer">
-              Wohnung suchen – Video
-            </a>
+            Hören Sie das Gespräch über eine Wohnung zweimal. Lesen Sie zuerst die Fragen und achten Sie besonders auf Miete, Nebenkosten, Möblierung, Haustiere und Verkehrsanbindung.
           </p>
 
-          <iframe
-            title="Wohnung suchen video preview"
-            src="https://www.youtube.com/embed/kR8SmSY99c8"
-            style={videoPreviewStyle}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
+          <CoursebookAudioPlayer
+            url="https://drive.google.com/file/d/1zErUZFGcTIUw_I3aasDXM2VlAoPfKsBP/view?usp=sharing"
+            linkLabel="Open listening audio"
           />
-
-          <div style={{ display: "grid", gap: 8 }}>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>Audio source for this exercise:</p>
-            <CoursebookAudioPlayer
-              url="https://drive.google.com/file/d/1zErUZFGcTIUw_I3aasDXM2VlAoPfKsBP/view?usp=sharing"
-              linkLabel="Open listening audio"
-            />
-          </div>
 
           <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
           <div style={{ display: "grid", gap: 10 }}>
@@ -428,19 +459,18 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             ))}
           </div>
 
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your listening answers in the assignment submission area, not directly on this page.
-          </p>
-
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day4WohnungSuchen", level: "B1", workbookId: "B1Day4WohnungSuchen" }} workbookId="B1Day4WohnungSuchen" />
+        <WorkbookReferenceAnswers
+          level="B1"
+          lesson={{ title: "B1Day4WohnungSuchen", level: "B1", workbookId: "B1Day4WohnungSuchen" }}
+          workbookId="B1Day4WohnungSuchen"
+        />
       )}
-
     </div>
   );
 };
