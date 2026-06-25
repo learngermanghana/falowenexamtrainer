@@ -1477,7 +1477,8 @@ const lessonCatalog = Object.freeze([
     "workbookRoute": "https://drive.google.com/file/d/1tEKd5Umb-imLpPYrmFfNQyjf4oe2weBp/view?usp=sharing",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "grammar_topic": "Finalsätze mit damit / um ... zu"
   },
   {
     "id": "B2-1.5",

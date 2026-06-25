@@ -3,9 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
@@ -49,11 +47,17 @@ const tabImageStyle = {
   objectFit: "cover",
 };
 
+const videoStyle = {
+  width: "100%",
+  aspectRatio: "16 / 9",
+  border: 0,
+  borderRadius: 10,
+};
+
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
     blue: { border: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a" },
     green: { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" },
-    amber: { border: "#fde68a", background: "#fffbeb", color: "#92400e" },
   };
   const selected = tones[tone] || tones.blue;
 
@@ -76,112 +80,54 @@ const NoteBox = ({ children, tone = "blue" }) => {
 const wohnungBrainMapBranches = [
   {
     title: "Wohnungsarten",
-    items: [
-      "Mietwohnung",
-      "Eigentumswohnung",
-      "WG / Wohngemeinschaft",
-      "Einzimmerwohnung",
-      "Mehrfamilienhaus",
-    ],
+    items: ["Mietwohnung", "Eigentumswohnung", "WG / Wohngemeinschaft", "Einzimmerwohnung", "Mehrfamilienhaus"],
   },
   {
     title: "Methoden der Wohnungssuche",
-    items: [
-      "Online-Portale",
-      "Zeitungsanzeigen",
-      "Immobilienmakler",
-      "persönliche Kontakte",
-      "Aushänge in Supermärkten",
-    ],
+    items: ["Online-Portale", "Zeitungsanzeigen", "Immobilienmakler", "persönliche Kontakte", "Aushänge in Supermärkten"],
   },
   {
     title: "Wichtige Kriterien",
-    items: [
-      "Mietpreis und Nebenkosten",
-      "Kaution",
-      "Lage und Verkehrsanbindung",
-      "Wohnungsgröße und Ausstattung",
-      "Einkaufsmöglichkeiten und Haustiere",
-    ],
+    items: ["Mietpreis und Nebenkosten", "Kaution", "Lage und Verkehrsanbindung", "Wohnungsgröße und Ausstattung", "Einkaufsmöglichkeiten und Haustiere"],
   },
   {
     title: "Besichtigung und Mietvertrag",
-    items: [
-      "Besichtigungstermin vereinbaren",
-      "Fragen stellen",
-      "Mängel kontrollieren",
-      "Mietvertrag prüfen",
-      "Kündigungsfrist beachten",
-    ],
+    items: ["Besichtigungstermin vereinbaren", "Fragen stellen", "Mängel kontrollieren", "Mietvertrag prüfen", "Kündigungsfrist beachten"],
   },
   {
     title: "Einzug und Kompromisse",
-    items: [
-      "Umzug planen",
-      "Möbel und Strom organisieren",
-      "Nachbarn kennenlernen",
-      "sich anmelden",
-      "bei Lage, Größe oder Preis flexibel bleiben",
-    ],
+    items: ["Umzug planen", "Möbel und Strom organisieren", "Nachbarn kennenlernen", "sich anmelden", "bei Lage, Größe oder Preis flexibel bleiben"],
   },
 ];
 
 const lesenQuestions = [
   {
     stem: "1. Warum ist die Wohnungssuche in Großstädten schwierig?",
-    options: [
-      "A) Wegen der vielen Neubauten",
-      "B) Wegen des Mangels an bezahlbarem Wohnraum",
-      "C) Wegen der hohen Gehälter",
-    ],
+    options: ["A) Wegen der vielen Neubauten", "B) Wegen des Mangels an bezahlbarem Wohnraum", "C) Wegen der hohen Gehälter"],
   },
   {
     stem: "2. Was führt zu einer geringeren Chance auf eine Zusage?",
-    options: [
-      "A) Hohe Nachfrage nach Wohnungen",
-      "B) Geringe Anzahl von Vermietern",
-      "C) Zentrale Lage",
-    ],
+    options: ["A) Hohe Nachfrage nach Wohnungen", "B) Geringe Anzahl von Vermietern", "C) Zentrale Lage"],
   },
   {
     stem: "3. Warum kaufen Investoren Wohnungen auf?",
-    options: [
-      "A) Um sie zu renovieren",
-      "B) Um sie als Ferienwohnungen oder Luxusapartments zu nutzen",
-      "C) Um sie günstig zu vermieten",
-    ],
+    options: ["A) Um sie zu renovieren", "B) Um sie als Ferienwohnungen oder Luxusapartments zu nutzen", "C) Um sie günstig zu vermieten"],
   },
   {
     stem: "4. Welche Maßnahmen ergreift die Politik?",
-    options: [
-      "A) Erhöhung der Mieten",
-      "B) Einführung der Mietpreisbremse und Neubauprogramme",
-      "C) Schließung von Altbauwohnungen",
-    ],
+    options: ["A) Erhöhung der Mieten", "B) Einführung der Mietpreisbremse und Neubauprogramme", "C) Schließung von Altbauwohnungen"],
   },
   {
     stem: "5. Warum bevorzugen Familien mit Kindern bestimmte Wohnungen?",
-    options: [
-      "A) Wegen der Nähe zu Schulen und Kindergärten",
-      "B) Wegen der größeren Wohnungsgröße",
-      "C) Wegen der besseren Verkehrsanbindung",
-    ],
+    options: ["A) Wegen der Nähe zu Schulen und Kindergärten", "B) Wegen der größeren Wohnungsgröße", "C) Wegen der besseren Verkehrsanbindung"],
   },
   {
     stem: "6. Welche Eigenschaft ist laut dem Text bei der Wohnungssuche wichtig?",
-    options: [
-      "A) Geduld und Flexibilität",
-      "B) Hohes Einkommen",
-      "C) Zentralität der Wohnung",
-    ],
+    options: ["A) Geduld und Flexibilität", "B) Hohes Einkommen", "C) Zentralität der Wohnung"],
   },
   {
     stem: "7. Was lässt sich zusammenfassend über die Wohnungssuche sagen?",
-    options: [
-      "A) Sie ist einfach und schnell erledigt.",
-      "B) Sie erfordert Zeit und Geduld.",
-      "C) Sie ist nur für Investoren interessant.",
-    ],
+    options: ["A) Sie ist einfach und schnell erledigt.", "B) Sie erfordert Zeit und Geduld.", "C) Sie ist nur für Investoren interessant."],
   },
 ];
 
@@ -236,6 +182,19 @@ const PreparedCheckbox = ({ checked, onChange }) => (
   </label>
 );
 
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question) => (
+      <div key={question.stem} style={questionCardStyle}>
+        <strong>{question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={option}>{option}</span>
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
 const B1Day4WohnungSuchenWorkbookPage = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
@@ -247,7 +206,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) =>
-    setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+    setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -305,7 +264,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           <ol style={listSpacing}>
             <li><strong>Zentrales Thema:</strong> Schreibe <strong>„Wohnung suchen“</strong> in die Mitte deiner Brain Map.</li>
             <li><strong>Hauptäste:</strong> Erstelle fünf Hauptäste zu den wichtigsten Bereichen der Wohnungssuche.</li>
-            <li><strong>Unterpunkte:</strong> Ergänze jeden Ast mit Beispielen, Vor- und Nachteilen sowie deiner eigenen Meinung.</li>
+            <li><strong>Unterpunkte:</strong> Ergänze jeden Ast mit Beispielen und Ideen.</li>
           </ol>
 
           <h3 style={sectionTitle}>Beispiel für die Brain Map</h3>
@@ -323,31 +282,25 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           </div>
 
           <h3 style={sectionTitle}>Group Sprechen</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Frage:</strong> Welche Methode ist bei der Wohnungssuche erfolgreicher: Online-Portale oder persönliche Kontakte? Begründe deine Meinung, nenne Vor- und Nachteile und gib ein konkretes Beispiel.
+          <p style={{ margin: 0 }}>
+            <strong>Frage:</strong> Welche Methode ist bei der Wohnungssuche erfolgreicher: Online-Portale oder persönliche Kontakte? Warum?
           </p>
 
           <h3 style={sectionTitle}>Schlüsselwörter / Stichpunkte für deine Antwort</h3>
           <ol style={listSpacing}>
             <li><strong>Begrüßung:</strong> „Guten Tag.“ / „Hallo zusammen.“</li>
             <li><strong>Thema vorstellen:</strong> „Heute spreche ich über die Wohnungssuche.“</li>
-            <li><strong>Meinung:</strong> „Meiner Meinung nach sind persönliche Kontakte / Online-Portale erfolgreicher.“</li>
-            <li><strong>Begründung:</strong> „Der wichtigste Grund dafür ist, dass …“</li>
-            <li><strong>Vergleich:</strong> „Einerseits …, andererseits …“ / „Online-Portale bieten zwar viele Anzeigen, aber …“</li>
-            <li><strong>Beispiel:</strong> „Ein gutes Beispiel dafür ist …“ / „Bei meiner letzten Wohnungssuche …“</li>
-            <li><strong>Schluss:</strong> „Deshalb würde ich …“ / „Danke fürs Zuhören.“</li>
+            <li><strong>Deine Meinung:</strong> „Meiner Meinung nach sind Online-Portale / persönliche Kontakte erfolgreicher.“</li>
+            <li><strong>Begründung:</strong> „Ich denke das, weil …“ / „Der wichtigste Grund ist …“</li>
+            <li><strong>Beispiel:</strong> „Zum Beispiel …“ / „Bei meiner letzten Wohnungssuche …“</li>
+            <li><strong>Abschluss:</strong> „Danke fürs Zuhören.“ / „Das war meine Meinung.“</li>
           </ol>
-
-          <NoteBox tone="amber">
-            Sprich 60 bis 90 Sekunden. Verwende mindestens zwei zweiteilige Konnektoren und entwickle deine Antwort über einzelne kurze Sätze hinaus.
-          </NoteBox>
-
-          <SpeakingPracticeTimerCard storageKey="b1-day4-sprechen-group-practice" />
-          <CourseInlinePracticePanel type="speaking" />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3 and Teil 4.
           </p>
+
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -366,8 +319,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             Thema: <strong>Wohnung suchen und persönliche Kontakte</strong>
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sie haben im Fernsehen eine Diskussionssendung zum Thema „Wohnung suchen und persönliche Kontakte“ gesehen.
-            Im Online-Gästebuch der Sendung finden Sie folgende Meinung:
+            Sie haben im Fernsehen eine Diskussionssendung zum Thema „Wohnung suchen und persönliche Kontakte“ gesehen. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:
           </p>
 
           <div style={questionCardStyle}>
@@ -436,16 +388,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           </p>
 
           <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
-          <div style={{ display: "grid", gap: 10 }}>
-            {lesenQuestions.map((question) => (
-              <div key={question.stem} style={questionCardStyle}>
-                <strong>{question.stem}</strong>
-                {question.options.map((option) => (
-                  <span key={option}>{option}</span>
-                ))}
-              </div>
-            ))}
-          </div>
+          <QuestionList questions={lesenQuestions} />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
@@ -454,34 +397,21 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
 
       {activeTab === "hoeren" && (
         <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
-            alt="Lernende Person hört einen Wohnungstext"
-            loading="lazy"
-            style={tabImageStyle}
+          <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
+          <iframe
+            src="https://www.youtube.com/embed/Gijr5NHNJ_o?rel=0"
+            title="B1 Wohnung suchen – Teil 4 Hören"
+            style={videoStyle}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
           />
 
-          <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Hören Sie das Gespräch über eine Wohnung zweimal. Lesen Sie zuerst die Fragen und achten Sie besonders auf Miete, Nebenkosten, Möblierung, Haustiere und Verkehrsanbindung.
           </p>
 
-          <CoursebookAudioPlayer
-            url="https://drive.google.com/file/d/1zErUZFGcTIUw_I3aasDXM2VlAoPfKsBP/view?usp=sharing"
-            linkLabel="Open listening audio"
-          />
-
           <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
-          <div style={{ display: "grid", gap: 10 }}>
-            {hoerenQuestions.map((question) => (
-              <div key={question.stem} style={questionCardStyle}>
-                <strong>{question.stem}</strong>
-                {question.options.map((option) => (
-                  <span key={option}>{option}</span>
-                ))}
-              </div>
-            ))}
-          </div>
+          <QuestionList questions={hoerenQuestions} />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
