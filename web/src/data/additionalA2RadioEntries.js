@@ -88,6 +88,14 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Einkaufen ein. Danach gehst du weiter zu Teil 1.",
   },
+  20: {
+    key: "a2-day20-typische-reklamationssituationen-falowen-radio",
+    title: "Typische Reklamationssituationen üben 7.20",
+    youtubeId: "P_ruQxHKzPg",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf typische Reklamationssituationen ein. Danach gehst du weiter zu Teil 1.",
+  },
   21: {
     key: "a2-day21-ein-wochenende-planen-falowen-radio",
     title: "Ein Wochenende planen 8.21",
