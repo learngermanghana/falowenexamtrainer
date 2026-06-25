@@ -1,0 +1,7 @@
+{
+  "checkedAt": "2026-06-25T12:10:11.137Z",
+  "success": false,
+  "endpoint": "",
+  "httpStatus": "",
+  "error": "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog returned 404"
+}
