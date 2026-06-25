@@ -54,6 +54,37 @@ test("cheat sheet tab renders lower-level sheets with the same renderer", () => 
   expect(screen.getByText("meiner Ansicht nach")).toBeInTheDocument();
 });
 
+test("renders the B1 opinion template as a structured template section", () => {
+  const { container } = render(
+    <WritingCheatSheetTabs level="B1" day={4}><TaskContent /></WritingCheatSheetTabs>,
+  );
+
+  userEvent.click(screen.getByRole("tab", { name: "Cheat Sheet" }));
+
+  expect(screen.getByText("B1 opinion text template")).toBeInTheDocument();
+  expect(screen.getByText("Einleitung")).toBeInTheDocument();
+  expect(
+    screen.getByText(/Heutzutage ist das Thema \[Thema\] ein sehr wichtiges Thema/),
+  ).toBeInTheDocument();
+  expect(
+    container.querySelector('[data-cheat-sheet-layout="template"]'),
+  ).toBeInTheDocument();
+});
+
+test("renders the upgraded B2 opinion template", () => {
+  render(<WritingCheatSheetTabs level="B2" day={4}><TaskContent /></WritingCheatSheetTabs>);
+
+  userEvent.click(screen.getByRole("tab", { name: "Cheat Sheet" }));
+
+  expect(screen.getByText("B2 opinion text template")).toBeInTheDocument();
+  expect(
+    screen.getByText(/gewinnt heutzutage zunehmend an Bedeutung/),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(/Unter Abwägung beider Seiten/),
+  ).toBeInTheDocument();
+});
+
 test("keeps stateful writing task mounted while switching to and from the cheat sheet", () => {
   const handleMount = jest.fn();
 
