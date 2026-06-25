@@ -98,6 +98,35 @@ test("lower levels use separate cheat sheet arrays", () => {
   expect(B2_WRITING_CHEAT_SHEET[0].title).toBe("B2 argument linkers");
 });
 
+test("B1 cheat sheet includes the corrected opinion text template", () => {
+  const template = B1_WRITING_CHEAT_SHEET.find(
+    (section) => section.id === "b1-opinion-text-template",
+  );
+  const templateText = template.items.map((item) => item.meaning).join(" ");
+
+  expect(template).toEqual(expect.objectContaining({ layout: "template" }));
+  expect(templateText).toContain(
+    "Heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben.",
+  );
+  expect(templateText).toContain(
+    "[Thema] unser Leben positiv oder negativ beeinflussen kann.",
+  );
+  expect(templateText).toContain("Mit freundlichen Grüßen");
+});
+
+test("B2 cheat sheet upgrades the opinion template with B2 vocabulary", () => {
+  const template = B2_WRITING_CHEAT_SHEET.find(
+    (section) => section.id === "b2-opinion-text-template",
+  );
+  const templateText = template.items.map((item) => item.meaning).join(" ");
+
+  expect(template).toEqual(expect.objectContaining({ layout: "template" }));
+  expect(templateText).toContain("gewinnt heutzutage zunehmend an Bedeutung");
+  expect(templateText).toContain("darf nicht außer Acht gelassen werden");
+  expect(templateText).toContain("Unter Abwägung beider Seiten");
+  expect(templateText).toContain("zu einem differenzierten Verständnis");
+});
+
 test("getWritingCheatSheet returns no sheet for unsupported levels", () => {
   ["A1", "C2", ""].forEach((level) => {
     expect(getWritingCheatSheet(level, 3)).toEqual([]);
