@@ -13,8 +13,43 @@ import {
 const DRAFT_KEY = "falowen:public-application-draft";
 const MOUNT_ID = "falowen-application-resume-panel";
 
+const MOBILE_INPUT_CSS = `
+  .signup-page-mobile-safe input:not([type="checkbox"]):not([type="radio"]),
+  .signup-page-mobile-safe textarea {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    caret-color: #111827 !important;
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+    font-size: 16px !important;
+    line-height: 1.35 !important;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+
+  .signup-page-mobile-safe input:not([type="checkbox"]):not([type="radio"])::placeholder,
+  .signup-page-mobile-safe textarea::placeholder {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+    opacity: 1 !important;
+  }
+
+  .signup-page-mobile-safe input:-webkit-autofill,
+  .signup-page-mobile-safe input:-webkit-autofill:hover,
+  .signup-page-mobile-safe input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #111827 !important;
+    caret-color: #111827 !important;
+    box-shadow: 0 0 0 1000px #ffffff inset !important;
+  }
+`;
+
 const slugify = (value) =>
-  String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
 const readDraft = () => {
   try {
@@ -36,12 +71,16 @@ const setControlValue = (control, value) => {
   const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
   if (setter) setter.call(control, value);
   else control.value = value;
-  control.dispatchEvent(new Event(control.tagName === "SELECT" ? "change" : "input", { bubbles: true }));
+  control.dispatchEvent(
+    new Event(control.tagName === "SELECT" ? "change" : "input", { bubbles: true })
+  );
 };
 
 const findLevelSelect = (form) =>
   Array.from(form?.querySelectorAll("select") || []).find((select) =>
-    ["A1", "A2", "B1"].every((value) => Array.from(select.options).some((option) => option.value === value))
+    ["A1", "A2", "B1"].every((value) =>
+      Array.from(select.options).some((option) => option.value === value)
+    )
   );
 
 const readFormDraft = (form) => ({
@@ -50,7 +89,10 @@ const readFormDraft = (form) => ({
   phone: form.querySelector('[autocomplete="tel"]')?.value || "",
   address: form.querySelector('[autocomplete="street-address"]')?.value || "",
   location: form.querySelector('[autocomplete="address-level2"]')?.value || "",
-  learningMode: Array.from(form.querySelectorAll("select")).find((select) => Array.from(select.options).some((option) => option.value === "Hybrid"))?.value || "",
+  learningMode:
+    Array.from(form.querySelectorAll("select")).find((select) =>
+      Array.from(select.options).some((option) => option.value === "Hybrid")
+    )?.value || "",
   emergencyContactPhone: form.querySelector('[autocomplete="tel-national"]')?.value || "",
   level: findLevelSelect(form)?.value || "",
   className: form.querySelector("#class-selection")?.value || "",
@@ -65,11 +107,16 @@ const restoreDraft = (form, draft) => {
   setControlValue(form.querySelector('[autocomplete="tel"]'), draft.phone);
   setControlValue(form.querySelector('[autocomplete="street-address"]'), draft.address);
   setControlValue(form.querySelector('[autocomplete="address-level2"]'), draft.location);
-  setControlValue(form.querySelector('[autocomplete="tel-national"]'), draft.emergencyContactPhone);
+  setControlValue(
+    form.querySelector('[autocomplete="tel-national"]'),
+    draft.emergencyContactPhone
+  );
   setControlValue(findLevelSelect(form), draft.level);
   setControlValue(form.querySelector("#class-selection"), draft.className);
   setControlValue(form.querySelector("#initial-payment-amount"), draft.paymentOption);
-  const mode = Array.from(form.querySelectorAll("select")).find((select) => Array.from(select.options).some((option) => option.value === "Hybrid"));
+  const mode = Array.from(form.querySelectorAll("select")).find((select) =>
+    Array.from(select.options).some((option) => option.value === "Hybrid")
+  );
   setControlValue(mode, draft.learningMode);
 };
 
@@ -77,23 +124,61 @@ const classNameFromQuery = () => {
   const requested = new URLSearchParams(window.location.search).get("class");
   if (!requested) return "";
   const token = slugify(requested);
-  return Object.keys(classCatalog).find((name) => {
-    const details = classCatalog[name] || {};
-    return slugify(name) === token || slugify(details.slug) === token;
-  }) || "";
+  return (
+    Object.keys(classCatalog).find((name) => {
+      const details = classCatalog[name] || {};
+      return slugify(name) === token || slugify(details.slug) === token;
+    }) || ""
+  );
 };
 
 const ResumePanel = ({ draft }) => {
   const context = useMemo(() => getPublicFunnelContext(), []);
   const message = encodeURIComponent(
-    `Hello Falowen, I started an application but have not finished it.${draft?.name ? ` My name is ${draft.name}.` : ""}${draft?.level ? ` Level: ${draft.level}.` : ""}${draft?.className ? ` Class: ${draft.className}.` : ""}${context.video ? ` I came from YouTube lesson ${context.video}.` : ""} Please help me continue.`
+    `Hello Falowen, I started an application but have not finished it.${
+      draft?.name ? ` My name is ${draft.name}.` : ""
+    }${draft?.level ? ` Level: ${draft.level}.` : ""}${
+      draft?.className ? ` Class: ${draft.className}.` : ""
+    }${context.video ? ` I came from YouTube lesson ${context.video}.` : ""} Please help me continue.`
   );
 
   return (
-    <aside style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 8, marginBottom: 12 }}>
+    <aside
+      style={{
+        border: "1px solid #bbf7d0",
+        background: "#f0fdf4",
+        borderRadius: 14,
+        padding: 14,
+        display: "grid",
+        gap: 8,
+        marginBottom: 12,
+      }}
+    >
       <strong>Continue your application</strong>
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}>Your non-password details are saved on this device. Continue below or ask us to help you finish.</p>
-      <a href={`https://wa.me/233205706589?text=${message}`} target="_blank" rel="noopener noreferrer" onClick={() => trackPublicFunnelEvent("incomplete_application_whatsapp_click", { level: draft?.level || context.level || "" })} style={{ width: "fit-content", padding: "9px 12px", borderRadius: 10, background: "#16a34a", color: "#fff", textDecoration: "none", fontWeight: 900 }}>Continue on WhatsApp</a>
+      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}>
+        Your non-password details are saved on this device. Continue below or ask us to help you finish.
+      </p>
+      <a
+        href={`https://wa.me/233205706589?text=${message}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() =>
+          trackPublicFunnelEvent("incomplete_application_whatsapp_click", {
+            level: draft?.level || context.level || "",
+          })
+        }
+        style={{
+          width: "fit-content",
+          padding: "9px 12px",
+          borderRadius: 10,
+          background: "#16a34a",
+          color: "#fff",
+          textDecoration: "none",
+          fontWeight: 900,
+        }}
+      >
+        Continue on WhatsApp
+      </a>
     </aside>
   );
 };
@@ -103,21 +188,31 @@ export default function SignUpPage(props) {
   const restoredRef = useRef(false);
   const createdRef = useRef(false);
   const [mount, setMount] = useState(null);
-  const [draft, setDraft] = useState(() => (typeof window === "undefined" ? null : readDraft()));
+  const [draft, setDraft] = useState(() =>
+    typeof window === "undefined" ? null : readDraft()
+  );
 
   if (typeof window !== "undefined") {
     const params = new URLSearchParams(window.location.search);
     const level = params.get("level")?.toUpperCase();
     const selectedClass = classNameFromQuery();
-    if (["A1", "A2", "B1", "B2", "C1"].includes(level)) window.localStorage.setItem("exam-coach-level", level);
+    if (["A1", "A2", "B1", "B2", "C1"].includes(level)) {
+      window.localStorage.setItem("exam-coach-level", level);
+    }
     if (selectedClass) window.localStorage.setItem("exam-coach-class", selectedClass);
-    rememberPublicFunnelContext({ level: level || undefined, class: selectedClass || undefined, lastStage: "application" });
+    rememberPublicFunnelContext({
+      level: level || undefined,
+      class: selectedClass || undefined,
+      lastStage: "application",
+    });
   }
 
   useEffect(() => {
     trackPublicFunnelEvent("application_view");
     const root = rootRef.current;
     if (!root) return undefined;
+
+    let draftSaveTimer = null;
 
     const sync = () => {
       const form = root.querySelector("form");
@@ -154,22 +249,34 @@ export default function SignUpPage(props) {
     });
     observer.observe(root, { childList: true, subtree: true, characterData: true });
 
-    const handleChange = (event) => {
-      const form = event.target?.closest?.("form");
-      if (!form || !root.contains(form)) return;
+    const saveCurrentDraft = () => {
+      const form = root.querySelector("form");
+      if (!form) return;
       const next = readFormDraft(form);
       writeDraft(next);
       setDraft(next);
     };
 
+    const queueDraftSave = (event) => {
+      const form = event.target?.closest?.("form");
+      if (!form || !root.contains(form)) return;
+
+      window.clearTimeout(draftSaveTimer);
+      draftSaveTimer = window.setTimeout(saveCurrentDraft, 180);
+    };
+
     const handleSubmit = (event) => {
       const form = event.target;
       if (!form || !root.contains(form)) return;
+      window.clearTimeout(draftSaveTimer);
       const next = readFormDraft(form);
       writeDraft(next);
       setDraft(next);
       const context = getPublicFunnelContext();
-      trackPublicFunnelEvent("application_submit", { level: next.level, className: next.className });
+      trackPublicFunnelEvent("application_submit", {
+        level: next.level,
+        className: next.className,
+      });
       submitPublicLead({
         id: `application_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         createdAt: new Date().toISOString(),
@@ -189,21 +296,25 @@ export default function SignUpPage(props) {
       }).catch(() => {});
     };
 
-    root.addEventListener("input", handleChange, true);
-    root.addEventListener("change", handleChange, true);
+    // Do not update React parent state during the native input event. On mobile,
+    // doing so can reset controlled fields before the keyboard composition finishes.
+    root.addEventListener("input", queueDraftSave);
+    root.addEventListener("change", queueDraftSave);
     root.addEventListener("submit", handleSubmit, true);
 
     return () => {
       observer.disconnect();
-      root.removeEventListener("input", handleChange, true);
-      root.removeEventListener("change", handleChange, true);
+      window.clearTimeout(draftSaveTimer);
+      root.removeEventListener("input", queueDraftSave);
+      root.removeEventListener("change", queueDraftSave);
       root.removeEventListener("submit", handleSubmit, true);
       document.getElementById(MOUNT_ID)?.remove();
     };
   }, []);
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} className="signup-page-mobile-safe">
+      <style>{MOBILE_INPUT_CSS}</style>
       <SignUpPageLegacy {...props} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} />, mount) : null}
     </div>
