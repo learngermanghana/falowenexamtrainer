@@ -33,6 +33,14 @@ div:has(> .speaking-mind-map) > .speaking-mind-map {
   order: -1;
 }
 
+/* A2 learners only need the visual mind map and the More speaking help
+   control. Hide the branch-detail card and route navigation across every A2
+   workbook while leaving other levels unchanged. */
+.speaking-mind-map[data-level="A2"] .speaking-mind-map__details,
+.speaking-mind-map[data-level="A2"] .speaking-mind-map__route {
+  display: none !important;
+}
+
 /* Focus mode keeps the essential speaking workflow visible and collapses the
    older phrase banks, vocabulary lists and duplicated model answers. */
 div:has(> .speaking-mind-map[data-focus-mode="true"]) > .speaking-compact-timer {
