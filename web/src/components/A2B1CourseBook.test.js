@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
 import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
@@ -134,6 +135,23 @@ describe("A2 and B1 course books", () => {
     courseWorkbookSubmissionTabsTesting.setWorkbookContentHidden(pageRoot, false, nativeRow);
     expect(introCard.style.display).toBe("");
     expect(exerciseCard.style.display).toBe("");
+  });
+
+  test("shows Falowen Radio before opening a B1 workbook", () => {
+    render(
+      <MemoryRouter>
+        <RadioFirstWorkbookGate level="B1" day={1}>
+          <div>B1 Day 1 workbook interface</div>
+        </RadioFirstWorkbookGate>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("heading", { name: /Falowen Radio/i })).toBeInTheDocument();
+    expect(screen.queryByText("B1 Day 1 workbook interface")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
+
+    expect(screen.getByText("B1 Day 1 workbook interface")).toBeInTheDocument();
   });
 
   test.each(["a2", "b1"])("does not mention class notes in the %s Day 0 guide", (level) => {

@@ -6,6 +6,7 @@ import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbo
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import B1Day3ErfolgsgeschichtenWorkbookPage from "./B1Day3ErfolgsgeschichtenWorkbookPage";
 import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
@@ -249,7 +250,11 @@ export default function CourseLessonPage() {
 
     if (requestedView === "workbook" && B1_WORKBOOK_PAGES[dayNumber]) {
       const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
-      return <WorkbookPage />;
+      return (
+        <RadioFirstWorkbookGate level={level} day={dayNumber}>
+          <WorkbookPage />
+        </RadioFirstWorkbookGate>
+      );
     }
   }
 
