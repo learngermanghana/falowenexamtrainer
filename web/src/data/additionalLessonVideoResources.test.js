@@ -53,6 +53,40 @@ describe("additional A1 AI lesson videos", () => {
   });
 });
 
+describe("Day 0 orientation videos", () => {
+  test.each([
+    ["B1", "Orientation", "B1 Day 0 · Orientation video"],
+    ["B2", "Tutorial", "B2 Day 0 · Self-learning onboarding video"],
+  ])("%s Day 0 uses the shared orientation video", (level, chapter, title) => {
+    expect(getAdditionalLessonVideoResources(level, 0)).toEqual([
+      expect.objectContaining({
+        chapter,
+        title,
+        url: "https://youtu.be/Y9slpUtONkg",
+      }),
+    ]);
+  });
+
+  test.each([
+    ["B1", "Orientation"],
+    ["B2", "Tutorial"],
+  ])("%s Day 0 exposes the video through the shared lesson model", (level, chapter) => {
+    const lesson = normalizeLesson({
+      level,
+      day: 0,
+      chapter,
+      topic: `${level} Day 0`,
+    });
+
+    expect(lesson.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter,
+        url: "https://youtu.be/Y9slpUtONkg",
+      }),
+    );
+  });
+});
+
 describe("additional B2 AI grammar videos", () => {
   test("Day 3 uses the Kontrast und Konzession grammar video", () => {
     expect(getAdditionalLessonVideoResources("B2", 3)).toEqual([
