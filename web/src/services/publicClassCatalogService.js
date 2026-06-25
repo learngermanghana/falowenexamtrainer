@@ -32,10 +32,12 @@ function normalizeClass(course = {}, defaults = {}) {
           };
         })
       : [];
+  const slug = course.slug || slugifyPublicClass(title);
   return {
     ...course,
-    id: course.id || slugifyPublicClass(title),
-    slug: course.slug || slugifyPublicClass(title),
+    id: course.id || slug,
+    slug,
+    classUrl: course.classUrl || `/classes/${slug}`,
     title,
     name: title,
     level,
@@ -62,7 +64,13 @@ export function isPublicClassOpen(course, now = new Date()) {
 }
 
 async function fetchJson(url) {
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: {
+      "cache-control": "no-cache",
+      pragma: "no-cache",
+    },
+  });
   if (!response.ok) throw new Error(`${url} returned ${response.status}`);
   return response.json();
 }
@@ -74,7 +82,7 @@ export async function loadPublicClasses() {
   } catch (_error) {}
 
   try {
-    const live = await fetchJson("/api/public/classes");
+    const live = await fetchJson(`/api/public/classes?fresh=${Date.now()}`);
     const liveClasses = (live.classes || []).map((course) => normalizeClass(course, fallback.classDefaults || {}));
     const alwaysOpen = (fallback.classes || [])
       .map((course) => normalizeClass(course, fallback.classDefaults || {}))
