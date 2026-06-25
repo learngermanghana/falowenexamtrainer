@@ -1,4 +1,8 @@
 const DAY_NAMES = { sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday" };
+const LIVE_CLASS_ENDPOINTS = [
+  "/api/public/classes",
+  "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog",
+];
 
 export const slugifyPublicClass = (value) =>
   String(value || "")
@@ -75,6 +79,21 @@ async function fetchJson(url) {
   return response.json();
 }
 
+async function loadLiveClassPayload() {
+  const failures = [];
+  for (const endpoint of LIVE_CLASS_ENDPOINTS) {
+    const separator = endpoint.includes("?") ? "&" : "?";
+    try {
+      const payload = await fetchJson(`${endpoint}${separator}fresh=${Date.now()}`);
+      if (!Array.isArray(payload?.classes)) throw new Error(`${endpoint} did not return a classes array`);
+      return payload;
+    } catch (error) {
+      failures.push(error?.message || String(error));
+    }
+  }
+  throw new Error(failures.join(" | ") || "Live class catalogue unavailable");
+}
+
 export async function loadPublicClasses() {
   let fallback = { classes: [], classDefaults: {} };
   try {
@@ -82,7 +101,7 @@ export async function loadPublicClasses() {
   } catch (_error) {}
 
   try {
-    const live = await fetchJson(`/api/public/classes?fresh=${Date.now()}`);
+    const live = await loadLiveClassPayload();
     const liveClasses = (live.classes || []).map((course) => normalizeClass(course, fallback.classDefaults || {}));
     const alwaysOpen = (fallback.classes || [])
       .map((course) => normalizeClass(course, fallback.classDefaults || {}))
