@@ -54,33 +54,31 @@ describe("additional A1 AI lesson videos", () => {
 });
 
 describe("Day 0 orientation videos", () => {
-  test.each([
-    ["B1", "Orientation", "B1 Day 0 · Orientation video"],
-    ["B2", "Tutorial", "B2 Day 0 · Self-learning onboarding video"],
-  ])("%s Day 0 uses the shared orientation video", (level, chapter, title) => {
-    expect(getAdditionalLessonVideoResources(level, 0)).toEqual([
+  test("B1 Day 0 remains without a video until one is supplied", () => {
+    expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([]);
+  });
+
+  test("B2 Day 0 uses the onboarding video", () => {
+    expect(getAdditionalLessonVideoResources("B2", 0)).toEqual([
       expect.objectContaining({
-        chapter,
-        title,
+        chapter: "Tutorial",
+        title: "B2 Day 0 · Self-learning onboarding video",
         url: "https://youtu.be/Y9slpUtONkg",
       }),
     ]);
   });
 
-  test.each([
-    ["B1", "Orientation"],
-    ["B2", "Tutorial"],
-  ])("%s Day 0 exposes the video through the shared lesson model", (level, chapter) => {
+  test("B2 Day 0 exposes the video through the shared lesson model", () => {
     const lesson = normalizeLesson({
-      level,
+      level: "B2",
       day: 0,
-      chapter,
-      topic: `${level} Day 0`,
+      chapter: "Tutorial",
+      topic: "B2 Day 0",
     });
 
     expect(lesson.resources.aiVideo).toEqual(
       expect.objectContaining({
-        chapter,
+        chapter: "Tutorial",
         url: "https://youtu.be/Y9slpUtONkg",
       }),
     );
