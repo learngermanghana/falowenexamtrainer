@@ -17,6 +17,17 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     workbook: "/campus/course/lesson/B1/3?view=workbook",
     aiVideo: "https://youtu.be/n6eCMJRWTy8",
   }),
+  4: Object.freeze({
+    chapter: "2.4",
+    grammarBook: "/campus/course/lesson/B1/4?view=grammar",
+    workbook: "/campus/course/lesson/B1/4?view=workbook",
+    grammarTopic:
+      "Zweiteilige Konnektoren: sowohl ... als auch, nicht nur ... sondern auch, zwar ... aber, einerseits ... andererseits, entweder ... oder, weder ... noch",
+    goal:
+      "Wohnungsmöglichkeiten und Suchmethoden vergleichen, Vor- und Nachteile abwägen und eine strukturierte B1-Meinung formulieren.",
+    instruction:
+      "Lies zuerst die Grammatiknotizen zu zweiteiligen Konnektoren. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; reiche die geforderten Antworten für Schreiben, Lesen und Hören direkt über den Submit-Bereich im Workbook ein.",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -35,6 +46,10 @@ export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
   lesson.grammarPage = override.grammarBook;
   lesson.workbook_link = override.workbook;
   lesson.workbookRoute = override.workbook;
+
+  if (override.grammarTopic) lesson.grammar_topic = override.grammarTopic;
+  if (override.goal) lesson.goal = override.goal;
+  if (override.instruction) lesson.instruction = override.instruction;
 
   if (override.aiVideo) {
     lesson.ai_grammar_video = override.aiVideo;
