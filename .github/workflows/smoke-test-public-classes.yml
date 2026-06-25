@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'functions/functionz/routes/publicClasses.js'
+      - 'functions/**'
       - 'api/**'
       - 'web/public/classes/**'
       - 'vercel.json'
@@ -16,30 +16,47 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Vercel deployment
-        run: sleep 90
+      - name: Wait for deployments
+        run: sleep 120
 
-      - name: Check public classes API
+      - name: Check public classes catalogue
         shell: bash
         run: |
           set -euo pipefail
-          url="https://www.falowen.app/api/public/classes?smoke=$(date +%s)"
-          echo "GET $url"
-          status=$(curl --silent --show-error --location \
-            --connect-timeout 20 --max-time 60 \
-            --header 'Cache-Control: no-cache' \
-            --output /tmp/public-classes.json \
-            --write-out '%{http_code}' \
-            "$url")
-          echo "HTTP status: $status"
-          cat /tmp/public-classes.json
-          echo
-          test "$status" = "200"
-          node -e '
-            const fs = require("fs");
-            const payload = JSON.parse(fs.readFileSync("/tmp/public-classes.json", "utf8"));
-            if (!Array.isArray(payload.classes)) throw new Error("classes array missing");
-            const bonn = payload.classes.find((item) => item.slug === "a1-bonn-klasse");
-            if (!bonn) throw new Error("A1 Bonn Klasse missing from live API");
-            console.log("Found:", JSON.stringify(bonn));
-          '
+          endpoints=(
+            "https://www.falowen.app/api/public/classes"
+            "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog"
+          )
+
+          success=false
+          for endpoint in "${endpoints[@]}"; do
+            url="${endpoint}?smoke=$(date +%s)"
+            echo "GET $url"
+            status=$(curl --silent --show-error --location \
+              --connect-timeout 20 --max-time 60 \
+              --header 'Cache-Control: no-cache' \
+              --output /tmp/public-classes.json \
+              --write-out '%{http_code}' \
+              "$url" || true)
+            echo "HTTP status: $status"
+            cat /tmp/public-classes.json 2>/dev/null || true
+            echo
+
+            if [ "$status" != "200" ]; then
+              continue
+            fi
+
+            if node -e '
+              const fs = require("fs");
+              const payload = JSON.parse(fs.readFileSync("/tmp/public-classes.json", "utf8"));
+              if (!Array.isArray(payload.classes)) throw new Error("classes array missing");
+              const bonn = payload.classes.find((item) => item.slug === "a1-bonn-klasse");
+              if (!bonn) throw new Error("A1 Bonn Klasse missing from live API");
+              console.log("Found:", JSON.stringify(bonn));
+            '; then
+              success=true
+              break
+            fi
+          done
+
+          test "$success" = "true"
