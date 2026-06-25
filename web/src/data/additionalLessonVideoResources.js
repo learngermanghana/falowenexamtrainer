@@ -43,18 +43,6 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
       },
     ],
   },
-  B1: {
-    0: [
-      {
-        key: "b1-day0-orientation-video",
-        chapter: "Orientation",
-        title: "B1 Day 0 · Orientation video",
-        description:
-          "Watch this orientation video before completing the B1 Day 0 guide and knowledge test.",
-        url: "https://youtu.be/Y9slpUtONkg",
-      },
-    ],
-  },
   B2: {
     0: [
       {
