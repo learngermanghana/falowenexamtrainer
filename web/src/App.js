@@ -178,6 +178,7 @@ import StudyBuddyBar from "./components/StudyBuddyBar";
 import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
+import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
@@ -417,6 +418,10 @@ function App() {
 
   if (location.pathname === "/learn-german-ghana/falowen-guide") {
     return <PublicStudentGuidePage />;
+  }
+
+  if (location.pathname === "/learn-german-ghana/upcoming-classes") {
+    return <PublicUpcomingClassesPage />;
   }
 
 

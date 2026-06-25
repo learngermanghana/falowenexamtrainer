@@ -7,6 +7,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
+import { findPublicClassName, loadPublicClasses, publicClassLabel } from "../services/publicClassCatalogService";
 import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import TuitionStatusCard from "./TuitionStatusCard";
@@ -56,6 +57,21 @@ const formatClassLabel = (className) => {
     : `${className} — starts ${startLabel}`;
 };
 
+const staticClassOptions = (now) => Object.keys(classCatalog)
+  .filter((className) => {
+    const details = classCatalog[className];
+    if (!details) return false;
+    if (details.isSelfLearning || details.availability === "always") return true;
+    if (!details.startDate) return false;
+    const startDate = new Date(`${details.startDate}T00:00:00`);
+    return startDate > now;
+  })
+  .map((className) => ({
+    value: className,
+    label: formatClassLabel(className),
+    source: "static",
+  }));
+
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
@@ -81,6 +97,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [paymentOption, setPaymentOption] = useState("full");
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
+  const [publicClasses, setPublicClasses] = useState([]);
+  const [publicClassesLoaded, setPublicClassesLoaded] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
   const [showConsentDetails, setShowConsentDetails] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -88,29 +106,47 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const consentHighlights = t("signupPage.consent.highlights", { returnObjects: true });
 
-  const classOptions = useMemo(() => {
-    return Object.keys(classCatalog)
-      .filter((className) => {
-        const details = classCatalog[className];
-        if (!details) return false;
-        if (details.isSelfLearning || details.availability === "always") return true;
-        if (!details.startDate) return false;
-        const startDate = new Date(`${details.startDate}T00:00:00`);
-        return startDate > now;
+  useEffect(() => {
+    let active = true;
+    loadPublicClasses()
+      .then((rows) => {
+        if (!active) return;
+        setPublicClasses(rows);
       })
-      .map((className) => ({
-        value: className,
-        label: formatClassLabel(className),
-      }));
-  }, [now]);
+      .catch(() => {})
+      .finally(() => {
+        if (active) setPublicClassesLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const classOptions = useMemo(() => {
+    const liveOptions = publicClasses.map((course) => ({
+      value: course.title,
+      label: publicClassLabel(course),
+      source: "firestore",
+    }));
+    const liveTokens = new Set(liveOptions.map((option) => option.value));
+    const fallbackOptions = staticClassOptions(now).filter((option) => !liveTokens.has(option.value));
+    return publicClassesLoaded ? [...liveOptions, ...fallbackOptions] : fallbackOptions;
+  }, [now, publicClasses, publicClassesLoaded]);
 
   useEffect(() => {
-    if (!selectedClass) return;
+    if (!publicClassesLoaded || !selectedClass) return;
     const availableValues = new Set(classOptions.map((option) => option.value));
     if (!availableValues.has(selectedClass)) {
       setSelectedClass("");
     }
-  }, [classOptions, selectedClass]);
+  }, [classOptions, publicClassesLoaded, selectedClass]);
+
+  useEffect(() => {
+    if (!publicClassesLoaded || selectedClass || typeof window === "undefined") return;
+    const requested = new URLSearchParams(window.location.search).get("class");
+    const requestedName = requested ? findPublicClassName(publicClasses, requested) : "";
+    if (requestedName) setSelectedClass(requestedName);
+  }, [publicClasses, publicClassesLoaded, selectedClass]);
 
   const tuitionFeeForLevel = useMemo(
     () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }).tuitionFee,
@@ -661,7 +697,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </select>
           {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Picking a class is required so we can reserve your spot. If unsure, choose the closest option for now.
+            Picking a class is required so we can reserve your spot. Current upcoming classes are loaded from Falowen Admin.
+            {!publicClassesLoaded ? " Loading the latest class list…" : ""}
           </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
