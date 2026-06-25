@@ -42,6 +42,13 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const tabImageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
     blue: { border: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a" },
@@ -65,6 +72,59 @@ const NoteBox = ({ children, tone = "blue" }) => {
     </div>
   );
 };
+
+const wohnungBrainMapBranches = [
+  {
+    title: "Wohnungsarten",
+    items: [
+      "Mietwohnung",
+      "Eigentumswohnung",
+      "WG / Wohngemeinschaft",
+      "Einzimmerwohnung",
+      "Mehrfamilienhaus",
+    ],
+  },
+  {
+    title: "Methoden der Wohnungssuche",
+    items: [
+      "Online-Portale",
+      "Zeitungsanzeigen",
+      "Immobilienmakler",
+      "persönliche Kontakte",
+      "Aushänge in Supermärkten",
+    ],
+  },
+  {
+    title: "Wichtige Kriterien",
+    items: [
+      "Mietpreis und Nebenkosten",
+      "Kaution",
+      "Lage und Verkehrsanbindung",
+      "Wohnungsgröße und Ausstattung",
+      "Einkaufsmöglichkeiten und Haustiere",
+    ],
+  },
+  {
+    title: "Besichtigung und Mietvertrag",
+    items: [
+      "Besichtigungstermin vereinbaren",
+      "Fragen stellen",
+      "Mängel kontrollieren",
+      "Mietvertrag prüfen",
+      "Kündigungsfrist beachten",
+    ],
+  },
+  {
+    title: "Einzug und Kompromisse",
+    items: [
+      "Umzug planen",
+      "Möbel und Strom organisieren",
+      "Nachbarn kennenlernen",
+      "sich anmelden",
+      "bei Lage, Größe oder Preis flexibel bleiben",
+    ],
+  },
+];
 
 const lesenQuestions = [
   {
@@ -155,6 +215,7 @@ const hoerenQuestions = [
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
@@ -200,6 +261,13 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           Beschreibe Wohnungsmöglichkeiten, vergleiche Suchmethoden und begründe deine Meinung mit klaren B1-Strukturen.
         </p>
 
+        <img
+          src="https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1600&q=80"
+          alt="Wohnungen in einer Großstadt"
+          loading="lazy"
+          style={tabImageStyle}
+        />
+
         <NoteBox>
           <strong>Grammar focus:</strong> zweiteilige Konnektoren – <em>sowohl … als auch, nicht nur … sondern auch, zwar … aber, einerseits … andererseits, entweder … oder</em> und <em>weder … noch</em>.
         </NoteBox>
@@ -222,107 +290,63 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
       {activeTab === "sprechen" && (
         <div style={card}>
           <img
-            src="https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1600&q=80"
-            alt="Wohnungen in einer Großstadt"
+            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80"
+            alt="Wohnungssuchende vergleichen Wohnungen und wichtige Wohnkriterien"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
 
-          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Tauscht euch in der Gruppe über Wohnungssuche, Wohnformen, wichtige Kriterien und mögliche Kompromisse aus.
+            In diesem Kapitel sprecht ihr in der Gruppe über Wohnungssuche, Wohnformen, wichtige Kriterien und mögliche Kompromisse.
           </p>
 
-          <h3 style={sectionTitle}>Zentrales Thema</h3>
-          <p style={{ margin: 0 }}>
-            <strong>Wohnung suchen</strong>
-          </p>
-
-          <h3 style={sectionTitle}>Wortschatzfelder</h3>
+          <h3 style={sectionTitle}>Brain Map: Wohnung suchen</h3>
           <ol style={listSpacing}>
-            <li>
-              <strong>Wohnungsarten</strong>
-              <ul style={listSpacing}>
-                <li>Mietwohnung</li>
-                <li>Eigentumswohnung</li>
-                <li>WG / Wohngemeinschaft</li>
-                <li>Einzimmerwohnung</li>
-                <li>Mehrfamilienhaus</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Wohnungssuche</strong>
-              <ul style={listSpacing}>
-                <li>Online-Portale</li>
-                <li>Zeitungsanzeigen</li>
-                <li>Immobilienmakler</li>
-                <li>Mundpropaganda</li>
-                <li>Aushänge in Supermärkten</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Kriterien und Anforderungen</strong>
-              <ul style={listSpacing}>
-                <li>Mietpreis, Kaution und Nebenkosten</li>
-                <li>Lage und Verkehrsanbindung</li>
-                <li>Einkaufsmöglichkeiten</li>
-                <li>Wohnungsgröße und Ausstattung</li>
-                <li>Haustiere erlaubt?</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Besichtigung und Vertrag</strong>
-              <ul style={listSpacing}>
-                <li>Besichtigungstermin vereinbaren</li>
-                <li>Fragen stellen</li>
-                <li>Mietvertrag prüfen</li>
-                <li>Kündigungsfrist</li>
-                <li>Mieterschutz</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Einzug und Einrichtung</strong>
-              <ul style={listSpacing}>
-                <li>Umzug planen und Möbel kaufen</li>
-                <li>Nachbarn kennenlernen</li>
-                <li>sich beim Einwohnermeldeamt anmelden</li>
-                <li>Internet und Strom anmelden</li>
-              </ul>
-            </li>
+            <li><strong>Zentrales Thema:</strong> Schreibe <strong>„Wohnung suchen“</strong> in die Mitte deiner Brain Map.</li>
+            <li><strong>Hauptäste:</strong> Erstelle fünf Hauptäste zu den wichtigsten Bereichen der Wohnungssuche.</li>
+            <li><strong>Unterpunkte:</strong> Ergänze jeden Ast mit Beispielen, Vor- und Nachteilen sowie deiner eigenen Meinung.</li>
           </ol>
 
-          <NoteBox tone="green">
-            <strong>Hauptfrage für die Diskussion:</strong><br />
-            Welche Methode ist bei der Wohnungssuche erfolgreicher: Online-Portale oder persönliche Kontakte? Begründe deine Meinung, nenne Vor- und Nachteile und gib ein konkretes Beispiel.
-          </NoteBox>
+          <h3 style={sectionTitle}>Beispiel für die Brain Map</h3>
+          <div style={{ display: "grid", gap: 10 }}>
+            {wohnungBrainMapBranches.map((branch) => (
+              <div key={branch.title} style={questionCardStyle}>
+                <strong>{branch.title}</strong>
+                <ul style={listSpacing}>
+                  {branch.items.map((item) => (
+                    <li key={`${branch.title}-${item}`}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
-          <h3 style={sectionTitle}>Weitere Diskussionsfragen</h3>
-          <ul style={listSpacing}>
-            <li>Welche drei Kriterien sind für dich bei einer Wohnung unverzichtbar?</li>
-            <li>Welche Kompromisse würdest du bei einer schwierigen Wohnungssuche eingehen?</li>
-            <li>Welche Vor- und Nachteile hat eine WG im Vergleich zu einer eigenen Wohnung?</li>
-            <li>Welche Fragen sollte man bei einer Besichtigung unbedingt stellen?</li>
-            <li>Ist eine zentrale Lage wichtiger als eine günstige Miete?</li>
-          </ul>
+          <h3 style={sectionTitle}>Group Sprechen</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Frage:</strong> Welche Methode ist bei der Wohnungssuche erfolgreicher: Online-Portale oder persönliche Kontakte? Begründe deine Meinung, nenne Vor- und Nachteile und gib ein konkretes Beispiel.
+          </p>
 
-          <h3 style={sectionTitle}>B1-Sprechstruktur</h3>
+          <h3 style={sectionTitle}>Schlüsselwörter / Stichpunkte für deine Antwort</h3>
           <ol style={listSpacing}>
-            <li><strong>Meinung:</strong> Meiner Meinung nach …</li>
-            <li><strong>Begründung:</strong> Der wichtigste Grund dafür ist, dass …</li>
-            <li><strong>Beispiel:</strong> Ein gutes Beispiel dafür ist …</li>
-            <li><strong>Gegenseite:</strong> Einerseits …, andererseits …</li>
-            <li><strong>Schluss:</strong> Deshalb würde ich …</li>
+            <li><strong>Begrüßung:</strong> „Guten Tag.“ / „Hallo zusammen.“</li>
+            <li><strong>Thema vorstellen:</strong> „Heute spreche ich über die Wohnungssuche.“</li>
+            <li><strong>Meinung:</strong> „Meiner Meinung nach sind persönliche Kontakte / Online-Portale erfolgreicher.“</li>
+            <li><strong>Begründung:</strong> „Der wichtigste Grund dafür ist, dass …“</li>
+            <li><strong>Vergleich:</strong> „Einerseits …, andererseits …“ / „Online-Portale bieten zwar viele Anzeigen, aber …“</li>
+            <li><strong>Beispiel:</strong> „Ein gutes Beispiel dafür ist …“ / „Bei meiner letzten Wohnungssuche …“</li>
+            <li><strong>Schluss:</strong> „Deshalb würde ich …“ / „Danke fürs Zuhören.“</li>
           </ol>
 
           <NoteBox tone="amber">
-            Verwende in deiner Antwort mindestens zwei zweiteilige Konnektoren. Sprich 60 bis 90 Sekunden und entwickle deine Idee über einen einzelnen Satz hinaus.
+            Sprich 60 bis 90 Sekunden. Verwende mindestens zwei zweiteilige Konnektoren und entwickle deine Antwort über einzelne kurze Sätze hinaus.
           </NoteBox>
 
           <SpeakingPracticeTimerCard storageKey="b1-day4-sprechen-group-practice" />
           <CourseInlinePracticePanel type="speaking" />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is group practice only and has no assignment submission.
+            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3 and Teil 4.
           </p>
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
@@ -334,7 +358,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
             alt="Studentin schreibt einen Meinungsbeitrag"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
 
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
@@ -389,7 +413,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
             alt="Lesetext und Notizen"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
 
           <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
@@ -434,7 +458,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
             alt="Lernende Person hört einen Wohnungstext"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
 
           <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
