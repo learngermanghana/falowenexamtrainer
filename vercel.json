@@ -11,6 +11,7 @@
   },
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
     { "src": "/api/sync-student", "dest": "/api/sync-student.js" },
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/index.html" }
