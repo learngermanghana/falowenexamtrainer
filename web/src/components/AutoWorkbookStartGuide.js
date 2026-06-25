@@ -10,6 +10,7 @@ import WorkbookStartGuide from "./WorkbookStartGuide";
 const A1_DAY18_CHAPTER121_PATH = "/campus/course/two-case-prepositions-wechselpraepositionen-day-18";
 const A1_DAY18_CHAPTER122_GRAMMAR_PATH = "/campus/course/a1-12-2-dative-articles-mit-bei-zu";
 const A1_DAY18_CHAPTER122_WORKBOOK_PATH = "/campus/course/a1-day-18-kapitel-12-2-workbook";
+const A2_DAY20_WORKBOOK_PATH = "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
 const workbookRouteIndex = buildWorkbookRouteIndex();
 export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
@@ -18,6 +19,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
   A1_DAY18_CHAPTER121_PATH,
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
+  A2_DAY20_WORKBOOK_PATH,
 ]);
 
 export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } = {}) => {
@@ -78,4 +80,5 @@ export const __TESTING__ = {
   A1_DAY18_CHAPTER121_PATH,
   A1_DAY18_CHAPTER122_GRAMMAR_PATH,
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
+  A2_DAY20_WORKBOOK_PATH,
 };
