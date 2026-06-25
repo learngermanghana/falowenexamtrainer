@@ -6,6 +6,8 @@ import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbo
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import B1Day3ErfolgsgeschichtenWorkbookPage from "./B1Day3ErfolgsgeschichtenWorkbookPage";
 import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
+import B1Day4WohnungSuchenWorkbookPage from "./B1Day4WohnungSuchenWorkbookPage";
+import B1Day4WohnungSuchenGrammarNotesPage from "./B1Day4WohnungSuchenGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
@@ -31,12 +33,14 @@ const B1_WORKBOOK_PAGES = {
   1: B1Day1TraumweltWorkbookPage,
   2: B1Day2FreundeFuersLebenWorkbookPage,
   3: B1Day3ErfolgsgeschichtenWorkbookPage,
+  4: B1Day4WohnungSuchenWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
   1: B1Day1TraumweltGrammarNotesPage,
   2: B1Day2FreundeFuersLebenGrammarNotesPage,
   3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
+  4: B1Day4WohnungSuchenGrammarNotesPage,
 };
 
 const decorateA1Day3Lesson = (lesson) => {
@@ -163,10 +167,10 @@ const labelA1Day3Resources = (root) => {
     if (text === "Kapitel 1.2") replaceText(element, "Kapitel 1.2 · Assignment");
   });
 
-  Array.from(root.querySelectorAll("article")).forEach((card) => {
-    const title = card.querySelector("strong");
-    const description = card.querySelector("p");
-    const action = card.querySelector("a");
+  Array.from(root.querySelectorAll("article")).forEach((cardElement) => {
+    const title = cardElement.querySelector("strong");
+    const description = cardElement.querySelector("p");
+    const action = cardElement.querySelector("a");
     const titleText = title?.textContent || "";
 
     if (titleText.includes("Kapitel 1.1 workbook")) {
