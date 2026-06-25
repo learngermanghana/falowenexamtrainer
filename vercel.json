@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "npm install && npm --prefix web install",
+  "installCommand": "npm install && npm --prefix functions install && npm --prefix web install",
   "buildCommand": "npm --prefix web run build",
   "outputDirectory": "web/build",
   "git": {
@@ -12,6 +12,7 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
+    { "src": "/api/public/classes", "dest": "/api/public-classes.js" },
     { "src": "/api/sync-student", "dest": "/api/sync-student.js" },
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/index.html" }
