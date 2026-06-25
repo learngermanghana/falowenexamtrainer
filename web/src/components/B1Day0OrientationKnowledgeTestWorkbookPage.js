@@ -19,8 +19,8 @@ const config = {
     "B1 answers must be fuller than A2: state your idea, explain why, add an example and connect sentences clearly.",
   ],
   campusItems: ["Course Book", "Exam File", "Attendance", "Class Members", "Vocab Practice", "Results", "Account"],
-  nextLink: "/campus/course/lesson/B1/1",
-  nextLabel: "Open B1 Day 1",
+  nextLink: "/campus/course/lesson/B1/1?view=workbook",
+  nextLabel: "Open B1 Day 1 Workbook",
   questions: [
     q("Choose the correct sentence with weil.", ["Ich bleibe zu Hause, weil bin ich krank.", "Ich bleibe zu Hause, weil ich krank bin.", "Ich bleibe zu Hause, weil ich bin krank."], 1, "Weil sends the conjugated verb to the end."),
     q("Choose the correct sentence with dass.", ["Ich glaube, dass ist der Kurs hilfreich.", "Ich glaube, dass der Kurs ist hilfreich.", "Ich glaube, dass der Kurs hilfreich ist."], 2, "Dass introduces a subordinate clause, so the verb comes last."),
