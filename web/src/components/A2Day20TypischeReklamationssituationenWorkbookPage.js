@@ -146,105 +146,50 @@ const lesenQuestions = [
   },
 ];
 
-const hoerenBlocks = [
+const hoerenQuestions = [
   {
-    title: "Hören 1 · Bewerbung (Job Application)",
-    audioLink:
-      "https://drive.google.com/file/d/1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3/view?usp=sharing",
-    questions: [
-      {
-        prompt: "1) Was sind wichtige Informationen, die in einem Lebenslauf enthalten sein sollten?",
-        options: [
-          "a) Die Hobbys des Bewerbers",
-          "b) Die beruflichen Qualifikationen und Erfahrungen",
-          "c) Die Gehaltsvorstellungen",
-          "d) Der Familienstand",
-        ],
-      },
-      {
-        prompt: "2) Wie bereitet man sich auf ein Vorstellungsgespräch vor?",
-        options: [
-          "a) Man übt das Vorstellungsgespräch mit Freunden",
-          "b) Man informiert sich über die Firma",
-          "c) Man kauft neue Kleidung",
-          "d) Man lernt den Arbeitsweg",
-        ],
-      },
+    prompt: "1. Warum bringt Laura den Wasserkocher zurück?",
+    options: [
+      "A) Er ist zu teuer",
+      "B) Er funktioniert nicht",
+      "C) Er ist zu groß",
+      "D) Er gefällt ihr nicht",
     ],
   },
   {
-    title: "Hören 2 · Berufswahl (Career Choice)",
-    audioLink:
-      "https://drive.google.com/file/d/1j7PWbKGDh27l0F0A68DNu6swUJYAPRJR/view?usp=sharing",
-    questions: [
-      {
-        prompt: "3) Welche Faktoren sind bei der Wahl eines Berufs wichtig?",
-        options: [
-          "a) Die Bezahlung",
-          "b) Die Arbeitszeiten",
-          "c) Die Entfernung zur Arbeit",
-          "d) Die Berufserfahrung der Eltern",
-        ],
-      },
-      {
-        prompt: "4) Was sind die Vorteile eines Praktikums?",
-        options: [
-          "a) Man sammelt praktische Erfahrungen",
-          "b) Man knüpft Kontakte",
-          "c) Man verdient viel Geld",
-          "d) Man lernt verschiedene Berufe kennen",
-        ],
-      },
+    prompt: "2. Was bringt Laura als Kaufnachweis mit?",
+    options: [
+      "A) Eine Rechnung vom Arzt",
+      "B) Eine Kundenkarte",
+      "C) Den Kassenbon",
+      "D) Einen Brief",
     ],
   },
   {
-    title: "Hören 3 · Frauensachen (Women's Issues)",
-    audioLink:
-      "https://drive.google.com/file/d/1EZh08j4vFH4VPfcNPDSv4pWruD9ISg56/view?usp=sharing",
-    questions: [
-      {
-        prompt: "5) Welche Herausforderungen haben Frauen heute im Berufsleben?",
-        options: [
-          "a) Geringere Aufstiegschancen",
-          "b) Höhere Gehälter als Männer",
-          "c) Schwierigkeit, Beruf und Familie zu vereinbaren",
-          "d) Bevorzugte Einstellungen",
-        ],
-      },
-      {
-        prompt: "6) Welche Maßnahmen könnten Frauen im Beruf unterstützen?",
-        options: [
-          "a) Flexible Arbeitszeiten",
-          "b) Frauenquote",
-          "c) Transparente Gehaltsstrukturen",
-          "d) Strengere Auswahlverfahren",
-        ],
-      },
+    prompt: "3. Was bietet der Verkäufer Laura an?",
+    options: [
+      "A) Einen Rabatt",
+      "B) Eine Reparatur in einem Jahr",
+      "C) Einen Umtausch oder eine Rückerstattung",
+      "D) Einen Gutschein für Essen",
     ],
   },
   {
-    title: "Hören 4 · Damals (Back Then)",
-    audioLink:
-      "https://drive.google.com/file/d/1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD/view?usp=sharing",
-    questions: [
-      {
-        prompt: "7) Wie war das Leben vor 50 Jahren im Vergleich zu heute?",
-        options: [
-          "a) Es gab weniger technische Geräte im Haushalt",
-          "b) Die Menschen reisten häufiger",
-          "c) Es gab weniger Freizeitangebote",
-          "d) Die Arbeitszeiten waren kürzer",
-        ],
-      },
-      {
-        prompt: "8) Welche waren einige der früheren Herausforderungen in Verbindung mit Technologie?",
-        options: [
-          "a) Sie hatten viele Computer.",
-          "b) Sie arbeiteten mehr und hatten weniger Freizeit.",
-          "c) Es gab so viele Autos.",
-          "d) Sie hatten nicht genug Hausaufgaben zu erledigen.",
-        ],
-      },
+    prompt: "4. Welches Problem gibt es mit der Jacke?",
+    options: [
+      "A) Sie hat die falsche Farbe",
+      "B) Sie ist beschädigt",
+      "C) Sie hat die falsche Größe",
+      "D) Sie kommt zu spät",
+    ],
+  },
+  {
+    prompt: "5. Was bittet Laura den Kundenservice zu schicken?",
+    options: [
+      "A) Einen Retourenschein",
+      "B) Eine neue Rechnung",
+      "C) Einen Katalog",
+      "D) Einen Rabattcode",
     ],
   },
 ];
@@ -289,6 +234,13 @@ const A2Day20WorkbookContent = () => {
           Follow Teil 1–4 in order, check Ref when needed, and submit your final answers through the Submit tab.
         </p>
 
+        <img
+          src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=80"
+          alt="Customer discussing a product complaint with service staff"
+          loading="lazy"
+          style={{ ...imageStyle, maxHeight: 260 }}
+        />
+
         <div
           role="tablist"
           aria-label="A2 Day 20 workbook sections"
@@ -331,8 +283,7 @@ const A2Day20WorkbookContent = () => {
             <strong>Zentrales Thema: Reklamieren (Making a Complaint)</strong>
             <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
               <li>
-                <strong>Gründe für die Reklamation:</strong> falsche Lieferung, defektes Produkt, falsche Größe oder Farbe,
-                verspätete Lieferung und schlechter Service.
+                <strong>Gründe für die Reklamation:</strong> falsche Lieferung, defektes Produkt, falsche Größe oder Farbe, verspätete Lieferung und schlechter Service.
               </li>
               <li>
                 <strong>Nützliche Sätze:</strong> „Ich möchte mich beschweren.", „Das Produkt ist kaputt.", „Ich möchte mein Geld zurück." und „Könnten Sie das bitte umtauschen?"
@@ -397,6 +348,12 @@ const A2Day20WorkbookContent = () => {
 
       {activeTab === "schreiben" && (
         <section style={sectionStyle}>
+          <img
+            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
+            alt="Learner writing a formal complaint letter"
+            loading="lazy"
+            style={imageStyle}
+          />
           <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Formeller Brief)</h2>
           <div style={infoBoxStyle}>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -416,6 +373,12 @@ const A2Day20WorkbookContent = () => {
 
       {activeTab === "lesen" && (
         <section style={sectionStyle}>
+          <img
+            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
+            alt="Learner reading workbook questions"
+            loading="lazy"
+            style={imageStyle}
+          />
           <h2 style={{ margin: 0 }}>Teil 3 · Lesen (Exercise)</h2>
           {lesenQuestions.map((question) => (
             <div key={question.title} style={questionBoxStyle}>
@@ -435,29 +398,63 @@ const A2Day20WorkbookContent = () => {
 
       {activeTab === "hoeren" && (
         <section style={sectionStyle}>
+          <img
+            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
+            alt="Learner listening to a German complaint dialogue"
+            loading="lazy"
+            style={imageStyle}
+          />
+
           <h2 style={{ margin: 0 }}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Open each audio link, listen carefully and answer the questions.
+            Sieh das Video zweimal. Lies zuerst alle Fragen und achte besonders auf den Wasserkocher, den Kaufnachweis, die angebotene Lösung, die Jacke und den Retourenschein.
           </p>
 
-          {hoerenBlocks.map((block) => (
-            <div key={block.title} style={questionBoxStyle}>
-              <strong>{block.title}</strong>
-              <a href={block.audioLink} target="_blank" rel="noreferrer">
-                Open Audio
-              </a>
-              {block.questions.map((question) => (
-                <div key={`${block.title}-${question.prompt}`} style={{ display: "grid", gap: 6 }}>
-                  <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
-                  <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-                    {question.options.map((option) => (
-                      <li key={`${block.title}-${question.prompt}-${option}`}>{option}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          ))}
+          <div style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}>
+            <iframe
+              src="https://www.youtube.com/embed/pH1X3E7vOao?rel=0"
+              title="A2 Day 20 Hören · Typische Reklamationssituationen"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                border: 0,
+                borderRadius: 12,
+              }}
+            />
+          </div>
+
+          <a
+            href="https://youtu.be/pH1X3E7vOao"
+            target="_blank"
+            rel="noreferrer"
+            style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+          >
+            Open Hören video on YouTube
+          </a>
+
+          <h3 style={{ margin: 0 }}>Fragen und mögliche Antworten</h3>
+          <div style={{ display: "grid", gap: 12 }}>
+            {hoerenQuestions.map((question) => (
+              <div key={question.prompt} style={questionBoxStyle}>
+                <strong>{question.prompt}</strong>
+                <ol
+                  type="A"
+                  style={{ margin: 0, paddingLeft: 24, lineHeight: 1.8 }}
+                >
+                  {question.options.map((option) => (
+                    <li key={`${question.prompt}-${option}`} style={{ listStyle: "none" }}>
+                      {option}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ))}
+          </div>
+
           <WorkbookSubmissionReminder />
         </section>
       )}
