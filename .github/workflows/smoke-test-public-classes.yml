@@ -1,0 +1,45 @@
+name: Smoke test public classes API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'functions/functionz/routes/publicClasses.js'
+      - 'api/**'
+      - 'web/public/classes/**'
+      - 'vercel.json'
+      - '.github/workflows/smoke-test-public-classes.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment
+        run: sleep 90
+
+      - name: Check public classes API
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://www.falowen.app/api/public/classes?smoke=$(date +%s)"
+          echo "GET $url"
+          status=$(curl --silent --show-error --location \
+            --connect-timeout 20 --max-time 60 \
+            --header 'Cache-Control: no-cache' \
+            --output /tmp/public-classes.json \
+            --write-out '%{http_code}' \
+            "$url")
+          echo "HTTP status: $status"
+          cat /tmp/public-classes.json
+          echo
+          test "$status" = "200"
+          node -e '
+            const fs = require("fs");
+            const payload = JSON.parse(fs.readFileSync("/tmp/public-classes.json", "utf8"));
+            if (!Array.isArray(payload.classes)) throw new Error("classes array missing");
+            const bonn = payload.classes.find((item) => item.slug === "a1-bonn-klasse");
+            if (!bonn) throw new Error("A1 Bonn Klasse missing from live API");
+            console.log("Found:", JSON.stringify(bonn));
+          '
