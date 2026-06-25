@@ -77,6 +77,7 @@
       ...rawClass,
       id: rawClass.id || (isSelfLearning ? `${level.toLowerCase()}-self-learning` : `${slug}-${rawClass.startDate}`),
       slug,
+      classUrl: rawClass.classUrl || `/classes/${slug}`,
       title,
       language: rawClass.language || defaults.language || "German",
       level,
@@ -138,7 +139,14 @@
       try {
         const staticData = expandClassData(await response.clone().json());
         try {
-          const liveResponse = await originalFetch("/api/public/classes", { cache: "no-store" });
+          const liveUrl = `/api/public/classes?fresh=${Date.now()}`;
+          const liveResponse = await originalFetch(liveUrl, {
+            cache: "no-store",
+            headers: {
+              "cache-control": "no-cache",
+              pragma: "no-cache",
+            },
+          });
           if (!liveResponse.ok) throw new Error(`Public class API returned ${liveResponse.status}`);
           const merged = mergeLiveClasses(staticData, await liveResponse.json());
           window.__falowenClassCatalogSource = "firestore";
