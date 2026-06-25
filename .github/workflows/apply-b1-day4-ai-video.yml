@@ -1,0 +1,52 @@
+name: Apply B1 Day 4 AI video
+
+on:
+  push:
+    branches: [fix-b1-day4-ai-video-radio-continue]
+    paths:
+      - .github/workflows/apply-b1-day4-ai-video.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add the B1 Day 4 AI video
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('web/src/data/lessonVideoDictionary.js')
+          text = path.read_text(encoding='utf-8')
+          old = '''  B1: {
+            1: {
+              ai_grammar_video: "https://youtu.be/_mmAtSzWbNo",
+            },
+          },'''
+          new = '''  B1: {
+            1: {
+              ai_grammar_video: "https://youtu.be/_mmAtSzWbNo",
+            },
+            4: {
+              ai_grammar_video: "https://youtu.be/ACEq0gpykN0",
+            },
+          },'''
+          if old not in text:
+              raise SystemExit('B1 video dictionary block was not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Commit the update and remove this workflow
+        run: |
+          rm .github/workflows/apply-b1-day4-ai-video.yml
+          git config user.name "Falowen Update Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add web/src/data/lessonVideoDictionary.js .github/workflows/apply-b1-day4-ai-video.yml
+          git commit -m "Set B1 Day 4 AI video"
+          git push
