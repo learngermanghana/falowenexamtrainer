@@ -7,13 +7,15 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 
 const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
+  { key: "sprechen", label: "Teil 1" },
+  { key: "schreiben", label: "Teil 2" },
+  { key: "lesen", label: "Teil 3" },
+  { key: "hoeren", label: "Teil 4" },
+  { key: "references", label: "Ref" },
+  { key: "submit", label: "Submit" },
 ];
 
 const cardStyle = {
@@ -56,7 +58,11 @@ const questionBoxStyle = {
 const miniPresentationCards = [
   {
     title: "Gute Einleitungen",
-    phrases: ["Ich möchte kurz über … sprechen.", "Heute geht es um …", "Meiner Meinung nach ist das Thema wichtig, weil …"],
+    phrases: [
+      "Ich möchte kurz über … sprechen.",
+      "Heute geht es um …",
+      "Meiner Meinung nach ist das Thema wichtig, weil …",
+    ],
   },
   {
     title: "Verbindungswörter / Connectors",
@@ -88,7 +94,8 @@ const lesenQuestions = [
   },
   {
     title: "2) Vorstellungsgespräch",
-    prompt: "Wie bereitet man sich auf ein Vorstellungsgespräch vor? Welche Tipps findest du besonders nützlich? (Two answers are correct)",
+    prompt:
+      "Wie bereitet man sich auf ein Vorstellungsgespräch vor? Welche Tipps findest du besonders nützlich? (Two answers are correct)",
     explanation:
       "Man sollte die Firma gründlich recherchieren und häufige Fragen üben. Auch ein passendes Outfit und eine gute Planung des Arbeitswegs helfen, sicher und pünktlich zu sein.",
     options: [
@@ -126,7 +133,8 @@ const lesenQuestions = [
   },
   {
     title: "5) Damals (Back Then)",
-    prompt: "Wie war das Leben vor 50 Jahren im Vergleich zu heute? Nenne mindestens drei Unterschiede. (Three answers are correct)",
+    prompt:
+      "Wie war das Leben vor 50 Jahren im Vergleich zu heute? Nenne mindestens drei Unterschiede. (Three answers are correct)",
     explanation:
       "Früher gab es weniger technische Geräte, die Menschen waren oft weniger mobil und die Arbeitszeiten waren häufig länger und härter als heute.",
     options: [
@@ -141,7 +149,8 @@ const lesenQuestions = [
 const hoerenBlocks = [
   {
     title: "Hören 1 · Bewerbung (Job Application)",
-    audioLink: "https://drive.google.com/file/d/1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3/view?usp=sharing",
+    audioLink:
+      "https://drive.google.com/file/d/1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3/view?usp=sharing",
     questions: [
       {
         prompt: "1) Was sind wichtige Informationen, die in einem Lebenslauf enthalten sein sollten?",
@@ -165,7 +174,8 @@ const hoerenBlocks = [
   },
   {
     title: "Hören 2 · Berufswahl (Career Choice)",
-    audioLink: "https://drive.google.com/file/d/1j7PWbKGDh27l0F0A68DNu6swUJYAPRJR/view?usp=sharing",
+    audioLink:
+      "https://drive.google.com/file/d/1j7PWbKGDh27l0F0A68DNu6swUJYAPRJR/view?usp=sharing",
     questions: [
       {
         prompt: "3) Welche Faktoren sind bei der Wahl eines Berufs wichtig?",
@@ -189,7 +199,8 @@ const hoerenBlocks = [
   },
   {
     title: "Hören 3 · Frauensachen (Women's Issues)",
-    audioLink: "https://drive.google.com/file/d/1EZh08j4vFH4VPfcNPDSv4pWruD9ISg56/view?usp=sharing",
+    audioLink:
+      "https://drive.google.com/file/d/1EZh08j4vFH4VPfcNPDSv4pWruD9ISg56/view?usp=sharing",
     questions: [
       {
         prompt: "5) Welche Herausforderungen haben Frauen heute im Berufsleben?",
@@ -213,7 +224,8 @@ const hoerenBlocks = [
   },
   {
     title: "Hören 4 · Damals (Back Then)",
-    audioLink: "https://drive.google.com/file/d/1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD/view?usp=sharing",
+    audioLink:
+      "https://drive.google.com/file/d/1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD/view?usp=sharing",
     questions: [
       {
         prompt: "7) Wie war das Leben vor 50 Jahren im Vergleich zu heute?",
@@ -240,12 +252,16 @@ const hoerenBlocks = [
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
         borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
+        background: active ? "#2563eb" : "#fff",
+        color: active ? "#fff" : "#1d4ed8",
+        fontWeight: 800,
+        flex: "0 0 auto",
+        minWidth: 74,
       }}
     >
       {children}
@@ -253,26 +269,37 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
-const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
+const A2Day20WorkbookContent = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
-
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
+  const activeIndex = useMemo(
+    () => tabs.findIndex((tab) => tab.key === activeTab),
+    [activeTab]
+  );
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <h1 style={{ ...styles.title, margin: 0 }}>A2 · Day 20 Workbook · Typische Reklamationssituationen üben</h1>
+        <h1 style={{ ...styles.title, margin: 0 }}>
+          A2 · Day 20 Workbook · Typische Reklamationssituationen üben
+        </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 7.20</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          4-part workbook: Sprechen, Schreiben, Lesen und Hören. Complete each Teil and submit your final answers in the
-          submission area (not on this page).
+          Follow Teil 1–4 in order, check Ref when needed, and submit your final answers through the Submit tab.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div
+          role="tablist"
+          aria-label="A2 Day 20 workbook sections"
+          style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}
+        >
           {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
+            <TabButton
+              key={tab.key}
+              active={tab.key === activeTab}
+              onClick={() => setActiveTab(tab.key)}
+            >
               {tab.label}
             </TabButton>
           ))}
@@ -304,24 +331,23 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
             <strong>Zentrales Thema: Reklamieren (Making a Complaint)</strong>
             <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
               <li>
-                <strong>Gründe für die Reklamation</strong>: falsche Lieferung, defektes Produkt, falsche Größe/Farbe,
-                verspätete Lieferung, schlechter Service.
+                <strong>Gründe für die Reklamation:</strong> falsche Lieferung, defektes Produkt, falsche Größe oder Farbe,
+                verspätete Lieferung und schlechter Service.
               </li>
               <li>
-                <strong>Nützliche Sätze</strong>: „Ich möchte mich beschweren.", „Das Produkt ist kaputt.", „Ich möchte mein
-                Geld zurück.", „Könnten Sie das bitte umtauschen?"
+                <strong>Nützliche Sätze:</strong> „Ich möchte mich beschweren.", „Das Produkt ist kaputt.", „Ich möchte mein Geld zurück." und „Könnten Sie das bitte umtauschen?"
               </li>
               <li>
-                <strong>Wichtige Unterlagen</strong>: Quittung/Rechnung, Lieferschein, Bestellnummer, Garantieschein.
+                <strong>Wichtige Unterlagen:</strong> Quittung, Rechnung, Lieferschein, Bestellnummer und Garantieschein.
               </li>
               <li>
-                <strong>Mögliche Lösungen</strong>: Umtausch, Reparatur, Erstattung, Gutschein, Preisnachlass.
+                <strong>Mögliche Lösungen:</strong> Umtausch, Reparatur, Erstattung, Gutschein oder Preisnachlass.
               </li>
               <li>
-                <strong>Reaktion und Service</strong>: Kundendienst kontaktieren, Entschuldigung, klare Anleitung, Bestätigung.
+                <strong>Reaktion und Service:</strong> Kundendienst kontaktieren, sich entschuldigen, eine klare Anleitung geben und die Lösung bestätigen.
               </li>
               <li>
-                <strong>Eigene Erfahrungen</strong>: Hast du schon einmal etwas reklamiert? Was ist passiert?
+                <strong>Eigene Erfahrungen:</strong> Hast du schon einmal etwas reklamiert? Was ist passiert?
               </li>
             </ol>
           </div>
@@ -329,29 +355,20 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
           <div style={infoBoxStyle}>
             <strong>Sprechen wie bei einer Mini-Präsentation</strong>
             <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>
-                <strong>Einleitung:</strong> Sage kurz, worum es geht.
-              </li>
-              <li>
-                <strong>Hauptteil mit Verbindungswörtern:</strong> Nutze einfache Wörter wie <strong>und</strong>,{" "}
-                <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.
-              </li>
-              <li>
-                <strong>Beispiel:</strong> Gib eine kurze Situation aus dem Alltag.
-              </li>
-              <li>
-                <strong>Schluss:</strong> Sage deine Meinung oder eine klare Zusammenfassung.
-              </li>
+              <li><strong>Einleitung:</strong> Sage kurz, worum es geht.</li>
+              <li><strong>Hauptteil:</strong> Nutze und, oder, weil und deshalb.</li>
+              <li><strong>Beispiel:</strong> Gib eine kurze Alltagssituation.</li>
+              <li><strong>Schluss:</strong> Sage deine Meinung oder fasse die Lösung zusammen.</li>
             </ol>
           </div>
 
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-            {miniPresentationCards.map((card) => (
-              <div key={card.title} style={questionBoxStyle}>
-                <strong>{card.title}</strong>
+            {miniPresentationCards.map((item) => (
+              <div key={item.title} style={questionBoxStyle}>
+                <strong>{item.title}</strong>
                 <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-                  {card.phrases.map((phrase) => (
-                    <li key={`${card.title}-${phrase}`}>{phrase}</li>
+                  {item.phrases.map((phrase) => (
+                    <li key={`${item.title}-${phrase}`}>{phrase}</li>
                   ))}
                 </ul>
               </div>
@@ -361,10 +378,7 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
           <div style={questionBoxStyle}>
             <strong>📝 Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Ich möchte kurz über eine Reklamation sprechen. Letzten Monat habe ich einen Wasserkocher gekauft, aber er war
-              nach zwei Tagen kaputt. Ich bin in das Geschäft gegangen und habe die Quittung gezeigt, weil das wichtig war.
-              Die Mitarbeiterin war freundlich und hat mir sofort einen neuen Wasserkocher gegeben. Deshalb war ich am Ende
-              zufrieden. Zum Schluss kann ich sagen: Guter Service ist sehr wichtig."
+              „Ich möchte kurz über eine Reklamation sprechen. Letzten Monat habe ich einen Wasserkocher gekauft, aber er war nach zwei Tagen kaputt. Ich bin in das Geschäft gegangen und habe die Quittung gezeigt, weil das wichtig war. Die Mitarbeiterin war freundlich und hat mir sofort einen neuen Wasserkocher gegeben. Deshalb war ich am Ende zufrieden. Zum Schluss kann ich sagen: Guter Service ist sehr wichtig."
             </p>
             <p style={{ margin: 0 }}>
               <strong>Impulsfrage:</strong> Hast du schon einmal etwas reklamieren müssen? Erzähle davon.
@@ -373,9 +387,11 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
               <strong>Keywords:</strong> Produkt, Problem, Umtausch, Kundendienst.
             </p>
           </div>
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+
+          <CourseInlinePracticePanel type="speaking" />
+          <p style={{ margin: 0, color: "#4b5563" }}>
+            Teil 1 is group practice only and has no assignment submission.
+          </p>
         </section>
       )}
 
@@ -384,8 +400,7 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
           <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Formeller Brief)</h2>
           <div style={infoBoxStyle}>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Aufgabe:</strong> Schreiben Sie einen formellen Brief an einen Supermarkt (z. B. „CityMall"), weil ein
-              Produkt defekt oder nicht in Ordnung ist.
+              <strong>Aufgabe:</strong> Schreiben Sie einen formellen Brief an einen Supermarkt, weil ein Produkt defekt oder nicht in Ordnung ist.
             </p>
             <p style={{ margin: 0 }}><strong>Berücksichtigen Sie:</strong></p>
             <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
@@ -393,11 +408,9 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
               <li>Was ist genau das Problem mit dem Produkt?</li>
               <li>Welche Lösung erwarten Sie: Umtausch, Reparatur oder Geld zurück?</li>
             </ol>
-          <WorkbookSubmissionReminder />
           </div>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
+          <WorkbookSubmissionReminder />
         </section>
       )}
 
@@ -414,9 +427,9 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
                   <li key={`${question.title}-${option}`}>{option}</li>
                 ))}
               </ul>
-            <WorkbookSubmissionReminder />
             </div>
           ))}
+          <WorkbookSubmissionReminder />
         </section>
       )}
 
@@ -424,7 +437,7 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
         <section style={sectionStyle}>
           <h2 style={{ margin: 0 }}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Note: The audio has been uploaded among the files in this chapter. You can also open each link in your browser.
+            Open each audio link, listen carefully and answer the questions.
           </p>
 
           {hoerenBlocks.map((block) => (
@@ -443,41 +456,55 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
                   </ul>
                 </div>
               ))}
-            <WorkbookSubmissionReminder />
             </div>
           ))}
+          <WorkbookSubmissionReminder />
         </section>
       )}
 
-      <section
-        style={{
-          ...styles.card,
-          border: "1px solid #bfdbfe",
-          background: "#eff6ff",
-          display: "grid",
-          gap: 10,
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Final Submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Submit all answers in the submission area. Do not submit answers directly on this workbook page.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, textDecoration: "none", justifySelf: "start" }}
-        >
-          Open Submission Area
-        </a>
-      </section>
-
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day20TypischeReklamationssituationen", level: "A2", workbookId: "A2Day20TypischeReklamationssituationen" }} workbookId="A2Day20TypischeReklamationssituationen" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{
+            title: "A2Day20TypischeReklamationssituationen",
+            level: "A2",
+            workbookId: "A2Day20TypischeReklamationssituationen",
+          }}
+          workbookId="A2Day20TypischeReklamationssituationen"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <section
+          style={{
+            ...styles.card,
+            border: "1px solid #bfdbfe",
+            background: "#eff6ff",
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <h2 style={{ margin: 0 }}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit the required answers for Schreiben, Lesen and Hören after completing Teil 1–4.
+          </p>
+          <WorkbookSubmissionReminder />
+          <a
+            href="/campus/course?submitWork=1"
+            style={{ ...styles.primaryButton, textDecoration: "none", justifySelf: "start" }}
+          >
+            Open submission area
+          </a>
+        </section>
+      )}
     </div>
   );
 };
+
+const A2Day20TypischeReklamationssituationenWorkbookPage = () => (
+  <RadioFirstWorkbookGate level="A2" day={20}>
+    <A2Day20WorkbookContent />
+  </RadioFirstWorkbookGate>
+);
 
 export default A2Day20TypischeReklamationssituationenWorkbookPage;
