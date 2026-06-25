@@ -43,7 +43,29 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
       },
     ],
   },
+  B1: {
+    0: [
+      {
+        key: "b1-day0-orientation-video",
+        chapter: "Orientation",
+        title: "B1 Day 0 · Orientation video",
+        description:
+          "Watch this orientation video before completing the B1 Day 0 guide and knowledge test.",
+        url: "https://youtu.be/Y9slpUtONkg",
+      },
+    ],
+  },
   B2: {
+    0: [
+      {
+        key: "b2-day0-self-learning-onboarding-video",
+        chapter: "Tutorial",
+        title: "B2 Day 0 · Self-learning onboarding video",
+        description:
+          "Watch this onboarding video before completing the B2 Day 0 self-learning orientation and readiness check.",
+        url: "https://youtu.be/Y9slpUtONkg",
+      },
+    ],
     3: [
       {
         key: "b2-day3-kontrast-konzession-ai-grammar-video",
