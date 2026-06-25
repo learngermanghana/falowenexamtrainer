@@ -2,15 +2,20 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 
 const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "sprechen", label: "Teil 1" },
+  { key: "schreiben", label: "Teil 2" },
+  { key: "lesen", label: "Teil 3" },
+  { key: "hoeren", label: "Teil 4" },
+  { key: "references", label: "Ref" },
+  { key: "submit", label: "Submit" },
 ];
 
 const card = {
@@ -39,17 +44,17 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const imageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
 const phraseGridStyle = {
   display: "grid",
   gap: 10,
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-};
-
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
 };
 
 const lesenQuestions = [
@@ -114,12 +119,16 @@ const hoerenQuestions = [
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
         borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
+        background: active ? "#2563eb" : "#fff",
+        color: active ? "#fff" : "#1d4ed8",
+        fontWeight: 800,
+        flex: "0 0 auto",
+        minWidth: 74,
       }}
     >
       {children}
@@ -134,7 +143,20 @@ const PreparedCheckbox = ({ checked, onChange }) => (
   </label>
 );
 
-const A2Day2SmallTalkWorkbookEnhancedPage = () => {
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question, index) => (
+      <div key={question.stem} style={questionCardStyle}>
+        <strong>{index + 1}. {question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={`${question.stem}-${option}`}>{option}</span>
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
+const A2Day2SmallTalkWorkbookContent = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -143,9 +165,12 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const activeIndex = useMemo(
+    () => tabs.findIndex((tab) => tab.key === activeTab),
+    [activeTab],
+  );
+  const setPreparedFor = (tabKey) => (event) =>
+    setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -156,10 +181,24 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Four-part workbook for speaking, writing, reading and listening practice.
         </p>
+        <img
+          src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1600&q=80"
+          alt="Students practising friendly small talk together"
+          loading="lazy"
+          style={imageStyle}
+        />
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div
+          role="tablist"
+          aria-label="A2 Day 2 workbook sections"
+          style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}
+        >
           {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
+            <TabButton
+              key={tab.key}
+              active={tab.key === activeTab}
+              onClick={() => setActiveTab(tab.key)}
+            >
               {tab.label}
             </TabButton>
           ))}
@@ -173,244 +212,178 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
       <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
-        <div style={card}>
+        <section style={card}>
           <img
-            src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1600&q=80"
-            alt="Students practicing conversation in a classroom"
+            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80"
+            alt="Friends having a relaxed small-talk conversation"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we engage in group exercises about <strong>Small Talk</strong>. First, prepare by reading ideas and
-            key phrases on your own. In class, use the discussion questions, mini presentation and keywords.
+            Bereite ein kurzes Gespräch vor. Nutze einfache Fragen, reagiere auf die Antwort und stelle mindestens eine Rückfrage.
           </p>
 
           <h3 style={sectionTitle}>Zentrales Thema: Small Talk</h3>
-          <ul style={listSpacing}>
-            <li>
-              <strong>Begrüßung und Einstieg</strong>
-              <ul style={listSpacing}>
-                <li>Hallo, wie geht es dir? (Hello, how are you?)</li>
-                <li>Woher kommst du? (Where are you from?)</li>
-                <li>Schön, dich kennenzulernen. (Nice to meet you.)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Themen für Small Talk</strong>
-              <ol style={listSpacing}>
-                <li>
-                  <strong>Arbeit (Work)</strong>: Wo arbeitest du? • Ich arbeite in einem Büro. • Was machst du beruflich? • Ich
-                  bin Lehrer.
-                </li>
-                <li>
-                  <strong>Sport und Hobbys</strong>: Machst du gerne Sport? • Ja, ich spiele gern Fußball. • Hast du ein Hobby? •
-                  Ich lese gern Bücher.
-                </li>
-                <li>
-                  <strong>Familie</strong>: Hast du Geschwister? • Ja, ich habe eine Schwester. • Wie heißt dein Bruder? • Er
-                  heißt Max.
-                </li>
-                <li>
-                  <strong>Wetter</strong>: Wie ist das Wetter heute? • Es ist sonnig und warm. • Magst du den Sommer? • Ja, ich
-                  liebe den Sommer.
-                </li>
-              </ol>
-            </li>
-          </ul>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese Struktur für starke Sprechpunkte: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7, color: "#374151" }}>
-            <strong>Wichtig für Day 2:</strong> Heute bleiben wir bewusst bei einfachen Verbindungswörtern. Nutze zuerst <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>. Das reicht für eine starke A2-Leistung.
-          </p>
           <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>1) Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über das Thema Small Talk.“</li>
-                <li>„In meiner kurzen Präsentation geht es um Gespräche im Alltag.“</li>
-                <li>„Ich finde Small Talk wichtig, weil man schnell Kontakt machen kann.“</li>
-              </ul>
+            <div style={questionCardStyle}>
+              <strong>Begrüßung</strong>
+              <span>Hallo, wie geht es dir?</span>
+              <span>Schön, dich kennenzulernen.</span>
             </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>2) Verbindungswörter / Connectors</strong>
-              <ul style={listSpacing}>
-                <li><strong>Zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong></li>
-                <li><strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong></li>
-                <li><strong>aber</strong>, <strong>zum Beispiel</strong></li>
-              </ul>
+            <div style={questionCardStyle}>
+              <strong>Arbeit und Studium</strong>
+              <span>Was machst du beruflich?</span>
+              <span>Wo arbeitest oder studierst du?</span>
             </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>3) Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich denke: …“</li>
-                <li>„Ich finde … gut/wichtig.“</li>
-                <li>„Für mich ist … wichtig, weil …“</li>
-              </ul>
+            <div style={questionCardStyle}>
+              <strong>Familie und Sprachen</strong>
+              <span>Hast du Geschwister?</span>
+              <span>Welche Sprachen sprichst du?</span>
             </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>4) Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zusammenfassend kann man sagen, dass …“</li>
-                <li>„Zum Schluss möchte ich betonen, dass …“</li>
-                <li>„Danke fürs Zuhören.“</li>
-              </ul>
+            <div style={questionCardStyle}>
+              <strong>Hobbys und Wetter</strong>
+              <span>Was machst du gern in deiner Freizeit?</span>
+              <span>Wie findest du das Wetter heute?</span>
             </div>
           </div>
 
-          <h3 style={sectionTitle}>Diskussionsfragen (A2)</h3>
-          <p style={{ margin: 0 }}>Kannst du dich vorstellen? Erzähl uns etwas über dich:</p>
-          <ul style={listSpacing}>
-            <li>Familie</li>
-            <li>Sprachen</li>
-            <li>Beruf/Studium</li>
-            <li>Hobbys</li>
-          </ul>
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <ol style={listSpacing}>
+            <li><strong>Einleitung:</strong> „Heute spreche ich kurz über mich.“</li>
+            <li><strong>Informationen:</strong> Familie, Sprachen, Beruf oder Studium und Hobbys.</li>
+            <li><strong>Verbindungen:</strong> und, aber, weil, deshalb, zuerst, dann.</li>
+            <li><strong>Rückfrage:</strong> „Und wie ist es bei dir?“</li>
+            <li><strong>Schluss:</strong> „Danke fürs Zuhören.“</li>
+          </ol>
 
-          <SpeakingPracticeTimerCard />
+          <SpeakingPracticeTimerCard storageKey="a2-day2-small-talk-speaking" />
 
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über Small Talk im Alltag. <strong>Zuerst</strong> begrüße ich die Person und frage: ‚Wie geht es
-              dir?‘ <strong>Dann</strong> spreche ich über einfache Themen wie Arbeit, Hobbys oder das Wetter. <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball, <strong>und</strong> du?‘ <strong>Ich finde</strong> Small
-              Talk wichtig, <strong>weil</strong> man neue Leute besser kennenlernen kann. <strong>Deshalb</strong> ist Small Talk
-              einfach, freundlich und sehr nützlich.“
+              „Hallo, ich heiße Maria und komme aus Ghana. Ich spreche Englisch und ein bisschen Deutsch. Zurzeit arbeite ich in einem Büro, aber später möchte ich studieren. In meiner Freizeit höre ich gern Musik und treffe Freunde, weil das entspannend ist. Und wie ist es bei dir?“
             </p>
           </div>
 
-          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
-
           <CourseInlinePracticePanel type="speaking" />
+          <p style={{ margin: 0, color: "#4b5563" }}>
+            Teil 1 is group practice only and has no assignment submission.
+          </p>
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "schreiben" && (
-        <div style={card}>
+        <section style={card}>
           <img
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Student writing notes in a workbook"
+            alt="Student writing a friendly German letter"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben) · Exercise</h2>
+          <h2 style={sectionTitle}>Teil 2 · Schreiben</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Anleitung:</strong> Schreibe einen Brief an deinen Freund Felix.
+            Schreibe einen Brief an deinen Freund Felix. Erzähle etwas über deine Arbeit und Familie.
           </p>
-          <p style={{ margin: 0 }}>In deinem Brief möchtest du über deine Arbeit und Familie sprechen.</p>
-          <p style={{ margin: 0 }}>Dein Brief soll folgende Punkte enthalten:</p>
           <ol style={listSpacing}>
             <li>Warum schreibst du?</li>
             <li>Erzähle Felix etwas über deine Arbeit und deine Familie.</li>
             <li>Frage Felix, wie es ihm geht und was bei ihm neu ist.</li>
           </ol>
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
-          </p>
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "lesen" && (
-        <div style={card}>
+        <section style={card}>
           <img
             src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
-            alt="Open book and reading glasses on a desk"
+            alt="Open book for German reading practice"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
-          <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit section at
-            the bottom of the lesson to send your answers.
-          </p>
-
+          <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
           <h3 style={sectionTitle}>Mein Gespräch mit Lisa</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Gestern habe ich Lisa im Café getroffen. Sie arbeitet in einer Schule und unterrichtet Kinder. Wir haben über
-            unsere Arbeit gesprochen. Lisa sagt, dass sie ihren Beruf liebt, weil sie gerne mit Kindern arbeitet. Ich habe ihr
-            erzählt, dass ich in einem Büro arbeite. Dann haben wir über Sport gesprochen. Lisa spielt gern Tennis, aber ich
-            mag Fußball mehr. Wir haben auch über das Wetter geredet. Es war gestern sonnig und warm, und Lisa liebt den
-            Sommer. Ich habe ihr erzählt, dass ich lieber den Herbst mag, weil die Bäume so schön bunt sind. Zum Schluss haben
-            wir über Reisen gesprochen. Lisa war schon in Italien und Spanien. Sie möchte nächstes Jahr nach Frankreich reisen.
-            Ich war noch nie in Spanien, aber ich würde gerne dorthin reisen. Es war ein sehr nettes Gespräch, und wir haben
-            viel gelacht!
+            Gestern habe ich Lisa im Café getroffen. Sie arbeitet in einer Schule und unterrichtet Kinder. Wir haben über unsere Arbeit gesprochen. Lisa sagt, dass sie ihren Beruf liebt, weil sie gerne mit Kindern arbeitet. Ich habe ihr erzählt, dass ich in einem Büro arbeite. Dann haben wir über Sport gesprochen. Lisa spielt gern Tennis, aber ich mag Fußball mehr. Wir haben auch über das Wetter geredet. Es war gestern sonnig und warm, und Lisa liebt den Sommer. Ich habe ihr erzählt, dass ich lieber den Herbst mag, weil die Bäume so schön bunt sind. Zum Schluss haben wir über Reisen gesprochen. Lisa war schon in Italien und Spanien. Sie möchte nächstes Jahr nach Frankreich reisen.
           </p>
-
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "hoeren" && (
-        <div style={card}>
+        <section style={card}>
           <img
             src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
-            alt="Headphones and audio setup for listening practice"
+            alt="Headphones for German listening practice"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
-          <p style={{ margin: 0 }}>
-            Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
+          <h2 style={sectionTitle}>Teil 4 · Hören</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Höre den Text zweimal. Lies zuerst die Fragen und achte auf Pläne, Film, Sport, Wetter und das nächste Treffen.
           </p>
-          <p style={{ margin: 0 }}>
-            Audio link:{" "}
-            <a
-              href="https://drive.google.com/file/d/1UXO1nHeBxOt8TS8dpp68xXr4Txjzu-NZ/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
-            </a>
-          </p>
-
+          <CoursebookAudioPlayer
+            url="https://drive.google.com/file/d/1UXO1nHeBxOt8TS8dpp68xXr4Txjzu-NZ/view?usp=sharing"
+            linkLabel="Open Teil 4 audio"
+          />
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/r-DuOo0vrqc" target="_blank" rel="noreferrer">
-              How do you make SMALL TALK in German?
-            </a>
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/r-DuOo0vrqc"
-            title="How do you make SMALL TALK in German?"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-
+          <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
-        </div>
+        </section>
+      )}
+
+      {activeTab === "references" && (
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{
+            title: "A2Day2SmallTalk",
+            level: "A2",
+            day: 2,
+            workbookId: "A2Day2SmallTalk",
+          }}
+          workbookId="A2Day2SmallTalk"
+        />
+      )}
+
+      {activeTab === "submit" && (
+        <section
+          style={{
+            ...styles.card,
+            border: "1px solid #bfdbfe",
+            background: "#eff6ff",
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <h2 style={{ margin: 0 }}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit the required answers for Schreiben, Lesen and Hören after completing Teil 1–4.
+          </p>
+          <WorkbookSubmissionReminder />
+          <a
+            href="/campus/course?submitWork=1"
+            style={{ ...styles.primaryButton, textDecoration: "none", justifySelf: "start" }}
+          >
+            Open submission area
+          </a>
+        </section>
       )}
     </div>
   );
 };
+
+const A2Day2SmallTalkWorkbookEnhancedPage = () => (
+  <RadioFirstWorkbookGate level="A2" day={2}>
+    <A2Day2SmallTalkWorkbookContent />
+  </RadioFirstWorkbookGate>
+);
 
 export default A2Day2SmallTalkWorkbookEnhancedPage;
