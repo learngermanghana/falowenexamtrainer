@@ -1,6 +1,10 @@
 (function () {
   const originalFetch = window.fetch.bind(window);
   const DAY_INDEX = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+  const LIVE_CATALOG_ENDPOINTS = [
+    "/api/public/classes",
+    "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog",
+  ];
 
   function slugify(value) {
     return String(value || "")
@@ -132,6 +136,30 @@
     };
   }
 
+  async function fetchLiveCatalogue() {
+    const failures = [];
+    for (const endpoint of LIVE_CATALOG_ENDPOINTS) {
+      const separator = endpoint.includes("?") ? "&" : "?";
+      const liveUrl = `${endpoint}${separator}fresh=${Date.now()}`;
+      try {
+        const response = await originalFetch(liveUrl, {
+          cache: "no-store",
+          headers: {
+            "cache-control": "no-cache",
+            pragma: "no-cache",
+          },
+        });
+        if (!response.ok) throw new Error(`${endpoint} returned ${response.status}`);
+        const payload = await response.json();
+        if (!Array.isArray(payload?.classes)) throw new Error(`${endpoint} did not return a classes array`);
+        return payload;
+      } catch (error) {
+        failures.push(error?.message || String(error));
+      }
+    }
+    throw new Error(failures.join(" | ") || "No live class catalogue endpoint was available");
+  }
+
   window.fetch = function patchedFetch(resource, init) {
     return originalFetch(resource, init).then(async (response) => {
       const url = typeof resource === "string" ? resource : resource?.url || "";
@@ -139,16 +167,7 @@
       try {
         const staticData = expandClassData(await response.clone().json());
         try {
-          const liveUrl = `/api/public/classes?fresh=${Date.now()}`;
-          const liveResponse = await originalFetch(liveUrl, {
-            cache: "no-store",
-            headers: {
-              "cache-control": "no-cache",
-              pragma: "no-cache",
-            },
-          });
-          if (!liveResponse.ok) throw new Error(`Public class API returned ${liveResponse.status}`);
-          const merged = mergeLiveClasses(staticData, await liveResponse.json());
+          const merged = mergeLiveClasses(staticData, await fetchLiveCatalogue());
           window.__falowenClassCatalogSource = "firestore";
           return new Response(JSON.stringify(merged), { status: 200, headers: { "content-type": "application/json", "x-falowen-class-source": "firestore" } });
         } catch (liveError) {
