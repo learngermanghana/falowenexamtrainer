@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
@@ -7,39 +8,29 @@ import { styles } from "../styles";
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
 
-const hasCompletedRadioStep = () => {
-  if (typeof window === "undefined") return false;
-
+const hasCompletedRadioStep = (search = "") => {
   try {
-    return new URLSearchParams(window.location.search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE;
+    return new URLSearchParams(search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE;
   } catch (error) {
     return false;
   }
 };
 
-const persistCompletedRadioStep = () => {
-  if (typeof window === "undefined") return;
-
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
-    window.history.replaceState(
-      window.history.state,
-      "",
-      `${url.pathname}${url.search}${url.hash}`,
-    );
-  } catch (error) {
-    // The local state update below still opens the workbook if URL persistence
-    // is unavailable in an older browser or test environment.
-  }
+export const buildCompletedRadioSearch = (search = "") => {
+  const params = new URLSearchParams(search);
+  params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+  const query = params.toString();
+  return query ? `?${query}` : "";
 };
 
 export const shouldShowRadioFirst = (level, day) => Boolean(getLessonRadioResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children }) => {
   const radio = getLessonRadioResource(level, day);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(
-    () => !radio || hasCompletedRadioStep(),
+    () => !radio || hasCompletedRadioStep(location.search),
   );
   const [isContinuing, setIsContinuing] = useState(false);
 
@@ -49,8 +40,15 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
     if (isContinuing) return;
 
     setIsContinuing(true);
-    persistCompletedRadioStep();
     setHasEnteredWorkbook(true);
+    navigate(
+      {
+        pathname: location.pathname,
+        search: buildCompletedRadioSearch(location.search),
+        hash: location.hash,
+      },
+      { replace: true },
+    );
 
     if (typeof window !== "undefined") {
       const scrollToTop = () => window.scrollTo({ top: 0, behavior: "auto" });
