@@ -93,6 +93,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Freunde fürs Leben ein. Danach gehst du weiter zum Lernteil.",
     },
+    4: {
+      key: "b1-day4-wohnung-suchen-falowen-radio",
+      title: "Wohnung suchen (Übung) 2.4",
+      youtubeId: "6VKgmBgdMLg",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Wohnungssuche in Deutschland ein. Danach gehst du weiter zum Workbook. Die AI-Grammatik wird später ergänzt.",
+    },
   },
   B2: {
     1: {
