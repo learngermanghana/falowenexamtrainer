@@ -75,6 +75,43 @@ export const B2_WRITING_CHEAT_SHEET = [
       { phrase: "ich bin davon überzeugt, dass", meaning: "I am convinced that" },
     ],
   },
+  {
+    id: "b2-opinion-text-template",
+    title: "B2 opinion text template",
+    layout: "template",
+    items: [
+      {
+        phrase: "Einleitung",
+        meaning:
+          "Das Thema [Thema] gewinnt heutzutage zunehmend an Bedeutung und wird in der Gesellschaft kontrovers diskutiert. Meines Erachtens [Ihre Meinung], zumal [Begründung].",
+      },
+      {
+        phrase: "Vorteile",
+        meaning:
+          "Einerseits spricht dafür, dass [Vorteil]. Ein wesentlicher Vorteil besteht darin, dass [weitere Information]. Darüber hinaus kann/können [Modalverb/Verb + weitere Information].",
+      },
+      {
+        phrase: "Nachteile",
+        meaning:
+          "Andererseits darf nicht außer Acht gelassen werden, dass [Nachteil]. Als Beispiel lassen sich [Nomen] anführen, etwa [weitere Information].",
+      },
+      {
+        phrase: "Abwägung und eigene Position",
+        meaning:
+          "Unter Abwägung beider Seiten bin ich der Auffassung, dass [Ihre abschließende Meinung]. Entscheidend ist dabei, dass [Bedingung oder Lösung].",
+      },
+      {
+        phrase: "Zusammenfassung",
+        meaning:
+          "Zusammenfassend lässt sich festhalten, dass [Thema] sowohl positive als auch negative Auswirkungen auf [Bereich] haben kann. Daher sollte [Empfehlung oder Maßnahme].",
+      },
+      {
+        phrase: "Schluss",
+        meaning:
+          "Ich hoffe, dass diese Überlegungen zu einem differenzierten Verständnis des Themas beitragen.\n\nMit freundlichen Grüßen\n[Ihr Name]",
+      },
+    ],
+  },
 ];
 
 export const B1_WRITING_CHEAT_SHEET = [
@@ -103,6 +140,42 @@ export const B1_WRITING_CHEAT_SHEET = [
       { phrase: "ich würde gern", meaning: "I would like to" },
       { phrase: "leider kann ich nicht", meaning: "unfortunately I cannot" },
       { phrase: "ich freue mich auf deine/Ihre Antwort", meaning: "I look forward to your reply" },
+    ],
+  },
+  {
+    id: "b1-opinion-text-template",
+    title: "B1 opinion text template",
+    layout: "template",
+    items: [
+      {
+        phrase: "Einleitung",
+        meaning:
+          "Heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].",
+      },
+      {
+        phrase: "Vorteile",
+        meaning:
+          "Einerseits gibt es viele Vorteile. Zum Beispiel kann/können [Modalverb/Verb + weitere Information].",
+      },
+      {
+        phrase: "Nachteile",
+        meaning:
+          "Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist/sind [Nomen], wie [weitere Information].",
+      },
+      {
+        phrase: "Eigene Meinung",
+        meaning: "Ich glaube, dass [Ihre abschließende Meinung].",
+      },
+      {
+        phrase: "Zusammenfassung",
+        meaning:
+          "Zusammenfassend lässt sich sagen, dass [Thema] unser Leben positiv oder negativ beeinflussen kann.",
+      },
+      {
+        phrase: "Schluss",
+        meaning:
+          "Ich hoffe, dass meine Meinung dazu beiträgt, das Thema besser zu verstehen.\n\nMit freundlichen Grüßen\n[Ihr Name]",
+      },
     ],
   },
 ];
