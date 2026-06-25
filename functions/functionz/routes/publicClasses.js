@@ -62,6 +62,7 @@ function publicClass(snapshot) {
   return {
     id: snapshot.id,
     slug,
+    classUrl: String(data.classUrl || `/classes/${slug}`),
     title,
     language: data.language || "German",
     level,
@@ -94,7 +95,15 @@ async function publicClassesHandler(req, res) {
       .filter((course) => !["draft", "graduated", "archived"].includes(course.status))
       .filter((course) => course.startDate && (course.startDate >= today || (course.status === "active" && (!course.endDate || course.endDate >= today))))
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
-    res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+
+    // Live Classes updates must appear immediately. Do not allow the browser,
+    // Vercel edge cache, or another CDN to serve an older class catalogue.
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0");
+    res.setHeader("CDN-Cache-Control", "no-store");
+    res.setHeader("Vercel-CDN-Cache-Control", "no-store");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     return res.status(200).json({ classes, source: "firestore", generatedAt: new Date().toISOString() });
   } catch (error) {
     console.error("public classes error", error);
