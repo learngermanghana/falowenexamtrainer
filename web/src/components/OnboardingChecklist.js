@@ -115,9 +115,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         <section className="onboarding-steps" aria-labelledby="easy-steps-title">
           <h2 id="easy-steps-title" style={{ margin: 0 }}>Your 3 easy steps</h2>
           <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 16 }}>
-            <Step number="1" title="Open Campus" description="Follow your course in order and start with the next lesson shown to you." />
-            <Step number="2" title="Complete and submit your work" description="Use the lesson instructions, finish the workbook, and submit assignments when requested." />
-            <Step number="3" title="Check feedback and ask for help" description="Return to your dashboard to see results, class access, and support whenever you need it." />
+            <Step number="1" title="Open Campus and the Course Book" description="Start from Campus, open the Course Book, and follow the current lesson in order." />
+            <Step number="2" title="Complete and submit inside the workbook" description="Use the lesson tabs, finish the required work, and submit through the Submit tab inside the Course Book when it appears. There is no separate student submission page." />
+            <Step number="3" title="Use Results, Attendance and Exams Room correctly" description="Check marked work in Results, record class attendance when required, and use Exams Room only for separate exam-style practice." />
           </ol>
         </section>
 
