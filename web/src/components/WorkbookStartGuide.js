@@ -84,8 +84,8 @@ const mergeVideoResources = (...groups) => {
 
 const findVideo = (videos = [], keyword) => videos.find((resource) => String(resource.title || "").toLowerCase().includes(keyword));
 
-const LessonResourceItem = ({ number, icon, title, actionLabel, url }) => {
-  if (!url) return null;
+const LessonResourceItem = ({ number, icon, title, actionLabel, url, onClick }) => {
+  if (!url && !onClick) return null;
 
   return (
     <article style={resourceCardStyle}>
@@ -109,9 +109,20 @@ const LessonResourceItem = ({ number, icon, title, actionLabel, url }) => {
         <strong style={{ fontSize: 13, lineHeight: 1.25 }}>
           {icon} {title}
         </strong>
-        <a href={url} {...getExternalProps(url)} style={resourceButtonStyle}>
-          {actionLabel}
-        </a>
+        {onClick ? (
+          <button
+            type="button"
+            className="book-pdf-download-action"
+            onClick={onClick}
+            style={resourceButtonStyle}
+          >
+            {actionLabel}
+          </button>
+        ) : (
+          <a href={url} {...getExternalProps(url)} style={resourceButtonStyle}>
+            {actionLabel}
+          </a>
+        )}
       </div>
     </article>
   );
@@ -144,7 +155,8 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) =>
       <div style={{ display: "grid", gap: 6 }}>
         <LessonResourceItem number="1" icon="🎬" title="Teacher lecture video" actionLabel="Watch teacher video" url={teacherVideo?.url} />
         <LessonResourceItem number="2" icon="🤖" title="AI lecture / grammar video" actionLabel="Watch AI video" url={aiVideo?.url} />
-        <LessonResourceItem number="3" icon="📘" title="Grammar book" actionLabel="Open grammar book" url={derivedGrammarUrl} />
+        <LessonResourceItem number="3" icon="📄" title="Download this workbook as PDF" actionLabel="Download / Print PDF" onClick={() => window.print()} />
+        <LessonResourceItem number="4" icon="📘" title="Grammar book" actionLabel="Open grammar book" url={derivedGrammarUrl} />
       </div>
     </section>
   );
