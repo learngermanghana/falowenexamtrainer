@@ -36,6 +36,17 @@ const Section = ({ title, children }) => (
   </section>
 );
 
+const WritingTaskPrompt = ({ lesson }) => (
+  <NoteBox>
+    <strong>Task:</strong> {lesson.writingTopic}
+    {Array.isArray(lesson.writingPromptBullets) && lesson.writingPromptBullets.length ? (
+      <ul style={{ ...listStyle, marginTop: 8 }}>
+        {lesson.writingPromptBullets.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+    ) : null}
+  </NoteBox>
+);
+
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
     blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"],
@@ -187,7 +198,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
 
       {active === "write" ? <Section title="Guided writing builder">
         <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
-          <NoteBox><strong>Task:</strong> {lesson.writingTopic}</NoteBox>
+          <WritingTaskPrompt lesson={lesson} />
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
           {fullEssay ? (<>
             <EmbeddedWritingPracticePanel />
