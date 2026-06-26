@@ -14,6 +14,7 @@ import {
 import { styles } from "../styles";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
+import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 import { SpeakingPoints } from "./B2Day1IdentityPilotLessonPage";
@@ -85,7 +86,7 @@ const isC1Day4 = (lesson) => matches(lesson, "C1", 4);
 const isC1Day5 = (lesson) => matches(lesson, "C1", 5);
 const isC1Day6 = (lesson) => matches(lesson, "C1", 6);
 const isCompactC1 = (lesson) => isC1Day1(lesson) || isC1Day2(lesson) || isC1Day4(lesson) || isC1Day5(lesson) || isC1Day6(lesson);
-const isCompactSpeakingLesson = (lesson) => isB2Day1(lesson) || isB2Day2(lesson) || isB2Day3(lesson) || isCompactC1(lesson);
+const isCompactSpeakingLesson = (lesson) => isB2Day1(lesson) || isB2Day2(lesson) || isB2Day3(lesson) || isCompactC1(lesson) || lesson?.speakingBuilder?.style === "compact";
 
 const c1Questions = {
   1: "Wie kann man einen realistischen und zugleich flexiblen Lernweg planen, um ein anspruchsvolles Sprachziel zu erreichen?",
@@ -134,6 +135,10 @@ const CompactSpeakingPoints = ({ question, branches = [] }) => (
 
 const SpeakingBuilder = ({ lesson }) => {
   const rich = lesson.speakingBuilder?.branches;
+  if (lesson?.speakingBuilder?.style === "compact") {
+    const question = lesson.speakingBuilder.question || String(lesson.speakingTopic || "").replace(/^Sprechen:\s*/i, "");
+    return <CompactSpeakingPoints question={question} branches={rich || []} />;
+  }
   if (isB2Day1(lesson)) return <SpeakingPoints />;
   if (isB2Day2(lesson)) return <CompactSpeakingPoints question={b2Day2SpeakingQuestion} branches={b2Day2SpeakingTopics} />;
   if (isB2Day3(lesson)) return <CompactSpeakingPoints question={b2Day3SpeakingQuestion} branches={b2Day3SpeakingTopics} />;
@@ -302,7 +307,7 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
 
       {active === "write" ? <Section title="Guided writing builder">
         <WritingCheatSheetTabs level={lesson.level} day={lesson.day}>
-          <NoteBox><strong>Task:</strong> {lesson.writingTopic || `Schreibe einen Text zum Thema „${lesson.title}“.`}</NoteBox>
+          <WritingTaskPrompt lesson={lesson} />
           <ResourceButton href={workbookUrl}>Open lesson workbook</ResourceButton>
           {fullEssay ? (<>
             <EmbeddedWritingPracticePanel />
