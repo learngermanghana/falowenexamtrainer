@@ -209,7 +209,7 @@
   }
 
   function openClassPage(course, reason) {
-    const url = buildClassUrl(course, reason ? { reason } : null);
+    const url = buildClassUrl(course);
     writeDebug({ step: "openClassPage", url, reason, slug: typeof course === "string" ? course : getCourseSlug(course) });
     if (!url.includes("class=")) return;
     window.location.href = url;
