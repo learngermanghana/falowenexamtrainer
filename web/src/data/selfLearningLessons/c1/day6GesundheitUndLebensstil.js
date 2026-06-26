@@ -7,6 +7,11 @@ const c1Day6GesundheitUndLebensstil = makeLesson({
   title: "Gesundheit und Lebensstil",
   topic: "Balance, Prävention, psychisches Wohlbefinden und gesellschaftliche Verantwortung differenziert beurteilen",
   heroImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "AI video: Gesundheit und Lebensstil",
+    description: "KI-gestützte Lektion zu Gesundheit, Prävention, Lebensstil und gesellschaftlicher Verantwortung.",
+    url: "https://youtu.be/V2Ut_as3ZGk",
+  },
   grammarFocus: "Ursache, Folge und Einräumung präzise unterscheiden: kausale, konsekutive und konzessive Strukturen",
   objectives: [
     "Ich kann Zusammenhänge zwischen Alltag, Arbeit, Gesundheit und gesellschaftlichen Bedingungen erklären.",
