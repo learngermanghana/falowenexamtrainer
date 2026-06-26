@@ -28,6 +28,17 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die Grammatiknotizen zu zweiteiligen Konnektoren. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; reiche die geforderten Antworten für Schreiben, Lesen und Hören direkt über den Submit-Bereich im Workbook ein.",
   }),
+  5: Object.freeze({
+    chapter: "2.5",
+    grammarBook: "/campus/course/lesson/B1/5?view=grammar",
+    workbook: "/campus/course/lesson/B1/5?view=workbook",
+    grammarTopic:
+      "Höfliche Terminvereinbarung: Konjunktiv II mit könnte, würde und wäre sowie indirekte Fragen mit ob, wann, wo und wie",
+    goal:
+      "Einen Besichtigungstermin höflich vereinbaren, Informationen beim Vermieter erfragen und eine formelle B1-E-Mail schreiben.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zur höflichen Terminvereinbarung. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Nutze Ref erst zur Kontrolle und sende deine endgültigen Antworten über den Submit-Tab.",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
