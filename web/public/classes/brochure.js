@@ -1,4 +1,8 @@
 const DAY_INDEX = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+const LIVE_CATALOG_ENDPOINTS = [
+  "/api/public/classes",
+  "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog",
+];
 let brochureData = null;
 let selectedClassId = null;
 
@@ -174,6 +178,14 @@ const setHref = (id, href) => {
   if (el && href) el.href = href;
 };
 
+const slugifyClassValue = (value = "") =>
+  String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
 const normalizeClassSlug = (value = "") =>
   String(value)
     .toLowerCase()
@@ -181,6 +193,139 @@ const normalizeClassSlug = (value = "") =>
     .replace(/^classes\/?/, "")
     .replace(/\/index\.html$/, "")
     .replace(/\/$/, "");
+
+function addMinutes(time, minutesToAdd) {
+  if (!time) return "";
+  const [hourRaw, minuteRaw] = String(time).split(":").map(Number);
+  const total = hourRaw * 60 + minuteRaw + Number(minutesToAdd || 60);
+  return `${String(Math.floor((total % 1440) / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function buildScheduleUrl(defaults, course) {
+  if (course.scheduleUrl) return course.scheduleUrl;
+  if (!course.startDate || !Array.isArray(course.meetingDays) || !course.meetingDays.length) return "";
+  const url = new URL(defaults.scheduleBaseUrl || "https://admin.falowen.app/course-schedule/public");
+  url.searchParams.set("level", course.level);
+  url.searchParams.set("startDate", course.startDate);
+  url.searchParams.set("defaultWeekdays", course.meetingDays.map((item) => item.day).join(","));
+  url.searchParams.set("holidayDates", "");
+  url.searchParams.set("useAdvancedWeekdays", "false");
+  url.searchParams.set("weekDaysMap", "{}");
+  return url.toString();
+}
+
+function expandBrochureClass(rawClass = {}, defaults = {}) {
+  const level = String(rawClass.level || rawClass.levelId || "A1").toUpperCase();
+  const isSelfLearning = rawClass.availability === "always" || rawClass.isSelfLearning === true;
+  const city = rawClass.city || (isSelfLearning ? "Online" : "");
+  const title = rawClass.title || rawClass.name || (isSelfLearning ? `${level} Self-Learning` : `${level} ${city} Klasse`);
+  const slug = rawClass.slug || slugifyClassValue(title);
+  const sessionMinutes = rawClass.sessionMinutes || defaults.sessionMinutesByLevel?.[level] || 60;
+  const meetingDays = Array.isArray(rawClass.meetingDays)
+    ? rawClass.meetingDays.map((slot) => ({ ...slot, endTime: slot.endTime || addMinutes(slot.startTime, sessionMinutes) }))
+    : Array.isArray(rawClass.scheduleRules)
+      ? rawClass.scheduleRules.map((rule) => {
+          const dayKey = String(rule.day || "").slice(0, 3).toLowerCase();
+          const day = { sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday" }[dayKey] || rule.day;
+          const startTime = rule.startTime || "";
+          return { day, startTime, endTime: addMinutes(startTime, rule.durationMinutes || sessionMinutes) };
+        })
+      : [];
+  const totalSessions = Number(rawClass.totalSessions ?? (isSelfLearning ? 0 : defaults.totalSessionsByLevel?.[level] ?? 24));
+  const expanded = {
+    ...rawClass,
+    id: rawClass.id || (isSelfLearning ? `${level.toLowerCase()}-self-learning` : `${slug}-${String(rawClass.startDate || "").slice(0, 10)}`),
+    slug,
+    classUrl: rawClass.classUrl || `/classes/${slug}`,
+    title,
+    name: title,
+    language: rawClass.language || defaults.language || "German",
+    level,
+    city,
+    location: rawClass.location || (isSelfLearning ? defaults.selfLearningLocation : defaults.location),
+    format: rawClass.format || (isSelfLearning ? defaults.selfLearningFormat : defaults.format),
+    startDate: String(rawClass.startDate || "").slice(0, 10),
+    orientationDate: String(rawClass.orientationDate || rawClass.startDate || "").slice(0, 10),
+    endDate: String(rawClass.endDate || "").slice(0, 10),
+    totalSessions,
+    tuitionGhs: Number(rawClass.tuitionGhs ?? defaults.tuitionGhsByLevel?.[level] ?? 3000),
+    meetingDays,
+    highlights: rawClass.highlights || defaults.highlightsByLevel?.[level] || [],
+    registrationOpen: rawClass.registrationOpen !== false,
+    publicVisible: rawClass.publicVisible !== false,
+  };
+  expanded.scheduleUrl = buildScheduleUrl(defaults, expanded);
+  return expanded;
+}
+
+function isBrochureClassOpen(course) {
+  if (!course || course.publicVisible === false || course.registrationOpen === false) return false;
+  if (course.availability === "always") return true;
+  if (!course.startDate) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(`${course.startDate}T00:00:00`);
+  const end = course.endDate ? new Date(`${course.endDate}T23:59:59`) : null;
+  if (course.status === "active" && (!end || end >= today)) return true;
+  return start >= today;
+}
+
+async function fetchJsonNoCache(url) {
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: { "cache-control": "no-cache", pragma: "no-cache" },
+  });
+  if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+  return response.json();
+}
+
+async function fetchLiveClassCatalog() {
+  const failures = [];
+  for (const endpoint of LIVE_CATALOG_ENDPOINTS) {
+    const separator = endpoint.includes("?") ? "&" : "?";
+    try {
+      const payload = await fetchJsonNoCache(`${endpoint}${separator}fresh=${Date.now()}`);
+      if (!Array.isArray(payload?.classes)) throw new Error(`${endpoint} did not return a classes array`);
+      return payload;
+    } catch (error) {
+      failures.push(error?.message || String(error));
+    }
+  }
+  throw new Error(failures.join(" | ") || "Live class catalogue unavailable");
+}
+
+async function loadBrochureData() {
+  const staticData = await fetchJsonNoCache("/classes/classes-data.json");
+  const defaults = staticData.classDefaults || {};
+  const staticSelfLearning = (staticData.classes || [])
+    .map((course) => expandBrochureClass(course, defaults))
+    .filter((course) => course.availability === "always");
+
+  try {
+    const liveData = await fetchLiveClassCatalog();
+    const liveClasses = (liveData.classes || [])
+      .map((course) => expandBrochureClass(course, defaults))
+      .filter(isBrochureClassOpen);
+    const liveTokens = new Set(liveClasses.flatMap((course) => [course.id, course.slug, course.title].filter(Boolean)));
+    return {
+      ...staticData,
+      catalogSource: "firestore",
+      catalogGeneratedAt: liveData.generatedAt || "",
+      classes: [
+        ...liveClasses,
+        ...staticSelfLearning.filter((course) => ![course.id, course.slug, course.title].some((token) => liveTokens.has(token))),
+      ],
+    };
+  } catch (error) {
+    console.warn("Live Falowen class catalogue unavailable", error);
+    return {
+      ...staticData,
+      catalogSource: "fallback",
+      catalogError: String(error?.message || error || "Live class API unavailable"),
+      classes: staticSelfLearning,
+    };
+  }
+}
 
 function getRequestedSlug() {
   const url = new URL(window.location.href);
@@ -491,8 +636,7 @@ async function copyBrochureText() {
 
 window.addEventListener("popstate", () => render());
 
-fetch("/classes/classes-data.json")
-  .then((response) => response.json())
+loadBrochureData()
   .then((data) => {
     brochureData = data;
     render();
