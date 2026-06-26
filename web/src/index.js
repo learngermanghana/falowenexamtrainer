@@ -15,31 +15,41 @@ import LockedSubmissionCardCompactor from './components/LockedSubmissionCardComp
 import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingCheatSheetInjector';
 import BookPdfDownloadInjector from './components/BookPdfDownloadInjector';
 import AutoGrammarStartGuide from './components/AutoGrammarStartGuide';
+import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { registerOfflineServiceWorker } from './serviceWorkerRegistration';
 
+const normalizedPublicPath = window.location.pathname.replace(/\/+$/, '') || '/';
+const isFalowenRadioSeoPage = normalizedPublicPath === '/falowen-radio';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <PublicAuthRouteBridge />
-      <AuthProvider>
-        <ToastProvider>
-          <LandingPublicLanguageGuard />
-          <PublicClassSelectInjector />
-          <MobileHeaderMenuInjector />
-          <SubmitPageLevelGuidanceInjector />
-          <SubmitSuccessScreenInjector />
-          <CourseBookTerminologyInjector />
-          <LockedSubmissionCardCompactor />
-          <B1WorkbookWritingCheatSheetInjector />
-          <App />
-          <AutoGrammarStartGuide />
-          <BookPdfDownloadInjector />
-        </ToastProvider>
-      </AuthProvider>
+      {isFalowenRadioSeoPage ? (
+        <FalowenRadioSeoPage />
+      ) : (
+        <>
+          <PublicAuthRouteBridge />
+          <AuthProvider>
+            <ToastProvider>
+              <LandingPublicLanguageGuard />
+              <PublicClassSelectInjector />
+              <MobileHeaderMenuInjector />
+              <SubmitPageLevelGuidanceInjector />
+              <SubmitSuccessScreenInjector />
+              <CourseBookTerminologyInjector />
+              <LockedSubmissionCardCompactor />
+              <B1WorkbookWritingCheatSheetInjector />
+              <App />
+              <AutoGrammarStartGuide />
+              <BookPdfDownloadInjector />
+            </ToastProvider>
+          </AuthProvider>
+        </>
+      )}
     </BrowserRouter>
   </React.StrictMode>
 );
