@@ -177,6 +177,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf berufliche Entwicklung ein. Danach gehst du weiter zum Lernteil.",
     },
+    6: {
+      key: "c1-day6-gesundheit-lebensstil-falowen-radio",
+      title: "Gesundheit und Lebensstil",
+      youtubeId: "tWoSGXGiWD8",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Gesundheit, Prävention, psychisches Wohlbefinden und einen ausgewogenen Lebensstil ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
 };
 
