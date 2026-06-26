@@ -7,6 +7,11 @@ const b2Day4BildungUndLernen = makeLesson({
   title: "Bildung und Lernen",
   topic: "Lernstrategien, Prüfungen und Weiterbildung",
   heroImage: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "AI video: Bildung und Lernen",
+    description: "KI-gestützte Lektion zu Lernstrategien, Online-Lernen, Präsenzunterricht und Weiterbildung.",
+    url: "https://youtu.be/coQ8W5vynsI",
+  },
   grammarFocus: "Finalsätze mit damit / um ... zu und klare Zielbegründungen",
   objectives: [
     "Ich kann über meine Lernstrategien sprechen.",
