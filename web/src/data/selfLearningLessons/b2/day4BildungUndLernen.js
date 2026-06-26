@@ -57,24 +57,28 @@ const b2Day4BildungUndLernen = makeLesson({
     ],
   },
   speakingTaskType: "Learning strategy comparison talk",
-  speakingTopic: "Sprechen: Erkläre deine beste Lernstrategie, vergleiche Online-Lernen und Präsenzunterricht und sage, wie du dich auf Prüfungen vorbereitest.",
+  speakingTopic: "Sprechen: Welche Lernstrategie hilft dir am meisten, und wie lassen sich Online-Lernen und Präsenzunterricht sinnvoll verbinden?",
   speakingBuilder: {
-    plan: [
-      "Einleitung: Nenne deine aktuelle Lernsituation.",
-      "Hauptteil 1: Beschreibe deine beste Lernstrategie und warum sie funktioniert.",
-      "Hauptteil 2: Vergleiche Online-Lernen und Präsenzunterricht mit Vor- und Nachteilen.",
-      "Schluss: Erkläre, was du in Zukunft verbessern möchtest.",
-    ],
-    starters: [
-      "Eine Lernstrategie, die für mich gut funktioniert, ist ...",
-      "Ich nutze diese Methode, um ...",
-      "Online-Lernen hat den Vorteil, dass ...",
-      "Präsenzunterricht ist hilfreich, weil ...",
-      "Damit ich mich besser vorbereiten kann, ...",
+    style: "compact",
+    question: "Welche Lernstrategie hilft dir am meisten, und wie lassen sich Online-Lernen und Präsenzunterricht sinnvoll verbinden?",
+    branches: [
+      { id: "lernsituation", title: "Aktuelle Lernsituation", keywords: ["Deutsch lernen", "Beruf", "Prüfung", "Zeit", "Lernziel"] },
+      { id: "strategie", title: "Beste Lernstrategie", keywords: ["Karteikarten", "Wiederholung", "Notizen", "Übungen", "Lerngruppe"] },
+      { id: "online", title: "Online-Lernen", keywords: ["flexibel", "selbstständig", "Videos", "Apps", "Internet"] },
+      { id: "praesenz", title: "Präsenzunterricht", keywords: ["Lehrkraft", "direkte Fragen", "Austausch", "Motivation", "Feedback"] },
+      { id: "pruefung", title: "Prüfungsvorbereitung", keywords: ["Lernplan", "Übungstest", "Pausen", "Zeitmanagement", "Wiederholen"] },
+      { id: "kombination", title: "Gute Kombination", keywords: ["Blended Learning", "Online-Phasen", "Präsenztreffen", "Unterstützung", "Flexibilität"] },
     ],
   },
   writingTaskType: "B2 opinion essay / Meinungsbeitrag",
   writingTopic: "Schreiben: Online-Lernen und Präsenzunterricht. Verfassen Sie einen B2-Meinungsbeitrag zu diesem Thema: Welche Lernform unterstützt Lernende am besten? Bearbeiten Sie alle Punkte: Äußern Sie Ihre Meinung dazu, ob Online-Lernen eine gute Alternative zum Präsenzunterricht ist. Nennen Sie Gründe, warum digitale Lernangebote immer verbreiteter werden. Nennen Sie andere Möglichkeiten, Online- und Präsenzlernen sinnvoll miteinander zu verbinden. Nennen Sie Vorteile kombinierter und flexibler Lernangebote.",
+  writingPromptBullets: [
+    "Verfassen Sie einen B2-Meinungsbeitrag mit 180–220 Wörtern.",
+    "Äußern Sie Ihre Meinung dazu, ob Online-Lernen eine gute Alternative zum Präsenzunterricht ist.",
+    "Nennen Sie Gründe, warum digitale Lernangebote immer verbreiteter werden.",
+    "Beschreiben Sie andere Möglichkeiten, Online- und Präsenzlernen sinnvoll miteinander zu verbinden.",
+    "Erklären Sie die Vorteile kombinierter und flexibler Lernangebote.",
+  ],
   writingBuilder: {
     structure: [
       "Einleitung: Stellen Sie das Thema Online-Lernen und Präsenzunterricht kurz vor.",
