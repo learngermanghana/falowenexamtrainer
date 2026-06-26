@@ -184,9 +184,21 @@ function calculateTimelineProgress(klass = {}, nonCancelled = [], now = new Date
   return Math.round((elapsed.length / nonCancelled.length) * 100);
 }
 
+function curriculumSessionsOnly(sessions = []) {
+  const ordered = [...sessions].sort((a, b) => sessionTime(a, "startsAt") - sessionTime(b, "startsAt"));
+  const mapped = ordered.filter((session) => normalizeCurriculumIds(session).length > 0);
+
+  // A generated class can contain many contract-date occurrences after the
+  // level dictionary has ended. Once curriculum mappings exist, only those
+  // mapped rows are real course sessions. This prevents blank "Live class"
+  // entries from appearing on the homepage and becoming the next session.
+  return mapped.length ? mapped : ordered;
+}
+
 export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfile = null, now = new Date() }) {
   const nowMs = now.getTime();
-  const ordered = [...sessions].sort((a, b) => sessionTime(a, "startsAt") - sessionTime(b, "startsAt"));
+  const allOrderedSessions = [...sessions].sort((a, b) => sessionTime(a, "startsAt") - sessionTime(b, "startsAt"));
+  const ordered = curriculumSessionsOnly(allOrderedSessions);
   const nonCancelled = ordered.filter((session) => normalize(session.status) !== CANCELLED);
   const elapsed = nonCancelled.filter((session) => {
     if (normalize(session.status) === COMPLETED) return true;
@@ -215,6 +227,7 @@ export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfi
     progressMode: klass?.startDate && klass?.endDate ? "timeline" : "sessions",
     completedCount: elapsed.length,
     totalCount: nonCancelled.length,
+    hiddenUnmappedSessionCount: Math.max(0, allOrderedSessions.length - ordered.length),
     zoom: resolveZoomDetails(zoomProfile, klass),
   };
 }
