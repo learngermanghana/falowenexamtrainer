@@ -1,42 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import {
-  collection,
-  db,
-  isFirebaseConfigured,
-  onSnapshot,
-  query,
-  where,
-} from "../firebase";
+import { collection, db, isFirebaseConfigured, onSnapshot, query, where } from "../firebase";
 import { styles } from "../styles";
 import "./MobileWritingTextarea.css";
 
-const getClassName = (profile = {}) =>
-  String(
-    profile.className ||
-      profile.class_name ||
-      profile.class ||
-      profile.cohort ||
-      ""
-  ).trim();
+const classNameFrom = (profile = {}) =>
+  String(profile.className || profile.class_name || profile.class || profile.cohort || "").trim();
 
-const getLevel = (profile = {}) =>
+const levelFrom = (profile = {}) =>
   String(profile.level || profile.courseLevel || "").trim().toUpperCase();
 
-const getDisplayName = (profile = {}, user = {}) =>
-  String(profile.name || profile.fullName || user.displayName || user.email || "Student").trim();
+const studentCodeFrom = (profile = {}, user = {}) =>
+  String(profile.studentcode || profile.studentCode || profile.student_id || profile.id || user.uid || "").trim();
 
-const getStudentCode = (profile = {}, user = {}) =>
-  String(
-    profile.studentcode ||
-      profile.studentCode ||
-      profile.student_id ||
-      profile.id ||
-      user.uid ||
-      ""
-  ).trim();
-
-const normalizeMember = (snapshot) => {
+const memberFrom = (snapshot) => {
   const data = snapshot.data() || {};
   return {
     id: snapshot.id,
@@ -48,22 +25,19 @@ const normalizeMember = (snapshot) => {
   };
 };
 
-export default function PersonalInformationContributionBox({ lessonId, lessonLabel }) {
+export default function PersonalInformationContributionBox() {
   const { user, studentProfile, saveStudentProfile } = useAuth();
   const [draft, setDraft] = useState("");
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingMembers, setIsLoadingMembers] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [members, setMembers] = useState([]);
 
-  const level = useMemo(() => getLevel(studentProfile), [studentProfile]);
-  const className = useMemo(() => getClassName(studentProfile), [studentProfile]);
-  const currentStudentCode = useMemo(
-    () => getStudentCode(studentProfile, user),
-    [studentProfile, user]
-  );
+  const level = useMemo(() => levelFrom(studentProfile), [studentProfile]);
+  const className = useMemo(() => classNameFrom(studentProfile), [studentProfile]);
+  const studentCode = useMemo(() => studentCodeFrom(studentProfile, user), [studentProfile, user]);
 
   useEffect(() => {
     if (!isDirty) setDraft(String(studentProfile?.biography || ""));
@@ -71,85 +45,67 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
 
   useEffect(() => {
     if (!isFirebaseConfigured || !db) {
-      setMembers([]);
       setError("Firebase is not configured.");
-      setIsLoadingMembers(false);
+      setIsLoading(false);
       return undefined;
     }
-
     if (!level || !className) {
-      setMembers([]);
       setError("Your class details are missing. Please contact support.");
-      setIsLoadingMembers(false);
+      setIsLoading(false);
       return undefined;
     }
 
-    setIsLoadingMembers(true);
-    setError("");
-
-    // Firestore receives only the exact level-and-class query. A student in
-    // Class A never subscribes to the Class B student documents.
-    const membersQuery = query(
+    setIsLoading(true);
+    const classMembersQuery = query(
       collection(db, "students"),
       where("level", "==", level),
       where("className", "==", className)
     );
 
     return onSnapshot(
-      membersQuery,
+      classMembersQuery,
       (snapshot) => {
-        const nextMembers = snapshot.docs
-          .map(normalizeMember)
-          .filter(
-            (member) =>
-              member.level === level &&
-              member.className === className &&
-              Boolean(member.biography)
-          )
-          .sort((left, right) => left.name.localeCompare(right.name));
-
-        setMembers(nextMembers);
-        setIsLoadingMembers(false);
+        const next = snapshot.docs
+          .map(memberFrom)
+          .filter((member) => member.level === level && member.className === className && member.biography)
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setMembers(next);
         setError("");
+        setIsLoading(false);
       },
-      (subscriptionError) => {
-        console.error("Failed to load Day 5 class member introductions", subscriptionError);
+      (snapshotError) => {
+        console.error("Failed to load class member introductions", snapshotError);
         setMembers([]);
-        setIsLoadingMembers(false);
         setError("Class member introductions could not be loaded.");
+        setIsLoading(false);
       }
     );
   }, [className, level]);
 
   const handleSave = async (event) => {
     event.preventDefault();
-    const introduction = draft.trim();
-
-    if (!introduction) {
-      setStatus("");
+    const biography = draft.trim();
+    if (!biography) {
       setError("Write your introduction before saving.");
+      setStatus("");
       return;
     }
-
     if (!level || !className) {
-      setStatus("");
       setError("Your class details are missing. Please contact support.");
+      setStatus("");
       return;
     }
 
     setIsSaving(true);
-    setStatus("");
     setError("");
-
+    setStatus("");
     try {
-      // Teil 3 belongs to Class Members. It is deliberately not written to
-      // writingSubmissions, assignmentProgress, qa_posts, or any submission path.
-      await saveStudentProfile({ biography: introduction });
-      setDraft(introduction);
+      await saveStudentProfile({ biography });
+      setDraft(biography);
       setIsDirty(false);
       setStatus(`✓ Saved to Class Members for ${className}.`);
     } catch (saveError) {
-      console.error("Failed to save Day 5 class member introduction", saveError);
+      console.error("Failed to save class member introduction", saveError);
       setError("Your introduction could not be saved. Please try again.");
     } finally {
       setIsSaving(false);
@@ -177,35 +133,15 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
           rows={10}
           disabled={isSaving}
         />
-
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ ...styles.helperText, margin: 0 }}>
-            Class: {className || "Not assigned"}
-          </span>
-          <button
-            className="day5-writing-save-button"
-            type="submit"
-            style={styles.primaryButton}
-            disabled={isSaving || !level || !className}
-          >
+          <span style={{ ...styles.helperText, margin: 0 }}>Class: {className || "Not assigned"}</span>
+          <button className="day5-writing-save-button" type="submit" style={styles.primaryButton} disabled={isSaving || !level || !className}>
             {isSaving ? "Speichern…" : "Save to Class Members"}
           </button>
         </div>
-
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          This introduction updates your Class Members profile. It is not submitted for grading.
-        </p>
-
-        {status ? (
-          <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
-            {status}
-          </p>
-        ) : null}
-        {error ? (
-          <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>
-            {error}
-          </p>
-        ) : null}
+        <p style={{ ...styles.helperText, margin: 0 }}>This updates your Class Members profile and is not submitted for grading.</p>
+        {status ? <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>{status}</p> : null}
+        {error ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{error}</p> : null}
       </form>
 
       <section style={{ display: "grid", gap: 10 }}>
@@ -213,39 +149,17 @@ export default function PersonalInformationContributionBox({ lessonId, lessonLab
           <strong>{className ? `${className} introductions` : "Class introductions"}</strong>
           <span style={styles.badge}>{members.length}</span>
         </div>
-
-        {isLoadingMembers ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>Loading class member introductions…</p>
-        ) : null}
-
-        {!isLoadingMembers && !error && members.length === 0 ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>No introductions from this class yet.</p>
-        ) : null}
-
+        {isLoading ? <p style={{ ...styles.helperText, margin: 0 }}>Loading class member introductions…</p> : null}
+        {!isLoading && !error && members.length === 0 ? <p style={{ ...styles.helperText, margin: 0 }}>No introductions from this class yet.</p> : null}
         {members.map((member) => {
-          const isCurrentStudent =
-            member.id === studentProfile?.id ||
-            (currentStudentCode && member.studentCode === currentStudentCode);
-
+          const mine = member.id === studentProfile?.id || (studentCode && member.studentCode === studentCode);
           return (
-            <article
-              key={member.id}
-              style={{
-                border: "1px solid #dbeafe",
-                borderRadius: 14,
-                padding: 14,
-                background: "#f8fbff",
-                display: "grid",
-                gap: 8,
-              }}
-            >
+            <article key={member.id} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#f8fbff", display: "grid", gap: 8 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
                 <strong>{member.name}</strong>
-                {isCurrentStudent ? <span style={styles.badge}>You</span> : null}
+                {mine ? <span style={styles.badge}>You</span> : null}
               </div>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>
-                {member.biography}
-              </p>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>{member.biography}</p>
             </article>
           );
         })}
