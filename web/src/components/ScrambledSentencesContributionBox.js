@@ -4,24 +4,59 @@ import {
   collection,
   db,
   doc,
-  getDocs,
   isFirebaseConfigured,
   onSnapshot,
-  query,
   serverTimestamp,
   setDoc,
-  where,
 } from "../firebase";
 import { styles } from "../styles";
 import "./MobileWritingTextarea.css";
 
-const DRAFT_STORAGE_KEY = "a1-day5-scrambled-sentences";
+const safeDocKey = (value, fallback = "unknown") =>
+  String(value || fallback)
+    .trim()
+    .replace(/[\\/]+/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .toLowerCase()
+    .slice(0, 180) || fallback;
 
-const postsCollectionRef = (level, className) =>
-  collection(db, "class_board", level, "classes", className, "posts");
+const getClassName = (profile = {}) =>
+  String(
+    profile.className ||
+      profile.class_name ||
+      profile.class ||
+      profile.cohort ||
+      ""
+  ).trim();
 
-const responsesCollectionRef = (threadId) =>
-  collection(db, "qa_posts", threadId, "responses");
+const getLevel = (profile = {}) =>
+  String(profile.level || profile.courseLevel || "").trim().toUpperCase();
+
+const getStudentCode = (profile = {}, user = {}) =>
+  String(
+    profile.studentcode ||
+      profile.studentCode ||
+      profile.student_id ||
+      profile.id ||
+      user.uid ||
+      "unknown"
+  ).trim();
+
+const getDisplayName = (profile = {}, user = {}) =>
+  String(profile.name || profile.fullName || user.displayName || user.email || "Student").trim();
+
+const contributionsCollectionRef = (level, classKey, activityLessonId) =>
+  collection(
+    db,
+    "group_discussion",
+    level,
+    "classes",
+    classKey,
+    "lessons",
+    activityLessonId,
+    "contributions"
+  );
 
 const toMillis = (value) => {
   if (!value) return 0;
@@ -32,40 +67,13 @@ const toMillis = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const responseTime = (item) =>
+const contributionTime = (item) =>
   Math.max(
     toMillis(item?.updatedAt),
     toMillis(item?.editedAt),
     toMillis(item?.createdAt),
     Number(item?.createdAtMs || 0)
   );
-
-const pickLatest = (items) =>
-  [...items].sort((left, right) => responseTime(right) - responseTime(left))[0] || null;
-
-const dedupeContributions = (items) => {
-  const latestByStudent = new Map();
-
-  items.forEach((item) => {
-    if (!String(item?.text || "").trim()) return;
-    const identity = String(
-      item.responderUid || item.responderCode || item.author || item.id
-    ).toLowerCase();
-    const current = latestByStudent.get(identity);
-    if (!current || responseTime(item) >= responseTime(current)) {
-      latestByStudent.set(identity, item);
-    }
-  });
-
-  return Array.from(latestByStudent.values()).sort((left, right) =>
-    String(left.author || "Student").localeCompare(String(right.author || "Student"))
-  );
-};
-
-const safeIdPart = (value, fallback) =>
-  String(value || fallback)
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .slice(0, 220);
 
 const countAttempts = (text) => {
   const nonEmptyLines = String(text || "")
@@ -83,184 +91,126 @@ export default function ScrambledSentencesContributionBox({
   expectedCount = 11,
 }) {
   const { user, studentProfile } = useAuth();
-  const [draft, setDraft] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return window.localStorage.getItem(DRAFT_STORAGE_KEY) || "";
-  });
-  const [threadId, setThreadId] = useState("");
-  const [responseId, setResponseId] = useState("");
+  const level = useMemo(() => getLevel(studentProfile), [studentProfile]);
+  const className = useMemo(() => getClassName(studentProfile), [studentProfile]);
+  const classKey = useMemo(() => safeDocKey(className, "unknown-class"), [className]);
+  const activityLessonId = `${lessonId}-teil6-scrambled-sentences`;
+  const studentCode = useMemo(
+    () => getStudentCode(studentProfile, user),
+    [studentProfile, user]
+  );
+  const contributionId = useMemo(
+    () => safeDocKey(user?.uid || studentProfile?.id || studentCode, "student"),
+    [studentCode, studentProfile?.id, user?.uid]
+  );
+  const draftStorageKey = useMemo(
+    () => `day5-scrambled:${level}:${classKey}:${contributionId}`,
+    [classKey, contributionId, level]
+  );
+
+  const [draft, setDraft] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [contributions, setContributions] = useState([]);
-  const [contributionsError, setContributionsError] = useState("");
   const [showAnswers, setShowAnswers] = useState(false);
-
-  const activityLessonId = `${lessonId}-teil6-scrambled-sentences`;
-  const responderCode =
-    studentProfile?.studentcode ||
-    studentProfile?.studentCode ||
-    studentProfile?.id ||
-    user?.uid ||
-    "unknown";
-  const displayName =
-    studentProfile?.name || user?.displayName || user?.email || "Student";
 
   const isTutor = useMemo(() => {
     const role = String(studentProfile?.role || "").toLowerCase();
     const email = String(user?.email || studentProfile?.email || "").toLowerCase();
-    return role === "tutor" || role === "admin" || studentProfile?.isTutor === true || email === "moxflex@gmail.com";
+    return (
+      role === "tutor" ||
+      role === "admin" ||
+      studentProfile?.isTutor === true ||
+      email === "moxflex@gmail.com"
+    );
   }, [studentProfile?.email, studentProfile?.isTutor, studentProfile?.role, user?.email]);
 
   const canViewAnswers = hasSubmitted || isTutor;
   const completedAttempts = countAttempts(draft);
 
   useEffect(() => {
+    if (typeof window === "undefined" || isDirty) return;
+    try {
+      setDraft(window.localStorage.getItem(draftStorageKey) || "");
+    } catch (storageError) {
+      console.error("Could not load the class-scoped Day 5 draft", storageError);
+    }
+  }, [draftStorageKey, isDirty]);
+
+  useEffect(() => {
     if (typeof window === "undefined") return undefined;
     const timer = window.setTimeout(() => {
       try {
-        window.localStorage.setItem(DRAFT_STORAGE_KEY, draft);
+        window.localStorage.setItem(draftStorageKey, draft);
       } catch (storageError) {
-        console.error("Could not save scrambled-sentence draft on this device", storageError);
+        console.error("Could not save the class-scoped Day 5 draft", storageError);
       }
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [draft]);
+  }, [draft, draftStorageKey]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const prepareActivity = async () => {
-      setIsLoading(true);
-      setError("");
-
-      if (!isFirebaseConfigured || !db) {
-        setError("Firebase is not configured.");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!studentProfile?.level || !studentProfile?.className) {
-        setError("Your class details are missing. Please contact support.");
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const postsRef = postsCollectionRef(studentProfile.level, studentProfile.className);
-        const snapshot = await getDocs(
-          query(postsRef, where("lessonId", "==", activityLessonId))
-        );
-        const threads = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        let selectedThread =
-          pickLatest(threads.filter((thread) => thread.status !== "archived")) ||
-          pickLatest(threads);
-
-        if (!selectedThread) {
-          const automaticThreadId = `auto-${safeIdPart(activityLessonId, "day5-teil6")}`;
-          await setDoc(
-            doc(postsRef, automaticThreadId),
-            {
-              level: studentProfile.level,
-              className: studentProfile.className,
-              lessonId: activityLessonId,
-              lessonLabel: `${lessonLabel || lessonId} · Teil 6`,
-              topic: "Scrambled Sentences",
-              questionTitle: "Correct the scrambled sentences",
-              instructions: "",
-              question: "Rearrange all sentences and identify each one as a statement or question.",
-              timerDurationMinutes: 0,
-              timerExpiresAt: null,
-              createdAtMs: Date.now(),
-              createdAt: serverTimestamp(),
-              createdBy: "Falowen",
-              createdByUid: null,
-              status: "open",
-              autoCreated: true,
-            },
-            { merge: true }
-          );
-          selectedThread = { id: automaticThreadId, status: "open" };
-        } else if (selectedThread.status === "archived") {
-          await setDoc(
-            doc(postsRef, selectedThread.id),
-            { status: "open", reopenedAt: serverTimestamp() },
-            { merge: true }
-          );
-        }
-
-        if (cancelled) return;
-        setThreadId(selectedThread.id);
-
-        let ownResponses = [];
-        if (user?.uid) {
-          const ownSnapshot = await getDocs(
-            query(
-              responsesCollectionRef(selectedThread.id),
-              where("responderUid", "==", user.uid)
-            )
-          );
-          ownResponses = ownSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        }
-
-        if (ownResponses.length === 0 && responderCode) {
-          const legacySnapshot = await getDocs(
-            query(
-              responsesCollectionRef(selectedThread.id),
-              where("responderCode", "==", responderCode)
-            )
-          );
-          ownResponses = legacySnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-        }
-
-        if (cancelled) return;
-        const existingResponse = pickLatest(ownResponses);
-        setResponseId(
-          existingResponse?.id ||
-            `sentences-${safeIdPart(user?.uid || studentProfile?.id || responderCode, "student")}`
-        );
-        setHasSubmitted(Boolean(existingResponse));
-        if (existingResponse?.text) {
-          setDraft(existingResponse.text);
-        }
-      } catch (loadError) {
-        console.error("Failed to prepare scrambled-sentence activity", loadError);
-        if (!cancelled) {
-          setError("The class writing activity could not be loaded. Please reload and try again.");
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    prepareActivity();
-    return () => {
-      cancelled = true;
-    };
-  }, [activityLessonId, lessonId, lessonLabel, responderCode, studentProfile?.className, studentProfile?.id, studentProfile?.level, user?.uid]);
-
-  useEffect(() => {
-    if (!threadId || !db) {
+    if (!isFirebaseConfigured || !db) {
       setContributions([]);
+      setError("Firebase is not configured.");
+      setIsLoading(false);
       return undefined;
     }
 
+    if (!level || !className) {
+      setContributions([]);
+      setError("Your class details are missing. Please contact support.");
+      setIsLoading(false);
+      return undefined;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    const contributionsRef = contributionsCollectionRef(level, classKey, activityLessonId);
+
+    // The subscription points to one exact level, class, and lesson. We also
+    // validate stored metadata before displaying it to guard against a class-key collision.
     return onSnapshot(
-      responsesCollectionRef(threadId),
+      contributionsRef,
       (snapshot) => {
-        setContributions(
-          dedupeContributions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })))
+        const nextContributions = snapshot.docs
+          .map((entry) => ({ id: entry.id, ...entry.data() }))
+          .filter(
+            (entry) =>
+              String(entry.level || "").toUpperCase() === level &&
+              String(entry.className || "") === className &&
+              String(entry.lessonId || "") === activityLessonId &&
+              Boolean(String(entry.text || "").trim())
+          )
+          .sort((left, right) => contributionTime(right) - contributionTime(left));
+
+        setContributions(nextContributions);
+        setError("");
+        setIsLoading(false);
+
+        const mine = nextContributions.find(
+          (entry) =>
+            entry.id === contributionId ||
+            (user?.uid && entry.studentUid === user.uid) ||
+            String(entry.studentCode || "").toLowerCase() === studentCode.toLowerCase()
         );
-        setContributionsError("");
+
+        setHasSubmitted(Boolean(mine));
+        if (mine?.text && !isDirty) setDraft(mine.text);
       },
       (subscriptionError) => {
-        console.error("Failed to subscribe to scrambled-sentence contributions", subscriptionError);
-        setContributionsError("Class answers could not be loaded.");
+        console.error("Failed to load class-scoped scrambled-sentence contributions", subscriptionError);
+        setContributions([]);
+        setError("Class answers could not be loaded.");
+        setIsLoading(false);
       }
     );
-  }, [threadId]);
+  }, [activityLessonId, classKey, className, contributionId, isDirty, level, studentCode, user?.uid]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -272,9 +222,9 @@ export default function ScrambledSentencesContributionBox({
       return;
     }
 
-    if (!threadId || !responseId) {
+    if (!level || !className || !db) {
       setStatus("");
-      setError("The class activity is still loading. Please try again.");
+      setError("Your class discussion is not ready. Please refresh and try again.");
       return;
     }
 
@@ -283,29 +233,41 @@ export default function ScrambledSentencesContributionBox({
     setError("");
 
     try {
+      const contributionRef = doc(
+        contributionsCollectionRef(level, classKey, activityLessonId),
+        contributionId
+      );
+
       await setDoc(
-        doc(responsesCollectionRef(threadId), responseId),
+        contributionRef,
         {
-          author: displayName,
-          responderCode,
-          responderUid: user?.uid || null,
+          level,
+          className,
+          classKey,
           lessonId: activityLessonId,
           lessonLabel: `${lessonLabel || lessonId} · Teil 6`,
-          activityType: "scrambled-sentences",
+          contributionType: "scrambled-sentences",
+          authorName: getDisplayName(studentProfile, user),
+          studentCode,
+          studentUid: user?.uid || null,
           text,
           answerCount: completedAttempts,
           updatedAt: serverTimestamp(),
           editedAt: hasSubmitted ? serverTimestamp() : null,
-          ...(!hasSubmitted ? { createdAt: serverTimestamp(), createdAtMs: Date.now() } : {}),
+          ...(!hasSubmitted
+            ? { createdAt: serverTimestamp(), createdAtMs: Date.now() }
+            : {}),
         },
         { merge: true }
       );
+
       setHasSubmitted(true);
       setDraft(text);
-      setStatus("✓ Deine Sätze wurden für die Klasse gespeichert.");
+      setIsDirty(false);
+      setStatus(`✓ Saved to the ${className} group discussion.`);
     } catch (saveError) {
-      console.error("Failed to save scrambled-sentence contribution", saveError);
-      setError("Deine Sätze konnten nicht gespeichert werden. Bitte versuche es erneut.");
+      console.error("Failed to save class-scoped scrambled-sentence contribution", saveError);
+      setError("Your sentences could not be saved. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -321,6 +283,7 @@ export default function ScrambledSentencesContributionBox({
             value={draft}
             onChange={(event) => {
               setDraft(event.target.value);
+              setIsDirty(true);
               setStatus("");
               setError("");
             }}
@@ -336,36 +299,61 @@ export default function ScrambledSentencesContributionBox({
 
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ ...styles.helperText, margin: 0 }}>
-            {completedAttempts}/{expectedCount} sentences completed
+            {completedAttempts}/{expectedCount} sentences · Class: {className || "Not assigned"}
           </span>
           <button
             className="day5-writing-save-button"
             type="submit"
             style={styles.primaryButton}
-            disabled={isLoading || isSaving || !threadId}
+            disabled={isLoading || isSaving || !level || !className}
           >
-            {isSaving ? "Posting…" : hasSubmitted ? "Update my answers" : "Post my answers"}
+            {isSaving ? "Posting…" : hasSubmitted ? "Update my answers" : "Post to group discussion"}
           </button>
         </div>
 
-        {status ? <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>{status}</p> : null}
-        {error ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{error}</p> : null}
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          This is a class discussion activity, not a graded submission.
+        </p>
+
+        {status ? (
+          <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
+            {status}
+          </p>
+        ) : null}
+        {error ? (
+          <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>
+            {error}
+          </p>
+        ) : null}
       </form>
 
       <section style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-          <strong>Class answers</strong>
+          <strong>{className ? `${className} answers` : "Class answers"}</strong>
           <span style={styles.badge}>{contributions.length}</span>
         </div>
-        {contributionsError ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{contributionsError}</p> : null}
-        {!contributionsError && contributions.length === 0 ? <p style={{ ...styles.helperText, margin: 0 }}>No answers posted yet.</p> : null}
+
+        {isLoading ? <p style={{ ...styles.helperText, margin: 0 }}>Loading class answers…</p> : null}
+        {!isLoading && !error && contributions.length === 0 ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>No answers posted in this class yet.</p>
+        ) : null}
+
         {contributions.map((contribution) => (
           <article
             key={contribution.id}
-            style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#f8fbff", display: "grid", gap: 8 }}
+            style={{
+              border: "1px solid #dbeafe",
+              borderRadius: 14,
+              padding: 14,
+              background: "#f8fbff",
+              display: "grid",
+              gap: 8,
+            }}
           >
-            <strong>{contribution.author || "Student"} posted</strong>
-            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>{contribution.text}</p>
+            <strong>{contribution.authorName || "Student"} posted</strong>
+            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#1f2937" }}>
+              {contribution.text}
+            </p>
           </article>
         ))}
       </section>
@@ -374,7 +362,7 @@ export default function ScrambledSentencesContributionBox({
         <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 14, padding: 14 }}>
           <strong>Post your own answers to unlock the answer key.</strong>
           <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>
-            You can read your classmates’ posts now. Complete and post all {expectedCount} sentences to view the official answers.
+            You can read posts from {className || "your class"} now. Complete and post all {expectedCount} sentences to view the official answers.
           </p>
         </div>
       ) : (
@@ -388,7 +376,9 @@ export default function ScrambledSentencesContributionBox({
           </button>
           {showAnswers ? (
             <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 7 }}>
-              {answers.map((answer, index) => <div key={answer}>{index + 1}. {answer}</div>)}
+              {answers.map((answer, index) => (
+                <div key={answer}>{index + 1}. {answer}</div>
+              ))}
             </div>
           ) : null}
         </div>
