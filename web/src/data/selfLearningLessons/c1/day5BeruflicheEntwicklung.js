@@ -88,7 +88,14 @@ const c1Day5BeruflicheEntwicklung = makeLesson({
     ],
   },
   writingTaskType: "Formal letter / E-Mail",
-  writingTopic: "Schreiben: Antrag auf Unterstützung für eine berufliche Weiterbildung. Schreiben Sie eine formelle E-Mail an Ihre vorgesetzte oder eine verantwortliche Person. Erläutern Sie, welche Weiterbildung Sie besuchen möchten und welches berufliche Ziel Sie damit verfolgen. Beschreiben Sie, welche zeitlichen oder finanziellen Bedingungen für Ihre Teilnahme notwendig wären. Erklären Sie, welchen Nutzen die Weiterbildung für Ihre aktuellen Aufgaben und das Unternehmen hätte. Machen Sie einen realistischen Vorschlag zur Organisation, Kostenaufteilung oder Vertretung und bitten Sie höflich um ein Gespräch oder eine Rückmeldung.",
+  writingTopic: "Schreiben: Antrag auf Unterstützung für eine berufliche Weiterbildung. Schreiben Sie eine formelle E-Mail an Ihre vorgesetzte oder eine verantwortliche Person.",
+  writingPromptBullets: [
+    "Erläutern Sie, welche Weiterbildung Sie besuchen möchten und welches berufliche Ziel Sie damit verfolgen.",
+    "Beschreiben Sie, welche zeitlichen oder finanziellen Bedingungen für Ihre Teilnahme notwendig wären.",
+    "Erklären Sie, welchen Nutzen die Weiterbildung für Ihre aktuellen Aufgaben und das Unternehmen hätte.",
+    "Machen Sie einen realistischen Vorschlag zur Organisation, Kostenaufteilung oder Vertretung.",
+    "Bitten Sie höflich um ein Gespräch oder eine Rückmeldung.",
+  ],
   writingBuilder: {
     structure: [
       "Betreff und Anrede: Formulieren Sie das Anliegen präzise und höflich.",
