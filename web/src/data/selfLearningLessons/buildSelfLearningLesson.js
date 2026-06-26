@@ -42,6 +42,7 @@ export const makeLesson = ({
   speakingBuilder,
   writingTaskType,
   writingTopic,
+  writingPromptBullets,
   writingBuilder,
   phrases,
   tasks,
@@ -66,6 +67,11 @@ export const makeLesson = ({
   speakingBuilder,
   writingTaskType,
   writingTopic,
+  writingPromptBullets: Array.isArray(writingPromptBullets) && writingPromptBullets.length
+    ? writingPromptBullets
+    : Array.isArray(writingBuilder?.structure)
+      ? writingBuilder.structure
+      : [],
   writingBuilder: writingBuilder && isC1OpinionWriting({ level, taskType: writingTaskType })
     ? { ...writingBuilder, opinionWritingTips: C1_OPINION_WRITING_TIPS }
     : writingBuilder,
