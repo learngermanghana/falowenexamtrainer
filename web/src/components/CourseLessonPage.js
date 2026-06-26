@@ -29,6 +29,8 @@ const A1_DAY_17_ASSIGNMENT_ID = "A1-11";
 const A1_DAY_17_WORKBOOK_ROUTE = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 const A1_DAY_17_GRAMMAR_ROUTE = "/campus/course/directions-imperative-11";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
+const B1_DAY5_DRIVE_FILE_ID = "1BhpLaVrqLIgLkD9OVwsHhedjBwLTPet9";
+const B1_DAY5_YOUTUBE_ID = "x7tUQjxt5uI";
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
 const B1_WORKBOOK_PAGES = {
@@ -203,6 +205,19 @@ const labelA1Day3Resources = (root) => {
   });
 };
 
+const replaceB1Day5ListeningResource = () => {
+  if (typeof document === "undefined") return;
+
+  document.querySelectorAll(`iframe[src*="${B1_DAY5_DRIVE_FILE_ID}"]`).forEach((iframe) => {
+    iframe.src = `https://www.youtube-nocookie.com/embed/${B1_DAY5_YOUTUBE_ID}?rel=0&playsinline=1`;
+    iframe.title = "B1 Day 5 Besichtigungstermin Hören";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.setAttribute("allowfullscreen", "");
+  });
+
+  document.querySelectorAll(`a[href*="${B1_DAY5_DRIVE_FILE_ID}"]`).forEach((link) => link.remove());
+};
+
 export default function CourseLessonPage() {
   const rootRef = useRef(null);
   const location = useLocation();
@@ -212,6 +227,7 @@ export default function CourseLessonPage() {
   const isA1Day3 = level === "A1" && day === 3;
   const isA1Day5 = level === "A1" && day === 5;
   const isA1Day17 = level === "A1" && day === 17;
+  const isB1Day5 = level === "B1" && day === 5;
   if (level === "A1") applyA1GrammarRouteToLesson(location.state?.entry, day);
   if (level === "B1") applyB1LessonResourceOverride(location.state?.entry, day);
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
@@ -245,6 +261,16 @@ export default function CourseLessonPage() {
 
     return () => observer.disconnect();
   }, [isA1Day3]);
+
+  useEffect(() => {
+    if (!isB1Day5 || typeof document === "undefined") return undefined;
+
+    replaceB1Day5ListeningResource();
+    const observer = new MutationObserver(replaceB1Day5ListeningResource);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [isB1Day5]);
 
   if (level === "B1") {
     const query = new URLSearchParams(location.search);
