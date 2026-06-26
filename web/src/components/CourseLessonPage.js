@@ -8,6 +8,8 @@ import B1Day3ErfolgsgeschichtenWorkbookPage from "./B1Day3ErfolgsgeschichtenWork
 import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
 import B1Day4WohnungSuchenWorkbookPage from "./B1Day4WohnungSuchenWorkbookPage";
 import B1Day4WohnungSuchenGrammarNotesPage from "./B1Day4WohnungSuchenGrammarNotesPage";
+import B1Day5BesichtigungsterminWorkbookPage from "./B1Day5BesichtigungsterminWorkbookPage";
+import B1Day5BesichtigungsterminGrammarNotesPage from "./B1Day5BesichtigungsterminGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
@@ -34,6 +36,7 @@ const B1_WORKBOOK_PAGES = {
   2: B1Day2FreundeFuersLebenWorkbookPage,
   3: B1Day3ErfolgsgeschichtenWorkbookPage,
   4: B1Day4WohnungSuchenWorkbookPage,
+  5: B1Day5BesichtigungsterminWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
@@ -41,6 +44,7 @@ const B1_GRAMMAR_PAGES = {
   2: B1Day2FreundeFuersLebenGrammarNotesPage,
   3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
   4: B1Day4WohnungSuchenGrammarNotesPage,
+  5: B1Day5BesichtigungsterminGrammarNotesPage,
 };
 
 const decorateA1Day3Lesson = (lesson) => {
