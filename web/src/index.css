@@ -245,3 +245,46 @@ code {
 .onboarding-video-subscribe a {
   flex: 0 0 auto;
 }
+
+@media print {
+  @page {
+    margin: 16mm 12mm 20mm;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  .book-pdf-download-dock,
+  button[aria-label*="menu" i],
+  nav,
+  [role="navigation"] {
+    display: none !important;
+  }
+
+  .book-print-stamp {
+    display: flex !important;
+    position: fixed;
+    right: 12mm;
+    bottom: 7mm;
+    left: 12mm;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8mm;
+    padding-top: 3mm;
+    border-top: 1px solid #cbd5e1;
+    color: #475569;
+    font-size: 9pt;
+    line-height: 1.25;
+  }
+
+  .book-print-stamp strong {
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

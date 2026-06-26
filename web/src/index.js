@@ -13,6 +13,7 @@ import PublicClassSelectInjector from './components/PublicClassSelectInjector';
 import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
 import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
 import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingCheatSheetInjector';
+import BookPdfDownloadInjector from './components/BookPdfDownloadInjector';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -33,6 +34,7 @@ root.render(
           <CourseBookTerminologyInjector />
           <LockedSubmissionCardCompactor />
           <B1WorkbookWritingCheatSheetInjector />
+          <BookPdfDownloadInjector />
           <App />
         </ToastProvider>
       </AuthProvider>
