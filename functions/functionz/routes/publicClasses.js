@@ -11,9 +11,41 @@ const HIGHLIGHTS = {
   C1: ["Advanced German communication", "Independent practice with support", "Professional-level writing and speaking"],
 };
 const DAYS = { sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday" };
+const CLOSED_STATUSES = new Set(["draft", "graduated", "archived", "inactive", "cancelled", "canceled"]);
 
 function slugify(value) {
   return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function dateOnly(value) {
+  if (!value) return "";
+  if (typeof value?.toDate === "function") return value.toDate().toISOString().slice(0, 10);
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+
+  const text = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(text)) return text.slice(0, 10);
+
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString().slice(0, 10);
+}
+
+function publicStatus(data, startDate, endDate) {
+  const rawStatus = String(data.status || "").trim().toLowerCase();
+  const today = new Date().toISOString().slice(0, 10);
+  const isRunningNow = Boolean(startDate && startDate <= today && (!endDate || endDate >= today));
+
+  // Falowen Admin uses both "active" and "ongoing" for a class in progress.
+  // Older records can also remain "upcoming" after their start date, so use
+  // the actual date range as the final source of truth when the record is open.
+  if (
+    !CLOSED_STATUSES.has(rawStatus) &&
+    data.active !== false &&
+    (["active", "ongoing"].includes(rawStatus) || isRunningNow)
+  ) {
+    return "active";
+  }
+
+  return rawStatus || "upcoming";
 }
 
 function addMinutes(time, duration) {
@@ -53,11 +85,11 @@ function scheduleUrl(data, level, startDate, meetings) {
 function publicClass(snapshot) {
   const data = snapshot.data() || {};
   const level = String(data.levelId || data.level || "A1").toUpperCase();
-  const title = String(data.name || data.title || `${level} Klasse`).trim();
+  const title = String(data.name || data.className || data.classId || data.title || `${level} Klasse`).trim();
   const slug = String(data.slug || slugify(title));
   const meetings = meetingDays(data, level);
-  const startDate = String(data.startDate || "").slice(0, 10);
-  const endDate = String(data.endDate || "").slice(0, 10);
+  const startDate = dateOnly(data.startDate);
+  const endDate = dateOnly(data.endDate);
   const firstRuleDuration = Number(data.scheduleRules?.[0]?.durationMinutes || 0);
   return {
     id: snapshot.id,
@@ -70,7 +102,7 @@ function publicClass(snapshot) {
     location: data.location || "Ghana, Accra - Awoshie",
     format: data.format || "Live hybrid class in Ghana, Accra - Awoshie with online access, recordings, and Falowen app support",
     startDate,
-    orientationDate: String(data.orientationDate || startDate).slice(0, 10),
+    orientationDate: dateOnly(data.orientationDate || startDate),
     endDate,
     totalSessions: Number(data.generatedSessionCount || data.totalSessions || SESSIONS[level] || 24),
     sessionMinutes: Number(data.sessionMinutes || firstRuleDuration || MINUTES[level] || 60),
@@ -78,7 +110,7 @@ function publicClass(snapshot) {
     meetingDays: meetings,
     scheduleUrl: scheduleUrl(data, level, startDate, meetings),
     highlights: Array.isArray(data.highlights) && data.highlights.length ? data.highlights : HIGHLIGHTS[level] || [],
-    status: String(data.status || "upcoming").toLowerCase(),
+    status: publicStatus(data, startDate, endDate),
     publicVisible: data.publicVisible !== false,
     registrationOpen: data.registrationOpen !== false,
   };
@@ -92,8 +124,12 @@ async function publicClassesHandler(req, res) {
     const classes = snapshot.docs
       .map(publicClass)
       .filter((course) => course.publicVisible && course.registrationOpen)
-      .filter((course) => !["draft", "graduated", "archived"].includes(course.status))
-      .filter((course) => course.startDate && (course.startDate >= today || (course.status === "active" && (!course.endDate || course.endDate >= today))))
+      .filter((course) => !CLOSED_STATUSES.has(course.status))
+      .filter((course) => {
+        if (!course.startDate) return false;
+        if (course.status === "active") return !course.endDate || course.endDate >= today;
+        return course.startDate >= today;
+      })
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
     // Live Classes updates must appear immediately. Do not allow the browser,
@@ -111,4 +147,4 @@ async function publicClassesHandler(req, res) {
   }
 }
 
-module.exports = { publicClassesHandler, publicClass };
+module.exports = { publicClassesHandler, publicClass, publicStatus, dateOnly };
