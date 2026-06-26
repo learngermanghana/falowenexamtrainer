@@ -27,6 +27,13 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   B1_DAY4_WORKBOOK_PATH,
 ]);
 
+const isSelfManagedB1LessonWorkbook = (pathname = "", search = "") => {
+  const normalizedPathname = normalizeInAppPath(pathname);
+  const requestedView = new URLSearchParams(search || "").get("view");
+  return requestedView === "workbook"
+    && /^\/campus\/course\/lesson\/b1\/(4|5)$/i.test(normalizedPathname);
+};
+
 export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } = {}) => {
   if (!match) return false;
   const normalizedPathname = normalizeInAppPath(pathname);
@@ -45,7 +52,9 @@ const AutoWorkbookStartGuide = () => {
   const hostRef = useRef(null);
   const normalizedPathname = normalizeInAppPath(pathname);
   const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
-  const usesSelfManagedSubmissionTabs = SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname);
+  const usesSelfManagedSubmissionTabs =
+    SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
+    || isSelfManagedB1LessonWorkbook(pathname, search);
 
   if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) return <A1Day18Kapitel122WorkbookPage />;
   if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
@@ -80,4 +89,5 @@ export const __TESTING__ = {
   A2_DAY20_WORKBOOK_PATH,
   A2_DAY21_WORKBOOK_PATH,
   B1_DAY4_WORKBOOK_PATH,
+  isSelfManagedB1LessonWorkbook,
 };
