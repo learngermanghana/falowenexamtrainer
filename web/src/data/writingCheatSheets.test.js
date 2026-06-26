@@ -36,6 +36,8 @@ const requiredSections = [
       { phrase: "einer Entwicklung entgegenwirken", meaning: "to counteract a development" },
       { phrase: "Maßnahmen ergreifen", meaning: "to take measures / take action" },
       { phrase: "etwas durchführen", meaning: "to carry out / conduct something" },
+      { phrase: "etwas beabsichtigen", meaning: "to intend / plan something" },
+      { phrase: "einen Bericht übermitteln", meaning: "to submit / transmit a report" },
       { phrase: "etwas umsetzen", meaning: "to implement / put something into practice" },
       { phrase: "einen Beitrag leisten", meaning: "to make a contribution" },
       { phrase: "sich positiv auf etwas auswirken", meaning: "to have a positive effect on something" },
