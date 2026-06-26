@@ -34,8 +34,8 @@ root.render(
           <CourseBookTerminologyInjector />
           <LockedSubmissionCardCompactor />
           <B1WorkbookWritingCheatSheetInjector />
-          <BookPdfDownloadInjector />
           <App />
+          <BookPdfDownloadInjector />
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
@@ -44,6 +44,5 @@ root.render(
 
 // If you want to start measuring performance in the app, pass a function
 // to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 registerOfflineServiceWorker();
