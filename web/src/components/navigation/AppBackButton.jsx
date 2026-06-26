@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { A1_GRAMMAR_ROUTE_ENTRIES } from "../../data/a1GrammarRoutes";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../../data/a2GrammarRoutes";
 import { courseSchedules } from "../../data/courseSchedule";
+import WorkbookInlineEnhancements from "../WorkbookInlineEnhancements";
 import "./AppBackButton.css";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -158,15 +159,18 @@ const AppBackButton = ({
   };
 
   return (
-    <button
-      type="button"
-      className={`app-back-button ${className}`.trim()}
-      onClick={handleBack}
-      aria-label={label}
-    >
-      <span className="app-back-button__icon" aria-hidden="true">←</span>
-      <span>{label}</span>
-    </button>
+    <>
+      <button
+        type="button"
+        className={`app-back-button ${className}`.trim()}
+        onClick={handleBack}
+        aria-label={label}
+      >
+        <span className="app-back-button__icon" aria-hidden="true">←</span>
+        <span>{label}</span>
+      </button>
+      <WorkbookInlineEnhancements pathname={location.pathname} />
+    </>
   );
 };
 
