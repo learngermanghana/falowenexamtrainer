@@ -7,12 +7,16 @@ import { styles } from "../styles";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
+const completedRadioSteps = new Set();
 
-const hasCompletedRadioStep = (search = "") => {
+const radioStepKey = (level, day) => `${String(level || "").trim().toUpperCase()}:${Number(day)}`;
+
+const hasCompletedRadioStep = (search = "", level = "", day = "") => {
   try {
-    return new URLSearchParams(search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE;
+    return new URLSearchParams(search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE
+      || completedRadioSteps.has(radioStepKey(level, day));
   } catch (error) {
-    return false;
+    return completedRadioSteps.has(radioStepKey(level, day));
   }
 };
 
@@ -30,7 +34,7 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(
-    () => !radio || hasCompletedRadioStep(location.search),
+    () => !radio || hasCompletedRadioStep(location.search, level, day),
   );
   const [isContinuing, setIsContinuing] = useState(false);
 
@@ -40,6 +44,7 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
     if (isContinuing) return;
 
     setIsContinuing(true);
+    completedRadioSteps.add(radioStepKey(level, day));
     setHasEnteredWorkbook(true);
     navigate(
       {
@@ -52,12 +57,8 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
 
     if (typeof window !== "undefined") {
       const scrollToTop = () => window.scrollTo({ top: 0, behavior: "auto" });
-
-      if (typeof window.requestAnimationFrame === "function") {
-        window.requestAnimationFrame(scrollToTop);
-      } else {
-        scrollToTop();
-      }
+      if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(scrollToTop);
+      else scrollToTop();
     }
   };
 
@@ -74,14 +75,7 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
           background: "linear-gradient(135deg, #eff6ff, #f8fafc)",
         }}
       >
-        <span
-          style={{
-            ...styles.badge,
-            width: "fit-content",
-            background: "#dbeafe",
-            color: "#1e3a8a",
-          }}
-        >
+        <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>
           Start here
         </span>
         <h1 style={{ margin: 0 }}>{String(level).toUpperCase()} · Day {day} · Falowen Radio</h1>
