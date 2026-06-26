@@ -35,6 +35,7 @@ const zoomDetailsStyle = {
 
 function asDate(value) {
   if (!value) return null;
+  if (typeof value?.toDate === "function") return value.toDate();
   const parsed = value instanceof Date ? value : new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -79,13 +80,27 @@ function sameGhanaDate(left, right = new Date()) {
   return Boolean(leftDate && formatter.format(leftDate) === formatter.format(right));
 }
 
+function normalizeStatus(value) {
+  return String(value || "scheduled").trim().toLowerCase();
+}
+
 function sessionTopic(session, fallback = "Live class") {
   return String(session?.topic || (session?.assignmentIds || []).join(", ") || fallback).trim();
 }
 
+function curriculumLabel(session) {
+  const ids = session?.assignmentIds || session?.chapterIds || session?.curriculumIds || [];
+  return Array.isArray(ids) ? ids.filter(Boolean).join(", ") : "";
+}
+
 function formatCanonicalSchedule(rules = []) {
   if (!rules.length) return "Class dates are managed by Falowen Admin.";
-  return rules.map((rule) => `${rule.day || "Day"} ${rule.startTime || ""}`.trim()).join(" · ");
+  return rules
+    .map((rule) => {
+      const minutes = Number(rule.durationMinutes || 0);
+      return `${rule.day || "Day"} ${rule.startTime || ""}${minutes ? ` · ${minutes} min` : ""}`.trim();
+    })
+    .join(" · ");
 }
 
 function countdownLabel(value, now) {
@@ -106,6 +121,25 @@ function canJoinSession(session, now) {
   if (!start) return false;
   const current = now.getTime();
   return current >= start - 15 * 60000 && current <= (end || start + 2 * 60 * 60000) + 15 * 60000;
+}
+
+function sessionDisplayStatus(session, now) {
+  const storedStatus = normalizeStatus(session?.status);
+  if (storedStatus === "cancelled") return "Cancelled";
+  if (storedStatus === "completed") return "Completed";
+  const start = asDate(session?.startsAt)?.getTime() || 0;
+  const end = asDate(session?.endsAt)?.getTime() || 0;
+  const current = now.getTime();
+  if (storedStatus === "live" || (start && start <= current && (!end || end >= current))) return "Live";
+  if (end && end < current) return "Completed";
+  return "Upcoming";
+}
+
+function sessionStatusStyle(status) {
+  if (status === "Cancelled") return { background: "#fee2e2", color: "#991b1b" };
+  if (status === "Completed") return { background: "#dcfce7", color: "#166534" };
+  if (status === "Live") return { background: "#fef3c7", color: "#92400e" };
+  return { background: "#dbeafe", color: "#1e40af" };
 }
 
 function escapeIcs(value) {
@@ -135,7 +169,7 @@ function downloadCanonicalCalendar(summary) {
       `DTEND:${toIcsDate(session.endsAt)}`,
       `SUMMARY:${escapeIcs(`${summary.klass.name}: ${sessionTopic(session)}`)}`,
       `DESCRIPTION:${escapeIcs(session.cancellationReason || "Falowen live class")}`,
-      session.status === "cancelled" ? "STATUS:CANCELLED" : "STATUS:CONFIRMED",
+      normalizeStatus(session.status) === "cancelled" ? "STATUS:CANCELLED" : "STATUS:CONFIRMED",
       "END:VEVENT",
     ].join("\r\n"));
 
@@ -202,8 +236,53 @@ function StaticClassCard({ selectedClass, classDetails, now }) {
       ) : <p style={styles.helperText}>No upcoming class is listed.</p>}
 
       <button type="button" style={styles.primaryButton} onClick={() => downloadClassCalendar(selectedClass)}>Download class calendar</button>
-      {classDetails?.docUrl ? <a href={classDetails.docUrl} target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>Open course materials</a> : null}
     </>
+  );
+}
+
+function CanonicalSessionsList({ summary, zoom, now, locale }) {
+  const sessions = useMemo(
+    () => [...(summary?.sessions || [])].sort((left, right) => (asDate(left.startsAt)?.getTime() || 0) - (asDate(right.startsAt)?.getTime() || 0)),
+    [summary?.sessions],
+  );
+
+  return (
+    <details open style={{ ...infoCardStyle, background: "#f8fafc" }}>
+      <summary style={{ cursor: "pointer", fontWeight: 800 }}>
+        All class sessions ({sessions.length})
+      </summary>
+      <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+        These are the actual sessions saved in Falowen Admin. Reschedules and cancellations update here automatically.
+      </p>
+      {!sessions.length ? (
+        <p style={{ ...styles.helperText, margin: "8px 0 0" }}>No generated sessions are available yet. Ask the administrator to regenerate this class schedule.</p>
+      ) : (
+        <div style={{ display: "grid", gap: 8, marginTop: 10, maxHeight: 560, overflowY: "auto", paddingRight: 4 }}>
+          {sessions.map((session, index) => {
+            const displayStatus = sessionDisplayStatus(session, now);
+            const statusColors = sessionStatusStyle(displayStatus);
+            const curriculum = curriculumLabel(session);
+            return (
+              <article key={session.id || `${session.startsAt}-${index}`} style={{ border: "1px solid #dbe3ee", borderRadius: 12, padding: 11, background: "#fff", display: "grid", gap: 5 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
+                  <div>
+                    <strong>Session {index + 1}</strong>
+                    <div style={{ ...styles.helperText, marginTop: 3 }}>{formatDate(session.startsAt, locale)} · {formatRange(session, locale)} Ghana time</div>
+                  </div>
+                  <span style={{ ...styles.badge, ...statusColors }}>{displayStatus}</span>
+                </div>
+                <div style={{ fontWeight: 700 }}>{sessionTopic(session)}</div>
+                {curriculum ? <div style={{ ...styles.helperText, margin: 0 }}>Curriculum: {curriculum}</div> : null}
+                {session.cancellationReason ? <div style={{ color: "#991b1b", fontSize: 13 }}>Reason: {session.cancellationReason}</div> : null}
+                {displayStatus !== "Cancelled" && canJoinSession(session, now) && zoom?.url ? (
+                  <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none", marginTop: 4 }}>Join this session</a>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </details>
   );
 }
 
@@ -232,6 +311,21 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
     const timer = window.setInterval(() => setNow(new Date()), 60000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const openImportantSections = () => {
+      const card = id ? document.getElementById(id) : null;
+      const liveClassDetails = card?.closest("details");
+      if (liveClassDetails) liveClassDetails.open = true;
+      document.querySelectorAll("details").forEach((details) => {
+        const text = String(details.querySelector("summary")?.textContent || "").toLowerCase();
+        if (text.includes("course guide") || text.includes("day 0 and access details")) details.open = true;
+      });
+    };
+    openImportantSections();
+    const frame = window.requestAnimationFrame(openImportantSections);
+    return () => window.cancelAnimationFrame(frame);
+  }, [id]);
 
   useEffect(() => {
     setCanonicalSummary(null);
@@ -266,8 +360,8 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
   const zoom = canonicalSummary?.zoom?.url
     ? canonicalSummary.zoom
     : !canonicalSummary?.klass?.zoomProfileId
-    ? ZOOM_DETAILS
-    : canonicalSummary?.zoom || {};
+      ? ZOOM_DETAILS
+      : canonicalSummary?.zoom || {};
   const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const ghanaNextTime = nextSession ? formatRange(nextSession, locale, GHANA_TIMEZONE) : "";
   const deviceNextTime = nextSession ? formatRange(nextSession, locale, deviceTimeZone) : "";
@@ -324,13 +418,17 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
 
           <section style={infoCardStyle}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <strong>Course progress</strong>
+              <strong>{canonicalSummary.klass.levelId || canonicalSummary.klass.level || "Course"} progress</strong>
               <span style={styles.badge}>{canonicalSummary.progress}%</span>
             </div>
             <div style={{ height: 10, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
               <div style={{ width: `${canonicalSummary.progress}%`, height: "100%", background: "linear-gradient(90deg, #2563eb, #7c3aed)" }} />
             </div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{canonicalSummary.completedCount} of {canonicalSummary.totalCount} non-cancelled sessions completed.</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {canonicalSummary.progressMode === "timeline"
+                ? "Calculated from the official class start and graduation dates."
+                : `${canonicalSummary.completedCount} of ${canonicalSummary.totalCount} non-cancelled sessions completed.`}
+            </p>
           </section>
 
           {cancelledSessions.map((session) => (
@@ -366,11 +464,13 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
               <p style={{ ...styles.helperText, margin: 0 }}>{sessionTopic(nextSession)}</p>
               {canJoinSession(nextSession, now) && zoom.url ? <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a> : null}
             </section>
-          ) : <p style={styles.helperText}>No upcoming non-cancelled session is scheduled.</p>}
+          ) : <p style={styles.helperText}>No upcoming non-cancelled session is scheduled. Check the full session list below.</p>}
+
+          <CanonicalSessionsList summary={canonicalSummary} zoom={zoom} now={now} locale={locale} />
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="button" style={styles.primaryButton} onClick={() => downloadCanonicalCalendar(canonicalSummary)}>Download class calendar</button>
-            {canonicalSummary.klass.classUrl ? <a href={canonicalSummary.klass.classUrl} style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open class page</a> : null}
+            <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open Course Book</a>
           </div>
         </>
       ) : canonicalStatus === "loading" ? (
