@@ -85,6 +85,7 @@ test("C1 Day 3 uses the requested Medien und Informationskompetenz radio", () =>
 test.each([
   ["/campus/course/lesson/C1/4", { level: "C1", day: 4 }],
   ["/campus/course/lesson/C1/5", { level: "C1", day: 5 }],
+  ["/campus/course/lesson/C1/6", { level: "C1", day: 6 }],
   ["/campus/course/lesson/A2/8", { level: "A2", day: 8 }],
   ["/campus/course/a2-day-8-rezepte-und-essen-workbook", { level: "A2", day: 8 }],
   ["/campus/course/lesson/A2/15", { level: "A2", day: 15 }],
@@ -116,6 +117,7 @@ test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", 
 test.each([
   [4, "Beziehungen und Teamarbeit", "Vl3mmytfrRk"],
   [5, "Berufliche Entwicklung", "69FO0zn9ZvA"],
+  [6, "Gesundheit und Lebensstil", "tWoSGXGiWD8"],
 ])("C1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("C1", day)).toEqual(
     expect.objectContaining({ title, youtubeId }),
