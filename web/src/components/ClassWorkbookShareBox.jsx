@@ -58,7 +58,7 @@ const formatRelativeTime = (value, now) => {
 
 const cleanPostText = (value) =>
   String(value || "")
-    .replace(/\u0000/g, "")
+    .split(String.fromCharCode(0)).join("")
     .trim()
     .slice(0, MAX_POST_LENGTH);
 
