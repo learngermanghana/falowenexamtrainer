@@ -9,12 +9,14 @@ const sanitizePracticeChapter = (value = "") =>
     .trim()
     .replace(/[^a-z0-9._-]/gi, "-");
 
-const buildCourseItemLabel = (entry = {}) => {
+const buildCourseItemLabel = (entry = {}, level = "") => {
+  const normalizedLevel = normalizeLevel(level || entry.level || "") || String(level || entry.level || "").toUpperCase();
   const displayDay = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day ?? 0);
   const displayChapter = String(entry.displayChapter || entry.chapter || "").trim();
   const title = String(entry.topic || entry.title || "Lesson").trim();
   const prefix = displayDay > 0 ? `Day ${displayDay}${displayChapter ? ` ${displayChapter}` : ""}` : displayChapter;
-  return `${prefix ? `${prefix}: ` : ""}${title}`.trim();
+  const lessonLabel = `${prefix ? `${prefix}: ` : ""}${title}`.trim();
+  return normalizedLevel ? `${normalizedLevel} · ${lessonLabel}` : lessonLabel;
 };
 
 const getPracticeKeysForEntry = (entry = {}, level = "") => {
@@ -69,13 +71,14 @@ const getAssignmentSummary = (level = "A1") => {
     const selfStudy = !submissionRequired;
     return {
       order: index,
+      level: normalizedLevel,
       assignmentDay: Number(entry.assignmentDay ?? entry.day ?? 0),
       dayNumber: displayDay,
       displayDay,
       displayChapter,
       title,
       goal: String(entry.goal || "").trim(),
-      label: buildCourseItemLabel(entry),
+      label: buildCourseItemLabel(entry, normalizedLevel),
       assignmentId,
       identifiers: submissionRequired && assignmentId ? [assignmentId] : [],
       submissionRequired,
