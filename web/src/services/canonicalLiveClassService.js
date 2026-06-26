@@ -36,7 +36,9 @@ function classIdentityKey(value) {
   const normalized = normalizeClassIdentity(value);
   if (!normalized) return "";
   const level = normalized.match(/\b(a1|a2|b1|b2|c1|c2)\b/)?.[1] || "";
-  const remainder = normalized.replace(new RegExp(`\\b${level}\\b`, "g"), " ").replace(/\s+/g, " ").trim();
+  const remainder = level
+    ? normalized.replace(new RegExp(`\\b${level}\\b`, "g"), " ").replace(/\s+/g, " ").trim()
+    : normalized;
   return [level, remainder].filter(Boolean).join(" ");
 }
 
@@ -128,9 +130,9 @@ function scoreClassCandidate(klass, targets = []) {
   const identities = fields.map(normalizeClassIdentity).filter(Boolean);
   const keys = fields.map(classIdentityKey).filter(Boolean);
 
-  let score = classStatusRank(klass);
-  if (identities.some((identity) => targetIdentities.has(identity))) score += 500;
-  if (keys.some((key) => targetKeys.has(key))) score += 350;
+  let matchScore = 0;
+  if (identities.some((identity) => targetIdentities.has(identity))) matchScore += 500;
+  if (keys.some((key) => targetKeys.has(key))) matchScore += 350;
 
   const targetLevel = [...targetKeys].map((key) => key.match(/^(a1|a2|b1|b2|c1|c2)\b/)?.[1]).find(Boolean);
   const targetPlaces = [...targetKeys]
@@ -141,9 +143,12 @@ function scoreClassCandidate(klass, targets = []) {
   const candidatePlace = candidateKey.replace(/^(a1|a2|b1|b2|c1|c2)\b/, "").trim();
 
   if (targetLevel && candidateLevel === targetLevel && candidatePlace && targetPlaces.includes(candidatePlace)) {
-    score += 250;
+    matchScore += 250;
   }
 
+  if (matchScore <= 0) return 0;
+
+  let score = matchScore + classStatusRank(klass);
   const startDate = classDateMillis(klass.startDate);
   if (startDate > 0) score += Math.min(50, Math.floor(startDate / 86400000) / 100000);
   return score;
