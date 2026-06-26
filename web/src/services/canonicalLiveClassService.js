@@ -11,9 +11,33 @@ import {
 
 const CANCELLED = "cancelled";
 const COMPLETED = "completed";
+const ACTIVE_CLASS_STATUSES = new Set(["active", "ongoing", "upcoming"]);
+const INACTIVE_CLASS_STATUSES = new Set(["archived", "deleted"]);
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function normalizeClassIdentity(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ß/g, "ss")
+    .toLowerCase()
+    .replace(/\b(muenchen|munchen)\b/g, "munich")
+    .replace(/\b(koeln|cologne)\b/g, "koln")
+    .replace(/\b(klasse|class|course|cohort)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function classIdentityKey(value) {
+  const normalized = normalizeClassIdentity(value);
+  if (!normalized) return "";
+  const level = normalized.match(/\b(a1|a2|b1|b2|c1|c2)\b/)?.[1] || "";
+  const remainder = normalized.replace(new RegExp(`\\b${level}\\b`, "g"), " ").replace(/\s+/g, " ").trim();
+  return [level, remainder].filter(Boolean).join(" ");
 }
 
 function normalizeIdArray(value) {
@@ -41,6 +65,15 @@ function toDate(value) {
   if (typeof value?.seconds === "number") return new Date(value.seconds * 1000);
   const parsed = value instanceof Date ? value : new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function classDateMillis(value, endOfDay = false) {
+  if (!value) return 0;
+  const text = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return new Date(`${text}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}Z`).getTime();
+  }
+  return toDate(value)?.getTime() || 0;
 }
 
 function sessionTime(session, field) {
@@ -73,23 +106,99 @@ function resolveZoomDetails(profile = {}, klass = {}) {
   };
 }
 
+function classStatusRank(klass = {}) {
+  const status = normalize(klass.status);
+  if (INACTIVE_CLASS_STATUSES.has(status) || klass.archived === true || klass.isArchived === true) return -1000;
+  if (ACTIVE_CLASS_STATUSES.has(status)) return 100;
+  if (status === "draft") return 20;
+  if (status === "graduated") return 5;
+  return 10;
+}
+
+function candidateFields(klass = {}) {
+  return [klass.id, klass.classId, klass.name, klass.className, klass.slug, klass.city]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+}
+
+function scoreClassCandidate(klass, targets = []) {
+  const targetIdentities = new Set(targets.map(normalizeClassIdentity).filter(Boolean));
+  const targetKeys = new Set(targets.map(classIdentityKey).filter(Boolean));
+  const fields = candidateFields(klass);
+  const identities = fields.map(normalizeClassIdentity).filter(Boolean);
+  const keys = fields.map(classIdentityKey).filter(Boolean);
+
+  let score = classStatusRank(klass);
+  if (identities.some((identity) => targetIdentities.has(identity))) score += 500;
+  if (keys.some((key) => targetKeys.has(key))) score += 350;
+
+  const targetLevel = [...targetKeys].map((key) => key.match(/^(a1|a2|b1|b2|c1|c2)\b/)?.[1]).find(Boolean);
+  const targetPlaces = [...targetKeys]
+    .map((key) => key.replace(/^(a1|a2|b1|b2|c1|c2)\b/, "").trim())
+    .filter(Boolean);
+  const candidateKey = keys.find((key) => key.match(/^(a1|a2|b1|b2|c1|c2)\b/)) || "";
+  const candidateLevel = candidateKey.match(/^(a1|a2|b1|b2|c1|c2)\b/)?.[1] || "";
+  const candidatePlace = candidateKey.replace(/^(a1|a2|b1|b2|c1|c2)\b/, "").trim();
+
+  if (targetLevel && candidateLevel === targetLevel && candidatePlace && targetPlaces.includes(candidatePlace)) {
+    score += 250;
+  }
+
+  const startDate = classDateMillis(klass.startDate);
+  if (startDate > 0) score += Math.min(50, Math.floor(startDate / 86400000) / 100000);
+  return score;
+}
+
+function chooseCanonicalClass(candidates = [], targets = []) {
+  return candidates
+    .map((klass) => ({ klass, score: scoreClassCandidate(klass, targets) }))
+    .filter((entry) => entry.score > 0)
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      return classDateMillis(right.klass.startDate) - classDateMillis(left.klass.startDate);
+    })[0]?.klass || null;
+}
+
+function calculateTimelineProgress(klass = {}, nonCancelled = [], now = new Date()) {
+  const nowMs = now.getTime();
+  const startMs = classDateMillis(klass.startDate);
+  const endMs = classDateMillis(klass.endDate, true);
+
+  if (startMs > 0 && endMs > startMs) {
+    if (nowMs <= startMs) return 0;
+    if (nowMs >= endMs) return 100;
+    return Math.max(1, Math.min(99, Math.round(((nowMs - startMs) / (endMs - startMs)) * 100)));
+  }
+
+  if (!nonCancelled.length) return 0;
+  const elapsed = nonCancelled.filter((session) => {
+    if (normalize(session.status) === COMPLETED) return true;
+    const end = sessionTime(session, "endsAt");
+    return end > 0 && end < nowMs;
+  });
+  return Math.round((elapsed.length / nonCancelled.length) * 100);
+}
+
 export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfile = null, now = new Date() }) {
   const nowMs = now.getTime();
   const ordered = [...sessions].sort((a, b) => sessionTime(a, "startsAt") - sessionTime(b, "startsAt"));
-  const nonCancelled = ordered.filter((session) => session.status !== CANCELLED);
-  const completed = nonCancelled.filter((session) => session.status === COMPLETED);
+  const nonCancelled = ordered.filter((session) => normalize(session.status) !== CANCELLED);
+  const elapsed = nonCancelled.filter((session) => {
+    if (normalize(session.status) === COMPLETED) return true;
+    const endsAt = sessionTime(session, "endsAt");
+    return endsAt > 0 && endsAt < nowMs;
+  });
   const nextSession = nonCancelled.find((session) => {
     const startsAt = sessionTime(session, "startsAt");
     const endsAt = sessionTime(session, "endsAt");
-    return session.status === "live" || startsAt >= nowMs || endsAt >= nowMs;
+    return normalize(session.status) === "live" || startsAt >= nowMs || endsAt >= nowMs;
   }) || null;
-  const latestCompletedSession = [...nonCancelled]
-    .filter((session) => session.status === COMPLETED || (sessionTime(session, "endsAt") > 0 && sessionTime(session, "endsAt") < nowMs))
+  const latestCompletedSession = [...elapsed]
     .sort((a, b) => sessionTime(b, "startsAt") - sessionTime(a, "startsAt"))[0] || null;
   const cancelledSessions = ordered
-    .filter((session) => session.status === CANCELLED)
+    .filter((session) => normalize(session.status) === CANCELLED)
     .sort((a, b) => sessionTime(b, "startsAt") - sessionTime(a, "startsAt"));
-  const progress = nonCancelled.length ? Math.round((completed.length / nonCancelled.length) * 100) : 0;
+  const progress = calculateTimelineProgress(klass, nonCancelled, now);
 
   return {
     klass,
@@ -98,7 +207,8 @@ export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfi
     latestCompletedSession,
     cancelledSessions,
     progress,
-    completedCount: completed.length,
+    progressMode: klass?.startDate && klass?.endDate ? "timeline" : "sessions",
+    completedCount: elapsed.length,
     totalCount: nonCancelled.length,
     zoom: resolveZoomDetails(zoomProfile, klass),
   };
@@ -106,26 +216,21 @@ export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfi
 
 export async function findCanonicalClass({ classId, className, slug } = {}) {
   if (!db) return null;
+  const targets = [classId, className, slug].map((value) => String(value || "").trim()).filter(Boolean);
+  if (!targets.length) return null;
+
   const directId = String(classId || "").trim();
+  let directMatch = null;
   if (directId) {
     const snap = await getDoc(doc(db, "classes", directId));
-    if (snap.exists()) return { id: snap.id, ...snap.data() };
+    if (snap.exists()) directMatch = { id: snap.id, ...snap.data() };
   }
 
-  const targetName = String(className || "").trim();
-  if (targetName) {
-    const exact = await getDocs(query(collection(db, "classes"), where("name", "==", targetName)));
-    if (!exact.empty) return { id: exact.docs[0].id, ...exact.docs[0].data() };
-  }
-
-  const targetTokens = new Set([className, slug].map(normalize).filter(Boolean));
-  if (!targetTokens.size) return null;
   const all = await getDocs(collection(db, "classes"));
-  const match = all.docs.find((snapshot) => {
-    const data = snapshot.data();
-    return [snapshot.id, data.name, data.slug].some((value) => targetTokens.has(normalize(value)));
-  });
-  return match ? { id: match.id, ...match.data() } : null;
+  const candidates = all.docs.map((snapshot) => ({ id: snapshot.id, ...snapshot.data() }));
+  if (directMatch && !candidates.some((candidate) => candidate.id === directMatch.id)) candidates.push(directMatch);
+
+  return chooseCanonicalClass(candidates, targets);
 }
 
 async function loadZoomProfile(klass) {
