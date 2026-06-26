@@ -12,7 +12,9 @@ const A1_DAY18_CHAPTER122_GRAMMAR_PATH = "/campus/course/a1-12-2-dative-articles
 const A1_DAY18_CHAPTER122_WORKBOOK_PATH = "/campus/course/a1-day-18-kapitel-12-2-workbook";
 const A2_DAY20_WORKBOOK_PATH = "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
 const A2_DAY21_WORKBOOK_PATH = "/campus/course/a2-day-21-ein-wochenende-planen-workbook";
+const B1_DAY4_WORKBOOK_PATH = "/campus/course/b1-day-4-wohnung-suchen-workbook";
 const workbookRouteIndex = buildWorkbookRouteIndex();
+
 export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
   "/campus/course/a1-day-2-kapitel-1-1-workbook",
@@ -22,6 +24,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
   A2_DAY20_WORKBOOK_PATH,
   A2_DAY21_WORKBOOK_PATH,
+  B1_DAY4_WORKBOOK_PATH,
 ]);
 
 export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } = {}) => {
@@ -29,15 +32,10 @@ export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } 
   const normalizedPathname = normalizeInAppPath(pathname);
   const requestedView = new URLSearchParams(search || "").get("view");
 
-  if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) {
-    return requestedView === "workbook";
-  }
+  if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) return requestedView === "workbook";
+  if (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH) return false;
 
-  if (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH) {
-    return false;
-  }
-
-  const isB1LessonRoute = /^\/campus\/course\/lesson\/B1\/\d+$/i.test(normalizedPathname);
+  const isB1LessonRoute = normalizedPathname.toLowerCase().startsWith("/campus/course/lesson/b1/");
   if (!isB1LessonRoute) return true;
   return requestedView === "workbook";
 };
@@ -49,10 +47,7 @@ const AutoWorkbookStartGuide = () => {
   const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
   const usesSelfManagedSubmissionTabs = SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname);
 
-  if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) {
-    return <A1Day18Kapitel122WorkbookPage />;
-  }
-
+  if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) return <A1Day18Kapitel122WorkbookPage />;
   if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
 
   return (
@@ -84,4 +79,5 @@ export const __TESTING__ = {
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
   A2_DAY20_WORKBOOK_PATH,
   A2_DAY21_WORKBOOK_PATH,
+  B1_DAY4_WORKBOOK_PATH,
 };
