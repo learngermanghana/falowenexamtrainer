@@ -96,10 +96,10 @@ export const LESSON_RADIO_DICTIONARY = {
     4: {
       key: "b1-day4-wohnung-suchen-falowen-radio",
       title: "Wohnung suchen (Übung) 2.4",
-      youtubeId: "6VKgmBgdMLg",
+      youtubeId: "w5NjPPQUfXI",
       duration: "",
       instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema Wohnungssuche in Deutschland ein. Danach gehst du weiter zum Workbook. Die AI-Grammatik wird später ergänzt.",
+        "Höre aufmerksam zu und stimme dich auf das Thema Wohnungssuche in Deutschland ein. Danach gehst du weiter zum Workbook.",
     },
   },
   B2: {
