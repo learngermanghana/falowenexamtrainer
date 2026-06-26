@@ -7,7 +7,7 @@ const c1Day6GesundheitUndLebensstil = makeLesson({
   title: "Gesundheit und Lebensstil",
   topic: "Balance, Prävention, psychisches Wohlbefinden und gesellschaftliche Verantwortung differenziert beurteilen",
   heroImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80",
-  grammarFocus: "Kausale, konsekutive und konzessive Strukturen: Ursachen, Folgen und Einschränkungen präzise ausdrücken",
+  grammarFocus: "Ursache, Folge und Einräumung präzise unterscheiden: kausale, konsekutive und konzessive Strukturen",
   objectives: [
     "Ich kann Zusammenhänge zwischen Alltag, Arbeit, Gesundheit und gesellschaftlichen Bedingungen erklären.",
     "Ich kann Ursachen mit da, zumal, aufgrund und infolge präzise formulieren.",
@@ -29,17 +29,18 @@ const c1Day6GesundheitUndLebensstil = makeLesson({
   grammarLesson: {
     title: "Kausale, konsekutive und konzessive Strukturen",
     explanation: [
-      "Kausale Strukturen nennen einen Grund oder eine Ursache. Neben weil und da kannst du auf C1-Niveau zumal, aufgrund, angesichts und infolge verwenden.",
-      "Konsekutive Strukturen zeigen eine Folge. Nebensätze mit sodass haben Endstellung des Verbs; Konnektoren wie daher, folglich und somit stehen im Hauptsatz und werden direkt vom Verb gefolgt.",
-      "Konzessive Strukturen nennen eine Einschränkung oder einen Gegensatz, der die Hauptaussage nicht verhindert. Typische Formen sind obwohl, obgleich, selbst wenn und trotz.",
+      "Bestimme zuerst die logische Beziehung: Nennst du einen Grund, eine Folge oder einen Gegensatz? Erst danach wählst du den passenden Konnektor.",
+      "Kausale Strukturen beantworten die Frage warum. Da und zumal leiten Nebensätze ein; aufgrund, angesichts und infolge verbinden sich mit einer Nominalgruppe und wirken besonders schriftsprachlich.",
+      "Konsekutive Strukturen zeigen das Ergebnis einer Ursache. Sodass leitet einen Nebensatz ein, während daher, folglich, somit und infolgedessen einen neuen Hauptsatz beginnen können.",
+      "Konzessive Strukturen räumen einen Einwand ein. Obwohl und obgleich beziehen sich meist auf eine reale Tatsache; selbst wenn kann auch eine nur angenommene Bedingung ausdrücken. Trotz steht mit einer Nominalgruppe.",
     ],
     rules: [
-      "Da und zumal leiten kausale Nebensätze ein; das konjugierte Verb steht am Ende.",
-      "Aufgrund, angesichts und infolge stehen in formellen Texten meist mit dem Genitiv.",
-      "Sodass leitet einen Folgesatz ein: Die Belastung nahm zu, sodass viele Beschäftigte ausfielen.",
-      "Nach daher, folglich, somit und infolgedessen steht das Verb auf Position zwei.",
-      "Obwohl, obgleich und selbst wenn leiten konzessive Nebensätze ein; das Verb steht am Ende.",
-      "Trotz steht in formellen Texten meist mit dem Genitiv: trotz des hohen Zeitdrucks.",
+      "Bedeutung zuerst: kausal = Grund, konsekutiv = Folge, konzessiv = Einräumung oder Gegenargument.",
+      "Kausaler Nebensatz: da oder zumal + Verb am Ende. Beispiel: Da der Zeitdruck zunimmt, leiden viele Beschäftigte unter Stress.",
+      "Kausale Nominalgruppe: aufgrund, angesichts oder infolge + Genitiv. Beispiel: aufgrund des hohen Zeitdrucks.",
+      "Folge ausdrücken: sodass + Verb am Ende; daher, folglich, somit oder infolgedessen + Verb auf Position zwei.",
+      "Einräumung ausdrücken: obwohl, obgleich oder selbst wenn + Verb am Ende; trotz + Genitivgruppe.",
+      "Kommasetzung: Nebensätze werden durch ein Komma vom Hauptsatz getrennt; Satzadverbien wie daher stehen im Hauptsatz und lösen Inversion aus.",
     ],
     examples: [
       "Da viele Menschen unter dauerhaftem Zeitdruck stehen, fällt es ihnen schwer, gesunde Routinen einzuhalten.",
@@ -48,7 +49,7 @@ const c1Day6GesundheitUndLebensstil = makeLesson({
       "Regelmäßige Pausen verbessern die Konzentration; folglich profitieren auch Arbeitgeber davon.",
       "Obwohl Gesundheitsprogramme sinnvoll sein können, dürfen sie soziale und finanzielle Unterschiede nicht ignorieren.",
     ],
-    miniExercise: "Verbinde die Aussagen: 1) Viele Beschäftigte stehen unter Zeitdruck. Gesunde Routinen werden vernachlässigt. Nutze sodass. 2) Die psychische Belastung steigt. Prävention wird wichtiger. Nutze angesichts. 3) Gesundheitskurse werden angeboten. Nicht alle können teilnehmen. Nutze obwohl. 4) Bewegung verbessert das Wohlbefinden. Arbeitgeber sollten aktive Pausen fördern. Nutze daher.",
+    miniExercise: "Formuliere vier vollständige Sätze: ① Zeitdruck steigt → gesunde Routinen werden vernachlässigt. Nutze sodass. ② Psychische Belastung nimmt zu → Prävention wird wichtiger. Nutze angesichts. ③ Gesundheitskurse werden angeboten → nicht alle können teilnehmen. Nutze obwohl. ④ Bewegung verbessert das Wohlbefinden → Arbeitgeber sollten aktive Pausen fördern. Nutze daher.",
     knowledgeTest: [
       {
         question: "Welche Formulierung drückt eine Folge aus?",
@@ -89,15 +90,23 @@ const c1Day6GesundheitUndLebensstil = makeLesson({
     ],
   },
   writingTaskType: "C1 opinion essay / Stellungnahme",
-  writingTopic: "Schreiben: Gesundheit und Lebensstil. Verfassen Sie eine C1-Stellungnahme zu der Frage: Welche Verantwortung tragen Einzelne, Arbeitgeber und Staat für einen gesunden Lebensstil? Bearbeiten Sie alle Punkte: Erklären Sie, warum Prävention in modernen Gesellschaften wichtig ist. Argumentieren Sie anhand eines konkreten Beispiels für eine gesundheitliche Belastung im Alltag oder Berufsleben. Nennen Sie einen möglichen Einwand gegen stärkere Gesundheitsprogramme oder staatliche Maßnahmen. Erläutern Sie eine ausgewogene Lösung, die Eigenverantwortung, gute Rahmenbedingungen und soziale Unterschiede berücksichtigt.",
+  writingTopic: "Schreiben: Stellungnahme – Wer trägt Verantwortung für einen gesunden Lebensstil?",
+  writingPromptBullets: [
+    "Verfassen Sie eine Stellungnahme mit 200–240 Wörtern.",
+    "Erklären Sie, warum Prävention in modernen Gesellschaften wichtig ist.",
+    "Beschreiben Sie anhand eines konkreten Beispiels eine gesundheitliche Belastung im Alltag oder Berufsleben und zeigen Sie Ursache und Folge.",
+    "Beurteilen Sie die Verantwortung von Einzelnen, Arbeitgebern und Staat.",
+    "Nennen Sie einen Einwand gegen stärkere Gesundheitsprogramme oder staatliche Maßnahmen.",
+    "Entwickeln Sie eine ausgewogene Lösung, die Eigenverantwortung, gute Rahmenbedingungen und soziale Unterschiede berücksichtigt.",
+  ],
   writingBuilder: {
     structure: [
       "Einleitung: Stellen Sie das Thema vor und formulieren Sie Ihre Grundposition.",
       "Bedeutung: Erklären Sie, warum Prävention gesellschaftlich und wirtschaftlich relevant ist.",
       "Beispiel: Beschreiben Sie eine konkrete gesundheitliche Belastung mit Ursache und Folge.",
+      "Verantwortung: Bewerten Sie die Rolle von Einzelnen, Arbeitgebern und Staat.",
       "Einwand: Erläutern Sie mögliche Kritik an Gesundheitsprogrammen, Regeln oder staatlicher Einflussnahme.",
-      "Lösung: Verbinden Sie Eigenverantwortung mit zugänglichen Angeboten und gesunden Rahmenbedingungen.",
-      "Schluss: Formulieren Sie ein differenziertes Fazit.",
+      "Lösung und Schluss: Verbinden Sie Eigenverantwortung mit zugänglichen Angeboten, gesunden Rahmenbedingungen und einem differenzierten Fazit.",
     ],
     usefulLines: [
       "Gesundheit wird häufig als private Angelegenheit betrachtet, obwohl sie stark von gesellschaftlichen Bedingungen beeinflusst wird.",
