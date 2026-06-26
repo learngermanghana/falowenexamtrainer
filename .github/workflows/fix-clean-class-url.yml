@@ -1,0 +1,41 @@
+name: Fix clean class redirect URL
+
+on:
+  push:
+    paths:
+      - ".github/workflows/fix-clean-class-url.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  fix-clean-class-url:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Remove internal reason from public class URL
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("web/public/classes/class-leads.js")
+          content = path.read_text(encoding="utf-8")
+          old = "    const url = buildClassUrl(course, reason ? { reason } : null);"
+          new = "    const url = buildClassUrl(course);"
+
+          if old not in content:
+              raise SystemExit("Expected class redirect line was not found")
+
+          path.write_text(content.replace(old, new, 1), encoding="utf-8")
+          PY
+          rm .github/workflows/fix-clean-class-url.yml
+
+      - name: Commit and push fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/public/classes/class-leads.js .github/workflows/fix-clean-class-url.yml
+          git commit -m "Remove internal reason from class redirect URL"
+          git push
