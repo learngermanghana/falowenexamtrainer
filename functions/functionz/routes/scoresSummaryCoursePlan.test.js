@@ -11,10 +11,18 @@ test("A1 split tasks use visible Course Book days and chapters", () => {
 
   assert.equal(alphabet.displayDay, 2);
   assert.equal(pronouns.displayDay, 2);
-  assert.match(alphabet.label, /^Day 2 0\.2:/);
-  assert.match(pronouns.label, /^Day 2 1\.1:/);
+  assert.match(alphabet.label, /^A1 · Day 2 0\.2:/);
+  assert.match(pronouns.label, /^A1 · Day 2 1\.1:/);
   assert.equal(plannedSet.has("A1-0.2"), true);
   assert.equal(plannedSet.has("A1-1.1"), true);
+});
+
+test("A2 recommendations are explicitly labelled as A2", () => {
+  const { lessons } = getAssignmentSummary("A2");
+  const firstLesson = lessons.find((item) => item.assignmentId === "A2-1.1");
+
+  assert.ok(firstLesson);
+  assert.match(firstLesson.label, /^A2 · Day 1 1\.1:/);
 });
 
 test("A1 self-study items expose completion keys for Course Book progress", () => {
