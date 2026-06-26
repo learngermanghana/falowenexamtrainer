@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -10,11 +11,12 @@ import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
+  { key: "sprechen", label: "Teil 1 · Sprechen" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
   { key: "references", label: "5. Ref" },
+  { key: "submit", label: "6. Submit" },
 ];
 
 const cardStyle = {
@@ -73,12 +75,15 @@ const readingQuestions = [
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
         borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
+        background: active ? "#2563eb" : "#fff",
+        color: active ? "#fff" : "#111827",
+        fontWeight: 800,
+        flex: "0 0 auto",
       }}
     >
       {children}
@@ -113,7 +118,22 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 21 Workbook · Ein Wochenende planen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div
+          role="tablist"
+          aria-label="A2 Day 21 workbook sections"
+          style={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 8,
+            padding: 8,
+            position: "sticky",
+            top: 8,
+            zIndex: 20,
+            border: "1px solid #bfdbfe",
+            borderRadius: 12,
+            background: "#eff6ff",
+          }}
+        >
           {tabs.map((tab) => (
             <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
               {tab.label}
@@ -260,9 +280,7 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
               „Heute spreche ich über meine Wochenendplanung. Am Samstag möchte ich ausschlafen und einkaufen gehen, weil ich unter der Woche wenig Zeit habe. Dann treffe ich Freunde oder mache Sport. Am Sonntag bleibe ich gern zu Hause und lerne Deutsch. Zum Beispiel wiederhole ich neue Wörter und schreibe eine kurze E-Mail. Zum Schluss finde ich: Ein gutes Wochenende hat Ruhe, Freunde und ein bisschen Vorbereitung für Montag.“
             </p>
           </div>
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </section>
       )}
@@ -270,28 +288,20 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
       {activeTab === "schreiben" && (
         <section style={sectionStyle}>
           <h2 style={{ margin: 0 }}>Teil 2 (Schreiben)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Schreiben Sie einen Brief an einen Freund oder eine Freundin, in dem Sie ihn oder sie zu einem gemeinsamen
-            Wochenende einladen.
-          </p>
-          <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>
-              Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind (z. B. was Sie vorhaben und
-              worauf Sie sich freuen).
-            </li>
-            <li>
-              Laden Sie die Person ein, mit Ihnen zu kommen, und nennen Sie wichtige Details (Datum, Ort, Treffpunkt,
-              Dauer).
-            </li>
-            <li>
-              Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann (Kleidung, Essen, Ausrüstung,
-              Aktivitäten).
-            </li>
-          </ol>
+          <div style={{ ...questionBoxStyle, background: "#eff6ff", borderColor: "#bfdbfe" }}>
+            <strong>Schreibaufgabe: Einladung zu einem gemeinsamen Wochenende</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Schreiben Sie einen Brief an einen Freund oder eine Freundin und laden Sie die Person zu einem gemeinsamen Wochenende ein.
+            </p>
+            <strong>Bearbeiten Sie diese Punkte:</strong>
+            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind.</li>
+              <li>Laden Sie die Person ein und nennen Sie Datum, Ort, Treffpunkt und Dauer.</li>
+              <li>Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann.</li>
+            </ol>
+          </div>
 
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </section>
@@ -363,24 +373,27 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
         </section>
       )}
 
-      <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <p style={{ margin: 0, fontWeight: 600 }}>
-          Finished the workbook? Submit all final answers in the submission area.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Submit Workbook Answers
-        </a>
-      </div>
-
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day21EinWochenendePlanen", level: "A2", workbookId: "A2Day21EinWochenendePlanen" }} workbookId="A2Day21EinWochenendePlanen" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day21EinWochenendePlanen", level: "A2", workbookId: "A2Day21EinWochenendePlanen" }}
+          workbookId="A2Day21EinWochenendePlanen"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <section style={sectionStyle}>
+          <h2 style={{ margin: 0 }}>Submit workbook answers</h2>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>
+            Submit your final Lesen and Schreiben answers here after completing the workbook sections.
+          </p>
+          <div className="a2-day21-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day21-submission-page > div > section:first-child { display: none !important; }
+            .a2-day21-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage />
+          </div>
+        </section>
+      )}
     </div>
   );
 };
