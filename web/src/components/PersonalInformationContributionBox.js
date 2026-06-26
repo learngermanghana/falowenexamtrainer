@@ -13,6 +13,19 @@ const levelFrom = (profile = {}) =>
 const studentCodeFrom = (profile = {}, user = {}) =>
   String(profile.studentcode || profile.studentCode || profile.student_id || profile.id || user.uid || "").trim();
 
+const personalInformationTranslations = [
+  { german: "Familienname", english: "Surname / family name", example: "Mein Familienname ist …", meaning: "My surname is …" },
+  { german: "Vorname", english: "First name", example: "Mein Vorname ist …", meaning: "My first name is …" },
+  { german: "Herkunft", english: "Country of origin", example: "Ich komme aus …", meaning: "I come from …" },
+  { german: "Geburtsort", english: "Place of birth", example: "Ich bin in … geboren.", meaning: "I was born in …" },
+  { german: "Adresse", english: "Address", example: "Meine Adresse ist …", meaning: "My address is …" },
+  { german: "Postleitzahl", english: "Postal code", example: "Meine Postleitzahl ist …", meaning: "My postal code is …" },
+  { german: "Telefonnummer", english: "Telephone number", example: "Meine Telefonnummer ist …", meaning: "My telephone number is …" },
+  { german: "Familienstand", english: "Marital status", example: "Ich bin ledig / verheiratet / geschieden / verwitwet.", meaning: "I am single / married / divorced / widowed." },
+  { german: "Kinder", english: "Children", example: "Ich habe … Kinder. / Ich habe keine Kinder.", meaning: "I have … children. / I have no children." },
+  { german: "Alter", english: "Age", example: "Ich bin … Jahre alt.", meaning: "I am … years old." },
+];
+
 const memberFrom = (snapshot) => {
   const data = snapshot.data() || {};
   return {
@@ -114,6 +127,33 @@ export default function PersonalInformationContributionBox() {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      <div
+        style={{
+          border: "1px solid #bfdbfe",
+          borderRadius: 14,
+          background: "#eff6ff",
+          padding: 14,
+          display: "grid",
+          gap: 10,
+        }}
+      >
+        <strong>English meaning and German sentence starters</strong>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Use the English meaning to understand each item, then write your answer in German.
+        </p>
+        <div style={{ display: "grid", gap: 9 }}>
+          {personalInformationTranslations.map((item, index) => (
+            <div key={item.german} style={{ display: "grid", gap: 3, lineHeight: 1.55 }}>
+              <div>
+                <strong>{index + 1}. {item.german}</strong> — {item.english}
+              </div>
+              <div><strong>German:</strong> {item.example}</div>
+              <div style={{ color: "#475569" }}><strong>English:</strong> {item.meaning}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
         <textarea
           className="day5-mobile-writing-box"
@@ -125,7 +165,7 @@ export default function PersonalInformationContributionBox() {
             setStatus("");
             setError("");
           }}
-          placeholder="Mein Vorname ist … Ich komme aus …"
+          placeholder="Example: Mein Vorname ist Ama. Ich komme aus Ghana. Ich bin 24 Jahre alt."
           autoCapitalize="sentences"
           autoCorrect="on"
           spellCheck
