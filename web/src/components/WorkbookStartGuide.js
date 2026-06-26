@@ -128,7 +128,7 @@ const LessonResourceItem = ({ number, icon, title, actionLabel, url, onClick }) 
   );
 };
 
-const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) => {
+const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workbook", entry: suppliedEntry }) => {
   const entry = useMemo(() => suppliedEntry || findEntry(level, day), [day, level, suppliedEntry]);
   const videos = useMemo(
     () => mergeVideoResources(
@@ -140,23 +140,37 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) =>
   const teacherVideo = findVideo(videos, "teacher") || videos[0];
   const aiVideo = findVideo(videos, "ai") || videos.find((resource) => resource?.url !== teacherVideo?.url);
   const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link", level, day);
+  const derivedWorkbookUrl = workbookUrl || findResourceUrl(entry, "workbook_link", level, day);
   const primaryResource = firstResource(entry);
   const chapterText = primaryResource?.chapter ? ` Kapitel ${primaryResource.chapter}` : "";
+  const isGrammarMode = mode === "grammar";
 
   return (
     <section style={guideStyle}>
       <div style={{ display: "grid", gap: 3 }}>
         <h2 style={{ margin: 0, fontSize: 18 }}>Supporting materials</h2>
         <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
-          You are already in the workbook{chapterText}. Use these if you need help.
+          You are already in the {isGrammarMode ? "grammar book" : "workbook"}{chapterText}. Use these if you need help.
         </p>
       </div>
 
       <div style={{ display: "grid", gap: 6 }}>
         <LessonResourceItem number="1" icon="🎬" title="Teacher lecture video" actionLabel="Watch teacher video" url={teacherVideo?.url} />
         <LessonResourceItem number="2" icon="🤖" title="AI lecture / grammar video" actionLabel="Watch AI video" url={aiVideo?.url} />
-        <LessonResourceItem number="3" icon="📄" title="Download this workbook as PDF" actionLabel="Download / Print PDF" onClick={() => window.print()} />
-        <LessonResourceItem number="4" icon="📘" title="Grammar book" actionLabel="Open grammar book" url={derivedGrammarUrl} />
+        <LessonResourceItem
+          number="3"
+          icon="📄"
+          title={isGrammarMode ? "Download this grammar book as PDF" : "Download this workbook as PDF"}
+          actionLabel="Download / Print PDF"
+          onClick={() => window.print()}
+        />
+        <LessonResourceItem
+          number="4"
+          icon={isGrammarMode ? "📝" : "📘"}
+          title={isGrammarMode ? "Workbook" : "Grammar book"}
+          actionLabel={isGrammarMode ? "Open workbook" : "Open grammar book"}
+          url={isGrammarMode ? derivedWorkbookUrl : derivedGrammarUrl}
+        />
       </div>
     </section>
   );
