@@ -14,6 +14,7 @@ import CourseBookTerminologyInjector from './components/CourseBookTerminologyInj
 import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
 import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingCheatSheetInjector';
 import BookPdfDownloadInjector from './components/BookPdfDownloadInjector';
+import AutoGrammarStartGuide from './components/AutoGrammarStartGuide';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -35,6 +36,7 @@ root.render(
           <LockedSubmissionCardCompactor />
           <B1WorkbookWritingCheatSheetInjector />
           <App />
+          <AutoGrammarStartGuide />
           <BookPdfDownloadInjector />
         </ToastProvider>
       </AuthProvider>
