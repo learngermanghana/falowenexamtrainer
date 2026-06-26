@@ -127,6 +127,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema öffentliches Leben, Privatsphäre und persönliche Grenzen ein. Danach gehst du weiter zum Lernteil.",
     },
+    4: {
+      key: "b2-day4-bildung-lernen-falowen-radio",
+      title: "Bildung und Lernen",
+      youtubeId: "0rBDjwRe9UY",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Lernstrategien, Prüfungen und Weiterbildung ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
   C1: {
     1: {
