@@ -2,6 +2,8 @@ import React from "react";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { styles } from "../styles";
 
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@LLEAGhana";
+
 const FalowenRadioTabContent = ({
   level = "A2",
   day = 9,
@@ -35,6 +37,9 @@ const FalowenRadioTabContent = ({
         </p>
         <p style={{ margin: 0, lineHeight: 1.7, color: "#e0e7ff" }}>
           {radio.instruction || "Höre einfach zu und stimme dich auf das Thema ein."}
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7, color: "#ddd6fe", fontSize: 14 }}>
+          Falowen Radio is the listening stage inside your course book. This episode matches today&apos;s topic and prepares you for the speaking, grammar and workbook activities that follow.
         </p>
       </div>
 
@@ -76,6 +81,38 @@ const FalowenRadioTabContent = ({
           </div>
         </div>
       )}
+
+      <div
+        style={{
+          border: "1px solid #c7d2fe",
+          borderRadius: 12,
+          padding: 14,
+          background: "#eef2ff",
+          display: "grid",
+          gap: 10,
+        }}
+      >
+        <strong>Train your ear before you answer</strong>
+        <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
+          Listen once for the general meaning. Listen again for pronunciation, rhythm and useful words. You do not need to understand every word before continuing.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <a
+            href="/falowen-radio"
+            style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+          >
+            How Falowen Radio works
+          </a>
+          <a
+            href={YOUTUBE_CHANNEL_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+          >
+            ▶ Subscribe on YouTube
+          </a>
+        </div>
+      </div>
 
       {showAction ? (
         <button
