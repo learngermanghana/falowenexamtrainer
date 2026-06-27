@@ -38,6 +38,22 @@
     return match ? match[1] : "";
   }
 
+  function hasCompletedLeadForSelectedClass() {
+    try {
+      var lead = JSON.parse(localStorage.getItem("falowen:last-class-lead") || "null");
+      if (!lead) return false;
+      var leadSlug = cleanSlug(lead.classSlug || lead.classId || lead.className || "");
+      var slug = selectedSlug();
+      return Boolean(slug && leadSlug && slug === leadSlug);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function isPostLeadDetailPage() {
+    return isQueryDetailPage() || (isDetailPage() && hasCompletedLeadForSelectedClass());
+  }
+
   function signupUrl(slug) {
     return slug ? "/signup/?class=" + encodeURIComponent(slug) : "/signup/";
   }
@@ -172,7 +188,7 @@
   }
 
   function prioritizeSelectedClass() {
-    if (!isQueryDetailPage()) return;
+    if (!isPostLeadDetailPage()) return;
     document.body.classList.add("post-lead-class-detail");
 
     var tabs = document.getElementById("classTabs");
@@ -237,7 +253,7 @@
   }
 
   function installDetailGuard() {
-    if (!isQueryDetailPage() || window.__falowenDetailPriorityGuard) return;
+    if (!isPostLeadDetailPage() || window.__falowenDetailPriorityGuard) return;
     var root = document.querySelector(".page") || document.body;
     if (!root) return;
     window.__falowenDetailPriorityGuard = true;
