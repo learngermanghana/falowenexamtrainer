@@ -1,4 +1,5 @@
 import { getLessonRadioResource } from "./lessonRadioDictionary";
+import { getB1Day5RadioResource } from "./b1Day5Media";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
@@ -43,6 +44,8 @@ const mergeVideos = (...groups) => {
 };
 const isTeacherVideo = (item = {}) =>
   `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
+const getLessonRadio = (level, day) =>
+  getLessonRadioResource(level, day) || getB1Day5RadioResource(level, day);
 
 const shouldHideGrammarBook = ({ level, day }) => level === "A1" && Number(day) === 5;
 
@@ -126,7 +129,6 @@ const resourceGroups = (raw, level, day) => {
 
 const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => {
   if (level !== "A1") return videos;
-
   const singleGroupChapter = groups.length === 1 ? chapterKey(groups[0]?.chapter) : "";
   const chaptersWithTeacher = new Set();
   videos.filter(isTeacherVideo).forEach((video) => {
@@ -145,7 +147,6 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
 
 export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
   const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
-
   if (selectedChapters.size !== 1) return videos;
 
   return videos.filter((video) => {
@@ -180,7 +181,7 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     lessonType: capabilities.fourPartWorkbook ? "fourPartWorkbook" : capabilities.selfAssessment ? "selfLearning" : "guided",
     capabilities,
     resources: {
-      falowenRadio: capabilities.radio ? getLessonRadioResource(level, day) : null,
+      falowenRadio: capabilities.radio ? getLessonRadio(level, day) : null,
       teacherVideo: videos.find(isTeacherVideo) || null,
       aiVideo: videos.find((item) => !isTeacherVideo(item)) || null,
       grammarBook: groups[0]?.grammarBook || null,
