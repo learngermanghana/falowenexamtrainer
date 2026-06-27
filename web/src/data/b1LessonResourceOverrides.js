@@ -32,6 +32,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     chapter: "2.5",
     grammarBook: "/campus/course/lesson/B1/5?view=grammar",
     workbook: "/campus/course/lesson/B1/5?view=workbook",
+    aiVideo: "https://youtu.be/dLzAwzMFGG4",
     grammarTopic:
       "Höfliche Terminvereinbarung: Konjunktiv II mit könnte, würde und wäre sowie indirekte Fragen mit ob, wann, wo und wie",
     goal:
