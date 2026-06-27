@@ -178,6 +178,31 @@ const setHref = (id, href) => {
   if (el && href) el.href = href;
 };
 
+function isBrochureDebugMode() {
+  const params = new URL(window.location.href).searchParams;
+  return params.get("debug") === "1" || localStorage.getItem("falowen:class-brochure-debug") === "1";
+}
+
+function writeBrochureDebug(payload) {
+  const entry = { at: new Date().toISOString(), ...payload };
+  if (window.console && typeof window.console.info === "function") {
+    console.info("[Falowen class brochure debug]", entry);
+  }
+  window.FalowenClassBrochureDebugLog = [entry, ...(window.FalowenClassBrochureDebugLog || [])].slice(0, 25);
+  if (!isBrochureDebugMode()) return;
+  let box = document.getElementById("brochureDebugBox");
+  if (!box) {
+    box = document.createElement("details");
+    box.id = "brochureDebugBox";
+    box.open = true;
+    box.style.cssText = "margin:16px auto;max-width:1100px;border:1px dashed #2563eb;border-radius:14px;padding:10px 12px;background:#eff6ff;color:#1e3a8a;font:12px/1.45 system-ui,-apple-system,Segoe UI,sans-serif";
+    box.innerHTML = '<summary style="font-weight:800;cursor:pointer">Class data debug</summary><pre id="brochureDebugOutput" style="white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto;margin:8px 0 0">[]</pre>';
+    (document.querySelector("main.page") || document.body).prepend(box);
+  }
+  const output = document.getElementById("brochureDebugOutput");
+  if (output) output.textContent = JSON.stringify(window.FalowenClassBrochureDebugLog.slice(0, 12), null, 2);
+}
+
 const slugifyClassValue = (value = "") =>
   String(value)
     .toLowerCase()
@@ -295,7 +320,9 @@ async function fetchLiveClassCatalog() {
 }
 
 async function loadBrochureData() {
+  writeBrochureDebug({ step: "loadBrochureData:start", href: window.location.href, requestedSlug: getRequestedSlug() });
   const staticData = await fetchJsonNoCache("/classes/classes-data.json");
+  writeBrochureDebug({ step: "staticDataLoaded", classCount: staticData?.classes?.length || 0, hasDefaults: Boolean(staticData?.classDefaults) });
   const defaults = staticData.classDefaults || {};
   const staticSelfLearning = (staticData.classes || [])
     .map((course) => expandBrochureClass(course, defaults))
@@ -303,10 +330,12 @@ async function loadBrochureData() {
 
   try {
     const liveData = await fetchLiveClassCatalog();
+    writeBrochureDebug({ step: "liveDataLoaded", classCount: liveData?.classes?.length || 0, generatedAt: liveData?.generatedAt || "" });
     const liveClasses = (liveData.classes || [])
       .map((course) => expandBrochureClass(course, defaults))
       .filter(isBrochureClassOpen);
     const liveTokens = new Set(liveClasses.flatMap((course) => [course.id, course.slug, course.title].filter(Boolean)));
+    writeBrochureDebug({ step: "liveClassesExpanded", openClassCount: liveClasses.length, selfLearningCount: staticSelfLearning.length });
     return {
       ...staticData,
       catalogSource: "firestore",
@@ -318,6 +347,7 @@ async function loadBrochureData() {
     };
   } catch (error) {
     console.warn("Live Falowen class catalogue unavailable", error);
+    writeBrochureDebug({ step: "liveDataError", message: error?.message || String(error), fallbackSelfLearningCount: staticSelfLearning.length });
     return {
       ...staticData,
       catalogSource: "fallback",
@@ -557,7 +587,23 @@ function render() {
   if (!selectedClassId) selectedClassId = sourceList[0]?.id;
 
   const course = brochureData.classes.find((item) => item.id === selectedClassId) || sourceList[0];
-  if (!course) return;
+  writeBrochureDebug({
+    step: "render:selection",
+    requestedSlug,
+    selectedClassId,
+    selectedTitle: course?.title || "",
+    totalClasses: brochureData.classes.length,
+    upcomingCount: courses.length,
+    sourceCount: sourceList.length,
+    catalogSource: brochureData.catalogSource || "static",
+    catalogError: brochureData.catalogError || "",
+  });
+  if (!course) {
+    writeBrochureDebug({ step: "render:noCourse", classIds: (brochureData.classes || []).map((item) => ({ id: item.id, slug: item.slug, title: item.title })) });
+    setText("classTitle", "No class data found");
+    setText("classFormat", "Open this page with ?debug=1 and send the Class data debug panel to Falowen support.");
+    return;
+  }
 
   const schedule = generateSchedule(course);
   const paymentLink = buildPaystackLink(course);
@@ -620,6 +666,8 @@ function render() {
   setText("scheduleHint", schedule.length
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
     : "This track is self-learning, so there is no fixed live class schedule.");
+  writeBrochureDebug({ step: "render:complete", renderedClassId: course.id, renderedSlug: course.slug, scheduleCount: schedule.length, hasPaymentLink: Boolean(paymentLink), hasScheduleUrl: Boolean(classScheduleUrl) });
+
   setHtml("scheduleList", schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
     : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`);
@@ -639,10 +687,13 @@ window.addEventListener("popstate", () => render());
 loadBrochureData()
   .then((data) => {
     brochureData = data;
+    window.FalowenClassBrochureData = data;
+    writeBrochureDebug({ step: "loadBrochureData:complete", classCount: data?.classes?.length || 0, catalogSource: data?.catalogSource || "static" });
     render();
   })
   .catch((error) => {
     console.error("Could not load class brochure", error);
+    writeBrochureDebug({ step: "loadBrochureData:fatal", message: error?.message || String(error) });
     setText("classTitle", "Class details are loading");
     setText("classFormat", "Please refresh the page if details do not appear.");
   });
