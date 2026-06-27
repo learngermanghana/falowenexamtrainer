@@ -54,6 +54,34 @@ describe("B1 canonical lesson resources", () => {
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
+  test("B1 Day 6 uses the corrected title and replaces both Drive lesson links", () => {
+    const lesson = {
+      day: 6,
+      chapter: "2.6",
+      topic: "Leben in der Stadt oder auf dem Land? 2.6",
+      grammar_topic: "Relativsätze",
+      lesen_hören: {
+        chapter: "2.6",
+        grammarbook_link: "https://drive.google.com/legacy-grammar",
+        workbook_link: "https://drive.google.com/legacy-workbook",
+      },
+    };
+
+    applyB1LessonResourceOverride(lesson);
+    const normalized = normalizeLesson(lesson, "B1");
+
+    expect(lesson.topic).toBe("Leben in der Stadt oder auf dem Land?");
+    expect(lesson.grammar_topic).toContain("Komparativ");
+    expect(normalized.resources.grammarBook.url).toBe(
+      "/campus/course/lesson/B1/6?view=grammar"
+    );
+    expect(normalized.resources.workbook.url).toBe(
+      "/campus/course/lesson/B1/6?view=workbook"
+    );
+    expect(normalized.resources.grammarBook.url).not.toContain("drive.google.com");
+    expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
+  });
+
   test("B1 Days 1 to 3 use the requested AI grammar videos", () => {
     const dictionary = { B1: {} };
     applyB1LessonVideoOverrides(dictionary);
