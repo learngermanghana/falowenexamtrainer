@@ -69,6 +69,14 @@
       "body.simple-classes-form .lead-actions{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}" +
       ".lead-register-now{width:100%;min-height:50px;background:#0f766e!important;border-color:#0f766e!important;color:#fff!important;text-decoration:none!important}" +
       "body.simple-classes-form .lead-help,body.simple-classes-form .lead-open-link,body.simple-classes-form .lead-small-actions{display:none!important}" +
+      "body.post-lead-class-detail .intro-video," +
+      "body.post-lead-class-detail .funnel-actions," +
+      "body.post-lead-class-detail .hero," +
+      "body.post-lead-class-detail #brochureToc," +
+      "body.post-lead-class-detail #otherAvailableClasses," +
+      "body.post-lead-class-detail .post-lead-hide{display:none!important}" +
+      "body.post-lead-class-detail .class-main-card{margin-top:0!important}" +
+      "body.post-lead-class-detail .page{padding-top:12px!important}" +
       "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))!important}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
 
     var tag = document.getElementById("simpleClassFlowStyles");
@@ -139,6 +147,7 @@
 
   function setupFormPage() {
     if (!isFormPage()) return;
+    document.body.classList.remove("post-lead-class-detail");
     document.body.classList.add("simple-classes-form");
     var eyebrow = document.querySelector(".hero .eyebrow");
     var title = document.querySelector(".hero h1");
@@ -162,12 +171,33 @@
     simplifyStatusCopy();
   }
 
+  function prioritizeSelectedClass() {
+    if (!isQueryDetailPage()) return;
+    document.body.classList.add("post-lead-class-detail");
+
+    var tabs = document.getElementById("classTabs");
+    var tabsCard = tabs && tabs.closest ? tabs.closest("section.card") : null;
+    if (tabsCard) tabsCard.classList.add("post-lead-hide");
+
+    var otherClasses = document.getElementById("otherAvailableClasses");
+    if (otherClasses) otherClasses.classList.add("post-lead-hide");
+
+    var target = document.getElementById("classTitle");
+    var classCard = target && target.closest ? target.closest(".card") : null;
+    if (classCard) {
+      classCard.setAttribute("data-post-lead-priority", "true");
+      if (!window.__falowenPostLeadScrolled) {
+        window.__falowenPostLeadScrolled = true;
+        window.setTimeout(function () {
+          classCard.scrollIntoView({ behavior: "auto", block: "start" });
+        }, 80);
+      }
+    }
+  }
+
   function setupDetailPage() {
     if (!isDetailPage()) return;
 
-    // Query-based brochure URLs such as /classes/?class=a1-bonn-klasse&open=1
-    // use the same document as the form page. Always remove the form-only
-    // class so rendered Firestore brochure sections remain visible.
     document.body.classList.remove("lead-gate-active", "simple-classes-form");
     var leadCard = document.getElementById("leadCaptureCard");
     if (leadCard) leadCard.remove();
@@ -179,6 +209,7 @@
       link.removeAttribute("target");
       link.removeAttribute("rel");
     });
+    prioritizeSelectedClass();
   }
 
   function run() {
@@ -205,11 +236,25 @@
     window.setTimeout(function () { observer.disconnect(); }, 10000);
   }
 
+  function installDetailGuard() {
+    if (!isQueryDetailPage() || window.__falowenDetailPriorityGuard) return;
+    var root = document.querySelector(".page") || document.body;
+    if (!root) return;
+    window.__falowenDetailPriorityGuard = true;
+    var observer = new MutationObserver(function () {
+      prioritizeSelectedClass();
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    window.setTimeout(function () { observer.disconnect(); }, 12000);
+  }
+
   run();
   installCopyGuard();
+  installDetailGuard();
   window.addEventListener("load", function () {
     run();
     installCopyGuard();
+    installDetailGuard();
   });
   document.addEventListener("change", function (event) {
     if (event.target && event.target.id === "leadClass") ensureRegisterButton();
