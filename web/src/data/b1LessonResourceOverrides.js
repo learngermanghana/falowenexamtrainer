@@ -40,6 +40,18 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zur höflichen Terminvereinbarung. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Nutze Ref erst zur Kontrolle und sende deine endgültigen Antworten über den Submit-Tab.",
   }),
+  6: Object.freeze({
+    chapter: "2.6",
+    title: "Leben in der Stadt oder auf dem Land?",
+    grammarBook: "/campus/course/lesson/B1/6?view=grammar",
+    workbook: "/campus/course/lesson/B1/6?view=workbook",
+    grammarTopic:
+      "Stadt und Land vergleichen: Komparativ mit als, Gründe mit weil/da/denn, Gegensätze mit obwohl/während und Relativsätze",
+    goal:
+      "Stadt- und Landleben differenziert vergleichen, Vor- und Nachteile abwägen und eine klare B1-Meinung mit passenden Begründungen formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zum Vergleichen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -59,6 +71,7 @@ export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
   lesson.workbook_link = override.workbook;
   lesson.workbookRoute = override.workbook;
 
+  if (override.title) lesson.topic = override.title;
   if (override.grammarTopic) lesson.grammar_topic = override.grammarTopic;
   if (override.goal) lesson.goal = override.goal;
   if (override.instruction) lesson.instruction = override.instruction;
