@@ -47,6 +47,26 @@
       body.post-lead-focus .page { padding-top: 8px !important; }
       body.post-lead-focus .class-main-card { margin-top: 0 !important; }
       body.post-lead-focus #mainSignupCta { display: inline-flex !important; width: 100% !important; min-height: 52px !important; }
+      .course-duration-notice {
+        display: grid;
+        gap: 5px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #86efac;
+        background: #f0fdf4;
+        color: #14532d;
+      }
+      .course-duration-notice strong { font-size: 17px; }
+      .course-duration-notice p { margin: 0; font-size: 14px; line-height: 1.55; }
+      .view-other-classes-cta {
+        display: inline-flex;
+        justify-content: center;
+        width: 100%;
+        min-height: 48px;
+        background: #ffffff !important;
+        color: #1d4ed8 !important;
+        border-color: #bfdbfe !important;
+      }
       @media (max-width: 520px) {
         body.post-lead-focus .page { padding-left: 8px !important; padding-right: 8px !important; }
       }
@@ -106,6 +126,119 @@
     });
   }
 
+  function currentCourse() {
+    try {
+      if (typeof brochureData === "undefined" || !brochureData || !Array.isArray(brochureData.classes)) return null;
+      var slug = selectedSlug();
+      var title = String(document.getElementById("classTitle")?.textContent || "").trim();
+      return brochureData.classes.find(function (course) {
+        return course.id === selectedClassId
+          || cleanSlug(course.slug || course.id || course.title) === slug
+          || String(course.title || "").trim() === title;
+      }) || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function addDurationNotice() {
+    var title = document.getElementById("classTitle");
+    if (!title || document.getElementById("courseDurationNotice")) return;
+    var notice = document.createElement("div");
+    notice.id = "courseDurationNotice";
+    notice.className = "course-duration-notice";
+    notice.innerHTML = "<strong>10-week live class · 6 months Falowen access</strong><p>The live course is designed to finish within 10 weeks when you attend consistently and complete the work. Full payment gives 6 months of Falowen access to cover unexpected delays, revision, and exam preparation.</p>";
+    title.insertAdjacentElement("afterend", notice);
+  }
+
+  function clarifyAccessStat() {
+    document.querySelectorAll("#stats .stat").forEach(function (stat) {
+      var label = stat.querySelector("span");
+      var value = stat.querySelector("b");
+      var text = String(label?.textContent || "").toLowerCase();
+      if (text.includes("access with full payment") || text.includes("falowen access")) {
+        label.textContent = "Falowen access after full payment";
+        if (value) value.textContent = "6 months";
+      }
+    });
+  }
+
+  function dateToIso(value) {
+    if (!value) return "";
+    var text = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+    var parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString().slice(0, 10);
+  }
+
+  function fallbackCourseFromPage() {
+    var title = String(document.getElementById("classTitle")?.textContent || "").trim();
+    var level = (title.match(/\b(A1|A2|B1|B2|C1|C2)\b/i) || [])[1] || "A1";
+    var blueMeta = String(document.getElementById("blueClassMeta")?.textContent || "");
+    var startMatch = blueMeta.match(/Starts\s+([^🏁\n]+)/i);
+    var meetingDays = Array.from(document.querySelectorAll("#meetingRows tr")).map(function (row) {
+      var cells = row.querySelectorAll("td");
+      return cells.length ? { day: String(cells[0].textContent || "").trim() } : null;
+    }).filter(Boolean);
+    return {
+      id: selectedSlug(),
+      slug: selectedSlug(),
+      title: title,
+      level: String(level).toUpperCase(),
+      startDate: dateToIso(startMatch && startMatch[1]),
+      meetingDays: meetingDays,
+      holidayDatesExcluded: [],
+    };
+  }
+
+  function buildAdminScheduleUrl(course) {
+    if (!course || !course.startDate || !Array.isArray(course.meetingDays) || !course.meetingDays.length) return "";
+    var url = new URL("https://admin.falowen.app/course-schedule/public");
+    url.searchParams.set("level", String(course.level || "A1").toUpperCase());
+    url.searchParams.set("startDate", String(course.startDate).slice(0, 10));
+    url.searchParams.set("defaultWeekdays", course.meetingDays.map(function (item) { return item.day; }).filter(Boolean).join(","));
+    url.searchParams.set("holidayDates", (course.holidayDatesExcluded || course.holidayDates || []).join(","));
+    url.searchParams.set("useAdvancedWeekdays", "false");
+    url.searchParams.set("weekDaysMap", "{}");
+    url.searchParams.set("classId", String(course.id || ""));
+    url.searchParams.set("className", String(course.title || course.name || ""));
+    return url.toString();
+  }
+
+  function repairScheduleLink() {
+    var course = currentCourse() || fallbackCourseFromPage();
+    var href = buildAdminScheduleUrl(course);
+    if (!href) return;
+
+    var hidden = document.getElementById("scheduleLink");
+    if (hidden) hidden.href = href;
+
+    document.querySelectorAll("#classScheduleCta, .schedule-simple-card .class-schedule-cta").forEach(function (link) {
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = "Open class schedule";
+    });
+
+    var scheduleCard = document.querySelector(".schedule-simple-card") || document.getElementById("class-schedule-section");
+    var copy = scheduleCard && scheduleCard.querySelector("p");
+    if (copy) {
+      copy.textContent = "This schedule is generated from the current class dates and teaching days managed in Falowen Admin. Open it to see lesson dates, topics, holidays, start date, and end date.";
+    }
+  }
+
+  function addViewOtherClassesButton() {
+    if (document.getElementById("viewOtherClassesCta")) return;
+    var anchor = document.querySelector(".schedule-simple-card .class-schedule-cta") || document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
+    if (!anchor) return;
+    var link = document.createElement("a");
+    link.id = "viewOtherClassesCta";
+    link.className = "button view-other-classes-cta";
+    link.href = "/classes/";
+    link.textContent = "View other classes";
+    anchor.insertAdjacentElement("afterend", link);
+  }
+
   function applyPostLeadFocus() {
     if (!isPostLeadView()) return;
     injectStyles();
@@ -116,6 +249,10 @@
     hideTopContent();
     moveSelectedClassFirst();
     keepOneRegisterButton();
+    addDurationNotice();
+    clarifyAccessStat();
+    repairScheduleLink();
+    addViewOtherClassesButton();
   }
 
   applyPostLeadFocus();
