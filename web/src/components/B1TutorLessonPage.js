@@ -15,6 +15,15 @@ const firstWorkbookUrl = (canonicalLesson = {}) => {
   return fromGroups || canonicalLesson?.resources?.workbook?.url || "";
 };
 
+const markRadioComplete = (url = "") => {
+  const value = String(url || "").trim();
+  if (!value || !isInternalLink(value)) return value;
+
+  const parsed = new URL(value, "https://www.falowen.app");
+  parsed.searchParams.set("radio", "done");
+  return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+};
+
 const B1ResourceCard = ({ icon, title, description, url }) => {
   if (!url) return null;
   return (
@@ -121,8 +130,8 @@ export default function B1TutorLessonPage({ canonicalLesson }) {
       return;
     }
 
-    if (String(workbookUrl).startsWith("/")) {
-      navigate(workbookUrl);
+    if (isInternalLink(workbookUrl)) {
+      navigate(markRadioComplete(workbookUrl));
       return;
     }
 
@@ -261,3 +270,5 @@ export default function B1TutorLessonPage({ canonicalLesson }) {
     </div>
   );
 }
+
+export const __TESTING__ = { firstWorkbookUrl, markRadioComplete };
