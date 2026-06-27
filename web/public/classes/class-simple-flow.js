@@ -3,21 +3,37 @@
     return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   }
 
+  function requestedClassSlug() {
+    var url = new URL(window.location.href);
+    var requested = url.searchParams.get("class") || url.searchParams.get("level") || url.searchParams.get("slug");
+    return requested ? cleanSlug(requested) : "";
+  }
+
+  function isQueryDetailPage() {
+    var path = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (path !== "/classes" && path !== "/classes/index.html") return false;
+
+    var url = new URL(window.location.href);
+    var slug = requestedClassSlug();
+    var openRequested = url.searchParams.get("open") === "1";
+    return Boolean(slug && openRequested);
+  }
+
   function isFormPage() {
     var path = window.location.pathname.replace(/\/+$/, "") || "/";
-    return path === "/classes" || path === "/classes/index.html";
+    var isClassesRoot = path === "/classes" || path === "/classes/index.html";
+    return isClassesRoot && !isQueryDetailPage();
   }
 
   function isDetailPage() {
-    return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
+    return /^\/classes\/[^/]+\/?$/.test(window.location.pathname) || isQueryDetailPage();
   }
 
   function selectedSlug() {
     var select = document.getElementById("leadClass");
     if (select && select.value) return cleanSlug(select.value);
-    var url = new URL(window.location.href);
-    var fromQuery = url.searchParams.get("class") || url.searchParams.get("level") || url.searchParams.get("slug");
-    if (fromQuery) return cleanSlug(fromQuery);
+    var fromQuery = requestedClassSlug();
+    if (fromQuery) return fromQuery;
     var match = window.location.pathname.match(/^\/classes\/([^/]+)\/?$/);
     return match ? match[1] : "";
   }
@@ -148,6 +164,10 @@
 
   function setupDetailPage() {
     if (!isDetailPage()) return;
+
+    // Query-based brochure URLs such as /classes/?class=a1-bonn-klasse&open=1
+    // use the same document as the form page. Always remove the form-only
+    // class so rendered Firestore brochure sections remain visible.
     document.body.classList.remove("lead-gate-active", "simple-classes-form");
     var leadCard = document.getElementById("leadCaptureCard");
     if (leadCard) leadCard.remove();
