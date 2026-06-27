@@ -17,9 +17,14 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
 
     let frameId = null;
     let mountedNode = null;
-    let legacyCard = null;
-    let legacyDisplay = "";
     let attempts = 0;
+    const hiddenElements = [];
+
+    const hideElement = (element) => {
+      if (!element || hiddenElements.some((item) => item.element === element)) return;
+      hiddenElements.push({ element, display: element.style.display });
+      element.style.display = "none";
+    };
 
     const install = () => {
       const writingSection = document.getElementById("writing");
@@ -29,19 +34,31 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
         return;
       }
 
-      legacyCard = Array.from(writingSection.children).find((element) =>
+      const directChildren = Array.from(writingSection.children);
+      const finalTaskCard = directChildren.find((element) =>
+        String(element.textContent || "").includes("Final writing task")
+      );
+      const oldSubmitCard = directChildren.find((element) =>
         String(element.textContent || "").includes("Where to write and submit")
       );
+      const oldDiscussionBox = writingSection.querySelector('[data-a1-day6-family-writing-box="true"]');
+
+      hideElement(finalTaskCard);
+      hideElement(oldSubmitCard);
+      hideElement(oldDiscussionBox);
 
       mountedNode = document.createElement("div");
       mountedNode.setAttribute("data-workbook-class-share", "family-and-hobbies");
 
-      if (legacyCard) {
-        legacyDisplay = legacyCard.style.display;
-        legacyCard.style.display = "none";
-        writingSection.insertBefore(mountedNode, legacyCard);
+      const insertionPoint = finalTaskCard || oldSubmitCard;
+      if (insertionPoint?.parentNode === writingSection) {
+        writingSection.insertBefore(mountedNode, insertionPoint);
       } else {
-        writingSection.appendChild(mountedNode);
+        const helpCard = directChildren.find((element) =>
+          String(element.textContent || "").includes("Need help?")
+        );
+        if (helpCard?.parentNode === writingSection) writingSection.insertBefore(mountedNode, helpCard);
+        else writingSection.appendChild(mountedNode);
       }
 
       setMountNode(mountedNode);
@@ -51,7 +68,9 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
 
     return () => {
       if (frameId) window.cancelAnimationFrame(frameId);
-      if (legacyCard) legacyCard.style.display = legacyDisplay;
+      hiddenElements.forEach(({ element, display }) => {
+        if (element) element.style.display = display;
+      });
       if (mountedNode?.parentNode) mountedNode.parentNode.removeChild(mountedNode);
     };
   }, [pathname]);
