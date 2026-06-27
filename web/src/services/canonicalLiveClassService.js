@@ -1,1 +1,1 @@
-export * from "./canonicalLiveClassServiceV2";
+export * from "./canonicalLiveClassServiceV3";
