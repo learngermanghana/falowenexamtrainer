@@ -35,21 +35,6 @@
     if (document.getElementById("postLeadFocusStyles")) return;
     var style = document.createElement("style");
     style.id = "postLeadFocusStyles";
-    style.textContent = [
-      "body.post-lead-focus .intro-video",
-      "body.post-lead-focus .funnel-actions",
-      "body.post-lead-focus .hero",
-      "body.post-lead-focus #brochureToc",
-      "body.post-lead-focus #otherAvailableClasses",
-      "body.post-lead-focus .other-classes-card",
-      "body.post-lead-focus .post-lead-extra-cta",
-      "body.post-lead-focus .post-lead-tabs-card{display:none!important}",
-      "body.post-lead-focus .page{padding-top:8px!important}",
-      "body.post-lead-focus .class-main-card{margin-top:0!important}",
-      "body.post-lead-focus #mainSignupCta{display:inline-flex!important;width:100%!important;min-height:52px!important}",
-      "@media(max-width:520px){body.post-lead-focus .page{padding-left:8px!important;padding-right:8px!important}}"
-    ].join(",").replace(",@media", "}@media").replace("{display:none!important},body", ",body");
-    // Replace the compact generated string with valid CSS while keeping this file dependency-free.
     style.textContent = `
       body.post-lead-focus .intro-video,
       body.post-lead-focus .funnel-actions,
@@ -69,19 +54,16 @@
     document.head.appendChild(style);
   }
 
-  function hideTopAndOtherClassContent() {
-    [
-      ".intro-video",
-      ".funnel-actions",
-      ".hero",
-      "#brochureToc",
-      "#otherAvailableClasses",
-      ".other-classes-card"
-    ].forEach(function (selector) {
+  function hideTopContent() {
+    [".intro-video", ".funnel-actions", ".hero", "#brochureToc"].forEach(function (selector) {
       document.querySelectorAll(selector).forEach(function (node) {
         node.hidden = true;
         node.setAttribute("aria-hidden", "true");
       });
+    });
+
+    document.querySelectorAll("#otherAvailableClasses, .other-classes-card").forEach(function (node) {
+      node.remove();
     });
 
     var tabs = document.getElementById("classTabs");
@@ -89,12 +71,14 @@
     if (tabsCard) {
       tabsCard.classList.add("post-lead-tabs-card");
       tabsCard.hidden = true;
+      tabsCard.setAttribute("aria-hidden", "true");
     }
   }
 
   function moveSelectedClassFirst() {
     var page = document.querySelector("main.page") || document.querySelector(".page");
-    var classCard = document.querySelector(".class-main-card") || document.getElementById("classTitle")?.closest(".card");
+    var title = document.getElementById("classTitle");
+    var classCard = document.querySelector(".class-main-card") || (title && title.closest ? title.closest(".card") : null);
     if (!page || !classCard) return;
     if (page.firstElementChild !== classCard) page.insertBefore(classCard, page.firstElementChild);
     classCard.setAttribute("data-post-lead-priority", "true");
@@ -105,7 +89,7 @@
     if (!signupLinks.length) return;
 
     var primary = document.getElementById("mainSignupCta")
-      || signupLinks.find(function (link) { return Boolean(link.closest(".class-main-card")); })
+      || signupLinks.find(function (link) { return Boolean(link.closest && link.closest(".class-main-card")); })
       || signupLinks[0];
 
     signupLinks.forEach(function (link) {
@@ -129,7 +113,7 @@
     document.body.classList.remove("simple-classes-form", "lead-gate-active");
     var leadCard = document.getElementById("leadCaptureCard");
     if (leadCard) leadCard.remove();
-    hideTopAndOtherClassContent();
+    hideTopContent();
     moveSelectedClassFirst();
     keepOneRegisterButton();
   }
