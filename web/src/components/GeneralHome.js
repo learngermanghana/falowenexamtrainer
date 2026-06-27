@@ -47,6 +47,11 @@ const formatContractStatus = (studentProfile = {}) => {
   return `Access active until ${contractDate}`;
 };
 
+const classLevelFromName = (className = "") => {
+  const match = String(className || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return match?.[1] || "";
+};
+
 const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount }) => {
   const { t } = useTranslation();
   const studentName =
@@ -166,9 +171,9 @@ const CompactCourseGuide = ({ studentProfile, levelKey, onOpenDay0, onOpenCourse
     <section style={{ ...styles.card, display: "grid", gap: 10, border: "1px solid #bfdbfe", background: "#f8fafc" }}>
       <details>
         <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1d4ed8" }}>
-          Expand course guide, Day 0 and access details
+          Expand course guide, access and navigation help
         </summary>
-        <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+        <div style={{ display: "grid", gap: 14, marginTop: 12 }}>
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
             <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
               <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Course</p>
@@ -193,6 +198,10 @@ const CompactCourseGuide = ({ studentProfile, levelKey, onOpenDay0, onOpenCourse
             <button type="button" style={styles.primaryButton} onClick={onOpenCourseBook}>Continue Course Book</button>
             <button type="button" style={styles.secondaryButton} onClick={onOpenExamsRoom}>Open Exams Room</button>
           </PrimaryActionBar>
+
+          <div style={{ borderTop: "1px solid #dbe3ee", paddingTop: 12 }}>
+            <NavigationGuide />
+          </div>
         </div>
       </details>
     </section>
@@ -271,7 +280,13 @@ const GeneralHome = ({
   const levelKey = detectLevelKey(studentProfile);
   const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
-  const useSelfLearningGuide = selfLearningLevels.has(levelKey);
+  const assignedClassLevel = classLevelFromName(preferredClass);
+  const metricsStudentProfile = useMemo(
+    () => assignedClassLevel
+      ? { ...studentProfile, level: assignedClassLevel, classLevel: assignedClassLevel }
+      : studentProfile,
+    [assignedClassLevel, studentProfile]
+  );
 
   const openCampus = useCallback(() => {
     playOpenFeedback();
@@ -461,30 +476,9 @@ const GeneralHome = ({
         onOpenExamsRoom={openExamsRoom}
       />
 
-      {useSelfLearningGuide ? null : <HomeMetrics studentProfile={studentProfile} />}
+      <HomeMetrics studentProfile={metricsStudentProfile} />
 
-      <details style={{ ...styles.card, background: "#f8fafc" }}>
-        <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
-          Expand learning guide and navigation help
-        </summary>
-        <div style={{ marginTop: 12 }}>
-          <NavigationGuide />
-        </div>
-      </details>
-
-      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <details style={{ ...styles.card, background: "#f8fafc" }}>
-          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
-            ▶ Live class access & calendar
-          </summary>
-          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Zoom meeting, class dates, calendar download, and next live class details.
-            </p>
-            <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} program={studentProfile?.program} />
-          </div>
-        </details>
-      </section>
+      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} program={studentProfile?.program} />
 
       <AnnouncementSection
         announcements={announcements}
