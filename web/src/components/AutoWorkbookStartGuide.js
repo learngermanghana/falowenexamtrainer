@@ -2,7 +2,6 @@ import React, { useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
-import A1Day6FamilyWritingInjector from "./A1Day6FamilyWritingInjector";
 import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import WorkbookContextSync from "./WorkbookContextSync";
@@ -58,35 +57,29 @@ const AutoWorkbookStartGuide = () => {
   const usesSelfManagedSubmissionTabs =
     SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
     || isSelfManagedB1LessonWorkbook(pathname, search);
-  const showA1Day6WritingBox = normalizedPathname === A1_DAY6_WORKBOOK_PATH;
 
   if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) return <A1Day18Kapitel122WorkbookPage />;
 
-  if (!shouldRenderWorkbookGuide({ pathname, search, match })) {
-    return showA1Day6WritingBox ? <A1Day6FamilyWritingInjector /> : null;
-  }
+  if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
 
   return (
-    <>
-      <div
-        ref={hostRef}
-        data-auto-workbook-start-guide="true"
-        style={{
-          ...styles.container,
-          display: "grid",
-          width: "100%",
-          minHeight: 0,
-          padding: "0 16px",
-          marginBottom: 12,
-          boxSizing: "border-box",
-        }}
-      >
-        {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
-        <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
-        {usesSelfManagedSubmissionTabs ? null : <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />}
-      </div>
-      {showA1Day6WritingBox ? <A1Day6FamilyWritingInjector /> : null}
-    </>
+    <div
+      ref={hostRef}
+      data-auto-workbook-start-guide="true"
+      style={{
+        ...styles.container,
+        display: "grid",
+        width: "100%",
+        minHeight: 0,
+        padding: "0 16px",
+        marginBottom: 12,
+        boxSizing: "border-box",
+      }}
+    >
+      {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
+      <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
+      {usesSelfManagedSubmissionTabs ? null : <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />}
+    </div>
   );
 };
 
