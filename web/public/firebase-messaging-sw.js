@@ -7,10 +7,11 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v9`;
+const CACHE_NAME = `${CACHE_PREFIX}-v10`;
 const OFFLINE_URL = "/offline.html";
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
+const PUBLIC_AUTH_PATHS = new Set(["/signup", "/login"]);
 
 const STATIC_ASSETS = [
   "/",
@@ -20,6 +21,9 @@ const STATIC_ASSETS = [
   "/logo192.png",
   "/logo512.png",
 ];
+
+const normalizePathname = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
+const isPublicAuthPath = (pathname = "") => PUBLIC_AUTH_PATHS.has(normalizePathname(pathname));
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
   const params = new URLSearchParams();
@@ -169,9 +173,22 @@ self.addEventListener("activate", (event) => {
 });
 
 const cacheNetworkResponse = async (request, response) => {
+  const requestUrl = new URL(request.url);
+  if (isPublicAuthPath(requestUrl.pathname)) return response;
+
   const cache = await caches.open(CACHE_NAME);
   cache.put(request, response.clone());
   return response;
+};
+
+const handleAuthNavigationRequest = async (request) => {
+  try {
+    return await fetch(request, { cache: "no-store" });
+  } catch (error) {
+    const offlineFallback = await caches.match(OFFLINE_URL);
+    if (offlineFallback) return offlineFallback;
+    throw error;
+  }
 };
 
 const handleNavigationRequest = async (request) => {
@@ -213,7 +230,11 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(request.url);
 
   if (request.mode === "navigate") {
-    event.respondWith(handleNavigationRequest(request));
+    event.respondWith(
+      isPublicAuthPath(requestUrl.pathname)
+        ? handleAuthNavigationRequest(request)
+        : handleNavigationRequest(request)
+    );
     return;
   }
 

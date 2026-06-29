@@ -2,6 +2,8 @@ const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-
 const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
 const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
+let registrationStarted = false;
+
 const getLastForceRefreshAt = () => {
   try {
     return Number(window.localStorage.getItem(FORCE_REFRESH_KEY) || 0);
@@ -83,6 +85,24 @@ const setupUpdateChecks = (registration) => {
   window.addEventListener("online", runUpdate);
 };
 
+const startRegistration = () => {
+  if (registrationStarted) return;
+  registrationStarted = true;
+
+  navigator.serviceWorker
+    .register(SERVICE_WORKER_PATH)
+    .then(async (registration) => {
+      setupUpdateHandlers(registration);
+      setupUpdateChecks(registration);
+      await registration.update();
+      await forcePeriodicRefresh(registration);
+    })
+    .catch((error) => {
+      registrationStarted = false;
+      console.error("Service worker registration failed", error);
+    });
+};
+
 export const registerOfflineServiceWorker = () => {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return;
@@ -98,17 +118,12 @@ export const registerOfflineServiceWorker = () => {
     return;
   }
 
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register(SERVICE_WORKER_PATH)
-      .then(async (registration) => {
-        setupUpdateHandlers(registration);
-        setupUpdateChecks(registration);
-        await registration.update();
-        await forcePeriodicRefresh(registration);
-      })
-      .catch((error) => console.error("Service worker registration failed", error));
-  });
+  if (document.readyState === "complete") {
+    startRegistration();
+    return;
+  }
+
+  window.addEventListener("load", startRegistration, { once: true });
 };
 
 export const __private__ = {
@@ -117,4 +132,5 @@ export const __private__ = {
   setupUpdateChecks,
   getLastForceRefreshAt,
   markForceRefreshAt,
+  startRegistration,
 };
