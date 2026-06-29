@@ -29,24 +29,57 @@ describe("PublicAuthRouteBridge", () => {
     await waitFor(() => expect(screen.getByTestId("route")).toHaveTextContent("/login"));
   });
 
-  it("adds the saved programme to a direct signup URL", async () => {
+  it("keeps the German signup URL clean", async () => {
+    renderAt("/signup?program=german");
+
+    await waitFor(() => expect(screen.getByTestId("route")).toHaveTextContent(/^\/signup$/));
+    expect(window.localStorage.getItem("falowen:signup-program")).toBe("german");
+  });
+
+  it("treats a direct signup URL as German even after a saved French choice", async () => {
     window.localStorage.setItem("falowen:signup-program", "french");
     renderAt("/signup");
+
+    await waitFor(() => expect(screen.getByTestId("route")).toHaveTextContent(/^\/signup$/));
+    expect(window.localStorage.getItem("falowen:signup-program")).toBe("german");
+  });
+
+  it("keeps French as the only programme query parameter", async () => {
+    renderAt("/signup?program=french");
 
     await waitFor(() =>
       expect(screen.getByTestId("route")).toHaveTextContent("/signup?program=french")
     );
+    expect(window.localStorage.getItem("falowen:signup-program")).toBe("french");
   });
 
-  it("moves from login to the standalone signup route", async () => {
+  it("preserves other signup parameters while removing program=german", async () => {
+    renderAt("/signup?program=german&class=berlin");
+
+    await waitFor(() =>
+      expect(screen.getByTestId("route")).toHaveTextContent("/signup?class=berlin")
+    );
+  });
+
+  it("moves from login to the clean German signup route", async () => {
     window.localStorage.setItem("falowen:signup-program", "german");
     renderAt("/login", <button type="button">Create account</button>);
 
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    await waitFor(() =>
-      expect(screen.getByTestId("route")).toHaveTextContent("/signup?program=german")
+    await waitFor(() => expect(screen.getByTestId("route")).toHaveTextContent(/^\/signup$/));
+  });
+
+  it("opens the clean German route from the landing signup button", async () => {
+    window.localStorage.setItem("falowen:signup-program", "german");
+    renderAt(
+      "/",
+      <button type="button" className="falowen-home-primary">Start German</button>
     );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start German" }));
+
+    await waitFor(() => expect(screen.getByTestId("route")).toHaveTextContent(/^\/signup$/));
   });
 
   it("moves from signup to the standalone login route", async () => {
