@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
 import MobileHeaderMenuInjector from "./MobileHeaderMenuInjector";
@@ -16,14 +17,7 @@ import CourseDebugPanel from "./CourseDebugPanel";
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
 const ADSENSE_SRC =
   "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8991390842894141";
-const PUBLIC_AUTH_PATHS = new Set(["/signup", "/login"]);
 const AD_ELIGIBLE_PATHS = new Set(["/"]);
-
-export const normalizePublicPath = (value = "") =>
-  String(value || "").replace(/\/+$/, "") || "/";
-
-export const isPublicAuthPath = (value = "") =>
-  PUBLIC_AUTH_PATHS.has(normalizePublicPath(value));
 
 const isInstalledApp = () => {
   if (typeof window === "undefined") return false;
