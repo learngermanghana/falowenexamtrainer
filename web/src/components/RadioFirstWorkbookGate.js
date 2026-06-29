@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
+import { getB1Day5RadioResource } from "../data/b1Day5Media";
+import { courseDebug } from "../lib/courseDebug";
 import { styles } from "../styles";
 
 const RADIO_COMPLETE_PARAM = "radio";
@@ -11,11 +13,14 @@ const completedRadioSteps = new Set();
 
 const radioStepKey = (level, day) => `${String(level || "").trim().toUpperCase()}:${Number(day)}`;
 
+const getRadioResource = (level, day) =>
+  getLessonRadioResource(level, day) || getB1Day5RadioResource(level, day);
+
 const hasCompletedRadioStep = (search = "", level = "", day = "") => {
   try {
     return new URLSearchParams(search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE
       || completedRadioSteps.has(radioStepKey(level, day));
-  } catch (error) {
+  } catch (_error) {
     return completedRadioSteps.has(radioStepKey(level, day));
   }
 };
@@ -27,20 +32,42 @@ export const buildCompletedRadioSearch = (search = "") => {
   return query ? `?${query}` : "";
 };
 
-export const shouldShowRadioFirst = (level, day) => Boolean(getLessonRadioResource(level, day));
+export const shouldShowRadioFirst = (level, day) => Boolean(getRadioResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children }) => {
-  const radio = getLessonRadioResource(level, day);
+  const radio = getRadioResource(level, day);
   const location = useLocation();
   const navigate = useNavigate();
-  const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(
-    () => !radio || hasCompletedRadioStep(location.search, level, day),
-  );
+  const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
+  const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
   const [isContinuing, setIsContinuing] = useState(false);
+
+  useEffect(() => {
+    courseDebug("radioGate:state", {
+      level: String(level || "").toUpperCase(),
+      day: Number(day),
+      hasRadio: Boolean(radio),
+      radioKey: radio?.key || "",
+      youtubeId: radio?.youtubeId || "",
+      search: location.search,
+      completedInUrl: new URLSearchParams(location.search || "").get(RADIO_COMPLETE_PARAM),
+      completedInMemory: completedRadioSteps.has(radioStepKey(level, day)),
+      hasEnteredWorkbook,
+      isContinuing,
+    });
+  }, [day, hasEnteredWorkbook, isContinuing, level, location.search, radio]);
 
   if (hasEnteredWorkbook) return children;
 
   const handleContinue = () => {
+    courseDebug("radioGate:continueClick", {
+      level: String(level || "").toUpperCase(),
+      day: Number(day),
+      searchBefore: location.search,
+      isContinuing,
+      nextSearch: buildCompletedRadioSearch(location.search),
+    });
+
     if (isContinuing) return;
 
     setIsContinuing(true);
