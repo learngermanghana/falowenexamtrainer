@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { isPublicAuthPath } from "../lib/publicAuthRoutes";
 import { registerOfflineServiceWorker } from "../serviceWorkerRegistration";
-import { isPublicAuthPath } from "./RouteScopedAppServices";
 
 export default function RouteScopedBackgroundServices() {
   const location = useLocation();
