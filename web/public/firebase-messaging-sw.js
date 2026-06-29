@@ -7,11 +7,18 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v10`;
+const CACHE_NAME = `${CACHE_PREFIX}-v11`;
 const OFFLINE_URL = "/offline.html";
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
-const PUBLIC_AUTH_PATHS = new Set(["/signup", "/login"]);
+const PUBLIC_AUTH_PATHS = [
+  "/signup",
+  "/login",
+  "/onboarding",
+  "/forgot-password",
+  "/password-reset",
+  "/reset-password",
+];
 
 const STATIC_ASSETS = [
   "/",
@@ -23,7 +30,12 @@ const STATIC_ASSETS = [
 ];
 
 const normalizePathname = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
-const isPublicAuthPath = (pathname = "") => PUBLIC_AUTH_PATHS.has(normalizePathname(pathname));
+const isPublicAuthPath = (pathname = "") => {
+  const normalized = normalizePathname(pathname);
+  return PUBLIC_AUTH_PATHS.some(
+    (path) => normalized === path || normalized.startsWith(`${path}/`)
+  );
+};
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
   const params = new URLSearchParams();
