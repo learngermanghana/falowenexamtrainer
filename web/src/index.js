@@ -17,6 +17,7 @@ import B1WorkbookWritingCheatSheetInjector from './components/B1WorkbookWritingC
 import BookPdfDownloadInjector from './components/BookPdfDownloadInjector';
 import AutoGrammarStartGuide from './components/AutoGrammarStartGuide';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
+import CourseDebugPanel from './components/CourseDebugPanel';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -48,6 +49,7 @@ root.render(
               <App />
               <AutoGrammarStartGuide />
               <BookPdfDownloadInjector />
+              <CourseDebugPanel />
             </ToastProvider>
           </AuthProvider>
         </>
