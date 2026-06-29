@@ -44,6 +44,12 @@ const readDomSnapshot = () => {
   };
 };
 
+const describeError = (value) => {
+  if (!value) return "Unknown error";
+  if (value instanceof Error) return value.stack || value.message || String(value);
+  return String(value);
+};
+
 export default function CourseDebugPanel() {
   const enabled = useMemo(() => isCourseDebugEnabled(), []);
   const [entries, setEntries] = useState(() => getCourseDebugEntries());
@@ -68,7 +74,7 @@ export default function CourseDebugPanel() {
     };
     const onClick = (event) => {
       const control = event.target?.closest?.("button,a");
-      if (!control) return;
+      if (!control || control.closest?.('[aria-label="Falowen course debug panel"]')) return;
       courseDebug("ui:click", {
         tag: control.tagName,
         text: compactText(control.textContent, 120),
@@ -78,16 +84,28 @@ export default function CourseDebugPanel() {
       snapshot("after-click");
     };
     const onPopState = () => snapshot("popstate");
+    const onError = (event) => {
+      courseDebug("window:error", {
+        message: event.message || describeError(event.error),
+        filename: event.filename || "",
+        line: event.lineno || 0,
+        column: event.colno || 0,
+        stack: describeError(event.error),
+        dom: readDomSnapshot(),
+      });
+    };
+    const onUnhandledRejection = (event) => {
+      courseDebug("window:unhandledRejection", {
+        reason: describeError(event.reason),
+        dom: readDomSnapshot(),
+      });
+    };
 
     window.addEventListener(COURSE_DEBUG_EVENT, refresh);
     window.addEventListener("popstate", onPopState);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onUnhandledRejection);
     document.addEventListener("click", onClick, true);
-
-    const observer = new MutationObserver(() => snapshot("dom-mutation"));
-    observer.observe(document.getElementById("root") || document.body, {
-      childList: true,
-      subtree: true,
-    });
 
     const initialTimers = [400, 1200, 2500].map((delay) =>
       window.setTimeout(() => snapshot(`initial-${delay}`), delay)
@@ -96,8 +114,9 @@ export default function CourseDebugPanel() {
     return () => {
       window.removeEventListener(COURSE_DEBUG_EVENT, refresh);
       window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection);
       document.removeEventListener("click", onClick, true);
-      observer.disconnect();
       initialTimers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [enabled]);
