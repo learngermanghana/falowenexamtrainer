@@ -15,7 +15,8 @@ const MOUNT_ID = "falowen-application-resume-panel";
 
 const MOBILE_INPUT_CSS = `
   .signup-page-mobile-safe input:not([type="checkbox"]):not([type="radio"]),
-  .signup-page-mobile-safe textarea {
+  .signup-page-mobile-safe textarea,
+  .signup-page-mobile-safe select {
     color: #111827 !important;
     -webkit-text-fill-color: #111827 !important;
     caret-color: #111827 !important;
@@ -23,8 +24,16 @@ const MOBILE_INPUT_CSS = `
     opacity: 1 !important;
     font-size: 16px !important;
     line-height: 1.35 !important;
+  }
+
+  .signup-page-mobile-safe input:not([type="checkbox"]):not([type="radio"]),
+  .signup-page-mobile-safe textarea {
     -webkit-user-select: text !important;
     user-select: text !important;
+  }
+
+  .signup-page-mobile-safe select {
+    min-height: 48px !important;
   }
 
   .signup-page-mobile-safe input:not([type="checkbox"]):not([type="radio"])::placeholder,
@@ -40,6 +49,28 @@ const MOBILE_INPUT_CSS = `
     -webkit-text-fill-color: #111827 !important;
     caret-color: #111827 !important;
     box-shadow: 0 0 0 1000px #ffffff inset !important;
+  }
+
+  .signup-password-visibility {
+    position: fixed;
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    z-index: 40;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #1d4ed8;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .signup-password-visibility:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.28);
+    outline-offset: 2px;
   }
 `;
 
@@ -74,6 +105,85 @@ const setControlValue = (control, value) => {
   control.dispatchEvent(
     new Event(control.tagName === "SELECT" ? "change" : "input", { bubbles: true })
   );
+};
+
+const setAttributes = (element, attributes = {}) => {
+  if (!element) return;
+  Object.entries(attributes).forEach(([name, value]) => {
+    if (value === undefined || value === null) return;
+    element.setAttribute(name, String(value));
+  });
+};
+
+const applyMobileFieldEnhancements = (form, { showPasswords = false } = {}) => {
+  if (!form) return;
+  form.setAttribute("autocomplete", "on");
+
+  const nameInput = form.querySelector('[autocomplete="name"]');
+  setAttributes(nameInput, {
+    name: "fullName",
+    inputmode: "text",
+    autocapitalize: "words",
+    enterkeyhint: "next",
+  });
+
+  const emailInput = form.querySelector('[autocomplete="email"]');
+  setAttributes(emailInput, {
+    name: "email",
+    inputmode: "email",
+    autocapitalize: "none",
+    autocorrect: "off",
+    spellcheck: "false",
+    enterkeyhint: "next",
+  });
+
+  const passwordInputs = Array.from(
+    form.querySelectorAll('input[autocomplete="new-password"]')
+  );
+  passwordInputs.forEach((input, index) => {
+    input.type = showPasswords ? "text" : "password";
+    setAttributes(input, {
+      name: index === 0 ? "password" : "confirmPassword",
+      autocapitalize: "none",
+      autocorrect: "off",
+      spellcheck: "false",
+      enterkeyhint: "next",
+    });
+  });
+
+  const phoneInput = form.querySelector('[autocomplete="tel"]');
+  setAttributes(phoneInput, {
+    name: "phone",
+    inputmode: "tel",
+    enterkeyhint: "next",
+  });
+  if (phoneInput && /^0176\b/.test(phoneInput.placeholder || "")) {
+    phoneInput.placeholder = "024 123 4567 or +233 24 123 4567";
+  }
+
+  const addressInput = form.querySelector('[autocomplete="street-address"]');
+  setAttributes(addressInput, {
+    name: "address",
+    autocapitalize: "words",
+  });
+
+  const locationInput = form.querySelector('[autocomplete="address-level2"]');
+  setAttributes(locationInput, {
+    name: "location",
+    inputmode: "text",
+    autocapitalize: "words",
+    enterkeyhint: "next",
+  });
+
+  const emergencyInput = form.querySelector('[autocomplete="tel-national"]');
+  setAttributes(emergencyInput, {
+    name: "emergencyContactPhone",
+    inputmode: "tel",
+    enterkeyhint: "next",
+  });
+  if (emergencyInput && /^0176\b/.test(emergencyInput.placeholder || "")) {
+    emergencyInput.placeholder = "024 987 6543 or +233 24 987 6543";
+  }
 };
 
 const findLevelSelect = (form) =>
@@ -187,7 +297,10 @@ export default function SignUpPage(props) {
   const rootRef = useRef(null);
   const restoredRef = useRef(false);
   const createdRef = useRef(false);
+  const showPasswordsRef = useRef(false);
   const [mount, setMount] = useState(null);
+  const [showPasswords, setShowPasswords] = useState(false);
+  const [passwordFieldActive, setPasswordFieldActive] = useState(false);
   const [draft, setDraft] = useState(() =>
     typeof window === "undefined" ? null : readDraft()
   );
@@ -213,10 +326,15 @@ export default function SignUpPage(props) {
     if (!root) return undefined;
 
     let draftSaveTimer = null;
+    let focusTimer = null;
 
     const sync = () => {
       const form = root.querySelector("form");
       if (!form) return;
+
+      applyMobileFieldEnhancements(form, {
+        showPasswords: showPasswordsRef.current,
+      });
 
       let target = document.getElementById(MOUNT_ID);
       if (!target) {
@@ -296,27 +414,69 @@ export default function SignUpPage(props) {
       }).catch(() => {});
     };
 
+    const isPasswordInput = (element) =>
+      element?.matches?.('input[autocomplete="new-password"]');
+
+    const handleFocusIn = (event) => {
+      if (isPasswordInput(event.target)) {
+        window.clearTimeout(focusTimer);
+        setPasswordFieldActive(true);
+      }
+    };
+
+    const handleFocusOut = () => {
+      window.clearTimeout(focusTimer);
+      focusTimer = window.setTimeout(() => {
+        setPasswordFieldActive(isPasswordInput(document.activeElement));
+      }, 80);
+    };
+
     // Do not update React parent state during the native input event. On mobile,
     // doing so can reset controlled fields before the keyboard composition finishes.
     root.addEventListener("input", queueDraftSave);
     root.addEventListener("change", queueDraftSave);
     root.addEventListener("submit", handleSubmit, true);
+    root.addEventListener("focusin", handleFocusIn);
+    root.addEventListener("focusout", handleFocusOut);
 
     return () => {
       observer.disconnect();
       window.clearTimeout(draftSaveTimer);
+      window.clearTimeout(focusTimer);
       root.removeEventListener("input", queueDraftSave);
       root.removeEventListener("change", queueDraftSave);
       root.removeEventListener("submit", handleSubmit, true);
+      root.removeEventListener("focusin", handleFocusIn);
+      root.removeEventListener("focusout", handleFocusOut);
       document.getElementById(MOUNT_ID)?.remove();
     };
   }, []);
+
+  const togglePasswordVisibility = () => {
+    const next = !showPasswordsRef.current;
+    showPasswordsRef.current = next;
+    setShowPasswords(next);
+    applyMobileFieldEnhancements(rootRef.current?.querySelector("form"), {
+      showPasswords: next,
+    });
+  };
 
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
       <SignUpPageLegacy {...props} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} />, mount) : null}
+      {passwordFieldActive ? (
+        <button
+          type="button"
+          className="signup-password-visibility"
+          aria-pressed={showPasswords}
+          onPointerDown={(event) => event.preventDefault()}
+          onClick={togglePasswordVisibility}
+        >
+          {showPasswords ? "Hide passwords" : "Show passwords"}
+        </button>
+      ) : null}
     </div>
   );
 }
