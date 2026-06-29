@@ -110,4 +110,22 @@ describe('forcePeriodicRefresh', () => {
 
     expect(window.localStorage.getItem('app-last-force-refresh-at')).toBe(String(now));
   });
+
+  it('does not reload repeatedly when storage cannot persist the refresh marker', async () => {
+    jest.spyOn(Date, 'now').mockReturnValue(3_000_000);
+    const setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('Storage disabled');
+    });
+    const registration = {
+      update: jest.fn().mockResolvedValue(undefined),
+    };
+
+    await __private__.forcePeriodicRefresh(registration);
+
+    expect(registration.update).not.toHaveBeenCalled();
+    expect(window.location.reload).not.toHaveBeenCalled();
+
+    setItemSpy.mockRestore();
+  });
+
 });
