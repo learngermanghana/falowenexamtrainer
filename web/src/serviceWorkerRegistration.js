@@ -13,8 +13,9 @@ const getLastForceRefreshAt = () => {
 const markForceRefreshAt = (timestamp) => {
   try {
     window.localStorage.setItem(FORCE_REFRESH_KEY, String(timestamp));
+    return Number(window.localStorage.getItem(FORCE_REFRESH_KEY)) === timestamp;
   } catch (error) {
-    // Ignore storage write failures.
+    return false;
   }
 };
 
@@ -32,7 +33,9 @@ const forcePeriodicRefresh = async (registration) => {
 
   if (!shouldForceRefresh) return;
 
-  markForceRefreshAt(now);
+  if (!markForceRefreshAt(now)) {
+    return;
+  }
 
   try {
     await registration.update();
