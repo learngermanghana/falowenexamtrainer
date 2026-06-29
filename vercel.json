@@ -10,6 +10,7 @@
     }
   },
   "routes": [
+    { "src": "/signup/?", "dest": "/index.html" },
     { "handle": "filesystem" },
     { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
     { "src": "/api/public/classes", "dest": "/api/public-classes.js" },
