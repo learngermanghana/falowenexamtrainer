@@ -1,9 +1,15 @@
-import { collection, db, getDocs } from "../firebase";
+import { auth, collection, db, getDocs } from "../firebase";
 import * as base from "./attendanceServiceBase";
 
 export * from "./attendanceServiceBase";
 
 const normalizeValue = (value = "") => String(value || "").trim();
+const emptyAttendanceResult = () => ({
+  records: [],
+  sessions: 0,
+  hours: 0,
+  excludedSessions: 0,
+});
 
 const normalizeClassIdentity = (value = "") =>
   normalizeValue(value)
@@ -112,8 +118,12 @@ const mergeAttendanceResults = (results = []) => {
 };
 
 export const fetchAttendanceRecords = async (options = {}) => {
+  // Attendance is private student data. Do not query Firestore on public pages
+  // or during the brief period before Firebase restores the signed-in user.
+  if (auth && !auth.currentUser) return emptyAttendanceResult();
+
   const roots = await resolveAttendanceRoots(options.className);
-  if (!roots.length) return { records: [], sessions: 0, hours: 0, excludedSessions: 0 };
+  if (!roots.length) return emptyAttendanceResult();
 
   const results = [];
   for (const root of roots) {
