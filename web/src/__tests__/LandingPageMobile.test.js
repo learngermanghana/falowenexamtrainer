@@ -36,22 +36,30 @@ describe("Falowen public homepage on mobile", () => {
     jest.clearAllMocks();
   });
 
-  it("keeps website language separate from the selected study programme", async () => {
+  it("keeps the selected programme when the interface language changes", async () => {
     render(<LandingHost />);
 
-    expect(screen.getByRole("note")).toHaveTextContent("Website language");
-    expect(screen.getByRole("note")).toHaveTextContent("Study programme: German");
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "German" })).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.click(screen.getByRole("button", { name: "French" }));
-    expect(screen.getByRole("note")).toHaveTextContent("Study programme: French");
+    expect(screen.getByRole("button", { name: "French" })).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.change(screen.getByRole("combobox", { name: "Language" }), {
       target: { value: "de" },
     });
 
-    await waitFor(() => expect(screen.getByRole("note")).toHaveTextContent("Website-Sprache"));
-    expect(screen.getByRole("note")).toHaveTextContent("Lernprogramm: Französisch");
-    expect(screen.getByRole("button", { name: "Französisch" })).toHaveAttribute("aria-pressed", "true");
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Französisch" })).toHaveAttribute("aria-pressed", "true")
+    );
+  });
+
+  it("does not show the removed Falowen Radio promotion", () => {
+    render(<LandingHost />);
+
+    expect(screen.queryByText("German listening practice built into the Falowen course book to help learners understand natural, real-world German before lesson tasks.")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "What is Falowen Radio?" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Subscribe on YouTube/i })).not.toBeInTheDocument();
   });
 
   it("keeps the WhatsApp support deep link available", () => {

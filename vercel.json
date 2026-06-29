@@ -10,7 +10,20 @@
     }
   },
   "routes": [
-    { "src": "/signup/?", "dest": "/index.html" },
+    {
+      "src": "/signup/?",
+      "headers": {
+        "Cache-Control": "no-store, no-cache, must-revalidate"
+      },
+      "dest": "/index.html"
+    },
+    {
+      "src": "/login/?",
+      "headers": {
+        "Cache-Control": "no-store, no-cache, must-revalidate"
+      },
+      "dest": "/index.html"
+    },
     { "handle": "filesystem" },
     { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
     { "src": "/api/public/classes", "dest": "/api/public-classes.js" },

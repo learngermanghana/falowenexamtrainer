@@ -9,6 +9,7 @@ import SubmitSuccessScreenInjector from './components/SubmitSuccessScreenInjecto
 import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
+import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
 import PublicClassSelectInjector from './components/PublicClassSelectInjector';
 import CourseBookTerminologyInjector from './components/CourseBookTerminologyInjector';
 import LockedSubmissionCardCompactor from './components/LockedSubmissionCardCompactor';
@@ -33,6 +34,7 @@ root.render(
       ) : (
         <>
           <PublicAuthRouteBridge />
+          <PublicAuthMobileRecovery />
           <AuthProvider>
             <ToastProvider>
               <LandingPublicLanguageGuard />
@@ -54,7 +56,7 @@ root.render(
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in the app, pass a function
+// If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 reportWebVitals();
 registerOfflineServiceWorker();
