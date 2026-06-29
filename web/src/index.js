@@ -20,18 +20,20 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <PublicAuthRouteBridge />
-      <PublicAuthMobileRecovery />
       <RouteScopedBackgroundServices />
       {isFalowenRadioSeoPage ? (
         <FalowenRadioSeoPage />
       ) : (
-        <AuthProvider>
-          <ToastProvider>
-            <RouteScopedAppServices />
-            <App />
-          </ToastProvider>
-        </AuthProvider>
+        <>
+          <PublicAuthRouteBridge />
+          <PublicAuthMobileRecovery />
+          <AuthProvider>
+            <ToastProvider>
+              <RouteScopedAppServices />
+              <App />
+            </ToastProvider>
+          </AuthProvider>
+        </>
       )}
     </BrowserRouter>
   </React.StrictMode>
