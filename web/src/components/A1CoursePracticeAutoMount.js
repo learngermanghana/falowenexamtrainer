@@ -14,13 +14,18 @@ const WRITING_PATHS = new Set([
   "/campus/course/a1-day-22-health-and-body-parts-workbook",
 ]);
 
+const normalizePath = (pathname = "") =>
+  String(pathname || "")
+    .toLowerCase()
+    .replace(/\/+$/, "") || "/";
+
 const getPageContainer = () => {
   const main = document.querySelector("main") || document.body;
   return main.querySelector("div[style*='display: grid']") || main.firstElementChild || main;
 };
 
 const isA1Day19LessonRoute = (location) => {
-  const path = String(location.pathname || "").toLowerCase();
+  const path = normalizePath(location.pathname);
   const chapter = new URLSearchParams(location.search || "").get("chapter");
   return path === A1_DAY_19_LESSON_PATH && String(chapter || "").trim() === "5.9";
 };
@@ -57,13 +62,31 @@ const insertSpeakingMount = (container, mount) => {
   }
 };
 
+const findSectionByHeading = (container, headingText) =>
+  Array.from(container.querySelectorAll("section")).find((section) => {
+    const heading = section.querySelector("h2");
+    return String(heading?.textContent || "").trim().toLowerCase() === headingText.toLowerCase();
+  });
+
+const insertWritingMount = (container, mount) => {
+  const finalSubmissionSection = findSectionByHeading(container, "Next step");
+
+  if (finalSubmissionSection?.parentNode) {
+    finalSubmissionSection.parentNode.insertBefore(mount, finalSubmissionSection);
+    return;
+  }
+
+  container.appendChild(mount);
+};
+
 const A1CoursePracticeAutoMount = () => {
   const location = useLocation();
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
+    const pathname = normalizePath(location.pathname);
     const isCanonicalLessonPage = isA1Day19LessonRoute(location);
-    const isWritingPage = WRITING_PATHS.has(location.pathname);
+    const isWritingPage = WRITING_PATHS.has(pathname);
     if (!isCanonicalLessonPage && !isWritingPage) return undefined;
 
     document.getElementById("falowen-a1-practice-mount")?.remove();
@@ -79,7 +102,7 @@ const A1CoursePracticeAutoMount = () => {
     if (isCanonicalLessonPage) {
       insertSpeakingMount(container, mount);
     } else {
-      container.appendChild(mount);
+      insertWritingMount(container, mount);
     }
 
     const root = createRoot(mount);
