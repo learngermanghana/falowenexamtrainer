@@ -11,7 +11,10 @@ const workflowStepStyle = {
   gap: 4,
 };
 
-const A1SimpleMarkMyLetterPanel = ({ title = "Check your letters before submission" }) => (
+const A1SimpleMarkMyLetterPanel = ({
+  title = "Check your letter before submission",
+  writingContext = {},
+}) => (
   <section
     style={{
       ...styles.card,
@@ -49,7 +52,7 @@ const A1SimpleMarkMyLetterPanel = ({ title = "Check your letters before submissi
       </div>
       <div style={workflowStepStyle}>
         <strong>3. Submit</strong>
-        <span>Copy your final letters into the normal assignment submission area.</span>
+        <span>Copy your final answer into the normal assignment submission area.</span>
       </div>
     </div>
 
@@ -71,15 +74,7 @@ const A1SimpleMarkMyLetterPanel = ({ title = "Check your letters before submissi
       type="writing"
       title="Self-practice · Mark My Letter"
       description="Paste one completed A1 letter here. Falowen AI will mark it, explain the corrections, and help you improve it. When you are satisfied, submit the final version through the normal assignment area."
-      writingContext={{
-        level: "A1",
-        courseLevel: "A1",
-        day: 12,
-        lessonId: "A1-day-12.3",
-        workbookId: "A1-day-12.3-letter-writing",
-        writingTaskId: "A1-day-12.3-letter-writing-practice",
-        taskTitle: "A1 Day 12.3 letter self-practice",
-      }}
+      writingContext={writingContext}
     />
 
     <div
@@ -92,7 +87,7 @@ const A1SimpleMarkMyLetterPanel = ({ title = "Check your letters before submissi
         lineHeight: 1.7,
       }}
     >
-      <strong>After checking both letters:</strong> continue to the submission section below and send
+      <strong>After checking your letter:</strong> continue to the submission section below and send
       your complete work for tutor marking.
     </div>
   </section>
