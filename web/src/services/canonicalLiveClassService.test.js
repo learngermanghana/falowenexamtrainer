@@ -76,4 +76,42 @@ describe("buildCanonicalLiveClassSummary", () => {
       passcode: "abc",
     });
   });
+
+  test("ignores sessions from an older class record with the same class name", () => {
+    const summary = buildCanonicalLiveClassSummary({
+      klass: {
+        id: "a1-koln-current",
+        name: "A1 Koln Klasse",
+        startDate: "2026-05-13",
+        endDate: "2026-07-13",
+      },
+      now: new Date("2026-06-30T16:00:00.000Z"),
+      sessions: [
+        {
+          id: "stale-old-class",
+          classId: "a1-koln-old",
+          className: "A1 Koln Klasse",
+          status: "scheduled",
+          topic: "Day 17: Instructions and the German Imperative",
+          startsAt: new Date("2026-06-30T17:00:00.000Z"),
+          endsAt: new Date("2026-06-30T18:00:00.000Z"),
+        },
+        {
+          id: "current-class",
+          classId: "a1-koln-current",
+          classRecordId: "a1-koln-current",
+          className: "A1 Koln Klasse",
+          status: "scheduled",
+          topic: "Day 20: Introduction to Letter Writing",
+          startsAt: new Date("2026-06-30T18:00:00.000Z"),
+          endsAt: new Date("2026-06-30T19:00:00.000Z"),
+        },
+      ],
+    });
+
+    expect(summary.sessions).toHaveLength(1);
+    expect(summary.nextSession.id).toBe("current-class");
+    expect(summary.nextSession.topic).toBe("Day 20: Introduction to Letter Writing");
+    expect(summary.progress).toBe(79);
+  });
 });
