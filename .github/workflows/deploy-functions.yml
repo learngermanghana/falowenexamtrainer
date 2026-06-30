@@ -60,12 +60,12 @@ jobs:
         shell: bash
         run: |
           set +e
-          # Deploy only the existing API function. Deploying the full codebase also
-          # attempts to create publicClassesCatalog, which requires the service
-          # account to have cloudfunctions.functions.setIamPolicy.
+          # The API belongs to the non-default "falowenexamtrainer" codebase.
+          # Deploying this existing function avoids the unrelated IAM permission
+          # needed to create the new publicClassesCatalog HTTPS function.
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
-            --only functions:api \
+            --only functions:falowenexamtrainer:api \
             --debug > firebase-deploy.log 2>&1
           status=$?
           echo "Firebase deploy exit code: $status"
