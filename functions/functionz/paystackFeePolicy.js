@@ -1,3 +1,4 @@
+// Falowen payment policy: students and Falowen share the estimated Paystack fee equally.
 const PAYSTACK_GH_FEE_RATE = 0.0195;
 const PAYSTACK_STUDENT_FEE_SHARE = 0.5;
 
