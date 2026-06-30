@@ -51,10 +51,10 @@ const prepareSpeakingLessonPage = (container) => {
   duplicateVideoLink?.closest("article")?.remove();
 };
 
-const prepareWritingLessonPage = (container, pathname) => {
+const prepareWritingLessonPage = (_container, pathname) => {
   if (!LETTER_WRITING_INTRO_PATHS.has(pathname)) return;
 
-  const teacherVideoLink = Array.from(container.querySelectorAll("a")).find((link) => {
+  const teacherVideoLink = Array.from(document.querySelectorAll("a")).find((link) => {
     const href = String(link.getAttribute("href") || link.href || "");
     const label = String(link.textContent || "").trim();
     return href.includes("youtu.be/") && /video öffnen/i.test(label);
@@ -88,7 +88,7 @@ const findSectionByHeading = (container, headingText) =>
   });
 
 const insertWritingMount = (container, mount) => {
-  const finalSubmissionSection = findSectionByHeading(container, "Next step");
+  const finalSubmissionSection = findSectionByHeading(document, "Next step");
 
   if (finalSubmissionSection?.parentNode) {
     finalSubmissionSection.parentNode.insertBefore(mount, finalSubmissionSection);
