@@ -4,8 +4,8 @@ import { styles } from "../styles";
 import { computeTuitionStatus, MIN_INSTALLMENT_GHS } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
-import { getBackendUrl } from "../services/backendUrl";
 import { formatCurrency } from "../lib/formatters";
+import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 
 const PAYMENT_GRACE_PERIOD_DAYS = 7;
 
@@ -17,10 +17,10 @@ const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) =>
 
 /**
  * TuitionStatusCard
- * - shows tuition fee, paid so far, balance.
- * - lets students choose how much to pay now.
+ * - shows tuition fee, paid so far, balance and the shared Paystack fee.
+ * - lets students choose how much tuition to pay now.
  * - enforces: minimum GH₵2000 unless they're paying the final remaining balance.
- * - calls backend /paystack/initialize so Paystack receives clear metadata (paid so far, balance, plan).
+ * - sends the tuition portion to the backend; the backend adds the student's 50% fee share.
  */
 const TuitionStatusCard = ({
   level,
@@ -38,6 +38,16 @@ const TuitionStatusCard = ({
     () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
     [locale]
   );
+  const formatCheckoutMoney = useMemo(
+    () =>
+      (value) =>
+        formatCurrency(value, {
+          locale,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+    [locale]
+  );
   const paymentsEnabled = isPaymentsEnabled();
   const { idToken, studentProfile, user } = useAuth();
 
@@ -53,28 +63,26 @@ const TuitionStatusCard = ({
   );
 
   const maxPayable = Math.max(Number(summary.balanceDue) || 0, 0);
-
-  // If remaining balance is below the minimum installment, it's a final top-up (pay exact balance).
   const isFinalTopUp = maxPayable > 0 && maxPayable < MIN_INSTALLMENT_GHS;
 
   const defaultAmount =
     checkoutAmountOverride !== undefined && checkoutAmountOverride !== null
       ? clampNumber(checkoutAmountOverride, { min: 0, max: maxPayable })
-      : clampNumber(studentProfile?.paymentIntentAmount ?? maxPayable, { min: 0, max: maxPayable });
+      : clampNumber(studentProfile?.paymentIntentAmount ?? maxPayable, {
+          min: 0,
+          max: maxPayable,
+        });
 
   const [amountText, setAmountText] = useState(defaultAmount ? String(defaultAmount) : "");
   const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
   useEffect(() => {
-    // If we are in final-topup mode, force the exact remaining balance.
     if (isFinalTopUp) {
       setAmountText(String(maxPayable));
       return;
     }
-    // Otherwise keep input synced to suggested default.
-    const nextDefault = defaultAmount ? String(defaultAmount) : "";
-    setAmountText(nextDefault);
+    setAmountText(defaultAmount ? String(defaultAmount) : "");
   }, [defaultAmount, isFinalTopUp, maxPayable]);
 
   const amountNow = useMemo(() => {
@@ -83,8 +91,12 @@ const TuitionStatusCard = ({
     return clampNumber(numericOnly, { min: 0, max: maxPayable });
   }, [amountText, maxPayable]);
 
-  // In final-topup mode, always charge the exact remaining balance.
+  // This is the tuition amount. The backend adds the student's half of the Paystack fee.
   const amountToPay = isFinalTopUp ? maxPayable : amountNow;
+  const feeBreakdown = useMemo(
+    () => calculateSharedPaystackFee(amountToPay),
+    [amountToPay]
+  );
 
   const paidSoFar = Math.max(Number(summary.paidAmount) || 0, 0);
   const tuitionTotal = Math.max(Number(summary.tuitionFee) || 0, 0);
@@ -92,27 +104,33 @@ const TuitionStatusCard = ({
 
   const isFinalPayment = maxPayable > 0 && Math.abs(amountToPay - maxPayable) < 0.5;
   const meetsMinimum = amountToPay >= MIN_INSTALLMENT_GHS || isFinalPayment;
-
   const willClearTuition = tuitionTotal > 0 && projectedTotalPaid >= tuitionTotal;
   const accessAfterPayment = willClearTuition ? "6 months" : "1 month";
 
   const amountHelper = useMemo(() => {
     if (maxPayable <= 0) return t("accountSettings.tuition.noBalance");
-
     if (isFinalTopUp) {
-      return t("accountSettings.tuition.finalTopUp", { amount: formatMoney(maxPayable), access: accessAfterPayment });
+      return t("accountSettings.tuition.finalTopUp", {
+        amount: formatMoney(maxPayable),
+        access: accessAfterPayment,
+      });
     }
-
     if (!amountToPay) {
-      return t("accountSettings.tuition.enterAmount", { min: formatMoney(MIN_INSTALLMENT_GHS) });
+      return t("accountSettings.tuition.enterAmount", {
+        min: formatMoney(MIN_INSTALLMENT_GHS),
+      });
     }
-
     if (!meetsMinimum) {
-      return t("accountSettings.tuition.minimumRule", { min: formatMoney(MIN_INSTALLMENT_GHS), remaining: formatMoney(maxPayable) });
+      return t("accountSettings.tuition.minimumRule", {
+        min: formatMoney(MIN_INSTALLMENT_GHS),
+        remaining: formatMoney(maxPayable),
+      });
     }
-
     const remaining = Math.max(maxPayable - amountToPay, 0);
-    return t("accountSettings.tuition.afterPayment", { access: accessAfterPayment, remaining: formatMoney(remaining) });
+    return t("accountSettings.tuition.afterPayment", {
+      access: accessAfterPayment,
+      remaining: formatMoney(remaining),
+    });
   }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum, t]);
 
   const canPay =
@@ -129,27 +147,66 @@ const TuitionStatusCard = ({
 
     const carryoverUntilMs = new Date(studentProfile?.upgradeCarryoverUntil || "").getTime();
     const hasQueuedUpgradeAccess =
-      String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
+      String(studentProfile?.contractMergeMode || "").toLowerCase() ===
+        "append_after_active_contract" &&
       Number.isFinite(carryoverUntilMs) &&
       carryoverUntilMs > Date.now();
     if (hasQueuedUpgradeAccess) return null;
 
     const joinedAtRaw = studentProfile?.joined_at;
     if (!joinedAtRaw) return null;
-
     const joinedAt = new Date(joinedAtRaw);
     if (Number.isNaN(joinedAt.getTime())) return null;
 
-    const expiresAt = new Date(joinedAt.getTime() + PAYMENT_GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
-    const now = new Date();
-    const millisecondsLeft = expiresAt.getTime() - now.getTime();
-    const daysLeft = Math.max(Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)), 0);
-
+    const expiresAt = new Date(
+      joinedAt.getTime() + PAYMENT_GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000
+    );
+    const millisecondsLeft = expiresAt.getTime() - Date.now();
     return {
-      daysLeft,
+      daysLeft: Math.max(Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)), 0),
       isExpired: millisecondsLeft <= 0,
     };
-  }, [studentProfile?.contractMergeMode, studentProfile?.joined_at, studentProfile?.paymentStatus, studentProfile?.upgradeCarryoverUntil]);
+  }, [
+    studentProfile?.contractMergeMode,
+    studentProfile?.joined_at,
+    studentProfile?.paymentStatus,
+    studentProfile?.upgradeCarryoverUntil,
+  ]);
+
+  const feeSummary = amountToPay > 0 ? (
+    <div
+      style={{
+        ...styles.card,
+        margin: "10px 0 0",
+        background: "#f8fafc",
+        borderColor: "#cbd5e1",
+      }}
+      data-testid="paystack-fee-breakdown"
+    >
+      <div style={styles.metaRow}>
+        <span>Tuition payment</span>
+        <strong>{formatCheckoutMoney(feeBreakdown.tuitionAmount)}</strong>
+      </div>
+      <div style={{ ...styles.metaRow, marginTop: 6 }}>
+        <span>Your 50% Paystack fee share</span>
+        <strong>{formatCheckoutMoney(feeBreakdown.studentFeeContribution)}</strong>
+      </div>
+      <div
+        style={{
+          ...styles.metaRow,
+          marginTop: 8,
+          paddingTop: 8,
+          borderTop: "1px solid #cbd5e1",
+        }}
+      >
+        <span><strong>Total charged by Paystack</strong></span>
+        <strong>{formatCheckoutMoney(feeBreakdown.checkoutAmount)}</strong>
+      </div>
+      <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+        Paystack’s estimated 1.95% transaction fee is shared equally. Falowen pays the other 50%.
+      </p>
+    </div>
+  ) : null;
 
   const startPayment = async () => {
     setPaymentError("");
@@ -165,7 +222,6 @@ const TuitionStatusCard = ({
       setPaymentError("Missing student code. Please re-login or contact support.");
       return;
     }
-
     if (!idToken) {
       setPaymentError("Your login session is missing. Please refresh and try again.");
       return;
@@ -173,7 +229,8 @@ const TuitionStatusCard = ({
 
     setIsStartingPayment(true);
     try {
-      const res = await fetch(`${getBackendUrl()}/paystack/initialize`, {
+      // Use Falowen's same-origin payment gateway so the fee policy and webhook agree.
+      const res = await fetch(`${window.location.origin}/api/paystack/initialize`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -187,19 +244,15 @@ const TuitionStatusCard = ({
       });
 
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(json?.error || "Could not start the payment.");
-      }
+      if (!res.ok) throw new Error(json?.error || "Could not start the payment.");
 
       const url = json?.authorization_url;
-      if (!url) {
-        throw new Error("Paystack did not return a payment link.");
-      }
-
+      if (!url) throw new Error("Paystack did not return a payment link.");
       window.location.assign(url);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not start the payment.";
-      setPaymentError(message);
+      setPaymentError(
+        error instanceof Error ? error.message : "Could not start the payment."
+      );
     } finally {
       setIsStartingPayment(false);
     }
@@ -212,7 +265,9 @@ const TuitionStatusCard = ({
         <span style={styles.badge}>{summary.statusLabel}</span>
       </div>
 
-      {description ? <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{description}</p> : null}
+      {description ? (
+        <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{description}</p>
+      ) : null}
 
       <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
         <div style={styles.metaRow}>
@@ -244,7 +299,9 @@ const TuitionStatusCard = ({
               <strong>
                 {paymentGraceNotice.isExpired
                   ? t("accountSettings.tuition.graceEnded")
-                  : t("accountSettings.tuition.graceDays", { count: paymentGraceNotice.daysLeft })}
+                  : t("accountSettings.tuition.graceDays", {
+                      count: paymentGraceNotice.daysLeft,
+                    })}
               </strong>
               <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#9a3412" }}>
                 {t("accountSettings.tuition.graceBody")}
@@ -253,25 +310,40 @@ const TuitionStatusCard = ({
           ) : null}
 
           <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155" }}>
-            {t("payments.notice.nonRefundable")}
-            {" "}
-            <a href="https://register.falowen.app/" target="_blank" rel="noreferrer" style={{ color: "#1d4ed8", fontWeight: 600 }}>
+            {t("payments.notice.nonRefundable")} {" "}
+            <a
+              href="https://register.falowen.app/"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "#1d4ed8", fontWeight: 600 }}
+            >
               {t("payments.notice.contractLink")}
             </a>
             . {t("payments.notice.emailReminder")}
           </p>
+
           {maxPayable <= 0 ? null : isFinalTopUp ? (
             <>
-              <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
+              <div
+                style={{
+                  ...styles.card,
+                  margin: 0,
+                  background: "#f8fafc",
+                  borderColor: "#e2e8f0",
+                }}
+              >
                 <div style={styles.metaRow}>
                   <span>{t("accountSettings.tuition.finalPayment")}</span>
                   <strong>{formatMoney(maxPayable)}</strong>
                 </div>
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  {t("accountSettings.tuition.finalPaymentHelp", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
+                  {t("accountSettings.tuition.finalPaymentHelp", {
+                    min: formatMoney(MIN_INSTALLMENT_GHS),
+                  })}
                 </p>
               </div>
 
+              {feeSummary}
               <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{amountHelper}</p>
 
               <button
@@ -280,23 +352,31 @@ const TuitionStatusCard = ({
                 onClick={startPayment}
                 disabled={!canPay || isStartingPayment}
               >
-                {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payToFinish", { amount: formatMoney(maxPayable) })}
+                {isStartingPayment
+                  ? t("accountSettings.tuition.opening")
+                  : `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} to finish`}
               </button>
             </>
           ) : (
             <>
-              <label style={{ ...styles.label, marginBottom: 6 }}>{t("accountSettings.tuition.amountNow")}</label>
+              <label style={{ ...styles.label, marginBottom: 6 }}>
+                {t("accountSettings.tuition.amountNow")}
+              </label>
               <input
                 type="text"
                 inputMode="numeric"
                 value={amountText}
-                onChange={(e) => {
+                onChange={(event) => {
                   setPaymentError("");
-                  setAmountText(e.target.value);
+                  setAmountText(event.target.value);
                 }}
                 style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-                placeholder={t("accountSettings.tuition.amountPlaceholder", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
+                placeholder={t("accountSettings.tuition.amountPlaceholder", {
+                  min: formatMoney(MIN_INSTALLMENT_GHS),
+                })}
               />
+
+              {feeSummary}
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
@@ -309,7 +389,9 @@ const TuitionStatusCard = ({
                   }}
                   disabled={maxPayable <= 0 || isStartingPayment}
                 >
-                  {t("accountSettings.tuition.payOutstanding", { amount: formatMoney(maxPayable) })}
+                  {t("accountSettings.tuition.payOutstanding", {
+                    amount: formatMoney(maxPayable),
+                  })}
                 </button>
 
                 <button
@@ -318,13 +400,17 @@ const TuitionStatusCard = ({
                   onClick={startPayment}
                   disabled={!canPay || isStartingPayment}
                 >
-                  {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payOnline")}
+                  {isStartingPayment
+                    ? t("accountSettings.tuition.opening")
+                    : `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} online`}
                 </button>
               </div>
             </>
           )}
 
-          {paymentError ? <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div> : null}
+          {paymentError ? (
+            <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div>
+          ) : null}
         </div>
       ) : (
         <div
