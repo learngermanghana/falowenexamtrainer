@@ -1,0 +1,117 @@
+name: Apply Course Book completion handoff
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-course-completion-handoff.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Connect completion handoff
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('web/src/components/CourseTab.js')
+          text = path.read_text(encoding='utf-8')
+
+          def replace_once(old, new, label):
+              global text
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, found {count}')
+              text = text.replace(old, new, 1)
+
+          replace_once(
+              'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\n',
+              'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\nimport CourseCompletionHandoff from "./CourseCompletionHandoff";\nimport { getCourseCompletionJourney } from "../data/courseCompletionJourney";\n',
+              'imports',
+          )
+
+          replace_once(
+              '''  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
+
+  const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);''',
+              '''  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
+  const finalCourseLesson = courseLessons.length ? courseLessons[courseLessons.length - 1] : null;
+  const finalCourseLessonTitle = finalCourseLesson ? getCourseBookEntryTitle(finalCourseLesson) : "";
+  const isCourseComplete = courseLessons.length > 0 && completedCount === courseLessons.length;
+  const completionJourney = getCourseCompletionJourney(selectedCourseLevel);
+  const openExamsRoom = () => navigate("/exams/overview");
+
+  const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);''',
+              'completion variables',
+          )
+
+          replace_once(
+              '''            ) : (
+              <section style={courseBookStyles.nextCard}>
+                <div>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
+                  <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Review earlier lessons or continue to exam preparation.</p>
+                </div>
+              </section>
+            )}''',
+              '''            ) : (
+              <section style={{ ...courseBookStyles.nextCard, borderColor: "#86efac", background: "linear-gradient(135deg,#ecfdf5,#ffffff)" }}>
+                <div>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
+                  <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Your next stage is structured exam preparation in the Exams Room.</p>
+                </div>
+                <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>
+                  Go to Exams Room
+                </button>
+              </section>
+            )}''',
+              'complete next card',
+          )
+
+          replace_once(
+              '''          ) : (
+            <section style={courseBookStyles.emptyState}>
+              <h3 style={{ marginTop: 0 }}>No lessons found</h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>
+            </section>
+          )}
+        </>''',
+              '''          ) : (
+            <section style={courseBookStyles.emptyState}>
+              <h3 style={{ marginTop: 0 }}>No lessons found</h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>
+            </section>
+          )}
+
+          <CourseCompletionHandoff
+            level={selectedCourseLevel}
+            isComplete={isCourseComplete}
+            progressPercent={progressPercent}
+            finalLessonTitle={finalCourseLessonTitle}
+            journey={completionJourney}
+            onOpenExamsRoom={openExamsRoom}
+            onReviewFinalLesson={finalCourseLesson ? () => openLesson(finalCourseLesson) : null}
+          />
+        </>''',
+              'bottom handoff',
+          )
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit Course Book handoff
+        run: |
+          git config user.name "Falowen Automation"
+          git config user.email "moxflex@gmail.com"
+          git add web/src/components/CourseTab.js
+          git commit -m "Guide course graduates to the Exams Room"
+          git push origin main
