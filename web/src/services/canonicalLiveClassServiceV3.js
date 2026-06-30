@@ -43,11 +43,12 @@ function sessionBelongsToCanonicalClass(session = {}, klass = {}) {
     return sessionIds.some((value) => canonicalIds.has(value));
   }
 
+  const sessionName = normalizeClassIdentity(session.className);
+  if (!sessionName) return true;
   const canonicalNames = new Set([klass.name, klass.className]
     .map(normalizeClassIdentity)
     .filter(Boolean));
-  const sessionName = normalizeClassIdentity(session.className);
-  return Boolean(sessionName && canonicalNames.has(sessionName));
+  return canonicalNames.has(sessionName);
 }
 
 function scopeSummaryToCanonicalClass(summary, now = new Date()) {
@@ -71,8 +72,9 @@ function hideOldCompletedCard(summary, now = new Date()) {
 }
 
 export function buildCanonicalLiveClassSummary(options = {}) {
+  const now = options.now || new Date();
   const summary = base.buildCanonicalLiveClassSummary(options);
-  return hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, options.now || new Date()), options.now || new Date());
+  return hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, now), now);
 }
 
 export function subscribeCanonicalLiveClass(options = {}) {
