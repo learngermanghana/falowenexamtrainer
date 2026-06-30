@@ -1,3 +1,9 @@
+// Preserve the existing Firebase API export and secret configuration while
+// replacing only the Express app it loads for payment-aware reconciliation.
+require("./functionz/app");
+const paymentAwareApp = require("./functionz/paymentAwareApp");
+require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
+
 const exportedFunctions = require("./index.notifications");
 const lessonProgressFunctions = require("./lessonProgress");
 const { submitAssignmentResubmission } = require("./resubmission");
