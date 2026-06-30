@@ -17,6 +17,51 @@ function dateKey(value, timezone = GHANA_TIMEZONE) {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
+function normalizeClassIdentity(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ß/g, "ss")
+    .toLowerCase()
+    .replace(/\b(muenchen|munchen)\b/g, "munich")
+    .replace(/\b(koeln|cologne)\b/g, "koln")
+    .replace(/\b(klasse|class|course|cohort)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sessionBelongsToCanonicalClass(session = {}, klass = {}) {
+  const canonicalIds = new Set([klass.id, klass.classId]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean));
+  const sessionIds = [session.classId, session.classRecordId]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+
+  if (sessionIds.length) {
+    return sessionIds.some((value) => canonicalIds.has(value));
+  }
+
+  const canonicalNames = new Set([klass.name, klass.className]
+    .map(normalizeClassIdentity)
+    .filter(Boolean));
+  const sessionName = normalizeClassIdentity(session.className);
+  return Boolean(sessionName && canonicalNames.has(sessionName));
+}
+
+function scopeSummaryToCanonicalClass(summary, now = new Date()) {
+  if (!summary?.klass) return summary;
+  const scopedSessions = (summary.sessions || []).filter((session) =>
+    sessionBelongsToCanonicalClass(session, summary.klass));
+  return base.buildCanonicalLiveClassSummary({
+    klass: summary.klass,
+    sessions: scopedSessions,
+    zoomProfile: summary.zoom,
+    now,
+  });
+}
+
 function hideOldCompletedCard(summary, now = new Date()) {
   const completed = summary?.latestCompletedSession;
   if (!completed) return summary;
@@ -26,13 +71,17 @@ function hideOldCompletedCard(summary, now = new Date()) {
 }
 
 export function buildCanonicalLiveClassSummary(options = {}) {
-  return hideOldCompletedCard(base.buildCanonicalLiveClassSummary(options), options.now || new Date());
+  const summary = base.buildCanonicalLiveClassSummary(options);
+  return hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, options.now || new Date()), options.now || new Date());
 }
 
 export function subscribeCanonicalLiveClass(options = {}) {
   const { onChange } = options;
   return base.subscribeCanonicalLiveClass({
     ...options,
-    onChange: (summary) => onChange?.(hideOldCompletedCard(summary, new Date())),
+    onChange: (summary) => {
+      const now = new Date();
+      onChange?.(hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, now), now));
+    },
   });
 }
