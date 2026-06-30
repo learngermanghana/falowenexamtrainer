@@ -24,6 +24,13 @@
       },
       "dest": "/index.html"
     },
+    {
+      "src": "/campus/(.*)",
+      "headers": {
+        "Cache-Control": "no-store, no-cache, must-revalidate"
+      },
+      "dest": "/index.html"
+    },
     { "handle": "filesystem" },
     { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
     { "src": "/api/public/classes", "dest": "/api/public-classes.js" },
