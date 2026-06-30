@@ -2,6 +2,18 @@
 // replacing only the Express app it loads for payment-aware reconciliation.
 require("./functionz/app");
 const paymentAwareApp = require("./functionz/paymentAwareApp");
+
+paymentAwareApp.get("/paystack/fee-policy", (_req, res) =>
+  res.json({
+    ok: true,
+    policy: "shared_50_50",
+    paystackFeeRate: 0.0195,
+    studentFeeShareRate: 0.5,
+    tuitionAccounting: "tuition_only",
+    version: "2026-06-30",
+  })
+);
+
 require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
 
 const exportedFunctions = require("./index.notifications");
