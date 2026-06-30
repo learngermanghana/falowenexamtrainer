@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import C1Day7ReisenGrammarNotes from "./C1Day7ReisenGrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -120,6 +121,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
   const assignmentId = canonicalLesson?.submission?.assignmentId;
   const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
+  const isC1Day7Grammar = String(lesson.level || "").toUpperCase() === "C1" && Number(lesson.day) === 7;
   const effectiveWritingComplete = fullEssay ? progress.aiWritingDone : writing.complete;
   const finishRequirements = [
     { key: "learn", label: "tick the grammar review checkbox on Learn", complete: progress.learnDone },
@@ -173,16 +175,23 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "Lesson video"} src={videoEmbed} allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes.</NoteBox>}
         </Section>
-        <Section title={`Grammar: ${lesson.grammarLesson?.title || lesson.grammarFocus}`}>
-          <NoteBox tone="amber"><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
-            <div><h3>Core rules</h3><ul style={listStyle}>{grammarRules.map((item) => <li key={item}>{item}</li>)}</ul></div>
-            <div><h3>Model sentences</h3><ul style={listStyle}>{grammarExamples.map((item) => <li key={item}>{item}</li>)}</ul></div>
-          </div>
-          {lesson.grammarLesson?.miniExercise ? <NoteBox><strong>Mini practice:</strong> {lesson.grammarLesson.miniExercise}</NoteBox> : null}
-          <ResourceButton href={grammarUrl}>Open full grammar notes</ResourceButton>
-          <label style={{ fontWeight: 800 }}><input type="checkbox" checked={progress.learnDone} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} /> I reviewed the grammar.</label>
-        </Section>
+        {isC1Day7Grammar ? (
+          <C1Day7ReisenGrammarNotes
+            checked={progress.learnDone}
+            onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))}
+          />
+        ) : (
+          <Section title={`Grammar: ${lesson.grammarLesson?.title || lesson.grammarFocus}`}>
+            <NoteBox tone="amber"><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
+              <div><h3>Core rules</h3><ul style={listStyle}>{grammarRules.map((item) => <li key={item}>{item}</li>)}</ul></div>
+              <div><h3>Model sentences</h3><ul style={listStyle}>{grammarExamples.map((item) => <li key={item}>{item}</li>)}</ul></div>
+            </div>
+            {lesson.grammarLesson?.miniExercise ? <NoteBox><strong>Mini practice:</strong> {lesson.grammarLesson.miniExercise}</NoteBox> : null}
+            <ResourceButton href={grammarUrl}>Open full grammar notes</ResourceButton>
+            <label style={{ fontWeight: 800 }}><input type="checkbox" checked={progress.learnDone} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} /> I reviewed the grammar.</label>
+          </Section>
+        )}
       </> : null}
 
       {active === "speak" ? <Section title="Speaking builder">
