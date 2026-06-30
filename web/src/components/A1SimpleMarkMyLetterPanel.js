@@ -1,6 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
-import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import WritingPage from "./WritingPage";
 
 const workflowStepStyle = {
   border: "1px solid #fed7aa",
@@ -70,12 +70,24 @@ const A1SimpleMarkMyLetterPanel = ({
       your assignment to your tutor.
     </div>
 
-    <CourseInlinePracticePanel
-      type="writing"
-      title="Self-practice · Mark My Letter"
-      description="Paste one completed A1 letter here. Falowen AI will mark it, explain the corrections, and help you improve it. When you are satisfied, submit the final version through the normal assignment area."
-      writingContext={writingContext}
-    />
+    <div
+      style={{
+        border: "1px solid #e5e7eb",
+        borderRadius: 16,
+        overflow: "hidden",
+        background: "#fff",
+      }}
+    >
+      <WritingPage
+        mode="course"
+        initialTab="mark"
+        enabledTabs={["mark"]}
+        hideTabList
+        markLabel="Mark My Letter"
+        submitLabel="Mark My Letter"
+        writingContext={writingContext}
+      />
+    </div>
 
     <div
       style={{
