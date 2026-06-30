@@ -3,16 +3,19 @@
 require("./functionz/app");
 const paymentAwareApp = require("./functionz/paymentAwareApp");
 
-paymentAwareApp.get("/paystack/fee-policy", (_req, res) =>
+const sendPaymentPolicyHealth = (_req, res) =>
   res.json({
     ok: true,
     policy: "shared_50_50",
     paystackFeeRate: 0.0195,
     studentFeeShareRate: 0.5,
     tuitionAccounting: "tuition_only",
+    webhookMethod: "POST",
     version: "2026-06-30",
-  })
-);
+  });
+
+paymentAwareApp.get("/paystack/fee-policy", sendPaymentPolicyHealth);
+paymentAwareApp.get("/paystack/webhook", sendPaymentPolicyHealth);
 
 require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
 
