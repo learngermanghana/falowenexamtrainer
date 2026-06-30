@@ -6,6 +6,7 @@ import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
 
 const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
 const A1_DAY_19_VIDEO_ID = "gprnEZtMUPM";
+const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
 
 const LETTER_WRITING_INTRO_PATHS = new Set([
   "/campus/course/letter-writing-intro-12-3",
@@ -48,6 +49,20 @@ const prepareSpeakingLessonPage = (container) => {
     String(link.getAttribute("href") || link.href || "").includes(A1_DAY_19_VIDEO_ID),
   );
   duplicateVideoLink?.closest("article")?.remove();
+};
+
+const prepareWritingLessonPage = (container, pathname) => {
+  if (!LETTER_WRITING_INTRO_PATHS.has(pathname)) return;
+
+  const teacherVideoLink = Array.from(container.querySelectorAll("a")).find((link) => {
+    const href = String(link.getAttribute("href") || link.href || "");
+    const label = String(link.textContent || "").trim();
+    return href.includes("youtu.be/") && /video öffnen/i.test(label);
+  });
+
+  if (teacherVideoLink) {
+    teacherVideoLink.setAttribute("href", A1_DAY_12_TEACHER_VIDEO_URL);
+  }
 };
 
 const insertSpeakingMount = (container, mount) => {
@@ -114,7 +129,11 @@ const A1CoursePracticeAutoMount = () => {
 
     const container =
       (isCanonicalLessonPage ? getCanonicalLessonArticle() : null) || getPageContainer();
-    if (isCanonicalLessonPage) prepareSpeakingLessonPage(container);
+    if (isCanonicalLessonPage) {
+      prepareSpeakingLessonPage(container);
+    } else {
+      prepareWritingLessonPage(container, pathname);
+    }
 
     const mount = document.createElement("div");
     mount.id = "falowen-a1-practice-mount";
