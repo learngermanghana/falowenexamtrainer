@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import B2Day1IdentityGrammarNotes from "./B2Day1IdentityGrammarNotes";
 import B2Day2To4GrammarNotes from "./B2Day2To4GrammarNotes";
+import B2Day5HealthGrammarNotes from "./B2Day5HealthGrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -75,9 +76,18 @@ const embedUrl = (url = "") => {
   }
 };
 
+const day5SpeakingTopics = [
+  { id: "ursachen", title: "Stressursachen", keywords: ["Zeitdruck", "zu viele Aufgaben", "ständige Erreichbarkeit", "finanzielle Sorgen", "Konflikte", "fehlende Pausen"] },
+  { id: "koerper", title: "Körperliche Folgen", keywords: ["Schlafprobleme", "Kopfschmerzen", "Erschöpfung", "Verspannung", "weniger Energie", "Immunsystem"] },
+  { id: "psychisch", title: "Psychische Folgen", keywords: ["Unruhe", "Überforderung", "schlechte Stimmung", "weniger Motivation", "Konzentration", "Reizbarkeit"] },
+  { id: "routinen", title: "Gesunde Routinen", keywords: ["Bewegung", "ausreichend Schlaf", "feste Pausen", "Ernährung", "handyfreie Zeit", "soziale Kontakte"] },
+  { id: "empfehlungen", title: "Realistische Empfehlungen", keywords: ["kleine Schritte", "Grenzen setzen", "Prioritäten", "Unterstützung", "Zeitplan", "Regelmäßigkeit"] },
+  { id: "ziel", title: "Persönliches Ziel", keywords: ["Gewohnheit verbessern", "konkreter Plan", "Hindernis", "Vorteil", "Motivation", "nächster Schritt"] },
+];
+
 const CompactSpeakingPoints = ({ lesson }) => {
   const builder = lesson.speakingBuilder || {};
-  const branches = builder.branches || [];
+  const branches = Number(lesson.day) === 5 ? day5SpeakingTopics : (builder.branches || []);
   const plan = builder.plan || [];
   const starters = builder.starters || [];
   const question = builder.question || String(lesson.speakingTopic || "").replace(/^Sprechen:\s*/i, "");
@@ -93,12 +103,13 @@ const CompactSpeakingPoints = ({ lesson }) => {
         </div>
       ) : null}
       {plan.length ? (
-        <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
+        <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#f8fafc" }}>
           <h3 style={{ margin: "0 0 8px" }}>Aufbau deiner Antwort</h3>
           <ol style={listStyle}>{plan.map((item) => <li key={item}>{item}</li>)}</ol>
         </div>
       ) : null}
       {starters.length ? <NoteBox><strong>Nützliche Satzanfänge:</strong><ul style={{ ...listStyle, marginTop: 8 }}>{starters.map((item) => <li key={item}>{item}</li>)}</ul></NoteBox> : null}
+      {Number(lesson.day) === 5 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens vier Verbindungen aus <em>weil, da, deshalb, daher</em> und <em>aus diesem Grund</em>. Nenne mindestens ein konkretes Beispiel.</NoteBox> : null}
     </div>
   );
 };
@@ -107,9 +118,12 @@ const SpeakingBuilder = ({ lesson }) => Number(lesson.day) === 1
   ? <SpeakingPoints />
   : <CompactSpeakingPoints lesson={lesson} />;
 
-const GrammarNotes = ({ lesson, checked, onCheckedChange }) => Number(lesson.day) === 1
-  ? <B2Day1IdentityGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />
-  : <B2Day2To4GrammarNotes day={lesson.day} checked={checked} onCheckedChange={onCheckedChange} />;
+const GrammarNotes = ({ lesson, checked, onCheckedChange }) => {
+  const day = Number(lesson.day);
+  if (day === 1) return <B2Day1IdentityGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
+  if (day === 5) return <B2Day5HealthGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
+  return <B2Day2To4GrammarNotes day={day} checked={checked} onCheckedChange={onCheckedChange} />;
+};
 
 export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = null }) {
   const navigate = useNavigate();
