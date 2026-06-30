@@ -40,12 +40,13 @@ jobs:
         working-directory: functions
         run: npm install --no-audit --no-fund
 
-      - name: Validate functions source
+      - name: Validate functions source and discovery
         working-directory: functions
         run: |
           node --check index.entry.js
           node --check functionz/paymentAwareApp.js
           node --check functionz/paystackFeePolicy.js
+          node -e 'const exported = require("./index.entry.js"); console.log("Discovered exports:", Object.keys(exported).sort().join(", "));'
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -56,4 +57,27 @@ jobs:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
       - name: Deploy exam trainer functions
-        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only functions:falowenexamtrainer --force --debug
+        shell: bash
+        run: |
+          set +e
+          firebase deploy \
+            --project "$FIREBASE_PROJECT_ID" \
+            --only functions:falowenexamtrainer \
+            --force \
+            --debug > firebase-deploy.log 2>&1
+          status=$?
+          echo "Firebase deploy exit code: $status"
+          echo "=== Firebase deployment summary ==="
+          tail -n 180 firebase-deploy.log || true
+          exit "$status"
+
+      - name: Upload Firebase deployment diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-deploy-diagnostics-${{ github.run_id }}
+          path: |
+            firebase-deploy.log
+            firebase-debug.log
+          if-no-files-found: warn
+          retention-days: 7
