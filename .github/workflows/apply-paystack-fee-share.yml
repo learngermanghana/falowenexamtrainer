@@ -1,0 +1,344 @@
+name: Apply Paystack fee sharing patch
+
+on:
+  push:
+    paths:
+      - .github/workflows/apply-paystack-fee-share.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Patch backend and checkout display
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected 1 match, found {count}")
+              return text.replace(old, new, 1)
+
+          backend_path = Path("functions/functionz/app.js")
+          backend = backend_path.read_text()
+
+          backend = replace_once(
+              backend,
+              'const { courseSchedulesByName } = require("../data/classSchedules");',
+              'const { courseSchedulesByName } = require("../data/classSchedules");\nconst { calculateSharedPaystackFee } = require("./paystackFeePolicy");',
+              "backend helper import",
+          )
+
+          backend = replace_once(
+              backend,
+              '''    if (amountRounded < PAYSTACK_MIN_INSTALLMENT_GHS && !isFinalPayment) {
+              return res.status(400).json({
+                error: `Minimum payment is GH₵${PAYSTACK_MIN_INSTALLMENT_GHS} (or pay the remaining balance).`,
+              });
+            }
+
+            const payEmail = studentEmail || authedEmail;''',
+              '''    if (amountRounded < PAYSTACK_MIN_INSTALLMENT_GHS && !isFinalPayment) {
+              return res.status(400).json({
+                error: `Minimum payment is GH₵${PAYSTACK_MIN_INSTALLMENT_GHS} (or pay the remaining balance).`,
+              });
+            }
+
+            const feeBreakdown = calculateSharedPaystackFee(amountRounded);
+
+            const payEmail = studentEmail || authedEmail;''',
+              "backend fee calculation",
+          )
+
+          backend = replace_once(
+              backend,
+              '''      amountRequested: amountRounded,
+              planAfterPayment: paidSoFar + amountRounded >= tuitionFee ? "6-month" : "1-month",''',
+              '''      amountRequested: amountRounded,
+              tuitionAmount: amountRounded,
+              checkoutAmount: feeBreakdown.checkoutAmount,
+              estimatedPaystackFee: feeBreakdown.estimatedPaystackFee,
+              studentFeeContribution: feeBreakdown.studentFeeContribution,
+              falowenFeeContribution: feeBreakdown.falowenFeeContribution,
+              paystackFeeRate: feeBreakdown.feeRate,
+              studentFeeShareRate: feeBreakdown.studentShareRate,
+              feePolicy: "shared_50_50",
+              planAfterPayment: paidSoFar + amountRounded >= tuitionFee ? "6-month" : "1-month",''',
+              "backend metadata",
+          )
+
+          backend = replace_once(
+              backend,
+              '''      { display_name: "This payment", variable_name: "payment_now", value: `GH₵${amountRounded}` },
+              { display_name: "Plan after payment", variable_name: "plan_after", value: metadata.planAfterPayment },''',
+              '''      { display_name: "Tuition payment", variable_name: "payment_now", value: `GH₵${amountRounded.toFixed(2)}` },
+              { display_name: "Your 50% fee share", variable_name: "student_fee_share", value: `GH₵${feeBreakdown.studentFeeContribution.toFixed(2)}` },
+              { display_name: "Total charged", variable_name: "checkout_total", value: `GH₵${feeBreakdown.checkoutAmount.toFixed(2)}` },
+              { display_name: "Plan after payment", variable_name: "plan_after", value: metadata.planAfterPayment },''',
+              "backend custom fields",
+          )
+
+          backend = replace_once(
+              backend,
+              '      amount: Math.round(amountRounded * 100), // pesewas',
+              '      amount: Math.round(feeBreakdown.checkoutAmount * 100), // pesewas',
+              "backend checkout amount",
+          )
+
+          backend = replace_once(
+              backend,
+              '''        paymentIntentAmount: amountRounded,
+                paystackReference: reference,''',
+              '''        paymentIntentAmount: amountRounded,
+                paymentIntentCheckoutAmount: feeBreakdown.checkoutAmount,
+                paymentIntentStudentFeeContribution: feeBreakdown.studentFeeContribution,
+                paystackReference: reference,''',
+              "backend student payment intent",
+          )
+
+          backend = replace_once(
+              backend,
+              '''        amount: amountRounded,
+                balanceBefore: balanceDue,''',
+              '''        amount: amountRounded,
+                tuitionAmount: amountRounded,
+                checkoutAmount: feeBreakdown.checkoutAmount,
+                estimatedPaystackFee: feeBreakdown.estimatedPaystackFee,
+                studentFeeContribution: feeBreakdown.studentFeeContribution,
+                falowenFeeContribution: feeBreakdown.falowenFeeContribution,
+                feePolicy: "shared_50_50",
+                balanceBefore: balanceDue,''',
+              "backend init audit",
+          )
+
+          backend = replace_once(
+              backend,
+              '    return res.json({ ok: true, authorization_url: authorizationUrl, reference });',
+              '''    return res.json({
+              ok: true,
+              authorization_url: authorizationUrl,
+              reference,
+              tuitionAmount: amountRounded,
+              checkoutAmount: feeBreakdown.checkoutAmount,
+              studentFeeContribution: feeBreakdown.studentFeeContribution,
+              falowenFeeContribution: feeBreakdown.falowenFeeContribution,
+            });''',
+              "backend initialize response",
+          )
+
+          backend = replace_once(
+              backend,
+              '    const amountPaid = Number(data?.amount || 0) / 100;',
+              '''    const checkoutAmountPaid = Number(data?.amount || 0) / 100;
+            const metadataTuitionAmount = Number(
+              data?.metadata?.tuitionAmount ?? data?.metadata?.amountRequested
+            );
+            const amountPaid =
+              Number.isFinite(metadataTuitionAmount) && metadataTuitionAmount > 0
+                ? Math.round(metadataTuitionAmount * 100) / 100
+                : checkoutAmountPaid;
+            const expectedCheckoutAmount = Number(data?.metadata?.checkoutAmount || 0);
+            const studentFeeContribution = Number(data?.metadata?.studentFeeContribution || 0);
+            const estimatedPaystackFee = Number(data?.fees || 0) / 100 || Number(data?.metadata?.estimatedPaystackFee || 0);''',
+              "webhook tuition and checkout split",
+          )
+
+          backend = replace_once(
+              backend,
+              '''        amount: amountPaid,
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),''',
+              '''        amount: checkoutAmountPaid,
+                checkoutAmount: checkoutAmountPaid,
+                tuitionAmount: amountPaid,
+                studentFeeContribution,
+                estimatedPaystackFee,
+                feePolicy: data?.metadata?.feePolicy || "legacy_merchant_paid",
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),''',
+              "webhook audit amounts",
+          )
+
+          backend = replace_once(
+              backend,
+              '''    if (!Number.isFinite(amountPaid) || amountPaid < PAYSTACK_MIN_PAYMENT_FLOOR) {
+              return markRejected("invalid_amount", { amountPaid });
+            }
+
+            // Minimum installment unless final balance''',
+              '''    if (
+              !Number.isFinite(checkoutAmountPaid) ||
+              checkoutAmountPaid < PAYSTACK_MIN_PAYMENT_FLOOR ||
+              !Number.isFinite(amountPaid) ||
+              amountPaid <= 0
+            ) {
+              return markRejected("invalid_amount", { amountPaid, checkoutAmountPaid });
+            }
+
+            if (checkoutAmountPaid + 0.01 < amountPaid) {
+              return markRejected("checkout_below_tuition", { amountPaid, checkoutAmountPaid });
+            }
+
+            if (
+              Number.isFinite(expectedCheckoutAmount) &&
+              expectedCheckoutAmount > 0 &&
+              Math.abs(checkoutAmountPaid - expectedCheckoutAmount) > 0.05
+            ) {
+              return markRejected("checkout_amount_mismatch", {
+                checkoutAmountPaid,
+                expectedCheckoutAmount,
+                amountPaid,
+              });
+            }
+
+            // Minimum installment unless final balance''',
+              "webhook amount validation",
+          )
+
+          backend = replace_once(
+              backend,
+              '''      paystackReference: data?.reference || studentData.paystackReference || "",
+              level: shouldApplyQueuedUpgrade ? queuedUpgradeLevel : studentData.level,''',
+              '''      paystackReference: data?.reference || studentData.paystackReference || "",
+              lastPaymentTuitionAmount: amountPaid,
+              lastPaymentCheckoutAmount: checkoutAmountPaid,
+              lastPaymentStudentFeeContribution: studentFeeContribution,
+              lastPaymentPaystackFee: estimatedPaystackFee,
+              lastPaymentFeePolicy: data?.metadata?.feePolicy || "legacy_merchant_paid",
+              level: shouldApplyQueuedUpgrade ? queuedUpgradeLevel : studentData.level,''',
+              "student payment audit fields",
+          )
+
+          backend = replace_once(
+              backend,
+              '''        paymentStatus,
+                balanceDue,
+                contractTermMonths: finalMonths,''',
+              '''        paymentStatus,
+                balanceDue,
+                tuitionAmount: amountPaid,
+                checkoutAmount: checkoutAmountPaid,
+                studentFeeContribution,
+                estimatedPaystackFee,
+                contractTermMonths: finalMonths,''',
+              "webhook handled audit",
+          )
+
+          backend_path.write_text(backend)
+
+          frontend_path = Path("web/src/components/TuitionStatusCardLegacy.js")
+          frontend = frontend_path.read_text()
+
+          frontend = replace_once(
+              frontend,
+              'import { formatCurrency } from "../lib/formatters";',
+              'import { formatCurrency } from "../lib/formatters";\nimport { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";',
+              "frontend helper import",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''  const formatMoney = useMemo(
+                () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+                [locale]
+              );''',
+              '''  const formatMoney = useMemo(
+                () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+                [locale]
+              );
+              const formatCheckoutMoney = useMemo(
+                () => (value) => formatCurrency(value, { locale, minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                [locale]
+              );''',
+              "frontend money formatter",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''  // In final-topup mode, always charge the exact remaining balance.
+              const amountToPay = isFinalTopUp ? maxPayable : amountNow;
+
+              const paidSoFar = Math.max(Number(summary.paidAmount) || 0, 0);''',
+              '''  // In final-topup mode, always use the exact remaining tuition balance.
+              const amountToPay = isFinalTopUp ? maxPayable : amountNow;
+              const feeBreakdown = useMemo(
+                () => calculateSharedPaystackFee(amountToPay),
+                [amountToPay]
+              );
+
+              const paidSoFar = Math.max(Number(summary.paidAmount) || 0, 0);''',
+              "frontend fee breakdown",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''  const startPayment = async () => {''',
+              '''  const feeSummary = amountToPay > 0 ? (
+                <div style={{ ...styles.card, margin: "10px 0 0", background: "#f8fafc", borderColor: "#cbd5e1" }}>
+                  <div style={styles.metaRow}>
+                    <span>Tuition payment</span>
+                    <strong>{formatCheckoutMoney(feeBreakdown.tuitionAmount)}</strong>
+                  </div>
+                  <div style={{ ...styles.metaRow, marginTop: 6 }}>
+                    <span>Your 50% Paystack fee share</span>
+                    <strong>{formatCheckoutMoney(feeBreakdown.studentFeeContribution)}</strong>
+                  </div>
+                  <div style={{ ...styles.metaRow, marginTop: 8, paddingTop: 8, borderTop: "1px solid #cbd5e1" }}>
+                    <span><strong>Total charged by Paystack</strong></span>
+                    <strong>{formatCheckoutMoney(feeBreakdown.checkoutAmount)}</strong>
+                  </div>
+                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                    Paystack’s estimated 1.95% transaction fee is shared equally. Falowen pays the other 50%.
+                  </p>
+                </div>
+              ) : null;
+
+              const startPayment = async () => {''',
+              "frontend fee summary",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{amountHelper}</p>''',
+              '''              {feeSummary}
+
+              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{amountHelper}</p>''',
+              "frontend final topup summary",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>''',
+              '''              {feeSummary}
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>''',
+              "frontend standard summary",
+          )
+
+          frontend = replace_once(
+              frontend,
+              '''{isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payToFinish", { amount: formatMoney(maxPayable) })}''',
+              '''{isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payToFinish", { amount: formatCheckoutMoney(feeBreakdown.checkoutAmount) })}''',
+              "frontend final button total",
+          )
+
+          frontend_path.write_text(frontend)
+          PY
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/paystackFeePolicy.js
+
+      - name: Commit generated patch
+        run: |
+          git config user.name "Falowen Automation"
+          git config user.email "moxflex@gmail.com"
+          git add functions/functionz/app.js web/src/components/TuitionStatusCardLegacy.js
+          git commit -m "Share Paystack transaction fee equally with students"
+          git push origin main
