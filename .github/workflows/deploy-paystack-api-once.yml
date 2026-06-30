@@ -1,5 +1,6 @@
 name: Deploy Paystack API once
 
+# This second push triggers the one-time deployment workflow.
 on:
   push:
     paths:
