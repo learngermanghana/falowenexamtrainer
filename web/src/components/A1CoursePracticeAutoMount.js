@@ -7,9 +7,13 @@ import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
 const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
 const A1_DAY_19_VIDEO_ID = "gprnEZtMUPM";
 
-const WRITING_PATHS = new Set([
+const LETTER_WRITING_INTRO_PATHS = new Set([
   "/campus/course/letter-writing-intro-12-3",
   "/campus/course/letter-writing-intro-german-a1-day-12-3",
+]);
+
+const WRITING_PATHS = new Set([
+  ...LETTER_WRITING_INTRO_PATHS,
   "/campus/course/a1-day-21-weather-workbook",
   "/campus/course/a1-day-22-health-and-body-parts-workbook",
 ]);
@@ -79,6 +83,23 @@ const insertWritingMount = (container, mount) => {
   container.appendChild(mount);
 };
 
+const getWritingPanelProps = (pathname) => {
+  if (!LETTER_WRITING_INTRO_PATHS.has(pathname)) return {};
+
+  return {
+    title: "Check both letters before submission",
+    writingContext: {
+      level: "A1",
+      courseLevel: "A1",
+      day: 12,
+      lessonId: "A1-day-12.3",
+      workbookId: "A1-day-12.3-letter-writing",
+      writingTaskId: "A1-day-12.3-letter-writing-practice",
+      taskTitle: "A1 Day 12.3 letter self-practice",
+    },
+  };
+};
+
 const A1CoursePracticeAutoMount = () => {
   const location = useLocation();
 
@@ -107,7 +128,11 @@ const A1CoursePracticeAutoMount = () => {
 
     const root = createRoot(mount);
     root.render(
-      isCanonicalLessonPage ? <A1ExamSpeakingPracticePanel /> : <A1SimpleMarkMyLetterPanel />,
+      isCanonicalLessonPage ? (
+        <A1ExamSpeakingPracticePanel />
+      ) : (
+        <A1SimpleMarkMyLetterPanel {...getWritingPanelProps(pathname)} />
+      ),
     );
 
     return () => {
