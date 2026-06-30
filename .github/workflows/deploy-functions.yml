@@ -11,6 +11,9 @@ on:
       - '.github/workflows/deploy-functions.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: falowenexamtrainer-firebase-api
   cancel-in-progress: true
@@ -57,12 +60,11 @@ jobs:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
       - name: Deploy existing exam trainer API
+        id: firebase_deploy
+        continue-on-error: true
         shell: bash
         run: |
           set +e
-          # The API belongs to the non-default "falowenexamtrainer" codebase.
-          # Deploying this existing function avoids the unrelated IAM permission
-          # needed to create the new publicClassesCatalog HTTPS function.
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
             --only functions:falowenexamtrainer:api \
@@ -83,3 +85,44 @@ jobs:
             firebase-debug.log
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Record Firebase API deployment result
+        if: always()
+        env:
+          DEPLOY_OUTCOME: '${{ steps.firebase_deploy.outcome }}'
+          DEPLOY_COMMIT: '${{ github.sha }}'
+          DEPLOY_RUN_ID: '${{ github.run_id }}'
+          DEPLOY_RUN_NUMBER: '${{ github.run_number }}'
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          payload = {
+              "checkedAt": datetime.now(timezone.utc).isoformat(),
+              "success": os.environ.get("DEPLOY_OUTCOME") == "success",
+              "outcome": os.environ.get("DEPLOY_OUTCOME", "unknown"),
+              "commit": os.environ.get("DEPLOY_COMMIT", ""),
+              "runId": os.environ.get("DEPLOY_RUN_ID", ""),
+              "runNumber": os.environ.get("DEPLOY_RUN_NUMBER", ""),
+              "function": "falowenexamtrainer:api",
+              "project": os.environ.get("FIREBASE_PROJECT_ID", ""),
+              "webhook": "https://api-awc2au65xa-ew.a.run.app/paystack/webhook",
+          }
+          path = Path("diagnostics/firebase-api-deploy.json")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          git config user.name "Falowen Deployment Bot"
+          git config user.email "moxflex@gmail.com"
+          git add diagnostics/firebase-api-deploy.json
+          git commit -m "Record Firebase API deploy result [skip ci]" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Fail workflow when Firebase deployment failed
+        if: steps.firebase_deploy.outcome != 'success'
+        run: exit 1
