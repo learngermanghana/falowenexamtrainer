@@ -180,10 +180,18 @@ export const LESSON_RADIO_DICTIONARY = {
     6: {
       key: "c1-day6-gesundheit-lebensstil-falowen-radio",
       title: "Gesundheit und Lebensstil",
-      youtubeId: "tWoSGXGiWD8",
+      youtubeId: "Yp1usG7StS8",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Gesundheit, Prävention, psychisches Wohlbefinden und einen ausgewogenen Lebensstil ein. Danach gehst du weiter zum Lernteil.",
+    },
+    7: {
+      key: "c1-day7-reisen-nachhaltigkeit-falowen-radio",
+      title: "Reisen und Nachhaltigkeit",
+      youtubeId: "9OrT0EeIrvU",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf nachhaltiges Reisen, Mobilität, Tourismus und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
     },
   },
 };
