@@ -7,6 +7,11 @@ const c1Day7ReisenUndNachhaltigkeit = makeLesson({
   title: "Reisen und Nachhaltigkeit",
   topic: "Mobilität, Tourismus, Umweltfolgen und Verantwortung differenziert vergleichen und bewerten",
   heroImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "AI video: Reisen und Nachhaltigkeit",
+    description: "KI-gestützte Lektion zu nachhaltigem Reisen, Mobilität, Tourismus, Umweltfolgen und Verantwortung.",
+    url: "https://youtu.be/4EZtNkaEP4U?si=MLWapIvZzowk41XJ",
+  },
   grammarFocus: "Erweiterte Vergleichsformen und abwägende Argumentation",
   objectives: [
     "Ich kann Reiseformen nach Umweltwirkung, Kosten, Zeit und Zugänglichkeit vergleichen.",
