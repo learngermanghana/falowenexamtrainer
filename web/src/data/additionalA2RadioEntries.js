@@ -1,4 +1,12 @@
 export const ADDITIONAL_A2_RADIO_ENTRIES = {
+  1: {
+    key: "a2-day1-small-talk-falowen-radio",
+    title: "Small Talk 1.1",
+    youtubeId: "vweIJixJ9QA",
+    duration: "",
+    instruction:
+      "Höre aufmerksam zu und stimme dich auf Begrüßungen, persönliche Informationen und einfache Small-Talk-Fragen ein. Danach gehst du weiter zu Teil 1.",
+  },
   2: {
     key: "a2-day2-personen-beschreiben-falowen-radio",
     title: "Personen beschreiben 1.2",
