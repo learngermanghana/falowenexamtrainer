@@ -8,15 +8,18 @@ const asDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+const usesTwelveHourClock = (locale = "") =>
+  String(locale || "").toLowerCase().startsWith("en");
+
 export const formatZonedClock = (value, timeZone = GHANA_TIMEZONE, locale = "en-GB") => {
   const date = asDate(value);
   if (!date) return "";
   try {
     return new Intl.DateTimeFormat(locale || "en-GB", {
       timeZone,
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
-      hour12: false,
+      hour12: usesTwelveHourClock(locale),
     }).format(date);
   } catch {
     return "";
@@ -46,6 +49,6 @@ export const getGhanaDeviceTimeNotice = (
     ghanaTime,
     deviceTime,
     deviceTimeZone,
-    message: `Ghana time now: ${ghanaTime}. Your device shows ${deviceTime} (${deviceTimeZone}). Class countdowns follow Ghana time.`,
+    message: `Ghana time now: ${ghanaTime}. Your browser time-zone setting differs from Ghana. Class countdowns use Ghana time.`,
   };
 };
