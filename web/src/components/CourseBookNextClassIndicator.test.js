@@ -30,6 +30,20 @@ describe("CourseBookNextClassIndicator", () => {
     expect(formatClassCountdown(session, now)).toBe("Starts in 6 hours 20 minutes");
   });
 
+
+  test("uses Ghana wall-clock fields for countdowns when browser timezone differs", () => {
+    const now = new Date("2026-07-01T16:36:00.000Z");
+    const session = {
+      date: "2026-07-01",
+      startTime: "17:00",
+      endTime: "18:30",
+      startsAt: new Date("2026-07-01T18:00:00.000Z"),
+      endsAt: new Date("2026-07-01T19:30:00.000Z"),
+    };
+
+    expect(formatClassCountdown(session, now)).toBe("Starts in 24 minutes");
+  });
+
   test("shows the live state during class", () => {
     const now = new Date("2026-07-01T16:30:00.000Z");
     const session = {

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
-import { findNextClassSession } from "../services/classCalendar";
+import { buildGhanaDateTime, findNextClassSession } from "../services/classCalendar";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
 import { GHANA_TIMEZONE, getGhanaDeviceTimeNotice } from "../utils/ghanaClassTime";
 
@@ -45,8 +45,49 @@ export const findCourseBookStatGrid = (root = document) => {
 
 const sessionStatus = (session = {}) => normalizeText(session.status || "scheduled");
 
-const sessionStart = (session = {}) => asDate(session.startsAt || session.startDateTime);
-const sessionEnd = (session = {}) => asDate(session.endsAt || session.endDateTime);
+const resolveSessionDateKey = (session = {}) => {
+  const explicitDate = String(session.date || session.sessionDate || session.classDate || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(explicitDate)) return explicitDate;
+
+  const start = asDate(session.startsAt || session.startDateTime);
+  if (!start) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: GHANA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(start);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
+const resolveSessionTime = (session = {}, field, fallbackField) => {
+  const value = String(session[field] || "").trim();
+  if (/^\d{1,2}:\d{2}$/.test(value)) return value.padStart(5, "0");
+
+  const fallback = asDate(session[fallbackField]);
+  if (!fallback) return "";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: GHANA_TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(fallback);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.hour}:${values.minute}`;
+};
+
+const sessionDateTimeFromGhanaFields = (session = {}, timeField, fallbackField) => {
+  const dateKey = resolveSessionDateKey(session);
+  const time = resolveSessionTime(session, timeField, fallbackField);
+  if (!dateKey || !time) return null;
+  return buildGhanaDateTime(dateKey, time);
+};
+
+const sessionStart = (session = {}) =>
+  sessionDateTimeFromGhanaFields(session, "startTime", "startsAt") || asDate(session.startsAt || session.startDateTime);
+const sessionEnd = (session = {}) =>
+  sessionDateTimeFromGhanaFields(session, "endTime", "endsAt") || asDate(session.endsAt || session.endDateTime);
 
 export const findCurrentOrNextSession = (sessions = [], now = new Date()) => {
   const nowMs = now.getTime();
