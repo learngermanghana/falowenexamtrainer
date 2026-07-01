@@ -109,6 +109,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Fast Food und Hausmannskost ein. Danach gehst du weiter zum Workbook.",
     },
+    8: {
+      key: "b1-day8-alles-fuer-die-gesundheit-falowen-radio",
+      title: "Alles für die Gesundheit 3.8",
+      youtubeId: "_aFuOTSdMb8",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Gesundheit ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
