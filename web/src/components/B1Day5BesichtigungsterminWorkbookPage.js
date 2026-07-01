@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import {
   STANDARD_WORKBOOK_TABS,
@@ -248,31 +249,11 @@ export default function B1Day5BesichtigungsterminWorkbookPage() {
       ) : null}
 
       {activeTab === "references" ? (
-        <section style={card}>
-          <h2 style={sectionTitle}>Reference answers</h2>
-          <NoteBox tone="amber">Nutze die Referenz erst, nachdem du die Aufgaben selbst bearbeitet hast.</NoteBox>
-
-          <div style={questionCard}>
-            <strong>Teil 2 · Beispiel-E-Mail</strong>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              <strong>Betreff: Besichtigungstermin für die Wohnung in Accra</strong><br /><br />
-              Sehr geehrter Herr Mensah,<br /><br />
-              ich interessiere mich sehr für Ihre Wohnung in Accra und würde sie gern besichtigen. Könnten Sie mir bitte mitteilen, wann ein Termin möglich wäre? Für mich wäre Samstag um 14 Uhr besonders passend. Alternativ könnte ich auch am Montagabend kommen. Bitte bestätigen Sie mir den Termin per E-Mail. Sie erreichen mich außerdem telefonisch unter 024 000 0000.<br /><br />
-              Mit freundlichen Grüßen<br />
-              Ama Boateng
-            </p>
-          </div>
-
-          <div style={questionCard}>
-            <strong>Teil 3 · Lesen</strong>
-            <p style={{ margin: 0 }}>1. b · 2. b · 3. b · 4. b · 5. a · 6. b · 7. c</p>
-          </div>
-
-          <div style={questionCard}>
-            <strong>Teil 4 · Hören</strong>
-            <p style={{ margin: 0 }}>Höre den Originalbeitrag erneut. Für diesen Hörtext wurde noch kein bestätigter Lösungsschlüssel bereitgestellt.</p>
-          </div>
-        </section>
+        <WorkbookReferenceAnswers
+          level="B1"
+          lesson={{ title: "B1Day5Besichtigungstermin", level: "B1", day: 5, workbookId: "B1Day5Besichtigungstermin" }}
+          workbookId="B1Day5Besichtigungstermin"
+        />
       ) : null}
 
       {activeTab === "submit" ? (
