@@ -13,6 +13,9 @@ const WORKBOOK_NAV_SELECTOR = '[aria-label="Workbook assignment navigation"]';
 const OFFICIAL_SUBMIT_ATTRIBUTE = "data-falowen-workbook-submit-tab";
 const SYNTHETIC_SUBMIT_ATTRIBUTE = "data-falowen-workbook-submit-proxy";
 const BACK_TO_WORKBOOK_ATTRIBUTE = "data-falowen-back-to-workbook";
+const COURSE_BOOK_PATH = "/campus/course";
+const COURSE_SUBMIT_GUIDANCE =
+  "Close this message and find the exact assignment number in the Course Book. Open that workbook and use the Submit tab inside it. Read the assignment number carefully and do not submit from a different lesson.";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "");
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -220,6 +223,32 @@ const applyA2ResourceFixes = (root = document) => {
   });
 };
 
+const applyCourseSubmitGuidance = (root = document) => {
+  if (!root?.querySelectorAll || typeof window === "undefined") return;
+  if (normalizePath(window.location.pathname) !== COURSE_BOOK_PATH) return;
+
+  const heading = Array.from(root.querySelectorAll("h3")).find(
+    (element) => normalizeText(element.textContent) === "submit your workbook answers"
+  );
+  const panel = heading?.closest("section");
+  if (!panel) return;
+
+  const guidanceParagraph = Array.from(panel.querySelectorAll("p")).find((element) =>
+    normalizeText(element.textContent).includes("submissions now live inside each workbook")
+  );
+  if (guidanceParagraph && guidanceParagraph.textContent !== COURSE_SUBMIT_GUIDANCE) {
+    guidanceParagraph.textContent = COURSE_SUBMIT_GUIDANCE;
+  }
+
+  Array.from(panel.querySelectorAll("button")).forEach((button) => {
+    const label = normalizeText(button.textContent);
+    if (label !== "open next lesson" && label !== "show assignment lessons") return;
+    button.style.display = "none";
+    button.setAttribute("aria-hidden", "true");
+    button.setAttribute("tabindex", "-1");
+  });
+};
+
 export const replaceCourseBookTerminology = (root = document) => {
   if (!root?.querySelectorAll) return 0;
 
@@ -232,6 +261,7 @@ export const replaceCourseBookTerminology = (root = document) => {
   applyA1ResourceFixes(root);
   applyA2ResourceFixes(root);
   applyWorkbookTabDeduplication(root);
+  applyCourseSubmitGuidance(root);
 
   return replacements;
 };
