@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
-import { findNextClassSession, GHANA_TIMEZONE } from "../services/classCalendar";
+import { findNextClassSession } from "../services/classCalendar";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
+import { GHANA_TIMEZONE, getGhanaDeviceTimeNotice } from "../utils/ghanaClassTime";
 
 const COURSE_BOOK_PATH = "/campus/course";
 const CANCELLED_STATUS = "cancelled";
@@ -212,6 +213,7 @@ const CourseBookNextClassIndicator = () => {
       : className || "Ask the school to assign your class";
   const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(className)}`;
   const isLive = countdown === "Class is live now";
+  const timeZoneNotice = getGhanaDeviceTimeNotice(now, locale);
 
   return createPortal(
     <div
@@ -233,6 +235,11 @@ const CourseBookNextClassIndicator = () => {
         {countdown}
       </p>
       <p style={{ margin: 0, color: "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>{detail}</p>
+      {timeZoneNotice ? (
+        <p style={{ margin: "4px 0 0", color: "#fef3c7", fontSize: 11, lineHeight: 1.35, fontWeight: 700 }}>
+          {timeZoneNotice.message}
+        </p>
+      ) : null}
       {!isSelfLearning && className ? (
         <a
           href={fullCalendarLink}
