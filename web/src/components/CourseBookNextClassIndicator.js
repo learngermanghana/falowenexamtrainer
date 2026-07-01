@@ -22,8 +22,9 @@ const asDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const resolveLevel = (studentProfile = {}) => {
-  const source = `${studentProfile.level || ""} ${studentProfile.classLevel || ""} ${studentProfile.className || ""}`.toUpperCase();
+export const resolveLevel = (studentProfile = {}) => {
+  const profile = studentProfile || {};
+  const source = `${profile.level || ""} ${profile.classLevel || ""} ${profile.className || ""}`.toUpperCase();
   return source.match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
 };
 
