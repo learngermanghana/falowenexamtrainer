@@ -1,3 +1,4 @@
+import { getLessonsByLevel } from "../data/lessonCatalog";
 import * as base from "./canonicalLiveClassServiceV2";
 
 export { normalizeCurriculumIds, findCanonicalClass } from "./canonicalLiveClassServiceV2";
@@ -61,20 +62,49 @@ function sessionCurriculumLevels(session = {}) {
   return [...new Set(candidates.map(extractCourseLevel).filter(Boolean))];
 }
 
-function sanitizeCrossLevelSession(session = {}, expectedLevel = "") {
+function getTeachingCurriculum(level = "") {
+  if (!level) return [];
+  return getLessonsByLevel(level)
+    .filter((lesson) => Number(lesson.day) > 0 && lesson.contentStatus !== "planned")
+    .sort((left, right) => Number(left.sequence || 0) - Number(right.sequence || 0));
+}
+
+function resolveCanonicalLesson(session = {}, position = 0, curriculum = []) {
+  if (!curriculum.length) return null;
+
+  const curriculumIndex = Number(session.curriculumIndex);
+  if (Number.isInteger(curriculumIndex) && curriculumIndex >= 0 && curriculum[curriculumIndex]) {
+    return curriculum[curriculumIndex];
+  }
+
+  const sessionSequence = Number(session.sequence);
+  if (Number.isInteger(sessionSequence) && sessionSequence > 0 && curriculum[sessionSequence - 1]) {
+    return curriculum[sessionSequence - 1];
+  }
+
+  return curriculum[position] || null;
+}
+
+function sanitizeCrossLevelSession(session = {}, expectedLevel = "", canonicalLesson = null) {
   if (!expectedLevel) return session;
   const sessionLevels = sessionCurriculumLevels(session);
   if (!sessionLevels.length || sessionLevels.includes(expectedLevel)) return session;
 
+  const canonicalAssignmentId = String(canonicalLesson?.assignmentId || canonicalLesson?.id || "").trim();
+  const canonicalTitle = String(canonicalLesson?.title || "").trim() || `${expectedLevel} live class`;
+  const canonicalIds = canonicalAssignmentId ? [canonicalAssignmentId] : [];
+
   return {
     ...session,
-    topic: `${expectedLevel} live class`,
-    title: `${expectedLevel} live class`,
-    assignmentIds: [],
-    chapterIds: [],
-    curriculumIds: [],
-    assignment_id: null,
+    topic: canonicalTitle,
+    title: canonicalTitle,
+    assignmentIds: canonicalIds,
+    chapterIds: canonicalIds,
+    curriculumIds: canonicalIds,
+    assignment_id: canonicalAssignmentId || null,
     curriculumLevelMismatch: true,
+    curriculumRepaired: Boolean(canonicalLesson),
+    curriculumSource: canonicalLesson ? "canonical lesson catalog" : session.curriculumSource,
     hiddenCurriculumLevels: sessionLevels,
   };
 }
@@ -106,13 +136,17 @@ function scopeSummaryToCanonicalClass(summary, now = new Date()) {
   const normalizedKlass = expectedLevel
     ? { ...summary.klass, levelId: expectedLevel, level: expectedLevel }
     : summary.klass;
+  const curriculum = getTeachingCurriculum(expectedLevel);
   let curriculumMismatchCount = 0;
+  let curriculumRepairCount = 0;
 
   const scopedSessions = (summary.sessions || [])
     .filter((session) => sessionBelongsToCanonicalClass(session, summary.klass))
-    .map((session) => {
-      const sanitized = sanitizeCrossLevelSession(session, expectedLevel);
+    .map((session, position) => {
+      const canonicalLesson = resolveCanonicalLesson(session, position, curriculum);
+      const sanitized = sanitizeCrossLevelSession(session, expectedLevel, canonicalLesson);
       if (sanitized.curriculumLevelMismatch) curriculumMismatchCount += 1;
+      if (sanitized.curriculumRepaired) curriculumRepairCount += 1;
       return sanitized;
     });
 
@@ -126,6 +160,7 @@ function scopeSummaryToCanonicalClass(summary, now = new Date()) {
   return {
     ...rebuilt,
     curriculumMismatchCount,
+    curriculumRepairCount,
   };
 }
 
