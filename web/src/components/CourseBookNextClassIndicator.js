@@ -71,6 +71,7 @@ export const formatClassCountdown = (session, now = new Date()) => {
   if (sessionStatus(session) === "live" || (nowMs >= startMs && nowMs <= endMs)) {
     return "Class is live now";
   }
+  if (nowMs > endMs) return "Class has ended";
 
   const totalMinutes = Math.max(0, Math.ceil((startMs - nowMs) / 60000));
   if (totalMinutes === 0) return "Starting now";
@@ -98,13 +99,14 @@ export const formatClassCountdown = (session, now = new Date()) => {
 const formatSessionDateTime = (session, locale = "en") => {
   const start = sessionStart(session);
   if (!start) return "Date and time not available";
-  const date = new Intl.DateTimeFormat(locale, {
+  const resolvedLocale = String(locale || "en").toLowerCase().startsWith("en") ? "en-GB" : locale;
+  const date = new Intl.DateTimeFormat(resolvedLocale, {
     timeZone: GHANA_TIMEZONE,
     weekday: "long",
     day: "numeric",
     month: "long",
   }).format(start);
-  const time = new Intl.DateTimeFormat(locale, {
+  const time = new Intl.DateTimeFormat(resolvedLocale, {
     timeZone: GHANA_TIMEZONE,
     hour: "numeric",
     minute: "2-digit",
@@ -184,7 +186,7 @@ const CourseBookNextClassIndicator = () => {
     if (isSelfLearning) return null;
     const canonicalSessions = canonicalSummary?.sessions || [];
     const canonicalNext = findCurrentOrNextSession(canonicalSessions, now)
-      || canonicalSummary?.nextSession
+      || (!canonicalSessions.length ? canonicalSummary?.nextSession : null)
       || null;
     if (canonicalNext) return canonicalNext;
     return normalizeLegacySession(findNextClassSession(className, now));
@@ -207,18 +209,15 @@ const CourseBookNextClassIndicator = () => {
     : isSelfLearning
       ? "No live class is required"
       : className || "Ask the school to assign your class";
-  const fullCalendarLink = className
-    ? `/campus/course/full-class-calendar/${encodeURIComponent(className)}`
-    : "/";
+  const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(className)}`;
+  const isLive = countdown === "Class is live now";
 
   return createPortal(
     <div
       data-falowen-next-class-indicator="true"
       style={{
         border: "1px solid rgba(255,255,255,0.28)",
-        background: nextSession && formatClassCountdown(nextSession, now) === "Class is live now"
-          ? "rgba(220,252,231,0.22)"
-          : "rgba(255,255,255,0.16)",
+        background: isLive ? "rgba(220,252,231,0.22)" : "rgba(255,255,255,0.16)",
         borderRadius: 16,
         padding: 12,
         backdropFilter: "blur(8px)",
@@ -233,7 +232,7 @@ const CourseBookNextClassIndicator = () => {
         {countdown}
       </p>
       <p style={{ margin: 0, color: "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>{detail}</p>
-      {!isSelfLearning ? (
+      {!isSelfLearning && className ? (
         <a
           href={fullCalendarLink}
           style={{ ...styles.backTextLink, color: "#ffffff", width: "fit-content", marginTop: 3, fontSize: 12 }}
