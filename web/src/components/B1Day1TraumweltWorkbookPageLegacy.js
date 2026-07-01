@@ -1,18 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
-
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+  WorkbookTaskCard,
+} from "./StandardWorkbookComponents";
 
 const card = {
   ...styles.card,
@@ -131,23 +129,6 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -177,16 +158,19 @@ const B1Day1TraumweltWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const setPreparedFor = (tabKey) => (event) =>
+    setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Day 1 Workbook · Traumwelt</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
+        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 1 · Kapitel 1.1</span>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · Traumwelt</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Select Teil 1–4 below. The highlighted card at the top of each section tells you exactly what to answer.
+        </p>
         <img
           src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=1600&q=80"
           alt="Dream landscape for a B1 workbook about dreams and future wishes"
@@ -194,33 +178,41 @@ const B1Day1TraumweltWorkbookPage = () => {
           style={tabImageStyle}
         />
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
-        </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
+        <WorkbookTabNav
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          tabs={STANDARD_WORKBOOK_TABS}
+          ariaLabel="B1 Day 1 Traumwelt workbook sections"
+        />
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance level="B1" />
 
       {activeTab === "sprechen" && (
-        <div style={card}>
+        <section style={card}>
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <WorkbookTaskCard
+            eyebrow="Question of the Day · Speaking"
+            title="Was ist dein Traumberuf und warum?"
+            practiceOnly
+            submissionNote="Prepare a 60–90 second answer for class. Teil 1 is not submitted."
+          >
+            <p style={{ margin: 0 }}>
+              Nenne deinen Traumberuf, erkläre mindestens <strong>zwei Gründe</strong>, beschreibe wichtige Fähigkeiten und sage, wie du dieses Ziel erreichen möchtest.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
             alt="Students discussing dream jobs and future plans"
             loading="lazy"
             style={tabImageStyle}
           />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
 
           <h3 style={sectionTitle}>Brain Map: Traumwelt</h3>
+          <p style={{ margin: 0, color: "#475569" }}>
+            Use this supporting material to collect ideas before answering the Question of the Day.
+          </p>
           <ol style={listSpacing}>
             <li><strong>Central Topic:</strong> Write <strong>„Traumwelt“</strong> in the center of your brain map.</li>
             <li><strong>Main Branches:</strong> Create five main branches from the central topic.</li>
@@ -239,53 +231,50 @@ const B1Day1TraumweltWorkbookPage = () => {
             ))}
           </div>
 
-          <h3 style={sectionTitle}>Group Sprechen</h3>
-          <p style={{ margin: 0 }}><strong>Frage:</strong> Was ist dein Traumberuf und warum?</p>
-          <h3 style={sectionTitle}>Schlüsselwörter / Stichpunkte für deine Antwort</h3>
+          <h3 style={sectionTitle}>Suggested answer structure</h3>
           <ol style={listSpacing}>
             <li><strong>Begrüßung:</strong> „Hallo, ich heiße ...“ / „Guten Tag!“</li>
             <li><strong>Thema vorstellen:</strong> „Heute spreche ich über meinen Traumberuf.“</li>
             <li><strong>Dein Traumberuf:</strong> „Mein Traumberuf ist ...“ / „Ich möchte ... werden.“</li>
-            <li><strong>Begründung:</strong> „Ich finde diesen Beruf interessant, weil ...“ / „Ich möchte diesen Beruf machen, weil ...“</li>
-            <li><strong>Abschluss/Dank:</strong> „Danke fürs Zuhören!“ / „Das war meine Vorstellung.“</li>
+            <li><strong>Begründung:</strong> „Ich finde diesen Beruf interessant, weil ...“</li>
+            <li><strong>Plan:</strong> „Um dieses Ziel zu erreichen, möchte ich ...“</li>
+            <li><strong>Abschluss:</strong> „Danke fürs Zuhören!“</li>
           </ol>
-
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3 and Teil 4.
-          </p>
 
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "schreiben" && (
-        <div style={card}>
+        <section style={card}>
+          <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Writing"
+            title="Schreiben Sie Ihre Meinung: Traumberuf und persönliche Kontakte."
+            submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
+          >
+            <p style={{ margin: 0 }}>
+              Reagieren Sie auf Tanjas Meinung. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre eigene Meinung.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
             alt="Student writing a B1 opinion text"
             loading="lazy"
             style={tabImageStyle}
           />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben) (Assignment)</h2>
-          <p style={{ margin: 0 }}><strong>Thema:</strong> Traumberuf und persönliche Kontakte</p>
 
           <div style={questionCardStyle}>
             <strong>Meinung aus dem Online-Gästebuch</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Tanja: „Ich finde es wichtig, dass man im Traumberuf mit anderen Menschen in Kontakt steht. Aber heute arbeiten viele im Homeoffice,
-              und oft haben sie wenig persönlichen Kontakt mit Kollegen. Meiner Meinung nach kann das den Beruf nicht so erfüllend machen wie bei
-              direkter Zusammenarbeit im Büro.“
+              Tanja: „Ich finde es wichtig, dass man im Traumberuf mit anderen Menschen in Kontakt steht. Aber heute arbeiten viele im Homeoffice, und oft haben sie wenig persönlichen Kontakt mit Kollegen. Meiner Meinung nach kann das den Beruf nicht so erfüllend machen wie bei direkter Zusammenarbeit im Büro.“
             </p>
           </div>
 
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sie haben im Fernsehen eine Diskussionssendung zum Thema <strong>„Traumberuf und persönliche Kontakte“</strong> gesehen. Im Online-Gästebuch
-            der Sendung finden Sie die Meinung von Tanja. Schreiben Sie nun Ihre Meinung zum Thema. Schreiben Sie circa <strong>80 Wörter</strong>.
-          </p>
-
           <div style={questionCardStyle}>
-            <strong>Template for Writing</strong>
+            <strong>Writing support template</strong>
             <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{`Liebe Forum-Mitglieder,
 
 heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
@@ -303,79 +292,77 @@ Mit freundlichen Grüßen
 [Ihr Name]`}</p>
           </div>
 
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area after practising here.
-          </p>
-
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "lesen" && (
-        <div style={card}>
+        <section style={card}>
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Reading"
+            title="Lesen Sie den Text und beantworten Sie alle sieben Fragen."
+            submissionNote="Submit only the answer letters in this format: 1A, 2B, 3C ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the complete text first. Then choose one answer, A–D, for every question.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80"
             alt="Night sky and book for a reading exercise about dreams"
             loading="lazy"
             style={tabImageStyle}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen) (Exercise)</h2>
-          <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit section to send your answers.
-          </p>
 
           <h3 style={sectionTitle}>Traumdeutung und ihre Bedeutung</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Träume faszinieren die Menschheit seit Jahrtausenden. In vielen Kulturen werden Träume als Botschaften aus einer anderen Welt betrachtet.
-            In der Antike glaubte man, dass Träume von den Göttern gesendet wurden und wichtige Hinweise auf das Schicksal geben konnten. Auch heute
-            noch versuchen viele Menschen, die Bedeutung ihrer Träume zu entschlüsseln.
+            Träume faszinieren die Menschheit seit Jahrtausenden. In vielen Kulturen werden Träume als Botschaften aus einer anderen Welt betrachtet. In der Antike glaubte man, dass Träume von den Göttern gesendet wurden und wichtige Hinweise auf das Schicksal geben konnten. Auch heute noch versuchen viele Menschen, die Bedeutung ihrer Träume zu entschlüsseln.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Es gibt verschiedene Ansätze zur Traumdeutung. Der bekannteste ist wahrscheinlich die psychoanalytische Traumdeutung nach Sigmund Freud.
-            Freud glaubte, dass Träume eine Art Ventil für unterdrückte Wünsche und Ängste sind. Seiner Meinung nach sind viele Traumbilder symbolisch
-            und müssen interpretiert werden, um ihre wahre Bedeutung zu verstehen. Zum Beispiel könnte ein Traum von fallenden Zähnen auf Angst vor dem
-            Älterwerden oder Machtverlust hinweisen.
+            Es gibt verschiedene Ansätze zur Traumdeutung. Der bekannteste ist wahrscheinlich die psychoanalytische Traumdeutung nach Sigmund Freud. Freud glaubte, dass Träume eine Art Ventil für unterdrückte Wünsche und Ängste sind. Seiner Meinung nach sind viele Traumbilder symbolisch und müssen interpretiert werden, um ihre wahre Bedeutung zu verstehen. Zum Beispiel könnte ein Traum von fallenden Zähnen auf Angst vor dem Älterwerden oder Machtverlust hinweisen.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein weiterer Ansatz ist die analytische Traumdeutung nach Carl Gustav Jung. Jung sah Träume als Ausdruck des kollektiven Unbewussten, einer
-            Art gemeinsamen psychologischen Erbes der Menschheit. Für ihn waren Träume voller Archetypen, universeller Symbole wie der Held oder die
-            Mutter, die tief in der menschlichen Psyche verwurzelt sind. Jung glaubte, dass Träume uns helfen können, unser wahres Selbst zu erkennen und
-            persönliche Probleme zu lösen.
+            Ein weiterer Ansatz ist die analytische Traumdeutung nach Carl Gustav Jung. Jung sah Träume als Ausdruck des kollektiven Unbewussten, einer Art gemeinsamen psychologischen Erbes der Menschheit. Für ihn waren Träume voller Archetypen, universeller Symbole wie der Held oder die Mutter, die tief in der menschlichen Psyche verwurzelt sind. Jung glaubte, dass Träume uns helfen können, unser wahres Selbst zu erkennen und persönliche Probleme zu lösen.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In der modernen Traumforschung gibt es auch wissenschaftliche Erklärungen für Träume. Viele Wissenschaftler sehen Träume als eine Art
-            Gedächtnisverarbeitung. Während wir schlafen, sortiert unser Gehirn die Erlebnisse des Tages, speichert wichtige Informationen und verwirft
-            Unnötiges. Träume könnten also eine Nebenwirkung dieses Prozesses sein.
+            In der modernen Traumforschung gibt es auch wissenschaftliche Erklärungen für Träume. Viele Wissenschaftler sehen Träume als eine Art Gedächtnisverarbeitung. Während wir schlafen, sortiert unser Gehirn die Erlebnisse des Tages, speichert wichtige Informationen und verwirft Unnötiges. Träume könnten also eine Nebenwirkung dieses Prozesses sein.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Unabhängig davon, welchem Ansatz man folgt, bleibt die Frage, ob Träume wirklich eine tiefere Bedeutung haben. Manche Menschen sind fest davon
-            überzeugt, dass ihre Träume ihnen wichtige Hinweise auf ihr Leben geben. Andere sehen Träume eher als zufällige Gedankenspiele ohne besonderen
-            Sinn. Trotz aller wissenschaftlichen Fortschritte bleibt die Welt der Träume ein geheimnisvolles und faszinierendes Gebiet. Vielleicht werden
-            wir eines Tages genau verstehen, warum wir träumen und was unsere Träume bedeuten. Bis dahin können wir uns weiterhin von unseren Träumen
-            inspirieren lassen und versuchen, ihre Rätsel zu lösen.
+            Unabhängig davon, welchem Ansatz man folgt, bleibt die Frage, ob Träume wirklich eine tiefere Bedeutung haben. Manche Menschen sind fest davon überzeugt, dass ihre Träume ihnen wichtige Hinweise auf ihr Leben geben. Andere sehen Träume eher als zufällige Gedankenspiele ohne besonderen Sinn. Trotz aller wissenschaftlichen Fortschritte bleibt die Welt der Träume ein geheimnisvolles und faszinierendes Gebiet. Vielleicht werden wir eines Tages genau verstehen, warum wir träumen und was unsere Träume bedeuten. Bis dahin können wir uns weiterhin von unseren Träumen inspirieren lassen und versuchen, ihre Rätsel zu lösen.
           </p>
 
-          <h3 style={sectionTitle}>Multiple Choice Questions (7 Fragen)</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
-
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "hoeren" && (
-        <div style={card}>
+        <section style={card}>
+          <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Listening"
+            title="Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen."
+            submissionNote="Submit only the answer letters in this format: 1A, 2B, 3C ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the questions first. Listen for discoveries, famous people, nightmares, lucid dreams and sleep phases.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80"
             alt="Headphones and laptop for listening comprehension"
             loading="lazy"
             style={tabImageStyle}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören) (Exercise)</h2>
           <p style={{ margin: 0 }}>
-            Audio Link – {" "}
+            Hören video – {" "}
             <a href="https://drive.google.com/file/d/1c62CXG6BHBtiGA9FGWLY5Ijj9J59Pa8d/view?usp=sharing" target="_blank" rel="noreferrer">
               Open listening audio
             </a>
@@ -388,18 +375,47 @@ Mit freundlichen Grüßen
             style={audioPreviewStyle}
           />
 
-          <h3 style={sectionTitle}>Multiple Choice Questions (5 Fragen)</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={hoerenQuestions} />
-
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
-        </div>
+        </section>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day1Traumwelt", level: "B1", workbookId: "B1Day1Traumwelt" }} workbookId="B1Day1Traumwelt" />
+        <WorkbookReferenceAnswers
+          level="B1"
+          lesson={{ title: "B1Day1Traumwelt", level: "B1", day: 1, workbookId: "B1Day1Traumwelt" }}
+          workbookId="B1Day1Traumwelt"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <section style={card}>
+          <h2 style={sectionTitle}>Submit workbook answers</h2>
+          <WorkbookTaskCard
+            eyebrow="Final step"
+            title="Submit Teil 2, Teil 3 and Teil 4."
+            submissionNote="Do not submit Teil 1."
+          >
+            <p style={{ margin: 0 }}>
+              Paste your final opinion text, seven reading answer letters and five listening answer letters into the form below.
+            </p>
+          </WorkbookTaskCard>
+          <div className="b1-day1-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.b1-day1-submission-page > div > section:first-child { display: none !important; }
+            .b1-day1-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "B1",
+                day: 1,
+                assignmentKey: "B1-1.1",
+                canonicalAssignmentKey: "B1-1.1",
+              }}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 };
