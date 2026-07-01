@@ -40,7 +40,18 @@ describe("CourseBookNextClassIndicator", () => {
     expect(formatClassCountdown(session, now)).toBe("Class is live now");
   });
 
-  test("ignores cancelled and completed sessions", () => {
+  test("does not keep showing live after the scheduled end time", () => {
+    const now = new Date("2026-07-01T17:45:00.000Z");
+    const session = {
+      status: "live",
+      startsAt: new Date("2026-07-01T16:00:00.000Z"),
+      endsAt: new Date("2026-07-01T17:30:00.000Z"),
+    };
+
+    expect(formatClassCountdown(session, now)).toBe("Class has ended");
+  });
+
+  test("ignores cancelled, completed and stale live sessions", () => {
     const now = new Date("2026-07-01T10:00:00.000Z");
     const expected = {
       id: "upcoming",
@@ -59,6 +70,12 @@ describe("CourseBookNextClassIndicator", () => {
         status: "completed",
         startsAt: new Date("2026-07-01T13:00:00.000Z"),
         endsAt: new Date("2026-07-01T14:30:00.000Z"),
+      },
+      {
+        id: "stale-live",
+        status: "live",
+        startsAt: new Date("2026-07-01T07:00:00.000Z"),
+        endsAt: new Date("2026-07-01T08:30:00.000Z"),
       },
       expected,
     ];
