@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 
 const resolveWorkbookLevel = (level) => {
   const explicit = String(level || "").trim().toUpperCase();
@@ -54,19 +55,55 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   );
 };
 
-export const WorkbookSubmissionReminder = () => (
-  <div
-    role="note"
-    style={{
-      border: "1px solid #bfdbfe",
-      borderRadius: 10,
-      padding: "10px 12px",
-      background: "#eff6ff",
-      color: "#1e40af",
-      fontWeight: 600,
-      lineHeight: 1.5,
-    }}
-  >
-    Reminder: This page is for learning and practice. Submit only your final assignment work in the Submit tab in the Course Book.
-  </div>
-);
+export const WorkbookSubmissionReminder = () => {
+  const reminderRef = useRef(null);
+  const [showDay20Submission, setShowDay20Submission] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const isDay20Workbook = window.location.pathname.includes(
+      "/campus/course/a2-day-20-typische-reklamationssituationen-workbook"
+    );
+    const sectionTitle = reminderRef.current
+      ?.closest("section")
+      ?.querySelector("h2")
+      ?.textContent?.trim()
+      ?.toLowerCase();
+
+    setShowDay20Submission(Boolean(isDay20Workbook && sectionTitle?.startsWith("submit workbook")));
+  }, []);
+
+  if (showDay20Submission) {
+    return (
+      <div
+        ref={reminderRef}
+        className="a2-day20-inline-submission"
+        style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}
+      >
+        <style>{`.a2-day20-inline-submission > div > section:first-child { display: none !important; }
+        .a2-day20-inline-submission select { display: none !important; }
+        .a2-day20-inline-submission ~ a[href="/campus/course?submitWork=1"] { display: none !important; }`}</style>
+        <AssignmentSubmissionPage />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={reminderRef}
+      role="note"
+      style={{
+        border: "1px solid #bfdbfe",
+        borderRadius: 10,
+        padding: "10px 12px",
+        background: "#eff6ff",
+        color: "#1e40af",
+        fontWeight: 600,
+        lineHeight: 1.5,
+      }}
+    >
+      Reminder: This page is for learning and practice. Submit only your final assignment work in the Submit tab in the Course Book.
+    </div>
+  );
+};
