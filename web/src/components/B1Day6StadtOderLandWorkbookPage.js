@@ -1,20 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+  WorkbookTaskCard,
+} from "./StandardWorkbookComponents";
 import { styles } from "../styles";
 
 const AUDIO_FILE_ID = "1zLP6fMwvZNYaw_Vb0sHTMhy8-2GeRNca";
-
-const tabs = [
-  { key: "sprechen", label: "Teil 1" },
-  { key: "schreiben", label: "Teil 2" },
-  { key: "lesen", label: "Teil 3" },
-  { key: "hoeren", label: "Teil 4" },
-  { key: "references", label: "5. Ref" },
-  { key: "submit", label: "6. Submit" },
-];
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const sectionTitle = { margin: 0, fontSize: "1.15rem" };
@@ -123,7 +119,6 @@ const TopicCard = ({ title, advantages, disadvantages }) => (
 export default function B1Day6StadtOderLandWorkbookPage() {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
 
   return (
@@ -133,7 +128,7 @@ export default function B1Day6StadtOderLandWorkbookPage() {
         <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 6 · Kapitel 2.6</span>
         <h1 style={{ ...styles.title, margin: 0 }}>Leben in der Stadt oder auf dem Land? – Workbook</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Vergleiche Stadt- und Landleben, diskutiere Vor- und Nachteile und formuliere eine klare persönliche Meinung.
+          Select Teil 1–4 below. The highlighted task card at the top of each section tells you exactly what to answer.
         </p>
         <img
           src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80"
@@ -145,62 +140,58 @@ export default function B1Day6StadtOderLandWorkbookPage() {
           <strong>Grammar focus:</strong> Vergleiche mit Komparativ und <em>als</em>, Gründe mit <em>weil/da/denn</em>, Gegensätze mit <em>obwohl/während</em> und Relativsätze zum Thema Wohnen.
         </NoteBox>
 
-        <div
-          role="tablist"
-          aria-label="B1 Day 6 workbook sections"
-          style={{ display: "flex", gap: 8, overflowX: "auto", padding: 8, position: "sticky", top: 8, zIndex: 20, border: "1px solid #bfdbfe", borderRadius: 12, background: "#eff6ff" }}
-        >
-          {tabs.map((tab) => {
-            const selected = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => setActiveTab(tab.key)}
-                style={{ ...styles.secondaryButton, background: selected ? "#2563eb" : "#fff", borderColor: selected ? "#2563eb" : "#93c5fd", color: selected ? "#fff" : "#1d4ed8", fontWeight: 800, flex: "0 0 auto", minWidth: 82 }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-        <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
+        <WorkbookTabNav
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          tabs={STANDARD_WORKBOOK_TABS}
+          ariaLabel="B1 Day 6 Stadt oder Land workbook sections"
+        />
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance level="B1" />
 
       {activeTab === "sprechen" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In diesem Kapitel diskutiert ihr die Vorteile und Nachteile des Lebens in der Stadt und auf dem Land.
+          <WorkbookTaskCard
+            eyebrow="Question of the Day · Speaking"
+            title="Wo lebt man besser – in der Stadt oder auf dem Land?"
+            practiceOnly
+            submissionNote="Prepare a 1–2 minute answer for class. Teil 1 is not submitted."
+          >
+            <p style={{ margin: 0 }}>
+              Entscheiden Sie sich für Stadt, Land oder einen Kompromiss wie den Stadtrand. Nennen Sie mindestens <strong>zwei Vorteile</strong>, einen möglichen Nachteil und begründen Sie Ihre persönliche Meinung.
+            </p>
+            <p style={{ margin: 0 }}>
+              Use: <strong>Meiner Meinung nach ...</strong>, <strong>weil ...</strong>, <strong>einerseits ... andererseits ...</strong> and a short conclusion.
+            </p>
+          </WorkbookTaskCard>
+
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#475569" }}>
+            The notes below are supporting ideas. They are not separate questions that you must answer one by one.
           </p>
-          <NoteBox tone="amber"><strong>Zentrales Thema:</strong> Leben in der Stadt oder auf dem Land?</NoteBox>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-            <TopicCard title="1. Leben in der Stadt" advantages={cityAdvantages} disadvantages={cityDisadvantages} />
-            <TopicCard title="2. Leben auf dem Land" advantages={countryAdvantages} disadvantages={countryDisadvantages} />
+            <TopicCard title="Leben in der Stadt" advantages={cityAdvantages} disadvantages={cityDisadvantages} />
+            <TopicCard title="Leben auf dem Land" advantages={countryAdvantages} disadvantages={countryDisadvantages} />
           </div>
 
           <article style={{ ...questionCard, background: "#eef2ff", borderColor: "#c7d2fe" }}>
-            <h3 style={{ margin: 0 }}>3. Persönliche Meinung und Lebensstil</h3>
+            <h3 style={{ margin: 0 }}>Ideas for your personal answer</h3>
             <ul style={listStyle}>
-              <li>Wo würde ich lieber wohnen: in der Stadt oder auf dem Land?</li>
-              <li>Welche Faktoren sind mir wichtig: Arbeit, Freizeit, Natur, Ruhe oder Familie?</li>
-              <li>Habe ich schon in beiden Umgebungen gelebt?</li>
+              <li>Welche Faktoren sind Ihnen wichtig: Arbeit, Freizeit, Natur, Ruhe oder Familie?</li>
+              <li>Haben Sie schon in beiden Umgebungen gelebt?</li>
               <li>Ist eine Kleinstadt oder der Stadtrand ein guter Kompromiss?</li>
-              <li>Wie könnte sich mein Wohnort in Zukunft ändern?</li>
+              <li>Wie könnte sich Ihr Wohnort in Zukunft ändern?</li>
             </ul>
           </article>
 
           <div style={{ ...questionCard, background: "#f0fdf4", borderColor: "#bbf7d0" }}>
-            <strong>Sprechaufgabe: Stadt oder Land – Wo lebt man besser?</strong>
+            <strong>Suggested speaking structure</strong>
             <ol style={listStyle}>
               <li><strong>Einleitung:</strong> Ich möchte heute über das Thema sprechen: Ist das Leben in der Stadt oder auf dem Land besser?</li>
-              <li><strong>Argumente für die Stadt:</strong> Arbeitsmöglichkeiten, Verkehrsmittel, Freizeit und Kultur.</li>
-              <li><strong>Argumente für das Land:</strong> Ruhe, saubere Luft und günstigere Wohnungen.</li>
+              <li><strong>Stadt:</strong> Nennen Sie einen Vorteil und einen möglichen Nachteil.</li>
+              <li><strong>Land:</strong> Nennen Sie einen Vorteil und einen möglichen Nachteil.</li>
               <li><strong>Eigene Meinung:</strong> Meiner Meinung nach ist das Leben in ... besser, weil ...</li>
               <li><strong>Schluss:</strong> Am Ende hängt es von der Person und ihren Bedürfnissen ab.</li>
             </ol>
@@ -214,13 +205,20 @@ export default function B1Day6StadtOderLandWorkbookPage() {
       {activeTab === "schreiben" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
-          <div style={{ ...questionCard, background: "#eff6ff", borderColor: "#bfdbfe" }}>
-            <strong>Meinungsaufgabe</strong>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              „Tanja sagt, dass das Leben in der Stadt für sie besser ist, weil dort immer etwas los ist und sie alles schnell erreichen kann. Ich denke anders. Für mich ist das Leben auf dem Land besser, weil es ruhiger ist und ich mehr Kontakt zur Natur habe. Was denken Sie? Leben in der Stadt oder auf dem Land – welches ist Ihrer Meinung nach besser und warum?“
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Writing"
+            title="Stadt oder Land – welches ist Ihrer Meinung nach besser und warum?"
+            submissionNote="Write approximately 80 words and submit your final text through the Submit tab."
+          >
+            <p style={{ margin: 0 }}>
+              Reagieren Sie auf Tanjas Meinung, vergleichen Sie beide Wohnorte und begründen Sie Ihre persönliche Entscheidung.
             </p>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Schreiben Sie Ihre Meinung zum Thema in ungefähr <strong>80 Wörtern</strong>.
+          </WorkbookTaskCard>
+
+          <div style={{ ...questionCard, background: "#eff6ff", borderColor: "#bfdbfe" }}>
+            <strong>Meinung von Tanja</strong>
+            <p style={{ margin: 0, lineHeight: 1.75 }}>
+              „Tanja sagt, dass das Leben in der Stadt für sie besser ist, weil dort immer etwas los ist und sie alles schnell erreichen kann. Ich denke anders. Für mich ist das Leben auf dem Land besser, weil es ruhiger ist und ich mehr Kontakt zur Natur habe.“
             </p>
           </div>
 
@@ -255,7 +253,17 @@ export default function B1Day6StadtOderLandWorkbookPage() {
 
       {activeTab === "lesen" ? (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Reading"
+            title="Lesen Sie den Text und beantworten Sie alle sieben Fragen."
+            submissionNote="Submit only the answer letters in this format: 1B, 2C, 3A ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the complete text first. Then choose one answer, A–C, for every question.
+            </p>
+          </WorkbookTaskCard>
+
           <h3 style={{ margin: 0 }}>Verschiedene Wohnarten in Deutschland</h3>
           <p style={{ margin: 0, lineHeight: 1.75 }}>
             In Deutschland gibt es viele verschiedene Wohnarten, die von Menschen je nach ihren Bedürfnissen und Vorlieben gewählt werden. Besonders beliebt sind Einfamilienhäuser, Wohnungen in Mehrfamilienhäusern und WGs. Jede dieser Wohnformen hat ihre eigenen Vor- und Nachteile.
@@ -273,7 +281,7 @@ export default function B1Day6StadtOderLandWorkbookPage() {
             Für viele Menschen spielt die Lage der Wohnung oder des Hauses eine wichtige Rolle. Manche leben lieber in der Stadt, weil sie dort schnell Geschäfte, Restaurants und kulturelle Einrichtungen erreichen. Andere bevorzugen das ruhigere Leben auf dem Land. Dort hat man oft mehr Platz und eine engere Verbindung zur Natur, muss aber längere Wege zur Arbeit oder in die Stadt akzeptieren.
           </p>
 
-          <h3 style={sectionTitle}>Fragen zum Text</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={readingQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
@@ -282,10 +290,16 @@ export default function B1Day6StadtOderLandWorkbookPage() {
 
       {activeTab === "hoeren" ? (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Lesen Sie zuerst die Fragen. Hören Sie den Beitrag anschließend zweimal und wählen Sie die passende Antwort.
-          </p>
+          <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Listening"
+            title="Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen."
+            submissionNote="Submit only the answer letters in this format: 1B, 2A, 3C ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the questions first. Then listen for information about WGs, family houses, city apartments and sustainable housing.
+            </p>
+          </WorkbookTaskCard>
 
           <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 12, overflow: "hidden", background: "#111827" }}>
             <iframe
@@ -304,7 +318,7 @@ export default function B1Day6StadtOderLandWorkbookPage() {
             Open audio in Google Drive
           </a>
 
-          <h3 style={sectionTitle}>Fragen zum Audio</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={listeningQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
@@ -338,9 +352,15 @@ export default function B1Day6StadtOderLandWorkbookPage() {
       {activeTab === "submit" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>
-            Submit your final Schreiben, Lesen and Hören answers for B1 Day 6.
-          </p>
+          <WorkbookTaskCard
+            eyebrow="Final step"
+            title="Submit Teil 2, Teil 3 and Teil 4."
+            submissionNote="Do not submit Teil 1."
+          >
+            <p style={{ margin: 0 }}>
+              Paste your final 80-word opinion text, seven reading answer letters and five listening answer letters into the form below.
+            </p>
+          </WorkbookTaskCard>
           <div className="b1-day6-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
             <style>{`.b1-day6-submission-page > div > section:first-child { display: none !important; }
             .b1-day6-submission-page select { display: none !important; }`}</style>
