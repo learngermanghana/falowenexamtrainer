@@ -7,7 +7,10 @@ const normalizeText = (value = "") =>
     .trim();
 
 const normalizeLower = (value = "") => normalizeText(value).toLowerCase();
-const GUIDANCE_VERSION = "2";
+const GUIDANCE_VERSION = "3";
+const A1_COMPLETION_VIDEO_ID = "Iu_Ydk0vjHE";
+const A1_COMPLETION_VIDEO_URL = `https://youtu.be/${A1_COMPLETION_VIDEO_ID}`;
+const A1_COMPLETION_VIDEO_EMBED_URL = `https://www.youtube-nocookie.com/embed/${A1_COMPLETION_VIDEO_ID}`;
 
 const EXAM_TAB_GUIDANCE = [
   {
@@ -86,6 +89,86 @@ const buildListItem = ({ name, description }) => {
   return item;
 };
 
+const createA1CompletionVideo = () => {
+  const wrapper = document.createElement("section");
+  wrapper.setAttribute("data-a1-completion-video", "true");
+  Object.assign(wrapper.style, {
+    border: "1px solid #bfdbfe",
+    borderRadius: "16px",
+    background: "#eff6ff",
+    padding: "12px",
+    display: "grid",
+    gap: "10px",
+    margin: "12px 0",
+  });
+
+  const heading = document.createElement("strong");
+  heading.textContent = "A1 completion video: prepare for the Goethe A1 exam";
+  heading.style.color = "#1e3a8a";
+
+  const description = document.createElement("p");
+  description.textContent =
+    "Watch this video before you begin your A1 exam preparation in the Exams Room.";
+  Object.assign(description.style, {
+    margin: "0",
+    color: "#334155",
+    lineHeight: "1.55",
+  });
+
+  const videoShell = document.createElement("div");
+  Object.assign(videoShell.style, {
+    position: "relative",
+    width: "100%",
+    paddingTop: "56.25%",
+    borderRadius: "14px",
+    overflow: "hidden",
+    background: "#000000",
+  });
+
+  const frame = document.createElement("iframe");
+  frame.src = A1_COMPLETION_VIDEO_EMBED_URL;
+  frame.title = "A1 completion video: prepare for the Goethe A1 exam";
+  frame.loading = "lazy";
+  frame.allow =
+    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+  frame.allowFullscreen = true;
+  Object.assign(frame.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    border: "0",
+  });
+  videoShell.appendChild(frame);
+
+  const link = document.createElement("a");
+  link.href = A1_COMPLETION_VIDEO_URL;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = "Open the A1 completion video on YouTube";
+  Object.assign(link.style, {
+    width: "fit-content",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    textDecoration: "none",
+  });
+
+  wrapper.append(heading, description, videoShell, link);
+  return wrapper;
+};
+
+const ensureCompletionVideo = ({ card, level, intro }) => {
+  const existingVideo = card.querySelector('[data-a1-completion-video="true"]');
+
+  if (level !== "A1") {
+    existingVideo?.remove();
+    return;
+  }
+
+  if (existingVideo) return;
+  intro.insertAdjacentElement("afterend", createA1CompletionVideo());
+};
+
 export const applyCourseCompletionExamGuidance = (root = document) => {
   if (!root?.querySelectorAll || typeof document === "undefined") return 0;
 
@@ -120,11 +203,14 @@ export const applyCourseCompletionExamGuidance = (root = document) => {
     intro.setAttribute("data-course-completion-exam-intro", "true");
     if (normalizeText(intro.textContent) !== introText) intro.textContent = introText;
 
+    ensureCompletionVideo({ card, level, intro });
+
     let list = card.querySelector('[data-course-completion-exam-tabs="true"]');
     if (!list) list = card.querySelector("ul, ol");
     if (!list) {
       list = document.createElement("ul");
-      intro.insertAdjacentElement("afterend", list);
+      const video = card.querySelector('[data-a1-completion-video="true"]');
+      (video || intro).insertAdjacentElement("afterend", list);
     }
     list.setAttribute("data-course-completion-exam-tabs", "true");
     if (list.getAttribute("data-course-completion-exam-tabs-version") !== GUIDANCE_VERSION) {
@@ -172,6 +258,7 @@ export default function CourseCompletionExamGuidanceInjector() {
 }
 
 export const __private__ = {
+  A1_COMPLETION_VIDEO_ID,
   EXAM_TAB_GUIDANCE,
   findGuidanceCards,
   readLevel,
