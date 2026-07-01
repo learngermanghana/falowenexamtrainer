@@ -2,9 +2,14 @@ import {
   findCourseBookStatGrid,
   findCurrentOrNextSession,
   formatClassCountdown,
+  resolveLevel,
 } from "./CourseBookNextClassIndicator";
 
 describe("CourseBookNextClassIndicator", () => {
+  test("handles a null student profile while authentication is loading", () => {
+    expect(resolveLevel(null)).toBe("");
+  });
+
   test("shows days and hours until the next class", () => {
     const now = new Date("2026-07-01T10:00:00.000Z");
     const session = {
