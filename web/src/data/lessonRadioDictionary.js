@@ -101,6 +101,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Wohnungssuche in Deutschland ein. Danach gehst du weiter zum Workbook.",
     },
+    7: {
+      key: "b1-day7-fast-food-hausmannskost-falowen-radio",
+      title: "Fast Food vs. Hausmannskost 3.7",
+      youtubeId: "y5wqJv8_GMI",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf das Thema Fast Food und Hausmannskost ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {

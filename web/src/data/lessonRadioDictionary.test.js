@@ -28,6 +28,16 @@ test("B1 Day 1 Traumwelten radio remains available", () =>
   ),
 );
 
+
+test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the course video", () =>
+  expect(getLessonRadioResource("B1", 7)).toEqual(
+    expect.objectContaining({
+      title: "Fast Food vs. Hausmannskost 3.7",
+      youtubeId: "y5wqJv8_GMI",
+    }),
+  ),
+);
+
 test("B2 Day 1 radio remains available", () =>
   expect(getLessonRadioResource("B2", 1)).toEqual(
     expect.objectContaining({

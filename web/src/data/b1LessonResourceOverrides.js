@@ -52,6 +52,19 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zum Vergleichen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
   }),
+  7: Object.freeze({
+    chapter: "3.7",
+    title: "Fast Food vs. Hausmannskost",
+    grammarBook: "/campus/course/lesson/B1/7?view=grammar",
+    workbook: "/campus/course/lesson/B1/7?view=workbook",
+    aiVideo: "https://youtu.be/y5wqJv8_GMI",
+    grammarTopic:
+      "Genitiv mit wegen und trotz: Gründe, Gegengründe und Eigenschaften von Ernährung präzise ausdrücken",
+    goal:
+      "Fast Food, Fertiggerichte und Hausmannskost vergleichen, gesundheitliche Vor- und Nachteile erklären und eine klare B1-Meinung formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zum Genitiv mit wegen und trotz. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
