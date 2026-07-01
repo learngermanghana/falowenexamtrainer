@@ -85,6 +85,29 @@ const inputStyle = {
   fontSize: "1rem",
 };
 
+const positionTokenStyle = (type) => {
+  const colors = {
+    verb: { background: "#dbeafe", border: "#60a5fa", color: "#1e3a8a" },
+    subject: { background: "#dcfce7", border: "#4ade80", color: "#14532d" },
+    rest: { background: "#f3f4f6", border: "#d1d5db", color: "#374151" },
+    question: { background: "#f3e8ff", border: "#c084fc", color: "#581c87" },
+    amount: { background: "#fef3c7", border: "#fbbf24", color: "#78350f" },
+  };
+
+  const selected = colors[type] || colors.rest;
+
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "7px 10px",
+    borderRadius: 9,
+    border: `1px solid ${selected.border}`,
+    background: selected.background,
+    color: selected.color,
+    fontWeight: 700,
+  };
+};
+
 const optionButtonStyle = (selected, correct, submitted) => ({
   width: "100%",
   textAlign: "left",
@@ -158,9 +181,7 @@ const hobbies = [
   ["Malen", "Painting"],
   ["Musik hören", "Listening to music"],
   ["Kochen", "Cooking"],
-  ["Reisen", "Traveling"],
-  ["Gartenarbeit", "Gardening"],
-  ["Radfahren", "Cycling"],
+  ["Reisen", "Travelling"],
   ["Wandern", "Hiking"],
 ];
 
@@ -215,10 +236,10 @@ const languageQuiz = [
     stem: "3. Which sentence is correct?",
     correct: "C",
     options: {
-      A: "Ich Deutsch spreche.",
-      B: "Ich sprechen Deutsch.",
-      C: "Ich spreche Deutsch.",
-      D: "Deutsch ich spreche.",
+      A: "Ich spreche bisschen Deutsch.",
+      B: "Ich ein bisschen spreche Deutsch.",
+      C: "Ich spreche ein bisschen Deutsch.",
+      D: "Ein Deutsch bisschen ich spreche.",
     },
   },
 ];
@@ -248,13 +269,13 @@ const questionQuiz = [
   },
   {
     id: "q3",
-    stem: "3. What is the rule?",
+    stem: "3. What is the rule for a yes/no question?",
     correct: "D",
     options: {
       A: "The noun comes first",
-      B: "The pronoun comes first",
+      B: "The subject comes first",
       C: "The object comes first",
-      D: "The verb comes first",
+      D: "The conjugated verb comes first",
     },
   },
 ];
@@ -262,30 +283,30 @@ const questionQuiz = [
 const hobbyQuiz = [
   {
     id: "h1",
-    stem: "1. What is 'Playing football' in German?",
+    stem: "1. What does 'Musik hören' mean?",
     correct: "B",
-    options: { A: "Musik hören", B: "Fußball spielen", C: "Schwimmen", D: "Malen" },
-  },
-  {
-    id: "h2",
-    stem: "2. Which sentence correctly uses gern?",
-    correct: "D",
     options: {
-      A: "Ich gern spiele Fußball.",
-      B: "Ich spiele Fußball gerne.",
-      C: "Mein Hobby gern ist Fußball spielen.",
-      D: "Ich spiele gern Fußball.",
+      A: "to make music",
+      B: "to listen to music",
+      C: "to buy music",
+      D: "to write music",
     },
   },
   {
+    id: "h2",
+    stem: "2. Complete the sentence: Ich ___ gern Fußball.",
+    correct: "A",
+    options: { A: "spiele", B: "spreche", C: "höre", D: "lese" },
+  },
+  {
     id: "h3",
-    stem: "3. What does this sentence mean: Ich höre gern Musik.",
+    stem: "3. Which sentence means 'I like reading'?",
     correct: "A",
     options: {
-      A: "I like listening to music.",
-      B: "I do not listen to music.",
-      C: "My hobby is music.",
-      D: "I listen to German music only.",
+      A: "Ich lese gern.",
+      B: "Ich reise gern.",
+      C: "Ich male gern.",
+      D: "Ich koche gern.",
     },
   },
 ];
@@ -308,6 +329,27 @@ const PreparedCheckbox = ({ checked, onChange }) => (
     <input type="checkbox" checked={checked} onChange={onChange} />
     I practised this section.
   </label>
+);
+
+const PositionLegend = () => (
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    <span style={positionTokenStyle("verb")}>Verb</span>
+    <span style={positionTokenStyle("subject")}>Subject</span>
+    <span style={positionTokenStyle("rest")}>Rest</span>
+    <span style={positionTokenStyle("question")}>W-word</span>
+    <span style={positionTokenStyle("amount")}>Amount</span>
+  </div>
+);
+
+const SentencePattern = ({ parts }) => (
+  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 7 }}>
+    {parts.map((part, index) => (
+      <React.Fragment key={`${part.text}-${index}`}>
+        <span style={positionTokenStyle(part.type)}>{part.text}</span>
+        {index < parts.length - 1 ? <span aria-hidden="true">+</span> : null}
+      </React.Fragment>
+    ))}
+  </div>
 );
 
 function QuizBlock({ title, questions }) {
@@ -400,9 +442,9 @@ function TypedGapPractice({ title, items }) {
               <input
                 type="text"
                 value={values[item.id]}
-                onChange={(e) => setValues((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                onChange={(event) => setValues((prev) => ({ ...prev, [item.id]: event.target.value }))}
                 style={inputStyle}
-                placeholder="Type your answer"
+                placeholder="Type the complete question"
               />
               {checked ? (
                 <div style={resultText(ok)}>
@@ -450,7 +492,8 @@ function TypedGapPractice({ title, items }) {
   );
 }
 
-const heroImageUrl = "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
+const heroImageUrl =
+  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
 
 const A1FamilyLanguagesQuestionsWorkbookPage = () => {
   const navigate = useNavigate();
@@ -479,10 +522,12 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           style={{ width: "100%", height: 240, objectFit: "cover", borderRadius: 14 }}
         />
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies
+        </h1>
 
         <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-          Everything is now on one page. Move section by section and mark each part when you finish it.
+          Everything is on one page. Move section by section and mark each part when you finish it.
         </p>
       </div>
 
@@ -589,7 +634,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       </div>
 
       <div id="languages" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 3 · Languages and “ein bisschen”</h2>
+        <h2 style={sectionTitle}>Teil 3 · Languages and „ein bisschen“</h2>
 
         <div style={infoBoxStyle}>
           <strong>Language Names</strong>
@@ -602,45 +647,249 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           </div>
         </div>
 
+        <div style={questionCardStyle}>
+          <strong>What does „ein bisschen“ mean?</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Ein bisschen</strong> means <strong>a little</strong> or <strong>a bit</strong>. Use it when you can do
+            something, but only to a small degree.
+          </p>
+          <div style={answerCardStyle}>
+            <div style={{ lineHeight: 1.7 }}>
+              <strong>Ich spreche Deutsch.</strong> = I speak German.
+              <br />
+              <strong>Ich spreche ein bisschen Deutsch.</strong> = I speak a little German.
+            </div>
+          </div>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>The sentence pattern</strong>
+          <PositionLegend />
+          <SentencePattern
+            parts={[
+              { type: "subject", text: "Ich" },
+              { type: "verb", text: "spreche" },
+              { type: "amount", text: "ein bisschen" },
+              { type: "rest", text: "Deutsch." },
+            ]}
+          />
+          <div style={{ color: "#374151", lineHeight: 1.7 }}>
+            <strong>Subject</strong> = who speaks · <strong>Verb</strong> = the action · <strong>ein bisschen</strong> = how
+            much · <strong>Deutsch</strong> = the language
+          </div>
+        </div>
+
+        <div style={warningBoxStyle}>
+          <strong>Important rule</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Ein bisschen</strong> is a fixed expression. Keep the word <strong>ein</strong>. Language names also
+            begin with a capital letter in German.
+          </p>
+          <div style={sentenceBoxStyle}>
+            ✅ Ich spreche <strong>ein bisschen</strong> Deutsch.
+            <br />
+            ❌ Ich spreche bisschen Deutsch.
+            <br />
+            ❌ Ich ein bisschen spreche Deutsch.
+          </div>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>More examples</strong>
+          <div style={{ lineHeight: 1.8 }}>
+            Ich spreche ein bisschen Englisch.
+            <br />
+            Ama spricht ein bisschen Französisch.
+            <br />
+            Wir sprechen ein bisschen Deutsch.
+            <br />
+            Er versteht ein bisschen Spanisch.
+          </div>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>Asking about languages</strong>
+          <SentencePattern
+            parts={[
+              { type: "verb", text: "Sprichst" },
+              { type: "subject", text: "du" },
+              { type: "amount", text: "ein bisschen" },
+              { type: "rest", text: "Deutsch?" },
+            ]}
+          />
+          <div style={answerCardStyle}>
+            Ja, ich spreche ein bisschen Deutsch.
+            <br />
+            Ja, ein bisschen.
+            <br />
+            Nein, noch nicht.
+          </div>
+        </div>
+
         <QuizBlock title="Languages self-check" questions={languageQuiz} />
         <PreparedCheckbox checked={prepared.languages} onChange={setPreparedFor("languages")} />
       </div>
 
       <div id="questions" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 4 · Forming Yes or No Questions</h2>
+        <h2 style={sectionTitle}>Teil 4 · Forming Yes-or-No Questions</h2>
 
         <div style={infoBoxStyle}>
-          <strong>Basic Structure</strong>
-          <div style={chipStyle}>Verb + Subject + Rest of sentence?</div>
+          <strong>Basic structure</strong>
+          <div style={chipStyle}>Conjugated verb + subject + rest of the sentence?</div>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            A <strong>Ja/Nein-Frage</strong> can normally be answered with <strong>ja</strong> or <strong>nein</strong>.
+            The conjugated verb starts the question.
+          </p>
         </div>
 
         <div style={questionCardStyle}>
-          <strong>How to form yes/no questions (Ja/Nein-Fragen)</strong>
+          <strong>See the positions</strong>
+          <PositionLegend />
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div>
+              <div style={{ marginBottom: 6, fontWeight: 600 }}>Statement</div>
+              <SentencePattern
+                parts={[
+                  { type: "subject", text: "Du" },
+                  { type: "verb", text: "lernst" },
+                  { type: "rest", text: "Deutsch." },
+                ]}
+              />
+            </div>
+
+            <div>
+              <div style={{ marginBottom: 6, fontWeight: 600 }}>Yes-or-no question</div>
+              <SentencePattern
+                parts={[
+                  { type: "verb", text: "Lernst" },
+                  { type: "subject", text: "du" },
+                  { type: "rest", text: "Deutsch?" },
+                ]}
+              />
+            </div>
+          </div>
+
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            A <strong>Ja/Nein-Frage</strong> asks for <strong>yes</strong> or <strong>no</strong>, so the conjugated verb comes
-            first. A <strong>W-Frage</strong> asks for information (who, what, where, when, why), so it starts with a
-            question word like <strong>Wer</strong>, <strong>Was</strong>, or <strong>Wo</strong>, then the verb is second.
+            The verb <strong>lernst</strong> moves from position two in the statement to position one in the question.
           </p>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>How to form a yes-or-no question</strong>
           <ol style={listStyle}>
-            <li>Start with the conjugated verb.</li>
+            <li>Find the conjugated verb.</li>
+            <li>Move the conjugated verb to the beginning.</li>
             <li>Put the subject directly after the verb.</li>
-            <li>Keep the rest of the sentence in the same order.</li>
-            <li>Add a question mark at the end.</li>
+            <li>Keep the remaining information after the subject.</li>
+            <li>Add a question mark.</li>
           </ol>
-          <div style={answerCardStyle}>
-            <div style={{ lineHeight: 1.7 }}>
-              <strong>Statement:</strong> Du lernst Deutsch.
-              <br />
-              <strong>Question:</strong> Lernst du Deutsch?
-              <br />
-              <strong>Statement:</strong> Er spielt Fußball.
-              <br />
-              <strong>Question:</strong> Spielt er Fußball?
-              <br />
-              <strong>W-question example:</strong> Wo wohnst du?
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>More verb-first examples</strong>
+          <div style={{ display: "grid", gap: 12 }}>
+            <SentencePattern
+              parts={[
+                { type: "verb", text: "Spielt" },
+                { type: "subject", text: "er" },
+                { type: "rest", text: "Fußball?" },
+              ]}
+            />
+            <SentencePattern
+              parts={[
+                { type: "verb", text: "Hört" },
+                { type: "subject", text: "sie" },
+                { type: "rest", text: "Musik?" },
+              ]}
+            />
+            <SentencePattern
+              parts={[
+                { type: "verb", text: "Kochst" },
+                { type: "subject", text: "du" },
+                { type: "rest", text: "gern?" },
+              ]}
+            />
+            <SentencePattern
+              parts={[
+                { type: "verb", text: "Sprichst" },
+                { type: "subject", text: "du" },
+                { type: "rest", text: "Deutsch?" },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div style={warningBoxStyle}>
+          <strong>Use the conjugated verb</strong>
+          <div style={sentenceBoxStyle}>
+            ✅ <strong>Spielst</strong> du Fußball?
+            <br />
+            ❌ <strong>Spielen</strong> du Fußball?
+            <br />
+            <br />
+            ✅ <strong>Sprichst</strong> du Deutsch?
+            <br />
+            ❌ <strong>Sprechen</strong> du Deutsch?
+          </div>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>Yes-or-no question versus W-question</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            A W-question starts with a question word. The conjugated verb is second.
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <div style={{ marginBottom: 6, fontWeight: 600 }}>Yes-or-no question: verb first</div>
+              <SentencePattern
+                parts={[
+                  { type: "verb", text: "Wohnst" },
+                  { type: "subject", text: "du" },
+                  { type: "rest", text: "in Accra?" },
+                ]}
+              />
+            </div>
+
+            <div>
+              <div style={{ marginBottom: 6, fontWeight: 600 }}>W-question: question word first, verb second</div>
+              <SentencePattern
+                parts={[
+                  { type: "question", text: "Wo" },
+                  { type: "verb", text: "wohnst" },
+                  { type: "subject", text: "du?" },
+                ]}
+              />
             </div>
           </div>
         </div>
+
+        <TypedGapPractice
+          title="Practice · Change the statement into a question"
+          items={[
+            {
+              id: "qa1",
+              prompt: "Du schwimmst im Meer. → ______",
+              answers: ["Schwimmst du im Meer?"],
+            },
+            {
+              id: "qa2",
+              prompt: "Du spielst Fußball. → ______",
+              answers: ["Spielst du Fußball?"],
+            },
+            {
+              id: "qa3",
+              prompt: "Du malst ein Bild. → ______",
+              answers: ["Malst du ein Bild?"],
+            },
+            {
+              id: "qa4",
+              prompt: "Du hörst Musik. → ______",
+              answers: ["Hörst du Musik?"],
+            },
+          ]}
+        />
 
         <QuizBlock title="Yes/No questions self-check" questions={questionQuiz} />
         <PreparedCheckbox checked={prepared.questions} onChange={setPreparedFor("questions")} />
@@ -662,41 +911,42 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
 
         <div style={questionCardStyle}>
           <strong>Talking about hobbies with gern</strong>
-          <div style={{ lineHeight: 1.7 }}>
-            Use <strong>gern</strong> with a verb to say what you like doing.
-            <br />
-            <strong>Ich tanze gern.</strong> = I like dancing.
-            <br />
-            More examples:
-            <br />
-            <strong>Ich lese gern.</strong> (I like reading.)
-            <br />
-            <strong>Wir schwimmen gern.</strong> (We like swimming.)
-            <br />
-            <strong>Er kocht gern.</strong> (He likes cooking.)
-          </div>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Use <strong>verb + gern</strong> to say what you enjoy doing.
+          </p>
+          <div style={chipStyle}>Ich + conjugated verb + gern.</div>
           <div style={answerCardStyle}>
-            <div style={{ lineHeight: 1.7 }}>
-              <strong>Difference:</strong>
-              <br />
-              <strong>Mein Hobby ist Tanzen.</strong> → names your hobby as a noun phrase.
-              <br />
-              <strong>Ich tanze gern.</strong> → says you enjoy the activity (verb + gern).
-              <br />
-              Both are correct. The second one sounds more natural in everyday speech.
-            </div>
+            Ich lese gern.
+            <br />
+            Ich schwimme gern.
+            <br />
+            Ich spiele gern Fußball.
+            <br />
+            Ich male gern.
+            <br />
+            Ich höre gern Musik.
+            <br />
+            Ich koche gern.
+            <br />
+            Ich reise gern.
+            <br />
+            Ich wandere gern.
           </div>
         </div>
 
-        <TypedGapPractice
-          title="Practice · Write the question"
-          items={[
-            { id: "ha1", prompt: "schwimmen + im Meer → ______", answers: ["Schwimmen Sie im Meer?"] },
-            { id: "ha2", prompt: "spielen + Fußball → ______", answers: ["Spielen Sie Fußball?"] },
-            { id: "ha3", prompt: "malen + ein Bild → ______", answers: ["Malen Sie ein Bild?"] },
-            { id: "ha4", prompt: "hören + Musik → ______", answers: ["Hören Sie Musik?"] },
-          ]}
-        />
+        <div style={questionCardStyle}>
+          <strong>Asking about hobbies</strong>
+          <div style={sentenceBoxStyle}>
+            <strong>Was machst du gern?</strong> = What do you like doing?
+            <br />
+            <br />
+            Ich spiele gern Fußball.
+            <br />
+            Ich höre gern Musik.
+            <br />
+            Ich schwimme gern.
+          </div>
+        </div>
 
         <QuizBlock title="Hobbies self-check" questions={hobbyQuiz} />
         <PreparedCheckbox checked={prepared.hobbies} onChange={setPreparedFor("hobbies")} />
