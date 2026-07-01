@@ -1,22 +1,19 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
-
-const tabs = [
-  { key: "sprechen", label: "Teil 1" },
-  { key: "schreiben", label: "Teil 2" },
-  { key: "lesen", label: "Teil 3" },
-  { key: "hoeren", label: "Teil 4" },
-  { key: "references", label: "Ref" },
-  { key: "submit", label: "Submit" },
-];
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+  WorkbookTaskCard,
+} from "./StandardWorkbookComponents";
 
 const card = {
   ...styles.card,
@@ -116,26 +113,6 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#2563eb" : "#fff",
-        color: active ? "#fff" : "#1d4ed8",
-        fontWeight: 800,
-        flex: "0 0 auto",
-        minWidth: 74,
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -165,10 +142,6 @@ const A2Day2SmallTalkWorkbookContent = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(
-    () => tabs.findIndex((tab) => tab.key === activeTab),
-    [activeTab],
-  );
   const setPreparedFor = (tabKey) => (event) =>
     setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
 
@@ -177,9 +150,10 @@ const A2Day2SmallTalkWorkbookContent = () => {
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 2 Workbook · Small Talk</h1>
+        <span style={{ ...styles.badge, width: "fit-content" }}>A2 · Day 1 · Kapitel 1.1</span>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 Workbook · Small Talk</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Four-part workbook for speaking, writing, reading and listening practice.
+          Select Teil 1–4 below. Each part begins with a highlighted task showing exactly what you must answer.
         </p>
         <img
           src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1600&q=80"
@@ -188,43 +162,41 @@ const A2Day2SmallTalkWorkbookContent = () => {
           style={imageStyle}
         />
 
-        <div
-          role="tablist"
-          aria-label="A2 Day 2 workbook sections"
-          style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}
-        >
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.key}
-              active={tab.key === activeTab}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </TabButton>
-          ))}
-        </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
+        <WorkbookTabNav
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          tabs={STANDARD_WORKBOOK_TABS}
+          ariaLabel="A2 Day 1 Small Talk workbook sections"
+        />
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance level="A2" />
 
       {activeTab === "sprechen" && (
         <section style={card}>
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <WorkbookTaskCard
+            eyebrow="Question of the Day · Speaking"
+            title="Führe ein kurzes Small-Talk-Gespräch."
+            practiceOnly
+            submissionNote="Prepare this before class. Teil 1 is group practice and is not submitted."
+          >
+            <p style={{ margin: 0 }}>
+              Begrüße deinen Partner, stelle mindestens <strong>drei persönliche Fragen</strong>, reagiere auf die Antworten und stelle mindestens <strong>eine Rückfrage</strong>.
+            </p>
+            <p style={{ margin: 0 }}>
+              Sprich über Arbeit oder Studium, Familie oder Sprachen, Hobbys und das Wetter. Ziel: ungefähr <strong>30–45 Sekunden</strong>.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80"
             alt="Friends having a relaxed small-talk conversation"
             loading="lazy"
             style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Bereite ein kurzes Gespräch vor. Nutze einfache Fragen, reagiere auf die Antwort und stelle mindestens eine Rückfrage.
-          </p>
 
-          <h3 style={sectionTitle}>Zentrales Thema: Small Talk</h3>
+          <h3 style={sectionTitle}>Useful questions and phrases</h3>
           <div style={phraseGridStyle}>
             <div style={questionCardStyle}>
               <strong>Begrüßung</strong>
@@ -248,7 +220,7 @@ const A2Day2SmallTalkWorkbookContent = () => {
             </div>
           </div>
 
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <h3 style={sectionTitle}>Suggested speaking structure</h3>
           <ol style={listSpacing}>
             <li><strong>Einleitung:</strong> „Heute spreche ich kurz über mich.“</li>
             <li><strong>Informationen:</strong> Familie, Sprachen, Beruf oder Studium und Hobbys.</li>
@@ -267,30 +239,34 @@ const A2Day2SmallTalkWorkbookContent = () => {
           </div>
 
           <CourseInlinePracticePanel type="speaking" />
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is group practice only and has no assignment submission.
-          </p>
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </section>
       )}
 
       {activeTab === "schreiben" && (
         <section style={card}>
+          <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Writing"
+            title="Schreibe einen Brief an deinen Freund Felix."
+            submissionNote="Submit your finished letter through the Submit tab."
+          >
+            <p style={{ margin: 0 }}>
+              Erzähle Felix etwas über deine Arbeit und deine Familie.
+            </p>
+            <ol style={listSpacing}>
+              <li>Erkläre kurz, warum du schreibst.</li>
+              <li>Erzähle etwas über deine Arbeit und deine Familie.</li>
+              <li>Frage Felix, wie es ihm geht und was bei ihm neu ist.</li>
+            </ol>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
             alt="Student writing a friendly German letter"
             loading="lazy"
             style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 2 · Schreiben</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Schreibe einen Brief an deinen Freund Felix. Erzähle etwas über deine Arbeit und Familie.
-          </p>
-          <ol style={listSpacing}>
-            <li>Warum schreibst du?</li>
-            <li>Erzähle Felix etwas über deine Arbeit und deine Familie.</li>
-            <li>Frage Felix, wie es ihm geht und was bei ihm neu ist.</li>
-          </ol>
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
@@ -299,18 +275,28 @@ const A2Day2SmallTalkWorkbookContent = () => {
 
       {activeTab === "lesen" && (
         <section style={card}>
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Reading"
+            title="Lies den Text und beantworte alle sieben Fragen."
+            submissionNote="Submit only the answer letters in this format: 1C, 2B, 3A ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the complete text first. Then choose one answer, A–D, for each question.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
             alt="Open book for German reading practice"
             loading="lazy"
             style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
           <h3 style={sectionTitle}>Mein Gespräch mit Lisa</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Gestern habe ich Lisa im Café getroffen. Sie arbeitet in einer Schule und unterrichtet Kinder. Wir haben über unsere Arbeit gesprochen. Lisa sagt, dass sie ihren Beruf liebt, weil sie gerne mit Kindern arbeitet. Ich habe ihr erzählt, dass ich in einem Büro arbeite. Dann haben wir über Sport gesprochen. Lisa spielt gern Tennis, aber ich mag Fußball mehr. Wir haben auch über das Wetter geredet. Es war gestern sonnig und warm, und Lisa liebt den Sommer. Ich habe ihr erzählt, dass ich lieber den Herbst mag, weil die Bäume so schön bunt sind. Zum Schluss haben wir über Reisen gesprochen. Lisa war schon in Italien und Spanien. Sie möchte nächstes Jahr nach Frankreich reisen.
           </p>
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
@@ -319,21 +305,28 @@ const A2Day2SmallTalkWorkbookContent = () => {
 
       {activeTab === "hoeren" && (
         <section style={card}>
+          <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
+          <WorkbookTaskCard
+            eyebrow="Your assignment · Listening"
+            title="Höre den Text zweimal und beantworte alle fünf Fragen."
+            submissionNote="Submit only the answer letters in this format: 1B, 2A, 3C ..."
+          >
+            <p style={{ margin: 0 }}>
+              Read the questions first. Listen for plans, the film, sport, weather and the next meeting.
+            </p>
+          </WorkbookTaskCard>
+
           <img
             src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
             alt="Headphones for German listening practice"
             loading="lazy"
             style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 4 · Hören</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Höre den Text zweimal. Lies zuerst die Fragen und achte auf Pläne, Film, Sport, Wetter und das nächste Treffen.
-          </p>
           <CoursebookAudioPlayer
             url="https://drive.google.com/file/d/1UXO1nHeBxOt8TS8dpp68xXr4Txjzu-NZ/view?usp=sharing"
             linkLabel="Open Teil 4 audio"
           />
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
@@ -346,7 +339,7 @@ const A2Day2SmallTalkWorkbookContent = () => {
           lesson={{
             title: "A2Day2SmallTalk",
             level: "A2",
-            day: 2,
+            day: 1,
             workbookId: "A2Day2SmallTalk",
           }}
           workbookId="A2Day2SmallTalk"
@@ -354,26 +347,29 @@ const A2Day2SmallTalkWorkbookContent = () => {
       )}
 
       {activeTab === "submit" && (
-        <section
-          style={{
-            ...styles.card,
-            border: "1px solid #bfdbfe",
-            background: "#eff6ff",
-            display: "grid",
-            gap: 10,
-          }}
-        >
+        <section style={card}>
           <h2 style={{ margin: 0 }}>Submit Workbook</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Submit the required answers for Schreiben, Lesen and Hören after completing Teil 1–4.
-          </p>
-          <WorkbookSubmissionReminder />
-          <a
-            href="/campus/course?submitWork=1"
-            style={{ ...styles.primaryButton, textDecoration: "none", justifySelf: "start" }}
+          <WorkbookTaskCard
+            eyebrow="Final step"
+            title="Submit Teil 2, Teil 3 and Teil 4."
+            submissionNote="Do not submit Teil 1."
           >
-            Open submission area
-          </a>
+            <p style={{ margin: 0 }}>
+              Paste your final writing, reading answer letters and listening answer letters into the assignment form below.
+            </p>
+          </WorkbookTaskCard>
+          <div className="a2-day1-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day1-submission-page > div > section:first-child { display: none !important; }
+            .a2-day1-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 1,
+                assignmentKey: "A2-1.1",
+                canonicalAssignmentKey: "A2-1.1",
+              }}
+            />
+          </div>
         </section>
       )}
     </div>
@@ -381,7 +377,7 @@ const A2Day2SmallTalkWorkbookContent = () => {
 };
 
 const A2Day2SmallTalkWorkbookEnhancedPage = () => (
-  <RadioFirstWorkbookGate level="A2" day={2}>
+  <RadioFirstWorkbookGate level="A2" day={1}>
     <A2Day2SmallTalkWorkbookContent />
   </RadioFirstWorkbookGate>
 );
