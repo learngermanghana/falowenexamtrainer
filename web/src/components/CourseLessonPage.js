@@ -12,6 +12,8 @@ import B1Day5BesichtigungsterminWorkbookPage from "./B1Day5BesichtigungsterminWo
 import B1Day5BesichtigungsterminGrammarNotesPage from "./B1Day5BesichtigungsterminGrammarNotesPage";
 import B1Day6StadtOderLandWorkbookPage from "./B1Day6StadtOderLandWorkbookPage";
 import B1Day6StadtOderLandGrammarNotesPage from "./B1Day6StadtOderLandGrammarNotesPage";
+import B1Day7FastFoodHausmannskostWorkbookPage from "./B1Day7FastFoodHausmannskostWorkbookPage";
+import B1Day7FastFoodHausmannskostGrammarNotesPage from "./B1Day7FastFoodHausmannskostGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
@@ -42,6 +44,7 @@ const B1_WORKBOOK_PAGES = {
   4: B1Day4WohnungSuchenWorkbookPage,
   5: B1Day5BesichtigungsterminWorkbookPage,
   6: B1Day6StadtOderLandWorkbookPage,
+  7: B1Day7FastFoodHausmannskostWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
@@ -51,6 +54,7 @@ const B1_GRAMMAR_PAGES = {
   4: B1Day4WohnungSuchenGrammarNotesPage,
   5: B1Day5BesichtigungsterminGrammarNotesPage,
   6: B1Day6StadtOderLandGrammarNotesPage,
+  7: B1Day7FastFoodHausmannskostGrammarNotesPage,
 };
 
 const decorateA1Day3Lesson = (lesson) => {
