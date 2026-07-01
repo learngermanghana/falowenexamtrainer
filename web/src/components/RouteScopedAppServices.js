@@ -70,6 +70,9 @@ export default function RouteScopedAppServices() {
 
   if (isPublicAuthPath(location.pathname)) return null;
 
+  const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
+  const isCourseBook = normalizedPath === "/campus/course";
+
   return (
     <>
       <PublicAdsLoader />
@@ -79,7 +82,7 @@ export default function RouteScopedAppServices() {
       <SubmitPageLevelGuidanceInjector />
       <SubmitSuccessScreenInjector />
       <CourseBookTerminologyInjector />
-      <CourseBookNextClassIndicator />
+      {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <AutoGrammarStartGuide />
