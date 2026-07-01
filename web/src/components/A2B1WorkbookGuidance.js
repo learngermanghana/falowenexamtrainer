@@ -22,35 +22,44 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   return (
     <>
       <WorkbookReadAloudInjector />
-      <section
-        aria-label="Workbook guide"
+      <details
         style={{
           ...styles.card,
           margin: 0,
-          display: "grid",
-          gap: 12,
           border: "1px solid #bfdbfe",
           background: "#eff6ff",
           color: "#1e3a8a",
+          padding: 0,
+          overflow: "hidden",
         }}
       >
-        <h2 style={{ margin: 0, fontSize: "1.05rem" }}>How this workbook works</h2>
+        <summary
+          style={{
+            cursor: "pointer",
+            padding: 14,
+            fontWeight: 800,
+            fontSize: "1.02rem",
+            listStylePosition: "inside",
+          }}
+        >
+          How this workbook works · open guide
+        </summary>
 
-        <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+        <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            This {workbookLabel} has <strong>four workbook parts</strong>: Sprechen, Schreiben, Lesen and Hören. In the Course Book tab system, you also have a <strong>Ref</strong> tab for reference answers and a <strong>Submit</strong> tab for final submission.
+            Use the tabs above to move between the four parts of this {workbookLabel}. The highlighted task card at the top of each part tells you exactly what to answer.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>{levelPrefix} · Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
+            <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submit</strong> tab in the Course Book.
+            <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Read aloud:</strong> In Teil 3 · Lesen, use the free German voice controls to listen to the text, pause, continue, stop and change speed.
+            <strong>Read aloud:</strong> In Teil 3, use the German voice controls to listen to the reading text, pause, continue, stop and change speed.
           </p>
         </div>
-      </section>
+      </details>
     </>
   );
 };
@@ -103,7 +112,7 @@ export const WorkbookSubmissionReminder = () => {
         lineHeight: 1.5,
       }}
     >
-      Reminder: This page is for learning and practice. Submit only your final assignment work in the Submit tab in the Course Book.
+      Reminder: Practise here, then submit only your final answers through the Submit tab.
     </div>
   );
 };
