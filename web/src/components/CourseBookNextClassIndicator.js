@@ -56,6 +56,7 @@ export const findCurrentOrNextSession = (sessions = [], now = new Date()) => {
       if (status === CANCELLED_STATUS || status === COMPLETED_STATUS) return false;
       const start = sessionStart(session)?.getTime() || 0;
       const end = sessionEnd(session)?.getTime() || 0;
+      if (end && end < nowMs) return false;
       if (status === "live") return true;
       return Boolean(start && (start >= nowMs || end >= nowMs));
     })
@@ -70,10 +71,10 @@ export const formatClassCountdown = (session, now = new Date()) => {
   const startMs = start.getTime();
   const endMs = end?.getTime() || startMs + 2 * 60 * 60 * 1000;
 
+  if (nowMs > endMs) return "Class has ended";
   if (sessionStatus(session) === "live" || (nowMs >= startMs && nowMs <= endMs)) {
     return "Class is live now";
   }
-  if (nowMs > endMs) return "Class has ended";
 
   const totalMinutes = Math.max(0, Math.ceil((startMs - nowMs) / 60000));
   if (totalMinutes === 0) return "Starting now";
@@ -101,7 +102,8 @@ export const formatClassCountdown = (session, now = new Date()) => {
 const formatSessionDateTime = (session, locale = "en") => {
   const start = sessionStart(session);
   if (!start) return "Date and time not available";
-  const resolvedLocale = String(locale || "en").toLowerCase().startsWith("en") ? "en-GB" : locale;
+  const isEnglish = String(locale || "en").toLowerCase().startsWith("en");
+  const resolvedLocale = isEnglish ? "en-GB" : locale;
   const date = new Intl.DateTimeFormat(resolvedLocale, {
     timeZone: GHANA_TIMEZONE,
     weekday: "long",
@@ -112,6 +114,7 @@ const formatSessionDateTime = (session, locale = "en") => {
     timeZone: GHANA_TIMEZONE,
     hour: "numeric",
     minute: "2-digit",
+    hour12: isEnglish,
   }).format(start);
   return `${date} · ${time} Ghana time`;
 };
@@ -157,8 +160,24 @@ const CourseBookNextClassIndicator = () => {
 
   useEffect(() => {
     if (!isCourseBook) return undefined;
-    const timer = window.setInterval(() => setNow(new Date()), 60000);
-    return () => window.clearInterval(timer);
+
+    const refreshNow = () => setNow(new Date());
+    const refreshWhenVisible = () => {
+      if (!document.hidden) refreshNow();
+    };
+
+    refreshNow();
+    const timer = window.setInterval(refreshNow, 30000);
+    window.addEventListener("focus", refreshNow);
+    window.addEventListener("pageshow", refreshNow);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refreshNow);
+      window.removeEventListener("pageshow", refreshNow);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
   }, [isCourseBook]);
 
   useEffect(() => {
