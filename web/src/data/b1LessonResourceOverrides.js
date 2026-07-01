@@ -65,6 +65,19 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zum Genitiv mit wegen und trotz. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
   }),
+  8: Object.freeze({
+    chapter: "3.8",
+    title: "Alles für die Gesundheit",
+    grammarBook: "/campus/course/lesson/B1/8?view=grammar",
+    workbook: "/campus/course/lesson/B1/8?view=workbook",
+    aiVideo: "https://youtu.be/_aFuOTSdMb8",
+    grammarTopic:
+      "Modalverben für Gesundheitstipps: sollte, muss, kann, darf und möchte",
+    goal:
+      "Über gesunde Ernährung, Bewegung, mentale Gesundheit und Gesundheitsvorsorge sprechen und klare B1-Ratschläge formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zu Modalverben für Gesundheitstipps. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
