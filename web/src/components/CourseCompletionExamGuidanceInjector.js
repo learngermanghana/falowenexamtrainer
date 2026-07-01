@@ -7,6 +7,7 @@ const normalizeText = (value = "") =>
     .trim();
 
 const normalizeLower = (value = "") => normalizeText(value).toLowerCase();
+const GUIDANCE_VERSION = "2";
 
 const EXAM_TAB_GUIDANCE = [
   {
@@ -126,12 +127,9 @@ export const applyCourseCompletionExamGuidance = (root = document) => {
       intro.insertAdjacentElement("afterend", list);
     }
     list.setAttribute("data-course-completion-exam-tabs", "true");
-
-    const expectedListText = EXAM_TAB_GUIDANCE.map(
-      ({ name, description }) => `${name} — ${description}`,
-    ).join(" ");
-    if (normalizeText(list.textContent) !== expectedListText) {
+    if (list.getAttribute("data-course-completion-exam-tabs-version") !== GUIDANCE_VERSION) {
       list.replaceChildren(...EXAM_TAB_GUIDANCE.map(buildListItem));
+      list.setAttribute("data-course-completion-exam-tabs-version", GUIDANCE_VERSION);
     }
 
     const closingText = `Use Exam File to monitor your ${level} progress. Repeat the areas where you are weakest until your results and confidence show that you are ready.`;
