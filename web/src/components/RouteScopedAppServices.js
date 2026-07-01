@@ -8,6 +8,7 @@ import MobileHeaderMenuInjector from "./MobileHeaderMenuInjector";
 import SubmitPageLevelGuidanceInjector from "./SubmitPageLevelGuidanceInjector";
 import SubmitSuccessScreenInjector from "./SubmitSuccessScreenInjector";
 import CourseBookTerminologyInjector from "./CourseBookTerminologyInjector";
+import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
@@ -78,6 +79,7 @@ export default function RouteScopedAppServices() {
       <SubmitPageLevelGuidanceInjector />
       <SubmitSuccessScreenInjector />
       <CourseBookTerminologyInjector />
+      <CourseBookNextClassIndicator />
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <AutoGrammarStartGuide />
