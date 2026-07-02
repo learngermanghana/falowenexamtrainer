@@ -1299,7 +1299,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.21",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/21?view=grammar",
-    "workbookRoute": "/campus/course/lesson/B1/21?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1314,7 +1314,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.22",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
-    "workbookRoute": "/campus/course/lesson/B1/22?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1328,10 +1328,10 @@ const lessonCatalog = Object.freeze([
     "title": "Erstes Date – Typische Situationen 7.23",
     "assignmentId": "B1-7.23",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/23?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B1-8.24",
@@ -1342,10 +1342,10 @@ const lessonCatalog = Object.freeze([
     "title": "Konsum und Nachhaltigkeit 8.24",
     "assignmentId": "B1-8.24",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/24?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B1-8.25",
@@ -1356,10 +1356,10 @@ const lessonCatalog = Object.freeze([
     "title": "Online einkaufen – Rechte und Risiken 8.25",
     "assignmentId": "B1-8.25",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/25?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B1-9.26",
@@ -1370,10 +1370,10 @@ const lessonCatalog = Object.freeze([
     "title": "Reiseprobleme und Lösungen 9.26",
     "assignmentId": "B1-9.26",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/26?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B1-10.27",
@@ -1384,10 +1384,10 @@ const lessonCatalog = Object.freeze([
     "title": "Umweltfreundlich im Alltag 10.27",
     "assignmentId": "B1-10.27",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/27?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B1-10.28",
@@ -1398,10 +1398,10 @@ const lessonCatalog = Object.freeze([
     "title": "Klimafreundlich leben 10.28",
     "assignmentId": "B1-10.28",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/lesson/B1/28?view=workbook",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "planned"
   },
   {
     "id": "B2-Tutorial",

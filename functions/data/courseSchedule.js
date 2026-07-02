@@ -1220,7 +1220,7 @@ const courseSchedules = {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         grammarbook_link: "/campus/course/lesson/B1/21?view=grammar",
-        workbook_link: "/campus/course/lesson/B1/21?view=workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1234,7 +1234,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/15H7jEA7zkl4c58rhybkKPjN1eqK7mPoM/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -1248,7 +1248,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1DZxrsgU-vZPGrQAqLuYP3Q3U6KCFy-Cy/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -1262,7 +1262,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1x8IM6xcjR2hv3jbnnNudjyxLWPiT0-VL/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -1276,7 +1276,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1290,7 +1290,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1BMwDDkfPJVEhL3wHNYqGMAvjOts9tv24/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -1304,7 +1304,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/15fjOKp_u75GfcbvRJVbR8UbHg-cgrgWL/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -1318,7 +1318,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1iBeZHMDq_FnusY4kkRwRQvyOfm51-COU/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {

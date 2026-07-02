@@ -78,14 +78,6 @@
     "2": { "*": "/campus/course/lesson/B1/2?view=workbook" },
     "3": { "*": "/campus/course/lesson/B1/3?view=workbook" },
     "4": { "*": "/campus/course/b1-day-4-wohnung-suchen-workbook" },
-    "9": { "*": "/campus/course/lesson/B1/9?view=workbook" },
-    "21": { "*": "/campus/course/b1-day-21-lebensformen-heute-workbook" },
-    "22": { "*": "/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" },
-    "23": { "*": "/campus/course/b1-day-23-erstes-date-typische-situationen-workbook" },
-    "24": { "*": "/campus/course/b1-day-24-konsum-und-nachhaltigkeit-workbook" },
-    "25": { "*": "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook" },
-    "26": { "*": "/campus/course/b1-day-26-reiseprobleme-und-loesungen-workbook" },
-    "27": { "*": "/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook" },
-    "28": { "*": "/campus/course/b1-day-28-klimafreundlich-leben-workbook" }
+    "9": { "*": "/campus/course/lesson/B1/9?view=workbook" }
   }
 }

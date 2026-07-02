@@ -21,20 +21,21 @@ describe("B1 workbook writing cheat sheet injector", () => {
         ""
       )
     ).toBe(false);
+    expect(
+      __TESTING__.isB1WorkbookRoute(
+        "/campus/course/lesson/B1/21",
+        "?view=workbook"
+      )
+    ).toBe(false);
   });
 
-  test("activates on standalone B1 workbook routes", () => {
+  test("does not activate on removed standalone B1 Day 21 workbook routes", () => {
     expect(
       __TESTING__.isB1WorkbookRoute(
         "/campus/course/b1-day-21-lebensformen-heute-workbook",
         ""
       )
-    ).toBe(true);
-    expect(
-      __TESTING__.getB1WorkbookDay(
-        "/campus/course/b1-day-21-lebensformen-heute-workbook"
-      )
-    ).toBe(21);
+    ).toBe(false);
   });
 
   test("B1 cheat sheet content exists for workbook days", () => {
