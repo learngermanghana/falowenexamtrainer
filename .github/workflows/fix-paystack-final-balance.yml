@@ -26,10 +26,18 @@ jobs:
           path = Path("functions/functionz/paymentAwareApp.js")
           text = path.read_text()
 
-          old_round = '''const roundMoney = (value) =>
+          def replace_once(source, old, new, label):
+              count = source.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected 1 match, found {count}")
+              return source.replace(old, new, 1)
+
+          text = replace_once(
+              text,
+              '''const roundMoney = (value) =>
             Math.round((Number(value) + Number.EPSILON) * 100) / 100;
-          '''
-          new_round = '''const roundMoney = (value) =>
+          ''',
+              '''const roundMoney = (value) =>
             Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
           const parseMoney = (value) => {
@@ -46,18 +54,12 @@ jobs:
             const parsedTuition = parseMoney(student.tuitionFee);
             const tuitionFee = Number.isFinite(parsedTuition) ? Math.max(parsedTuition, 0) : 0;
 
-            const paidCandidates = [
-              student.paid,
-              student.initialPaymentAmount,
-              student.paidAmount,
-            ];
-            const parsedPaid = paidCandidates
+            const parsedPaid = [student.paid, student.initialPaymentAmount, student.paidAmount]
               .map(parseMoney)
               .find((value) => Number.isFinite(value));
             const paidSoFar = Number.isFinite(parsedPaid) ? Math.max(parsedPaid, 0) : 0;
 
-            const explicitBalanceRaw = student.balanceDue ?? student.balance;
-            const parsedExplicitBalance = parseMoney(explicitBalanceRaw);
+            const parsedExplicitBalance = parseMoney(student.balanceDue ?? student.balance);
             const explicitBalance = Number.isFinite(parsedExplicitBalance)
               ? Math.max(parsedExplicitBalance, 0)
               : null;
@@ -68,56 +70,56 @@ jobs:
 
             return { tuitionFee, paidSoFar, balanceDue };
           };
-          '''
-          if old_round not in text:
-            raise SystemExit("Could not find roundMoney block")
-          text = text.replace(old_round, new_round, 1)
+          ''',
+              "billing helper",
+          )
 
-          old_initialize = '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
+          text = replace_once(
+              text,
+              '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
               const paidSoFar = Math.max(Number(student.initialPaymentAmount || 0), 0);
               const balanceDue = Number.isFinite(Number(student.balanceDue))
                 ? Math.max(Number(student.balanceDue), 0)
                 : Math.max(tuitionFee - paidSoFar, 0);
-          '''
-          new_initialize = '''    const { tuitionFee, paidSoFar, balanceDue } = getStudentBillingTotals(student);
-          '''
-          if old_initialize not in text:
-            raise SystemExit("Could not find initialize billing block")
-          text = text.replace(old_initialize, new_initialize, 1)
+          ''',
+              '''    const { tuitionFee, paidSoFar, balanceDue } = getStudentBillingTotals(student);
+          ''',
+              "initialize billing",
+          )
 
-          old_webhook = '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
+          text = replace_once(
+              text,
+              '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
               const priorPaid = Math.max(Number(student.initialPaymentAmount || 0), 0);
               const priorBalanceDue = Number.isFinite(Number(student.balanceDue))
                 ? Math.max(Number(student.balanceDue), 0)
                 : Math.max(tuitionFee - priorPaid, 0);
-          '''
-          new_webhook = '''    const {
+          ''',
+              '''    const {
                 tuitionFee,
                 paidSoFar: priorPaid,
                 balanceDue: priorBalanceDue,
               } = getStudentBillingTotals(student);
-          '''
-          if old_webhook not in text:
-            raise SystemExit("Could not find webhook billing block")
-          text = text.replace(old_webhook, new_webhook, 1)
+          ''',
+              "webhook billing",
+          )
 
-          old_updates = '''    const updates = {
+          text = replace_once(
+              text,
+              '''    const updates = {
               initialPaymentAmount: totalPaid,
               balanceDue,
-          '''
-          new_updates = '''    const updates = {
+          ''',
+              '''    const updates = {
               paid: totalPaid,
               initialPaymentAmount: totalPaid,
               balanceDue,
-          '''
-          if old_updates not in text:
-            raise SystemExit("Could not find payment update block")
-          text = text.replace(old_updates, new_updates, 1)
+          ''',
+              "payment updates",
+          )
 
           path.write_text(text)
-
-          workflow = Path(".github/workflows/fix-paystack-final-balance.yml")
-          workflow.unlink()
+          Path(".github/workflows/fix-paystack-final-balance.yml").unlink()
           PY
 
       - name: Validate backend syntax
