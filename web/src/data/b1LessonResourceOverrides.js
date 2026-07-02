@@ -102,6 +102,18 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
   }),
+  20: Object.freeze({
+    chapter: "6.20",
+    title: "Wie wird man …?",
+    grammarBook: "",
+    workbook: "/campus/course/lesson/B1/20?view=workbook",
+    grammarTopic:
+      "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
+    goal:
+      "Über Ausbildung, Qualifikationen und Karrierewege in verschiedenen Berufen strukturiert sprechen.",
+    instruction:
+      "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Teil 1 is group practice; submit only Schreiben and Lesen through the Submit tab.",
+  }),
   21: Object.freeze({
     chapter: "7.21",
     title: "Lebensformen heute",
@@ -112,7 +124,35 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal:
       "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
     instruction:
-      "Lies zuerst die in-app Grammatiknotizen zum Abwägen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+      "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Teil 1 is group practice; submit only Schreiben and Lesen through the Submit tab.",
+  }),
+  22: Object.freeze({
+    chapter: "7.22",
+    workbook: "/campus/course/lesson/B1/22?view=workbook",
+  }),
+  23: Object.freeze({
+    chapter: "7.23",
+    workbook: "/campus/course/lesson/B1/23?view=workbook",
+  }),
+  24: Object.freeze({
+    chapter: "8.24",
+    workbook: "/campus/course/lesson/B1/24?view=workbook",
+  }),
+  25: Object.freeze({
+    chapter: "8.25",
+    workbook: "/campus/course/lesson/B1/25?view=workbook",
+  }),
+  26: Object.freeze({
+    chapter: "9.26",
+    workbook: "/campus/course/lesson/B1/26?view=workbook",
+  }),
+  27: Object.freeze({
+    chapter: "10.27",
+    workbook: "/campus/course/lesson/B1/27?view=workbook",
+  }),
+  28: Object.freeze({
+    chapter: "10.28",
+    workbook: "/campus/course/lesson/B1/28?view=workbook",
   }),
 });
 

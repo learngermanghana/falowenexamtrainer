@@ -1269,8 +1269,8 @@ const lessonCatalog = Object.freeze([
     "title": "Das Vorstellungsgespräch 6.19",
     "assignmentId": "B1-6.19",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "/campus/course/lesson/B1/19?view=grammar",
-    "workbookRoute": "/campus/course/lesson/B1/19?view=workbook",
+    "grammarPage": "https://drive.google.com/file/d/1IimP5JZHHvUYkDSuE7F-YI-Z4PeMYad2/view?usp=sharing",
+    "workbookRoute": "https://drive.google.com/file/d/1fHjQGvObAE3TBmnstPhQBm5RUooP_NyJ/view?usp=sharing",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1284,7 +1284,7 @@ const lessonCatalog = Object.freeze([
     "title": "Wie wird man …? (Ausbildung und Qu) 6.20",
     "assignmentId": "B1-6.20",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/1kfFEDI3ufCCndSi-LhfMFYEdih58D5XQ/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/20?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1298,8 +1298,8 @@ const lessonCatalog = Object.freeze([
     "title": "Lebensformen heute – Familie, Wohnge 7.21",
     "assignmentId": "B1-7.21",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "https://drive.google.com/file/d/1-5hQoiAohD-lB-keyi7mTidjw8YJbvgT/view?usp=sharing",
-    "workbookRoute": "https://drive.google.com/file/d/1y9B__4gEvvdgNzaD17SSWJO0TVRYxFBa/view?usp=sharing",
+    "grammarPage": "/campus/course/lesson/B1/21?view=grammar",
+    "workbookRoute": "/campus/course/lesson/B1/21?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1314,7 +1314,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.22",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
-    "workbookRoute": "https://drive.google.com/file/d/15H7jEA7zkl4c58rhybkKPjN1eqK7mPoM/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/22?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1328,7 +1328,7 @@ const lessonCatalog = Object.freeze([
     "title": "Erstes Date – Typische Situationen 7.23",
     "assignmentId": "B1-7.23",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/1DZxrsgU-vZPGrQAqLuYP3Q3U6KCFy-Cy/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/23?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1342,7 +1342,7 @@ const lessonCatalog = Object.freeze([
     "title": "Konsum und Nachhaltigkeit 8.24",
     "assignmentId": "B1-8.24",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/1x8IM6xcjR2hv3jbnnNudjyxLWPiT0-VL/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/24?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1356,7 +1356,7 @@ const lessonCatalog = Object.freeze([
     "title": "Online einkaufen – Rechte und Risiken 8.25",
     "assignmentId": "B1-8.25",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
+    "workbookRoute": "/campus/course/lesson/B1/25?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1370,7 +1370,7 @@ const lessonCatalog = Object.freeze([
     "title": "Reiseprobleme und Lösungen 9.26",
     "assignmentId": "B1-9.26",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/1BMwDDkfPJVEhL3wHNYqGMAvjOts9tv24/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/26?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1384,7 +1384,7 @@ const lessonCatalog = Object.freeze([
     "title": "Umweltfreundlich im Alltag 10.27",
     "assignmentId": "B1-10.27",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/15fjOKp_u75GfcbvRJVbR8UbHg-cgrgWL/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/27?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1398,7 +1398,7 @@ const lessonCatalog = Object.freeze([
     "title": "Klimafreundlich leben 10.28",
     "assignmentId": "B1-10.28",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "https://drive.google.com/file/d/1iBeZHMDq_FnusY4kkRwRQvyOfm51-COU/view?usp=sharing",
+    "workbookRoute": "/campus/course/lesson/B1/28?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
