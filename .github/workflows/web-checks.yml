@@ -35,7 +35,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
 
   regression-tests:
     runs-on: ubuntu-latest
@@ -58,37 +58,37 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/services/attendanceService.test.js
+        run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js
 
       - name: Test speaking tools
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js
 
       - name: Test inline course submissions
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/CourseLessonInlineSubmission.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/CourseLessonInlineSubmission.test.js
 
       - name: Test workbook route matching
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
 
       - name: Test workbook tabs and lock identities
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/utils/courseWorkbookSubmission.test.js
+        run: npm run test:ci -- --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
       - name: Test A2 and B1 workbook navigation
         working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runInBand --runTestsByPath src/components/A2B1CourseBook.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2B1CourseBook.test.js
 
   build:
     runs-on: ubuntu-latest

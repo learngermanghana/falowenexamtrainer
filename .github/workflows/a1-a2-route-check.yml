@@ -25,6 +25,6 @@ jobs:
       - working-directory: web
         env:
           CI: true
-        run: npm test -- --watchAll=false --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
       - working-directory: web
         run: npm run build
