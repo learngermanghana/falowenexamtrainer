@@ -133,6 +133,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Ausbildung, Qualifikationen und Karrierewege ein. Danach gehst du weiter zum Workbook.",
     },
+    21: {
+      key: "b1-day21-lebensformen-heute-falowen-radio",
+      title: "Lebensformen heute 7.21",
+      youtubeId: "yY7uUgJr31g",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Familie, Wohngemeinschaft, Singleleben und moderne Lebensformen ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
