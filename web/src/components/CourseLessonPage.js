@@ -17,6 +17,7 @@ import B1Day7FastFoodHausmannskostGrammarNotesPage from "./B1Day7FastFoodHausman
 import B1Day8AllesFuerDieGesundheitWorkbookPage from "./B1Day8AllesFuerDieGesundheitWorkbookPage";
 import B1Day8AllesFuerDieGesundheitGrammarNotesPage from "./B1Day8AllesFuerDieGesundheitGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
+import B1Day20WieWirdManWorkbookPage from "./B1Day20WieWirdManWorkbookPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
@@ -51,6 +52,7 @@ const B1_WORKBOOK_PAGES = {
   7: B1Day7FastFoodHausmannskostWorkbookPage,
   8: B1Day8AllesFuerDieGesundheitWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
+  20: B1Day20WieWirdManWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
