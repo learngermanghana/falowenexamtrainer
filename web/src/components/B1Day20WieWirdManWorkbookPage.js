@@ -17,7 +17,7 @@ const config = {
     image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "A group discussing professions and career paths",
     ideaTitle: "Vorbereitung für die Gruppendiskussion",
-    ideaIntro: "Wähle nur die Punkte, die zu deinem Beruf passen. Für diese B1-Aufgabe musst du keine Brain Map erstellen.",
+    ideaIntro: "Wähle nur die Punkte, die zu deinem Beruf und deiner Präsentation passen.",
     activityTitle: "Beruf kennen: Themen und Leitfragen",
     activityOrdered: true,
     activityPoints: [
