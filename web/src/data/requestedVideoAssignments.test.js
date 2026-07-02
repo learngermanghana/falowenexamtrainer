@@ -12,6 +12,15 @@ describe("requested video assignments", () => {
     );
   });
 
+  test("B1 Day 21 Lebensformen heute uses the requested Falowen Radio video", () => {
+    expect(getLessonRadioResource("B1", 21)).toEqual(
+      expect.objectContaining({
+        title: "Lebensformen heute 7.21",
+        youtubeId: "yY7uUgJr31g",
+      })
+    );
+  });
+
   test("B1 Day 7 Fast Food vs. Hausmannskost uses the requested AI video", () => {
     expect(getB1LessonResourceOverride(7)).toEqual(
       expect.objectContaining({
