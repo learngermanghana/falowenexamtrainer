@@ -23,6 +23,7 @@ const COMPLETION_JOURNEYS = {
   },
   A2: {
     ...DEFAULT_COMPLETION_JOURNEY,
+    videoUrl: "https://youtu.be/Qw54j9GiMd4",
     title: "After A2: prepare for the Goethe A2 exam",
     completedTitle: "You finished the A2 Course Book — now prepare for the exam",
   },
