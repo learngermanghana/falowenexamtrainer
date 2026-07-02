@@ -7,7 +7,7 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v11`;
+const CACHE_NAME = `${CACHE_PREFIX}-v12`;
 const OFFLINE_URL = "/offline.html";
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
@@ -224,7 +224,7 @@ const handleNavigationRequest = async (request) => {
 
 const handleStaticRequest = async (request) => {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: "no-store" });
     return await cacheNetworkResponse(request, response);
   } catch (error) {
     const cached = await caches.match(request);
