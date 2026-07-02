@@ -13,15 +13,27 @@ export const STANDARD_WORKBOOK_TABS = [
 const TabButton = ({ active, onClick, children }) => (
   <button
     type="button"
+    role="tab"
+    aria-selected={active}
     onClick={onClick}
     style={{
       ...styles.secondaryButton,
-      borderColor: active ? "#2563eb" : "#d1d5db",
-      background: active ? "#2563eb" : "#fff",
-      color: active ? "#fff" : "#1d4ed8",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      minWidth: 0,
+      minHeight: 44,
+      padding: "10px 12px",
+      border: active ? "2px solid #1d4ed8" : "1px solid #cbd5e1",
+      borderRadius: 10,
+      background: active ? "#2563eb" : "#ffffff",
+      color: active ? "#ffffff" : "#1d4ed8",
       fontWeight: 800,
-      flex: "0 0 auto",
-      minWidth: 74,
+      lineHeight: 1.2,
+      opacity: 1,
+      visibility: "visible",
+      cursor: "pointer",
     }}
   >
     {children}
@@ -37,11 +49,36 @@ export const WorkbookTabNav = ({
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
 
   return (
-    <div style={{ display: "grid", gap: 8 }}>
+    <nav
+      aria-label={ariaLabel}
+      data-workbook-tab-navigation
+      style={{
+        position: "relative",
+        zIndex: 30,
+        display: "grid",
+        gap: 8,
+        width: "100%",
+        padding: 10,
+        border: "2px solid #2563eb",
+        borderRadius: 14,
+        background: "#ffffff",
+        boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+        opacity: 1,
+        visibility: "visible",
+      }}
+    >
       <div
         role="tablist"
         aria-label={ariaLabel}
-        style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(82px, 1fr))",
+          gap: 8,
+          width: "100%",
+          overflow: "visible",
+          opacity: 1,
+          visibility: "visible",
+        }}
       >
         {tabs.map((tab) => (
           <TabButton
@@ -54,10 +91,10 @@ export const WorkbookTabNav = ({
         ))}
       </div>
 
-      <p style={{ margin: 0, color: "#4b5563" }}>
-        Tab {activeIndex + 1} of {tabs.length}
+      <p style={{ margin: 0, color: "#475569", fontWeight: 700, fontSize: 13 }}>
+        Tab {activeIndex + 1} of {tabs.length} · Select Teil 1, Teil 2, Teil 3, Teil 4, Ref or Submit.
       </p>
-    </div>
+    </nav>
   );
 };
 
