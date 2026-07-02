@@ -1,6 +1,5 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
-import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 
 const config = {
   day: 21,
@@ -98,9 +97,5 @@ const config = {
 };
 
 export default function B1Day21LebensformenHeuteWorkbookPage() {
-  return (
-    <RadioFirstWorkbookGate level="B1" day={21}>
-      <B1StandardWorkbookPage config={config} />
-    </RadioFirstWorkbookGate>
-  );
+  return <B1StandardWorkbookPage config={config} />;
 }
