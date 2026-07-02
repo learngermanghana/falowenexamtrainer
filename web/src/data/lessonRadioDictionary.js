@@ -101,10 +101,18 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Wohnungssuche in Deutschland ein. Danach gehst du weiter zum Workbook.",
     },
+    6: {
+      key: "b1-day6-stadt-oder-land-falowen-radio",
+      title: "Leben in der Stadt oder auf dem Land? 2.6",
+      youtubeId: "houqw5Dg3eY",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf den Vergleich zwischen Stadt- und Landleben ein. Danach gehst du weiter zum Workbook.",
+    },
     7: {
       key: "b1-day7-fast-food-hausmannskost-falowen-radio",
       title: "Fast Food vs. Hausmannskost 3.7",
-      youtubeId: "y5wqJv8_GMI",
+      youtubeId: "ugKmSqTMiQc",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Fast Food und Hausmannskost ein. Danach gehst du weiter zum Workbook.",
