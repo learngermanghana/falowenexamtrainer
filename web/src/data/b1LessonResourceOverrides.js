@@ -118,7 +118,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     chapter: "6.20",
     title: "Wie wird man …?",
     grammarBook: "",
-    workbook: "/campus/course/lesson/B1/20?view=workbook",
+    workbook: "",
     grammarTopic:
       "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
     goal:

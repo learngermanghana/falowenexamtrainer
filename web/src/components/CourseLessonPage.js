@@ -23,7 +23,6 @@ import B1Day10DigitaleAuszeitGrammarNotesPage from "./B1Day10DigitaleAuszeitGram
 import B1Day11TeamspieleWorkbookPage from "./B1Day11TeamspieleWorkbookPage";
 import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
-import B1Day20WieWirdManWorkbookPage from "./B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./B1Day22BeziehungWichtigWorkbookPage";
@@ -73,7 +72,6 @@ const B1_WORKBOOK_PAGES = {
   10: B1Day10DigitaleAuszeitWorkbookPage,
   11: B1Day11TeamspieleWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
-  20: B1Day20WieWirdManWorkbookPage,
   21: B1Day21LebensformenHeuteWorkbookPage,
   22: B1Day22BeziehungWichtigWorkbookPage,
   23: B1Day23ErstesDateWorkbookPage,
