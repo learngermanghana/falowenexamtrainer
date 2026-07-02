@@ -1,0 +1,132 @@
+name: Fix Paystack final balance detection
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/fix-paystack-final-balance.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Align backend billing fields with frontend
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("functions/functionz/paymentAwareApp.js")
+          text = path.read_text()
+
+          old_round = '''const roundMoney = (value) =>
+            Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+          '''
+          new_round = '''const roundMoney = (value) =>
+            Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+          const parseMoney = (value) => {
+            if (typeof value === "number") return Number.isFinite(value) ? value : Number.NaN;
+            if (value === null || value === undefined || value === "") return Number.NaN;
+            const normalized = String(value)
+              .replace(/,/g, "")
+              .replace(/[^0-9.-]/g, "");
+            const parsed = Number(normalized);
+            return Number.isFinite(parsed) ? parsed : Number.NaN;
+          };
+
+          const getStudentBillingTotals = (student = {}) => {
+            const parsedTuition = parseMoney(student.tuitionFee);
+            const tuitionFee = Number.isFinite(parsedTuition) ? Math.max(parsedTuition, 0) : 0;
+
+            const paidCandidates = [
+              student.paid,
+              student.initialPaymentAmount,
+              student.paidAmount,
+            ];
+            const parsedPaid = paidCandidates
+              .map(parseMoney)
+              .find((value) => Number.isFinite(value));
+            const paidSoFar = Number.isFinite(parsedPaid) ? Math.max(parsedPaid, 0) : 0;
+
+            const explicitBalanceRaw = student.balanceDue ?? student.balance;
+            const parsedExplicitBalance = parseMoney(explicitBalanceRaw);
+            const explicitBalance = Number.isFinite(parsedExplicitBalance)
+              ? Math.max(parsedExplicitBalance, 0)
+              : null;
+            const derivedBalance = Math.max(roundMoney(tuitionFee - paidSoFar), 0);
+            const balanceDue = explicitBalance === null
+              ? derivedBalance
+              : Math.min(explicitBalance, derivedBalance);
+
+            return { tuitionFee, paidSoFar, balanceDue };
+          };
+          '''
+          if old_round not in text:
+            raise SystemExit("Could not find roundMoney block")
+          text = text.replace(old_round, new_round, 1)
+
+          old_initialize = '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
+              const paidSoFar = Math.max(Number(student.initialPaymentAmount || 0), 0);
+              const balanceDue = Number.isFinite(Number(student.balanceDue))
+                ? Math.max(Number(student.balanceDue), 0)
+                : Math.max(tuitionFee - paidSoFar, 0);
+          '''
+          new_initialize = '''    const { tuitionFee, paidSoFar, balanceDue } = getStudentBillingTotals(student);
+          '''
+          if old_initialize not in text:
+            raise SystemExit("Could not find initialize billing block")
+          text = text.replace(old_initialize, new_initialize, 1)
+
+          old_webhook = '''    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
+              const priorPaid = Math.max(Number(student.initialPaymentAmount || 0), 0);
+              const priorBalanceDue = Number.isFinite(Number(student.balanceDue))
+                ? Math.max(Number(student.balanceDue), 0)
+                : Math.max(tuitionFee - priorPaid, 0);
+          '''
+          new_webhook = '''    const {
+                tuitionFee,
+                paidSoFar: priorPaid,
+                balanceDue: priorBalanceDue,
+              } = getStudentBillingTotals(student);
+          '''
+          if old_webhook not in text:
+            raise SystemExit("Could not find webhook billing block")
+          text = text.replace(old_webhook, new_webhook, 1)
+
+          old_updates = '''    const updates = {
+              initialPaymentAmount: totalPaid,
+              balanceDue,
+          '''
+          new_updates = '''    const updates = {
+              paid: totalPaid,
+              initialPaymentAmount: totalPaid,
+              balanceDue,
+          '''
+          if old_updates not in text:
+            raise SystemExit("Could not find payment update block")
+          text = text.replace(old_updates, new_updates, 1)
+
+          path.write_text(text)
+
+          workflow = Path(".github/workflows/fix-paystack-final-balance.yml")
+          workflow.unlink()
+          PY
+
+      - name: Validate backend syntax
+        run: node --check functions/functionz/paymentAwareApp.js
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add functions/functionz/paymentAwareApp.js .github/workflows/fix-paystack-final-balance.yml
+          git commit -m "Fix Paystack final balance detection"
+          git push origin main
