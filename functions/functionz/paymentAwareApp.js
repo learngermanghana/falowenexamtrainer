@@ -26,6 +26,45 @@ app.use(
 const roundMoney = (value) =>
   Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
+const parseMoney = (value) => {
+  if (typeof value === "number") return Number.isFinite(value) ? roundMoney(value) : null;
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(/,/g, "").replace(/[^0-9.-]/g, "").trim();
+  if (!normalized || normalized === "-" || normalized === ".") return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? roundMoney(parsed) : null;
+};
+
+const firstValidMoney = (...values) => {
+  for (const value of values) {
+    const parsed = parseMoney(value);
+    if (parsed !== null) return Math.max(parsed, 0);
+  }
+  return null;
+};
+
+const normalizeStudentBilling = (student = {}) => {
+  const tuitionFee = firstValidMoney(student.tuitionFee) ?? 0;
+  const paidSoFar = firstValidMoney(
+    student.paid,
+    student.initialPaymentAmount,
+    student.paidAmount
+  ) ?? 0;
+  const explicitBalance = firstValidMoney(student.balanceDue, student.balance);
+  const derivedBalance = Math.max(roundMoney(tuitionFee - paidSoFar), 0);
+  const effectiveBalance = explicitBalance === null
+    ? derivedBalance
+    : Math.min(explicitBalance, derivedBalance);
+
+  return {
+    tuitionFee,
+    paidSoFar,
+    explicitBalance,
+    derivedBalance,
+    effectiveBalance: Math.max(roundMoney(effectiveBalance), 0),
+  };
+};
+
 const safeEqualHex = (first, second) => {
   if (!first || !second) return false;
   const a = String(first);
@@ -127,11 +166,7 @@ app.post("/paystack/initialize", async (req, res) => {
       return res.status(403).json({ error: "Not authorized for this student" });
     }
 
-    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
-    const paidSoFar = Math.max(Number(student.initialPaymentAmount || 0), 0);
-    const balanceDue = Number.isFinite(Number(student.balanceDue))
-      ? Math.max(Number(student.balanceDue), 0)
-      : Math.max(tuitionFee - paidSoFar, 0);
+    const { tuitionFee, paidSoFar, effectiveBalance: balanceDue } = normalizeStudentBilling(student);
 
     if (balanceDue <= 0) return res.status(400).json({ error: "No balance due" });
     if (tuitionAmount > balanceDue * (1 + PAYSTACK_OVERPAY_TOLERANCE_RATE)) {
@@ -336,11 +371,8 @@ app.post("/paystack/webhook", async (req, res) => {
     if (!match) return reject("student_not_found", { studentCode, email });
 
     const student = match.snap.data() || {};
-    const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
-    const priorPaid = Math.max(Number(student.initialPaymentAmount || 0), 0);
-    const priorBalanceDue = Number.isFinite(Number(student.balanceDue))
-      ? Math.max(Number(student.balanceDue), 0)
-      : Math.max(tuitionFee - priorPaid, 0);
+    const { tuitionFee, paidSoFar: priorPaid, effectiveBalance: priorBalanceDue } =
+      normalizeStudentBilling(student);
 
     const checkoutAmountPaid = roundMoney(Number(data.amount || 0) / 100);
     const metadataTuitionAmount = Number(
@@ -459,6 +491,7 @@ app.post("/paystack/webhook", async (req, res) => {
     const queuedUpgradeLevel = String(student.upgradeToLevel || "").toUpperCase();
     const applyUpgrade = Boolean(queuedUpgradeLevel) && paymentStatus === "paid";
     const updates = {
+      paid: totalPaid,
       initialPaymentAmount: totalPaid,
       balanceDue,
       paymentStatus,
@@ -544,3 +577,5 @@ app.post("/paystack/webhook", async (req, res) => {
 app.use(legacyApp);
 
 module.exports = app;
+module.exports.parseMoney = parseMoney;
+module.exports.normalizeStudentBilling = normalizeStudentBilling;
