@@ -2,13 +2,31 @@ import React from "react";
 import { styles } from "../styles";
 
 export const STANDARD_WORKBOOK_TABS = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "sprechen", label: "Teil 1" },
+  { key: "schreiben", label: "Teil 2" },
+  { key: "lesen", label: "Teil 3" },
+  { key: "hoeren", label: "Teil 4" },
   { key: "references", label: "Ref" },
   { key: "submit", label: "Submit" },
 ];
+
+const TabButton = ({ active, onClick, children }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    style={{
+      ...styles.secondaryButton,
+      borderColor: active ? "#2563eb" : "#d1d5db",
+      background: active ? "#2563eb" : "#fff",
+      color: active ? "#fff" : "#1d4ed8",
+      fontWeight: 800,
+      flex: "0 0 auto",
+      minWidth: 74,
+    }}
+  >
+    {children}
+  </button>
+);
 
 export const WorkbookTabNav = ({
   activeTab,
@@ -17,79 +35,27 @@ export const WorkbookTabNav = ({
   ariaLabel = "Workbook sections",
 }) => {
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
-  const activeLabel = tabs[activeIndex]?.label || "Workbook";
 
   return (
-    <div style={{ display: "grid", gap: 10 }}>
-      <label style={{ display: "grid", gap: 6, fontWeight: 900, color: "#1e3a8a" }}>
-        Teil auswählen
-        <select
-          value={activeTab}
-          onChange={(event) => onChange(event.target.value)}
-          aria-label={`${ariaLabel} selector`}
-          style={{
-            width: "100%",
-            minHeight: 48,
-            padding: "10px 12px",
-            border: "2px solid #2563eb",
-            borderRadius: 10,
-            background: "#fff",
-            color: "#111827",
-            fontSize: 16,
-            fontWeight: 800,
-          }}
-        >
-          {tabs.map((tab) => (
-            <option key={tab.key} value={tab.key}>{tab.label}</option>
-          ))}
-        </select>
-      </label>
-
-      <nav
+    <div style={{ display: "grid", gap: 8 }}>
+      <div
+        role="tablist"
         aria-label={ariaLabel}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
-          gap: 8,
-          padding: 10,
-          border: "2px solid #bfdbfe",
-          borderRadius: 12,
-          background: "#eff6ff",
-          boxShadow: "0 8px 18px rgba(30, 64, 175, 0.08)",
-        }}
+        style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}
       >
-        {tabs.map((tab) => {
-          const selected = tab.key === activeTab;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onChange(tab.key)}
-              style={{
-                ...styles.secondaryButton,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                minHeight: 46,
-                borderRadius: 10,
-                background: selected ? "#2563eb" : "#fff",
-                borderColor: selected ? "#2563eb" : "#93c5fd",
-                color: selected ? "#fff" : "#1d4ed8",
-                fontWeight: 900,
-                whiteSpace: "normal",
-                textAlign: "center",
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </nav>
+        {tabs.map((tab) => (
+          <TabButton
+            key={tab.key}
+            active={tab.key === activeTab}
+            onClick={() => onChange(tab.key)}
+          >
+            {tab.label}
+          </TabButton>
+        ))}
+      </div>
 
-      <p style={{ margin: 0, color: "#475569", fontSize: 14 }}>
-        Open section: <strong>{activeLabel}</strong> · {activeIndex + 1} of {tabs.length}
+      <p style={{ margin: 0, color: "#4b5563" }}>
+        Tab {activeIndex + 1} of {tabs.length}
       </p>
     </div>
   );
