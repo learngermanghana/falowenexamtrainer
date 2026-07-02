@@ -1,7 +1,6 @@
 import React, { Fragment, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
-import { getRouteSpeakingMindMap } from "../data/speakingMindMaps/routeMindMaps";
 import SpeakingMindMap from "./SpeakingMindMap";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
@@ -34,13 +33,14 @@ const routeWritingContext = () => {
 const routeSpeakingMindMap = () => {
   const path = currentPath();
 
-  // The historical URL says "day-2", but the A2 course schedule correctly
-  // identifies Small Talk 1.1 as the first teaching lesson (Day 1).
+  // Mind-map speaking support is reserved for A2 workbooks.
+  // The historical URL says "day-2", but the A2 schedule identifies
+  // Small Talk 1.1 as the first teaching lesson (Day 1).
   if (path.includes("/campus/course/a2-day-2-small-talk-workbook")) {
     return getA2SpeakingMindMap(1);
   }
 
-  return getRouteSpeakingMindMap(path);
+  return null;
 };
 
 const practiceConfig = {
