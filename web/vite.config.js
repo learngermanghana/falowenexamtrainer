@@ -9,7 +9,24 @@ const getClientEnv = (mode) => {
 };
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [
+    react({
+      include: /\.[jt]sx?$/,
+    }),
+  ],
+  esbuild: {
+    loader: 'jsx',
+    include: /src\/.*\.(js|jsx)$/,
+    exclude: [],
+    jsx: 'automatic',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx',
+      },
+    },
+  },
   define: {
     'process.env': JSON.stringify({
       ...getClientEnv(mode),
