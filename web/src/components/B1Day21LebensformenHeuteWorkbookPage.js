@@ -1,406 +1,122 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-
-import { styles } from "../styles";
-import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { STANDARD_WORKBOOK_TABS, WorkbookTabNav, WorkbookTaskCard } from "./StandardWorkbookComponents";
+import { styles } from "../styles";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
+const LISTENING_YOUTUBE_ID = "iyydRu3oY4I";
+const card = { ...styles.card, display: "grid", gap: 14 };
+const title = { margin: 0, fontSize: "1.15rem" };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+const box = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 13, background: "#fff", display: "grid", gap: 7, lineHeight: 1.7 };
+
+const branches = [
+  { title: "Familie", items: ["Traditionelle Familie", "Alleinerziehende Eltern", "Patchworkfamilien", "Rollenverteilung"] },
+  { title: "Wohngemeinschaft (WG)", items: ["Studenten-WG", "geteilte Kosten und Gemeinschaft", "Privatsphäre und Konflikte", "Organisation im Alltag"] },
+  { title: "Singleleben", items: ["Unabhängigkeit", "Selbstverwirklichung", "Einsamkeit", "flexible Lebensgestaltung"] },
+  { title: "Neue Lebensformen", items: ["gleichgeschlechtliche Partnerschaften", "Fernbeziehungen", "Wohnen auf Zeit", "Co-Parenting"] },
 ];
 
-const speakingBranches = [
-  "Kommunikation (Communication)",
-  "Vertrauen und Ehrlichkeit (Trust and honesty)",
-  "Gemeinsame Interessen (Shared interests)",
-  "Respekt und Unterstützung (Respect and support)",
-  "Zukunftspläne (Future plans)",
+const readingQuestions = [
+  { stem: "1. Warum ging Frau Müller ins Ausland?", options: ["a) Sie wollte Urlaub machen.", "b) Sie wollte Auslandserfahrung sammeln.", "c) Sie wollte ihre Eltern besuchen.", "d) Sie wollte einen Mann kennenlernen."] },
+  { stem: "2. In welchem Land sammelte Frau Müller Auslandserfahrungen?", options: ["a) Niederlande", "b) Hessen", "c) Nordrhein-Westfalen", "d) Österreich"] },
+  { stem: "3. Hat Frau Müller Kinder?", options: ["a) Ja, einen Sohn und eine Tochter.", "b) Nein.", "c) Ja, einen Sohn.", "d) Ja, zwei Söhne."] },
+  { stem: "4. Hat Frau Müller Geschwister?", options: ["a) Nein.", "b) Ja, zwei Brüder.", "c) Das steht nicht im Text.", "d) Ja, fünf Geschwister."] },
+  { stem: "5. Warum möchte Frau Müller wieder nach Nordrhein-Westfalen umziehen?", options: ["a) Weil ihr Mann aus Nordrhein-Westfalen ist.", "b) Weil sie arbeitslos ist.", "c) Weil ihre Eltern dort wohnen.", "d) Weil ihre Geschwister dort wohnen."] },
 ];
 
-const speakingSubBranches = [
-  {
-    title: "Kommunikation",
-    items: [
-      "Offen reden können (Being able to speak openly)",
-      "Zuhören (Listening)",
-      "Probleme gemeinsam lösen (Solving problems together)",
-      "Regelmäßiger Austausch (Regular conversations)",
-    ],
-  },
-  {
-    title: "Vertrauen und Ehrlichkeit",
-    items: [
-      "Treue (Loyalty)",
-      "Keine Geheimnisse (No secrets)",
-      "Ehrliche Meinungen teilen (Sharing honest opinions)",
-      "Verlässlichkeit (Reliability)",
-    ],
-  },
-  {
-    title: "Gemeinsame Interessen",
-    items: [
-      "Hobbys teilen (Sharing hobbies)",
-      "Gemeinsame Unternehmungen (Doing things together)",
-      "Gemeinsamer Humor (Shared sense of humor)",
-      "Musik, Filme oder Sport (Music, movies, or sports)",
-    ],
-  },
-  {
-    title: "Respekt und Unterstützung",
-    items: [
-      "Den anderen akzeptieren (Accepting the other person)",
-      "Unterstützung im Alltag (Support in daily life)",
-      "Verständnis zeigen (Showing understanding)",
-      "Keine Kontrolle oder Eifersucht (No control or jealousy)",
-    ],
-  },
-  {
-    title: "Zukunftspläne",
-    items: [
-      "Zusammenleben (Living together)",
-      "Familie planen (Planning a family)",
-      "Gemeinsame Ziele (Common goals)",
-      "Vertrauen in die gemeinsame Zukunft (Trust in a shared future)",
-    ],
-  },
-];
-
-const profileQuestions = [
-  "Wie heißen Sie? (Geben Sie einen fiktiven Namen an, den Sie in Ihrem Profil verwenden möchten.)",
-  "Wie alt sind Sie? (Wählen Sie ein Alter, das Sie in Ihrem Profil angeben möchten.)",
-  "Wo wohnen Sie? (Geben Sie eine Stadt oder Region an, in der Sie leben.)",
-  "Welche Hobbys und Interessen haben Sie? (Nennen Sie mindestens drei Hobbys oder Interessen, die Sie in Ihrem Profil erwähnen möchten.)",
-  "Was suchen Sie in einer Beziehung? (Beschreiben Sie, was Ihnen in einer Beziehung wichtig ist, z.B. Ehrlichkeit, gemeinsame Interessen, Humor.)",
-  "Welche Eigenschaften schätzen Sie an einem Partner? (Nennen Sie mindestens drei Eigenschaften, die Ihnen bei einem potenziellen Partner wichtig sind.)",
-  "Was möchten Sie über sich selbst mitteilen? (Schreiben Sie einen kurzen Absatz über Ihre Persönlichkeit oder was Sie einzigartig macht.)",
-  "Gibt es etwas, das Ihr idealer Partner unbedingt haben sollte? (Z.B. Vorlieben, Lebensstil oder Werte, die Ihnen wichtig sind.)",
-  "Wie würden Sie Ihre Persönlichkeit in drei Worten beschreiben?",
-  "Was sind Ihre Lieblingsaktivitäten am Wochenende? (Nennen Sie mindestens zwei Aktivitäten, die Sie gerne in Ihrer Freizeit machen.)",
-  "Wie wichtig ist Ihnen die Kommunikation in einer Beziehung? Warum?",
-  "Haben Sie Haustiere? Möchten Sie, dass Ihr Partner auch Haustiere hat?",
-  "Welche Musik hören Sie gerne? (Nennen Sie ein oder zwei Musikrichtungen oder Lieblingskünstler.)",
-  "Wie stehen Sie zu Reisen? (Reisen Sie gerne? Welche Orte möchten Sie besuchen?)",
-  "Was sind Ihre Lebensziele oder Träume für die Zukunft? (Nennen Sie mindestens ein Ziel oder einen Traum, den Sie verwirklichen möchten.)",
-];
-
-const lesenQuestions = [
-  {
-    stem: "Wie alt ist der Große Tiergarten?",
-    options: ["a) wenige Minuten", "b) wenige Jahre", "c) Das steht nicht im Text.", "d) 500 Jahre"],
-  },
-  {
-    stem: "In der Nähe welches Platzes befinden sich Weltzeituhr und Fernsehturm?",
-    options: ["a) Siegessäule", "b) Alexanderplatz", "c) Brandenburger Tor", "d) Kurfürstendamm"],
-  },
-  {
-    stem: "Was ist der Kurfürstendamm?",
-    options: ["a) Ein Restaurant", "b) Ein Hotel", "c) Eine Hauptstadt", "d) Eine Einkaufsstraße"],
-  },
-  {
-    stem: "Wo arbeitet die Erzählerin?",
-    options: ["a) in einem Geschäft", "b) in einem Restaurant", "c) am Alexanderplatz", "d) in einem Hotel"],
-  },
-  {
-    stem: "Was bietet das Hotel als besonderen Service für seine Gäste?",
-    options: ["a) Fahrkarten für die U-Bahn", "b) eine Weltzeituhr", "c) Stadtrundfahrten", "d) Kostenloses Frühstück"],
-  },
-];
-
-const card = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-};
-
-const sectionTitle = {
-  margin: 0,
-  fontSize: "1.1rem",
-};
-
-const listSpacing = {
-  margin: 0,
-  paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
-const questionCardStyle = {
-  border: "1px solid #e5e7eb",
-  borderRadius: 10,
-  padding: 12,
-  background: "#fff",
-  display: "grid",
-  gap: 6,
-};
-
-const tabImageStyle = {
-  width: "100%",
-  borderRadius: 10,
-  maxHeight: 260,
-  objectFit: "cover",
-};
-
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
-};
-
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-const PreparedCheckbox = ({ checked, onChange }) => (
-  <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-    <input type="checkbox" checked={checked} onChange={onChange} />
-    I prepared this part.
+const Prepared = ({ checked, onChange }) => (
+  <label style={{ display: "inline-flex", gap: 8, alignItems: "center", fontWeight: 700 }}>
+    <input type="checkbox" checked={checked} onChange={onChange} /> I prepared this part.
   </label>
 );
 
-const B1Day21LebensformenHeuteWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({
-    sprechen: false,
-    schreiben: false,
-    lesen: false,
-    hoeren: false,
-  });
+const QuestionList = ({ items }) => <div style={{ display: "grid", gap: 10 }}>{items.map((item) => <div key={item.stem} style={box}><strong>{item.stem}</strong>{item.options.map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+export default function B1Day21LebensformenHeuteWorkbookPage() {
+  const [activeTab, setActiveTab] = useState("sprechen");
+  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
+  const mark = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
+      <header style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 21 · Kapitel 7.21</span>
+        <h1 style={{ ...styles.title, margin: 0 }}>Lebensformen heute</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Select Teil 1–4, Ref or Submit. Each section starts with the exact task.</p>
+        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 21 workbook sections" />
+      </header>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Day 21 Workbook · Lebensformen heute</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Chapter 7.21 · Beziehung und Werte, Partnersuche, Stadtleben und Bewerbungskompetenz.
-        </p>
+      <A2B1WorkbookGuidance level="B1" />
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+      {activeTab === "sprechen" && <section style={card}>
+        <h2 style={title}>Teil 1 · Sprechen (Group Practice)</h2>
+        <WorkbookTaskCard eyebrow="Question of the Day · Speaking" title="Welche Lebensform findest du am besten – Familie, Wohngemeinschaft oder Singleleben? Warum?" practiceOnly submissionNote="Speak for 1–2 minutes. Teil 1 is class preparation and is not submitted.">
+          <p style={{ margin: 0 }}>Beschreiben Sie mehrere Lebensformen, nennen Sie Vor- und Nachteile und erklären Sie genauer, welche Lebensform gut oder nicht gut zu Ihnen passt. Verwenden Sie Redemittel wie „einerseits … andererseits“, „weil“, „obwohl“ und „meiner Meinung nach“.</p>
+        </WorkbookTaskCard>
+        <p style={{ margin: 0, color: "#475569" }}>The supporting notes below are ideas for your discussion. They are not separate questions to answer one by one.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>{branches.map((branch) => <article key={branch.title} style={{ ...box, background: "#f8fafc" }}><h3 style={{ margin: 0 }}>{branch.title}</h3><ul style={list}>{branch.items.map((item) => <li key={item}>{item}</li>)}</ul></article>)}</div>
+        <div style={{ ...box, background: "#f0fdf4", borderColor: "#bbf7d0" }}><strong>Suggested speaking structure</strong><ol style={list}><li>Einleitung: Heute gibt es viele Lebensformen.</li><li>Vergleich: Familie, WG und Singleleben mit Vorteilen und Nachteilen.</li><li>Bewertung: Was ist für Sie wichtiger: Freiheit, Nähe, Kosten oder Sicherheit?</li><li>Persönliche Entscheidung mit Begründung.</li></ol></div>
+        <div style={box}><strong>Useful phrases</strong><ul style={list}><li>Meiner Meinung nach …</li><li>Einerseits …, andererseits …</li><li>Ein Vorteil/Nachteil ist, dass …</li><li>Für mich passt … am besten, weil …</li></ul></div>
+        <CourseInlinePracticePanel type="speaking" />
+        <Prepared checked={prepared.sprechen} onChange={mark("sprechen")} />
+      </section>}
+
+      {activeTab === "schreiben" && <section style={card}>
+        <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
+        <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Welche Lebensform ist heute am besten – Familie, Wohngemeinschaft oder Singleleben? Schreiben Sie Ihre Meinung." submissionNote="Write about 80–100 words and submit your final text in the Submit tab.">
+          <p style={{ margin: 0 }}>Situation: Mara schreibt, dass die beste Lebensform von der persönlichen Situation abhängt. Reagieren Sie auf Maras Meinung. Beschreiben Sie Familie, WG und Singleleben, nennen Sie Vor- und Nachteile und begründen Sie Ihre eigene Meinung.</p>
+        </WorkbookTaskCard>
+        <div style={{ ...box, background: "#eff6ff" }}><strong>Meinung von Mara</strong><p style={{ margin: 0 }}>Heute gibt es viele verschiedene Lebensformen, und jede hat ihre Vorteile. Ich finde, dass die beste Lebensform von der persönlichen Situation abhängt. In einer Familie hat man oft viel Unterstützung und Nähe. In einer Wohngemeinschaft lebt man mit anderen zusammen und kann Kosten teilen. Das Singleleben bietet dagegen viel Freiheit und Unabhängigkeit. Dennoch kann es manchmal auch einsam sein. Ich denke, dass jeder selbst entscheiden sollte, welche Lebensform am besten zu ihm passt. Was denken Sie darüber?</p></div>
+        <div style={box}><strong>Writing support</strong><ol style={list}><li>Einleitung zum Thema.</li><li>Maras Meinung kurz zusammenfassen.</li><li>Vor- und Nachteile vergleichen.</li><li>Eigene Meinung mit Beispiel.</li><li>Kurzer Schluss.</li></ol></div>
+        <CourseInlinePracticePanel type="writing" />
+        <WorkbookSubmissionReminder />
+        <Prepared checked={prepared.schreiben} onChange={mark("schreiben")} />
+      </section>}
+
+      {activeTab === "lesen" && <section style={card}>
+        <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
+        <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie alle fünf Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3D.">
+          <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, a–d, for every question.</p>
+        </WorkbookTaskCard>
+        <h3 style={{ margin: 0 }}>Andrea Müller: Familie an verschiedenen Orten</h3>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>Mein Name ist Andrea Müller und meine Familie lebt nicht gemeinsam an einem Ort, sondern ist über mehrere Bundesländer innerhalb Deutschlands verstreut. Ursprünglich komme ich aus Nordrhein-Westfalen und habe in Köln studiert. Nach Abschluss des Studiums fand ich jedoch nicht gleich eine Arbeit, die mir zusagte und so entschied ich mich, zunächst einmal ins Ausland zu gehen und Erfahrungen zu sammeln.</p>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>Ich lebte zwei Jahre lang in den Niederlanden, wo es mir sehr gut gefiel und ich sowohl meine Englischkenntnisse verbessern, als auch die niederländische Sprache als neue Fremdsprache hinzulernen konnte. Mit dieser internationalen Berufserfahrung und den erweiterten Sprachkenntnissen fand ich eine Anstellung in Hessen.</p>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>Dort lernte ich auch meinen Mann kennen, der ursprünglich aus Bayern stammt. Wir heirateten und bekamen zwei Söhne. In Hessen haben wir uns inzwischen einen größeren Kreis an Freunden und Bekannten aufgebaut, unsere Familien leben jedoch noch immer größtenteils in Nordrhein-Westfalen und Bayern. Hinzu kommt, dass meine fünf Geschwister ebenfalls nicht in Nordrhein-Westfalen sesshaft geworden sind, sondern über die gesamte Bundesrepublik Deutschland verstreut leben.</p>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>Nur bei größeren Familienfesten und Geburtstagen sehen wir uns alle. Ich würde sehr gern in der Nähe meiner Eltern leben, da diese mittlerweile auch ziemlich alt sind und sicherlich bald Unterstützung benötigen. Auch unsere Kinder vermissen die Großeltern und Verwandten oft.</p>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>Unsere mittelfristige Perspektive ist es daher, für meinen Mann und mich in der nächsten Zeit Arbeitsstellen und ein Haus in Nordrhein-Westfalen zu finden.</p>
+        <QuestionList items={readingQuestions} />
+        <WorkbookSubmissionReminder />
+        <Prepared checked={prepared.lesen} onChange={mark("lesen")} />
+      </section>}
+
+      {activeTab === "hoeren" && <section style={card}>
+        <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
+        <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Hören Sie den Goethe-standard Hören-Test und markieren Sie Ihre Ergebnisse selbst." submissionNote="Submit your self-marked Hören result or a short note that you checked the answers in the video.">
+          <p style={{ margin: 0 }}>Listen twice. Focus on the task instructions and the answer choices shown in the video. The answers are provided in the YouTube video, so you are responsible for checking your own Hören results.</p>
+        </WorkbookTaskCard>
+        <iframe src={`https://www.youtube.com/embed/${LISTENING_YOUTUBE_ID}`} title="B1 Day 21 Hören" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 12 }} />
+        <div style={box}><strong>Listening answer format</strong><p style={{ margin: 0 }}>After self-checking, write: „Hören checked: __ / __ correct“ or paste the answers required by your teacher. Remember: Lesen and Schreiben are officially evaluated by the school; Hören is self-marked.</p></div>
+        <WorkbookSubmissionReminder />
+        <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
+      </section>}
+
+      {activeTab === "references" && <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day21LebensformenHeute", level: "B1", day: 21, workbookId: "B1Day21LebensformenHeute" }} workbookId="B1Day21LebensformenHeute" />}
+
+      {activeTab === "submit" && <section style={card}>
+        <h2 style={title}>Submit workbook answers</h2>
+        <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
+          <p style={{ margin: 0 }}>Paste your writing text, reading answer letters and self-marked listening result into the form below.</p>
+        </WorkbookTaskCard>
+        <div className="b1-day21-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+          <style>{`.b1-day21-submission-page > div > section:first-child { display: none !important; }.b1-day21-submission-page select { display: none !important; }`}</style>
+          <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 21, assignmentKey: "B1-7.21", canonicalAssignmentKey: "B1-7.21" }} />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
-      </div>
-
-      <A2B1WorkbookGuidance />
-
-      {activeTab === "sprechen" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1600&q=80"
-            alt="Group conversation about relationships and values"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) (Group Practice)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we&apos;ll engage in group exercises discussing these topics.
-          </p>
-
-          <h3 style={sectionTitle}>Zentrales Thema (Central Topic)</h3>
-          <p style={{ margin: 0 }}>
-            <strong>Beziehung und Werte</strong> (Relationship and values)
-          </p>
-
-          <h3 style={sectionTitle}>🌿 Hauptäste (Main Branches)</h3>
-          <ol style={listSpacing}>
-            {speakingBranches.map((branch) => (
-              <li key={branch}>{branch}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>🌟 Unteräste (Sub-Branches)</h3>
-          <ol style={listSpacing}>
-            {speakingSubBranches.map((branch) => (
-              <li key={branch.title}>
-                <strong>{branch.title}</strong>
-                <ul style={listSpacing}>
-                  {branch.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Sprechthemen zur Partnersuche und Beziehung</h3>
-          <p style={{ margin: 0 }}>
-            Use these profile-building prompts for pair or group practice. You may answer as yourself or create a fictional
-            profile for speaking practice.
-          </p>
-          <ol style={listSpacing}>
-            {profileQuestions.map((question) => (
-              <li key={question}>{question}</li>
-            ))}
-          </ol>
-
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3,
-            and Teil 4.
-          </p>
-
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
-          <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
-        </div>
-      )}
-
-      {activeTab === "schreiben" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Writing practice about online dating and relationships"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Diskussion über Partnersuche und Beziehung</strong>
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Meinung von Maria:</strong> "Ich finde, dass die Partnersuche heutzutage durch das Internet viel einfacher
-            geworden ist. Man hat die Möglichkeit, viele verschiedene Menschen kennenzulernen und schnell herauszufinden,
-            ob man gemeinsame Interessen hat. Allerdings denke ich, dass es auch schwierig sein kann, weil viele Leute sich
-            online anders präsentieren als sie wirklich sind. Manchmal vermisse ich die Zeiten, als man sich noch
-            persönlich kennenlernen musste, um eine Beziehung aufzubauen."
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Frage an den Schüler:</strong> "Was denken Sie über Partnersuche im Internet? Teilen Sie ihre Ansichten oder
-            haben Sie eine andere Meinung? Bitte begründen Sie Ihre Antwort."
-          </p>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Writing guidance before submission</strong>
-            <p style={{ margin: 0 }}>
-              Draft your response first, organize your arguments clearly, and support your opinion with reasons and examples.
-              You can use the Ideas Generator for support before you submit.
-            </p>
-          </div>
-          <p style={{ margin: 0 }}>
-            Submit your final writing in the assignment submission area, not directly on this page.
-          </p>
-
-          <CourseInlinePracticePanel
-            type="writing"
-          />
-          <WorkbookSubmissionReminder />
-          <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
-        </div>
-      )}
-
-      {activeTab === "lesen" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80"
-            alt="Berlin city landmarks for reading comprehension"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
-          <p style={{ margin: 0 }}>
-            Read the text carefully, then complete the multiple-choice task in the assignment submission area. <strong>Do
-            not answer directly on this page.</strong>
-          </p>
-          <h3 style={sectionTitle}>Berlin</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Berlin ist nicht nur Weltmetropole und die Hauptstadt Deutschlands, sondern auch meine Heimatstadt. Jeden
-            Morgen auf dem Weg zur Arbeit komme ich an vielen berühmten Sehenswürdigkeiten vorbei. Da ist zunächst der
-            Große Tiergarten, welcher schon über 500 Jahre alt ist. Von hier ist es nicht weit bis zum Brandenburger Tor
-            und der Siegessäule. Hier steige ich in die U-Bahn und fahre einige Stationen bis zum Alexanderplatz, wo sich
-            die Weltzeituhr und das Wahrzeichen der Stadt, der Fernsehturm, befinden.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Von dort sind es nur wenige Minuten Fußweg bis zum Kurfürstendamm, der riesigen Einkaufsstraße mit zahlreichen
-            Restaurants, Geschäften und Hotels.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Hier arbeite ich als Hotelfachfrau und betreue die zahlreichen Gäste des Hotels, welche als Touristen Berlin
-            besichtigen. Als echte Berlinerin kann ich ihnen dabei gute Tipps geben, welche Sehenswürdigkeiten sich
-            wirklich lohnen und wie sie auf dem besten Wege dorthin gelangen. Sehr oft kommt man so mit den Gästen
-            unserer Stadt ins Gespräch und erfährt, aus welchen Ländern sie angereist sind und ob es ihnen in Berlin
-            gefällt. Als besonderen Service bietet unser Hotel auch eigene Stadtrundfahrten an, die immer sehr gern
-            gebucht werden.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen zum Text</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                Frage {index + 1}: {question.stem}
-              </strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <WorkbookSubmissionReminder />
-          <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
-        </div>
-      )}
-
-      {activeTab === "hoeren" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80"
-            alt="Listening and job application preparation with laptop and headphones"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Listen to the recommended video first. Then complete the answers in the assignment submission area.
-          </p>
-          <p style={{ margin: 0 }}>
-            Recommended video: <a href="https://www.falowen.app/campus/course/b1-day-21-lebensformen-heute-workbook" target="_blank" rel="noreferrer">B1 Day 21 Lebensformen heute workbook</a>
-          </p>
-
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/iyydRu3oY4I"
-            title="Goethe-standard Hören test"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-
-          <WorkbookSubmissionReminder />
-          <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
-        </div>
-      )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day21LebensformenHeute", level: "B1", workbookId: "B1Day21LebensformenHeute" }} workbookId="B1Day21LebensformenHeute" />
-      )}
-
+      </section>}
     </div>
   );
-};
-
-export default B1Day21LebensformenHeuteWorkbookPage;
+}
