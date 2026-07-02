@@ -4,7 +4,7 @@ const normalizeLevel = (level = "") =>
     .toUpperCase();
 
 export const shouldShowTeacherLectureVideo = (level) =>
-  String(level || "").trim().toUpperCase() === "A1";
+  ["A1", "A2", "B1", "B2", "C1"].includes(normalizeLevel(level));
 
 const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
   key: "a1-day0-orientation-video",
@@ -456,21 +456,7 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     .map((resource) => legacyVideoResource(resource, "teacher"))
     .filter(Boolean);
   const dictionaryResources = normalizeVideoResources(dictionaryEntry);
-  const hasConfiguredAiVideo = [...explicitResources, ...dictionaryResources].some(
-    (resource) => !isTeacherVideoResource(resource),
-  );
-  const fallbackLegacyVideos =
-    normalizedLevel === "A1"
-      ? legacyVideos
-      : hasConfiguredAiVideo
-        ? []
-        : legacyVideos.map((resource) => ({
-            ...resource,
-            key: "ai-grammar-video",
-            title: "AI grammar video",
-            description:
-              "Step-by-step grammar explanation for revision and self-study.",
-          }));
+  const fallbackLegacyVideos = legacyVideos;
   const allResources = uniqueVideoResources(
     fallbackLegacyVideos,
     explicitResources,

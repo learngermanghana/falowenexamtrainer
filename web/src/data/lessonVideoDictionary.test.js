@@ -114,19 +114,18 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("hides teacher videos but keeps available AI videos from A2 through C1", () => {
+  test("shows teacher videos with available AI videos from A2 through C1", () => {
     const entry = {
       teacher_video: "https://example.com/teacher",
       ai_grammar_video: "https://example.com/ai",
-      lesen_hören: [{ video: "https://example.com/nested-teacher" }],
     };
 
     expect(
       getLessonVideoResources("A2", 9, entry).map((resource) => resource.url),
-    ).toEqual(["https://example.com/ai"]);
+    ).toEqual(["https://example.com/teacher", "https://example.com/ai"]);
   });
 
-  test("uses the scheduled generic video as an AI fallback when no AI video is configured", () => {
+  test("uses the scheduled generic video as a teacher video when no AI video is configured", () => {
     const entry = {
       chapter: "8.99",
       lesen_hören: {
@@ -137,7 +136,7 @@ describe("getLessonVideoResources", () => {
 
     expect(getLessonVideoResources("A2", 99, entry)).toEqual([
       expect.objectContaining({
-        key: "ai-grammar-video",
+        key: "teacher-explanation",
         chapter: "8.99",
         url: "https://example.com/fallback-video",
       }),
