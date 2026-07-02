@@ -1,8 +1,18 @@
+import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
 import { getCourseCompletionJourney } from "./courseCompletionJourney";
 import { getLessonRadioResource } from "./lessonRadioDictionary";
 
 describe("requested video assignments", () => {
+  test("B1 Day 0 uses the requested orientation video", () => {
+    expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([
+      expect.objectContaining({
+        key: "teacher-b1-day0-orientation-video",
+        url: "https://youtu.be/6fb0A87z9yA",
+      }),
+    ]);
+  });
+
   test("B1 Day 20 uses the requested Falowen Radio video", () => {
     expect(getLessonRadioResource("B1", 20)).toEqual(
       expect.objectContaining({
@@ -26,6 +36,16 @@ describe("requested video assignments", () => {
       expect.objectContaining({
         chapter: "3.7",
         aiVideo: "https://youtu.be/xky4ziUJIis",
+      })
+    );
+  });
+
+  test("B1 Day 9 uses in-app grammar and workbook routes", () => {
+    expect(getB1LessonResourceOverride(9)).toEqual(
+      expect.objectContaining({
+        chapter: "3.9",
+        grammarBook: "/campus/course/lesson/B1/9?view=grammar",
+        workbook: "/campus/course/lesson/B1/9?view=workbook",
       })
     );
   });
