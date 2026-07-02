@@ -90,6 +90,18 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zu Zielen, Methoden und Gegensätzen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis, Teil 4 ist Selbstkontrolle; sende nur Schreiben und Lesen über den Submit-Tab.",
   }),
+  10: Object.freeze({
+    chapter: "4.10",
+    title: "Digitale Auszeit und Selbstfürsorge",
+    grammarBook: "/campus/course/lesson/B1/10?view=grammar",
+    workbook: "/campus/course/lesson/B1/10?view=workbook",
+    grammarTopic:
+      "Vergleiche und Wirkungen mit Komparativ, Superlativ, so ... wie, als und je ... desto/umso",
+    goal:
+      "Über digitale Gewohnheiten, Selbstfürsorge und konkrete Digital-Detox-Strategien sprechen, Lösungen vergleichen und eine strukturierte B1-Meinung formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zu Komparativ, Superlativ und je ... desto. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis, Teil 4 ist Selbstkontrolle; sende nur Schreiben und Lesen über den Submit-Tab.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
