@@ -1,364 +1,106 @@
-import React, { useMemo, useState } from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import React from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 
-import { styles } from "../styles";
-import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
-import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
-
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
-
-const card = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
+const config = {
+  day: 25,
+  chapter: "8.25",
+  assignmentKey: "B1-8.25",
+  workbookId: "B1Day25OnlineShoppingRightsRisks",
+  title: "Online einkaufen – Rechte und Risiken",
+  heroImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+  heroAlt: "Person shopping online with a laptop",
+  speaking: {
+    question: "Welche Vorteile und Risiken hat Online-Shopping, und wie kann man sicher einkaufen?",
+    instructions: "Sprich über Gründe für Online-Shopping, Verbraucherrechte, typische Probleme und sichere Bezahl- und Rückgabemöglichkeiten.",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Online shopping and digital payment",
+    ideaTitle: "Brain Map: Online einkaufen",
+    ideaGroups: [
+      { title: "Gründe für Online-Shopping", items: ["Rund um die Uhr einkaufen", "Große Auswahl", "Preise vergleichen", "Lieferung nach Hause", "Oft günstiger"] },
+      { title: "Typische Produkte", items: ["Kleidung", "Elektronik", "Bücher", "Lebensmittel", "Möbel und Haushaltsartikel"] },
+      { title: "Rechte beim Online-Kauf", items: ["Widerrufsrecht", "Rücksendung", "Geld zurück", "Klare Informationen zu Preis und Lieferzeit", "Garantie"] },
+      { title: "Risiken und Probleme", items: ["Beschädigte oder falsche Ware", "Lange Lieferzeit", "Fake-Shops", "Datenschutzprobleme", "Schwierige Rückgabe"] },
+      { title: "Sichere Shops erkennen", items: ["Gütesiegel", "Kundenbewertungen", "Impressum", "HTTPS", "Sichere Bezahlmethoden"] },
+      { title: "Sicher einkaufen", items: ["Bei bekannten Anbietern bestellen", "Zahlungsbestätigung speichern", "Preise vergleichen", "Rückgabebedingungen lesen", "Persönliche Daten schützen"] },
+    ],
+    activityTitle: "Gemeinsam einen sicheren Online-Einkauf planen",
+    activityIntro: "Plant einen Online-Einkauf und entscheidet gemeinsam:",
+    activityPoints: [
+      "Was möchtet ihr kaufen?",
+      "Welche Webseite oder App nutzt ihr?",
+      "Wie bezahlt ihr sicher?",
+      "Welche Informationen prüft ihr vor der Bestellung?",
+      "Was macht ihr bei beschädigter oder falscher Ware?",
+    ],
+    answerStructure: [
+      "Das Thema Online-Shopping vorstellen.",
+      "Wichtige Vorteile beschreiben.",
+      "Risiken und Verbraucherrechte erklären.",
+      "Ein persönliches Beispiel oder eine typische Reklamation nennen.",
+      "Tipps für sicheres Einkaufen geben und die Meinung zusammenfassen.",
+    ],
+    usefulPhrases: ["Ich möchte die Ware zurückgeben.", "Das Produkt ist beschädigt angekommen.", "Wie funktioniert die Rücksendung?", "Ich möchte mein Geld zurück.", "Könnten Sie mir bitte Ersatz schicken?"],
+  },
+  writing: {
+    title: "Schreiben Sie einen formellen Beschwerdebrief an den Kundenservice.",
+    instructions: "Sie haben online ein Handy gekauft. Das Display war bei der Lieferung kaputt, und Sie haben das Gerät zurückgeschickt. Schreiben Sie jetzt an den Kundenservice.",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Writing a formal customer complaint",
+    taskPoints: [
+      "Wann Sie das Handy gekauft haben",
+      "Was genau das Problem war",
+      "Wann und wie Sie das Handy zurückgeschickt haben",
+      "Was Sie jetzt erwarten: Ersatz, Reparatur oder Geld zurück",
+      "Eine höfliche Bitte um schnelle Antwort",
+    ],
+    supportStructure: [
+      "Anrede: Sehr geehrte Damen und Herren,",
+      "Grund des Schreibens nennen.",
+      "Bestellung und Schaden genau beschreiben.",
+      "Rücksendung erklären.",
+      "Gewünschte Lösung höflich formulieren.",
+      "Grußformel und Name.",
+    ],
+    template: "Sehr geehrte Damen und Herren,\n\nam [Datum] habe ich in Ihrem Online-Shop [Produkt] bestellt. Leider …\n\nDas Problem ist, dass … Deshalb habe ich das Handy am [Datum] zurückgeschickt.\n\nIch bitte Sie, mir [eine Ersatzlieferung / mein Geld] …\n\nIch freue mich auf Ihre schnelle Antwort.\n\nMit freundlichen Grüßen\n[Name]",
+    vocabulary: ["eine Bestellung aufgeben", "beschädigt ankommen", "die Ware zurückschicken", "eine Reklamation bearbeiten", "Ersatz verlangen", "den Kaufpreis erstatten"],
+  },
+  reading: {
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading about consumer rights and daily decisions",
+    text: {
+      title: "Selbstständigkeit, Umweltschutz und Verbraucherberatung in Deutschland",
+      paragraphs: [
+        "Ich habe einen eigenen Friseursalon. Ein großer Vorteil daran ist, dass ich endlich gut Geld verdienen kann. Früher, als ich angestellt war, war mein Gehalt sehr niedrig. Jetzt ist das anders. Ich kann selbst entscheiden, welche Dienstleistungen ich anbiete, und bin unabhängig. Viele Kunden bleiben mir treu, obwohl es in Kaufhäusern oft günstigere Angebote gibt. Das liegt daran, dass wir auf gute Beratung achten und uns viel Zeit für die Kunden nehmen.",
+        "Ein Problem in meiner Arbeit ist die Konkurrenz. Ein weiteres Problem ist die Sozialversicherung. Als Selbstständige muss ich keine Rentenversicherung haben, aber ich habe freiwillig eine abgeschlossen. Auch wenn ich später vielleicht nicht viel Rente bekomme, habe ich dadurch eine gewisse Sicherheit. Insgesamt bin ich sehr zufrieden mit meiner Selbstständigkeit.",
+        "In meiner Familie spielt auch der Umweltschutz eine wichtige Rolle. Wir fahren mit dem Fahrrad oder mit öffentlichen Verkehrsmitteln, wenn wir einkaufen gehen. Außerdem achten wir darauf, möglichst wenig Müll zu produzieren. Wir kaufen Produkte mit wenig Verpackung und trennen den Müll richtig. Ich habe das Gefühl, dass die Menschen heute umweltbewusster sind als früher. Auch wir sparen Energie in der Wohnung: Wir heizen nur die Zimmer, die wir benutzen, und schalten das Licht und elektrische Geräte aus, wenn wir das Haus verlassen.",
+        "Wenn man Fragen rund um das Thema Konsum hat, kann man sich in Deutschland an die Verbraucherzentralen wenden. Es gibt ungefähr 200 Beratungsstellen in allen Bundesländern. Die Mitarbeiter dort helfen bei Fragen zu Kaufverträgen, Krediten, Gewinnspielen, Versicherungen oder auch beim Wechsel des Stromanbieters. Sie informieren auch über Lebensmittel und gesunde Ernährung. Die Verbraucherzentralen werden vom Staat unterstützt, aber trotzdem müssen Kunden für manche Beratungen etwas bezahlen. Einfache Informationen sind oft kostenlos. Im Internet gibt es viele Broschüren, die man gratis herunterladen kann.",
+      ],
+      questions: [
+        { stem: "Warum ist die Friseurin zufrieden mit ihrer Arbeit?", options: ["A) Sie arbeitet in Teilzeit.", "B) Sie ist selbstständig und verdient mehr.", "C) Sie hat einen neuen Chef.", "D) Sie muss keine Kunden bedienen."] },
+        { stem: "Warum bleiben viele Kunden bei ihrem Friseursalon?", options: ["A) Weil sie keine andere Wahl haben.", "B) Weil der Salon am billigsten ist.", "C) Weil Service und Beratung gut sind.", "D) Weil sie dort arbeiten."] },
+        { stem: "Was macht die Familie für den Umweltschutz?", options: ["A) Sie nutzt immer das Auto.", "B) Sie trennt Müll und spart Energie.", "C) Sie kauft viele neue Geräte.", "D) Sie wirft alles in den gleichen Müll."] },
+        { stem: "Was passiert in der Wohnung, wenn niemand zu Hause ist?", options: ["A) Die Heizung wird höher gestellt.", "B) Alle Lichter bleiben an.", "C) Licht und elektrische Geräte werden ausgeschaltet.", "D) Die Türen bleiben offen."] },
+        { stem: "Was bieten die Verbraucherzentralen an?", options: ["A) Friseurdienstleistungen", "B) Beratung zu Konsum, Verträgen und Ernährung", "C) Fahrstunden", "D) Sportkurse"] },
+        { stem: "Wie werden die Verbraucherzentralen finanziert?", options: ["A) Nur durch Spenden", "B) Nur durch Mitgliedsbeiträge", "C) Durch staatliche Unterstützung und teilweise Kundenzahlungen", "D) Nur durch Werbung"] },
+        { stem: "Was ist im Internet kostenlos erhältlich?", options: ["A) Kinokarten", "B) Broschüren mit Informationen", "C) Reisen ins Ausland", "D) Elektronische Geräte"] },
+      ],
+    },
+  },
+  listening: {
+    title: "Bearbeiten Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Complete the listening task without checking the solutions first. Listen a second time where necessary.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for listening practice",
+    videoId: "iyydRu3oY4I",
+    externalUrl: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
+    selfCheckText: "The solutions are provided in the listening resource. Mark your own score. Only Lesen and Schreiben are submitted for tutor evaluation.",
+  },
+  submitWritingDescription: "Paste your final formal complaint letter.",
+  submitReadingDescription: "Paste your seven reading answer letters.",
 };
 
-const sectionTitle = {
-  margin: 0,
-  fontSize: "1.1rem",
-};
-
-const listStyle = {
-  margin: 0,
-  paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
-const tabImageStyle = {
-  width: "100%",
-  borderRadius: 10,
-  maxHeight: 260,
-  objectFit: "cover",
-};
-
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
+export default function B1Day25OnlineShoppingRightsRisksWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} />;
 }
-
-const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Chapter 8.25 Workbook · Online einkaufen – Rechte und Risiken</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Rechte und Risiken beim Online-Shopping besprechen.</p>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
-        </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
-      </div>
-
-      <A2B1WorkbookGuidance />
-
-      {activeTab === "sprechen" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80"
-            alt="Person shopping online on a laptop"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) (Group Practice)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we&apos;ll engage in group exercises discussing these topics.
-          </p>
-
-          <h3 style={sectionTitle}>Zentrales Thema: Online einkaufen – Rechte und Risiken</h3>
-          <ol style={listStyle}>
-            <li>
-              <strong>Gründe für Online-Shopping</strong>
-              <ul style={listStyle}>
-                <li>Bequemlichkeit: rund um die Uhr einkaufen</li>
-                <li>Große Auswahl an Produkten</li>
-                <li>Preisvergleiche möglich</li>
-                <li>Lieferung nach Hause</li>
-                <li>Oft günstiger als im Laden</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Typische Produkte beim Online-Kauf</strong>
-              <ul style={listStyle}>
-                <li>Kleidung</li>
-                <li>Elektronik (z. B. Handys, Laptops)</li>
-                <li>Bücher</li>
-                <li>Lebensmittel</li>
-                <li>Möbel und Haushaltsartikel</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Rechte beim Online-Kauf</strong>
-              <ul style={listStyle}>
-                <li>Widerrufsrecht (14 Tage Rückgaberecht ohne Grund)</li>
-                <li>Rücksendung möglich</li>
-                <li>Geld-zurück-Garantie</li>
-                <li>Informationspflicht des Verkäufers (z. B. Preis, Lieferzeit)</li>
-                <li>Garantie auf Produkte</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Risiken und Probleme</strong>
-              <ul style={listStyle}>
-                <li>Falsche oder beschädigte Ware</li>
-                <li>Lange Lieferzeiten</li>
-                <li>Betrügerische Webseiten (Fake-Shops)</li>
-                <li>Datenschutzprobleme (unsichere Bezahlung)</li>
-                <li>Schwierige Rückgabe, besonders bei Auslandsbestellungen</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Sichere Online-Shops erkennen</strong>
-              <ul style={listStyle}>
-                <li>Gütesiegel (z. B. Trusted Shops, TÜV)</li>
-                <li>Kundenbewertungen lesen</li>
-                <li>Impressum prüfen</li>
-                <li>HTTPS (sichere Verbindung)</li>
-                <li>Bezahlmethoden: PayPal, Rechnung, Kreditkarte</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Nützliche Redemittel</strong>
-              <ul style={listStyle}>
-                <li>„Ich möchte die Ware zurückgeben.“</li>
-                <li>„Das Produkt ist beschädigt angekommen.“</li>
-                <li>„Ich habe etwas anderes bestellt.“</li>
-                <li>„Wie funktioniert die Rücksendung?“</li>
-                <li>„Ich möchte mein Geld zurück.“</li>
-                <li>„Könnten Sie mir bitte eine neue Ware schicken?“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Tipps für sicheres Online-Shopping</strong>
-              <ul style={listStyle}>
-                <li>Nur bei bekannten Anbietern bestellen</li>
-                <li>Zahlungsbestätigung aufbewahren</li>
-                <li>Preise vergleichen</li>
-                <li>Rückgabebedingungen lesen</li>
-                <li>Niemals persönliche Daten per E-Mail weitergeben</li>
-              </ul>
-            </li>
-          </ol>
-
-          <h3 style={sectionTitle}>Gemeinsam etwas planen</h3>
-          <p style={{ margin: 0 }}>
-            <strong>„Online einkaufen – Rechte und Risiken“</strong>
-          </p>
-          <p style={{ margin: 0 }}>Plant gemeinsam einen Online-Einkauf. Nutzt dabei diese Struktur:</p>
-          <ul style={listStyle}>
-            <li>Was wollt ihr online kaufen? (z. B. Kleidung, Elektronik, Möbel)</li>
-            <li>Wo kauft ihr ein? (Welche Webseite oder App?)</li>
-            <li>Wie bezahlt ihr? (z. B. mit Karte, PayPal, auf Rechnung)</li>
-            <li>
-              Was macht ihr, wenn etwas nicht stimmt? (z. B. Rückgabe, Reklamation, Kundenservice kontaktieren)
-            </li>
-          </ul>
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
-        </div>
-      )}
-
-      {activeTab === "schreiben" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Writing notes about online shopping rights"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 2 - Assignment: Schreiben</h2>
-          <p style={{ margin: 0 }}>
-            <strong>Aufgabe – B1 Schreiben (Formeller Brief)</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Situation:</strong> Sie haben online ein Handy gekauft. Nach der Lieferung haben Sie bemerkt, dass das
-            Display kaputt war. Deshalb haben Sie es zurückgeschickt.
-          </p>
-          <p style={{ margin: 0 }}>Schreiben Sie einen formellen Brief an den Kundenservice und erwähnen Sie dabei auch:</p>
-          <ul style={listStyle}>
-            <li>Wann Sie das Handy gekauft haben</li>
-            <li>Was genau das Problem war</li>
-            <li>Wann Sie das Handy zurückgeschickt haben</li>
-            <li>Was Sie jetzt erwarten</li>
-          </ul>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
-        <WorkbookSubmissionReminder />
-        </div>
-      )}
-
-      {activeTab === "lesen" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=80"
-            alt="Reading article pages about consumer rights"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 3 – Lesen</h2>
-          <h3 style={sectionTitle}>Essay: Selbstständigkeit, Umweltschutz und Verbraucherberatung in Deutschland</h3>
-          <p style={{ margin: 0, lineHeight: 1.8 }}>
-            Ich habe einen eigenen Friseursalon. Ein großer Vorteil daran ist, dass ich endlich gut Geld verdienen kann.
-            Früher, als ich angestellt war, war mein Gehalt sehr niedrig. Jetzt ist das anders. Ich kann selbst entscheiden,
-            welche Dienstleistungen ich anbiete, und bin unabhängig. Viele Kunden bleiben mir treu, obwohl es in
-            Kaufhäusern oft günstigere Angebote gibt. Das liegt daran, dass wir auf gute Beratung achten und uns viel Zeit
-            für die Kunden nehmen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.8 }}>
-            Ein Problem in meiner Arbeit ist die Konkurrenz. Ein weiteres Problem ist die Sozialversicherung. Als
-            Selbstständige muss ich keine Rentenversicherung haben, aber ich habe freiwillig eine abgeschlossen. Auch wenn
-            ich später vielleicht nicht viel Rente bekomme, habe ich dadurch eine gewisse Sicherheit. Insgesamt bin ich sehr
-            zufrieden mit meiner Selbstständigkeit.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.8 }}>
-            In meiner Familie spielt auch der Umweltschutz eine wichtige Rolle. Wir fahren mit dem Fahrrad oder mit
-            öffentlichen Verkehrsmitteln, wenn wir einkaufen gehen. Außerdem achten wir darauf, möglichst wenig Müll zu
-            produzieren. Wir kaufen Produkte mit wenig Verpackung und trennen den Müll richtig. Ich habe das Gefühl, dass
-            die Menschen heute umweltbewusster sind als früher. Auch wir sparen Energie in der Wohnung: Wir heizen nur die
-            Zimmer, die wir benutzen, und schalten das Licht und elektrische Geräte aus, wenn wir das Haus verlassen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.8 }}>
-            Wenn man Fragen rund um das Thema Konsum hat, kann man sich in Deutschland an die Verbraucherzentralen wenden.
-            Es gibt ungefähr 200 Beratungsstellen in allen Bundesländern. Die Mitarbeiter dort helfen bei Fragen zu
-            Kaufverträgen, Krediten, Gewinnspielen, Versicherungen oder auch beim Wechsel des Stromanbieters. Sie
-            informieren auch über Lebensmittel und gesunde Ernährung. Die Verbraucherzentralen werden vom Staat unterstützt,
-            aber trotzdem müssen Kunden für manche Beratungen etwas bezahlen. Einfache Informationen sind oft kostenlos. Im
-            Internet gibt es viele Broschüren, die man gratis herunterladen kann.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen (Multiple Choice – 1 richtige Antwort pro Frage)</h3>
-          <ol style={listStyle}>
-            <li>
-              Warum ist die Friseurin zufrieden mit ihrer Arbeit?
-              <ul style={listStyle}>
-                <li>a) Sie arbeitet in Teilzeit.</li>
-                <li>b) Sie ist selbstständig und verdient mehr.</li>
-                <li>c) Sie hat einen neuen Chef.</li>
-                <li>d) Sie muss keine Kunden bedienen.</li>
-              </ul>
-            </li>
-            <li>
-              Warum bleiben viele Kunden bei ihrem Friseursalon?
-              <ul style={listStyle}>
-                <li>a) Weil sie keine andere Wahl haben.</li>
-                <li>b) Weil der Salon am billigsten ist.</li>
-                <li>c) Weil der Service und die Beratung gut sind.</li>
-                <li>d) Weil sie dort arbeiten.</li>
-              </ul>
-            </li>
-            <li>
-              Was macht die Familie von Robert Schmidt für den Umweltschutz?
-              <ul style={listStyle}>
-                <li>a) Sie nutzt immer das Auto.</li>
-                <li>b) Sie trennt Müll und spart Energie.</li>
-                <li>c) Sie kauft viele neue Geräte.</li>
-                <li>d) Sie wirft alles in den gleichen Müll.</li>
-              </ul>
-            </li>
-            <li>
-              Was passiert in der Wohnung, wenn niemand zu Hause ist?
-              <ul style={listStyle}>
-                <li>a) Die Heizung wird auf 25 Grad gestellt.</li>
-                <li>b) Alle Lichter bleiben an.</li>
-                <li>c) Die Familie stellt die Heizung auf 18 Grad und schaltet Geräte aus.</li>
-                <li>d) Die Türen bleiben offen.</li>
-              </ul>
-            </li>
-            <li>
-              Was bieten die Verbraucherzentralen an?
-              <ul style={listStyle}>
-                <li>a) Friseurdienstleistungen</li>
-                <li>b) Beratung zu Konsum, Verträgen und Ernährung</li>
-                <li>c) Fahrstunden</li>
-                <li>d) Sportkurse</li>
-              </ul>
-            </li>
-            <li>
-              Wie werden die Verbraucherzentralen finanziert?
-              <ul style={listStyle}>
-                <li>a) Nur durch Spenden</li>
-                <li>b) Nur durch Mitgliedsbeiträge</li>
-                <li>c) Durch den Staat und Kundenzahlungen</li>
-                <li>d) Durch Werbung</li>
-              </ul>
-            </li>
-            <li>
-              Was ist im Internet bei den Verbraucherzentralen kostenlos erhältlich?
-              <ul style={listStyle}>
-                <li>a) Kinokarten</li>
-                <li>b) Broschüren mit Informationen</li>
-                <li>c) Reisen ins Ausland</li>
-                <li>d) Elektronische Geräte</li>
-              </ul>
-            </li>
-          </ol>
-        <WorkbookSubmissionReminder />
-        </div>
-      )}
-
-      {activeTab === "hoeren" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
-            alt="Headphones prepared for listening practice"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 4 (Hören) (Exercise)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Please note that this is a Goethe-standard Hörverstehen (listening comprehension) test, and the answers are
-            provided in the YouTube video. You are responsible for checking your own answers. The only parts that will be
-            officially evaluated by the school are Lesen (reading) and Schreiben (writing). You must mark your own
-            Hörverstehen results. This process will require a lot of motivation and self-discipline on your part to be
-            effective. Thank you, and good luck!
-          </p>
-          <p style={{ margin: 0 }}>
-            Link:{" "}
-            <a href="https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X" target="_blank" rel="noreferrer">
-              https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X
-            </a>
-          </p>
-        <WorkbookSubmissionReminder />
-        </div>
-      )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day25OnlineShoppingRightsRisks", level: "B1", workbookId: "B1Day25OnlineShoppingRightsRisks" }} workbookId="B1Day25OnlineShoppingRightsRisks" />
-      )}
-
-    </div>
-  );
-};
-
-export default B1Day25OnlineShoppingRightsRisksWorkbookPage;
