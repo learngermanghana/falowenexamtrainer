@@ -12,7 +12,7 @@ describe("A1 Day 2 lesson video resources", () => {
 
   test("A1 lessons allow teacher lecture videos", () => {
     expect(shouldShowTeacherLectureVideo("A1")).toBe(true);
-    expect(shouldShowTeacherLectureVideo("A2")).toBe(false);
+    expect(shouldShowTeacherLectureVideo("A2")).toBe(true);
   });
 
   test("chapter 0.2 shows both teacher and AI videos", () => {
