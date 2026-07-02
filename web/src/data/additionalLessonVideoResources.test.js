@@ -53,6 +53,34 @@ describe("additional A1 AI lesson videos", () => {
   });
 });
 
+describe("additional B1 AI lesson videos", () => {
+  test("Day 6 uses the city-versus-country AI video", () => {
+    expect(getAdditionalLessonVideoResources("B1", 6)).toEqual([
+      expect.objectContaining({
+        chapter: "2.6",
+        title: "B1 Day 6 · Leben in der Stadt oder auf dem Land? · AI video",
+        url: "https://youtu.be/5tGvAPq6hGk?si=uI_ODAT_A6_mZjG2",
+      }),
+    ]);
+  });
+
+  test("B1 Day 6 exposes the AI video through the shared lesson model", () => {
+    const lesson = normalizeLesson({
+      level: "B1",
+      day: 6,
+      chapter: "2.6",
+      topic: "Leben in der Stadt oder auf dem Land?",
+    });
+
+    expect(lesson.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "2.6",
+        url: "https://youtu.be/5tGvAPq6hGk?si=uI_ODAT_A6_mZjG2",
+      }),
+    );
+  });
+});
+
 describe("Day 0 orientation videos", () => {
   test("B1 Day 0 remains without a video until one is supplied", () => {
     expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([]);
