@@ -44,6 +44,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
     ],
   },
   B1: {
+    0: [
+      {
+        key: "teacher-b1-day0-orientation-video",
+        chapter: "Tutorial",
+        title: "B1 Day 0 · Orientation video",
+        description:
+          "Watch this B1 orientation video before completing the Day 0 guide and readiness activities.",
+        url: "https://youtu.be/6fb0A87z9yA",
+      },
+    ],
     6: [
       {
         key: "b1-day6-stadt-oder-land-ai-video",
