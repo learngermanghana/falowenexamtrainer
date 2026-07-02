@@ -43,6 +43,18 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
       },
     ],
   },
+  B1: {
+    6: [
+      {
+        key: "b1-day6-stadt-oder-land-ai-video",
+        chapter: "2.6",
+        title: "B1 Day 6 · Leben in der Stadt oder auf dem Land? · AI video",
+        description:
+          "AI video lesson for comparing city and country life, giving reasons and expressing contrasts at B1 level.",
+        url: "https://youtu.be/5tGvAPq6hGk?si=uI_ODAT_A6_mZjG2",
+      },
+    ],
+  },
   B2: {
     0: [
       {
