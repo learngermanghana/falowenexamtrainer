@@ -1551,7 +1551,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/fMCYUVNYc9U",
         youtube_link: "https://youtu.be/fMCYUVNYc9U",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook",
+        workbook_link: "",
       },
     },
     {

@@ -26,15 +26,15 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("activates on standalone B1 workbook routes", () => {
     expect(
       __TESTING__.isB1WorkbookRoute(
-        "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook",
+        "/campus/course/b1-day-21-lebensformen-heute-workbook",
         ""
       )
     ).toBe(true);
     expect(
       __TESTING__.getB1WorkbookDay(
-        "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook"
+        "/campus/course/b1-day-21-lebensformen-heute-workbook"
       )
-    ).toBe(20);
+    ).toBe(21);
   });
 
   test("B1 cheat sheet content exists for workbook days", () => {
