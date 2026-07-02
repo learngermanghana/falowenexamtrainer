@@ -20,6 +20,8 @@ import B1Day9WorkLifeBalanceWorkbookPage from "./B1Day9WorkLifeBalanceWorkbookPa
 import B1Day9WorkLifeBalanceGrammarNotesPage from "./B1Day9WorkLifeBalanceGrammarNotesPage";
 import B1Day10DigitaleAuszeitWorkbookPage from "./B1Day10DigitaleAuszeitWorkbookPage";
 import B1Day10DigitaleAuszeitGrammarNotesPage from "./B1Day10DigitaleAuszeitGrammarNotesPage";
+import B1Day11TeamspieleWorkbookPage from "./B1Day11TeamspieleWorkbookPage";
+import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
@@ -50,6 +52,9 @@ const A1_DAY_5_TITLE = "Personal Information, Articles, Adjectives and W-Questio
 const A1_DAY_17_ASSIGNMENT_ID = "A1-11";
 const A1_DAY_17_WORKBOOK_ROUTE = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 const A1_DAY_17_GRAMMAR_ROUTE = "/campus/course/directions-imperative-11";
+const B1_DAY_11_ASSIGNMENT_ID = "B1-4.11";
+const B1_DAY_11_WORKBOOK_ROUTE = "/campus/course/lesson/B1/11?view=workbook";
+const B1_DAY_11_GRAMMAR_ROUTE = "/campus/course/lesson/B1/11?view=grammar";
 const FIRST_LESSON_TRACKED_KEY = "falowen:public-funnel-first-lesson";
 const B1_DAY5_DRIVE_FILE_ID = "1BhpLaVrqLIgLkD9OVwsHhedjBwLTPet9";
 const B1_DAY5_YOUTUBE_ID = "x7tUQjxt5uI";
@@ -66,6 +71,7 @@ const B1_WORKBOOK_PAGES = {
   8: B1Day8AllesFuerDieGesundheitWorkbookPage,
   9: B1Day9WorkLifeBalanceWorkbookPage,
   10: B1Day10DigitaleAuszeitWorkbookPage,
+  11: B1Day11TeamspieleWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20WieWirdManWorkbookPage,
   21: B1Day21LebensformenHeuteWorkbookPage,
@@ -89,6 +95,7 @@ const B1_GRAMMAR_PAGES = {
   8: B1Day8AllesFuerDieGesundheitGrammarNotesPage,
   9: B1Day9WorkLifeBalanceGrammarNotesPage,
   10: B1Day10DigitaleAuszeitGrammarNotesPage,
+  11: B1Day11TeamspieleGrammarNotesPage,
   19: B1Day19VorstellungsgespraechGrammarNotesPage,
   21: B1Day21LebensformenHeuteGrammarNotesPage,
 };
@@ -180,6 +187,49 @@ const decorateA1Day17Lesson = (lesson) => {
   assignment.workbook_link = A1_DAY_17_WORKBOOK_ROUTE;
 };
 
+const decorateB1Day11Lesson = (lesson) => {
+  if (!lesson || Number(lesson.day) !== 11) return;
+
+  lesson.topic = "Teamspiele und kooperative Aktivitäten";
+  lesson.chapter = "4.11";
+  lesson.grammar_topic =
+    "Reziproke Ausdrücke für Teamarbeit: einander, miteinander, füreinander, voneinander, aufeinander und gegeneinander";
+  lesson.goal =
+    "Über Teamspiele, Zusammenarbeit, Konflikte und kooperative Aktivitäten sprechen und gegenseitige Handlungen klar ausdrücken.";
+  lesson.instruction =
+    "Lies zuerst die in-app Grammatiknotizen zu reziproken Ausdrücken. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis; sende Schreiben, Lesen und Hören über den Submit-Tab.";
+  lesson.assignment = true;
+  lesson.assignmentId = B1_DAY_11_ASSIGNMENT_ID;
+  lesson.assignment_id = B1_DAY_11_ASSIGNMENT_ID;
+  lesson.canonicalAssignmentId = B1_DAY_11_ASSIGNMENT_ID;
+  lesson.grammarbook_link = B1_DAY_11_GRAMMAR_ROUTE;
+  lesson.grammar_link = B1_DAY_11_GRAMMAR_ROUTE;
+  lesson.grammarPage = B1_DAY_11_GRAMMAR_ROUTE;
+  lesson.workbook_link = B1_DAY_11_WORKBOOK_ROUTE;
+  lesson.workbookRoute = B1_DAY_11_WORKBOOK_ROUTE;
+
+  let assignment = Array.isArray(lesson.lesen_hören)
+    ? lesson.lesen_hören.find((resource) => String(resource?.chapter || "4.11") === "4.11")
+    : lesson.lesen_hören;
+
+  if (!assignment) {
+    assignment = {};
+    lesson.lesen_hören = assignment;
+  }
+
+  assignment.chapter = "4.11";
+  assignment.assignment = true;
+  assignment.assignmentId = B1_DAY_11_ASSIGNMENT_ID;
+  assignment.assignment_id = B1_DAY_11_ASSIGNMENT_ID;
+  assignment.canonicalAssignmentId = B1_DAY_11_ASSIGNMENT_ID;
+  assignment.resourceRole = "assignment";
+  assignment.grammarbook_link = B1_DAY_11_GRAMMAR_ROUTE;
+  assignment.grammar_link = B1_DAY_11_GRAMMAR_ROUTE;
+  assignment.grammarPage = B1_DAY_11_GRAMMAR_ROUTE;
+  assignment.workbook_link = B1_DAY_11_WORKBOOK_ROUTE;
+  assignment.workbookRoute = B1_DAY_11_WORKBOOK_ROUTE;
+};
+
 const syncA2LessonFromSchedule = (lesson, day) => {
   if (!lesson) return;
   const canonicalLesson = (courseSchedules.A2 || []).find(
@@ -197,12 +247,14 @@ const syncA2LessonFromSchedule = (lesson, day) => {
 const scheduleDay3 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 3);
 const scheduleDay5 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 5);
 const scheduleDay17 = (courseSchedules.A1 || []).find((entry) => Number(entry.day) === 17);
+const scheduleB1Day11 = (courseSchedules.B1 || []).find((entry) => Number(entry.day) === 11);
 (courseSchedules.A1 || []).forEach((entry) => applyA1GrammarRouteToLesson(entry, entry?.day));
 (courseSchedules.A2 || []).forEach((entry) => applyA2GrammarRouteToLesson(entry, entry?.day));
 (courseSchedules.B1 || []).forEach((entry) => applyB1LessonResourceOverride(entry, entry?.day));
 decorateA1Day3Lesson(scheduleDay3);
 decorateA1Day5Lesson(scheduleDay5);
 decorateA1Day17Lesson(scheduleDay17);
+decorateB1Day11Lesson(scheduleB1Day11);
 
 const replaceText = (element, text) => {
   if (element && element.textContent !== text) element.textContent = text;
@@ -272,11 +324,13 @@ export default function CourseLessonPage() {
   const isA1Day5 = level === "A1" && day === 5;
   const isA1Day17 = level === "A1" && day === 17;
   const isB1Day5 = level === "B1" && day === 5;
+  const isB1Day11 = level === "B1" && day === 11;
   if (level === "A1") applyA1GrammarRouteToLesson(location.state?.entry, day);
   if (level === "B1") applyB1LessonResourceOverride(location.state?.entry, day);
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);
   if (isA1Day5) decorateA1Day5Lesson(location.state?.entry);
   if (isA1Day17) decorateA1Day17Lesson(location.state?.entry);
+  if (isB1Day11) decorateB1Day11Lesson(location.state?.entry);
   if (level === "A2") syncA2LessonFromSchedule(location.state?.entry, day);
 
   useEffect(() => {
