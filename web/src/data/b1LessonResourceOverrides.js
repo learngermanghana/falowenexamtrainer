@@ -1,182 +1,117 @@
+const route = (day, view) => `/campus/course/lesson/B1/${day}?view=${view}`;
+const doneWorkbook = (day) => `${route(day, "workbook")}&radio=done`;
+
 const B1_RESOURCE_OVERRIDES = Object.freeze({
-  1: Object.freeze({
-    chapter: "1.1",
-    grammarBook: "/campus/course/lesson/B1/1?view=grammar",
-    workbook: "/campus/course/lesson/B1/1?view=workbook",
-    aiVideo: "https://youtu.be/_mmAtSzWbNo",
-  }),
-  2: Object.freeze({
-    chapter: "1.2",
-    grammarBook: "/campus/course/lesson/B1/2?view=grammar",
-    workbook: "/campus/course/lesson/B1/2?view=workbook",
-    aiVideo: "https://youtu.be/Skl0FjF5JBg",
-  }),
-  3: Object.freeze({
-    chapter: "1.3",
-    grammarBook: "/campus/course/lesson/B1/3?view=grammar",
-    workbook: "/campus/course/lesson/B1/3?view=workbook",
-    aiVideo: "https://youtu.be/n6eCMJRWTy8",
-  }),
+  1: Object.freeze({ chapter: "1.1", grammarBook: route(1, "grammar"), workbook: route(1, "workbook"), aiVideo: "https://youtu.be/_mmAtSzWbNo" }),
+  2: Object.freeze({ chapter: "1.2", grammarBook: route(2, "grammar"), workbook: route(2, "workbook"), aiVideo: "https://youtu.be/Skl0FjF5JBg" }),
+  3: Object.freeze({ chapter: "1.3", grammarBook: route(3, "grammar"), workbook: route(3, "workbook"), aiVideo: "https://youtu.be/n6eCMJRWTy8" }),
   4: Object.freeze({
     chapter: "2.4",
-    grammarBook: "/campus/course/lesson/B1/4?view=grammar",
-    workbook: "/campus/course/lesson/B1/4?view=workbook",
-    grammarTopic:
-      "Zweiteilige Konnektoren: sowohl ... als auch, nicht nur ... sondern auch, zwar ... aber, einerseits ... andererseits, entweder ... oder, weder ... noch",
-    goal:
-      "Wohnungsmöglichkeiten und Suchmethoden vergleichen, Vor- und Nachteile abwägen und eine strukturierte B1-Meinung formulieren.",
-    instruction:
-      "Lies zuerst die Grammatiknotizen zu zweiteiligen Konnektoren. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; reiche die geforderten Antworten für Schreiben, Lesen und Hören direkt über den Submit-Bereich im Workbook ein.",
+    grammarBook: route(4, "grammar"),
+    workbook: route(4, "workbook"),
+    grammarTopic: "Zweiteilige Konnektoren: sowohl ... als auch, nicht nur ... sondern auch, zwar ... aber, einerseits ... andererseits, entweder ... oder, weder ... noch",
+    goal: "Wohnungsmöglichkeiten und Suchmethoden vergleichen, Vor- und Nachteile abwägen und eine strukturierte B1-Meinung formulieren.",
+    instruction: "Lies zuerst die Grammatiknotizen zu zweiteiligen Konnektoren. Bearbeite danach alle vier Workbook-Teile und sende die geforderten Antworten über den Submit-Bereich.",
   }),
   5: Object.freeze({
     chapter: "2.5",
-    grammarBook: "/campus/course/lesson/B1/5?view=grammar",
-    workbook: "/campus/course/lesson/B1/5?view=workbook",
+    grammarBook: route(5, "grammar"),
+    workbook: route(5, "workbook"),
     aiVideo: "https://youtu.be/dLzAwzMFGG4",
-    grammarTopic:
-      "Höfliche Terminvereinbarung: Konjunktiv II mit könnte, würde und wäre sowie indirekte Fragen mit ob, wann, wo und wie",
-    goal:
-      "Einen Besichtigungstermin höflich vereinbaren, Informationen beim Vermieter erfragen und eine formelle B1-E-Mail schreiben.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zur höflichen Terminvereinbarung. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Nutze Ref erst zur Kontrolle und sende deine endgültigen Antworten über den Submit-Tab.",
+    grammarTopic: "Höfliche Terminvereinbarung: Konjunktiv II und indirekte Fragen",
+    goal: "Einen Besichtigungstermin höflich vereinbaren und eine formelle B1-E-Mail schreiben.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 und sende deine endgültigen Antworten über den Submit-Tab.",
   }),
   6: Object.freeze({
     chapter: "2.6",
     title: "Leben in der Stadt oder auf dem Land?",
-    grammarBook: "/campus/course/lesson/B1/6?view=grammar",
-    workbook: "/campus/course/lesson/B1/6?view=workbook",
-    grammarTopic:
-      "Stadt und Land vergleichen: Komparativ mit als, Gründe mit weil/da/denn, Gegensätze mit obwohl/während und Relativsätze",
-    goal:
-      "Stadt- und Landleben differenziert vergleichen, Vor- und Nachteile abwägen und eine klare B1-Meinung mit passenden Begründungen formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zum Vergleichen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+    grammarBook: route(6, "grammar"),
+    workbook: route(6, "workbook"),
+    grammarTopic: "Stadt und Land vergleichen: Komparativ, Gründe, Gegensätze und Relativsätze",
+    goal: "Stadt- und Landleben vergleichen und eine klare B1-Meinung formulieren.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite danach alle vier Workbook-Teile und sende deine Antworten über den Submit-Tab.",
   }),
   7: Object.freeze({
     chapter: "3.7",
     title: "Fast Food vs. Hausmannskost",
-    grammarBook: "/campus/course/lesson/B1/7?view=grammar",
-    workbook: "/campus/course/lesson/B1/7?view=workbook",
+    grammarBook: route(7, "grammar"),
+    workbook: route(7, "workbook"),
     aiVideo: "https://youtu.be/xky4ziUJIis",
-    grammarTopic:
-      "Genitiv mit wegen und trotz: Gründe, Gegengründe und Eigenschaften von Ernährung präzise ausdrücken",
-    goal:
-      "Fast Food, Fertiggerichte und Hausmannskost vergleichen, gesundheitliche Vor- und Nachteile erklären und eine klare B1-Meinung formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zum Genitiv mit wegen und trotz. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+    grammarTopic: "Genitiv mit wegen und trotz",
+    goal: "Fast Food und Hausmannskost vergleichen und eine klare B1-Meinung formulieren.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite danach alle vier Workbook-Teile und sende deine Antworten über den Submit-Tab.",
   }),
   8: Object.freeze({
     chapter: "3.8",
     title: "Alles für die Gesundheit",
-    grammarBook: "/campus/course/lesson/B1/8?view=grammar",
-    workbook: "/campus/course/lesson/B1/8?view=workbook",
+    grammarBook: route(8, "grammar"),
+    workbook: route(8, "workbook"),
     aiVideo: "https://youtu.be/_aFuOTSdMb8",
-    grammarTopic:
-      "Modalverben für Gesundheitstipps: sollte, muss, kann, darf und möchte",
-    goal:
-      "Über gesunde Ernährung, Bewegung, mentale Gesundheit und Gesundheitsvorsorge sprechen und klare B1-Ratschläge formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zu Modalverben für Gesundheitstipps. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+    grammarTopic: "Modalverben für Gesundheitstipps",
+    goal: "Über Gesundheit sprechen und klare B1-Ratschläge formulieren.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite danach alle vier Workbook-Teile und sende deine Antworten über den Submit-Tab.",
   }),
   9: Object.freeze({
     chapter: "3.9",
     title: "Work-Life-Balance im modernen Arbeitsumfeld",
-    grammarBook: "/campus/course/lesson/B1/9?view=grammar",
-    workbook: "/campus/course/lesson/B1/9?view=workbook",
-    grammarTopic:
-      "Ziele, Methoden, Alternativen und Gegensätze mit um ... zu, damit, indem, ohne ... zu, statt ... zu, obwohl und trotzdem",
-    goal:
-      "Über Arbeitsdruck, flexible Arbeitsmodelle und persönliche Grenzen sprechen, Lösungen erklären und eine strukturierte B1-Meinung zur Work-Life-Balance formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zu Zielen, Methoden und Gegensätzen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis, Teil 4 ist Selbstkontrolle; sende nur Schreiben und Lesen über den Submit-Tab.",
+    grammarBook: route(9, "grammar"),
+    workbook: route(9, "workbook"),
+    grammarTopic: "Ziele, Methoden, Alternativen und Gegensätze",
+    goal: "Über Arbeitsdruck, flexible Arbeitsmodelle und persönliche Grenzen sprechen.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
   }),
   10: Object.freeze({
     chapter: "4.10",
     title: "Digitale Auszeit und Selbstfürsorge",
-    grammarBook: "/campus/course/lesson/B1/10?view=grammar",
-    workbook: "/campus/course/lesson/B1/10?view=workbook",
-    grammarTopic:
-      "Vergleiche und Wirkungen mit Komparativ, Superlativ, so ... wie, als und je ... desto/umso",
-    goal:
-      "Über digitale Gewohnheiten, Selbstfürsorge und konkrete Digital-Detox-Strategien sprechen, Lösungen vergleichen und eine strukturierte B1-Meinung formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zu Komparativ, Superlativ und je ... desto. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis, Teil 4 ist Selbstkontrolle; sende nur Schreiben und Lesen über den Submit-Tab.",
+    grammarBook: route(10, "grammar"),
+    workbook: route(10, "workbook"),
+    grammarTopic: "Vergleiche und Wirkungen mit Komparativ, Superlativ und je ... desto",
+    goal: "Über digitale Gewohnheiten und Digital-Detox-Strategien sprechen.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
   }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
-    grammarBook: "/campus/course/lesson/B1/19?view=grammar",
-    workbook: "/campus/course/lesson/B1/19?view=workbook",
-    grammarTopic:
-      "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen im Vorstellungsgespräch",
-    goal:
-      "Sich im Vorstellungsgespräch vorstellen, Stärken und Erfahrungen begründen und eine klare B1-Meinung zu Vorstellungsgesprächen schreiben.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
+    grammarBook: route(19, "grammar"),
+    workbook: route(19, "workbook"),
+    grammarTopic: "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen",
+    goal: "Sich im Vorstellungsgespräch vorstellen und eine klare B1-Meinung formulieren.",
+    instruction: "Lies zuerst die Grammatiknotizen und bearbeite danach alle vier Workbook-Teile.",
   }),
   20: Object.freeze({
     chapter: "6.20",
     title: "Wie wird man …?",
     grammarBook: "",
-    workbook: "/campus/course/lesson/B1/20?view=workbook",
-    grammarTopic:
-      "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
-    goal:
-      "Über Ausbildung, Qualifikationen und Karrierewege in verschiedenen Berufen strukturiert sprechen.",
-    instruction:
-      "Open the new in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Teil 1 is group practice; submit only Schreiben and Lesen through the Submit tab.",
+    workbook: doneWorkbook(20),
+    grammarTopic: "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
+    goal: "Über Ausbildung, Qualifikationen und Karrierewege strukturiert sprechen.",
+    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit only Schreiben and Lesen.",
   }),
   21: Object.freeze({
     chapter: "7.21",
     title: "Lebensformen heute",
-    grammarBook: "/campus/course/lesson/B1/21?view=grammar",
-    workbook: "",
-    grammarTopic:
-      "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
-    goal:
-      "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
-    instruction:
-      "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Teil 1 is group practice; submit only Schreiben and Lesen through the Submit tab.",
+    grammarBook: route(21, "grammar"),
+    workbook: doneWorkbook(21),
+    grammarTopic: "Vor- und Nachteile abwägen: weil, obwohl, während und zweiteilige Konnektoren",
+    goal: "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen.",
+    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit only Schreiben and Lesen.",
   }),
-  22: Object.freeze({
-    chapter: "7.22",
-    workbook: "",
-  }),
-  23: Object.freeze({
-    chapter: "7.23",
-    workbook: "",
-  }),
-  24: Object.freeze({
-    chapter: "8.24",
-    workbook: "",
-  }),
-  25: Object.freeze({
-    chapter: "8.25",
-    workbook: "",
-  }),
-  26: Object.freeze({
-    chapter: "9.26",
-    workbook: "",
-  }),
-  27: Object.freeze({
-    chapter: "10.27",
-    workbook: "",
-  }),
-  28: Object.freeze({
-    chapter: "10.28",
-    workbook: "",
-  }),
+  22: Object.freeze({ chapter: "7.22", workbook: doneWorkbook(22) }),
+  23: Object.freeze({ chapter: "7.23", workbook: route(23, "workbook") }),
+  24: Object.freeze({ chapter: "8.24", workbook: route(24, "workbook") }),
+  25: Object.freeze({ chapter: "8.25", workbook: route(25, "workbook") }),
+  26: Object.freeze({ chapter: "9.26", workbook: route(26, "workbook") }),
+  27: Object.freeze({ chapter: "10.27", workbook: route(27, "workbook") }),
+  28: Object.freeze({ chapter: "10.28", workbook: route(28, "workbook") }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-export const getB1LessonResourceOverride = (day) =>
-  B1_RESOURCE_OVERRIDES[Number(day)] || null;
+export const getB1LessonResourceOverride = (day) => B1_RESOURCE_OVERRIDES[Number(day)] || null;
 
 export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
   if (!lesson || typeof lesson !== "object") return lesson;
-  const resolvedDay = Number(day ?? lesson.day ?? lesson.assignmentDay);
-  const override = getB1LessonResourceOverride(resolvedDay);
+  const override = getB1LessonResourceOverride(Number(day ?? lesson.day ?? lesson.assignmentDay));
   if (!override) return lesson;
 
   lesson.grammarbook_link = override.grammarBook;
@@ -184,27 +119,19 @@ export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
   lesson.grammarPage = override.grammarBook;
   lesson.workbook_link = override.workbook;
   lesson.workbookRoute = override.workbook;
-
   if (override.title) lesson.topic = override.title;
   if (override.grammarTopic) lesson.grammar_topic = override.grammarTopic;
   if (override.goal) lesson.goal = override.goal;
   if (override.instruction) lesson.instruction = override.instruction;
-
   if (override.aiVideo) {
     lesson.ai_grammar_video = override.aiVideo;
     lesson.aiGrammarVideo = override.aiVideo;
   }
 
-  const resources = [
-    ...toArray(lesson.lesen_hören),
-    ...toArray(lesson.schreiben_sprechen),
-  ];
-
-  resources.forEach((resource) => {
+  [...toArray(lesson.lesen_hören), ...toArray(lesson.schreiben_sprechen)].forEach((resource) => {
     if (!resource || typeof resource !== "object") return;
-    const resourceChapter = String(resource.chapter || lesson.chapter || "").trim();
-    if (resourceChapter && resourceChapter !== override.chapter) return;
-
+    const chapter = String(resource.chapter || lesson.chapter || "").trim();
+    if (chapter && chapter !== override.chapter) return;
     resource.grammarbook_link = override.grammarBook;
     resource.grammar_link = override.grammarBook;
     resource.grammarPage = override.grammarBook;
@@ -215,58 +142,24 @@ export const applyB1LessonResourceOverride = (lesson, day = lesson?.day) => {
       resource.aiGrammarVideo = override.aiVideo;
     }
   });
-
   return lesson;
 };
 
 export const applyB1LessonVideoOverrides = (dictionary = {}) => {
   const b1 = dictionary.B1 || (dictionary.B1 = {});
-  const dayOne = getB1LessonResourceOverride(1);
-  const dayTwo = getB1LessonResourceOverride(2);
-  const dayThree = getB1LessonResourceOverride(3);
-
-  b1[1] = {
-    ...(b1[1] || {}),
-    videoResources: [
-      {
-        key: "b1-day1-traumwelten-ai-grammar-video",
-        chapter: dayOne.chapter,
-        title: "B1 Day 1 · Traumwelten · AI grammar video",
-        description:
-          "AI grammar explanation for Präsens and Perfekt in the topic Traumwelten.",
-        url: dayOne.aiVideo,
-      },
-    ],
-  };
-
-  b1[2] = {
-    ...(b1[2] || {}),
-    videoResources: [
-      {
-        key: "b1-day2-freunde-fuers-leben-ai-grammar-video",
-        chapter: dayTwo.chapter,
-        title: "B1 Day 2 · Freunde fürs Leben · AI grammar video",
-        description:
-          "AI grammar explanation for talking about friendship and past experiences.",
-        url: dayTwo.aiVideo,
-      },
-    ],
-  };
-
-  b1[3] = {
-    ...(b1[3] || {}),
-    videoResources: [
-      {
-        key: "b1-day3-erfolgsgeschichten-ai-grammar-video",
-        chapter: dayThree.chapter,
-        title: "B1 Day 3 · Erfolgsgeschichten · AI grammar video",
-        description:
-          "AI grammar explanation for adjective endings and describing success stories.",
-        url: dayThree.aiVideo,
-      },
-    ],
-  };
-
+  [1, 2, 3].forEach((day) => {
+    const item = getB1LessonResourceOverride(day);
+    b1[day] = {
+      ...(b1[day] || {}),
+      videoResources: [{
+        key: `b1-day${day}-ai-grammar-video`,
+        chapter: item.chapter,
+        title: `B1 Day ${day} · AI grammar video`,
+        description: "AI grammar explanation for this B1 lesson.",
+        url: item.aiVideo,
+      }],
+    };
+  });
   return dictionary;
 };
 
