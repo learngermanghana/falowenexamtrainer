@@ -16,6 +16,8 @@ import B1Day7FastFoodHausmannskostWorkbookPage from "./B1Day7FastFoodHausmannsko
 import B1Day7FastFoodHausmannskostGrammarNotesPage from "./B1Day7FastFoodHausmannskostGrammarNotesPage";
 import B1Day8AllesFuerDieGesundheitWorkbookPage from "./B1Day8AllesFuerDieGesundheitWorkbookPage";
 import B1Day8AllesFuerDieGesundheitGrammarNotesPage from "./B1Day8AllesFuerDieGesundheitGrammarNotesPage";
+import B1Day9WorkLifeBalanceWorkbookPage from "./B1Day9WorkLifeBalanceWorkbookPage";
+import B1Day9WorkLifeBalanceGrammarNotesPage from "./B1Day9WorkLifeBalanceGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
@@ -53,6 +55,7 @@ const B1_WORKBOOK_PAGES = {
   6: B1Day6StadtOderLandWorkbookPage,
   7: B1Day7FastFoodHausmannskostWorkbookPage,
   8: B1Day8AllesFuerDieGesundheitWorkbookPage,
+  9: B1Day9WorkLifeBalanceWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20WieWirdManWorkbookPage,
   21: B1Day21LebensformenHeuteWorkbookPage,
@@ -67,6 +70,7 @@ const B1_GRAMMAR_PAGES = {
   6: B1Day6StadtOderLandGrammarNotesPage,
   7: B1Day7FastFoodHausmannskostGrammarNotesPage,
   8: B1Day8AllesFuerDieGesundheitGrammarNotesPage,
+  9: B1Day9WorkLifeBalanceGrammarNotesPage,
   19: B1Day19VorstellungsgespraechGrammarNotesPage,
   21: B1Day21LebensformenHeuteGrammarNotesPage,
 };
