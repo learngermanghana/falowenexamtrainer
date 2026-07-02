@@ -174,13 +174,13 @@ export default function B1StandardWorkbookPage({ config }) {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           {config.subtitle || "Select Teil 1–4 below. The highlighted task card explains exactly what to prepare, submit or check yourself."}
         </p>
-        <SectionImage image={config.heroImage} alt={config.heroAlt} />
         <WorkbookTabNav
           activeTab={activeTab}
           onChange={setActiveTab}
           tabs={STANDARD_WORKBOOK_TABS}
           ariaLabel={`B1 Day ${config.day} workbook sections`}
         />
+        <SectionImage image={config.heroImage} alt={config.heroAlt} />
       </header>
 
       <A2B1WorkbookGuidance level="B1" />
