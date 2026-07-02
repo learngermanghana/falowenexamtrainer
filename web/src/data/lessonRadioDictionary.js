@@ -125,6 +125,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Gesundheit ein. Danach gehst du weiter zum Workbook.",
     },
+    20: {
+      key: "b1-day20-wie-wird-man-falowen-radio",
+      title: "Wie wird man …? (Ausbildung und Qualifikationen) 6.20",
+      youtubeId: "jAsPc3RTL7k",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Ausbildung, Qualifikationen und Karrierewege ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
