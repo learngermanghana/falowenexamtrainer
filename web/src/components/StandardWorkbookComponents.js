@@ -21,6 +21,30 @@ export const WorkbookTabNav = ({
 
   return (
     <div style={{ display: "grid", gap: 8 }}>
+      <label style={{ display: "grid", gap: 6, fontWeight: 900, color: "#1e3a8a" }}>
+        Teil auswählen
+        <select
+          value={activeTab}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label={`${ariaLabel} selector`}
+          style={{
+            width: "100%",
+            minHeight: 48,
+            padding: "10px 12px",
+            border: "2px solid #2563eb",
+            borderRadius: 10,
+            background: "#fff",
+            color: "#111827",
+            fontSize: 16,
+            fontWeight: 800,
+          }}
+        >
+          {tabs.map((tab) => (
+            <option key={tab.key} value={tab.key}>{tab.label}</option>
+          ))}
+        </select>
+      </label>
+
       <div
         role="tablist"
         aria-label={ariaLabel}
