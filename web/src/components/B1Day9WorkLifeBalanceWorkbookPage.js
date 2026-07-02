@@ -1,0 +1,177 @@
+import React from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+
+const config = {
+  day: 9,
+  chapter: "3.9",
+  assignmentKey: "B1-3.9",
+  workbookId: "B1Day9WorkLifeBalance",
+  title: "Work-Life-Balance im modernen Arbeitsumfeld",
+  subtitle: "Choose Teil 1–4, Ref or Submit. Teil 1 is group practice, Teil 4 is self-check, and only Schreiben and Lesen are submitted.",
+  heroImage: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80",
+  heroAlt: "Professionals discussing work-life balance in a modern workplace",
+  speaking: {
+    question: "Ist eine gute Work-Life-Balance in der modernen Welt möglich?",
+    instructions: "Diskutieren Sie Definition, Herausforderungen, Strategien, Vorteile und zukünftige Entwicklungen. Begründen Sie Ihre Meinung und nennen Sie Beispiele aus Ihrem Alltag oder Heimatland.",
+    image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Colleagues discussing work, stress and personal time",
+    ideaTitle: "Diskussionspunkte zur Vorbereitung",
+    ideaIntro: "Wählen Sie passende Punkte für Ihre Präsentation. Sie müssen nicht jeden Punkt einzeln behandeln.",
+    ideaGroups: [
+      {
+        title: "Definition und Bedeutung",
+        items: [
+          "Gleichgewicht zwischen Beruf und Privatleben",
+          "Wichtiger Faktor für Gesundheit und Zufriedenheit",
+          "Herausforderung in der modernen Arbeitswelt",
+          "Unterschiedliche Ansichten je nach Beruf und Kultur",
+        ],
+      },
+      {
+        title: "Herausforderungen und Probleme",
+        items: [
+          "Hoher Arbeitsdruck, viele Aufgaben und enge Fristen",
+          "Überstunden und ständige Erreichbarkeit",
+          "Wenig Freizeit für Familie und Hobbys",
+          "Psychische und körperliche Belastung",
+          "Schwierige Trennung von Arbeit und Privatleben im Homeoffice",
+        ],
+      },
+      {
+        title: "Strategien für eine bessere Balance",
+        items: [
+          "Klare Arbeitszeiten festlegen und Pausen respektieren",
+          "Freizeit aktiv mit Sport, Hobbys und sozialen Kontakten gestalten",
+          "Nein sagen und persönliche Grenzen setzen",
+          "Yoga, Meditation, Atemübungen oder Spaziergänge nutzen",
+          "Arbeitgeber mit Homeoffice, Teilzeit oder Gleitzeit suchen",
+        ],
+      },
+      {
+        title: "Vorteile einer guten Work-Life-Balance",
+        items: [
+          "Weniger Stress und bessere Gesundheit",
+          "Mehr Zeit für Familie und Freunde",
+          "Höhere Motivation und Produktivität",
+          "Bessere Lebensqualität und Zufriedenheit",
+          "Geringeres Risiko für Burnout und Depressionen",
+        ],
+      },
+      {
+        title: "Zukunft der Work-Life-Balance",
+        items: [
+          "Digitalisierung und Homeoffice – Fluch oder Segen?",
+          "4-Tage-Woche als mögliches Zukunftsmodell",
+          "Flexible Arbeitszeiten als neuer Standard",
+          "Mehr Fokus auf Mitarbeiterwohlbefinden",
+          "Größere Bedeutung mentaler Gesundheit im Berufsleben",
+        ],
+      },
+    ],
+    discussionQuestions: [
+      "Welche Faktoren stören die Work-Life-Balance am stärksten?",
+      "Hilft Homeoffice wirklich, Beruf und Privatleben besser zu verbinden?",
+      "Sollten Unternehmen eine 4-Tage-Woche anbieten?",
+      "Welche persönliche Strategie funktioniert für Sie am besten?",
+    ],
+    answerStructure: [
+      "Einleitung: Thema und Fragestellung vorstellen.",
+      "Argumente dafür: positive Aspekte und Begründungen nennen.",
+      "Argumente dagegen: Probleme und Grenzen erklären.",
+      "Eigene Meinung deutlich machen und kurz begründen.",
+      "Die wichtigsten Punkte zusammenfassen und mit einem Abschlusssatz enden.",
+    ],
+    usefulPhrases: [
+      "Eine gute Work-Life-Balance bedeutet für mich, dass …",
+      "Einerseits bietet Homeoffice mehr Flexibilität, andererseits …",
+      "Arbeitgeber können helfen, indem sie …",
+      "Viele Menschen setzen klare Grenzen, um …",
+      "Obwohl moderne Arbeitsmodelle Vorteile haben, …",
+      "Zusammenfassend lässt sich sagen, dass …",
+    ],
+  },
+  writing: {
+    title: "Ist eine gute Work-Life-Balance im modernen Arbeitsumfeld möglich?",
+    instructions: "Reagieren Sie auf Lisas Meinung. Nennen Sie Argumente dafür und dagegen, geben Sie ein Beispiel und formulieren Sie Ihre eigene Position.",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Student writing an opinion about work-life balance",
+    sourceTitle: "Meinung von Lisa",
+    sourceText: "Viele Menschen haben Schwierigkeiten, Arbeit und Privatleben in Einklang zu bringen. Ich stimme dem zu, denn lange Arbeitszeiten und ständiger Stress können die Gesundheit und das Wohlbefinden beeinträchtigen. Dennoch gibt es heute flexible Arbeitsmodelle wie Homeoffice oder Gleitzeit, die helfen können, eine bessere Balance zu finden. Ich finde, dass jeder bewusst Pausen einplanen und Zeit für Familie und Hobbys nehmen sollte, um langfristig produktiv und zufrieden zu bleiben. Was denken Sie darüber?",
+    taskPoints: [
+      "Fassen Sie Lisas Meinung kurz zusammen.",
+      "Nennen Sie mindestens ein Argument dafür und ein Argument dagegen.",
+      "Erklären Sie, welche Rolle Homeoffice oder flexible Arbeitszeiten spielen.",
+      "Geben Sie ein persönliches Beispiel oder beschreiben Sie die Situation in Ihrem Heimatland.",
+      "Formulieren Sie Ihre eigene Meinung und einen klaren Schluss.",
+    ],
+    supportStructure: [
+      "Einleitung zum Thema",
+      "Reaktion auf Lisas Meinung",
+      "Argumente dafür",
+      "Argumente dagegen",
+      "Persönliches Beispiel und eigene Meinung",
+      "Schluss",
+    ],
+    template: "Liebe Forum-Mitglieder,\n\nich möchte meine Meinung zum Thema Work-Life-Balance äußern.\n\nLisa meint, dass … Ich stimme ihr zu / nicht ganz zu, weil …\n\nEinerseits … Andererseits …\n\nIn meinem Alltag / In meinem Heimatland …\n\nMeiner Meinung nach ist eine gute Work-Life-Balance möglich, wenn …\n\nZusammenfassend lässt sich sagen, dass …\n\nMit freundlichen Grüßen\n[Ihr Name]",
+    vocabulary: [
+      "Arbeit und Privatleben in Einklang bringen",
+      "klare Grenzen setzen",
+      "Pausen einplanen",
+      "Überstunden machen",
+      "ständig erreichbar sein",
+      "flexible Arbeitszeiten nutzen",
+      "Stress reduzieren",
+      "langfristig produktiv bleiben",
+    ],
+  },
+  reading: {
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
+    image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading about stress and health",
+    text: {
+      title: "Stress im Alltag und seine Auswirkungen auf die Gesundheit",
+      paragraphs: [
+        "Stress ist heutzutage ein alltägliches Problem für viele Menschen. Sei es im Berufsleben, in der Schule oder im Privatleben – Stress begleitet uns oft und kann gravierende Auswirkungen auf die Gesundheit haben, wenn er nicht richtig bewältigt wird.",
+        "Es gibt viele Ursachen für Stress. Zu den häufigsten gehören Zeitdruck, hohe Erwartungen, finanzielle Sorgen und Probleme in zwischenmenschlichen Beziehungen. Besonders im Berufsleben kann ein überfüllter Terminkalender und ständiger Leistungsdruck schnell zu Burnout-Symptomen führen. In der Schule oder Universität fühlen sich viele junge Menschen durch Prüfungen, Projekte oder den Druck, gute Noten zu erzielen, gestresst.",
+        "Die körperlichen Auswirkungen von Stress sind vielfältig. Häufig sind Kopfschmerzen, Schlafstörungen oder Magenprobleme erste Anzeichen dafür, dass der Körper überlastet ist. Langfristig kann chronischer Stress zu ernsthaften Erkrankungen wie Herzproblemen, Bluthochdruck oder sogar Depressionen führen.",
+        "Zum Glück gibt es verschiedene Methoden, wie man Stress im Alltag reduzieren kann. Eine der effektivsten Maßnahmen ist regelmäßige Bewegung. Schon ein täglicher Spaziergang oder eine kurze Yoga-Einheit können Wunder wirken. Sport hilft nicht nur, den Kopf freizubekommen, sondern unterstützt auch das Immunsystem und die allgemeine Gesundheit.",
+        "Neben körperlicher Aktivität spielen auch Ernährung und Schlaf eine wichtige Rolle. Eine ausgewogene Ernährung mit viel Obst, Gemüse und Vollkornprodukten versorgt den Körper mit den nötigen Nährstoffen, um besser mit Stress umzugehen. Auch ausreichend Schlaf ist entscheidend, da der Körper nachts regeneriert und Energie für den nächsten Tag tankt.",
+        "Entspannungstechniken wie Meditation oder Atemübungen sind ebenfalls sehr beliebt. Sie helfen dabei, die Gedanken zu beruhigen und den Körper zu entspannen. Viele Menschen finden es außerdem hilfreich, sich regelmäßig Zeit für Hobbys oder Treffen mit Freunden zu nehmen. Diese sozialen Kontakte können das Wohlbefinden steigern und den Stresspegel senken.",
+        "Zusammenfassend lässt sich sagen, dass es viele Möglichkeiten gibt, Stress im Alltag zu bewältigen. Es ist wichtig, frühzeitig auf die Signale des Körpers zu hören und rechtzeitig Maßnahmen zu ergreifen, um gesundheitliche Probleme zu vermeiden.",
+      ],
+      questions: [
+        { stem: "Was sind häufige Ursachen für Stress im Alltag?", options: ["A) Langeweile", "B) Zeitdruck und hohe Erwartungen", "C) Zu viel Schlaf", "D) Freizeit"] },
+        { stem: "Welche körperlichen Folgen kann chronischer Stress haben?", options: ["A) Bessere Konzentration", "B) Gewichtszunahme", "C) Herzprobleme und Bluthochdruck", "D) Bessere Verdauung"] },
+        { stem: "Was kann helfen, Stress abzubauen?", options: ["A) Regelmäßige Bewegung", "B) Mehr Stress im Alltag", "C) Ungesunde Ernährung", "D) Wenig Schlaf"] },
+        { stem: "Warum ist eine ausgewogene Ernährung wichtig?", options: ["A) Sie verbessert immer das Gedächtnis.", "B) Sie liefert dem Körper die nötigen Nährstoffe.", "C) Sie verursacht Stress.", "D) Sie hilft nur beim Abnehmen."] },
+        { stem: "Was unterstützen Entspannungstechniken?", options: ["A) Die Zunahme von Stress", "B) Einen höheren Blutdruck", "C) Die Entspannung von Körper und Geist", "D) Stärkere Schlafstörungen"] },
+        { stem: "Wie können soziale Kontakte helfen?", options: ["A) Sie verursachen mehr Stress.", "B) Sie tragen zum Wohlbefinden bei.", "C) Sie verringern die Schlafqualität.", "D) Sie fördern den Stresspegel."] },
+        { stem: "Was ist wichtig, um gesundheitliche Folgen von Stress zu vermeiden?", options: ["A) Viel arbeiten und keine Pausen machen", "B) Auf die Signale des Körpers hören und frühzeitig Maßnahmen ergreifen", "C) Regelmäßig Überstunden machen", "D) Stress ignorieren"] },
+      ],
+    },
+  },
+  listening: {
+    title: "Hören Sie den Beitrag über Stressbewältigung und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Read the questions first. Listen carefully, answer all five questions and check your own work afterwards.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for a listening exercise about stress management",
+    embedUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/preview",
+    externalUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/view?usp=sharing",
+    videoTitle: "B1 Day 9 Hören · Stress reduzieren",
+    selfCheckText: "Complete the listening task independently and mark your own answers. Only Teil 2 Schreiben and Teil 3 Lesen are submitted for tutor evaluation.",
+    questions: [
+      { stem: "Was ist ein wichtiger Tipp, um Stress zu reduzieren?", options: ["A) Ungeplante Aufgaben erledigen", "B) Realistische Ziele setzen", "C) Mehr Verpflichtungen übernehmen", "D) Aufgaben ignorieren"] },
+      { stem: "Wie kann Bewegung bei Stress helfen?", options: ["A) Sie macht immer müde.", "B) Sie erhöht den Stress.", "C) Sie verbessert die Stimmung.", "D) Sie verringert die Immunabwehr."] },
+      { stem: "Wie können Entspannungstechniken wie Yoga helfen?", options: ["A) Sie beruhigen Körper und Geist.", "B) Sie machen nervös.", "C) Sie verstärken den Druck.", "D) Sie verringern die Schlafqualität."] },
+      { stem: "Warum ist Schlaf wichtig für den Stressabbau?", options: ["A) Weil er den Körper überfordert.", "B) Weil er den Körper regeneriert.", "C) Weil er Stress verursacht.", "D) Weil er ungesund ist."] },
+      { stem: "Warum sind soziale Kontakte wichtig?", options: ["A) Sie sorgen für zusätzliche Aufgaben.", "B) Sie helfen, das Wohlbefinden zu steigern.", "C) Sie erhöhen den Stress.", "D) Sie verursachen mehr Arbeit."] },
+    ],
+  },
+  submitWritingDescription: "Paste your final 80–100 word opinion text about Work-Life-Balance.",
+  submitReadingDescription: "Paste your seven reading answer letters.",
+};
+
+export default function B1Day9WorkLifeBalanceWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} />;
+}
