@@ -57,7 +57,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Fast Food vs. Hausmannskost",
     grammarBook: "/campus/course/lesson/B1/7?view=grammar",
     workbook: "/campus/course/lesson/B1/7?view=workbook",
-    aiVideo: "https://youtu.be/y5wqJv8_GMI",
+    aiVideo: "https://youtu.be/xky4ziUJIis",
     grammarTopic:
       "Genitiv mit wegen und trotz: Gründe, Gegengründe und Eigenschaften von Ernährung präzise ausdrücken",
     goal:
