@@ -2825,7 +2825,7 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
   }
 });
 
-app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) => {
+app.post("/speech-trainer/feedback", audioUpload, async (req, res) => {
   let authedUser;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
@@ -2891,7 +2891,7 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
   }
 });
 
-app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
+app.post("/chatbuddy/respond", audioUpload, async (req, res) => {
   let authedUser;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
