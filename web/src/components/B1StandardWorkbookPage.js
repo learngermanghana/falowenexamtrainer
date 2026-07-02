@@ -165,23 +165,23 @@ export default function B1StandardWorkbookPage({ config }) {
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={card}>
+      <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span style={{ ...styles.badge, width: "fit-content" }}>
           B1 · Day {config.day} · Kapitel {config.chapter}
         </span>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · {config.title}</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          {config.subtitle || "Select Teil 1–4 below. The highlighted task card explains exactly what to prepare, submit or check yourself."}
+          {config.subtitle || "Select Teil 1–4 below. The highlighted card at the top of each section tells you exactly what to answer."}
         </p>
+        <SectionImage image={config.heroImage} alt={config.heroAlt} />
         <WorkbookTabNav
           activeTab={activeTab}
           onChange={setActiveTab}
           tabs={STANDARD_WORKBOOK_TABS}
           ariaLabel={`B1 Day ${config.day} workbook sections`}
         />
-        <SectionImage image={config.heroImage} alt={config.heroAlt} />
-      </header>
+      </div>
 
       <A2B1WorkbookGuidance level="B1" />
 
