@@ -65,32 +65,6 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zum Genitiv mit wegen und trotz. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
   }),
-
-  19: Object.freeze({
-    chapter: "6.19",
-    title: "Das Vorstellungsgespräch",
-    grammarBook: "/campus/course/lesson/B1/19?view=grammar",
-    workbook: "/campus/course/lesson/B1/19?view=workbook",
-    grammarTopic:
-      "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen im Vorstellungsgespräch",
-    goal:
-      "Sich im Vorstellungsgespräch vorstellen, Stärken und Erfahrungen begründen und eine klare B1-Meinung zu Vorstellungsgesprächen schreiben.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
-  }),
-
-  21: Object.freeze({
-    chapter: "7.21",
-    title: "Lebensformen heute",
-    grammarBook: "/campus/course/lesson/B1/21?view=grammar",
-    workbook: "/campus/course/lesson/B1/21?view=workbook",
-    grammarTopic:
-      "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
-    goal:
-      "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
-    instruction:
-      "Lies zuerst die in-app Grammatiknotizen zum Abwägen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
-  }),
   8: Object.freeze({
     chapter: "3.8",
     title: "Alles für die Gesundheit",
@@ -103,6 +77,42 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
       "Über gesunde Ernährung, Bewegung, mentale Gesundheit und Gesundheitsvorsorge sprechen und klare B1-Ratschläge formulieren.",
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zu Modalverben für Gesundheitstipps. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
+  9: Object.freeze({
+    chapter: "3.9",
+    title: "Work-Life-Balance im modernen Arbeitsumfeld",
+    grammarBook: "/campus/course/lesson/B1/9?view=grammar",
+    workbook: "/campus/course/lesson/B1/9?view=workbook",
+    grammarTopic:
+      "Ziele, Methoden, Alternativen und Gegensätze mit um ... zu, damit, indem, ohne ... zu, statt ... zu, obwohl und trotzdem",
+    goal:
+      "Über Arbeitsdruck, flexible Arbeitsmodelle und persönliche Grenzen sprechen, Lösungen erklären und eine strukturierte B1-Meinung zur Work-Life-Balance formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zu Zielen, Methoden und Gegensätzen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis, Teil 4 ist Selbstkontrolle; sende nur Schreiben und Lesen über den Submit-Tab.",
+  }),
+  19: Object.freeze({
+    chapter: "6.19",
+    title: "Das Vorstellungsgespräch",
+    grammarBook: "/campus/course/lesson/B1/19?view=grammar",
+    workbook: "/campus/course/lesson/B1/19?view=workbook",
+    grammarTopic:
+      "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen im Vorstellungsgespräch",
+    goal:
+      "Sich im Vorstellungsgespräch vorstellen, Stärken und Erfahrungen begründen und eine klare B1-Meinung zu Vorstellungsgesprächen schreiben.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
+  }),
+  21: Object.freeze({
+    chapter: "7.21",
+    title: "Lebensformen heute",
+    grammarBook: "/campus/course/lesson/B1/21?view=grammar",
+    workbook: "/campus/course/lesson/B1/21?view=workbook",
+    grammarTopic:
+      "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
+    goal:
+      "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zum Abwägen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
   }),
 });
 
