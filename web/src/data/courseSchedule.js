@@ -1566,7 +1566,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         grammarbook_link: "/campus/course/lesson/B1/21?view=grammar",
-        workbook_link: "/campus/course/lesson/B1/21?view=workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1581,7 +1581,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         grammarbook_link: "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
-        workbook_link: "/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1596,7 +1596,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-23-erstes-date-typische-situationen-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1612,7 +1612,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/zzPpGxzvJCY",
         youtube_link: "https://youtu.be/zzPpGxzvJCY",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-24-konsum-und-nachhaltigkeit-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1626,7 +1626,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1641,7 +1641,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/0sZVT9XAEBc",
         youtube_link: "https://youtu.be/0sZVT9XAEBc",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-26-reiseprobleme-und-loesungen-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1656,7 +1656,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/jzm-MnWC7I0",
         youtube_link: "https://youtu.be/jzm-MnWC7I0",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook",
+        workbook_link: "",
       },
     },
     {
@@ -1671,7 +1671,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
         youtube_link: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
         grammarbook_link: "",
-        workbook_link: "/campus/course/b1-day-28-klimafreundlich-leben-workbook",
+        workbook_link: "",
       },
     },
     {

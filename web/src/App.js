@@ -109,15 +109,7 @@ import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./components/
 import A2Day27DigitaleKommunikationWorkbookPage from "./components/A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./components/A2Day28UeberDieZukunftSprechenWorkbookPage";
 import A2Day28UeberDieZukunftSprechenGrammarPage from "./components/A2Day28UeberDieZukunftSprechenGrammarPage";
-import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./components/B1Day21LebensformenHeuteGrammarNotesPage";
-import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
-import B1Day23ErstesDateWorkbookPage from "./components/B1Day23ErstesDateWorkbookPage";
-import B1Day24KonsumNachhaltigkeitWorkbookPage from "./components/B1Day24KonsumNachhaltigkeitWorkbookPage";
-import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
-import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./components/B1Day26ReiseproblemeUndLoesungenWorkbookPage";
-import B1Day27UmweltfreundlichImAlltagWorkbookPage from "./components/B1Day27UmweltfreundlichImAlltagWorkbookPage";
-import B1Day28KlimafreundlichLebenWorkbookPage from "./components/B1Day28KlimafreundlichLebenWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
 import A1Day16FoodAndNegationGrammarPage from "./components/A1Day16FoodAndNegationGrammarPage";
 import A1Day16FoodAndDailyLifeWorkbookPage from "./components/A1Day16FoodAndDailyLifeWorkbookPage";
@@ -846,26 +838,6 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1Day16TechnologieImAlltagGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-16-technologie-im-alltag-workbook" element={<C1Day16TechnologieImAlltagWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-grammar-notes" element={<B1Day21LebensformenHeuteGrammarNotesPage />} />
-          <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
-          <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
-          <Route path="/campus/course/b1-day-23-erstes-date-typische-situationen-workbook" element={<B1Day23ErstesDateWorkbookPage />} />
-          <Route path="/campus/course/b1-day-24-konsum-und-nachhaltigkeit-workbook" element={<B1Day24KonsumNachhaltigkeitWorkbookPage />} />
-          <Route
-            path="/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook"
-            element={<B1Day25OnlineShoppingRightsRisksWorkbookPage />}
-          />
-          <Route
-            path="/campus/course/b1-day-26-reiseprobleme-und-loesungen-workbook"
-            element={<B1Day26ReiseproblemeUndLoesungenWorkbookPage />}
-          />
-          <Route
-            path="/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook"
-            element={<B1Day27UmweltfreundlichImAlltagWorkbookPage />}
-          />
-          <Route
-            path="/campus/course/b1-day-28-klimafreundlich-leben-workbook"
-            element={<B1Day28KlimafreundlichLebenWorkbookPage />}
-          />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
           <Route path="/campus/course/a1-day-7-asking-about-prices-and-preferences" element={<A1Day7PricesPreferencesGrammarPage />} />

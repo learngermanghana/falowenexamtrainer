@@ -24,15 +24,7 @@ import B1Day11TeamspieleWorkbookPage from "./B1Day11TeamspieleWorkbookPage";
 import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20BerufKennenWorkbookPage from "./B1Day20BerufKennenWorkbookPage";
-import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
-import B1Day22BeziehungWichtigWorkbookPage from "./B1Day22BeziehungWichtigWorkbookPage";
-import B1Day23ErstesDateWorkbookPage from "./B1Day23ErstesDateWorkbookPage";
-import B1Day24KonsumNachhaltigkeitWorkbookPage from "./B1Day24KonsumNachhaltigkeitWorkbookPage";
-import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./B1Day25OnlineShoppingRightsRisksWorkbookPage";
-import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./B1Day26ReiseproblemeUndLoesungenWorkbookPage";
-import B1Day27UmweltfreundlichImAlltagWorkbookPage from "./B1Day27UmweltfreundlichImAlltagWorkbookPage";
-import B1Day28KlimafreundlichLebenWorkbookPage from "./B1Day28KlimafreundlichLebenWorkbookPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
@@ -74,14 +66,6 @@ const B1_WORKBOOK_PAGES = {
   11: B1Day11TeamspieleWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20BerufKennenWorkbookPage,
-  21: B1Day21LebensformenHeuteWorkbookPage,
-  22: B1Day22BeziehungWichtigWorkbookPage,
-  23: B1Day23ErstesDateWorkbookPage,
-  24: B1Day24KonsumNachhaltigkeitWorkbookPage,
-  25: B1Day25OnlineShoppingRightsRisksWorkbookPage,
-  26: B1Day26ReiseproblemeUndLoesungenWorkbookPage,
-  27: B1Day27UmweltfreundlichImAlltagWorkbookPage,
-  28: B1Day28KlimafreundlichLebenWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {

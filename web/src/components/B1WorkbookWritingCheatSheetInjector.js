@@ -4,10 +4,16 @@ import { courseDebug } from "../lib/courseDebug";
 
 const isB1WorkbookRoute = (pathname = "", search = "") => {
   const path = String(pathname || "").replace(/\/+$/, "");
-  if (/^\/campus\/course\/lesson\/B1\/\d+$/i.test(path)) {
-    return new URLSearchParams(search || "").get("view") === "workbook";
+  const lessonMatch = path.match(/^\/campus\/course\/lesson\/B1\/(\d+)$/i);
+  if (lessonMatch) {
+    const lessonDay = Number(lessonMatch[1]);
+    return (lessonDay < 21 || lessonDay > 28) && new URLSearchParams(search || "").get("view") === "workbook";
   }
-  return /^\/campus\/course\/b1-day-\d+-.*-workbook$/i.test(path);
+  const standaloneMatch = path.match(/^\/campus\/course\/b1-day-(\d+)-.*-workbook$/i);
+  if (!standaloneMatch) return false;
+
+  const standaloneDay = Number(standaloneMatch[1]);
+  return standaloneDay < 21 || standaloneDay > 28;
 };
 
 const getB1WorkbookDay = (pathname = "") => {

@@ -130,7 +130,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     chapter: "7.21",
     title: "Lebensformen heute",
     grammarBook: "/campus/course/lesson/B1/21?view=grammar",
-    workbook: "/campus/course/lesson/B1/21?view=workbook",
+    workbook: "",
     grammarTopic:
       "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
     goal:
@@ -140,31 +140,31 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
   }),
   22: Object.freeze({
     chapter: "7.22",
-    workbook: "/campus/course/lesson/B1/22?view=workbook",
+    workbook: "",
   }),
   23: Object.freeze({
     chapter: "7.23",
-    workbook: "/campus/course/lesson/B1/23?view=workbook",
+    workbook: "",
   }),
   24: Object.freeze({
     chapter: "8.24",
-    workbook: "/campus/course/lesson/B1/24?view=workbook",
+    workbook: "",
   }),
   25: Object.freeze({
     chapter: "8.25",
-    workbook: "/campus/course/lesson/B1/25?view=workbook",
+    workbook: "",
   }),
   26: Object.freeze({
     chapter: "9.26",
-    workbook: "/campus/course/lesson/B1/26?view=workbook",
+    workbook: "",
   }),
   27: Object.freeze({
     chapter: "10.27",
-    workbook: "/campus/course/lesson/B1/27?view=workbook",
+    workbook: "",
   }),
   28: Object.freeze({
     chapter: "10.28",
-    workbook: "/campus/course/lesson/B1/28?view=workbook",
+    workbook: "",
   }),
 });
 
