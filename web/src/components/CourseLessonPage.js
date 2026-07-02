@@ -16,6 +16,8 @@ import B1Day7FastFoodHausmannskostWorkbookPage from "./B1Day7FastFoodHausmannsko
 import B1Day7FastFoodHausmannskostGrammarNotesPage from "./B1Day7FastFoodHausmannskostGrammarNotesPage";
 import B1Day8AllesFuerDieGesundheitWorkbookPage from "./B1Day8AllesFuerDieGesundheitWorkbookPage";
 import B1Day8AllesFuerDieGesundheitGrammarNotesPage from "./B1Day8AllesFuerDieGesundheitGrammarNotesPage";
+import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
+import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
@@ -48,6 +50,7 @@ const B1_WORKBOOK_PAGES = {
   6: B1Day6StadtOderLandWorkbookPage,
   7: B1Day7FastFoodHausmannskostWorkbookPage,
   8: B1Day8AllesFuerDieGesundheitWorkbookPage,
+  19: B1Day19VorstellungsgespraechWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
@@ -59,6 +62,7 @@ const B1_GRAMMAR_PAGES = {
   6: B1Day6StadtOderLandGrammarNotesPage,
   7: B1Day7FastFoodHausmannskostGrammarNotesPage,
   8: B1Day8AllesFuerDieGesundheitGrammarNotesPage,
+  19: B1Day19VorstellungsgespraechGrammarNotesPage,
 };
 
 const decorateA1Day3Lesson = (lesson) => {

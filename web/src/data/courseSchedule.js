@@ -1534,8 +1534,8 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "",
         youtube_link: "",
-        grammarbook_link: "https://drive.google.com/file/d/1IimP5JZHHvUYkDSuE7F-YI-Z4PeMYad2/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1fHjQGvObAE3TBmnstPhQBm5RUooP_NyJ/view?usp=sharing",
+        grammarbook_link: "/campus/course/lesson/B1/19?view=grammar",
+        workbook_link: "/campus/course/lesson/B1/19?view=workbook",
       },
     },
     {

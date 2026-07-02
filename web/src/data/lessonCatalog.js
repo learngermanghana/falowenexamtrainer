@@ -1269,8 +1269,8 @@ const lessonCatalog = Object.freeze([
     "title": "Das Vorstellungsgespräch 6.19",
     "assignmentId": "B1-6.19",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "https://drive.google.com/file/d/1IimP5JZHHvUYkDSuE7F-YI-Z4PeMYad2/view?usp=sharing",
-    "workbookRoute": "https://drive.google.com/file/d/1fHjQGvObAE3TBmnstPhQBm5RUooP_NyJ/view?usp=sharing",
+    "grammarPage": "/campus/course/lesson/B1/19?view=grammar",
+    "workbookRoute": "/campus/course/lesson/B1/19?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

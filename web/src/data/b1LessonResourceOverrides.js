@@ -65,6 +65,19 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zum Genitiv mit wegen und trotz. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
   }),
+
+  19: Object.freeze({
+    chapter: "6.19",
+    title: "Das Vorstellungsgespräch",
+    grammarBook: "/campus/course/lesson/B1/19?view=grammar",
+    workbook: "/campus/course/lesson/B1/19?view=workbook",
+    grammarTopic:
+      "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen im Vorstellungsgespräch",
+    goal:
+      "Sich im Vorstellungsgespräch vorstellen, Stärken und Erfahrungen begründen und eine klare B1-Meinung zu Vorstellungsgesprächen schreiben.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
+  }),
   8: Object.freeze({
     chapter: "3.8",
     title: "Alles für die Gesundheit",
