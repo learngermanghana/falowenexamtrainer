@@ -28,12 +28,20 @@ test("B1 Day 1 Traumwelten radio remains available", () =>
   ),
 );
 
+test("B1 Day 6 Stadt oder Land radio uses the requested course video", () =>
+  expect(getLessonRadioResource("B1", 6)).toEqual(
+    expect.objectContaining({
+      title: "Leben in der Stadt oder auf dem Land? 2.6",
+      youtubeId: "houqw5Dg3eY",
+    }),
+  ),
+);
 
-test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the course video", () =>
+test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the requested course video", () =>
   expect(getLessonRadioResource("B1", 7)).toEqual(
     expect.objectContaining({
       title: "Fast Food vs. Hausmannskost 3.7",
-      youtubeId: "y5wqJv8_GMI",
+      youtubeId: "ugKmSqTMiQc",
     }),
   ),
 );
