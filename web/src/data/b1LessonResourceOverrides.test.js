@@ -82,6 +82,29 @@ describe("B1 canonical lesson resources", () => {
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
+  test("B1 Days 20 to 28 open the in-app standard workbook route", () => {
+    for (let day = 20; day <= 28; day += 1) {
+      const lesson = {
+        day,
+        chapter: day === 20 ? "6.20" : `${day}`,
+        lesen_hören: {
+          workbook_link: "https://drive.google.com/legacy-workbook",
+        },
+      };
+
+      applyB1LessonResourceOverride(lesson, day);
+      const normalized = normalizeLesson(lesson, "B1");
+
+      expect(getB1LessonResourceOverride(day).workbook).toBe(
+        `/campus/course/lesson/B1/${day}?view=workbook`
+      );
+      expect(normalized.resources.workbook.url).toBe(
+        `/campus/course/lesson/B1/${day}?view=workbook`
+      );
+      expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
+    }
+  });
+
   test("B1 Days 1 to 3 use the requested AI grammar videos", () => {
     const dictionary = { B1: {} };
     applyB1LessonVideoOverrides(dictionary);
