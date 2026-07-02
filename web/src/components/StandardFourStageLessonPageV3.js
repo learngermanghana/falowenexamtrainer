@@ -63,6 +63,18 @@ const ProgressCard = ({ label, complete, detail }) => (
   </div>
 );
 
+const getSkillDashboard = ({ progress, writing, effectiveWritingComplete, fullEssay }) => {
+  const skills = [
+    { key: "listening", label: "Listening", complete: progress.learnDone, recommendation: "Replay Falowen Radio and note 3 words you heard." },
+    { key: "speaking", label: "Speaking", complete: progress.speakDone, recommendation: "Record one 60-second answer and ask the AI coach for corrections." },
+    { key: "writing", label: "Writing", complete: effectiveWritingComplete, recommendation: fullEssay ? "Revise your essay after AI feedback." : `Finish the guided writing builder (${writing.completedQuestions}/${writing.totalQuestions}).` },
+    { key: "reflection", label: "Reflection", complete: Boolean(progress.confidence), recommendation: "Choose a confidence level and write your next improvement step." },
+  ];
+  const completed = skills.filter((skill) => skill.complete).length;
+  const weakest = skills.find((skill) => !skill.complete) || skills[skills.length - 1];
+  return { skills, completed, weakest, readiness: Math.round((completed / skills.length) * 100) };
+};
+
 const embedUrl = (url = "") => {
   try {
     const parsed = new URL(url);
@@ -242,6 +254,19 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
   const missingRequirements = finishRequirements.filter((item) => !item.complete);
   const finishReady = missingRequirements.length === 0;
 
+  const studyPath = [
+    { tab: "learn", label: "Listen/read the lesson input", complete: progress.learnDone, helper: "Falowen Radio, video and grammar focus" },
+    { tab: "speak", label: "Practise one spoken answer", complete: progress.speakDone, helper: "Use the speaking builder and AI coach" },
+    { tab: "write", label: "Build and improve writing", complete: effectiveWritingComplete, helper: fullEssay ? "Analyse, revise and tick the AI writing review" : "Complete every guided writing prompt" },
+    { tab: "finish", label: "Reflect and set confidence", complete: Boolean(progress.confidence), helper: "Choose confidence and write one next step" },
+  ];
+  const nextStudyStep = studyPath.find((step) => !step.complete) || studyPath[studyPath.length - 1];
+  const skillDashboard = getSkillDashboard({ progress, writing, effectiveWritingComplete, fullEssay });
+  const goToStudyStep = (step = nextStudyStep) => {
+    setActive(step.tab);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const finish = () => {
     if (!finishReady) return;
     const completedAt = new Date().toISOString();
@@ -274,6 +299,19 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
         </div>
         <div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.6rem)" }}>{lesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{lesson.topic}</p></div>
       </header>
+
+      <Section title="Today’s B2/C1 self-learning path">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10 }}>
+          {studyPath.map((step, index) => (
+            <button key={step.tab} type="button" onClick={() => goToStudyStep(step)} style={{ textAlign: "left", border: `1px solid ${step.complete ? "#86efac" : "#cbd5e1"}`, borderRadius: 14, padding: 13, background: step.complete ? "#f0fdf4" : "#fff", cursor: "pointer" }}>
+              <strong>{step.complete ? "✅" : "⬜"} {index + 1}. {step.label}</strong>
+              <span style={{ display: "block", marginTop: 4, color: "#64748b", fontSize: 13 }}>{step.helper}</span>
+            </button>
+          ))}
+        </div>
+        <NoteBox tone={nextStudyStep.complete ? "green" : "blue"}><strong>Next step:</strong> {nextStudyStep.label}. Use this path so you know exactly what is enough for today.</NoteBox>
+        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => goToStudyStep()}>Go to next step</button>
+      </Section>
 
       <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>
         {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}
@@ -323,6 +361,12 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
           <ProgressCard label="Learn" complete={progress.learnDone} detail="Video and grammar reviewed" />
           <ProgressCard label="Speak" complete={progress.speakDone} detail={isCompactSpeakingLesson(lesson) ? "Speaking practice completed" : "Brain-map speaking practice completed"} />
           <ProgressCard label="Write" complete={effectiveWritingComplete} detail={fullEssay ? "AI analysis reviewed and errors improved" : `${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
+        </div>
+        <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 14, background: "#eff6ff", display: "grid", gap: 12 }}>
+          <div><h3 style={{ margin: "0 0 4px" }}>Skill dashboard</h3><p style={{ margin: 0, color: "#475569" }}>Exam readiness for this lesson: <strong>{skillDashboard.readiness}%</strong>. Weakest next focus: <strong>{skillDashboard.weakest.label}</strong>.</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
+            {skillDashboard.skills.map((skill) => <ProgressCard key={skill.key} label={skill.label} complete={skill.complete} detail={skill.complete ? "Done today" : skill.recommendation} />)}
+          </div>
         </div>
         <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose this here so you do not have to mark confidence again in the Course Book.</span><select value={progress.confidence || ""} onChange={(e) => setProgress((old) => ({ ...old, confidence: e.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
         <label style={{ display: "grid", gap: 7 }}><strong>Short reflection</strong><span style={{ color: "#64748b", fontSize: 13 }}>What did you learn, and what should you improve next?</span><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
