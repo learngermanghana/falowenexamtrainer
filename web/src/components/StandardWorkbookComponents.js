@@ -20,7 +20,7 @@ export const WorkbookTabNav = ({
   const activeLabel = tabs[activeIndex]?.label || "Workbook";
 
   return (
-    <div style={{ display: "grid", gap: 8 }}>
+    <div style={{ display: "grid", gap: 10 }}>
       <label style={{ display: "grid", gap: 6, fontWeight: 900, color: "#1e3a8a" }}>
         Teil auswählen
         <select
@@ -45,18 +45,14 @@ export const WorkbookTabNav = ({
         </select>
       </label>
 
-      <div
-        role="tablist"
+      <nav
         aria-label={ariaLabel}
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
           gap: 8,
-          overflowX: "auto",
-          padding: 8,
-          position: "sticky",
-          top: 8,
-          zIndex: 30,
-          border: "1px solid #bfdbfe",
+          padding: 10,
+          border: "2px solid #bfdbfe",
           borderRadius: 12,
           background: "#eff6ff",
           boxShadow: "0 8px 18px rgba(30, 64, 175, 0.08)",
@@ -68,25 +64,30 @@ export const WorkbookTabNav = ({
             <button
               key={tab.key}
               type="button"
-              role="tab"
-              aria-selected={selected}
+              aria-pressed={selected}
               onClick={() => onChange(tab.key)}
               style={{
                 ...styles.secondaryButton,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                minHeight: 46,
+                borderRadius: 10,
                 background: selected ? "#2563eb" : "#fff",
                 borderColor: selected ? "#2563eb" : "#93c5fd",
                 color: selected ? "#fff" : "#1d4ed8",
-                fontWeight: 800,
-                flex: "0 0 auto",
-                whiteSpace: "nowrap",
-                minWidth: tab.key === "references" || tab.key === "submit" ? 84 : 150,
+                fontWeight: 900,
+                whiteSpace: "normal",
+                textAlign: "center",
               }}
             >
               {tab.label}
             </button>
           );
         })}
-      </div>
+      </nav>
+
       <p style={{ margin: 0, color: "#475569", fontSize: 14 }}>
         Open section: <strong>{activeLabel}</strong> · {activeIndex + 1} of {tabs.length}
       </p>
