@@ -39,6 +39,13 @@ const getWordMilestone = (words = 0, minimumWords = 1) => {
 const getMilestoneMessage = (question, index) =>
   `Question ${index + 1} word goal reached: ${question.minimumWords}+ words. You can keep typing if you prefer.`;
 
+const getMotivationMessage = ({ completeCount, totalQuestions, totalMissingWords }) => {
+  if (completeCount === totalQuestions) return "All five answers are unlocked — polish the combined text and send it for AI feedback.";
+  if (completeCount >= 3) return "Great momentum. Finish the last cards to unlock your complete exam-style answer.";
+  if (completeCount >= 1) return "You have started. Keep typing to build a full answer step by step.";
+  return `Start with one card. Your full mission has ${totalMissingWords} target words remaining.`;
+};
+
 const emptyState = () => ({
   answers: {},
   finalEssay: "",
@@ -147,6 +154,9 @@ export default function GuidedWritingWorkspace({
     state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
   const completeCount = questions.filter((question) => question.complete).length;
   const allComplete = completeCount === questions.length;
+  const totalMissingWords = questions.reduce((sum, question) => sum + Math.max(question.minimumWords - question.words, 0), 0);
+  const nextQuestion = questions.find((question) => !question.complete);
+  const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
 
   const update = (updater) =>
@@ -380,6 +390,14 @@ export default function GuidedWritingWorkspace({
           Guided {config.level} Writing
         </span>
         <h3 style={{ margin: 0 }}>Answer five questions and build your text</h3>
+        <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 12, background: "#eff6ff", display: "grid", gap: 8 }}>
+          <strong>Writing mission: {completeCount}/5 cards complete</strong>
+          <span style={{ color: "#475569" }}>{motivationMessage}</span>
+          <div style={{ height: 10, overflow: "hidden", borderRadius: 999, background: "#dbeafe" }} aria-label="Writing mission progress" aria-valuemin={0} aria-valuemax={5} aria-valuenow={completeCount} role="progressbar">
+            <div style={{ width: `${(completeCount / Math.max(questions.length, 1)) * 100}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#2563eb,#7c3aed,#16a34a)", transition: "width 180ms ease" }} />
+          </div>
+          {nextQuestion ? <small style={{ color: "#1e3a8a", fontWeight: 800 }}>Next unlock: {nextQuestion.section} · {Math.max(nextQuestion.minimumWords - nextQuestion.words, 0)} words to go</small> : <small style={{ color: "#166534", fontWeight: 900 }}>Mission complete: all five answer cards are ready.</small>}
+        </div>
         <small
           style={{
             color: saveStatus === "error" ? "#b91c1c" : "#166534",
@@ -412,7 +430,7 @@ export default function GuidedWritingWorkspace({
               }}
             >
               <strong>
-                Question {index + 1} of 5 · {question.section}
+                {question.complete ? "🏅" : "✍️"} Question {index + 1} of 5 · {question.section}
               </strong>
               <span
                 style={{
@@ -485,8 +503,8 @@ export default function GuidedWritingWorkspace({
               </div>
               <small>
                 {question.words}/{question.minimumWords} words · {question.complete
-                  ? "Goal reached — you can still type more if you prefer."
-                  : `Add ${Math.max(question.minimumWords - question.words, 0)} more words.`}
+                  ? "Badge earned — this answer card is ready for your combined text."
+                  : `Add ${Math.max(question.minimumWords - question.words, 0)} more words to earn this card badge.`}
               </small>
             </div>
           </article>
