@@ -78,6 +78,19 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     instruction:
       "Lies zuerst die in-app Grammatiknotizen zur höflichen Sprache im Vorstellungsgespräch. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und den zweiten Leseteil über den Submit-Tab.",
   }),
+
+  21: Object.freeze({
+    chapter: "7.21",
+    title: "Lebensformen heute",
+    grammarBook: "/campus/course/lesson/B1/21?view=grammar",
+    workbook: "/campus/course/lesson/B1/21?view=workbook",
+    grammarTopic:
+      "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
+    goal:
+      "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
+    instruction:
+      "Lies zuerst die in-app Grammatiknotizen zum Abwägen und Begründen. Bearbeite danach alle vier Workbook-Teile. Teil 1 ist Gruppenpraxis; sende deine endgültigen Antworten für Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
   8: Object.freeze({
     chapter: "3.8",
     title: "Alles für die Gesundheit",

@@ -1556,17 +1556,17 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 21,
-      topic: "Lebensformen heute – Familie, Wohnge 7.21",
+      topic: "Lebensformen heute 7.21",
       chapter: "7.21",
-      goal: "Discuss relationship values, online dating, city life, and job application vocabulary with confidence.",
+      goal: "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen, Vor- und Nachteile bewerten und eine persönliche B1-Meinung formulieren.",
       instruction: "Open the workbook and complete all four parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben, Lesen, and Hören in the assignment area.",
-      grammar_topic: "Beziehung und Werte: Kommunikation, Vertrauen, gemeinsame Interessen, Respekt und Zukunftspläne",
+      grammar_topic: "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        grammarbook_link: "https://drive.google.com/file/d/1-5hQoiAohD-lB-keyi7mTidjw8YJbvgT/view?usp=sharing",
-        workbook_link: "/campus/course/b1-day-21-lebensformen-heute-workbook",
+        grammarbook_link: "/campus/course/lesson/B1/21?view=grammar",
+        workbook_link: "/campus/course/lesson/B1/21?view=workbook",
       },
     },
     {
