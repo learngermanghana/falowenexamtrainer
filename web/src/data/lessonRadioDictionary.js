@@ -144,7 +144,7 @@ export const LESSON_RADIO_DICTIONARY = {
     22: {
       key: "b1-day22-beziehung-werte-falowen-radio",
       title: "Was ist dir in einer Beziehung wichtig? 7.22",
-      youtubeId: "MYUvyIVAGiw",
+      youtubeId: "d9vhD_MTrek",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Kommunikation, Vertrauen, Respekt und gemeinsame Zukunftspläne in einer Beziehung ein. Danach gehst du weiter zum Workbook.",
