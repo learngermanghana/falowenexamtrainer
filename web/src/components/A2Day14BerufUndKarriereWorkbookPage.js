@@ -13,7 +13,9 @@ const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
+  { key: "hoeren", label: "Teil 4 · Hören" },
   { key: "references", label: "5. Ref" },
+  { key: "submit", label: "Submit" },
 ];
 
 const card = {
@@ -95,9 +97,33 @@ const lesenQuestions = [
   },
 ];
 
+const hoerenQuestions = [
+  {
+    stem: "Warum möchte Nadine eine Weiterbildung machen?",
+    options: ["A) Sie möchte weniger arbeiten", "B) Sie möchte bessere Aufgaben übernehmen", "C) Sie möchte sofort Urlaub nehmen", "D) Sie möchte die Firma verlassen"],
+  },
+  {
+    stem: "Mit wem spricht Nadine über ihre Karrierepläne?",
+    options: ["A) Mit ihrem Nachbarn", "B) Mit ihrer Chefin", "C) Mit einem Kunden", "D) Mit ihrer Deutschlehrerin"],
+  },
+  {
+    stem: "Wann findet das Seminar statt?",
+    options: ["A) Am Wochenende", "B) Jeden Morgen vor der Arbeit", "C) Am Dienstag und Donnerstagabend", "D) Nur in den Ferien"],
+  },
+  {
+    stem: "Was muss Nadine vor dem Seminar machen?",
+    options: ["A) Ein Formular ausfüllen", "B) Eine Prüfung schreiben", "C) Neue Kleidung kaufen", "D) Ihr Konto schließen"],
+  },
+  {
+    stem: "Was findet Nadine an ihrem Beruf wichtig?",
+    options: ["A) Nur das Gehalt", "B) Keine Kollegen zu haben", "C) Neue Dinge zu lernen", "D) Immer allein zu arbeiten"],
+  },
+];
+
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
@@ -124,6 +150,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
     sprechen: false,
     schreiben: false,
     lesen: false,
+    hoeren: false,
   });
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
@@ -137,7 +164,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 14 Workbook · Beruf und Karriere</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          3-part workbook: group speaking, writing and reading practice.
+          4-part workbook: group speaking, writing, reading and listening practice.
         </p>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -369,10 +396,55 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
         </div>
       )}
 
+      {activeTab === "hoeren" && (
+        <div style={card}>
+          <img
+            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80"
+            alt="Listening practice with laptop and headphones"
+            loading="lazy"
+            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+          />
+          <h2 style={sectionTitle}>Teil 4 · Hören</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Listen to the Falowen Radio lesson for Day 14, then submit your answers in the assignment area. Do not answer directly on this page.
+          </p>
+
+          <h3 style={sectionTitle}>Hörsituation: Weiterbildung im Beruf</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nadine arbeitet in einem Büro und möchte sich beruflich weiterentwickeln. Sie spricht mit ihrer Chefin über ein Seminar, neue Aufgaben und ihre Karriereziele.
+          </p>
+
+          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          {hoerenQuestions.map((question, index) => (
+            <div key={question.stem} style={questionCardStyle}>
+              <strong>{index + 1}. {question.stem}</strong>
+              {question.options.map((option) => (
+                <span key={option}>{option}</span>
+              ))}
+            </div>
+          ))}
+
+          <WorkbookSubmissionReminder />
+          <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
+        </div>
+      )}
+
       {activeTab === "references" && (
         <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day14BerufUndKarriere", level: "A2", workbookId: "A2Day14BerufUndKarriere" }} workbookId="A2Day14BerufUndKarriere" />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            After Falowen Radio and Teil 1–4, submit your required writing, reading and listening answers in the assignment submission area.
+          </p>
+          <WorkbookSubmissionReminder />
+          <a href="/campus/course?submitWork=1" style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
+            Open submission area
+          </a>
+        </div>
+      )}
     </div>
   );
 };
