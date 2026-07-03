@@ -22,7 +22,9 @@ const PrepositionCaseHints = ({ hints = [], onDismiss }) => {
     const currentIds = new Set(hints.map((hint) => hint.id));
     setRevealedIds((current) => {
       const next = new Set([...current].filter((id) => currentIds.has(id)));
-      return next.size === current.size ? current : next;
+      const unchanged =
+        next.size === current.size && [...next].every((id) => current.has(id));
+      return unchanged ? current : next;
     });
   }, [hints]);
 
