@@ -52,7 +52,13 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test Preposition Case Coach
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachInjector.test.jsx
 
       - name: Test attendance reporting
         working-directory: web
@@ -96,10 +102,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -108,7 +114,7 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
       - name: Build web app
         working-directory: web
