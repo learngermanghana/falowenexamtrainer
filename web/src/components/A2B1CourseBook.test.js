@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
@@ -75,10 +75,6 @@ jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
 
 describe("A2 and B1 course books", () => {
-  beforeEach(() => {
-    window.localStorage.clear();
-  });
-
   test("describes the four workbook parts plus Ref and Submit", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
@@ -91,13 +87,10 @@ describe("A2 and B1 course books", () => {
 
   test("keeps the native custom A2 Day 2 workbook focused on four content parts after Radio", () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={["/campus/course/a2-day-2-small-talk?radio=done"]}>
         <A2Day2SmallTalkWorkbookEnhancedPage />
       </MemoryRouter>
     );
-
-    expect(screen.queryByRole("tab", { name: /Teil [1-4]/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
 
     expect(screen.getAllByRole("tab", { name: /Teil [1-4]/i })).toHaveLength(4);
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
@@ -152,8 +145,8 @@ describe("A2 and B1 course books", () => {
   });
 
   test("shows Falowen Radio before opening a B1 workbook", () => {
-    render(
-      <MemoryRouter>
+    const firstView = render(
+      <MemoryRouter initialEntries={["/campus/course/b1-day-1"]}>
         <RadioFirstWorkbookGate level="B1" day={1}>
           <div>B1 Day 1 workbook interface</div>
         </RadioFirstWorkbookGate>
@@ -164,10 +157,20 @@ describe("A2 and B1 course books", () => {
       screen.getByRole("heading", { name: /^🎙️ Falowen Radio$/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText("B1 Day 1 workbook interface")).not.toBeInTheDocument();
+    firstView.unmount();
 
-    fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
+    render(
+      <MemoryRouter initialEntries={["/campus/course/b1-day-1?radio=done"]}>
+        <RadioFirstWorkbookGate level="B1" day={1}>
+          <div>B1 Day 1 workbook interface</div>
+        </RadioFirstWorkbookGate>
+      </MemoryRouter>
+    );
 
     expect(screen.getByText("B1 Day 1 workbook interface")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /^🎙️ Falowen Radio$/i }),
+    ).not.toBeInTheDocument();
   });
 
   test.each(["a2", "b1"])("does not mention class notes in the %s Day 0 guide", (level) => {
