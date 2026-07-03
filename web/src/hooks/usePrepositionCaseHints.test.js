@@ -12,11 +12,11 @@ describe("usePrepositionCaseHints", () => {
 
   const runDebounce = () => {
     act(() => {
-      jest.advanceTimersByTime(900);
+      jest.advanceTimersByTime(300);
     });
   };
 
-  it("debounces and returns local B2 hints with a summary", () => {
+  it("returns hints after a 300 ms pause", () => {
     const { result } = renderHook(() =>
       usePrepositionCaseHints({
         text: "mit einem wichtig Projekt",
@@ -25,8 +25,14 @@ describe("usePrepositionCaseHints", () => {
       }),
     );
 
+    act(() => {
+      jest.advanceTimersByTime(299);
+    });
     expect(result.current.hints).toEqual([]);
-    runDebounce();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
     expect(result.current.hints).toHaveLength(1);
     expect(result.current.hints[0].fullCorrection).toBe(
       "mit einem wichtigen Projekt",
@@ -39,10 +45,10 @@ describe("usePrepositionCaseHints", () => {
     });
   });
 
-  it("returns no hints or progress for unsupported levels", () => {
+  it("returns no hints or progress for unsupported levels by default", () => {
     const { result } = renderHook(() =>
       usePrepositionCaseHints({
-        text: "mit einem wichtig Projekt",
+        text: "mit einen",
         level: "B1",
         enabled: true,
       }),
@@ -51,6 +57,24 @@ describe("usePrepositionCaseHints", () => {
     runDebounce();
     expect(result.current.hints).toEqual([]);
     expect(result.current.summary.checked).toBe(0);
+  });
+
+  it("supports article case hints at every level in marking mode", () => {
+    const { result } = renderHook(() =>
+      usePrepositionCaseHints({
+        text: "Ich arbeite mit einen großen Unterschied.",
+        level: "A1",
+        enabled: true,
+        allowAllLevels: true,
+      }),
+    );
+
+    runDebounce();
+    expect(result.current.hints[0]).toMatchObject({
+      fullPhrase: "mit einen",
+      fullCorrection: "mit einem",
+      issueType: "determiner-case",
+    });
   });
 
   it("keeps a dismissed phrase hidden until that phrase changes", () => {
@@ -80,17 +104,17 @@ describe("usePrepositionCaseHints", () => {
     expect(result.current.summary.dismissed).toBe(1);
   });
 
-  it("removes a fixed hint and records it as cleared", () => {
+  it("removes a fixed article hint and records it as cleared", () => {
     const { result, rerender } = renderHook(
       ({ text }) =>
         usePrepositionCaseHints({ text, level: "B2", enabled: true }),
-      { initialProps: { text: "für eine besser Zukunft" } },
+      { initialProps: { text: "Wir arbeiten mit einen" } },
     );
 
     runDebounce();
     expect(result.current.hints).toHaveLength(1);
 
-    rerender({ text: "für eine bessere Zukunft" });
+    rerender({ text: "Wir arbeiten mit einem" });
     runDebounce();
     expect(result.current.hints).toEqual([]);
     expect(result.current.summary).toEqual({
