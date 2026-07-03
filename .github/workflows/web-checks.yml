@@ -52,13 +52,24 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
       - name: Test Preposition Case Coach
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachInjector.test.jsx
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachInjector.test.jsx 2>&1 | tee preposition-case-coach-tests.log
+
+      - name: Upload coach test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preposition-case-coach-test-log
+          path: web/preposition-case-coach-tests.log
+          if-no-files-found: ignore
 
       - name: Test attendance reporting
         working-directory: web
@@ -114,11 +125,22 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
       - name: Build web app
         working-directory: web
-        run: npm run build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee web-build.log
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preposition-case-coach-build-log
+          path: web/web-build.log
+          if-no-files-found: ignore
 
   curriculum-sync:
     runs-on: ubuntu-latest
