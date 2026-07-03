@@ -16,7 +16,7 @@ describe("usePrepositionCaseHints", () => {
     });
   };
 
-  it("debounces and returns local B2 hints", () => {
+  it("debounces and returns local B2 hints with a summary", () => {
     const { result } = renderHook(() =>
       usePrepositionCaseHints({
         text: "mit einem wichtig Projekt",
@@ -31,9 +31,15 @@ describe("usePrepositionCaseHints", () => {
     expect(result.current.hints[0].fullCorrection).toBe(
       "mit einem wichtigen Projekt",
     );
+    expect(result.current.summary).toEqual({
+      checked: 1,
+      current: 1,
+      cleared: 0,
+      dismissed: 0,
+    });
   });
 
-  it("returns no hints for unsupported levels", () => {
+  it("returns no hints or progress for unsupported levels", () => {
     const { result } = renderHook(() =>
       usePrepositionCaseHints({
         text: "mit einem wichtig Projekt",
@@ -44,6 +50,7 @@ describe("usePrepositionCaseHints", () => {
 
     runDebounce();
     expect(result.current.hints).toEqual([]);
+    expect(result.current.summary.checked).toBe(0);
   });
 
   it("keeps a dismissed phrase hidden until that phrase changes", () => {
@@ -57,6 +64,7 @@ describe("usePrepositionCaseHints", () => {
     const dismissedId = result.current.hints[0].id;
     act(() => result.current.dismissHint(dismissedId));
     expect(result.current.hints).toEqual([]);
+    expect(result.current.summary).toMatchObject({ current: 0, dismissed: 1 });
 
     rerender({ text: "Heute arbeiten wir mit einem wichtig Projekt" });
     runDebounce();
@@ -69,9 +77,10 @@ describe("usePrepositionCaseHints", () => {
     rerender({ text: "Heute arbeiten wir mit einem wichtig Projekt" });
     runDebounce();
     expect(result.current.hints).toHaveLength(1);
+    expect(result.current.summary.dismissed).toBe(1);
   });
 
-  it("removes a hint as soon as the debounced corrected text is checked", () => {
+  it("removes a fixed hint and records it as cleared", () => {
     const { result, rerender } = renderHook(
       ({ text }) =>
         usePrepositionCaseHints({ text, level: "B2", enabled: true }),
@@ -84,6 +93,27 @@ describe("usePrepositionCaseHints", () => {
     rerender({ text: "für eine bessere Zukunft" });
     runDebounce();
     expect(result.current.hints).toEqual([]);
+    expect(result.current.summary).toEqual({
+      checked: 1,
+      current: 0,
+      cleared: 1,
+      dismissed: 0,
+    });
+  });
+
+  it("supports contracted-preposition hints", () => {
+    const { result } = renderHook(() =>
+      usePrepositionCaseHints({
+        text: "Wir arbeiten im modern Gebäude.",
+        level: "C1",
+        enabled: true,
+      }),
+    );
+
+    runDebounce();
+    expect(result.current.hints[0].fullCorrection).toBe(
+      "im modernen Gebäude",
+    );
   });
 
   it("returns at most five current hints", () => {
@@ -97,5 +127,26 @@ describe("usePrepositionCaseHints", () => {
 
     runDebounce();
     expect(result.current.hints).toHaveLength(5);
+    expect(result.current.summary.current).toBe(5);
+  });
+
+  it("can reset its local session summary", () => {
+    const { result } = renderHook(() =>
+      usePrepositionCaseHints({
+        text: "mit einem wichtig Projekt",
+        level: "B2",
+        enabled: true,
+      }),
+    );
+
+    runDebounce();
+    act(() => result.current.resetCoach());
+    expect(result.current.hints).toEqual([]);
+    expect(result.current.summary).toEqual({
+      checked: 0,
+      current: 0,
+      cleared: 0,
+      dismissed: 0,
+    });
   });
 });
