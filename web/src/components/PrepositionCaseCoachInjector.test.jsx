@@ -1,3 +1,7 @@
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ studentProfile: null }),
+}));
+
 import {
   isPrepositionCoachTextarea,
   resolvePrepositionCoachLevel,
