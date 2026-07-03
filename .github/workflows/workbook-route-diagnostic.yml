@@ -1,0 +1,44 @@
+name: Workbook route diagnostic
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/workbook-route-diagnostic.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  workbook-route:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Run workbook route test
+        working-directory: web
+        env:
+          CI: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js 2>&1 | tee /tmp/workbook-route.log
+
+      - name: Upload workbook route details
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbook-route-diagnostic
+          path: /tmp/workbook-route.log
