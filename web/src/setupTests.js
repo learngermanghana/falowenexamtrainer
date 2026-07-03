@@ -19,3 +19,15 @@ if (!globalThis.TextDecoder) {
     value: TextDecoder,
   });
 }
+
+// Firebase checks for fetch while modules are imported. Tests remain offline,
+// and individual suites can replace this fallback with their own mock.
+if (!globalThis.fetch) {
+  Object.defineProperty(globalThis, "fetch", {
+    configurable: true,
+    writable: true,
+    value: jest.fn(() =>
+      Promise.reject(new Error("Network requests are disabled in Jest tests.")),
+    ),
+  });
+}
