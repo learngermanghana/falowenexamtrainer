@@ -15,6 +15,7 @@ import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetIn
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import CourseDebugPanel from "./CourseDebugPanel";
+import PrepositionCaseCoachInjector from "./PrepositionCaseCoachInjector";
 
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
 const ADSENSE_SRC =
@@ -89,6 +90,7 @@ export default function RouteScopedAppServices() {
       <B1WorkbookWritingCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
+      <PrepositionCaseCoachInjector />
       <CourseDebugPanel />
     </>
   );
