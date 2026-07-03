@@ -113,7 +113,7 @@ describe("AutoWorkbookStartGuide route matching", () => {
 
   test("every tutor-marked A1 workbook route receives assignment/submission support", () => {
     const index = buildWorkbookRouteIndex();
-    const assignmentWorkbookPaths = new Set();
+    const assignmentWorkbookRoutes = new Map();
 
     (courseSchedules.A1 || []).forEach((entry) => {
       const resources = [
@@ -128,16 +128,19 @@ describe("AutoWorkbookStartGuide route matching", () => {
 
       resources.forEach((resource) => {
         if (resource?.assignment !== true) return;
-        const path = normalizeInAppPath(resource.workbook_link || resource.workbookRoute);
-        if (path) assignmentWorkbookPaths.add(path);
+        const route = resource.workbook_link || resource.workbookRoute;
+        const pathname = normalizeInAppPath(route);
+        if (!pathname) return;
+        const search = new URL(route, "https://www.falowen.app").search;
+        assignmentWorkbookRoutes.set(pathname, search);
       });
     });
 
-    expect(assignmentWorkbookPaths.size).toBeGreaterThan(10);
-    assignmentWorkbookPaths.forEach((pathname) => {
+    expect(assignmentWorkbookRoutes.size).toBeGreaterThan(10);
+    assignmentWorkbookRoutes.forEach((search, pathname) => {
       const match = index.get(pathname);
       expect(match).toBeTruthy();
-      expect(shouldRenderWorkbookGuide({ pathname, search: "", match })).toBe(true);
+      expect(shouldRenderWorkbookGuide({ pathname, search, match })).toBe(true);
     });
   });
 
