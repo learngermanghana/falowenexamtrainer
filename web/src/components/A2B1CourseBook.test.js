@@ -59,6 +59,19 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ user: null, studentProfile: null }),
+}));
+
+jest.mock("../firebase", () => ({
+  db: {},
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  onSnapshot: jest.fn(() => () => {}),
+  serverTimestamp: jest.fn(),
+  setDoc: jest.fn(),
+}));
+
 jest.mock("./AssignmentSubmissionPage", () => () => null);
 jest.mock("./WorkbookReadAloudInjector", () => () => null);
 jest.mock("./SpeakingPracticeTimerCard", () => () => null);
