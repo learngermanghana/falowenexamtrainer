@@ -7,8 +7,12 @@ on:
       - "shared/**"
       - "scripts/**"
       - "functions/data/curriculumManifest.js"
+      - "functions/data/lessonCatalog.js"
       - "package.json"
       - ".github/workflows/web-checks.yml"
+
+permissions:
+  contents: read
 
 jobs:
   a1-curriculum:
@@ -17,10 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -43,10 +47,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -58,7 +62,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachInjector.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachField.test.jsx
 
       - name: Test attendance reporting
         working-directory: web
@@ -125,6 +129,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Check curriculum manifest sync
         run: node scripts/checkCurriculumManifestSync.js
