@@ -5,6 +5,7 @@ jest.mock("../context/AuthContext", () => ({
 import {
   isPrepositionCoachTextarea,
   resolvePrepositionCoachLevel,
+  selectCoachPhrase,
 } from "./PrepositionCaseCoachInjector";
 
 describe("PrepositionCaseCoachInjector helpers", () => {
@@ -50,5 +51,23 @@ describe("PrepositionCaseCoachInjector helpers", () => {
   it("uses the profile level only as a fallback", () => {
     document.body.innerHTML = `<textarea id="field" placeholder="Combine what you wrote today and paste it here for level-based analysis..."></textarea>`;
     expect(resolvePrepositionCoachLevel(document.getElementById("field"), "B2")).toBe("B2");
+  });
+
+  it("selects the exact phrase without changing the textarea value", () => {
+    document.body.innerHTML = `<textarea id="field">Heute arbeiten wir mit einem wichtig Projekt.</textarea>`;
+    const textarea = document.getElementById("field");
+    const originalValue = textarea.value;
+    const start = originalValue.indexOf("mit einem wichtig Projekt");
+
+    expect(
+      selectCoachPhrase(textarea, {
+        fullStart: start,
+        start: start + 4,
+        end: start + "mit einem wichtig Projekt".length,
+      }),
+    ).toBe(true);
+    expect(textarea.selectionStart).toBe(start);
+    expect(textarea.selectionEnd).toBe(start + "mit einem wichtig Projekt".length);
+    expect(textarea.value).toBe(originalValue);
   });
 });

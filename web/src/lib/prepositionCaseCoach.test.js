@@ -25,9 +25,71 @@ describe("Preposition Case Coach rule engine", () => {
   });
 
   test.each([
+    ["im modern Gebäude", "im modernen Gebäude", "dative", "en"],
+    ["am neu Standort", "am neuen Standort", "dative", "en"],
+    ["beim wichtig Gespräch", "beim wichtigen Gespräch", "dative", "en"],
+    ["vom aktuell Projekt", "vom aktuellen Projekt", "dative", "en"],
+    ["zum nächst Termin", "zum nächsten Termin", "dative", "en"],
+    ["zur beruflich Entwicklung", "zur beruflichen Entwicklung", "dative", "en"],
+    ["ins schön Gebäude", "ins schöne Gebäude", "accusative", "e"],
+    ["ans ruhig Meer", "ans ruhige Meer", "accusative", "e"],
+  ])("supports contracted preposition %s", (text, correction, grammaticalCase, ending) => {
+    const issue = firstIssue(text);
+
+    expect(issue).toMatchObject({
+      fullCorrection: correction,
+      case: grammaticalCase,
+      expectedEnding: ending,
+      contracted: true,
+    });
+    expect(issue.explanation).toMatch(/short for/i);
+  });
+
+  it("corrects safe multi-adjective phrases", () => {
+    const issue = firstIssue("mit einem wichtig international Projekt");
+
+    expect(issue.fullCorrection).toBe(
+      "mit einem wichtigen internationalen Projekt",
+    );
+    expect(issue.adjectives).toEqual(["wichtig", "international"]);
+    expect(issue.incorrectAdjectives).toEqual(["wichtig", "international"]);
+    expect(issue.confidence).toBe(0.95);
+  });
+
+  it("keeps already-correct adjectives while correcting another adjective", () => {
+    const issue = firstIssue("mit einem wichtigen international Projekt");
+
+    expect(issue.fullCorrection).toBe(
+      "mit einem wichtigen internationalen Projekt",
+    );
+    expect(issue.incorrectAdjectives).toEqual(["international"]);
+  });
+
+  it("skips uncertain multi-word sequences containing an adverb", () => {
+    expect(
+      analyzePrepositionCaseCoach("mit einem sehr wichtig Projekt", { level: "B2" }),
+    ).toEqual([]);
+  });
+
+  test.each([
+    ["mit einem hoch Gebäude", "mit einem hohen Gebäude"],
+    ["mit einem hohe Gebäude", "mit einem hohen Gebäude"],
+    ["mit einem teuer Projekt", "mit einem teuren Projekt"],
+    ["mit einem dunkel Raum", "mit einem dunklen Raum"],
+    ["mit einem offen Fenster", "mit einem offenen Fenster"],
+  ])("uses a safe adjective stem for %s", (text, correction) => {
+    expect(firstIssue(text).fullCorrection).toBe(correction);
+  });
+
+  test.each([
     "mit einem wichtigen Projekt",
     "für eine bessere Zukunft",
     "von der modernen Technologie",
+    "im modernen Gebäude",
+    "mit einem hohen Gebäude",
+    "mit einem teuren Projekt",
+    "mit einem offenen Fenster",
+    "mit einem wichtigen internationalen Projekt",
     "Das Projekt ist wichtig.",
     "mit moderner Technologie",
   ])("does not flag correct or unsupported phrase: %s", (text) => {
@@ -45,6 +107,9 @@ describe("Preposition Case Coach rule engine", () => {
     expect(
       analyzePrepositionCaseCoach("mit einem wichtig", { level: "B2" }),
     ).toEqual([]);
+    expect(
+      analyzePrepositionCaseCoach("im wichtig", { level: "B2" }),
+    ).toEqual([]);
   });
 
   it("tokenises umlauts and sharp s with exact offsets", () => {
@@ -61,6 +126,7 @@ describe("Preposition Case Coach rule engine", () => {
       "Überlegung",
     ]);
     expect(text.slice(issue.start, issue.end)).toBe(issue.phrase);
+    expect(text.slice(issue.fullStart, issue.end)).toBe(issue.fullPhrase);
     expect(issue.fullCorrection).toBe("für eine schöne Überlegung");
   });
 
