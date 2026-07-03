@@ -35,6 +35,7 @@ import WritingHistorySection, {
   buildWritingHistoryRecord,
 } from "./WritingHistorySection";
 import WritingLibraryTab from "./WritingLibraryTab";
+import PrepositionCaseCoachField from "./PrepositionCaseCoachField";
 import {
   makeReferenceId,
   normalizeReferenceNotes,
@@ -603,6 +604,7 @@ const WritingPage = ({
   const [timerRunning, setTimerRunning] = useState(false);
   const chatLogRef = useRef(null);
   const markDraftRef = useRef(null);
+  const revisedDraftRef = useRef(null);
   const ideasPromptRef = useRef(null);
   const ideasWorkspaceRef = useRef(null);
   const referencesRef = useRef(null);
@@ -2345,6 +2347,12 @@ const WritingPage = ({
               style={styles.textArea}
               rows={9}
             />
+            <PrepositionCaseCoachField
+              text={typedAnswer}
+              level={level}
+              textareaRef={markDraftRef}
+              studentProfile={studentProfile}
+            />
             <SpecialCharacterRow
               onInsert={(character) =>
                 insertSpecialCharacter(setTypedAnswer, markDraftRef, character)
@@ -2467,6 +2475,7 @@ const WritingPage = ({
                   <label style={styles.label}>Your improved draft</label>
 
                   <textarea
+                    ref={revisedDraftRef}
                     value={revisedDraftText}
                     onChange={(event) => {
                       setRevisedDraftText(event.target.value);
@@ -2480,6 +2489,12 @@ const WritingPage = ({
                     placeholder="Rewrite your improved letter or essay here."
                     style={styles.textArea}
                     rows={9}
+                  />
+                  <PrepositionCaseCoachField
+                    text={revisedDraftText}
+                    level={level}
+                    textareaRef={revisedDraftRef}
+                    studentProfile={studentProfile}
                   />
 
                   <p style={{ ...styles.helperText, marginBottom: 0 }}>

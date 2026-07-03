@@ -23,6 +23,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
   A1_DAY6_WORKBOOK_PATH,
   A1_DAY18_CHAPTER121_PATH,
+  A1_DAY18_CHAPTER122_GRAMMAR_PATH,
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
   A2_DAY20_WORKBOOK_PATH,
   A2_DAY21_WORKBOOK_PATH,
@@ -42,7 +43,7 @@ export const shouldRenderWorkbookGuide = ({ pathname = "", search = "", match } 
   const requestedView = new URLSearchParams(search || "").get("view");
 
   if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) return requestedView === "workbook";
-  if (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH) return false;
+  if (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH) return requestedView === "workbook";
 
   const isB1LessonRoute = normalizedPathname.toLowerCase().startsWith("/campus/course/lesson/b1/");
   if (!isB1LessonRoute) return true;
@@ -58,7 +59,11 @@ const AutoWorkbookStartGuide = () => {
     SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
     || isSelfManagedB1LessonWorkbook(pathname, search);
 
-  if (normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH) return <A1Day18Kapitel122WorkbookPage />;
+  if (
+    normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH
+    || (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH
+      && new URLSearchParams(search || "").get("view") === "workbook")
+  ) return <A1Day18Kapitel122WorkbookPage />;
 
   if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
 
