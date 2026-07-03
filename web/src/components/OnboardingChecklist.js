@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { LESSON_VIDEO_DICTIONARY } from "../data/lessonVideoDictionary";
 import { detectLevelKey } from "../lib/day0Workbook";
+import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { useToast } from "../context/ToastContext";
+import SetupCheckpoint from "./SetupCheckpoint";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import {
   getPublicFunnelContext,
@@ -48,12 +50,18 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const level = detectLevelKey(studentProfile);
   const video = useMemo(() => LESSON_VIDEO_DICTIONARY?.[level]?.[0]?.videoResources?.[0] || null, [level]);
   const videoId = getYouTubeId(video?.url);
+  const paymentConfirmed = useMemo(() => {
+    const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
+    const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
+    return ["paid", "partial"].includes(paymentStatus) || hasClearedBalance(balanceDue);
+  }, [studentProfile?.balance, studentProfile?.balanceDue, studentProfile?.paymentStatus]);
 
   useEffect(() => {
+    if (!paymentConfirmed) return;
     const context = getPublicFunnelContext();
     if (!context.sessionId && !context.source && !context.video) return;
     trackPublicFunnelEvent("onboarding_view", { level, onboardingVideo: videoId });
-  }, [level, videoId]);
+  }, [level, paymentConfirmed, videoId]);
 
   const openDashboard = async () => {
     if (!watchedVideo) {
@@ -75,6 +83,10 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
       setSaving(false);
     }
   };
+
+  if (!paymentConfirmed) {
+    return <SetupCheckpoint />;
+  }
 
   return (
     <div className="onboarding-page">
