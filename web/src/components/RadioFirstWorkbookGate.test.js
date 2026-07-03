@@ -1,24 +1,38 @@
 import {
+  buildCompletedRadioHref,
   buildCompletedRadioSearch,
-  shouldShowRadioFirst,
+  openCompletedWorkbook,
 } from "./RadioFirstWorkbookGate";
 
-const A2_RADIO_DAYS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28];
+describe("RadioFirstWorkbookGate navigation", () => {
+  it("preserves the workbook view and adds the completed radio flag", () => {
+    expect(buildCompletedRadioSearch("?view=workbook")).toBe("?view=workbook&radio=done");
+  });
 
-test.each(A2_RADIO_DAYS)("A2 Day %i uses the standardized radio-first workbook gate", (day) => {
-  expect(shouldShowRadioFirst("A2", day)).toBe(true);
-});
+  it("builds the correct B1 Day 21 workbook URL", () => {
+    expect(
+      buildCompletedRadioHref({
+        pathname: "/campus/course/lesson/B1/21",
+        search: "?view=workbook",
+        hash: "",
+      })
+    ).toBe("/campus/course/lesson/B1/21?view=workbook&radio=done");
+  });
 
-test.each([["B2", 1], ["C1", 1]])("%s Day %i uses the standardized radio-first workbook gate", (level, day) => {
-  expect(shouldShowRadioFirst(level, day)).toBe(true);
-});
+  it("uses direct browser navigation so Continue always opens the workbook", () => {
+    const assign = jest.fn();
+    const opened = openCompletedWorkbook(
+      {
+        pathname: "/campus/course/lesson/B1/21",
+        search: "?view=workbook",
+        hash: "",
+      },
+      { location: { assign } }
+    );
 
-test("an A2 workbook without a radio skips the radio-first gate", () => {
-  expect(shouldShowRadioFirst("A2", 20)).toBe(false);
-});
-
-test("Continue records radio completion while preserving the existing query", () => {
-  expect(buildCompletedRadioSearch("")).toBe("?radio=done");
-  expect(buildCompletedRadioSearch("?view=workbook")).toBe("?view=workbook&radio=done");
-  expect(buildCompletedRadioSearch("?radio=done")).toBe("?radio=done");
+    expect(opened).toBe(true);
+    expect(assign).toHaveBeenCalledWith(
+      "/campus/course/lesson/B1/21?view=workbook&radio=done"
+    );
+  });
 });

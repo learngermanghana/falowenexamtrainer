@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
@@ -32,15 +32,26 @@ export const buildCompletedRadioSearch = (search = "") => {
   return query ? `?${query}` : "";
 };
 
+export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" } = {}) =>
+  `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+
+export const openCompletedWorkbook = (locationLike, windowRef) => {
+  const href = buildCompletedRadioHref(locationLike);
+  const browserWindow = windowRef || (typeof window !== "undefined" ? window : null);
+  if (!browserWindow || typeof browserWindow.location?.assign !== "function") return false;
+  browserWindow.location.assign(href);
+  return true;
+};
+
 export const shouldShowRadioFirst = (level, day) => Boolean(getRadioResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children }) => {
   const radio = getRadioResource(level, day);
   const location = useLocation();
-  const navigate = useNavigate();
   const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
   const [isContinuing, setIsContinuing] = useState(false);
+  const continueHref = buildCompletedRadioHref(location);
 
   useEffect(() => {
     if (!hasEnteredWorkbook && hasCompletedRadioStep(location.search, level, day)) {
@@ -61,8 +72,9 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
       completedInMemory: completedRadioSteps.has(radioStepKey(level, day)),
       hasEnteredWorkbook,
       isContinuing,
+      continueHref,
     });
-  }, [day, hasEnteredWorkbook, isContinuing, level, location.search, radio]);
+  }, [continueHref, day, hasEnteredWorkbook, isContinuing, level, location.search, radio]);
 
   if (hasEnteredWorkbook) return children;
 
@@ -72,28 +84,16 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
       day: Number(day),
       searchBefore: location.search,
       isContinuing,
-      nextSearch: buildCompletedRadioSearch(location.search),
+      continueHref,
     });
 
     if (isContinuing) return;
 
     setIsContinuing(true);
     completedRadioSteps.add(radioStepKey(level, day));
-    setHasEnteredWorkbook(true);
-    navigate(
-      {
-        pathname: location.pathname,
-        search: buildCompletedRadioSearch(location.search),
-        hash: location.hash,
-      },
-      { replace: true },
-    );
 
-    if (typeof window !== "undefined") {
-      const scrollToTop = () => window.scrollTo({ top: 0, behavior: "auto" });
-      if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(scrollToTop);
-      else scrollToTop();
-    }
+    if (openCompletedWorkbook(location)) return;
+    setHasEnteredWorkbook(true);
   };
 
   return (
