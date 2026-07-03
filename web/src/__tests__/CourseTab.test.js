@@ -248,7 +248,10 @@ describe("CourseTab", () => {
     expect(screen.getByText("Practical completed: 0/4")).toBeInTheDocument();
     expect(screen.getByText("Assignments").nextElementSibling).toHaveTextContent("9");
 
-    fireEvent.click(within(day5Card).getByRole("button", { name: "Open Lesson" }));
+    const openLessonLink = within(day5Card).getByRole("link", { name: "Open Lesson" });
+    expect(openLessonLink).toHaveAttribute("href", "/campus/course/lesson/A1/5?chapter=1.3");
+
+    fireEvent.click(openLessonLink);
     expect(mockNavigate).toHaveBeenCalledWith(
       "/campus/course/lesson/A1/5?chapter=1.3",
       expect.objectContaining({

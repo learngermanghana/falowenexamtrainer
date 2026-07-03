@@ -794,10 +794,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
   };
 
-  const openLesson = (entry) => {
-    const chapter = String(entry.displayChapter || entry.chapter || "").trim();
+  const getLessonHref = (entry) => {
+    const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
     const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";
-    navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}${search}`, {
+    return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;
+  };
+
+  const openLesson = (entry) => {
+    navigate(getLessonHref(entry), {
       state: {
         level: selectedCourseLevel,
         day: entry.day,
@@ -807,6 +811,22 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         scoreText: entry.scoreBadge?.text || "",
       },
     });
+  };
+
+  const handleLessonLinkClick = (event, entry) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    openLesson(entry);
   };
 
   return (
@@ -989,14 +1009,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     </label>
                   ) : null}
                 </div>
-                <button
-                  type="button"
-                  style={styles.primaryButton}
+                <a
+                  href={getLessonHref(nextLesson)}
+                  style={{ ...styles.primaryButton, textDecoration: "none" }}
                   aria-label={`Open ${nextLessonTitle}`}
-                  onClick={() => openLesson(nextLesson)}
+                  onClick={(event) => handleLessonLinkClick(event, nextLesson)}
                 >
                   Open: {nextLessonTitle}
-                </button>
+                </a>
               </section>
             ) : (
               <section style={courseBookStyles.nextCard}>
@@ -1089,9 +1109,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 ) : null}
                               </>
                             ) : null}
-                            <button type="button" style={styles.primaryButton} onClick={() => openLesson(entry)}>
+                            <a
+                              href={getLessonHref(entry)}
+                              style={{ ...styles.primaryButton, textDecoration: "none" }}
+                              onClick={(event) => handleLessonLinkClick(event, entry)}
+                            >
                               Open Lesson
-                            </button>
+                            </a>
                           </div>
                         </div>
                         {entry.goal ? <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.45 }}>{entry.goal}</p> : null}
