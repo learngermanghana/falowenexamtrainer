@@ -74,6 +74,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Das Vorstellungsgespräch",
     grammarBook: route(19, "grammar"),
     workbook: route(19, "workbook"),
+    aiVideo: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
     grammarTopic: "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen",
     goal: "Sich im Vorstellungsgespräch vorstellen und eine klare B1-Meinung formulieren.",
     instruction: "Lies zuerst die Grammatiknotizen und bearbeite danach alle vier Workbook-Teile.",
