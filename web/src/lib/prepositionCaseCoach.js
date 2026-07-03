@@ -5,10 +5,22 @@ export const PREPOSITION_CASES = {
   twoWay: ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"],
 };
 
+export const CONTRACTED_PREPOSITIONS = {
+  am: { preposition: "an", determiner: "dem", case: "dative", gender: "neuter", number: "singular" },
+  ans: { preposition: "an", determiner: "das", case: "accusative", gender: "neuter", number: "singular" },
+  beim: { preposition: "bei", determiner: "dem", case: "dative", gender: "neuter", number: "singular" },
+  im: { preposition: "in", determiner: "dem", case: "dative", gender: "neuter", number: "singular" },
+  ins: { preposition: "in", determiner: "das", case: "accusative", gender: "neuter", number: "singular" },
+  vom: { preposition: "von", determiner: "dem", case: "dative", gender: "neuter", number: "singular" },
+  zum: { preposition: "zu", determiner: "dem", case: "dative", gender: "neuter", number: "singular" },
+  zur: { preposition: "zu", determiner: "der", case: "dative", gender: "feminine", number: "singular" },
+};
+
 const SUPPORTED_LEVELS = new Set(["B2", "C1"]);
 const TOKEN_PATTERN = /[\p{L}]+(?:[-’'][\p{L}]+)*/gu;
 const UPPERCASE_PATTERN = /^\p{Lu}/u;
 const LOWERCASE_PATTERN = /^\p{Ll}/u;
+const MAX_ADJECTIVES = 3;
 
 const CASE_BY_PREPOSITION = Object.entries(PREPOSITION_CASES).reduce((map, [caseName, items]) => {
   items.forEach((item) => map.set(item, caseName));
@@ -193,18 +205,31 @@ const MIXED_ENDINGS = {
 };
 
 const BASE_FORM_ER_EXCEPTIONS = new Set([
-  "besser",
-  "bitter",
-  "clever",
-  "finster",
-  "heiter",
-  "locker",
-  "mager",
-  "sauber",
-  "sauer",
-  "schwer",
-  "sicher",
-  "teuer",
+  "besser", "bitter", "clever", "finster", "heiter", "locker", "mager",
+  "sauber", "schwer", "sicher", "wunderbar",
+]);
+
+const BASE_FORM_EN_EXCEPTIONS = new Set([
+  "bescheiden", "eigen", "offen", "trocken", "verschieden", "zufrieden",
+]);
+
+const IRREGULAR_STEMS = new Map([
+  ["hoch", "hoh"], ["hohe", "hoh"], ["hoher", "hoh"], ["hohes", "hoh"], ["hohem", "hoh"], ["hohen", "hoh"],
+  ["nah", "nah"], ["nahe", "nah"], ["naher", "nah"], ["nahes", "nah"], ["nahem", "nah"], ["nahen", "nah"],
+  ["dunkel", "dunkl"], ["dunkle", "dunkl"], ["dunkler", "dunkl"], ["dunkles", "dunkl"], ["dunklem", "dunkl"], ["dunklen", "dunkl"],
+  ["edel", "edl"], ["edle", "edl"], ["edler", "edl"], ["edles", "edl"], ["edlem", "edl"], ["edlen", "edl"],
+  ["teuer", "teur"], ["teure", "teur"], ["teurer", "teur"], ["teures", "teur"], ["teurem", "teur"], ["teuren", "teur"],
+  ["sauer", "saur"], ["saure", "saur"], ["saurer", "saur"], ["saures", "saur"], ["saurem", "saur"], ["sauren", "saur"],
+]);
+
+const SAFE_MULTI_ADJECTIVES = new Set([
+  "aktuell", "alt", "beruflich", "besser", "deutsch", "digital", "dringend",
+  "effektiv", "europäisch", "finanziell", "flexibel", "gesellschaftlich",
+  "gesund", "global", "groß", "hoch", "individuell", "innovativ", "international",
+  "kulturell", "langfristig", "lokal", "modern", "nachhaltig", "national",
+  "neu", "öffentlich", "persönlich", "politisch", "positiv", "praktisch",
+  "professionell", "regional", "schlecht", "schwer", "sozial", "staatlich",
+  "technisch", "teuer", "traditionell", "umweltfreundlich", "wichtig", "wirtschaftlich",
 ]);
 
 const tokenize = (text) => {
@@ -238,23 +263,54 @@ const resolveDeterminer = (form, prepositionCase) => {
   const endings = [...new Set(candidates.map(getExpectedEnding).filter(Boolean))];
   if (endings.length !== 1) return null;
 
-  return {
-    ...candidates[0],
-    candidates,
-    expectedEnding: endings[0],
-  };
+  return { ...candidates[0], candidates, expectedEnding: endings[0] };
 };
-
-const adjectiveHasEnding = (adjective, expectedEnding) =>
-  adjective.toLocaleLowerCase("de-DE").endsWith(expectedEnding);
 
 const getAdjectiveStem = (adjective) => {
   const lower = adjective.toLocaleLowerCase("de-DE");
-  if (BASE_FORM_ER_EXCEPTIONS.has(lower)) return adjective;
-  if (/(em|en|es)$/u.test(lower)) return adjective.slice(0, -2);
-  if (/e$/u.test(lower)) return adjective.slice(0, -1);
-  if (/er$/u.test(lower)) return adjective.slice(0, -2);
-  return adjective;
+  const irregular = IRREGULAR_STEMS.get(lower);
+  if (irregular) return irregular;
+  if (BASE_FORM_ER_EXCEPTIONS.has(lower) || BASE_FORM_EN_EXCEPTIONS.has(lower)) return lower;
+  if (/(em|en|es)$/u.test(lower)) return lower.slice(0, -2);
+  if (/e$/u.test(lower)) return lower.slice(0, -1);
+  if (/er$/u.test(lower)) return lower.slice(0, -2);
+  return lower;
+};
+
+const correctAdjective = (adjective, expectedEnding) =>
+  `${getAdjectiveStem(adjective)}${expectedEnding}`;
+
+const isSafeMultiAdjective = (adjective) => {
+  const lower = adjective.toLocaleLowerCase("de-DE");
+  const stem = getAdjectiveStem(lower);
+  return SAFE_MULTI_ADJECTIVES.has(lower) || SAFE_MULTI_ADJECTIVES.has(stem);
+};
+
+const collectAdjectiveNounSequence = (source, tokens, firstAdjectiveIndex) => {
+  const adjectives = [];
+  let previous = tokens[firstAdjectiveIndex - 1];
+
+  for (let index = firstAdjectiveIndex; index < tokens.length && adjectives.length <= MAX_ADJECTIVES; index += 1) {
+    const token = tokens[index];
+    if (!onlyWhitespaceBetween(source, previous, token)) return null;
+
+    if (UPPERCASE_PATTERN.test(token.value)) {
+      if (!adjectives.length || token.value.length < 2) return null;
+      if (adjectives.length > 1 && !adjectives.every((item) => isSafeMultiAdjective(item.value))) {
+        return null;
+      }
+      return { adjectives, noun: token };
+    }
+
+    if (!LOWERCASE_PATTERN.test(token.value) || token.value.length < 3 || adjectives.length === MAX_ADJECTIVES) {
+      return null;
+    }
+
+    adjectives.push(token);
+    previous = token;
+  }
+
+  return null;
 };
 
 const makeStableId = (signature, occurrence) => {
@@ -266,14 +322,98 @@ const makeStableId = (signature, occurrence) => {
   return `preposition-case-${(hash >>> 0).toString(36)}-${occurrence}`;
 };
 
+const buildExplanation = ({ caseName, declensionType, determiner, contractedForm, expanded }) => {
+  if (contractedForm) {
+    return `“${contractedForm}” is short for “${expanded}”. “${determiner}” marks ${caseName}, so the following adjective uses weak declension.`;
+  }
+  if (declensionType === "weak") {
+    return `“${determiner}” already carries the case marker. That makes this weak adjective declension in ${caseName}.`;
+  }
+  return `“${determiner}” is an ein-word determiner. The adjective therefore follows mixed declension in ${caseName}.`;
+};
+
+const buildIssue = ({
+  source,
+  prepositionToken,
+  determinerToken,
+  adjectives,
+  noun,
+  resolution,
+  occurrence,
+  contracted,
+}) => {
+  const correctedAdjectives = adjectives.map((token) => correctAdjective(token.value, resolution.expectedEnding));
+  const incorrectAdjectives = adjectives.filter(
+    (token, index) => token.normalized !== correctedAdjectives[index].toLocaleLowerCase("de-DE"),
+  );
+  if (!incorrectAdjectives.length) return null;
+
+  const writtenHead = contracted ? prepositionToken.value : `${prepositionToken.value} ${determinerToken.value}`;
+  const fullStart = prepositionToken.start;
+  const phraseStart = contracted ? prepositionToken.start : determinerToken.start;
+  const fullPhrase = source.slice(fullStart, noun.end);
+  const phrase = source.slice(phraseStart, noun.end);
+  const adjectiveText = correctedAdjectives.join(" ");
+  const correction = contracted
+    ? `${prepositionToken.value} ${adjectiveText} ${noun.value}`
+    : `${determinerToken.value} ${adjectiveText} ${noun.value}`;
+  const fullCorrection = contracted
+    ? correction
+    : `${prepositionToken.value} ${correction}`;
+  const signature = [
+    prepositionToken.normalized,
+    contracted ? "contracted" : determinerToken.normalized,
+    ...adjectives.map((token) => token.normalized),
+    noun.value,
+  ].join("|");
+  const adjectiveLabel = adjectives.length > 1 ? "adjectives normally end" : "adjective normally ends";
+  const caseLead = contracted
+    ? `“${prepositionToken.value}” contains “${resolution.preposition} ${resolution.determiner}” and shows ${resolution.case}.`
+    : resolution.prepositionCase === "twoWay"
+      ? `With “${writtenHead}”, the determiner shows ${resolution.case}.`
+      : `“${prepositionToken.value}” requires ${resolution.case}.`;
+
+  return {
+    id: makeStableId(signature, occurrence),
+    start: phraseStart,
+    fullStart,
+    end: noun.end,
+    phrase,
+    fullPhrase,
+    preposition: contracted ? resolution.preposition : prepositionToken.value,
+    writtenPreposition: prepositionToken.value,
+    determiner: resolution.determiner || determinerToken.value,
+    writtenDeterminer: contracted ? prepositionToken.value : determinerToken.value,
+    adjective: incorrectAdjectives[0].value,
+    adjectives: adjectives.map((token) => token.value),
+    incorrectAdjectives: incorrectAdjectives.map((token) => token.value),
+    noun: noun.value,
+    expectedEnding: resolution.expectedEnding,
+    correction,
+    fullCorrection,
+    hint: `${caseLead} After “${contracted ? prepositionToken.value : determinerToken.value}”, the ${adjectiveLabel} in -${resolution.expectedEnding}.`,
+    explanation: buildExplanation({
+      caseName: resolution.case,
+      declensionType: resolution.declensionType,
+      determiner: resolution.determiner || determinerToken.value,
+      contractedForm: contracted ? prepositionToken.value : "",
+      expanded: contracted ? `${resolution.preposition} ${resolution.determiner}` : "",
+    }),
+    case: resolution.case,
+    confidence: adjectives.length > 1 ? 0.95 : 1,
+    declensionType: resolution.declensionType,
+    contracted,
+  };
+};
+
 /**
  * @typedef {Object} PrepositionCaseIssue
  * @property {string} id Stable while the relevant phrase remains unchanged.
- * @property {number} start Start offset of the determiner.
+ * @property {number} start Start offset of the visible determiner or contraction.
+ * @property {number} fullStart Start offset including the preposition.
  * @property {number} end End offset of the noun.
- * @property {string} phrase Original determiner + adjective + noun phrase.
- * @property {string} fullPhrase Original preposition + phrase.
- * @property {string} correction Suggested phrase without automatic replacement.
+ * @property {string} fullPhrase Original preposition phrase.
+ * @property {string} fullCorrection Teaching correction; never inserted automatically.
  */
 
 /**
@@ -294,60 +434,69 @@ export const analyzePrepositionCaseCoach = (text, { level = "" } = {}) => {
   const issues = [];
   const signatureCounts = new Map();
 
-  for (let index = 0; index <= tokens.length - 4; index += 1) {
-    const [prepositionToken, determinerToken, adjectiveToken, nounToken] = tokens.slice(index, index + 4);
-    const prepositionCase = CASE_BY_PREPOSITION.get(prepositionToken.normalized);
-    if (!prepositionCase) continue;
-    if (
-      !onlyWhitespaceBetween(source, prepositionToken, determinerToken) ||
-      !onlyWhitespaceBetween(source, determinerToken, adjectiveToken) ||
-      !onlyWhitespaceBetween(source, adjectiveToken, nounToken)
-    ) {
+  for (let index = 0; index < tokens.length; index += 1) {
+    const prepositionToken = tokens[index];
+    const contraction = CONTRACTED_PREPOSITIONS[prepositionToken.normalized];
+
+    if (contraction) {
+      const sequence = collectAdjectiveNounSequence(source, tokens, index + 1);
+      if (!sequence) continue;
+      const expectedEnding = WEAK_ENDINGS[contraction.case][contraction.gender];
+      const signature = [prepositionToken.normalized, ...sequence.adjectives.map((item) => item.normalized), sequence.noun.value].join("|");
+      const occurrence = signatureCounts.get(signature) || 0;
+      signatureCounts.set(signature, occurrence + 1);
+      const issue = buildIssue({
+        source,
+        prepositionToken,
+        determinerToken: prepositionToken,
+        adjectives: sequence.adjectives,
+        noun: sequence.noun,
+        occurrence,
+        contracted: true,
+        resolution: {
+          ...contraction,
+          expectedEnding,
+          declensionType: "weak",
+          prepositionCase: contraction.case,
+        },
+      });
+      if (issue) issues.push(issue);
       continue;
     }
-    if (!LOWERCASE_PATTERN.test(adjectiveToken.value) || adjectiveToken.value.length < 3) continue;
-    if (!UPPERCASE_PATTERN.test(nounToken.value)) continue;
 
+    const prepositionCase = CASE_BY_PREPOSITION.get(prepositionToken.normalized);
+    if (!prepositionCase) continue;
+
+    const determinerToken = tokens[index + 1];
+    if (!determinerToken || !onlyWhitespaceBetween(source, prepositionToken, determinerToken)) continue;
     const resolution = resolveDeterminer(determinerToken.value, prepositionCase);
     if (!resolution) continue;
-    if (adjectiveHasEnding(adjectiveToken.value, resolution.expectedEnding)) continue;
 
-    const stem = getAdjectiveStem(adjectiveToken.value);
-    if (!stem || stem.length < 2) continue;
-    const correctedAdjective = `${stem}${resolution.expectedEnding}`;
-    const phrase = source.slice(determinerToken.start, nounToken.end);
-    const fullPhrase = source.slice(prepositionToken.start, nounToken.end);
+    const sequence = collectAdjectiveNounSequence(source, tokens, index + 2);
+    if (!sequence) continue;
     const signature = [
       prepositionToken.normalized,
       determinerToken.normalized,
-      adjectiveToken.normalized,
-      nounToken.value,
+      ...sequence.adjectives.map((item) => item.normalized),
+      sequence.noun.value,
     ].join("|");
     const occurrence = signatureCounts.get(signature) || 0;
     signatureCounts.set(signature, occurrence + 1);
-    const inferredCase = resolution.case;
-    const caseLead = prepositionCase === "twoWay"
-      ? `With “${prepositionToken.value} ${determinerToken.value}”, the determiner shows ${inferredCase}.`
-      : `“${prepositionToken.value}” requires ${inferredCase}.`;
-
-    issues.push({
-      id: makeStableId(signature, occurrence),
-      start: determinerToken.start,
-      end: nounToken.end,
-      phrase,
-      fullPhrase,
-      preposition: prepositionToken.value,
-      determiner: determinerToken.value,
-      adjective: adjectiveToken.value,
-      noun: nounToken.value,
-      expectedEnding: resolution.expectedEnding,
-      correction: `${determinerToken.value} ${correctedAdjective} ${nounToken.value}`,
-      fullCorrection: `${prepositionToken.value} ${determinerToken.value} ${correctedAdjective} ${nounToken.value}`,
-      hint: `${caseLead} After “${determinerToken.value}”, the adjective normally ends in -${resolution.expectedEnding}.`,
-      case: inferredCase,
-      confidence: 1,
-      declensionType: resolution.declensionType,
+    const issue = buildIssue({
+      source,
+      prepositionToken,
+      determinerToken,
+      adjectives: sequence.adjectives,
+      noun: sequence.noun,
+      occurrence,
+      contracted: false,
+      resolution: {
+        ...resolution,
+        determiner: determinerToken.value,
+        prepositionCase,
+      },
     });
+    if (issue) issues.push(issue);
   }
 
   return issues;
