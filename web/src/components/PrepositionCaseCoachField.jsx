@@ -42,7 +42,7 @@ const PrepositionCaseCoachField = ({
   getTextarea,
   studentProfile,
   enabled = true,
-  allowAllLevels = false,
+  allowAllLevels = true,
 }) => {
   const originalStyleRef = useRef(null);
   const active = Boolean(enabled) && !isFrenchWritingProfile(studentProfile);
