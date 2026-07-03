@@ -1,0 +1,39 @@
+name: Apply canonical CI repairs
+
+on:
+  push:
+    branches:
+      - fix/ci-and-direct-writing-coach
+    paths:
+      - scripts/applyCanonicalCiRepairs.js
+      - .github/workflows/apply-canonical-ci-repairs.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/ci-and-direct-writing-coach
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply canonical repairs and regenerate outputs
+        run: node scripts/applyCanonicalCiRepairs.js
+
+      - name: Commit repaired canonical outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Repair canonical curriculum and A1 legacy card alignment"
+          git push origin HEAD:fix/ci-and-direct-writing-coach
