@@ -15,16 +15,16 @@ describe("PrepositionCaseCoachField", () => {
     jest.useRealTimers();
   });
 
-  it("renders directly beside a controlled B2 textarea and selects its phrase", () => {
+  it("shows an all-level article hint after 300 ms and selects its phrase", () => {
     const textareaRef = createRef();
-    const text = "Heute arbeiten wir mit einem wichtig Projekt.";
+    const text = "Heute arbeiten wir mit einen großen Unterschied.";
 
     render(
       <>
         <textarea ref={textareaRef} value={text} readOnly />
         <PrepositionCaseCoachField
           text={text}
-          level="B2"
+          level="A1"
           textareaRef={textareaRef}
           studentProfile={{ program: "German" }}
         />
@@ -32,18 +32,19 @@ describe("PrepositionCaseCoachField", () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(900);
+      jest.advanceTimersByTime(300);
     });
 
-    expect(screen.getByText(/Check “mit einem wichtig Projekt”/)).toBeInTheDocument();
+    expect(screen.getByText(/Check “mit einen”/)).toBeInTheDocument();
     expect(textareaRef.current.dataset.prepositionCaseHint).toBe("true");
 
+    fireEvent.click(screen.getByRole("button", { name: "Show correction" }));
+    expect(screen.getByText("Try: mit einem")).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: "Find in text" }));
-    const start = text.indexOf("mit einem wichtig Projekt");
+    const start = text.indexOf("mit einen");
     expect(textareaRef.current.selectionStart).toBe(start);
-    expect(textareaRef.current.selectionEnd).toBe(
-      start + "mit einem wichtig Projekt".length,
-    );
+    expect(textareaRef.current.selectionEnd).toBe(start + "mit einen".length);
     expect(textareaRef.current.value).toBe(text);
   });
 
@@ -51,10 +52,10 @@ describe("PrepositionCaseCoachField", () => {
     const textareaRef = createRef();
     render(
       <>
-        <textarea ref={textareaRef} value="mit einem wichtig Projekt" readOnly />
+        <textarea ref={textareaRef} value="mit einen" readOnly />
         <PrepositionCaseCoachField
-          text="mit einem wichtig Projekt"
-          level="B2"
+          text="mit einen"
+          level="A1"
           textareaRef={textareaRef}
           studentProfile={{ program: "French A1" }}
         />
@@ -62,7 +63,7 @@ describe("PrepositionCaseCoachField", () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(900);
+      jest.advanceTimersByTime(300);
     });
 
     expect(screen.queryByLabelText("Preposition Case Coach")).not.toBeInTheDocument();
