@@ -59,6 +59,7 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock("./AssignmentSubmissionPage", () => () => null);
 jest.mock("./WorkbookReadAloudInjector", () => () => null);
 jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
