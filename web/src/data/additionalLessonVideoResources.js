@@ -64,6 +64,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/5tGvAPq6hGk?si=uI_ODAT_A6_mZjG2",
       },
     ],
+    19: [
+      {
+        key: "b1-day19-vorstellungsgespraech-ai-video",
+        chapter: "6.19",
+        title: "B1 Day 19 · Das Vorstellungsgespräch · AI video",
+        description:
+          "AI video lesson for speaking politely and professionally during a job interview.",
+        url: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
+      },
+    ],
   },
   B2: {
     0: [

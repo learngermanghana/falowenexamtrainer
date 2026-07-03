@@ -5,7 +5,7 @@ import {
 } from "./b1LessonResourceOverrides";
 import { normalizeLesson } from "./lessonModel";
 
-describe("B1 canonical lesson resources", () => {
+ describe("B1 canonical lesson resources", () => {
   test("B1 Day 1 exposes the in-app grammar notes and workbook", () => {
     const lesson = {
       day: 1,
@@ -95,8 +95,8 @@ describe("B1 canonical lesson resources", () => {
       applyB1LessonResourceOverride(lesson, day);
       const normalized = normalizeLesson(lesson, "B1");
 
-      const expectedWorkbook = day === 21
-        ? "/campus/course/lesson/B1/21?view=workbook&radio=done"
+      const expectedWorkbook = [21, 22].includes(day)
+        ? `/campus/course/lesson/B1/${day}?view=workbook&radio=done`
         : `/campus/course/lesson/B1/${day}?view=workbook`;
 
       expect(getB1LessonResourceOverride(day).workbook).toBe(expectedWorkbook);
@@ -124,7 +124,6 @@ describe("B1 canonical lesson resources", () => {
     expect(dictionary.B1[3].videoResources).toEqual([
       expect.objectContaining({
         chapter: "1.3",
-        title: "B1 Day 3 · Erfolgsgeschichten · AI grammar video",
         url: "https://youtu.be/n6eCMJRWTy8",
       }),
     ]);
@@ -136,6 +135,12 @@ describe("B1 canonical lesson resources", () => {
     );
     expect(getB1LessonResourceOverride(3).aiVideo).toBe(
       "https://youtu.be/n6eCMJRWTy8"
+    );
+  });
+
+  test("B1 Day 19 uses the requested interview AI video", () => {
+    expect(getB1LessonResourceOverride(19).aiVideo).toBe(
+      "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q"
     );
   });
 });

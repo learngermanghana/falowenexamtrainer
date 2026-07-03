@@ -141,6 +141,22 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Familie, Wohngemeinschaft, Singleleben und moderne Lebensformen ein. Danach gehst du weiter zum Workbook.",
     },
+    22: {
+      key: "b1-day22-beziehung-werte-falowen-radio",
+      title: "Was ist dir in einer Beziehung wichtig? 7.22",
+      youtubeId: "d9vhD_MTrek",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Kommunikation, Vertrauen, Respekt und gemeinsame Zukunftspläne in einer Beziehung ein. Danach gehst du weiter zum Workbook.",
+    },
+    23: {
+      key: "b1-day23-erstes-date-falowen-radio",
+      title: "Erstes Date – Typische Situationen 7.23",
+      youtubeId: "76JUgui6CnY",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf typische Situationen, Gespräche und höfliches Verhalten beim ersten Date ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
