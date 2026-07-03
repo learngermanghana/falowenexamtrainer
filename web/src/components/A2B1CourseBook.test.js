@@ -7,9 +7,6 @@ import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
-// react-router-dom v7 is resolved by the production bundler, but the legacy
-// react-scripts Jest resolver cannot load its package exports under Node 18.
-// This small test-only router preserves the APIs used by these components.
 jest.mock(
   "react-router-dom",
   () => {
@@ -99,10 +96,10 @@ describe("A2 and B1 course books", () => {
       </MemoryRouter>
     );
 
-    expect(screen.queryByRole("button", { name: /Teil [1-4]/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: /Teil [1-4]/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
 
-    expect(screen.getAllByRole("button", { name: /Teil [1-4]/i })).toHaveLength(4);
+    expect(screen.getAllByRole("tab", { name: /Teil [1-4]/i })).toHaveLength(4);
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
