@@ -1,19 +1,14 @@
-jest.mock("./A1Day18Kapitel122WorkbookPage", () => () => null);
-jest.mock("./CourseWorkbookSubmissionTabs", () => () => null);
-jest.mock("./WorkbookContextSync", () => () => null);
-jest.mock("./WorkbookStartGuide", () => () => null);
-
 import { courseSchedules } from "../data/courseSchedule";
 import {
   getConfiguredInAppWorkbookRoute,
   hasOnlyInAppWorkbookRoutesForLevel,
 } from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
-import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import {
   SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
   shouldRenderWorkbookGuide,
-} from "./AutoWorkbookStartGuide";
+} from "../utils/autoWorkbookGuideRouting";
+import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
 describe("AutoWorkbookStartGuide route matching", () => {
   test("normalizes relative and Falowen-hosted in-app links", () => {
