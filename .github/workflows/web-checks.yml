@@ -39,17 +39,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        shell: bash
-        run: |
-          set -o pipefail
-          npm run test:ci -- --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js 2>&1 | tee /tmp/a1-curriculum-tests.log
-
-      - name: Upload A1 curriculum failure details
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: a1-curriculum-failure
-          path: /tmp/a1-curriculum-tests.log
+        run: npm run test:ci -- --runTestsByPath src/data/a1CourseBookCards.test.js src/utils/courseBookEntries.test.js
 
   regression-tests:
     runs-on: ubuntu-latest
@@ -146,14 +136,4 @@ jobs:
           node-version: 22
 
       - name: Check curriculum manifest sync
-        shell: bash
-        run: |
-          set -o pipefail
-          node scripts/checkCurriculumManifestSync.js 2>&1 | tee /tmp/curriculum-sync.log
-
-      - name: Upload curriculum sync failure details
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: curriculum-sync-failure
-          path: /tmp/curriculum-sync.log
+        run: node scripts/checkCurriculumManifestSync.js
