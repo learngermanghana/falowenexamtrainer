@@ -109,6 +109,7 @@ import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./components/
 import A2Day27DigitaleKommunikationWorkbookPage from "./components/A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./components/A2Day28UeberDieZukunftSprechenWorkbookPage";
 import A2Day28UeberDieZukunftSprechenGrammarPage from "./components/A2Day28UeberDieZukunftSprechenGrammarPage";
+import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./components/B1Day21LebensformenHeuteGrammarNotesPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
 import A1Day16FoodAndNegationGrammarPage from "./components/A1Day16FoodAndNegationGrammarPage";
@@ -768,6 +769,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook" element={withRadioWorkbookGate("A2", 3, <A2Day3ComparisonsWorkbookPage />)} />
           <Route path="/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook" element={withRadioWorkbookGate("A2", 4, <A2Day4WoMoechtenWirUnsTreffenWorkbookPage />)} />
           <Route path="/campus/course/b1-day-4-wohnung-suchen-workbook" element={withRadioWorkbookGate("B1", 4, <B1Day4WohnungSuchenWorkbookPage />)} />
+          <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/a2-day-5-freizeit-workbook" element={withRadioWorkbookGate("A2", 5, <A2Day5FreizeitWorkbookPage />)} />
           <Route path="/campus/course/a2-day-6-moebel-und-raeume-workbook" element={withRadioWorkbookGate("A2", 6, <A2Day6MoebelRaeumeWorkbookPage />)} />
           <Route path="/campus/course/a2-day-7-eine-wohnung-suchen-workbook" element={withRadioWorkbookGate("A2", 7, <A2Day7WohnungSuchenWorkbookPage />)} />

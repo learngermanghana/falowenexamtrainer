@@ -1299,7 +1299,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.21",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/21?view=grammar",
-    "workbookRoute": "",
+    "workbookRoute": "/campus/course/lesson/B1/21?view=workbook&radio=done",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

@@ -85,15 +85,24 @@ const config = {
   },
   listening: {
     title: "Hören Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Listen twice if possible. Focus on the task instructions and answer choices shown in the video.",
+    instructions: "Listen twice if possible. Answer every question shown in the video, listen for names, places, reasons and opinions, and write your answer letters before checking the solutions.",
+    submitRequired: true,
     image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "Headphones for German listening practice",
     videoId: "iyydRu3oY4I",
     externalUrl: "https://youtu.be/iyydRu3oY4I",
-    selfCheckText: "The solutions are provided in the video. Mark your own Hören result. Only Lesen and Schreiben are submitted for tutor evaluation.",
+    selfCheckText: "The solutions are provided in the video. Mark your own Hören result, then submit your Hören answer letters or result together with Schreiben and Lesen.",
+    steps: [
+      "Schauen Sie zuerst nur auf die Aufgaben und Antwortmöglichkeiten im Video.",
+      "Hören Sie den Test möglichst zweimal.",
+      "Notieren Sie zu jeder Aufgabe Ihren Antwortbuchstaben.",
+      "Kontrollieren Sie mit den Lösungen im Video und tragen Sie Ihr Ergebnis im Submit-Tab ein.",
+    ],
   },
+  submitListening: true,
   submitWritingDescription: "Paste your final 80–100 word opinion text.",
   submitReadingDescription: "Paste your five reading answer letters.",
+  submitListeningDescription: "Paste your Hören answer letters or your checked Hören result from the video.",
 };
 
 export default function B1Day21LebensformenHeuteWorkbookPage() {

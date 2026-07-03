@@ -95,12 +95,12 @@ describe("B1 canonical lesson resources", () => {
       applyB1LessonResourceOverride(lesson, day);
       const normalized = normalizeLesson(lesson, "B1");
 
-      expect(getB1LessonResourceOverride(day).workbook).toBe(
-        `/campus/course/lesson/B1/${day}?view=workbook`
-      );
-      expect(normalized.resources.workbook.url).toBe(
-        `/campus/course/lesson/B1/${day}?view=workbook`
-      );
+      const expectedWorkbook = day === 21
+        ? "/campus/course/lesson/B1/21?view=workbook&radio=done"
+        : `/campus/course/lesson/B1/${day}?view=workbook`;
+
+      expect(getB1LessonResourceOverride(day).workbook).toBe(expectedWorkbook);
+      expect(normalized.resources.workbook.url).toBe(expectedWorkbook);
       expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
     }
   });
