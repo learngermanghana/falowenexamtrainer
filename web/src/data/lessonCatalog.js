@@ -1284,7 +1284,7 @@ const lessonCatalog = Object.freeze([
     "title": "Wie wird man …? (Ausbildung und Qu) 6.20",
     "assignmentId": "B1-6.20",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "",
+    "workbookRoute": "/campus/course/lesson/B1/20?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

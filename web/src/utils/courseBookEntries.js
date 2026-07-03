@@ -1,4 +1,5 @@
 import { applyCourseBookCurriculumCorrection } from "../data/courseBookCurriculumCorrections";
+import { A1_COURSE_BOOK_CARDS } from "../data/a1CourseBookCards";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -248,17 +249,31 @@ export const expandCourseBookEntry = (entry = {}, options = {}) => {
 
   if (tasks.length <= 1) return [normalizedEntry];
 
+  const entryLevel = getEntryLevel(normalizedEntry, {}, options.level);
+  const canonicalDayCards = entryLevel === "A1"
+    ? A1_COURSE_BOOK_CARDS.filter(
+        (card) => Number(card.displayDay) === Number(normalizedEntry.displayDay ?? normalizedEntry.day)
+      )
+    : [];
+  const canAlignCanonicalCards = canonicalDayCards.length === tasks.length;
+
   return tasks.map(({ section, task }, index) => {
-    const chapter = getTaskChapter(task, normalizedEntry);
-    const assignmentId = getTaskAssignmentId(task, normalizedEntry);
-    const assignment = task.assignment === undefined ? Boolean(normalizedEntry.assignment) : Boolean(task.assignment);
+    const alignedCard = canAlignCanonicalCards ? canonicalDayCards[index] : null;
+    const chapter = alignedCard?.chapter || getTaskChapter(task, normalizedEntry);
+    const assignmentId = alignedCard?.assignmentId || getTaskAssignmentId(task, normalizedEntry);
+    const assignment = alignedCard
+      ? alignedCard.assessmentType === COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked
+      : task.assignment === undefined
+        ? Boolean(normalizedEntry.assignment)
+        : Boolean(task.assignment);
+    const taskTitle = alignedCard?.title || getTaskTitle(task, normalizedEntry);
 
     return normalizeCourseBookEntry(
       {
         ...normalizedEntry,
-        topic: getTaskTitle(task, normalizedEntry),
-        title: task.title || task.topic || normalizedEntry.title,
-        lessonTitle: getTaskTitle(task, normalizedEntry),
+        topic: taskTitle,
+        title: alignedCard?.title || task.title || task.topic || normalizedEntry.title,
+        lessonTitle: taskTitle,
         chapter,
         displayChapter: chapter,
         assignment,
