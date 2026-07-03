@@ -13,6 +13,7 @@ import WritingHistorySection, {
   buildWritingHistoryRecord,
 } from "./WritingHistorySection";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import PrepositionCaseCoachField from "./PrepositionCaseCoachField";
 import { normalizeWritingFeedback } from "../lib/writingFeedbackNormalizer";
 
 const countWords = (text = "") =>
@@ -110,6 +111,8 @@ export default function GuidedWritingWorkspace({
   const { user, idToken, studentProfile } = useAuth();
   const { showToast } = useToast();
   const reachedMilestonesRef = useRef(new Set());
+  const questionTextareaRefs = useRef({});
+  const combinedDraftRef = useRef(null);
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || userId;
@@ -456,6 +459,10 @@ export default function GuidedWritingWorkspace({
                 "Beginne mit einer klaren Aussage und begründe sie."}
             </div>
             <textarea
+              ref={(node) => {
+                if (node) questionTextareaRefs.current[question.id] = node;
+                else delete questionTextareaRefs.current[question.id];
+              }}
               aria-label={`Question ${index + 1}`}
               value={state.answers[question.id] || ""}
               onChange={(event) =>
@@ -474,6 +481,12 @@ export default function GuidedWritingWorkspace({
                 borderRadius: 12,
                 font: "inherit",
               }}
+            />
+            <PrepositionCaseCoachField
+              text={state.answers[question.id] || ""}
+              level={config.level}
+              getTextarea={() => questionTextareaRefs.current[question.id] || null}
+              studentProfile={studentProfile}
             />
             <div style={{ display: "grid", gap: 6 }}>
               <div
@@ -529,6 +542,7 @@ export default function GuidedWritingWorkspace({
             : "You are editing the combined version"}
         </small>
         <textarea
+          ref={combinedDraftRef}
           aria-label="Your combined text"
           value={finalEssay}
           onChange={(event) =>
@@ -546,6 +560,12 @@ export default function GuidedWritingWorkspace({
             font: "inherit",
             lineHeight: 1.7,
           }}
+        />
+        <PrepositionCaseCoachField
+          text={finalEssay}
+          level={config.level}
+          textareaRef={combinedDraftRef}
+          studentProfile={studentProfile}
         />
         <div>
           <strong>{countWords(finalEssay)} words</strong> · Target: about{" "}

@@ -1284,7 +1284,7 @@ const lessonCatalog = Object.freeze([
     "title": "Wie wird man …? (Ausbildung und Qu) 6.20",
     "assignmentId": "B1-6.20",
     "assignmentType": "Lesen & Hören",
-    "workbookRoute": "",
+    "workbookRoute": "/campus/course/lesson/B1/20?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1299,7 +1299,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.21",
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/21?view=grammar",
-    "workbookRoute": "/campus/course/lesson/B1/21?view=workbook&radio=done",
+    "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

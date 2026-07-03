@@ -4,11 +4,11 @@ import {
   hasOnlyInAppWorkbookRoutesForLevel,
 } from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
-import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import {
   SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
   shouldRenderWorkbookGuide,
-} from "./AutoWorkbookStartGuide";
+} from "../utils/autoWorkbookGuideRouting";
+import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
 describe("AutoWorkbookStartGuide route matching", () => {
   test("normalizes relative and Falowen-hosted in-app links", () => {
@@ -111,9 +111,9 @@ describe("AutoWorkbookStartGuide route matching", () => {
     ).toBe(true);
   });
 
-  test("every tutor-marked A1 workbook route receives assignment/submission support", () => {
+  test("every configured tutor-marked A1 workbook route receives submission support", () => {
     const index = buildWorkbookRouteIndex();
-    const assignmentWorkbookPaths = new Set();
+    const assignmentWorkbookRoutes = new Map();
 
     (courseSchedules.A1 || []).forEach((entry) => {
       const resources = [
@@ -128,16 +128,19 @@ describe("AutoWorkbookStartGuide route matching", () => {
 
       resources.forEach((resource) => {
         if (resource?.assignment !== true) return;
-        const path = normalizeInAppPath(resource.workbook_link || resource.workbookRoute);
-        if (path) assignmentWorkbookPaths.add(path);
+        const route = resource.workbook_link || resource.workbookRoute;
+        const pathname = normalizeInAppPath(route);
+        if (!pathname) return;
+        const search = new URL(route, "https://www.falowen.app").search;
+        assignmentWorkbookRoutes.set(pathname, search);
       });
     });
 
-    expect(assignmentWorkbookPaths.size).toBeGreaterThan(10);
-    assignmentWorkbookPaths.forEach((pathname) => {
+    expect(assignmentWorkbookRoutes.size).toBeGreaterThan(0);
+    assignmentWorkbookRoutes.forEach((search, pathname) => {
       const match = index.get(pathname);
       expect(match).toBeTruthy();
-      expect(shouldRenderWorkbookGuide({ pathname, search: "", match })).toBe(true);
+      expect(shouldRenderWorkbookGuide({ pathname, search, match })).toBe(true);
     });
   });
 

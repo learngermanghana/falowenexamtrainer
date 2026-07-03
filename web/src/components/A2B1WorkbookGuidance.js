@@ -47,7 +47,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
         <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Use the tabs above to move between the four parts of this {workbookLabel}. The highlighted task card at the top of each part tells you exactly what to answer.
+            Use the tabs above to move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab in the Course Book when your final answers are ready.
           </p>
           <p style={{ margin: 0 }}>
             <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.

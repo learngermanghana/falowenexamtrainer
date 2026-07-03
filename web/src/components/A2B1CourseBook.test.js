@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
@@ -7,9 +7,6 @@ import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
-// react-router-dom v7 is resolved by the production bundler, but the legacy
-// react-scripts Jest resolver cannot load its package exports under Node 18.
-// This small test-only router preserves the APIs used by these components.
 jest.mock(
   "react-router-dom",
   () => {
@@ -59,33 +56,43 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ user: null, studentProfile: null }),
+}));
+
+jest.mock("../firebase", () => ({
+  db: {},
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  onSnapshot: jest.fn(() => () => {}),
+  serverTimestamp: jest.fn(),
+  setDoc: jest.fn(),
+}));
+
+jest.mock("./AssignmentSubmissionPage", () => () => null);
 jest.mock("./WorkbookReadAloudInjector", () => () => null);
 jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
 
 describe("A2 and B1 course books", () => {
-  test("describes the shared workbook as four parts without class notes", () => {
+  test("describes the four workbook parts plus Ref and Submit", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
-    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("four workbook parts");
-    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("Ref");
-    expect(
-      screen.getByText((_, element) =>
-        element?.tagName === "P" &&
-        element.textContent.includes("Submit tab in the Course Book")
-      )
-    ).toBeInTheDocument();
+    const navigationGuide = screen.getByText(/four workbook parts of this B1 workbook/i);
+    expect(navigationGuide).toHaveTextContent("Ref");
+    expect(navigationGuide).toHaveTextContent("Submit");
+    expect(navigationGuide).toHaveTextContent("Submit tab in the Course Book");
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
-  test("keeps the native custom A2 Day 2 workbook focused on four content parts", () => {
+  test("keeps the native custom A2 Day 2 workbook focused on four content parts after Radio", () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={["/campus/course/a2-day-2-small-talk?radio=done"]}>
         <A2Day2SmallTalkWorkbookEnhancedPage />
       </MemoryRouter>
     );
 
-    expect(screen.getAllByRole("button", { name: /Teil [1-4]/i })).toHaveLength(4);
+    expect(screen.getAllByRole("tab", { name: /Teil [1-4]/i })).toHaveLength(4);
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
@@ -138,20 +145,32 @@ describe("A2 and B1 course books", () => {
   });
 
   test("shows Falowen Radio before opening a B1 workbook", () => {
-    render(
-      <MemoryRouter>
+    const firstView = render(
+      <MemoryRouter initialEntries={["/campus/course/b1-day-1"]}>
         <RadioFirstWorkbookGate level="B1" day={1}>
           <div>B1 Day 1 workbook interface</div>
         </RadioFirstWorkbookGate>
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("heading", { name: /Falowen Radio/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /^🎙️ Falowen Radio$/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText("B1 Day 1 workbook interface")).not.toBeInTheDocument();
+    firstView.unmount();
 
-    fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
+    render(
+      <MemoryRouter initialEntries={["/campus/course/b1-day-1?radio=done"]}>
+        <RadioFirstWorkbookGate level="B1" day={1}>
+          <div>B1 Day 1 workbook interface</div>
+        </RadioFirstWorkbookGate>
+      </MemoryRouter>
+    );
 
     expect(screen.getByText("B1 Day 1 workbook interface")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /^🎙️ Falowen Radio$/i }),
+    ).not.toBeInTheDocument();
   });
 
   test.each(["a2", "b1"])("does not mention class notes in the %s Day 0 guide", (level) => {

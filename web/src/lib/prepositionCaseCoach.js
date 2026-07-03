@@ -17,6 +17,7 @@ export const CONTRACTED_PREPOSITIONS = {
 };
 
 const SUPPORTED_LEVELS = new Set(["B2", "C1"]);
+const ALL_GERMAN_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
 const TOKEN_PATTERN = /[\p{L}]+(?:[-’'][\p{L}]+)*/gu;
 const UPPERCASE_PATTERN = /^\p{Lu}/u;
 const LOWERCASE_PATTERN = /^\p{Ll}/u;
@@ -204,6 +205,76 @@ const MIXED_ENDINGS = {
   genitive: { masculine: "en", feminine: "en", neuter: "en", plural: "en" },
 };
 
+const DEFINITE_FORMS = {
+  nominative: { masculine: "der", feminine: "die", neuter: "das", plural: "die" },
+  accusative: { masculine: "den", feminine: "die", neuter: "das", plural: "die" },
+  dative: { masculine: "dem", feminine: "der", neuter: "dem", plural: "den" },
+  genitive: { masculine: "des", feminine: "der", neuter: "des", plural: "der" },
+};
+
+const DER_WORD_ENDINGS = {
+  nominative: { masculine: "er", feminine: "e", neuter: "es", plural: "e" },
+  accusative: { masculine: "en", feminine: "e", neuter: "es", plural: "e" },
+  dative: { masculine: "em", feminine: "er", neuter: "em", plural: "en" },
+  genitive: { masculine: "es", feminine: "er", neuter: "es", plural: "er" },
+};
+
+const EIN_WORD_ENDINGS = {
+  nominative: { masculine: "", feminine: "e", neuter: "", plural: "e" },
+  accusative: { masculine: "en", feminine: "e", neuter: "", plural: "e" },
+  dative: { masculine: "em", feminine: "er", neuter: "em", plural: "en" },
+  genitive: { masculine: "es", feminine: "er", neuter: "es", plural: "er" },
+};
+
+const DER_WORD_STEMS = ["dies", "jed", "welch", "solch"];
+const EIN_WORD_FAMILIES = [
+  { base: "ein", declined: "ein" },
+  { base: "kein", declined: "kein" },
+  { base: "mein", declined: "mein" },
+  { base: "dein", declined: "dein" },
+  { base: "sein", declined: "sein" },
+  { base: "ihr", declined: "ihr" },
+  { base: "unser", declined: "unser" },
+  { base: "euer", declined: "eur" },
+];
+
+const getDeterminerFamily = (form) => {
+  const lower = String(form || "").toLocaleLowerCase("de-DE");
+  if (["der", "die", "das", "den", "dem", "des"].includes(lower)) {
+    return { type: "definite" };
+  }
+
+  const derWordStem = DER_WORD_STEMS.find((stem) =>
+    ["er", "e", "es", "en", "em"].some((ending) => lower === `${stem}${ending}`),
+  );
+  if (derWordStem) return { type: "derWord", stem: derWordStem };
+
+  const einWord = EIN_WORD_FAMILIES.find(({ base, declined }) =>
+    lower === base || ["e", "en", "em", "er", "es"].some((ending) => lower === `${declined}${ending}`),
+  );
+  return einWord ? { type: "einWord", ...einWord } : null;
+};
+
+const getDeterminerFormForCase = (family, candidate, targetCase) => {
+  const genderKey = candidate.number === "plural" ? "plural" : candidate.gender;
+  if (family.type === "definite") return DEFINITE_FORMS[targetCase]?.[genderKey] || null;
+  if (family.type === "derWord") {
+    const ending = DER_WORD_ENDINGS[targetCase]?.[genderKey];
+    return ending === undefined ? null : `${family.stem}${ending}`;
+  }
+  if (family.type === "einWord") {
+    const ending = EIN_WORD_ENDINGS[targetCase]?.[genderKey];
+    if (ending === undefined) return null;
+    return ending ? `${family.declined}${ending}` : family.base;
+  }
+  return null;
+};
+
+const preserveInitialCase = (source, replacement) =>
+  /^\p{Lu}/u.test(source)
+    ? `${replacement.charAt(0).toLocaleUpperCase("de-DE")}${replacement.slice(1)}`
+    : replacement;
+
 const BASE_FORM_ER_EXCEPTIONS = new Set([
   "besser", "bitter", "clever", "finster", "heiter", "locker", "mager",
   "sauber", "schwer", "sicher", "wunderbar",
@@ -264,6 +335,40 @@ const resolveDeterminer = (form, prepositionCase) => {
   if (endings.length !== 1) return null;
 
   return { ...candidates[0], candidates, expectedEnding: endings[0] };
+};
+
+const resolveDeterminerCaseCorrection = (form, requiredCase) => {
+  if (requiredCase === "twoWay") return null;
+  const lower = form.toLocaleLowerCase("de-DE");
+  const allCandidates = determinerForms.get(lower) || [];
+  if (!allCandidates.length || allCandidates.some((candidate) => candidate.case === requiredCase)) {
+    return null;
+  }
+
+  const family = getDeterminerFamily(lower);
+  if (!family) return null;
+
+  const correctedForms = allCandidates.map((candidate) =>
+    getDeterminerFormForCase(family, candidate, requiredCase),
+  );
+  if (correctedForms.some((candidate) => !candidate)) return null;
+  const uniqueForms = [...new Set(correctedForms)];
+  if (uniqueForms.length !== 1) return null;
+
+  const targetCandidates = allCandidates.map((candidate) => ({
+    ...candidate,
+    case: requiredCase,
+  }));
+  const endings = [...new Set(targetCandidates.map(getExpectedEnding).filter(Boolean))];
+
+  return {
+    case: requiredCase,
+    correctedDeterminer: preserveInitialCase(form, uniqueForms[0]),
+    sourceCases: [...new Set(allCandidates.map((candidate) => candidate.case))],
+    targetCandidates,
+    expectedEnding: endings.length === 1 ? endings[0] : null,
+    declensionType: allCandidates[0].declensionType,
+  };
 };
 
 const getAdjectiveStem = (adjective) => {
@@ -330,6 +435,52 @@ const buildExplanation = ({ caseName, declensionType, determiner, contractedForm
     return `“${determiner}” already carries the case marker. That makes this weak adjective declension in ${caseName}.`;
   }
   return `“${determiner}” is an ein-word determiner. The adjective therefore follows mixed declension in ${caseName}.`;
+};
+
+const buildDeterminerIssue = ({
+  source,
+  prepositionToken,
+  determinerToken,
+  resolution,
+  occurrence,
+}) => {
+  const fullPhrase = source.slice(prepositionToken.start, determinerToken.end);
+  const sourceCaseLabel = resolution.sourceCases.length === 1
+    ? resolution.sourceCases[0]
+    : "the wrong case";
+  const signature = [
+    prepositionToken.normalized,
+    determinerToken.normalized,
+    "determiner-case",
+    resolution.case,
+  ].join("|");
+
+  return {
+    id: makeStableId(signature, occurrence),
+    start: determinerToken.start,
+    fullStart: prepositionToken.start,
+    end: determinerToken.end,
+    phrase: determinerToken.value,
+    fullPhrase,
+    preposition: prepositionToken.value,
+    writtenPreposition: prepositionToken.value,
+    determiner: resolution.correctedDeterminer,
+    writtenDeterminer: determinerToken.value,
+    adjective: null,
+    adjectives: [],
+    incorrectAdjectives: [],
+    noun: null,
+    expectedEnding: resolution.expectedEnding,
+    correction: resolution.correctedDeterminer,
+    fullCorrection: `${prepositionToken.value} ${resolution.correctedDeterminer}`,
+    hint: `“${prepositionToken.value}” requires ${resolution.case}. “${determinerToken.value}” shows ${sourceCaseLabel}; use “${resolution.correctedDeterminer}”.`,
+    explanation: `The preposition controls the case of the article. After “${prepositionToken.value}”, the article must use ${resolution.case}, so “${determinerToken.value}” changes to “${resolution.correctedDeterminer}”.`,
+    case: resolution.case,
+    confidence: 1,
+    declensionType: resolution.declensionType,
+    contracted: false,
+    issueType: "determiner-case",
+  };
 };
 
 const buildIssue = ({
@@ -403,32 +554,27 @@ const buildIssue = ({
     confidence: adjectives.length > 1 ? 0.95 : 1,
     declensionType: resolution.declensionType,
     contracted,
+    issueType: "adjective-ending",
   };
 };
 
 /**
- * @typedef {Object} PrepositionCaseIssue
- * @property {string} id Stable while the relevant phrase remains unchanged.
- * @property {number} start Start offset of the visible determiner or contraction.
- * @property {number} fullStart Start offset including the preposition.
- * @property {number} end End offset of the noun.
- * @property {string} fullPhrase Original preposition phrase.
- * @property {string} fullCorrection Teaching correction; never inserted automatically.
- */
-
-/**
- * Analyse visible German prepositional adjective phrases locally.
+ * Analyse visible German prepositional adjective and article phrases locally.
  *
  * @param {string} text
- * @param {{ level?: string }} options
- * @returns {PrepositionCaseIssue[]}
+ * @param {{ level?: string, allowAllLevels?: boolean }} options
+ * @returns {Array<Object>}
  */
-export const analyzePrepositionCaseCoach = (text, { level = "" } = {}) => {
+export const analyzePrepositionCaseCoach = (
+  text,
+  { level = "", allowAllLevels = false } = {},
+) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
-  if (!SUPPORTED_LEVELS.has(normalizedLevel)) return [];
+  const allowedLevels = allowAllLevels ? ALL_GERMAN_LEVELS : SUPPORTED_LEVELS;
+  if (!allowedLevels.has(normalizedLevel)) return [];
 
   const source = String(text || "");
-  if (source.trim().length < 8) return [];
+  if (source.trim().length < 6) return [];
 
   const tokens = tokenize(source);
   const issues = [];
@@ -469,6 +615,30 @@ export const analyzePrepositionCaseCoach = (text, { level = "" } = {}) => {
 
     const determinerToken = tokens[index + 1];
     if (!determinerToken || !onlyWhitespaceBetween(source, prepositionToken, determinerToken)) continue;
+
+    const determinerCorrection = resolveDeterminerCaseCorrection(
+      determinerToken.value,
+      prepositionCase,
+    );
+    if (determinerCorrection) {
+      const signature = [
+        prepositionToken.normalized,
+        determinerToken.normalized,
+        "determiner-case",
+        prepositionCase,
+      ].join("|");
+      const occurrence = signatureCounts.get(signature) || 0;
+      signatureCounts.set(signature, occurrence + 1);
+      issues.push(buildDeterminerIssue({
+        source,
+        prepositionToken,
+        determinerToken,
+        resolution: determinerCorrection,
+        occurrence,
+      }));
+      continue;
+    }
+
     const resolution = resolveDeterminer(determinerToken.value, prepositionCase);
     if (!resolution) continue;
 
@@ -502,7 +672,12 @@ export const analyzePrepositionCaseCoach = (text, { level = "" } = {}) => {
   return issues;
 };
 
-export const isPrepositionCaseCoachLevel = (level) =>
-  SUPPORTED_LEVELS.has(String(level || "").trim().toUpperCase());
+export const isPrepositionCaseCoachLevel = (
+  level,
+  { allowAllLevels = false } = {},
+) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  return (allowAllLevels ? ALL_GERMAN_LEVELS : SUPPORTED_LEVELS).has(normalizedLevel);
+};
 
 export const tokenizeGermanText = tokenize;

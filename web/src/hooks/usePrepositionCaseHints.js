@@ -4,7 +4,7 @@ import {
   isPrepositionCaseCoachLevel,
 } from "../lib/prepositionCaseCoach";
 
-const DEFAULT_DEBOUNCE_MS = 850;
+const DEFAULT_DEBOUNCE_MS = 300;
 const MAX_HINTS = 5;
 const EMPTY_SUMMARY = { checked: 0, current: 0, cleared: 0, dismissed: 0 };
 
@@ -31,6 +31,7 @@ export const usePrepositionCaseHints = ({
   text = "",
   level = "",
   enabled = true,
+  allowAllLevels = false,
   debounceMs = DEFAULT_DEBOUNCE_MS,
 } = {}) => {
   const [hints, setHints] = useState([]);
@@ -40,7 +41,7 @@ export const usePrepositionCaseHints = ({
   const seenIdsRef = useRef(new Set());
   const previousIssueIdsRef = useRef(new Set());
   const sourceText = String(text || "");
-  const active = Boolean(enabled) && isPrepositionCaseCoachLevel(level);
+  const active = Boolean(enabled) && isPrepositionCaseCoachLevel(level, { allowAllLevels });
 
   const resetCoach = useCallback(() => {
     dismissedIdsRef.current = new Set();
@@ -53,13 +54,16 @@ export const usePrepositionCaseHints = ({
   }, []);
 
   useEffect(() => {
-    if (!active || sourceText.trim().length < 8) {
+    if (!active || sourceText.trim().length < 6) {
       resetCoach();
       return undefined;
     }
 
     const timer = window.setTimeout(() => {
-      const currentIssues = analyzePrepositionCaseCoach(sourceText, { level });
+      const currentIssues = analyzePrepositionCaseCoach(sourceText, {
+        level,
+        allowAllLevels,
+      });
       const currentIds = new Set(currentIssues.map((issue) => issue.id));
       const newlySeen = [...currentIds].filter((id) => !seenIdsRef.current.has(id));
       const cleared = [...previousIssueIdsRef.current].filter(
@@ -91,7 +95,7 @@ export const usePrepositionCaseHints = ({
     }, debounceMs);
 
     return () => window.clearTimeout(timer);
-  }, [active, debounceMs, dismissVersion, level, resetCoach, sourceText]);
+  }, [active, allowAllLevels, debounceMs, dismissVersion, level, resetCoach, sourceText]);
 
   const dismissHint = useCallback((id) => {
     if (!id || dismissedIdsRef.current.has(id)) return;

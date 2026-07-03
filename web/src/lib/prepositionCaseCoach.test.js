@@ -3,8 +3,8 @@ import {
   tokenizeGermanText,
 } from "./prepositionCaseCoach";
 
-const firstIssue = (text, level = "B2") =>
-  analyzePrepositionCaseCoach(text, { level })[0];
+const firstIssue = (text, level = "B2", options = {}) =>
+  analyzePrepositionCaseCoach(text, { level, ...options })[0];
 
 describe("Preposition Case Coach rule engine", () => {
   test.each([
@@ -21,7 +21,43 @@ describe("Preposition Case Coach rule engine", () => {
       case: grammaticalCase,
       expectedEnding: ending,
       confidence: 1,
+      issueType: "adjective-ending",
     });
+  });
+
+  test.each([
+    ["mit einen", "mit einem", "dative"],
+    ["mit ein", "mit einem", "dative"],
+    ["mit eine", "mit einer", "dative"],
+    ["mit das", "mit dem", "dative"],
+    ["wegen einem", "wegen eines", "genitive"],
+    ["wegen eine", "wegen einer", "genitive"],
+    ["für einer", "für eine", "accusative"],
+  ])("corrects clear article-case error %s", (text, correction, grammaticalCase) => {
+    const issue = firstIssue(text);
+
+    expect(issue).toMatchObject({
+      fullPhrase: text,
+      fullCorrection: correction,
+      case: grammaticalCase,
+      issueType: "determiner-case",
+      confidence: 1,
+    });
+  });
+
+  it("detects the screenshot phrase before noun capitalization is corrected", () => {
+    const text = "Ich denke, die Regierung sollte mit einen großen unterschiede arbeiten.";
+    const issue = firstIssue(text, "C1");
+
+    expect(issue.fullPhrase).toBe("mit einen");
+    expect(issue.fullCorrection).toBe("mit einem");
+    expect(issue.hint).toMatch(/requires dative/i);
+    expect(text.slice(issue.fullStart, issue.end)).toBe("mit einen");
+  });
+
+  it("skips article corrections when gender or number would change the answer", () => {
+    expect(analyzePrepositionCaseCoach("für einem", { level: "B2" })).toEqual([]);
+    expect(analyzePrepositionCaseCoach("mit die", { level: "B2" })).toEqual([]);
   });
 
   test.each([
@@ -92,17 +128,30 @@ describe("Preposition Case Coach rule engine", () => {
     "mit einem wichtigen internationalen Projekt",
     "Das Projekt ist wichtig.",
     "mit moderner Technologie",
+    "mit einem",
   ])("does not flag correct or unsupported phrase: %s", (text) => {
     expect(analyzePrepositionCaseCoach(text, { level: "C1" })).toEqual([]);
   });
 
-  test.each(["A1", "A2", "B1"])("is disabled for %s", (level) => {
+  test.each(["A1", "A2", "B1"])("stays disabled by default for %s", (level) => {
     expect(
-      analyzePrepositionCaseCoach("mit einem wichtig Projekt", { level }),
+      analyzePrepositionCaseCoach("mit einen", { level }),
     ).toEqual([]);
   });
 
-  it("returns no hints for empty and incomplete drafts", () => {
+  test.each(["A1", "A2", "B1", "B2", "C1"])(
+    "supports %s in all-level Mark My Letter mode",
+    (level) => {
+      expect(
+        analyzePrepositionCaseCoach("mit einen", {
+          level,
+          allowAllLevels: true,
+        })[0].fullCorrection,
+      ).toBe("mit einem");
+    },
+  );
+
+  it("returns no hints for empty and incomplete adjective drafts", () => {
     expect(analyzePrepositionCaseCoach("", { level: "B2" })).toEqual([]);
     expect(
       analyzePrepositionCaseCoach("mit einem wichtig", { level: "B2" }),
