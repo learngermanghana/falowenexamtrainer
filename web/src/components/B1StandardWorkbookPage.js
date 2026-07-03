@@ -357,10 +357,10 @@ export default function B1StandardWorkbookPage({ config }) {
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Hören (Self-check)</h2>
           <WorkbookTaskCard
-            eyebrow="Independent practice · Listening"
+            eyebrow="Your assignment · Listening"
             title={listening.title || "Listening material will be added here."}
-            practiceOnly
-            submissionNote="Teil 4 is self-check practice. Do not submit your Hören answers."
+            practiceOnly={!listening.submitRequired}
+            submissionNote={listening.submitRequired ? "Submit your Hören result through the Submit tab." : "Teil 4 is self-check practice. Do not submit your Hören answers."}
           >
             <p style={{ margin: 0 }}>
               {listening.instructions || "Complete the listening task independently and check your own answers."}
@@ -421,14 +421,17 @@ export default function B1StandardWorkbookPage({ config }) {
           <h2 style={sectionTitle}>Submit Workbook · Day {config.day} · Kapitel {config.chapter}</h2>
           <WorkbookTaskCard
             eyebrow="Final step"
-            title="Submit Teil 2 and Teil 3 only."
-            submissionNote="Do not submit Teil 1 or Teil 4."
+            title={config.submitListening ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3 only."}
+            submissionNote={config.submitListening ? "Do not submit Teil 1." : "Do not submit Teil 1 or Teil 4."}
           >
             <ul style={listSpacing}>
               <li><strong>Teil 2 · Schreiben:</strong> {config.submitWritingDescription || "Paste your final writing text."}</li>
               <li><strong>Teil 3 · Lesen:</strong> {config.submitReadingDescription || "Paste your final reading answer letters."}</li>
+              {config.submitListening ? (
+                <li><strong>Teil 4 · Hören:</strong> {config.submitListeningDescription || "Paste your listening answer letters or self-check result."}</li>
+              ) : null}
               <li><strong>Teil 1 · Sprechen:</strong> Group practice only; do not submit it.</li>
-              <li><strong>Teil 4 · Hören:</strong> Self-check only; do not submit it.</li>
+              {!config.submitListening ? <li><strong>Teil 4 · Hören:</strong> Self-check only; do not submit it.</li> : null}
             </ul>
           </WorkbookTaskCard>
 

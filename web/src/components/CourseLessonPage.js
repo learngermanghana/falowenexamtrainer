@@ -24,6 +24,7 @@ import B1Day11TeamspieleWorkbookPage from "./B1Day11TeamspieleWorkbookPage";
 import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20BerufKennenWorkbookPage from "./B1Day20BerufKennenWorkbookPage";
+import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
@@ -66,6 +67,7 @@ const B1_WORKBOOK_PAGES = {
   11: B1Day11TeamspieleWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20BerufKennenWorkbookPage,
+  21: B1Day21LebensformenHeuteWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {

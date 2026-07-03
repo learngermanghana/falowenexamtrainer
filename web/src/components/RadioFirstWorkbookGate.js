@@ -43,6 +43,13 @@ const RadioFirstWorkbookGate = ({ level, day, children }) => {
   const [isContinuing, setIsContinuing] = useState(false);
 
   useEffect(() => {
+    if (!hasEnteredWorkbook && hasCompletedRadioStep(location.search, level, day)) {
+      setHasEnteredWorkbook(true);
+      setIsContinuing(false);
+    }
+  }, [day, hasEnteredWorkbook, level, location.search]);
+
+  useEffect(() => {
     courseDebug("radioGate:state", {
       level: String(level || "").toUpperCase(),
       day: Number(day),
