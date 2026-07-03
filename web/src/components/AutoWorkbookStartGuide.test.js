@@ -1,3 +1,8 @@
+jest.mock("./A1Day18Kapitel122WorkbookPage", () => () => null);
+jest.mock("./CourseWorkbookSubmissionTabs", () => () => null);
+jest.mock("./WorkbookContextSync", () => () => null);
+jest.mock("./WorkbookStartGuide", () => () => null);
+
 import { courseSchedules } from "../data/courseSchedule";
 import {
   getConfiguredInAppWorkbookRoute,
