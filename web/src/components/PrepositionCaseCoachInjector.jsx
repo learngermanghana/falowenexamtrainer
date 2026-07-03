@@ -66,6 +66,18 @@ export const resolvePrepositionCoachLevel = (textarea, profileLevel = "") => {
   return String(profileLevel || "").trim().toUpperCase();
 };
 
+export const selectCoachPhrase = (textarea, hint) => {
+  if (!textarea || !hint) return false;
+  const start = Number.isInteger(hint.fullStart) ? hint.fullStart : hint.start;
+  const end = hint.end;
+  if (!Number.isInteger(start) || !Number.isInteger(end) || end <= start) return false;
+
+  textarea.focus({ preventScroll: true });
+  textarea.setSelectionRange(start, end);
+  textarea.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  return true;
+};
+
 const TextareaCoach = ({ textarea, anchor, studentProfile }) => {
   const [snapshot, setSnapshot] = useState(() => ({
     text: textarea.value || "",
@@ -76,7 +88,7 @@ const TextareaCoach = ({ textarea, anchor, studentProfile }) => {
     boxShadow: textarea.style.boxShadow,
   });
   const enabled = !isFrenchWritingProfile(studentProfile);
-  const { hints, dismissHint } = usePrepositionCaseHints({
+  const { hints, summary, dismissHint } = usePrepositionCaseHints({
     text: snapshot.text,
     level: snapshot.level,
     enabled,
@@ -98,7 +110,7 @@ const TextareaCoach = ({ textarea, anchor, studentProfile }) => {
 
     textarea.addEventListener("input", syncFromTextarea);
     textarea.addEventListener("change", syncFromTextarea);
-    const interval = window.setInterval(syncFromTextarea, 350);
+    const interval = window.setInterval(syncFromTextarea, 700);
     syncFromTextarea();
 
     return () => {
@@ -127,7 +139,12 @@ const TextareaCoach = ({ textarea, anchor, studentProfile }) => {
   }, [hints.length, textarea]);
 
   return createPortal(
-    <PrepositionCaseHints hints={hints} onDismiss={dismissHint} />,
+    <PrepositionCaseHints
+      hints={hints}
+      summary={summary}
+      onDismiss={dismissHint}
+      onSelectHint={(hint) => selectCoachPhrase(textarea, hint)}
+    />,
     anchor,
   );
 };
