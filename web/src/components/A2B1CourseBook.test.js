@@ -78,26 +78,29 @@ jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
 
 describe("A2 and B1 course books", () => {
-  test("describes the shared workbook as four parts without class notes", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  test("describes the four workbook parts plus Ref and Submit", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
-    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("four workbook parts");
-    expect(screen.getByText(/B1 workbook/i)).toHaveTextContent("Ref");
-    expect(
-      screen.getByText((_, element) =>
-        element?.tagName === "P" &&
-        element.textContent.includes("Submit tab in the Course Book")
-      )
-    ).toBeInTheDocument();
+    const navigationGuide = screen.getByText(/four workbook parts of this B1 workbook/i);
+    expect(navigationGuide).toHaveTextContent("Ref");
+    expect(navigationGuide).toHaveTextContent("Submit");
+    expect(navigationGuide).toHaveTextContent("Submit tab in the Course Book");
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
   });
 
-  test("keeps the native custom A2 Day 2 workbook focused on four content parts", () => {
+  test("keeps the native custom A2 Day 2 workbook focused on four content parts after Radio", () => {
     render(
       <MemoryRouter>
         <A2Day2SmallTalkWorkbookEnhancedPage />
       </MemoryRouter>
     );
+
+    expect(screen.queryByRole("button", { name: /Teil [1-4]/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
 
     expect(screen.getAllByRole("button", { name: /Teil [1-4]/i })).toHaveLength(4);
     expect(screen.queryByText(/class notes/i)).not.toBeInTheDocument();
@@ -160,7 +163,9 @@ describe("A2 and B1 course books", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("heading", { name: /Falowen Radio/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /^🎙️ Falowen Radio$/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText("B1 Day 1 workbook interface")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /Continue to workbook/i }));
