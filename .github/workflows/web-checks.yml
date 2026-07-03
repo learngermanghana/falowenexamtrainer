@@ -54,6 +54,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
+      - name: Test Preposition Case Coach
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/lib/prepositionCaseCoach.test.js src/hooks/usePrepositionCaseHints.test.js src/components/PrepositionCaseHints.test.jsx src/components/PrepositionCaseCoachInjector.test.jsx
+
       - name: Test attendance reporting
         working-directory: web
         env:
