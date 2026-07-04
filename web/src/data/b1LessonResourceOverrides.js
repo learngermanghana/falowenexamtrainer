@@ -87,6 +87,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Einen Film strukturiert beschreiben, bewerten und eine klare Empfehlung formulieren.",
     instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
+  14: Object.freeze({
+    chapter: "5.14",
+    title: "Traditionelles vs. digitales Lernen",
+    grammarBook: route(14, "grammar"),
+    workbook: doneWorkbook(14),
+    grammarTopic: "Lernmethoden vergleichen: während, hingegen, einerseits ... andererseits, Nebensätze und formelle Absage",
+    goal: "Traditionelles und digitales Lernen vergleichen, Vor- und Nachteile abwägen und eine kurze formelle E-Mail schreiben.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
