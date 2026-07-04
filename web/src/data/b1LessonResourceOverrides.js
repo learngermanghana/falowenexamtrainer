@@ -96,6 +96,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Traditionelles und digitales Lernen vergleichen, Vor- und Nachteile abwägen und eine kurze formelle E-Mail schreiben.",
     instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
+  16: Object.freeze({
+    chapter: "5.16",
+    title: "Prüfungsangst und Stressbewältigung",
+    grammarBook: route(16, "grammar"),
+    workbook: doneWorkbook(16),
+    grammarTopic: "Prüfungsangst erklären: weil, dass, wenn, damit, Infinitiv mit zu, Modalverben und Ratschläge",
+    goal: "Ursachen und Symptome von Prüfungsangst beschreiben, Strategien zur Stressbewältigung erklären und eine B1-Meinung schreiben.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
