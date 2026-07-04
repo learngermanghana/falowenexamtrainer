@@ -100,6 +100,12 @@ const B1_GRAMMAR_PAGES = {
   21: B1Day21LebensformenHeuteGrammarNotesPage,
 };
 
+const B1_WORKBOOK_CHAPTER_LINKS = {
+  26: "9.26",
+  27: "10.27",
+  28: "10.28",
+};
+
 const decorateA1Day3Lesson = (lesson) => {
   if (!lesson || Number(lesson.day) !== 3) return;
 
@@ -374,13 +380,16 @@ export default function CourseLessonPage() {
     const query = new URLSearchParams(location.search);
     const dayNumber = Number(day);
     const requestedView = query.get("view");
+    const requestedChapter = String(query.get("chapter") || "").trim();
+    const chapterWorkbookRequested =
+      Boolean(B1_WORKBOOK_CHAPTER_LINKS[dayNumber]) && requestedChapter === B1_WORKBOOK_CHAPTER_LINKS[dayNumber];
 
     if (requestedView === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
       const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
       return <GrammarPage />;
     }
 
-    if (requestedView === "workbook" && B1_WORKBOOK_PAGES[dayNumber]) {
+    if ((requestedView === "workbook" || chapterWorkbookRequested) && B1_WORKBOOK_PAGES[dayNumber]) {
       const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
       return (
         <RadioFirstWorkbookGate level={level} day={dayNumber}>
