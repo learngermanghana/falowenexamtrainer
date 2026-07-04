@@ -29,6 +29,9 @@ import B1Day22BeziehungWichtigWorkbookPage from "./B1Day22BeziehungWichtigWorkbo
 import B1Day23ErstesDateWorkbookPage from "./B1Day23ErstesDateWorkbookPage";
 import B1Day24KonsumNachhaltigkeitWorkbookPage from "./B1Day24KonsumNachhaltigkeitWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./B1Day25OnlineShoppingRightsRisksWorkbookPage";
+import B1Day26ReiseproblemeLoesungenWorkbookPage from "./B1Day26ReiseproblemeLoesungenWorkbookPage";
+import B1Day27UmweltfreundlichAlltagWorkbookPage from "./B1Day27UmweltfreundlichAlltagWorkbookPage";
+import B1Day28KlimafreundlichLebenWorkbookPage from "./B1Day28KlimafreundlichLebenWorkbookPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
@@ -76,6 +79,9 @@ const B1_WORKBOOK_PAGES = {
   23: B1Day23ErstesDateWorkbookPage,
   24: B1Day24KonsumNachhaltigkeitWorkbookPage,
   25: B1Day25OnlineShoppingRightsRisksWorkbookPage,
+  26: B1Day26ReiseproblemeLoesungenWorkbookPage,
+  27: B1Day27UmweltfreundlichAlltagWorkbookPage,
+  28: B1Day28KlimafreundlichLebenWorkbookPage,
 };
 
 const B1_GRAMMAR_PAGES = {
