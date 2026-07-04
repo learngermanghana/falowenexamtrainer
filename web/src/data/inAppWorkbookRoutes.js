@@ -5,19 +5,30 @@ const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
 const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook";
 
-const B1_LATE_WORKBOOK_ROUTES = {
-  "26": {
-    "9.26": "/campus/course/lesson/B1/26?view=workbook&radio=done",
-    "*": "/campus/course/lesson/B1/26?view=workbook&radio=done",
-  },
-  "27": {
-    "10.27": "/campus/course/lesson/B1/27?view=workbook&radio=done",
-    "*": "/campus/course/lesson/B1/27?view=workbook&radio=done",
-  },
-  "28": {
-    "10.28": "/campus/course/lesson/B1/28?view=workbook&radio=done",
-    "*": "/campus/course/lesson/B1/28?view=workbook&radio=done",
-  },
+const b1WorkbookLessonRoute = (day) => `/campus/course/lesson/B1/${day}?view=workbook&radio=done`;
+
+const B1_WORKBOOK_ROUTES = {
+  "1": { "*": b1WorkbookLessonRoute(1) },
+  "2": { "*": b1WorkbookLessonRoute(2) },
+  "3": { "*": b1WorkbookLessonRoute(3) },
+  "4": { "*": "/campus/course/b1-day-4-wohnung-suchen-workbook" },
+  "5": { "*": b1WorkbookLessonRoute(5) },
+  "6": { "*": b1WorkbookLessonRoute(6) },
+  "7": { "*": b1WorkbookLessonRoute(7) },
+  "8": { "*": b1WorkbookLessonRoute(8) },
+  "9": { "*": b1WorkbookLessonRoute(9) },
+  "10": { "*": b1WorkbookLessonRoute(10) },
+  "11": { "*": b1WorkbookLessonRoute(11) },
+  "19": { "*": b1WorkbookLessonRoute(19) },
+  "20": { "*": b1WorkbookLessonRoute(20) },
+  "21": { "*": b1WorkbookLessonRoute(21) },
+  "22": { "*": b1WorkbookLessonRoute(22) },
+  "23": { "*": b1WorkbookLessonRoute(23) },
+  "24": { "*": b1WorkbookLessonRoute(24) },
+  "25": { "*": b1WorkbookLessonRoute(25) },
+  "26": { "*": b1WorkbookLessonRoute(26) },
+  "27": { "*": b1WorkbookLessonRoute(27) },
+  "28": { "*": b1WorkbookLessonRoute(28) },
 };
 
 export const normalizeFalowenCourseRoute = (value = "") => {
@@ -42,8 +53,8 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
     return A1_DAY18_CHAPTER122_WORKBOOK_ROUTE;
   }
 
-  if (normalizedLevel === "B1" && B1_LATE_WORKBOOK_ROUTES[normalizedDay]) {
-    const dayRoutes = B1_LATE_WORKBOOK_ROUTES[normalizedDay];
+  if (normalizedLevel === "B1" && B1_WORKBOOK_ROUTES[normalizedDay]) {
+    const dayRoutes = B1_WORKBOOK_ROUTES[normalizedDay];
     return dayRoutes[normalizedChapter] || dayRoutes["*"] || "";
   }
 
