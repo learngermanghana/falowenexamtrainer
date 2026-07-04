@@ -92,12 +92,31 @@ const lessons = {
   },
   9: {
     title: "Konzessive und adversative Strukturen bei Konsum und Werbung",
-    subtitle: "Werbung, Kaufverhalten und Manipulation differenziert bewerten",
-    why: "Beim Thema Konsum und Werbung musst du widersprüchliche Positionen abwägen: Werbung informiert, beeinflusst aber auch; Konsum schafft Auswahl, erzeugt aber Druck. C1 braucht präzise Gegensätze und Einschränkungen.",
-    goals: ["Gegensätze mit während, wohingegen und dagegen formulieren", "Einschränkungen mit obwohl, obgleich und auch wenn ausdrücken", "Werbewirkung differenziert analysieren", "Argumente mit zwar … jedoch verdichten"],
-    rows: [["während / wohingegen", "Während Werbung Orientierung bieten kann, erzeugt sie zugleich künstliche Bedürfnisse."], ["obgleich", "Obgleich Konsumenten informiert wirken, werden viele Entscheidungen emotional gesteuert."], ["zwar … jedoch", "Werbung ist zwar ein Teil der Marktwirtschaft, jedoch sollte ihre Wirkung kritisch reflektiert werden."], ["dagegen", "Preisvergleiche wirken rational; dagegen sprechen impulsive Käufe eher für emotionale Steuerung."]],
-    model: "Werbung ist zwar ein wichtiger Bestandteil moderner Märkte, jedoch beeinflusst sie Kaufentscheidungen oft stärker, als Konsumenten wahrhaben möchten. Während sie über Produkte informiert, erzeugt sie zugleich Bedürfnisse, die vorher kaum vorhanden waren. Obgleich viele Menschen glauben, frei zu entscheiden, werden ihre Wünsche durch Bilder, Sprache und soziale Trends gelenkt. Daher sollte Medien- und Konsumkompetenz stärker gefördert werden.",
-    checks: [["Werbung informiert. Sie beeinflusst aber auch. → während", "Während Werbung informiert, beeinflusst sie auch."], ["Synonym für obwohl auf C1", "obgleich / wenngleich"], ["zwar …", "zwar … jedoch / aber"]],
+    subtitle: "Werbung, Kaufverhalten und digitale Beeinflussung differenziert bewerten",
+    why:
+      "Beim Thema Konsum und Werbung musst du widersprüchliche Positionen abwägen: Werbung informiert, beeinflusst aber auch; personalisierte Empfehlungen können praktisch sein, greifen jedoch in Datenschutz und Entscheidungsfreiheit ein. C1 braucht präzise Gegensätze, Einschränkungen und vorsichtige Empfehlungen.",
+    goals: [
+      "Gegensätze mit während, wohingegen, dagegen und demgegenüber formulieren",
+      "Einschränkungen mit obwohl, obgleich, wenngleich und auch wenn ausdrücken",
+      "Argumente mit zwar … jedoch und einerseits … andererseits abwägen",
+      "kritische Empfehlungen mit sollte, müsste, könnte und wäre sinnvoll formulieren",
+      "eine Stellungnahme zu personalisierter Werbung differenziert schreiben",
+    ],
+    rows: [
+      ["während / wohingegen", "Während Werbung Orientierung bieten kann, erzeugt sie zugleich künstliche Bedürfnisse."],
+      ["obgleich / obwohl", "Obgleich viele Nutzer glauben, frei zu entscheiden, werden ihre Wünsche durch Algorithmen gelenkt."],
+      ["zwar … jedoch", "Personalisierte Werbung kann zwar nützlich sein, jedoch sollte ihre Datengrundlage transparent gemacht werden."],
+      ["dagegen / demgegenüber", "Rabatte wirken rational; dagegen sprechen Impulskäufe eher für emotionale Steuerung."],
+      ["Konjunktiv II", "Plattformen müssten verständlichere Datenschutzeinstellungen anbieten."],
+    ],
+    model:
+      "Personalisierte Werbung ist zwar ein wichtiger Bestandteil digitaler Geschäftsmodelle, jedoch beeinflusst sie Kaufentscheidungen oft stärker, als Nutzer wahrhaben möchten. Während passende Produktempfehlungen Zeit sparen können, erzeugen wiederholte Anzeigen, Rabatt-Timer und Influencer-Beiträge zusätzlichen Konsumdruck. Obgleich viele Menschen glauben, frei zu entscheiden, werden ihre Wünsche durch Datenanalyse und emotionale Strategien gelenkt. Daher müssten Plattformen transparenter erklären, warum bestimmte Anzeigen erscheinen. Eine sinnvolle Regulierung sollte Datenschutz, wirtschaftliche Interessen und Medienbildung miteinander verbinden.",
+    checks: [
+      ["Werbung informiert. Werbung beeinflusst aber auch. → während", "Während Werbung informiert, beeinflusst sie auch."],
+      ["Synonym für obwohl auf C1", "obgleich / wenngleich / auch wenn"],
+      ["Verbinde: Werbung ist nützlich. Sie braucht Regeln. → zwar … jedoch", "Werbung ist zwar nützlich, jedoch braucht sie klare Regeln."],
+      ["Formuliere eine Empfehlung mit müssen im Konjunktiv II", "Plattformen müssten transparenter informieren."],
+    ],
   },
   10: {
     title: "Passiv, Modalpassiv und differenzierte Bewertung bei Integration und Gesellschaft",
@@ -190,9 +209,87 @@ const Day8DeepDive = ({ lesson }) => {
   );
 };
 
+const Day9DeepDive = ({ lesson }) => {
+  if (!lesson || Number(lesson.day) !== 9) return null;
+
+  return (
+    <>
+      <section style={card}>
+        <h2 style={sectionTitle}>1. Gegensatz oder Einschränkung?</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          Beim Thema Werbung musst du oft zeigen, dass zwei Aussagen gleichzeitig gelten: Werbung informiert, aber sie beeinflusst auch. Dafür brauchst du klare Gegensätze und Einschränkungen.
+        </p>
+        <Table
+          headers={["Funktion", "Struktur", "Beispiel"]}
+          rows={[
+            ["Gegensatz", "während / wohingegen", "Während Werbung Orientierung bieten kann, erzeugt sie zugleich künstliche Bedürfnisse."],
+            ["Hauptsatz-Gegensatz", "dagegen / demgegenüber", "Personalisierte Empfehlungen wirken praktisch. Demgegenüber steht das Risiko der Datenauswertung."],
+            ["Einschränkung", "obwohl / obgleich / wenngleich", "Obgleich viele Nutzer informiert wirken, erkennen sie manipulative Strategien nicht immer."],
+            ["Abwägung", "zwar … jedoch", "Personalisierte Werbung ist zwar nützlich, jedoch braucht sie klare Grenzen."],
+          ]}
+        />
+        <Mistake
+          wrong="Obwohl Werbung kann nützlich sein, beeinflusst sie stark."
+          correct="Obwohl Werbung nützlich sein kann, beeinflusst sie viele Kaufentscheidungen stark."
+        />
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>2. Konjunktiv II für vorsichtige Empfehlungen</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          Auf C1 klingt Kritik stärker, wenn sie sachlich und nicht aggressiv formuliert ist. Mit Konjunktiv II kannst du Empfehlungen und Forderungen höflich, aber klar ausdrücken.
+        </p>
+        <Table
+          headers={["Direkt", "C1 vorsichtiger"]}
+          rows={[
+            ["Plattformen müssen transparenter sein.", "Plattformen müssten transparenter erklären, warum bestimmte Anzeigen erscheinen."],
+            ["Man muss Werbung stärker regulieren.", "Personalisierte Werbung sollte stärker reguliert werden, wenn sensible Daten genutzt werden."],
+            ["Nutzer brauchen mehr Kontrolle.", "Nutzer könnten durch verständliche Einstellungen mehr Kontrolle über ihre Daten erhalten."],
+            ["Ein Verbot ist gut.", "Eine vollständige Einschränkung wäre nur dann sinnvoll, wenn mildere Maßnahmen nicht ausreichen."],
+          ]}
+        />
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>3. Werbestrategien präzise analysieren</h2>
+        <Table
+          headers={["Strategie", "Wirkung", "C1-Formulierung"]}
+          rows={[
+            ["Rabatt-Timer", "Zeitdruck", "Künstliche Verknappung kann dazu führen, dass Kaufentscheidungen weniger rational getroffen werden."],
+            ["Influencer", "soziale Nähe", "Influencer-Werbung wirkt oft glaubwürdig, obwohl sie wirtschaftlich motiviert ist."],
+            ["Tracking", "Personalisierung", "Durch die Auswertung früherer Suchanfragen können Anzeigen gezielt auf individuelle Interessen zugeschnitten werden."],
+            ["Wiederholte Anzeigen", "Gewöhnung und Druck", "Je häufiger ein Produkt erscheint, desto vertrauter und attraktiver kann es wirken."],
+          ]}
+        />
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>4. Mini-Schreibtraining: 80–100 Wörter</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          Schreibe einen kurzen C1-Absatz zur Frage, ob personalisierte Werbung stärker reguliert werden sollte.
+        </p>
+        <NoteBox tone="blue">
+          <strong>Pflichtstrukturen:</strong>
+          <ul style={{ ...listStyle, marginTop: 8 }}>
+            <li>ein Gegensatz mit <strong>während</strong> oder <strong>wohingegen</strong>,</li>
+            <li>eine Einschränkung mit <strong>obwohl</strong> oder <strong>obgleich</strong>,</li>
+            <li>eine Abwägung mit <strong>zwar … jedoch</strong>,</li>
+            <li>eine Empfehlung mit <strong>sollte</strong>, <strong>müsste</strong> oder <strong>könnte</strong>.</li>
+          </ul>
+        </NoteBox>
+        <ExampleBox>
+          <strong>Modell für 80–100 Wörter:</strong><br />
+          Während personalisierte Werbung passende Produkte sichtbar machen kann, erhöht sie zugleich den Druck zu spontanen Käufen. Obgleich viele Nutzer glauben, frei zu entscheiden, werden ihre Interessen durch Tracking und wiederholte Anzeigen gezielt beeinflusst. Diese Werbung ist zwar für Unternehmen wirtschaftlich attraktiv, jedoch sollte sie klarer gekennzeichnet werden. Plattformen müssten verständlich erklären, warum bestimmte Anzeigen erscheinen. Außerdem könnten einfache Datenschutzeinstellungen und mehr Medienbildung helfen, bewussteren Konsum zu fördern.
+        </ExampleBox>
+      </section>
+    </>
+  );
+};
+
 export default function C1Day8To10GrammarNotes({ day, checked = false, onCheckedChange }) {
   const lesson = lessons[Number(day)];
   if (!lesson) return null;
+  const dayNumber = Number(day);
   return <div style={{ display: "grid", gap: 16 }}>
     <section style={card}>
       <span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day {day} · Grammar Notes</span>
@@ -211,7 +308,8 @@ export default function C1Day8To10GrammarNotes({ day, checked = false, onChecked
       <h2 style={sectionTitle}>Kernstrukturen</h2>
       <Table rows={lesson.rows} />
     </section>
-    <Day8DeepDive lesson={{ ...lesson, day: Number(day) }} />
+    <Day8DeepDive lesson={{ ...lesson, day: dayNumber }} />
+    <Day9DeepDive lesson={{ ...lesson, day: dayNumber }} />
     <section style={card}>
       <h2 style={sectionTitle}>C1-Modellabsatz</h2>
       <NoteBox tone="green">{lesson.model}</NoteBox>
