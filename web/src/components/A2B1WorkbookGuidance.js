@@ -48,6 +48,7 @@ const hasCompleteVisibleWorkbookTabs = () => {
   if (typeof document === "undefined") return false;
   const foundKeys = new Set();
   document.querySelectorAll("button, a").forEach((element) => {
+    if (element.closest("[data-universal-a2-workbook-tabs]")) return;
     const style = window.getComputedStyle?.(element);
     if (style && (style.display === "none" || style.visibility === "hidden")) return;
     const key = detectTabKey(element.textContent || "");
