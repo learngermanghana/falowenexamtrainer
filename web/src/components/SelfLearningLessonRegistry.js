@@ -29,6 +29,7 @@ import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2Al
 import b2Day3ArbeitUndBeruf from "../data/selfLearningLessons/b2/day3ArbeitUndBeruf";
 import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUndLernen";
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
+import b2Day6MigrationUndIntegration from "../data/selfLearningLessons/b2/day6MigrationUndIntegration";
 
 const c1FallbackLessons = [
   [17, "4.2", "Umwelt und Verantwortung", "Nachhaltigkeit, Klima und persönliches Handeln"],
@@ -46,7 +47,6 @@ const c1FallbackLessons = [
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "C1", day, chapter, title, topic }));
 
 const b2FallbackLessons = [
-  [6, "2.1", "Medien und digitale Kommunikation", "Soziale Medien, Datenschutz und Online-Verhalten"],
   [7, "2.2", "Umwelt und Nachhaltigkeit", "Klimaschutz, Konsum und Alltagshandeln"],
   [8, "2.3", "Reisen und Mobilität", "Transport, Urlaub und nachhaltige Entscheidungen"],
   [9, "2.4", "Wohnen und Nachbarschaft", "Wohnformen, Mietprobleme und Zusammenleben"],
@@ -79,6 +79,7 @@ export const SELF_LEARNING_LESSONS = {
     b2Day3ArbeitUndBeruf,
     b2Day4BildungUndLernen,
     b2Day5GesundheitUndWohlbefinden,
+    b2Day6MigrationUndIntegration,
     ...b2FallbackLessons,
   ],
   C1: [
@@ -112,7 +113,7 @@ const componentRegistry = Object.fromEntries(
       ({ canonicalLesson }) => (
         Number(lesson.day) === 0 ? (
           <SelfLearningEditableLessonPageV2 lesson={lesson} falowenRadio={canonicalLesson?.resources?.falowenRadio || null} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 5 ? (
+        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 6 ? (
           <B2Day1To4GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
         ) : (
           <StandardLessonWritingCoachPage lesson={lesson} canonicalLesson={canonicalLesson} />
