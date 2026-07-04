@@ -52,6 +52,72 @@ const ResourceButton = ({ href, children }) => {
   return <a href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})} style={{ ...styles.linkButton, width: "fit-content" }}>{children}</a>;
 };
 
+
+const getGermanyLifeMiniLesson = (lesson) => {
+  const topic = lesson?.title || lesson?.topic || "dieses Thema";
+  const level = String(lesson?.level || "B2").toUpperCase();
+  const lower = `${topic} ${lesson?.topic || ""}`.toLowerCase();
+  const b2 = level === "B2";
+  if (/ausbildung|beruf|karriere|arbeit|weiterbildung|bildung|lernen/.test(lower)) {
+    return {
+      title: `${topic}: Leben und Arbeiten in Deutschland`,
+      intro: b2
+        ? "In Deutschland ist der Weg in den Beruf oft klar organisiert. Viele Menschen lernen einen Beruf in einer Ausbildung: Sie arbeiten in einem Betrieb und besuchen gleichzeitig die Berufsschule."
+        : "Das deutsche Bildungs- und Berufssystem ist stark durch institutionalisierte Übergänge geprägt: Ausbildung, Studium, duales Studium und berufliche Weiterbildung bilden verschiedene Wege in qualifizierte Beschäftigung.",
+      points: b2
+        ? ["Die duale Ausbildung verbindet Praxis im Betrieb mit Theorie in der Berufsschule.", "Typische Bereiche sind Pflege, Handwerk, Büro, IT, Gastronomie und Technik.", "Weiterbildung hilft, wenn man den Beruf wechseln oder mehr Verantwortung übernehmen möchte."]
+        : ["Die duale Ausbildung gilt als ein zentraler Pfeiler der Fachkräftesicherung.", "Lebenslanges Lernen ist wegen Digitalisierung, Migration und demografischem Wandel politisch und wirtschaftlich relevant.", "Berufliche Qualifikation beeinflusst gesellschaftliche Teilhabe, Einkommen und Aufstiegschancen."],
+      vocabulary: b2 ? ["die Ausbildung", "der Betrieb", "die Berufsschule", "die Weiterbildung", "die Fachkraft"] : ["die Durchlässigkeit", "die Fachkräftesicherung", "der Bildungsweg", "die Umschulung", "die Chancengerechtigkeit"],
+    };
+  }
+  if (/migration|integration|gesellschaft|vielfalt|identität|identitaet|kultur|mehrsprach/.test(lower)) {
+    return {
+      title: `${topic}: Zusammenleben in Deutschland`,
+      intro: b2
+        ? "Deutschland ist ein Einwanderungsland. Menschen mit verschiedenen Sprachen, Religionen und Lebensgeschichten leben zusammen. Darum sind Respekt, klare Regeln und Kommunikation im Alltag wichtig."
+        : "In Deutschland werden Fragen von Identität, Integration und Mehrsprachigkeit oft als gesamtgesellschaftliche Aufgaben verstanden, weil sie Schule, Arbeitsmarkt, Verwaltung und Nachbarschaft direkt betreffen.",
+      points: b2
+        ? ["Deutschkenntnisse helfen bei Arbeit, Schule, Behörden und Freundschaften.", "Integration bedeutet nicht, die eigene Kultur zu verlieren, sondern aktiv am Alltag teilzunehmen.", "Vereine, Nachbarschaft und Ehrenamt können Kontakte leichter machen." ]
+        : ["Integration umfasst Sprache, rechtliche Teilhabe, Bildungschancen und soziale Anerkennung.", "Mehrsprachigkeit kann eine Ressource sein, wenn Institutionen sie nicht nur als Problem betrachten.", "Öffentliche Debatten zeigen, dass Zugehörigkeit verhandelbar und vielschichtig ist."],
+      vocabulary: b2 ? ["die Integration", "die Vielfalt", "die Herkunft", "die Zugehörigkeit", "der Verein"] : ["die Teilhabe", "die Anerkennung", "die Zugehörigkeit", "die Mehrheitsgesellschaft", "die Ausgrenzung"],
+    };
+  }
+  if (/gesund|wohlbefinden|stress|freizeit|sport|ernährung|ernaehrung/.test(lower)) {
+    return {
+      title: `${topic}: Alltag und Gesundheit in Deutschland`,
+      intro: b2
+        ? "Im deutschen Alltag spielen Gesundheit, Freizeit und eine gute Work-Life-Balance eine wichtige Rolle. Viele Menschen planen feste Zeiten für Arbeit, Familie, Sport und Erholung."
+        : "Gesundheit und Wohlbefinden werden in Deutschland zunehmend als Zusammenspiel von individueller Verantwortung, Arbeitsbedingungen, Prävention und sozialer Infrastruktur diskutiert.",
+      points: b2
+        ? ["Hausärzte, Apotheken und Krankenkassen sind wichtige Ansprechpartner.", "Viele Menschen nutzen Vereine, Parks und Kurse, um aktiv zu bleiben.", "Stress wird ernst genommen, besonders wenn Arbeit und Privatleben nicht im Gleichgewicht sind." ]
+        : ["Prävention gewinnt an Bedeutung, weil chronischer Stress hohe persönliche und gesellschaftliche Kosten verursacht.", "Betriebliche Gesundheitsförderung soll Arbeitsfähigkeit und Lebensqualität langfristig sichern.", "Freizeitangebote und Vereinskultur stärken soziale Kontakte und mentale Gesundheit."],
+      vocabulary: b2 ? ["die Krankenkasse", "die Apotheke", "die Erholung", "der Verein", "die Belastung"] : ["die Prävention", "die Belastbarkeit", "die Gesundheitsförderung", "die Vereinbarkeit", "die Lebensqualität"],
+    };
+  }
+  return {
+    title: `${topic}: Verbindung zum Leben in Deutschland`,
+    intro: b2
+      ? "Dieses Thema hilft dir, den Alltag in Deutschland besser zu verstehen. Es zeigt, wie Menschen Entscheidungen treffen, miteinander sprechen und ihr Leben organisieren."
+      : "Dieses Thema eröffnet einen differenzierten Blick auf Deutschland, weil private Entscheidungen, gesellschaftliche Strukturen und öffentliche Debatten eng miteinander verbunden sind.",
+    points: b2
+      ? ["Achte darauf, welche Regeln und Erwartungen im Alltag wichtig sind.", "Vergleiche die Situation in Deutschland mit deinem Land und nenne konkrete Beispiele.", "Nutze passende Wörter, damit deine Meinung klar und natürlich klingt." ]
+      : ["Analysiere, welche Institutionen, Werte und Konflikte hinter dem Thema stehen.", "Verbinde persönliche Beispiele mit gesellschaftlichen Entwicklungen.", "Formuliere abgewogen: nicht nur Vorteile und Nachteile, sondern auch Bedingungen und Folgen."],
+    vocabulary: b2 ? ["der Alltag", "die Regel", "die Erfahrung", "der Vergleich", "die Meinung"] : ["die Rahmenbedingung", "die Wechselwirkung", "der gesellschaftliche Wandel", "die Perspektive", "die Ambivalenz"],
+  };
+};
+
+const GermanyLifeMiniLesson = ({ lesson }) => {
+  const mini = getGermanyLifeMiniLesson(lesson);
+  return (
+    <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 14, background: "#eff6ff", display: "grid", gap: 10 }}>
+      <h3 style={{ margin: 0 }}>{mini.title}</h3>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>{mini.intro}</p>
+      <ul style={listStyle}>{mini.points.map((item) => <li key={item}>{item}</li>)}</ul>
+      <div><strong>Wortschatz:</strong> {mini.vocabulary.join(" · ")}</div>
+    </div>
+  );
+};
+
 const ProgressCard = ({ label, complete, detail }) => (
   <div style={{ border: `1px solid ${complete ? "#86efac" : "#cbd5e1"}`, borderRadius: 14, padding: 13, background: complete ? "#f0fdf4" : "#fff", display: "grid", gap: 5 }}>
     <strong>{complete ? "✅" : "⬜"} {label}</strong>
@@ -262,7 +328,8 @@ export default function StandardFourStageLessonPage({ lesson, canonicalLesson = 
           <ProgressCard label="Speak" complete={progress.speakDone} detail={isCompactC1(lesson) ? "Speaking practice completed" : "Brain-map speaking practice completed"} />
           <ProgressCard label="Write" complete={writing.complete} detail={`${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
         </div>
-        <label style={{ display: "grid", gap: 7 }}><strong>Short reflection</strong><span style={{ color: "#64748b", fontSize: 13 }}>What did you learn, and what should you improve next?</span><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
+        <GermanyLifeMiniLesson lesson={lesson} />
+        <label style={{ display: "grid", gap: 7 }}><strong>Your learning note</strong><span style={{ color: "#64748b", fontSize: 13 }}>Write one useful connection between this topic and life in Germany, plus one thing you want to improve next.</span><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
         {!finishReady ? <NoteBox tone="amber">Complete Learn, Speak and the guided writing task before finishing this lesson.</NoteBox> : null}
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
