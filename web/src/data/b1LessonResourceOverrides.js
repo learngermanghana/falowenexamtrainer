@@ -114,6 +114,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Eigene Lernmethoden beschreiben, effektives Lernen erklären und eine B1-Meinung zu Lernstrategien schreiben.",
     instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit Schreiben, Lesen and Hören.",
   }),
+  18: Object.freeze({
+    chapter: "6.18",
+    title: "Wege zum Wunschberuf",
+    grammarBook: route(18, "grammar"),
+    workbook: doneWorkbook(18),
+    grammarTopic: "Berufswege beschreiben: Infinitiv mit zu, um ... zu, Relativsätze, je nachdem und Bewerbungsvokabular",
+    goal: "Den Wunschberuf erklären, Ausbildung und Qualifikationen beschreiben und verschiedene Wege zum Beruf vergleichen.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
