@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import B2Day1IdentityGrammarNotes from "./B2Day1IdentityGrammarNotes";
 import B2Day2To4GrammarNotes from "./B2Day2To4GrammarNotes";
@@ -50,7 +50,6 @@ const NoteBox = ({ children, tone = "blue" }) => {
   const [border, background, color] = tones[tone] || tones.blue;
   return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 12, background, color, lineHeight: 1.65 }}>{children}</div>;
 };
-
 
 const getGermanyLifeMiniLesson = (lesson) => {
   const topic = lesson?.title || lesson?.topic || "dieses Thema";
@@ -116,13 +115,6 @@ const GermanyLifeMiniLesson = ({ lesson }) => {
     </div>
   );
 };
-
-const ProgressCard = ({ label, complete, detail }) => (
-  <div style={{ border: `1px solid ${complete ? "#86efac" : "#cbd5e1"}`, borderRadius: 14, padding: 13, background: complete ? "#f0fdf4" : "#fff", display: "grid", gap: 5 }}>
-    <strong>{complete ? "✅" : "⬜"} {label}</strong>
-    <span style={{ color: "#64748b", fontSize: 13 }}>{detail}</span>
-  </div>
-);
 
 const ResourceButton = ({ href, children }) => {
   if (!href) return null;
@@ -195,7 +187,6 @@ const GrammarNotes = ({ lesson, checked, onCheckedChange }) => {
 };
 
 export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = null }) {
-  const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
   const { studentProfile, user } = useAuth();
@@ -203,7 +194,7 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
   const radio = canonicalLesson?.resources?.falowenRadio || null;
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
-  const [writing, setWriting] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
+  const [, setWriting] = useState({ complete: false, completedQuestions: 0, totalQuestions: 5, wordCount: 0 });
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
   const [progress, setProgress] = useState(() => {
     try {
@@ -232,19 +223,8 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
   const video = lesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
   const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
-  const assignmentId = canonicalLesson?.submission?.assignmentId;
-  const canSubmit = Boolean(canonicalLesson?.submission?.enabled && assignmentId);
-  const finishRequirements = [
-    { key: "learn", label: "read the complete guided grammar notes and tick the Learn checkbox", complete: progress.learnDone },
-    { key: "speak", label: "complete a speaking practice", complete: progress.speakDone },
-    { key: "write", label: "complete the guided writing questions", complete: writing.complete },
-    { key: "confidence", label: "choose your confidence level", complete: Boolean(progress.confidence) },
-  ];
-  const missingRequirements = finishRequirements.filter((item) => !item.complete);
-  const finishReady = missingRequirements.length === 0;
 
   const finish = () => {
-    if (!finishReady) return;
     const completedAt = new Date().toISOString();
     setProgress((old) => ({ ...old, completed: true, completedAt }));
     const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "student";
@@ -252,16 +232,9 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
     if (assignmentKey && typeof window !== "undefined") {
       const practiceStorageKey = `coursePracticeProgress:${studentCode}:B2`;
       const saved = JSON.parse(window.localStorage.getItem(practiceStorageKey) || "{}");
-      window.localStorage.setItem(practiceStorageKey, JSON.stringify({ ...saved, [assignmentKey]: { ...(saved[assignmentKey] || {}), completed: true, confidence: progress.confidence, completedAt, updatedAt: completedAt } }));
+      window.localStorage.setItem(practiceStorageKey, JSON.stringify({ ...saved, [assignmentKey]: { ...(saved[assignmentKey] || {}), completed: true, completedAt, updatedAt: completedAt } }));
     }
     showToast(`B2 Day ${day} completed. Your progress was saved.`, "success");
-  };
-
-  const submit = () => {
-    if (!assignmentId) return;
-    navigate(`/campus/course?submitWork=1&assignmentKey=${encodeURIComponent(assignmentId)}&assignmentId=${encodeURIComponent(assignmentId)}`, {
-      state: { assignmentKey: assignmentId, assignmentId, canonicalAssignmentId: assignmentId, day, level: "B2", assignmentTitle: lesson.title },
-    });
   };
 
   return (
@@ -307,21 +280,10 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
 
       {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
 
-      {active === "finish" ? <Section title={`Finish B2 Day ${day}`}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
-          <ProgressCard label="Learn" complete={progress.learnDone} detail="Video and full guided grammar notes reviewed" />
-          <ProgressCard label="Speak" complete={progress.speakDone} detail="Speaking practice completed" />
-          <ProgressCard label="Write" complete={writing.complete} detail={`${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
-        </div>
-        <label style={{ display: "grid", gap: 7 }}><strong>Confidence level</strong><span style={{ color: "#64748b", fontSize: 13 }}>Choose how confident you feel after this lesson.</span><select value={progress.confidence || ""} onChange={(event) => setProgress((old) => ({ ...old, confidence: event.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low confidence</option><option value="medium">Medium confidence</option><option value="high">High confidence</option></select></label>
+      {active === "finish" ? <Section title={`Summary B2 Day ${day}`}>
         <GermanyLifeMiniLesson lesson={lesson} />
-        <label style={{ display: "grid", gap: 7 }}><strong>Your learning note</strong><span style={{ color: "#64748b", fontSize: 13 }}>Write one useful connection between this topic and life in Germany, plus one thing you want to improve next.</span><textarea value={progress.reflection} onChange={(event) => setProgress((old) => ({ ...old, reflection: event.target.value }))} placeholder="Example: In Germany, Ausbildung connects school and work. I want to improve my connectors when I explain examples." style={{ minHeight: 120, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", resize: "vertical" }} /></label>
-        {!finishReady ? <NoteBox tone="amber"><strong>Mark complete is blocked because:</strong><ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>{missingRequirements.map((item) => <li key={item.key}>{item.label}</li>)}</ul></NoteBox> : null}
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={{ ...styles.primaryButton, opacity: finishReady ? 1 : .5 }} disabled={!finishReady} onClick={finish}>{progress.completed ? "Mark complete again" : "Mark lesson complete"}</button>
-          {canSubmit ? <button type="button" style={{ ...styles.primaryButton, opacity: finishReady ? 1 : .5 }} disabled={!finishReady} onClick={submit}>Submit assignment</button> : null}
-        </div>
+        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button>
       </Section> : null}
     </div>
   );
