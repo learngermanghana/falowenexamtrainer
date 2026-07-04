@@ -8,14 +8,25 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 
 const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
+  { key: "sprechen", label: "Teil 1" },
+  { key: "schreiben", label: "Teil 2" },
+  { key: "lesen", label: "Teil 3" },
+  { key: "hoeren", label: "Teil 4" },
+  { key: "references", label: "Ref" },
+  { key: "submit", label: "Submit" },
 ];
+
+const tabDescriptions = {
+  sprechen: "Sprechen · Group Practice",
+  schreiben: "Schreiben · Assignment",
+  lesen: "Lesen · Reading questions",
+  hoeren: "Hören · Listening questions",
+  references: "Reference answers",
+  submit: "Submit final answers",
+};
 
 const card = {
   ...styles.card,
@@ -50,6 +61,19 @@ const videoPreviewStyle = {
   minHeight: 315,
   border: 0,
   borderRadius: 10,
+};
+
+const workbookTabBarStyle = {
+  position: "sticky",
+  top: 0,
+  zIndex: 20,
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 8,
+  padding: "10px 0",
+  background: "rgba(255,255,255,0.96)",
+  backdropFilter: "blur(10px)",
+  borderBottom: "1px solid #e5e7eb",
 };
 
 const lesenQuestions = [
@@ -129,12 +153,16 @@ const hoerenQuestions = [
 function TabButton({ active, onClick, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         ...styles.secondaryButton,
         borderColor: active ? "#2563eb" : "#d1d5db",
         background: active ? "#eff6ff" : "#fff",
         color: active ? "#1d4ed8" : "#111827",
+        fontWeight: active ? 800 : 700,
+        minWidth: 88,
+        boxShadow: active ? "0 0 0 2px rgba(37,99,235,0.16)" : "none",
       }}
     >
       {children}
@@ -172,7 +200,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           4-part workbook: group speaking, writing, reading and listening practice.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div style={workbookTabBarStyle} aria-label="Workbook parts navigation">
           {tabs.map((tab) => (
             <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
               {tab.label}
@@ -180,12 +208,12 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           ))}
         </div>
 
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
+        <p style={{ margin: 0, color: "#4b5563", fontWeight: 700 }}>
+          {activeIndex + 1}. {tabDescriptions[activeTab] || "Workbook section"}
         </p>
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance level="A2" />
 
       {activeTab === "sprechen" && (
         <div style={card}>
@@ -336,9 +364,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -366,12 +392,9 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             <li>Was erwarten Sie?</li>
           </ol>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (same workflow as usual), not directly on this
-            page.
+            Submit your final writing in the <strong>Submit</strong> tab of this workbook.
           </p>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -387,8 +410,8 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
           <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit
-            section at the bottom of the lesson to send your answers.
+            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the Submit
+            tab to send your answers.
           </p>
 
           <h3 style={sectionTitle}>Kinderbetreuung in Deutschland (A2-Niveau)</h3>
@@ -434,18 +457,21 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
           <p style={{ margin: 0 }}>
-            Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
+            Listen to the video, then submit your answers in the Submit tab.
           </p>
           <p style={{ margin: 0 }}>
-            Audio link:{" "}
-            <a
-              href="https://drive.google.com/file/d/1iT-0eKLWmEn_ZNdhQ8qiEWh0Dhn-ql4p/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
+            Hören video:{" "}
+            <a href="https://youtu.be/kr9Rj2j-ghw" target="_blank" rel="noreferrer">
+              Open Teil 4 Hören video on YouTube
             </a>
           </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/kr9Rj2j-ghw?rel=0"
+            title="A2 Day 13 Vorstellungsgespräch Teil 4 Hören video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
@@ -459,29 +485,28 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             </div>
           ))}
 
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/urKBrX5VAYU" target="_blank" rel="noreferrer">
-              Vorstellungsgespräch führen (A2)
-            </a>
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/urKBrX5VAYU"
-            title="Vorstellungsgespräch führen (A2)"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day13Vorstellungsgespraech", level: "A2", workbookId: "A2Day13Vorstellungsgespraech" }} workbookId="A2Day13Vorstellungsgespraech" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day13Vorstellungsgespraech", level: "A2", workbookId: "A2Day13Vorstellungsgespraech" }}
+          workbookId="A2Day13Vorstellungsgespraech"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit only your final answers here. Include Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören in one submission.
+          </p>
+          <AssignmentSubmissionPage />
+        </div>
+      )}
     </div>
   );
 };
