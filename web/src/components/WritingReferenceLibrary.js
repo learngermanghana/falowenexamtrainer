@@ -17,9 +17,9 @@ const buildReferencePreview = (body = "", maxLength = 150) => {
 };
 
 const WritingReferenceLibrary = ({
-  title = "Reference library",
-  description = "Save each pasted reference with a clear topic. The main page stays clean; open a topic to study the full note on its own page.",
-  tip = "Use topics like “Apology letter”, “Complaint phrases”, or “B1 connectors”, then paste the complete explanation, examples, and corrections in the body.",
+  title = "Student notes",
+  description = "Ref is for students to save their own notes, useful phrases, model snippets, corrections, and reminders. It is not an answers page.",
+  tip = "Use topics like “Apology letter”, “Complaint phrases”, or “B1 connectors”, then paste your notes, examples, and corrections in the body.",
   emptyText = "No references saved yet. Add your first topic above — it will be saved with your writing workspace.",
   idPrefix = "writing-reference",
   topicPlaceholder = "e.g., Complaint letter phrases",

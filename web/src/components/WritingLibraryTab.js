@@ -44,9 +44,12 @@ export default function WritingLibraryTab({
     <section data-writing-library-tab style={{ display: "grid", gap: 16 }}>
       <div style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
-          References and saved writing
+          Ref notes and saved writing
         </h3>
         <p style={{ ...styles.helperText, margin: 0 }}>
+          Ref is your student notes space for useful phrases, examples, corrections, and reminders. It is not an answer key.
+        </p>
+        <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
           Level {context.level || context.courseLevel || level || "—"} · Day{" "}
           {dayLabel} ·{" "}
           {context.taskTitle ||

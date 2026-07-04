@@ -2067,17 +2067,6 @@ const WritingPage = ({
             ))}
           </div>
         )}
-        {!isTutorOnlyView && (
-          <div style={{ marginTop: 12 }}>
-            <button
-              style={styles.dangerButton}
-              onClick={handleResetWorkspace}
-              type="button"
-            >
-              Reset writing workspace
-            </button>
-          </div>
-        )}
       </section>
 
       {activeTab === "practice" && canUsePracticeLetters && (
@@ -2395,6 +2384,14 @@ const WritingPage = ({
                   disabled={!typedAnswer.trim()}
                 >
                   Export / Print draft
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.dangerButton}
+                  onClick={handleResetWorkspace}
+                >
+                  Reset writing workspace
                 </button>
               </div>
             </div>
