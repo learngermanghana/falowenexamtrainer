@@ -5,6 +5,7 @@ import B2Day1IdentityGrammarNotes from "./B2Day1IdentityGrammarNotes";
 import B2Day2To4GrammarNotes from "./B2Day2To4GrammarNotes";
 import B2Day5HealthGrammarNotes from "./B2Day5HealthGrammarNotes";
 import B2Day6MigrationIntegrationGrammarNotes from "./B2Day6MigrationIntegrationGrammarNotes";
+import B2Day14To16GrammarNotes from "./B2Day14To16GrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -183,6 +184,7 @@ const GrammarNotes = ({ lesson, checked, onCheckedChange }) => {
   if (day === 1) return <B2Day1IdentityGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
   if (day === 5) return <B2Day5HealthGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
   if (day === 6) return <B2Day6MigrationIntegrationGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
+  if (day >= 14 && day <= 16) return <B2Day14To16GrammarNotes day={day} checked={checked} onCheckedChange={onCheckedChange} />;
   return <B2Day2To4GrammarNotes day={day} checked={checked} onCheckedChange={onCheckedChange} />;
 };
 

@@ -113,7 +113,7 @@ const componentRegistry = Object.fromEntries(
       ({ canonicalLesson }) => (
         Number(lesson.day) === 0 ? (
           <SelfLearningEditableLessonPageV2 lesson={lesson} falowenRadio={canonicalLesson?.resources?.falowenRadio || null} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 13 ? (
+        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 16 ? (
           <B2Day1To4GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
         ) : (
           <StandardLessonWritingCoachPage lesson={lesson} canonicalLesson={canonicalLesson} />
