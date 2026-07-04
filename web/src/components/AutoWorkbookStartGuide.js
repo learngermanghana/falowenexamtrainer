@@ -15,7 +15,7 @@ import {
   shouldRenderWorkbookGuide,
 } from "../utils/autoWorkbookGuideRouting";
 import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
-import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
+import WorkbookTopSubmissionTabs from "./WorkbookTopSubmissionTabs";
 import WorkbookContextSync from "./WorkbookContextSync";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
@@ -59,7 +59,7 @@ const AutoWorkbookStartGuide = () => {
     >
       {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
-      {usesSelfManagedSubmissionTabs ? null : <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />}
+      {usesSelfManagedSubmissionTabs ? null : <WorkbookTopSubmissionTabs hostRef={hostRef} match={match} />}
     </div>
   );
 };
