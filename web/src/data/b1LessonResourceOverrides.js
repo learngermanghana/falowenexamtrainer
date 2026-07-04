@@ -105,6 +105,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Ursachen und Symptome von Prüfungsangst beschreiben, Strategien zur Stressbewältigung erklären und eine B1-Meinung schreiben.",
     instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
+  17: Object.freeze({
+    chapter: "5.17",
+    title: "Wie lernt man am besten?",
+    grammarBook: "",
+    workbook: doneWorkbook(17),
+    grammarTopic: "Effektiv lernen: Lernmethoden, Lernumgebung, Zeitmanagement, Motivation und Wiederholung",
+    goal: "Eigene Lernmethoden beschreiben, effektives Lernen erklären und eine B1-Meinung zu Lernstrategien schreiben.",
+    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit Schreiben, Lesen and Hören.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
