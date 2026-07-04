@@ -69,6 +69,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Über digitale Gewohnheiten und Digital-Detox-Strategien sprechen.",
     instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
   }),
+  12: Object.freeze({
+    chapter: "4.12",
+    title: "Abenteuer in der Natur",
+    grammarBook: route(12, "grammar"),
+    workbook: doneWorkbook(12),
+    grammarTopic: "Natur-Abenteuer erzählen: Zeitangaben, Perfekt/Präteritum, Nebensätze und beschreibende Adjektive",
+    goal: "Ein beeindruckendes Natur-Abenteuer strukturiert erzählen, Herausforderungen beschreiben und Erfahrungen bewerten.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
