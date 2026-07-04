@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import B2Day1IdentityGrammarNotes from "./B2Day1IdentityGrammarNotes";
 import B2Day2To4GrammarNotes from "./B2Day2To4GrammarNotes";
 import B2Day5HealthGrammarNotes from "./B2Day5HealthGrammarNotes";
+import B2Day6MigrationIntegrationGrammarNotes from "./B2Day6MigrationIntegrationGrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -110,6 +111,7 @@ const CompactSpeakingPoints = ({ lesson }) => {
       ) : null}
       {starters.length ? <NoteBox><strong>Nützliche Satzanfänge:</strong><ul style={{ ...listStyle, marginTop: 8 }}>{starters.map((item) => <li key={item}>{item}</li>)}</ul></NoteBox> : null}
       {Number(lesson.day) === 5 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens vier Verbindungen aus <em>weil, da, deshalb, daher</em> und <em>aus diesem Grund</em>. Nenne mindestens ein konkretes Beispiel.</NoteBox> : null}
+      {Number(lesson.day) === 6 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens zwei Verbindungen aus <em>obwohl, auch wenn</em> und <em>trotzdem</em>. Nenne eine konkrete Lösung mit Vorteil.</NoteBox> : null}
     </div>
   );
 };
@@ -122,6 +124,7 @@ const GrammarNotes = ({ lesson, checked, onCheckedChange }) => {
   const day = Number(lesson.day);
   if (day === 1) return <B2Day1IdentityGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
   if (day === 5) return <B2Day5HealthGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
+  if (day === 6) return <B2Day6MigrationIntegrationGrammarNotes checked={checked} onCheckedChange={onCheckedChange} />;
   return <B2Day2To4GrammarNotes day={day} checked={checked} onCheckedChange={onCheckedChange} />;
 };
 
