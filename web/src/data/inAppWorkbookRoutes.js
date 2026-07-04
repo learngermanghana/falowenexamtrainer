@@ -24,6 +24,7 @@ const B1_WORKBOOK_ROUTES = {
   "14": { "5.14": b1WorkbookLessonRoute(14), "*": b1WorkbookLessonRoute(14) },
   "16": { "5.16": b1WorkbookLessonRoute(16), "*": b1WorkbookLessonRoute(16) },
   "17": { "5.17": b1WorkbookLessonRoute(17), "*": b1WorkbookLessonRoute(17) },
+  "18": { "6.18": b1WorkbookLessonRoute(18), "*": b1WorkbookLessonRoute(18) },
   "19": { "*": b1WorkbookLessonRoute(19) },
   "20": { "*": b1WorkbookLessonRoute(20) },
   "21": { "*": b1WorkbookLessonRoute(21) },
