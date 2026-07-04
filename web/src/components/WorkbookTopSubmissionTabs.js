@@ -51,8 +51,9 @@ const hideNativeWorkbookNavigation = (pageRoot) => {
 
   const nativeRow = findNativeTabRow(pageRoot);
   if (nativeRow) {
-    rememberDisplay(nativeRow, HIDDEN_ROW_ATTRIBUTE);
-    nativeRow.style.display = "none";
+    const nativeShell = nativeRow.closest("[data-workbook-tab-navigation]") || nativeRow;
+    rememberDisplay(nativeShell, HIDDEN_ROW_ATTRIBUTE);
+    nativeShell.style.display = "none";
   }
 
   Array.from(pageRoot.querySelectorAll("p")).forEach((paragraph) => {
