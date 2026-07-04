@@ -22,6 +22,8 @@ import B1Day10DigitaleAuszeitWorkbookPage from "./B1Day10DigitaleAuszeitWorkbook
 import B1Day10DigitaleAuszeitGrammarNotesPage from "./B1Day10DigitaleAuszeitGrammarNotesPage";
 import B1Day11TeamspieleWorkbookPage from "./B1Day11TeamspieleWorkbookPage";
 import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
+import B1Day12AbenteuerInDerNaturWorkbookPage from "./B1Day12AbenteuerInDerNaturWorkbookPage";
+import B1Day12AbenteuerInDerNaturGrammarNotesPage from "./B1Day12AbenteuerInDerNaturGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20BerufKennenWorkbookPage from "./B1Day20BerufKennenWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
@@ -73,6 +75,7 @@ const B1_WORKBOOK_PAGES = {
   9: B1Day9WorkLifeBalanceWorkbookPage,
   10: B1Day10DigitaleAuszeitWorkbookPage,
   11: B1Day11TeamspieleWorkbookPage,
+  12: B1Day12AbenteuerInDerNaturWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20BerufKennenWorkbookPage,
   21: B1Day21LebensformenHeuteWorkbookPage,
@@ -97,11 +100,13 @@ const B1_GRAMMAR_PAGES = {
   9: B1Day9WorkLifeBalanceGrammarNotesPage,
   10: B1Day10DigitaleAuszeitGrammarNotesPage,
   11: B1Day11TeamspieleGrammarNotesPage,
+  12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
   19: B1Day19VorstellungsgespraechGrammarNotesPage,
   21: B1Day21LebensformenHeuteGrammarNotesPage,
 };
 
 const B1_WORKBOOK_CHAPTER_LINKS = {
+  12: "4.12",
   26: "9.26",
   27: "10.27",
   28: "10.28",
