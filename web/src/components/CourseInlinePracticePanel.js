@@ -4,6 +4,7 @@ import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import SpeakingMindMap from "./SpeakingMindMap";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
+import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 
 const currentPath = () => {
   if (typeof window === "undefined") return "";
@@ -104,6 +105,19 @@ const CourseInlinePracticePanel = ({
     };
   }, [title, type, writingContext]);
 
+  const renderedPractice = config.render(resolvedWritingContext);
+  const practiceContent =
+    type === "writing" ? (
+      <WritingCheatSheetTabs
+        level={resolvedWritingContext.level || resolvedWritingContext.courseLevel}
+        day={resolvedWritingContext.day}
+      >
+        {renderedPractice}
+      </WritingCheatSheetTabs>
+    ) : (
+      renderedPractice
+    );
+
   return (
     <Fragment>
       {speakingMindMap ? <SpeakingMindMap config={speakingMindMap} /> : null}
@@ -143,10 +157,7 @@ const CourseInlinePracticePanel = ({
               paddingTop: 12,
             }}
           >
-            <span style={styles.helperText}>
-              {config.label} loaded inside this workbook page.
-            </span>
-            {config.render(resolvedWritingContext)}
+            {practiceContent}
           </div>
         ) : null}
       </div>
