@@ -28,6 +28,8 @@ import B1Day13EigeneFilmkritikWorkbookPage from "./B1Day13EigeneFilmkritikWorkbo
 import B1Day13EigeneFilmkritikGrammarNotesPage from "./B1Day13EigeneFilmkritikGrammarNotesPage";
 import B1Day14TraditionellesDigitalesLernenWorkbookPage from "./B1Day14TraditionellesDigitalesLernenWorkbookPage";
 import B1Day14TraditionellesDigitalesLernenGrammarNotesPage from "./B1Day14TraditionellesDigitalesLernenGrammarNotesPage";
+import B1Day16PruefungsangstStressbewaeltigungWorkbookPage from "./B1Day16PruefungsangstStressbewaeltigungWorkbookPage";
+import B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage from "./B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20BerufKennenWorkbookPage from "./B1Day20BerufKennenWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
@@ -82,6 +84,7 @@ const B1_WORKBOOK_PAGES = {
   12: B1Day12AbenteuerInDerNaturWorkbookPage,
   13: B1Day13EigeneFilmkritikWorkbookPage,
   14: B1Day14TraditionellesDigitalesLernenWorkbookPage,
+  16: B1Day16PruefungsangstStressbewaeltigungWorkbookPage,
   19: B1Day19VorstellungsgespraechWorkbookPage,
   20: B1Day20BerufKennenWorkbookPage,
   21: B1Day21LebensformenHeuteWorkbookPage,
@@ -109,6 +112,7 @@ const B1_GRAMMAR_PAGES = {
   12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
   13: B1Day13EigeneFilmkritikGrammarNotesPage,
   14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage,
+  16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage,
   19: B1Day19VorstellungsgespraechGrammarNotesPage,
   21: B1Day21LebensformenHeuteGrammarNotesPage,
 };
@@ -117,6 +121,7 @@ const B1_WORKBOOK_CHAPTER_LINKS = {
   12: "4.12",
   13: "4.13",
   14: "5.14",
+  16: "5.16",
   26: "9.26",
   27: "10.27",
   28: "10.28",
