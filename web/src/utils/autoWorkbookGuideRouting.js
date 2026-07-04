@@ -43,7 +43,8 @@ export const shouldRenderWorkbookGuide = ({
 } = {}) => {
   if (!match) return false;
   const normalizedPathname = normalizeInAppPath(pathname);
-  const requestedView = new URLSearchParams(search || "").get("view");
+  const searchParams = new URLSearchParams(search || "");
+  const requestedView = searchParams.get("view");
 
   if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) {
     return requestedView === "workbook";
@@ -56,5 +57,9 @@ export const shouldRenderWorkbookGuide = ({
     .toLowerCase()
     .startsWith("/campus/course/lesson/b1/");
   if (!isB1LessonRoute) return true;
-  return requestedView === "workbook";
+  if (requestedView === "workbook") return true;
+
+  const requestedChapter = String(searchParams.get("chapter") || "").trim();
+  const matchedChapter = String(match?.resource?.chapter || match?.entry?.chapter || "").trim();
+  return Boolean(requestedChapter && matchedChapter && requestedChapter === matchedChapter);
 };
