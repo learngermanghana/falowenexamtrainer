@@ -3,6 +3,7 @@ import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2
 import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
+import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
@@ -114,6 +115,8 @@ const componentRegistry = Object.fromEntries(
       ({ canonicalLesson }) => (
         Number(lesson.day) === 0 ? (
           <SelfLearningEditableLessonPageV2 lesson={lesson} falowenRadio={canonicalLesson?.resources?.falowenRadio || null} />
+        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 17 && Number(lesson.day) <= 20 ? (
+          <B2Day17To20GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
         ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 7 && Number(lesson.day) <= 16 ? (
           <B2Day7To16GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
         ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 6 ? (
