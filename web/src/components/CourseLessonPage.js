@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Navigate } from "react-router-dom";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenWorkbookPage from "./B1Day2FreundeFuersLebenWorkbookPage";
@@ -39,6 +39,7 @@ import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
 import { courseSchedules } from "../data/courseSchedule";
+import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
 import CourseLessonPageLegacy, { LessonResourcesHub } from "./CourseLessonPageLegacy";
 import {
   getPublicFunnelContext,
@@ -376,11 +377,17 @@ export default function CourseLessonPage() {
     return () => observer.disconnect();
   }, [isB1Day5]);
 
+  const query = new URLSearchParams(location.search);
+  const requestedView = query.get("view");
+  const requestedChapter = String(query.get("chapter") || "").trim();
+
+  if ((level === "A2" || level === "B1") && !requestedView && requestedChapter) {
+    const workbookRoute = getConfiguredInAppWorkbookRoute({ level, day, chapter: requestedChapter });
+    if (workbookRoute) return <Navigate to={workbookRoute} replace />;
+  }
+
   if (level === "B1") {
-    const query = new URLSearchParams(location.search);
     const dayNumber = Number(day);
-    const requestedView = query.get("view");
-    const requestedChapter = String(query.get("chapter") || "").trim();
     const chapterWorkbookRequested =
       Boolean(B1_WORKBOOK_CHAPTER_LINKS[dayNumber]) && requestedChapter === B1_WORKBOOK_CHAPTER_LINKS[dayNumber];
 
