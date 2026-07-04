@@ -61,9 +61,9 @@ export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
   makeB2ScheduleEntry({
     day: 6,
     chapter: "2.1",
-    topic: "Medien und digitale Kommunikation",
-    goal: "Soziale Medien, Datenschutz und Online-Verhalten diskutieren.",
-    grammar_topic: "Indirekte Fragen und Meinungsformeln",
+    topic: "Migration und Integration",
+    goal: "Migrationserfahrungen, Integration, Sprache, Teilhabe und gesellschaftliches Zusammenleben differenziert diskutieren.",
+    grammar_topic: "Konzessive Nebensätze mit obwohl / auch wenn, trotzdem und differenzierte Argumentation",
   }),
   makeB2ScheduleEntry({
     day: 7,
