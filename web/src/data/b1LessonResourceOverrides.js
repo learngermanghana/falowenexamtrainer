@@ -78,6 +78,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Ein beeindruckendes Natur-Abenteuer strukturiert erzählen, Herausforderungen beschreiben und Erfahrungen bewerten.",
     instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
+  13: Object.freeze({
+    chapter: "4.13",
+    title: "Eigene Filmkritik schreiben",
+    grammarBook: route(13, "grammar"),
+    workbook: doneWorkbook(13),
+    grammarTopic: "Filmkritik schreiben: Passiv, Bewertungsadjektive, Nebensätze und Empfehlungen mit Konjunktiv II",
+    goal: "Einen Film strukturiert beschreiben, bewerten und eine klare Empfehlung formulieren.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   19: Object.freeze({
     chapter: "6.19",
     title: "Das Vorstellungsgespräch",
