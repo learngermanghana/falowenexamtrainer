@@ -59,7 +59,7 @@ const getLegacyA2SubmitConfig = () => {
 };
 
 const isLegacyWorkbookTabRow = (element) => {
-  if (!element || element.dataset?.a2LegacySubmitPatched === "true") return false;
+  if (!element) return false;
   const buttons = Array.from(element.children || []).filter((child) => child.tagName === "BUTTON");
   if (buttons.length < 5) return false;
 
@@ -101,8 +101,6 @@ const LegacyA2SubmitTabPatch = () => {
 
     const tabRow = Array.from(document.querySelectorAll("div")).find(isLegacyWorkbookTabRow);
     if (!tabRow) return;
-
-    tabRow.dataset.a2LegacySubmitPatched = "true";
 
     const legacyButtons = Array.from(tabRow.children || []).filter(
       (child) => child.tagName === "BUTTON" && child.dataset.a2LegacySubmitButton !== "true"
@@ -206,7 +204,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
         <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Use the tabs above to move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab in the Course Book when your final answers are ready.
+            Use the tabs above to move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab when your final answers are ready.
           </p>
           <p style={{ margin: 0 }}>
             <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
