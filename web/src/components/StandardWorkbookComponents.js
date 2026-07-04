@@ -2,41 +2,80 @@ import React from "react";
 import { styles } from "../styles";
 
 export const STANDARD_WORKBOOK_TABS = [
-  { key: "sprechen", label: "Teil 1" },
-  { key: "schreiben", label: "Teil 2" },
-  { key: "lesen", label: "Teil 3" },
-  { key: "hoeren", label: "Teil 4" },
-  { key: "references", label: "Ref" },
-  { key: "submit", label: "Submit" },
+  { key: "sprechen", label: "Teil 1", description: "Sprechen" },
+  { key: "schreiben", label: "Teil 2", description: "Schreiben" },
+  { key: "lesen", label: "Teil 3", description: "Lesen" },
+  { key: "hoeren", label: "Teil 4", description: "Hören" },
+  { key: "references", label: "Ref", description: "Answers" },
+  { key: "submit", label: "Submit", description: "Send work" },
 ];
 
-const TabButton = ({ active, onClick, children }) => (
+const TabButton = ({ active, onClick, label, description }) => (
   <button
     type="button"
     role="tab"
+    aria-label={label}
     aria-selected={active}
     onClick={onClick}
     style={{
       ...styles.secondaryButton,
-      display: "inline-flex",
+      position: "relative",
+      display: "grid",
       alignItems: "center",
-      justifyContent: "center",
+      justifyItems: "center",
+      gap: 4,
       width: "100%",
       minWidth: 0,
-      minHeight: 44,
-      padding: "10px 12px",
-      border: active ? "2px solid #1d4ed8" : "1px solid #cbd5e1",
-      borderRadius: 10,
-      background: active ? "#2563eb" : "#ffffff",
-      color: active ? "#ffffff" : "#1d4ed8",
-      fontWeight: 800,
-      lineHeight: 1.2,
+      minHeight: 74,
+      padding: "13px 10px 12px",
+      border: active ? "3px solid #1d4ed8" : "2px solid #bfdbfe",
+      borderRadius: 16,
+      background: active
+        ? "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)"
+        : "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
+      color: active ? "#ffffff" : "#1e3a8a",
+      boxShadow: active
+        ? "0 14px 28px rgba(37, 99, 235, 0.28)"
+        : "0 8px 18px rgba(15, 23, 42, 0.08)",
+      fontWeight: 900,
+      lineHeight: 1.15,
       opacity: 1,
       visibility: "visible",
       cursor: "pointer",
+      transform: active ? "translateY(-1px)" : "none",
     }}
   >
-    {children}
+    <span aria-hidden="true" style={{ fontSize: "1rem", letterSpacing: "0.01em" }}>
+      {label}
+    </span>
+    {description ? (
+      <span
+        aria-hidden="true"
+        style={{
+          fontSize: 12,
+          fontWeight: 800,
+          opacity: active ? 0.95 : 0.78,
+          textTransform: "uppercase",
+          letterSpacing: "0.04em",
+        }}
+      >
+        {description}
+      </span>
+    ) : null}
+    {active ? (
+      <span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: -7,
+          width: 42,
+          height: 6,
+          borderRadius: 999,
+          background: "#facc15",
+          boxShadow: "0 4px 10px rgba(250, 204, 21, 0.45)",
+        }}
+      />
+    ) : null}
   </button>
 );
 
@@ -56,13 +95,13 @@ export const WorkbookTabNav = ({
         position: "relative",
         zIndex: 30,
         display: "grid",
-        gap: 8,
+        gap: 10,
         width: "100%",
-        padding: 10,
+        padding: 12,
         border: "2px solid #2563eb",
-        borderRadius: 14,
-        background: "#ffffff",
-        boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+        borderRadius: 18,
+        background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 70%)",
+        boxShadow: "0 14px 30px rgba(15, 23, 42, 0.12)",
         opacity: 1,
         visibility: "visible",
       }}
@@ -72,8 +111,8 @@ export const WorkbookTabNav = ({
         aria-label={ariaLabel}
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(82px, 1fr))",
-          gap: 8,
+          gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))",
+          gap: 10,
           width: "100%",
           overflow: "visible",
           opacity: 1,
@@ -85,13 +124,13 @@ export const WorkbookTabNav = ({
             key={tab.key}
             active={tab.key === activeTab}
             onClick={() => onChange(tab.key)}
-          >
-            {tab.label}
-          </TabButton>
+            label={tab.label}
+            description={tab.description}
+          />
         ))}
       </div>
 
-      <p style={{ margin: 0, color: "#475569", fontWeight: 700, fontSize: 13 }}>
+      <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
         Tab {activeIndex + 1} of {tabs.length} · Select Teil 1, Teil 2, Teil 3, Teil 4, Ref or Submit.
       </p>
     </nav>
