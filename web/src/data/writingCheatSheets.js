@@ -44,6 +44,19 @@ export const C1_WRITING_CHEAT_SHEET = [
       { phrase: "sich negativ auf etwas auswirken", meaning: "to have a negative effect on something" },
     ],
   },
+  {
+    id: "c1-formal-letter-template",
+    title: "C1 formal letter template",
+    layout: "template",
+    items: [
+      { phrase: "Betreff", meaning: "Betreff: [präzises Anliegen]" },
+      { phrase: "Anrede", meaning: "Guten Tag Frau/Herr [Name]," },
+      { phrase: "Einleitung", meaning: "ich wende mich an Sie, da [Anlass] aus meiner Sicht einer Klärung bedarf." },
+      { phrase: "Hauptteil", meaning: "Zunächst möchte ich darauf hinweisen, dass [Punkt 1]. Darüber hinaus ist zu berücksichtigen, dass [Punkt 2]." },
+      { phrase: "Bitte", meaning: "Ich bitte Sie daher um [konkrete Bitte] und um eine kurze Rückmeldung." },
+      { phrase: "Schluss", meaning: "Für Ihre Unterstützung danke ich Ihnen im Voraus.\n\nMit freundlichen Grüßen\n[Ihr Name]" },
+    ],
+  },
 ];
 
 export const B2_WRITING_CHEAT_SHEET = [
@@ -114,6 +127,19 @@ export const B2_WRITING_CHEAT_SHEET = [
       },
     ],
   },
+  {
+    id: "b2-formal-letter-template",
+    title: "B2 formal letter template",
+    layout: "template",
+    items: [
+      { phrase: "Betreff", meaning: "Betreff: [Ihr Anliegen]" },
+      { phrase: "Anrede", meaning: "Guten Tag Frau/Herr [Name]," },
+      { phrase: "Einleitung", meaning: "ich schreibe Ihnen, weil ich [Anliegen] klären möchte." },
+      { phrase: "Hauptteil", meaning: "Zunächst möchte ich sagen, dass [Punkt 1]. Außerdem ist für mich wichtig, dass [Punkt 2]." },
+      { phrase: "Bitte", meaning: "Könnten Sie mir bitte mitteilen, ob/wann/wie [Frage]?" },
+      { phrase: "Schluss", meaning: "Ich freue mich auf Ihre Antwort.\n\nMit freundlichen Grüßen\n[Ihr Name]" },
+    ],
+  },
 ];
 
 export const B1_WRITING_CHEAT_SHEET = [
@@ -149,35 +175,12 @@ export const B1_WRITING_CHEAT_SHEET = [
     title: "B1 opinion text template",
     layout: "template",
     items: [
-      {
-        phrase: "Einleitung",
-        meaning:
-          "Heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].",
-      },
-      {
-        phrase: "Vorteile",
-        meaning:
-          "Einerseits gibt es viele Vorteile. Zum Beispiel kann/können [Modalverb/Verb + weitere Information].",
-      },
-      {
-        phrase: "Nachteile",
-        meaning:
-          "Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist/sind [Nomen], wie [weitere Information].",
-      },
-      {
-        phrase: "Eigene Meinung",
-        meaning: "Ich glaube, dass [Ihre abschließende Meinung].",
-      },
-      {
-        phrase: "Zusammenfassung",
-        meaning:
-          "Zusammenfassend lässt sich sagen, dass [Thema] unser Leben positiv oder negativ beeinflussen kann.",
-      },
-      {
-        phrase: "Schluss",
-        meaning:
-          "Ich hoffe, dass meine Meinung dazu beiträgt, das Thema besser zu verstehen.\n\nMit freundlichen Grüßen\n[Ihr Name]",
-      },
+      { phrase: "Einleitung", meaning: "Heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung]." },
+      { phrase: "Vorteile", meaning: "Einerseits gibt es viele Vorteile. Zum Beispiel kann/können [Modalverb/Verb + weitere Information]." },
+      { phrase: "Nachteile", meaning: "Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist/sind [Nomen], wie [weitere Information]." },
+      { phrase: "Eigene Meinung", meaning: "Ich glaube, dass [Ihre abschließende Meinung]." },
+      { phrase: "Zusammenfassung", meaning: "Zusammenfassend lässt sich sagen, dass [Thema] unser Leben positiv oder negativ beeinflussen kann." },
+      { phrase: "Schluss", meaning: "Ich hoffe, dass meine Meinung dazu beiträgt, das Thema besser zu verstehen.\n\nMit freundlichen Grüßen\n[Ihr Name]" },
     ],
   },
 ];
