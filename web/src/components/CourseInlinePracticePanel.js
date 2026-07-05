@@ -44,6 +44,135 @@ const routeSpeakingMindMap = () => {
   return null;
 };
 
+const mobileTextStyle = {
+  margin: 0,
+  lineHeight: 1.75,
+  fontSize: "clamp(.94rem, 3.7vw, 1rem)",
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+};
+
+const b1WritingTabsWrapStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: 8,
+  padding: 6,
+  border: "1px solid #dbeafe",
+  borderRadius: 14,
+  background: "#eff6ff",
+};
+
+const b1WritingSubTabButtonStyle = (active) => ({
+  border: active ? "1px solid #1d4ed8" : "1px solid #cbd5e1",
+  borderRadius: 12,
+  padding: "12px 10px",
+  minHeight: 44,
+  background: active ? "#1d4ed8" : "#fff",
+  color: active ? "#fff" : "#1e293b",
+  fontWeight: 800,
+  fontSize: "clamp(.92rem, 3.8vw, 1rem)",
+  cursor: "pointer",
+});
+
+const b1WritingPanelStyle = {
+  border: "1px solid #bfdbfe",
+  borderRadius: 14,
+  padding: 12,
+  background: "#f8fbff",
+  display: "grid",
+  gap: 12,
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+};
+
+const b1WritingTextareaStyle = {
+  width: "100%",
+  minHeight: 260,
+  border: "1px solid #cbd5e1",
+  borderRadius: 14,
+  padding: 12,
+  fontSize: "clamp(1rem, 4vw, 1.05rem)",
+  lineHeight: 1.7,
+  resize: "vertical",
+  boxSizing: "border-box",
+  overflowWrap: "anywhere",
+};
+
+const b1ListStyle = {
+  margin: 0,
+  paddingLeft: 22,
+  lineHeight: 1.75,
+  fontSize: "clamp(.94rem, 3.7vw, 1rem)",
+};
+
+const defaultB1WritingTemplate = `Liebe Forum-Mitglieder,
+
+heutzutage ist das Thema [Thema] sehr wichtig. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
+
+Einerseits gibt es Vorteile. Zum Beispiel [Beispiel].
+
+Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist [Beispiel].
+
+Meiner Meinung nach [abschließende Meinung].
+
+Zusammenfassend lässt sich sagen, dass [Thema] eine wichtige Rolle spielt.
+
+Mit freundlichen Grüßen
+[Ihr Name]`;
+
+const B1WritingDraftPanel = ({ writingContext = {} }) => {
+  const [activeView, setActiveView] = useState("schreiben");
+  const [draft, setDraft] = useState("");
+  const supportItems = writingContext.supportStructure?.length
+    ? writingContext.supportStructure
+    : writingContext.taskPoints || [];
+  const vocabulary = writingContext.vocabulary || [];
+  const template = writingContext.template || defaultB1WritingTemplate;
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <div style={b1WritingTabsWrapStyle}>
+        <button type="button" style={b1WritingSubTabButtonStyle(activeView === "schreiben")} onClick={() => setActiveView("schreiben")}>Schreiben</button>
+        <button type="button" style={b1WritingSubTabButtonStyle(activeView === "cheatSheet")} onClick={() => setActiveView("cheatSheet")}>Cheat sheet</button>
+      </div>
+
+      {activeView === "schreiben" ? (
+        <div style={b1WritingPanelStyle}>
+          <strong>Schreiben</strong>
+          <p style={mobileTextStyle}>Type your draft here first. When it is finished, copy it to the Submit tab.</p>
+          <textarea
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ..."
+            style={b1WritingTextareaStyle}
+          />
+        </div>
+      ) : null}
+
+      {activeView === "cheatSheet" ? (
+        <div style={b1WritingPanelStyle}>
+          <strong>Cheat sheet · Writing support</strong>
+          {writingContext.taskTitle ? <p style={mobileTextStyle}><strong>Question:</strong> {writingContext.taskTitle}</p> : null}
+          {supportItems.length ? (
+            <>
+              <strong>What to include</strong>
+              <ul style={b1ListStyle}>{supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
+            </>
+          ) : null}
+          <strong>Template</strong>
+          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{template}</p>
+          {vocabulary.length ? (
+            <>
+              <strong>Useful vocabulary</strong>
+              <ul style={b1ListStyle}>{vocabulary.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const practiceConfig = {
   speaking: {
     defaultTitle: "Practice Teil 1 speaking here",
@@ -105,18 +234,26 @@ const CourseInlinePracticePanel = ({
     };
   }, [title, type, writingContext]);
 
+  const level = String(resolvedWritingContext.level || resolvedWritingContext.courseLevel || "").toUpperCase();
+  const isB1Writing = type === "writing" && level === "B1";
   const renderedPractice = config.render(resolvedWritingContext);
-  const practiceContent =
-    type === "writing" ? (
-      <WritingCheatSheetTabs
-        level={resolvedWritingContext.level || resolvedWritingContext.courseLevel}
-        day={resolvedWritingContext.day}
-      >
-        {renderedPractice}
-      </WritingCheatSheetTabs>
-    ) : (
-      renderedPractice
-    );
+  const practiceContent = isB1Writing ? (
+    <B1WritingDraftPanel writingContext={resolvedWritingContext} />
+  ) : type === "writing" ? (
+    <WritingCheatSheetTabs
+      level={resolvedWritingContext.level || resolvedWritingContext.courseLevel}
+      day={resolvedWritingContext.day}
+    >
+      {renderedPractice}
+    </WritingCheatSheetTabs>
+  ) : (
+    renderedPractice
+  );
+  const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
+  const panelDescription = isB1Writing
+    ? "Use Schreiben to draft your answer, or open the Cheat sheet for the hidden support template. Copy your final text to the Submit tab when you are done."
+    : description || config.defaultDescription;
+  const closedButtonLabel = isB1Writing ? "Open writing workspace" : config.closedButtonLabel;
 
   return (
     <Fragment>
@@ -133,9 +270,9 @@ const CourseInlinePracticePanel = ({
         }}
       >
         <div style={{ display: "grid", gap: 6 }}>
-          <strong>{title || config.defaultTitle}</strong>
+          <strong>{panelTitle}</strong>
           <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-            {description || config.defaultDescription}
+            {panelDescription}
           </p>
         </div>
         <button
@@ -145,7 +282,7 @@ const CourseInlinePracticePanel = ({
           aria-expanded={isOpen}
           aria-controls={panelId}
         >
-          {isOpen ? "Hide practice" : config.closedButtonLabel}
+          {isOpen ? "Hide practice" : closedButtonLabel}
         </button>
         {isOpen ? (
           <div
