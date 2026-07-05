@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import SpeakingMindMap from "./SpeakingMindMap";
@@ -35,6 +35,17 @@ const routeSpeakingMindMap = () => {
   const path = currentPath();
   if (path.includes("/campus/course/a2-day-2-small-talk-workbook")) return getA2SpeakingMindMap(1);
   return null;
+};
+
+const routeSpeakingContext = () => {
+  const path = currentPath();
+  const match =
+    path.match(/\/campus\/course\/lesson\/(a1|a2|b1|b2|c1)\/(\d+)/) ||
+    path.match(/(a1|a2|b1|b2|c1)-day-(\d+)/);
+  if (!match) return {};
+  const level = match[1].toUpperCase();
+  const day = Number(match[2]);
+  return { level, day };
 };
 
 const mobileTextStyle = {
@@ -231,11 +242,26 @@ const CourseInlinePracticePanel = ({
   description,
   defaultOpen = true,
   writingContext = {},
+  speakingContext = {},
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
   const speakingMindMap = useMemo(() => (type === "speaking" ? routeSpeakingMindMap() : null), [type]);
+  const resolvedSpeakingContext = useMemo(() => {
+    if (type !== "speaking") return {};
+    const routeContext = routeSpeakingContext();
+    const topic = speakingContext.topic || speakingContext.question || title || "current workbook speaking topic";
+    const allowedScope = speakingContext.allowedScope || speakingContext.instructions || description || "Ask follow-up questions only inside this workbook topic.";
+    return {
+      ...routeContext,
+      ...speakingContext,
+      topic,
+      question: speakingContext.question || title || topic,
+      allowedScope,
+      topicLock: true,
+    };
+  }, [description, speakingContext, title, type]);
   const resolvedWritingContext = useMemo(() => {
     if (type !== "writing") return {};
     const routeContext = routeWritingContext();
@@ -253,6 +279,16 @@ const CourseInlinePracticePanel = ({
       taskTitle: merged.taskTitle || title || "Teil 2 writing task",
     };
   }, [title, type, writingContext]);
+
+  useEffect(() => {
+    if (type !== "speaking" || typeof window === "undefined") return undefined;
+    window.__FALOWEN_COURSE_SPEAKING_CONTEXT__ = resolvedSpeakingContext;
+    return () => {
+      if (window.__FALOWEN_COURSE_SPEAKING_CONTEXT__ === resolvedSpeakingContext) {
+        delete window.__FALOWEN_COURSE_SPEAKING_CONTEXT__;
+      }
+    };
+  }, [resolvedSpeakingContext, type]);
 
   const level = String(resolvedWritingContext.level || resolvedWritingContext.courseLevel || "").toUpperCase();
   const isB1Writing = type === "writing" && level === "B1";
@@ -272,7 +308,9 @@ const CourseInlinePracticePanel = ({
   const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
   const panelDescription = isB1Writing
     ? "Use Schreiben to draft your answer, or open the Cheat sheet for the hidden support template. Copy your final text to the Submit tab when you are done."
-    : description || config.defaultDescription;
+    : type === "speaking"
+      ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
+      : description || config.defaultDescription;
   const closedButtonLabel = isB1Writing ? "Open writing workspace" : config.closedButtonLabel;
 
   return (
@@ -280,6 +318,7 @@ const CourseInlinePracticePanel = ({
       {speakingMindMap ? <SpeakingMindMap config={speakingMindMap} /> : null}
       <div
         data-course-inline-practice={type || "speaking"}
+        data-topic-lock={type === "speaking" ? resolvedSpeakingContext.topic : undefined}
         style={{
           ...styles.card,
           margin: 0,
