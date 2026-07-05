@@ -4,6 +4,7 @@ import StandardFourStageLessonPage from "./StandardFourStageLessonPageV3";
 import CompactC1LessonPage from "./CompactC1LessonPage";
 import C1Day1To6GuidedLessonPage from "./C1Day1To6GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
+import C1NextGuidedLessonPage from "./C1Day12To14GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 
@@ -17,47 +18,19 @@ export const shouldMountMarkMyLetter = () => false;
 export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
   const level = String(lesson?.level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
-
   if (level === "C1" && day === 3) {
-    return {
-      ...(canonicalLesson || {}),
-      resources: {
-        ...(canonicalLesson?.resources || {}),
-        falowenRadio: C1_DAY3_RADIO_OVERRIDE,
-      },
-    };
+    return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), falowenRadio: C1_DAY3_RADIO_OVERRIDE } };
   }
-
   if (level === "B2" && (day === 2 || day === 3)) {
     const grammarRoute = day === 2 ? B2_DAY2_GRAMMAR_ROUTE : B2_DAY3_GRAMMAR_ROUTE;
     const workbookRoute = day === 2 ? B2_DAY2_WORKBOOK_ROUTE : B2_DAY3_WORKBOOK_ROUTE;
     const chapter = day === 2 ? "1.2" : "1.3";
-
-    return {
-      ...(canonicalLesson || {}),
-      resources: {
-        ...(canonicalLesson?.resources || {}),
-        grammarBook: { url: grammarRoute },
-        workbook: { url: workbookRoute },
-        resourceGroups: [
-          {
-            chapter,
-            grammarBook: { url: grammarRoute },
-            workbook: { url: workbookRoute },
-          },
-        ],
-      },
-    };
+    return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), grammarBook: { url: grammarRoute }, workbook: { url: workbookRoute }, resourceGroups: [{ chapter, grammarBook: { url: grammarRoute }, workbook: { url: workbookRoute } }] } };
   }
-
   return canonicalLesson;
 };
 
-const viewButtonLabel = (view) => {
-  if (view === "workbook") return "3. Write";
-  if (view === "grammar") return "1. Learn";
-  return "";
-};
+const viewButtonLabel = (view) => view === "workbook" ? "3. Write" : view === "grammar" ? "1. Learn" : "";
 
 export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson }) {
   const level = String(lesson?.level || "").toUpperCase();
@@ -66,16 +39,9 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   const isGuidedC1Lesson = level === "C1" && day >= 1 && day <= 6;
   const isGuidedC1Day7 = level === "C1" && day === 7;
   const isGuidedC1Day11 = level === "C1" && day === 11;
+  const isGuidedC1NextBlock = level === "C1" && day > 11 && day < 15;
   const isCompactC1Lesson = level === "C1" && day >= 8 && day <= 16;
-  const LessonPage = isGuidedB2Lesson
-    ? B2Day1To4GuidedLessonPage
-    : isGuidedC1Lesson
-      ? C1Day1To6GuidedLessonPage
-      : isGuidedC1Day7 || isGuidedC1Day11
-        ? C1Day8To10GuidedLessonPage
-        : isCompactC1Lesson
-          ? CompactC1LessonPage
-          : StandardFourStageLessonPage;
+  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
   const resolvedCanonicalLesson = resolveCanonicalLessonForPage(lesson, canonicalLesson);
   const location = useLocation();
   const rootRef = useRef(null);
@@ -87,39 +53,22 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
     const applyKey = `${location.pathname}:${requestedView}`;
     appliedViewRef.current = "";
     if (!targetLabel || !rootRef.current) return undefined;
-
     const applyView = () => {
       if (appliedViewRef.current === applyKey) return true;
-      const target = Array.from(rootRef.current.querySelectorAll("button")).find(
-        (button) => String(button.textContent || "").trim() === targetLabel
-      );
+      const target = Array.from(rootRef.current.querySelectorAll("button")).find((button) => String(button.textContent || "").trim() === targetLabel);
       if (!target) return false;
       target.click();
       appliedViewRef.current = applyKey;
       window.scrollTo({ top: 0, behavior: "smooth" });
       return true;
     };
-
     applyView();
-    const observer = new MutationObserver(() => {
-      if (applyView()) observer.disconnect();
-    });
+    const observer = new MutationObserver(() => { if (applyView()) observer.disconnect(); });
     observer.observe(rootRef.current, { childList: true, subtree: true });
-
     return () => observer.disconnect();
   }, [location.pathname, requestedView]);
 
-  return (
-    <div ref={rootRef}>
-      <LessonPage lesson={lesson} canonicalLesson={resolvedCanonicalLesson} />
-    </div>
-  );
+  return <div ref={rootRef}><LessonPage lesson={lesson} canonicalLesson={resolvedCanonicalLesson} /></div>;
 }
 
-export const __TESTING__ = {
-  B2_DAY2_GRAMMAR_ROUTE,
-  B2_DAY2_WORKBOOK_ROUTE,
-  B2_DAY3_GRAMMAR_ROUTE,
-  B2_DAY3_WORKBOOK_ROUTE,
-  viewButtonLabel,
-};
+export const __TESTING__ = { B2_DAY2_GRAMMAR_ROUTE, B2_DAY2_WORKBOOK_ROUTE, B2_DAY3_GRAMMAR_ROUTE, B2_DAY3_WORKBOOK_ROUTE, viewButtonLabel };
