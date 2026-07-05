@@ -9,6 +9,7 @@ import C1MoreGuidedLessonPage from "./C1Day15To17GuidedLessonPage";
 import C1LaterGuidedLessonPage from "./C1Day18To20GuidedLessonPage";
 import C1FinalGuidedLessonPage from "./C1Day21To23GuidedLessonPage";
 import C1ExtraGuidedLessonPage from "./C1Day24To26GuidedLessonPage";
+import C1LastGuidedLessonPage from "./C1Day27To28GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 
@@ -48,8 +49,9 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   const isGuidedC1LaterBlock = level === "C1" && day > 17 && day < 21;
   const isGuidedC1FinalBlock = level === "C1" && day > 20 && day < 24;
   const isGuidedC1ExtraBlock = level === "C1" && day > 23 && day < 27;
+  const isGuidedC1LastBlock = level === "C1" && day > 26 && day < 29;
   const isCompactC1Lesson = level === "C1" && day >= 8 && day <= 16;
-  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1ExtraBlock ? C1ExtraGuidedLessonPage : isGuidedC1FinalBlock ? C1FinalGuidedLessonPage : isGuidedC1LaterBlock ? C1LaterGuidedLessonPage : isGuidedC1MoreBlock ? C1MoreGuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
+  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1LastBlock ? C1LastGuidedLessonPage : isGuidedC1ExtraBlock ? C1ExtraGuidedLessonPage : isGuidedC1FinalBlock ? C1FinalGuidedLessonPage : isGuidedC1LaterBlock ? C1LaterGuidedLessonPage : isGuidedC1MoreBlock ? C1MoreGuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
   const resolvedCanonicalLesson = resolveCanonicalLessonForPage(lesson, canonicalLesson);
   const location = useLocation();
   const rootRef = useRef(null);
