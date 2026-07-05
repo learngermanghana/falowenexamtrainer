@@ -5,6 +5,7 @@ import CompactC1LessonPage from "./CompactC1LessonPage";
 import C1Day1To6GuidedLessonPage from "./C1Day1To6GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import C1NextGuidedLessonPage from "./C1Day12To14GuidedLessonPage";
+import C1MoreGuidedLessonPage from "./C1Day15To17GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 
@@ -40,8 +41,9 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   const isGuidedC1Day7 = level === "C1" && day === 7;
   const isGuidedC1Day11 = level === "C1" && day === 11;
   const isGuidedC1NextBlock = level === "C1" && day > 11 && day < 15;
+  const isGuidedC1MoreBlock = level === "C1" && day > 14 && day < 18;
   const isCompactC1Lesson = level === "C1" && day >= 8 && day <= 16;
-  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
+  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1MoreBlock ? C1MoreGuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
   const resolvedCanonicalLesson = resolveCanonicalLessonForPage(lesson, canonicalLesson);
   const location = useLocation();
   const rootRef = useRef(null);
