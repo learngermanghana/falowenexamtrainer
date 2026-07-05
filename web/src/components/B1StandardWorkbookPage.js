@@ -280,38 +280,26 @@ export default function B1StandardWorkbookPage({ config }) {
                   <p style={{ margin: 0 }}>{writing.sourceText}</p>
                 </div>
               ) : null}
-
-              {writing.taskPoints?.length ? (
-                <div style={contentCard}>
-                  <strong>{writing.pointsTitle || "Beantworten Sie diese Inhaltspunkte"}</strong>
-                  <BulletList items={writing.taskPoints} />
-                </div>
-              ) : null}
-
-              {writing.supportStructure?.length ? (
-                <div style={contentCard}>
-                  <strong>Writing support</strong>
-                  <BulletList items={writing.supportStructure} ordered />
-                </div>
-              ) : null}
-
-              {writing.template ? (
-                <div style={contentCard}>
-                  <strong>Writing support template</strong>
-                  <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{writing.template}</p>
-                </div>
-              ) : null}
-
-              {writing.vocabulary?.length ? (
-                <>
-                  <h3 style={sectionTitle}>Useful vocabulary</h3>
-                  <BulletList items={writing.vocabulary} />
-                </>
-              ) : null}
             </>
           )}
 
-          <CourseInlinePracticePanel type="writing" />
+          <CourseInlinePracticePanel
+            type="writing"
+            title={writing.title || "Teil 2 writing task"}
+            writingContext={{
+              level: "B1",
+              courseLevel: "B1",
+              day: config.day,
+              lessonId: `B1-day-${config.day}`,
+              workbookId: writing.workbookId || config.workbookId || `B1-day-${config.day}`,
+              writingTaskId: writing.writingTaskId || `${writing.workbookId || config.workbookId || `B1-day-${config.day}`}-teil-2-writing`,
+              taskTitle: writing.title,
+              taskPoints: writing.taskPoints,
+              supportStructure: writing.supportStructure,
+              template: writing.template,
+              vocabulary: writing.vocabulary,
+            }}
+          />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </section>
@@ -358,52 +346,36 @@ export default function B1StandardWorkbookPage({ config }) {
           <h2 style={sectionTitle}>Teil 4 · Hören (Self-check)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Listening"
-            title={listening.title || "Listening material will be added here."}
-            practiceOnly={!listening.submitRequired}
-            submissionNote={listening.submitRequired ? "Submit your Hören result through the Submit tab." : "Teil 4 is self-check practice. Do not submit your Hören answers."}
+            title={listening.title || "Listening task will be added here."}
+            submissionNote={listening.submissionNote || "Self-check this part. Submit only if your teacher asks for it."}
           >
             <p style={{ margin: 0 }}>
-              {listening.instructions || "Complete the listening task independently and check your own answers."}
+              {listening.instructions || "Listen carefully and complete the questions."}
             </p>
           </WorkbookTaskCard>
 
           <SectionImage image={listening.image} alt={listening.imageAlt} />
 
-          {listening.status === "planned" || !embedUrl ? (
+          {listening.status === "planned" ? (
             <PlaceholderCard
-              title="Hören content skeleton"
-              text={listening.placeholderText || "The listening video, task instructions and optional self-check questions can be added here later without changing the workbook structure."}
+              title="Listening content skeleton"
+              text="Add the listening media, questions and self-check instructions here when the material is ready."
             />
-          ) : (
+          ) : embedUrl ? (
             <>
-              <iframe
-                style={videoStyle}
-                src={embedUrl}
-                title={listening.videoTitle || `B1 Day ${config.day} Hören`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-              {listening.externalUrl ? (
-                <p style={{ margin: 0 }}>
-                  Open video: <a href={listening.externalUrl} target="_blank" rel="noreferrer">YouTube</a>
-                </p>
-              ) : null}
-              <div style={contentCard}>
-                <strong>Important self-check instructions</strong>
-                <p style={{ margin: 0 }}>
-                  {listening.selfCheckText || "The answers are provided with the listening resource. Check and mark your own result. Only Lesen and Schreiben are submitted for tutor evaluation."}
-                </p>
-              </div>
-              {listening.questions?.length ? (
-                <>
-                  <h3 style={sectionTitle}>Self-check questions</h3>
-                  <QuestionList questions={listening.questions} />
-                </>
-              ) : null}
-              <BulletList items={listening.steps || ["Bearbeiten Sie den Hörtest ohne die Lösungen anzusehen.", "Hören Sie schwierige Teile ein zweites Mal.", "Vergleichen Sie Ihre Antworten mit den Lösungen.", "Notieren Sie Ihr Ergebnis für Ihre eigene Lernkontrolle."]} ordered />
+              <iframe title={listening.videoTitle || `B1 Day ${config.day} listening`} src={embedUrl} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={videoStyle} />
+              {listening.externalUrl ? <a href={listening.externalUrl} target="_blank" rel="noreferrer">Open listening resource</a> : null}
+              {listening.selfCheckText ? <p style={{ margin: 0 }}>{listening.selfCheckText}</p> : null}
+              <QuestionList questions={listening.questions || []} />
             </>
+          ) : (
+            <PlaceholderCard
+              title="Listening media missing"
+              text="The questions are ready, but the listening resource link has not been added yet."
+            />
           )}
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
@@ -411,36 +383,26 @@ export default function B1StandardWorkbookPage({ config }) {
       {activeTab === "references" && (
         <WorkbookReferenceAnswers
           level="B1"
-          lesson={{ title: config.workbookId, level: "B1", day: config.day, workbookId: config.workbookId }}
+          lesson={{ title: config.workbookId || `B1Day${config.day}`, level: "B1", day: config.day, workbookId: config.workbookId }}
           workbookId={config.workbookId}
         />
       )}
 
       {activeTab === "submit" && (
         <section style={card}>
-          <h2 style={sectionTitle}>Submit Workbook · Day {config.day} · Kapitel {config.chapter}</h2>
+          <h2 style={sectionTitle}>Submit workbook answers</h2>
           <WorkbookTaskCard
             eyebrow="Final step"
-            title={config.submitListening ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3 only."}
-            submissionNote={config.submitListening ? "Do not submit Teil 1." : "Do not submit Teil 1 or Teil 4."}
+            title={config.submitTitle || "Submit Teil 2 and Teil 3."}
+            submissionNote={config.submitNote || "Teil 1 is group practice. Teil 4 may be self-check depending on the lesson."}
           >
-            <ul style={listSpacing}>
-              <li><strong>Teil 2 · Schreiben:</strong> {config.submitWritingDescription || "Paste your final writing text."}</li>
-              <li><strong>Teil 3 · Lesen:</strong> {config.submitReadingDescription || "Paste your final reading answer letters."}</li>
-              {config.submitListening ? (
-                <li><strong>Teil 4 · Hören:</strong> {config.submitListeningDescription || "Paste your listening answer letters or self-check result."}</li>
-              ) : null}
-              <li><strong>Teil 1 · Sprechen:</strong> Group practice only; do not submit it.</li>
-              {!config.submitListening ? <li><strong>Teil 4 · Hören:</strong> Self-check only; do not submit it.</li> : null}
-            </ul>
+            <p style={{ margin: 0 }}>
+              {config.submitInstructions || "Paste your final writing text and reading answers into the form below."}
+            </p>
           </WorkbookTaskCard>
-
-          <div
-            className={`b1-day${config.day}-submission-page`}
-            style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}
-          >
-            <style>{`.b1-day${config.day}-submission-page > div > section:first-child { display: none !important; }
-            .b1-day${config.day}-submission-page select { display: none !important; }`}</style>
+          <div className="b1-standard-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.b1-standard-submission-page > div > section:first-child { display: none !important; }
+            .b1-standard-submission-page select { display: none !important; }`}</style>
             <AssignmentSubmissionPage
               submissionContext={{
                 level: "B1",
