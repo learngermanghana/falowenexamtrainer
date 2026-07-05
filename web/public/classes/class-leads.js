@@ -3,6 +3,7 @@
   const LAST_LEAD_KEY = "falowen:last-class-lead";
   const ENDPOINT_KEY = "falowen:class-leads-endpoint";
   const CTA_VARIANT_KEY = "falowen:class-lead-cta-variant";
+  const DEFAULT_CLASS_LOCATION = "Ghana, Accra - Awoshie";
   const DEFAULT_APPS_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzrUe3IC5w24Rmf_Ed-8HmdKzV3mn0BQyg2qsaveOSQOYunQj89MM23mgDhjGbsMa2gSA/exec";
 
   function slugify(value) {
@@ -80,6 +81,16 @@
     return slugify(course?.slug || course?.id || getCourseTitle(course));
   }
 
+  function getCourseCohortName(course) {
+    if (course?.availability === "always") return "Self-learning";
+    return course?.city ? `${course.city} class name` : getCourseTitle(course);
+  }
+
+  function getCourseLocation(course) {
+    if (course?.availability === "always") return course?.location || "Online self-learning";
+    return course?.location || course?.venue || DEFAULT_CLASS_LOCATION;
+  }
+
   function getMeetingTimes(course) {
     return Array.isArray(course?.meetingDays) && course.meetingDays.length
       ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
@@ -94,7 +105,7 @@
   }
 
   function getClassSummary(course) {
-    return `${getCourseTitle(course)} · ${getCourseDateRange(course)} · ${getMeetingTimes(course)}`;
+    return `${getCourseTitle(course)} · Cohort: ${getCourseCohortName(course)} · Venue: ${getCourseLocation(course)} · ${getCourseDateRange(course)} · ${getMeetingTimes(course)}`;
   }
 
   function buildClassUrl(courseOrSlug, extraParams) {
@@ -243,7 +254,7 @@
     card.innerHTML = `
       <div>
         <h2>Fill the form to continue</h2>
-        <p>No payment question here. We only collect your contact details and selected class for follow-up.</p>
+        <p>Class names such as Berlin, Leipzig or Stuttgart are cohort names only. The in-person venue is shown separately below.</p>
       </div>
       <form class="lead-capture-form" id="leadCaptureForm" novalidate>
         <div class="lead-form-grid">
@@ -326,7 +337,7 @@
       const url = buildClassUrl(course);
       if (openLink && url) openLink.href = url;
       if (selectedSummary) selectedSummary.textContent = getClassSummary(course);
-      writeDebug({ step: "syncSelectedClassInfo", selectedValue: select.value, url, classCount: classes.length, endDate: course?.endDate || "" });
+      writeDebug({ step: "syncSelectedClassInfo", selectedValue: select.value, url, classCount: classes.length, endDate: course?.endDate || "", location: getCourseLocation(course) });
     }
 
     syncSelectedClassInfo();
@@ -395,7 +406,7 @@
 
       const course = selectedCourse();
       const targetUrl = buildClassUrl(course);
-      writeDebug({ step: "submit", selectedValue: select.value, targetUrl, courseTitle: getCourseTitle(course), courseSlug: getCourseSlug(course), endDate: course?.endDate || "" });
+      writeDebug({ step: "submit", selectedValue: select.value, targetUrl, courseTitle: getCourseTitle(course), courseSlug: getCourseSlug(course), endDate: course?.endDate || "", location: getCourseLocation(course) });
 
       if (!course || !getCourseSlug(course)) {
         setStatus(status, "Could not find the selected class. Use the debug box below and send a screenshot.", true);
@@ -438,6 +449,8 @@
       classId: course.id || getCourseSlug(course),
       classSlug: getCourseSlug(course),
       className: getCourseTitle(course),
+      classCohort: getCourseCohortName(course),
+      classLocation: getCourseLocation(course),
       level: course.level || "",
       startDate: course.startDate || "",
       endDate: course.endDate || "",
@@ -469,7 +482,7 @@
     };
 
     if (status) setStatus(status, "Saving enquiry and opening class information...", false);
-    writeDebug({ step: "submitLead", endpoint: endpoint ? "configured" : "missing", target: buildClassUrl(targetCourse), endDate: lead.endDate || "" });
+    writeDebug({ step: "submitLead", endpoint: endpoint ? "configured" : "missing", target: buildClassUrl(targetCourse), endDate: lead.endDate || "", location: lead.classLocation || "" });
 
     if (!endpoint) {
       window.setTimeout(() => openClass("no_endpoint"), 250);
