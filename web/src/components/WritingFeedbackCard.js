@@ -41,7 +41,7 @@ const parseCorrectionsFromText = (feedback = "") => {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => /→|->/.test(line))
-    .slice(0, 8);
+    .slice(0, 12);
 
   return correctionLines
     .map((line) => {
@@ -114,8 +114,8 @@ const toSimpleFeedback = (
         .slice(0, 2);
 
   const corrections = mappedCorrections.length
-    ? mappedCorrections.slice(0, 4)
-    : fixesFromSimple.slice(0, 4).map((line) => {
+    ? mappedCorrections
+    : fixesFromSimple.slice(0, 6).map((line) => {
         const [wrong, correct] = line
           .split(/→|->/)
           .map((part) => (part || "").trim());
@@ -179,6 +179,8 @@ const WritingFeedbackCard = ({
   structuredFeedback = null,
 }) => {
   const [copyState, setCopyState] = useState("");
+  const normalizedLevel = String(level || "A1").toUpperCase();
+  const correctionDisplayLimit = ["B1", "B2", "C1"].includes(normalizedLevel) ? 10 : 5;
   const structured =
     structuredFeedback && typeof structuredFeedback === "object"
       ? structuredFeedback
@@ -190,15 +192,19 @@ const WritingFeedbackCard = ({
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(structuredCorrections) && structuredCorrections.length) {
       return structuredCorrections
-        .map((item) => ({
-          wrong: cleanTags(item?.wrong || item?.original || ""),
-          correct: cleanTags(
-            item?.correct || item?.corrected || item?.improved || "",
-          ),
-          reason:
-            cleanTags(item?.reason || item?.explanation || "") ||
-            "Use the corrected form for accuracy.",
-        }))
+        .map((item) => {
+          const category = cleanTags(item?.category || "");
+          const reason = cleanTags(item?.reason || item?.explanation || "");
+          return {
+            wrong: cleanTags(item?.wrong || item?.original || ""),
+            correct: cleanTags(
+              item?.correct || item?.corrected || item?.improved || "",
+            ),
+            reason:
+              [category, reason].filter(Boolean).join(": ") ||
+              "Use the corrected form for accuracy.",
+          };
+        })
         .filter(
           (item) =>
             item.wrong &&
@@ -210,9 +216,9 @@ const WritingFeedbackCard = ({
           (item) =>
             countWords(item.wrong) <= 18 &&
             countWords(item.correct) <= 18 &&
-            countWords(item.reason) <= 20,
+            countWords(item.reason) <= 28,
         )
-        .slice(0, 5);
+        .slice(0, correctionDisplayLimit);
     }
     return parseCorrectionsFromText(feedback)
       .filter(
@@ -220,8 +226,8 @@ const WritingFeedbackCard = ({
           item.wrong.trim().toLowerCase() !==
           item.correct.trim().toLowerCase(),
       )
-      .slice(0, 5);
-  }, [structuredCorrections, feedback]);
+      .slice(0, correctionDisplayLimit);
+  }, [structuredCorrections, feedback, correctionDisplayLimit]);
 
   const activeRubric = structured?.rubric || rubric || {};
   const maxScore = useMemo(() => {
@@ -299,12 +305,12 @@ const WritingFeedbackCard = ({
       "",
       "Main issues",
       ...(mainIssues.length
-        ? mainIssues.slice(0, 3).map((item) => `- ${item}`)
+        ? mainIssues.slice(0, 4).map((item) => `- ${item}`)
         : ["- None listed."]),
       "",
       "Fix these mistakes",
       ...simple.corrections
-        .slice(0, 4)
+        .slice(0, correctionDisplayLimit)
         .flatMap((item) => [
           `- ❌ Needs fix: ${item.wrong}`,
           `  ✅ Better: ${item.correct}`,
@@ -368,7 +374,7 @@ const WritingFeedbackCard = ({
         <strong>Corrections</strong>
         <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
           {simple.corrections.length ? (
-            simple.corrections.slice(0, 5).map((item, index) => (
+            simple.corrections.slice(0, correctionDisplayLimit).map((item, index) => (
               <div key={`${item.wrong}-${index}`} style={styles.correctionCard}>
                 <div style={styles.wrong}>
                   <strong>❌ Needs fix:</strong> {item.wrong}
@@ -453,7 +459,7 @@ const WritingFeedbackCard = ({
           })}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: "#475569" }}>
-          Level focus ({level}): {CEFR_EXPECTATIONS[level] || CEFR_EXPECTATIONS.A1}
+          Level focus ({normalizedLevel}): {CEFR_EXPECTATIONS[normalizedLevel] || CEFR_EXPECTATIONS.A1}
         </div>
       </div>
     </div>
