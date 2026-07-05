@@ -1,14 +1,38 @@
 import React from "react";
 import { styles } from "../styles";
 
-export const STANDARD_WORKBOOK_TABS = [
+export const A1_WORKBOOK_TABS = [
+  { key: "schreiben", label: "Teil 1", description: "Schreiben" },
+  { key: "lesen", label: "Teil 2", description: "Lesen" },
+  { key: "hoeren", label: "Teil 3", description: "Hören" },
+  { key: "references", label: "Ref", description: "Notes" },
+  { key: "submit", label: "Submit", description: "Send work" },
+];
+
+export const A2_B1_WORKBOOK_TABS = [
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "hoeren", label: "Teil 4", description: "Hören" },
-  { key: "references", label: "Ref", description: "Answers" },
+  { key: "references", label: "Ref", description: "Notes" },
   { key: "submit", label: "Submit", description: "Send work" },
 ];
+
+export const B2_C1_WORKBOOK_TABS = [
+  { key: "learn", label: "Learn", description: "Input" },
+  { key: "write", label: "Write", description: "Practice" },
+  { key: "finish", label: "Finish", description: "Task" },
+  { key: "references", label: "Ref", description: "Notes" },
+];
+
+export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;
+
+export const getWorkbookTabsForLevel = (level) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  if (normalizedLevel === "A1") return A1_WORKBOOK_TABS;
+  if (normalizedLevel === "B2" || normalizedLevel === "C1") return B2_C1_WORKBOOK_TABS;
+  return A2_B1_WORKBOOK_TABS;
+};
 
 const TabButton = ({ active, onClick, label, description }) => (
   <button
@@ -86,6 +110,7 @@ export const WorkbookTabNav = ({
   ariaLabel = "Workbook sections",
 }) => {
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
+  const tabNames = tabs.map((tab) => tab.label).join(", ");
 
   return (
     <nav
@@ -131,7 +156,7 @@ export const WorkbookTabNav = ({
       </div>
 
       <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
-        Tab {activeIndex + 1} of {tabs.length} · Select Teil 1, Teil 2, Teil 3, Teil 4, Ref or Submit.
+        Tab {activeIndex + 1} of {tabs.length} · Select {tabNames}.
       </p>
     </nav>
   );
