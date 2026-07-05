@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import WritingPage from "./WritingPage";
 
 const inferLevel = (lesson = {}) => String(lesson?.level || lesson?.courseLevel || "").trim().toUpperCase();
 const inferDay = (lesson = {}) => lesson?.day || lesson?.lessonDay || null;
 const inferWorkbookId = (lesson = {}) => lesson?.workbookId || lesson?.id || [lesson?.level, lesson?.day].filter(Boolean).join("-day-") || "current-workbook";
+const inferLessonId = (lesson = {}) => lesson?.lessonId || lesson?.id || [lesson?.level, lesson?.day].filter(Boolean).join("-day-") || inferWorkbookId(lesson);
 
 const cardStyle = {
   ...styles.card,
@@ -29,8 +31,37 @@ const helperStyle = {
   lineHeight: 1.65,
 };
 
-export default function WorkbookReferenceAnswers({ level, lesson = {}, workbookId }) {
+const LegacyReferenceAnswers = ({ level, lesson = {}, task, workbookId }) => {
   const resolvedLevel = level || inferLevel(lesson);
+  const resolvedWorkbookId = workbookId || inferWorkbookId(lesson);
+  const taskTitle = task?.title || lesson?.writingTask?.title || lesson?.writingTopic || lesson?.topic || lesson?.title || "Writing task";
+  const writingPage = WritingPage({
+    mode: "course",
+    initialTab: "references",
+    enabledTabs: ["references"],
+    hideTabList: true,
+    writingContext: {
+      courseLevel: resolvedLevel,
+      level: resolvedLevel,
+      day: inferDay(lesson),
+      lessonId: inferLessonId(lesson),
+      workbookId: resolvedWorkbookId,
+      writingTaskId: task?.id || lesson?.writingTask?.id || `${resolvedWorkbookId}-writing`,
+      taskTitle,
+    },
+  });
+  const referenceChildren = React.Children.toArray(writingPage.props.children).slice(1);
+
+  return <section data-workbook-reference-library>{referenceChildren}</section>;
+};
+
+export default function WorkbookReferenceAnswers({ level, lesson = {}, task, workbookId }) {
+  const resolvedLevel = level || inferLevel(lesson);
+
+  if (String(resolvedLevel || "").toUpperCase() === "A1") {
+    return <LegacyReferenceAnswers level={level} lesson={lesson} task={task} workbookId={workbookId} />;
+  }
+
   const resolvedDay = inferDay(lesson);
   const resolvedWorkbookId = workbookId || inferWorkbookId(lesson);
   const storageKey = useMemo(
