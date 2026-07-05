@@ -65,12 +65,13 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   const isGuidedB2Lesson = level === "B2" && day >= 1 && day <= 5;
   const isGuidedC1Lesson = level === "C1" && day >= 1 && day <= 6;
   const isGuidedC1Day7 = level === "C1" && day === 7;
+  const isGuidedC1Day11 = level === "C1" && day === 11;
   const isCompactC1Lesson = level === "C1" && day >= 8 && day <= 16;
   const LessonPage = isGuidedB2Lesson
     ? B2Day1To4GuidedLessonPage
     : isGuidedC1Lesson
       ? C1Day1To6GuidedLessonPage
-      : isGuidedC1Day7
+      : isGuidedC1Day7 || isGuidedC1Day11
         ? C1Day8To10GuidedLessonPage
         : isCompactC1Lesson
           ? CompactC1LessonPage
