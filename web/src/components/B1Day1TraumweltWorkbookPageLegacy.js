@@ -40,19 +40,54 @@ const questionCardStyle = {
   wordBreak: "break-word",
 };
 
-const writingCheatSheetStyle = {
-  ...questionCardStyle,
-  border: "1px solid #bfdbfe",
-  background: "#eff6ff",
-  gap: 10,
-};
-
 const mobileTextStyle = {
   margin: 0,
   lineHeight: 1.75,
   fontSize: "clamp(.94rem, 3.7vw, 1rem)",
   overflowWrap: "anywhere",
   wordBreak: "break-word",
+};
+
+const writingTabsWrapStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: 8,
+  padding: 6,
+  border: "1px solid #dbeafe",
+  borderRadius: 14,
+  background: "#eff6ff",
+};
+
+const writingSubTabButtonStyle = (active) => ({
+  border: active ? "1px solid #1d4ed8" : "1px solid #cbd5e1",
+  borderRadius: 12,
+  padding: "12px 10px",
+  minHeight: 44,
+  background: active ? "#1d4ed8" : "#fff",
+  color: active ? "#fff" : "#1e293b",
+  fontWeight: 800,
+  fontSize: "clamp(.92rem, 3.8vw, 1rem)",
+  cursor: "pointer",
+});
+
+const writingPanelStyle = {
+  ...questionCardStyle,
+  border: "1px solid #bfdbfe",
+  background: "#f8fbff",
+  gap: 12,
+};
+
+const writingTextareaStyle = {
+  width: "100%",
+  minHeight: 260,
+  border: "1px solid #cbd5e1",
+  borderRadius: 14,
+  padding: 12,
+  fontSize: "clamp(1rem, 4vw, 1.05rem)",
+  lineHeight: 1.7,
+  resize: "vertical",
+  boxSizing: "border-box",
+  overflowWrap: "anywhere",
 };
 
 const templateTextStyle = {
@@ -173,6 +208,8 @@ const QuestionList = ({ questions }) => (
 
 const B1Day1TraumweltWorkbookPage = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
+  const [writingView, setWritingView] = useState("schreiben");
+  const [writingDraft, setWritingDraft] = useState("");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -295,22 +332,28 @@ const B1Day1TraumweltWorkbookPage = () => {
             </p>
           </div>
 
-          <div style={writingCheatSheetStyle}>
-            <strong>Writing cheat sheet · Actual question</strong>
-            <p style={mobileTextStyle}>
-              <strong>Frage:</strong> Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?
-            </p>
-            <ul style={{ ...listSpacing, fontSize: "clamp(.94rem, 3.7vw, 1rem)" }}>
-              <li>Reagieren Sie direkt auf Tanjas Meinung.</li>
-              <li>Sagen Sie klar: persönlicher Kontakt ist wichtig / nicht so wichtig.</li>
-              <li>Nennen Sie Vorteile oder Nachteile von Homeoffice.</li>
-              <li>Begründen Sie Ihre Meinung mit mindestens einem Beispiel.</li>
-            </ul>
+          <div style={writingTabsWrapStyle}>
+            <button type="button" style={writingSubTabButtonStyle(writingView === "schreiben")} onClick={() => setWritingView("schreiben")}>Schreiben</button>
+            <button type="button" style={writingSubTabButtonStyle(writingView === "cheatSheet")} onClick={() => setWritingView("cheatSheet")}>Cheat sheet</button>
           </div>
 
-          <div style={questionCardStyle}>
-            <strong>Writing support template</strong>
-            <p style={templateTextStyle}>{`Liebe Forum-Mitglieder,
+          {writingView === "schreiben" && (
+            <div style={writingPanelStyle}>
+              <strong>Schreiben</strong>
+              <p style={mobileTextStyle}>Type your draft here first. When it is finished, copy it to the Submit tab.</p>
+              <textarea
+                value={writingDraft}
+                onChange={(event) => setWritingDraft(event.target.value)}
+                placeholder="Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ..."
+                style={writingTextareaStyle}
+              />
+            </div>
+          )}
+
+          {writingView === "cheatSheet" && (
+            <div style={writingPanelStyle}>
+              <strong>Cheat sheet · Writing support template</strong>
+              <p style={templateTextStyle}>{`Liebe Forum-Mitglieder,
 
 heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
 
@@ -325,9 +368,9 @@ Ich hoffe, dass meine Meinung hilft, das Thema zu verstehen.
 
 Mit freundlichen Grüßen
 [Ihr Name]`}</p>
-          </div>
+            </div>
+          )}
 
-          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </section>
