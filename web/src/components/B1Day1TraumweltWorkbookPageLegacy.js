@@ -36,6 +36,28 @@ const questionCardStyle = {
   background: "#fff",
   display: "grid",
   gap: 6,
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+};
+
+const writingCheatSheetStyle = {
+  ...questionCardStyle,
+  border: "1px solid #bfdbfe",
+  background: "#eff6ff",
+  gap: 10,
+};
+
+const mobileTextStyle = {
+  margin: 0,
+  lineHeight: 1.75,
+  fontSize: "clamp(.94rem, 3.7vw, 1rem)",
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+};
+
+const templateTextStyle = {
+  ...mobileTextStyle,
+  whiteSpace: "pre-line",
 };
 
 const tabImageStyle = {
@@ -254,7 +276,7 @@ const B1Day1TraumweltWorkbookPage = () => {
             title="Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?"
             submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
           >
-            <p style={{ margin: 0 }}>
+            <p style={mobileTextStyle}>
               Schreiben Sie Ihre Meinung zum Thema <strong>Traumberuf und persönliche Kontakte</strong>. Reagieren Sie auf Tanjas Meinung. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre eigene Meinung.
             </p>
           </WorkbookTaskCard>
@@ -268,14 +290,27 @@ const B1Day1TraumweltWorkbookPage = () => {
 
           <div style={questionCardStyle}>
             <strong>Meinung aus dem Online-Gästebuch</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <p style={mobileTextStyle}>
               Tanja: „Ich finde es wichtig, dass man im Traumberuf mit anderen Menschen in Kontakt steht. Aber heute arbeiten viele im Homeoffice, und oft haben sie wenig persönlichen Kontakt mit Kollegen. Meiner Meinung nach kann das den Beruf nicht so erfüllend machen wie bei direkter Zusammenarbeit im Büro.“
             </p>
           </div>
 
+          <div style={writingCheatSheetStyle}>
+            <strong>Writing cheat sheet · Actual question</strong>
+            <p style={mobileTextStyle}>
+              <strong>Frage:</strong> Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?
+            </p>
+            <ul style={{ ...listSpacing, fontSize: "clamp(.94rem, 3.7vw, 1rem)" }}>
+              <li>Reagieren Sie direkt auf Tanjas Meinung.</li>
+              <li>Sagen Sie klar: persönlicher Kontakt ist wichtig / nicht so wichtig.</li>
+              <li>Nennen Sie Vorteile oder Nachteile von Homeoffice.</li>
+              <li>Begründen Sie Ihre Meinung mit mindestens einem Beispiel.</li>
+            </ul>
+          </div>
+
           <div style={questionCardStyle}>
             <strong>Writing support template</strong>
-            <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{`Liebe Forum-Mitglieder,
+            <p style={templateTextStyle}>{`Liebe Forum-Mitglieder,
 
 heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
 
