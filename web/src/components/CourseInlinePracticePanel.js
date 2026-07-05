@@ -33,14 +33,7 @@ const routeWritingContext = () => {
 
 const routeSpeakingMindMap = () => {
   const path = currentPath();
-
-  // Mind-map speaking support is reserved for A2 workbooks.
-  // The historical URL says "day-2", but the A2 schedule identifies
-  // Small Talk 1.1 as the first teaching lesson (Day 1).
-  if (path.includes("/campus/course/a2-day-2-small-talk-workbook")) {
-    return getA2SpeakingMindMap(1);
-  }
-
+  if (path.includes("/campus/course/a2-day-2-small-talk-workbook")) return getA2SpeakingMindMap(1);
   return null;
 };
 
@@ -120,6 +113,32 @@ Zusammenfassend lässt sich sagen, dass [Thema] eine wichtige Rolle spielt.
 Mit freundlichen Grüßen
 [Ihr Name]`;
 
+const b1FormalLetterTemplate = `Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
+
+ich schreibe Ihnen, weil [Grund].
+
+Ich möchte gern wissen, ob [Frage]. Außerdem ist für mich wichtig, dass [Information].
+
+Könnten Sie mir bitte antworten?
+
+Vielen Dank im Voraus.
+
+Mit freundlichen Grüßen
+[Ihr Name]`;
+
+const b1InformalLetterTemplate = `Liebe/r [Name],
+
+wie geht es dir? Ich hoffe, es geht dir gut.
+
+Ich schreibe dir, weil [Grund].
+
+Ich möchte dir erzählen, dass [Information]. Außerdem [weitere Information].
+
+Was meinst du dazu? Schreib mir bald.
+
+Liebe Grüße
+[Ihr Name]`;
+
 const B1WritingDraftPanel = ({ writingContext = {} }) => {
   const [activeView, setActiveView] = useState("schreiben");
   const [draft, setDraft] = useState("");
@@ -159,8 +178,12 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
               <ul style={b1ListStyle}>{supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
             </>
           ) : null}
-          <strong>Template</strong>
+          <strong>Task template</strong>
           <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{template}</p>
+          <strong>Formal letter template</strong>
+          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{b1FormalLetterTemplate}</p>
+          <strong>Informal letter template</strong>
+          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{b1InformalLetterTemplate}</p>
           {vocabulary.length ? (
             <>
               <strong>Useful vocabulary</strong>
@@ -212,10 +235,7 @@ const CourseInlinePracticePanel = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
-  const speakingMindMap = useMemo(
-    () => (type === "speaking" ? routeSpeakingMindMap() : null),
-    [type],
-  );
+  const speakingMindMap = useMemo(() => (type === "speaking" ? routeSpeakingMindMap() : null), [type]);
   const resolvedWritingContext = useMemo(() => {
     if (type !== "writing") return {};
     const routeContext = routeWritingContext();
@@ -271,9 +291,7 @@ const CourseInlinePracticePanel = ({
       >
         <div style={{ display: "grid", gap: 6 }}>
           <strong>{panelTitle}</strong>
-          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-            {panelDescription}
-          </p>
+          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{panelDescription}</p>
         </div>
         <button
           type="button"
