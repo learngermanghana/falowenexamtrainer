@@ -251,11 +251,11 @@ const B1Day1TraumweltWorkbookPage = () => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Schreiben Sie Ihre Meinung: Traumberuf und persönliche Kontakte."
+            title="Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?"
             submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
           >
             <p style={{ margin: 0 }}>
-              Reagieren Sie auf Tanjas Meinung. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre eigene Meinung.
+              Schreiben Sie Ihre Meinung zum Thema <strong>Traumberuf und persönliche Kontakte</strong>. Reagieren Sie auf Tanjas Meinung. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre eigene Meinung.
             </p>
           </WorkbookTaskCard>
 
