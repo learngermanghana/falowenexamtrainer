@@ -80,6 +80,23 @@
     return slugify(course?.slug || course?.id || getCourseTitle(course));
   }
 
+  function getMeetingTimes(course) {
+    return Array.isArray(course?.meetingDays) && course.meetingDays.length
+      ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
+      : "Self-learning";
+  }
+
+  function getCourseDateRange(course) {
+    if (course?.availability === "always") return "Always open";
+    const start = course?.startDate ? `Starts ${formatDate(course.startDate)}` : "Start date not set";
+    const end = course?.endDate ? `Ends ${formatDate(course.endDate)}` : "End date not set";
+    return `${start} · ${end}`;
+  }
+
+  function getClassSummary(course) {
+    return `${getCourseTitle(course)} · ${getCourseDateRange(course)} · ${getMeetingTimes(course)}`;
+  }
+
   function buildClassUrl(courseOrSlug, extraParams) {
     const slug = typeof courseOrSlug === "string" ? slugify(courseOrSlug) : getCourseSlug(courseOrSlug);
     const params = new URLSearchParams({ class: slug, open: "1" });
@@ -160,6 +177,7 @@
       .lead-field input:focus, .lead-field select:focus { outline: 2px solid #bfdbfe; border-color: #1455f5; }
       .lead-form-grid { display: grid; gap: 10px; }
       .lead-help { color: #64748b; font-size: 12px; line-height: 1.45; }
+      .lead-selected-class { border: 1px solid #bfdbfe; border-radius: 12px; background: #eff6ff; color: #1e3a8a; font-size: 12px; font-weight: 800; line-height: 1.5; padding: 9px 10px; }
       .lead-actions { display: grid; gap: 10px; }
       .lead-submit { width: 100%; min-height: 50px; }
       .lead-whatsapp { width: 100%; min-height: 50px; }
@@ -180,13 +198,6 @@
       }
     `;
     document.head.appendChild(style);
-  }
-
-  function getClassSummary(course) {
-    const times = Array.isArray(course.meetingDays)
-      ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
-      : "Self-learning";
-    return `${getCourseTitle(course)} · Starts ${formatDate(course.startDate)} · ${times}`;
   }
 
   function currentCourseFromData(data) {
@@ -260,6 +271,7 @@
                 return `<option value="${slug}" ${isSelected ? "selected" : ""}>${getClassSummary(course)}</option>`;
               }).join("")}
             </select>
+            <p class="lead-selected-class" id="leadSelectedClassSummary">${getClassSummary(selected)}</p>
             <div class="lead-inline-error" id="leadClassError"></div>
           </div>
         </div>
@@ -291,6 +303,7 @@
 
     const form = card.querySelector("#leadCaptureForm");
     const select = card.querySelector("#leadClass");
+    const selectedSummary = card.querySelector("#leadSelectedClassSummary");
     const nameInput = card.querySelector("#leadName");
     const emailInput = card.querySelector("#leadEmail");
     const phoneInput = card.querySelector("#leadPhone");
@@ -308,15 +321,16 @@
       return classes.find((item) => getCourseSlug(item) === select.value) || selected || classes[0];
     }
 
-    function syncOpenLink() {
+    function syncSelectedClassInfo() {
       const course = selectedCourse();
       const url = buildClassUrl(course);
       if (openLink && url) openLink.href = url;
-      writeDebug({ step: "syncOpenLink", selectedValue: select.value, url, classCount: classes.length });
+      if (selectedSummary) selectedSummary.textContent = getClassSummary(course);
+      writeDebug({ step: "syncSelectedClassInfo", selectedValue: select.value, url, classCount: classes.length, endDate: course?.endDate || "" });
     }
 
-    syncOpenLink();
-    select.addEventListener("change", syncOpenLink);
+    syncSelectedClassInfo();
+    select.addEventListener("change", syncSelectedClassInfo);
     openLink.addEventListener("click", function () {
       if (debugBox) debugBox.classList.add("active");
       writeDebug({ step: "manualOpenLinkClick", href: openLink.href });
@@ -381,7 +395,7 @@
 
       const course = selectedCourse();
       const targetUrl = buildClassUrl(course);
-      writeDebug({ step: "submit", selectedValue: select.value, targetUrl, courseTitle: getCourseTitle(course), courseSlug: getCourseSlug(course) });
+      writeDebug({ step: "submit", selectedValue: select.value, targetUrl, courseTitle: getCourseTitle(course), courseSlug: getCourseSlug(course), endDate: course?.endDate || "" });
 
       if (!course || !getCourseSlug(course)) {
         setStatus(status, "Could not find the selected class. Use the debug box below and send a screenshot.", true);
@@ -427,9 +441,7 @@
       level: course.level || "",
       startDate: course.startDate || "",
       endDate: course.endDate || "",
-      meetingTimes: Array.isArray(course.meetingDays)
-        ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
-        : "Self-learning",
+      meetingTimes: getMeetingTimes(course),
       scheduleUrl: course.scheduleUrl || course.docUrl || "",
       paymentStatus: "not_requested",
       paidAt: "",
@@ -457,7 +469,7 @@
     };
 
     if (status) setStatus(status, "Saving enquiry and opening class information...", false);
-    writeDebug({ step: "submitLead", endpoint: endpoint ? "configured" : "missing", target: buildClassUrl(targetCourse) });
+    writeDebug({ step: "submitLead", endpoint: endpoint ? "configured" : "missing", target: buildClassUrl(targetCourse), endDate: lead.endDate || "" });
 
     if (!endpoint) {
       window.setTimeout(() => openClass("no_endpoint"), 250);
@@ -503,6 +515,7 @@
     slugify,
     getCourseTitle,
     getCourseSlug,
+    getClassSummary,
     buildClassUrl,
     shouldGate,
     isOpenMode,
