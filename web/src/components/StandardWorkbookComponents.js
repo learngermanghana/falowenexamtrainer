@@ -1,14 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
 
-export const A1_WORKBOOK_TABS = [
-  { key: "schreiben", label: "Teil 1", description: "Schreiben" },
-  { key: "lesen", label: "Teil 2", description: "Lesen" },
-  { key: "hoeren", label: "Teil 3", description: "Hören" },
-  { key: "references", label: "Ref", description: "Notes" },
-  { key: "submit", label: "Submit", description: "Send work" },
-];
-
 export const A2_B1_WORKBOOK_TABS = [
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
@@ -29,7 +21,6 @@ export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;
 
 export const getWorkbookTabsForLevel = (level) => {
   const normalizedLevel = String(level || "").toUpperCase();
-  if (normalizedLevel === "A1") return A1_WORKBOOK_TABS;
   if (normalizedLevel === "B2" || normalizedLevel === "C1") return B2_C1_WORKBOOK_TABS;
   return A2_B1_WORKBOOK_TABS;
 };
