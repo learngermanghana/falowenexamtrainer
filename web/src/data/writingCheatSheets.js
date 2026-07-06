@@ -28,6 +28,18 @@ export const C1_WRITING_CHEAT_SHEET = [
     ],
   },
   {
+    id: "c1-vocab-critical-distance",
+    title: "C1 vocabulary group · Counterargument and critical distancing",
+    items: [
+      { phrase: "Kritiker führen an, dass", meaning: "critics argue that" },
+      { phrase: "Es wird häufig behauptet, dass", meaning: "it is often claimed that" },
+      { phrase: "Diese Position ist insofern nachvollziehbar, als", meaning: "this position is understandable insofar as" },
+      { phrase: "Gleichzeitig darf nicht übersehen werden, dass", meaning: "at the same time, one must not overlook that" },
+      { phrase: "Dem ist jedoch entgegenzuhalten, dass", meaning: "however, it must be countered that" },
+      { phrase: "unter Berücksichtigung beider Seiten", meaning: "taking both sides into account" },
+    ],
+  },
+  {
     id: "c1-vocab-formal-letter",
     title: "C1 vocabulary group · Formal letter phrases",
     items: [
@@ -37,6 +49,22 @@ export const C1_WRITING_CHEAT_SHEET = [
       { phrase: "ich wäre Ihnen dankbar, wenn", meaning: "I would be grateful if" },
       { phrase: "ich bitte um eine zeitnahe Rückmeldung", meaning: "I request a prompt response" },
       { phrase: "Für Ihre Unterstützung danke ich Ihnen im Voraus.", meaning: "Thank you in advance for your support." },
+    ],
+  },
+  {
+    id: "c1-opinion-essay-template",
+    title: "C1 MEINUNGSBEITRAG / ERÖRTERUNG · Use this for C1 opinion essay questions with Pflichtpunkte, Gegenargument and proposal",
+    layout: "template",
+    items: [
+      { phrase: "Aufgabe lesen", meaning: "Markiere zuerst: Thema, Leitfrage, Pflichtpunkte, gefordertes Register und Wortzahl." },
+      { phrase: "Einleitung", meaning: "In der aktuellen Diskussion um [Thema] stellt sich die Frage, inwiefern [Leitfrage]. Dabei geht es nicht nur um [Aspekt 1], sondern auch um [Aspekt 2]." },
+      { phrase: "These / Position", meaning: "Ich vertrete die Auffassung, dass [klare Position], sofern [Bedingung oder Einschränkung]." },
+      { phrase: "Argument 1 + Beispiel", meaning: "Ein zentrales Argument dafür ist, dass [Argument 1]. Dies zeigt sich beispielsweise daran, dass [konkretes Beispiel]." },
+      { phrase: "Argument 2 + Folge", meaning: "Darüber hinaus wirkt sich [Aspekt] positiv/negativ auf [Bereich] aus, weil [Begründung]. Folglich [Konsequenz]." },
+      { phrase: "Herausforderung / Gegenargument", meaning: "Kritiker führen an, dass [Gegenargument]. Diese Position ist insofern nachvollziehbar, als [Teilzustimmung]. Dem ist jedoch entgegenzuhalten, dass [Entkräftung]." },
+      { phrase: "Kritische Distanzierung", meaning: "Häufig wird behauptet, [Konjunktiv I/II: es sei / es könne / es müsse]. Diese Sichtweise greift jedoch zu kurz, da [eigene Bewertung]." },
+      { phrase: "Eigene Lösung / Vorschlag", meaning: "Aus diesem Grund sollte [Akteur: Staat/Schule/Unternehmen/Gesellschaft] [konkrete Maßnahme] umsetzen. Entscheidend wäre dabei, dass [Bedingung]." },
+      { phrase: "Schluss", meaning: "Zusammenfassend lässt sich feststellen, dass [Thema] differenziert betrachtet werden muss. Unter Berücksichtigung beider Seiten überwiegt aus meiner Sicht [abschließende Bewertung], solange [Bedingung/Ausblick]." },
     ],
   },
   {
