@@ -1,21 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+const tabs = STANDARD_WORKBOOK_TABS;
 
 const card = {
   ...styles.card,
@@ -98,22 +97,6 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -130,8 +113,6 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
@@ -141,20 +122,29 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 16 Workbook · Wohlbefinden und Entspannung</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 16 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       <A2B1WorkbookGuidance />
@@ -368,7 +358,7 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (not on this workbook page).
+            Submit your final writing through the Submit tab on this workbook.
           </p>
 
           <CourseInlinePracticePanel
@@ -436,7 +426,7 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           ))}
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your answers in the assignment submission area (not on this workbook page).
+            Submit your answers through the Submit tab on this workbook.
           </p>
 
           <WorkbookSubmissionReminder />
@@ -456,7 +446,7 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Audio: <a href="https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing" target="_blank" rel="noreferrer">Open Teil 4 audio</a>
           </p>
-          <p style={{ margin: 0 }}>Listen carefully, then submit your final answers in the assignment submission area.</p>
+          <p style={{ margin: 0 }}>Listen carefully, then submit your final answers through the Submit tab.</p>
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
@@ -480,7 +470,7 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your answers in the assignment submission area (not on this workbook page).
+            Submit your answers through the Submit tab on this workbook.
           </p>
 
           <WorkbookSubmissionReminder />
@@ -489,7 +479,29 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day16WohlbefindenUndEntspannung", level: "A2", workbookId: "A2Day16WohlbefindenUndEntspannung" }} workbookId="A2Day16WohlbefindenUndEntspannung" />
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day16WohlbefindenUndEntspannung", level: "A2", day: 16, workbookId: "A2Day16WohlbefindenUndEntspannung" }} workbookId="A2Day16WohlbefindenUndEntspannung" />
+      )}
+
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit your required answers for A2 Day 16 here. Include your writing text and your reading/listening answer letters if required by your tutor.
+          </p>
+          <WorkbookSubmissionReminder />
+          <div className="a2-day16-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day16-submission-page > div > section:first-child { display: none !important; }
+            .a2-day16-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 16,
+                assignmentKey: "A2-6.16",
+                canonicalAssignmentKey: "A2-6.16",
+              }}
+            />
+          </div>
+        </div>
       )}
 
     </div>
