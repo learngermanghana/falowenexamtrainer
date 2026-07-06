@@ -217,7 +217,22 @@ export const LESSON_VIDEO_DICTIONARY = {
       ai_grammar_video: "https://youtu.be/uf3OJwalh6U",
     },
     16: {
-      ai_grammar_video: "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR",
+      videoResources: [
+        {
+          key: "a2-day16-teacher-lecture",
+          chapter: "6.16",
+          title: "Teacher lecture video",
+          description: "Recorded teacher lecture for A2 Day 16 Wohlbefinden und Entspannung.",
+          url: "https://youtu.be/t_9HDdZbbEA",
+        },
+        {
+          key: "a2-day16-ai-grammar-video",
+          chapter: "6.16",
+          title: "AI grammar video",
+          description: "Step-by-step grammar explanation for revision and self-study.",
+          url: "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR",
+        },
+      ],
     },
     17: {
       ai_grammar_video: "https://youtu.be/8xybaJbs89I",
@@ -456,7 +471,10 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     .map((resource) => legacyVideoResource(resource, "teacher"))
     .filter(Boolean);
   const dictionaryResources = normalizeVideoResources(dictionaryEntry);
-  const fallbackLegacyVideos = legacyVideos;
+  const dictionaryHasTeacherVideo = dictionaryResources.some(isTeacherVideoResource);
+  const fallbackLegacyVideos = dictionaryHasTeacherVideo
+    ? legacyVideos.filter((resource) => !isTeacherVideoResource(resource))
+    : legacyVideos;
   const allResources = uniqueVideoResources(
     fallbackLegacyVideos,
     explicitResources,
