@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -15,6 +16,7 @@ const tabs = [
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
   { key: "references", label: "5. Ref" },
+  { key: "submit", label: "Submit" },
 ];
 
 const card = { ...styles.card, display: "grid", gap: 12 };
@@ -178,7 +180,7 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
           A2 · Day 28 Workbook · Über die Zukunft sprechen
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          4-part workbook: group speaking, writing, reading, listening practice, Ref notes and Submit.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => (
@@ -239,30 +241,12 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
 
           <h3 style={sectionTitle}>Beispiel für die Brain Map-Struktur</h3>
           <ul style={listSpacing}>
-            <li>
-              <strong>A. Arbeit &amp; Beruf:</strong> einen guten Job finden, Berufserfahrung sammeln,
-              eine Ausbildung machen, selbstständig werden, in einem internationalen Team arbeiten.
-            </li>
-            <li>
-              <strong>B. Bildung &amp; Deutsch:</strong> B1/B2 lernen, Prüfung bestehen, studieren,
-              Weiterbildung machen, jeden Tag Vokabeln lernen.
-            </li>
-            <li>
-              <strong>C. Familie &amp; Wohnen:</strong> eine Familie gründen, eine Wohnung suchen,
-              in einer ruhigen Stadt wohnen, die Familie unterstützen.
-            </li>
-            <li>
-              <strong>D. Reisen &amp; Ausland:</strong> nach Deutschland reisen, Europa besuchen,
-              neue Kulturen kennenlernen, ein Praktikum im Ausland machen.
-            </li>
-            <li>
-              <strong>E. Gesundheit &amp; Freizeit:</strong> gesund bleiben, regelmäßig Sport machen,
-              mehr lesen, weniger Stress haben, Zeit für Hobbys finden.
-            </li>
-            <li>
-              <strong>F. Persönliche Ziele:</strong> selbstbewusster sprechen, Geld sparen,
-              Verantwortung übernehmen, anderen Menschen helfen.
-            </li>
+            <li><strong>A. Arbeit &amp; Beruf:</strong> einen guten Job finden, Berufserfahrung sammeln, eine Ausbildung machen, selbstständig werden, in einem internationalen Team arbeiten.</li>
+            <li><strong>B. Bildung &amp; Deutsch:</strong> B1/B2 lernen, Prüfung bestehen, studieren, Weiterbildung machen, jeden Tag Vokabeln lernen.</li>
+            <li><strong>C. Familie &amp; Wohnen:</strong> eine Familie gründen, eine Wohnung suchen, in einer ruhigen Stadt wohnen, die Familie unterstützen.</li>
+            <li><strong>D. Reisen &amp; Ausland:</strong> nach Deutschland reisen, Europa besuchen, neue Kulturen kennenlernen, ein Praktikum im Ausland machen.</li>
+            <li><strong>E. Gesundheit &amp; Freizeit:</strong> gesund bleiben, regelmäßig Sport machen, mehr lesen, weniger Stress haben, Zeit für Hobbys finden.</li>
+            <li><strong>F. Persönliche Ziele:</strong> selbstbewusster sprechen, Geld sparen, Verantwortung übernehmen, anderen Menschen helfen.</li>
           </ul>
 
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -381,7 +365,7 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
             <li>Fragen Sie, was Ihr Freund/Ihre Freundin für die Zukunft plant.</li>
           </ol>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area, not directly on this page.
+            Submit your final writing through the Submit tab on this workbook.
           </p>
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
@@ -399,7 +383,7 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 3 (Lesen) · Assignment</h2>
           <p style={{ margin: 0 }}>
-            <strong>Students must submit answers in the submission area (NOT on page).</strong>
+            <strong>Students must submit answers through the Submit tab.</strong>
           </p>
           <h3 style={sectionTitle}>Pass und Visum, Einwohnermeldeamt und Aufenthaltstitel</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -468,7 +452,29 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day28UeberDieZukunftSprechen", level: "A2", workbookId: "A2Day28UeberDieZukunftSprechen" }} workbookId="A2Day28UeberDieZukunftSprechen" />
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day28UeberDieZukunftSprechen", level: "A2", day: 28, workbookId: "A2Day28UeberDieZukunftSprechen" }} workbookId="A2Day28UeberDieZukunftSprechen" />
+      )}
+
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit your required answers for A2 Day 28 here. Include your writing text and your reading/listening answer letters if required by your tutor.
+          </p>
+          <WorkbookSubmissionReminder />
+          <div className="a2-day28-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day28-submission-page > div > section:first-child { display: none !important; }
+            .a2-day28-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 28,
+                assignmentKey: "A2-10.28",
+                canonicalAssignmentKey: "A2-10.28",
+              }}
+            />
+          </div>
+        </div>
       )}
 
     </div>
