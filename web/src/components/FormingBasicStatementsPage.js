@@ -339,10 +339,10 @@ const FormingBasicStatementsPage = () => {
 
       <MCQSection
         title="Practice 1"
-        instruction="Choose the correct verb form."
+        instruction="Choose the correct verb form. Remember: time word first, verb second. Example: Gestern war ich ..."
         questions={[
           { question: "Ich ___ heute in Accra.", options: ["A. bin", "B. war", "C. hatte"], correctIndex: 0 },
-          { question: "Gestern ich ___ in Kumasi.", options: ["A. bin", "B. war", "C. habe"], correctIndex: 1 },
+          { question: "Gestern ___ ich in Kumasi.", options: ["A. bin", "B. war", "C. habe"], correctIndex: 1 },
         ]}
       />
 
@@ -444,6 +444,9 @@ const FormingBasicStatementsPage = () => {
           <br />
           <br />
           Example: <strong>ich fahre</strong> → <strong>du fährst</strong> → <strong>er fährt</strong>
+          <br />
+          <br />
+          At A1, remember this simple pattern: <strong>a</strong> often changes to <strong>ä</strong> in the second and third person singular, for example <strong>du fährst</strong> and <strong>er fährt</strong>. The vowel <strong>e</strong> often changes to <strong>i</strong> or <strong>ie</strong>, for example <strong>du sprichst</strong> / <strong>er spricht</strong> and <strong>du liest</strong> / <strong>er liest</strong>.
         </div>
 
         <TableScroll caption="Common vowel changes" minWidth={760}>
@@ -474,11 +477,11 @@ const FormingBasicStatementsPage = () => {
 
       <MCQSection
         title="Practice 5"
-        instruction="Choose the correct verb form."
+        instruction="Choose the correct verb form. Here, Sie means she, not they and not formal you."
         questions={[
           { question: "Du ___ nach Berlin. (fahren)", options: ["A. fahre", "B. fährst", "C. fährt"], correctIndex: 1 },
           { question: "Er ___ Deutsch. (sprechen)", options: ["A. sprichst", "B. sprechen", "C. spricht"], correctIndex: 2 },
-          { question: "Sie ___ Pizza. (essen)", options: ["A. isst", "B. essen", "C. esst"], correctIndex: 0 },
+          { question: "Sie (she, not they or formal you) ___ Pizza. (essen)", options: ["A. isst", "B. essen", "C. esst"], correctIndex: 0 },
           { question: "Du ___ den Bus. (nehmen)", options: ["A. nimmst", "B. nimmt", "C. nehme"], correctIndex: 0 },
         ]}
       />
