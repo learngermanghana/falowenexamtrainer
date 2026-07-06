@@ -1,21 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+const tabs = STANDARD_WORKBOOK_TABS;
 
 const card = {
   ...styles.card,
@@ -43,7 +42,18 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
+const imageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
 
 const videoPreviewStyle = {
   width: "100%",
@@ -106,27 +116,24 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
     I prepared this part.
   </label>
+);
+
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question, index) => (
+      <div key={question.stem} style={questionCardStyle}>
+        <strong>{index + 1}. {question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={option}>{option}</span>
+        ))}
+      </div>
+    ))}
+  </div>
 );
 
 const A2Day15MeinLieblingssportWorkbookPage = () => {
@@ -138,8 +145,6 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
@@ -149,20 +154,29 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 15 Workbook · Mein Lieblingssport</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 15 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       <A2B1WorkbookGuidance />
@@ -173,135 +187,50 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1600&q=80"
             alt="People playing basketball during sports practice"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <SpeakingMindMap config={getA2SpeakingMindMap(15)} />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we&apos;ll engage in group exercises discussing these topics. Following this, your tutor will revise
-            the questions and invite you to write a brief essay about yourself.
+            In this chapter, we discuss sport, training, health benefits and favourite activities.
           </p>
 
           <h3 style={sectionTitle}>Zentrales Thema: „Mein Lieblingssport“</h3>
           <ol style={listSpacing}>
-            <li>
-              <strong>Sportart (Type of Sport) 🏅</strong>
-              <ul style={listSpacing}>
-                <li>Welche Sportart treibst du? – Fußball, Basketball, Schwimmen, Tennis, Laufen, Radfahren</li>
-                <li>Einzelsport oder Mannschaftssport? – „Ich spiele in einer Mannschaft." / „Ich mache den Sport allein."</li>
-                <li>Wo machst du den Sport? – Sportplatz, Stadion, Turnhalle, zu Hause, in der Natur</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Training (Training) 🏋️‍♂️</strong>
-              <ul style={listSpacing}>
-                <li>Wie oft trainierst du? – „Ich trainiere dreimal pro Woche."</li>
-                <li>Wie lange dauert das Training? – 30 Minuten, 1 Stunde, 2 Stunden</li>
-                <li>Hast du einen Trainer? – Ja / Nein</li>
-                <li>Trainierst du mit Freunden oder allein?</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Bewegung (Exercise &amp; Activity) 🏃‍♀️</strong>
-              <ul style={listSpacing}>
-                <li>Welche Bewegungen machst du? – Rennen, springen, schwimmen, kicken, werfen</li>
-                <li>Ist der Sport anstrengend? – Ja, ein bisschen, sehr</li>
-                <li>Gibt es Wettbewerbe? – Ja, Turniere, Meisterschaften</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Gesundheit (Health Benefits) ❤️</strong>
-              <ul style={listSpacing}>
-                <li>Warum ist der Sport gut für dich?</li>
-                <li>„Der Sport ist gut für meine Gesundheit."</li>
-                <li>Hilft der Sport beim Stressabbau? – Ja / Nein</li>
-                <li>Ist Ernährung wichtig für den Sport? – Ja, gesundes Essen ist wichtig.</li>
-              </ul>
-            </li>
+            <li><strong>Sportart:</strong> Fußball, Basketball, Schwimmen, Tennis, Laufen, Radfahren.</li>
+            <li><strong>Training:</strong> Wie oft trainierst du? Trainierst du allein oder mit Freunden?</li>
+            <li><strong>Gesundheit:</strong> Warum ist der Sport gut für deine Fitness?</li>
+            <li><strong>Meinung:</strong> Warum magst du diesen Sport?</li>
           </ol>
 
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>💬 Frage zur Diskussion</strong>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>Was ist Ihr Lieblingssport und warum?</p>
-            <p style={{ margin: 0 }}>
-              <strong>Vier Schlüsselwörter:</strong> Fußball · Fitness · gesund · Freunde
-            </p>
-          </div>
-
           <div style={questionCardStyle}>
-            <strong>📝 Beispielantwort</strong>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>
-              „Mein Lieblingssport ist Basketball. Ich spiele Basketball, weil es ein spannender Mannschaftssport ist. Ich
-              trainiere zweimal pro Woche in einer Sporthalle mit meinen Freunden. Das Training dauert 1,5 Stunden. Beim
-              Basketball muss man schnell laufen und hoch springen. Das ist gut für meine Fitness. Ich mag diesen Sport, weil
-              er Spaß macht und mich fit hält!"
-            </p>
+            <strong>Frage zur Diskussion</strong>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>Was ist Ihr Lieblingssport und warum?</p>
+            <p style={{ margin: 0 }}><strong>Vier Schlüsselwörter:</strong> Fußball · Fitness · gesund · Freunde</p>
           </div>
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-            So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
+            Nutze diese Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
           </p>
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Schnelle Struktur für 30–45 Sekunden</strong>
-            <ol style={listSpacing}>
-              <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
-              <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
-              <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
-              <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
-            </ol>
-          </div>
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>Gute Einleitungen</strong>
               <ul style={listSpacing}>
                 <li>„Heute spreche ich über …“</li>
-                <li>„Ich möchte kurz etwas über … sagen.“</li>
                 <li>„Mein Thema ist …“</li>
               </ul>
             </div>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter / Connectors</strong>
+              <strong>Verbindungswörter</strong>
               <ul style={listSpacing}>
-                <li><strong>und</strong> · „Ich fahre Bus und ich gehe zu Fuß.“</li>
-                <li><strong>oder</strong> · „Ich nehme den Zug oder den Bus.“</li>
-                <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
-                <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich finde … gut, weil …“</li>
-                <li>„Für mich ist … wichtig.“</li>
-                <li>„Meiner Meinung nach ist … praktisch.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zum Schluss kann ich sagen: …“</li>
-                <li>„Deshalb finde ich … gut.“</li>
-                <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
+                <li><strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong></li>
               </ul>
             </div>
           </div>
 
           <SpeakingPracticeTimerCard />
-
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über meinen Lieblingssport. Mein Lieblingssport ist Fußball, weil ich gern im Team spiele. Fußball macht Spaß und ist gut für die Gesundheit. Außerdem treffe ich Freunde, deshalb bin ich motiviert. Zum Beispiel spiele ich am Samstag im Park oder schaue ein Spiel im Fernsehen. Zum Schluss finde ich: Sport ist wichtig, weil man fit bleibt und weniger Stress hat.“
-            </p>
-          </div>
-
-          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
-
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -312,12 +241,11 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1600&q=80"
             alt="Learner writing an email assignment in a notebook"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 2 · Schreiben</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Aufgabenstellung:</strong> Sie sind jetzt in Deutschland und möchten sich für einen Sportkurs anmelden.
-            Schreiben Sie eine E-Mail an einen Sportverein oder ein Fitnessstudio.
+            <strong>Aufgabenstellung:</strong> Sie sind jetzt in Deutschland und möchten sich für einen Sportkurs anmelden. Schreiben Sie eine E-Mail an einen Sportverein oder ein Fitnessstudio.
           </p>
           <p style={{ margin: 0 }}>Ihre E-Mail soll folgende Punkte enthalten:</p>
           <ol style={listSpacing}>
@@ -325,21 +253,11 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
             <li>Ihre bisherigen Erfahrungen oder Ihre Motivation beschreiben.</li>
             <li>Nach Trainingszeiten und Kosten fragen.</li>
           </ol>
-          <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
-            <strong>Writing guidance before submission</strong>
-            <ul style={listSpacing}>
-              <li>Start with a polite greeting and clear purpose.</li>
-              <li>Use short A2-level sentences and connect ideas with weil, und, aber.</li>
-              <li>End with a polite closing sentence and your name.</li>
-            </ul>
-          </div>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (not on this workbook page).
+            Submit your final writing through the Submit tab on this workbook.
           </p>
 
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -351,56 +269,20 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
             alt="Reading text and questions for German class practice"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
           <p style={{ margin: 0 }}>
-            Read the article and review the multiple-choice questions. <strong>Do not answer directly on this page.</strong> Submit
-            answers in the assignment area.
+            Read the article and review the multiple-choice questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.
           </p>
 
           <h3 style={sectionTitle}>Sportangebote in unserer Stadt</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In unserer Stadt gibt es ein breites Angebot an Sportmöglichkeiten für Jung und Alt. Besonders beliebt sind die
-            Kurse im Fitnessstudio "Fit &amp; Fun", wo man alles von Yoga bis hin zu Zumba ausprobieren kann. Für diejenigen, die
-            lieber draußen aktiv sind, bietet der Sportverein "Grün-Weiß" verschiedene Mannschaftssportarten wie Fußball,
-            Handball und Volleyball an.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein Highlight ist der jährliche Stadtlauf, bei dem Läufer jeden Alters teilnehmen können. Dieses Event zieht immer
-            viele Zuschauer an und fördert das Gemeinschaftsgefühl. Die Teilnahmegebühren für den Stadtlauf sind moderat und
-            ein Teil der Einnahmen wird an lokale Wohltätigkeitsorganisationen gespendet.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Auch die Schwimmhalle im Stadtpark ist ein beliebter Ort. Hier können Kinder und Erwachsene Schwimmkurse besuchen
-            oder einfach nur zum Spaß schwimmen gehen. Besonders im Sommer ist die Schwimmhalle ein Ort, an dem man sich
-            erfrischen und gleichzeitig fit bleiben kann.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Für die Älteren bietet der Seniorenclub "Aktiv im Alter" spezielle Fitnessprogramme an. Diese Kurse sind darauf
-            ausgerichtet, die Beweglichkeit und Gesundheit der Senioren zu fördern. Die Teilnehmer schätzen besonders die
-            Gemeinschaft und die Unterstützung, die sie in den Kursen erfahren.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Die Stadtverwaltung arbeitet ständig daran, das Sportangebot zu erweitern und zu verbessern. In den nächsten
-            Monaten ist die Eröffnung eines neuen Kletterparks geplant, der sowohl für Anfänger als auch für erfahrene
-            Kletterer geeignet sein wird. Dieser Park wird ein weiteres Highlight in unserer Stadt sein und die Möglichkeiten
-            für sportliche Aktivitäten noch vielfältiger machen.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sport spielt eine wichtige Rolle in unserer Stadt und trägt wesentlich zur Lebensqualität bei. Egal, ob jung oder
-            alt, für jeden gibt es das passende Angebot, um aktiv und gesund zu bleiben.
+            In unserer Stadt gibt es ein breites Angebot an Sportmöglichkeiten für Jung und Alt. Besonders beliebt sind die Kurse im Fitnessstudio "Fit & Fun", wo man alles von Yoga bis Zumba ausprobieren kann. Für diejenigen, die lieber draußen aktiv sind, bietet der Sportverein "Grün-Weiß" Mannschaftssportarten wie Fußball, Handball und Volleyball an. Auch der jährliche Stadtlauf ist sehr beliebt und unterstützt lokale Wohltätigkeitsorganisationen. Die Schwimmhalle befindet sich im Stadtzentrum und der Seniorenclub "Aktiv im Alter" bietet Fitnessprogramme an.
           </p>
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
+          <QuestionList questions={lesenQuestions} />
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
@@ -410,54 +292,58 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
       {activeTab === "hoeren" && (
         <div style={card}>
           <img
-            src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80"
-            alt="Student using headphones for German listening exercise"
+            src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1600&q=80"
+            alt="Listening practice with headphones"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 4 · Hören</h2>
           <p style={{ margin: 0 }}>
-            Listen to the recording, then submit your answers in the assignment area (not on this page).
+            Watch and listen to the Hören video, then submit your final answer letters through the Submit tab if required by your tutor.
           </p>
-          <p style={{ margin: 0 }}>
-            Audio link: {" "}
-            <a
-              href="https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
-            </a>
-          </p>
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <p style={{ margin: 0 }}>Embedded preview:</p>
           <iframe
-            style={videoPreviewStyle}
-            src="https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/preview"
-            title="A2 Day 15 listening audio preview"
-            allow="autoplay"
+            src="https://www.youtube.com/embed/p_OE59m0J-Y?rel=0"
+            title="A2 Day 15 Mein Lieblingssport Teil 4 Hören video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
+            style={videoPreviewStyle}
           />
-
+          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day15MeinLieblingssport", level: "A2", workbookId: "A2Day15MeinLieblingssport" }} workbookId="A2Day15MeinLieblingssport" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day15MeinLieblingssport", level: "A2", day: 15, workbookId: "A2Day15MeinLieblingssport" }}
+          workbookId="A2Day15MeinLieblingssport"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit your required answers for A2 Day 15 here. Include your writing text and your reading/listening answer letters if required by your tutor.
+          </p>
+          <WorkbookSubmissionReminder />
+          <div className="a2-day15-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day15-submission-page > div > section:first-child { display: none !important; }
+            .a2-day15-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 15,
+                assignmentKey: "A2-5.15",
+                canonicalAssignmentKey: "A2-5.15",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
