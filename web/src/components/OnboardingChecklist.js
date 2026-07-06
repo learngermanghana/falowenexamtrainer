@@ -63,18 +63,22 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
     trackPublicFunnelEvent("onboarding_view", { level, onboardingVideo: videoId });
   }, [level, paymentConfirmed, videoId]);
 
-  const openDashboard = async () => {
-    if (!watchedVideo) {
-      showToast("Please watch the short welcome video first.", "info");
-      return;
-    }
-
+  const openDashboard = async ({ skippedVideo = false } = {}) => {
     setSaving(true);
     setSaveError("");
     try {
       await onSaveOnboarding?.();
-      trackPublicFunnelEvent("onboarding_completed", { level, onboardingVideo: videoId });
-      showToast("Welcome to Falowen. Your dashboard is ready.", "success");
+      trackPublicFunnelEvent("onboarding_completed", {
+        level,
+        onboardingVideo: videoId,
+        skippedVideo: skippedVideo || !watchedVideo,
+      });
+      showToast(
+        skippedVideo || !watchedVideo
+          ? "Dashboard opened. You can watch the welcome video later from the course resources."
+          : "Welcome to Falowen. Your dashboard is ready.",
+        "success"
+      );
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Failed to save onboarding", error);
@@ -97,7 +101,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           </span>
           <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.12 }}>Watch this before your dashboard opens</h1>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 17 }}>
-            This short introduction shows you where to learn, how to complete your work, and where to get help. There are no other buttons here, so you can focus on these easy steps first.
+            This short introduction shows you where to learn, how to complete your work, and where to get help. If the video fails to load, you can still continue to your dashboard.
           </p>
         </div>
 
@@ -120,9 +124,23 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           <div className="onboarding-video-placeholder">
             <span aria-hidden style={{ fontSize: 38 }}>▶️</span>
             <strong>Your welcome video is being prepared.</strong>
-            <span style={styles.helperText}>Read the easy steps below, then confirm that you are ready.</span>
+            <span style={styles.helperText}>Read the easy steps below, then continue to your dashboard.</span>
           </div>
         )}
+
+        <div
+          style={{
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            padding: 12,
+            background: "#eff6ff",
+            color: "#1e3a8a",
+            lineHeight: 1.6,
+            fontWeight: 700,
+          }}
+        >
+          Video not playing? Do not worry. Paid students can continue to the dashboard and watch the video later.
+        </div>
 
         <section className="onboarding-steps" aria-labelledby="easy-steps-title">
           <h2 id="easy-steps-title" style={{ margin: 0 }}>Your 3 easy steps</h2>
@@ -137,12 +155,12 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           <input type="checkbox" checked={watchedVideo} onChange={(event) => setWatchedVideo(event.target.checked)} />
           <span>
             <strong>{videoId ? "I watched the video and understand the easy steps." : "I read and understand the easy steps."}</strong>
-            <small>Your dashboard will open after you confirm.</small>
+            <small>Your dashboard can open after you confirm. If the video does not play, use Continue to dashboard.</small>
           </span>
         </label>
 
-        <button type="button" className="onboarding-open-dashboard" onClick={openDashboard} disabled={!watchedVideo || saving}>
-          {saving ? "Opening dashboard..." : "Open my dashboard"}
+        <button type="button" className="onboarding-open-dashboard" onClick={() => openDashboard({ skippedVideo: !watchedVideo })} disabled={saving}>
+          {saving ? "Opening dashboard..." : watchedVideo ? "Open my dashboard" : "Continue to dashboard"}
         </button>
         {saveError ? <p style={{ margin: 0, color: "#b91c1c", textAlign: "center" }}>{saveError}</p> : null}
       </section>
