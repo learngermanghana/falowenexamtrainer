@@ -78,6 +78,29 @@ const b1WritingSubTabButtonStyle = (active) => ({
   cursor: "pointer",
 });
 
+const b1TemplateTabsWrapStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+  gap: 8,
+  padding: 6,
+  border: "1px solid #bfdbfe",
+  borderRadius: 14,
+  background: "#eff6ff",
+};
+
+const b1TemplateButtonStyle = (active) => ({
+  border: active ? "1px solid #1d4ed8" : "1px solid #cbd5e1",
+  borderRadius: 12,
+  padding: "10px 8px",
+  minHeight: 48,
+  background: active ? "#1d4ed8" : "#fff",
+  color: active ? "#fff" : "#1e293b",
+  fontWeight: 850,
+  fontSize: "clamp(.86rem, 3.5vw, .96rem)",
+  cursor: "pointer",
+  lineHeight: 1.25,
+});
+
 const b1WritingPanelStyle = {
   border: "1px solid #bfdbfe",
   borderRadius: 14,
@@ -87,6 +110,15 @@ const b1WritingPanelStyle = {
   gap: 12,
   overflowWrap: "anywhere",
   wordBreak: "break-word",
+};
+
+const b1TemplateCardStyle = {
+  border: "1px solid #dbeafe",
+  borderRadius: 14,
+  padding: 12,
+  background: "#ffffff",
+  display: "grid",
+  gap: 8,
 };
 
 const b1WritingTextareaStyle = {
@@ -109,22 +141,20 @@ const b1ListStyle = {
   fontSize: "clamp(.94rem, 3.7vw, 1rem)",
 };
 
-const defaultB1WritingTemplate = `Liebe Forum-Mitglieder,
+const defaultB1WritingTemplate = `Liebe Forenmitglieder,
 
 heutzutage ist das Thema [Thema] sehr wichtig. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
 
-Einerseits gibt es Vorteile. Zum Beispiel [Beispiel].
+Einerseits gibt es viele Vorteile. Zum Beispiel kann/können [Verb/Modalverb] [weitere Information].
 
-Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist [Beispiel].
+Andererseits gibt es auch Nachteile. Ein Beispiel dafür ist/sind [Nomen], wie [weitere Information].
 
-Meiner Meinung nach [abschließende Meinung].
+Ich glaube, dass [Ihre abschließende Meinung].
 
-Zusammenfassend lässt sich sagen, dass [Thema] eine wichtige Rolle spielt.
+Zusammenfassend lässt sich sagen, dass [Thema] unser Leben positiv/negativ beeinflussen kann.`;
 
-Mit freundlichen Grüßen
-[Ihr Name]`;
-
-const b1FormalLetterTemplate = `Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
+const b1FormalLetterTemplate = `Sehr geehrte Damen und Herren,
+Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
 
 ich schreibe Ihnen, weil [Grund].
 
@@ -138,6 +168,7 @@ Mit freundlichen Grüßen
 [Ihr Name]`;
 
 const b1InformalLetterTemplate = `Liebe/r [Name],
+Hallo [Name],
 
 wie geht es dir? Ich hoffe, es geht dir gut.
 
@@ -145,19 +176,48 @@ Ich schreibe dir, weil [Grund].
 
 Ich möchte dir erzählen, dass [Information]. Außerdem [weitere Information].
 
-Was meinst du dazu? Schreib mir bald.
+Hast du Zeit? / Was meinst du dazu? / Kannst du mir helfen?
+
+Schreib mir bald.
 
 Liebe Grüße
 [Ihr Name]`;
 
+const b1WritingTemplateOptions = [
+  {
+    key: "opinion",
+    label: "Opinion essay / forum post",
+    title: "OPINION ESSAY / FORUM POST",
+    helper: "Use this for Meinung, Forum, Diskussion, Vorteile und Nachteile.",
+    template: defaultB1WritingTemplate,
+  },
+  {
+    key: "formal",
+    label: "Formal letter",
+    title: "FORMAL LETTER",
+    helper: "Use this for Schule, Firma, Vermieter, Amt, course provider or official emails.",
+    template: b1FormalLetterTemplate,
+  },
+  {
+    key: "informal",
+    label: "Informal letter",
+    title: "INFORMAL LETTER",
+    helper: "Use this for friends, family or personal messages.",
+    template: b1InformalLetterTemplate,
+  },
+];
+
 const B1WritingDraftPanel = ({ writingContext = {} }) => {
   const [activeView, setActiveView] = useState("schreiben");
+  const [activeTemplate, setActiveTemplate] = useState("opinion");
   const [draft, setDraft] = useState("");
   const supportItems = writingContext.supportStructure?.length
     ? writingContext.supportStructure
     : writingContext.taskPoints || [];
   const vocabulary = writingContext.vocabulary || [];
-  const template = writingContext.template || defaultB1WritingTemplate;
+  const selectedTemplate =
+    b1WritingTemplateOptions.find((item) => item.key === activeTemplate) ||
+    b1WritingTemplateOptions[0];
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -173,7 +233,7 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ..."
+            placeholder="Liebe Forenmitglieder,\n\nich bin der Meinung, dass ..."
             style={b1WritingTextareaStyle}
           />
         </div>
@@ -181,7 +241,7 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
 
       {activeView === "cheatSheet" ? (
         <div style={b1WritingPanelStyle}>
-          <strong>Cheat sheet · Writing support</strong>
+          <strong>Cheat sheet · Choose the correct writing type</strong>
           {writingContext.taskTitle ? <p style={mobileTextStyle}><strong>Question:</strong> {writingContext.taskTitle}</p> : null}
           {supportItems.length ? (
             <>
@@ -189,12 +249,28 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
               <ul style={b1ListStyle}>{supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
             </>
           ) : null}
-          <strong>Task template</strong>
-          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{template}</p>
-          <strong>Formal letter template</strong>
-          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{b1FormalLetterTemplate}</p>
-          <strong>Informal letter template</strong>
-          <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{b1InformalLetterTemplate}</p>
+
+          <div style={b1TemplateTabsWrapStyle} aria-label="Choose B1 writing template">
+            {b1WritingTemplateOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                style={b1TemplateButtonStyle(activeTemplate === option.key)}
+                onClick={() => setActiveTemplate(option.key)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <section style={b1TemplateCardStyle}>
+            <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
+              {selectedTemplate.title}
+            </span>
+            <p style={{ ...mobileTextStyle, color: "#475569" }}>{selectedTemplate.helper}</p>
+            <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{selectedTemplate.template}</p>
+          </section>
+
           {vocabulary.length ? (
             <>
               <strong>Useful vocabulary</strong>
@@ -307,7 +383,7 @@ const CourseInlinePracticePanel = ({
   );
   const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
   const panelDescription = isB1Writing
-    ? "Use Schreiben to draft your answer, or open the Cheat sheet for the hidden support template. Copy your final text to the Submit tab when you are done."
+    ? "Use Schreiben to draft your answer, or open the Cheat sheet and choose the correct template type: opinion essay, formal letter or informal letter. Copy your final text to the Submit tab when you are done."
     : type === "speaking"
       ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
       : description || config.defaultDescription;
