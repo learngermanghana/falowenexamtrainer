@@ -10,7 +10,7 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
   2: {
     key: "a2-day2-personen-beschreiben-falowen-radio",
     title: "Personen beschreiben 1.2",
-    youtubeId: "5UGb1ENJ8Cs",
+    youtubeId: "_AHBm9nw",
     duration: "",
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Personen beschreiben ein. Danach gehst du weiter zu Teil 1.",
