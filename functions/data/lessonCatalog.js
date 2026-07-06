@@ -523,7 +523,6 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "A2-Tutorial",
     "assignmentType": "Lesen & Hören",
     "workbookRoute": "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
-    "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
     "progressionEligible": false,
     "contentStatus": "published"
@@ -539,7 +538,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/a2-starter-conjunctions-day-1",
     "workbookRoute": "/campus/course/lesson/A2/1?view=workbook",
-    "video": "https://youtu.be/DfJ04x4JGOo",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -555,7 +553,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/personen-beschreiben-1-2-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-2-personen-beschreiben-workbook",
-    "video": "https://youtu.be/3_X7pyFA5A4",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -571,7 +568,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1Z3sSDCxPQz27TDSpN9r8lQUpHhBVfhYZ/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook",
-    "video": "https://youtu.be/wV45Md6nSgY",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -587,7 +583,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/14qE_XJr3mTNr6PF5aa0aCqauh9ngYTJ8/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook",
-    "video": "https://youtu.be/U14gkjld0ys",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -603,7 +598,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/11yEcMioSB9x1ZD-x5_67ApFzP53iau-N/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-5-freizeit-workbook",
-    "video": "https://youtu.be/8605_yumfoM",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -619,7 +613,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1MSahBEyElIiLnitWoJb5xkvRlB21yo0y/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-6-moebel-und-raeume-workbook",
-    "video": "https://youtu.be/eP4NeBmmZF8",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -635,7 +628,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes",
     "workbookRoute": "/campus/course/a2-day-7-eine-wohnung-suchen-workbook",
-    "video": "https://youtu.be/ScU6w8VQgNg",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -651,7 +643,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-8-rezepte-und-essen-workbook",
-    "video": "https://youtu.be/hxkk6dZSjNM",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -667,7 +658,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/perfekt-urlaub-4-9-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-9-urlaub-workbook",
-    "video": "https://youtu.be/NxoQH-BY9Js",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -683,7 +673,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
-    "video": "https://youtu.be/yOfTCQDn_JM",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -699,7 +688,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/19I7oOHX8r4daxXmx38mNMaZO10AXHEFu/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
-    "video": "https://youtu.be/RkvfRiPCZI4",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -715,7 +703,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1dyGB5q92EePy8q60eWWYA91LXnsWQFb1/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-12-mein-traumberuf-workbook",
-    "video": "https://youtu.be/w81bsmssGXQ",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -731,7 +718,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1tv2tYzn9mIG57hwWr_ilxV1My7kt-RKQ/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
-    "video": "https://youtu.be/urKBrX5VAYU",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -747,7 +733,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/13mVpVGfhY1NQn-BEb7xYUivnaZbhXJsK/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-14-beruf-und-karriere-workbook",
-    "video": "https://youtu.be/_YlapM9rQq4",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -763,7 +748,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-15-mein-lieblingssport-workbook",
-    "video": "https://youtu.be/uf3OJwalh6U",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -779,7 +763,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
-    "video": "https://youtu.be/r4se8KuS8cA",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -795,7 +778,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
     "workbookRoute": "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
-    "video": "https://youtu.be/0p28KQE2A8c",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -811,7 +793,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-18-die-bank-anrufen-workbook",
-    "video": "https://youtu.be/ahIUVAbsuxU",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -827,7 +808,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
-    "video": "https://youtu.be/TOTK1yohCTg",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -843,7 +823,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
-    "video": "https://youtu.be/P_ruQxHKzPg",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -874,7 +853,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-22-die-woche-planung-workbook",
-    "video": "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -890,7 +868,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
-    "video": "https://youtu.be/c4TpUe3teBE",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -920,7 +897,6 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "A2-9.25",
     "assignmentType": "Lesen & Hören",
     "workbookRoute": "/campus/course/a2-day-25-tagesablauf-workbook",
-    "video": "https://youtu.be/NxoQH-BY9Js",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -935,7 +911,6 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "A2-10.26",
     "assignmentType": "Lesen & Hören",
     "workbookRoute": "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
-    "video": "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -964,7 +939,6 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "A2-10.28",
     "assignmentType": "Lesen & Hören",
     "workbookRoute": "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
-    "video": "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -979,7 +953,6 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-Tutorial",
     "assignmentType": "Lesen & Hören",
     "workbookRoute": "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
-    "video": "https://youtu.be/a1-day0-tutorial",
     "submissionRequired": false,
     "progressionEligible": false,
     "contentStatus": "published"
@@ -995,7 +968,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/1?view=grammar",
     "workbookRoute": "/campus/course/lesson/B1/1?view=workbook",
-    "video": "https://youtu.be/wMrdW2DhD5o",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1011,7 +983,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/2?view=grammar",
     "workbookRoute": "/campus/course/lesson/B1/2?view=workbook",
-    "video": "https://youtu.be/piJE4ucYFuc",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1027,7 +998,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "/campus/course/lesson/B1/3?view=grammar",
     "workbookRoute": "/campus/course/lesson/B1/3?view=workbook",
-    "video": "https://youtu.be/8k0Iaw_-o8c",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1043,7 +1013,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1NW5F0R5zj6nn2SqDjhpQlkGcfK-UBUqk/view?usp=drive_link",
     "workbookRoute": "https://drive.google.com/file/d/12r_HE51QtpknXSSU0R75ur-EDFpTjzXU/view?usp=sharing",
-    "video": "https://youtu.be/kR8SmSY99c8",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1059,7 +1028,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/13SI6AiqC2BAWLZjPh-AsiyTEfvGyk8DR/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1-HaOiGQtP_JI7ujg4-h-u1GnCumabdx_/view?usp=sharing",
-    "video": "https://youtu.be/2lUPAnzx4e4",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1090,7 +1058,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1DMyTdt1cxhDxYJZQPHe3pAqE30TNwThU/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1XXVhFMJdFI_j3pZXw3UkuHCoKqYR8dkj/view?usp=sharing",
-    "video": "https://youtu.be/y5wqJv8_GMI",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1106,7 +1073,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1s6TcUzjADzicOKRx3adxW4UdqEXQmz_L/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1PgsULeo11OhzpICZ77RSlVEuuyrSdxSe/view?usp=sharing",
-    "video": "https://youtu.be/_aFuOTSdMb8",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1122,7 +1088,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1Mp6i2pbaTd3r5fLZGqh6NLFZE6txCZpJ/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1giWw3qYhTmm3VO9and2ZuS7ARUFkq7vO/view?usp=sharing",
-    "video": "https://youtu.be/3ozjxgOenaI",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1182,7 +1147,6 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/11_i8x_tmppV5Vzc1jfYAkGAhJYelwMrr/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1dC4H3hyiX2gZ0R3jj_0CAjhl7iBa5oA7/view?usp=sharing",
-    "video": "https://youtu.be/8rclmwsAYtc",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
