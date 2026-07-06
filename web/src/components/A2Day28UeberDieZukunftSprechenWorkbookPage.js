@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -9,15 +9,12 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-  { key: "submit", label: "Submit" },
-];
+const tabs = STANDARD_WORKBOOK_TABS;
 
 const card = { ...styles.card, display: "grid", gap: 12 };
 const sectionTitle = { margin: 0, fontSize: "1.1rem" };
@@ -140,22 +137,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
   </label>
 );
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
@@ -165,10 +146,6 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(
-    () => tabs.findIndex((tab) => tab.key === activeTab),
-    [activeTab],
-  );
   const setPreparedFor = (tabKey) => (event) =>
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
@@ -180,22 +157,28 @@ const A2Day28UeberDieZukunftSprechenWorkbookPage = () => {
           A2 · Day 28 Workbook · Über die Zukunft sprechen
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading, listening practice, Ref notes and Submit.
+          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.key}
-              active={tab.key === activeTab}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </TabButton>
-          ))}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 28 workbook sections"
+          />
         </div>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       <A2B1WorkbookGuidance />
