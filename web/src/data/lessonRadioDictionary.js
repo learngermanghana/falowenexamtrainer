@@ -120,10 +120,18 @@ export const LESSON_RADIO_DICTIONARY = {
     8: {
       key: "b1-day8-alles-fuer-die-gesundheit-falowen-radio",
       title: "Alles für die Gesundheit 3.8",
-      youtubeId: "_aFuOTSdMb8",
+      youtubeId: "CXwkby4OHjM",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Gesundheit ein. Danach gehst du weiter zum Workbook.",
+    },
+    9: {
+      key: "b1-day9-work-life-balance-falowen-radio",
+      title: "Work-Life-Balance im modernen Arbeitsumfeld 3.9",
+      youtubeId: "dpo7_xwUeWU",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Work-Life-Balance, Stress und moderne Arbeitswelt ein. Danach gehst du weiter zum Workbook.",
     },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
@@ -272,6 +280,14 @@ export const LESSON_RADIO_DICTIONARY = {
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf nachhaltiges Reisen, Mobilität, Tourismus und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+    },
+    8: {
+      key: "c1-day8-wohnen-stadtentwicklung-falowen-radio",
+      title: "Wohnen und Stadtentwicklung",
+      youtubeId: "z61nrz6yFgs",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Wohnen, Stadtentwicklung und Lebensqualität ein. Danach gehst du weiter zum Lernteil.",
     },
   },
 };
