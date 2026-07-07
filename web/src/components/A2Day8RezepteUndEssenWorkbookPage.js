@@ -1,21 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+const tabs = STANDARD_WORKBOOK_TABS;
 
 const card = {
   ...styles.card,
@@ -43,6 +42,13 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const imageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -62,7 +68,7 @@ const lesenQuestions = [
     options: ["a) Eier und Speck", "b) Brot, Brötchen, Aufschnitt, Käse und Marmelade", "c) Müsli und Joghurt", "d) Nur Kaffee"],
   },
   {
-    stem: "2. Was versteht man unter \"Brotzeit\"?",
+    stem: "2. Was versteht man unter Brotzeit?",
     options: ["a) Ein warmes Mittagessen", "b) Ein kaltes Abendessen", "c) Ein Snack zwischendurch", "d) Ein Dessert"],
   },
   {
@@ -70,7 +76,7 @@ const lesenQuestions = [
     options: ["a) Fischgerichte", "b) Schweinshaxe und Knödel", "c) Spätzle", "d) Quiche"],
   },
   {
-    stem: "4. Welches Fest ist weltweit bekannt und zieht jedes Jahr Millionen von Besuchern an?",
+    stem: "4. Welches Fest ist weltweit bekannt?",
     options: ["a) Weihnachtsmarkt", "b) Oktoberfest", "c) Karneval", "d) Erntedankfest"],
   },
   {
@@ -110,27 +116,24 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
     I prepared this part.
   </label>
+);
+
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question) => (
+      <div key={question.stem} style={questionCardStyle}>
+        <strong>{question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={option}>{option}</span>
+        ))}
+      </div>
+    ))}
+  </div>
 );
 
 const A2Day8RezepteUndEssenWorkbookPage = () => {
@@ -142,31 +145,37 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const setPreparedFor = (tabKey) => (event) =>
+    setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 8 Workbook · Rezepte und Essen (Exercise) 3.8</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading, and listening practice focused on recipes and food culture.
+          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 8 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       <A2B1WorkbookGuidance />
@@ -177,166 +186,44 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1600&q=80"
             alt="Fresh ingredients arranged for cooking practice"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
-
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <SpeakingMindMap config={getA2SpeakingMindMap(8)} />
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Practise speaking about recipes, food, ingredients, meals, restaurants and cooking steps.
+          </p>
 
-          <h3 style={sectionTitle}>Instructions</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Central Topic:</strong> Write <strong>"Rezepte und Essen"</strong> in the center of your brain map.
-            </li>
-            <li>
-              <strong>Main Branches:</strong> Create five main branches from the central topic:
-              <ul style={listSpacing}>
-                <li>Zutaten (Ingredients)</li>
-                <li>Kochmethoden (Cooking Methods)</li>
-                <li>Küchengeräte (Kitchen Tools)</li>
-                <li>Mahlzeiten (Meals)</li>
-                <li>Typische Gerichte (Typical Dishes)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Sub-Branches:</strong> Expand each branch with examples and phrases.
-            </li>
-          </ol>
-
-          <h3 style={sectionTitle}>Example Ideas for Your Brain Map</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Zutaten (Ingredients)</strong>
-              <ul style={listSpacing}>
-                <li>Obst: Äpfel, Bananen, Orangen (fruit: apples, bananas, oranges)</li>
-                <li>Gemüse: Karotten, Tomaten, Kartoffeln (vegetables: carrots, tomatoes, potatoes)</li>
-                <li>Gewürze: Salz, Pfeffer, Paprika (spices/seasoning: salt, pepper, paprika)</li>
-                <li>Milchprodukte: Milch, Käse, Butter (dairy products: milk, cheese, butter)</li>
-                <li>Fleisch und Fisch: Hähnchen, Rindfleisch, Lachs (meat and fish: chicken, beef, salmon)</li>
-                <li>Kohlenhydrate: Reis, Nudeln, Brot (carbohydrates: rice, noodles/pasta, bread)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Kochmethoden (Cooking Methods)</strong>
-              <ul style={listSpacing}>
-                <li>Kochen (Boiling)</li>
-                <li>Backen (Baking)</li>
-                <li>Braten (Frying)</li>
-                <li>Grillen (Grilling)</li>
-                <li>Dünsten (Steaming)</li>
-                <li>Mischen (Mixing)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Küchengeräte (Kitchen Tools)</strong>
-              <ul style={listSpacing}>
-                <li>Messer (Knife)</li>
-                <li>Topf (Pot)</li>
-                <li>Pfanne (Pan)</li>
-                <li>Schüssel (Bowl)</li>
-                <li>Küchenwaage (Kitchen scale)</li>
-                <li>Backofen (Oven)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Mahlzeiten (Meals)</strong>
-              <ul style={listSpacing}>
-                <li>Frühstück: Brot, Marmelade, Kaffee (breakfast: bread, jam, coffee)</li>
-                <li>Mittagessen: Suppe, Hauptgericht, Dessert (lunch: soup, main course, dessert)</li>
-                <li>Abendessen: Salat, Sandwiches, Tee (dinner: salad, sandwiches, tea)</li>
-                <li>Zwischenmahlzeit: Obst, Joghurt, Kekse (snack: fruit, yogurt, cookies)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Typische Gerichte (Typical Dishes)</strong>
-              <ul style={listSpacing}>
-                <li>Deutschland: Bratwurst, Sauerkraut, Brezel (Germany: sausage, sauerkraut, pretzel)</li>
-                <li>Italien: Pizza, Pasta (Italy: pizza, pasta)</li>
-                <li>Frankreich: Quiche, Croissant (France: quiche, croissant)</li>
-                <li>Internationale Küche: Sushi, Curry, Tacos (international cuisine: sushi, curry, tacos)</li>
-              </ul>
-            </li>
-          </ol>
-
-          <h3 style={sectionTitle}>Final Task</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Create a Recipe:</strong> Write a simple recipe using your brain map. Include dish name, ingredients, and
-              cooking steps.
-            </li>
-            <li>
-              <strong>Short Dialogue:</strong> Imagine you are in a restaurant. Write a dialogue between you and the waiter using
-              phrases like: <em>Was empfehlen Sie?</em>, <em>Ich hätte gern ...</em>, <em>Ist das Gericht vegetarisch?</em>, and <em>Die Rechnung bitte.</em>
-            </li>
-          </ol>
-
-          <h3 style={sectionTitle}>Group Discussion Questions</h3>
-          <p style={{ margin: 0 }}>Was isst du gern und wie bereitest du es zu?</p>
+          <h3 style={sectionTitle}>Useful ideas for your mind map</h3>
           <ul style={listSpacing}>
-            <li>Zutaten</li>
-            <li>Kochen</li>
-            <li>Restaurant</li>
-            <li>Mahlzeit</li>
+            <li><strong>Zutaten:</strong> Obst, Gemüse, Gewürze, Fleisch, Fisch, Reis, Nudeln.</li>
+            <li><strong>Kochmethoden:</strong> kochen, backen, braten, grillen, mischen, schneiden.</li>
+            <li><strong>Küchengeräte:</strong> Messer, Topf, Pfanne, Schüssel, Backofen.</li>
+            <li><strong>Mahlzeiten:</strong> Frühstück, Mittagessen, Abendessen, Zwischenmahlzeit.</li>
+            <li><strong>Typische Gerichte:</strong> Bratwurst, Sauerkraut, Pizza, Pasta, Curry, Jollof-Reis.</li>
           </ul>
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese Struktur für einen klaren Beitrag: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-          </p>
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>1) Gute Einleitungen</strong>
+              <strong>Gute Einleitungen</strong>
               <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
+                <li>„Heute spreche ich über mein Lieblingsessen.“</li>
                 <li>„In meiner Präsentation geht es um …“</li>
-                <li>„Ich möchte kurz etwas zu … sagen.“</li>
               </ul>
             </div>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>2) Verbindungswörter / Connectors</strong>
+              <strong>Connectors</strong>
               <ul style={listSpacing}>
-                <li><strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong></li>
-                <li><strong>und</strong>, <strong>oder</strong>, <strong>auch</strong></li>
-                <li><strong>weil</strong>, <strong>deshalb</strong></li>
-                <li><strong>zum Beispiel</strong>, <strong>außerdem</strong></li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>3) Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich finde, dass …“</li>
-                <li>„Meiner Meinung nach …“</li>
-                <li>„Für mich ist … wichtig, weil …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>4) Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zusammenfassend kann ich sagen, dass …“</li>
-                <li>„Zum Schluss möchte ich sagen, dass …“</li>
-                <li>„Danke fürs Zuhören.“</li>
+                <li>zuerst · dann · am Ende</li>
+                <li>und · oder · weil · deshalb</li>
               </ul>
             </div>
           </div>
 
           <SpeakingPracticeTimerCard />
-
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Beispiel (30–45 Sekunden)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über mein Lieblingsessen. <strong>Zuerst</strong> koche ich oft Nudeln mit Gemüse, <strong>weil</strong> es schnell
-              geht. <strong>Dann</strong> mache ich eine Soße mit Tomaten und Gewürzen, <strong>und</strong> ich schneide Zucchini. <strong>Zum Beispiel</strong> esse ich
-              dieses Gericht am Abend mit meiner Familie. <strong>Meiner Meinung nach</strong> ist es lecker und gesund, <strong>deshalb</strong> koche ich
-              es regelmäßig. <strong>Zum Schluss</strong> kann ich sagen: Einfaches Essen kann sehr gut sein.“
-            </p>
-          </div>
-
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
-
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -345,27 +232,21 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
         <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Learner preparing a formal restaurant reservation email"
+            alt="Learner preparing a restaurant reservation email"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
+          <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Writing Task: Formal Letter to a Restaurant (A2)</strong>
+            <strong>Situation:</strong> Sie möchten einen Tisch in einem Restaurant reservieren. Schreiben Sie eine E-Mail an das Restaurant.
           </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>Situation: Sie möchten einen Tisch in einem Restaurant reservieren.</p>
-          <p style={{ margin: 0 }}>Schreiben Sie eine E-Mail an das Restaurant:</p>
           <ol style={listSpacing}>
             <li>Fragen Sie nach einem freien Tisch.</li>
-            <li>Geben Sie an, was für Sie wichtig ist (z. B. Datum, Uhrzeit, Anzahl der Personen).</li>
+            <li>Geben Sie Datum, Uhrzeit und Anzahl der Personen an.</li>
             <li>Fragen Sie nach dem Menü und den Preisen.</li>
           </ol>
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
-          </p>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <p style={{ margin: 0, color: "#4b5563" }}>Submit your final writing through the Submit tab on this workbook.</p>
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -377,42 +258,17 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80"
             alt="Traditional German dishes on a dining table"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
+          <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
           <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit section at
-            the bottom of the lesson to send your answers.
+            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.
           </p>
-
-          <h3 style={sectionTitle}>Die Vielfalt der Deutschen Küche</h3>
+          <h3 style={sectionTitle}>Die Vielfalt der deutschen Küche</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Die deutsche Küche ist vielfältig und regional unterschiedlich. In Norddeutschland sind Fischgerichte sehr beliebt,
-            während im Süden Deutschlands eher deftige Speisen wie Schweinshaxe und Knödel auf den Tisch kommen. Ein
-            typisches deutsches Frühstück besteht aus Brot, Brötchen, Aufschnitt, Käse und Marmelade. Zum Mittagessen gibt es
-            oft eine warme Mahlzeit, und am Abend wird häufig kalt gegessen – Brotzeit nennt man das.
+            Die deutsche Küche ist vielfältig und regional unterschiedlich. In Norddeutschland sind Fischgerichte sehr beliebt, während im Süden Deutschlands deftige Speisen wie Schweinshaxe und Knödel auf den Tisch kommen. Ein typisches deutsches Frühstück besteht aus Brot, Brötchen, Aufschnitt, Käse und Marmelade. Zu den bekanntesten Gerichten zählen Sauerkraut, Bratwurst und Spätzle. Internationale Küche findet man heute auch in vielen deutschen Städten.
           </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Zu den bekanntesten deutschen Gerichten zählen Sauerkraut, Bratwurst und Spätzle. Auch regionale Spezialitäten wie
-            der Schwarzwälder Schinken oder der Bayerische Leberkäse sind sehr beliebt. In den letzten Jahren hat die
-            internationale Küche auch in Deutschland an Bedeutung gewonnen, und man findet Restaurants aus aller Welt.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Ein weiterer wichtiger Bestandteil der deutschen Esskultur sind die vielen Feste und Märkte, bei denen Essen und
-            Trinken eine zentrale Rolle spielen. Das Oktoberfest in München ist weltweit bekannt und zieht jedes Jahr Millionen
-            von Besuchern an. Auch Weihnachtsmärkte mit ihren zahlreichen kulinarischen Angeboten sind sehr beliebt.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {lesenQuestions.map((question) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
@@ -424,18 +280,11 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80"
             alt="People enjoying food and conversation in a restaurant"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
+          <h2 style={sectionTitle}>Teil 4 · Hören</h2>
           <p style={{ margin: 0 }}>
-            Listen carefully and answer the questions in your assignment submission area, not directly on this page.
-          </p>
-
-          <p style={{ margin: 0 }}>
-            <strong>Hören Video:</strong>{" "}
-            <a href="https://youtu.be/Y6G1TTSQyKA" target="_blank" rel="noreferrer">
-              Open listening video
-            </a>
+            Listen carefully and submit your final answer letters through the Submit tab if required by your tutor.
           </p>
           <iframe
             title="Teil 4 Hören: Rezepte und Essen"
@@ -444,55 +293,41 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             allowFullScreen
             style={videoPreviewStyle}
           />
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {hoerenQuestions.map((question) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <h3 style={sectionTitle}>Recommended Video</h3>
-          <ul style={listSpacing}>
-            <li>
-              Deutschlandlabor - Folge 15: Bio: {" "}
-              <a href="https://www.youtube.com/watch?v=IyMgjkY0LgU" target="_blank" rel="noreferrer">
-                https://www.youtube.com/watch?v=IyMgjkY0LgU
-              </a>
-            </li>
-            <li>
-              Das Deutschlandlabor – Folge 19: Wurst: {" "}
-              <a href="https://www.youtube.com/watch?v=eATxA-wj66A" target="_blank" rel="noreferrer">
-                https://www.youtube.com/watch?v=eATxA-wj66A
-              </a>
-            </li>
-            <li>
-              Deutschlandlabor - Folge 20: Bier: {" "}
-              <a href="https://www.youtube.com/watch?v=95cup2iq9E0" target="_blank" rel="noreferrer">
-                https://www.youtube.com/watch?v=95cup2iq9E0
-              </a>
-            </li>
-          </ul>
-          <iframe
-            title="Deutschlandlabor Folge 15: Bio"
-            src="https://www.youtube.com/embed/IyMgjkY0LgU"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={videoPreviewStyle}
-          />
-
+          <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day8RezepteUndEssen", level: "A2", workbookId: "A2Day8RezepteUndEssen" }} workbookId="A2Day8RezepteUndEssen" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day8RezepteUndEssen", level: "A2", day: 8, workbookId: "A2Day8RezepteUndEssen" }}
+          workbookId="A2Day8RezepteUndEssen"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit your required answers for A2 Day 8 here. Include your writing text and your reading/listening answer letters if required by your tutor.
+          </p>
+          <WorkbookSubmissionReminder />
+          <div className="a2-day8-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day8-submission-page > div > section:first-child { display: none !important; }
+            .a2-day8-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 8,
+                assignmentKey: "A2-3.8",
+                canonicalAssignmentKey: "A2-3.8",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
