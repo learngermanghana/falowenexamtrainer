@@ -173,6 +173,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf umweltfreundliche Entscheidungen im Alltag ein. Danach gehst du weiter zum Workbook.",
     },
+    28: {
+      key: "b1-day28-klimafreundlich-leben-falowen-radio",
+      title: "Klimafreundlich leben 10.28",
+      youtubeId: ["6ksGuFsv", "_H4"].join(""),
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf klimafreundliches Leben im Alltag ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
