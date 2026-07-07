@@ -36,7 +36,18 @@ const day0PathConfig = [
         "Watch this B1 orientation video first so you understand the Course Book, workbook flow, stronger B1 answers and submission routine before Day 1.",
     },
   },
-  { match: "/campus/course/b2-day-0-self-learning-orientation-workbook", level: "B2", selfLearning: true },
+  {
+    match: "/campus/course/b2-day-0-self-learning-orientation-workbook",
+    level: "B2",
+    selfLearning: true,
+    video: {
+      id: "AH2dPdqjfTo",
+      url: "https://youtu.be/AH2dPdqjfTo",
+      title: "B2 Day 0 self-learning onboarding video",
+      description:
+        "Watch this B2 orientation video first so you understand the self-learning workflow, Course Book routine, Falowen AI practice and workbook expectations.",
+    },
+  },
   { match: "/campus/course/c1-day-0-progression-workbook", level: "C1", selfLearning: true },
 ];
 
