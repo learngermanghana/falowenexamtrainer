@@ -15,7 +15,7 @@ const ROUTE_ENTRIES = [
   [14, "5.14", "/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes"],
   [15, "6.15", "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes"],
   [16, "6.16", "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"],
-  [17, "6.17", "/campus/course/modal-verbs-day-14-3-6"],
+  [17, "6.17", "/campus/course/modal-verbs-day-14-3-6?level=A2&day=17"],
   [18, "7.18", "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"],
   [19, "7.19", "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes"],
   [20, "7.20", "/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes"],
