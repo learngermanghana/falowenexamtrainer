@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -223,7 +223,7 @@ const A2StandardTabbedWorkbookPage = ({
           <div className={`a2-day${day}-submission-page`} style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
             <style>{`.a2-day${day}-submission-page > div > section:first-child { display: none !important; }
             .a2-day${day}-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
+            <ContextualAssignmentSubmissionPage
               submissionContext={{
                 level: "A2",
                 day,
