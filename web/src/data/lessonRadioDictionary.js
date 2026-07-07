@@ -157,6 +157,22 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf typische Situationen, Gespräche und höfliches Verhalten beim ersten Date ein. Danach gehst du weiter zum Workbook.",
     },
+    26: {
+      key: "b1-day26-reiseprobleme-loesungen-falowen-radio",
+      title: "Reiseprobleme und Lösungen 9.26",
+      youtubeId: "8HdiyR5I96I",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Reiseprobleme, Verzögerungen und Lösungen ein. Danach gehst du weiter zum Workbook.",
+    },
+    27: {
+      key: "b1-day27-umweltfreundlich-im-alltag-falowen-radio",
+      title: "Umweltfreundlich im Alltag 10.27",
+      youtubeId: "CdpRrbYGT0I",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf umweltfreundliche Entscheidungen im Alltag ein. Danach gehst du weiter zum Workbook.",
+    },
   },
   B2: {
     1: {
