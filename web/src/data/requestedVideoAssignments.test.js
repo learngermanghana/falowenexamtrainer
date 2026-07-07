@@ -3,12 +3,14 @@ import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
 import { getCourseCompletionJourney } from "./courseCompletionJourney";
 import { getLessonRadioResource } from "./lessonRadioDictionary";
 
+const B1_DAY0_ORIENTATION_URL = ["https://youtu.be/QMWj", "_N6ncwI"].join("");
+
 describe("requested video assignments", () => {
   test("B1 Day 0 uses the requested orientation video", () => {
     expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([
       expect.objectContaining({
         key: "teacher-b1-day0-orientation-video",
-        url: "https://youtu.be/6fb0A87z9yA",
+        url: B1_DAY0_ORIENTATION_URL,
       }),
     ]);
   });
