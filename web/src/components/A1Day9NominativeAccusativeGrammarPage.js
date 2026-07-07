@@ -112,6 +112,40 @@ const ExampleList = ({ examples }) => (
   </ul>
 );
 
+const ArticleTable = ({ title, definite, indefinite }) => (
+  <div style={tableWrapStyle}>
+    <table style={tableStyle}>
+      <thead>
+        <tr>
+          <th style={cellStyle}>{title}</th>
+          <th style={cellStyle}>Masculine</th>
+          <th style={cellStyle}>Feminine</th>
+          <th style={cellStyle}>Neuter</th>
+          <th style={cellStyle}>Plural</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style={cellStyle}>Definite</td>
+          {definite.map((article) => (
+            <td key={`def-${article}`} style={cellStyle}>
+              {article}
+            </td>
+          ))}
+        </tr>
+        <tr>
+          <td style={cellStyle}>Indefinite / negation</td>
+          {indefinite.map((article) => (
+            <td key={`indef-${article}`} style={cellStyle}>
+              {article}
+            </td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+
 const nominativeCoreExamples = [
   {
     id: "nom-core-1",
@@ -150,14 +184,15 @@ const nominativeCoreExamples = [
     id: "nom-core-4",
     sentence: (
       <>
-        <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Haus. /{" "}
+        <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Auto. /{" "}
+        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>ist</span> groß. /{" "}
         <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span> Lehrer.
       </>
     ),
-    english: "That is a house. / He becomes a teacher.",
-    gender: "Haus = neuter singular; Lehrer = masculine singular profession",
+    english: "That is a car. / He is tall. / He becomes a teacher.",
+    gender: "Auto = neuter singular; Lehrer = masculine singular profession",
     note:
-      "With sein and werden, the noun after the verb describes the subject. It stays nominative, so ein Haus and Lehrer are used as descriptions/complements.",
+      "With sein (to be) and werden (to become), ask whether the word is the subject or the object. These beginner examples mainly describe the subject, so the article stays nominative.",
   },
 ];
 
@@ -365,12 +400,6 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'sehen' takes an accusative object, so masculine 'der Mann' becomes 'den Mann'.",
-    highlightedSentence: {
-      subject: "Ich",
-      verb: "sehe",
-      noun: "den Mann",
-      rest: "jeden Tag.",
-    },
     englishTranslation: "I see the man every day.",
   },
   {
@@ -379,12 +408,6 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: the subject is nominative, and feminine nominative definite article is 'die'.",
-    highlightedSentence: {
-      subject: "Die Frau",
-      verb: "arbeitet",
-      noun: "Die Frau",
-      rest: "im Büro.",
-    },
     englishTranslation: "The woman works in the office.",
   },
   {
@@ -393,12 +416,6 @@ const knowledgeQuestions = [
     options: ["das", "dem", "des"],
     correctAnswer: "das",
     feedback: "Correct: 'kaufen' takes accusative. Neuter article stays 'das' in accusative.",
-    highlightedSentence: {
-      subject: "Wir",
-      verb: "kaufen",
-      noun: "das Buch.",
-      rest: "",
-    },
     englishTranslation: "We buy the book.",
   },
   {
@@ -407,12 +424,6 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'sehen' takes an accusative object, so we use 'den Schüler'.",
-    highlightedSentence: {
-      subject: "Der Lehrer",
-      verb: "sieht",
-      noun: "den Schüler",
-      rest: "",
-    },
     englishTranslation: "The teacher sees the student.",
   },
   {
@@ -421,12 +432,6 @@ const knowledgeQuestions = [
     options: ["das", "den", "dem"],
     correctAnswer: "das",
     feedback: "Correct: this is the subject (nominative), so we use 'das Kind'.",
-    highlightedSentence: {
-      subject: "Das Kind",
-      verb: "spielt",
-      noun: "Das Kind",
-      rest: "im Garten.",
-    },
     englishTranslation: "The child plays in the garden.",
   },
   {
@@ -435,12 +440,6 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'brauchen' takes accusative, so masculine 'der Computer' becomes 'den Computer'.",
-    highlightedSentence: {
-      subject: "Wir",
-      verb: "brauchen",
-      noun: "den Computer",
-      rest: "",
-    },
     englishTranslation: "We need the computer.",
   },
   {
@@ -449,12 +448,6 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: plural nominative uses 'die'.",
-    highlightedSentence: {
-      subject: "Die Bücher",
-      verb: "sind",
-      noun: "Die Bücher",
-      rest: "interessant.",
-    },
     englishTranslation: "The books are interesting.",
   },
   {
@@ -463,12 +456,6 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: plural accusative also uses 'die'.",
-    highlightedSentence: {
-      subject: "Ich",
-      verb: "lese",
-      noun: "die Bücher",
-      rest: "jeden Abend.",
-    },
     englishTranslation: "I read the books every evening.",
   },
 ];
@@ -561,35 +548,11 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           </li>
         </ul>
 
-        <div style={tableWrapStyle}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={cellStyle}>Type</th>
-                <th style={cellStyle}>Masculine</th>
-                <th style={cellStyle}>Feminine</th>
-                <th style={cellStyle}>Neuter</th>
-                <th style={cellStyle}>Plural</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={cellStyle}>Definite articles ("the")</td>
-                <td style={cellStyle}>der</td>
-                <td style={cellStyle}>die</td>
-                <td style={cellStyle}>das</td>
-                <td style={cellStyle}>die</td>
-              </tr>
-              <tr>
-                <td style={cellStyle}>Indefinite / negation ("a / an" / "no")</td>
-                <td style={cellStyle}>ein</td>
-                <td style={cellStyle}>eine</td>
-                <td style={cellStyle}>ein</td>
-                <td style={cellStyle}>keine</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ArticleTable
+          title="Type"
+          definite={["der", "die", "das", "die"]}
+          indefinite={["ein", "eine", "ein", "keine"]}
+        />
 
         <p style={{ margin: 0 }}>
           <strong>English explanation:</strong> A <strong>definite article</strong> means <strong>"the"</strong>. It points
@@ -633,7 +596,8 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             In this lesson, we focus only on <strong>verbs</strong> as the case signal.
           </li>
           <li>
-            Step 1: identify sentence role (subject/direct object), then choose the matching article form.
+            Step 1: decide if the noun is the <strong>subject</strong> or the <strong>object</strong>, then choose the
+            matching article form.
           </li>
         </ul>
       </section>
@@ -641,39 +605,18 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>3) Nominative case (Der Nominativ)</h2>
         <p style={{ margin: 0 }}>
-          Use nominative for the <strong>subject</strong> (who/what does the action). A beginner tip: with{" "}
-          <strong>sein</strong> and <strong>werden</strong>, you often get a subject + description pattern (no direct
-          object).
+          Use nominative for the <strong>subject</strong> (who/what the sentence is about, or who/what does the
+          action). <strong>sein</strong> means <strong>"to be"</strong>, and <strong>werden</strong> means{" "}
+          <strong>"to become"</strong>. Beginner tip: first ask, <strong>is the word the subject or the object?</strong>{" "}
+          In simple nominative sentences, you usually describe the subject instead of adding a normal object, for
+          example: <strong>Er ist groß.</strong> / <strong>Das ist ein Auto.</strong>
         </p>
-        <div style={tableWrapStyle}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={cellStyle}>Nominative articles</th>
-                <th style={cellStyle}>Masculine</th>
-                <th style={cellStyle}>Feminine</th>
-                <th style={cellStyle}>Neuter</th>
-                <th style={cellStyle}>Plural</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={cellStyle}>Definite</td>
-                <td style={cellStyle}>der</td>
-                <td style={cellStyle}>die</td>
-                <td style={cellStyle}>das</td>
-                <td style={cellStyle}>die</td>
-              </tr>
-              <tr>
-                <td style={cellStyle}>Indefinite / negation</td>
-                <td style={cellStyle}>ein</td>
-                <td style={cellStyle}>eine</td>
-                <td style={cellStyle}>ein</td>
-                <td style={cellStyle}>keine</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+
+        <ArticleTable
+          title="Nominative articles"
+          definite={["der", "die", "das", "die"]}
+          indefinite={["ein", "eine", "ein", "keine"]}
+        />
         <ExampleList examples={nominativeCoreExamples} />
 
         <p style={{ margin: 0 }}>
@@ -697,35 +640,11 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           .
         </p>
 
-        <div style={tableWrapStyle}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={cellStyle}>Accusative articles</th>
-                <th style={cellStyle}>Masculine</th>
-                <th style={cellStyle}>Feminine</th>
-                <th style={cellStyle}>Neuter</th>
-                <th style={cellStyle}>Plural</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={cellStyle}>Definite</td>
-                <td style={cellStyle}>den</td>
-                <td style={cellStyle}>die</td>
-                <td style={cellStyle}>das</td>
-                <td style={cellStyle}>die</td>
-              </tr>
-              <tr>
-                <td style={cellStyle}>Indefinite / negation</td>
-                <td style={cellStyle}>einen</td>
-                <td style={cellStyle}>eine</td>
-                <td style={cellStyle}>ein</td>
-                <td style={cellStyle}>keine</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ArticleTable
+          title="Accusative articles"
+          definite={["den", "die", "das", "die"]}
+          indefinite={["einen", "eine", "ein", "keine"]}
+        />
 
         <ExampleList examples={accusativeCoreExamples} />
 
@@ -740,7 +659,9 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         <h2 style={sectionTitleStyle}>5) Helpful verb tips for beginners</h2>
         <ul style={listStyle}>
           <li>
-            <strong>Nominative focus:</strong> sein, werden (often no direct object, but a description/complement)
+            <strong>Nominative focus:</strong> sein (to be), werden (to become). Ask: is the word the subject or the
+            object? In simple nominative examples, you mostly describe the subject: <strong>Er ist groß.</strong> /{" "}
+            <strong>Das ist ein Auto.</strong>
           </li>
           <li>
             <strong>Accusative object verbs:</strong> haben, sehen, finden, kaufen, nehmen, brauchen, essen, trinken,
