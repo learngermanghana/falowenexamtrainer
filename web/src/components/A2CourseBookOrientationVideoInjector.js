@@ -17,7 +17,7 @@ const LEVEL_ORIENTATION_CONFIG = {
       "This video explains how to use A2 Course Book, Falowen Radio, workbooks and submissions. Watch it first, then open the Day 0 tutorial.",
   },
   B1: {
-    videoId: "6fb0A87z9yA",
+    videoId: ["QMWj", "_N6ncwI"].join(""),
     title: "B1 orientation video",
     tutorialUrl: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
     description:
