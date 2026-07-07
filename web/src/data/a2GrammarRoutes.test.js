@@ -6,6 +6,11 @@ import {
 } from "./a2GrammarRoutes";
 import { normalizeLesson } from "./lessonModel";
 
+const A2_DAY17_APOTHEKE_ROUTE = [
+  "/campus/course/modal-verbs-day-14-3-6?level=A2",
+  "&day=17",
+].join("");
+
 describe("A2 in-app grammar routes", () => {
   test("all configured A2 grammar routes stay inside Falowen", () => {
     expect(hasOnlyInternalA2GrammarRoutes()).toBe(true);
@@ -14,6 +19,11 @@ describe("A2 in-app grammar routes", () => {
       expect(route).toMatch(/^\/campus\/course\//);
       expect(route).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
     });
+  });
+
+  test("A2 Day 17 Apotheke uses the A2 grammar context instead of the A1 modal workbook", () => {
+    const route = getA2GrammarRoute({ day: 17, chapter: "6.17" });
+    expect(route).toBe(A2_DAY17_APOTHEKE_ROUTE);
   });
 
   test("replaces a stale Drive grammar link by day and chapter", () => {
