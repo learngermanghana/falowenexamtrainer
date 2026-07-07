@@ -18,8 +18,8 @@ const day0PathConfig = [
     match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
     level: "A2",
     video: {
-      id: "mY0ArOMOV9Y",
-      url: "https://youtu.be/mY0ArOMOV9Y",
+      id: "ORX4KELTPEQ",
+      url: "https://youtu.be/ORX4KELTPEQ",
       title: "A2 Day 0 orientation video",
       description:
         "Watch this A2 orientation video first so you understand how to use the workbook, submit assignments, check attendance, and prepare before Day 1.",
