@@ -94,7 +94,7 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         title: "B2 Day 0 · Self-learning onboarding video",
         description:
           "Watch this onboarding video before completing the B2 Day 0 self-learning orientation and readiness check.",
-        url: "https://youtu.be/Y9slpUtONkg",
+        url: "https://youtu.be/AH2dPdqjfTo",
       },
     ],
     3: [
