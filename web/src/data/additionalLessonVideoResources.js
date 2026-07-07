@@ -1,4 +1,5 @@
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
+const B1_DAY0_ORIENTATION_URL = ["https://youtu.be/QMWj", "_N6ncwI"].join("");
 
 const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
   A1: {
@@ -51,7 +52,7 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         title: "B1 Day 0 · Orientation video",
         description:
           "Watch this B1 orientation video before completing the Day 0 guide and readiness activities.",
-        url: "https://youtu.be/6fb0A87z9yA",
+        url: B1_DAY0_ORIENTATION_URL,
       },
     ],
     6: [
