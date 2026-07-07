@@ -10,7 +10,7 @@ const LEVEL_ORIENTATION_CONFIG = {
       "This video explains how to start A1, use the Course Book and complete Day 0 before the first real lesson.",
   },
   A2: {
-    videoId: "3TL_2L8RgUw",
+    videoId: "ORX4KELTPEQ",
     title: "A2 orientation video",
     tutorialUrl: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
     description:
