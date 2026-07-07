@@ -24,7 +24,7 @@ const LEVEL_ORIENTATION_CONFIG = {
       "This video explains how to continue with B1, use the Course Book, prepare speaking, write better answers and submit workbook tasks.",
   },
   B2: {
-    videoId: "Y9slpUtONkg",
+    videoId: "AH2dPdqjfTo",
     title: "B2 self-learning onboarding video",
     tutorialUrl: "/campus/course/b2-day-0-self-learning-orientation-workbook",
     description:
