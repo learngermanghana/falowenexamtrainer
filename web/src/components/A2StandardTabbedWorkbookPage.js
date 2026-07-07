@@ -42,6 +42,18 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const draftTextAreaStyle = {
+  width: "100%",
+  minHeight: 220,
+  border: "1px solid #d1d5db",
+  borderRadius: 12,
+  padding: 12,
+  fontSize: "1rem",
+  lineHeight: 1.6,
+  resize: "vertical",
+  boxSizing: "border-box",
+};
+
 const defaultImages = {
   sprechen: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=80",
   schreiben: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
@@ -91,6 +103,7 @@ const A2StandardTabbedWorkbookPage = ({
   hoerenQuestions = [],
 }) => {
   const [activeTab, setActiveTab] = useState("sprechen");
+  const [writingDraft, setWritingDraft] = useState("");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -166,11 +179,20 @@ const A2StandardTabbedWorkbookPage = ({
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               {schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}
             </p>
-            <p style={{ margin: 0, color: "#4b5563" }}>
-              Submit your final writing through the Submit tab on this workbook.
+            <p style={{ margin: 0, color: "#1d4ed8", fontWeight: 700 }}>
+              Write approximately 60–80 words, then copy your finished answer into the Submit tab.
             </p>
           </WorkbookTaskCard>
-          <CourseInlinePracticePanel type="writing" />
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <strong>Schreiben</strong>
+            <span>Type your draft here first. When it is finished, copy it to the Submit tab.</span>
+            <textarea
+              value={writingDraft}
+              onChange={(event) => setWritingDraft(event.target.value)}
+              placeholder="Liebe/r ...\n\nich schreibe, weil ..."
+              style={draftTextAreaStyle}
+            />
+          </div>
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
