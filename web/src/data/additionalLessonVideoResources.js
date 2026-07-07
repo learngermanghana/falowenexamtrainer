@@ -74,6 +74,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
       },
     ],
+    20: [
+      {
+        key: "b1-day20-ausbildung-qualifikationen-ai-video",
+        chapter: "6.20",
+        title: "B1 Day 20 · Wie wird man …? · AI video",
+        description:
+          "AI video lesson for Ausbildung, qualifications, career paths and professional opportunities.",
+        url: "https://youtu.be/g__8v0xamUI",
+      },
+    ],
   },
   B2: {
     0: [
