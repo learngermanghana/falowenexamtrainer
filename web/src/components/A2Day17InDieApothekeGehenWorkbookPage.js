@@ -1,21 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "sprechen", label: "Teil 1 · Sprechen" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+const tabs = STANDARD_WORKBOOK_TABS;
 
 const card = {
   ...styles.card,
@@ -43,7 +42,18 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
+const imageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
 
 const videoPreviewStyle = {
   width: "100%",
@@ -111,27 +121,24 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
     I prepared this part.
   </label>
+);
+
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question, index) => (
+      <div key={question.stem} style={questionCardStyle}>
+        <strong>{index + 1}. {question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={option}>{option}</span>
+        ))}
+      </div>
+    ))}
+  </div>
 );
 
 const A2Day17InDieApothekeGehenWorkbookPage = () => {
@@ -143,9 +150,8 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const setPreparedFor = (tabKey) => (event) =>
+    setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -154,20 +160,29 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 17 Workbook · In die Apotheke gehen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 17 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       <A2B1WorkbookGuidance />
@@ -178,79 +193,36 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=1600&q=80"
             alt="Pharmacist speaking with a customer in a pharmacy"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
+          <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <SpeakingMindMap config={getA2SpeakingMindMap(17)} />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            In this chapter, we practise speaking about going to the pharmacy, symptoms, medicine, prescriptions and polite questions.
+          </p>
 
           <h3 style={sectionTitle}>Ziel (Objective)</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Erstelle eine Brain Map, um folgende Themen zu behandeln: Berufe in der Apotheke, Wortschatz (Symptome &amp;
-            Medikamente), Dialog in der Apotheke, Rezepte und Regeln, Tipps &amp; Kultur.
+            Erstelle eine Brain Map zu: Berufe in der Apotheke, Symptome, Medikamente, Dialog in der Apotheke, Rezepte und Regeln.
           </p>
-
-          <h3 style={sectionTitle}>Anleitung (Instructions)</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Zentrales Thema:</strong> Schreibe in die Mitte deiner Brain Map: „Beruf: Apotheke“ oder „In die Apotheke
-              gehen“.
-            </li>
-            <li>
-              <strong>Hauptzweige (Main Branches):</strong> Zeichne fünf Hauptzweige: (1) Berufe in der Apotheke, (2) Wortschatz
-              (Symptome &amp; Medikamente), (3) Dialog in der Apotheke, (4) Rezepte und Regeln, (5) Tipps &amp; Kultur.
-            </li>
-            <li>
-              <strong>Unterzweige (Sub-Branches):</strong> Erweitere jeden Hauptzweig mit passenden Unterthemen, Wortfeldern und
-              Beispielsätzen.
-            </li>
-          </ol>
 
           <h3 style={sectionTitle}>Beispiel für die Brain Map-Struktur</h3>
           <ul style={listSpacing}>
-            <li>
-              <strong>A. Berufe in der Apotheke (Pharmacy jobs)</strong>: Apotheker/in (pharmacist), PKA, PTA;
-              Ausbildung/Aufgaben (training/tasks) like Beratung (advice), Rezeptprüfung (checking prescriptions),
-              Lager (stockroom), Bestellungen (orders), Salbenherstellung (making ointments).
-            </li>
-            <li>
-              <strong>B. Wortschatz (Symptoms &amp; medicine vocabulary)</strong>: Kopfschmerzen (headache), Halsschmerzen (sore throat), Fieber (fever), Husten (cough),
-              Medikamentenformen (medicine forms: tablets, capsules, drops, ointment, spray) and terms like rezeptfrei/rezeptpflichtig
-              (over-the-counter/prescription-only), Packungsbeilage (package leaflet), Dosierung (dosage).
-            </li>
-            <li>
-              <strong>C. Dialog in der Apotheke (Dialogue in the pharmacy)</strong>: Kund*in und Apotheker*in (customer and pharmacist) with polite phrases
-              (for example, „Darf ich Sie kurz beraten?“ = “May I advise you briefly?” / „Gute Besserung!“ = “Get well soon!”).
-            </li>
-            <li>
-              <strong>D. Rezepte und Regeln (Prescriptions and rules)</strong>: Wann braucht man ein Rezept? (When do you need a prescription?),
-              Kassenrezept vs. Privatrezept (public-insurance prescription vs. private prescription), Öffnungszeiten (opening hours),
-              Altersbeschränkungen (age restrictions), keine Selbstbedienung (no self-service).
-            </li>
-            <li>
-              <strong>E. Tipps &amp; Kultur (Tips &amp; culture)</strong>: Strenge Vorschriften in Deutschland (strict rules in Germany),
-              Apotheken-Notdienst (emergency pharmacy service), Länderunterschiede (country differences) and the polite form „Sie“ (“you,” formal).
-            </li>
+            <li><strong>Berufe:</strong> Apotheker/in, PTA, PKA, Beratung, Rezeptprüfung, Bestellungen.</li>
+            <li><strong>Symptome:</strong> Kopfschmerzen, Halsschmerzen, Fieber, Husten, Schnupfen, Bauchschmerzen.</li>
+            <li><strong>Medikamente:</strong> Tabletten, Hustensaft, Nasenspray, Salbe, Tropfen, rezeptfrei, rezeptpflichtig.</li>
+            <li><strong>Dialog:</strong> „Was fehlt Ihnen?“, „Wie oft soll ich das Medikament nehmen?“, „Gute Besserung!“</li>
+            <li><strong>Regeln:</strong> Rezept, Dosierung, Nebenwirkungen, Packungsbeilage, Apotheken-Notdienst.</li>
           </ul>
 
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sprecht außerdem über diese Leitfrage: <strong>Was kaufst du in der Apotheke und wann gehst du dorthin?</strong>
+            Leitfrage: <strong>Was kaufst du in der Apotheke und wann gehst du dorthin?</strong>
           </p>
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-            So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
           </p>
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Schnelle Struktur für 30–45 Sekunden</strong>
-            <ol style={listSpacing}>
-              <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
-              <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
-              <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
-              <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
-            </ol>
-          </div>
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>Gute Einleitungen</strong>
@@ -263,44 +235,24 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>Verbindungswörter / Connectors</strong>
               <ul style={listSpacing}>
-                <li><strong>und</strong> · „Ich fahre Bus und ich gehe zu Fuß.“</li>
-                <li><strong>oder</strong> · „Ich nehme den Zug oder den Bus.“</li>
-                <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
-                <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich finde … gut, weil …“</li>
-                <li>„Für mich ist … wichtig.“</li>
-                <li>„Meiner Meinung nach ist … praktisch.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zum Schluss kann ich sagen: …“</li>
-                <li>„Deshalb finde ich … gut.“</li>
-                <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
+                <li><strong>und</strong> · „Ich habe Husten und Halsschmerzen.“</li>
+                <li><strong>oder</strong> · „Ich kaufe Tabletten oder Hustensaft.“</li>
+                <li><strong>weil</strong> · „Ich gehe in die Apotheke, weil ich krank bin.“</li>
+                <li><strong>deshalb</strong> · „Ich habe Fieber, deshalb brauche ich Hilfe.“</li>
               </ul>
             </div>
           </div>
 
           <SpeakingPracticeTimerCard />
-
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über einen Besuch in der Apotheke. Zuerst erkläre ich mein Problem, zum Beispiel: Ich habe Kopfschmerzen oder Husten. Dann frage ich nach einem Medikament, weil ich schnell Hilfe brauche. Außerdem sage ich, ob ich Allergien habe oder andere Medikamente nehme. Zum Beispiel frage ich: Wie oft soll ich die Tabletten nehmen? Zum Schluss bedanke ich mich und lese die Packungsbeilage zu Hause.“
+              „Heute spreche ich über einen Besuch in der Apotheke. Zuerst erkläre ich mein Problem, zum Beispiel: Ich habe Kopfschmerzen oder Husten. Dann frage ich nach einem Medikament, weil ich schnell Hilfe brauche. Außerdem sage ich, ob ich Allergien habe. Zum Schluss bedanke ich mich und lese die Packungsbeilage zu Hause.“
             </p>
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
-
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -311,36 +263,24 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1600&q=80"
             alt="Learner writing an email assignment in a notebook"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
+          <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Neue Aufgabenstellung (A2-Niveau):</strong> Sie möchten ein bestimmtes Medikament kaufen und schreiben
-            deswegen einen Brief oder eine E-Mail an eine Apotheke (nicht an den Arzt).
+            <strong>Aufgabenstellung (A2-Niveau):</strong> Sie möchten ein bestimmtes Medikament kaufen und schreiben deswegen einen Brief oder eine E-Mail an eine Apotheke.
           </p>
 
           <p style={{ margin: 0 }}><strong>Write about these three points:</strong></p>
           <ol style={listSpacing}>
-            <li>
-              Beschreiben Sie kurz, warum Sie das Medikament benötigen. Beispiel: „Ich habe seit drei Tagen starke
-              Kopfschmerzen...“
-            </li>
-            <li>
-              Fragen Sie nach den Kosten und ob die Versicherung das Medikament übernimmt. Beispiel: „Wie viel kostet das
-              Medikament, und zahlt meine Versicherung einen Teil davon?“
-            </li>
-            <li>
-              Fragen Sie nach der richtigen Dosierung oder möglichen Nebenwirkungen. Beispiel: „Könnten Sie mir bitte sagen,
-              wie oft ich das Medikament einnehmen soll und ob es Nebenwirkungen gibt?“
-            </li>
+            <li>Beschreiben Sie kurz, warum Sie das Medikament benötigen.</li>
+            <li>Fragen Sie nach den Kosten und ob die Versicherung das Medikament übernimmt.</li>
+            <li>Fragen Sie nach der richtigen Dosierung oder möglichen Nebenwirkungen.</li>
           </ol>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
+            Submit your final writing through the Submit tab on this workbook.
           </p>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -352,49 +292,23 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80"
             alt="Reading exercise text on a desk with glasses"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen) · Exercise</h2>
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
           <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit section at
-            the bottom of the lesson to send your answers.
+            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.
           </p>
 
           <h3 style={sectionTitle}>Essay</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Es war ein kalter Wintermorgen, als ich entschied, in die Apotheke zu gehen. Ich fühlte mich seit Tagen krank und
-            wusste, dass ich etwas gegen meine Erkältung tun musste. Als ich in die Apotheke kam, begrüßte mich die
-            Apothekerin freundlich. Ich erklärte ihr meine Symptome: Husten, Halsschmerzen und eine laufende Nase. Sie
-            empfahl mir sofort einen Hustensaft und Tabletten gegen die Halsschmerzen. Außerdem gab sie mir noch Nasenspray,
-            das meine verstopfte Nase befreien sollte.
+            Es war ein kalter Wintermorgen, als ich entschied, in die Apotheke zu gehen. Ich fühlte mich seit Tagen krank und wusste, dass ich etwas gegen meine Erkältung tun musste. Als ich in die Apotheke kam, begrüßte mich die Apothekerin freundlich. Ich erklärte ihr meine Symptome: Husten, Halsschmerzen und eine laufende Nase. Sie empfahl mir sofort einen Hustensaft und Tabletten gegen die Halsschmerzen. Außerdem gab sie mir Nasenspray.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Während sie die Medikamente holte, erzählte sie mir von verschiedenen Hausmitteln, die ebenfalls helfen könnten.
-            Ich war beeindruckt von ihrem Wissen und ihrer Freundlichkeit. Nachdem ich bezahlt hatte, gab sie mir noch einige
-            Broschüren mit Tipps zur Gesundheit im Winter. Auf dem Heimweg fühlte ich mich schon ein bisschen besser, allein
-            durch das Wissen, gut versorgt zu sein.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Zu Hause angekommen, nahm ich sofort die empfohlenen Medikamente ein. Innerhalb weniger Stunden spürte ich eine
-            deutliche Verbesserung. Der Hustensaft beruhigte meinen Husten und die Tabletten linderten die Halsschmerzen. Auch
-            das Nasenspray war sehr wirksam. Ich war sehr dankbar für die schnelle Hilfe und den guten Rat der Apothekerin.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In den folgenden Tagen setzte ich die Behandlung fort und konnte bald wieder gesund zur Arbeit gehen. Der Besuch
-            in der Apotheke hatte sich wirklich gelohnt und ich wusste, dass ich mich in Zukunft immer auf den Rat der
-            Apotheker verlassen konnte.
+            Während sie die Medikamente holte, erzählte sie mir von verschiedenen Hausmitteln. Nachdem ich bezahlt hatte, gab sie mir noch einige Broschüren mit Tipps zur Gesundheit im Winter. Zu Hause nahm ich die empfohlenen Medikamente ein und nach einigen Stunden spürte ich eine Verbesserung.
           </p>
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <QuestionList questions={lesenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
@@ -406,11 +320,11 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1589903308904-1010c2294adc?auto=format&fit=crop&w=1600&q=80"
             alt="Listening practice with headphones and laptop"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={imageStyle}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
+          <h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0 }}>
-            Watch and listen to the video, then submit your answers in the assignment area (do not answer directly on this page).
+            Watch and listen to the video, then submit your final answer letters through the Submit tab if required by your tutor.
           </p>
           <iframe
             style={videoPreviewStyle}
@@ -421,24 +335,41 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           />
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day17InDieApothekeGehen", level: "A2", workbookId: "A2Day17InDieApothekeGehen" }} workbookId="A2Day17InDieApothekeGehen" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day17InDieApothekeGehen", level: "A2", day: 17, workbookId: "A2Day17InDieApothekeGehen" }}
+          workbookId="A2Day17InDieApothekeGehen"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Submit Workbook</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Submit your required answers for A2 Day 17 here. Include your writing text and your reading/listening answer letters if required by your tutor.
+          </p>
+          <WorkbookSubmissionReminder />
+          <div className="a2-day17-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
+            <style>{`.a2-day17-submission-page > div > section:first-child { display: none !important; }
+            .a2-day17-submission-page select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: "A2",
+                day: 17,
+                assignmentKey: "A2-6.17",
+                canonicalAssignmentKey: "A2-6.17",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
