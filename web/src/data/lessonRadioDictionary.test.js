@@ -46,6 +46,15 @@ test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the requested course video
   ),
 );
 
+test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", () =>
+  expect(getLessonRadioResource("B1", 28)).toEqual(
+    expect.objectContaining({
+      title: "Klimafreundlich leben 10.28",
+      youtubeId: ["6ksGuFsv", "_H4"].join(""),
+    }),
+  ),
+);
+
 test("B2 Day 1 radio remains available", () =>
   expect(getLessonRadioResource("B2", 1)).toEqual(
     expect.objectContaining({
