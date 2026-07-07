@@ -82,16 +82,22 @@ describe("additional B1 AI lesson videos", () => {
 });
 
 describe("Day 0 orientation videos", () => {
-  test("B1 Day 0 remains without a video until one is supplied", () => {
-    expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([]);
+  test("B1 Day 0 uses the requested orientation video", () => {
+    expect(getAdditionalLessonVideoResources("B1", 0)).toEqual([
+      expect.objectContaining({
+        chapter: "Tutorial",
+        title: "B1 Day 0 · Orientation video",
+        url: ["https://youtu.be/QMWj", "_N6ncwI"].join(""),
+      }),
+    ]);
   });
 
-  test("B2 Day 0 uses the onboarding video", () => {
+  test("B2 Day 0 uses the requested onboarding video", () => {
     expect(getAdditionalLessonVideoResources("B2", 0)).toEqual([
       expect.objectContaining({
         chapter: "Tutorial",
         title: "B2 Day 0 · Self-learning onboarding video",
-        url: "https://youtu.be/Y9slpUtONkg",
+        url: "https://youtu.be/AH2dPdqjfTo",
       }),
     ]);
   });
@@ -107,7 +113,7 @@ describe("Day 0 orientation videos", () => {
     expect(lesson.resources.aiVideo).toEqual(
       expect.objectContaining({
         chapter: "Tutorial",
-        url: "https://youtu.be/Y9slpUtONkg",
+        url: "https://youtu.be/AH2dPdqjfTo",
       }),
     );
   });
