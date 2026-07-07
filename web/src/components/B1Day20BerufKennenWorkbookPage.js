@@ -304,24 +304,6 @@ export default function B1Day20BerufKennenWorkbookPage() {
             </ul>
           </div>
 
-          <div style={questionCardStyle}>
-            <strong>Writing support template</strong>
-            <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{`Liebe Forum-Mitglieder,
-
-ich möchte meine Meinung zum Thema Ausbildung und Qualifikationen äußern.
-
-Ich stimme Felix zu / nicht ganz zu, weil …
-
-Einerseits … Andererseits …
-
-In meinem Leben / In meinem Heimatland …
-
-Zusammenfassend finde ich, dass …
-
-Mit freundlichen Grüßen
-[Ihr Name]`}</p>
-          </div>
-
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
