@@ -9,6 +9,7 @@ import SubmitPageLevelGuidanceInjector from "./SubmitPageLevelGuidanceInjector";
 import SubmitSuccessScreenInjector from "./SubmitSuccessScreenInjector";
 import CourseBookTerminologyInjector from "./CourseBookTerminologyInjector";
 import CourseCompletionExamGuidanceInjector from "./CourseCompletionExamGuidanceInjector";
+import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideoInjector";
 import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
@@ -84,6 +85,7 @@ export default function RouteScopedAppServices() {
       <SubmitSuccessScreenInjector />
       <CourseBookTerminologyInjector />
       <CourseCompletionExamGuidanceInjector />
+      <A2CourseBookOrientationVideoInjector />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
