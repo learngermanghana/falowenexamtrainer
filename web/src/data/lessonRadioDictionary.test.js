@@ -46,6 +46,15 @@ test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the requested course video
   ),
 );
 
+test.each([
+  [8, "Alles für die Gesundheit 3.8", "CXwkby4OHjM"],
+  [9, "Work-Life-Balance im modernen Arbeitsumfeld 3.9", "dpo7_xwUeWU"],
+])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
+  expect(getLessonRadioResource("B1", day)).toEqual(
+    expect.objectContaining({ title, youtubeId }),
+  ),
+);
+
 test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", () =>
   expect(getLessonRadioResource("B1", 28)).toEqual(
     expect.objectContaining({
@@ -144,7 +153,8 @@ test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", 
 test.each([
   [4, "Beziehungen und Teamarbeit", "Vl3mmytfrRk"],
   [5, "Berufliche Entwicklung", "69FO0zn9ZvA"],
-  [6, "Gesundheit und Lebensstil", "tWoSGXGiWD8"],
+  [6, "Gesundheit und Lebensstil", "Yp1usG7StS8"],
+  [8, "Wohnen und Stadtentwicklung", "z61nrz6yFgs"],
 ])("C1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("C1", day)).toEqual(
     expect.objectContaining({ title, youtubeId }),
