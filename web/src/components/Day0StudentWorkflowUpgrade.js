@@ -25,7 +25,17 @@ const day0PathConfig = [
         "Watch this A2 orientation video first so you understand how to use the workbook, submit assignments, check attendance, and prepare before Day 1.",
     },
   },
-  { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
+  {
+    match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+    level: "B1",
+    video: {
+      id: ["QMWj", "_N6ncwI"].join(""),
+      url: ["https://youtu.be/QMWj", "_N6ncwI"].join(""),
+      title: "B1 Day 0 orientation video",
+      description:
+        "Watch this B1 orientation video first so you understand the Course Book, workbook flow, stronger B1 answers and submission routine before Day 1.",
+    },
+  },
   { match: "/campus/course/b2-day-0-self-learning-orientation-workbook", level: "B2", selfLearning: true },
   { match: "/campus/course/c1-day-0-progression-workbook", level: "C1", selfLearning: true },
 ];
