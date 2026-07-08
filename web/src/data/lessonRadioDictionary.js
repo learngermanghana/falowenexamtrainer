@@ -133,6 +133,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Work-Life-Balance, Stress und moderne Arbeitswelt ein. Danach gehst du weiter zum Workbook.",
     },
+    10: {
+      key: "b1-day10-digitale-auszeit-falowen-radio",
+      title: "Digitale Auszeit 4.10",
+      youtubeId: "dpo7_xwUeWU",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf digitale Auszeit, Mediennutzung und Erholung ein. Danach gehst du weiter zum Workbook.",
+    },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
       title: "Wie wird man …? (Ausbildung und Qualifikationen) 6.20",
