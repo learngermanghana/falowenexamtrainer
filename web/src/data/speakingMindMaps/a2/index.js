@@ -14,7 +14,7 @@ const branch = (id, label, type, keywords, guidingQuestion, sentenceStarter, mod
 
 const bankAnrufenBranches = [
   branch(
-    "konto-sperren",
+    "konto-karte-sperren",
     "Konto oder Karte sperren",
     "topic",
     ["sperren", "Karte verloren", "sofort"],
@@ -61,12 +61,13 @@ const bankAnrufenBranches = [
 ];
 
 const bankAnrufenExtraHelp = {
-  title: "Bankgespräch: wichtige Sätze",
+  title: "More speaking help: Die Bank anrufen",
   instructions: [
-    "Beginne immer höflich mit Begrüßung und Grund des Anrufs.",
-    "Nenne nur die wichtigen Informationen: Name, Kundennummer oder Kontonummer, Problem und Wunsch.",
-    "Stelle eine klare Bitte mit Könnten Sie bitte ...? oder Ich möchte ...",
-    "Beende das Gespräch mit Dank und einer kurzen Bestätigung.",
+    "Beginne mit einer höflichen Begrüßung: Guten Tag, mein Name ist ...",
+    "Nenne sofort den Grund des Anrufs: Ich rufe an, weil ...",
+    "Gib wichtige Daten nur allgemein an: Kundennummer, Kontonummer, Ausweis oder Telefonnummer.",
+    "Stelle klare Bitten mit Könnten Sie bitte ...? / Ich möchte ... / Ich hätte gern ...",
+    "Beende das Gespräch mit Dank, Bestätigung und Auf Wiederhören.",
   ],
   phraseGroups: [
     {
@@ -74,8 +75,11 @@ const bankAnrufenExtraHelp = {
       items: [
         "Ich möchte meine Karte sperren lassen.",
         "Meine Bankkarte ist verloren gegangen.",
+        "Ich glaube, meine Karte wurde gestohlen.",
         "Könnten Sie mein Konto bitte vorübergehend sperren?",
         "Ist mein Geld noch sicher?",
+        "Wie bekomme ich eine neue Karte?",
+        "Wie lange dauert es, bis ich eine Ersatzkarte bekomme?",
       ],
     },
     {
@@ -83,17 +87,22 @@ const bankAnrufenExtraHelp = {
       items: [
         "Ich möchte Geld abheben.",
         "Der Geldautomat funktioniert nicht.",
+        "Meine Karte wurde am Geldautomaten nicht akzeptiert.",
         "Wie hoch ist mein Tageslimit?",
         "Kann ich am Schalter Geld abheben?",
+        "Welche Gebühren muss ich bezahlen?",
+        "Könnten Sie mein Auszahlungslimit bitte prüfen?",
       ],
     },
     {
       title: "3. Konto eröffnen",
       items: [
         "Ich möchte ein Konto eröffnen.",
-        "Welche Dokumente brauche ich?",
+        "Welche Dokumente brauche ich für die Kontoeröffnung?",
         "Brauche ich einen Ausweis oder eine Meldebescheinigung?",
-        "Könnte ich bitte einen Termin bekommen?",
+        "Kann ich das Konto online eröffnen?",
+        "Könnte ich bitte einen Termin für die Kontoeröffnung bekommen?",
+        "Gibt es ein kostenloses Konto für Studenten?",
       ],
     },
     {
@@ -101,25 +110,48 @@ const bankAnrufenExtraHelp = {
       items: [
         "Könnten Sie bitte meinen Kontostand prüfen?",
         "Ist die Überweisung angekommen?",
-        "Ich kann mich nicht im Online-Banking anmelden.",
+        "Ich habe eine Überweisung gemacht, aber das Geld ist noch nicht da.",
         "Könnten Sie mir bitte eine Bestätigung schicken?",
+        "Ich kann mich nicht im Online-Banking anmelden.",
+        "Könnten Sie mein Online-Banking bitte entsperren?",
+      ],
+    },
+    {
+      title: "5. Höfliche Rückfragen",
+      items: [
+        "Könnten Sie das bitte wiederholen?",
+        "Könnten Sie bitte etwas langsamer sprechen?",
+        "Was bedeutet das genau?",
+        "Welche Unterlagen soll ich mitbringen?",
+        "Könnten Sie mir das bitte per E-Mail schicken?",
+        "Vielen Dank für Ihre Hilfe. Auf Wiederhören.",
       ],
     },
   ],
   vocabulary: [
     "die Bankkarte",
     "das Konto",
+    "das Konto sperren",
+    "die Karte sperren lassen",
+    "die Ersatzkarte",
+    "Geld abheben",
+    "der Geldautomat",
+    "das Bargeld",
+    "das Tageslimit",
+    "das Auszahlungslimit",
+    "der Schalter",
     "der Kontostand",
     "die Überweisung",
-    "das Tageslimit",
-    "der Geldautomat",
-    "der Schalter",
+    "das Online-Banking",
+    "das Konto eröffnen",
+    "die Kontoeröffnung",
     "der Ausweis",
     "die Meldebescheinigung",
-    "die Karte sperren lassen",
+    "die Gebühren",
+    "die Bestätigung",
   ],
   modelAnswer:
-    "Guten Tag, mein Name ist Ama Mensah. Ich rufe an, weil ich meine Bankkarte verloren habe. Könnten Sie die Karte bitte sofort sperren? Außerdem möchte ich wissen, ob ich am Schalter Geld abheben kann. Ich kann meinen Ausweis mitbringen. Vielen Dank für Ihre Hilfe. Auf Wiederhören.",
+    "Guten Tag, mein Name ist Ama Mensah. Ich rufe an, weil ich meine Bankkarte verloren habe. Könnten Sie die Karte bitte sofort sperren? Außerdem möchte ich wissen, ob ich am Schalter Geld abheben kann. Wie hoch ist mein Tageslimit? Könnten Sie mir die Informationen bitte per E-Mail schicken? Vielen Dank für Ihre Hilfe. Auf Wiederhören.",
 };
 
 const topics = [
