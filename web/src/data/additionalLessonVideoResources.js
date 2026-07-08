@@ -119,6 +119,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/V6xRrkILD3M",
       },
     ],
+    8: [
+      {
+        key: "c1-day8-wohnen-stadtentwicklung-ai-video",
+        chapter: "2.3",
+        title: "C1 Day 8 · Wohnen und Stadtentwicklung · AI video",
+        description:
+          "AI video lesson for housing, urban development, living quality and city planning at C1 level.",
+        url: "https://youtu.be/z61nrz6yFgs?si=EgP3DygzLyd9w3q1",
+      },
+    ],
   },
 };
 
