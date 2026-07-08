@@ -84,24 +84,26 @@ describe("additional B1 AI lesson videos", () => {
     [21, "7.21", "B1 Day 21 · Lebensformen heute · AI video", "https://youtu.be/nCSa1JBapEs"],
     [22, "7.22", "B1 Day 22 · Was ist dir in einer Beziehung wichtig? · AI video", "https://youtu.be/D88j-22s7Ow"],
     [23, "7.23", "B1 Day 23 · Erstes Date · AI video", "https://youtu.be/z0o4AKwC2Jw"],
+    [24, "8.24", "B1 Day 24 · Konsum und Nachhaltigkeit · AI video", "https://youtu.be/IEkOJbMjngk"],
+    [25, "8.25", "B1 Day 25 · Online einkaufen – Rechte und Risiken · AI video", "https://youtu.be/wlbEusnTbj4"],
   ])("Day %i uses the requested B1 AI video", (day, chapter, title, url) => {
     expect(getAdditionalLessonVideoResources("B1", day)).toEqual([
       expect.objectContaining({ chapter, title, url }),
     ]);
   });
 
-  test("B1 Day 23 exposes the AI video through the shared lesson model", () => {
+  test("B1 Day 25 exposes the AI video through the shared lesson model", () => {
     const lesson = normalizeLesson({
       level: "B1",
-      day: 23,
-      chapter: "7.23",
-      topic: "Erstes Date",
+      day: 25,
+      chapter: "8.25",
+      topic: "Online einkaufen – Rechte und Risiken",
     });
 
     expect(lesson.resources.aiVideo).toEqual(
       expect.objectContaining({
-        chapter: "7.23",
-        url: "https://youtu.be/z0o4AKwC2Jw",
+        chapter: "8.25",
+        url: "https://youtu.be/wlbEusnTbj4",
       }),
     );
   });
