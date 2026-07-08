@@ -88,6 +88,77 @@ const getPositions = (count) =>
     };
   });
 
+const HelpList = ({ items, ordered = false }) => {
+  if (!Array.isArray(items) || !items.length) return null;
+  const Tag = ordered ? "ol" : "ul";
+  return (
+    <Tag>
+      {items.map((item, index) => (
+        <li key={`${item}-${index}`}>{item}</li>
+      ))}
+    </Tag>
+  );
+};
+
+const ExtraHelpPanel = ({ help, selectedBranch }) => {
+  if (!help) {
+    return (
+      <article className="speaking-mind-map__help-panel" aria-label="Extra speaking help">
+        <h4>Extra speaking help</h4>
+        <p>
+          Use the selected branch, sentence starter, keywords and model sentence to build a short answer.
+        </p>
+        <div className="speaking-mind-map__help-grid">
+          <div>
+            <strong>Useful words</strong>
+            <HelpList items={selectedBranch?.keywords || []} />
+          </div>
+          <div>
+            <strong>Model sentence</strong>
+            <p>{selectedBranch?.modelSentence || "Prepare one simple sentence for this part."}</p>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <article className="speaking-mind-map__help-panel" aria-label="Extra speaking help">
+      <h4>{help.title || "Extra speaking help"}</h4>
+      <HelpList items={help.instructions} ordered />
+
+      {Array.isArray(help.phraseGroups) && help.phraseGroups.length ? (
+        <div className="speaking-mind-map__help-grid">
+          {help.phraseGroups.map((group) => (
+            <div key={group.title}>
+              <strong>{group.title}</strong>
+              <HelpList items={group.items} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {Array.isArray(help.vocabulary) && help.vocabulary.length ? (
+        <div>
+          <strong>Important vocabulary</strong>
+          <div className="speaking-mind-map__keywords speaking-mind-map__keywords--large">
+            {help.vocabulary.map((word) => (
+              <span key={word}>{word}</span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {help.modelAnswer ? (
+        <div className="speaking-mind-map__model-answer">
+          <strong>Short model answer</strong>
+          <p>{help.modelAnswer}</p>
+        </div>
+      ) : null}
+    </article>
+  );
+};
+
 const SpeakingMindMap = ({ config }) => {
   const safeConfig = useMemo(() => normalizeConfig(config), [config]);
   const firstBranchId =
@@ -316,6 +387,10 @@ const SpeakingMindMap = ({ config }) => {
           </button>
           <span>Phrase bank · vocabulary · model answer · detailed instructions</span>
         </div>
+      ) : null}
+
+      {focusModeEnabled && helpOpen ? (
+        <ExtraHelpPanel help={safeConfig.extraHelp} selectedBranch={selectedBranch} />
       ) : null}
     </section>
   );
