@@ -1,5 +1,6 @@
 import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
 import { A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE } from "../data/courseBookCurriculumCorrections";
+import { getCurriculumEntriesForLevel } from "../data/lessonCatalog";
 import {
   COURSE_BOOK_ASSESSMENT_TYPES,
   COURSE_BOOK_RESOURCE_TYPES,
@@ -60,6 +61,26 @@ describe("course book task entries", () => {
     expect(entries.map((entry) => entry.topic)).toEqual([
       "German Alphabet",
       "Personal Pronouns and Verb Conjugation",
+    ]);
+  });
+
+  it("keeps generated A1 catalog cards separated by chapter and title", () => {
+    const entries = expandCourseBookEntries(getCurriculumEntriesForLevel("A1"), { level: "A1" });
+    const byDay = (day) => entries.filter((entry) => Number(entry.displayDay) === Number(day));
+
+    expect(byDay(2).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["0.2", "German Alphabet"],
+      ["1.1", "Personal Pronouns and Verb Conjugation"],
+    ]);
+
+    expect(byDay(16).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["9", "Negation"],
+      ["10", "Food"],
+    ]);
+
+    expect(byDay(18).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["12.1", "Two Case Prepositions"],
+      ["12.2", "Dative Prepositions"],
     ]);
   });
 
