@@ -18,6 +18,12 @@ const highlightStyle = {
   background: "rgba(59,130,246,0.1)",
   border: "1px solid rgba(59,130,246,0.35)",
 };
+const warningStyle = {
+  borderRadius: 12,
+  padding: 12,
+  background: "rgba(254,242,242,0.95)",
+  border: "1px solid rgba(248,113,113,0.45)",
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -94,26 +100,49 @@ const A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage = () => {
 
           <SectionCard title="4) öffnen oder eröffnen?">
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              These two verbs look similar, but they are used differently. In banking, the difference is important.
+              These two verbs look similar, but they are not the same. In a bank call, this difference is very important.
             </p>
+
             <div style={highlightStyle}>
-              <strong>öffnen = to open something physically or digitally</strong>
+              <strong>öffnen = to open something physically, digitally or by opening hours</strong>
               <ul style={listStyle}>
                 <li>Ich öffne die Tür. = I open the door.</li>
+                <li>Könnten Sie bitte die App öffnen? = Could you please open the app?</li>
                 <li>Könnten Sie bitte das Formular öffnen? = Could you please open the form?</li>
                 <li>Die Bank öffnet um 8 Uhr. = The bank opens at 8 o'clock.</li>
               </ul>
             </div>
+
             <div style={highlightStyle}>
-              <strong>eröffnen = to open/start something official</strong>
+              <strong>eröffnen = to open/start something official, new or formal</strong>
               <ul style={listStyle}>
                 <li>Ich möchte ein Konto eröffnen. = I would like to open an account.</li>
-                <li>Die Bank eröffnet eine neue Filiale. = The bank opens a new branch.</li>
                 <li>Ich habe gestern ein Sparkonto eröffnet. = I opened a savings account yesterday.</li>
+                <li>Die Bank eröffnet eine neue Filiale. = The bank opens a new branch.</li>
+                <li>Der Mitarbeiter eröffnet den Termin. = The employee opens/starts the appointment formally.</li>
               </ul>
             </div>
+
+            <div style={warningStyle}>
+              <strong>Banking rule for A2 learners</strong>
+              <ul style={listStyle}>
+                <li>
+                  Say: <strong>Ich möchte ein Konto eröffnen.</strong>
+                </li>
+                <li>
+                  Do not say: <strong>Ich möchte ein Konto öffnen.</strong>
+                </li>
+                <li>
+                  Use <strong>öffnen</strong> for a door, window, app, website, form or opening time.
+                </li>
+                <li>
+                  Use <strong>eröffnen</strong> for an official new account, branch, business, meeting or case.
+                </li>
+              </ul>
+            </div>
+
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Simple rule: use <strong>öffnen</strong> for doors, windows, apps, forms and opening hours. Use <strong>eröffnen</strong> for official new things like <strong>ein Konto</strong>, <strong>eine Filiale</strong>, <strong>ein Geschäft</strong> or <strong>eine Sitzung</strong>.
+              Noun forms: <strong>die Öffnungszeiten</strong> = opening hours, but <strong>die Kontoeröffnung</strong> = account opening.
             </p>
           </SectionCard>
 
@@ -136,6 +165,8 @@ const A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage = () => {
               <li>Choose the better sentence: A) Gib mir einen Termin. B) Könnten Sie mir bitte einen Termin geben?</li>
               <li>Ich möchte ein Konto ___. (öffnen / eröffnen)</li>
               <li>Die Bank ___ um 8 Uhr. (öffnet / eröffnet)</li>
+              <li>Könnten Sie bitte die Banking-App ___? (öffnen / eröffnen)</li>
+              <li>Die ___ dauert nur zehn Minuten. (Öffnungszeiten / Kontoeröffnung)</li>
             </ol>
 
             <button type="button" onClick={() => setShowAnswers((prev) => !prev)} style={styles.secondaryBtn}>
@@ -152,6 +183,8 @@ const A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage = () => {
                   <li>B</li>
                   <li>eröffnen</li>
                   <li>öffnet</li>
+                  <li>öffnen</li>
+                  <li>Kontoeröffnung</li>
                 </ol>
               </div>
             ) : null}
