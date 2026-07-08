@@ -145,6 +145,9 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   return mergeVideos(missingTeacherVideos, videos);
 };
 
+const removeB1TeacherVideos = (level, videos = []) =>
+  level === "B1" ? videos.filter((video) => !isTeacherVideo(video)) : videos;
+
 export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
   const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
   if (selectedChapters.size !== 1) return videos;
@@ -171,7 +174,7 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     videos: configuredVideos,
     groups,
   });
-  const videos = scopeLessonVideosToSelectedChapters(allVideos, groups);
+  const videos = scopeLessonVideosToSelectedChapters(removeB1TeacherVideos(level, allVideos), groups);
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,
