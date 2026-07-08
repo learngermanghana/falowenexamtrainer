@@ -85,6 +85,36 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/g__8v0xamUI",
       },
     ],
+    21: [
+      {
+        key: "b1-day21-lebensformen-heute-ai-video",
+        chapter: "7.21",
+        title: "B1 Day 21 · Lebensformen heute · AI video",
+        description:
+          "AI video lesson for comparing family, shared flats, single life and modern living arrangements at B1 level.",
+        url: "https://youtu.be/nCSa1JBapEs",
+      },
+    ],
+    22: [
+      {
+        key: "b1-day22-beziehung-werte-ai-video",
+        chapter: "7.22",
+        title: "B1 Day 22 · Was ist dir in einer Beziehung wichtig? · AI video",
+        description:
+          "AI video lesson for talking about trust, respect, communication and values in relationships at B1 level.",
+        url: "https://youtu.be/D88j-22s7Ow",
+      },
+    ],
+    23: [
+      {
+        key: "b1-day23-erstes-date-ai-video",
+        chapter: "7.23",
+        title: "B1 Day 23 · Erstes Date · AI video",
+        description:
+          "AI video lesson for first-date situations, polite conversation and typical relationship vocabulary at B1 level.",
+        url: "https://youtu.be/z0o4AKwC2Jw",
+      },
+    ],
   },
   B2: {
     0: [
