@@ -136,10 +136,18 @@ export const LESSON_RADIO_DICTIONARY = {
     10: {
       key: "b1-day10-digitale-auszeit-falowen-radio",
       title: "Digitale Auszeit 4.10",
-      youtubeId: "dpo7_xwUeWU",
+      youtubeId: "N9fTrnsUfJs",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf digitale Auszeit, Mediennutzung und Erholung ein. Danach gehst du weiter zum Workbook.",
+    },
+    11: {
+      key: "b1-day11-teamspiele-falowen-radio",
+      title: "Teamspiele 4.11",
+      youtubeId: "lPpQtsfyBI0",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Teamspiele, Zusammenarbeit und Kommunikation ein. Danach gehst du weiter zum Workbook.",
     },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
