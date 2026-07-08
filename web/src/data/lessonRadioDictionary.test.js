@@ -49,7 +49,8 @@ test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the requested course video
 test.each([
   [8, "Alles für die Gesundheit 3.8", "CXwkby4OHjM"],
   [9, "Work-Life-Balance im modernen Arbeitsumfeld 3.9", "dpo7_xwUeWU"],
-  [10, "Digitale Auszeit 4.10", "dpo7_xwUeWU"],
+  [10, "Digitale Auszeit 4.10", "N9fTrnsUfJs"],
+  [11, "Teamspiele 4.11", "lPpQtsfyBI0"],
   [26, "Reiseprobleme und Lösungen 9.26", "8HdiyR5I96I"],
 ])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("B1", day)).toEqual(
