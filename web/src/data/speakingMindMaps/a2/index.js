@@ -2,6 +2,126 @@ import { validateSpeakingMindMapConfig as validateMultiLevelSpeakingMindMapConfi
 import { earlyA2LessonBranchesByDay } from "./earlyLessonBranches";
 import { personenBeschreibenBranches } from "./personenBeschreiben";
 
+const branch = (id, label, type, keywords, guidingQuestion, sentenceStarter, modelSentence) => ({
+  id,
+  label,
+  type,
+  keywords,
+  guidingQuestion,
+  sentenceStarter,
+  modelSentence,
+});
+
+const bankAnrufenBranches = [
+  branch(
+    "konto-sperren",
+    "Konto oder Karte sperren",
+    "topic",
+    ["sperren", "Karte verloren", "sofort"],
+    "Warum musst du die Bank schnell anrufen?",
+    "Ich rufe an, weil ich ...",
+    "Ich rufe an, weil ich meine Bankkarte verloren habe. Könnten Sie die Karte bitte sofort sperren?",
+  ),
+  branch(
+    "geld-abheben",
+    "Geld abheben",
+    "detail",
+    ["Geldautomat", "Bargeld", "Limit"],
+    "Was möchtest du über Geldabheben fragen?",
+    "Ich möchte Geld abheben, aber ...",
+    "Ich möchte Geld abheben, aber der Geldautomat funktioniert nicht. Können Sie bitte prüfen, ob mein Konto aktiv ist?",
+  ),
+  branch(
+    "konto-eroeffnen",
+    "Konto eröffnen",
+    "example",
+    ["Konto eröffnen", "Ausweis", "Termin"],
+    "Welche Informationen brauchst du für ein neues Konto?",
+    "Ich möchte ein Konto eröffnen. Welche ...?",
+    "Ich möchte ein Konto eröffnen. Welche Dokumente brauche ich, und kann ich dafür einen Termin vereinbaren?",
+  ),
+  branch(
+    "kontostand-ueberweisung",
+    "Kontostand und Überweisung",
+    "opinion",
+    ["Kontostand", "Überweisung", "Online-Banking"],
+    "Welche Kontoinformationen brauchst du?",
+    "Könnten Sie bitte meinen ...?",
+    "Könnten Sie bitte meinen Kontostand prüfen? Ich möchte wissen, ob meine Überweisung angekommen ist.",
+  ),
+  branch(
+    "abschluss",
+    "Höflich abschließen",
+    "closing",
+    ["vielen Dank", "wiederholen", "Auf Wiederhören"],
+    "Wie beendest du das Bankgespräch höflich?",
+    "Vielen Dank für Ihre Hilfe. ...",
+    "Vielen Dank für Ihre Hilfe. Könnten Sie mir die Informationen bitte noch einmal wiederholen? Auf Wiederhören.",
+  ),
+];
+
+const bankAnrufenExtraHelp = {
+  title: "Bankgespräch: wichtige Sätze",
+  instructions: [
+    "Beginne immer höflich mit Begrüßung und Grund des Anrufs.",
+    "Nenne nur die wichtigen Informationen: Name, Kundennummer oder Kontonummer, Problem und Wunsch.",
+    "Stelle eine klare Bitte mit Könnten Sie bitte ...? oder Ich möchte ...",
+    "Beende das Gespräch mit Dank und einer kurzen Bestätigung.",
+  ],
+  phraseGroups: [
+    {
+      title: "1. Konto oder Karte sperren",
+      items: [
+        "Ich möchte meine Karte sperren lassen.",
+        "Meine Bankkarte ist verloren gegangen.",
+        "Könnten Sie mein Konto bitte vorübergehend sperren?",
+        "Ist mein Geld noch sicher?",
+      ],
+    },
+    {
+      title: "2. Geld abheben",
+      items: [
+        "Ich möchte Geld abheben.",
+        "Der Geldautomat funktioniert nicht.",
+        "Wie hoch ist mein Tageslimit?",
+        "Kann ich am Schalter Geld abheben?",
+      ],
+    },
+    {
+      title: "3. Konto eröffnen",
+      items: [
+        "Ich möchte ein Konto eröffnen.",
+        "Welche Dokumente brauche ich?",
+        "Brauche ich einen Ausweis oder eine Meldebescheinigung?",
+        "Könnte ich bitte einen Termin bekommen?",
+      ],
+    },
+    {
+      title: "4. Kontostand und Überweisung",
+      items: [
+        "Könnten Sie bitte meinen Kontostand prüfen?",
+        "Ist die Überweisung angekommen?",
+        "Ich kann mich nicht im Online-Banking anmelden.",
+        "Könnten Sie mir bitte eine Bestätigung schicken?",
+      ],
+    },
+  ],
+  vocabulary: [
+    "die Bankkarte",
+    "das Konto",
+    "der Kontostand",
+    "die Überweisung",
+    "das Tageslimit",
+    "der Geldautomat",
+    "der Schalter",
+    "der Ausweis",
+    "die Meldebescheinigung",
+    "die Karte sperren lassen",
+  ],
+  modelAnswer:
+    "Guten Tag, mein Name ist Ama Mensah. Ich rufe an, weil ich meine Bankkarte verloren habe. Könnten Sie die Karte bitte sofort sperren? Außerdem möchte ich wissen, ob ich am Schalter Geld abheben kann. Ich kann meinen Ausweis mitbringen. Vielen Dank für Ihre Hilfe. Auf Wiederhören.",
+};
+
 const topics = [
   [1, "a2-day-1-small-talk", "Small Talk", "Wie führst du ein kurzes freundliches Gespräch?", ["Begrüßung", "Kennenlernen", "Arbeit oder Studium", "Freizeit", "Gespräch beenden"], earlyA2LessonBranchesByDay[1]],
   [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"], personenBeschreibenBranches],
@@ -20,7 +140,7 @@ const topics = [
   [15, "a2-day-15-lieblingssport", "Mein Lieblingssport", "Welchen Sport magst du und warum?", ["Sportart", "Ort", "Personen", "Training", "Gefühl"]],
   [16, "a2-day-16-wohlbefinden", "Wohlbefinden und Entspannung", "Was machst du für dein Wohlbefinden?", ["Stress", "Entspannung", "Schlaf", "Bewegung", "Tipp"]],
   [17, "a2-day-17-apotheke", "In die Apotheke gehen", "Was sagst du in der Apotheke?", ["Problem", "Symptome", "Medizin", "Fragen", "Dank"]],
-  [18, "a2-day-18-bank-anrufen", "Die Bank anrufen", "Warum rufst du die Bank an?", ["Grund", "Daten", "Fragen", "Termin", "Abschluss"]],
+  [18, "a2-day-18-bank-anrufen", "Die Bank anrufen", "Warum rufst du die Bank an?", ["Grund", "Daten", "Fragen", "Termin", "Abschluss"], bankAnrufenBranches, bankAnrufenExtraHelp],
   [19, "a2-day-19-einkaufen", "Einkaufen: wo und wie?", "Wo kaufst du gern ein und warum?", ["Geschäft", "Produkte", "Preis", "Qualität", "Meinung"]],
   [20, "a2-day-20-reklamation", "Reklamationssituationen", "Wie reklamierst du ein Problem höflich?", ["Produkt", "Problem", "Wunsch", "Beleg", "Lösung"]],
   [21, "a2-day-21-wochenende", "Ein Wochenende planen", "Was planst du für das Wochenende?", ["Tag", "Aktivität", "Personen", "Ort", "Plan B"]],
@@ -45,7 +165,7 @@ const makeBranch = (label, index, title) => {
   };
 };
 
-export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels, configuredBranches]) => {
+export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQuestion, labels, configuredBranches, extraHelp]) => {
   const branches = configuredBranches || labels.map((label, index) => makeBranch(label, index, title));
   return {
     level: "A2",
@@ -55,7 +175,8 @@ export const a2SpeakingMindMaps = topics.map(([day, lessonId, title, centralQues
     title,
     centralQuestion,
     branches,
-    speakingRoute: branches.map((branch) => branch.id),
+    extraHelp,
+    speakingRoute: branches.map((branchItem) => branchItem.id),
     targetDurationSeconds: 45,
   };
 });
