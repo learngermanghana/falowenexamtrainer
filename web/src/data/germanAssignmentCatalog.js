@@ -81,9 +81,32 @@ const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false }
 export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
 export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
 
+const A1_MULTI_CHAPTER_CHILD_IDS = new Set(["A1-9", "A1-10", "A1-12.1", "A1-12.2"]);
+
+const isLevelPrefixedChildLookupWithoutDay = ({ level, assignmentId, chapter, assignmentDay }) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (normalizedLevel !== "A1") return false;
+  if (assignmentDay) return false;
+
+  const explicitAssignmentId = String(assignmentId || "").trim().toUpperCase();
+  const chapterToken = normalizeChapter(chapter);
+  if (!A1_MULTI_CHAPTER_CHILD_IDS.has(explicitAssignmentId)) return false;
+
+  return explicitAssignmentId === `A1-${chapterToken}`;
+};
+
 export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mode, assignmentDay } = {}) => {
   const normalizedLevel = normalizeLevel(level);
   if (!normalizedLevel) return null;
+
+  // A1 Day 16 and Day 18 contain two tutor-marked child assignments on one parent day.
+  // The parent schedule uses chapters like 9_10 and 12.1_12.2. During schedule normalization
+  // that parent probes the first child with a generated level-prefixed id, which previously
+  // caused both children to inherit the first assignment identity. Unprefixed child lookups
+  // still resolve normally below, so A1-9/A1-10 and A1-12.1/A1-12.2 remain submittable.
+  if (isLevelPrefixedChildLookupWithoutDay({ level: normalizedLevel, assignmentId, chapter, assignmentDay })) {
+    return null;
+  }
 
   const entries = CURRICULUM_BY_LEVEL[normalizedLevel] || [];
   const explicitAssignmentId = String(assignmentId || "").trim().toUpperCase();
