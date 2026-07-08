@@ -5,7 +5,7 @@ const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
 const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook";
 
-const b1WorkbookLessonRoute = (day) => `/campus/course/lesson/B1/${day}?view=workbook&radio=done`;
+const b1WorkbookLessonRoute = (day) => `/campus/course/lesson/B1/${day}?view=workbook`;
 
 const B1_WORKBOOK_ROUTES = {
   "1": { "*": b1WorkbookLessonRoute(1) },
