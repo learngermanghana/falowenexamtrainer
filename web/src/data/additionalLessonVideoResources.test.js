@@ -79,6 +79,32 @@ describe("additional B1 AI lesson videos", () => {
       }),
     );
   });
+
+  test.each([
+    [21, "7.21", "B1 Day 21 · Lebensformen heute · AI video", "https://youtu.be/nCSa1JBapEs"],
+    [22, "7.22", "B1 Day 22 · Was ist dir in einer Beziehung wichtig? · AI video", "https://youtu.be/D88j-22s7Ow"],
+    [23, "7.23", "B1 Day 23 · Erstes Date · AI video", "https://youtu.be/z0o4AKwC2Jw"],
+  ])("Day %i uses the requested B1 AI video", (day, chapter, title, url) => {
+    expect(getAdditionalLessonVideoResources("B1", day)).toEqual([
+      expect.objectContaining({ chapter, title, url }),
+    ]);
+  });
+
+  test("B1 Day 23 exposes the AI video through the shared lesson model", () => {
+    const lesson = normalizeLesson({
+      level: "B1",
+      day: 23,
+      chapter: "7.23",
+      topic: "Erstes Date",
+    });
+
+    expect(lesson.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "7.23",
+        url: "https://youtu.be/z0o4AKwC2Jw",
+      }),
+    );
+  });
 });
 
 describe("Day 0 orientation videos", () => {
