@@ -149,6 +149,22 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Teamspiele, Zusammenarbeit und Kommunikation ein. Danach gehst du weiter zum Workbook.",
     },
+    12: {
+      key: "b1-day12-abenteuer-natur-falowen-radio",
+      title: "Abenteuer in der Natur 4.12",
+      youtubeId: "8oISDL8kGqQ",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Natur, Abenteuer und persönliche Erlebnisse ein. Danach gehst du weiter zum Workbook.",
+    },
+    13: {
+      key: "b1-day13-filmkritik-falowen-radio",
+      title: "Eigene Filmkritik schreiben 4.13",
+      youtubeId: "WpxdZG953Xo",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Filme, Bewertungen und eine eigene Filmkritik ein. Danach gehst du weiter zum Workbook.",
+    },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
       title: "Wie wird man …? (Ausbildung und Qualifikationen) 6.20",
