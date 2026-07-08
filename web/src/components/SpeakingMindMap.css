@@ -205,7 +205,9 @@
 }
 
 .speaking-mind-map__details-grid p,
-.speaking-mind-map__model p {
+.speaking-mind-map__model p,
+.speaking-mind-map__help-panel p,
+.speaking-mind-map__model-answer p {
   margin: 6px 0 0;
   color: #334155;
   line-height: 1.55;
@@ -245,6 +247,14 @@
   font-weight: 800;
 }
 
+.speaking-mind-map__keywords--large {
+  margin-top: 8px;
+}
+
+.speaking-mind-map__keywords--large span {
+  font-size: 0.78rem;
+}
+
 .speaking-mind-map__route {
   display: flex;
   gap: 8px;
@@ -282,6 +292,41 @@
   text-align: center;
   font-weight: 800;
   font-size: 0.76rem;
+}
+
+.speaking-mind-map__help-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  background: #f0f9ff;
+}
+
+.speaking-mind-map__help-panel h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.speaking-mind-map__help-panel ul,
+.speaking-mind-map__help-panel ol {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  line-height: 1.65;
+}
+
+.speaking-mind-map__help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.speaking-mind-map__help-grid > div,
+.speaking-mind-map__model-answer {
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 11px;
+  background: #ffffff;
 }
 
 @media (max-width: 760px) {
