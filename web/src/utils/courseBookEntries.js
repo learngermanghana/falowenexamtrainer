@@ -166,6 +166,43 @@ const normalizeLessonCollection = (value, parentEntry, section, level) => {
   return value;
 };
 
+const getSingleResource = (entry = {}) => {
+  const resources = toArray(entry.resources);
+  return entry.primaryResource || (resources.length === 1 ? resources[0] : null);
+};
+
+const isGeneratedSingleResourceEntry = (rawEntry = {}, normalizedEntry = {}) => {
+  const resourceCount = Math.max(toArray(rawEntry.resources).length, toArray(normalizedEntry.resources).length);
+  return Boolean(
+    resourceCount <= 1 &&
+    getSingleResource(rawEntry) &&
+    getSingleResource(normalizedEntry) &&
+    (normalizedEntry.lessonId || normalizedEntry.courseBookId || rawEntry.lessonId || rawEntry.id)
+  );
+};
+
+const collapseSingleResourceEntry = (entry = {}) => {
+  const resource = getSingleResource(entry) || entry.primaryResource;
+  if (!resource) return entry;
+
+  const section =
+    entry.resourceSection ||
+    entry.courseBookTaskSection ||
+    resource.resourceSection ||
+    resource.courseBookTaskSection ||
+    resource.kind;
+  const readingListening = section === "lesen_hören" ? [resource] : [];
+  const writingSpeaking = section === "schreiben_sprechen" ? [resource] : [];
+
+  return {
+    ...entry,
+    resources: [resource],
+    primaryResource: resource,
+    lesen_hören: readingListening,
+    schreiben_sprechen: writingSpeaking,
+  };
+};
+
 /**
  * Converts old and new curriculum records into one stable Course Book shape.
  * Legacy aliases are retained so existing assignment and route lookups continue to work.
@@ -243,13 +280,18 @@ const getTaskTitle = (task = {}, entry = {}) =>
 
 export const expandCourseBookEntry = (entry = {}, options = {}) => {
   const normalizedEntry = normalizeCourseBookEntry(entry, options);
+  const entryLevel = getEntryLevel(normalizedEntry, {}, options.level);
+
+  if (entryLevel === "A1" && isGeneratedSingleResourceEntry(entry, normalizedEntry)) {
+    return [collapseSingleResourceEntry(normalizedEntry)];
+  }
+
   const tasks = TASK_SECTIONS.flatMap((section) =>
     toArray(normalizedEntry?.[section]).filter(Boolean).map((task) => ({ section, task }))
   );
 
   if (tasks.length <= 1) return [normalizedEntry];
 
-  const entryLevel = getEntryLevel(normalizedEntry, {}, options.level);
   const canonicalDayCards = entryLevel === "A1"
     ? A1_COURSE_BOOK_CARDS.filter(
         (card) => Number(card.displayDay) === Number(normalizedEntry.displayDay ?? normalizedEntry.day)
@@ -271,6 +313,9 @@ export const expandCourseBookEntry = (entry = {}, options = {}) => {
     return normalizeCourseBookEntry(
       {
         ...normalizedEntry,
+        id: alignedCard?.lessonId || normalizedEntry.id,
+        lessonId: alignedCard?.lessonId || normalizedEntry.lessonId,
+        courseBookId: alignedCard?.lessonId || normalizedEntry.courseBookId,
         topic: taskTitle,
         title: alignedCard?.title || task.title || task.topic || normalizedEntry.title,
         lessonTitle: taskTitle,
