@@ -72,7 +72,7 @@ const TopicImageBreak = ({ src, alt, title, subtitle }) => (
   </div>
 );
 
-const possessiveColumns = ["Person", "Before der/das words", "Before die/plural words", "English"];
+const possessiveColumns = ["Person", "Masculine / Neuter (der/das)", "Feminine / Plural (die)", "English"];
 const possessiveRows = [
   { key: "ich", cells: ["ich", "mein Tisch / mein Buch", "meine Tasche / meine Bücher", "my"] },
   { key: "du", cells: ["du", "dein Tisch / dein Buch", "deine Tasche / deine Bücher", "your"] },
@@ -443,20 +443,34 @@ const ObjectsAndColorsPage = () => {
 
       <Section title="Possessive Words: mein, meine, dein, deine">
         <SimpleTable
-          caption="A1 reference table"
+          caption="A1 nominative reference table"
           columns={possessiveColumns}
           rows={possessiveRows}
           minWidth={760}
         />
         <div style={helperBoxStyle}>
-          <strong>Simple rule</strong>
+          <strong>Simple rule: nominative first</strong>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            If the object uses <strong>der</strong> or <strong>das</strong>, start with <strong>mein/dein/sein/ihr</strong>. If the
-            object uses <strong>die</strong> or plural, add <strong>-e</strong>: <strong>meine/deine/seine/ihre</strong>.
+            Look at the noun gender or number. Do not think of this as “before” or “after” a word.
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+            <li>
+              <strong>Masculine</strong> nouns with <strong>der</strong> and <strong>neuter</strong> nouns with <strong>das</strong> use
+              the short form: <strong>mein/dein/sein/ihr</strong>.
+            </li>
+            <li>
+              <strong>Feminine</strong> nouns with <strong>die</strong> and <strong>plural</strong> nouns use <strong>-e</strong>:{" "}
+              <strong>meine/deine/seine/ihre</strong>.
+            </li>
+          </ul>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            This table is for <strong>nominative</strong> sentences like <strong>Das ist mein Tisch.</strong> In the{" "}
+            <strong>accusative</strong>, masculine changes to <strong>-en</strong>: <strong>Ich sehe meinen Tisch.</strong> Feminine,
+            neuter and plural stay the same: <strong>meine Tasche</strong>, <strong>mein Buch</strong>, <strong>meine Bücher</strong>.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             For <strong>euer/eure</strong>, the second <strong>e</strong> often disappears: <strong>euer Vater</strong>,{" "}
-            <strong>eure Mutter</strong>, <strong>euren Tisch</strong>.
+            <strong>eure Mutter</strong>. In accusative: <strong>euren Tisch</strong>.
           </p>
         </div>
       </Section>
