@@ -16,11 +16,37 @@ const keyTakeaways = [
   "Use these structures to build clear, exam-ready sentences in letters and messages.",
 ];
 
+const conjunctionColors = {
+  denn: {
+    bg: "#fff7ed",
+    soft: "#ffedd5",
+    border: "#fb923c",
+    dark: "#9a3412",
+  },
+  weil: {
+    bg: "#eff6ff",
+    soft: "#dbeafe",
+    border: "#60a5fa",
+    dark: "#1d4ed8",
+  },
+  deshalb: {
+    bg: "#f0fdf4",
+    soft: "#dcfce7",
+    border: "#4ade80",
+    dark: "#166534",
+  },
+  verb: {
+    bg: "#fef2f2",
+    border: "#ef4444",
+    dark: "#991b1b",
+  },
+};
+
 const comparisonRows = [
   {
     name: "denn",
     type: "Coordinating conjunction",
-    order: "Verb stays in position 2",
+    order: "Normal order: subject + verb",
     example: "Ich gehe nicht ins Kino, denn ich habe keine Zeit.",
   },
   {
@@ -32,7 +58,7 @@ const comparisonRows = [
   {
     name: "deshalb",
     type: "Adverb / conjunctional adverb",
-    order: "Verb stays in position 2",
+    order: "Deshalb + verb + subject",
     example: "Ich habe keine Zeit, deshalb gehe ich nicht ins Kino.",
   },
 ];
@@ -208,6 +234,191 @@ const Callout = ({ children }) => (
   </div>
 );
 
+const WordBadge = ({ type, children }) => {
+  const color = conjunctionColors[type] || conjunctionColors.denn;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        width: "fit-content",
+        borderRadius: 999,
+        border: `1px solid ${color.border}`,
+        background: color.soft,
+        color: color.dark,
+        padding: "3px 8px",
+        fontWeight: 900,
+        lineHeight: 1.15,
+      }}
+    >
+      {children}
+    </span>
+  );
+};
+
+const VerbHighlight = ({ children }) => (
+  <span
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      borderRadius: 8,
+      border: `1px solid ${conjunctionColors.verb.border}`,
+      background: conjunctionColors.verb.bg,
+      color: conjunctionColors.verb.dark,
+      padding: "2px 7px",
+      fontWeight: 900,
+      lineHeight: 1.15,
+    }}
+  >
+    {children}
+  </span>
+);
+
+const PatternChip = ({ children }) => (
+  <span
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      borderRadius: 8,
+      border: "1px solid #cbd5e1",
+      background: "#f8fafc",
+      padding: "2px 7px",
+      fontWeight: 800,
+      lineHeight: 1.15,
+    }}
+  >
+    {children}
+  </span>
+);
+
+const SentenceBox = ({ children, tone = "denn" }) => {
+  const color = conjunctionColors[tone] || conjunctionColors.denn;
+  return (
+    <div
+      style={{
+        border: `1px solid ${color.border}`,
+        background: color.bg,
+        borderRadius: 12,
+        padding: "10px 12px",
+        lineHeight: 1.8,
+        fontSize: 15,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const VerbPositionCard = ({ type, title, rule, pattern, children }) => {
+  const color = conjunctionColors[type] || conjunctionColors.denn;
+  return (
+    <article
+      style={{
+        border: `2px solid ${color.border}`,
+        background: color.bg,
+        borderRadius: 16,
+        padding: 14,
+        display: "grid",
+        gap: 10,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <WordBadge type={type}>{type}</WordBadge>
+        <strong style={{ color: color.dark }}>{title}</strong>
+      </div>
+      <p style={{ margin: 0, lineHeight: 1.6 }}>{rule}</p>
+      <div
+        style={{
+          border: "1px dashed rgba(15, 23, 42, 0.24)",
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.72)",
+          padding: "8px 10px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 6,
+          alignItems: "center",
+        }}
+      >
+        {pattern}
+      </div>
+      <SentenceBox tone={type}>{children}</SentenceBox>
+    </article>
+  );
+};
+
+const VerbPositionColorGuide = () => (
+  <Section title="Verb Position Colour Guide: denn, weil, deshalb">
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Use the colours to see the word order. The red word is the conjugated verb.
+      This is the part students must watch carefully.
+    </p>
+
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <WordBadge type="denn">denn = normal order</WordBadge>
+      <WordBadge type="weil">weil = verb at the end</WordBadge>
+      <WordBadge type="deshalb">deshalb = verb in position 2</WordBadge>
+      <VerbHighlight>conjugated verb</VerbHighlight>
+    </div>
+
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 12 }}>
+      <VerbPositionCard
+        type="denn"
+        title="No switch"
+        rule="After denn, the second clause keeps normal main-clause order. The subject comes first, then the verb."
+        pattern={
+          <>
+            <PatternChip>denn</PatternChip>
+            <PatternChip>subject</PatternChip>
+            <VerbHighlight>verb</VerbHighlight>
+          </>
+        }
+      >
+        Ich komme nicht, <WordBadge type="denn">denn</WordBadge> ich <VerbHighlight>bin</VerbHighlight> krank.
+      </VerbPositionCard>
+
+      <VerbPositionCard
+        type="weil"
+        title="Verb goes to the end"
+        rule="After weil, the conjugated verb moves to the end of the weil-clause."
+        pattern={
+          <>
+            <PatternChip>weil</PatternChip>
+            <PatternChip>subject</PatternChip>
+            <PatternChip>details</PatternChip>
+            <VerbHighlight>verb</VerbHighlight>
+          </>
+        }
+      >
+        Ich komme nicht, <WordBadge type="weil">weil</WordBadge> ich krank <VerbHighlight>bin</VerbHighlight>.
+      </VerbPositionCard>
+
+      <VerbPositionCard
+        type="deshalb"
+        title="Verb comes directly after deshalb"
+        rule="Deshalb often stands in position 1. Then the conjugated verb must come immediately after it."
+        pattern={
+          <>
+            <PatternChip>deshalb</PatternChip>
+            <VerbHighlight>verb</VerbHighlight>
+            <PatternChip>subject</PatternChip>
+          </>
+        }
+      >
+        Ich bin krank, <WordBadge type="deshalb">deshalb</WordBadge> <VerbHighlight>komme</VerbHighlight> ich nicht.
+      </VerbPositionCard>
+    </div>
+
+    <Callout>
+      <strong>Memory trick:</strong>
+      <span>
+        <WordBadge type="denn">denn</WordBadge> is calm: no change. {" "}
+        <WordBadge type="weil">weil</WordBadge> pushes the verb to the end. {" "}
+        <WordBadge type="deshalb">deshalb</WordBadge> takes position 1, so the verb jumps to position 2.
+      </span>
+    </Callout>
+  </Section>
+);
+
 const formatPrompt = (prompt) => {
   const [instruction, ...parts] = prompt.split(": ");
 
@@ -284,24 +495,24 @@ const ChallengeCard = ({ title, prompt, hint, answer, level }) => {
         )}
       </div>
 
-    <div
-      style={{
-        fontSize: 14,
-        color: "#4f5565",
-        background: "#f7f8fb",
-        borderRadius: 8,
-        padding: "8px 10px",
-      }}
-    >
-      <strong>Hint:</strong> {hint}
-    </div>
+      <div
+        style={{
+          fontSize: 14,
+          color: "#4f5565",
+          background: "#f7f8fb",
+          borderRadius: 8,
+          padding: "8px 10px",
+        }}
+      >
+        <strong>Hint:</strong> {hint}
+      </div>
 
-    <details>
-      <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-        Reveal answer
-      </summary>
-      <p style={{ margin: "8px 0 0" }}>{answer}</p>
-    </details>
+      <details>
+        <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+          Reveal answer
+        </summary>
+        <p style={{ margin: "8px 0 0" }}>{answer}</p>
+      </details>
     </div>
   );
 };
@@ -381,12 +592,19 @@ const ConjunctionNotesPage = () => {
         </p>
       </Section>
 
+      <VerbPositionColorGuide />
+
       <Section title="Conjunctions and Their Usage">
         <h3 style={{ margin: 0 }}>1. Denn (because)</h3>
         <Callout>
           <strong>Word order:</strong> Verb stays in position 2 — <em>denn</em>{" "}
           does not change normal main-clause word order.
         </Callout>
+        <SentenceBox tone="denn">
+          Pattern: Main clause + , <WordBadge type="denn">denn</WordBadge> + subject + <VerbHighlight>verb</VerbHighlight> + ...
+          <br />
+          Example: Ich schreibe dir, <WordBadge type="denn">denn</WordBadge> ich <VerbHighlight>habe</VerbHighlight> gute Nachrichten.
+        </SentenceBox>
         <BulletList
           items={[
             "Rule → Coordinating conjunction; verb order stays the same.",
@@ -402,6 +620,11 @@ const ConjunctionNotesPage = () => {
           <strong>Word order:</strong> After <em>weil</em>, the conjugated verb
           goes to the end.
         </Callout>
+        <SentenceBox tone="weil">
+          Pattern: Main clause + , <WordBadge type="weil">weil</WordBadge> + subject + details + <VerbHighlight>verb</VerbHighlight>.
+          <br />
+          Example: Ich schreibe dir, <WordBadge type="weil">weil</WordBadge> ich gute Nachrichten <VerbHighlight>habe</VerbHighlight>.
+        </SentenceBox>
         <BulletList
           items={[
             "Rule → Subordinating conjunction; the conjugated verb moves to the end.",
@@ -417,6 +640,11 @@ const ConjunctionNotesPage = () => {
           <strong>Word order:</strong> If <em>deshalb</em> is in the first
           position, the conjugated verb stays in position 2.
         </Callout>
+        <SentenceBox tone="deshalb">
+          Pattern: Main clause + , <WordBadge type="deshalb">deshalb</WordBadge> + <VerbHighlight>verb</VerbHighlight> + subject + ...
+          <br />
+          Example: Ich habe gute Nachrichten, <WordBadge type="deshalb">deshalb</WordBadge> <VerbHighlight>schreibe</VerbHighlight> ich dir.
+        </SentenceBox>
         <BulletList
           items={[
             "Rule → Adverb / conjunctional adverb; it connects ideas across clauses.",
@@ -443,6 +671,11 @@ const ConjunctionNotesPage = () => {
           <br />
           • With modals, the main verb usually stays in infinitive form.
         </Callout>
+        <SentenceBox tone="weil">
+          With modal verbs, the modal is the conjugated verb. In a <WordBadge type="weil">weil</WordBadge>-clause, the modal goes to the end:
+          <br />
+          Ich lerne heute, <WordBadge type="weil">weil</WordBadge> ich morgen eine Prüfung bestehen <VerbHighlight>möchte</VerbHighlight>.
+        </SentenceBox>
         <BulletList
           items={[
             "Without modal (main verb conjugated) → Ich lerne heute, weil ich morgen eine Prüfung habe.",
@@ -486,10 +719,20 @@ const ConjunctionNotesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {comparisonRows.map((row) => (
-                <tr key={row.name}>
-                  {[row.name, row.type, row.order, row.example].map(
-                    (cell, index) => (
+              {comparisonRows.map((row) => {
+                const color = conjunctionColors[row.name] || conjunctionColors.denn;
+                return (
+                  <tr key={row.name} style={{ background: color.bg }}>
+                    <td
+                      style={{
+                        padding: "8px 10px",
+                        borderBottom: "1px solid #e6e8ef",
+                        verticalAlign: "top",
+                      }}
+                    >
+                      <WordBadge type={row.name}>{row.name}</WordBadge>
+                    </td>
+                    {[row.type, row.order, row.example].map((cell, index) => (
                       <td
                         key={`${row.name}-${index}`}
                         style={{
@@ -500,10 +743,10 @@ const ConjunctionNotesPage = () => {
                       >
                         {cell}
                       </td>
-                    )
-                  )}
-                </tr>
-              ))}
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -540,7 +783,6 @@ const ConjunctionNotesPage = () => {
       </Section>
 
       <Section title="Final Revision: Sentence Formulation Check">
-        {/* UPDATED TEXT (your requested replacement) */}
         <p style={{ margin: 0 }}>
           Congratulations on completing the course! If you’re preparing for the A1
           exams, head to the Exam Room and make a clear plan for what to practise
