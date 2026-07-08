@@ -145,8 +145,15 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   return mergeVideos(missingTeacherVideos, videos);
 };
 
-const removeB1TeacherVideos = (level, videos = []) =>
-  level === "B1" ? videos.filter((video) => !isTeacherVideo(video)) : videos;
+const shouldKeepTeacherVideo = ({ level, day, video }) => {
+  if (!isTeacherVideo(video)) return true;
+  if (level === "B1") return false;
+  if (level === "A2") return Number(day) === 16;
+  return true;
+};
+
+const removeHiddenTeacherVideos = (level, day, videos = []) =>
+  videos.filter((video) => shouldKeepTeacherVideo({ level, day, video }));
 
 export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) => {
   const selectedChapters = new Set(groups.map((group) => chapterKey(group?.chapter)).filter(Boolean));
@@ -174,7 +181,7 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     videos: configuredVideos,
     groups,
   });
-  const videos = scopeLessonVideosToSelectedChapters(removeB1TeacherVideos(level, allVideos), groups);
+  const videos = scopeLessonVideosToSelectedChapters(removeHiddenTeacherVideos(level, day, allVideos), groups);
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,
