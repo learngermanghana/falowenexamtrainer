@@ -51,6 +51,8 @@ test.each([
   [9, "Work-Life-Balance im modernen Arbeitsumfeld 3.9", "dpo7_xwUeWU"],
   [10, "Digitale Auszeit 4.10", "N9fTrnsUfJs"],
   [11, "Teamspiele 4.11", "lPpQtsfyBI0"],
+  [12, "Abenteuer in der Natur 4.12", "8oISDL8kGqQ"],
+  [13, "Eigene Filmkritik schreiben 4.13", "WpxdZG953Xo"],
   [26, "Reiseprobleme und Lösungen 9.26", "8HdiyR5I96I"],
 ])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("B1", day)).toEqual(
