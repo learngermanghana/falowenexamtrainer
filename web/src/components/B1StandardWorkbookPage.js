@@ -52,6 +52,34 @@ const videoStyle = {
   borderRadius: 10,
 };
 
+const REMOVED_B1_TEACHER_VIDEO_IDS = new Set([
+  "iyydRu3oY4I",
+  "zzPpGxzvJCY",
+  "0sZVT9XAEBc",
+  "jzm-MnWC7I0",
+  "IGIxBJA222o",
+]);
+
+const extractYouTubeId = (url = "") => {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  const shortMatch = value.match(/youtu\.be\/([^?&#/]+)/i);
+  if (shortMatch?.[1]) return shortMatch[1];
+  const watchMatch = value.match(/[?&]v=([^?&#/]+)/i);
+  if (watchMatch?.[1]) return watchMatch[1];
+  const embedMatch = value.match(/\/embed\/([^?&#/]+)/i);
+  return embedMatch?.[1] || "";
+};
+
+const isRemovedB1TeacherVideo = (listening = {}) => {
+  const ids = [
+    listening.videoId,
+    extractYouTubeId(listening.externalUrl),
+    extractYouTubeId(listening.embedUrl),
+  ].filter(Boolean);
+  return ids.some((id) => REMOVED_B1_TEACHER_VIDEO_IDS.has(id));
+};
+
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -140,6 +168,7 @@ const PlaceholderCard = ({ title, text }) => (
 );
 
 const getYouTubeEmbedUrl = (listening = {}) => {
+  if (isRemovedB1TeacherVideo(listening)) return null;
   if (listening.embedUrl) return listening.embedUrl;
   if (!listening.videoId) return null;
   return `https://www.youtube-nocookie.com/embed/${listening.videoId}?rel=0&playsinline=1`;
@@ -371,7 +400,7 @@ export default function B1StandardWorkbookPage({ config }) {
           ) : (
             <PlaceholderCard
               title="Listening media missing"
-              text="The questions are ready, but the listening resource link has not been added yet."
+              text="The old B1 teacher/listening video link has been removed. Add a new video link when the replacement is ready."
             />
           )}
 
