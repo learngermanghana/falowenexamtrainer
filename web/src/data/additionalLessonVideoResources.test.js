@@ -147,6 +147,34 @@ describe("additional B2 AI grammar videos", () => {
   });
 });
 
+describe("additional C1 AI lesson videos", () => {
+  test("Day 8 uses the requested Wohnen und Stadtentwicklung AI video", () => {
+    expect(getAdditionalLessonVideoResources("C1", 8)).toEqual([
+      expect.objectContaining({
+        chapter: "2.3",
+        title: "C1 Day 8 · Wohnen und Stadtentwicklung · AI video",
+        url: "https://youtu.be/z61nrz6yFgs?si=EgP3DygzLyd9w3q1",
+      }),
+    ]);
+  });
+
+  test("C1 Day 8 exposes the AI video through the shared lesson model", () => {
+    const lesson = normalizeLesson({
+      level: "C1",
+      day: 8,
+      chapter: "2.3",
+      title: "Wohnen und Stadtentwicklung",
+    });
+
+    expect(lesson.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "2.3",
+        url: "https://youtu.be/z61nrz6yFgs?si=EgP3DygzLyd9w3q1",
+      }),
+    );
+  });
+});
+
 describe("A1 AI lesson video overrides", () => {
   const dictionary = applyA1LessonVideoResourceOverrides({});
 
