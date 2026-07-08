@@ -82,7 +82,7 @@ import { normalizeLesson } from "./lessonModel";
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
-  test("B1 Days 20 to 28 open the in-app standard workbook route", () => {
+  test("B1 Days 20 to 28 open the in-app standard workbook route without skipping radio", () => {
     for (let day = 20; day <= 28; day += 1) {
       const lesson = {
         day,
@@ -94,13 +94,11 @@ import { normalizeLesson } from "./lessonModel";
 
       applyB1LessonResourceOverride(lesson, day);
       const normalized = normalizeLesson(lesson, "B1");
-
-      const expectedWorkbook = [21, 22].includes(day)
-        ? `/campus/course/lesson/B1/${day}?view=workbook&radio=done`
-        : `/campus/course/lesson/B1/${day}?view=workbook`;
+      const expectedWorkbook = `/campus/course/lesson/B1/${day}?view=workbook`;
 
       expect(getB1LessonResourceOverride(day).workbook).toBe(expectedWorkbook);
       expect(normalized.resources.workbook.url).toBe(expectedWorkbook);
+      expect(normalized.resources.workbook.url).not.toContain("radio=done");
       expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
     }
   });
