@@ -115,6 +115,26 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/z0o4AKwC2Jw",
       },
     ],
+    24: [
+      {
+        key: "b1-day24-konsum-nachhaltigkeit-ai-video",
+        chapter: "8.24",
+        title: "B1 Day 24 · Konsum und Nachhaltigkeit · AI video",
+        description:
+          "AI video lesson for discussing sustainable consumption, environmental responsibility and everyday choices at B1 level.",
+        url: "https://youtu.be/IEkOJbMjngk",
+      },
+    ],
+    25: [
+      {
+        key: "b1-day25-online-shopping-rights-risks-ai-video",
+        chapter: "8.25",
+        title: "B1 Day 25 · Online einkaufen – Rechte und Risiken · AI video",
+        description:
+          "AI video lesson for online shopping, consumer rights, complaints, returns and safe purchasing at B1 level.",
+        url: "https://youtu.be/wlbEusnTbj4",
+      },
+    ],
   },
   B2: {
     0: [
