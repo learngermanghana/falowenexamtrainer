@@ -179,8 +179,8 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
             <p style={{ margin: 0 }}>Read the questions before listening. Pay attention to support, shared experiences, honesty, success and forgiveness.</p>
           </WorkbookTaskCard>
           <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80" alt="Listening exercise about friendship" loading="lazy" style={tabImageStyle} />
-          <p style={{ margin: 0 }}>Audio – <a href="https://drive.google.com/file/d/1Xfaxwgg2dCZmPGduDl_Amhasi6t8HbxO/view?usp=sharing" target="_blank" rel="noreferrer">Open listening audio</a></p>
-          <iframe title="Listening exercise" src="https://drive.google.com/file/d/1Xfaxwgg2dCZmPGduDl_Amhasi6t8HbxO/preview" allow="autoplay" style={audioPreviewStyle} />
+          <p style={{ margin: 0 }}>Hören – <a href="https://youtu.be/t0lMjkXSQdA" target="_blank" rel="noreferrer">Open listening video</a></p>
+          <iframe title="Listening exercise" src="https://www.youtube.com/embed/t0lMjkXSQdA" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={audioPreviewStyle} />
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
