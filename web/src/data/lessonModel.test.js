@@ -101,14 +101,28 @@ describe("canonical lesson model", () => {
       { chapter: "1", grammarBook: { url: "grammar-b" }, workbook: { url: "workbook-b" } },
     ])).toHaveLength(2);
   });
-  test("uses an explicit AI video instead of a generic A2 fallback", () => {
+  test("uses an explicit AI video instead of a generic A2 teacher fallback", () => {
     const lesson = normalizeA2B1Lesson({ day: 8, video: "generic", ai_video: "explicit-ai" }, "A2");
     expect(lesson.resources.videos.map(({ url }) => url)).toEqual(["explicit-ai"]);
+    expect(lesson.resources.teacherVideo).toBeNull();
     expect(lesson.resources.aiVideo.url).toBe("explicit-ai");
   });
-  test("promotes a generic A2 video to the canonical AI fallback", () => {
-    const lesson = normalizeA2B1Lesson({ day: 23, video: "generic" }, "A2");
-    expect(lesson.resources.aiVideo).toEqual(expect.objectContaining({ url: "generic" }));
+  test("removes generic A2 teacher videos outside day 16", () => {
+    const lesson = normalizeA2B1Lesson({ day: 23, video: "generic-teacher" }, "A2");
+    expect(lesson.resources.teacherVideo).toBeNull();
+    expect(lesson.resources.aiVideo).toBeNull();
+    expect(lesson.resources.videos).toEqual([]);
+  });
+  test("keeps the correct A2 Day 16 teacher video and AI video", () => {
+    const lesson = normalizeA2B1Lesson({ day: 16, chapter: "6.16" }, "A2");
+    expect(lesson.resources.teacherVideo).toEqual(expect.objectContaining({
+      title: "Teacher lecture video",
+      url: "https://youtu.be/t_9HDdZbbEA",
+    }));
+    expect(lesson.resources.aiVideo).toEqual(expect.objectContaining({
+      title: "AI grammar video",
+      url: "https://youtu.be/Yt_vBwfoDBk?si=mg5pzqUvaGMZZtyR",
+    }));
   });
   test("shows only the Alphabet AI video on the Kapitel 0.2 page", () => {
     expect(scopeLessonVideosToSelectedChapters(chapterVideos, [{ chapter: "0.2" }])).toEqual([
