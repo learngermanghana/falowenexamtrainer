@@ -78,8 +78,8 @@
     "3": { "*": "/campus/course/lesson/B1/3?view=workbook" },
     "4": { "*": "/campus/course/b1-day-4-wohnung-suchen-workbook" },
     "9": { "*": "/campus/course/lesson/B1/9?view=workbook" },
-    "20": { "*": "/campus/course/lesson/B1/20?view=workbook&radio=done" },
-    "21": { "*": "/campus/course/lesson/B1/21?view=workbook&radio=done" },
-    "22": { "*": "/campus/course/lesson/B1/22?view=workbook&radio=done" }
+    "20": { "*": "/campus/course/lesson/B1/20?view=workbook" },
+    "21": { "*": "/campus/course/lesson/B1/21?view=workbook" },
+    "22": { "*": "/campus/course/lesson/B1/22?view=workbook" }
   }
 }
