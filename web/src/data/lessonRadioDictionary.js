@@ -165,6 +165,38 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Filme, Bewertungen und eine eigene Filmkritik ein. Danach gehst du weiter zum Workbook.",
     },
+    14: {
+      key: "b1-day14-traditionelles-digitales-lernen-falowen-radio",
+      title: "Traditionelles vs. digitales Lernen 5.14",
+      youtubeId: "NS58BIySjx8",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf traditionelles und digitales Lernen ein. Danach gehst du weiter zum Workbook.",
+    },
+    15: {
+      key: "b1-day15-medien-homeoffice-falowen-radio",
+      title: "Medien und Arbeiten im Homeoffice 5.15",
+      youtubeId: "VhS1sIckFpU",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Medien, Homeoffice und modernes Arbeiten ein. Danach gehst du weiter zum Workbook.",
+    },
+    16: {
+      key: "b1-day16-pruefungsangst-stressbewaeltigung-falowen-radio",
+      title: "Prüfungsangst und Stressbewältigung 5.16",
+      youtubeId: "dQMaaYXqMWI",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Prüfungsangst, Stress und Bewältigungsstrategien ein. Danach gehst du weiter zum Workbook.",
+    },
+    17: {
+      key: "b1-day17-wie-lernt-man-am-besten-falowen-radio",
+      title: "Wie lernt man am besten? 5.17",
+      youtubeId: "7jbMA-e-jeE",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Lernmethoden und gute Lernstrategien ein. Danach gehst du weiter zum Workbook.",
+    },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
       title: "Wie wird man …? (Ausbildung und Qualifikationen) 6.20",
