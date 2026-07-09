@@ -5,6 +5,27 @@ import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { styles } from "../styles";
 
+export const A1_TUTOR_MARKED_ASSIGNMENT_CHAPTERS = [
+  "0.1",
+  "0.2",
+  "1.1",
+  "1.2",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12.1",
+  "12.2",
+  "13",
+  "14",
+];
+
 const shellCard = {
   ...styles.card,
   display: "grid",
@@ -21,6 +42,13 @@ const buildSubmitClassName = (level, day, chapter) =>
   `a1-tutor-marked-submit-${String(level || "a1").toLowerCase()}-${String(day || "day").replace(/[^a-z0-9]/gi, "-")}-${String(
     chapter || "chapter"
   ).replace(/[^a-z0-9]/gi, "-")}`;
+
+const normalizeFallbackAssignmentKey = (level, value) => {
+  const normalizedLevel = String(level || "A1").trim().toUpperCase();
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  return new RegExp(`^${normalizedLevel}-`, "i").test(raw) ? raw.toUpperCase() : `${normalizedLevel}-${raw}`;
+};
 
 const A1TutorMarkedWorkbookShell = ({
   level = "A1",
@@ -45,7 +73,11 @@ const A1TutorMarkedWorkbookShell = ({
     const assignment = getInlineCourseAssignments(normalizedLevel, day).find(
       (item) => String(item.chapter || "").trim() === String(chapter || "").trim()
     );
-    return assignment?.assignmentKey || fallbackAssignmentKey || `${normalizedLevel}-${chapter || day}`;
+    return (
+      assignment?.assignmentKey ||
+      normalizeFallbackAssignmentKey(normalizedLevel, fallbackAssignmentKey) ||
+      normalizeFallbackAssignmentKey(normalizedLevel, chapter || day)
+    );
   }, [chapter, day, fallbackAssignmentKey, normalizedLevel]);
 
   useEffect(() => {
