@@ -100,6 +100,7 @@ const A2StandardTabbedWorkbookPage = ({
   lesenText,
   lesenQuestions = [],
   hoerenTask,
+  hoerenAudioUrl,
   hoerenQuestions = [],
 }) => {
   const [activeTab, setActiveTab] = useState("sprechen");
@@ -205,7 +206,7 @@ const A2StandardTabbedWorkbookPage = ({
           <p style={{ margin: 0 }}>
             Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.
           </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>
             {lesenText || "Read a short A2 text about the lesson topic. Identify the main idea, important details and the correct answer letters."}
           </p>
           <QuestionList questions={lesenQuestions} />
@@ -221,6 +222,11 @@ const A2StandardTabbedWorkbookPage = ({
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             {hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor."}
           </p>
+          {hoerenAudioUrl ? (
+            <a href={hoerenAudioUrl} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
+              Open listening audio
+            </a>
+          ) : null}
           <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
