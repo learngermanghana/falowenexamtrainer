@@ -208,30 +208,49 @@ function dedupeSessions(sessions = [], canonicalClassId = "") {
   return [...byMoment.values()].sort((a, b) => sessionTime(a, "startsAt") - sessionTime(b, "startsAt"));
 }
 
+function sessionWithinOfficialClassDates(session = {}, klass = {}) {
+  const startsAt = sessionTime(session, "startsAt");
+  if (!startsAt) return true;
+
+  const startMs = classDateMillis(klass.startDate);
+  const endMs = classDateMillis(klass.endDate, true);
+  if (startMs > 0 && startsAt < startMs) return false;
+  if (endMs > 0 && startsAt > endMs) return false;
+  return true;
+}
+
+function officialClassEndMs(klass = {}) {
+  return classDateMillis(klass.endDate, true);
+}
+
 export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfile = null, now = new Date() }) {
   const nowMs = now.getTime();
   const ordered = dedupeSessions(sessions, klass?.id);
-  const nonCancelled = ordered.filter((session) => normalize(session.status) !== CANCELLED);
+  const officialSessions = ordered.filter((session) => sessionWithinOfficialClassDates(session, klass));
+  const hiddenOutOfDateRangeSessionCount = ordered.length - officialSessions.length;
+  const nonCancelled = officialSessions.filter((session) => normalize(session.status) !== CANCELLED);
   const elapsed = nonCancelled.filter((session) => {
     if (normalize(session.status) === COMPLETED) return true;
     const endsAt = sessionTime(session, "endsAt");
     return endsAt > 0 && endsAt < nowMs;
   });
-  const nextSession = nonCancelled.find((session) => {
+  const endMs = officialClassEndMs(klass);
+  const classEnded = endMs > 0 && nowMs > endMs;
+  const nextSession = classEnded ? null : nonCancelled.find((session) => {
     const startsAt = sessionTime(session, "startsAt");
     const endsAt = sessionTime(session, "endsAt");
     return normalize(session.status) === "live" || startsAt >= nowMs || endsAt >= nowMs;
   }) || null;
   const latestCompletedSession = [...elapsed]
     .sort((a, b) => sessionTime(b, "startsAt") - sessionTime(a, "startsAt"))[0] || null;
-  const cancelledSessions = ordered
+  const cancelledSessions = officialSessions
     .filter((session) => normalize(session.status) === CANCELLED)
     .sort((a, b) => sessionTime(b, "startsAt") - sessionTime(a, "startsAt"));
   const progress = calculateTimelineProgress(klass, nonCancelled, now);
 
   return {
     klass,
-    sessions: ordered,
+    sessions: officialSessions,
     nextSession,
     latestCompletedSession,
     cancelledSessions,
@@ -239,7 +258,10 @@ export function buildCanonicalLiveClassSummary({ klass, sessions = [], zoomProfi
     progressMode: klass?.startDate && klass?.endDate ? "timeline" : "sessions",
     completedCount: elapsed.length,
     totalCount: nonCancelled.length,
+    classEnded,
+    classEndedAt: klass?.endDate || null,
     hiddenUnmappedSessionCount: 0,
+    hiddenOutOfDateRangeSessionCount,
     zoom: resolveZoomDetails(zoomProfile, klass),
   };
 }
