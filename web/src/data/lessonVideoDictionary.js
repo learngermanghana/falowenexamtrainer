@@ -1,3 +1,8 @@
+import {
+  getTeacherLectureVideoResources,
+  hasTeacherLectureVideoResources,
+} from "./teacherLectureVideoResources";
+
 const normalizeLevel = (level = "") =>
   String(level || "")
     .trim()
@@ -5,8 +10,9 @@ const normalizeLevel = (level = "") =>
 
 export const shouldShowTeacherLectureVideo = (level, day) => {
   const normalizedLevel = normalizeLevel(level);
-  if (normalizedLevel === "A2") return Number(day) === 16;
-  if (normalizedLevel === "B1") return false;
+  if (["A2", "B1"].includes(normalizedLevel)) {
+    return hasTeacherLectureVideoResources(normalizedLevel, day);
+  }
   return ["A1", "B2", "C1"].includes(normalizedLevel);
 };
 
@@ -222,13 +228,6 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
     16: {
       videoResources: [
-        {
-          key: "a2-day16-teacher-lecture",
-          chapter: "6.16",
-          title: "Teacher lecture video",
-          description: "Recorded teacher lecture for A2 Day 16 Wohlbefinden und Entspannung.",
-          url: "https://youtu.be/t_9HDdZbbEA",
-        },
         {
           key: "a2-day16-ai-grammar-video",
           chapter: "6.16",
@@ -477,6 +476,7 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);
 
+  const configuredTeacherVideos = getTeacherLectureVideoResources(normalizedLevel, dayKey);
   const explicitResources = entries.flatMap((resource) =>
     normalizeVideoResources(resource),
   );
@@ -489,6 +489,7 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     ? genericLessonVideos.filter((resource) => !isTeacherVideoResource(resource))
     : genericLessonVideos;
   const allResources = uniqueVideoResources(
+    configuredTeacherVideos,
     fallbackGenericLessonVideos,
     explicitResources,
     dictionaryResources,
