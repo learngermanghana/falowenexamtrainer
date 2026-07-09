@@ -63,6 +63,47 @@ describe("buildCanonicalLiveClassSummary", () => {
     expect(summary.progress).toBe(50);
   });
 
+  test("marks a class as ended and hides sessions outside the official end date", () => {
+    const summary = buildCanonicalLiveClassSummary({
+      klass: {
+        id: "a1-koln-current",
+        name: "A1 Koln Klasse",
+        startDate: "2026-05-13",
+        endDate: "2026-07-08",
+      },
+      now: new Date("2026-07-09T10:00:00.000Z"),
+      sessions: [
+        {
+          id: "last-official-session",
+          classId: "a1-koln-current",
+          classRecordId: "a1-koln-current",
+          className: "A1 Koln Klasse",
+          status: "scheduled",
+          topic: "Day 24: Conjunctions and Basic Sentence Structure",
+          startsAt: new Date("2026-07-08T18:00:00.000Z"),
+          endsAt: new Date("2026-07-08T19:00:00.000Z"),
+        },
+        {
+          id: "wrong-future-session",
+          classId: "a1-koln-current",
+          classRecordId: "a1-koln-current",
+          className: "A1 Koln Klasse",
+          status: "scheduled",
+          topic: "Day 20: Introduction to Letter Writing",
+          startsAt: new Date("2026-07-13T16:00:00.000Z"),
+          endsAt: new Date("2026-07-13T19:00:00.000Z"),
+        },
+      ],
+    });
+
+    expect(summary.classEnded).toBe(true);
+    expect(summary.classEndedAt).toBe("2026-07-08");
+    expect(summary.progress).toBe(100);
+    expect(summary.nextSession).toBeNull();
+    expect(summary.sessions.map((session) => session.id)).toEqual(["last-official-session"]);
+    expect(summary.hiddenOutOfDateRangeSessionCount).toBe(1);
+  });
+
   test("uses the class Zoom details when a profile is unavailable", () => {
     const summary = buildCanonicalLiveClassSummary({
       klass: { ...klass, zoomUrl: "https://zoom.example/class", meetingId: "123", passcode: "abc" },
