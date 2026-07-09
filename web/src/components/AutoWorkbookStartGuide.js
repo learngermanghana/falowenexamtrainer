@@ -91,12 +91,41 @@ const findGrammarWorkbookTarget = ({ pathname = "", search = "" }) => {
   };
 };
 
-const GrammarBackToWorkbookCard = ({ target }) => {
-  if (!target?.workbookUrl) return null;
-
-  const lessonLabel = [target.level, `Day ${target.day}`, target.chapter ? `Kapitel ${target.chapter}` : ""]
+const getLessonLabel = (target) =>
+  [target?.level, target?.day ? `Day ${target.day}` : "", target?.chapter ? `Kapitel ${target.chapter}` : ""]
     .filter(Boolean)
     .join(" · ");
+
+const GrammarReturnActions = ({ target, compact = false }) => {
+  if (!target?.workbookUrl) return null;
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+      <a
+        href={target.workbookUrl}
+        style={{
+          ...styles.primaryButton,
+          textDecoration: "none",
+          width: compact ? "auto" : "fit-content",
+          minHeight: compact ? 36 : undefined,
+          padding: compact ? "9px 14px" : undefined,
+          fontWeight: 900,
+        }}
+      >
+        Back to workbook ›
+      </a>
+      {!compact ? (
+        <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}>
+          Back to Course Book
+        </a>
+      ) : null}
+    </div>
+  );
+};
+
+const GrammarBackToWorkbookCard = ({ target }) => {
+  if (!target?.workbookUrl) return null;
+  const lessonLabel = getLessonLabel(target);
 
   return (
     <section
@@ -105,28 +134,61 @@ const GrammarBackToWorkbookCard = ({ target }) => {
         ...styles.card,
         margin: "18px auto 0",
         display: "grid",
-        gap: 10,
-        border: "1px solid #bfdbfe",
-        background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 72%)",
+        gap: 12,
+        border: "2px solid #2563eb",
+        background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 72%)",
         width: "min(100%, 960px)",
         boxSizing: "border-box",
+        boxShadow: "0 14px 34px rgba(37, 99, 235, 0.16)",
       }}
     >
       <div style={{ display: "grid", gap: 4 }}>
-        <strong>Finished the grammar?</strong>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+        <strong style={{ fontSize: "1.08rem" }}>Finished the grammar? Return to the workbook</strong>
+        <p style={{ margin: 0, color: "#334155", lineHeight: 1.6 }}>
           Go straight back to the workbook for {lessonLabel}. You do not need to return to the Course Book first.
         </p>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <a href={target.workbookUrl} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
-          Back to workbook ›
-        </a>
-        <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}>
-          Back to Course Book
-        </a>
-      </div>
+      <GrammarReturnActions target={target} />
     </section>
+  );
+};
+
+const GrammarStickyWorkbookBar = ({ target }) => {
+  if (!target?.workbookUrl) return null;
+  const lessonLabel = getLessonLabel(target);
+
+  return (
+    <div
+      data-grammar-back-to-workbook-sticky="true"
+      style={{
+        position: "fixed",
+        left: "50%",
+        bottom: 14,
+        transform: "translateX(-50%)",
+        zIndex: 80,
+        width: "min(94vw, 760px)",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 10,
+        padding: "10px 12px",
+        border: "1px solid #bfdbfe",
+        borderRadius: 18,
+        background: "rgba(255, 255, 255, 0.96)",
+        boxShadow: "0 18px 42px rgba(15, 23, 42, 0.18)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <div style={{ display: "grid", gap: 2, minWidth: 0 }}>
+        <strong style={{ fontSize: ".9rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          Grammar page
+        </strong>
+        <span style={{ color: "#475569", fontSize: ".78rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {lessonLabel}
+        </span>
+      </div>
+      <GrammarReturnActions target={target} compact />
+    </div>
   );
 };
 
@@ -163,7 +225,7 @@ const AutoWorkbookStartGuide = () => {
     const host = document.createElement("div");
     host.setAttribute(GRAMMAR_BACK_HOST_ATTR, "true");
     host.style.display = "grid";
-    host.style.padding = "0 16px 16px";
+    host.style.padding = "0 16px 88px";
     host.style.boxSizing = "border-box";
     main.appendChild(host);
     setGrammarBackHost(host);
@@ -219,9 +281,12 @@ const AutoWorkbookStartGuide = () => {
     };
   }, [normalizedPathname, search, shouldRenderGuide]);
 
-  const grammarBackCard = grammarBackHost && grammarWorkbookTarget
-    ? createPortal(<GrammarBackToWorkbookCard target={grammarWorkbookTarget} />, grammarBackHost)
-    : null;
+  const grammarReturn = grammarWorkbookTarget ? (
+    <>
+      {grammarBackHost ? createPortal(<GrammarBackToWorkbookCard target={grammarWorkbookTarget} />, grammarBackHost) : null}
+      <GrammarStickyWorkbookBar target={grammarWorkbookTarget} />
+    </>
+  ) : null;
 
   if (
     normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH
@@ -229,7 +294,7 @@ const AutoWorkbookStartGuide = () => {
       && new URLSearchParams(search || "").get("view") === "workbook")
   ) return <A1Day18Kapitel122WorkbookPage />;
 
-  if (!shouldRenderGuide) return grammarBackCard;
+  if (!shouldRenderGuide) return grammarReturn;
 
   const guide = <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />;
 
@@ -255,7 +320,7 @@ const AutoWorkbookStartGuide = () => {
           {guide}
         </div>
       )}
-      {grammarBackCard}
+      {grammarReturn}
     </>
   );
 };
