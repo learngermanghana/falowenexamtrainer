@@ -55,8 +55,6 @@ function sessionCurriculumLevels(session = {}) {
     session.level,
     session.courseLevel,
     session.assignment_id,
-    session.topic,
-    session.title,
   ];
 
   return [...new Set(candidates.map(extractCourseLevel).filter(Boolean))];
@@ -85,6 +83,10 @@ function resolveCanonicalLesson(session = {}, position = 0, curriculum = []) {
   return curriculum[position] || null;
 }
 
+function hasAdminVisibleTopic(session = {}) {
+  return Boolean(String(session.topic || session.title || "").trim());
+}
+
 function sanitizeCrossLevelSession(session = {}, expectedLevel = "", canonicalLesson = null) {
   if (!expectedLevel) return session;
   const sessionLevels = sessionCurriculumLevels(session);
@@ -93,19 +95,21 @@ function sanitizeCrossLevelSession(session = {}, expectedLevel = "", canonicalLe
   const canonicalAssignmentId = String(canonicalLesson?.assignmentId || canonicalLesson?.id || "").trim();
   const canonicalTitle = String(canonicalLesson?.title || "").trim() || `${expectedLevel} live class`;
   const canonicalIds = canonicalAssignmentId ? [canonicalAssignmentId] : [];
+  const keepAdminTopic = hasAdminVisibleTopic(session);
 
   return {
     ...session,
-    topic: canonicalTitle,
-    title: canonicalTitle,
-    assignmentIds: canonicalIds,
-    chapterIds: canonicalIds,
-    curriculumIds: canonicalIds,
-    assignment_id: canonicalAssignmentId || null,
+    topic: keepAdminTopic ? session.topic : canonicalTitle,
+    title: keepAdminTopic ? session.title : canonicalTitle,
+    assignmentIds: canonicalIds.length ? canonicalIds : session.assignmentIds,
+    chapterIds: canonicalIds.length ? canonicalIds : session.chapterIds,
+    curriculumIds: canonicalIds.length ? canonicalIds : session.curriculumIds,
+    assignment_id: canonicalAssignmentId || session.assignment_id || null,
     curriculumLevelMismatch: true,
     curriculumRepaired: Boolean(canonicalLesson),
     curriculumSource: canonicalLesson ? "canonical lesson catalog" : session.curriculumSource,
     hiddenCurriculumLevels: sessionLevels,
+    adminTopicPreserved: keepAdminTopic,
   };
 }
 
