@@ -317,7 +317,7 @@ const uniqueVideoResources = (...groups) => {
     });
 };
 
-const legacyVideoResource = (source = {}, type = "teacher") => {
+const genericLessonVideoResource = (source = {}) => {
   const url = pickFirst(
     source.video,
     source.youtube_link,
@@ -325,15 +325,12 @@ const legacyVideoResource = (source = {}, type = "teacher") => {
   );
   if (!url) return null;
 
-  const teacherVideo = type === "teacher";
-
   return {
-    key: teacherVideo ? "teacher-explanation" : "ai-grammar-video",
+    key: "lesson-listening-video",
     chapter: source.chapter || null,
-    title: teacherVideo ? "Teacher explanation" : "AI grammar video",
-    description: teacherVideo
-      ? "Recorded class explanation from the teacher."
-      : "Step-by-step grammar explanation for revision and self-study.",
+    title: "Lesson / Hören video",
+    description:
+      "Video or listening resource for the lesson. This is not a teacher lecture, so it remains visible for Lesen & Hören / Teil 4.",
     url,
   };
 };
@@ -348,9 +345,9 @@ export const normalizeVideoResources = (source = {}) => {
       .map((resource, index) => {
         if (typeof resource === "string") {
           return {
-            key: `video-${index + 1}`,
+            key: `lesson-video-${index + 1}`,
             chapter: source.chapter || null,
-            title: index === 0 ? "Teacher explanation" : "AI grammar video",
+            title: "Lesson / Hören video",
             description:
               "Watch this video before you continue with the grammar and workbook.",
             url: resource,
@@ -366,11 +363,11 @@ export const normalizeVideoResources = (source = {}) => {
         if (!url) return null;
 
         return {
-          key: resource?.key || `video-${index + 1}`,
+          key: resource?.key || `lesson-video-${index + 1}`,
           chapter: resource?.chapter || source.chapter || null,
           title:
             resource?.title ||
-            (index === 0 ? "Teacher explanation" : "AI grammar video"),
+            "Lesson / Hören video",
           description:
             resource?.description ||
             "Watch this video before you continue with the grammar and workbook.",
@@ -471,16 +468,16 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const explicitResources = entries.flatMap((resource) =>
     normalizeVideoResources(resource),
   );
-  const legacyVideos = entries
-    .map((resource) => legacyVideoResource(resource, "teacher"))
+  const genericLessonVideos = entries
+    .map((resource) => genericLessonVideoResource(resource))
     .filter(Boolean);
   const dictionaryResources = normalizeVideoResources(dictionaryEntry);
   const dictionaryHasTeacherVideo = dictionaryResources.some(isTeacherVideoResource);
-  const fallbackLegacyVideos = dictionaryHasTeacherVideo
-    ? legacyVideos.filter((resource) => !isTeacherVideoResource(resource))
-    : legacyVideos;
+  const fallbackGenericLessonVideos = dictionaryHasTeacherVideo
+    ? genericLessonVideos.filter((resource) => !isTeacherVideoResource(resource))
+    : genericLessonVideos;
   const allResources = uniqueVideoResources(
-    fallbackLegacyVideos,
+    fallbackGenericLessonVideos,
     explicitResources,
     dictionaryResources,
   );
