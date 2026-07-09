@@ -1,4 +1,5 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
@@ -15,7 +16,6 @@ import {
   shouldRenderWorkbookGuide,
 } from "../utils/autoWorkbookGuideRouting";
 import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
-import WorkbookTopSubmissionTabs from "./WorkbookTopSubmissionTabs";
 import WorkbookContextSync from "./WorkbookContextSync";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
@@ -25,15 +25,68 @@ export {
 } from "../utils/autoWorkbookGuideRouting";
 
 const workbookRouteIndex = buildWorkbookRouteIndex();
+const SUPPORT_GUIDE_HOST_ATTR = "data-workbook-supporting-materials-host";
+
+const findExistingSupportGuideHost = (nav) => {
+  const next = nav?.nextElementSibling;
+  return next?.getAttribute?.(SUPPORT_GUIDE_HOST_ATTR) === "true" ? next : null;
+};
 
 const AutoWorkbookStartGuide = () => {
   const { pathname, search } = useLocation();
-  const hostRef = useRef(null);
+  const fallbackRef = useRef(null);
+  const [portalHost, setPortalHost] = useState(null);
   const normalizedPathname = normalizeInAppPath(pathname);
   const match = useMemo(() => workbookRouteIndex.get(normalizedPathname), [normalizedPathname]);
   const usesSelfManagedSubmissionTabs =
     SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
     || isSelfManagedB1LessonWorkbook(pathname, search);
+  const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
+
+  useEffect(() => {
+    if (!shouldRenderGuide || typeof document === "undefined") {
+      setPortalHost(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    let createdHost = null;
+
+    const placeGuideBelowSharedTabs = () => {
+      if (cancelled) return false;
+      const nav = document.querySelector("[data-workbook-tab-navigation]");
+      if (!nav || nav.closest("[data-auto-workbook-start-guide]") || nav.closest(`[${SUPPORT_GUIDE_HOST_ATTR}]`)) {
+        return false;
+      }
+
+      let host = findExistingSupportGuideHost(nav);
+      if (!host) {
+        host = document.createElement("div");
+        host.setAttribute(SUPPORT_GUIDE_HOST_ATTR, "true");
+        host.style.display = "grid";
+        host.style.gap = "8px";
+        host.style.margin = "12px 0 0";
+        nav.insertAdjacentElement("afterend", host);
+        createdHost = host;
+      }
+
+      setPortalHost(host);
+      return true;
+    };
+
+    const delays = [0, 50, 150, 400, 900];
+    const timers = delays.map((delay) => window.setTimeout(placeGuideBelowSharedTabs, delay));
+    const observer = new MutationObserver(placeGuideBelowSharedTabs);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timer) => window.clearTimeout(timer));
+      observer.disconnect();
+      setPortalHost(null);
+      if (createdHost?.parentNode) createdHost.parentNode.removeChild(createdHost);
+    };
+  }, [normalizedPathname, search, shouldRenderGuide]);
 
   if (
     normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH
@@ -41,26 +94,33 @@ const AutoWorkbookStartGuide = () => {
       && new URLSearchParams(search || "").get("view") === "workbook")
   ) return <A1Day18Kapitel122WorkbookPage />;
 
-  if (!shouldRenderWorkbookGuide({ pathname, search, match })) return null;
+  if (!shouldRenderGuide) return null;
+
+  const guide = <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />;
 
   return (
-    <div
-      ref={hostRef}
-      data-auto-workbook-start-guide="true"
-      style={{
-        ...styles.container,
-        display: "grid",
-        width: "100%",
-        minHeight: 0,
-        padding: "0 16px",
-        marginBottom: 12,
-        boxSizing: "border-box",
-      }}
-    >
+    <>
       {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
-      <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
-      {usesSelfManagedSubmissionTabs ? null : <WorkbookTopSubmissionTabs hostRef={hostRef} match={match} />}
-    </div>
+      {portalHost ? (
+        createPortal(guide, portalHost)
+      ) : (
+        <div
+          ref={fallbackRef}
+          data-auto-workbook-start-guide="true"
+          style={{
+            ...styles.container,
+            display: "grid",
+            width: "100%",
+            minHeight: 0,
+            padding: "0 16px",
+            marginBottom: 12,
+            boxSizing: "border-box",
+          }}
+        >
+          {guide}
+        </div>
+      )}
+    </>
   );
 };
 
