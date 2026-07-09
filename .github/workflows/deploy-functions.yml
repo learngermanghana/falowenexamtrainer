@@ -8,6 +8,7 @@ on:
       - 'functions/**'
       - 'firebase.json'
       - '.firebaserc'
+      - 'firestore.rules'
       - '.github/workflows/deploy-functions.yml'
   workflow_dispatch:
 
@@ -56,6 +57,18 @@ jobs:
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
+      - name: Deploy Firestore security rules
+        shell: bash
+        run: |
+          set +e
+          firebase deploy \
+            --project "$FIREBASE_PROJECT_ID" \
+            --only firestore:rules \
+            --debug > firebase-rules-deploy.log 2>&1
+          status=$?
+          tail -n 180 firebase-rules-deploy.log || true
+          exit "$status"
+
       - name: Deploy existing exam trainer API
         shell: bash
         run: |
@@ -88,6 +101,7 @@ jobs:
         with:
           name: firebase-api-deploy-diagnostics-${{ github.run_id }}
           path: |
+            firebase-rules-deploy.log
             firebase-deploy.log
             firebase-debug.log
           if-no-files-found: warn
