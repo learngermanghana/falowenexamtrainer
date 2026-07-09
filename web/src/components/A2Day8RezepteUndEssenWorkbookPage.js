@@ -78,6 +78,7 @@ export default function A2Day8RezepteUndEssenWorkbookPage() {
         },
       ]}
       hoerenTask="Höre den Text zum Thema Rezepte und Essen. Achte auf den Tag, die Zutaten, den Ort und das Gericht. Submitte deine Antwortbuchstaben im Submit-Tab."
+      hoerenAudioUrl="https://drive.google.com/file/d/1oPqOjmHtocxUZFRfuhi-pUZKgFZy-kyQ/view?usp=sharing"
       hoerenQuestions={[
         {
           stem: "Wann gehen die Personen einkaufen oder kochen zusammen?",
