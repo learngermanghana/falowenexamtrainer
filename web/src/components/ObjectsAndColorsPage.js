@@ -98,6 +98,88 @@ const accusativeRows = [
   { key: "acc_pl", cells: ["Plural", "die", "-"] },
 ];
 
+const quickGuideRows = [
+  {
+    key: "her-their",
+    cells: [
+      <strong>ihr + noun</strong>,
+      "her / their",
+      <>
+        Das ist <strong>ihr</strong> Bruder. = This is her/their brother.
+        <br />
+        Here <strong>ihr</strong> is small because it is not the first word.
+      </>,
+    ],
+  },
+  {
+    key: "formal-your",
+    cells: [
+      <strong>Ihr + noun</strong>,
+      "your formal",
+      <>
+        Das ist <strong>Ihr</strong> Buch. = This is your book, Sir/Madam.
+        <br />
+        <strong>Ihr</strong> stays capital because it is formal.
+      </>,
+    ],
+  },
+  {
+    key: "you-all",
+    cells: [
+      <strong>ihr + verb</strong>,
+      "you all",
+      <>
+        Wo wohnt <strong>ihr</strong>? = Where do you all live?
+        <br />
+        Heute lernt <strong>ihr</strong> Deutsch. = Today you all learn German.
+      </>,
+    ],
+  },
+];
+
+const patternRows = [
+  {
+    key: "ein-tisch",
+    cells: [
+      "ein Tisch",
+      <strong>mein Tisch / dein Tisch / sein Tisch / ihr Tisch</strong>,
+      "my table / your table / his table / her table",
+    ],
+  },
+  {
+    key: "eine-tasche",
+    cells: [
+      "eine Tasche",
+      <strong>meine Tasche / deine Tasche / seine Tasche / ihre Tasche</strong>,
+      "my bag / your bag / his bag / her bag",
+    ],
+  },
+  {
+    key: "ein-buch",
+    cells: [
+      "ein Buch",
+      <strong>mein Buch / dein Buch / sein Buch / ihr Buch</strong>,
+      "my book / your book / his book / her book",
+    ],
+  },
+  {
+    key: "einen-tisch",
+    cells: [
+      "Ich suche einen Tisch.",
+      <strong>Ich suche meinen Tisch / deinen Tisch / seinen Tisch / ihren Tisch.</strong>,
+      "I am looking for my/your/his/her table.",
+    ],
+  },
+  {
+    key: "eine-tasche-acc",
+    cells: [
+      "Ich nehme eine Tasche.",
+      <strong>Ich nehme meine Tasche / deine Tasche / seine Tasche / ihre Tasche.</strong>,
+      "I take my/your/his/her bag.",
+    ],
+  },
+];
+
 const COLORS = [
   { de: "rot", en: "red" },
   { de: "blau", en: "blue" },
@@ -172,7 +254,7 @@ const PracticeBlock = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <p style={{ margin: 0 }}>Choose the correct possessive word.</p>
+      <p style={{ margin: 0 }}>Choose the correct possessive word. Use the article pattern to help you.</p>
 
       <div style={{ display: "grid", gap: 6 }}>
         <strong>1) Das ist ___ Tisch.</strong>
@@ -183,8 +265,8 @@ const PracticeBlock = () => {
         </div>
         {q1 ? (
           <p style={{ margin: 0 }}>
-            {q1 === "mein" ? "✅ Correct" : "❌ Try again"} — <strong>der Tisch</strong> uses <strong>mein</strong> in
-            this sentence.
+            {q1 === "mein" ? "✅ Correct" : "❌ Try again"} — The pattern is <strong>ein Tisch</strong>, so you say{" "}
+            <strong>mein Tisch</strong>.
           </p>
         ) : null}
       </div>
@@ -198,7 +280,7 @@ const PracticeBlock = () => {
         </div>
         {q2 ? (
           <p style={{ margin: 0 }}>
-            {q2 === "meinen" ? "✅ Correct" : "❌ Try again"} — <strong>Ich suche den/einen Tisch</strong> changes to{" "}
+            {q2 === "meinen" ? "✅ Correct" : "❌ Try again"} — The pattern is <strong>einen Tisch</strong>, so you say{" "}
             <strong>meinen Tisch</strong>.
           </p>
         ) : null}
@@ -428,7 +510,7 @@ const ObjectsAndColorsPage = () => {
         src={IMG_COLORS}
         alt="Colour palette photo used as a section break"
         title="Lesson Visual"
-        subtitle="We use colours and objects to build simple A1 sentences."
+        subtitle="Start with one small grammar difference, then use objects and colours in simple A1 sentences."
       />
 
       <Section title="Instruction Note">
@@ -436,43 +518,9 @@ const ObjectsAndColorsPage = () => {
           In this lesson, you learn how to say <strong>my, your, his, her, our</strong> with objects and colours.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Do not worry about long grammar words. First look at the article: <strong>der</strong>, <strong>die</strong>, or{" "}
-          <strong>das</strong>. Then choose the correct possessive word.
+          Start with <strong>ihr / Ihr</strong>, because this word can confuse A1 students. After that, learn the full possessive
+          table and use <strong>ein / eine / einen</strong> as the pattern.
         </p>
-      </Section>
-
-      <Section title="Possessive Words: mein, meine, dein, deine">
-        <SimpleTable
-          caption="A1 nominative reference table"
-          columns={possessiveColumns}
-          rows={possessiveRows}
-          minWidth={760}
-        />
-        <div style={helperBoxStyle}>
-          <strong>Simple rule: nominative first</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Look at the noun gender or number. Do not think of this as “before” or “after” a word.
-          </p>
-          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>
-              <strong>Masculine</strong> nouns with <strong>der</strong> and <strong>neuter</strong> nouns with <strong>das</strong> use
-              the short form: <strong>mein/dein/sein/ihr</strong>.
-            </li>
-            <li>
-              <strong>Feminine</strong> nouns with <strong>die</strong> and <strong>plural</strong> nouns use <strong>-e</strong>:{" "}
-              <strong>meine/deine/seine/ihre</strong>.
-            </li>
-          </ul>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            This table is for <strong>nominative</strong> sentences like <strong>Das ist mein Tisch.</strong> In the{" "}
-            <strong>accusative</strong>, masculine changes to <strong>-en</strong>: <strong>Ich sehe meinen Tisch.</strong> Feminine,
-            neuter and plural stay the same: <strong>meine Tasche</strong>, <strong>mein Buch</strong>, <strong>meine Bücher</strong>.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            For <strong>euer/eure</strong>, the second <strong>e</strong> often disappears: <strong>euer Vater</strong>,{" "}
-            <strong>eure Mutter</strong>. In accusative: <strong>euren Tisch</strong>.
-          </p>
-        </div>
       </Section>
 
       <Section title="Quick Guide: ihr / Ihr">
@@ -487,45 +535,55 @@ const ObjectsAndColorsPage = () => {
         <SimpleTable
           caption="Use simple examples to see the difference"
           columns={["Form", "Meaning", "A1 example"]}
-          rows={[
-            {
-              key: "her",
-              cells: [
-                <strong>ihr + noun</strong>,
-                "her / their",
-                <>
-                  Das ist <strong>ihr</strong> Bruder. = This is her/their brother.
-                  <br />
-                  Here <strong>ihr</strong> is small because it is not the first word.
-                </>,
-              ],
-            },
-            {
-              key: "formal",
-              cells: [
-                <strong>Ihr + noun</strong>,
-                "your formal",
-                <>
-                  Das ist <strong>Ihr</strong> Buch. = This is your book, Sir/Madam.
-                  <br />
-                  <strong>Ihr</strong> stays capital because it is formal.
-                </>,
-              ],
-            },
-            {
-              key: "you-all",
-              cells: [
-                <strong>ihr + verb</strong>,
-                "you all",
-                <>
-                  Wo wohnt <strong>ihr</strong>? = Where do you all live?
-                  <br />
-                  Heute lernt <strong>ihr</strong> Deutsch. = Today you all learn German.
-                </>,
-              ],
-            },
-          ]}
+          rows={quickGuideRows}
           minWidth={760}
+        />
+      </Section>
+
+      <Section title="Possessive Words: mein, meine, dein, deine">
+        <SimpleTable
+          caption="A1 nominative reference table"
+          columns={possessiveColumns}
+          rows={possessiveRows}
+          minWidth={760}
+        />
+      </Section>
+
+      <TopicImageBreak
+        src={IMG_GRAMMAR_NOTES}
+        alt="Notebook and pen used as a visual break before grammar notes"
+        title="Grammar Focus"
+        subtitle="Possessive determiners copy the ein/eine/einen pattern."
+      />
+
+      <Section title="Simple Rule: Copy the ein / eine / einen Pattern">
+        <div style={helperBoxStyle}>
+          <strong>Possessive determiners work like the indefinite article.</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            First ask: what would I use with the normal article? <strong>ein</strong>, <strong>eine</strong>, or{" "}
+            <strong>einen</strong>? Then use the same ending with the possessive word.
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+            <li>
+              If the pattern is <strong>ein</strong>, use <strong>mein/dein/sein/ihr</strong>: <strong>ein Tisch → mein Tisch</strong>.
+            </li>
+            <li>
+              If the pattern is <strong>eine</strong>, use <strong>meine/deine/seine/ihre</strong>: <strong>eine Tasche → meine Tasche</strong>.
+            </li>
+            <li>
+              If the pattern is <strong>einen</strong>, use <strong>meinen/deinen/seinen/ihren</strong>: <strong>einen Tisch → meinen Tisch</strong>.
+            </li>
+          </ul>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Do not say <strong>ein mein Tisch</strong>. Choose one: <strong>ein Tisch</strong> or <strong>mein Tisch</strong>.
+          </p>
+        </div>
+
+        <SimpleTable
+          caption="Easy pattern"
+          columns={["Article pattern", "Possessive example", "Meaning"]}
+          rows={patternRows}
+          minWidth={860}
         />
       </Section>
 
@@ -536,37 +594,13 @@ const ObjectsAndColorsPage = () => {
         <SimpleTable caption="Articles in accusative" columns={articleColumns} rows={accusativeRows} />
       </Section>
 
-      <TopicImageBreak
-        src={IMG_GRAMMAR_NOTES}
-        alt="Notebook and pen used as a visual break before grammar notes"
-        title="Grammar Focus"
-        subtitle="Use ein/eine/einen only as a pattern to choose the possessive ending."
-      />
-
-      <Section title="Indefinite Articles and Possessive Words">
+      <Section title="Small Extra Note: euer / eure">
         <div style={helperBoxStyle}>
-          <strong>Important A1 rule</strong>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Do not put <strong>ein</strong> and <strong>mein</strong> together. You say <strong>ein Tisch</strong> or{" "}
-            <strong>mein Tisch</strong>, not “ein mein Tisch”.
+            For <strong>euer/eure</strong>, the second <strong>e</strong> often disappears: <strong>euer Vater</strong>,{" "}
+            <strong>eure Mutter</strong>. In the masculine accusative, use <strong>euren</strong>: <strong>Ich sehe euren Tisch.</strong>
           </p>
         </div>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Use <strong>ein / eine / einen</strong> as a small pattern. The pattern helps you choose the ending:
-        </p>
-        <SimpleTable
-          caption="Easy pattern"
-          columns={["Article pattern", "Possessive example", "Meaning"]}
-          rows={[
-            { key: "masc-nom", cells: ["ein Tisch", <strong>mein Tisch</strong>, "my table"] },
-            { key: "fem", cells: ["eine Tasche", <strong>meine Tasche</strong>, "my bag"] },
-            { key: "neuter", cells: ["ein Buch", <strong>mein Buch</strong>, "my book"] },
-            { key: "masc-acc", cells: ["Ich suche einen Tisch", <strong>Ich suche meinen Tisch</strong>, "I am looking for my table"] },
-            { key: "fem-acc", cells: ["Ich nehme eine Tasche", <strong>Ich nehme meine Tasche</strong>, "I take my bag"] },
-          ]}
-          minWidth={760}
-        />
       </Section>
 
       <Section title="Simple Adjective Note: zu, sehr, super">
@@ -579,15 +613,36 @@ const ObjectsAndColorsPage = () => {
           rows={[
             {
               key: "zu",
-              cells: [<strong>zu</strong>, "too", "It is more than good or more than needed.", <><strong>Das Auto ist zu teuer.</strong> = The car is too expensive.</>],
+              cells: [
+                <strong>zu</strong>,
+                "too",
+                "It is more than good or more than needed.",
+                <>
+                  <strong>Das Auto ist zu teuer.</strong> = The car is too expensive.
+                </>,
+              ],
             },
             {
               key: "sehr",
-              cells: [<strong>sehr</strong>, "very", "Normal and polite. Use it in class and exams.", <><strong>Das Buch ist sehr interessant.</strong> = The book is very interesting.</>],
+              cells: [
+                <strong>sehr</strong>,
+                "very",
+                "Normal and polite. Use it in class and exams.",
+                <>
+                  <strong>Das Buch ist sehr interessant.</strong> = The book is very interesting.
+                </>,
+              ],
             },
             {
               key: "super",
-              cells: [<strong>super</strong>, "super / very", "Friendly and informal. Use it when you are happy or excited.", <><strong>Das Essen ist super lecker.</strong> = The food is super delicious.</>],
+              cells: [
+                <strong>super</strong>,
+                "super / very",
+                "Friendly and informal. Use it when you are happy or excited.",
+                <>
+                  <strong>Das Essen ist super lecker.</strong> = The food is super delicious.
+                </>,
+              ],
             },
           ]}
           minWidth={820}
