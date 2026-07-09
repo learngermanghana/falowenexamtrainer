@@ -317,13 +317,25 @@ const uniqueVideoResources = (...groups) => {
     });
 };
 
-const genericLessonVideoResource = (source = {}) => {
+const genericLessonVideoResource = (source = {}, level = "") => {
   const url = pickFirst(
     source.video,
     source.youtube_link,
     source.tutorial_video_url,
   );
   if (!url) return null;
+
+  const normalizedLevel = normalizeLevel(level);
+  if (normalizedLevel === "A1") {
+    return {
+      key: "teacher-lecture-video",
+      chapter: source.chapter || null,
+      title: "Teacher lecture video",
+      description:
+        "Recorded A1 tutor lecture for this lesson. Watch this first, then use the AI grammar explainer for revision.",
+      url,
+    };
+  }
 
   return {
     key: "lesson-listening-video",
@@ -419,7 +431,7 @@ export const normalizeVideoResources = (source = {}) => {
 
 const isTeacherVideoResource = (resource = {}) => {
   const label = `${resource.key || ""} ${resource.title || ""}`.toLowerCase();
-  return label.includes("teacher");
+  return label.includes("teacher") || label.includes("tutor lecture");
 };
 
 const toResourceArray = (value) =>
@@ -469,7 +481,7 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     normalizeVideoResources(resource),
   );
   const genericLessonVideos = entries
-    .map((resource) => genericLessonVideoResource(resource))
+    .map((resource) => genericLessonVideoResource(resource, normalizedLevel))
     .filter(Boolean);
   const dictionaryResources = normalizeVideoResources(dictionaryEntry);
   const dictionaryHasTeacherVideo = dictionaryResources.some(isTeacherVideoResource);
