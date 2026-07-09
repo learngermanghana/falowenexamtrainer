@@ -23,13 +23,21 @@ Rules:
 - Use `getInlineCourseAssignments(level, day)` and the workbook chapter to resolve the correct assignment key. Keep a safe `fallbackAssignmentKey` such as `A1-0.1`, `A1-4`, or `A1-8`.
 - Practice-only A1 workbooks are not tutor-marked and do not need this shell unless they later become submission-required.
 
+A1 tutor-marked assignment chapter keys:
+
+```
+0.1, 0.2, 1.1, 1.2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12.1, 12.2, 13, 14
+```
+
+In code and submissions, these are stored as canonical assignment IDs with the level prefix. Examples: `0.1` becomes `A1-0.1`, `12.2` becomes `A1-12.2`, and `14` becomes `A1-14`.
+
 Example:
 
 ```jsx
 <A1TutorMarkedWorkbookShell
   day={1}
   chapter="0.1"
-  fallbackAssignmentKey="A1-0.1"
+  fallbackAssignmentKey="0.1"
   title="A1 · Day 1 Workbook · Greetings"
   subtitle="Chapter 0.1 · Tutor-marked assignment"
   submitTitle="Submit A1 · Day 1 · Chapter 0.1"
