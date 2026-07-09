@@ -10,6 +10,10 @@
   overflow: hidden;
 }
 
+.speaking-mind-map ~ .speaking-mind-map {
+  display: none !important;
+}
+
 .speaking-mind-map__header {
   display: flex;
   justify-content: space-between;
