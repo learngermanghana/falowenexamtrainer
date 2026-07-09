@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-import { STANDARD_WORKBOOK_TABS, WorkbookTabNav } from "./StandardWorkbookComponents";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 
 import { styles } from "../styles";
+
+const LEVEL = "A1";
+const DAY = 10;
+const CHAPTER = "6";
+const FALLBACK_ASSIGNMENT_KEY = "A1-6";
 
 const card = {
   ...styles.card,
@@ -147,82 +154,138 @@ const horenAssignments = [
   },
 ];
 
-const vocabularyPairs = [
-  "das Wohnzimmer",
-  "die Küche",
-  "das Schlafzimmer",
-  "das Badezimmer",
-  "der Balkon",
-  "der Flur",
-  "das Bett",
-  "der Tisch",
-  "der Stuhl",
-  "der Schrank",
-];
-
-const englishMeanings = [
-  "a. the kitchen",
-  "b. the bedroom",
-  "c. the balcony",
-  "d. the bathroom",
-  "e. the hallway",
-  "f. the living room",
-  "g. the chair",
-  "h. the table",
-  "i. the bed",
-  "j. the wardrobe",
-];
-
-const SubmitPanel = () => (
-  <div
-    style={{
-      ...card,
-      border: "2px solid #2563eb",
-      background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 75%)",
-      boxShadow: "0 16px 30px rgba(37, 99, 235, 0.14)",
-    }}
-  >
-    <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>
-      Submit tab
-    </span>
-    <h2 style={{ ...sectionTitle, fontSize: "1.35rem" }}>Submit your A1 Day 10 workbook</h2>
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      After completing Teil 1, Teil 2, Teil 3 and Teil 4, send your final answers through the campus submission area.
-      Do not submit inside the lesson text.
-    </p>
-    <a
-      href="/campus/course?submitWork=1"
-      target="_blank"
-      rel="noreferrer"
-      style={{ ...styles.button, textDecoration: "none", width: "fit-content" }}
-    >
-      Open Submit Tab
-    </a>
-    <p style={{ margin: 0, lineHeight: 1.7, color: "#1e40af", fontWeight: 700 }}>
-      Choose A1 Day 10 / Objects, Colors and Possessive Articles, then paste your final answers clearly by Teil.
-    </p>
-  </div>
-);
-
 const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
+  const requestedTab = searchParams.get("workbookTab");
+  const [activeTab, setActiveTab] = useState(requestedTab === "submit" ? "submit" : "assignment");
 
-  const renderQuestions = (questions) =>
-    questions.map((question) => (
-      <div key={question.stem} style={questionBlock}>
-        <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
-        {question.options.map((option) => (
-          <p key={option} style={optionLine}>
-            {option}
-          </p>
-        ))}
+  const assignmentKey = useMemo(() => {
+    const assignment = getInlineCourseAssignments(LEVEL, DAY).find(
+      (item) => String(item.chapter || "").trim() === CHAPTER
+    );
+    return assignment?.assignmentKey || FALLBACK_ASSIGNMENT_KEY;
+  }, []);
+
+  useEffect(() => {
+    setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
+  }, [requestedTab]);
+
+  useEffect(() => {
+    if (requestedTab !== "submit") return;
+    if (
+      searchParams.get("assignmentKey") === assignmentKey &&
+      searchParams.get("assignmentId") === assignmentKey &&
+      searchParams.get("level") === LEVEL
+    ) {
+      return;
+    }
+
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("workbookTab", "submit");
+    nextSearch.set("assignmentKey", assignmentKey);
+    nextSearch.set("assignmentId", assignmentKey);
+    nextSearch.set("level", LEVEL);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+      },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: LEVEL,
+          day: DAY,
+          assignmentKey,
+          assignmentId: assignmentKey,
+          canonicalAssignmentKey: assignmentKey,
+          inlineCourseSubmission: true,
+        },
+      }
+    );
+  }, [assignmentKey, location.pathname, location.search, location.state, navigate, requestedTab, searchParams]);
+
+  const openTab = (tabKey) => {
+    setActiveTab(tabKey);
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("workbookTab", tabKey);
+    nextSearch.set("assignmentKey", assignmentKey);
+    nextSearch.set("assignmentId", assignmentKey);
+    nextSearch.set("level", LEVEL);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+      },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: LEVEL,
+          day: DAY,
+          assignmentKey,
+          assignmentId: assignmentKey,
+          canonicalAssignmentKey: assignmentKey,
+          inlineCourseSubmission: true,
+        },
+      }
+    );
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <div style={card}>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          A1 · Day 10 Workbook · Objects, Colors and Possessive Articles
+        </h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 6 · Tutor-marked assignment</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Complete the assignment, then open Submit to send your final answers for {assignmentKey}.
+        </p>
+
+        <div
+          role="tablist"
+          aria-label="A1 Day 10 workbook tabs"
+          style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid #dbeafe", paddingTop: 12 }}
+        >
+          {[
+            { key: "assignment", label: "Assignment" },
+            { key: "submit", label: "Submit" },
+          ].map((tab) => {
+            const selected = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => openTab(tab.key)}
+                style={{
+                  ...styles.secondaryButton,
+                  background: selected ? "#2563eb" : "#ffffff",
+                  borderColor: selected ? "#2563eb" : "#93c5fd",
+                  color: selected ? "#ffffff" : "#1d4ed8",
+                  fontWeight: 800,
+                  minWidth: 120,
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    ));
 
-  const renderActiveTab = () => {
-    switch (activeTab) {
-      case "sprechen":
-        return (
+      {activeTab === "assignment" ? (
+        <>
           <div style={card}>
             <img
               src="https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=1600&q=80"
@@ -236,61 +299,51 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
               }}
             />
 
-            <h2 style={sectionTitle}>Teil 1: Objects, Rooms and Vocabulary</h2>
+            <h2 style={sectionTitle}>Teil 1: Reading / Writing</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               <strong>Assignment: Die Wohnung (The Apartment)</strong>
             </p>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Complete the vocabulary matching exercise. Write the German word and the English meaning when you submit.
+              Instructions: Complete the following exercises about an apartment. This assignment will help you practice
+              your vocabulary and sentence structures in German, focusing on rooms and furniture in an apartment.
             </p>
-
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-              <div style={questionBlock}>
-                <p style={{ margin: 0, fontWeight: 700 }}>German words</p>
-                <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-                  {vocabularyPairs.map((word) => (
-                    <li key={word}>{word}</li>
-                  ))}
-                </ol>
-              </div>
-
-              <div style={questionBlock}>
-                <p style={{ margin: 0, fontWeight: 700 }}>English meanings</p>
-                <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-                  {englishMeanings.map((meaning) => (
-                    <li key={meaning}>{meaning}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "schreiben":
-        return (
-          <div style={card}>
-            <h2 style={sectionTitle}>Teil 2: Schreiben mit mein / meine / dein / deine</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Write five short German sentences about things in an apartment. Use possessive articles and colours where possible.
+              <strong>Part 1: Vocabulary Matching</strong>
             </p>
-            <div style={questionBlock}>
-              <p style={{ margin: 0, fontWeight: 700 }}>Example</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>Das ist mein Tisch. Mein Tisch ist braun.</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>Das ist meine Tasche. Meine Tasche ist rot.</p>
-            </div>
-            <div style={questionBlock}>
-              <p style={{ margin: 0, fontWeight: 700 }}>Your task</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Write sentences for: das Bett, der Tisch, der Stuhl, die Tasche, die Küche.
-              </p>
-            </div>
-          </div>
-        );
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Match the German words with their English meanings. Write the words and not just a, b, c, d. Also include
+              both the German word and the English meaning when submitting.
+            </p>
 
-      case "lesen":
-        return (
+            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>das Wohnzimmer</li>
+              <li>die Küche</li>
+              <li>das Schlafzimmer</li>
+              <li>das Badezimmer</li>
+              <li>der Balkon</li>
+              <li>der Flur</li>
+              <li>das Bett</li>
+              <li>der Tisch</li>
+              <li>der Stuhl</li>
+              <li>der Schrank</li>
+            </ol>
+
+            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>a. the kitchen</li>
+              <li>b. the bedroom</li>
+              <li>c. the balcony</li>
+              <li>d. the bathroom</li>
+              <li>e. the hallway</li>
+              <li>f. the living room</li>
+              <li>g. the chair</li>
+              <li>h. the table</li>
+              <li>i. the bed</li>
+              <li>j. the wardrobe</li>
+            </ul>
+          </div>
+
           <div style={card}>
-            <h2 style={sectionTitle}>Teil 3: Lesen / Questions</h2>
+            <h2 style={sectionTitle}>Teil 2: Questions</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               <strong>Passage: Die Wohnung</strong>
             </p>
@@ -298,22 +351,30 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
               Meine Wohnung ist sehr gemütlich. Sie hat vier Zimmer: ein Wohnzimmer, eine Küche, ein Schlafzimmer und
               ein Badezimmer. Im Wohnzimmer steht ein großes Sofa und ein Fernseher. In der Küche gibt es einen Herd,
               einen Kühlschrank und einen Tisch mit vier Stühlen. Das Schlafzimmer hat ein großes Bett und einen
-              Kleiderschrank. Im Badezimmer gibt es eine Dusche, eine Badewanne und ein Waschbecken. Der Balkon ist
-              klein, aber schön. Ich habe dort Blumen und einen kleinen Tisch mit zwei Stühlen.
+              Kleiderschrank. Im Badezimmer gibt es eine Dusche, eine Badewanne und ein Waschbecken. Der Balkon ist klein,
+              aber schön. Ich habe dort Blumen und einen kleinen Tisch mit zwei Stühlen.
             </p>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Multiple-choice questions</strong>
+              <strong>Multiple-Choice Questions</strong>
             </p>
-            {renderQuestions(teil2Questions)}
-          </div>
-        );
 
-      case "hoeren":
-        return (
+            {teil2Questions.map((question) => (
+              <div key={question.stem} style={questionBlock}>
+                <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+                {question.options.map((option) => (
+                  <p key={option} style={optionLine}>
+                    {option}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+
           <div style={card}>
-            <h2 style={sectionTitle}>Teil 4: Hören</h2>
+            <h2 style={sectionTitle}>Teil 3: Hören</h2>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Listen to the short passages about an apartment. After listening, answer the multiple-choice questions.
+              Listen to the following short passages about an apartment. After listening, answer the multiple-choice
+              questions that follow.
             </p>
             <div style={{ display: "grid", gap: 8 }}>
               <div
@@ -328,7 +389,7 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
               >
                 <iframe
                   src={horenVideoEmbedUrl}
-                  title="Teil 4 Hören: Die Wohnung"
+                  title="Teil 3 Hören: Die Wohnung"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   style={{
@@ -374,59 +435,57 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
               </div>
             ))}
           </div>
-        );
 
-      case "references":
-        return (
-          <div style={card}>
-            <h2 style={sectionTitle}>Reference: possessive articles</h2>
-            <div style={questionBlock}>
-              <p style={{ margin: 0, fontWeight: 700 }}>Simple A1 rule</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Use <strong>mein / dein</strong> before der and das words. Use <strong>meine / deine</strong> before die
-                words and plural words.
-              </p>
-            </div>
-            <div style={questionBlock}>
-              <p style={{ margin: 0, fontWeight: 700 }}>Examples</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>der Tisch → mein Tisch / dein Tisch</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>das Buch → mein Buch / dein Buch</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>die Tasche → meine Tasche / deine Tasche</p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>die Bücher → meine Bücher / deine Bücher</p>
-            </div>
+          <div
+            style={{
+              ...card,
+              border: "1px solid #c7d2fe",
+              background: "#eef2ff",
+            }}
+          >
+            <h2 style={sectionTitle}>Final Submission</h2>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Submit all your answers after you complete the workbook tasks.
+            </p>
+            <button type="button" style={{ ...styles.button, width: "fit-content" }} onClick={() => openTab("submit")}>
+              Open Submit Tab
+            </button>
           </div>
-        );
-
-      case "submit":
-        return <SubmitPanel />;
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 10 Workbook · Objects, Colors and Possessive Articles
-        </h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 6</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Work through each tab, then use the <strong>Submit</strong> tab to send your final answers.
-        </p>
-      </div>
-
-      <WorkbookTabNav
-        activeTab={activeTab}
-        onChange={setActiveTab}
-        tabs={STANDARD_WORKBOOK_TABS}
-        ariaLabel="A1 Day 10 workbook sections"
-      />
-
-      {renderActiveTab()}
+        </>
+      ) : (
+        <section style={{ ...card, border: "1px solid #bfdbfe" }} aria-label="Submit A1 Day 10 workbook answers">
+          <div>
+            <p
+              style={{
+                color: "#1d4ed8",
+                fontSize: 13,
+                fontWeight: 900,
+                letterSpacing: ".04em",
+                margin: 0,
+                textTransform: "uppercase",
+              }}
+            >
+              Tutor-marked assignment
+            </p>
+            <h2 style={{ margin: "4px 0" }}>Submit A1 · Day 10 · Chapter 6</h2>
+            <p style={{ color: "#475569", margin: 0 }}>
+              This submission box is locked to {assignmentKey}, so your work is saved under the correct assignment.
+            </p>
+          </div>
+          <div className="a1-day10-objects-colors-workbook-submit-tab">
+            <style>{`.a1-day10-objects-colors-workbook-submit-tab > div > section:first-child { display: none !important; }
+              .a1-day10-objects-colors-workbook-submit-tab select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: LEVEL,
+                day: DAY,
+                assignmentKey,
+                canonicalAssignmentKey: assignmentKey,
+              }}
+            />
+          </div>
+        </section>
+      )}
     </div>
   );
 };
