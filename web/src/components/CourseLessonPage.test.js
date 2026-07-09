@@ -85,8 +85,21 @@ describe("lesson video visibility policy", () => {
     expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
   });
 
-  test.each(["A2", "B1", "B2", "C1"])("%s shows teacher lecture when available and keeps AI video", (level) => {
-    expect(shouldShowTeacherLectureVideo(level)).toBe(true);
+  test.each(["A2", "B1"])("%s hides teacher lecture links and keeps AI video", (level) => {
+    expect(shouldShowTeacherLectureVideo(level, 99)).toBe(false);
+    const resources = getLessonVideoResources(level, 99, {
+      day: 99,
+      teacherVideo: "teacher-url",
+      aiVideo: "ai-url",
+    });
+    expect(resources.map((resource) => resource.url)).toEqual(["ai-url"]);
+    render(<LessonResourcesHub lesson={videoLesson(resources)} />);
+    expect(screen.queryByText("Teacher Lecture")).not.toBeInTheDocument();
+    expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
+  });
+
+  test.each(["B2", "C1"])("%s still shows teacher lecture when available and keeps AI video", (level) => {
+    expect(shouldShowTeacherLectureVideo(level, 99)).toBe(true);
     const resources = getLessonVideoResources(level, 99, {
       day: 99,
       teacherVideo: "teacher-url",
@@ -96,6 +109,16 @@ describe("lesson video visibility policy", () => {
     render(<LessonResourcesHub lesson={videoLesson(resources)} />);
     expect(screen.getByText("Teacher Lecture")).toBeInTheDocument();
     expect(screen.getByText("AI Grammar Explainer")).toBeInTheDocument();
+  });
+
+  test("A2 Day 16 keeps the approved teacher lecture", () => {
+    expect(shouldShowTeacherLectureVideo("A2", 16)).toBe(true);
+    const resources = getLessonVideoResources("A2", 16, {
+      day: 16,
+      teacherVideo: "teacher-url",
+      aiVideo: "ai-url",
+    });
+    expect(resources.map((resource) => resource.url)).toEqual(["teacher-url", "ai-url"]);
   });
 
   test("AI override only sets aiVideo and preserves teacher URL fields", () => {

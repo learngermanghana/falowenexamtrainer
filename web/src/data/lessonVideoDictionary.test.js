@@ -114,7 +114,7 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("shows teacher videos with available AI videos from A2 through C1", () => {
+  test("hides A2 teacher videos except Day 16 while keeping AI videos", () => {
     const entry = {
       teacher_video: "https://example.com/teacher",
       ai_grammar_video: "https://example.com/ai",
@@ -122,10 +122,13 @@ describe("getLessonVideoResources", () => {
 
     expect(
       getLessonVideoResources("A2", 9, entry).map((resource) => resource.url),
+    ).toEqual(["https://example.com/ai"]);
+    expect(
+      getLessonVideoResources("A2", 16, entry).map((resource) => resource.url),
     ).toEqual(["https://example.com/teacher", "https://example.com/ai"]);
   });
 
-  test("uses the scheduled generic video as a teacher video when no AI video is configured", () => {
+  test("hides scheduled generic A2 teacher fallback videos outside Day 16", () => {
     const entry = {
       chapter: "8.99",
       lesen_hören: {
@@ -134,13 +137,7 @@ describe("getLessonVideoResources", () => {
       },
     };
 
-    expect(getLessonVideoResources("A2", 99, entry)).toEqual([
-      expect.objectContaining({
-        key: "teacher-explanation",
-        chapter: "8.99",
-        url: "https://example.com/fallback-video",
-      }),
-    ]);
+    expect(getLessonVideoResources("A2", 99, entry)).toEqual([]);
   });
 
   test.each([
