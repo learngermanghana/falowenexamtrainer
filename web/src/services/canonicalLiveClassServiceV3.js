@@ -92,24 +92,34 @@ function sanitizeCrossLevelSession(session = {}, expectedLevel = "", canonicalLe
   const sessionLevels = sessionCurriculumLevels(session);
   if (!sessionLevels.length || sessionLevels.includes(expectedLevel)) return session;
 
+  const keepAdminTopic = hasAdminVisibleTopic(session);
+  if (keepAdminTopic) {
+    return {
+      ...session,
+      curriculumLevelMismatch: true,
+      curriculumRepaired: false,
+      adminTopicPreserved: true,
+      hiddenCurriculumLevels: sessionLevels,
+    };
+  }
+
   const canonicalAssignmentId = String(canonicalLesson?.assignmentId || canonicalLesson?.id || "").trim();
   const canonicalTitle = String(canonicalLesson?.title || "").trim() || `${expectedLevel} live class`;
   const canonicalIds = canonicalAssignmentId ? [canonicalAssignmentId] : [];
-  const keepAdminTopic = hasAdminVisibleTopic(session);
 
   return {
     ...session,
-    topic: keepAdminTopic ? session.topic : canonicalTitle,
-    title: keepAdminTopic ? session.title : canonicalTitle,
-    assignmentIds: canonicalIds.length ? canonicalIds : session.assignmentIds,
-    chapterIds: canonicalIds.length ? canonicalIds : session.chapterIds,
-    curriculumIds: canonicalIds.length ? canonicalIds : session.curriculumIds,
-    assignment_id: canonicalAssignmentId || session.assignment_id || null,
+    topic: canonicalTitle,
+    title: canonicalTitle,
+    assignmentIds: canonicalIds,
+    chapterIds: canonicalIds,
+    curriculumIds: canonicalIds,
+    assignment_id: canonicalAssignmentId || null,
     curriculumLevelMismatch: true,
     curriculumRepaired: Boolean(canonicalLesson),
     curriculumSource: canonicalLesson ? "canonical lesson catalog" : session.curriculumSource,
     hiddenCurriculumLevels: sessionLevels,
-    adminTopicPreserved: keepAdminTopic,
+    adminTopicPreserved: false,
   };
 }
 
