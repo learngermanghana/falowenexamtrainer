@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import {
   STANDARD_WORKBOOK_TABS,
@@ -230,7 +229,6 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
   return (
     <>
-      <WorkbookReadAloudInjector />
       <UniversalA2WorkbookTabs level={workbookLevel} />
       <details
         style={{
@@ -264,9 +262,6 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
           </p>
           <p style={{ margin: 0 }}>
             <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören:</strong> complete the tasks and send only your final answers through the <strong>Submit</strong> tab.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Read aloud:</strong> In Teil 3, use the German voice controls to listen to the reading text, pause, continue, stop and change speed.
           </p>
         </div>
       </details>
