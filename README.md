@@ -6,6 +6,38 @@ Falowen Exam Coach is a two-part application that helps learners practice spoken
 - `web/` – React frontend that records audio/text answers and calls the backend.
 - `api/`, `vercel.json` – Deployment helpers for serverless environments (the API entry re-exports the Express app from `functions/functionz/app.js`).
 
+## A1 tutor-marked workbook standard
+All in-app A1 tutor-marked / submission-required workbook pages must use the shared shell:
+
+```
+web/src/components/A1TutorMarkedWorkbookShell.js
+```
+
+Rules:
+
+- A1 tutor-marked workbooks have only two visible workbook tabs: **Assignment** and **Submit**.
+- Do not use the A2/B1 `WorkbookTabNav` or the A2/B1 `Teil 1`, `Teil 2`, `Teil 3`, `Teil 4`, `Ref`, `Submit` tab structure for A1.
+- Do not send students to the generic `/campus/course?submitWork=1` page from A1 tutor-marked workbooks.
+- The Submit tab must render `AssignmentSubmissionPage` inside the workbook page.
+- The submit form must be locked with `submissionContext` using the correct `level`, `day`, and canonical `assignmentKey`.
+- Use `getInlineCourseAssignments(level, day)` and the workbook chapter to resolve the correct assignment key. Keep a safe `fallbackAssignmentKey` such as `A1-0.1`, `A1-4`, or `A1-8`.
+- Practice-only A1 workbooks are not tutor-marked and do not need this shell unless they later become submission-required.
+
+Example:
+
+```jsx
+<A1TutorMarkedWorkbookShell
+  day={1}
+  chapter="0.1"
+  fallbackAssignmentKey="A1-0.1"
+  title="A1 · Day 1 Workbook · Greetings"
+  subtitle="Chapter 0.1 · Tutor-marked assignment"
+  submitTitle="Submit A1 · Day 1 · Chapter 0.1"
+>
+  <section>Assignment content here</section>
+</A1TutorMarkedWorkbookShell>
+```
+
 ## Prerequisites
 - Node.js 18+ and npm
 - An OpenAI API key with access to the `gpt-4o-mini` family
@@ -257,192 +289,3 @@ rows into the approval spreadsheet with the helper script at
 
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
-
-## Restore students from Google Sheets
-If the `students` collection was deleted and you have a backup in Google Sheets,
-you can restore the most important fields with the helper script at
-`functions/functionz/restoreStudentsFromSheet.js`:
-
-```
-STUDENTS_SHEET_ID="<sheet_id>" \
-STUDENTS_SHEET_TAB="students" \
-GOOGLE_SERVICE_ACCOUNT_FILE=./service-account.json \
-node functions/functionz/restoreStudentsFromSheet.js
-```
-
-The script only restores the key student fields (name, studentCode, email,
-level, paid, balance, etc.), upserts by `studentCode`, and adds a `restoredAt`
-timestamp to each document.
-
-## Deploy the Cloud Functions (Firestore trigger + Paystack webhook)
-The Firebase Functions bundle exposes two entry points:
-
-- `api`: an Express app that now includes the Paystack webhook at
-  `/paystack/webhook`
-- `onStudentCreated`: a Firestore trigger that mirrors new student docs to the
-  Students Google Sheet
-
-To deploy them:
-
-1. Install the Firebase CLI if needed: `npm install -g firebase-tools`.
-2. Authenticate and pick your project: `firebase login` then
-   `firebase use <your-project-id>`.
-3. From the repository root, enter the functions directory:
-   ```
-   cd functions
-   ```
-4. Set the required secrets (for both the API and the sheet sync):
-   ```
-   firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON_B64   # base64 of your service-account JSON
-   firebase functions:secrets:set STUDENTS_SHEET_ID                 # sheet ID from the URL
-   firebase functions:secrets:set STUDENTS_SHEET_TAB                # optional; defaults to "students"
-   firebase functions:secrets:set PAYSTACK_SECRET                   # your Paystack secret key for webhook verification
-   ```
-5. Deploy the functions (both the API + webhook and the Firestore trigger):
-   ```
-   firebase deploy --only functions:api,functions:onStudentCreated
-   ```
-6. Confirm the deployment in the Firebase console or with
-   `firebase functions:list`, and watch logs while testing:
-   ```
-   firebase functions:log --only onStudentCreated
-   firebase functions:log --only api
-   ```
-
-### Avoid function conflicts when multiple repos deploy to the same Firebase project
-If another repository deploys to the same Firebase project, use a unique
-Functions `codebase` name in each repository's `firebase.json`. This repository
-uses:
-
-```json
-{
-  "functions": {
-    "source": "functions",
-    "codebase": "falowenexamtrainer"
-  }
-}
-```
-
-Then deploy with an explicit project ID from each repository:
-
-```
-firebase deploy --project <your-project-id> --only functions
-```
-
-Important: `codebase` prevents one repo's deploy from deleting functions owned
-by another repo, but it does **not** allow two repos to own the same function
-name. If both repos export a function with the same deployed name (for example
-`api`), the most recent deploy will still overwrite that function. To avoid
-that, rename function exports so each repo uses distinct names/prefixes.
-
-### Point Paystack to the webhook
-After deploying, configure the webhook URL in your Paystack dashboard to point
-to the HTTPS endpoint (replace `<project>` with your Firebase project ID):
-
-```
-https://europe-west1-<project>.cloudfunctions.net/api/paystack/webhook
-```
-
-Include the student code (preferred) or email in your Paystack transaction
-metadata (e.g., `studentCode: "ABC123"`). The webhook will verify the
-`PAYSTACK_SECRET`, add the new payment to the student's totals, update the
-Firestore document, and upsert the row in the Students sheet.
-
-### Configure level-specific tuition fees
-- Update `web/src/data/levelFees.js` to set the GH₵ tuition amount for each CEFR
-  level (A1, A2, B1, B2, etc.). The signup form reads these values to set each
-  student's `tuitionFee`, `balanceDue`, and `paymentStatus`.
-- Make sure your Paystack payment pages/links for each level charge the same
-  amounts so webhook callbacks reconcile correctly with the stored tuition.
-
-## Legacy student login (pre-Firebase accounts)
-For historic student rows that only stored an email, student code, and a
-bcrypt-hashed password in Firestore, the backend exposes a `/legacy/login`
-endpoint. It validates the supplied password against the stored hash and
-returns the student record without the password.
-
-Example request (from the repository root while the backend is running):
-
-```
-curl -X POST http://localhost:5000/api/legacy/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"moxflex@live.com","password":"<plaintext password>"}'
-```
-
-You can also pass `studentCode` instead of `email` when the document ID is
-known:
-
-```
-{
-  "studentCode": "ABC123",
-  "password": "<plaintext password>"
-}
-```
-
-On success, the response includes the `id` (doc ID) and all student fields
-except `password`, allowing the React app to display the legacy profile data.
-
-## Install dependencies
-From the repository root, install backend dependencies:
-
-```
-npm install
-```
-
-Then install frontend dependencies:
-
-```
-cd web
-npm install
-```
-
-## Firebase integration tests
-The repository includes Jest integration tests that run against the Firebase Emulator Suite for Authentication and Firestore.
-
-- Install dependencies from the repository root:
-
-```
-npm install
-```
-
-- Run the integration suite (requires the Firebase CLI; `npm i -g firebase-tools` if you don't already have it):
-
-```
-npm run test:integration
-```
-
-The suite provisions a test user via email/password, completes the email verification flow through the Auth emulator, and writes/reads a student profile document in Firestore.
-
-## Run locally
-1. **Start the backend** (from the repository root):
-   ```
-   npm start
-   ```
-   The API listens on `http://localhost:5000` by default and stores user history under `functions/functionz/data/`.
-
-2. **Start the frontend** (new terminal):
-   ```
-   cd web
-   npm start
-   ```
-   The React dev server runs on `http://localhost:3000` and proxies requests to the backend URL set by `REACT_APP_BACKEND_URL`.
-
-## Build for local static hosting
-To produce a production build of the frontend that can be hosted from disk or any static server:
-
-```
-cd web
-npm run build
-```
-
-The optimized static files are written to `web/build/`. You can serve that folder locally with a static file server (for example, `npx serve build`) while keeping the backend running.
-
-## Troubleshooting
-- Ensure `OPENAI_API_KEY` is set before starting the backend; requests will fail without it.
-- Audio uploads are limited to 25 MB and stored under `functionz/uploads/` when running locally.
-
-## Deploying to Vercel
-- The repository includes a `vercel.json` that builds the React app from `web/` and deploys the Express API from `api/`.
-- When running on Vercel, the backend writes user history to `/tmp/falowen-exam-coach/` to comply with the platform's read-only filesystem.
-- The frontend calls the API on the same origin by default in production; set `REACT_APP_BACKEND_URL` only when pointing to a different API URL.
-- Make sure `OPENAI_API_KEY` is configured as a Vercel environment variable before deploying.
