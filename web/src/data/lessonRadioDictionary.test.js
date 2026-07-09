@@ -53,6 +53,10 @@ test.each([
   [11, "Teamspiele 4.11", "lPpQtsfyBI0"],
   [12, "Abenteuer in der Natur 4.12", "8oISDL8kGqQ"],
   [13, "Eigene Filmkritik schreiben 4.13", "WpxdZG953Xo"],
+  [14, "Traditionelles vs. digitales Lernen 5.14", "NS58BIySjx8"],
+  [15, "Medien und Arbeiten im Homeoffice 5.15", "VhS1sIckFpU"],
+  [16, "Prüfungsangst und Stressbewältigung 5.16", "dQMaaYXqMWI"],
+  [17, "Wie lernt man am besten? 5.17", "7jbMA-e-jeE"],
   [26, "Reiseprobleme und Lösungen 9.26", "8HdiyR5I96I"],
 ])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("B1", day)).toEqual(
