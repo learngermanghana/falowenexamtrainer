@@ -18,7 +18,7 @@ describe("getLessonVideoResources", () => {
     ]);
   });
 
-  test("returns the A1 Day 2 chapter-specific AI videos beside matching teacher videos", () => {
+  test("returns the A1 Day 2 chapter-specific AI videos beside matching generic lesson videos", () => {
     const resources = getLessonVideoResources("A1", 2, A1_DAY_2);
 
     expect(
@@ -31,7 +31,7 @@ describe("getLessonVideoResources", () => {
     ]);
 
     expect(
-      resources.filter((resource) => resource.title.includes("Teacher")),
+      resources.filter((resource) => resource.title.includes("Lesson / Hören")),
     ).toHaveLength(2);
     expect(
       resources.filter((resource) => resource.title.includes("AI video")),
@@ -128,7 +128,7 @@ describe("getLessonVideoResources", () => {
     ).toEqual(["https://example.com/teacher", "https://example.com/ai"]);
   });
 
-  test("hides scheduled generic A2 teacher fallback videos outside Day 16", () => {
+  test("keeps scheduled generic A2 listening videos outside Day 16", () => {
     const entry = {
       chapter: "8.99",
       lesen_hören: {
@@ -137,7 +137,13 @@ describe("getLessonVideoResources", () => {
       },
     };
 
-    expect(getLessonVideoResources("A2", 99, entry)).toEqual([]);
+    expect(getLessonVideoResources("A2", 99, entry)).toEqual([
+      expect.objectContaining({
+        key: "lesson-listening-video",
+        title: "Lesson / Hören video",
+        url: "https://example.com/fallback-video",
+      }),
+    ]);
   });
 
   test.each([
@@ -171,13 +177,13 @@ describe("getLessonVideoResources", () => {
   });
 });
 
-test("explicit AI video takes priority over a generic legacy video", () => {
+test("explicit AI video remains visible beside a generic lesson video", () => {
   expect(
     getLessonVideoResources("A2", 8, {
       video: "generic",
       ai_video: "explicit-ai",
     }).map(({ url }) => url),
-  ).toEqual(["explicit-ai"]);
+  ).toEqual(["generic", "explicit-ai"]);
 });
 
 test("removes duplicate videos and preserves chapter ordering", () => {
