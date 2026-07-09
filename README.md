@@ -25,6 +25,178 @@ Create a `.env` file inside `web/` for the frontend (optional when using the def
 REACT_APP_BACKEND_URL=http://localhost:5000
 ```
 
+## Course media: AI video, teacher lecture video, and Falowen Radio
+The Course Book lesson page can show three different media types. They must be configured in the correct file so the app knows what label and button to show.
+
+### 1. AI grammar video
+Use this for AI-generated grammar explanations or AI revision videos.
+
+Main file:
+
+```
+web/src/data/lessonVideoDictionary.js
+```
+
+The app recognizes an AI video when the lesson has one of these fields:
+
+```js
+ai_grammar_video
+aiGrammarVideo
+ai_grammar_video_url
+aiGrammarVideoUrl
+ai_video
+aiVideo
+```
+
+Example:
+
+```js
+A2: {
+  7: {
+    ai_grammar_video: "https://youtu.be/VIDEO_ID",
+  },
+},
+```
+
+Or as a full resource:
+
+```js
+A2: {
+  16: {
+    videoResources: [
+      {
+        key: "a2-day16-ai-grammar-video",
+        chapter: "6.16",
+        title: "AI grammar video",
+        description: "Step-by-step grammar explanation for revision and self-study.",
+        url: "https://youtu.be/VIDEO_ID",
+      },
+    ],
+  },
+},
+```
+
+In the Course Book UI, this appears as **AI Grammar Explainer** with a **Watch AI video** button.
+
+### 2. Teacher lecture video / tutor lecture video
+Use this only for real teacher/tutor lecture recordings.
+
+A1 teacher videos are managed here:
+
+```
+web/src/data/a1TeacherVideoResources.js
+```
+
+A1 already has teacher lecture videos configured by day and chapter. Example format:
+
+```js
+[2, "0.2", "German Alphabet", "https://youtu.be/VIDEO_ID"]
+```
+
+For future A2 or B1 teacher lecture videos, use this simple config file:
+
+```
+web/src/data/teacherLectureVideoResources.js
+```
+
+Add new A2/B1 teacher lecture videos like this:
+
+```js
+const TEACHER_LECTURE_VIDEO_ENTRIES = {
+  A2: {
+    16: [
+      {
+        chapter: "6.16",
+        topic: "Wohlbefinden und Entspannung",
+        url: "https://youtu.be/VIDEO_ID",
+      },
+    ],
+  },
+  B1: {
+    8: [
+      {
+        chapter: "3.8",
+        topic: "Alles für die Gesundheit",
+        url: "https://youtu.be/VIDEO_ID",
+      },
+    ],
+  },
+};
+```
+
+Rules:
+
+- A1 teacher lecture videos show when an A1 teacher video link exists.
+- A2 teacher lecture videos show only when that day is added to `teacherLectureVideoResources.js`.
+- B1 teacher lecture videos show only when that day is added to `teacherLectureVideoResources.js`.
+- If no teacher lecture video exists for an A2/B1 day, the app does not show an empty teacher video card.
+
+In the Course Book UI, this appears as **Teacher Lecture** with a **Watch teacher video** button.
+
+### 3. Falowen Radio
+Use this for the radio/listening intro shown with the `?radio=done` flow and A2/B1 radio lessons.
+
+Main files:
+
+```
+web/src/data/lessonRadioDictionary.js
+web/src/data/additionalA2RadioEntries.js
+```
+
+A2 extra radio entries are easiest to update in:
+
+```
+web/src/data/additionalA2RadioEntries.js
+```
+
+Example:
+
+```js
+7: {
+  key: "a2-day7-eine-wohnung-suchen-falowen-radio",
+  title: "Eine Wohnung suchen (Übung) 3.7",
+  youtubeId: "VIDEO_ID",
+  duration: "",
+  instruction:
+    "Höre einfach zu und stimme dich auf das Thema Wohnung suchen ein. Danach gehst du weiter zu Teil 1.",
+},
+```
+
+Use only the YouTube ID for `youtubeId`, not the full URL. For example:
+
+```
+https://youtu.be/P1so4g9y3Ao  ->  P1so4g9y3Ao
+```
+
+### How the app decides what to show
+The media flow is handled mainly by:
+
+```
+web/src/data/lessonModel.js
+web/src/data/lessonVideoDictionary.js
+web/src/data/teacherLectureVideoResources.js
+web/src/data/lessonRadioDictionary.js
+web/src/data/additionalA2RadioEntries.js
+web/src/components/CourseLessonPageLegacy.js
+```
+
+The logic is:
+
+1. `lessonModel.js` normalizes the lesson and collects media resources.
+2. `lessonVideoDictionary.js` separates AI grammar videos from teacher lecture videos.
+3. `teacherLectureVideoResources.js` controls which A2/B1 teacher videos are allowed to show.
+4. `a1TeacherVideoResources.js` provides the A1 teacher lecture videos.
+5. `lessonRadioDictionary.js` and `additionalA2RadioEntries.js` provide Falowen Radio.
+6. `CourseLessonPageLegacy.js` renders the cards in the Lesson resources box.
+
+### Quick checklist when adding media
+- Add AI videos to `lessonVideoDictionary.js` using `ai_grammar_video` or a resource titled `AI grammar video`.
+- Add A1 teacher videos to `a1TeacherVideoResources.js`.
+- Add A2/B1 teacher videos to `teacherLectureVideoResources.js`.
+- Add Falowen Radio videos to `lessonRadioDictionary.js` or `additionalA2RadioEntries.js`.
+- Do not put a teacher lecture link in `ai_grammar_video`.
+- Do not put a Falowen Radio link in the AI video or teacher lecture files.
+
 ## Configure Firebase for auth + Firestore
 The React app reads/writes student data from Firestore and relies on Firebase Authentication for login, email verification, and
 password resets. To set it up:
