@@ -86,24 +86,27 @@ describe("additional B1 AI lesson videos", () => {
     [23, "7.23", "B1 Day 23 · Erstes Date · AI video", "https://youtu.be/z0o4AKwC2Jw"],
     [24, "8.24", "B1 Day 24 · Konsum und Nachhaltigkeit · AI video", "https://youtu.be/IEkOJbMjngk"],
     [25, "8.25", "B1 Day 25 · Online einkaufen – Rechte und Risiken · AI video", "https://youtu.be/wlbEusnTbj4"],
+    [26, "9.26", "B1 Day 26 · Reiseprobleme und Lösungen · AI video", "https://youtu.be/zepPwqf-orA?si=1r6nME-tz4WxLqSA"],
+    [27, "10.27", "B1 Day 27 · Umweltfreundlich im Alltag · AI video", "https://youtu.be/ppH6fDhlcWY"],
+    [28, "10.28", "B1 Day 28 · Klimafreundlich leben · AI video", "https://youtu.be/rJ3lEt3T4-4"],
   ])("Day %i uses the requested B1 AI video", (day, chapter, title, url) => {
     expect(getAdditionalLessonVideoResources("B1", day)).toEqual([
       expect.objectContaining({ chapter, title, url }),
     ]);
   });
 
-  test("B1 Day 25 exposes the AI video through the shared lesson model", () => {
+  test("B1 Day 28 exposes the AI video through the shared lesson model", () => {
     const lesson = normalizeLesson({
       level: "B1",
-      day: 25,
-      chapter: "8.25",
-      topic: "Online einkaufen – Rechte und Risiken",
+      day: 28,
+      chapter: "10.28",
+      topic: "Klimafreundlich leben",
     });
 
     expect(lesson.resources.aiVideo).toEqual(
       expect.objectContaining({
-        chapter: "8.25",
-        url: "https://youtu.be/wlbEusnTbj4",
+        chapter: "10.28",
+        url: "https://youtu.be/rJ3lEt3T4-4",
       }),
     );
   });
