@@ -137,7 +137,7 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
     ),
     [day, entry, level],
   );
-  const teacherVideo = findVideo(videos, "teacher") || videos[0];
+  const teacherVideo = findVideo(videos, "teacher");
   const aiVideo = findVideo(videos, "ai") || videos.find((resource) => resource?.url !== teacherVideo?.url);
   const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link", level, day);
   const derivedWorkbookUrl = workbookUrl || findResourceUrl(entry, "workbook_link", level, day);

@@ -3,8 +3,12 @@ const normalizeLevel = (level = "") =>
     .trim()
     .toUpperCase();
 
-export const shouldShowTeacherLectureVideo = (level) =>
-  ["A1", "A2", "B1", "B2", "C1"].includes(normalizeLevel(level));
+export const shouldShowTeacherLectureVideo = (level, day) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (normalizedLevel === "A2") return Number(day) === 16;
+  if (normalizedLevel === "B1") return false;
+  return ["A1", "B2", "C1"].includes(normalizedLevel);
+};
 
 const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
   key: "a1-day0-orientation-video",
@@ -459,7 +463,7 @@ const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
-  const showTeacherVideos = shouldShowTeacherLectureVideo(normalizedLevel) && dayKey !== "0";
+  const showTeacherVideos = shouldShowTeacherLectureVideo(normalizedLevel, dayKey) && dayKey !== "0";
   const dictionaryEntry =
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);
