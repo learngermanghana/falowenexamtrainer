@@ -61,6 +61,79 @@ const defaultImages = {
   hoeren: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
 };
 
+const extractYouTubeId = (url = "") => {
+  const value = String(url || "").trim();
+  if (!value) return "";
+
+  const shortMatch = value.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+  if (shortMatch) return shortMatch[1];
+
+  const watchMatch = value.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+  if (watchMatch) return watchMatch[1];
+
+  const embedMatch = value.match(/youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
+  if (embedMatch) return embedMatch[1];
+
+  const shortsMatch = value.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+  if (shortsMatch) return shortsMatch[1];
+
+  return "";
+};
+
+const ListeningMedia = ({ url }) => {
+  const youtubeId = extractYouTubeId(url);
+
+  if (youtubeId) {
+    return (
+      <div style={{ display: "grid", gap: 8 }}>
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            paddingTop: "56.25%",
+            borderRadius: 12,
+            overflow: "hidden",
+            background: "#000",
+          }}
+        >
+          <iframe
+            title="Teil 4 Hören video"
+            src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              border: 0,
+            }}
+          />
+        </div>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
+        >
+          Open in YouTube
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}
+    >
+      Open listening audio
+    </a>
+  );
+};
+
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -222,11 +295,7 @@ const A2StandardTabbedWorkbookPage = ({
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             {hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor."}
           </p>
-          {hoerenAudioUrl ? (
-            <a href={hoerenAudioUrl} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
-              Open listening audio
-            </a>
-          ) : null}
+          {hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}
           <QuestionList questions={hoerenQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
