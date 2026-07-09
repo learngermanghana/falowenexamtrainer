@@ -1,23 +1,7 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
-
-const pageStyle = {
-  ...styles.container,
-  display: "grid",
-  gap: 10,
-  maxWidth: 860,
-  padding: "12px 10px 28px",
-};
-
-const cardStyle = {
-  ...styles.card,
-  display: "grid",
-  gap: 8,
-  padding: 12,
-  marginBottom: 8,
-};
 
 const sectionStyle = {
   ...styles.card,
@@ -98,15 +82,16 @@ const questions = [
 ];
 
 const A1Day1GreetingsWorkbookPage = () => {
-
   return (
-    <div style={pageStyle}>
-      <div style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, margin: 0, fontSize: 22, lineHeight: 1.15 }}>A1 · Day 1 Workbook · Greetings</h1>
-        <p style={{ ...styles.subtitle, margin: 0, fontSize: 12 }}>Chapter 0.1 · Complete Teil 1 and submit only Teil 2.</p>
-      </div>
-
+    <A1TutorMarkedWorkbookShell
+      day={1}
+      chapter="0.1"
+      fallbackAssignmentKey="A1-0.1"
+      title="A1 · Day 1 Workbook · Greetings"
+      subtitle="Chapter 0.1 · Tutor-marked assignment"
+      assignmentIntro="Complete the assignment, then open Submit to send only your Teil 2 answers for A1-0.1."
+      submitTitle="Submit A1 · Day 1 · Chapter 0.1"
+    >
       <section style={sectionStyle}>
         <img
           src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70"
@@ -140,21 +125,7 @@ const A1Day1GreetingsWorkbookPage = () => {
           </div>
         ))}
       </section>
-
-      <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <p style={{ margin: 0, fontWeight: 600, fontSize: 13 }}>
-          Submit only your Teil 2 answers in the submission area.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none", padding: "8px 12px", fontSize: 13 }}
-        >
-          Submit Workbook Answers
-        </a>
-      </div>
-    </div>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
