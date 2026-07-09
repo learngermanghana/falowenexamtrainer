@@ -34,8 +34,27 @@ service cloud.firestore {
       );
     }
 
+    function ownsStudentResource() {
+      return signedIn() && (
+        resource.data.studentId == request.auth.uid ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.uid == request.auth.uid ||
+        resource.data.ownerUid == request.auth.uid
+      );
+    }
+
+    function ownsStudentIncoming() {
+      return signedIn() && (
+        request.resource.data.studentId == request.auth.uid ||
+        request.resource.data.userId == request.auth.uid ||
+        request.resource.data.uid == request.auth.uid ||
+        request.resource.data.ownerUid == request.auth.uid
+      );
+    }
+
     function ownershipFieldsUnchanged() {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'studentId',
         'userId',
         'uid',
         'ownerUid'
@@ -59,6 +78,30 @@ service cloud.firestore {
         allow update: if ownsResource() && ownsIncoming() && ownershipFieldsUnchanged();
         allow delete: if ownsResource();
       }
+    }
+
+    // Assignment submission persistence.
+    // Students can save/retrieve their own drafts, submissions, and one-time submission locks.
+    // Staff can read/write for support and grading workflows.
+    match /submissionDrafts/{draftId} {
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
+    match /submissions/{submissionId} {
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if isStaff();
+    }
+
+    match /submissionLocks/{lockId} {
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if isStaff();
     }
 
     match /writingReferences/{docId} {
