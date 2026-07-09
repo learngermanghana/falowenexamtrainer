@@ -112,9 +112,6 @@ const GrammarReturnActions = ({ target }) => {
       >
         Back to workbook ›
       </a>
-      <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}>
-        Back to Course Book
-      </a>
     </div>
   );
 };
