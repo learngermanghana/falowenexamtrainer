@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
 import { loadPreferredLevel } from "../services/levelStorage";
 import { styles } from "../styles";
@@ -185,16 +186,18 @@ const CheatSheetContent = ({ level }) => {
 };
 
 export default function ExamQuestionCheatSheetInjector() {
+  const location = useLocation();
   const [targets, setTargets] = useState({ button: null, panel: null });
   const [open, setOpen] = useState(false);
   const [level, setLevel] = useState(readActiveLevel);
-  const pathname = typeof window === "undefined" ? "" : window.location.pathname;
-  const enabled = isExamQuestionRoute(pathname);
+  const enabled = isExamQuestionRoute(location.pathname);
 
   useEffect(() => {
     if (!enabled || typeof document === "undefined") {
-      document?.getElementById?.(BUTTON_HOST_ID)?.remove();
-      document?.getElementById?.(PANEL_HOST_ID)?.remove();
+      if (typeof document !== "undefined") {
+        document.getElementById(BUTTON_HOST_ID)?.remove();
+        document.getElementById(PANEL_HOST_ID)?.remove();
+      }
       setTargets({ button: null, panel: null });
       setOpen(false);
       return undefined;
