@@ -135,6 +135,36 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/wlbEusnTbj4",
       },
     ],
+    26: [
+      {
+        key: "b1-day26-reiseprobleme-loesungen-ai-video",
+        chapter: "9.26",
+        title: "B1 Day 26 · Reiseprobleme und Lösungen · AI video",
+        description:
+          "AI video lesson for travel problems, complaints, solutions and useful phrases at B1 level.",
+        url: "https://youtu.be/zepPwqf-orA?si=1r6nME-tz4WxLqSA",
+      },
+    ],
+    27: [
+      {
+        key: "b1-day27-umweltfreundlich-im-alltag-ai-video",
+        chapter: "10.27",
+        title: "B1 Day 27 · Umweltfreundlich im Alltag · AI video",
+        description:
+          "AI video lesson for eco-friendly habits, everyday sustainability and environmental vocabulary at B1 level.",
+        url: "https://youtu.be/ppH6fDhlcWY",
+      },
+    ],
+    28: [
+      {
+        key: "b1-day28-klimafreundlich-leben-ai-video",
+        chapter: "10.28",
+        title: "B1 Day 28 · Klimafreundlich leben · AI video",
+        description:
+          "AI video lesson for climate-friendly living, personal choices and environmental responsibility at B1 level.",
+        url: "https://youtu.be/rJ3lEt3T4-4",
+      },
+    ],
   },
   B2: {
     0: [
