@@ -1,5 +1,5 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -95,18 +95,15 @@ const horenQuestions = [
 ];
 
 const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
-
   return (
-    <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <section style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 12 Workbook · The 24 Hour Clock and Dates</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 8</p>
-        <p style={paragraph}>
-          Complete each Teil below and submit your final answers in the submission area, not directly on this page.
-        </p>
-      </section>
-
+    <A1TutorMarkedWorkbookShell
+      day={12}
+      chapter="8"
+      fallbackAssignmentKey="A1-8"
+      title="A1 · Day 12 Workbook · The 24 Hour Clock and Dates"
+      subtitle="Chapter 8 · Tutor-marked assignment"
+      submitTitle="Submit A1 · Day 12 · Chapter 8"
+    >
       <section style={card}>
         <img
           src={teil1HeroImage}
@@ -116,18 +113,17 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
         />
         <h2 style={sectionTitle}>Teil 1: Lesen (Multiple Choice)</h2>
         <p style={paragraph}>
-          Heute ist der dritte Februar. In Deutschland benutzen wir oft die 24-Stunden-Uhr. Das bedeutet, dass der Tag
-          um Mitternacht bei null Uhr beginnt und bis 23:59 Uhr dauert. Zum Beispiel, wenn es 14:00 Uhr ist, bedeutet
-          das, dass es zwei Uhr nachmittags ist. Wenn es 20:00 Uhr ist, dann ist es acht Uhr abends.
+          Heute ist der dritte Februar. In Deutschland benutzen wir oft die 24-Stunden-Uhr. Das bedeutet, dass der Tag um
+          Mitternacht bei null Uhr beginnt und bis 23:59 Uhr dauert. Zum Beispiel, wenn es 14:00 Uhr ist, bedeutet das,
+          dass es zwei Uhr nachmittags ist. Wenn es 20:00 Uhr ist, dann ist es acht Uhr abends.
         </p>
         <p style={paragraph}>
-          Die Monate des Jahres sind Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober,
-          November und Dezember. Der Februar hat normalerweise 28 Tage, aber in einem Schaltjahr hat er 29 Tage.
+          Die Monate des Jahres sind Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November
+          und Dezember. Der Februar hat normalerweise 28 Tage, aber in einem Schaltjahr hat er 29 Tage.
         </p>
         <p style={paragraph}>
-          Die Wochentage sind Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag. Heute ist Mittwoch.
-          Das Datum wird in Deutschland als Tag.Monat.Jahr geschrieben. Also, der dritte Februar 2024 wird als
-          03.02.2024 geschrieben.
+          Die Wochentage sind Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag. Heute ist Mittwoch. Das
+          Datum wird in Deutschland als Tag.Monat.Jahr geschrieben. Also, der dritte Februar 2024 wird als 03.02.2024 geschrieben.
         </p>
         <p style={paragraph}>Jetzt möchte ich, dass ihr ein paar Fragen beantwortet.</p>
 
@@ -155,13 +151,12 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
           dass es vier Uhr nachmittags ist. Wenn es 21:00 Uhr ist, dann ist es neun Uhr abends.
         </p>
         <p style={paragraph}>
-          Die Monate des Jahres sind Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober,
-          November und Dezember. Der Februar hat normalerweise 28 Tage, aber in einem Schaltjahr hat er 29 Tage.
+          Die Monate des Jahres sind Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November
+          und Dezember. Der Februar hat normalerweise 28 Tage, aber in einem Schaltjahr hat er 29 Tage.
         </p>
         <p style={paragraph}>
-          Die Wochentage sind Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag. Heute ist Montag.
-          Das Datum wird in Deutschland als Tag.Monat.Jahr geschrieben. Also, der fünfte April 2024 wird als
-          05.04.2024 geschrieben.
+          Die Wochentage sind Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag. Heute ist Montag. Das
+          Datum wird in Deutschland als Tag.Monat.Jahr geschrieben. Also, der fünfte April 2024 wird als 05.04.2024 geschrieben.
         </p>
         <ol style={listStyle}>
           {teil2Questions.map((question) => (
@@ -179,8 +174,7 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
         />
         <h2 style={sectionTitle}>Teil 3: Hörverstehen</h2>
         <p style={paragraph}>
-          Hören Thema: 24-Stunden-Uhr und Daten. Use the in-app player first. If playback fails, open the Google Drive
-          link directly.
+          Hören Thema: 24-Stunden-Uhr und Daten. Use the in-app player first. If playback fails, open the Google Drive link directly.
         </p>
         <CoursebookAudioPlayer url={horenLink} linkLabel="Open Hören Audio in Google Drive" />
         {horenQuestions.map((question) => (
@@ -196,29 +190,14 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
       <section style={card}>
         <h2 style={sectionTitle}>Teil 4: Vocabulary Notes</h2>
         <p style={paragraph}>
-          Focus words: Mitternacht, null Uhr, vierzehn Uhr, sechzehn Uhr, Tag, Monat, Jahr, Datum, Schaltjahr,
-          Montag-Sonntag, Januar-Dezember.
+          Focus words: Mitternacht, null Uhr, vierzehn Uhr, sechzehn Uhr, Tag, Monat, Jahr, Datum, Schaltjahr, Montag-Sonntag,
+          Januar-Dezember.
         </p>
         <p style={paragraph}>
           Useful date forms: der dritte (3.), der fünfte (5.), der zehnte (10.), der einunddreißigste (31.).
         </p>
       </section>
-
-      <section style={{ ...card, border: "1px solid #c7d2fe", background: "#eef2ff" }}>
-        <h2 style={sectionTitle}>Final Submission</h2>
-        <p style={paragraph}>
-          After completing all parts, submit your answers in the submission area only (not on this page).
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Go to Submission Area
-        </a>
-      </section>
-    </main>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
