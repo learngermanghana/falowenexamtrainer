@@ -13,6 +13,8 @@ import { loadPreferredClass, savePreferredClass } from "../services/classSelecti
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
 
 const GHANA_TIMEZONE = "Africa/Accra";
+const BACKSLASH = String.fromCharCode(92);
+const NEWLINE = String.fromCharCode(10);
 
 const infoCardStyle = {
   border: "1px solid #e5e7eb",
@@ -144,16 +146,16 @@ function sessionStatusStyle(status) {
 
 function escapeIcs(value) {
   return String(value || "")
-    .replace(/\/g, "\\")
-    .replace(/\n/g, "\\n")
-    .replace(/,/g, "\\,")
-    .replace(/;/g, "\\;");
+    .split(BACKSLASH).join(`${BACKSLASH}${BACKSLASH}`)
+    .split(NEWLINE).join(`${BACKSLASH}n`)
+    .split(",").join(`${BACKSLASH},`)
+    .split(";").join(`${BACKSLASH};`);
 }
 
 function toIcsDate(value) {
   const date = asDate(value);
   if (!date) return "";
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+  return date.toISOString().replace(/[-:]/g, "").replace(/[.]\d{3}Z$/, "Z");
 }
 
 function downloadCanonicalCalendar(summary) {
