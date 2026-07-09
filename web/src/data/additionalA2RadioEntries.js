@@ -51,7 +51,7 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
   7: {
     key: "a2-day7-eine-wohnung-suchen-falowen-radio",
     title: "Eine Wohnung suchen (Übung) 3.7",
-    youtubeId: "ScU6w8VQgNg",
+    youtubeId: "P1so4g9y3Ao",
     duration: "",
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Wohnung suchen ein. Danach gehst du weiter zu Teil 1.",
