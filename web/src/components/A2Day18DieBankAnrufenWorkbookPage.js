@@ -18,13 +18,14 @@ export default function A2Day18DieBankAnrufenWorkbookPage() {
         { stem: "Welche Bank hat Filialen in den Vororten?", options: ["A) Commerzbank", "B) Deutsche Bank", "C) Volksbank", "D) Sparkasse"] },
         { stem: "Welche Bank hat die kürzesten Öffnungszeiten?", options: ["A) Commerzbank", "B) Postbank", "C) Deutsche Bank", "D) Sparkasse"] },
       ]}
-      hoerenTask="Hören Sie das Gespräch über einen Anruf bei der Bank. Achten Sie auf Dokumente, Termin, Dauer des Gesprächs, Kontomodelle und Online-Formulare. Video: https://youtu.be/cHKVQOLWv7c"
+      hoerenTask="Hören Sie das Gespräch über einen Anruf bei der Bank. Achten Sie auf Dokumente, Termin, Dauer des Gesprächs, Kontomodelle und Online-Formulare."
+      hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"
       hoerenQuestions={[
         { stem: "Welche Dokumente benötigen Sie, um ein Konto zu eröffnen?", options: ["A) Nur einen Reisepass", "B) Reisepass, Meldebescheinigung, Einkommensnachweis", "C) Nur einen Einkommensnachweis", "D) Keine Dokumente"] },
         { stem: "Wie lange dauert das Beratungsgespräch?", options: ["A) 30 Minuten", "B) Eine Stunde", "C) Zwei Stunden", "D) 15 Minuten"] },
         { stem: "Wie viele Kontomodelle bietet die Bank an?", options: ["A) Zwei", "B) Drei", "C) Vier", "D) Fünf"] },
         { stem: "Welches Konto ist kostenlos?", options: ["A) Basiskonto", "B) Konto mit zusätzlichen Dienstleistungen", "C) Premium-Konto", "D) Geschäftskonto"] },
-        { stem: "Was können Sie tun, um Zeit zu sparen?", options: ["A) Die Formulare in der Bankfiliale ausfüllen", "B) Die Formulare vor dem Termin online ausfüllen", "C) Einen Termin absagen", "D) Ohne Unterlagen kommen"] },
+        { stem: "Was können Sie tun, um Zeit zu sparen?", options: ["A) Die Formulare in der Bankfiliale ausfüllen", "B) Die Formulare vor dem Termin online ausfüllen", "C) Einen Termin absagen"] },
       ]}
     />
   );
