@@ -45,7 +45,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Alles für die Gesundheit",
     grammarBook: route(8, "grammar"),
     workbook: route(8, "workbook"),
-    aiVideo: "https://youtu.be/_aFuOTSdMb8",
+    aiVideo: "https://youtu.be/myDdgoNbBL8",
     grammarTopic: "Modalverben für Gesundheitstipps",
     goal: "Über Gesundheit sprechen und klare B1-Ratschläge formulieren.",
     instruction: "Lies zuerst die Grammatiknotizen. Bearbeite danach alle vier Workbook-Teile und sende deine Antworten über den Submit-Tab.",
