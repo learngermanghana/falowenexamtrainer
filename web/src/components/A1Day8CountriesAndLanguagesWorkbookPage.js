@@ -1,14 +1,7 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
-
-const pageStyle = {
-  ...styles.container,
-  display: "grid",
-  gap: 16,
-  paddingBottom: 32,
-};
 
 const cardStyle = {
   ...styles.card,
@@ -55,19 +48,15 @@ const essayText = [
 ];
 
 const A1Day8CountriesAndLanguagesWorkbookPage = () => {
-
   return (
-    <div style={pageStyle}>
-      <section style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 8 Workbook · Countries and Languages</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 4</p>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete each Teil below and submit your final answers in the submission area, not directly on this page.
-        </p>
-      </section>
-
+    <A1TutorMarkedWorkbookShell
+      day={8}
+      chapter="4"
+      fallbackAssignmentKey="A1-4"
+      title="A1 · Day 8 Workbook · Countries and Languages"
+      subtitle="Chapter 4 · Tutor-marked assignment"
+      submitTitle="Submit A1 · Day 8 · Chapter 4"
+    >
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>Teil 1 · Countries and Languages Part 1: Translation</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>Translate the following sentences into German.</p>
@@ -215,17 +204,7 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
           </ol>
         </div>
       </section>
-
-      <section style={{ ...cardStyle, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
-        <h2 style={sectionTitleStyle}>Final submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Submit your answers in the submission area (not on this workbook page).
-        </p>
-        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
-          Open submission area
-        </a>
-      </section>
-    </div>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
