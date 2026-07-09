@@ -197,6 +197,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Lernmethoden und gute Lernstrategien ein. Danach gehst du weiter zum Workbook.",
     },
+    18: {
+      key: "b1-day18-wege-zum-wunschberuf-falowen-radio",
+      title: "Wege zum Wunschberuf 6.18",
+      youtubeId: "uNabTZwqrB0",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Berufswege, Ziele und den Wunschberuf ein. Danach gehst du weiter zum Workbook.",
+    },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
       title: "Wie wird man …? (Ausbildung und Qualifikationen) 6.20",
