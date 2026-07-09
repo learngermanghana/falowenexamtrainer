@@ -64,6 +64,14 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
     instruction:
       "Höre einfach zu und stimme dich auf das Thema Rezepte und Essen ein. Danach gehst du weiter zu Teil 1.",
   },
+  10: {
+    key: "a2-day10-tourismus-traditionelle-feste-falowen-radio",
+    title: "Tourismus und Traditionelle Feste 4.10",
+    youtubeId: "vpSwGAtqIlU",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Tourismus und traditionelle Feste ein. Danach gehst du weiter zu Teil 1.",
+  },
   12: {
     key: "a2-day12-mein-traumberuf-falowen-radio",
     title: "Mein Traumberuf 5.12",
