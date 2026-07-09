@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import {
+  STANDARD_WORKBOOK_TABS,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
 const resolveWorkbookLevel = (level) => {
   const explicit = String(level || "").trim().toUpperCase();
@@ -24,13 +28,20 @@ const normalizeTabText = (value = "") =>
 
 const REQUIRED_A2_TAB_KEYS = ["teil1", "teil2", "teil3", "teil4", "ref", "submit"];
 
+const FORCE_SHARED_A2_TAB_PATHS = [
+  "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
+  "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
+  "/campus/course/a2-day-12-mein-traumberuf-workbook",
+  "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
+];
+
 const UNIVERSAL_A2_WORKBOOK_TABS = [
-  { key: "teil1", label: "Teil 1", match: /\bteil\s*1\b|sprechen|speak/i },
-  { key: "teil2", label: "Teil 2", match: /\bteil\s*2\b|schreiben|write/i },
-  { key: "teil3", label: "Teil 3", match: /\bteil\s*3\b|lesen|read/i },
-  { key: "teil4", label: "Teil 4", match: /\bteil\s*4\b|h[oö]ren|hoeren|listen/i },
-  { key: "ref", label: "Ref", match: /\bref\b|reference|answers|antwort/i },
-  { key: "submit", label: "Submit", match: /submit|abgeben|send/i },
+  { key: "sprechen", legacyKey: "teil1", match: /\bteil\s*1\b|sprechen|speak/i },
+  { key: "schreiben", legacyKey: "teil2", match: /\bteil\s*2\b|schreiben|write/i },
+  { key: "lesen", legacyKey: "teil3", match: /\bteil\s*3\b|lesen|read/i },
+  { key: "hoeren", legacyKey: "teil4", match: /\bteil\s*4\b|h[oö]ren|hoeren|listen/i },
+  { key: "references", legacyKey: "ref", match: /\bref\b|reference|answers|antwort/i },
+  { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
 ];
 
 const detectTabKey = (text = "") => {
@@ -44,13 +55,54 @@ const detectTabKey = (text = "") => {
   return "";
 };
 
+const isElementVisible = (element) => {
+  if (!element || typeof window === "undefined") return false;
+  const style = window.getComputedStyle?.(element);
+  if (style && (style.display === "none" || style.visibility === "hidden" || style.opacity === "0")) return false;
+  return true;
+};
+
+const shouldForceSharedA2Tabs = () => {
+  if (typeof window === "undefined") return false;
+  const pathname = window.location.pathname || "";
+  return FORCE_SHARED_A2_TAB_PATHS.some((path) => pathname.startsWith(path));
+};
+
+const hideLegacyWorkbookTabSelectors = () => {
+  if (typeof document === "undefined") return;
+
+  document.querySelectorAll("div, nav").forEach((container) => {
+    if (container.closest("[data-universal-a2-workbook-tabs]")) return;
+    if (container.matches("[data-workbook-tab-navigation]") || container.querySelector("[data-workbook-tab-navigation]")) return;
+
+    const directButtons = Array.from(container.children).filter((child) => child.tagName === "BUTTON");
+    if (directButtons.length < 4 || directButtons.length > 8) return;
+
+    const foundKeys = new Set();
+    directButtons.forEach((button) => {
+      const key = detectTabKey(button.textContent || "");
+      if (key) foundKeys.add(key);
+    });
+
+    const hasWorkbookParts = ["teil1", "teil2", "teil3", "teil4"].every((key) => foundKeys.has(key));
+    const hasWorkbookExtras = foundKeys.has("ref") || foundKeys.has("submit");
+    if (!hasWorkbookParts || !hasWorkbookExtras) return;
+
+    container.setAttribute("data-hidden-legacy-workbook-tabs", "true");
+    container.style.display = "none";
+  });
+};
+
 const hasCompleteVisibleWorkbookTabs = () => {
   if (typeof document === "undefined") return false;
+
+  const sharedNav = document.querySelector("[data-workbook-tab-navigation]");
+  if (sharedNav && isElementVisible(sharedNav)) return true;
+
   const foundKeys = new Set();
   document.querySelectorAll("button, a").forEach((element) => {
     if (element.closest("[data-universal-a2-workbook-tabs]")) return;
-    const style = window.getComputedStyle?.(element);
-    if (style && (style.display === "none" || style.visibility === "hidden")) return;
+    if (!isElementVisible(element)) return;
     const key = detectTabKey(element.textContent || "");
     if (key) foundKeys.add(key);
   });
@@ -82,7 +134,7 @@ const clickExistingWorkbookTab = (tab) => {
 
 const UniversalA2WorkbookTabs = ({ level = "" }) => {
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
-  const [activeTab, setActiveTab] = useState("teil1");
+  const [activeTab, setActiveTab] = useState("sprechen");
   const [showFallbackTabs, setShowFallbackTabs] = useState(false);
   const [showSubmit, setShowSubmit] = useState(false);
   const submitRef = useRef(null);
@@ -93,7 +145,16 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       return undefined;
     }
 
-    const checkTabs = () => setShowFallbackTabs(!hasCompleteVisibleWorkbookTabs());
+    const checkTabs = () => {
+      if (shouldForceSharedA2Tabs()) {
+        hideLegacyWorkbookTabSelectors();
+        setShowFallbackTabs(true);
+        return;
+      }
+
+      setShowFallbackTabs(!hasCompleteVisibleWorkbookTabs());
+    };
+
     const timeoutId = window.setTimeout(checkTabs, 50);
     const secondTimeoutId = window.setTimeout(checkTabs, 500);
     const observer = new MutationObserver(checkTabs);
@@ -108,7 +169,10 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
 
   if (workbookLevel !== "A2" || !showFallbackTabs) return null;
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tabKey) => {
+    const tab = UNIVERSAL_A2_WORKBOOK_TABS.find((item) => item.key === tabKey);
+    if (!tab) return;
+
     setActiveTab(tab.key);
     if (tab.key === "submit") {
       setShowSubmit(true);
@@ -127,7 +191,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
         ...styles.card,
         margin: 0,
         display: "grid",
-        gap: 10,
+        gap: 12,
         border: "1px solid #bfdbfe",
         background: "#f8fbff",
       }}
@@ -135,40 +199,17 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       <div style={{ display: "grid", gap: 4 }}>
         <strong>A2 workbook navigation</strong>
         <span style={{ color: "#475569", fontSize: 13 }}>
-          Use these fallback tabs if the workbook page does not show all parts clearly.
+          Use the shared workbook tabs below: Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit.
         </span>
       </div>
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 30,
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 8,
-          padding: "8px 0",
-          background: "rgba(248,251,255,0.96)",
-          borderBottom: "1px solid #dbeafe",
-        }}
-      >
-        {UNIVERSAL_A2_WORKBOOK_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => handleTabClick(tab)}
-            style={{
-              ...styles.secondaryButton,
-              minWidth: 86,
-              borderColor: activeTab === tab.key ? "#2563eb" : "#d1d5db",
-              background: activeTab === tab.key ? "#eff6ff" : "#fff",
-              color: activeTab === tab.key ? "#1d4ed8" : "#111827",
-              fontWeight: activeTab === tab.key ? 800 : 700,
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+
+      <WorkbookTabNav
+        activeTab={activeTab}
+        onChange={handleTabClick}
+        tabs={STANDARD_WORKBOOK_TABS}
+        ariaLabel="A2 workbook sections"
+      />
+
       {showSubmit ? (
         <div ref={submitRef} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 10, background: "#fff" }}>
           <h3 style={{ margin: "0 0 8px" }}>Submit workbook</h3>
