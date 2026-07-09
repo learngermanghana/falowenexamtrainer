@@ -144,7 +144,7 @@ function sessionStatusStyle(status) {
 
 function escapeIcs(value) {
   return String(value || "")
-    .replace(/\\/g, "\\\\")
+    .replace(/\/g, "\\")
     .replace(/\n/g, "\\n")
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;");
@@ -245,6 +245,7 @@ function CanonicalSessionsList({ summary, zoom, now, locale }) {
     () => [...(summary?.sessions || [])].sort((left, right) => (asDate(left.startsAt)?.getTime() || 0) - (asDate(right.startsAt)?.getTime() || 0)),
     [summary?.sessions],
   );
+  const hiddenOutOfRange = Number(summary?.hiddenOutOfDateRangeSessionCount || 0);
 
   return (
     <details open style={{ ...infoCardStyle, background: "#f8fafc" }}>
@@ -254,6 +255,11 @@ function CanonicalSessionsList({ summary, zoom, now, locale }) {
       <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
         These are the actual sessions saved in Falowen Admin. Reschedules and cancellations update here automatically.
       </p>
+      {hiddenOutOfRange > 0 ? (
+        <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#92400e" }}>
+          {hiddenOutOfRange} session{hiddenOutOfRange === 1 ? "" : "s"} outside the official class start/end dates were hidden.
+        </p>
+      ) : null}
       {!sessions.length ? (
         <p style={{ ...styles.helperText, margin: "8px 0 0" }}>No generated sessions are available yet. Ask the administrator to regenerate this class schedule.</p>
       ) : (
@@ -283,6 +289,28 @@ function CanonicalSessionsList({ summary, zoom, now, locale }) {
         </div>
       )}
     </details>
+  );
+}
+
+function ClassEndedNotice({ summary, locale }) {
+  const endedLabel = summary?.classEndedAt ? formatDate(summary.classEndedAt, locale) : "the official end date";
+  return (
+    <section style={{ ...infoCardStyle, borderColor: "#86efac", background: "#f0fdf4" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Class ended</h3>
+        <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Completed</span>
+      </div>
+      <p style={{ ...styles.helperText, margin: 0 }}>
+        This class finished on {endedLabel}. No more live sessions are scheduled for this cohort.
+      </p>
+      <p style={{ ...styles.helperText, margin: 0 }}>
+        Continue with exam practice, revise the course book, and check teacher feedback/results.
+      </p>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <a href="/exams/overview" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Open Exams Room</a>
+        <a href="/campus/course" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>Revise Course Book</a>
+      </div>
+    </section>
   );
 }
 
@@ -353,6 +381,7 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
   const studentClassLocked = Boolean(initialClassName || initialClassId);
   const nextSession = canonicalSummary?.nextSession || null;
   const completedSession = canonicalSummary?.latestCompletedSession || null;
+  const classEnded = Boolean(canonicalSummary?.classEnded);
   const cancelledSessions = canonicalSummary?.cancelledSessions?.filter((session) => {
     const start = asDate(session.startsAt)?.getTime() || 0;
     return start >= now.getTime() - 7 * 24 * 60 * 60 * 1000;
@@ -404,11 +433,17 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
                 <h3 style={{ margin: 0 }}>{canonicalSummary.klass.name}</h3>
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{formatCanonicalSchedule(canonicalSummary.klass.scheduleRules)}</p>
               </div>
-              <span style={styles.badge}>{canonicalSummary.klass.status || "active"}</span>
+              <span style={{ ...styles.badge, ...(classEnded ? { background: "#dcfce7", color: "#166534" } : {}) }}>
+                {classEnded ? "ended" : canonicalSummary.klass.status || "active"}
+              </span>
             </div>
             {canonicalSummary.klass.startDate && canonicalSummary.klass.endDate ? <p style={{ ...styles.helperText, margin: 0 }}>{canonicalSummary.klass.startDate} → {canonicalSummary.klass.endDate}</p> : null}
-            {zoom.url ? <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a> : <p style={{ ...styles.helperText, margin: 0 }}>Zoom has not yet been assigned by the administrator.</p>}
-            {(zoom.meetingId || zoom.passcode) ? (
+            {classEnded ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>Live classes for this cohort have ended. Use the Exams Room for exam practice and keep revising your course work.</p>
+            ) : zoom.url ? (
+              <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Join live class</a>
+            ) : <p style={{ ...styles.helperText, margin: 0 }}>Zoom has not yet been assigned by the administrator.</p>}
+            {!classEnded && (zoom.meetingId || zoom.passcode) ? (
               <div style={zoomDetailsStyle}>
                 <strong>Zoom details</strong>
                 <span>{zoom.meetingId ? `Meeting ID: ${zoom.meetingId}` : ""}{zoom.meetingId && zoom.passcode ? " · " : ""}{zoom.passcode ? `Passcode: ${zoom.passcode}` : ""}</span>
@@ -425,9 +460,11 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
               <div style={{ width: `${canonicalSummary.progress}%`, height: "100%", background: "linear-gradient(90deg, #2563eb, #7c3aed)" }} />
             </div>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              {canonicalSummary.progressMode === "timeline"
-                ? "Calculated from the official class start and graduation dates."
-                : `${canonicalSummary.completedCount} of ${canonicalSummary.totalCount} non-cancelled sessions completed.`}
+              {classEnded
+                ? "Class has ended. Progress is complete according to the official Falowen Admin start and graduation dates."
+                : canonicalSummary.progressMode === "timeline"
+                  ? "Calculated from the official class start and graduation dates."
+                  : `${canonicalSummary.completedCount} of ${canonicalSummary.totalCount} non-cancelled sessions completed.`}
             </p>
           </section>
 
@@ -453,7 +490,9 @@ const ClassCalendarCard = ({ id, initialClassName, initialClassId, program }) =>
             </section>
           ) : null}
 
-          {nextSession ? (
+          {classEnded ? (
+            <ClassEndedNotice summary={canonicalSummary} locale={locale} />
+          ) : nextSession ? (
             <section style={{ ...infoCardStyle, borderColor: "#93c5fd", background: "#eff6ff" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
                 <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
