@@ -57,6 +57,7 @@ test.each([
   [15, "Medien und Arbeiten im Homeoffice 5.15", "VhS1sIckFpU"],
   [16, "Prüfungsangst und Stressbewältigung 5.16", "dQMaaYXqMWI"],
   [17, "Wie lernt man am besten? 5.17", "7jbMA-e-jeE"],
+  [18, "Wege zum Wunschberuf 6.18", "uNabTZwqrB0"],
   [26, "Reiseprobleme und Lösungen 9.26", "8HdiyR5I96I"],
 ])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
   expect(getLessonRadioResource("B1", day)).toEqual(
