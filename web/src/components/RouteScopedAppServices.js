@@ -13,6 +13,7 @@ import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideo
 import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
+import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import CourseDebugPanel from "./CourseDebugPanel";
@@ -89,6 +90,7 @@ export default function RouteScopedAppServices() {
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
+      <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
       <CourseDebugPanel />
