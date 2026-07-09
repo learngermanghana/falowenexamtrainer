@@ -23,15 +23,15 @@ const A1_EXAM_WRITING_CHEAT_SHEET = [
     ],
   },
   {
-    id: "a1-useful-small-phrases",
-    title: "A1 useful phrases · Copy and adapt",
+    id: "a1-simple-exam-phrases",
+    title: "A1 simple exam phrases · Use these in letters and messages",
     items: [
-      { phrase: "Wie geht es dir?", meaning: "How are you?" },
-      { phrase: "Ich hoffe, es geht dir gut.", meaning: "I hope you are well." },
-      { phrase: "Vielen Dank für deine/Ihre Nachricht.", meaning: "Thank you for your message." },
-      { phrase: "Ich habe eine Frage.", meaning: "I have a question." },
-      { phrase: "Leider kann ich nicht kommen.", meaning: "Unfortunately I cannot come." },
-      { phrase: "Bitte antworte mir bald.", meaning: "Please reply soon." },
+      { phrase: "Wie viel kostet das und wie kann ich bezahlen? Mit Kreditkarte oder bar?", meaning: "How much does it cost and how can I pay? By credit card or cash?" },
+      { phrase: "eine Anfrage stellen", meaning: "to make an enquiry" },
+      { phrase: "einen Termin absagen", meaning: "to cancel an appointment" },
+      { phrase: "einen neuen Termin vereinbaren", meaning: "to arrange a new appointment" },
+      { phrase: "Könnten Sie mir Informationen über [Thema] geben?", meaning: "Could you give me information about [topic]?" },
+      { phrase: "Könnten Sie mir bitte mitteilen, [Information needed]?", meaning: "Could you please inform me [information needed]?" },
     ],
   },
   {
