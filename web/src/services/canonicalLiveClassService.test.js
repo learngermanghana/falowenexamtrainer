@@ -104,6 +104,39 @@ describe("buildCanonicalLiveClassSummary", () => {
     expect(summary.hiddenOutOfDateRangeSessionCount).toBe(1);
   });
 
+  test("preserves admin session topic and curriculum when a repair layer detects mismatch", () => {
+    const summary = buildCanonicalLiveClassSummary({
+      klass: {
+        id: "a1-koln-current",
+        name: "A1 Koln Klasse",
+        startDate: "2026-05-13",
+        endDate: "2026-07-13",
+      },
+      now: new Date("2026-06-30T16:00:00.000Z"),
+      sessions: [
+        {
+          id: "admin-session",
+          classId: "a1-koln-current",
+          classRecordId: "a1-koln-current",
+          className: "A1 Koln Klasse",
+          levelId: "B1",
+          status: "scheduled",
+          topic: "Day 20: Introduction to Letter Writing",
+          assignmentIds: ["B1-9.20"],
+          chapterIds: ["B1-9.20"],
+          curriculumIds: ["B1-9.20"],
+          startsAt: new Date("2026-06-30T18:00:00.000Z"),
+          endsAt: new Date("2026-06-30T19:00:00.000Z"),
+        },
+      ],
+    });
+
+    expect(summary.nextSession.topic).toBe("Day 20: Introduction to Letter Writing");
+    expect(summary.nextSession.assignmentIds).toEqual(["B1-9.20"]);
+    expect(summary.nextSession.adminTopicPreserved).toBe(true);
+    expect(summary.nextSession.curriculumRepaired).toBe(false);
+  });
+
   test("uses the class Zoom details when a profile is unavailable", () => {
     const summary = buildCanonicalLiveClassSummary({
       klass: { ...klass, zoomUrl: "https://zoom.example/class", meetingId: "123", passcode: "abc" },
