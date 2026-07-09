@@ -1,14 +1,8 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
-
-const cardStyle = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-};
 
 const sectionStyle = {
   ...styles.card,
@@ -56,20 +50,15 @@ const multipleChoiceQuestions = [
 ];
 
 const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
-
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 Workbook · Pronouns and Identity Expressions in German
-        </h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.1</p>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete this workbook and submit your final answers in the submission area, not on this page.
-        </p>
-      </div>
-
+    <A1TutorMarkedWorkbookShell
+      day={3}
+      chapter="1.2"
+      fallbackAssignmentKey="A1-1.2"
+      title="A1 · Day 3 Workbook · Pronouns and Identity Expressions in German"
+      subtitle="Chapter 1.2 · Tutor-marked assignment"
+      submitTitle="Submit A1 · Day 3 · Chapter 1.2"
+    >
       <section style={sectionStyle}>
         <img
           src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1600&q=80"
@@ -81,8 +70,8 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Reading Passage: Introducing Yourself (Exercise) (16.6 Marks)</strong>
           <br />
-          Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du? Wo
-          wohnst du? Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.
+          Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid. Wie heißt du? Woher kommst du? Wo wohnst du?
+          Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Exercise: Complete the Sentences</strong> (Use the verbs <em>heiBen</em>, <em>wohnen</em> and <em>kommen</em>.
@@ -118,7 +107,6 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
             <em>Example:</em> Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid.
           </p>
         </div>
-
       </section>
 
       <section style={sectionStyle}>
@@ -148,26 +136,12 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
             <strong>Greetings:</strong> Hallo! · Guten Tag! · Guten Morgen! · Guten Abend!
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Personal Information:</strong> der Name (name), das Land (country), die Stadt (city), die Straße
-            (street), die Adresse (address)
+            <strong>Personal Information:</strong> der Name (name), das Land (country), die Stadt (city), die Straße (street), die
+            Adresse (address)
           </p>
         </div>
       </section>
-
-      <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <p style={{ margin: 0, fontWeight: 600 }}>
-          Finished the workbook? Please submit all answers in the submission area.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Submit Workbook Answers
-        </a>
-      </div>
-    </div>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
