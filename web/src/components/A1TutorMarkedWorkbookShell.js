@@ -1,0 +1,214 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
+import { styles } from "../styles";
+
+const shellCard = {
+  ...styles.card,
+  display: "grid",
+  gap: 12,
+};
+
+const tabButtonBase = {
+  ...styles.secondaryButton,
+  fontWeight: 800,
+  minWidth: 120,
+};
+
+const buildSubmitClassName = (level, day, chapter) =>
+  `a1-tutor-marked-submit-${String(level || "a1").toLowerCase()}-${String(day || "day").replace(/[^a-z0-9]/gi, "-")}-${String(
+    chapter || "chapter"
+  ).replace(/[^a-z0-9]/gi, "-")}`;
+
+const A1TutorMarkedWorkbookShell = ({
+  level = "A1",
+  day,
+  chapter,
+  fallbackAssignmentKey,
+  title,
+  subtitle,
+  assignmentIntro,
+  submitTitle,
+  submitDescription,
+  children,
+}) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const normalizedLevel = String(level || "A1").toUpperCase();
+  const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
+  const requestedTab = searchParams.get("workbookTab");
+  const [activeTab, setActiveTab] = useState(requestedTab === "submit" ? "submit" : "assignment");
+
+  const assignmentKey = useMemo(() => {
+    const assignment = getInlineCourseAssignments(normalizedLevel, day).find(
+      (item) => String(item.chapter || "").trim() === String(chapter || "").trim()
+    );
+    return assignment?.assignmentKey || fallbackAssignmentKey || `${normalizedLevel}-${chapter || day}`;
+  }, [chapter, day, fallbackAssignmentKey, normalizedLevel]);
+
+  useEffect(() => {
+    setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
+  }, [requestedTab]);
+
+  useEffect(() => {
+    if (requestedTab !== "submit") return;
+    if (
+      searchParams.get("assignmentKey") === assignmentKey &&
+      searchParams.get("assignmentId") === assignmentKey &&
+      searchParams.get("level") === normalizedLevel
+    ) {
+      return;
+    }
+
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("workbookTab", "submit");
+    nextSearch.set("assignmentKey", assignmentKey);
+    nextSearch.set("assignmentId", assignmentKey);
+    nextSearch.set("level", normalizedLevel);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+      },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: normalizedLevel,
+          day,
+          assignmentKey,
+          assignmentId: assignmentKey,
+          canonicalAssignmentKey: assignmentKey,
+          inlineCourseSubmission: true,
+        },
+      }
+    );
+  }, [assignmentKey, day, location.pathname, location.search, location.state, navigate, normalizedLevel, requestedTab, searchParams]);
+
+  const openTab = (tabKey) => {
+    setActiveTab(tabKey);
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("workbookTab", tabKey);
+    nextSearch.set("assignmentKey", assignmentKey);
+    nextSearch.set("assignmentId", assignmentKey);
+    nextSearch.set("level", normalizedLevel);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+      },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: normalizedLevel,
+          day,
+          assignmentKey,
+          assignmentId: assignmentKey,
+          canonicalAssignmentKey: assignmentKey,
+          inlineCourseSubmission: true,
+        },
+      }
+    );
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const submitClassName = buildSubmitClassName(normalizedLevel, day, chapter);
+
+  return (
+    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <div style={shellCard}>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>{title}</h1>
+        {subtitle ? <p style={{ ...styles.subtitle, margin: 0 }}>{subtitle}</p> : null}
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          {assignmentIntro || `Complete the assignment, then open Submit to send your final answers for ${assignmentKey}.`}
+        </p>
+
+        <div
+          role="tablist"
+          aria-label={`${title} workbook tabs`}
+          style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid #dbeafe", paddingTop: 12 }}
+        >
+          {[
+            { key: "assignment", label: "Assignment" },
+            { key: "submit", label: "Submit" },
+          ].map((tab) => {
+            const selected = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => openTab(tab.key)}
+                style={{
+                  ...tabButtonBase,
+                  background: selected ? "#2563eb" : "#ffffff",
+                  borderColor: selected ? "#2563eb" : "#93c5fd",
+                  color: selected ? "#ffffff" : "#1d4ed8",
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {activeTab === "assignment" ? (
+        <>
+          {children}
+          <div style={{ ...shellCard, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>
+              Finished the assignment? Open Submit and send your final answers for tutor marking.
+            </p>
+            <button type="button" style={{ ...styles.button, width: "fit-content" }} onClick={() => openTab("submit")}>
+              Open Submit Tab
+            </button>
+          </div>
+        </>
+      ) : (
+        <section style={{ ...shellCard, border: "1px solid #bfdbfe" }} aria-label={`Submit ${title} answers`}>
+          <div>
+            <p
+              style={{
+                color: "#1d4ed8",
+                fontSize: 13,
+                fontWeight: 900,
+                letterSpacing: ".04em",
+                margin: 0,
+                textTransform: "uppercase",
+              }}
+            >
+              Tutor-marked assignment
+            </p>
+            <h2 style={{ margin: "4px 0" }}>{submitTitle || `Submit ${normalizedLevel} · Day ${day} · Chapter ${chapter}`}</h2>
+            <p style={{ color: "#475569", margin: 0 }}>
+              {submitDescription || `This submission box is locked to ${assignmentKey}, so your work is saved under the correct assignment.`}
+            </p>
+          </div>
+          <div className={submitClassName}>
+            <style>{`.${submitClassName} > div > section:first-child { display: none !important; }
+              .${submitClassName} select { display: none !important; }`}</style>
+            <AssignmentSubmissionPage
+              submissionContext={{
+                level: normalizedLevel,
+                day,
+                assignmentKey,
+                canonicalAssignmentKey: assignmentKey,
+              }}
+            />
+          </div>
+        </section>
+      )}
+    </div>
+  );
+};
+
+export default A1TutorMarkedWorkbookShell;
