@@ -65,6 +65,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Digitale Auszeit und Selbstfürsorge",
     grammarBook: route(10, "grammar"),
     workbook: route(10, "workbook"),
+    aiVideo: "https://youtu.be/2j__qr8nT9g",
     grammarTopic: "Vergleiche und Wirkungen mit Komparativ, Superlativ und je ... desto",
     goal: "Über digitale Gewohnheiten und Digital-Detox-Strategien sprechen.",
     instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
