@@ -58,6 +58,35 @@ const miniBox = {
   gap: 8,
 };
 
+const prefixBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "3px 8px",
+  borderRadius: 999,
+  border: "1px solid #f59e0b",
+  background: "#fffbeb",
+  color: "#92400e",
+  fontWeight: 900,
+};
+
+const stemBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "3px 8px",
+  borderRadius: 999,
+  border: "1px solid #60a5fa",
+  background: "#eff6ff",
+  color: "#1d4ed8",
+  fontWeight: 900,
+};
+
+const splitWordStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  flexWrap: "wrap",
+};
+
 const calloutStyles = {
   default: {
     border: "1px solid #d1d5db",
@@ -145,6 +174,13 @@ const ChipRow = ({ items }) => (
   </div>
 );
 
+const SplitVerb = ({ stem, prefix }) => (
+  <span style={splitWordStyle}>
+    <span style={stemBadgeStyle}>{stem}</span>
+    <span style={prefixBadgeStyle}>{prefix}</span>
+  </span>
+);
+
 const PracticeQuestion = ({ prompt, options, answer, explanation }) => {
   const [selected, setSelected] = useState("");
   const [checked, setChecked] = useState(false);
@@ -218,6 +254,31 @@ const separableRows = [
   ["mitkommen", "to come along", "Kommst du am Freitag mit?"],
   ["anfangen", "to begin", "Der Kurs fängt um acht Uhr an."],
   ["mitbringen", "to bring along", "Ich bringe mein Buch mit."],
+];
+
+const separablePrefixRows = [
+  ["ab-", "away / off", "abfahren, abholen"],
+  ["an-", "on / at / start", "anrufen, anfangen"],
+  ["auf-", "up / open", "aufstehen, aufmachen"],
+  ["aus-", "out / off", "ausgehen, ausschalten"],
+  ["ein-", "in / into", "einkaufen, einsteigen"],
+  ["fern-", "far / TV context", "fernsehen"],
+  ["los-", "away / start", "losgehen, losfahren"],
+  ["mit-", "with / along", "mitkommen, mitbringen"],
+  ["nach-", "after / towards", "nachfragen, nachdenken"],
+  ["vor-", "before / forward", "vorlesen, vorstellen"],
+  ["weg-", "away", "weggehen, wegwerfen"],
+  ["zu-", "closed / to", "zumachen, zuhören"],
+  ["zurück-", "back", "zurückkommen, zurückrufen"],
+];
+
+const splitVerbRows = [
+  ["aufstehen", <SplitVerb stem="Ich stehe" prefix="auf" />, "Ich stehe um sechs Uhr auf."],
+  ["einkaufen", <SplitVerb stem="wir kaufen" prefix="ein" />, "Wir kaufen am Samstag ein."],
+  ["anrufen", <SplitVerb stem="ich rufe" prefix="an" />, "Ich rufe meine Mutter an."],
+  ["fernsehen", <SplitVerb stem="er sieht" prefix="fern" />, "Er sieht am Abend fern."],
+  ["zumachen", <SplitVerb stem="sie macht" prefix="zu" />, "Sie macht die Tür zu."],
+  ["mitbringen", <SplitVerb stem="ich bringe" prefix="mit" />, "Ich bringe mein Buch mit."],
 ];
 
 const timePractice = [
@@ -301,6 +362,18 @@ const knowledgeTest = [
     options: ["Subject + conjugated verb + information + prefix", "Subject + prefix + conjugated verb", "Prefix + subject + infinitive"],
     answer: "Subject + conjugated verb + information + prefix",
     explanation: "Example: Ich stehe um sechs Uhr auf.",
+  },
+  {
+    prompt: "11) In 'Ich rufe meine Mutter an', which part is the separable prefix?",
+    options: ["rufe", "Mutter", "an"],
+    answer: "an",
+    explanation: "The infinitive is anrufen. In the sentence, rufe is the conjugated verb and an goes to the end.",
+  },
+  {
+    prompt: "12) Which prefix often means 'with / along'?",
+    options: ["mit-", "weg-", "zu-"],
+    answer: "mit-",
+    explanation: "mit- often means with or along, as in mitkommen and mitbringen.",
   },
 ];
 
@@ -386,6 +459,14 @@ export const WeekTimeSeparableGrammarBook = () => (
       <Callout title="Main rule" variant="accent">
         In a simple present-tense sentence, the main verb is conjugated in position 2, and the separable prefix goes to the end.
       </Callout>
+      <Callout title="Common separable prefixes" variant="success">
+        The prefix is the small part at the beginning of the infinitive. In a sentence, it often moves to the end. Learn these common prefixes first.
+      </Callout>
+      <Table headers={["Prefix", "Basic idea", "Example verbs"]} rows={separablePrefixRows} />
+      <Callout title="See the split: blue = verb stem, orange = prefix" variant="accent">
+        First learn the full verb, then watch how the verb separates in the sentence.
+      </Callout>
+      <Table headers={["Infinitive", "Separated form", "Full sentence"]} rows={splitVerbRows} />
       <Table
         headers={["Step", "Example"]}
         rows={[
@@ -438,6 +519,7 @@ export const WeekTimeSeparableGrammarBook = () => (
           <li><strong>halb sieben = 6:30</strong>, not 7:30.</li>
           <li><strong>halb acht = 7:30</strong>, not 8:30.</li>
           <li><strong>Viertel vor acht = 7:45</strong>.</li>
+          <li>Common separable prefixes include <strong>auf-, an-, ein-, mit-, zu-, zurück-</strong>.</li>
           <li>Separable verbs split: <strong>Ich stehe ... auf.</strong></li>
           <li>Full pattern: <strong>Am Montag stehe ich um halb sieben auf.</strong></li>
         </ul>
