@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import PersistentAssignmentSubmissionPage from "./PersistentAssignmentSubmissionPage";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { styles } from "../styles";
 
@@ -228,7 +228,7 @@ const A1TutorMarkedWorkbookShell = ({
           <div className={submitClassName}>
             <style>{`.${submitClassName} > div > section:first-child { display: none !important; }
               .${submitClassName} select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
+            <PersistentAssignmentSubmissionPage
               submissionContext={{
                 level: normalizedLevel,
                 day,
