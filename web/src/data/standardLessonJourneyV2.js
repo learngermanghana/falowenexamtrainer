@@ -48,6 +48,40 @@ const defaultSections = [
   "Lösung und Schlussposition",
 ];
 
+const isFormalWritingTask = (lesson = {}) => {
+  const text = [lesson.writingTaskType, lesson.writingTopic, lesson.title, lesson.topic]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return /formal|formell|formelle|e-mail|email|letter|brief|eingabe|proposal|vorschlag|anfrage|beschwerde|bewerbung|absage|termin/.test(text)
+    && !/opinion essay|meinungsbeitrag|stellungnahme|erörterung|eroerterung/.test(text);
+};
+
+const buildChecklist = ({ lesson, level, formalMode }) => {
+  const writingStructure = toArray(lesson.writingBuilder?.structure).filter(Boolean);
+  if (formalMode && writingStructure.length) return writingStructure;
+
+  if (formalMode) {
+    return [
+      "Betreff, Anrede und Anlass sind klar und formell.",
+      "Das Problem oder Anliegen wird sachlich beschrieben.",
+      "Folgen, Gründe oder Hintergrundinformationen werden verständlich erklärt.",
+      "Mindestens ein realistischer Vorschlag oder eine Bitte wird formuliert.",
+      "Der Schluss bittet höflich um Prüfung, Rückmeldung oder Unterstützung.",
+      `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.",
+    ];
+  }
+
+  return [
+    "Die Einleitung stellt das Thema klar vor.",
+    "Ich habe Gründe oder wichtige Aspekte erklärt.",
+    "Ich habe ein konkretes Beispiel verwendet.",
+    "Ich habe eine Alternative, Lösung oder Gegenposition genannt.",
+    "Meine Lösung oder Schlussposition ist nachvollziehbar.",
+    `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.`,
+  ];
+};
+
 export const getStandardWritingConfig = (lesson = {}) => {
   const level = normalizeLevel(lesson.level);
   const day = Number(lesson.day || 0);
@@ -58,6 +92,8 @@ export const getStandardWritingConfig = (lesson = {}) => {
   const target = LEVEL_TARGETS[level] || LEVEL_TARGETS.B1;
   const isC1 = level === "C1";
   const isB1 = level === "B1";
+  const formalMode = isFormalWritingTask(lesson);
+  const mainPrompt = lesson.writingTopic || `Schreibe einen zusammenhängenden Text zum Thema „${title}“.`;
   const prompts = [
     [`Warum ist das Thema „${title}“ wichtig oder aktuell?`, isB1 ? "Führe kurz in das Thema ein und nenne die wichtigste Situation." : "Führe verständlich in das Thema ein und zeige seine Bedeutung."],
     [`Welche Gründe, Ursachen oder wichtigen Aspekte gehören zu „${title}“?`, isC1 ? "Erkläre mindestens zwei Aspekte differenziert und verbinde sie logisch." : "Nenne mindestens zwei Gründe oder wichtige Punkte."],
@@ -70,7 +106,10 @@ export const getStandardWritingConfig = (lesson = {}) => {
     level,
     day,
     title,
+    topic: mainPrompt,
+    prompt: mainPrompt,
     taskType: lesson.writingTaskType || `${level} guided writing`,
+    singleDraftMode: formalMode,
     targetWords: target.targetWords,
     questions: prompts.map(([question, help], index) => ({
       id: ["introduction", "reasons", "example", "alternative", "conclusion"][index],
@@ -80,14 +119,7 @@ export const getStandardWritingConfig = (lesson = {}) => {
       starter: defaultStarters[index],
       minimumWords: target.minimums[index],
     })),
-    checklist: [
-      "Die Einleitung stellt das Thema klar vor.",
-      "Ich habe Gründe oder wichtige Aspekte erklärt.",
-      "Ich habe ein konkretes Beispiel verwendet.",
-      "Ich habe eine Alternative, Lösung oder Gegenposition genannt.",
-      "Meine Lösung oder Schlussposition ist nachvollziehbar.",
-      `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.`,
-    ],
+    checklist: buildChecklist({ lesson, level, formalMode }),
   };
 };
 
