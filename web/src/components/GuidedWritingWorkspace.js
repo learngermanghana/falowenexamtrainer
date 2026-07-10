@@ -245,7 +245,6 @@ export default function GuidedWritingWorkspace({
   const finalWordCount = countWords(finalEssay);
   const promptText = getMainWritingPrompt(config);
   const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning;
-  const checklist = Array.isArray(config.checklist) ? config.checklist : [];
 
   const update = (updater) =>
     setState((old) => ({
@@ -716,16 +715,6 @@ export default function GuidedWritingWorkspace({
         <div>
           <strong>{finalWordCount} words</strong> · Target: about {config.targetWords}
         </div>
-        {checklist.length ? (
-          <div>
-            <strong>Checklist</strong>
-            <ul>
-              {checklist.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             type="button"
