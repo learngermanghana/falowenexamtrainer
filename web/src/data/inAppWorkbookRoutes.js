@@ -50,10 +50,19 @@ export const normalizeFalowenCourseRoute = (value = "") => {
   }
 };
 
+const isA1LessonRoute = () => {
+  if (typeof window === "undefined") return false;
+  return /^\/campus\/course\/lesson\/A1\//i.test(window.location?.pathname || "");
+};
+
 export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const normalizedDay = String(Number(day));
   const normalizedChapter = normalizeChapter(chapter);
+
+  if (normalizedLevel === "A1" && isA1LessonRoute()) {
+    return "";
+  }
 
   if (normalizedLevel === "A1" && normalizedDay === "18" && normalizedChapter === "12.2") {
     return A1_DAY18_CHAPTER122_WORKBOOK_ROUTE;
