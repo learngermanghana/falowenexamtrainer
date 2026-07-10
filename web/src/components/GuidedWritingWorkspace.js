@@ -47,6 +47,22 @@ const getMotivationMessage = ({ completeCount, totalQuestions, totalMissingWords
   return `Start with one card. Your full mission has ${totalMissingWords} target words remaining.`;
 };
 
+const isFormalWritingTask = (config = {}) => {
+  if (config.singleDraftMode === true || config.oneBoxMode === true) return true;
+  const text = [
+    config.taskType,
+    config.title,
+    config.topic,
+    config.writingTaskType,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return /formal|formell|formelle|e-mail|email|letter|brief|eingabe|proposal|vorschlag|anfrage|beschwerde|bewerbung|absage|termin/.test(text)
+    && !/opinion essay|meinungsbeitrag|stellungnahme|erörterung|eroerterung/.test(text);
+};
+
 const emptyState = () => ({
   answers: {},
   finalEssay: "",
@@ -102,6 +118,13 @@ const inferDay = (config, storageKey) => {
   return match ? Number(match[1]) : null;
 };
 
+const getMainWritingPrompt = (config = {}) =>
+  config.topic ||
+  config.prompt ||
+  config.writingTopic ||
+  config.mainQuestion ||
+  `Write your complete ${config.level || "German"} text for this task.`;
+
 export default function GuidedWritingWorkspace({
   config,
   storageKey,
@@ -135,9 +158,10 @@ export default function GuidedWritingWorkspace({
   const [analysisError, setAnalysisError] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
 
+  const formalMode = isFormalWritingTask(config);
   const questions = useMemo(
     () =>
-      config.questions.map((question) => ({
+      (config.questions || []).map((question) => ({
         ...question,
         words: countWords(state.answers[question.id]),
         complete:
@@ -153,14 +177,17 @@ export default function GuidedWritingWorkspace({
     .map((question) => String(state.answers[question.id] || "").trim())
     .filter(Boolean)
     .join("\n\n");
-  const finalEssay =
-    state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
+  const finalEssay = formalMode
+    ? (state.finalEssay || autoText)
+    : state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
   const completeCount = questions.filter((question) => question.complete).length;
-  const allComplete = completeCount === questions.length;
+  const allComplete = formalMode ? Boolean(finalEssay.trim()) : completeCount === questions.length;
   const totalMissingWords = questions.reduce((sum, question) => sum + Math.max(question.minimumWords - question.words, 0), 0);
   const nextQuestion = questions.find((question) => !question.complete);
   const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
+  const finalWordCount = countWords(finalEssay);
+  const promptText = getMainWritingPrompt(config);
 
   const update = (updater) =>
     setState((old) => ({
@@ -180,25 +207,28 @@ export default function GuidedWritingWorkspace({
   useEffect(() => {
     onStatusChange?.({
       complete: allComplete && Boolean(finalEssay.trim()),
-      completedQuestions: completeCount,
-      totalQuestions: questions.length,
-      wordCount: countWords(finalEssay),
+      completedQuestions: formalMode ? (finalEssay.trim() ? 1 : 0) : completeCount,
+      totalQuestions: formalMode ? 1 : questions.length,
+      wordCount: finalWordCount,
     });
   }, [
     allComplete,
     completeCount,
     finalEssay,
+    finalWordCount,
+    formalMode,
     onStatusChange,
     questions.length,
   ]);
 
   useEffect(() => {
+    if (formalMode) return;
     questions.forEach((question, index) => {
       if (!question.complete || reachedMilestonesRef.current.has(question.id)) return;
       reachedMilestonesRef.current.add(question.id);
       showToast(getMilestoneMessage(question, index), "success", { playSound: true });
     });
-  }, [questions, showToast]);
+  }, [formalMode, questions, showToast]);
 
   useEffect(() => {
     let active = true;
@@ -300,7 +330,7 @@ export default function GuidedWritingWorkspace({
         idToken,
         program: studentProfile?.program,
         submissionContext: "course-guided-writing-analysis",
-        promptType: "argument",
+        promptType: formalMode ? "formal-letter" : "argument",
       });
       const normalized = normalizeWritingFeedback(
         data?.structuredFeedback ?? data,
@@ -372,6 +402,7 @@ export default function GuidedWritingWorkspace({
   return (
     <div
       data-guided-writing-workspace
+      data-writing-mode={formalMode ? "formal-single-box" : "guided-five-questions"}
       style={{
         border: "1px solid #c7d2fe",
         borderRadius: 18,
@@ -390,17 +421,29 @@ export default function GuidedWritingWorkspace({
             color: "#3730a3",
           }}
         >
-          Guided {config.level} Writing
+          {formalMode ? `Formal ${config.level} Writing` : `Guided ${config.level} Writing`}
         </span>
-        <h3 style={{ margin: 0 }}>Answer five questions and build your text</h3>
-        <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 12, background: "#eff6ff", display: "grid", gap: 8 }}>
-          <strong>Writing mission: {completeCount}/5 cards complete</strong>
-          <span style={{ color: "#475569" }}>{motivationMessage}</span>
-          <div style={{ height: 10, overflow: "hidden", borderRadius: 999, background: "#dbeafe" }} aria-label="Writing mission progress" aria-valuemin={0} aria-valuemax={5} aria-valuenow={completeCount} role="progressbar">
-            <div style={{ width: `${(completeCount / Math.max(questions.length, 1)) * 100}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#2563eb,#7c3aed,#16a34a)", transition: "width 180ms ease" }} />
+        <h3 style={{ margin: 0 }}>
+          {formalMode ? "Write your complete formal letter" : "Answer five questions and build your text"}
+        </h3>
+        {formalMode ? (
+          <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 12, background: "#eff6ff", display: "grid", gap: 8 }}>
+            <strong>Main writing task</strong>
+            <span style={{ color: "#475569", lineHeight: 1.65 }}>{promptText}</span>
+            <small style={{ color: "#1e3a8a", fontWeight: 800 }}>
+              Write one complete formal text. Do not split this task into five answers.
+            </small>
           </div>
-          {nextQuestion ? <small style={{ color: "#1e3a8a", fontWeight: 800 }}>Next unlock: {nextQuestion.section} · {Math.max(nextQuestion.minimumWords - nextQuestion.words, 0)} words to go</small> : <small style={{ color: "#166534", fontWeight: 900 }}>Mission complete: all five answer cards are ready.</small>}
-        </div>
+        ) : (
+          <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 12, background: "#eff6ff", display: "grid", gap: 8 }}>
+            <strong>Writing mission: {completeCount}/5 cards complete</strong>
+            <span style={{ color: "#475569" }}>{motivationMessage}</span>
+            <div style={{ height: 10, overflow: "hidden", borderRadius: 999, background: "#dbeafe" }} aria-label="Writing mission progress" aria-valuemin={0} aria-valuemax={5} aria-valuenow={completeCount} role="progressbar">
+              <div style={{ width: `${(completeCount / Math.max(questions.length, 1)) * 100}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#2563eb,#7c3aed,#16a34a)", transition: "width 180ms ease" }} />
+            </div>
+            {nextQuestion ? <small style={{ color: "#1e3a8a", fontWeight: 800 }}>Next unlock: {nextQuestion.section} · {Math.max(nextQuestion.minimumWords - nextQuestion.words, 0)} words to go</small> : <small style={{ color: "#166534", fontWeight: 900 }}>Mission complete: all five answer cards are ready.</small>}
+          </div>
+        )}
         <small
           style={{
             color: saveStatus === "error" ? "#b91c1c" : "#166534",
@@ -411,118 +454,120 @@ export default function GuidedWritingWorkspace({
         </small>
       </header>
 
-      <div style={{ display: "grid", gap: 14 }}>
-        {questions.map((question, index) => (
-          <article
-            key={question.id}
-            style={{
-              border: `1px solid ${question.complete ? "#86efac" : "#e2e8f0"}`,
-              borderRadius: 16,
-              padding: 14,
-              background: question.complete ? "#f0fdf4" : "#fff",
-              display: "grid",
-              gap: 9,
-            }}
-          >
-            <div
+      {!formalMode ? (
+        <div style={{ display: "grid", gap: 14 }}>
+          {questions.map((question, index) => (
+            <article
+              key={question.id}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 8,
-                flexWrap: "wrap",
+                border: `1px solid ${question.complete ? "#86efac" : "#e2e8f0"}`,
+                borderRadius: 16,
+                padding: 14,
+                background: question.complete ? "#f0fdf4" : "#fff",
+                display: "grid",
+                gap: 9,
               }}
             >
-              <strong>
-                {question.complete ? "🏅" : "✍️"} Question {index + 1} of 5 · {question.section}
-              </strong>
-              <span
-                style={{
-                  color: question.milestone.color,
-                  fontWeight: 900,
-                }}
-              >
-                {question.milestone.label}
-                {question.complete ? " ✓" : ""}
-              </span>
-            </div>
-            <h4 style={{ margin: 0 }}>{question.question}</h4>
-            <p style={{ margin: 0, color: "#64748b" }}>{question.help}</p>
-            <div
-              style={{
-                borderLeft: "4px solid #818cf8",
-                padding: 9,
-                background: "#f8fafc",
-              }}
-            >
-              <strong>Starter:</strong>{" "}
-              {question.starter ||
-                "Beginne mit einer klaren Aussage und begründe sie."}
-            </div>
-            <textarea
-              ref={(node) => {
-                if (node) questionTextareaRefs.current[question.id] = node;
-                else delete questionTextareaRefs.current[question.id];
-              }}
-              aria-label={`Question ${index + 1}`}
-              value={state.answers[question.id] || ""}
-              onChange={(event) =>
-                update((old) => ({
-                  ...old,
-                  answers: {
-                    ...old.answers,
-                    [question.id]: event.target.value,
-                  },
-                }))
-              }
-              style={{
-                minHeight: 125,
-                padding: 12,
-                border: "1px solid #cbd5e1",
-                borderRadius: 12,
-                font: "inherit",
-              }}
-            />
-            <PrepositionCaseCoachField
-              text={state.answers[question.id] || ""}
-              level={config.level}
-              getTextarea={() => questionTextareaRefs.current[question.id] || null}
-              studentProfile={studentProfile}
-            />
-            <div style={{ display: "grid", gap: 6 }}>
               <div
-                aria-label={`Question ${index + 1} word progress`}
-                aria-valuemin={0}
-                aria-valuemax={question.minimumWords}
-                aria-valuenow={Math.min(question.words, question.minimumWords)}
-                role="progressbar"
                 style={{
-                  height: 10,
-                  overflow: "hidden",
-                  borderRadius: 999,
-                  background: "#e2e8f0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  flexWrap: "wrap",
                 }}
               >
-                <div
+                <strong>
+                  {question.complete ? "🏅" : "✍️"} Question {index + 1} of 5 · {question.section}
+                </strong>
+                <span
                   style={{
-                    width: `${Math.min((question.words / Math.max(question.minimumWords, 1)) * 100, 100)}%`,
-                    height: "100%",
-                    borderRadius: 999,
-                    background: question.complete
-                      ? "linear-gradient(90deg,#22c55e,#16a34a)"
-                      : "linear-gradient(90deg,#818cf8,#f59e0b)",
-                    transition: "width 180ms ease",
+                    color: question.milestone.color,
+                    fontWeight: 900,
                   }}
-                />
+                >
+                  {question.milestone.label}
+                  {question.complete ? " ✓" : ""}
+                </span>
               </div>
-              <small>
-                {question.words}/{question.minimumWords} words · {question.complete
-                  ? "Badge earned — this answer card is ready for your combined text."
-                  : `Add ${Math.max(question.minimumWords - question.words, 0)} more words to earn this card badge.`}
-              </small>
-            </div>
-          </article>
-        ))}
-      </div>
+              <h4 style={{ margin: 0 }}>{question.question}</h4>
+              <p style={{ margin: 0, color: "#64748b" }}>{question.help}</p>
+              <div
+                style={{
+                  borderLeft: "4px solid #818cf8",
+                  padding: 9,
+                  background: "#f8fafc",
+                }}
+              >
+                <strong>Starter:</strong>{" "}
+                {question.starter ||
+                  "Beginne mit einer klaren Aussage und begründe sie."}
+              </div>
+              <textarea
+                ref={(node) => {
+                  if (node) questionTextareaRefs.current[question.id] = node;
+                  else delete questionTextareaRefs.current[question.id];
+                }}
+                aria-label={`Question ${index + 1}`}
+                value={state.answers[question.id] || ""}
+                onChange={(event) =>
+                  update((old) => ({
+                    ...old,
+                    answers: {
+                      ...old.answers,
+                      [question.id]: event.target.value,
+                    },
+                  }))
+                }
+                style={{
+                  minHeight: 125,
+                  padding: 12,
+                  border: "1px solid #cbd5e1",
+                  borderRadius: 12,
+                  font: "inherit",
+                }}
+              />
+              <PrepositionCaseCoachField
+                text={state.answers[question.id] || ""}
+                level={config.level}
+                getTextarea={() => questionTextareaRefs.current[question.id] || null}
+                studentProfile={studentProfile}
+              />
+              <div style={{ display: "grid", gap: 6 }}>
+                <div
+                  aria-label={`Question ${index + 1} word progress`}
+                  aria-valuemin={0}
+                  aria-valuemax={question.minimumWords}
+                  aria-valuenow={Math.min(question.words, question.minimumWords)}
+                  role="progressbar"
+                  style={{
+                    height: 10,
+                    overflow: "hidden",
+                    borderRadius: 999,
+                    background: "#e2e8f0",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min((question.words / Math.max(question.minimumWords, 1)) * 100, 100)}%`,
+                      height: "100%",
+                      borderRadius: 999,
+                      background: question.complete
+                        ? "linear-gradient(90deg,#22c55e,#16a34a)"
+                        : "linear-gradient(90deg,#818cf8,#f59e0b)",
+                      transition: "width 180ms ease",
+                    }}
+                  />
+                </div>
+                <small>
+                  {question.words}/{question.minimumWords} words · {question.complete
+                    ? "Badge earned — this answer card is ready for your combined text."
+                    : `Add ${Math.max(question.minimumWords - question.words, 0)} more words to earn this card badge.`}
+                </small>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
 
       <section
         data-combined-text-card
@@ -535,15 +580,17 @@ export default function GuidedWritingWorkspace({
           gap: 12,
         }}
       >
-        <h3 style={{ margin: 0 }}>Your combined text</h3>
+        <h3 style={{ margin: 0 }}>{formalMode ? "Your formal letter" : "Your combined text"}</h3>
         <small style={{ color: "#475569", fontWeight: 700 }}>
-          {state.combinedDraftMode === "auto"
-            ? "Automatically built from your answers"
-            : "You are editing the combined version"}
+          {formalMode
+            ? "Type the full formal letter/e-mail here"
+            : state.combinedDraftMode === "auto"
+              ? "Automatically built from your answers"
+              : "You are editing the combined version"}
         </small>
         <textarea
           ref={combinedDraftRef}
-          aria-label="Your combined text"
+          aria-label={formalMode ? "Your formal letter" : "Your combined text"}
           value={finalEssay}
           onChange={(event) =>
             update((old) => ({
@@ -553,7 +600,7 @@ export default function GuidedWritingWorkspace({
             }))
           }
           style={{
-            minHeight: 320,
+            minHeight: formalMode ? 420 : 320,
             padding: 14,
             border: "1px solid #94a3b8",
             borderRadius: 12,
@@ -568,8 +615,7 @@ export default function GuidedWritingWorkspace({
           studentProfile={studentProfile}
         />
         <div>
-          <strong>{countWords(finalEssay)} words</strong> · Target: about{" "}
-          {config.targetWords}
+          <strong>{finalWordCount} words</strong> · Target: about {config.targetWords}
         </div>
         <div>
           <strong>Checklist</strong>
