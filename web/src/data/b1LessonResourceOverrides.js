@@ -55,6 +55,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Work-Life-Balance im modernen Arbeitsumfeld",
     grammarBook: route(9, "grammar"),
     workbook: route(9, "workbook"),
+    aiVideo: "https://youtu.be/56E4gCl2vP8",
     grammarTopic: "Ziele, Methoden, Alternativen und Gegensätze",
     goal: "Über Arbeitsdruck, flexible Arbeitsmodelle und persönliche Grenzen sprechen.",
     instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
