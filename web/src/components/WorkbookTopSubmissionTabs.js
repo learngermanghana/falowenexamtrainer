@@ -290,8 +290,29 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
       {activeTab === "submit" ? (
         <div style={{ background: "#ffffff", border: "1px solid #bfdbfe", borderRadius: 14, padding: 8 }}>
           <div className="course-book-tab-submission-page">
-            <style>{`.course-book-tab-submission-page > div > section:first-child { display: none !important; }
-            .course-book-tab-submission-page select { display: none !important; }`}</style>
+            <style>{`
+              .course-book-tab-submission-page > div > section:first-child { display: none !important; }
+              .course-book-tab-submission-page select { display: none !important; }
+              .course-book-tab-submission-page textarea {
+                background: #ffffff !important;
+                color: #111827 !important;
+                -webkit-text-fill-color: #111827 !important;
+                caret-color: #111827 !important;
+                opacity: 1 !important;
+                font-size: 16px !important;
+                line-height: 1.7 !important;
+                pointer-events: auto !important;
+                touch-action: manipulation !important;
+                -webkit-user-select: text !important;
+                user-select: text !important;
+                -webkit-touch-callout: default !important;
+              }
+              .course-book-tab-submission-page textarea::placeholder {
+                color: #6b7280 !important;
+                -webkit-text-fill-color: #6b7280 !important;
+                opacity: 1 !important;
+              }
+            `}</style>
             <AssignmentSubmissionPage
               key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
               submissionContext={{
