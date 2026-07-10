@@ -232,6 +232,24 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
 
   return (
     <div ref={rootRef} data-persistent-assignment-submission>
+      <style>{`
+        [data-persistent-assignment-submission] textarea {
+          pointer-events: auto !important;
+          -webkit-user-select: text !important;
+          user-select: text !important;
+          -webkit-touch-callout: default !important;
+          touch-action: manipulation !important;
+          font-size: 16px !important;
+          line-height: 1.7 !important;
+          position: relative !important;
+          z-index: 1 !important;
+          caret-color: #111827 !important;
+        }
+        [data-persistent-assignment-submission] textarea:not([disabled]):not([readonly]) {
+          background: #ffffff !important;
+          color: #111827 !important;
+        }
+      `}</style>
       <div
         style={{
           border: "1px solid #bbf7d0",
