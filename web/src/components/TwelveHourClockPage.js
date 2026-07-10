@@ -49,6 +49,15 @@ const chipStyle = {
   fontSize: 13,
 };
 
+const miniBox = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 14,
+  padding: 12,
+  background: "#ffffff",
+  display: "grid",
+  gap: 8,
+};
+
 const calloutStyles = {
   default: {
     border: "1px solid #d1d5db",
@@ -195,6 +204,7 @@ const timeRows = [
   ["1:45", "Viertel vor zwei", "quarter to two"],
   ["6:30", "halb sieben", "30 minutes before seven = 6:30"],
   ["7:30", "halb acht", "30 minutes before eight = 7:30"],
+  ["8:45", "Viertel vor neun", "quarter before nine = 8:45"],
 ];
 
 const separableRows = [
@@ -202,6 +212,12 @@ const separableRows = [
   ["einkaufen", "to shop", "Wir kaufen am Samstag ein."],
   ["anrufen", "to call", "Ich rufe meine Mutter am Abend an."],
   ["fernsehen", "to watch TV", "Er sieht am Abend fern."],
+  ["aufmachen", "to open", "Ich mache das Fenster auf."],
+  ["zumachen", "to close", "Sie macht die Tür zu."],
+  ["aufräumen", "to tidy up", "Wir räumen am Sonntag auf."],
+  ["mitkommen", "to come along", "Kommst du am Freitag mit?"],
+  ["anfangen", "to begin", "Der Kurs fängt um acht Uhr an."],
+  ["mitbringen", "to bring along", "Ich bringe mein Buch mit."],
 ];
 
 const timePractice = [
@@ -225,6 +241,69 @@ const timePractice = [
   },
 ];
 
+const knowledgeTest = [
+  {
+    prompt: "1) Which phrase means 'on Monday'?",
+    options: ["in Montag", "am Montag", "um Montag"],
+    answer: "am Montag",
+    explanation: "Use am with days of the week: am Montag, am Dienstag, am Freitag.",
+  },
+  {
+    prompt: "2) How do you say 1:00 in German?",
+    options: ["eins Uhr", "ein Uhr", "eine Uhr"],
+    answer: "ein Uhr",
+    explanation: "For 1:00, German says ein Uhr.",
+  },
+  {
+    prompt: "3) What does halb acht mean?",
+    options: ["8:30", "7:30", "8:00"],
+    answer: "7:30",
+    explanation: "halb acht means 30 minutes before eight.",
+  },
+  {
+    prompt: "4) What is 6:30 in spoken German?",
+    options: ["halb sechs", "halb sieben", "Viertel nach sechs"],
+    answer: "halb sieben",
+    explanation: "6:30 is 30 minutes before seven, so it is halb sieben.",
+  },
+  {
+    prompt: "5) What is Viertel nach acht?",
+    options: ["8:15", "7:45", "8:45"],
+    answer: "8:15",
+    explanation: "Viertel nach acht means quarter after eight.",
+  },
+  {
+    prompt: "6) What is Viertel vor acht?",
+    options: ["8:15", "7:45", "8:45"],
+    answer: "7:45",
+    explanation: "Viertel vor acht means quarter before eight.",
+  },
+  {
+    prompt: "7) Choose the correct sentence with aufstehen.",
+    options: ["Ich aufstehe um sechs Uhr.", "Ich stehe um sechs Uhr auf.", "Ich stehe auf um sechs Uhr."],
+    answer: "Ich stehe um sechs Uhr auf.",
+    explanation: "In a simple present-tense sentence, the prefix goes to the end.",
+  },
+  {
+    prompt: "8) Choose the correct sentence with anrufen.",
+    options: ["Ich anrufe meine Mutter.", "Ich rufe meine Mutter an.", "Ich rufe an meine Mutter."],
+    answer: "Ich rufe meine Mutter an.",
+    explanation: "anrufen splits: Ich rufe ... an.",
+  },
+  {
+    prompt: "9) Which sentence combines day, time and separable verb correctly?",
+    options: ["Am Montag ich stehe halb sieben auf.", "Am Montag stehe ich um halb sieben auf.", "Montag stehe ich halb sieben auf."],
+    answer: "Am Montag stehe ich um halb sieben auf.",
+    explanation: "Use am + day, um + time, and put the separable prefix at the end.",
+  },
+  {
+    prompt: "10) What is the correct order in a simple separable-verb sentence?",
+    options: ["Subject + conjugated verb + information + prefix", "Subject + prefix + conjugated verb", "Prefix + subject + infinitive"],
+    answer: "Subject + conjugated verb + information + prefix",
+    explanation: "Example: Ich stehe um sechs Uhr auf.",
+  },
+];
+
 export const WeekTimeSeparableGrammarBook = () => (
   <main style={pageWrap}>
     <div style={card}>
@@ -233,7 +312,7 @@ export const WeekTimeSeparableGrammarBook = () => (
       <p style={paragraph}>
         Learn days of the week, the 12-hour clock in German, <strong>halb</strong>, <strong>Viertel</strong>, and simple separable verbs for daily routines.
       </p>
-      <ChipRow items={["Wochentage", "12-hour clock", "halb", "Viertel", "trennbare Verben"]} />
+      <ChipRow items={["Wochentage", "12-hour clock", "halb", "Viertel", "trennbare Verben", "knowledge test"]} />
     </div>
 
     <Section title="1) Days of the week" subtitle="Days of the week are nouns in German, so they begin with a capital letter.">
@@ -252,24 +331,39 @@ export const WeekTimeSeparableGrammarBook = () => (
       <Callout title='A1 note: say "ein Uhr"' variant="warning">
         For <strong>1:00</strong>, say <strong>ein Uhr</strong>, not <strong>eins Uhr</strong>.
       </Callout>
+      <Callout title="Useful speaking pattern" variant="accent">
+        Use <strong>um</strong> before the time: <strong>um sieben Uhr</strong>, <strong>um halb acht</strong>, <strong>um Viertel nach acht</strong>.
+      </Callout>
     </Section>
 
     <Section title="3) The clear halb rule" subtitle="This is the most important time rule in this lesson.">
-      <Callout title='Better rule: "halb + hour" means 30 minutes before that hour' variant="accent">
+      <Callout title='Rule: "halb + hour" means 30 minutes before the named hour' variant="accent">
         <div style={{ display: "grid", gap: 8 }}>
+          <div>The hour after <strong>halb</strong> is the target hour. You are moving toward that hour.</div>
           <div><strong>halb sieben</strong> = 30 minutes before seven = <strong>6:30</strong></div>
           <div><strong>halb acht</strong> = 30 minutes before eight = <strong>7:30</strong></div>
           <div><strong>halb zwei</strong> = 30 minutes before two = <strong>1:30</strong></div>
         </div>
       </Callout>
 
-      <Callout title="Why the old phrase can confuse students" variant="warning">
-        Do not explain it as “halb uses the next hour” without more detail. A beginner may think <strong>halb sieben</strong> means 7:30. The clearer explanation is: <strong>the named hour is the target hour</strong>, and the time is 30 minutes before it.
-      </Callout>
-
       <Callout title="Simple memory formula" variant="success">
         <strong>halb + 7 = 6:30</strong>. The number after <strong>halb</strong> is the hour you are moving toward, not the hour you are already in.
       </Callout>
+
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <div style={miniBox}>
+          <strong>Think in English</strong>
+          <span>halb sieben = halfway to seven = 6:30</span>
+        </div>
+        <div style={miniBox}>
+          <strong>Think in German</strong>
+          <span>Es ist halb sieben. = It is 6:30.</span>
+        </div>
+        <div style={miniBox}>
+          <strong>Daily routine example</strong>
+          <span>Ich stehe um halb sieben auf. = I get up at 6:30.</span>
+        </div>
+      </div>
     </Section>
 
     <Section title="4) Viertel nach and Viertel vor" subtitle="These two are easier because they work like quarter past and quarter to.">
@@ -282,12 +376,28 @@ export const WeekTimeSeparableGrammarBook = () => (
           ["Viertel vor neun", "quarter before nine", "8:45"],
         ]}
       />
+      <Callout title="Small difference" variant="accent">
+        <strong>nach</strong> means after/past. <strong>vor</strong> means before/to. Example: <strong>Viertel nach acht</strong> = 8:15, but <strong>Viertel vor acht</strong> = 7:45.
+      </Callout>
     </Section>
 
     <Section title="5) Separable verbs" subtitle="Some German daily routine verbs split in simple present-tense sentences.">
       <Table headers={["Infinitive", "Meaning", "Example sentence"]} rows={separableRows} />
-      <Callout title="Rule">
-        In a simple present sentence, the prefix goes to the end: <strong>Ich stehe um sechs Uhr auf.</strong>
+      <Callout title="Main rule" variant="accent">
+        In a simple present-tense sentence, the main verb is conjugated in position 2, and the separable prefix goes to the end.
+      </Callout>
+      <Table
+        headers={["Step", "Example"]}
+        rows={[
+          ["Infinitive", "aufstehen = to get up"],
+          ["Conjugated verb", "ich stehe"],
+          ["Extra information", "um sechs Uhr"],
+          ["Prefix at the end", "auf"],
+          ["Full sentence", "Ich stehe um sechs Uhr auf."],
+        ]}
+      />
+      <Callout title="Questions with separable verbs" variant="success">
+        In a yes/no question, the conjugated verb comes first and the prefix still goes to the end: <strong>Stehst du um sechs Uhr auf?</strong> / <strong>Kommst du am Freitag mit?</strong>
       </Callout>
     </Section>
 
@@ -298,8 +408,14 @@ export const WeekTimeSeparableGrammarBook = () => (
           ["Am Montag stehe ich um halb sieben auf.", "On Monday I get up at 6:30."],
           ["Am Dienstag rufe ich meine Mutter um Viertel nach acht an.", "On Tuesday I call my mother at 8:15."],
           ["Am Samstag kaufen wir um vier Uhr ein.", "On Saturday we shop at 4:00."],
+          ["Am Sonntag räume ich mein Zimmer auf.", "On Sunday I tidy my room."],
+          ["Der Deutschkurs fängt um halb neun an.", "The German course starts at 8:30."],
         ]}
       />
+      <Callout title="Sentence pattern" variant="accent">
+        <strong>Am + day</strong> + conjugated verb + subject + <strong>um + time</strong> + other words + separable prefix.
+        <br />Example: <strong>Am Montag stehe ich um halb sieben auf.</strong>
+      </Callout>
     </Section>
 
     <Section title="7) Mini practice" subtitle="Check if the halb rule is clear now.">
@@ -308,14 +424,22 @@ export const WeekTimeSeparableGrammarBook = () => (
       </div>
     </Section>
 
-    <Section title="8) Final summary">
+    <Section title="8) Knowledge test" subtitle="Answer these questions after studying the lesson.">
+      <div style={{ display: "grid", gap: 14 }}>
+        {knowledgeTest.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
+      </div>
+    </Section>
+
+    <Section title="9) Final summary">
       <Callout title="Remember" variant="success">
         <ul style={listStyle}>
           <li>Use <strong>am</strong> with days: <strong>am Montag</strong>.</li>
+          <li>Use <strong>um</strong> with time: <strong>um sieben Uhr</strong>, <strong>um halb acht</strong>.</li>
           <li><strong>halb sieben = 6:30</strong>, not 7:30.</li>
           <li><strong>halb acht = 7:30</strong>, not 8:30.</li>
           <li><strong>Viertel vor acht = 7:45</strong>.</li>
           <li>Separable verbs split: <strong>Ich stehe ... auf.</strong></li>
+          <li>Full pattern: <strong>Am Montag stehe ich um halb sieben auf.</strong></li>
         </ul>
       </Callout>
     </Section>
@@ -356,6 +480,12 @@ export const WeekTimeSeparablePracticeBook = () => (
           answer="Ich stehe um sechs Uhr auf."
           explanation="In a simple sentence, the separable prefix goes to the end."
         />
+      </div>
+    </Section>
+
+    <Section title="Knowledge test">
+      <div style={{ display: "grid", gap: 14 }}>
+        {knowledgeTest.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
       </div>
     </Section>
   </main>
