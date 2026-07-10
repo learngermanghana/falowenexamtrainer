@@ -48,6 +48,21 @@ Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
 
 Zusammenfassend lässt sich sagen, dass [kurzes Fazit].`;
 
+const PLANNING_NOTES_PLACEHOLDER = `Write short points first. English is okay.
+
+1. What is the problem?
+2. Why is it a problem?
+3. What do I want?
+4. What solution or compromise can I suggest?
+5. What should happen next time?
+
+Example:
+1. need to rent again
+2. rent increased after Corona
+3. company should help me search for an apartment
+4. I need my own office
+5. next time they should inform me early`;
+
 const countWords = (text = "") =>
   String(text || "")
     .trim()
@@ -105,6 +120,7 @@ const isFormalWritingTask = (config = {}) => {
 
 const emptyState = () => ({
   answers: {},
+  planningNotes: "",
   finalEssay: "",
   combinedDraftMode: "auto",
   analysisFeedback: null,
@@ -125,6 +141,7 @@ export const migrateGuidedWritingState = (saved = {}) => {
     ...rest,
     answers:
       saved.answers && typeof saved.answers === "object" ? saved.answers : {},
+    planningNotes: typeof saved.planningNotes === "string" ? saved.planningNotes : "",
     combinedDraftMode:
       saved.combinedDraftMode ||
       (saved.finalEssay && saved.view === "final" ? "manual" : "auto"),
@@ -509,7 +526,7 @@ export default function GuidedWritingWorkspace({
             <strong>Main writing task</strong>
             <span style={{ color: "#475569", lineHeight: 1.65 }}>{promptText}</span>
             <small style={{ color: "#1e3a8a", fontWeight: 800 }}>
-              Start from the template, replace the brackets, then edit it to fit the exact task.
+              First write simple points in English or German, then use the template to turn those ideas into one complete German text.
             </small>
           </div>
         ) : (
@@ -661,15 +678,44 @@ export default function GuidedWritingWorkspace({
         <h3 style={{ margin: 0 }}>{singleBoxMode ? `Your ${formalMode ? "formal letter" : opinionMode ? "opinion essay" : "text"}` : "Your combined text"}</h3>
         <small style={{ color: "#475569", fontWeight: 700 }}>
           {singleBoxMode
-            ? "Edit the template into one complete exam-style answer"
+            ? "Use your points above, then edit the template into one complete exam-style answer"
             : state.combinedDraftMode === "auto"
               ? "Automatically built from your answers"
               : "You are editing the combined version"}
         </small>
 
+        {singleBoxMode ? (
+          <div style={{ border: "1px solid #c4b5fd", borderRadius: 14, padding: 12, background: "#faf5ff", display: "grid", gap: 8 }}>
+            <strong>Step 1 · My points first</strong>
+            <span style={{ color: "#5b21b6", lineHeight: 1.65 }}>
+              Write short ideas here before the German text. English is okay. Keep this box as your guide while you improve the template below.
+            </span>
+            <textarea
+              aria-label="My writing points"
+              value={state.planningNotes || ""}
+              onChange={(event) =>
+                update((old) => ({
+                  ...old,
+                  planningNotes: event.target.value,
+                }))
+              }
+              placeholder={PLANNING_NOTES_PLACEHOLDER}
+              style={{
+                minHeight: 130,
+                padding: 12,
+                border: "1px solid #a78bfa",
+                borderRadius: 12,
+                font: "inherit",
+                lineHeight: 1.6,
+                background: "#fff",
+              }}
+            />
+          </div>
+        ) : null}
+
         {singleBoxMode && templateText ? (
           <div style={{ border: "1px solid #fed7aa", borderRadius: 14, padding: 12, background: "#fffbeb", display: "grid", gap: 8 }}>
-            <strong>Start helper</strong>
+            <strong>Step 2 · Turn your points into German</strong>
             <span style={{ color: "#92400e", lineHeight: 1.65 }}>
               A template is already placed in the box when it is empty. Replace every bracket like <strong>[Anlass]</strong> with your own words.
             </span>
