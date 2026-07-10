@@ -13,9 +13,7 @@ const getLeadInstruction = (value = "", title = "") => {
   const text = String(value || "").replace(/^Schreiben:\s*/i, "").trim();
   const remainder = text.slice(title.length).trim();
   if (!remainder) return "";
-  const beforeTaskPoints = remainder.split(/Bearbeiten Sie (?:alle|folgende) Punkte\s*:/i)[0].trim();
-  const firstSentence = beforeTaskPoints.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim();
-  return firstSentence || beforeTaskPoints;
+  return remainder.split(/Bearbeiten Sie (?:alle|folgende|diese) Punkte\s*:/i)[0].trim();
 };
 
 export default function WritingTaskPrompt({ lesson }) {
