@@ -109,6 +109,17 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
     Boolean(selectedAssignment && assignmentKey) &&
     !isSelfPracticeWorkbookResource(match?.resource);
 
+  const submissionContextReady = useMemo(() => {
+    const normalizedAssignmentKey = normalizeCourseAssignmentKey(assignmentKey);
+    if (!normalizedAssignmentKey) return false;
+
+    const search = new URLSearchParams(location.search || "");
+    const currentSearchKey = normalizeCourseAssignmentKey(search.get("assignmentKey") || search.get("assignmentId"));
+    const currentSearchLevel = String(search.get("level") || "").trim().toUpperCase();
+
+    return currentSearchKey === normalizedAssignmentKey && currentSearchLevel === level;
+  }, [assignmentKey, level, location.search]);
+
   const ensureSubmissionContext = useCallback(() => {
     if (!assignmentKey) return;
 
@@ -268,6 +279,7 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
                 aria-selected={selected}
                 onClick={() => {
                   lastClickedRef.current = { key: "", button: null };
+                  if (tab.key === "submit") ensureSubmissionContext();
                   setActiveTab(tab.key);
                 }}
                 style={{
@@ -292,7 +304,7 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
           <div className="course-book-tab-submission-page">
             <style>{`
               .course-book-tab-submission-page > div > section:first-child { display: none !important; }
-              .course-book-tab-submission-page select { display: none !important; }
+              .course-book-tab-submission-page form > div:first-child > div:first-child { display: none !important; }
               .course-book-tab-submission-page textarea {
                 background: #ffffff !important;
                 color: #111827 !important;
@@ -313,15 +325,21 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
                 opacity: 1 !important;
               }
             `}</style>
-            <AssignmentSubmissionPage
-              key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
-              submissionContext={{
-                level,
-                day,
-                assignmentKey,
-                canonicalAssignmentKey: assignmentKey,
-              }}
-            />
+            {submissionContextReady ? (
+              <AssignmentSubmissionPage
+                key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
+                submissionContext={{
+                  level,
+                  day,
+                  assignmentKey,
+                  canonicalAssignmentKey: assignmentKey,
+                }}
+              />
+            ) : (
+              <div role="status" style={{ color: "#475569", padding: "18px 12px", textAlign: "center" }}>
+                Preparing your answer box…
+              </div>
+            )}
           </div>
         </div>
       ) : null}
