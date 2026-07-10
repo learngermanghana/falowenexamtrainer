@@ -7,6 +7,11 @@ const b2Day5GesundheitUndWohlbefinden = makeLesson({
   title: "Bildung und Lernen",
   topic: "Nominalisierung von Verben",
   heroImage: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "B2 Day 5 · AI video: Bildung und Lernen",
+    description: "AI explanation for B2 Day 5, chapter 1.5: Bildung und Lernen, Nominalisierung von Verben and B2 writing practice.",
+    url: "https://youtu.be/DiUEWUBJBio",
+  },
   grammarFocus: "Nominalisierung von Verben für sachliche und formelle B2-Sätze",
   objectives: [
     "Ich kann Verben in passende Nomen umwandeln.",
