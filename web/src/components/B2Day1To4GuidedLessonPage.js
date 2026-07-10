@@ -137,12 +137,11 @@ const embedUrl = (url = "") => {
 };
 
 const day5SpeakingTopics = [
-  { id: "ursachen", title: "Stressursachen", keywords: ["Zeitdruck", "zu viele Aufgaben", "ständige Erreichbarkeit", "finanzielle Sorgen", "Konflikte", "fehlende Pausen"] },
-  { id: "koerper", title: "Körperliche Folgen", keywords: ["Schlafprobleme", "Kopfschmerzen", "Erschöpfung", "Verspannung", "weniger Energie", "Immunsystem"] },
-  { id: "psychisch", title: "Psychische Folgen", keywords: ["Unruhe", "Überforderung", "schlechte Stimmung", "weniger Motivation", "Konzentration", "Reizbarkeit"] },
-  { id: "routinen", title: "Gesunde Routinen", keywords: ["Bewegung", "ausreichend Schlaf", "feste Pausen", "Ernährung", "handyfreie Zeit", "soziale Kontakte"] },
-  { id: "empfehlungen", title: "Realistische Empfehlungen", keywords: ["kleine Schritte", "Grenzen setzen", "Prioritäten", "Unterstützung", "Zeitplan", "Regelmäßigkeit"] },
-  { id: "ziel", title: "Persönliches Ziel", keywords: ["Gewohnheit verbessern", "konkreter Plan", "Hindernis", "Vorteil", "Motivation", "nächster Schritt"] },
+  { id: "lernformen", title: "Lernformen", keywords: ["Online-Lernen", "Präsenzunterricht", "Selbstlernen", "Lerngruppe", "digital", "flexibel"] },
+  { id: "weiterbildung", title: "Weiterbildung", keywords: ["Beruf", "Arbeitsmarkt", "neue Kompetenzen", "Karriere", "Qualifikation", "Zukunft"] },
+  { id: "strategie", title: "Lernstrategie", keywords: ["Wiederholung", "Planung", "Prüfungsvorbereitung", "Feedback", "Motivation", "Fortschritt"] },
+  { id: "nominalisierung", title: "Nominalisierung", keywords: ["das Lernen", "die Weiterbildung", "die Verbesserung", "die Teilnahme", "die Prüfung", "die Anmeldung"] },
+  { id: "meinung", title: "Eigene Meinung", keywords: ["meiner Meinung nach", "ein Vorteil", "ein Nachteil", "besonders wichtig", "zum Beispiel", "zusammenfassend"] },
 ];
 
 const CompactSpeakingPoints = ({ lesson }) => {
@@ -169,7 +168,7 @@ const CompactSpeakingPoints = ({ lesson }) => {
         </div>
       ) : null}
       {starters.length ? <NoteBox><strong>Nützliche Satzanfänge:</strong><ul style={{ ...listStyle, marginTop: 8 }}>{starters.map((item) => <li key={item}>{item}</li>)}</ul></NoteBox> : null}
-      {Number(lesson.day) === 5 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens vier Verbindungen aus <em>weil, da, deshalb, daher</em> und <em>aus diesem Grund</em>. Nenne mindestens ein konkretes Beispiel.</NoteBox> : null}
+      {Number(lesson.day) === 5 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens drei Nominalisierungen wie <em>das Lernen</em>, <em>die Weiterbildung</em>, <em>die Verbesserung</em> oder <em>die Teilnahme</em>. Nenne mindestens ein konkretes Beispiel.</NoteBox> : null}
       {Number(lesson.day) === 6 ? <NoteBox tone="green"><strong>B2-Ziel:</strong> Nutze mindestens zwei Verbindungen aus <em>obwohl, auch wenn</em> und <em>trotzdem</em>. Nenne eine konkrete Lösung mit Vorteil.</NoteBox> : null}
     </div>
   );
