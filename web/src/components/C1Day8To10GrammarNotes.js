@@ -121,11 +121,30 @@ const lessons = {
   10: {
     title: "Passiv, Modalpassiv und differenzierte Bewertung bei Integration und Gesellschaft",
     subtitle: "Teilhabe, Verantwortung und gesellschaftlichen Zusammenhalt sachlich analysieren",
-    why: "Integration und Gesellschaft sind C1-Themen, bei denen Prozesse und Verantwortung oft wichtiger sind als einzelne Personen. Passiv, Modalpassiv und abwägende Formulierungen machen deine Analyse sachlicher und reifer.",
-    goals: ["Vorgangspassiv und Modalpassiv sicher nutzen", "gesellschaftliche Prozesse sachlich beschreiben", "Verantwortung differenziert zuordnen", "Integration mit Chancen und Grenzen bewerten"],
-    rows: [["Vorgangspassiv", "Integrationsangebote werden in vielen Kommunen ausgebaut."], ["Modalpassiv", "Sprachbarrieren müssen systematisch abgebaut werden."], ["von / durch", "Teilhabe wird durch Bildung, Arbeit und Sprache erleichtert."], ["abwägend", "Integration kann nur gelingen, wenn individuelle Anstrengung und institutionelle Unterstützung zusammengedacht werden."]],
-    model: "Integration darf nicht allein als individuelle Anpassungsleistung verstanden werden. Sprachbarrieren müssen abgebaut, Bildungswege geöffnet und Diskriminierung ernst genommen werden. Gleichzeitig kann Teilhabe nur entstehen, wenn Zugewanderte aktiv Möglichkeiten nutzen und gesellschaftliche Institutionen verlässliche Strukturen bereitstellen. Entscheidend ist daher ein Verständnis von Integration, das Rechte, Pflichten und soziale Anerkennung miteinander verbindet.",
-    checks: [["Aktiv: Kommunen bauen Angebote aus. → Passiv", "Angebote werden von Kommunen ausgebaut."], ["Modalpassiv: Man muss Barrieren abbauen.", "Barrieren müssen abgebaut werden."], ["Teilhabe wird ___ Bildung erleichtert.", "durch"]],
+    why:
+      "Integration und Gesellschaft sind C1-Themen, bei denen du nicht nur persönliche Meinungen sammelst, sondern gesellschaftliche Prozesse erklärst. Es geht darum, wer Zugang zu Sprache, Bildung, Arbeit, Wohnraum, politischer Beteiligung und sozialer Anerkennung bekommt. Mit Passiv und Modalpassiv kannst du Maßnahmen sachlich formulieren, ohne immer eine einzelne Person zu nennen. Gleichzeitig musst du Verantwortung klar einordnen: Individuelle Eigeninitiative ist wichtig, aber ohne faire Strukturen, verständliche Informationen, Antidiskriminierung und institutionelle Unterstützung bleibt Teilhabe begrenzt. Eine starke C1-Antwort zeigt deshalb sowohl Chancen als auch Grenzen und verbindet Beispiele mit konkreten Maßnahmen.",
+    goals: [
+      "Vorgangspassiv und Modalpassiv sicher nutzen",
+      "gesellschaftliche Prozesse sachlich und nicht nur emotional beschreiben",
+      "Verantwortung zwischen Individuen, Staat, Institutionen, Medien und Zivilgesellschaft differenziert zuordnen",
+      "Integration mit Chancen, Grenzen und konkreten Bedingungen bewerten",
+      "Maßnahmen nennen, die Sprache, Bildung, Arbeit, Begegnung und Anerkennung verbinden",
+    ],
+    rows: [
+      ["Vorgangspassiv", "Integrationsangebote werden in vielen Kommunen ausgebaut."],
+      ["Modalpassiv", "Sprachbarrieren müssen systematisch abgebaut werden."],
+      ["von / durch", "Teilhabe wird durch Bildung, Arbeit und Sprache erleichtert."],
+      ["Verantwortung", "Diskriminierung muss von Institutionen erkannt und durch klare Verfahren reduziert werden."],
+      ["abwägend", "Integration kann nur gelingen, wenn individuelle Anstrengung und institutionelle Unterstützung zusammengedacht werden."],
+    ],
+    model:
+      "Integration darf nicht allein als individuelle Anpassungsleistung verstanden werden. Sprachbarrieren müssen abgebaut, Bildungswege geöffnet und Diskriminierung ernst genommen werden. Gleichzeitig kann Teilhabe nur entstehen, wenn Zugewanderte aktiv Möglichkeiten nutzen und gesellschaftliche Institutionen verlässliche Strukturen bereitstellen. Entscheidend ist daher ein Verständnis von Integration, das Rechte, Pflichten und soziale Anerkennung miteinander verbindet. Besonders wichtig erscheint dabei, dass Maßnahmen nicht nur kurzfristig angeboten, sondern langfristig finanziert, erklärt und regelmäßig überprüft werden.",
+    checks: [
+      ["Aktiv: Kommunen bauen Angebote aus. → Passiv", "Angebote werden von Kommunen ausgebaut."],
+      ["Modalpassiv: Man muss Barrieren abbauen.", "Barrieren müssen abgebaut werden."],
+      ["Teilhabe wird ___ Bildung erleichtert.", "durch"],
+      ["Nenne eine differenzierte C1-Bewertung.", "Integration braucht sowohl Eigeninitiative als auch faire institutionelle Unterstützung."],
+    ],
   },
 };
 
@@ -162,48 +181,8 @@ const Day8DeepDive = ({ lesson }) => {
             ["Ziel", "zur / zum + Nominalisierung", "Zur Entlastung der Bewohner sollte der Nahverkehr verbessert werden."],
             ["Mittel", "durch + Akkusativ", "Durch die Umgestaltung leerstehender Flächen könnten neue Begegnungsorte entstehen."],
             ["Einschränkung", "trotz / ungeachtet + Genitiv", "Trotz begrenzter Haushaltsmittel sollte eine Pilotphase geprüft werden."],
-            ["Bezug", "hinsichtlich + Genitiv", "Hinsichtlich der Barrierefreiheit besteht weiterhin Handlungsbedarf."],
           ]}
         />
-      </section>
-
-      <section style={card}>
-        <h2 style={sectionTitle}>3. Formeller Ton in einer Eingabe</h2>
-        <p style={{ margin: 0, lineHeight: 1.75 }}>
-          Eine Eingabe an die Stadtverwaltung soll nicht wie eine Beschwerde im Chat klingen. Sie ist höflich, konkret, lösungsorientiert und realistisch.
-        </p>
-        <Table
-          headers={["Zu emotional", "C1-formell"]}
-          rows={[
-            ["Die Stadt macht gar nichts gegen dieses Problem.", "Aus Sicht vieler Bewohner besteht weiterhin erheblicher Handlungsbedarf."],
-            ["Die Mieten sind unmöglich und unfair.", "Die steigenden Mieten stellen besonders für Haushalte mit geringem Einkommen eine erhebliche Belastung dar."],
-            ["Man muss sofort neue Parks bauen.", "Zur Verbesserung der Aufenthaltsqualität sollte die schrittweise Schaffung zusätzlicher Grünflächen geprüft werden."],
-          ]}
-        />
-        <Mistake
-          wrong="Ich schreibe, weil alles schlecht ist und die Stadt endlich etwas machen muss."
-          correct="Ich wende mich an Sie aufgrund der zunehmenden Belastung durch steigende Mieten und fehlende Grünflächen in unserem Stadtteil."
-        />
-      </section>
-
-      <section style={card}>
-        <h2 style={sectionTitle}>4. Mini-Schreibtraining: 80–100 Wörter</h2>
-        <p style={{ margin: 0, lineHeight: 1.75 }}>
-          Schreibe eine kurze formelle Eingabe an eine Stadtverwaltung. Beschreibe ein Problem und nenne eine Maßnahme.
-        </p>
-        <NoteBox tone="blue">
-          <strong>Pflichtstrukturen:</strong>
-          <ul style={{ ...listStyle, marginTop: 8 }}>
-            <li>eine Ursache mit <strong>aufgrund</strong> oder <strong>infolge</strong>,</li>
-            <li>ein Ziel mit <strong>zur/zum</strong>,</li>
-            <li>eine Maßnahme mit <strong>durch</strong>,</li>
-            <li>eine Einschränkung mit <strong>trotz</strong>.</li>
-          </ul>
-        </NoteBox>
-        <ExampleBox>
-          <strong>Modell für 80–100 Wörter:</strong><br />
-          Sehr geehrte Damen und Herren, ich wende mich an Sie aufgrund des zunehmenden Mangels an bezahlbarem Wohnraum in unserem Stadtteil. Infolge steigender Mieten werden Familien und ältere Menschen immer stärker belastet. Zur Verbesserung der Situation sollte die Stadt leerstehende Gebäude für sozialen Wohnungsbau prüfen. Durch den Ausbau kleiner Grünflächen könnte außerdem die Aufenthaltsqualität verbessert werden. Trotz begrenzter finanzieller Mittel erscheint eine schrittweise Umsetzung sinnvoll. Ich bitte Sie höflich um Prüfung dieser Vorschläge.
-        </ExampleBox>
       </section>
     </>
   );
@@ -245,41 +224,77 @@ const Day9DeepDive = ({ lesson }) => {
             ["Plattformen müssen transparenter sein.", "Plattformen müssten transparenter erklären, warum bestimmte Anzeigen erscheinen."],
             ["Man muss Werbung stärker regulieren.", "Personalisierte Werbung sollte stärker reguliert werden, wenn sensible Daten genutzt werden."],
             ["Nutzer brauchen mehr Kontrolle.", "Nutzer könnten durch verständliche Einstellungen mehr Kontrolle über ihre Daten erhalten."],
-            ["Ein Verbot ist gut.", "Eine vollständige Einschränkung wäre nur dann sinnvoll, wenn mildere Maßnahmen nicht ausreichen."],
+          ]}
+        />
+      </section>
+    </>
+  );
+};
+
+const Day10DeepDive = ({ lesson }) => {
+  if (!lesson || Number(lesson.day) !== 10) return null;
+
+  return (
+    <>
+      <section style={card}>
+        <h2 style={sectionTitle}>1. Integration: nicht nur Person, sondern System</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          Auf C1 solltest du Integration nicht nur mit dem Satz <em>Menschen müssen Deutsch lernen</em> erklären. Das ist zu einfach. Eine differenzierte Antwort fragt auch: Gibt es bezahlbare Sprachkurse? Werden Abschlüsse anerkannt? Gibt es faire Bewerbungsverfahren? Werden Menschen in Vereinen, Schulen, Behörden und Nachbarschaften tatsächlich einbezogen?
+        </p>
+        <NoteBox tone="amber">
+          <strong>Merke:</strong> Integration ist ein wechselseitiger Prozess. Zugewanderte Menschen brauchen Eigeninitiative, aber Gesellschaft und Institutionen müssen reale Zugänge schaffen.
+        </NoteBox>
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>2. Passiv und Modalpassiv für sachliche Maßnahmen</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          Passiv hilft dir, gesellschaftliche Prozesse sachlich zu beschreiben. Modalpassiv zeigt, was notwendig ist. So formulierst du nicht nur Kritik, sondern konkrete Handlungsfelder.
+        </p>
+        <Table
+          headers={["Funktion", "Struktur", "Beispiel"]}
+          rows={[
+            ["Problem sachlich nennen", "Passiv", "Menschen mit ausländischen Abschlüssen werden häufig zu spät beraten."],
+            ["Notwendigkeit formulieren", "Modalpassiv", "Anerkennungsverfahren müssen vereinfacht werden."],
+            ["Verantwortung benennen", "von + Dativ", "Integrationsangebote werden von Kommunen, Schulen und Vereinen getragen."],
+            ["Mittel nennen", "durch + Akkusativ", "Teilhabe kann durch Mentoring, Sprachförderung und faire Bewerbungen gestärkt werden."],
           ]}
         />
       </section>
 
       <section style={card}>
-        <h2 style={sectionTitle}>3. Werbestrategien präzise analysieren</h2>
+        <h2 style={sectionTitle}>3. Differenziert bewerten statt einseitig urteilen</h2>
         <Table
-          headers={["Strategie", "Wirkung", "C1-Formulierung"]}
+          headers={["Zu einfach", "C1-differenziert"]}
           rows={[
-            ["Rabatt-Timer", "Zeitdruck", "Künstliche Verknappung kann dazu führen, dass Kaufentscheidungen weniger rational getroffen werden."],
-            ["Influencer", "soziale Nähe", "Influencer-Werbung wirkt oft glaubwürdig, obwohl sie wirtschaftlich motiviert ist."],
-            ["Tracking", "Personalisierung", "Durch die Auswertung früherer Suchanfragen können Anzeigen gezielt auf individuelle Interessen zugeschnitten werden."],
-            ["Wiederholte Anzeigen", "Gewöhnung und Druck", "Je häufiger ein Produkt erscheint, desto vertrauter und attraktiver kann es wirken."],
+            ["Integration ist nur Aufgabe der Migranten.", "Integration erfordert sowohl Eigeninitiative als auch verlässliche institutionelle Unterstützung."],
+            ["Der Staat muss alles lösen.", "Staatliche Programme können Teilhabe erleichtern, ersetzen aber nicht persönliche Begegnung und zivilgesellschaftliches Engagement."],
+            ["Sprache löst alle Probleme.", "Sprachkenntnisse sind zentral, reichen jedoch ohne faire Bildungs- und Arbeitschancen nicht aus."],
           ]}
+        />
+        <Mistake
+          wrong="Integration ist leicht, wenn Menschen einfach Deutsch lernen."
+          correct="Sprachkenntnisse sind zwar eine zentrale Voraussetzung für Teilhabe, doch Integration gelingt nur, wenn Bildungswege, Arbeitsmarkt und gesellschaftliche Anerkennung ebenfalls zugänglich sind."
         />
       </section>
 
       <section style={card}>
         <h2 style={sectionTitle}>4. Mini-Schreibtraining: 80–100 Wörter</h2>
         <p style={{ margin: 0, lineHeight: 1.75 }}>
-          Schreibe einen kurzen C1-Absatz zur Frage, ob personalisierte Werbung stärker reguliert werden sollte.
+          Schreibe einen kurzen C1-Absatz zur Frage, wie gesellschaftlicher Zusammenhalt durch bessere Teilhabe gestärkt werden kann.
         </p>
         <NoteBox tone="blue">
           <strong>Pflichtstrukturen:</strong>
           <ul style={{ ...listStyle, marginTop: 8 }}>
-            <li>ein Gegensatz mit <strong>während</strong> oder <strong>wohingegen</strong>,</li>
-            <li>eine Einschränkung mit <strong>obwohl</strong> oder <strong>obgleich</strong>,</li>
-            <li>eine Abwägung mit <strong>zwar … jedoch</strong>,</li>
-            <li>eine Empfehlung mit <strong>sollte</strong>, <strong>müsste</strong> oder <strong>könnte</strong>.</li>
+            <li>ein Passivsatz mit <strong>wird/werden</strong>,</li>
+            <li>ein Modalpassiv mit <strong>muss/müssen ... werden</strong>,</li>
+            <li>ein Mittel mit <strong>durch</strong>,</li>
+            <li>eine abwägende Formulierung mit <strong>zwar ... jedoch</strong> oder <strong>nicht nur ... sondern auch</strong>.</li>
           </ul>
         </NoteBox>
         <ExampleBox>
           <strong>Modell für 80–100 Wörter:</strong><br />
-          Während personalisierte Werbung passende Produkte sichtbar machen kann, erhöht sie zugleich den Druck zu spontanen Käufen. Obgleich viele Nutzer glauben, frei zu entscheiden, werden ihre Interessen durch Tracking und wiederholte Anzeigen gezielt beeinflusst. Diese Werbung ist zwar für Unternehmen wirtschaftlich attraktiv, jedoch sollte sie klarer gekennzeichnet werden. Plattformen müssten verständlich erklären, warum bestimmte Anzeigen erscheinen. Außerdem könnten einfache Datenschutzeinstellungen und mehr Medienbildung helfen, bewussteren Konsum zu fördern.
+          Gesellschaftlicher Zusammenhalt wird gestärkt, wenn Teilhabe nicht nur gefordert, sondern konkret ermöglicht wird. Sprachbarrieren müssen abgebaut werden, doch Sprachkurse allein reichen nicht aus. Durch faire Anerkennungsverfahren, Mentoring und Begegnungsräume können Menschen schneller Zugang zu Bildung, Arbeit und sozialen Netzwerken erhalten. Integration verlangt zwar Eigeninitiative, jedoch müssen Institutionen verständliche Informationen, Schutz vor Diskriminierung und langfristige Unterstützung bereitstellen. Erst wenn beide Seiten Verantwortung übernehmen, kann Zugehörigkeit wachsen.
         </ExampleBox>
       </section>
     </>
@@ -310,6 +325,7 @@ export default function C1Day8To10GrammarNotes({ day, checked = false, onChecked
     </section>
     <Day8DeepDive lesson={{ ...lesson, day: dayNumber }} />
     <Day9DeepDive lesson={{ ...lesson, day: dayNumber }} />
+    <Day10DeepDive lesson={{ ...lesson, day: dayNumber }} />
     <section style={card}>
       <h2 style={sectionTitle}>C1-Modellabsatz</h2>
       <NoteBox tone="green">{lesson.model}</NoteBox>
