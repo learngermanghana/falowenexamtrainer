@@ -7,6 +7,11 @@ const c1Day9KonsumUndWerbung = makeLesson({
   title: "Konsum und Werbung",
   topic: "Kaufentscheidungen, Werbestrategien, digitale Beeinflussung und Verantwortung kritisch bewerten",
   heroImage: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "C1 Day 9 · AI video: Konsum und Werbung",
+    description: "AI explanation for C1 Day 9, chapter 2.4: Konsum, Werbung, digitale Beeinflussung and critical argumentation.",
+    url: "https://youtu.be/Ro30eoZOU88",
+  },
   grammarFocus: "Argumentative Redemittel und Konjunktiv II für Empfehlungen, Kritik und differenzierte Lösungen",
   objectives: [
     "Ich kann erklären, wie Werbung Bedürfnisse, Markenbilder und Kaufentscheidungen beeinflusst.",
