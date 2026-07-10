@@ -55,14 +55,10 @@ const isA1LessonRoute = () => {
   return /^\/campus\/course\/lesson\/A1\//i.test(window.location?.pathname || "");
 };
 
-export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
+export const getConfiguredInAppWorkbookResourceRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const normalizedDay = String(Number(day));
   const normalizedChapter = normalizeChapter(chapter);
-
-  if (normalizedLevel === "A1" && isA1LessonRoute()) {
-    return "";
-  }
 
   if (normalizedLevel === "A1" && normalizedDay === "18" && normalizedChapter === "12.2") {
     return A1_DAY18_CHAPTER122_WORKBOOK_ROUTE;
@@ -78,11 +74,21 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
   return config[normalizedChapter] || config["*"] || "";
 };
 
+export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
+  const normalizedLevel = normalizeLevel(level);
+
+  if (normalizedLevel === "A1" && isA1LessonRoute()) {
+    return "";
+  }
+
+  return getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
+};
+
 export const resolveInAppWorkbookRoute = ({ level, day, chapter, fallback } = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const internalFallback = normalizeFalowenCourseRoute(fallback);
   if (internalFallback) return internalFallback;
-  const configured = getConfiguredInAppWorkbookRoute({ level: normalizedLevel, day, chapter });
+  const configured = getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
   if (configured) return configured;
   if (GUARDED_LEVELS.has(normalizedLevel)) return "";
   return String(fallback || "").trim();
