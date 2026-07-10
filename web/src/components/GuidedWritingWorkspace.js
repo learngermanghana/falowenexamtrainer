@@ -16,6 +16,38 @@ import WritingFeedbackCard from "./WritingFeedbackCard";
 import PrepositionCaseCoachField from "./PrepositionCaseCoachField";
 import { normalizeWritingFeedback } from "../lib/writingFeedbackNormalizer";
 
+const FORMAL_LETTER_TEMPLATE = `FORMAL LETTER · Use this for complaints, enquiries, applications or official emails
+
+Betreff: [präzises Anliegen]
+
+Sehr geehrte Damen und Herren,
+Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
+
+hiermit wende ich mich an Sie, da [Anlass] aus meiner Sicht einer Klärung bedarf.
+
+Zunächst möchte ich darauf hinweisen, dass [Punkt 1]. Darüber hinaus ist zu berücksichtigen, dass [Punkt 2].
+
+Ich bitte Sie daher höflich um [konkrete Bitte] und um eine zeitnahe Rückmeldung.
+
+Für Ihre Unterstützung danke ich Ihnen im Voraus.
+
+Mit freundlichen Grüßen
+[Ihr Name]`;
+
+const OPINION_ESSAY_TEMPLATE = `OPINION ESSAY · Use this for Meinungsbeitrag, Stellungnahme or argument writing
+
+In der heutigen Zeit wird oft über [Thema] diskutiert.
+
+Meiner Meinung nach [eigene Meinung].
+
+Ein wichtiger Grund dafür ist, dass [Grund 1]. Außerdem sollte man berücksichtigen, dass [Grund 2].
+
+Natürlich gibt es auch andere Meinungen. Einige Menschen sind der Ansicht, dass [Gegenargument]. Dennoch bin ich der Meinung, dass [eigene Position stärken].
+
+Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
+
+Zusammenfassend lässt sich sagen, dass [kurzes Fazit].`;
+
 const countWords = (text = "") =>
   String(text || "")
     .trim()
@@ -47,20 +79,28 @@ const getMotivationMessage = ({ completeCount, totalQuestions, totalMissingWords
   return `Start with one card. Your full mission has ${totalMissingWords} target words remaining.`;
 };
 
-const isFormalWritingTask = (config = {}) => {
-  if (config.singleDraftMode === true || config.oneBoxMode === true) return true;
-  const text = [
+const getConfigSearchText = (config = {}) =>
+  [
     config.taskType,
     config.title,
     config.topic,
+    config.prompt,
+    config.writingTopic,
     config.writingTaskType,
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
+const isOpinionWritingTask = (config = {}) => {
+  const text = getConfigSearchText(config);
+  return /opinion essay|meinungsbeitrag|stellungnahme|erörterung|eroerterung|argument writing|argumentation|diskussionsbeitrag|diskussion/.test(text);
+};
+
+const isFormalWritingTask = (config = {}) => {
+  const text = getConfigSearchText(config);
   return /formal|formell|formelle|e-mail|email|letter|brief|eingabe|proposal|vorschlag|anfrage|beschwerde|bewerbung|absage|termin/.test(text)
-    && !/opinion essay|meinungsbeitrag|stellungnahme|erörterung|eroerterung/.test(text);
+    && !isOpinionWritingTask(config);
 };
 
 const emptyState = () => ({
@@ -125,6 +165,15 @@ const getMainWritingPrompt = (config = {}) =>
   config.mainQuestion ||
   `Write your complete ${config.level || "German"} text for this task.`;
 
+const getTemplateForMode = ({ formalMode, opinionMode, config }) => {
+  if (config?.starterTemplate) return config.starterTemplate;
+  if (formalMode) return config?.formalTemplate || FORMAL_LETTER_TEMPLATE;
+  if (opinionMode) return config?.opinionTemplate || OPINION_ESSAY_TEMPLATE;
+  return config?.template || "";
+};
+
+const hasUnfilledPlaceholders = (text = "") => /\[[^\]]+\]/.test(String(text || ""));
+
 export default function GuidedWritingWorkspace({
   config,
   storageKey,
@@ -158,7 +207,13 @@ export default function GuidedWritingWorkspace({
   const [analysisError, setAnalysisError] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
 
+  const opinionMode = isOpinionWritingTask(config);
   const formalMode = isFormalWritingTask(config);
+  const forcedSingleBoxMode = config.singleDraftMode === true || config.oneBoxMode === true;
+  const singleBoxMode = formalMode || opinionMode || forcedSingleBoxMode;
+  const modeLabel = formalMode ? "Formal letter" : opinionMode ? "Opinion essay" : "Writing";
+  const templateText = getTemplateForMode({ formalMode, opinionMode, config });
+
   const questions = useMemo(
     () =>
       (config.questions || []).map((question) => ({
@@ -177,17 +232,20 @@ export default function GuidedWritingWorkspace({
     .map((question) => String(state.answers[question.id] || "").trim())
     .filter(Boolean)
     .join("\n\n");
-  const finalEssay = formalMode
-    ? (state.finalEssay || autoText)
+  const finalEssay = singleBoxMode
+    ? (state.finalEssay || autoText || templateText)
     : state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
   const completeCount = questions.filter((question) => question.complete).length;
-  const allComplete = formalMode ? Boolean(finalEssay.trim()) : completeCount === questions.length;
+  const placeholderWarning = hasUnfilledPlaceholders(finalEssay);
+  const allComplete = singleBoxMode ? Boolean(finalEssay.trim()) && !placeholderWarning : completeCount === questions.length;
   const totalMissingWords = questions.reduce((sum, question) => sum + Math.max(question.minimumWords - question.words, 0), 0);
   const nextQuestion = questions.find((question) => !question.complete);
   const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
   const finalWordCount = countWords(finalEssay);
   const promptText = getMainWritingPrompt(config);
+  const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning;
+  const checklist = Array.isArray(config.checklist) ? config.checklist : [];
 
   const update = (updater) =>
     setState((old) => ({
@@ -196,6 +254,27 @@ export default function GuidedWritingWorkspace({
         : { ...old, ...updater }),
       updatedAt: new Date().toISOString(),
     }));
+
+  const insertTemplate = (template = templateText) => {
+    if (!template) return;
+    const current = String(finalEssay || "").trim();
+    const templateTrimmed = String(template || "").trim();
+    if (current && current !== templateTrimmed) {
+      const shouldReplace = window.confirm(
+        "This will replace the current text in the box with the writing template. Continue?",
+      );
+      if (!shouldReplace) return;
+    }
+    update((old) => ({
+      ...old,
+      finalEssay: template,
+      combinedDraftMode: "manual",
+      analysisFeedback: null,
+      analysisUpdatedAt: "",
+    }));
+    setCopyMessage("Template inserted. Replace every [placeholder] before analysis.");
+    window.setTimeout(() => combinedDraftRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
     localStorage.setItem(
@@ -207,8 +286,8 @@ export default function GuidedWritingWorkspace({
   useEffect(() => {
     onStatusChange?.({
       complete: allComplete && Boolean(finalEssay.trim()),
-      completedQuestions: formalMode ? (finalEssay.trim() ? 1 : 0) : completeCount,
-      totalQuestions: formalMode ? 1 : questions.length,
+      completedQuestions: singleBoxMode ? (allComplete ? 1 : 0) : completeCount,
+      totalQuestions: singleBoxMode ? 1 : questions.length,
       wordCount: finalWordCount,
     });
   }, [
@@ -216,19 +295,19 @@ export default function GuidedWritingWorkspace({
     completeCount,
     finalEssay,
     finalWordCount,
-    formalMode,
+    singleBoxMode,
     onStatusChange,
     questions.length,
   ]);
 
   useEffect(() => {
-    if (formalMode) return;
+    if (singleBoxMode) return;
     questions.forEach((question, index) => {
       if (!question.complete || reachedMilestonesRef.current.has(question.id)) return;
       reachedMilestonesRef.current.add(question.id);
       showToast(getMilestoneMessage(question, index), "success", { playSound: true });
     });
-  }, [formalMode, questions, showToast]);
+  }, [singleBoxMode, questions, showToast]);
 
   useEffect(() => {
     let active = true;
@@ -317,7 +396,7 @@ export default function GuidedWritingWorkspace({
 
   const analyse = async () => {
     const draft = finalEssay.trim();
-    if (!draft || analysisStatus === "loading") return;
+    if (!draft || analysisStatus === "loading" || placeholderWarning) return;
 
     setAnalysisStatus("loading");
     setAnalysisError("");
@@ -402,7 +481,7 @@ export default function GuidedWritingWorkspace({
   return (
     <div
       data-guided-writing-workspace
-      data-writing-mode={formalMode ? "formal-single-box" : "guided-five-questions"}
+      data-writing-mode={singleBoxMode ? (formalMode ? "formal-single-box" : opinionMode ? "opinion-single-box" : "single-box") : "guided-five-questions"}
       style={{
         border: "1px solid #c7d2fe",
         borderRadius: 18,
@@ -421,17 +500,17 @@ export default function GuidedWritingWorkspace({
             color: "#3730a3",
           }}
         >
-          {formalMode ? `Formal ${config.level} Writing` : `Guided ${config.level} Writing`}
+          {singleBoxMode ? `${modeLabel} · ${config.level} Writing` : `Guided ${config.level} Writing`}
         </span>
         <h3 style={{ margin: 0 }}>
-          {formalMode ? "Write your complete formal letter" : "Answer five questions and build your text"}
+          {singleBoxMode ? `Write one complete ${formalMode ? "formal text" : opinionMode ? "opinion essay" : "text"}` : "Answer five questions and build your text"}
         </h3>
-        {formalMode ? (
+        {singleBoxMode ? (
           <div style={{ border: "1px solid #bfdbfe", borderRadius: 16, padding: 12, background: "#eff6ff", display: "grid", gap: 8 }}>
             <strong>Main writing task</strong>
             <span style={{ color: "#475569", lineHeight: 1.65 }}>{promptText}</span>
             <small style={{ color: "#1e3a8a", fontWeight: 800 }}>
-              Write one complete formal text. Do not split this task into five answers.
+              Start from the template, replace the brackets, then edit it to fit the exact task.
             </small>
           </div>
         ) : (
@@ -454,7 +533,7 @@ export default function GuidedWritingWorkspace({
         </small>
       </header>
 
-      {!formalMode ? (
+      {!singleBoxMode ? (
         <div style={{ display: "grid", gap: 14 }}>
           {questions.map((question, index) => (
             <article
@@ -580,17 +659,32 @@ export default function GuidedWritingWorkspace({
           gap: 12,
         }}
       >
-        <h3 style={{ margin: 0 }}>{formalMode ? "Your formal letter" : "Your combined text"}</h3>
+        <h3 style={{ margin: 0 }}>{singleBoxMode ? `Your ${formalMode ? "formal letter" : opinionMode ? "opinion essay" : "text"}` : "Your combined text"}</h3>
         <small style={{ color: "#475569", fontWeight: 700 }}>
-          {formalMode
-            ? "Type the full formal letter/e-mail here"
+          {singleBoxMode
+            ? "Edit the template into one complete exam-style answer"
             : state.combinedDraftMode === "auto"
               ? "Automatically built from your answers"
               : "You are editing the combined version"}
         </small>
+
+        {singleBoxMode && templateText ? (
+          <div style={{ border: "1px solid #fed7aa", borderRadius: 14, padding: 12, background: "#fffbeb", display: "grid", gap: 8 }}>
+            <strong>Start helper</strong>
+            <span style={{ color: "#92400e", lineHeight: 1.65 }}>
+              A template is already placed in the box when it is empty. Replace every bracket like <strong>[Anlass]</strong> with your own words.
+            </span>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button type="button" onClick={() => insertTemplate(templateText)} style={styles.secondaryButton}>
+                Insert {formalMode ? "formal letter" : opinionMode ? "opinion essay" : "writing"} template
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         <textarea
           ref={combinedDraftRef}
-          aria-label={formalMode ? "Your formal letter" : "Your combined text"}
+          aria-label={singleBoxMode ? `Your ${formalMode ? "formal letter" : opinionMode ? "opinion essay" : "text"}` : "Your combined text"}
           value={finalEssay}
           onChange={(event) =>
             update((old) => ({
@@ -600,7 +694,7 @@ export default function GuidedWritingWorkspace({
             }))
           }
           style={{
-            minHeight: formalMode ? 420 : 320,
+            minHeight: singleBoxMode ? 420 : 320,
             padding: 14,
             border: "1px solid #94a3b8",
             borderRadius: 12,
@@ -608,6 +702,11 @@ export default function GuidedWritingWorkspace({
             lineHeight: 1.7,
           }}
         />
+        {placeholderWarning ? (
+          <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 10, background: "#fff7f7", color: "#991b1b", fontWeight: 800 }}>
+            Replace all bracket placeholders like [Anlass], [Punkt 1] or [Ihr Name] before you analyse your text.
+          </div>
+        ) : null}
         <PrepositionCaseCoachField
           text={finalEssay}
           level={config.level}
@@ -617,19 +716,21 @@ export default function GuidedWritingWorkspace({
         <div>
           <strong>{finalWordCount} words</strong> · Target: about {config.targetWords}
         </div>
-        <div>
-          <strong>Checklist</strong>
-          <ul>
-            {config.checklist.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
+        {checklist.length ? (
+          <div>
+            <strong>Checklist</strong>
+            <ul>
+              {checklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             type="button"
             onClick={analyse}
-            disabled={analysisStatus === "loading" || !finalEssay.trim()}
+            disabled={analysisStatus === "loading" || !readyForAnalysis}
             style={styles.primaryButton}
           >
             {buttonLabel}
