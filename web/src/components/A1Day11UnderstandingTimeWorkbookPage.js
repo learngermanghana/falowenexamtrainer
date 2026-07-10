@@ -1,5 +1,5 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
 
@@ -74,18 +74,16 @@ const teil2Text2Questions = [
 ];
 
 const A1Day11UnderstandingTimeWorkbookPage = () => {
-
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 11 Workbook · Understanding Time</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 7</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Please complete all parts and submit your final answers in the submission area, not on this page.
-        </p>
-      </div>
-
+    <A1TutorMarkedWorkbookShell
+      day={11}
+      chapter="7"
+      fallbackAssignmentKey="A1-7"
+      title="A1 · Day 11 Workbook · Understanding Time"
+      subtitle="Chapter 7 · Tutor-marked assignment"
+      submitTitle="Submit A1 · Day 11 · Chapter 7"
+      submitDescription="This submission box is locked to A1-7, so students can send their final Chapter 7 answers from this workbook."
+    >
       <div style={card}>
         <img
           src="https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1600&q=80"
@@ -170,17 +168,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Präpositionen der Zeit:</strong> um, am, im, vor, nach, von ... bis, seit, ab.</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Wochentage:</strong> Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag, Wochentag, Wochenende, heute, morgen, übermorgen, gestern, vorgestern.</p>
       </div>
-
-      <div style={{ ...styles.card, border: "1px solid #bfdbfe", background: "#eff6ff", display: "grid", gap: 10 }}>
-        <h2 style={{ margin: 0, fontSize: "1.05rem" }}>Final Submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          When you finish, submit all answers in the submission area (not on this page).
-        </p>
-        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}>
-          Open Submission Area
-        </a>
-      </div>
-    </div>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
