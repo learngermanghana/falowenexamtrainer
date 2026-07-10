@@ -226,8 +226,29 @@ const A1TutorMarkedWorkbookShell = ({
             </p>
           </div>
           <div className={submitClassName}>
-            <style>{`.${submitClassName} > div > section:first-child { display: none !important; }
-              .${submitClassName} select { display: none !important; }`}</style>
+            <style>{`
+              .${submitClassName} > div > section:first-child { display: none !important; }
+              .${submitClassName} select { display: none !important; }
+              .${submitClassName} textarea {
+                background: #ffffff !important;
+                color: #111827 !important;
+                -webkit-text-fill-color: #111827 !important;
+                caret-color: #111827 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                font-size: 16px !important;
+                line-height: 1.7 !important;
+                pointer-events: auto !important;
+                touch-action: manipulation !important;
+                -webkit-user-select: text !important;
+                user-select: text !important;
+              }
+              .${submitClassName} textarea::placeholder {
+                color: #6b7280 !important;
+                -webkit-text-fill-color: #6b7280 !important;
+                opacity: 1 !important;
+              }
+            `}</style>
             <PersistentAssignmentSubmissionPage
               submissionContext={{
                 level: normalizedLevel,
