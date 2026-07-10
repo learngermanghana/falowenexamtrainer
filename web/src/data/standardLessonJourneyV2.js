@@ -68,7 +68,7 @@ const buildChecklist = ({ lesson, level, formalMode }) => {
       "Folgen, Gründe oder Hintergrundinformationen werden verständlich erklärt.",
       "Mindestens ein realistischer Vorschlag oder eine Bitte wird formuliert.",
       "Der Schluss bittet höflich um Prüfung, Rückmeldung oder Unterstützung.",
-      `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.",
+      `Wortschatz, Satzverbindungen und Grammatik passen zum Niveau ${level}.`,
     ];
   }
 
