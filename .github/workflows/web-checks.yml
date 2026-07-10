@@ -58,6 +58,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
+      - name: Test A1 mobile submit visibility
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/a1MobileSubmit.test.js
+
       - name: Test Preposition Case Coach
         working-directory: web
         env:
@@ -87,12 +93,6 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
-
-      - name: Test A1 mobile submit visibility
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/a1MobileSubmit.test.js
 
       - name: Test workbook tabs and lock identities
         working-directory: web
