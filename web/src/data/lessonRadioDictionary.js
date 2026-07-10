@@ -295,6 +295,14 @@ export const LESSON_RADIO_DICTIONARY = {
       instruction:
         "Höre aufmerksam zu und stimme dich auf Lernstrategien, Prüfungen und Weiterbildung ein. Danach gehst du weiter zum Lernteil.",
     },
+    27: {
+      key: "b2-day27-pruefungstraining-argumentieren-reagieren-falowen-radio",
+      title: "Prüfungstraining: Argumentieren und Reagieren 6.2",
+      youtubeId: "2-SRhPEQdNU",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Prüfungstraining, Argumentieren und Reagieren ein. Danach gehst du weiter zum Lernteil.",
+    },
   },
   C1: {
     1: {
