@@ -121,17 +121,37 @@ const b1TemplateCardStyle = {
   gap: 8,
 };
 
+const b1PlanningBoxStyle = {
+  border: "1px solid #c4b5fd",
+  borderRadius: 14,
+  padding: 12,
+  background: "#faf5ff",
+  display: "grid",
+  gap: 8,
+};
+
 const b1WritingTextareaStyle = {
   width: "100%",
   minHeight: 260,
   border: "1px solid #cbd5e1",
   borderRadius: 14,
   padding: 12,
-  fontSize: "clamp(1rem, 4vw, 1.05rem)",
+  fontSize: "16px",
   lineHeight: 1.7,
   resize: "vertical",
   boxSizing: "border-box",
   overflowWrap: "anywhere",
+  userSelect: "text",
+  WebkitUserSelect: "text",
+  touchAction: "manipulation",
+  pointerEvents: "auto",
+  background: "#fff",
+};
+
+const b1PlanningTextareaStyle = {
+  ...b1WritingTextareaStyle,
+  minHeight: 130,
+  border: "1px solid #a78bfa",
 };
 
 const b1ListStyle = {
@@ -183,6 +203,21 @@ Schreib mir bald.
 Liebe Grüße
 [Ihr Name]`;
 
+const b1PlanningNotesPlaceholder = `Write short points first. English is okay.
+
+1. What is the topic/problem?
+2. What is my opinion or reason?
+3. What example can I use?
+4. What do I want to ask/suggest?
+5. What is my final sentence?
+
+Example:
+1. need to rent again
+2. rent increased after Corona
+3. company should help me search for an apartment
+4. I need my own office
+5. next time they should inform me early`;
+
 const b1WritingTemplateOptions = [
   {
     key: "opinion",
@@ -210,7 +245,8 @@ const b1WritingTemplateOptions = [
 const B1WritingDraftPanel = ({ writingContext = {} }) => {
   const [activeView, setActiveView] = useState("schreiben");
   const [activeTemplate, setActiveTemplate] = useState("opinion");
-  const [draft, setDraft] = useState("");
+  const [planningNotes, setPlanningNotes] = useState("");
+  const [draft, setDraft] = useState(() => defaultB1WritingTemplate);
   const supportItems = writingContext.supportStructure?.length
     ? writingContext.supportStructure
     : writingContext.taskPoints || [];
@@ -218,6 +254,23 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
   const selectedTemplate =
     b1WritingTemplateOptions.find((item) => item.key === activeTemplate) ||
     b1WritingTemplateOptions[0];
+
+  const insertTemplate = (template = selectedTemplate.template) => {
+    const current = String(draft || "").trim();
+    const templateTrimmed = String(template || "").trim();
+    const knownTemplate = b1WritingTemplateOptions.some((option) => current === String(option.template || "").trim());
+    if (current && current !== templateTrimmed && !knownTemplate) {
+      const shouldReplace = window.confirm("This will replace your current B1 draft with the selected template. Continue?");
+      if (!shouldReplace) return;
+    }
+    setDraft(template);
+    setActiveView("schreiben");
+  };
+
+  const chooseTemplate = (option) => {
+    setActiveTemplate(option.key);
+    insertTemplate(option.template);
+  };
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -229,12 +282,50 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
       {activeView === "schreiben" ? (
         <div style={b1WritingPanelStyle}>
           <strong>Schreiben</strong>
-          <p style={mobileTextStyle}>Type your draft here first. When it is finished, copy it to the Submit tab.</p>
+          <p style={mobileTextStyle}>Step 1: write simple points first. Step 2: edit the B1 template into your final German answer. When it is finished, copy it to the Submit tab.</p>
+
+          <div style={b1PlanningBoxStyle}>
+            <strong>Step 1 · My points first</strong>
+            <p style={{ ...mobileTextStyle, color: "#5b21b6" }}>English is okay here. Use these points as your guide while you improve the German template below.</p>
+            <textarea
+              value={planningNotes}
+              onChange={(event) => setPlanningNotes(event.target.value)}
+              placeholder={b1PlanningNotesPlaceholder}
+              style={b1PlanningTextareaStyle}
+              aria-label="B1 writing points"
+              inputMode="text"
+              autoCapitalize="sentences"
+              autoCorrect="on"
+            />
+          </div>
+
+          <div style={b1TemplateTabsWrapStyle} aria-label="Choose B1 writing template">
+            {b1WritingTemplateOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                style={b1TemplateButtonStyle(activeTemplate === option.key)}
+                onClick={() => chooseTemplate(option)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <section style={{ ...b1TemplateCardStyle, background: "#fffbeb", borderColor: "#fed7aa" }}>
+            <strong>Step 2 · Edit this template</strong>
+            <p style={{ ...mobileTextStyle, color: "#92400e" }}>{selectedTemplate.helper} Replace every bracket like [Thema], [Grund] or [Ihr Name].</p>
+          </section>
+
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="Liebe Forenmitglieder,\n\nich bin der Meinung, dass ..."
+            placeholder={selectedTemplate.template}
             style={b1WritingTextareaStyle}
+            aria-label="B1 writing draft"
+            inputMode="text"
+            autoCapitalize="sentences"
+            autoCorrect="on"
           />
         </div>
       ) : null}
@@ -256,7 +347,7 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
                 key={option.key}
                 type="button"
                 style={b1TemplateButtonStyle(activeTemplate === option.key)}
-                onClick={() => setActiveTemplate(option.key)}
+                onClick={() => chooseTemplate(option)}
               >
                 {option.label}
               </button>
@@ -269,6 +360,9 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
             </span>
             <p style={{ ...mobileTextStyle, color: "#475569" }}>{selectedTemplate.helper}</p>
             <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{selectedTemplate.template}</p>
+            <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => insertTemplate(selectedTemplate.template)}>
+              Use this template in Schreiben
+            </button>
           </section>
 
           {vocabulary.length ? (
@@ -383,7 +477,7 @@ const CourseInlinePracticePanel = ({
   );
   const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
   const panelDescription = isB1Writing
-    ? "Use Schreiben to draft your answer, or open the Cheat sheet and choose the correct template type: opinion essay, formal letter or informal letter. Copy your final text to the Submit tab when you are done."
+    ? "Use Schreiben to write simple points first, then edit the correct B1 template: opinion essay, formal letter or informal letter. Copy your final text to the Submit tab when you are done."
     : type === "speaking"
       ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
       : description || config.defaultDescription;
