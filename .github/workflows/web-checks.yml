@@ -88,6 +88,12 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
 
+      - name: Test A1 mobile submit visibility
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/a1MobileSubmit.test.js
+
       - name: Test workbook tabs and lock identities
         working-directory: web
         env:
