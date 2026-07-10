@@ -16,6 +16,15 @@ const examRoomItems = [
   "Exam File",
 ];
 
+const defaultTodayTasks = [
+  "Read how the current Course Book works for your level.",
+  "Understand the new Campus and Exams Room navigation.",
+  "Learn where assignments are submitted.",
+  "Read the study advice and enable notifications.",
+  "Complete the final knowledge test from your previous level.",
+  "Review every correction before starting Day 1.",
+];
+
 const listStyle = {
   margin: 0,
   paddingLeft: 22,
@@ -109,6 +118,18 @@ const CurrentDay0OrientationPage = ({ config }) => {
   );
   const percent = testComplete ? Math.round((score / questions.length) * 100) : 0;
   const passedReadiness = testComplete && percent >= config.threshold;
+  const introText =
+    config.introText ||
+    "Day 0 is not a graded assignment. It helps you understand the current Falowen workflow, check the knowledge from your previous level and prepare properly for Day 1.";
+  const todayTasks = config.todayTasks || defaultTodayTasks;
+  const submitNoteTitle = config.submitNoteTitle || "Submit directly inside the Course Book.";
+  const submitNoteText = config.submitNoteText || null;
+  const finishText =
+    config.finishText ||
+    "There is no normal assignment submission for Day 0. Finish the knowledge test, review the corrections and continue to Day 1.";
+  const testAdvice =
+    config.testAdvice ||
+    "Answer every question. A score of";
 
   const answerQuestion = (index, optionIndex) => {
     setAnswers((old) => ({ ...old, [index]: optionIndex }));
@@ -141,10 +162,7 @@ const CurrentDay0OrientationPage = ({ config }) => {
           progress that brought you here. Start with confidence, stay consistent, participate
           actively and do not be afraid of mistakes. Mistakes show you what to improve.
         </NoteBox>
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Day 0 is not a graded assignment. It helps you understand the current Falowen
-          workflow, check the knowledge from your previous level and prepare properly for Day 1.
-        </p>
+        <p style={{ margin: 0, lineHeight: 1.65 }}>{introText}</p>
       </SectionCard>
 
       <SectionCard title="Day 0 Orientation">
@@ -167,12 +185,9 @@ const CurrentDay0OrientationPage = ({ config }) => {
 
       <SectionCard title="What you must do today">
         <ol style={listStyle}>
-          <li>Read how the current Course Book works for your level.</li>
-          <li>Understand the new Campus and Exams Room navigation.</li>
-          <li>Learn where assignments are submitted.</li>
-          <li>Read the study advice and enable notifications.</li>
-          <li>Complete the final knowledge test from your previous level.</li>
-          <li>Review every correction before starting Day 1.</li>
+          {todayTasks.map((task) => (
+            <li key={task}>{task}</li>
+          ))}
         </ol>
       </SectionCard>
 
@@ -188,7 +203,11 @@ const CurrentDay0OrientationPage = ({ config }) => {
         </ul>
 
         <NoteBox tone="green">
-          {config.selfLearning ? (
+          {submitNoteText ? (
+            <>
+              <strong>{submitNoteTitle}</strong> {submitNoteText}
+            </>
+          ) : config.selfLearning ? (
             <>
               <strong>For B2 self-learning:</strong> complete Learn, Speak, Write and Finish,
               improve your work with feedback, and record your confidence honestly. The normal
@@ -298,7 +317,7 @@ const CurrentDay0OrientationPage = ({ config }) => {
         <p style={{ margin: 0, lineHeight: 1.65 }}>{config.testIntro}</p>
 
         <NoteBox tone="amber">
-          Answer every question. A score of <strong>{config.threshold}% or higher</strong> shows
+          {testAdvice} <strong>{config.threshold}% or higher</strong> shows
           good readiness. A lower score means you should revise the corrected topics before Day 1.
         </NoteBox>
 
@@ -353,10 +372,7 @@ const CurrentDay0OrientationPage = ({ config }) => {
       </SectionCard>
 
       <SectionCard title="Finish Day 0">
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          There is no normal assignment submission for Day 0. Finish the knowledge test, review
-          the corrections and continue to Day 1.
-        </p>
+        <p style={{ margin: 0, lineHeight: 1.65 }}>{finishText}</p>
 
         {testComplete ? (
           <NoteBox tone={passedReadiness ? "green" : "amber"}>
