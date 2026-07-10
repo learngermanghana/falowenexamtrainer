@@ -409,7 +409,7 @@ export default function CourseLessonPage() {
   const requestedView = query.get("view");
   const requestedChapter = String(query.get("chapter") || "").trim();
 
-  if ((level === "A2" || level === "B1") && !requestedView && requestedChapter) {
+  if ((level === "A1" || level === "A2" || level === "B1") && !requestedView && requestedChapter) {
     const workbookRoute = getConfiguredInAppWorkbookRoute({ level, day, chapter: requestedChapter });
     if (workbookRoute) return <Navigate to={workbookRoute} replace />;
   }
