@@ -1,4 +1,5 @@
 import React from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
 const headerImage =
@@ -38,7 +39,10 @@ const highlight = {
 const A1ReadingPage = () => {
   return (
     <div style={styles.pageWrap}>
-      
+      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+      </div>
+
       {/* HEADER IMAGE */}
       <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
         <img
@@ -210,14 +214,6 @@ const A1ReadingPage = () => {
           </p>
         </div>
       </section>
-
-      {/* BUTTON */}
-      <a
-        href="/campus/course?submitWork=1"
-        style={{ ...styles.button, textDecoration: "none", display: "inline-flex", justifyContent: "center" }}
-      >
-        Submit Assignment
-      </a>
     </div>
   );
 };
