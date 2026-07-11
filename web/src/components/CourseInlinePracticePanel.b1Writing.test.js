@@ -78,9 +78,9 @@ describe("B1 Teil 2 writing workspace", () => {
     ).toBeTruthy();
 
     fireEvent.click(formalButton);
-    expect(draftBox).toHaveValue(expect.stringContaining("Sehr geehrte Damen und Herren"));
+    expect(draftBox.value).toContain("Sehr geehrte Damen und Herren");
 
     fireEvent.click(informalButton);
-    expect(draftBox).toHaveValue(expect.stringContaining("Liebe/r [Name]"));
+    expect(draftBox.value).toContain("Liebe/r [Name]");
   });
 });
