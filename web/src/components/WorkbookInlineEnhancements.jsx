@@ -10,6 +10,30 @@ const FAMILY_WORKBOOK_PATH = "/campus/course/a1-day-6-family-and-hobbies-workboo
 const SUBMISSION_MOUNT_ATTRIBUTE = "data-a1-workbook-submission-mount";
 const LEGACY_SUBMIT_HIDDEN_ATTRIBUTE = "data-a1-legacy-submit-hidden";
 const LEGACY_SUBMIT_DISPLAY_ATTRIBUTE = "data-a1-legacy-submit-display";
+const INLINE_ENHANCEMENTS_ANCHOR_ATTRIBUTE = "data-workbook-inline-enhancements-anchor";
+
+export const A1_TUTOR_MARKED_ASSIGNMENT_KEYS = Object.freeze([
+  "A1-0.1",
+  "A1-0.2",
+  "A1-1.1",
+  "A1-1.2",
+  "A1-2",
+  "A1-3",
+  "A1-4",
+  "A1-5",
+  "A1-6",
+  "A1-7",
+  "A1-8",
+  "A1-9",
+  "A1-10",
+  "A1-11",
+  "A1-12.1",
+  "A1-12.2",
+  "A1-13",
+  "A1-14.1",
+]);
+
+const A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET = new Set(A1_TUTOR_MARKED_ASSIGNMENT_KEYS);
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
@@ -24,11 +48,6 @@ const A1_WORKBOOK_ROUTE_ALIASES = [
     pathname: "/campus/course/a1-day-3-kapitel-1-2-workbook",
     day: 3,
     chapter: "1.2",
-  },
-  {
-    pathname: "/campus/course/letter-writing-intro-12-3",
-    day: 20,
-    chapter: "12.3",
   },
 ];
 
@@ -58,7 +77,9 @@ export const resolveA1WorkbookSubmissionMatch = ({ pathname = "", search = "" } 
   for (const candidate of candidates) {
     if (candidate.requiredView && searchParams.get("view") !== candidate.requiredView) continue;
 
-    const assignments = getInlineCourseAssignments("A1", candidate.day);
+    const assignments = getInlineCourseAssignments("A1", candidate.day).filter((assignment) =>
+      A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET.has(normalizeCourseAssignmentKey(assignment?.assignmentKey))
+    );
     if (!assignments.length) continue;
 
     const selectedAssignment = candidate.chapter
@@ -72,7 +93,7 @@ export const resolveA1WorkbookSubmissionMatch = ({ pathname = "", search = "" } 
     if (!selectedAssignment?.assignmentKey) continue;
 
     const assignmentKey = normalizeCourseAssignmentKey(selectedAssignment.assignmentKey);
-    if (!assignmentKey) continue;
+    if (!A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET.has(assignmentKey)) continue;
 
     return {
       level: "A1",
@@ -135,10 +156,30 @@ export const restoreLegacyA1SubmitControls = (pageRoot) => {
   });
 };
 
-const findWorkbookPageRoot = (anchor) => {
+const isEnhancementUtilityNode = (element) =>
+  Boolean(
+    element?.hasAttribute?.(INLINE_ENHANCEMENTS_ANCHOR_ATTRIBUTE) ||
+      element?.hasAttribute?.(SUBMISSION_MOUNT_ATTRIBUTE) ||
+      element?.hasAttribute?.("data-workbook-supporting-materials-host") ||
+      element?.hasAttribute?.("data-grammar-back-to-workbook-host")
+  );
+
+const findSiblingWorkbookRoot = (anchor, direction) => {
+  let sibling = direction === "next" ? anchor?.nextElementSibling : anchor?.previousElementSibling;
+  while (sibling && isEnhancementUtilityNode(sibling)) {
+    sibling = direction === "next" ? sibling.nextElementSibling : sibling.previousElementSibling;
+  }
+  return sibling || null;
+};
+
+export const findWorkbookPageRoot = (anchor) => {
   if (!anchor) return null;
   const main = anchor.closest("main.layout-main") || anchor.closest("main");
   if (!main) return null;
+
+  if (anchor.parentElement === main) {
+    return findSiblingWorkbookRoot(anchor, "next") || findSiblingWorkbookRoot(anchor, "previous");
+  }
 
   let current = anchor;
   while (current?.parentElement && current.parentElement !== main) {
@@ -186,7 +227,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
       const writingSection = document.getElementById("writing");
       if (!writingSection) {
         attempts += 1;
-        if (attempts < 30) frameId = window.requestAnimationFrame(install);
+        if (attempts < 120) frameId = window.requestAnimationFrame(install);
         return;
       }
 
@@ -254,7 +295,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
       pageRoot = findWorkbookPageRoot(anchorRef.current);
       if (!pageRoot) {
         attempts += 1;
-        if (attempts < 30) frameId = window.requestAnimationFrame(install);
+        if (attempts < 120) frameId = window.requestAnimationFrame(install);
         return;
       }
 
