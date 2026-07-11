@@ -13,6 +13,12 @@ const emptyDiagnostics = {
   computedPointerEvents: null,
   elementAtTextareaCenter: null,
   selectValues: [],
+  draftSaveState: null,
+  draftDocId: null,
+  draftCloudError: null,
+  draftLoaded: null,
+  draftWriteCount: null,
+  draftLastSavedAt: null,
 };
 
 const describeElement = (element) => {
@@ -48,6 +54,7 @@ const AssignmentSubmissionDebugPanel = ({
     const inspect = () => {
       const textarea = root.querySelector("textarea");
       const selectValues = Array.from(root.querySelectorAll("select")).map((select) => select.value || "");
+      const cloudDraftRoot = root.querySelector("[data-cloud-draft-persistence]");
       let computedPointerEvents = null;
       let elementAtTextareaCenter = null;
 
@@ -74,6 +81,12 @@ const AssignmentSubmissionDebugPanel = ({
         computedPointerEvents,
         elementAtTextareaCenter,
         selectValues,
+        draftSaveState: cloudDraftRoot?.getAttribute("data-draft-save-state") || null,
+        draftDocId: cloudDraftRoot?.getAttribute("data-draft-doc-id") || null,
+        draftCloudError: cloudDraftRoot?.getAttribute("data-draft-cloud-error") || null,
+        draftLoaded: cloudDraftRoot?.getAttribute("data-draft-loaded") || null,
+        draftWriteCount: cloudDraftRoot?.getAttribute("data-draft-write-count") || null,
+        draftLastSavedAt: cloudDraftRoot?.getAttribute("data-draft-last-saved-at") || null,
       });
     };
 
