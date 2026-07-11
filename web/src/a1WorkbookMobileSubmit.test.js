@@ -86,7 +86,7 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("Nothing has been overwritten");
   });
 
-  test("always renders a visible final submit button beside Save draft", () => {
+  test("always renders a visible final submit button beside Save draft in both A1 mount types", () => {
     const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
     const css = readSource("a1WorkbookMobileSubmit.css");
 
@@ -95,6 +95,8 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain('type="submit"');
     expect(source).toContain("Submit assignment");
     expect(css).toContain("[data-a1-final-submit-button]");
+    expect(css).toContain("[data-a1-built-in-submission] form [data-a1-submission-actions]");
+    expect(css).toContain("[data-a1-built-in-submission] form [data-a1-final-submit-button]");
     expect(css).toContain("display: inline-flex !important;");
     expect(css).toContain("visibility: visible !important;");
   });
