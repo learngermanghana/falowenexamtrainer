@@ -20,11 +20,6 @@ it.each([
   );
 });
 
-it("uses the requested B1 Day 19 interview AI video", () => {
-  expect(getAdditionalLessonVideoResources("B1", 19)).toEqual([
-    expect.objectContaining({
-      chapter: "6.19",
-      url: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
-    }),
-  ]);
+it("does not expose an AI video for B1 Day 19", () => {
+  expect(getAdditionalLessonVideoResources("B1", 19)).toEqual([]);
 });
