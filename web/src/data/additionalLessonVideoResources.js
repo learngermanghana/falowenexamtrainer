@@ -85,6 +85,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/9NNSVqw-Y5A",
       },
     ],
+    14: [
+      {
+        key: "b1-day14-traditionelles-digitales-lernen-ai-video",
+        chapter: "5.14",
+        title: "B1 Day 14 · Traditionelles vs. digitales Lernen · AI video",
+        description:
+          "AI video lesson for comparing traditional and digital learning methods, advantages, disadvantages and personal preferences.",
+        url: "https://youtu.be/lktKK510Nxk",
+      },
+    ],
     19: [
       {
         key: "b1-day19-vorstellungsgespraech-ai-video",
