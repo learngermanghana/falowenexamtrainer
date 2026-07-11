@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-import PersistentAssignmentSubmissionPage from "./PersistentAssignmentSubmissionPage";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import AssignmentSubmissionDebugPanel from "./AssignmentSubmissionDebugPanel";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { styles } from "../styles";
 
@@ -23,7 +24,7 @@ export const A1_TUTOR_MARKED_ASSIGNMENT_CHAPTERS = [
   "12.1",
   "12.2",
   "13",
-  "14",
+  "14.1",
 ];
 
 const shellCard = {
@@ -64,6 +65,7 @@ const A1TutorMarkedWorkbookShell = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const submitRootRef = useRef(null);
   const normalizedLevel = String(level || "A1").toUpperCase();
   const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
   const requestedTab = searchParams.get("workbookTab");
@@ -80,19 +82,19 @@ const A1TutorMarkedWorkbookShell = ({
     );
   }, [chapter, day, fallbackAssignmentKey, normalizedLevel]);
 
+  const submissionContextReady =
+    searchParams.get("assignmentKey") === assignmentKey &&
+    searchParams.get("assignmentId") === assignmentKey &&
+    searchParams.get("level") === normalizedLevel;
+  const submitDebugEnabled = searchParams.get("submitDebug") === "1";
+
   useEffect(() => {
     setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
   }, [requestedTab]);
 
   useEffect(() => {
     if (requestedTab !== "submit") return;
-    if (
-      searchParams.get("assignmentKey") === assignmentKey &&
-      searchParams.get("assignmentId") === assignmentKey &&
-      searchParams.get("level") === normalizedLevel
-    ) {
-      return;
-    }
+    if (submissionContextReady) return;
 
     const nextSearch = new URLSearchParams(location.search || "");
     nextSearch.set("workbookTab", "submit");
@@ -118,7 +120,17 @@ const A1TutorMarkedWorkbookShell = ({
         },
       }
     );
-  }, [assignmentKey, day, location.pathname, location.search, location.state, navigate, normalizedLevel, requestedTab, searchParams]);
+  }, [
+    assignmentKey,
+    day,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+    normalizedLevel,
+    requestedTab,
+    submissionContextReady,
+  ]);
 
   const openTab = (tabKey) => {
     setActiveTab(tabKey);
@@ -225,10 +237,9 @@ const A1TutorMarkedWorkbookShell = ({
               {submitDescription || `This submission box is locked to ${assignmentKey}, so your work is saved under the correct assignment.`}
             </p>
           </div>
-          <div className={submitClassName}>
+          <div ref={submitRootRef} className={submitClassName} data-a1-built-in-submission>
             <style>{`
               .${submitClassName} > div > section:first-child { display: none !important; }
-              .${submitClassName} select { display: none !important; }
               .${submitClassName} textarea {
                 background: #ffffff !important;
                 color: #111827 !important;
@@ -242,6 +253,8 @@ const A1TutorMarkedWorkbookShell = ({
                 touch-action: manipulation !important;
                 -webkit-user-select: text !important;
                 user-select: text !important;
+                position: relative !important;
+                z-index: 1 !important;
               }
               .${submitClassName} textarea::placeholder {
                 color: #6b7280 !important;
@@ -249,14 +262,29 @@ const A1TutorMarkedWorkbookShell = ({
                 opacity: 1 !important;
               }
             `}</style>
-            <PersistentAssignmentSubmissionPage
-              submissionContext={{
-                level: normalizedLevel,
-                day,
-                assignmentKey,
-                canonicalAssignmentKey: assignmentKey,
-              }}
-            />
+            {submitDebugEnabled ? (
+              <AssignmentSubmissionDebugPanel
+                rootRef={submitRootRef}
+                assignmentKey={assignmentKey}
+                level={normalizedLevel}
+                day={day}
+                contextReady={submissionContextReady}
+              />
+            ) : null}
+            {submissionContextReady ? (
+              <AssignmentSubmissionPage
+                submissionContext={{
+                  level: normalizedLevel,
+                  day,
+                  assignmentKey,
+                  canonicalAssignmentKey: assignmentKey,
+                }}
+              />
+            ) : (
+              <p role="status" style={{ color: "#475569", margin: 8 }}>
+                Preparing the correct assignment submission…
+              </p>
+            )}
           </div>
         </section>
       )}
