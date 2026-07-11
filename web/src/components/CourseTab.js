@@ -657,6 +657,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     }
     setActiveSubTab("courseBook");
   }, [query]);
+
+  useEffect(() => {
+    if (String(selectedCourseLevel || "").toUpperCase() === "A1") {
+      setCourseSubmitOpen(false);
+    }
+  }, [selectedCourseLevel]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
@@ -727,7 +734,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     [progressByAssignmentId, schedule, selectedCourseLevel]
   );
 
-  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(String(selectedCourseLevel || "").toUpperCase());
+  const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
+  const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
+  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(normalizedSelectedCourseLevel);
+  const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
   const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
   const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
@@ -887,7 +897,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
                   Continue learning
                 </button>
-                {!isSelfLearningLevel ? (
+                {canShowCourseSubmit ? (
                   <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)", fontWeight: 800 }} onClick={() => setCourseSubmitOpen(true)}>
                     Submit work
                   </button>
@@ -938,7 +948,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             <YouTubeSubscribeButton />
           </div>
 
-          {!isSelfLearningLevel ? (
+          {canShowCourseSubmit ? (
             <button
               type="button"
               aria-haspopup="dialog"
@@ -951,7 +961,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </button>
           ) : null}
 
-          {courseSubmitOpen ? (
+          {canShowCourseSubmit && courseSubmitOpen ? (
             <div role="dialog" aria-modal="true" aria-label={`${selectedCourseLevel} assignment submit`} style={courseBookStyles.submitOverlay}>
               <div style={courseBookStyles.submitBackdrop} onClick={() => setCourseSubmitOpen(false)} />
               <section style={courseBookStyles.submitPanel}>

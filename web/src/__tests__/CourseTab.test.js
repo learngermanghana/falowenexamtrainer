@@ -368,6 +368,30 @@ describe("CourseTab", () => {
   });
 
 
+  it("does not render the Course Book shortcut on the first level", async () => {
+    render(<CourseTab defaultLevel="A1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("German Alphabet")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole("button", { name: "Submit work" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Submit$/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("keeps the Course Book shortcut available on later levels", async () => {
+    render(<CourseTab defaultLevel="A2" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("A2 Intro")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Submit work" }));
+
+    expect(screen.getByRole("dialog", { name: /A2 assignment submit/i })).toBeInTheDocument();
+  });
+
   it("renders Failed for A2 tutor-marked assignments below pass mark", async () => {
     mockFetchResults.mockResolvedValueOnce({
       results: [{ assignmentId: "A2-1", score: 42, studentCode: "ComfortArmah295" }],
