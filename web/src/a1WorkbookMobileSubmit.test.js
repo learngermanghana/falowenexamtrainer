@@ -18,7 +18,7 @@ describe("A1 mobile workbook submission", () => {
     expect(css).toContain("min-width: 0 !important;");
   });
 
-  test("keeps the A1 submit textarea visible and editable on iOS Safari", () => {
+  test("keeps the submit textarea editable on Android and iPhone browsers", () => {
     const css = readSource("a1WorkbookMobileSubmit.css");
 
     expect(css).toContain("-webkit-appearance: none !important;");
@@ -28,5 +28,28 @@ describe("A1 mobile workbook submission", () => {
     expect(css).toContain("touch-action: manipulation !important;");
     expect(css).toContain("textarea::placeholder");
     expect(css).toContain("textarea:focus");
+  });
+
+  test("prepares assignment context before mounting the mobile form", () => {
+    const source = readSource("components/WorkbookInlineEnhancements.jsx");
+
+    expect(source).toContain("isA1SubmissionContextReady");
+    expect(source).toContain('nextSearch.set("assignmentKey", submissionAssignmentKey);');
+    expect(source).toContain('nextSearch.set("assignmentId", submissionAssignmentKey);');
+    expect(source).toContain('nextSearch.set("level", "A1");');
+    expect(source).toContain("!submissionContextReady");
+    expect(source).toContain('mountedNode.setAttribute("data-submit-context-ready", "true");');
+  });
+
+  test("keeps assignment selectors visible as a mobile fallback and provides opt-in diagnostics", () => {
+    const css = readSource("a1WorkbookMobileSubmit.css");
+    const source = readSource("components/WorkbookInlineEnhancements.jsx");
+
+    expect(css).toContain(".course-book-tab-submission-page select");
+    expect(css).toContain("display: block !important;");
+    expect(source).toContain('get("submitDebug") === "1"');
+    expect(source).toContain("A1 Submit Debug");
+    expect(source).toContain("textareaDisabled");
+    expect(source).toContain("inputEvents");
   });
 });
