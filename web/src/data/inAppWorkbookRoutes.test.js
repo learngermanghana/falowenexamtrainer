@@ -20,11 +20,17 @@ describe("in-app workbook routes", () => {
   });
 
   test("B1 workbook routes do not include the completed radio flag", () => {
-    [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, ...days(12, 14), ...days(16, 28)].forEach((day) => {
+    [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, ...days(12, 28)].forEach((day) => {
       const route = getConfiguredInAppWorkbookRoute({ level: "B1", day });
       expect(route).toContain("/campus/course/");
       expect(route).not.toContain("radio=done");
     });
+  });
+
+  test("B1 Day 15 Chapter 5.15 opens the in-app workbook", () => {
+    expect(
+      getConfiguredInAppWorkbookRoute({ level: "B1", day: 15, chapter: "5.15" })
+    ).toBe("/campus/course/lesson/B1/15?view=workbook");
   });
 
   test("A1 lesson pages keep the configured workbook resource without redirecting", () => {
