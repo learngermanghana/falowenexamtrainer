@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import routeConfig from "../data/inAppWorkbookRoutes.json";
 import { getInlineCourseAssignments, normalizeCourseAssignmentKey } from "../utils/courseLessonAssignments";
 import ClassWorkbookShareBox from "./ClassWorkbookShareBox";
@@ -115,6 +115,19 @@ export const resolveA1WorkbookSubmissionMatch = ({ pathname = "", search = "" } 
   return null;
 };
 
+export const isA1SubmissionContextReady = ({ search = "", assignmentKey = "", level = "A1" } = {}) => {
+  const normalizedAssignmentKey = normalizeCourseAssignmentKey(assignmentKey);
+  if (!normalizedAssignmentKey) return false;
+
+  const searchParams = new URLSearchParams(search || "");
+  const currentAssignmentKey = normalizeCourseAssignmentKey(
+    searchParams.get("assignmentKey") || searchParams.get("assignmentId")
+  );
+  const currentLevel = String(searchParams.get("level") || "").trim().toUpperCase();
+
+  return currentAssignmentKey === normalizedAssignmentKey && currentLevel === String(level || "").trim().toUpperCase();
+};
+
 export const hasExistingA1SubmissionTabs = (pageRoot) => {
   if (!pageRoot) return false;
 
@@ -189,13 +202,106 @@ export const findWorkbookPageRoot = (anchor) => {
   return current?.parentElement === main ? current : null;
 };
 
-const CourseBookSubmissionPortal = ({ mountNode, match }) => {
+const A1SubmissionDebugPanel = ({ mountNode, match, contextReady }) => {
+  const [diagnostics, setDiagnostics] = useState({
+    textareaFound: false,
+    textareaDisabled: null,
+    textareaReadOnly: null,
+    textareaFocused: false,
+    valueLength: 0,
+    selectValues: [],
+    inputEvents: 0,
+  });
+  const inputEventsRef = useRef(0);
+
+  useEffect(() => {
+    if (!mountNode || typeof document === "undefined") return undefined;
+
+    const inspect = () => {
+      const textarea = mountNode.querySelector("textarea");
+      const selectValues = Array.from(mountNode.querySelectorAll("select")).map((select) => select.value || "");
+      setDiagnostics({
+        textareaFound: Boolean(textarea),
+        textareaDisabled: textarea ? Boolean(textarea.disabled) : null,
+        textareaReadOnly: textarea ? Boolean(textarea.readOnly) : null,
+        textareaFocused: textarea ? document.activeElement === textarea : false,
+        valueLength: textarea ? String(textarea.value || "").length : 0,
+        selectValues,
+        inputEvents: inputEventsRef.current,
+      });
+    };
+
+    const handleInput = () => {
+      inputEventsRef.current += 1;
+      inspect();
+    };
+
+    inspect();
+    const observer = new MutationObserver(inspect);
+    observer.observe(mountNode, { childList: true, subtree: true, attributes: true });
+    mountNode.addEventListener("input", handleInput, true);
+    mountNode.addEventListener("focusin", inspect, true);
+    mountNode.addEventListener("focusout", inspect, true);
+
+    return () => {
+      observer.disconnect();
+      mountNode.removeEventListener("input", handleInput, true);
+      mountNode.removeEventListener("focusin", inspect, true);
+      mountNode.removeEventListener("focusout", inspect, true);
+    };
+  }, [mountNode]);
+
+  const assignmentKey = normalizeCourseAssignmentKey(match?.resource?.assignmentKey);
+
+  return (
+    <aside
+      data-a1-submit-debug
+      style={{
+        background: "#fff7ed",
+        border: "1px solid #fdba74",
+        borderRadius: 12,
+        color: "#7c2d12",
+        fontSize: 12,
+        margin: "8px 0",
+        overflowWrap: "anywhere",
+        padding: 10,
+      }}
+    >
+      <strong>A1 Submit Debug</strong>
+      <pre style={{ margin: "6px 0 0", whiteSpace: "pre-wrap" }}>
+        {JSON.stringify(
+          {
+            assignmentKey,
+            contextReady,
+            day: match?.day,
+            path: typeof window !== "undefined" ? `${window.location.pathname}${window.location.search}` : "",
+            userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+            ...diagnostics,
+          },
+          null,
+          2
+        )}
+      </pre>
+    </aside>
+  );
+};
+
+const CourseBookSubmissionPortal = ({ mountNode, match, debugEnabled, contextReady }) => {
   const hostRef = useMemo(() => ({ current: mountNode }), [mountNode]);
-  return <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />;
+
+  return (
+    <>
+      {debugEnabled ? (
+        <A1SubmissionDebugPanel mountNode={mountNode} match={match} contextReady={contextReady} />
+      ) : null}
+      <CourseWorkbookSubmissionTabs hostRef={hostRef} match={match} />
+    </>
+  );
 };
 
 const WorkbookInlineEnhancements = ({ pathname }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const anchorRef = useRef(null);
   const [classShareMountNode, setClassShareMountNode] = useState(null);
   const [submissionMountNode, setSubmissionMountNode] = useState(null);
@@ -205,6 +311,60 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
     () => resolveA1WorkbookSubmissionMatch({ pathname: activePathname, search: location.search }),
     [activePathname, location.search]
   );
+  const submissionAssignmentKey = normalizeCourseAssignmentKey(submissionMatch?.resource?.assignmentKey);
+  const submissionContextReady = useMemo(
+    () =>
+      isA1SubmissionContextReady({
+        search: location.search,
+        assignmentKey: submissionAssignmentKey,
+        level: "A1",
+      }),
+    [location.search, submissionAssignmentKey]
+  );
+  const submitDebugEnabled = useMemo(
+    () => new URLSearchParams(location.search || "").get("submitDebug") === "1",
+    [location.search]
+  );
+
+  useEffect(() => {
+    if (!submissionMatch || !submissionAssignmentKey || submissionContextReady) return undefined;
+
+    const nextSearch = new URLSearchParams(location.search || "");
+    nextSearch.set("assignmentKey", submissionAssignmentKey);
+    nextSearch.set("assignmentId", submissionAssignmentKey);
+    nextSearch.set("level", "A1");
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${nextSearch.toString()}`,
+        hash: location.hash,
+      },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: "A1",
+          day: Number(submissionMatch.day),
+          assignmentKey: submissionAssignmentKey,
+          assignmentId: submissionAssignmentKey,
+          canonicalAssignmentKey: submissionAssignmentKey,
+          inlineCourseSubmission: true,
+        },
+      }
+    );
+
+    return undefined;
+  }, [
+    location.hash,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+    submissionAssignmentKey,
+    submissionContextReady,
+    submissionMatch,
+  ]);
 
   useEffect(() => {
     if (normalizePath(activePathname) !== FAMILY_WORKBOOK_PATH || typeof document === "undefined") {
@@ -274,7 +434,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
   }, [activePathname]);
 
   useEffect(() => {
-    if (!submissionMatch || typeof document === "undefined") {
+    if (!submissionMatch || !submissionContextReady || typeof document === "undefined") {
       setSubmissionMountNode(null);
       return undefined;
     }
@@ -306,7 +466,8 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
       } else if (!mountedNode) {
         mountedNode = document.createElement("div");
         mountedNode.setAttribute(SUBMISSION_MOUNT_ATTRIBUTE, "true");
-        mountedNode.setAttribute("data-assignment-key", submissionMatch.resource.assignmentKey || "");
+        mountedNode.setAttribute("data-assignment-key", submissionAssignmentKey);
+        mountedNode.setAttribute("data-submit-context-ready", "true");
         pageRoot.parentElement?.insertBefore(mountedNode, pageRoot);
         setSubmissionMountNode(mountedNode);
       }
@@ -326,7 +487,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
       restoreLegacyA1SubmitControls(pageRoot);
       removeMount();
     };
-  }, [submissionMatch]);
+  }, [submissionAssignmentKey, submissionContextReady, submissionMatch]);
 
   return (
     <>
@@ -340,9 +501,14 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
             classShareMountNode
           )
         : null}
-      {submissionMountNode && submissionMatch
+      {submissionMountNode && submissionMatch && submissionContextReady
         ? createPortal(
-            <CourseBookSubmissionPortal mountNode={submissionMountNode} match={submissionMatch} />,
+            <CourseBookSubmissionPortal
+              mountNode={submissionMountNode}
+              match={submissionMatch}
+              debugEnabled={submitDebugEnabled}
+              contextReady={submissionContextReady}
+            />,
             submissionMountNode
           )
         : null}
