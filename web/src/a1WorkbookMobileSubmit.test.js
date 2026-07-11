@@ -52,4 +52,25 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("textareaDisabled");
     expect(source).toContain("inputEvents");
   });
+
+  test("built-in A1 workbooks use the same direct submission page as A2", () => {
+    const source = readSource("components/A1TutorMarkedWorkbookShell.js");
+
+    expect(source).toContain('import AssignmentSubmissionPage from "./AssignmentSubmissionPage";');
+    expect(source).not.toContain("PersistentAssignmentSubmissionPage");
+    expect(source).toContain("submissionContextReady ? (");
+    expect(source).toContain("<AssignmentSubmissionPage");
+    expect(source).toContain('get("submitDebug") === "1"');
+    expect(source).toContain("AssignmentSubmissionDebugPanel");
+  });
+
+  test("shared diagnostics can detect touch events and overlays blocking the textarea", () => {
+    const source = readSource("components/AssignmentSubmissionDebugPanel.js");
+
+    expect(source).toContain("touchEvents");
+    expect(source).toContain("beforeInputEvents");
+    expect(source).toContain("computedPointerEvents");
+    expect(source).toContain("elementAtTextareaCenter");
+    expect(source).toContain("document.elementFromPoint");
+  });
 });
