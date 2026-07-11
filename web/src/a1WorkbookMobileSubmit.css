@@ -1,0 +1,130 @@
+/*
+ * Mobile-safe A1 workbook submission.
+ *
+ * A2 keeps its workbook navigation in a visible responsive grid and places the
+ * submission form inside a full-width card. The A1 inline mount uses the same
+ * behaviour here while retaining only Assignment and Submit.
+ */
+[data-a1-workbook-submission-mount] {
+  display: block !important;
+  position: relative;
+  z-index: 40;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+[data-a1-workbook-submission-mount] > section,
+[data-a1-workbook-submission-mount] section[aria-label="Workbook assignment navigation"] {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Use the same responsive grid approach as the A2 WorkbookTabNav. */
+[data-a1-workbook-submission-mount] [role="tablist"] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+[data-a1-workbook-submission-mount] [role="tab"] {
+  display: grid !important;
+  place-items: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  box-sizing: border-box !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  touch-action: manipulation !important;
+}
+
+[data-a1-workbook-submission-mount] .course-book-tab-submission-page,
+[data-a1-workbook-submission-mount] .course-book-tab-submission-page > div,
+[data-a1-workbook-submission-mount] .course-book-tab-submission-page section,
+[data-a1-workbook-submission-mount] .course-book-tab-submission-page form {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* iOS Safari can retain a transparent text fill even when color is dark. */
+[data-a1-workbook-submission-mount] textarea {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+[data-a1-workbook-submission-mount] textarea::placeholder {
+  color: #6b7280 !important;
+  -webkit-text-fill-color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+[data-a1-workbook-submission-mount] textarea:focus {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@media (max-width: 640px) {
+  [data-a1-workbook-submission-mount] {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  [data-a1-workbook-submission-mount] > section,
+  [data-a1-workbook-submission-mount] section[aria-label="Workbook assignment navigation"] {
+    margin: 8px 0 12px !important;
+    padding: 10px !important;
+    overflow: visible !important;
+  }
+
+  [data-a1-workbook-submission-mount] [role="tablist"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  [data-a1-workbook-submission-mount] [role="tab"] {
+    padding: 11px 8px !important;
+    font-size: 14px !important;
+  }
+
+  [data-a1-workbook-submission-mount] .course-book-tab-submission-page {
+    overflow: visible !important;
+  }
+}
