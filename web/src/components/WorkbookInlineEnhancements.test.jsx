@@ -1,7 +1,9 @@
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import {
   hasExistingA1SubmissionTabs,
+  hideLegacyA1SubmitControls,
   resolveA1WorkbookSubmissionMatch,
+  restoreLegacyA1SubmitControls,
 } from "./WorkbookInlineEnhancements";
 
 jest.mock("./ClassWorkbookShareBox", () => () => null);
@@ -42,6 +44,20 @@ describe("A1 workbook inline submission mounting", () => {
       expect.objectContaining({
         assignmentKey: "A1-10",
         chapter: "10",
+      })
+    );
+  });
+
+  test("covers the Day 21 workbook that previously had only a legacy submit link", () => {
+    expect(
+      resolveA1WorkbookSubmissionMatch({
+        pathname: "/campus/course/a1-day-21-weather-workbook",
+      })
+    ).toEqual(
+      expect.objectContaining({
+        level: "A1",
+        day: 21,
+        resource: expect.objectContaining({ assignmentKey: "A1-13" }),
       })
     );
   });
@@ -88,5 +104,22 @@ describe("A1 workbook inline submission mounting", () => {
 
     tabList.lastChild.remove();
     expect(hasExistingA1SubmissionTabs(pageRoot)).toBe(false);
+  });
+
+  test("hides old course-level submit shortcuts but preserves the new Submit tab", () => {
+    const pageRoot = document.createElement("div");
+    const legacyLink = document.createElement("a");
+    legacyLink.href = "/campus/course?submitWork=1";
+    legacyLink.textContent = "Submit Assignment";
+    const newSubmitTab = document.createElement("button");
+    newSubmitTab.textContent = "Submit";
+    pageRoot.append(legacyLink, newSubmitTab);
+
+    hideLegacyA1SubmitControls(pageRoot);
+    expect(legacyLink.style.display).toBe("none");
+    expect(newSubmitTab.style.display).toBe("");
+
+    restoreLegacyA1SubmitControls(pageRoot);
+    expect(legacyLink.style.display).toBe("");
   });
 });
