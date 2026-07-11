@@ -222,6 +222,7 @@ const b1WritingTemplateOptions = [
   {
     key: "opinion",
     label: "Opinion essay / forum post",
+    shortLabel: "Opinion template",
     title: "OPINION ESSAY / FORUM POST",
     helper: "Use this for Meinung, Forum, Diskussion, Vorteile und Nachteile.",
     template: defaultB1WritingTemplate,
@@ -229,6 +230,7 @@ const b1WritingTemplateOptions = [
   {
     key: "formal",
     label: "Formal letter",
+    shortLabel: "Formal template",
     title: "FORMAL LETTER",
     helper: "Use this for Schule, Firma, Vermieter, Amt, course provider or official emails.",
     template: b1FormalLetterTemplate,
@@ -236,6 +238,7 @@ const b1WritingTemplateOptions = [
   {
     key: "informal",
     label: "Informal letter",
+    shortLabel: "Informal template",
     title: "INFORMAL LETTER",
     helper: "Use this for friends, family or personal messages.",
     template: b1InformalLetterTemplate,
@@ -255,21 +258,21 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
     b1WritingTemplateOptions.find((item) => item.key === activeTemplate) ||
     b1WritingTemplateOptions[0];
 
-  const insertTemplate = (template = selectedTemplate.template) => {
+  const insertTemplate = (option = selectedTemplate) => {
     const current = String(draft || "").trim();
-    const templateTrimmed = String(template || "").trim();
-    const knownTemplate = b1WritingTemplateOptions.some((option) => current === String(option.template || "").trim());
+    const templateTrimmed = String(option.template || "").trim();
+    const knownTemplate = b1WritingTemplateOptions.some(
+      (item) => current === String(item.template || "").trim(),
+    );
     if (current && current !== templateTrimmed && !knownTemplate) {
-      const shouldReplace = window.confirm("This will replace your current B1 draft with the selected template. Continue?");
+      const shouldReplace = window.confirm(
+        `This will replace your current B1 draft with the ${option.label.toLowerCase()} template. Continue?`,
+      );
       if (!shouldReplace) return;
     }
-    setDraft(template);
-    setActiveView("schreiben");
-  };
-
-  const chooseTemplate = (option) => {
     setActiveTemplate(option.key);
-    insertTemplate(option.template);
+    setDraft(option.template);
+    setActiveView("schreiben");
   };
 
   return (
@@ -282,7 +285,7 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
       {activeView === "schreiben" ? (
         <div style={b1WritingPanelStyle}>
           <strong>Schreiben</strong>
-          <p style={mobileTextStyle}>Step 1: write simple points first. Step 2: edit the B1 template into your final German answer. When it is finished, copy it to the Submit tab.</p>
+          <p style={mobileTextStyle}>Step 1: write simple points first. Step 2: choose or edit the correct B1 template into your final German answer. When it is finished, copy it to the Submit tab.</p>
 
           <div style={b1PlanningBoxStyle}>
             <strong>Step 1 · My points first</strong>
@@ -305,7 +308,7 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
                 key={option.key}
                 type="button"
                 style={b1TemplateButtonStyle(activeTemplate === option.key)}
-                onClick={() => chooseTemplate(option)}
+                onClick={() => insertTemplate(option)}
               >
                 {option.label}
               </button>
@@ -327,12 +330,37 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
             autoCapitalize="sentences"
             autoCorrect="on"
           />
+
+          <section
+            aria-label="Quick insert B1 templates"
+            style={{ ...b1TemplateCardStyle, background: "#eff6ff", borderColor: "#bfdbfe" }}
+          >
+            <strong>Quick insert a template</strong>
+            <p style={{ ...mobileTextStyle, color: "#475569" }}>
+              Use one button to place the correct exam template directly into the writing box above.
+            </p>
+            <div style={b1TemplateTabsWrapStyle}>
+              {b1WritingTemplateOptions.map((option) => (
+                <button
+                  key={`quick-${option.key}`}
+                  type="button"
+                  style={b1TemplateButtonStyle(activeTemplate === option.key)}
+                  onClick={() => insertTemplate(option)}
+                >
+                  Insert {option.shortLabel}
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
       ) : null}
 
       {activeView === "cheatSheet" ? (
         <div style={b1WritingPanelStyle}>
-          <strong>Cheat sheet · Choose the correct writing type</strong>
+          <strong>Cheat sheet · All three B1 writing templates</strong>
+          <p style={mobileTextStyle}>
+            Compare the Opinion, Formal and Informal templates below. Choose the one that matches the task.
+          </p>
           {writingContext.taskTitle ? <p style={mobileTextStyle}><strong>Question:</strong> {writingContext.taskTitle}</p> : null}
           {supportItems.length ? (
             <>
@@ -341,29 +369,24 @@ const B1WritingDraftPanel = ({ writingContext = {} }) => {
             </>
           ) : null}
 
-          <div style={b1TemplateTabsWrapStyle} aria-label="Choose B1 writing template">
+          <div style={{ display: "grid", gap: 12 }}>
             {b1WritingTemplateOptions.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                style={b1TemplateButtonStyle(activeTemplate === option.key)}
-                onClick={() => chooseTemplate(option)}
-              >
-                {option.label}
-              </button>
+              <section key={`cheat-${option.key}`} style={b1TemplateCardStyle}>
+                <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
+                  {option.title}
+                </span>
+                <p style={{ ...mobileTextStyle, color: "#475569" }}>{option.helper}</p>
+                <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{option.template}</p>
+                <button
+                  type="button"
+                  style={{ ...styles.secondaryButton, width: "fit-content" }}
+                  onClick={() => insertTemplate(option)}
+                >
+                  Use {option.shortLabel} in Schreiben
+                </button>
+              </section>
             ))}
           </div>
-
-          <section style={b1TemplateCardStyle}>
-            <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
-              {selectedTemplate.title}
-            </span>
-            <p style={{ ...mobileTextStyle, color: "#475569" }}>{selectedTemplate.helper}</p>
-            <p style={{ ...mobileTextStyle, whiteSpace: "pre-line" }}>{selectedTemplate.template}</p>
-            <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => insertTemplate(selectedTemplate.template)}>
-              Use this template in Schreiben
-            </button>
-          </section>
 
           {vocabulary.length ? (
             <>
@@ -477,7 +500,7 @@ const CourseInlinePracticePanel = ({
   );
   const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
   const panelDescription = isB1Writing
-    ? "Use Schreiben to write simple points first, then edit the correct B1 template: opinion essay, formal letter or informal letter. Copy your final text to the Submit tab when you are done."
+    ? "Use Schreiben to write simple points first, then insert or edit the correct B1 template: opinion essay, formal letter or informal letter. Copy your final text to the Submit tab when you are done."
     : type === "speaking"
       ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
       : description || config.defaultDescription;
