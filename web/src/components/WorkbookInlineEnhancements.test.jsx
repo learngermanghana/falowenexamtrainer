@@ -28,6 +28,7 @@ const A1_ASSIGNMENT_WORKBOOK_CASES = [
   ["A1-11", "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook", ""],
   ["A1-12.1", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18", "?view=workbook"],
   ["A1-12.2", "/campus/course/a1-12-2-dative-articles-mit-bei-zu", "?view=workbook"],
+  ["A1-12.3", "/campus/course/letter-writing-intro-german-a1-day-12-3", ""],
   ["A1-13", "/campus/course/a1-day-21-weather-workbook", ""],
   ["A1-14.1", "/campus/course/a1-day-22-health-and-body-parts-workbook", ""],
 ];
@@ -71,12 +72,6 @@ describe("A1 workbook inline submission mounting", () => {
     expect(
       resolveA1WorkbookSubmissionMatch({
         pathname: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
-      })
-    ).toBeNull();
-
-    expect(
-      resolveA1WorkbookSubmissionMatch({
-        pathname: "/campus/course/letter-writing-intro-german-a1-day-12-3",
       })
     ).toBeNull();
   });

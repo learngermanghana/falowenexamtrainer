@@ -20,6 +20,7 @@ import {
   getWorkbookNavigationTabs,
 } from "../utils/courseWorkbookSubmission";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";
 
 const LOCK_COLLECTION = "submissionLocks";
 const TAB_COUNTER_REGEX = /^tab\s+\d+\s+of\s+\d+/i;
@@ -213,6 +214,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     !isSelfPracticeWorkbookResource(match?.resource);
   const nativeWorkbookTabsEligible = ["A2", "B1"].includes(level);
   const useNativeWorkbookTabs = nativeWorkbookTabsEligible && nativeTabRowDetected;
+  const SubmissionPage = level === "A1" ? VerifiedCloudDraftSubmissionPage : AssignmentSubmissionPage;
 
   const ensureSubmissionContext = useCallback(() => {
     if (!assignmentKey) return;
@@ -531,7 +533,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
             <div className="course-book-tab-submission-page">
               <style>{`.course-book-tab-submission-page > div > section:first-child { display: none !important; }
               .course-book-tab-submission-page select { display: none !important; }`}</style>
-              <AssignmentSubmissionPage
+              <SubmissionPage
                 key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
                 submissionContext={{
                   level,
@@ -623,7 +625,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
             <div className="course-book-tab-submission-page">
               <style>{`.course-book-tab-submission-page > div > section:first-child { display: none !important; }
               .course-book-tab-submission-page select { display: none !important; }`}</style>
-              <AssignmentSubmissionPage
+              <SubmissionPage
                 key={`${level}-${normalizeCourseAssignmentKey(assignmentKey)}`}
                 submissionContext={{
                   level,

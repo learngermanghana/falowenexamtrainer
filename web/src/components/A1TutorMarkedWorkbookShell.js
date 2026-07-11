@@ -23,6 +23,7 @@ export const A1_TUTOR_MARKED_ASSIGNMENT_CHAPTERS = [
   "11",
   "12.1",
   "12.2",
+  "12.3",
   "13",
   "14.1",
 ];

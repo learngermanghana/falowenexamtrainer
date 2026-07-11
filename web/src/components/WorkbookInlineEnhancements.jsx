@@ -29,6 +29,7 @@ export const A1_TUTOR_MARKED_ASSIGNMENT_KEYS = Object.freeze([
   "A1-11",
   "A1-12.1",
   "A1-12.2",
+  "A1-12.3",
   "A1-13",
   "A1-14.1",
 ]);
