@@ -1,7 +1,15 @@
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
+
+const DAY0_LESSON_REDIRECTS = Object.freeze({
+  "/campus/course/lesson/a1/0": "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+  "/campus/course/lesson/a2/0": "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+  "/campus/course/lesson/b1/0": "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+  "/campus/course/lesson/b2/0": "/campus/course/b2-day-0-self-learning-orientation-workbook",
+  "/campus/course/lesson/c1/0": "/campus/course/c1-day-0-progression-workbook",
+});
 
 const SUPPORTED_DAY0_PATHS = new Set([
   "/campus/course/c1-day-0-progression-workbook",
@@ -9,8 +17,17 @@ const SUPPORTED_DAY0_PATHS = new Set([
 
 const Day0StudentWorkflowAutoMount = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const normalizedPath = String(location.pathname || "").replace(/\/+$/, "").toLowerCase();
+    const directOrientationPath = DAY0_LESSON_REDIRECTS[normalizedPath];
+
+    if (directOrientationPath) {
+      navigate(directOrientationPath, { replace: true });
+      return undefined;
+    }
+
     if (typeof document === "undefined") return undefined;
     if (!SUPPORTED_DAY0_PATHS.has(location.pathname)) return undefined;
 
@@ -37,9 +54,14 @@ const Day0StudentWorkflowAutoMount = () => {
       root.unmount();
       mount.remove();
     };
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
 
   return null;
 };
 
 export default Day0StudentWorkflowAutoMount;
+
+export const __private__ = {
+  DAY0_LESSON_REDIRECTS,
+  SUPPORTED_DAY0_PATHS,
+};
