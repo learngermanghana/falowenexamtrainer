@@ -8,6 +8,7 @@ describe("writing video resources", () => {
     ["B1", 1, "https://youtu.be/nG1PUrvrS_s"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
+    ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
   ])("returns the requested %s Day %i writing video", (level, day, url) => {
     expect(getWritingVideoResource(level, day)).toEqual(
       expect.objectContaining({ url }),
@@ -30,6 +31,7 @@ describe("writing video resources", () => {
     ["https://youtu.be/w8TaNHk-a0U", "https://www.youtube.com/embed/w8TaNHk-a0U"],
     ["https://www.youtube.com/watch?v=nG1PUrvrS_s", "https://www.youtube.com/embed/nG1PUrvrS_s"],
     ["https://youtube.com/embed/VdczhJS9ClY", "https://www.youtube.com/embed/VdczhJS9ClY"],
+    ["https://youtu.be/tpj8TV8DaH8", "https://www.youtube.com/embed/tpj8TV8DaH8"],
   ])("creates a safe YouTube embed URL for %s", (url, expected) => {
     expect(getYouTubeEmbedUrl(url)).toBe(expected);
   });
