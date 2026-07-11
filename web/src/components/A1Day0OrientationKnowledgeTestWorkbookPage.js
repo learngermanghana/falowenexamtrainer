@@ -1,5 +1,6 @@
 import React from "react";
 import CurrentDay0OrientationPage from "./CurrentDay0OrientationPage";
+import Day0OrientationVideoPanel from "./Day0OrientationVideoPanel";
 
 const config = {
   level: "A1",
@@ -88,6 +89,11 @@ const config = {
   ],
 };
 
-const A1Day0OrientationKnowledgeTestWorkbookPage = () => <CurrentDay0OrientationPage config={config} />;
+const A1Day0OrientationKnowledgeTestWorkbookPage = () => (
+  <div style={{ display: "grid", gap: 16 }}>
+    <Day0OrientationVideoPanel level="A1" />
+    <CurrentDay0OrientationPage config={config} />
+  </div>
+);
 
 export default A1Day0OrientationKnowledgeTestWorkbookPage;
