@@ -41,34 +41,29 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain('mountedNode.setAttribute("data-submit-context-ready", "true");');
   });
 
-  test("keeps assignment selectors visible as a mobile fallback and provides opt-in diagnostics", () => {
-    const css = readSource("a1WorkbookMobileSubmit.css");
-    const source = readSource("components/WorkbookInlineEnhancements.jsx");
-
-    expect(css).toContain(".course-book-tab-submission-page select");
-    expect(css).toContain("display: block !important;");
-    expect(source).toContain('get("submitDebug") === "1"');
-    expect(source).toContain("A1 Submit Debug");
-    expect(source).toContain("textareaDisabled");
-    expect(source).toContain("inputEvents");
-  });
-
-  test("built-in A1 workbooks keep the direct submission page and add verified cloud persistence", () => {
+  test("built-in A1 workbooks use one React-owned draft and submission form", () => {
     const shellSource = readSource("components/A1TutorMarkedWorkbookShell.js");
-    const cloudSource = readSource("components/VerifiedCloudDraftSubmissionPage.js");
+    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
 
     expect(shellSource).toContain('import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";');
     expect(shellSource).not.toContain("PersistentAssignmentSubmissionPage");
     expect(shellSource).toContain("submissionContextReady ? (");
     expect(shellSource).toContain("<VerifiedCloudDraftSubmissionPage");
-    expect(cloudSource).toContain('import AssignmentSubmissionPage from "./AssignmentSubmissionPage";');
-    expect(cloudSource).toContain("<AssignmentSubmissionPage submissionContext={submissionContext} />");
+    expect(source).toContain('data-cloud-draft-persistence": "react-owned"');
+    expect(source).toContain("value={text}");
+    expect(source).toContain("onChange={handleTextChange}");
+    expect(source).toContain("setText(nextValue)");
+    expect(source).not.toContain("setControlledTextareaValue");
+    expect(source).not.toContain("MutationObserver");
+    expect(source).not.toContain("onSnapshot(");
+    expect(source).not.toContain("setInterval(");
   });
 
-  test("writes deterministic Firestore drafts and verifies them by reading the document back", () => {
+  test("writes deterministic Firestore drafts and verifies them by reading the exact document back", () => {
     const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
 
     expect(source).toContain('const DRAFT_COLLECTION = "submissionDrafts";');
+    expect(source).toContain("const draftRef = doc(db, DRAFT_COLLECTION, draftDocId);");
     expect(source).toContain("await setDoc(draftRef, payload, { merge: true });");
     expect(source).toContain("const verifiedSnapshot = await getDoc(draftRef);");
     expect(source).toContain("Firestore write verification did not return the latest draft text");
@@ -76,48 +71,67 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("uid: user.uid");
     expect(source).toContain("ownerUid: user.uid");
     expect(source).not.toContain("localStorage");
-    expect(source).not.toContain("setInterval");
   });
 
-  test("verifies the flat final submission path and recovers a missing write without changing typing", () => {
+  test("refreshes clean devices from Firestore and protects competing unsaved text", () => {
+    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
+
+    expect(source).toContain('window.addEventListener("focus", refreshFromCloud);');
+    expect(source).toContain('document.addEventListener("visibilitychange", refreshFromCloud);');
+    expect(source).toContain("document.activeElement === textareaRef.current");
+    expect(source).toContain("remoteChangedSinceLoad");
+    expect(source).toContain('state: "conflict"');
+    expect(source).toContain("Load newest cloud draft");
+    expect(source).toContain("Keep this device version");
+    expect(source).toContain("Nothing has been overwritten");
+  });
+
+  test("always renders a visible final submit button beside Save draft", () => {
+    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
+    const css = readSource("a1WorkbookMobileSubmit.css");
+
+    expect(source).toContain("data-a1-submission-actions");
+    expect(source).toContain("data-a1-final-submit-button");
+    expect(source).toContain('type="submit"');
+    expect(source).toContain("Submit assignment");
+    expect(css).toContain("[data-a1-final-submit-button]");
+    expect(css).toContain("display: inline-flex !important;");
+    expect(css).toContain("visibility: visible !important;");
+  });
+
+  test("saves and verifies the flat final submission path before locking", () => {
     const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
 
     expect(source).toContain('const SUBMISSION_COLLECTION = "submissions";');
     expect(source).toContain('const LOCK_COLLECTION = "submissionLocks";');
-    expect(source).toContain("handleSubmitCapture");
-    expect(source).toContain('root.addEventListener("submit", handleSubmitCapture, true);');
-    expect(source).toContain('where("studentId", "==", user.uid)');
     expect(source).toContain("const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));");
     expect(source).toContain("submissionPath");
     expect(source).toContain("await setDoc(submissionRef, payload);");
-    expect(source).toContain("const verifiedSnapshot = await getDoc(submissionRef);");
-    expect(source).toContain("reviewStatus: \"pending_review\"");
-    expect(source).toContain("studentId: user.uid");
-    expect(source).toContain("userId: user.uid");
-    expect(source).toContain("uid: user.uid");
-    expect(source).toContain("ownerUid: user.uid");
-    expect(source).toContain("ensureSubmissionLock");
-    expect(source).toContain("a1_verified_submission_guard");
-    expect(source).not.toContain("onSnapshot(");
-    expect(source).not.toContain("RECONCILE_DELAYS_MS");
+    expect(source).toContain("const verifiedSubmission = await getDoc(submissionRef);");
+    expect(source).toContain('reviewStatus: "pending_review"');
+    expect(source).toContain("await setDoc(lockRef, lockPayload, { merge: true });");
+    expect(source).toContain("const verifiedLock = await getDoc(lockRef);");
+    expect(source).toContain('source: "a1_react_owned_submission"');
   });
 
-  test("shared diagnostics report cloud draft and final submission verification", () => {
+  test("shared diagnostics report draft conflicts, remote freshness and final submission verification", () => {
     const source = readSource("components/AssignmentSubmissionDebugPanel.js");
 
     expect(source).toContain("touchEvents");
     expect(source).toContain("beforeInputEvents");
     expect(source).toContain("computedPointerEvents");
     expect(source).toContain("elementAtTextareaCenter");
-    expect(source).toContain("document.elementFromPoint");
     expect(source).toContain("draftSaveState");
     expect(source).toContain("draftDocId");
     expect(source).toContain("draftCloudError");
     expect(source).toContain("draftWriteCount");
+    expect(source).toContain("draftLocalDirty");
+    expect(source).toContain("draftConflict");
+    expect(source).toContain("draftRemoteUpdatedAt");
+    expect(source).toContain("draftRemoteSource");
     expect(source).toContain("finalSubmissionState");
     expect(source).toContain("finalSubmissionId");
     expect(source).toContain("finalSubmissionPath");
     expect(source).toContain("finalSubmissionError");
-    expect(source).toContain("finalSubmissionFallback");
   });
 });
