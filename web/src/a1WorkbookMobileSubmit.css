@@ -63,7 +63,20 @@
   box-sizing: border-box !important;
 }
 
-/* iOS Safari can retain a transparent text fill even when color is dark. */
+/*
+ * Keep the assignment selectors available as a fallback. The shared submit
+ * component contains an older rule that hides every select; that can leave a
+ * mobile form disabled if the assignment context arrives late.
+ */
+[data-a1-workbook-submission-mount] .course-book-tab-submission-page select {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Mobile browsers can retain an invisible text fill even when color is dark. */
 [data-a1-workbook-submission-mount] textarea {
   -webkit-appearance: none !important;
   appearance: none !important;
