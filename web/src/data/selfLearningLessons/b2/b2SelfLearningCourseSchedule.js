@@ -68,9 +68,9 @@ export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
   makeB2ScheduleEntry({
     day: 7,
     chapter: "2.2",
-    topic: "Umwelt und Nachhaltigkeit",
-    goal: "Klimaschutz, Konsum und Alltagshandeln bewerten.",
-    grammar_topic: "Passiv und sachliche Beschreibung",
+    topic: "Gesellschaftliche Vielfalt",
+    goal: "Vielfalt, unterschiedliche Lebensweisen, Respekt, Teilhabe und Chancengleichheit differenziert diskutieren.",
+    grammar_topic: "Relativsätze mit Präpositionen",
   }),
   makeB2ScheduleEntry({
     day: 8,
