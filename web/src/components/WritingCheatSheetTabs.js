@@ -1,19 +1,29 @@
 import React, { useEffect, useId, useState } from "react";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
+import {
+  getWritingVideoResource,
+  getYouTubeEmbedUrl,
+} from "../data/writingVideoResources";
 import { styles } from "../styles";
 
 export default function WritingCheatSheetTabs({ level, day, children }) {
   const baseId = useId();
   const taskTabId = `${baseId}-writing-task-tab`;
+  const videoTabId = `${baseId}-writing-video-tab`;
   const cheatSheetTabId = `${baseId}-writing-cheat-sheet-tab`;
   const taskPanelId = `${baseId}-writing-task-panel`;
+  const videoPanelId = `${baseId}-writing-video-panel`;
   const cheatSheetPanelId = `${baseId}-writing-cheat-sheet-panel`;
   const [writeView, setWriteView] = useState("task");
   const writingCheatSheet = getWritingCheatSheet(level, day);
+  const writingVideo = getWritingVideoResource(level, day);
+  const writingVideoEmbed = getYouTubeEmbedUrl(writingVideo?.url);
+  const hasWritingVideo = Boolean(writingVideo?.url);
+  const hasCheatSheet = writingCheatSheet.length > 0;
 
   useEffect(() => setWriteView("task"), [level, day]);
 
-  if (!writingCheatSheet.length) return children;
+  if (!hasWritingVideo && !hasCheatSheet) return children;
 
   return (
     <div style={{ display: "grid", gap: 14 }}>
@@ -44,20 +54,38 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
         >
           Schreiben Task
         </button>
-        <button
-          id={cheatSheetTabId}
-          type="button"
-          role="tab"
-          aria-selected={writeView === "cheatSheet"}
-          aria-controls={cheatSheetPanelId}
-          onClick={() => setWriteView("cheatSheet")}
-          style={{
-            ...(writeView === "cheatSheet" ? styles.primaryButton : styles.secondaryButton),
-            borderRadius: 999,
-          }}
-        >
-          Cheat Sheet
-        </button>
+        {hasWritingVideo ? (
+          <button
+            id={videoTabId}
+            type="button"
+            role="tab"
+            aria-selected={writeView === "video"}
+            aria-controls={videoPanelId}
+            onClick={() => setWriteView("video")}
+            style={{
+              ...(writeView === "video" ? styles.primaryButton : styles.secondaryButton),
+              borderRadius: 999,
+            }}
+          >
+            Writing Video
+          </button>
+        ) : null}
+        {hasCheatSheet ? (
+          <button
+            id={cheatSheetTabId}
+            type="button"
+            role="tab"
+            aria-selected={writeView === "cheatSheet"}
+            aria-controls={cheatSheetPanelId}
+            onClick={() => setWriteView("cheatSheet")}
+            style={{
+              ...(writeView === "cheatSheet" ? styles.primaryButton : styles.secondaryButton),
+              borderRadius: 999,
+            }}
+          >
+            Cheat Sheet
+          </button>
+        ) : null}
       </div>
 
       <div
@@ -69,7 +97,72 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
         {children}
       </div>
 
-      {writeView === "cheatSheet" ? (
+      {writeView === "video" && hasWritingVideo ? (
+        <div
+          id={videoPanelId}
+          role="tabpanel"
+          aria-labelledby={videoTabId}
+          style={{ display: "grid", gap: 12 }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gap: 8,
+              border: "1px solid #bfdbfe",
+              borderRadius: 14,
+              padding: 14,
+              background: "#eff6ff",
+            }}
+          >
+            <h3 style={{ margin: 0, color: "#1e3a8a" }}>
+              {writingVideo.title || "Writing explanation video"}
+            </h3>
+            {writingVideo.description ? (
+              <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>
+                {writingVideo.description}
+              </p>
+            ) : null}
+          </div>
+
+          {writingVideoEmbed ? (
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                paddingTop: "56.25%",
+                borderRadius: 16,
+                overflow: "hidden",
+                background: "#0f172a",
+              }}
+            >
+              <iframe
+                title={writingVideo.title || "Writing explanation video"}
+                src={writingVideoEmbed}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0,
+                }}
+              />
+            </div>
+          ) : (
+            <a
+              href={writingVideo.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...styles.linkButton, width: "fit-content" }}
+            >
+              Open writing video
+            </a>
+          )}
+        </div>
+      ) : null}
+
+      {writeView === "cheatSheet" && hasCheatSheet ? (
         <div
           id={cheatSheetPanelId}
           role="tabpanel"
