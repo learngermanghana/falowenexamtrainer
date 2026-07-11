@@ -29,7 +29,7 @@ const WRITING_VIDEO_RESOURCES = {
     },
     9: {
       key: "c1-day9-chapter-2-4-writing-video",
-      title: "C1 Day 9 · Kapitel 2.4 · Writing explanation",
+      title: "C1 Day 9 · Chapter 2.4 · Writing explanation",
       description:
         "Watch this video before writing. It explains how to analyse the task, organise a differentiated C1 response and address all required content points.",
       url: "https://youtu.be/tpj8TV8DaH8",
