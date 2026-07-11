@@ -49,6 +49,7 @@ describe("A1 mobile workbook submission", () => {
     expect(shellSource).not.toContain("PersistentAssignmentSubmissionPage");
     expect(shellSource).toContain("submissionContextReady ? (");
     expect(shellSource).toContain("<VerifiedCloudDraftSubmissionPage");
+    expect(shellSource).toContain('"12.3"');
     expect(source).toContain('data-cloud-draft-persistence": "react-owned"');
     expect(source).toContain("value={text}");
     expect(source).toContain("onChange={handleTextChange}");
@@ -57,6 +58,16 @@ describe("A1 mobile workbook submission", () => {
     expect(source).not.toContain("MutationObserver");
     expect(source).not.toContain("onSnapshot(");
     expect(source).not.toContain("setInterval(");
+  });
+
+  test("all injected A1 workbooks use the verified cloud form while A2 and B1 keep the existing form", () => {
+    const source = readSource("components/CourseWorkbookSubmissionTabs.js");
+
+    expect(source).toContain('import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";');
+    expect(source).toContain(
+      'const SubmissionPage = level === "A1" ? VerifiedCloudDraftSubmissionPage : AssignmentSubmissionPage;'
+    );
+    expect((source.match(/<SubmissionPage/g) || []).length).toBe(2);
   });
 
   test("writes deterministic Firestore drafts and verifies them by reading the exact document back", () => {
