@@ -20,12 +20,6 @@ const paragraph = {
   lineHeight: 1.7,
 };
 
-const listStyle = {
-  margin: 0,
-  paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
 const questionBlock = {
   display: "grid",
   gap: 6,
@@ -33,6 +27,40 @@ const questionBlock = {
   border: "1px solid #e5e7eb",
   borderRadius: 10,
   background: "#fff",
+};
+
+const trueFalseQuestionBlock = {
+  display: "grid",
+  gap: 10,
+  padding: "14px",
+  border: "1px solid #bfdbfe",
+  borderRadius: 12,
+  background: "#f8fbff",
+};
+
+const trueFalseNumber = {
+  alignItems: "center",
+  background: "#2563eb",
+  borderRadius: "999px",
+  color: "#ffffff",
+  display: "inline-flex",
+  flex: "0 0 34px",
+  fontSize: 14,
+  fontWeight: 900,
+  height: 34,
+  justifyContent: "center",
+  width: 34,
+};
+
+const trueFalseAnswerPrompt = {
+  background: "#ffffff",
+  border: "1px dashed #93c5fd",
+  borderRadius: 10,
+  color: "#1e3a8a",
+  fontSize: 14,
+  fontWeight: 800,
+  margin: 0,
+  padding: "9px 12px",
 };
 
 const horenLink = "https://drive.google.com/file/d/1CaSUhSWFlX1P8BT3BP22aGGy3Sl1R6BO/view?usp=sharing";
@@ -64,11 +92,11 @@ const teil1Questions = [
 ];
 
 const teil2Questions = [
-  "1. Der Text sagt, dass der Februar immer 28 Tage hat. (Richtig/Falsch)",
-  "2. Wenn es 16:00 Uhr ist, bedeutet das vier Uhr nachmittags. (Richtig/Falsch)",
-  "3. Heute ist Montag. (Richtig/Falsch)",
-  "4. In Deutschland wird das Datum als Monat.Tag.Jahr geschrieben. (Richtig/Falsch)",
-  "5. Der fünfte April wird als 05.04 geschrieben. (Richtig/Falsch)",
+  "Der Text sagt, dass der Februar immer 28 Tage hat.",
+  "Wenn es 16:00 Uhr ist, bedeutet das vier Uhr nachmittags.",
+  "Heute ist Montag.",
+  "In Deutschland wird das Datum als Monat.Tag.Jahr geschrieben.",
+  "Der fünfte April wird als 05.04 geschrieben.",
 ];
 
 const horenQuestions = [
@@ -158,11 +186,32 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
           Die Wochentage sind Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag. Heute ist Montag. Das
           Datum wird in Deutschland als Tag.Monat.Jahr geschrieben. Also, der fünfte April 2024 wird als 05.04.2024 geschrieben.
         </p>
-        <ol style={listStyle}>
-          {teil2Questions.map((question) => (
-            <li key={question}>{question}</li>
+
+        <div
+          style={{
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            borderRadius: 12,
+            color: "#1e3a8a",
+            fontWeight: 700,
+            lineHeight: 1.6,
+            padding: "11px 13px",
+          }}
+        >
+          Lies jede Aussage. Schreibe im Submit-Tab für jede Nummer entweder <strong>Richtig</strong> oder <strong>Falsch</strong>.
+        </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          {teil2Questions.map((question, index) => (
+            <div key={question} style={trueFalseQuestionBlock}>
+              <div style={{ alignItems: "flex-start", display: "flex", gap: 12 }}>
+                <span aria-hidden="true" style={trueFalseNumber}>{index + 1}</span>
+                <p style={{ ...paragraph, flex: 1, fontWeight: 750, paddingTop: 3 }}>{question}</p>
+              </div>
+              <p style={trueFalseAnswerPrompt}>Antwort: Richtig oder Falsch</p>
+            </div>
           ))}
-        </ol>
+        </div>
       </section>
 
       <section style={card}>
