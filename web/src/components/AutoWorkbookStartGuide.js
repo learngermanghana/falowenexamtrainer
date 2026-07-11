@@ -20,6 +20,7 @@ import {
 } from "../utils/autoWorkbookGuideRouting";
 import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
 import WorkbookContextSync from "./WorkbookContextSync";
+import WorkbookInlineEnhancements from "./WorkbookInlineEnhancements";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 export {
@@ -247,14 +248,29 @@ const AutoWorkbookStartGuide = () => {
   const grammarReturn = grammarWorkbookTarget && grammarBackHost
     ? createPortal(<GrammarBackToWorkbookCard target={grammarWorkbookTarget} />, grammarBackHost)
     : null;
+  const inlineEnhancements = <WorkbookInlineEnhancements pathname={pathname} />;
 
   if (
     normalizedPathname === A1_DAY18_CHAPTER122_WORKBOOK_PATH
     || (normalizedPathname === A1_DAY18_CHAPTER122_GRAMMAR_PATH
       && new URLSearchParams(search || "").get("view") === "workbook")
-  ) return <A1Day18Kapitel122WorkbookPage />;
+  ) {
+    return (
+      <>
+        <A1Day18Kapitel122WorkbookPage />
+        {inlineEnhancements}
+      </>
+    );
+  }
 
-  if (!shouldRenderGuide) return grammarReturn;
+  if (!shouldRenderGuide) {
+    return (
+      <>
+        {grammarReturn}
+        {inlineEnhancements}
+      </>
+    );
+  }
 
   const guide = <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />;
 
@@ -281,6 +297,7 @@ const AutoWorkbookStartGuide = () => {
         </div>
       )}
       {grammarReturn}
+      {inlineEnhancements}
     </>
   );
 };
