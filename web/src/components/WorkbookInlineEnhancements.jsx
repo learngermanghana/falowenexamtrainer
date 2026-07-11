@@ -8,6 +8,8 @@ import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 
 const FAMILY_WORKBOOK_PATH = "/campus/course/a1-day-6-family-and-hobbies-workbook";
 const SUBMISSION_MOUNT_ATTRIBUTE = "data-a1-workbook-submission-mount";
+const LEGACY_SUBMIT_HIDDEN_ATTRIBUTE = "data-a1-legacy-submit-hidden";
+const LEGACY_SUBMIT_DISPLAY_ATTRIBUTE = "data-a1-legacy-submit-display";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
@@ -101,6 +103,35 @@ export const hasExistingA1SubmissionTabs = (pageRoot) => {
       .filter(Boolean);
 
     return labels.some((label) => label === "assignment") && labels.some((label) => label === "submit");
+  });
+};
+
+const isLegacyA1SubmitControl = (element) => {
+  const href = String(element?.getAttribute?.("href") || "");
+  const label = String(element?.textContent || "").replace(/\s+/g, " ").trim();
+
+  if (/submitWork=1/i.test(href)) return true;
+  return /^(submit assignment|submit workbook answers|submit kapitel\b.*|open submit area)$/i.test(label);
+};
+
+export const hideLegacyA1SubmitControls = (pageRoot) => {
+  if (!pageRoot) return;
+
+  Array.from(pageRoot.querySelectorAll("a, button")).forEach((element) => {
+    if (!isLegacyA1SubmitControl(element) || element.hasAttribute(LEGACY_SUBMIT_HIDDEN_ATTRIBUTE)) return;
+    element.setAttribute(LEGACY_SUBMIT_HIDDEN_ATTRIBUTE, "true");
+    element.setAttribute(LEGACY_SUBMIT_DISPLAY_ATTRIBUTE, element.style.display || "");
+    element.style.display = "none";
+  });
+};
+
+export const restoreLegacyA1SubmitControls = (pageRoot) => {
+  if (!pageRoot) return;
+
+  Array.from(pageRoot.querySelectorAll(`[${LEGACY_SUBMIT_HIDDEN_ATTRIBUTE}]`)).forEach((element) => {
+    element.style.display = element.getAttribute(LEGACY_SUBMIT_DISPLAY_ATTRIBUTE) || "";
+    element.removeAttribute(LEGACY_SUBMIT_HIDDEN_ATTRIBUTE);
+    element.removeAttribute(LEGACY_SUBMIT_DISPLAY_ATTRIBUTE);
   });
 };
 
@@ -210,6 +241,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
     let frameId = null;
     let observer = null;
     let mountedNode = null;
+    let pageRoot = null;
     let attempts = 0;
 
     const removeMount = () => {
@@ -219,19 +251,18 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
     };
 
     const install = () => {
-      const pageRoot = findWorkbookPageRoot(anchorRef.current);
+      pageRoot = findWorkbookPageRoot(anchorRef.current);
       if (!pageRoot) {
         attempts += 1;
         if (attempts < 30) frameId = window.requestAnimationFrame(install);
         return;
       }
 
+      hideLegacyA1SubmitControls(pageRoot);
+
       if (hasExistingA1SubmissionTabs(pageRoot)) {
         removeMount();
-        return;
-      }
-
-      if (!mountedNode) {
+      } else if (!mountedNode) {
         mountedNode = document.createElement("div");
         mountedNode.setAttribute(SUBMISSION_MOUNT_ATTRIBUTE, "true");
         mountedNode.setAttribute("data-assignment-key", submissionMatch.resource.assignmentKey || "");
@@ -240,6 +271,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
       }
 
       observer = new MutationObserver(() => {
+        hideLegacyA1SubmitControls(pageRoot);
         if (hasExistingA1SubmissionTabs(pageRoot)) removeMount();
       });
       observer.observe(pageRoot, { childList: true, subtree: true });
@@ -250,6 +282,7 @@ const WorkbookInlineEnhancements = ({ pathname }) => {
     return () => {
       if (frameId) window.cancelAnimationFrame(frameId);
       observer?.disconnect();
+      restoreLegacyA1SubmitControls(pageRoot);
       removeMount();
     };
   }, [submissionMatch]);
