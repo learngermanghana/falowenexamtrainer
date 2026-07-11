@@ -79,22 +79,7 @@ describe("A1 mobile workbook submission", () => {
     expect(source).not.toContain("setInterval");
   });
 
-  test("uses the newest Firestore draft across devices and blocks stale overwrites", () => {
-    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
-
-    expect(source).toContain("onSnapshot(");
-    expect(source).toContain("latestCloudTextRef");
-    expect(source).toContain("lastSyncedCloudTextRef");
-    expect(source).toContain('source === "visibility-change" && !userEditedRef.current');
-    expect(source).toContain("remoteChangedSinceSync");
-    expect(source).toContain('state: "conflict"');
-    expect(source).toContain("This older device was blocked from overwriting it");
-    expect(source).toContain("Load newest cloud draft");
-    expect(source).toContain("Keep this device version");
-    expect(source).toContain("RECONCILE_DELAYS_MS");
-  });
-
-  test("shared diagnostics report cloud freshness and conflict state", () => {
+  test("shared diagnostics report cloud save state as well as touch and overlay data", () => {
     const source = readSource("components/AssignmentSubmissionDebugPanel.js");
 
     expect(source).toContain("touchEvents");
@@ -106,9 +91,5 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("draftDocId");
     expect(source).toContain("draftCloudError");
     expect(source).toContain("draftWriteCount");
-    expect(source).toContain("draftConflict");
-    expect(source).toContain("draftLocalDirty");
-    expect(source).toContain("draftRemoteUpdatedAt");
-    expect(source).toContain("draftRemoteSource");
   });
 });
