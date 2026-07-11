@@ -115,23 +115,45 @@
   visibility: visible !important;
 }
 
-/* The final action must never disappear while Save draft remains visible. */
-[data-a1-workbook-submission-mount] [data-a1-final-submit-button] {
+/*
+ * The final action must never disappear while Save draft remains visible.
+ * Built-in A1 workbook pages use data-a1-built-in-submission rather than the
+ * injected data-a1-workbook-submission-mount wrapper, so both paths must be
+ * protected from legacy button[type="submit"] hiding rules.
+ */
+[data-a1-workbook-submission-mount] [data-a1-final-submit-button],
+[data-a1-built-in-submission] form [data-a1-submission-actions] [data-a1-final-submit-button] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   min-height: 44px !important;
+  width: auto !important;
   opacity: 1 !important;
   visibility: visible !important;
   position: relative !important;
   z-index: 2 !important;
 }
 
-[data-a1-workbook-submission-mount] [data-a1-submission-actions] {
+[data-a1-workbook-submission-mount] [data-a1-submission-actions],
+[data-a1-built-in-submission] form [data-a1-submission-actions] {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 10px !important;
   width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+[data-a1-built-in-submission] form [data-a1-submission-actions] > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  min-width: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 @media (max-width: 640px) {
@@ -160,12 +182,15 @@
     overflow: visible !important;
   }
 
-  [data-a1-workbook-submission-mount] [data-a1-submission-actions] {
+  [data-a1-workbook-submission-mount] [data-a1-submission-actions],
+  [data-a1-built-in-submission] form [data-a1-submission-actions] {
     grid-template-columns: 1fr !important;
   }
 
   [data-a1-workbook-submission-mount] [data-a1-submission-actions] button,
-  [data-a1-workbook-submission-mount] [data-a1-final-submit-button] {
+  [data-a1-workbook-submission-mount] [data-a1-final-submit-button],
+  [data-a1-built-in-submission] form [data-a1-submission-actions] button,
+  [data-a1-built-in-submission] form [data-a1-final-submit-button] {
     width: 100% !important;
   }
 }
