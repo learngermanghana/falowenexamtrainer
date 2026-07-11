@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";
 import AssignmentSubmissionDebugPanel from "./AssignmentSubmissionDebugPanel";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { styles } from "../styles";
@@ -272,10 +272,11 @@ const A1TutorMarkedWorkbookShell = ({
               />
             ) : null}
             {submissionContextReady ? (
-              <AssignmentSubmissionPage
+              <VerifiedCloudDraftSubmissionPage
                 submissionContext={{
                   level: normalizedLevel,
                   day,
+                  chapter,
                   assignmentKey,
                   canonicalAssignmentKey: assignmentKey,
                 }}
