@@ -79,7 +79,30 @@ describe("A1 mobile workbook submission", () => {
     expect(source).not.toContain("setInterval");
   });
 
-  test("shared diagnostics report cloud save state as well as touch and overlay data", () => {
+  test("verifies the flat final submission path and recovers a missing write without changing typing", () => {
+    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
+
+    expect(source).toContain('const SUBMISSION_COLLECTION = "submissions";');
+    expect(source).toContain('const LOCK_COLLECTION = "submissionLocks";');
+    expect(source).toContain("handleSubmitCapture");
+    expect(source).toContain('root.addEventListener("submit", handleSubmitCapture, true);');
+    expect(source).toContain('where("studentId", "==", user.uid)');
+    expect(source).toContain("const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));");
+    expect(source).toContain("submissionPath");
+    expect(source).toContain("await setDoc(submissionRef, payload);");
+    expect(source).toContain("const verifiedSnapshot = await getDoc(submissionRef);");
+    expect(source).toContain("reviewStatus: \"pending_review\"");
+    expect(source).toContain("studentId: user.uid");
+    expect(source).toContain("userId: user.uid");
+    expect(source).toContain("uid: user.uid");
+    expect(source).toContain("ownerUid: user.uid");
+    expect(source).toContain("ensureSubmissionLock");
+    expect(source).toContain("a1_verified_submission_guard");
+    expect(source).not.toContain("onSnapshot(");
+    expect(source).not.toContain("RECONCILE_DELAYS_MS");
+  });
+
+  test("shared diagnostics report cloud draft and final submission verification", () => {
     const source = readSource("components/AssignmentSubmissionDebugPanel.js");
 
     expect(source).toContain("touchEvents");
@@ -91,5 +114,10 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("draftDocId");
     expect(source).toContain("draftCloudError");
     expect(source).toContain("draftWriteCount");
+    expect(source).toContain("finalSubmissionState");
+    expect(source).toContain("finalSubmissionId");
+    expect(source).toContain("finalSubmissionPath");
+    expect(source).toContain("finalSubmissionError");
+    expect(source).toContain("finalSubmissionFallback");
   });
 });
