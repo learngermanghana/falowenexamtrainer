@@ -115,6 +115,25 @@
   visibility: visible !important;
 }
 
+/* The final action must never disappear while Save draft remains visible. */
+[data-a1-workbook-submission-mount] [data-a1-final-submit-button] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+[data-a1-workbook-submission-mount] [data-a1-submission-actions] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
 @media (max-width: 640px) {
   [data-a1-workbook-submission-mount] {
     margin: 0 !important;
@@ -139,5 +158,14 @@
 
   [data-a1-workbook-submission-mount] .course-book-tab-submission-page {
     overflow: visible !important;
+  }
+
+  [data-a1-workbook-submission-mount] [data-a1-submission-actions] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [data-a1-workbook-submission-mount] [data-a1-submission-actions] button,
+  [data-a1-workbook-submission-mount] [data-a1-final-submit-button] {
+    width: 100% !important;
   }
 }
