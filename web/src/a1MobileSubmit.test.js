@@ -27,6 +27,16 @@ describe("A1 mobile submit text visibility", () => {
     expect(cssSource).toContain("textarea::placeholder");
   });
 
+  test("uses mobile-safe input and composition fallbacks for the submit textarea", () => {
+    const source = readSource("components/AssignmentSubmissionPage.js");
+
+    expect(source).toContain('onInput={(event) => syncTextFieldValue("submissionText", event.currentTarget.value)}');
+    expect(source).toContain('onCompositionEnd={(event) => syncTextFieldValue("submissionText", event.currentTarget.value)}');
+    expect(source).toContain('inputMode="text"');
+    expect(source).toContain('autoCorrect="off"');
+    expect(source).toContain('spellCheck={false}');
+  });
+
   test("keeps Day 11 Understanding Time on the shared A1 shell with canonical assignment A1-7", () => {
     const day11Source = readSource("components/A1Day11UnderstandingTimeWorkbookPage.js");
 

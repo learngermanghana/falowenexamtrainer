@@ -1828,6 +1828,10 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     lastAssignmentRef.current = "";
   };
 
+  const syncTextFieldValue = useCallback((field, value) => {
+    setForm((prev) => (prev[field] === value ? prev : { ...prev, [field]: value }));
+  }, []);
+
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
 
@@ -1843,6 +1847,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       }));
       setStatus((prev) => ({ ...prev, error: "", success: "" }));
       setCopyStatus("");
+      return;
+    }
+
+    if (field === "submissionText" || field === "resubmissionText" || field === "resubmissionImprovement") {
+      syncTextFieldValue(field, value);
       return;
     }
 
@@ -2607,6 +2616,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 ref={submissionTextRef}
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
+                onInput={(event) => syncTextFieldValue("submissionText", event.currentTarget.value)}
+                onCompositionEnd={(event) => syncTextFieldValue("submissionText", event.currentTarget.value)}
+                inputMode="text"
+                autoCapitalize="sentences"
+                autoCorrect="off"
+                spellCheck={false}
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 200 }}
                 placeholder={
@@ -2791,6 +2806,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 ref={resubmissionTextRef}
                 value={resubmissionText}
                 onChange={(event) => setResubmissionText(event.target.value)}
+                onInput={(event) => setResubmissionText(event.currentTarget.value)}
+                onCompositionEnd={(event) => setResubmissionText(event.currentTarget.value)}
+                inputMode="text"
+                autoCapitalize="sentences"
+                autoCorrect="off"
+                spellCheck={false}
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 160 }}
                 placeholder="Paste your corrected letter/text here."
@@ -2822,6 +2843,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 ref={resubmissionImprovementRef}
                 value={resubmissionImprovement}
                 onChange={(event) => setResubmissionImprovement(event.target.value)}
+                onInput={(event) => setResubmissionImprovement(event.currentTarget.value)}
+                onCompositionEnd={(event) => setResubmissionImprovement(event.currentTarget.value)}
+                inputMode="text"
+                autoCapitalize="sentences"
+                autoCorrect="off"
+                spellCheck={false}
                 style={{ ...styles.textArea, minHeight: 120 }}
                 placeholder="Example: I fixed verb placement in Nebensätze, corrected article endings, and rewrote the opening paragraph to match the prompt."
                 disabled={resubmissionLimitReached}
