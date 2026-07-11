@@ -53,18 +53,33 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("inputEvents");
   });
 
-  test("built-in A1 workbooks use the same direct submission page as A2", () => {
-    const source = readSource("components/A1TutorMarkedWorkbookShell.js");
+  test("built-in A1 workbooks keep the direct submission page and add verified cloud persistence", () => {
+    const shellSource = readSource("components/A1TutorMarkedWorkbookShell.js");
+    const cloudSource = readSource("components/VerifiedCloudDraftSubmissionPage.js");
 
-    expect(source).toContain('import AssignmentSubmissionPage from "./AssignmentSubmissionPage";');
-    expect(source).not.toContain("PersistentAssignmentSubmissionPage");
-    expect(source).toContain("submissionContextReady ? (");
-    expect(source).toContain("<AssignmentSubmissionPage");
-    expect(source).toContain('get("submitDebug") === "1"');
-    expect(source).toContain("AssignmentSubmissionDebugPanel");
+    expect(shellSource).toContain('import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";');
+    expect(shellSource).not.toContain("PersistentAssignmentSubmissionPage");
+    expect(shellSource).toContain("submissionContextReady ? (");
+    expect(shellSource).toContain("<VerifiedCloudDraftSubmissionPage");
+    expect(cloudSource).toContain('import AssignmentSubmissionPage from "./AssignmentSubmissionPage";');
+    expect(cloudSource).toContain("<AssignmentSubmissionPage submissionContext={submissionContext} />");
   });
 
-  test("shared diagnostics can detect touch events and overlays blocking the textarea", () => {
+  test("writes deterministic Firestore drafts and verifies them by reading the document back", () => {
+    const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
+
+    expect(source).toContain('const DRAFT_COLLECTION = "submissionDrafts";');
+    expect(source).toContain("await setDoc(draftRef, payload, { merge: true });");
+    expect(source).toContain("const verifiedSnapshot = await getDoc(draftRef);");
+    expect(source).toContain("Firestore write verification did not return the latest draft text");
+    expect(source).toContain("userId: user.uid");
+    expect(source).toContain("uid: user.uid");
+    expect(source).toContain("ownerUid: user.uid");
+    expect(source).not.toContain("localStorage");
+    expect(source).not.toContain("setInterval");
+  });
+
+  test("shared diagnostics report cloud save state as well as touch and overlay data", () => {
     const source = readSource("components/AssignmentSubmissionDebugPanel.js");
 
     expect(source).toContain("touchEvents");
@@ -72,5 +87,9 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain("computedPointerEvents");
     expect(source).toContain("elementAtTextareaCenter");
     expect(source).toContain("document.elementFromPoint");
+    expect(source).toContain("draftSaveState");
+    expect(source).toContain("draftDocId");
+    expect(source).toContain("draftCloudError");
+    expect(source).toContain("draftWriteCount");
   });
 });
