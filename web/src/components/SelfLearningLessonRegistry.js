@@ -35,6 +35,7 @@ import b2Day3ArbeitUndBeruf from "../data/selfLearningLessons/b2/day3ArbeitUndBe
 import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUndLernen";
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 import b2Day6MigrationUndIntegration from "../data/selfLearningLessons/b2/day6MigrationUndIntegration";
+import b2Day7GesellschaftlicheVielfalt from "../data/selfLearningLessons/b2/day7GesellschaftlicheVielfalt";
 
 const c1FallbackLessons = [
   [17, "4.2", "Umwelt und Verantwortung", "Nachhaltigkeit, Klima und persönliches Handeln"],
@@ -52,7 +53,6 @@ const c1FallbackLessons = [
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "C1", day, chapter, title, topic }));
 
 const b2FallbackLessons = [
-  [7, "2.2", "Umwelt und Nachhaltigkeit", "Klimaschutz, Konsum und Alltagshandeln"],
   [8, "2.3", "Reisen und Mobilität", "Transport, Urlaub und nachhaltige Entscheidungen"],
   [9, "2.4", "Wohnen und Nachbarschaft", "Wohnformen, Mietprobleme und Zusammenleben"],
   [10, "2.5", "Konsum und Geld", "Kaufentscheidungen, Budget und Werbung"],
@@ -85,6 +85,7 @@ export const SELF_LEARNING_LESSONS = {
     b2Day4BildungUndLernen,
     b2Day5GesundheitUndWohlbefinden,
     b2Day6MigrationUndIntegration,
+    b2Day7GesellschaftlicheVielfalt,
     ...b2FallbackLessons,
   ],
   C1: [
