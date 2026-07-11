@@ -39,13 +39,67 @@ const writeBackup = (backupKey, payload) => {
   }
 };
 
-const setTextareaValue = (textarea, value) => {
+const getEditableTextarea = (target) => {
+  if (typeof window === "undefined" || !(target instanceof window.HTMLTextAreaElement)) return null;
+  if (target.disabled || target.readOnly) return null;
+  return target;
+};
+
+const setTextareaValue = (textarea, value, { emit = true } = {}) => {
   const element = textarea;
   const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
   if (nativeSetter) nativeSetter.call(element, value);
   else element.value = value;
-  element.dispatchEvent(new Event("input", { bubbles: true }));
-  element.dispatchEvent(new Event("change", { bubbles: true }));
+
+  if (emit) {
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+};
+
+const getTextareaSelection = (textarea) => {
+  const valueLength = String(textarea.value || "").length;
+  const start = typeof textarea.selectionStart === "number" ? textarea.selectionStart : valueLength;
+  const end = typeof textarea.selectionEnd === "number" ? textarea.selectionEnd : start;
+  return { start, end };
+};
+
+const buildBeforeInputFallback = (textarea, event) => {
+  const currentValue = String(textarea.value || "");
+  const { start, end } = getTextareaSelection(textarea);
+  const replaceSelection = (insertedText) => {
+    const nextValue = `${currentValue.slice(0, start)}${insertedText}${currentValue.slice(end)}`;
+    return { value: nextValue, cursor: start + insertedText.length };
+  };
+
+  switch (event.inputType) {
+    case "insertText":
+    case "insertReplacementText":
+    case "insertFromPaste":
+    case "insertFromDrop":
+      return typeof event.data === "string" ? replaceSelection(event.data) : null;
+    case "insertLineBreak":
+    case "insertParagraph":
+      return replaceSelection("\n");
+    case "deleteByCut":
+      return start !== end ? replaceSelection("") : null;
+    case "deleteContentBackward":
+      if (start !== end) return replaceSelection("");
+      if (start <= 0) return { value: currentValue, cursor: 0 };
+      return {
+        value: `${currentValue.slice(0, start - 1)}${currentValue.slice(end)}`,
+        cursor: start - 1,
+      };
+    case "deleteContentForward":
+      if (start !== end) return replaceSelection("");
+      if (end >= currentValue.length) return { value: currentValue, cursor: end };
+      return {
+        value: `${currentValue.slice(0, start)}${currentValue.slice(end + 1)}`,
+        cursor: start,
+      };
+    default:
+      return null;
+  }
 };
 
 const collectTextareaDrafts = (root) => {
@@ -156,6 +210,120 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
 
   useEffect(() => {
     const root = rootRef.current;
+    if (!root) return undefined;
+
+    const liveSnapshots = new WeakMap();
+    const composingTextareas = new WeakSet();
+    const frameIds = new Set();
+    const timeoutIds = new Set();
+
+    const restoreSelection = (textarea, selection) => {
+      try {
+        textarea.setSelectionRange(selection.start, selection.end);
+      } catch (_error) {
+        // Some iOS WebKit states temporarily reject selection updates.
+      }
+    };
+
+    const scheduleRepair = (textarea, snapshot) => {
+      const repair = () => {
+        if (!root.contains(textarea) || liveSnapshots.get(textarea) !== snapshot) return;
+        if (document.activeElement !== textarea && !snapshot.composing) return;
+        if (textarea.value === snapshot.value) return;
+
+        setTextareaValue(textarea, snapshot.value);
+        restoreSelection(textarea, snapshot.selection);
+      };
+
+      const frameId = window.requestAnimationFrame(() => {
+        frameIds.delete(frameId);
+        repair();
+      });
+      frameIds.add(frameId);
+
+      const timeoutId = window.setTimeout(() => {
+        timeoutIds.delete(timeoutId);
+        repair();
+      }, 80);
+      timeoutIds.add(timeoutId);
+    };
+
+    const rememberTextareaValue = (textarea) => {
+      const selection = getTextareaSelection(textarea);
+      const snapshot = {
+        value: String(textarea.value || ""),
+        selection,
+        composing: composingTextareas.has(textarea),
+      };
+      liveSnapshots.set(textarea, snapshot);
+      scheduleRepair(textarea, snapshot);
+    };
+
+    const preserveInputValue = (event) => {
+      const textarea = getEditableTextarea(event.target);
+      if (!textarea) return;
+      rememberTextareaValue(textarea);
+    };
+
+    const preserveBeforeInput = (event) => {
+      const textarea = getEditableTextarea(event.target);
+      if (!textarea) return;
+
+      const originalValue = String(textarea.value || "");
+      const fallback = buildBeforeInputFallback(textarea, event);
+      if (!fallback) return;
+
+      const frameId = window.requestAnimationFrame(() => {
+        frameIds.delete(frameId);
+        if (!root.contains(textarea) || textarea.disabled || textarea.readOnly) return;
+
+        if (textarea.value !== originalValue) {
+          rememberTextareaValue(textarea);
+          return;
+        }
+
+        setTextareaValue(textarea, fallback.value);
+        restoreSelection(textarea, { start: fallback.cursor, end: fallback.cursor });
+        rememberTextareaValue(textarea);
+      });
+      frameIds.add(frameId);
+    };
+
+    const handleCompositionStart = (event) => {
+      const textarea = getEditableTextarea(event.target);
+      if (!textarea) return;
+      composingTextareas.add(textarea);
+      rememberTextareaValue(textarea);
+    };
+
+    const handleCompositionEnd = (event) => {
+      const textarea = getEditableTextarea(event.target);
+      if (!textarea) return;
+      composingTextareas.delete(textarea);
+      rememberTextareaValue(textarea);
+    };
+
+    root.addEventListener("beforeinput", preserveBeforeInput, true);
+    root.addEventListener("input", preserveInputValue, true);
+    root.addEventListener("change", preserveInputValue, true);
+    root.addEventListener("compositionstart", handleCompositionStart, true);
+    root.addEventListener("compositionend", handleCompositionEnd, true);
+    root.addEventListener("focusin", preserveInputValue, true);
+
+    return () => {
+      root.removeEventListener("beforeinput", preserveBeforeInput, true);
+      root.removeEventListener("input", preserveInputValue, true);
+      root.removeEventListener("change", preserveInputValue, true);
+      root.removeEventListener("compositionstart", handleCompositionStart, true);
+      root.removeEventListener("compositionend", handleCompositionEnd, true);
+      root.removeEventListener("focusin", preserveInputValue, true);
+      frameIds.forEach((frameId) => window.cancelAnimationFrame(frameId));
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
+  }, [backupKey]);
+
+  useEffect(() => {
+    const root = rootRef.current;
     if (!root || !backupKey) return undefined;
 
     const persistLocalBackup = () => {
@@ -165,11 +333,8 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
 
       const payload = {
         fields,
-        assignmentKey:
-          submissionContext?.canonicalAssignmentKey ||
-          submissionContext?.assignmentKey ||
-          "",
-        level: submissionContext?.level || "",
+        assignmentKey: identity.assignmentKey,
+        level: identity.level,
         updatedAt: new Date().toISOString(),
       };
       const serialized = JSON.stringify(payload);
@@ -228,7 +393,7 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
       window.removeEventListener("beforeunload", persistLocalBackup);
       persistLocalBackup();
     };
-  }, [backupKey, submissionContext]);
+  }, [backupKey, identity.assignmentKey, identity.level]);
 
   return (
     <div ref={rootRef} data-persistent-assignment-submission>
@@ -238,16 +403,18 @@ const PersistentAssignmentSubmissionPage = ({ submissionContext = null } = {}) =
           -webkit-user-select: text !important;
           user-select: text !important;
           -webkit-touch-callout: default !important;
-          touch-action: manipulation !important;
+          touch-action: auto !important;
           font-size: 16px !important;
           line-height: 1.7 !important;
           position: relative !important;
           z-index: 1 !important;
           caret-color: #111827 !important;
+          cursor: text !important;
         }
         [data-persistent-assignment-submission] textarea:not([disabled]):not([readonly]) {
           background: #ffffff !important;
           color: #111827 !important;
+          -webkit-text-fill-color: #111827 !important;
         }
       `}</style>
       <div
