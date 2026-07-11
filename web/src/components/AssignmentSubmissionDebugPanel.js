@@ -19,10 +19,6 @@ const emptyDiagnostics = {
   draftLoaded: null,
   draftWriteCount: null,
   draftLastSavedAt: null,
-  draftConflict: null,
-  draftLocalDirty: null,
-  draftRemoteUpdatedAt: null,
-  draftRemoteSource: null,
 };
 
 const describeElement = (element) => {
@@ -91,10 +87,6 @@ const AssignmentSubmissionDebugPanel = ({
         draftLoaded: cloudDraftRoot?.getAttribute("data-draft-loaded") || null,
         draftWriteCount: cloudDraftRoot?.getAttribute("data-draft-write-count") || null,
         draftLastSavedAt: cloudDraftRoot?.getAttribute("data-draft-last-saved-at") || null,
-        draftConflict: cloudDraftRoot?.getAttribute("data-draft-conflict") || null,
-        draftLocalDirty: cloudDraftRoot?.getAttribute("data-draft-local-dirty") || null,
-        draftRemoteUpdatedAt: cloudDraftRoot?.getAttribute("data-draft-remote-updated-at") || null,
-        draftRemoteSource: cloudDraftRoot?.getAttribute("data-draft-remote-source") || null,
       });
     };
 
