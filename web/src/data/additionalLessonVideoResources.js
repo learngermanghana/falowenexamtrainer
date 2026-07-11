@@ -65,6 +65,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/5tGvAPq6hGk?si=uI_ODAT_A6_mZjG2",
       },
     ],
+    11: [
+      {
+        key: "b1-day11-teamspiele-kooperative-aktivitaeten-ai-video",
+        chapter: "4.11",
+        title: "B1 Day 11 · Teamspiele und kooperative Aktivitäten · AI video",
+        description:
+          "AI video lesson for teamwork, cooperative activities, communication and shared problem-solving at B1 level.",
+        url: "https://youtu.be/XCNpkLMx6gk",
+      },
+    ],
     19: [
       {
         key: "b1-day19-vorstellungsgespraech-ai-video",
