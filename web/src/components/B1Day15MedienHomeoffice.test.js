@@ -31,7 +31,11 @@ describe("B1 Day 15 Medien und Arbeiten im Homeoffice", () => {
     expect(
       screen.getByRole("heading", { name: /Passiv im Präsens/ })
     ).toBeInTheDocument();
-    expect(screen.getByText(/Sichere Passwörter müssen verwendet werden/)).toBeInTheDocument();
-    expect(screen.getByText(/Persönliche Daten werden geschützt/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Sichere Passwörter müssen verwendet werden/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Persönliche Daten werden geschützt/).length
+    ).toBeGreaterThan(0);
   });
 });
