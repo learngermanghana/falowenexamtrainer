@@ -58,11 +58,11 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
-      - name: Test A1 workbook submit mounting
+      - name: Test A1 workbook submit mounting and mobile layout
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/WorkbookInlineEnhancements.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/WorkbookInlineEnhancements.test.jsx src/a1WorkbookMobileSubmit.test.js
 
       - name: Test Preposition Case Coach
         working-directory: web
