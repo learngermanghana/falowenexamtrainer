@@ -37,6 +37,18 @@ describe("A1 mobile submit text visibility", () => {
     expect(source).toContain('spellCheck={false}');
   });
 
+  test("preserves the latest native textarea value when iOS resets a controlled input", () => {
+    const source = readSource("components/PersistentAssignmentSubmissionPage.js");
+
+    expect(source).toContain('root.addEventListener("beforeinput", preserveBeforeInput, true);');
+    expect(source).toContain('root.addEventListener("compositionstart", handleCompositionStart, true);');
+    expect(source).toContain('root.addEventListener("compositionend", handleCompositionEnd, true);');
+    expect(source).toContain("const liveSnapshots = new WeakMap();");
+    expect(source).toContain("window.requestAnimationFrame");
+    expect(source).toContain("setTextareaValue(textarea, snapshot.value);");
+    expect(source).toContain("touch-action: auto !important;");
+  });
+
   test("keeps Day 11 Understanding Time on the shared A1 shell with canonical assignment A1-7", () => {
     const day11Source = readSource("components/A1Day11UnderstandingTimeWorkbookPage.js");
 
