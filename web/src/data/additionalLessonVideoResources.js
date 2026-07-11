@@ -75,6 +75,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/XCNpkLMx6gk",
       },
     ],
+    12: [
+      {
+        key: "b1-day12-abenteuer-in-der-natur-ai-video",
+        chapter: "4.12",
+        title: "B1 Day 12 · Abenteuer in der Natur · AI video",
+        description:
+          "AI video lesson for outdoor adventures, nature activities, experiences and useful B1 vocabulary.",
+        url: "https://youtu.be/9NNSVqw-Y5A",
+      },
+    ],
     19: [
       {
         key: "b1-day19-vorstellungsgespraech-ai-video",
