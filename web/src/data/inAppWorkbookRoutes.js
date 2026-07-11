@@ -8,6 +8,7 @@ const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articl
 const b1WorkbookLessonRoute = (day) => `/campus/course/lesson/B1/${day}?view=workbook`;
 
 const B1_WORKBOOK_ROUTES = {
+  "0": { "*": "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook" },
   "1": { "*": b1WorkbookLessonRoute(1) },
   "2": { "*": b1WorkbookLessonRoute(2) },
   "3": { "*": b1WorkbookLessonRoute(3) },
@@ -76,8 +77,9 @@ export const getConfiguredInAppWorkbookResourceRoute = ({ level, day, chapter } 
 
 export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
+  const normalizedDay = Number(day);
 
-  if (normalizedLevel === "A1" && isA1LessonRoute()) {
+  if (normalizedLevel === "A1" && isA1LessonRoute() && normalizedDay !== 0) {
     return "";
   }
 
