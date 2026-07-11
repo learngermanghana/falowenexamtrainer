@@ -19,6 +19,12 @@ const emptyDiagnostics = {
   draftLoaded: null,
   draftWriteCount: null,
   draftLastSavedAt: null,
+  finalSubmissionState: null,
+  finalSubmissionId: null,
+  finalSubmissionPath: null,
+  finalSubmissionError: null,
+  finalSubmissionFallback: null,
+  finalSubmissionVerifiedAt: null,
 };
 
 const describeElement = (element) => {
@@ -87,6 +93,12 @@ const AssignmentSubmissionDebugPanel = ({
         draftLoaded: cloudDraftRoot?.getAttribute("data-draft-loaded") || null,
         draftWriteCount: cloudDraftRoot?.getAttribute("data-draft-write-count") || null,
         draftLastSavedAt: cloudDraftRoot?.getAttribute("data-draft-last-saved-at") || null,
+        finalSubmissionState: cloudDraftRoot?.getAttribute("data-final-submission-state") || null,
+        finalSubmissionId: cloudDraftRoot?.getAttribute("data-final-submission-id") || null,
+        finalSubmissionPath: cloudDraftRoot?.getAttribute("data-final-submission-path") || null,
+        finalSubmissionError: cloudDraftRoot?.getAttribute("data-final-submission-error") || null,
+        finalSubmissionFallback: cloudDraftRoot?.getAttribute("data-final-submission-fallback") || null,
+        finalSubmissionVerifiedAt: cloudDraftRoot?.getAttribute("data-final-submission-verified-at") || null,
       });
     };
 
