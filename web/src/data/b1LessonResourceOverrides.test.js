@@ -5,7 +5,7 @@ import {
 } from "./b1LessonResourceOverrides";
 import { normalizeLesson } from "./lessonModel";
 
- describe("B1 canonical lesson resources", () => {
+describe("B1 canonical lesson resources", () => {
   test("B1 Day 1 exposes the in-app grammar notes and workbook", () => {
     const lesson = {
       day: 1,
@@ -163,10 +163,8 @@ import { normalizeLesson } from "./lessonModel";
     );
   });
 
-  test("B1 Day 19 uses the requested interview AI video", () => {
-    expect(getB1LessonResourceOverride(19).aiVideo).toBe(
-      "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q"
-    );
+  test("B1 Day 19 has no AI video override", () => {
+    expect(getB1LessonResourceOverride(19).aiVideo).toBeUndefined();
   });
 });
 
