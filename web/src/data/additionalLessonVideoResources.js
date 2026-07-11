@@ -85,6 +85,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/9NNSVqw-Y5A",
       },
     ],
+    13: [
+      {
+        key: "b1-day13-eigene-filmkritik-ai-video",
+        chapter: "4.13",
+        title: "B1 Day 13 · Eigene Filmkritik schreiben · AI video",
+        description:
+          "AI video lesson for describing, evaluating and recommending films in a structured B1 film review.",
+        url: "https://youtu.be/61Afr0Z3vO4",
+      },
+    ],
     14: [
       {
         key: "b1-day14-traditionelles-digitales-lernen-ai-video",
