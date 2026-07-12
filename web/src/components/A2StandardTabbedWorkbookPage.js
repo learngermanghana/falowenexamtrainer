@@ -80,34 +80,48 @@ const extractYouTubeId = (url = "") => {
   return "";
 };
 
+const extractGoogleDriveFileId = (url = "") => {
+  const value = String(url || "").trim();
+  if (!value) return "";
+
+  const fileMatch = value.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
+  if (fileMatch) return fileMatch[1];
+
+  const idMatch = value.match(/[?&]id=([^&#]+)/i);
+  return idMatch ? idMatch[1] : "";
+};
+
+const mediaFrameWrapper = {
+  position: "relative",
+  width: "100%",
+  paddingTop: "56.25%",
+  borderRadius: 12,
+  overflow: "hidden",
+  background: "#000",
+};
+
+const mediaFrame = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  border: 0,
+};
+
 const ListeningMedia = ({ url }) => {
   const youtubeId = extractYouTubeId(url);
+  const googleDriveFileId = extractGoogleDriveFileId(url);
 
   if (youtubeId) {
     return (
       <div style={{ display: "grid", gap: 8 }}>
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            paddingTop: "56.25%",
-            borderRadius: 12,
-            overflow: "hidden",
-            background: "#000",
-          }}
-        >
+        <div style={mediaFrameWrapper}>
           <iframe
             title="Teil 4 Hören video"
             src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              border: 0,
-            }}
+            style={mediaFrame}
           />
         </div>
         <a
@@ -117,6 +131,30 @@ const ListeningMedia = ({ url }) => {
           style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
         >
           Open in YouTube
+        </a>
+      </div>
+    );
+  }
+
+  if (googleDriveFileId) {
+    return (
+      <div style={{ display: "grid", gap: 8 }}>
+        <div style={mediaFrameWrapper}>
+          <iframe
+            title="Teil 4 Hören audio"
+            src={`https://drive.google.com/file/d/${googleDriveFileId}/preview`}
+            allow="autoplay"
+            allowFullScreen
+            style={mediaFrame}
+          />
+        </div>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören audio in Google Drive
         </a>
       </div>
     );
@@ -169,7 +207,10 @@ const A2StandardTabbedWorkbookPage = ({
   chapter,
   topicPrompt,
   workbookId,
+  sprechenContent,
   schreibenTask,
+  schreibenContent,
+  schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...",
   lesenText,
   lesenQuestions = [],
   hoerenTask,
@@ -228,17 +269,23 @@ const A2StandardTabbedWorkbookPage = ({
         <div style={card}>
           <HeroImage type="sprechen" alt="Students speaking together during German class" />
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-          <SpeakingMindMap config={getA2SpeakingMindMap(day)} />
-          <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly>
-            <p style={{ margin: 0 }}>
-              Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.
-            </p>
-            <ul style={listSpacing}>
-              <li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li>
-              <li>Speak clearly for 30–60 seconds.</li>
-              <li>This part is practice only; submit required final answers in the Submit tab.</li>
-            </ul>
-          </WorkbookTaskCard>
+          {sprechenContent ? (
+            sprechenContent
+          ) : (
+            <>
+              <SpeakingMindMap config={getA2SpeakingMindMap(day)} />
+              <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly>
+                <p style={{ margin: 0 }}>
+                  Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.
+                </p>
+                <ul style={listSpacing}>
+                  <li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li>
+                  <li>Speak clearly for 30–60 seconds.</li>
+                  <li>This part is practice only; submit required final answers in the Submit tab.</li>
+                </ul>
+              </WorkbookTaskCard>
+            </>
+          )}
           <SpeakingPracticeTimerCard />
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
@@ -249,21 +296,25 @@ const A2StandardTabbedWorkbookPage = ({
         <div style={card}>
           <HeroImage type="schreiben" alt="Learner writing a German workbook answer" />
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Writing task" title="Write your final text">
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              {schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}
-            </p>
-            <p style={{ margin: 0, color: "#1d4ed8", fontWeight: 700 }}>
-              Write approximately 60–80 words, then copy your finished answer into the Submit tab.
-            </p>
-          </WorkbookTaskCard>
+          {schreibenContent ? (
+            schreibenContent
+          ) : (
+            <WorkbookTaskCard eyebrow="Writing task" title="Write your final text">
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                {schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}
+              </p>
+              <p style={{ margin: 0, color: "#1d4ed8", fontWeight: 700 }}>
+                Write approximately 60–80 words, then copy your finished answer into the Submit tab.
+              </p>
+            </WorkbookTaskCard>
+          )}
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Schreiben</strong>
             <span>Type your draft here first. When it is finished, copy it to the Submit tab.</span>
             <textarea
               value={writingDraft}
               onChange={(event) => setWritingDraft(event.target.value)}
-              placeholder="Liebe/r ...\n\nich schreibe, weil ..."
+              placeholder={schreibenPlaceholder}
               style={draftTextAreaStyle}
             />
           </div>
