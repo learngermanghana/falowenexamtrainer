@@ -97,6 +97,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Traditionelles und digitales Lernen vergleichen, Vor- und Nachteile abwägen und eine kurze formelle E-Mail schreiben.",
     instruction: "Lies zuerst die in-app Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
+  15: Object.freeze({
+    chapter: "5.15",
+    title: "Medien und Arbeiten im Homeoffice",
+    grammarBook: route(15, "grammar"),
+    workbook: route(15, "workbook"),
+    grammarTopic: "Passiv im Präsens und Passiv mit Modalverben für digitale Prozesse, Regeln und Arbeitsabläufe",
+    goal: "Digitale Medien im Homeoffice beschreiben, Vor- und Nachteile abwägen und eine klare B1-Meinung formulieren.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen zum Passiv. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
+  }),
   16: Object.freeze({
     chapter: "5.16",
     title: "Prüfungsangst und Stressbewältigung",
@@ -129,7 +138,6 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     title: "Das Vorstellungsgespräch",
     grammarBook: route(19, "grammar"),
     workbook: route(19, "workbook"),
-    aiVideo: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
     grammarTopic: "Höflich und professionell sprechen: Konjunktiv II, Sie-Form und Begründungen",
     goal: "Sich im Vorstellungsgespräch vorstellen und eine klare B1-Meinung formulieren.",
     instruction: "Lies zuerst die Grammatiknotizen und bearbeite danach alle vier Workbook-Teile.",

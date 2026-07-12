@@ -85,14 +85,24 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/9NNSVqw-Y5A",
       },
     ],
-    19: [
+    13: [
       {
-        key: "b1-day19-vorstellungsgespraech-ai-video",
-        chapter: "6.19",
-        title: "B1 Day 19 · Das Vorstellungsgespräch · AI video",
+        key: "b1-day13-eigene-filmkritik-ai-video",
+        chapter: "4.13",
+        title: "B1 Day 13 · Eigene Filmkritik schreiben · AI video",
         description:
-          "AI video lesson for speaking politely and professionally during a job interview.",
-        url: "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q",
+          "AI video lesson for describing, evaluating and recommending films in a structured B1 film review.",
+        url: "https://youtu.be/61Afr0Z3vO4",
+      },
+    ],
+    14: [
+      {
+        key: "b1-day14-traditionelles-digitales-lernen-ai-video",
+        chapter: "5.14",
+        title: "B1 Day 14 · Traditionelles vs. digitales Lernen · AI video",
+        description:
+          "AI video lesson for comparing traditional and digital learning methods, advantages, disadvantages and personal preferences.",
+        url: "https://youtu.be/lktKK510Nxk",
       },
     ],
     20: [

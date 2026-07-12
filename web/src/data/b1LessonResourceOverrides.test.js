@@ -5,7 +5,7 @@ import {
 } from "./b1LessonResourceOverrides";
 import { normalizeLesson } from "./lessonModel";
 
- describe("B1 canonical lesson resources", () => {
+describe("B1 canonical lesson resources", () => {
   test("B1 Day 1 exposes the in-app grammar notes and workbook", () => {
     const lesson = {
       day: 1,
@@ -82,6 +82,33 @@ import { normalizeLesson } from "./lessonModel";
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
+  test("B1 Day 15 uses passive grammar notes and the Homeoffice workbook", () => {
+    const lesson = {
+      day: 15,
+      chapter: "5.15",
+      topic: "Medien und Arbeiten im Homeoffice 5.15",
+      lesen_hören: {
+        chapter: "5.15",
+        grammarbook_link: "https://drive.google.com/legacy-grammar",
+        workbook_link: "https://drive.google.com/legacy-workbook",
+      },
+    };
+
+    applyB1LessonResourceOverride(lesson);
+    const normalized = normalizeLesson(lesson, "B1");
+
+    expect(lesson.topic).toBe("Medien und Arbeiten im Homeoffice");
+    expect(lesson.grammar_topic).toContain("Passiv im Präsens");
+    expect(normalized.resources.grammarBook.url).toBe(
+      "/campus/course/lesson/B1/15?view=grammar"
+    );
+    expect(normalized.resources.workbook.url).toBe(
+      "/campus/course/lesson/B1/15?view=workbook"
+    );
+    expect(normalized.resources.grammarBook.url).not.toContain("drive.google.com");
+    expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
+  });
+
   test("B1 Days 20 to 28 open the in-app standard workbook route without skipping radio", () => {
     for (let day = 20; day <= 28; day += 1) {
       const lesson = {
@@ -136,10 +163,8 @@ import { normalizeLesson } from "./lessonModel";
     );
   });
 
-  test("B1 Day 19 uses the requested interview AI video", () => {
-    expect(getB1LessonResourceOverride(19).aiVideo).toBe(
-      "https://youtu.be/ha-uyeX2aVw?si=21xSaYQZVyH2ha2q"
-    );
+  test("B1 Day 19 has no AI video override", () => {
+    expect(getB1LessonResourceOverride(19).aiVideo).toBeUndefined();
   });
 });
 
