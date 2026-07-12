@@ -11,6 +11,7 @@ import CourseBookTerminologyInjector from "./CourseBookTerminologyInjector";
 import CourseCompletionExamGuidanceInjector from "./CourseCompletionExamGuidanceInjector";
 import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideoInjector";
 import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
+import UniversalWorkbookLessonNavigator from "./UniversalWorkbookLessonNavigator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
@@ -88,6 +89,7 @@ export default function RouteScopedAppServices() {
       <CourseCompletionExamGuidanceInjector />
       <A2CourseBookOrientationVideoInjector />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
+      <UniversalWorkbookLessonNavigator />
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <ExamQuestionCheatSheetInjector />
