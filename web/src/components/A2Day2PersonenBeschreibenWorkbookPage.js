@@ -351,8 +351,8 @@ export default function A2Day2PersonenBeschreibenWorkbookPage() {
       schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich schreibe dir, weil ...\n\nMein Chef / Meine Chefin ..."}
       lesenText={readingText}
       lesenQuestions={readingQuestions}
-      hoerenTask="Höre das Audio und beantworte danach die drei Hörverstehen-Fragen. Nutze zuerst den eingebetteten Player. Falls er nicht funktioniert, öffne den Google-Drive-Link."
-      hoerenAudioUrl="https://drive.google.com/file/d/1SIFA08DquWp-dU86pi7pHC6eElF_39I9/view?usp=sharing"
+      hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die drei Hörverstehen-Fragen."
+      hoerenAudioUrl="https://youtu.be/5ttnGcZWo-Q"
       hoerenQuestions={listeningQuestions}
     />
   );
