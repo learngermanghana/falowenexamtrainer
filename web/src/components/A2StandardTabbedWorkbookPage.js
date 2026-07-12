@@ -42,18 +42,6 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const draftTextAreaStyle = {
-  width: "100%",
-  minHeight: 220,
-  border: "1px solid #d1d5db",
-  borderRadius: 12,
-  padding: 12,
-  fontSize: "1rem",
-  lineHeight: 1.6,
-  resize: "vertical",
-  boxSizing: "border-box",
-};
-
 const defaultImages = {
   sprechen: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=80",
   schreiben: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
@@ -218,7 +206,6 @@ const A2StandardTabbedWorkbookPage = ({
   hoerenQuestions = [],
 }) => {
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [writingDraft, setWritingDraft] = useState("");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -227,6 +214,7 @@ const A2StandardTabbedWorkbookPage = ({
   });
   const assignmentKey = `A2-${chapter}`;
   const resolvedWorkbookId = workbookId || `A2Day${day}Workbook`;
+  const writingTaskTitle = schreibenTask || `${title} · Teil 2 writing task`;
 
   const setPreparedFor = (tabKey) => (event) =>
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -308,16 +296,23 @@ const A2StandardTabbedWorkbookPage = ({
               </p>
             </WorkbookTaskCard>
           )}
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Schreiben</strong>
-            <span>Type your draft here first. When it is finished, copy it to the Submit tab.</span>
-            <textarea
-              value={writingDraft}
-              onChange={(event) => setWritingDraft(event.target.value)}
-              placeholder={schreibenPlaceholder}
-              style={draftTextAreaStyle}
-            />
-          </div>
+
+          <CourseInlinePracticePanel
+            type="writing"
+            title="A2 writing workspace"
+            description="Plan your points in English, choose a formal or informal template, write your German draft and use Mark My Letter before submitting."
+            writingContext={{
+              level: "A2",
+              courseLevel: "A2",
+              day,
+              lessonId: `A2-day-${day}`,
+              workbookId: resolvedWorkbookId,
+              writingTaskId: `${resolvedWorkbookId}-teil-2-writing`,
+              taskTitle: writingTaskTitle,
+              draftPlaceholder: schreibenPlaceholder,
+            }}
+          />
+
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
