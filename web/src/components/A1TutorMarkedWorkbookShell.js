@@ -40,6 +40,9 @@ const tabButtonBase = {
   minWidth: 120,
 };
 
+const AUTO_RESOLVE_POLL_MS = 120;
+const AUTO_RESOLVE_MAX_ATTEMPTS = 80;
+
 const buildSubmitClassName = (level, day, chapter) =>
   `a1-tutor-marked-submit-${String(level || "a1").toLowerCase()}-${String(day || "day").replace(/[^a-z0-9]/gi, "-")}-${String(
     chapter || "chapter"
@@ -67,10 +70,12 @@ const A1TutorMarkedWorkbookShell = ({
   const location = useLocation();
   const navigate = useNavigate();
   const submitRootRef = useRef(null);
+  const autoResolveInFlightRef = useRef(false);
   const normalizedLevel = String(level || "A1").toUpperCase();
   const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
   const requestedTab = searchParams.get("workbookTab");
   const [activeTab, setActiveTab] = useState(requestedTab === "submit" ? "submit" : "assignment");
+  const [autoResolveMessage, setAutoResolveMessage] = useState("");
 
   const assignmentKey = useMemo(() => {
     const assignment = getInlineCourseAssignments(normalizedLevel, day).find(
@@ -92,6 +97,11 @@ const A1TutorMarkedWorkbookShell = ({
   useEffect(() => {
     setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
   }, [requestedTab]);
+
+  useEffect(() => {
+    autoResolveInFlightRef.current = false;
+    setAutoResolveMessage("");
+  }, [assignmentKey]);
 
   useEffect(() => {
     if (requestedTab !== "submit") return;
@@ -161,6 +171,80 @@ const A1TutorMarkedWorkbookShell = ({
     );
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSubmissionCapture = async (event) => {
+    const root = submitRootRef.current;
+    const cloudDraftRoot = root?.querySelector('[data-cloud-draft-persistence="react-owned"]');
+    const hasCloudConflict = cloudDraftRoot?.getAttribute("data-draft-conflict") === "true";
+
+    if (!hasCloudConflict) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.nativeEvent?.stopImmediatePropagation?.();
+
+    if (autoResolveInFlightRef.current) return;
+
+    const form = event.target?.tagName === "FORM" ? event.target : event.target?.closest?.("form");
+    const submitter = event.nativeEvent?.submitter || null;
+    const keepDeviceButton = Array.from(root?.querySelectorAll("button") || []).find(
+      (button) => String(button.textContent || "").trim().toLowerCase() === "keep this device version"
+    );
+
+    if (!form || !keepDeviceButton || keepDeviceButton.disabled) {
+      setAutoResolveMessage("A newer cloud draft was found. Please press Submit again in a moment.");
+      return;
+    }
+
+    autoResolveInFlightRef.current = true;
+    setAutoResolveMessage(
+      "A newer cloud draft was detected. Saving the answer visible on this device as the final version…"
+    );
+    keepDeviceButton.click();
+
+    for (let attempt = 0; attempt < AUTO_RESOLVE_MAX_ATTEMPTS; attempt += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, AUTO_RESOLVE_POLL_MS));
+
+      if (!submitRootRef.current || !form.isConnected) {
+        autoResolveInFlightRef.current = false;
+        return;
+      }
+
+      const currentCloudRoot = submitRootRef.current.querySelector(
+        '[data-cloud-draft-persistence="react-owned"]'
+      );
+      const conflictStillExists = currentCloudRoot?.getAttribute("data-draft-conflict") === "true";
+      const draftState = currentCloudRoot?.getAttribute("data-draft-save-state") || "";
+
+      if (!conflictStillExists && draftState === "saved") {
+        autoResolveInFlightRef.current = false;
+        setAutoResolveMessage(
+          "Draft conflict resolved automatically. Submitting the answer visible on this device…"
+        );
+
+        window.setTimeout(() => {
+          if (!form.isConnected) return;
+          if (submitter?.isConnected) {
+            form.requestSubmit(submitter);
+          } else {
+            form.requestSubmit();
+          }
+        }, 0);
+        return;
+      }
+
+      if (draftState === "error") {
+        autoResolveInFlightRef.current = false;
+        setAutoResolveMessage(
+          "The automatic draft recovery could not finish. Check your internet connection and press Submit again."
+        );
+        return;
+      }
+    }
+
+    autoResolveInFlightRef.current = false;
+    setAutoResolveMessage("Automatic draft recovery is taking longer than expected. Please press Submit again.");
   };
 
   const submitClassName = buildSubmitClassName(normalizedLevel, day, chapter);
@@ -238,7 +322,13 @@ const A1TutorMarkedWorkbookShell = ({
               {submitDescription || `This submission box is locked to ${assignmentKey}, so your work is saved under the correct assignment.`}
             </p>
           </div>
-          <div ref={submitRootRef} className={submitClassName} data-a1-built-in-submission>
+          <div
+            ref={submitRootRef}
+            className={submitClassName}
+            data-a1-built-in-submission
+            data-auto-resolve-draft-conflicts="visible-version-on-submit"
+            onSubmitCapture={handleSubmissionCapture}
+          >
             <style>{`
               .${submitClassName} > div > section:first-child { display: none !important; }
               .${submitClassName} textarea {
@@ -263,6 +353,23 @@ const A1TutorMarkedWorkbookShell = ({
                 opacity: 1 !important;
               }
             `}</style>
+            {autoResolveMessage ? (
+              <p
+                role="status"
+                aria-live="polite"
+                style={{
+                  background: "#eff6ff",
+                  border: "1px solid #93c5fd",
+                  borderRadius: 10,
+                  color: "#1e3a8a",
+                  fontWeight: 700,
+                  margin: "0 0 10px",
+                  padding: "10px 12px",
+                }}
+              >
+                {autoResolveMessage}
+              </p>
+            ) : null}
             {submitDebugEnabled ? (
               <AssignmentSubmissionDebugPanel
                 rootRef={submitRootRef}
