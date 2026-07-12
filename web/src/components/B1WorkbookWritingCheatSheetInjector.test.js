@@ -1,6 +1,21 @@
 import { __TESTING__ } from "./B1WorkbookWritingCheatSheetInjector";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
 
+const buildWritingRoot = () => {
+  const root = document.createElement("div");
+  root.innerHTML = `
+    <section>
+      <h2>Teil 2 · Schreiben (Assignment)</h2>
+      <div data-writing-task>Writing task</div>
+      <div data-writing-tabs>
+        <button type="button">Schreiben</button>
+        <button type="button">Cheat sheet</button>
+      </div>
+    </section>
+  `;
+  return root;
+};
+
 describe("B1 workbook writing cheat sheet injector", () => {
   test("activates on B1 lesson workbook views only", () => {
     expect(
@@ -41,5 +56,58 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("B1 cheat sheet content exists for workbook days", () => {
     expect(getWritingCheatSheet("B1", 1).length).toBeGreaterThan(0);
     expect(getWritingCheatSheet("B1", 1)[0].items.length).toBeGreaterThan(0);
+  });
+
+  test("injects the mapped B1 Day 1 writing video before the writing workspace", () => {
+    const root = buildWritingRoot();
+
+    expect(__TESTING__.findWritingSection(root)).not.toBeNull();
+    const result = __TESTING__.ensureWritingVideoCard(root, 1);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: true,
+      reason: "inserted",
+      key: "b1-day1-traumwelt-writing-video",
+    }));
+
+    const card = root.querySelector(
+      `[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`
+    );
+    const writingTabs = root.querySelector("[data-writing-tabs]");
+
+    expect(card).not.toBeNull();
+    expect(card.nextElementSibling).toBe(writingTabs);
+    expect(card).toHaveTextContent("Writing Video · Essay Ideas");
+    expect(card).toHaveTextContent("B1 Day 1 · Traumwelt · Writing explanation");
+    expect(card.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/nG1PUrvrS_s"
+    );
+  });
+
+  test("does not duplicate the writing video when React updates the workbook", () => {
+    const root = buildWritingRoot();
+
+    __TESTING__.ensureWritingVideoCard(root, 1);
+    const result = __TESTING__.ensureWritingVideoCard(root, 1);
+
+    expect(result.reason).toBe("already-mounted");
+    expect(
+      root.querySelectorAll(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)
+    ).toHaveLength(1);
+  });
+
+  test("does not inject a card for an unmapped B1 writing assignment", () => {
+    const root = buildWritingRoot();
+
+    const result = __TESTING__.ensureWritingVideoCard(root, 2);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: false,
+      reason: "unmapped",
+    }));
+    expect(
+      root.querySelector(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)
+    ).toBeNull();
   });
 });
