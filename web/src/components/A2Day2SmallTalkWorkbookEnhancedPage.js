@@ -293,7 +293,7 @@ export default function A2Day2SmallTalkWorkbookEnhancedPage() {
       lesenText={readingText}
       lesenQuestions={readingQuestions}
       hoerenTask="Höre den Text „Mein Gespräch mit Lisa“. Beantworte danach dieselben sieben Verständnisfragen."
-      hoerenAudioUrl="https://drive.google.com/file/d/1UXO1nHeBxOt8TS8dpp68xXr4Txjzu-NZ/view?usp=sharing"
+      hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
       hoerenQuestions={readingQuestions}
     />
   );
