@@ -60,6 +60,18 @@ describe("A1 mobile workbook submission", () => {
     expect(source).not.toContain("setInterval(");
   });
 
+  test("automatically resolves a cloud conflict with the visible answer before final submit", () => {
+    const shellSource = readSource("components/A1TutorMarkedWorkbookShell.js");
+
+    expect(shellSource).toContain('data-auto-resolve-draft-conflicts="visible-version-on-submit"');
+    expect(shellSource).toContain("onSubmitCapture={handleSubmissionCapture}");
+    expect(shellSource).toContain('data-draft-conflict") === "true"');
+    expect(shellSource).toContain('=== "keep this device version"');
+    expect(shellSource).toContain('draftState === "saved"');
+    expect(shellSource).toContain("form.requestSubmit");
+    expect(shellSource).toContain("Draft conflict resolved automatically");
+  });
+
   test("all injected A1 workbooks use the verified cloud form while A2 and B1 keep the existing form", () => {
     const source = readSource("components/CourseWorkbookSubmissionTabs.js");
 
