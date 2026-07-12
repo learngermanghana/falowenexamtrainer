@@ -5,6 +5,10 @@ import {
   getYouTubeEmbedUrl,
 } from "../data/writingVideoResources";
 import { styles } from "../styles";
+import {
+  A2LetterTemplateCheatSheet,
+  A2WritingPlanner,
+} from "./A2WritingWorkspaceSupport";
 
 export default function WritingCheatSheetTabs({ level, day, children }) {
   const baseId = useId();
@@ -15,11 +19,13 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
   const videoPanelId = `${baseId}-writing-video-panel`;
   const cheatSheetPanelId = `${baseId}-writing-cheat-sheet-panel`;
   const [writeView, setWriteView] = useState("task");
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  const isA2 = normalizedLevel === "A2";
   const writingCheatSheet = getWritingCheatSheet(level, day);
   const writingVideo = getWritingVideoResource(level, day);
   const writingVideoEmbed = getYouTubeEmbedUrl(writingVideo?.url);
   const hasWritingVideo = Boolean(writingVideo?.url);
-  const hasCheatSheet = writingCheatSheet.length > 0;
+  const hasCheatSheet = writingCheatSheet.length > 0 || isA2;
 
   useEffect(() => setWriteView("task"), [level, day]);
 
@@ -52,7 +58,7 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
             borderRadius: 999,
           }}
         >
-          Schreiben Task
+          {isA2 ? "Write + Mark My Letter" : "Schreiben Task"}
         </button>
         {hasWritingVideo ? (
           <button
@@ -83,7 +89,7 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
               borderRadius: 999,
             }}
           >
-            Cheat Sheet
+            {isA2 ? "Formal + Informal Cheat Sheet" : "Cheat Sheet"}
           </button>
         ) : null}
       </div>
@@ -93,7 +99,9 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
         role="tabpanel"
         hidden={writeView !== "task"}
         aria-labelledby={taskTabId}
+        style={{ display: writeView === "task" ? "grid" : "none", gap: 14 }}
       >
+        {isA2 ? <A2WritingPlanner /> : null}
         {children}
       </div>
 
@@ -169,6 +177,8 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
           aria-labelledby={cheatSheetTabId}
           style={{ display: "grid", gap: 16 }}
         >
+          {isA2 ? <A2LetterTemplateCheatSheet /> : null}
+
           {writingCheatSheet.map((section) => {
             const isTemplate = section.layout === "template";
 
