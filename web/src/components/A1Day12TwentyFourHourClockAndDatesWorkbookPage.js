@@ -2,7 +2,6 @@ import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const card = {
   ...styles.card,
@@ -63,7 +62,23 @@ const trueFalseAnswerPrompt = {
   padding: "9px 12px",
 };
 
-const horenLink = "https://drive.google.com/file/d/1CaSUhSWFlX1P8BT3BP22aGGy3Sl1R6BO/view?usp=sharing";
+const videoWrapper = {
+  position: "relative",
+  width: "100%",
+  paddingTop: "56.25%",
+  overflow: "hidden",
+  borderRadius: 12,
+  background: "#000",
+};
+
+const videoFrame = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  border: 0,
+};
+
 const teil1HeroImage = "https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1600&q=80";
 const teil2HeroImage = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=1600&q=80";
 const teil3HeroImage = "https://images.unsplash.com/photo-1495364141860-b0d03eccd065?auto=format&fit=crop&w=1600&q=80";
@@ -223,9 +238,18 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
         />
         <h2 style={sectionTitle}>Teil 3: Hörverstehen</h2>
         <p style={paragraph}>
-          Hören Thema: 24-Stunden-Uhr und Daten. Use the in-app player first. If playback fails, open the Google Drive link directly.
+          Hören Thema: 24-Stunden-Uhr und Daten. Sehen und hören Sie das Video. Beantworten Sie danach die Fragen.
         </p>
-        <CoursebookAudioPlayer url={horenLink} linkLabel="Open Hören Audio in Google Drive" />
+        <div style={videoWrapper}>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/vm22NeVPFNA"
+            title="A1 Day 12 Hörverstehen – 24-Stunden-Uhr und Daten"
+            style={videoFrame}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
         {horenQuestions.map((question) => (
           <div key={question.stem} style={questionBlock}>
             <p style={{ ...paragraph, fontWeight: 700 }}>{question.stem}</p>
