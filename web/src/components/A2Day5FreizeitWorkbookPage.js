@@ -91,8 +91,8 @@ export default function A2Day5FreizeitWorkbookPage() {
           ],
         },
       ]}
-      hoerenTask="Höre den Audio-Text über Anna und ihre Freizeit. Wähle die richtige Antwort und submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://drive.google.com/file/d/1TTqHwLUdG8yIZGkegj_UEAamiFpr1DMh/view?usp=sharing"
+      hoerenTask="Sieh dir das eingebettete Video über Anna und ihre Freizeit an. Wähle danach die richtige Antwort und submitte deine Antwortbuchstaben im Submit-Tab."
+      hoerenAudioUrl="https://youtu.be/V8gcgVcUGQM"
       hoerenQuestions={[
         {
           stem: "Was macht Anna abends gerne, wenn sie zu Hause ist?",
