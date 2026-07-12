@@ -101,8 +101,8 @@ export default function A2Day7WohnungSuchenWorkbookPage() {
           ],
         },
       ]}
-      hoerenTask="Höre die Wohnungsbeschreibung. Achte auf Stockwerk, Größe, Zimmer, Ausstattung und Nebenkosten. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://drive.google.com/file/d/1ULPeE_f3e12R4TXJaB2LE5qO7sa6vY0t/view?usp=sharing"
+      hoerenTask="Sieh dir das eingebettete Video zur Wohnungsbeschreibung an. Achte auf Stockwerk, Größe, Zimmer, Ausstattung und Nebenkosten. Submitte deine Antwortbuchstaben im Submit-Tab."
+      hoerenAudioUrl="https://youtu.be/hM1iPUq1Spg"
       hoerenQuestions={[
         {
           stem: "In welchem Stockwerk befindet sich die Wohnung?",
