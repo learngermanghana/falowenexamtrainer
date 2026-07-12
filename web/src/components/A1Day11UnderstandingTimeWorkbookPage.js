@@ -29,6 +29,23 @@ const optionLine = {
   lineHeight: 1.7,
 };
 
+const videoWrapper = {
+  position: "relative",
+  width: "100%",
+  paddingTop: "56.25%",
+  overflow: "hidden",
+  borderRadius: 12,
+  background: "#000",
+};
+
+const videoFrame = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  border: 0,
+};
+
 const teil1Questions = [
   { stem: "1. Wann steht Maria auf?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
   { stem: "2. Wann frühstückt Maria?", options: ["a) Um sieben Uhr", "b) Um acht Uhr", "c) Um neun Uhr"] },
@@ -121,16 +138,21 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       <div style={card}>
         <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Hören Sie die Texte und beantworten Sie die Fragen. Nutzen Sie für jeden Text den passenden Audio-Link.
+          Sehen und hören Sie das Video. Beantworten Sie danach die Fragen zu Text 1 und Text 2.
         </p>
 
+        <div style={videoWrapper}>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/W0tEZWxndLo"
+            title="A1 Day 11 Hören – Understanding Time"
+            style={videoFrame}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+
         <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 1: 12-Hour Clock</h3>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Audio-Link: {" "}
-          <a href="https://drive.google.com/file/d/1RZJsjFSwLVDPMMYboyqYcS2kovRtlKtt/view?usp=sharing" target="_blank" rel="noreferrer">
-            Open Audio 1
-          </a>
-        </p>
         {teil2Text1Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
             <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
@@ -145,12 +167,6 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           "Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die Bibliothek und
           lernt dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht seine
           Hausaufgaben. Abends um sieben Uhr isst er zu Abend und entspannt sich."
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Audio-Link: {" "}
-          <a href="https://drive.google.com/file/d/1EQm1zg_8_8VWx0f28klS8XBe738--Iuw/view?usp=sharing" target="_blank" rel="noreferrer">
-            Open Audio 2
-          </a>
         </p>
         {teil2Text2Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
