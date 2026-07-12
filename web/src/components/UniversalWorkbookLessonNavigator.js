@@ -207,7 +207,7 @@ const NavigationCard = ({ navigation }) => (
         </a>
       ) : (
         <a
-          href="/campus/exams"
+          href="/exams/overview"
           style={{ ...styles.primaryButton, textDecoration: "none", minHeight: 46, display: "inline-flex", alignItems: "center" }}
         >
           Open Exams Room
