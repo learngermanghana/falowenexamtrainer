@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { courseDebug } from "../lib/courseDebug";
+import {
+  getWritingVideoResource,
+  getYouTubeEmbedUrl,
+} from "../data/writingVideoResources";
+
+const WRITING_VIDEO_CARD_ATTRIBUTE = "data-b1-writing-video-support";
 
 const isB1WorkbookRoute = (pathname = "", search = "") => {
   const path = String(pathname || "").replace(/\/+$/, "");
@@ -40,6 +46,144 @@ const readTabs = (root) => {
   };
 };
 
+const findWritingSection = (root) => Array.from(root.querySelectorAll("section")).find((section) => {
+  const heading = String(section.querySelector("h2")?.textContent || "").toLowerCase();
+  return heading.includes("teil 2") && heading.includes("schreiben");
+}) || null;
+
+const findWritingInsertAnchor = (section) => {
+  const inlineWritingPanel = section.querySelector('[data-course-inline-practice="writing"]');
+  if (inlineWritingPanel) return inlineWritingPanel;
+
+  return Array.from(section.querySelectorAll("div")).find((candidate) => {
+    const labels = Array.from(candidate.children)
+      .filter((child) => child.tagName === "BUTTON")
+      .map((button) => String(button.textContent || "").trim().toLowerCase());
+    return labels.includes("schreiben") && labels.some((label) => label.includes("cheat sheet"));
+  }) || null;
+};
+
+const createWritingVideoCard = ({ resource, embedUrl, day }) => {
+  const card = document.createElement("div");
+  card.setAttribute(WRITING_VIDEO_CARD_ATTRIBUTE, String(day));
+  card.dataset.writingVideoKey = resource.key || `B1-day-${day}`;
+  card.setAttribute("aria-label", "B1 writing explanation video");
+  Object.assign(card.style, {
+    display: "grid",
+    gap: "12px",
+    border: "1px solid #bfdbfe",
+    borderRadius: "16px",
+    padding: "14px",
+    background: "#eff6ff",
+  });
+
+  const badge = document.createElement("span");
+  badge.textContent = "Writing Video · Essay Ideas";
+  Object.assign(badge.style, {
+    width: "fit-content",
+    borderRadius: "999px",
+    padding: "5px 10px",
+    background: "#dbeafe",
+    color: "#1e3a8a",
+    fontSize: ".82rem",
+    fontWeight: "800",
+  });
+  card.appendChild(badge);
+
+  const heading = document.createElement("h3");
+  heading.textContent = resource.title || "Writing explanation video";
+  Object.assign(heading.style, { margin: "0", color: "#1e3a8a" });
+  card.appendChild(heading);
+
+  if (resource.description) {
+    const description = document.createElement("p");
+    description.textContent = resource.description;
+    Object.assign(description.style, {
+      margin: "0",
+      color: "#475569",
+      lineHeight: "1.7",
+    });
+    card.appendChild(description);
+  }
+
+  if (embedUrl) {
+    const frameWrap = document.createElement("div");
+    Object.assign(frameWrap.style, {
+      position: "relative",
+      width: "100%",
+      paddingTop: "56.25%",
+      borderRadius: "14px",
+      overflow: "hidden",
+      background: "#0f172a",
+    });
+
+    const iframe = document.createElement("iframe");
+    iframe.title = resource.title || "Writing explanation video";
+    iframe.src = embedUrl;
+    iframe.loading = "lazy";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    Object.assign(iframe.style, {
+      position: "absolute",
+      inset: "0",
+      width: "100%",
+      height: "100%",
+      border: "0",
+    });
+    frameWrap.appendChild(iframe);
+    card.appendChild(frameWrap);
+  } else {
+    const link = document.createElement("a");
+    link.href = resource.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = "Open writing video";
+    Object.assign(link.style, {
+      width: "fit-content",
+      fontWeight: "800",
+      color: "#1d4ed8",
+    });
+    card.appendChild(link);
+  }
+
+  return card;
+};
+
+const ensureWritingVideoCard = (root, day) => {
+  const existing = root.querySelector(`[${WRITING_VIDEO_CARD_ATTRIBUTE}]`);
+  const resource = getWritingVideoResource("B1", day);
+
+  if (!resource) {
+    existing?.remove();
+    return { mounted: false, reason: "unmapped", day };
+  }
+
+  const writingSection = findWritingSection(root);
+  if (!writingSection) {
+    return { mounted: false, reason: "writing-section-not-mounted", day };
+  }
+
+  if (
+    existing
+    && writingSection.contains(existing)
+    && existing.dataset.writingVideoKey === resource.key
+  ) {
+    return { mounted: true, reason: "already-mounted", day, key: resource.key };
+  }
+
+  existing?.remove();
+  const card = createWritingVideoCard({
+    resource,
+    embedUrl: getYouTubeEmbedUrl(resource.url),
+    day,
+  });
+  const anchor = findWritingInsertAnchor(writingSection);
+  if (anchor) writingSection.insertBefore(card, anchor);
+  else writingSection.appendChild(card);
+
+  return { mounted: true, reason: "inserted", day, key: resource.key };
+};
+
 export default function B1WorkbookWritingCheatSheetInjector() {
   const location = useLocation();
 
@@ -48,19 +192,33 @@ export default function B1WorkbookWritingCheatSheetInjector() {
 
     const root = document.getElementById("root") || document.body;
     const day = getB1WorkbookDay(location.pathname);
-    let lastSnapshot = "";
+    let lastTabSnapshot = "";
+    let lastVideoSnapshot = "";
 
-    const report = (reason) => {
+    const reportTabs = (reason) => {
       const snapshot = readTabs(root);
       const serialized = JSON.stringify(snapshot);
-      if (reason !== "click" && serialized === lastSnapshot) return;
-      lastSnapshot = serialized;
+      if (reason !== "click" && serialized === lastTabSnapshot) return;
+      lastTabSnapshot = serialized;
       courseDebug("b1Workbook:tabs", {
         reason,
         day,
         query: location.search,
         ...snapshot,
       });
+    };
+
+    const syncWritingVideo = (reason) => {
+      const result = ensureWritingVideoCard(root, day);
+      const serialized = JSON.stringify(result);
+      if (reason !== "click" && serialized === lastVideoSnapshot) return;
+      lastVideoSnapshot = serialized;
+      courseDebug("b1Workbook:writingVideo", { reason, ...result });
+    };
+
+    const sync = (reason) => {
+      reportTabs(reason);
+      syncWritingVideo(reason);
     };
 
     const handleClick = (event) => {
@@ -72,13 +230,13 @@ export default function B1WorkbookWritingCheatSheetInjector() {
         selectedBeforeClick: tab.getAttribute("aria-selected"),
         disabled: Boolean(tab.disabled),
       });
-      window.setTimeout(() => report("click"), 0);
+      window.setTimeout(() => sync("click"), 0);
     };
 
-    report("mounted");
+    sync("mounted");
     document.addEventListener("click", handleClick, true);
 
-    const observer = new MutationObserver(() => report("react-update"));
+    const observer = new MutationObserver(() => sync("react-update"));
     observer.observe(root, {
       childList: true,
       subtree: true,
@@ -87,13 +245,14 @@ export default function B1WorkbookWritingCheatSheetInjector() {
     });
 
     const timers = [300, 1000, 2500].map((delay) =>
-      window.setTimeout(() => report(`timer-${delay}`), delay)
+      window.setTimeout(() => sync(`timer-${delay}`), delay)
     );
 
     return () => {
       document.removeEventListener("click", handleClick, true);
       observer.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
+      root.querySelector(`[${WRITING_VIDEO_CARD_ATTRIBUTE}]`)?.remove();
       courseDebug("b1Workbook:unmounted", { day });
     };
   }, [location.pathname, location.search]);
@@ -101,4 +260,13 @@ export default function B1WorkbookWritingCheatSheetInjector() {
   return null;
 }
 
-export const __TESTING__ = { getB1WorkbookDay, isB1WorkbookRoute, readTabs };
+export const __TESTING__ = {
+  WRITING_VIDEO_CARD_ATTRIBUTE,
+  createWritingVideoCard,
+  ensureWritingVideoCard,
+  findWritingInsertAnchor,
+  findWritingSection,
+  getB1WorkbookDay,
+  isB1WorkbookRoute,
+  readTabs,
+};
