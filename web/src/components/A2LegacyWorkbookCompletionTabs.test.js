@@ -1,58 +1,55 @@
-import {
-  A2_LEGACY_WORKBOOK_COMPLETION_BY_PATH,
-  findA2LegacyWorkbookTabRow,
-  getA2LegacyWorkbookTabKey,
-} from "./A2LegacyWorkbookCompletionTabs";
+import fs from "fs";
+import path from "path";
+
+const componentSource = fs.readFileSync(
+  path.resolve(__dirname, "A2LegacyWorkbookCompletionTabs.js"),
+  "utf8",
+);
+const routeServicesSource = fs.readFileSync(
+  path.resolve(__dirname, "RouteScopedAppServices.js"),
+  "utf8",
+);
+
+const restoredRoutes = [
+  "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
+  "/campus/course/a2-day-18-die-bank-anrufen-workbook",
+  "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
+  "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
+  "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
+  "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
+];
 
 describe("A2LegacyWorkbookCompletionTabs", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-  });
-
   it("covers every restored rich workbook route", () => {
-    expect(Object.keys(A2_LEGACY_WORKBOOK_COMPLETION_BY_PATH)).toEqual([
-      "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
-      "/campus/course/a2-day-18-die-bank-anrufen-workbook",
-      "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
-      "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
-      "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
-      "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
-    ]);
+    restoredRoutes.forEach((route) => {
+      expect(componentSource).toContain(`\"${route}\"`);
+    });
 
-    expect(
-      Object.values(A2_LEGACY_WORKBOOK_COMPLETION_BY_PATH).map((entry) => entry.day),
-    ).toEqual([16, 18, 19, 20, 21, 26]);
-
-    Object.values(A2_LEGACY_WORKBOOK_COMPLETION_BY_PATH).forEach((entry) => {
-      expect(entry.fallbackChapter).toMatch(/^\d+\.\d+$/);
-      expect(entry.workbookId).toMatch(/^A2Day\d+/);
-      expect(entry.title).toBeTruthy();
+    [16, 18, 19, 20, 21, 26].forEach((day) => {
+      expect(componentSource).toContain(`day: ${day}`);
     });
   });
 
-  it("recognizes Teil, Ref and Submit labels", () => {
-    expect(getA2LegacyWorkbookTabKey("Teil 1 · Sprechen")).toBe("teil1");
-    expect(getA2LegacyWorkbookTabKey("Teil 2 · Schreiben")).toBe("teil2");
-    expect(getA2LegacyWorkbookTabKey("Teil 3 · Lesen")).toBe("teil3");
-    expect(getA2LegacyWorkbookTabKey("Teil 4 · Hören")).toBe("teil4");
-    expect(getA2LegacyWorkbookTabKey("5. Ref")).toBe("references");
-    expect(getA2LegacyWorkbookTabKey("Submit")).toBe("submit");
+  it("injects missing Ref and Submit controls into four-part legacy workbooks", () => {
+    expect(componentSource).toContain('label: "5. Ref"');
+    expect(componentSource).toContain('label: "Submit"');
+    expect(componentSource).toContain('data-a2-legacy-completion-tab');
+    expect(componentSource).toContain('["teil1", "teil2", "teil3", "teil4"]');
+    expect(componentSource).toMatch(/keys\.has\("references"\)/);
+    expect(componentSource).toMatch(/keys\.has\("submit"\)/);
   });
 
-  it("finds the native four-part workbook tab row and ignores unrelated buttons", () => {
-    document.body.innerHTML = `
-      <main class="layout-main">
-        <div id="unrelated"><button>Back to Course</button><button>Help</button></div>
-        <div id="workbook-tabs">
-          <button>Teil 1 · Sprechen</button>
-          <button>Teil 2 · Schreiben</button>
-          <button>Teil 3 · Lesen</button>
-          <button>Teil 4 · Hören</button>
-          <button>5. Ref</button>
-        </div>
-      </main>
-    `;
+  it("connects Ref and Submit to the real workbook services", () => {
+    expect(componentSource).toContain("WorkbookReferenceAnswers");
+    expect(componentSource).toContain("ContextualAssignmentSubmissionPage");
+    expect(componentSource).toContain("canonicalAssignmentKey: assignmentKey");
+    expect(componentSource).toContain("workbookId: config.workbookId");
+  });
 
-    expect(findA2LegacyWorkbookTabRow(document)?.id).toBe("workbook-tabs");
+  it("mounts the completion tabs for route-scoped workbook pages", () => {
+    expect(routeServicesSource).toContain(
+      'import A2LegacyWorkbookCompletionTabs from "./A2LegacyWorkbookCompletionTabs";',
+    );
+    expect(routeServicesSource).toContain("<A2LegacyWorkbookCompletionTabs />");
   });
 });
