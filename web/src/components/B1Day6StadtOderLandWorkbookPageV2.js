@@ -16,7 +16,7 @@ import {
 } from "../data/b1Day6WorkbookData";
 import { styles } from "../styles";
 
-const AUDIO_FILE_ID = "1zLP6fMwvZNYaw_Vb0sHTMhy8-2GeRNca";
+const YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/kFlGr1TfV9A";
 const card = { ...styles.card, display: "grid", gap: 14 };
 const title = { margin: 0, fontSize: "1.15rem" };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -121,9 +121,16 @@ export default function B1Day6StadtOderLandWorkbookPageV2() {
         <section style={card}>
           <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C.">
-            <p style={{ margin: 0 }}>Listen for information about WGs, family houses, city apartments and sustainable housing.</p>
+            <p style={{ margin: 0 }}>Watch the embedded video and listen for information about WGs, family houses, city apartments and sustainable housing.</p>
           </WorkbookTaskCard>
-          <iframe src={`https://drive.google.com/file/d/${AUDIO_FILE_ID}/preview`} title="B1 Day 6 Hören" allow="autoplay" style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 12 }} />
+          <iframe
+            src={YOUTUBE_EMBED_URL}
+            title="B1 Day 6 Hören video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 12 }}
+          />
           <QuestionList items={B1_DAY6_LISTENING_QUESTIONS} />
           <WorkbookSubmissionReminder />
           <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
