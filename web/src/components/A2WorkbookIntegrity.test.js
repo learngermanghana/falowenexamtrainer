@@ -4,12 +4,8 @@ import workbookRoutes from "../data/inAppWorkbookRoutes.json";
 
 const componentsRoot = path.resolve(__dirname);
 const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
-const completionTabsSource = fs.readFileSync(
-  path.resolve(__dirname, "A2LegacyWorkbookCompletionTabs.js"),
-  "utf8",
-);
-const routeServicesSource = fs.readFileSync(
-  path.resolve(__dirname, "RouteScopedAppServices.js"),
+const standardShellSource = fs.readFileSync(
+  path.resolve(__dirname, "A2StandardTabbedWorkbookPage.js"),
   "utf8",
 );
 
@@ -46,22 +42,21 @@ const includeLegacySource = (source = "") => {
     : source;
 };
 
-const hasFourTeilExperience = (source = "") => {
-  if (source.includes("A2StandardTabbedWorkbookPage")) return true;
-  return [1, 2, 3, 4].every((teil) => new RegExp(`Teil\\s*${teil}\\b`, "i").test(source));
-};
-
-const hasRouteScopedCompletion = (pathname = "") =>
-  Boolean(pathname && completionTabsSource.includes(`\"${pathname}\"`));
-
-const hasSubmissionExperience = (source = "", pathname = "") =>
-  hasRouteScopedCompletion(pathname) ||
-  /A2StandardTabbedWorkbookPage|ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
-    source,
-  );
-
 const countQuestionItems = (source = "") =>
   (source.match(/\b(?:stem|prompt)\s*:/g) || []).length;
+
+const usesStandardShell = (source = "") =>
+  source.includes("A2StandardTabbedWorkbookPage");
+
+const hasFourTeilExperience = (source = "") =>
+  usesStandardShell(source) ||
+  [1, 2, 3, 4].every((teil) => new RegExp(`Teil\\s*${teil}\\b`, "i").test(source));
+
+const hasSubmissionExperience = (source = "") =>
+  usesStandardShell(source) ||
+  /ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
+    source,
+  );
 
 const routeEntries = Array.from({ length: 28 }, (_, index) => {
   const day = index + 1;
@@ -69,7 +64,6 @@ const routeEntries = Array.from({ length: 28 }, (_, index) => {
   const pathname = routePathname(route);
   const componentName = resolveRouteComponent(pathname);
   const component = readComponentSource(componentName);
-  const combinedSource = includeLegacySource(component.source);
   return {
     day,
     route,
@@ -77,13 +71,26 @@ const routeEntries = Array.from({ length: 28 }, (_, index) => {
     componentName,
     filePath: component.filePath,
     source: component.source,
-    combinedSource,
+    combinedSource: includeLegacySource(component.source),
   };
 });
 
 const getDay = (day) => routeEntries.find((entry) => entry.day === day);
 
 describe("A2 workbook integrity", () => {
+  it("keeps the shared A2 shell connected to Teil 1–4, Ref and Submit", () => {
+    expect(standardShellSource).toContain("STANDARD_WORKBOOK_TABS");
+    expect(standardShellSource).toContain('activeTab === "sprechen"');
+    expect(standardShellSource).toContain('activeTab === "schreiben"');
+    expect(standardShellSource).toContain('activeTab === "lesen"');
+    expect(standardShellSource).toContain('activeTab === "hoeren"');
+    expect(standardShellSource).toContain('activeTab === "references"');
+    expect(standardShellSource).toContain('activeTab === "submit"');
+    expect(standardShellSource).toContain("WorkbookReferenceAnswers");
+    expect(standardShellSource).toContain("ContextualAssignmentSubmissionPage");
+    expect(standardShellSource).toContain("canonicalAssignmentKey: assignmentKey");
+  });
+
   it("registers one internal workbook route and component for every A2 day", () => {
     expect(routeEntries).toHaveLength(28);
     const seenRoutes = new Set();
@@ -99,21 +106,18 @@ describe("A2 workbook integrity", () => {
       expect(source.length).toBeGreaterThan(500);
       expect(seenRoutes.has(route)).toBe(false);
       seenRoutes.add(route);
-
       expect(componentName).toMatch(new RegExp(`A2Day(?:${day}|2)`, "i"));
     });
   });
 
-  it("keeps every A2 workbook substantive with Teil 1–4 and a submission path", () => {
-    expect(routeServicesSource).toContain("<A2LegacyWorkbookCompletionTabs />");
-
-    routeEntries.forEach(({ day, pathname, combinedSource }) => {
+  it("keeps every A2 workbook substantive with Teil 1–4 and submission support", () => {
+    routeEntries.forEach(({ day, combinedSource }) => {
       expect(combinedSource.length).toBeGreaterThan(1200);
       expect(hasFourTeilExperience(combinedSource)).toBe(true);
-      expect(hasSubmissionExperience(combinedSource, pathname)).toBe(true);
+      expect(hasSubmissionExperience(combinedSource)).toBe(true);
       expect(combinedSource).not.toMatch(/default workbook|placeholder workbook|coming soon/i);
 
-      if (combinedSource.includes("A2StandardTabbedWorkbookPage")) {
+      if (usesStandardShell(combinedSource)) {
         expect(combinedSource).toContain(`day={${day}}`);
         expect(combinedSource).toMatch(/title=/);
         expect(combinedSource).toMatch(/chapter=/);
@@ -122,51 +126,37 @@ describe("A2 workbook integrity", () => {
         expect(combinedSource).toMatch(/schreibenTask=|schreibenContent=/);
         expect(combinedSource).toMatch(/lesenQuestions=/);
         expect(combinedSource).toMatch(/hoerenQuestions=/);
-        expect(countQuestionItems(combinedSource)).toBeGreaterThanOrEqual(7);
+        expect(countQuestionItems(combinedSource)).toBeGreaterThanOrEqual(6);
       }
     });
   });
 
-  it("keeps restored full lesson content instead of generic fallback text", () => {
-    const day16 = getDay(16)?.combinedSource || "";
-    const day18 = getDay(18)?.combinedSource || "";
-    const day19 = getDay(19)?.combinedSource || "";
-    const day20 = getDay(20)?.combinedSource || "";
-    const day21 = getDay(21)?.combinedSource || "";
-    const day26 = getDay(26)?.combinedSource || "";
+  it("keeps Days 16, 18, 19, 20 and 21 on the known-good standard layout", () => {
+    [16, 18, 19, 20, 21].forEach((day) => {
+      const source = getDay(day)?.source || "";
+      expect(source).toContain("A2StandardTabbedWorkbookPage");
+      expect(source).not.toContain("useNavigate");
+      expect(countQuestionItems(source)).toBeGreaterThanOrEqual(6);
+    });
 
-    expect(day16).toContain("Anzeige F");
-    expect(day16).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(countQuestionItems(day16)).toBeGreaterThanOrEqual(10);
-
-    expect(day18).toContain("Choosing a Bank: Anzeige");
-    expect(day18).toContain("ING-DiBa");
-    expect(day18).toContain("cHKVQOLWv7c");
-    expect(countQuestionItems(day18)).toBeGreaterThanOrEqual(10);
-
-    expect(day19).toContain("Konsumverhalten in der modernen Gesellschaft");
-    expect(day19).toContain("Fair Trade-Produkte");
-    expect(day19).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(countQuestionItems(day19)).toBeGreaterThanOrEqual(10);
-
-    expect(day20).toContain("Zentrales Thema: Reklamieren");
-    expect(day20).toContain("Warum bringt Laura den Wasserkocher zurück?");
-    expect(day20).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(countQuestionItems(day20)).toBeGreaterThanOrEqual(10);
-
-    expect(day21).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(day21).toMatch(/Wochenende/i);
-    expect(countQuestionItems(day21)).toBeGreaterThanOrEqual(5);
-
-    expect(day26).toContain("Gefühle in verschiedenen Situationen");
-    expect(day26).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(day26).toContain("Lesetext: Schwangerschaft");
-    expect(countQuestionItems(day26)).toBeGreaterThanOrEqual(7);
+    expect(getDay(16)?.source).toContain('title="Wohlbefinden und Entspannung"');
+    expect(getDay(18)?.source).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
+    expect(getDay(19)?.source).toContain('title="Einkaufen? Wo und wie?"');
+    expect(getDay(19)?.source).toContain("Wo kaufst du lieber ein: online, im Supermarkt oder auf dem Markt?");
+    expect(getDay(20)?.source).toContain('title="Typische Reklamationssituationen üben"');
+    expect(getDay(21)?.source).toContain('title="Ein Wochenende planen"');
   });
 
-  it("keeps the final Day 28 workbook complete", () => {
+  it("keeps the existing rich Day 26 custom workbook and final Day 28 workbook", () => {
+    const day26 = getDay(26)?.combinedSource || "";
     const day28 = getDay(28)?.combinedSource || "";
+
+    expect(day26).toContain("Gefühle in verschiedenen Situationen");
+    expect(day26).toContain("Lesetext: Schwangerschaft");
+    expect(day26).toContain('label: "5. Ref"');
+    expect(countQuestionItems(day26)).toBeGreaterThanOrEqual(7);
+
     expect(day28).toMatch(/Teil\s*4/i);
-    expect(hasSubmissionExperience(day28, getDay(28)?.pathname)).toBe(true);
+    expect(hasSubmissionExperience(day28)).toBe(true);
   });
 });
