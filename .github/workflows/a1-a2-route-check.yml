@@ -20,6 +20,8 @@ on:
       - "web/src/components/A2Day*Workbook*.js"
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
+      - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
+      - "web/src/components/A2Days21To26StandardNavigation.test.js"
       - "web/src/components/RouteScopedAppServices.js"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
@@ -71,10 +73,10 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js
-      - name: Test shared A2 workbook experience
+      - name: Test shared A2 workbook experience and Days 21-26 content preservation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2SharedWorkbookRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2SharedWorkbookRegression.test.js src/components/A2Days21To26StandardNavigation.test.js
       - working-directory: web
         run: npm run build
