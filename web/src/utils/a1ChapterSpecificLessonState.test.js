@@ -19,12 +19,29 @@ describe("A1 chapter-specific lesson state", () => {
     ).toBe(true);
   });
 
-  it("keeps state when it already matches the requested chapter", () => {
+  test.each([
+    ["/campus/course/lesson/A1/2", "?chapter=1.1", "1.1", "0.2_1.1"],
+    ["/campus/course/lesson/A1/16", "?chapter=10", "10", "9_10"],
+    ["/campus/course/lesson/A1/18", "?chapter=12.2", "12.2", "12.1_12.2"],
+  ])(
+    "resets matching-looking state on split A1 lessons because it can retain the first chapter content",
+    (pathname, search, displayChapter, chapter) => {
+      expect(
+        shouldResetA1ChapterSpecificLessonState({
+          pathname,
+          search,
+          state: { entry: { displayChapter, chapter } },
+        }),
+      ).toBe(true);
+    },
+  );
+
+  it("keeps matching state on a normal single-chapter A1 lesson", () => {
     expect(
       shouldResetA1ChapterSpecificLessonState({
-        pathname: "/campus/course/lesson/A1/2",
-        search: "?chapter=1.1",
-        state: { entry: { displayChapter: "1.1", chapter: "0.2_1.1" } },
+        pathname: "/campus/course/lesson/A1/7",
+        search: "?chapter=3",
+        state: { entry: { displayChapter: "3", chapter: "3" } },
       }),
     ).toBe(false);
   });

@@ -45,14 +45,14 @@ describe("A1WorkbookSectionTabs", () => {
     expect(groups[1].elements.map((element) => element.id)).toEqual(["teil2", "support"]);
   });
 
-  it("does not hide a workbook that already has native Assignment and Submit tabs", () => {
+  it("adds the Teil division to a native tutor-marked Assignment and Submit shell", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div id="native-workbook-root">
-          <div role="tablist"><button>Assignment</button><button>Submit</button></div>
-          <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1 · Lesen</button><button>Teil 2 · Hören</button></nav>
-          <div><h2>Teil 1 · Lesen</h2></div>
-          <div><h2>Teil 2 · Hören</h2></div>
+          <div role="tablist"><button>Assignment</button><button id="native-submit">Submit</button></div>
+          <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1 · Lesen</button><button>Teil 2 · Hören</button><button>Submit</button></nav>
+          <section id="teil1"><h2>Teil 1 · Lesen</h2></section>
+          <section id="teil2"><h2>Teil 2 · Hören</h2></section>
         </div>
       </main>
     `;
@@ -64,10 +64,11 @@ describe("A1WorkbookSectionTabs", () => {
         pathname: "/campus/course/a1-day-11-understanding-time-workbook",
         search: "",
       })
-    ).toBe(false);
+    ).toBe(true);
     expect(document.querySelector("#native-workbook-root").style.display).toBe("");
-    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
-    expect(document.querySelector('[data-a1-tab-managed="true"]')).toBeNull();
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).not.toBeNull();
+    expect(document.querySelector("#teil1").style.display).toBe("none");
+    expect(document.querySelector("#teil2").style.display).toBe("none");
   });
 
   it("shows a compact overview first and only the selected Teil after clicking", () => {
@@ -142,6 +143,33 @@ describe("A1WorkbookSectionTabs", () => {
     expect(submitSpy).toHaveBeenCalledTimes(1);
     __TESTING__.restoreManagedElements(document);
     expect(document.querySelector("#teil1").style.display).toBe("");
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
+  });
+
+  it("restores a practice workbook when its Teil heading is removed after mount", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1</button></nav>
+        <section id="practice"><h2>Teil 1 · Practice</h2><p>Day 3 self-practice content</p></section>
+      </main>
+    `;
+
+    expect(
+      applyA1WorkbookSectionTabs(document, {
+        pathname: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+        search: "",
+      })
+    ).toBe(true);
+    expect(document.querySelector("#practice").style.display).toBe("none");
+
+    document.querySelector("#practice h2").remove();
+    expect(
+      applyA1WorkbookSectionTabs(document, {
+        pathname: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+        search: "",
+      })
+    ).toBe(false);
+    expect(document.querySelector("#practice").style.display).toBe("");
     expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
   });
 });
