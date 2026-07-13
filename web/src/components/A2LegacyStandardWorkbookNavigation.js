@@ -97,7 +97,7 @@ export const findA2LegacyWorkbookTabRow = (root = document) => {
 };
 
 const findNativeTabButton = (row, standardKey) => {
-  const legacyKey = STANDARD_TO_LEGACY_KEY[standardKey];
+  const legacyKey = STANDARD_TO_LEGACY_KEY[standardKey] || standardKey;
   if (!row || !legacyKey) return null;
 
   return (
@@ -114,6 +114,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
   const normalizedPath = normalizePath(location.pathname);
   const config = A2_LEGACY_STANDARD_NAV_BY_PATH[normalizedPath] || null;
   const [activeTab, setActiveTab] = useState("sprechen");
+  const [portalTab, setPortalTab] = useState("");
   const [navRoot, setNavRoot] = useState(null);
   const [panelRoot, setPanelRoot] = useState(null);
   const nativeRowRef = useRef(null);
@@ -130,6 +131,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
 
   useEffect(() => {
     setActiveTab("sprechen");
+    setPortalTab("");
   }, [normalizedPath]);
 
   useEffect(() => {
@@ -209,20 +211,29 @@ export default function A2LegacyStandardWorkbookNavigation() {
   const selectTab = useCallback((tabKey) => {
     setActiveTab(tabKey);
 
-    if (tabKey === "references" || tabKey === "submit") return;
-
     const nativeButton = findNativeTabButton(nativeRowRef.current, tabKey);
-    nativeButton?.click();
+    if (nativeButton) {
+      setPortalTab("");
+      nativeButton.click();
+      return;
+    }
+
+    if (tabKey === "references" || tabKey === "submit") {
+      setPortalTab(tabKey);
+      return;
+    }
+
+    setPortalTab("");
   }, []);
 
   useEffect(() => {
-    if (activeTab !== "references" && activeTab !== "submit") return undefined;
+    if (!portalTab) return undefined;
     const timer = window.setTimeout(
       () => panelRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" }),
       0,
     );
     return () => window.clearTimeout(timer);
-  }, [activeTab]);
+  }, [portalTab]);
 
   if (!config) return null;
 
@@ -239,14 +250,14 @@ export default function A2LegacyStandardWorkbookNavigation() {
     : null;
 
   const completionPanel =
-    panelRoot && (activeTab === "references" || activeTab === "submit")
+    panelRoot && portalTab
       ? createPortal(
           <section
             ref={panelRef}
-            data-a2-standard-legacy-panel={activeTab}
+            data-a2-standard-legacy-panel={portalTab}
             style={{ ...styles.card, display: "grid", gap: 12, border: "2px solid #2563eb" }}
           >
-            {activeTab === "references" ? (
+            {portalTab === "references" ? (
               <WorkbookReferenceAnswers
                 level="A2"
                 lesson={{
