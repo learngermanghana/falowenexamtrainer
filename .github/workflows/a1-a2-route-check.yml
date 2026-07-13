@@ -12,7 +12,11 @@ on:
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/utils/courseWorkbookRoutes.js"
+      - "web/src/components/A1WorkbookSectionTabs.js"
+      - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
+      - "web/src/components/A2Day16WohlbefindenUndEntspannungWorkbookPage.js"
+      - "web/src/components/A2Day16CustomWorkbook.test.js"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
 
@@ -31,6 +35,6 @@ jobs:
       - working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/data/a1RouteAlignment.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/data/a1RouteAlignment.test.js src/components/A1WorkbookSectionTabs.test.js src/components/A2Day16CustomWorkbook.test.js
       - working-directory: web
         run: npm run build
