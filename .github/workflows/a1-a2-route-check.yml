@@ -42,11 +42,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="uses only internal registered routes"
-      - name: Test runtime A1 routes
+      - name: Test resolved A1 routes
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="aligns every runtime A1"
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="aligns every resolved A1"
       - name: Test fragile A1 assignments
         working-directory: web
         env:
