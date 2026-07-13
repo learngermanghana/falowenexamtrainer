@@ -8,17 +8,21 @@ import {
   getCurriculumEntriesForLevel as getRawCurriculumEntriesForLevel,
   normalizeLevel,
 } from "./lessonCatalog.js";
+import { alignA1CurriculumEntries } from "./a1RouteAlignment";
 import { alignB2CurriculumEntries } from "./b2LessonContentAlignment";
 
+const alignRuntimeCurriculumEntries = (entries = []) =>
+  alignB2CurriculumEntries(alignA1CurriculumEntries(entries));
+
 const CANONICAL_CURRICULUM = lessonCatalog;
-const CURRICULUM_ENTRIES = alignB2CurriculumEntries(RAW_CURRICULUM_ENTRIES);
+const CURRICULUM_ENTRIES = alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES);
 const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   if (!acc[entry.level]) acc[entry.level] = [];
   acc[entry.level].push(entry);
   return acc;
 }, {});
 const getCurriculumEntriesForLevel = (level) =>
-  alignB2CurriculumEntries(getRawCurriculumEntriesForLevel(level));
+  alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
 
 export {
   CANONICAL_CURRICULUM,
