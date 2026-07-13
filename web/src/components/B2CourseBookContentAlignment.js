@@ -4,6 +4,8 @@ import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
 
 const COURSE_BOOK_PATH = "/campus/course";
 const ALIGNED_ATTRIBUTE = "data-b2-content-aligned";
+const LESSON_ACTION_ALIGNED_ATTRIBUTE = "data-course-book-lesson-action-aligned";
+const LESSON_CARD_ALIGNED_ATTRIBUTE = "data-course-book-lesson-card-aligned";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -47,6 +49,50 @@ const isMetaLabel = (value = "") => {
     text === "practice only" ||
     text === "self-marked complete"
   );
+};
+
+const setStyleIfChanged = (element, property, value) => {
+  if (!element || element.style[property] === value) return false;
+  element.style[property] = value;
+  return true;
+};
+
+export const alignCourseBookLessonActions = (
+  root = document,
+  pathname = window.location?.pathname,
+) => {
+  if (!root?.querySelectorAll || normalizePath(pathname) !== COURSE_BOOK_PATH) return 0;
+
+  let changed = 0;
+  Array.from(root.querySelectorAll('article a[href*="/campus/course/lesson/"]')).forEach((anchor) => {
+    const article = anchor.closest("article");
+    if (!article) return;
+
+    let cardChanged = false;
+    cardChanged = setStyleIfChanged(article, "position", "relative") || cardChanged;
+    cardChanged = setStyleIfChanged(article, "paddingBottom", "74px") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "position", "absolute") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "right", "14px") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "bottom", "14px") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "minWidth", "136px") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "justifyContent", "center") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "boxSizing", "border-box") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "textAlign", "center") || cardChanged;
+    cardChanged = setStyleIfChanged(anchor, "whiteSpace", "nowrap") || cardChanged;
+
+    if (article.getAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE) !== "true") {
+      article.setAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE, "true");
+      cardChanged = true;
+    }
+    if (anchor.getAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE) !== "true") {
+      anchor.setAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE, "true");
+      cardChanged = true;
+    }
+
+    if (cardChanged) changed += 1;
+  });
+
+  return changed;
 };
 
 const alignLessonArticle = (article, alignment) => {
@@ -146,6 +192,7 @@ export default function B2CourseBookContentAlignment() {
     let scheduled = false;
     const apply = () => {
       scheduled = false;
+      alignCourseBookLessonActions(document, location.pathname);
       applyB2CourseBookContentAlignment(document, location.pathname);
     };
     const schedule = () => {
@@ -176,4 +223,5 @@ export const __TESTING__ = {
   isMetaLabel,
   alignLessonArticle,
   alignNextLessonCard,
+  setStyleIfChanged,
 };

@@ -1,4 +1,7 @@
-import { applyB2CourseBookContentAlignment } from "./B2CourseBookContentAlignment";
+import {
+  alignCourseBookLessonActions,
+  applyB2CourseBookContentAlignment,
+} from "./B2CourseBookContentAlignment";
 
 describe("B2CourseBookContentAlignment", () => {
   beforeEach(() => {
@@ -49,6 +52,33 @@ describe("B2CourseBookContentAlignment", () => {
     expect(document.querySelector("a").getAttribute("aria-label")).toBe("Open Konsum und Geld");
   });
 
+  it("anchors every lesson action at the bottom-right of its card", () => {
+    document.body.innerHTML = `
+      <article style="padding: 14px">
+        <div><h3>A2 lesson</h3><a href="/campus/course/lesson/A2/8">Start lesson</a></div>
+        <p>Long lesson description.</p>
+      </article>
+      <article style="padding: 14px">
+        <div><h3>B2 lesson</h3><a href="/campus/course/lesson/B2/9">Start lesson</a></div>
+        <p>Another lesson description.</p>
+      </article>
+    `;
+
+    expect(alignCourseBookLessonActions(document, "/campus/course")).toBe(2);
+    document.querySelectorAll("article").forEach((article) => {
+      const action = article.querySelector("a");
+      expect(article.style.position).toBe("relative");
+      expect(article.style.paddingBottom).toBe("74px");
+      expect(article.getAttribute("data-course-book-lesson-card-aligned")).toBe("true");
+      expect(action.style.position).toBe("absolute");
+      expect(action.style.right).toBe("14px");
+      expect(action.style.bottom).toBe("14px");
+      expect(action.style.minWidth).toBe("136px");
+      expect(action.style.justifyContent).toBe("center");
+      expect(action.getAttribute("data-course-book-lesson-action-aligned")).toBe("true");
+    });
+  });
+
   it("does not touch the Course Book when another level is selected", () => {
     document.body.innerHTML = `
       <select><option value="A2" selected>A2</option><option value="B2">B2</option></select>
@@ -68,5 +98,6 @@ describe("B2CourseBookContentAlignment", () => {
       <article><h3>Politik und Engagement</h3><a href="/campus/course/lesson/B2/8">Open Lesson</a></article>
     `;
     expect(applyB2CourseBookContentAlignment(document, "/campus/course/lesson/B2/8")).toBe(0);
+    expect(alignCourseBookLessonActions(document, "/campus/course/lesson/B2/8")).toBe(0);
   });
 });
