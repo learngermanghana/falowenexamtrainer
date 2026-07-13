@@ -114,17 +114,60 @@ const A1CourseBookScopeCleaner = () => {
   return null;
 };
 
+const AutoOpenFirstA1WorkbookTeil = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    let cancelled = false;
+    const openFirstTeil = () => {
+      if (cancelled) return true;
+      const main = document.querySelector("main.layout-main") || document.querySelector("main");
+      if (!main) return false;
+      const activeView = main.getAttribute("data-a1-active-workbook-view");
+      if (activeView && activeView !== "overview") return true;
+      const firstTeil = Array.from(main.querySelectorAll('[data-a1-teil-navigation="true"] button')).find((button) =>
+        /^\s*Teil\s*1\b/i.test(String(button.textContent || ""))
+      );
+      if (!firstTeil) return false;
+      firstTeil.click();
+      return true;
+    };
+
+    const timers = [0, 80, 250, 700].map((delay) =>
+      window.setTimeout(openFirstTeil, delay)
+    );
+    const observer = new MutationObserver(() => {
+      if (openFirstTeil()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timer) => window.clearTimeout(timer));
+      observer.disconnect();
+    };
+  }, [location.pathname, location.search]);
+
+  return null;
+};
+
 export default function RouteScopedAppServices() {
   const location = useLocation();
 
   if (isPublicAuthPath(location.pathname)) return null;
 
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
+  const params = new URLSearchParams(location.search || "");
+  const lessonView = String(params.get("view") || "").toLowerCase();
   const isCourseBook = normalizedPath === "/campus/course";
   const isA1Chapter7TimePage = normalizedPath === A1_CHAPTER7_TIME_PATH;
-  const isA1LessonOrWorkbook =
-    /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath) ||
-    /^\/campus\/course\/a1-day-.*(?:workbook|grammar.*)$/i.test(normalizedPath);
+  const isA1DynamicLesson = /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath);
+  const isA1NamedWorkbook = /^\/campus\/course\/a1-day-.*workbook$/i.test(normalizedPath);
+  const isA1NamedGrammar = /^\/campus\/course\/a1-day-.*grammar.*$/i.test(normalizedPath);
+  const isA1LessonOrWorkbook = isA1DynamicLesson || isA1NamedWorkbook || isA1NamedGrammar;
+  const isA1WorkbookView =
+    isA1NamedWorkbook ||
+    (isA1DynamicLesson && lessonView !== "grammar" && lessonView !== "learn");
   const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage;
 
   return (
@@ -146,7 +189,8 @@ export default function RouteScopedAppServices() {
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
-      {isA1LessonOrWorkbook ? <A1WorkbookSectionTabs /> : null}
+      {isA1WorkbookView ? <A1WorkbookSectionTabs /> : null}
+      {isA1WorkbookView ? <AutoOpenFirstA1WorkbookTeil /> : null}
       {isA1Chapter7TimePage ? <A1Chapter7SeparableVerbCleaner /> : null}
       {isCourseBook ? <B2CourseBookContentAlignment /> : null}
       {isCourseBook ? <A1CourseBookScopeCleaner /> : null}
