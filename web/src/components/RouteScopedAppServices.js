@@ -20,7 +20,6 @@ import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
 import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
-import A2LegacyWorkbookCompletionTabs from "./A2LegacyWorkbookCompletionTabs";
 import B2CourseBookContentAlignment from "./B2CourseBookContentAlignment";
 import CourseDebugPanel from "./CourseDebugPanel";
 
@@ -189,7 +188,6 @@ export default function RouteScopedAppServices() {
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
-      <A2LegacyWorkbookCompletionTabs />
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
       {isA1WorkbookView ? <A1WorkbookSectionTabs /> : null}
       {isA1WorkbookView ? <AutoOpenFirstA1WorkbookTeil /> : null}
