@@ -24,10 +24,12 @@ test("renders a central question with one visible connection per branch", () => 
 test("selects a branch and shows compact speaking support", async () => {
   render(<SpeakingMindMap config={config} />);
 
-  await userEvent.click(screen.getByRole("button", { name: /Daten/i }));
+  await userEvent.click(
+    screen.getByRole("button", { name: new RegExp(config.branches[1].label, "i") }),
+  );
 
   expect(
-    screen.getByRole("heading", { name: "Daten" }),
+    screen.getByRole("heading", { name: config.branches[1].label }),
   ).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].guidingQuestion)).toBeInTheDocument();
   expect(screen.getByText(config.branches[1].sentenceStarter)).toBeInTheDocument();
@@ -41,9 +43,9 @@ test("moves through the configured speaking route", async () => {
   await userEvent.click(screen.getByRole("button", { name: /^Next$/i }));
 
   expect(
-    screen.getByRole("heading", { name: "Daten" }),
+    screen.getByRole("heading", { name: config.branches[1].label }),
   ).toBeInTheDocument();
-  expect(screen.getByText("2/5")).toBeInTheDocument();
+  expect(screen.getByText(/2\s*\/\s*5/)).toBeInTheDocument();
 });
 
 test("starts A2 focus mode collapsed and opens extra speaking help", async () => {
