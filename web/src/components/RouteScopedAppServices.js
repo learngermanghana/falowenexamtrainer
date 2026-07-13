@@ -17,6 +17,7 @@ import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetIn
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
+import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import CourseDebugPanel from "./CourseDebugPanel";
 
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
@@ -69,6 +70,46 @@ const PublicAdsLoader = () => {
   return null;
 };
 
+const A1CourseBookScopeCleaner = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if ((location.pathname.replace(/\/+$/, "") || "/") !== "/campus/course") return undefined;
+
+    const cleanWhenAnotherLevelIsSelected = () => {
+      const levelSelect = Array.from(document.querySelectorAll("select")).find((select) =>
+        Array.from(select.options || []).some((option) => /^A1$/i.test(String(option.value || option.textContent || "").trim()))
+      );
+      if (!levelSelect || String(levelSelect.value || "").trim().toUpperCase() === "A1") return;
+      document.querySelectorAll("[data-a1-course-card]").forEach((element) => element.removeAttribute("data-a1-course-card"));
+      document.querySelectorAll("[data-a1-course-action]").forEach((element) => element.removeAttribute("data-a1-course-action"));
+    };
+
+    let scheduled = false;
+    const scheduleClean = () => {
+      if (scheduled) return;
+      scheduled = true;
+      const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
+      schedule(() => {
+        scheduled = false;
+        cleanWhenAnotherLevelIsSelected();
+      });
+    };
+
+    scheduleClean();
+    const observer = new MutationObserver(scheduleClean);
+    observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("change", scheduleClean, true);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("change", scheduleClean, true);
+    };
+  }, [location.pathname]);
+
+  return null;
+};
+
 export default function RouteScopedAppServices() {
   const location = useLocation();
 
@@ -76,6 +117,10 @@ export default function RouteScopedAppServices() {
 
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
   const isCourseBook = normalizedPath === "/campus/course";
+  const isA1LessonOrWorkbook =
+    /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath) ||
+    /^\/campus\/course\/a1-day-.*(?:workbook|grammar.*)$/i.test(normalizedPath);
+  const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook;
 
   return (
     <>
@@ -95,6 +140,8 @@ export default function RouteScopedAppServices() {
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
+      {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
+      {isCourseBook ? <A1CourseBookScopeCleaner /> : null}
       <CourseDebugPanel />
     </>
   );
