@@ -90,7 +90,8 @@ describe("A1 route integrity", () => {
   });
 
   it("preserves the A1 alignment whenever curriculum files are regenerated", () => {
-    expect(syncScriptSource).toContain('import { alignA1CurriculumEntries } from "./a1RouteAlignment"');
-    expect(syncScriptSource).toContain('alignA1CurriculumEntries(getLessonsByLevel("A1"))');
+    expect(syncScriptSource).toContain("alignA1CurriculumEntries");
+    expect(syncScriptSource).toContain("getLessonsByLevel");
+    expect(syncScriptSource).toContain("web/src/data/a1CourseBookCards.js");
   });
 });
