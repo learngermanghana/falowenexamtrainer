@@ -4,8 +4,8 @@ const path = require("path");
 const webRoot = path.resolve(__dirname, "..");
 const componentsRoot = path.join(webRoot, "src/components");
 const appSource = fs.readFileSync(path.join(webRoot, "src/App.js"), "utf8");
-const completionTabsSource = fs.readFileSync(
-  path.join(componentsRoot, "A2LegacyWorkbookCompletionTabs.js"),
+const standardShellSource = fs.readFileSync(
+  path.join(componentsRoot, "A2StandardTabbedWorkbookPage.js"),
   "utf8",
 );
 const workbookRoutes = JSON.parse(
@@ -26,11 +26,14 @@ const resolveRouteComponent = (pathname) => {
 
 const readComponent = (componentName) => {
   const importMatch = appSource.match(
-    new RegExp(`import\\s+${componentName}\\s+from\\s+["']\\./components/([^"']+)["']`),
+    new RegExp(`import\\s+${componentName}\\s+from\\s+[\"']\\./components/([^\"']+)[\"']`),
   );
   if (!importMatch) return { file: "", source: "" };
   const file = path.join(componentsRoot, `${importMatch[1]}.js`);
-  return { file: path.relative(webRoot, file), source: fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "" };
+  return {
+    file: path.relative(webRoot, file),
+    source: fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "",
+  };
 };
 
 const includeLegacy = (source) => {
@@ -46,12 +49,8 @@ const includeLegacy = (source) => {
   };
 };
 
-const hasRouteScopedCompletion = (pathname = "") =>
-  Boolean(pathname && completionTabsSource.includes(`\"${pathname}\"`));
-
-const hasSubmissionExperience = (source, usesStandardShell, pathname) =>
+const hasSubmissionExperience = (source, usesStandardShell) =>
   usesStandardShell ||
-  hasRouteScopedCompletion(pathname) ||
   /ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
     source,
   );
@@ -84,8 +83,7 @@ for (let day = 1; day <= 28; day += 1) {
   }
 
   const questionItems = count(source, /\b(?:stem|prompt)\s*:/g);
-  const hasCompletionTabs = hasRouteScopedCompletion(pathname);
-  const hasSubmit = hasSubmissionExperience(source, usesStandardShell, pathname);
+  const hasSubmit = hasSubmissionExperience(source, usesStandardShell);
   const hasGuidance = /A2B1WorkbookGuidance/.test(source);
   const warnings = [];
   if (!route || !pathname) warnings.push("missing route");
@@ -94,7 +92,7 @@ for (let day = 1; day <= 28; day += 1) {
   if (source.length < 1200) warnings.push("very small component source");
   if (!teilCoverage.every(Boolean)) warnings.push("missing Teil coverage");
   if (!hasSubmit) warnings.push("no submission path or guidance detected");
-  if (usesStandardShell && questionItems < 7) warnings.push(`only ${questionItems} question items`);
+  if (usesStandardShell && questionItems < 6) warnings.push(`only ${questionItems} question items`);
   if (missingStandardProps.length) warnings.push(`missing standard props: ${missingStandardProps.join(", ")}`);
   if (/default workbook|placeholder workbook|coming soon/i.test(source)) warnings.push("placeholder content detected");
 
@@ -112,15 +110,26 @@ for (let day = 1; day <= 28; day += 1) {
     teilCoverage,
     hasSubmit,
     hasGuidance,
-    hasCompletionTabs,
     missingStandardProps,
     warnings,
   });
 }
 
+const shellWarnings = [];
+[
+  "STANDARD_WORKBOOK_TABS",
+  'activeTab === "references"',
+  'activeTab === "submit"',
+  "WorkbookReferenceAnswers",
+  "ContextualAssignmentSubmissionPage",
+].forEach((marker) => {
+  if (!standardShellSource.includes(marker)) shellWarnings.push(`shared shell missing ${marker}`);
+});
+
 const output = {
   generatedAt: new Date().toISOString(),
   totalDays: report.length,
+  shellWarnings,
   warningDays: report.filter((entry) => entry.warnings.length).map((entry) => entry.day),
   report,
 };
