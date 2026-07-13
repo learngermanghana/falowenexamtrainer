@@ -12,6 +12,8 @@ const day21 = read("A2Day21EinWochenendePlanenWorkbookPage.js");
 const day26 = read("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
 const routeServices = read("RouteScopedAppServices.js");
 
+const countQuestions = (source) => (source.match(/\bstem\s*:/g) || []).length;
+
 describe("shared A2 workbook regression", () => {
   it("keeps affected A2 days on the shared workbook shell from 8dfa9f7", () => {
     [day16, day18, day19, day20, day21].forEach((source) => {
@@ -37,11 +39,28 @@ describe("shared A2 workbook regression", () => {
     expect(standardShell).toContain("ContextualAssignmentSubmissionPage");
   });
 
-  it("keeps lesson-specific content and the approved YouTube Hören source", () => {
+  it("keeps the full Day 16 lesson content", () => {
     expect(day16).toContain('title="Wohlbefinden und Entspannung"');
-    expect(day18).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
+    expect(day16).toContain("Körperliches Wohlbefinden");
+    expect(day16).toContain("Mentales Wohlbefinden");
+    expect(day16).toContain("Anzeige A: Yoga-Kurs für Anfänger");
+    expect(day16).toContain("Anzeige F: Laufgruppe im Stadtpark");
+    expect(day16).toContain("1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G");
+    expect(countQuestions(day16)).toBe(10);
+  });
+
+  it("keeps the full Day 19 lesson content", () => {
     expect(day19).toContain('title="Einkaufen? Wo und wie?"');
-    expect(day19).toContain("Wo kaufst du lieber ein: online, im Supermarkt oder auf dem Markt?");
+    expect(day19).toContain("Konsumverhalten");
+    expect(day19).toContain("Einkaufsmöglichkeiten");
+    expect(day19).toContain("Einladung zum Einkaufen");
+    expect(day19).toContain("Konsumverhalten in der modernen Gesellschaft");
+    expect(day19).toContain("1OsT5j6Y7a-rMdB0HlRJJ98gTgSvxm_LB");
+    expect(countQuestions(day19)).toBe(12);
+  });
+
+  it("keeps lesson-specific content and the approved YouTube Hören source", () => {
+    expect(day18).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
     expect(day20).toContain('title="Typische Reklamationssituationen üben"');
     expect(day21).toContain('title="Ein Wochenende planen"');
   });
