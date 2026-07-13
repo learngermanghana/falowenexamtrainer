@@ -1,5 +1,6 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
 const paragraph = {
@@ -279,22 +280,28 @@ Zum Schluss haben wir über Reisen gesprochen. Lisa war schon in Italien und Spa
 
 Es war ein sehr nettes Gespräch, und wir haben viel gelacht!`;
 
+const SmallTalkWorkbook = () => (
+  <A2StandardTabbedWorkbookPage
+    day={1}
+    title="Small Talk"
+    chapter="1.1"
+    workbookId="A2Day1SmallTalk"
+    topicPrompt="Small Talk"
+    sprechenContent={speakingContent}
+    schreibenContent={writingContent}
+    schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ..."}
+    lesenText={readingText}
+    lesenQuestions={readingQuestions}
+    hoerenTask="Höre den Text „Mein Gespräch mit Lisa“. Beantworte danach dieselben sieben Verständnisfragen."
+    hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
+    hoerenQuestions={readingQuestions}
+  />
+);
+
 export default function A2Day2SmallTalkWorkbookEnhancedPage() {
   return (
-    <A2StandardTabbedWorkbookPage
-      day={1}
-      title="Small Talk"
-      chapter="1.1"
-      workbookId="A2Day1SmallTalk"
-      topicPrompt="Small Talk"
-      sprechenContent={speakingContent}
-      schreibenContent={writingContent}
-      schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ..."}
-      lesenText={readingText}
-      lesenQuestions={readingQuestions}
-      hoerenTask="Höre den Text „Mein Gespräch mit Lisa“. Beantworte danach dieselben sieben Verständnisfragen."
-      hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
-      hoerenQuestions={readingQuestions}
-    />
+    <RadioFirstWorkbookGate level="A2" day={1}>
+      <SmallTalkWorkbook />
+    </RadioFirstWorkbookGate>
   );
 }
