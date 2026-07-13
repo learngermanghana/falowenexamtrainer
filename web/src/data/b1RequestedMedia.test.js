@@ -22,6 +22,15 @@ it.each([
   );
 });
 
+it("uses the requested B1 Day 16 exam anxiety AI video", () => {
+  expect(getAdditionalLessonVideoResources("B1", 16)).toEqual([
+    expect.objectContaining({
+      chapter: "5.16",
+      url: "https://youtu.be/JTq-kJXh7ZQ",
+    }),
+  ]);
+});
+
 it("uses the requested B1 Day 19 interview AI video", () => {
   expect(getAdditionalLessonVideoResources("B1", 19)).toEqual([
     expect.objectContaining({

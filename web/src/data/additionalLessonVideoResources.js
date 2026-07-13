@@ -85,6 +85,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/9NNSVqw-Y5A",
       },
     ],
+    16: [
+      {
+        key: "b1-day16-pruefungsangst-stressbewaeltigung-ai-video",
+        chapter: "5.16",
+        title: "B1 Day 16 · Prüfungsangst und Stressbewältigung · AI video",
+        description:
+          "AI video lesson for exam anxiety, stress management and practical coping strategies at B1 level.",
+        url: "https://youtu.be/JTq-kJXh7ZQ",
+      },
+    ],
     19: [
       {
         key: "b1-day19-vorstellungsgespraech-ai-video",
