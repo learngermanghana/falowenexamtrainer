@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
 import './i18n';
 import App from './App';
@@ -10,6 +10,9 @@ import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
+import A1Day11DirectWorkbookRoute, {
+  A1_DAY11_DIRECT_WORKBOOK_PATH,
+} from './components/A1Day11DirectWorkbookRoute';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -25,6 +28,25 @@ const AppMountedSignal = () => {
   return null;
 };
 
+const AuthenticatedAppRoutes = () => (
+  <>
+    <PublicAuthRouteBridge />
+    <PublicAuthMobileRecovery />
+    <AuthProvider>
+      <ToastProvider>
+        <RouteScopedAppServices />
+        <Routes>
+          <Route
+            path={A1_DAY11_DIRECT_WORKBOOK_PATH}
+            element={<A1Day11DirectWorkbookRoute />}
+          />
+          <Route path="*" element={<App />} />
+        </Routes>
+      </ToastProvider>
+    </AuthProvider>
+  </>
+);
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -35,16 +57,7 @@ root.render(
         {isFalowenRadioSeoPage ? (
           <FalowenRadioSeoPage />
         ) : (
-          <>
-            <PublicAuthRouteBridge />
-            <PublicAuthMobileRecovery />
-            <AuthProvider>
-              <ToastProvider>
-                <RouteScopedAppServices />
-                <App />
-              </ToastProvider>
-            </AuthProvider>
-          </>
+          <AuthenticatedAppRoutes />
         )}
       </BrowserRouter>
     </AppStartupBoundary>
