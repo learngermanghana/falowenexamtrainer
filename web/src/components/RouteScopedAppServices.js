@@ -17,6 +17,7 @@ import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetIn
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
+import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import CourseDebugPanel from "./CourseDebugPanel";
 
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
@@ -95,6 +96,7 @@ export default function RouteScopedAppServices() {
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
+      <A1CourseExperienceEnhancer />
       <CourseDebugPanel />
     </>
   );
