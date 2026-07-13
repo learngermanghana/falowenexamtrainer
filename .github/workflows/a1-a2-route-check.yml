@@ -17,6 +17,7 @@ on:
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/A2Day*Workbook*.js"
       - "web/src/components/A2WorkbookIntegrity.test.js"
+      - "web/scripts/auditA2Workbooks.cjs"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
 
@@ -32,6 +33,15 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Generate detailed A2 workbook report
+        working-directory: web
+        run: node scripts/auditA2Workbooks.cjs
+      - name: Upload A2 workbook report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-workbook-audit
+          path: web/a2-workbook-audit.json
       - name: Test existing workbook route matcher
         working-directory: web
         env:
