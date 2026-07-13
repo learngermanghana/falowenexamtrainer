@@ -3,8 +3,10 @@
 // Edit shared/curriculumCanonical.json and run npm run sync:curriculum.
 
 import { getLessonsByLevel, getLessonDisplayData } from "./lessonCatalog.js";
+import { alignA1CurriculumEntries } from "./a1RouteAlignment";
 
-const A1_COURSE_BOOK_CARDS = Object.freeze(getLessonsByLevel("A1").map((lesson) => Object.freeze({
+const ALIGNED_A1_LESSONS = alignA1CurriculumEntries(getLessonsByLevel("A1"));
+const A1_COURSE_BOOK_CARDS = Object.freeze(ALIGNED_A1_LESSONS.map((lesson) => Object.freeze({
   lessonId: lesson.id,
   ...getLessonDisplayData(lesson),
   chapter: lesson.chapter,
