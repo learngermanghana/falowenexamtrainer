@@ -16,7 +16,10 @@ on:
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2LegacyWorkbookCompletionTabs.js"
+      - "web/src/components/A2LegacyWorkbookCompletionTabs.test.js"
       - "web/src/components/A2WorkbookIntegrity.test.js"
+      - "web/src/components/RouteScopedAppServices.js"
       - "web/scripts/auditA2Workbooks.cjs"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
@@ -77,6 +80,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A2Day16CustomWorkbook.test.js
+      - name: Test restored A2 Ref and Submit tabs
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyWorkbookCompletionTabs.test.js
       - name: Audit all A2 workbook routes and content
         working-directory: web
         env:
