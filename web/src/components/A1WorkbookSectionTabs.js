@@ -205,14 +205,21 @@ const restoreManagedElements = (root = document) => {
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
   const mainRoot = findMainRoot(root);
-  if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) return false;
 
   const navigation = mainRoot.querySelector(`[${NAV_ATTRIBUTE}="true"]`);
-  if (!navigation) return false;
+  if (!navigation) {
+    restoreManagedElements(root);
+    return false;
+  }
 
   const sections = findA1WorkbookTeilSections(mainRoot);
   const groups = buildA1WorkbookContentGroups(mainRoot, sections);
-  if (!groups.length) return false;
+  if (!groups.length) {
+    // A workbook can change its headings after mount. Never leave content hidden when
+    // a practice page removes or replaces the heading that originally created the tabs.
+    restoreManagedElements(root);
+    return false;
+  }
 
   let overviewPanel = mainRoot.querySelector(`[${OVERVIEW_ATTRIBUTE}="true"]`);
 
