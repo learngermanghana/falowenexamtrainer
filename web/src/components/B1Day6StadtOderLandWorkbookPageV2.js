@@ -16,7 +16,7 @@ import {
 } from "../data/b1Day6WorkbookData";
 import { styles } from "../styles";
 
-const YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/kFlGr1TfV9A";
+const YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/6zpR_jF26l0";
 const card = { ...styles.card, display: "grid", gap: 14 };
 const title = { margin: 0, fontSize: "1.15rem" };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
