@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards";
+import { alignA1CurriculumEntries } from "./a1RouteAlignment";
 import { courseSchedules } from "./courseSchedule";
 
 const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
@@ -59,8 +60,11 @@ describe("A1 route integrity", () => {
     });
   });
 
-  it("aligns every runtime A1 grammar and workbook link to an internal app route", () => {
-    const routes = collectRouteFields(courseSchedules.A1);
+  it("aligns every resolved A1 grammar and workbook link to an internal app route", () => {
+    const resolvedSchedule = alignA1CurriculumEntries(
+      courseSchedules.A1.map((entry) => ({ ...entry, level: "A1" })),
+    );
+    const routes = collectRouteFields(resolvedSchedule);
     expect(routes.length).toBeGreaterThan(20);
 
     routes.forEach((route) => {
