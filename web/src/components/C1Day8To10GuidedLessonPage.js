@@ -18,6 +18,18 @@ const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
+export const C1_DAY9_FALOWEN_RADIO = {
+  key: "c1-day9-konsum-werbung-falowen-radio",
+  title: "Konsum und Werbung 2.4",
+  youtubeId: "VpL14EhvvEM",
+  duration: "",
+  instruction:
+    "Höre aufmerksam zu und stimme dich auf Konsum, Werbung, digitale Beeinflussung und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+};
+
+export const resolveC1Day8To10Radio = (day, canonicalLesson = null) =>
+  canonicalLesson?.resources?.falowenRadio || (Number(day) === 9 ? C1_DAY9_FALOWEN_RADIO : null);
+
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#bbf7d0", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] };
   const [border, background, color] = tones[tone] || tones.blue;
@@ -64,7 +76,7 @@ const SpeakingBuilder = ({ lesson }) => {
 export default function C1Day8To10GuidedLessonPage({ lesson, canonicalLesson = null }) {
   const { showToast } = useToast();
   const day = Number(lesson.day);
-  const radio = canonicalLesson?.resources?.falowenRadio || null;
+  const radio = resolveC1Day8To10Radio(day, canonicalLesson);
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
