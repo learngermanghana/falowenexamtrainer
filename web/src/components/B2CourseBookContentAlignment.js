@@ -57,8 +57,8 @@ const setStyleIfChanged = (element, property, value) => {
   return true;
 };
 
-const clearStyleIfPresent = (element, property) => {
-  if (!element || !element.style[property]) return false;
+const clearStyleValueIfMatched = (element, property, expectedValue) => {
+  if (!element || element.style[property] !== expectedValue) return false;
   element.style[property] = "";
   return true;
 };
@@ -77,14 +77,14 @@ export const alignCourseBookLessonActions = (
     let cardChanged = false;
 
     // The native CourseTab layout already uses the clean A2 flex-row design.
-    // Remove only the old global absolute-position override so every level
-    // returns to that same in-flow card layout.
-    cardChanged = clearStyleIfPresent(article, "position") || cardChanged;
-    cardChanged = clearStyleIfPresent(article, "paddingBottom") || cardChanged;
-    cardChanged = clearStyleIfPresent(anchor, "position") || cardChanged;
-    cardChanged = clearStyleIfPresent(anchor, "right") || cardChanged;
-    cardChanged = clearStyleIfPresent(anchor, "bottom") || cardChanged;
-    cardChanged = clearStyleIfPresent(anchor, "minWidth") || cardChanged;
+    // Remove only the exact values injected by the rejected absolute-position
+    // override. Native A2 padding and button styles remain untouched.
+    cardChanged = clearStyleValueIfMatched(article, "position", "relative") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(article, "paddingBottom", "74px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "position", "absolute") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "right", "14px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "bottom", "14px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "minWidth", "136px") || cardChanged;
 
     if (article.hasAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE)) {
       article.removeAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE);
@@ -230,5 +230,5 @@ export const __TESTING__ = {
   alignLessonArticle,
   alignNextLessonCard,
   setStyleIfChanged,
-  clearStyleIfPresent,
+  clearStyleValueIfMatched,
 };
