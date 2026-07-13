@@ -37,7 +37,31 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
-      - name: Test complete A1 route alignment
+      - name: Diagnose A1 Course Book card routes
+        continue-on-error: true
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="uses only internal registered routes"
+      - name: Diagnose runtime A1 routes
+        continue-on-error: true
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="aligns every runtime A1"
+      - name: Diagnose fragile A1 assignments
+        continue-on-error: true
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="keeps the previously fragile assignments"
+      - name: Diagnose curriculum regeneration guard
+        continue-on-error: true
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="preserves the A1 alignment"
+      - name: Enforce complete A1 route alignment
         working-directory: web
         env:
           CI: true
