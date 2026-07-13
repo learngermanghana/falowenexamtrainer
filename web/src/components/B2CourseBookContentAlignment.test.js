@@ -52,31 +52,62 @@ describe("B2CourseBookContentAlignment", () => {
     expect(document.querySelector("a").getAttribute("aria-label")).toBe("Open Konsum und Geld");
   });
 
-  it("anchors every lesson action at the bottom-right of its card", () => {
+  it("restores the native A2 in-flow lesson action layout", () => {
     document.body.innerHTML = `
-      <article style="padding: 14px">
-        <div><h3>A2 lesson</h3><a href="/campus/course/lesson/A2/8">Start lesson</a></div>
+      <article
+        data-course-book-lesson-card-aligned="true"
+        style="padding: 14px; position: relative; padding-bottom: 74px"
+      >
+        <div class="lesson-top">
+          <div><h3>A1 lesson</h3></div>
+          <div class="lesson-actions">
+            <span>Passed</span>
+            <span>Best score: 86/100</span>
+            <a
+              data-course-book-lesson-action-aligned="true"
+              href="/campus/course/lesson/A1/1"
+              style="position: absolute; right: 14px; bottom: 14px; min-width: 136px; justify-content: center"
+            >Start lesson</a>
+          </div>
+        </div>
         <p>Long lesson description.</p>
-      </article>
-      <article style="padding: 14px">
-        <div><h3>B2 lesson</h3><a href="/campus/course/lesson/B2/9">Start lesson</a></div>
-        <p>Another lesson description.</p>
       </article>
     `;
 
-    expect(alignCourseBookLessonActions(document, "/campus/course")).toBe(2);
-    document.querySelectorAll("article").forEach((article) => {
-      const action = article.querySelector("a");
-      expect(article.style.position).toBe("relative");
-      expect(article.style.paddingBottom).toBe("74px");
-      expect(article.getAttribute("data-course-book-lesson-card-aligned")).toBe("true");
-      expect(action.style.position).toBe("absolute");
-      expect(action.style.right).toBe("14px");
-      expect(action.style.bottom).toBe("14px");
-      expect(action.style.minWidth).toBe("136px");
-      expect(action.style.justifyContent).toBe("center");
-      expect(action.getAttribute("data-course-book-lesson-action-aligned")).toBe("true");
-    });
+    expect(alignCourseBookLessonActions(document, "/campus/course")).toBe(1);
+    const article = document.querySelector("article");
+    const action = article.querySelector("a");
+
+    expect(article.style.position).toBe("");
+    expect(article.style.paddingBottom).toBe("");
+    expect(article.getAttribute("data-course-book-lesson-card-aligned")).toBeNull();
+    expect(action.style.position).toBe("");
+    expect(action.style.right).toBe("");
+    expect(action.style.bottom).toBe("");
+    expect(action.style.minWidth).toBe("");
+    expect(action.style.justifyContent).toBe("center");
+    expect(action.getAttribute("data-course-book-lesson-action-aligned")).toBeNull();
+    expect(action.closest(".lesson-actions")).not.toBeNull();
+    expect(article.lastElementChild.textContent).toContain("Long lesson description");
+  });
+
+  it("does not touch a fresh native A2-style lesson card", () => {
+    document.body.innerHTML = `
+      <article style="padding: 14px">
+        <div class="lesson-top">
+          <div><h3>A2 lesson</h3></div>
+          <div class="lesson-actions">
+            <span>Passed</span>
+            <a href="/campus/course/lesson/A2/8" style="justify-content: center">Start lesson</a>
+          </div>
+        </div>
+      </article>
+    `;
+
+    expect(alignCourseBookLessonActions(document, "/campus/course")).toBe(0);
+    const action = document.querySelector("a");
+    expect(action.style.position).toBe("");
+    expect(action.style.justifyContent).toBe("center");
   });
 
   it("does not touch the Course Book when another level is selected", () => {

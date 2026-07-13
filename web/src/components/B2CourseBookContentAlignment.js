@@ -57,6 +57,12 @@ const setStyleIfChanged = (element, property, value) => {
   return true;
 };
 
+const clearStyleValueIfMatched = (element, property, expectedValue) => {
+  if (!element || element.style[property] !== expectedValue) return false;
+  element.style[property] = "";
+  return true;
+};
+
 export const alignCourseBookLessonActions = (
   root = document,
   pathname = window.location?.pathname,
@@ -69,23 +75,23 @@ export const alignCourseBookLessonActions = (
     if (!article) return;
 
     let cardChanged = false;
-    cardChanged = setStyleIfChanged(article, "position", "relative") || cardChanged;
-    cardChanged = setStyleIfChanged(article, "paddingBottom", "74px") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "position", "absolute") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "right", "14px") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "bottom", "14px") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "minWidth", "136px") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "justifyContent", "center") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "boxSizing", "border-box") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "textAlign", "center") || cardChanged;
-    cardChanged = setStyleIfChanged(anchor, "whiteSpace", "nowrap") || cardChanged;
 
-    if (article.getAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE) !== "true") {
-      article.setAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE, "true");
+    // The native CourseTab layout already uses the clean A2 flex-row design.
+    // Remove only the exact values injected by the rejected absolute-position
+    // override. Native A2 padding and button styles remain untouched.
+    cardChanged = clearStyleValueIfMatched(article, "position", "relative") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(article, "paddingBottom", "74px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "position", "absolute") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "right", "14px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "bottom", "14px") || cardChanged;
+    cardChanged = clearStyleValueIfMatched(anchor, "minWidth", "136px") || cardChanged;
+
+    if (article.hasAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE)) {
+      article.removeAttribute(LESSON_CARD_ALIGNED_ATTRIBUTE);
       cardChanged = true;
     }
-    if (anchor.getAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE) !== "true") {
-      anchor.setAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE, "true");
+    if (anchor.hasAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE)) {
+      anchor.removeAttribute(LESSON_ACTION_ALIGNED_ATTRIBUTE);
       cardChanged = true;
     }
 
@@ -224,4 +230,5 @@ export const __TESTING__ = {
   alignLessonArticle,
   alignNextLessonCard,
   setStyleIfChanged,
+  clearStyleValueIfMatched,
 };
