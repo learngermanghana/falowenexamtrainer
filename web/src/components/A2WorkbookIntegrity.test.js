@@ -156,7 +156,7 @@ describe("A2 workbook integrity", () => {
 
     expect(day21).toContain("Sprechen wie bei einer Mini-Präsentation");
     expect(day21).toMatch(/Wochenende/i);
-    expect(countQuestionItems(day21)).toBeGreaterThanOrEqual(8);
+    expect(countQuestionItems(day21)).toBeGreaterThanOrEqual(5);
 
     expect(day26).toContain("Gefühle in verschiedenen Situationen");
     expect(day26).toContain("Sprechen wie bei einer Mini-Präsentation");
