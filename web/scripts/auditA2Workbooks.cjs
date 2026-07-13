@@ -4,6 +4,10 @@ const path = require("path");
 const webRoot = path.resolve(__dirname, "..");
 const componentsRoot = path.join(webRoot, "src/components");
 const appSource = fs.readFileSync(path.join(webRoot, "src/App.js"), "utf8");
+const completionTabsSource = fs.readFileSync(
+  path.join(componentsRoot, "A2LegacyWorkbookCompletionTabs.js"),
+  "utf8",
+);
 const workbookRoutes = JSON.parse(
   fs.readFileSync(path.join(webRoot, "src/data/inAppWorkbookRoutes.json"), "utf8"),
 );
@@ -22,7 +26,7 @@ const resolveRouteComponent = (pathname) => {
 
 const readComponent = (componentName) => {
   const importMatch = appSource.match(
-    new RegExp(`import\\s+${componentName}\\s+from\\s+[\"']\\./components/([^\"']+)[\"']`),
+    new RegExp(`import\\s+${componentName}\\s+from\\s+["']\\./components/([^"']+)["']`),
   );
   if (!importMatch) return { file: "", source: "" };
   const file = path.join(componentsRoot, `${importMatch[1]}.js`);
@@ -42,8 +46,12 @@ const includeLegacy = (source) => {
   };
 };
 
-const hasSubmissionExperience = (source, usesStandardShell) =>
+const hasRouteScopedCompletion = (pathname = "") =>
+  Boolean(pathname && completionTabsSource.includes(`\"${pathname}\"`));
+
+const hasSubmissionExperience = (source, usesStandardShell, pathname) =>
   usesStandardShell ||
+  hasRouteScopedCompletion(pathname) ||
   /ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
     source,
   );
@@ -76,7 +84,8 @@ for (let day = 1; day <= 28; day += 1) {
   }
 
   const questionItems = count(source, /\b(?:stem|prompt)\s*:/g);
-  const hasSubmit = hasSubmissionExperience(source, usesStandardShell);
+  const hasCompletionTabs = hasRouteScopedCompletion(pathname);
+  const hasSubmit = hasSubmissionExperience(source, usesStandardShell, pathname);
   const hasGuidance = /A2B1WorkbookGuidance/.test(source);
   const warnings = [];
   if (!route || !pathname) warnings.push("missing route");
@@ -103,6 +112,7 @@ for (let day = 1; day <= 28; day += 1) {
     teilCoverage,
     hasSubmit,
     hasGuidance,
+    hasCompletionTabs,
     missingStandardProps,
     warnings,
   });
