@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import A2LegacyStandardWorkbookNavigationImpl, {
+  A2_LEGACY_STANDARD_NAV_BY_PATH,
   findA2LegacyWorkbookTabRow,
 } from "./A2LegacyStandardWorkbookNavigationImpl";
 import {
@@ -8,6 +9,15 @@ import {
   A2_LEGACY_SUBMISSION_CLEANUP_PATHS,
   cleanA2WorkbookPresentation,
 } from "./a2GoetheListeningOnlyCleanup";
+
+const A2_DAY20_PATH = "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
+
+A2_LEGACY_STANDARD_NAV_BY_PATH[A2_DAY20_PATH] = {
+  day: 20,
+  fallbackChapter: "7.20",
+  title: "Typische Reklamationssituationen üben",
+  workbookId: "A2Day20TypischeReklamationssituationen",
+};
 
 export const A2_DAYS_22_TO_26_PATHS = new Set([
   "/campus/course/a2-day-22-die-woche-planung-workbook",
@@ -17,12 +27,17 @@ export const A2_DAYS_22_TO_26_PATHS = new Set([
   "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
 ]);
 
+export const A2_LEGACY_STANDARD_NAV_PATHS = new Set([
+  A2_DAY20_PATH,
+  ...A2_DAYS_22_TO_26_PATHS,
+]);
+
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 
 export default function A2LegacyStandardWorkbookNavigation() {
   const location = useLocation();
   const normalizedPath = normalizePath(location.pathname);
-  const isSupportedRoute = A2_DAYS_22_TO_26_PATHS.has(normalizedPath);
+  const isSupportedRoute = A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath);
   const shouldCleanPresentation =
     A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath) ||
     A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath);
