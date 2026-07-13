@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { cleanA2GoetheListeningOnlyWorkbook } from "./a2GoetheListeningOnlyCleanup";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
@@ -144,6 +145,75 @@ describe("shared A2 workbook regression", () => {
       expect(source).toContain("WorkbookTabNav");
       expect(source).toContain('activeTab === "submit"');
     });
+  });
+
+  it("shows Day 27 Goethe Hören without separate workbook questions or listening submission", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <header><p>Select Teil 1–4, Ref or Submit. Teil 1 is group practice; submit Teil 2, Teil 3 and Teil 4.</p></header>
+        <details><p>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören: complete the tasks and send only your final answers through the Submit tab.</p></details>
+        <section id="day27-hoeren">
+          <h2>Teil 4 · Hören (Assignment)</h2>
+          <div id="day27-task">Hören Sie den Beitrag und beantworten Sie alle vier Fragen.</div>
+          <img alt="Listening practice" />
+          <div id="day27-questions">Was hat Miriam gestern verloren?</div>
+          <p>Recommended video</p>
+          <iframe title="Digitale Kommunikation (A2)"></iframe>
+          <div role="note">Reminder: submit your final answers.</div>
+        </section>
+        <section id="day27-submit">
+          <h2>Submit Workbook · Day 27 · Kapitel 10.27</h2>
+          <div><h3>Submit Teil 2, Teil 3 and Teil 4.</h3><ul><li>Teil 4 · Hören: Paste your four listening answer letters.</li></ul></div>
+        </section>
+      </main>
+    `;
+
+    expect(
+      cleanA2GoetheListeningOnlyWorkbook(
+        document,
+        "/campus/course/a2-day-27-digitale-kommunikation-workbook",
+      ),
+    ).toBe(true);
+    expect(document.querySelector("#day27-task")).toBeNull();
+    expect(document.querySelector("#day27-questions")).toBeNull();
+    expect(document.querySelector("#day27-hoeren [role='note']")).toBeNull();
+    expect(document.querySelector("#day27-hoeren iframe")).not.toBeNull();
+    expect(document.querySelector("#day27-submit").textContent).not.toContain("four listening answer letters");
+    expect(document.body.textContent).toContain("no separate workbook questions to submit");
+  });
+
+  it("shows Day 28 Goethe Hören without separate workbook questions or listening submission", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <details><p>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören: complete the tasks and send only your final answers through the Submit tab.</p></details>
+        <div id="day28-hoeren">
+          <h2>Teil 4 (Hören)</h2>
+          <p>Goethe-standard listening practice.</p>
+          <iframe title="A2 Zukunftspläne listening practice"></iframe>
+          <h3>Fragen zum Hören</h3>
+          <div>1. Worum geht es im Video / Audio?</div>
+          <div>2. Welche Zeitform passt oft zu Zukunftsplänen?</div>
+          <div>3. Was sollst du nach dem Hören machen?</div>
+          <p>Teil 4 is for self-check listening practice.</p>
+        </div>
+        <div id="day28-submit">
+          <h2>Submit Workbook</h2>
+          <p>Submit your required answers for A2 Day 28 here. Include your writing text and your reading/listening answer letters if required by your tutor.</p>
+        </div>
+      </main>
+    `;
+
+    expect(
+      cleanA2GoetheListeningOnlyWorkbook(
+        document,
+        "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
+      ),
+    ).toBe(true);
+    expect(document.querySelector("#day28-hoeren iframe")).not.toBeNull();
+    expect(document.querySelector("#day28-hoeren").textContent).not.toContain("Fragen zum Hören");
+    expect(document.querySelector("#day28-hoeren").textContent).not.toContain("Welche Zeitform passt");
+    expect(document.querySelector("#day28-submit").textContent).not.toContain("reading/listening");
+    expect(document.body.textContent).toContain("no separate Hören questions are provided");
   });
 
   it("keeps lesson-specific content and the approved YouTube Hören source", () => {
