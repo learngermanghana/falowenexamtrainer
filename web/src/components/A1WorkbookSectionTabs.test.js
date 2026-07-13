@@ -3,6 +3,7 @@ import {
   buildA1WorkbookContentGroups,
   findA1WorkbookTeilSections,
   getA1TeilNumber,
+  hasNativeTutorMarkedWorkbookTabs,
   isA1WorkbookLessonPath,
   __TESTING__,
 } from "./A1WorkbookSectionTabs";
@@ -42,6 +43,31 @@ describe("A1WorkbookSectionTabs", () => {
     expect(groups).toHaveLength(2);
     expect(groups[0].elements.map((element) => element.id)).toEqual(["teil1"]);
     expect(groups[1].elements.map((element) => element.id)).toEqual(["teil2", "support"]);
+  });
+
+  it("does not hide a workbook that already has native Assignment and Submit tabs", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <div id="native-workbook-root">
+          <div role="tablist"><button>Assignment</button><button>Submit</button></div>
+          <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1 · Lesen</button><button>Teil 2 · Hören</button></nav>
+          <div><h2>Teil 1 · Lesen</h2></div>
+          <div><h2>Teil 2 · Hören</h2></div>
+        </div>
+      </main>
+    `;
+
+    const main = document.querySelector("main");
+    expect(hasNativeTutorMarkedWorkbookTabs(main)).toBe(true);
+    expect(
+      applyA1WorkbookSectionTabs(document, {
+        pathname: "/campus/course/a1-day-11-understanding-time-workbook",
+        search: "",
+      })
+    ).toBe(false);
+    expect(document.querySelector("#native-workbook-root").style.display).toBe("");
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
+    expect(document.querySelector('[data-a1-tab-managed="true"]')).toBeNull();
   });
 
   it("shows a compact overview first and only the selected Teil after clicking", () => {
