@@ -77,6 +77,10 @@ export default function RouteScopedAppServices() {
 
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
   const isCourseBook = normalizedPath === "/campus/course";
+  const isA1LessonOrWorkbook =
+    /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath) ||
+    /^\/campus\/course\/a1-day-.*(?:workbook|grammar.*)$/i.test(normalizedPath);
+  const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook;
 
   return (
     <>
@@ -96,7 +100,7 @@ export default function RouteScopedAppServices() {
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
-      <A1CourseExperienceEnhancer />
+      {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
       <CourseDebugPanel />
     </>
   );
