@@ -8,6 +8,7 @@ import {
 } from "./A1UnifiedTutorWorkbookNavigation";
 import { buildA1WorkbookContentGroups, findA1WorkbookTeilSections } from "./A1WorkbookSectionTabs";
 
+jest.mock("./ClassWorkbookShareBox", () => () => null);
 jest.mock("./CourseWorkbookSubmissionTabs", () => () => null);
 
 describe("A1 unified tutor-marked workbook navigation", () => {
