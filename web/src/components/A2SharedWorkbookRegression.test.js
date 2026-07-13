@@ -26,6 +26,8 @@ const legacyNavigationImpl = read("A2LegacyStandardWorkbookNavigationImpl.js");
 const routeServices = read("RouteScopedAppServices.js");
 
 const countQuestions = (source) => (source.match(/\bstem\s*:/g) || []).length;
+const countPrompts = (source) => (source.match(/\bprompt\s*:/g) || []).length;
+const day20Route = "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
 
 const legacyDays22To26 = [
   {
@@ -68,11 +70,22 @@ describe("shared A2 workbook regression", () => {
     document.body.innerHTML = "";
   });
 
-  it("keeps affected A2 days on the shared workbook shell from 8dfa9f7", () => {
-    [day16, day18, day19, day20, day21].forEach((source) => {
+  it("keeps shared-shell A2 lessons on the shared workbook implementation", () => {
+    [day16, day18, day19, day21].forEach((source) => {
       expect(source).toContain("A2StandardTabbedWorkbookPage");
       expect(source).not.toContain("useNavigate");
     });
+  });
+
+  it("keeps the restored full Day 20 legacy lesson instead of the generic template", () => {
+    expect(day20.length).toBeGreaterThan(15000);
+    expect(day20).not.toContain("A2StandardTabbedWorkbookPage");
+    expect(day20).toContain("Zentrales Thema: Reklamieren");
+    expect(day20).toContain("Sprechen wie bei einer Mini-Präsentation");
+    expect(day20).toContain("Teil 2 · Schreiben (Formeller Brief)");
+    expect(day20).toContain("Hören 4 · Damals (Back Then)");
+    expect(day20).toContain("1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3");
+    expect(countPrompts(day20)).toBe(13);
   });
 
   it("keeps the shared Teil 1 speaking experience", () => {
@@ -132,8 +145,10 @@ describe("shared A2 workbook regression", () => {
     });
   });
 
-  it("adds working standard six-tab navigation only to Days 22 to 26", () => {
-    expect(legacyNavigation).toContain("A2_DAYS_22_TO_26_PATHS");
+  it("adds working standard six-tab navigation to restored Day 20 and Days 22 to 26", () => {
+    expect(legacyNavigation).toContain("A2_LEGACY_STANDARD_NAV_PATHS");
+    expect(legacyNavigation).toContain(day20Route);
+    expect(legacyNavigation).toContain("A2_LEGACY_STANDARD_NAV_BY_PATH[A2_DAY20_PATH]");
     expect(legacyNavigation).toContain('button.type = "button"');
     expect(legacyNavigation).not.toContain("A2_DAYS_21_TO_26_PATHS");
 
@@ -306,9 +321,10 @@ describe("shared A2 workbook regression", () => {
     expect(document.body.textContent).toContain("no separate Hören questions are provided");
   });
 
-  it("keeps lesson-specific content and the approved YouTube Hören source", () => {
+  it("keeps lesson-specific media and restored sources", () => {
     expect(day18).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
-    expect(day20).toContain('title="Typische Reklamationssituationen üben"');
+    expect(day20).toContain("Typische Reklamationssituationen üben");
+    expect(day20).toContain("1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD");
   });
 
   it("does not remount the rejected legacy A2 completion injector", () => {

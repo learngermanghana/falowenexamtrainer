@@ -21,6 +21,7 @@ import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
+import A1UnifiedTutorWorkbookNavigation from "./A1UnifiedTutorWorkbookNavigation";
 import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
 import B2CourseBookContentAlignment from "./B2CourseBookContentAlignment";
 import CourseDebugPanel from "./CourseDebugPanel";
@@ -125,6 +126,7 @@ const AutoOpenFirstA1WorkbookTeil = () => {
       if (cancelled) return true;
       const main = document.querySelector("main.layout-main") || document.querySelector("main");
       if (!main) return false;
+      if (main.querySelector('[data-a1-unified-tutor-workbook-nav="true"]')) return true;
       const activeView = main.getAttribute("data-a1-active-workbook-view");
       if (activeView && activeView !== "overview") return true;
       const firstTeil = Array.from(main.querySelectorAll('[data-a1-teil-navigation="true"] button')).find((button) =>
@@ -208,6 +210,7 @@ export default function RouteScopedAppServices() {
       <CourseCompletionExamGuidanceInjector />
       <A2CourseBookOrientationVideoInjector />
       <A2LegacyStandardWorkbookNavigation />
+      <A1UnifiedTutorWorkbookNavigation />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <UniversalWorkbookLessonNavigator />
       <LockedSubmissionCardCompactor />
