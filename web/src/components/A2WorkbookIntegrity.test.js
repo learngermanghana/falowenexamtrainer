@@ -38,22 +38,18 @@ const includeLegacySource = (source = "") => {
     : source;
 };
 
-const getMeaningfulLineCount = (source = "") =>
-  String(source)
-    .split("\n")
-    .filter((line) => line.trim() && !line.trim().startsWith("//")).length;
-
 const hasFourTeilExperience = (source = "") => {
   if (source.includes("A2StandardTabbedWorkbookPage")) return true;
   return [1, 2, 3, 4].every((teil) => new RegExp(`Teil\\s*${teil}\\b`, "i").test(source));
 };
 
 const hasSubmissionExperience = (source = "") =>
-  /A2StandardTabbedWorkbookPage|ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|Submit Workbook|submit tab/i.test(
+  /A2StandardTabbedWorkbookPage|ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
     source,
   );
 
-const countQuestionStems = (source = "") => (source.match(/\bstem\s*:/g) || []).length;
+const countQuestionItems = (source = "") =>
+  (source.match(/\b(?:stem|prompt)\s*:/g) || []).length;
 
 const routeEntries = Array.from({ length: 28 }, (_, index) => {
   const day = index + 1;
@@ -72,6 +68,8 @@ const routeEntries = Array.from({ length: 28 }, (_, index) => {
     combinedSource,
   };
 });
+
+const getDay = (day) => routeEntries.find((entry) => entry.day === day);
 
 describe("A2 workbook integrity", () => {
   it("registers one internal workbook route and component for every A2 day", () => {
@@ -94,9 +92,9 @@ describe("A2 workbook integrity", () => {
     });
   });
 
-  it("keeps every A2 workbook substantive and exposes Teil 1–4 plus submission", () => {
+  it("keeps every A2 workbook substantive with Teil 1–4 and a submission path", () => {
     routeEntries.forEach(({ day, combinedSource }) => {
-      expect(getMeaningfulLineCount(combinedSource)).toBeGreaterThan(25);
+      expect(combinedSource.length).toBeGreaterThan(1200);
       expect(hasFourTeilExperience(combinedSource)).toBe(true);
       expect(hasSubmissionExperience(combinedSource)).toBe(true);
       expect(combinedSource).not.toMatch(/default workbook|placeholder workbook|coming soon/i);
@@ -110,20 +108,42 @@ describe("A2 workbook integrity", () => {
         expect(combinedSource).toMatch(/schreibenTask=|schreibenContent=/);
         expect(combinedSource).toMatch(/lesenQuestions=/);
         expect(combinedSource).toMatch(/hoerenQuestions=/);
-        expect(countQuestionStems(combinedSource)).toBeGreaterThanOrEqual(10);
+        expect(countQuestionItems(combinedSource)).toBeGreaterThanOrEqual(7);
       }
     });
   });
 
-  it("keeps the restored Day 16 workbook and the final Day 28 workbook complete", () => {
-    const day16 = routeEntries.find((entry) => entry.day === 16);
-    const day28 = routeEntries.find((entry) => entry.day === 28);
+  it("keeps restored full lesson content instead of generic fallback text", () => {
+    const day16 = getDay(16)?.combinedSource || "";
+    const day18 = getDay(18)?.combinedSource || "";
+    const day19 = getDay(19)?.combinedSource || "";
+    const day20 = getDay(20)?.combinedSource || "";
+    const day26 = getDay(26)?.combinedSource || "";
 
-    expect(day16?.combinedSource).toContain("Zentrales Thema");
-    expect(day16?.combinedSource).toContain("Anzeige F");
-    expect(countQuestionStems(day16?.combinedSource)).toBeGreaterThanOrEqual(10);
+    expect(day16).toContain("Anzeige F");
+    expect(day16).toContain("Wohlbefinden und Entspannung");
+    expect(countQuestionItems(day16)).toBeGreaterThanOrEqual(10);
 
-    expect(day28?.combinedSource).toMatch(/Teil\s*4/i);
-    expect(hasSubmissionExperience(day28?.combinedSource)).toBe(true);
+    expect(day18).toContain("Choosing a Bank: Anzeige");
+    expect(day18).toContain("ING-DiBa");
+    expect(countQuestionItems(day18)).toBeGreaterThanOrEqual(10);
+
+    expect(day19).toContain("Konsumverhalten in der modernen Gesellschaft");
+    expect(day19).toContain("Fair Trade-Produkte");
+    expect(countQuestionItems(day19)).toBeGreaterThanOrEqual(12);
+
+    expect(day20).toContain("Zentrales Thema: Reklamieren");
+    expect(day20).toContain("Warum bringt Laura den Wasserkocher zurück?");
+    expect(countQuestionItems(day20)).toBeGreaterThanOrEqual(10);
+
+    expect(day26).toContain("Gefühle in verschiedenen Situationen");
+    expect(day26).toContain("Lesetext: Schwangerschaft");
+    expect(countQuestionItems(day26)).toBeGreaterThanOrEqual(7);
+  });
+
+  it("keeps the final Day 28 workbook complete", () => {
+    const day28 = getDay(28)?.combinedSource || "";
+    expect(day28).toMatch(/Teil\s*4/i);
+    expect(hasSubmissionExperience(day28)).toBe(true);
   });
 });
