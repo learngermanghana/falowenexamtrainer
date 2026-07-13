@@ -41,4 +41,16 @@ describe("in-app workbook routes", () => {
       fallback: "https://drive.google.com/file/d/legacy-workbook/view",
     })).toBe(expectedRoute);
   });
+
+  test("Day 0 lesson links open the dedicated A1 and B1 orientation pages", () => {
+    window.history.replaceState({}, "", "/campus/course/lesson/A1/0?chapter=Tutorial");
+    expect(
+      getConfiguredInAppWorkbookRoute({ level: "A1", day: 0, chapter: "Tutorial" })
+    ).toBe("/campus/course/a1-day-0-orientation-and-knowledge-test-workbook");
+
+    window.history.replaceState({}, "", "/campus/course/lesson/B1/0?chapter=Tutorial");
+    expect(
+      getConfiguredInAppWorkbookRoute({ level: "B1", day: 0, chapter: "Tutorial" })
+    ).toBe("/campus/course/b1-day-0-orientation-and-knowledge-test-workbook");
+  });
 });
