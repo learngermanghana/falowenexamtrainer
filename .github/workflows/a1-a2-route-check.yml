@@ -32,9 +32,25 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - working-directory: web
+      - name: Test existing workbook route matcher
+        working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/data/a1RouteAlignment.test.js src/components/A1WorkbookSectionTabs.test.js src/components/A2Day16CustomWorkbook.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+      - name: Test complete A1 route alignment
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js
+      - name: Test native A1 workbook visibility
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js
+      - name: Test restored A2 Day 16 workbook
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day16CustomWorkbook.test.js
       - working-directory: web
         run: npm run build
