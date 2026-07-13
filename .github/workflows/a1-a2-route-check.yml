@@ -12,6 +12,8 @@ on:
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/utils/courseWorkbookRoutes.js"
+      - "web/src/utils/a1ChapterSpecificLessonState.js"
+      - "web/src/utils/a1ChapterSpecificLessonState.test.js"
       - "web/src/components/A1WorkbookSectionTabs.js"
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
@@ -64,6 +66,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js
+      - name: Test split A1 lesson chapter state
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js
       - name: Test shared A2 workbook experience
         working-directory: web
         env:

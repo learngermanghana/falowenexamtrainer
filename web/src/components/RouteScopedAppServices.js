@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
+import { shouldResetA1ChapterSpecificLessonState } from "../utils/a1ChapterSpecificLessonState";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
 import MobileHeaderMenuInjector from "./MobileHeaderMenuInjector";
@@ -151,6 +152,30 @@ const AutoOpenFirstA1WorkbookTeil = () => {
   return null;
 };
 
+const A1ChapterSpecificLessonStateReset = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (
+      !shouldResetA1ChapterSpecificLessonState({
+        pathname: location.pathname,
+        search: location.search,
+        state: location.state,
+      })
+    ) {
+      return;
+    }
+
+    navigate(
+      { pathname: location.pathname, search: location.search },
+      { replace: true, state: null },
+    );
+  }, [location.pathname, location.search, location.state, navigate]);
+
+  return null;
+};
+
 export default function RouteScopedAppServices() {
   const location = useLocation();
 
@@ -188,6 +213,7 @@ export default function RouteScopedAppServices() {
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
+      {isA1DynamicLesson ? <A1ChapterSpecificLessonStateReset /> : null}
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
       {isA1WorkbookView ? <A1WorkbookSectionTabs /> : null}
       {isA1WorkbookView ? <AutoOpenFirstA1WorkbookTeil /> : null}
