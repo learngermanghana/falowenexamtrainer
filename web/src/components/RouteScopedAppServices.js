@@ -18,12 +18,14 @@ import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
+import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
 import CourseDebugPanel from "./CourseDebugPanel";
 
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
 const ADSENSE_SRC =
   "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8991390842894141";
 const AD_ELIGIBLE_PATHS = new Set(["/"]);
+const A1_CHAPTER7_TIME_PATH = "/campus/course/the-12-hour-clock-system-in-german-chapter-7";
 
 const isInstalledApp = () => {
   if (typeof window === "undefined") return false;
@@ -117,10 +119,11 @@ export default function RouteScopedAppServices() {
 
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
   const isCourseBook = normalizedPath === "/campus/course";
+  const isA1Chapter7TimePage = normalizedPath === A1_CHAPTER7_TIME_PATH;
   const isA1LessonOrWorkbook =
     /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath) ||
     /^\/campus\/course\/a1-day-.*(?:workbook|grammar.*)$/i.test(normalizedPath);
-  const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook;
+  const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage;
 
   return (
     <>
@@ -141,6 +144,7 @@ export default function RouteScopedAppServices() {
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
+      {isA1Chapter7TimePage ? <A1Chapter7SeparableVerbCleaner /> : null}
       {isCourseBook ? <A1CourseBookScopeCleaner /> : null}
       <CourseDebugPanel />
     </>
