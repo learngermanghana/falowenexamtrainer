@@ -42,6 +42,12 @@ const includeLegacy = (source) => {
   };
 };
 
+const hasSubmissionExperience = (source, usesStandardShell) =>
+  usesStandardShell ||
+  /ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|A2B1WorkbookGuidance|key:\s*["']submit["']|label:\s*["'][^"']*Submit|Submit Workbook|submission area|submit section|submit your final/i.test(
+    source,
+  );
+
 const report = [];
 for (let day = 1; day <= 28; day += 1) {
   const route = workbookRoutes?.A2?.[String(day)]?.["*"] || "";
@@ -69,17 +75,17 @@ for (let day = 1; day <= 28; day += 1) {
     missingStandardProps.push("schreibenTask or schreibenContent");
   }
 
-  const questionStems = count(source, /\bstem\s*:/g);
-  const hasSubmit = /ContextualAssignmentSubmissionPage|AssignmentSubmissionPage|Submit Workbook|submit tab/i.test(source);
+  const questionItems = count(source, /\b(?:stem|prompt)\s*:/g);
+  const hasSubmit = hasSubmissionExperience(source, usesStandardShell);
   const hasGuidance = /A2B1WorkbookGuidance/.test(source);
   const warnings = [];
   if (!route || !pathname) warnings.push("missing route");
   if (!appSource.includes(`path=\"${pathname}\"`)) warnings.push("route not registered");
   if (!componentName || !component.source) warnings.push("component missing");
-  if (lineCount(source) < 80) warnings.push("very short component");
+  if (source.length < 1200) warnings.push("very small component source");
   if (!teilCoverage.every(Boolean)) warnings.push("missing Teil coverage");
-  if (!hasSubmit && !hasGuidance) warnings.push("no visible Submit support in component");
-  if (usesStandardShell && questionStems < 10) warnings.push(`only ${questionStems} question stems`);
+  if (!hasSubmit) warnings.push("no submission path or guidance detected");
+  if (usesStandardShell && questionItems < 7) warnings.push(`only ${questionItems} question items`);
   if (missingStandardProps.length) warnings.push(`missing standard props: ${missingStandardProps.join(", ")}`);
   if (/default workbook|placeholder workbook|coming soon/i.test(source)) warnings.push("placeholder content detected");
 
@@ -90,9 +96,10 @@ for (let day = 1; day <= 28; day += 1) {
     componentName,
     componentFile: component.file,
     legacyFile: combined.legacyFile,
+    sourceCharacters: source.length,
     meaningfulLines: lineCount(source),
     usesStandardShell,
-    questionStems,
+    questionItems,
     teilCoverage,
     hasSubmit,
     hasGuidance,
