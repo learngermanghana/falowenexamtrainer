@@ -206,6 +206,11 @@ export const applyA1WorkbookSectionTabs = (root = document, locationLike = windo
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
   const mainRoot = findMainRoot(root);
 
+  if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) {
+    restoreManagedElements(root);
+    return false;
+  }
+
   const navigation = mainRoot.querySelector(`[${NAV_ATTRIBUTE}="true"]`);
   if (!navigation) {
     restoreManagedElements(root);
