@@ -11,6 +11,7 @@ import SubmitSuccessScreenInjector from "./SubmitSuccessScreenInjector";
 import CourseBookTerminologyInjector from "./CourseBookTerminologyInjector";
 import CourseCompletionExamGuidanceInjector from "./CourseCompletionExamGuidanceInjector";
 import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideoInjector";
+import A2LegacyStandardWorkbookNavigation from "./A2LegacyStandardWorkbookNavigation";
 import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import UniversalWorkbookLessonNavigator from "./UniversalWorkbookLessonNavigator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
@@ -206,6 +207,7 @@ export default function RouteScopedAppServices() {
       <CourseBookTerminologyInjector />
       <CourseCompletionExamGuidanceInjector />
       <A2CourseBookOrientationVideoInjector />
+      <A2LegacyStandardWorkbookNavigation />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <UniversalWorkbookLessonNavigator />
       <LockedSubmissionCardCompactor />
