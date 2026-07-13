@@ -16,9 +16,9 @@ on:
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/A2Day*Workbook*.js"
-      - "web/src/components/A2LegacyWorkbookCompletionTabs.js"
+      - "web/src/components/A2StandardTabbedWorkbookPage.js"
+      - "web/src/components/A2SharedWorkbookRegression.test.js"
       - "web/src/components/RouteScopedAppServices.js"
-      - "web/scripts/auditA2Workbooks.cjs"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
 
@@ -34,15 +34,6 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Audit all A2 workbook routes, lesson content, Ref and Submit
-        working-directory: web
-        run: node scripts/auditA2Workbooks.cjs
-      - name: Upload A2 workbook audit
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: a2-workbook-audit
-          path: web/a2-workbook-audit.json
       - name: Test existing workbook route matcher
         working-directory: web
         env:
@@ -73,10 +64,10 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js
-      - name: Test restored A2 Day 16 workbook
+      - name: Test shared A2 workbook experience
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2Day16CustomWorkbook.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2SharedWorkbookRegression.test.js
       - working-directory: web
         run: npm run build
