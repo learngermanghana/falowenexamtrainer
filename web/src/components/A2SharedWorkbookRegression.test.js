@@ -59,10 +59,18 @@ describe("shared A2 workbook regression", () => {
     expect(countQuestions(day19)).toBe(12);
   });
 
+  it("keeps the complete Day 21 lesson and original assignment identity", () => {
+    expect(day21).toContain('title="Ein Wochenende planen"');
+    expect(day21).toContain('chapter="8.21"');
+    expect(day21).toContain("Hauptzweig 5: Ausdrücke und Fragen");
+    expect(day21).toContain("Der TV-Koch Stefan Berger");
+    expect(day21).toContain("Qg0tQFveI0M");
+    expect(countQuestions(day21)).toBe(5);
+  });
+
   it("keeps lesson-specific content and the approved YouTube Hören source", () => {
     expect(day18).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
     expect(day20).toContain('title="Typische Reklamationssituationen üben"');
-    expect(day21).toContain('title="Ein Wochenende planen"');
   });
 
   it("does not remount the rejected legacy A2 completion injector", () => {
