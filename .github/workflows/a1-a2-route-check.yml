@@ -6,9 +6,19 @@ on:
       - "web/src/data/inAppWorkbookRoutes.json"
       - "web/src/data/inAppWorkbookRoutes.js"
       - "web/src/data/strictInAppWorkbookRoutes.js"
+      - "web/src/data/a1RouteAlignment.js"
+      - "web/src/data/a1RouteAlignment.test.js"
+      - "web/src/data/a1CourseBookCards.js"
+      - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/utils/courseWorkbookRoutes.js"
+      - "web/src/components/A1WorkbookSectionTabs.js"
+      - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
+      - "web/src/components/A2Day16WohlbefindenUndEntspannungWorkbookPage.js"
+      - "web/src/components/A2Day16CustomWorkbook.test.js"
+      - "scripts/applyA1RouteAlignment.js"
+      - "package.json"
 
 jobs:
   test-routes:
@@ -17,14 +27,45 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - working-directory: web
+      - name: Test existing workbook route matcher
+        working-directory: web
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+      - name: Test A1 Course Book card routes
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="uses only internal registered routes"
+      - name: Test resolved A1 routes
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="aligns every resolved A1"
+      - name: Test fragile A1 assignments
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="keeps the previously fragile assignments"
+      - name: Test curriculum regeneration guard
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1RouteAlignment.test.js --testNamePattern="preserves the A1 alignment"
+      - name: Test native A1 workbook visibility
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js
+      - name: Test restored A2 Day 16 workbook
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day16CustomWorkbook.test.js
       - working-directory: web
         run: npm run build
