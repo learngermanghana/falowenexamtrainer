@@ -11,13 +11,18 @@ on:
       - "web/src/data/a1CourseBookCards.js"
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
+      - "web/src/data/additionalA2RadioEntries.js"
       - "web/src/utils/courseWorkbookRoutes.js"
       - "web/src/utils/a1ChapterSpecificLessonState.js"
       - "web/src/utils/a1ChapterSpecificLessonState.test.js"
       - "web/src/components/A1WorkbookSectionTabs.js"
       - "web/src/components/A1WorkbookSectionTabs.test.js"
+      - "web/src/components/A1UnifiedTutorWorkbookNavigation.js"
+      - "web/src/components/A1UnifiedTutorWorkbookNavigation.test.js"
+      - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
       - "web/src/components/RouteScopedAppServices.js"
@@ -66,11 +71,21 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js
+      - name: Test unified A1 tutor workbook navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1UnifiedTutorWorkbookNavigation.test.js
       - name: Test split A1 lesson chapter state
         working-directory: web
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js
+      - name: Test A2 Day 1 Falowen Radio
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day1RadioRegression.test.js
       - name: Test shared A2 workbook experience
         working-directory: web
         env:
