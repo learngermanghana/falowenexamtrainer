@@ -1,6 +1,19 @@
 export const A2_GOETHE_LISTENING_ONLY_PATHS = new Set([
+  "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
+  "/campus/course/a2-day-22-die-woche-planung-workbook",
+  "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+  "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
+  "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
   "/campus/course/a2-day-27-digitale-kommunikation-workbook",
   "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
+]);
+
+export const A2_LEGACY_SUBMISSION_CLEANUP_PATHS = new Set([
+  "/campus/course/a2-day-22-die-woche-planung-workbook",
+  "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+  "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
+  "/campus/course/a2-day-25-tagesablauf-workbook",
+  "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
 ]);
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
@@ -52,6 +65,12 @@ const ensureListeningNote = (root, heading, text) => {
     note.setAttribute("data-a2-goethe-listening-note", "true");
     note.style.margin = "0";
     note.style.lineHeight = "1.7";
+    note.style.fontWeight = "700";
+    note.style.color = "#1e3a8a";
+    note.style.background = "#eff6ff";
+    note.style.border = "1px solid #bfdbfe";
+    note.style.borderRadius = "10px";
+    note.style.padding = "10px 12px";
     heading.insertAdjacentElement("afterend", note);
   }
   if (note.textContent === text) return false;
@@ -69,6 +88,136 @@ const cleanSharedGuidance = (main) => {
   guidance.textContent =
     "Teil 2 · Schreiben and Teil 3 · Lesen: complete the tasks and send only your final answers through the Submit tab. Teil 4 · Hören is Goethe self-check practice in the video and is not submitted.";
   return true;
+};
+
+const cleanSubmitPanelForGoethe = (main) => {
+  const submitHeading = Array.from(main?.querySelectorAll?.("h1, h2, h3") || []).find(
+    (element) => normalizeText(element.textContent) === "submit workbook",
+  );
+  const submitPanel = submitHeading?.closest("section") || submitHeading?.parentElement;
+  if (!submitPanel) return false;
+
+  let changed = false;
+  const submitCopy = findByText(submitPanel, "p", "reading listening answer letters");
+  if (submitCopy) {
+    submitCopy.textContent =
+      "Submit your final writing text and reading answer letters. Teil 4 · Hören is checked inside the Goethe video and is not submitted.";
+    changed = true;
+  }
+
+  Array.from(submitPanel.querySelectorAll('[role="note"]')).forEach((note) => {
+    if (!normalizeText(note.textContent).includes("reminder practise here then submit only your final answers")) return;
+    note.remove();
+    changed = true;
+  });
+
+  return changed;
+};
+
+const removeGenericSubmissionReminders = (main) => {
+  let changed = false;
+  Array.from(main?.querySelectorAll?.('[role="note"]') || []).forEach((note) => {
+    const text = normalizeText(note.textContent);
+    if (!text.includes("reminder practise here then submit only your final answers through the submit tab")) return;
+    note.remove();
+    changed = true;
+  });
+  return changed;
+};
+
+const removeLegacyFinalSubmissionCards = (main) => {
+  let changed = false;
+  Array.from(main?.querySelectorAll?.("h2, h3") || []).forEach((heading) => {
+    if (normalizeText(heading.textContent) !== "final submission") return;
+    const panel = heading.closest("section") || heading.parentElement;
+    if (!panel || panel.hasAttribute?.("data-a2-standard-legacy-panel")) return;
+    panel.remove();
+    changed = true;
+  });
+  return changed;
+};
+
+const cleanLegacySubmissionNoise = (main) => {
+  let changed = false;
+  changed = removeGenericSubmissionReminders(main) || changed;
+  changed = removeLegacyFinalSubmissionCards(main) || changed;
+  return changed;
+};
+
+const cleanDay25ReadingLabels = (main) => {
+  let changed = false;
+  const nav = main?.querySelector?.('[data-a2-standard-legacy-nav-root] [data-workbook-tab-navigation]');
+  const teil4Button = Array.from(nav?.querySelectorAll?.("button") || []).find((button) => {
+    const spans = Array.from(button.querySelectorAll("span"));
+    const label = normalizeText(button.getAttribute("aria-label") || spans[0]?.textContent || "");
+    const description = normalizeText(spans[1]?.textContent || "");
+    return /teil\s*4\b/.test(label) && /horen|hoeren/.test(description);
+  });
+  const description = Array.from(teil4Button?.querySelectorAll?.("span") || [])[1] || null;
+  if (description && description.textContent !== "Lesen") {
+    description.textContent = "Lesen";
+    changed = true;
+  }
+
+  const guidance = findByText(
+    main,
+    "p",
+    "Teil 2 Schreiben Teil 3 Lesen and Teil 4 Hören complete the tasks and send only your final answers",
+  );
+  if (guidance) {
+    guidance.textContent =
+      "Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Lesen: complete the tasks and submit your final answers through the Submit tab. This workbook has no Hören assignment.";
+    changed = true;
+  }
+
+  return changed;
+};
+
+const removeOldGoetheListeningCopy = (panel) => {
+  const oldPhrases = [
+    "this is a goethe standard horen test",
+    "please be aware that this is a goethe standard horverstehen test",
+    "the only parts that will be officially evaluated",
+    "this process will require significant motivation",
+    "this process requires motivation and self discipline",
+    "submit any required listening work",
+    "you must mark your own horen results",
+    "goethe standard listening practice check your own answers with the video",
+    "teil 4 is for self check listening practice",
+  ];
+
+  let changed = false;
+  Array.from(panel?.querySelectorAll?.("p") || []).forEach((paragraph) => {
+    if (paragraph.hasAttribute("data-a2-goethe-listening-note")) return;
+    const text = normalizeText(paragraph.textContent);
+    if (!oldPhrases.some((phrase) => text.includes(phrase))) return;
+    paragraph.remove();
+    changed = true;
+  });
+  changed = removeGenericSubmissionReminders(panel) || changed;
+  return changed;
+};
+
+const cleanLegacyGoetheDay = (root, main) => {
+  let changed = false;
+  const { heading, panel } = findListeningPanel(main);
+  if (heading && panel) {
+    if (heading.textContent !== "Teil 4 · Hören · Goethe Self-Check") {
+      heading.textContent = "Teil 4 · Hören · Goethe Self-Check";
+      changed = true;
+    }
+    changed =
+      ensureListeningNote(
+        root,
+        heading,
+        "Watch the Goethe past-paper video and check your answers there. Teil 4 is self-check practice and is not submitted. The school evaluates only Teil 2 · Schreiben and Teil 3 · Lesen for this workbook.",
+      ) || changed;
+    changed = removeOldGoetheListeningCopy(panel) || changed;
+  }
+
+  changed = cleanSharedGuidance(main) || changed;
+  changed = cleanSubmitPanelForGoethe(main) || changed;
+  return changed;
 };
 
 const cleanDay27 = (root, main) => {
@@ -169,18 +318,41 @@ const cleanDay28 = (root, main) => {
   return cleanSharedGuidance(main) || changed;
 };
 
+export const cleanA2WorkbookPresentation = (
+  root = document,
+  pathname = typeof window !== "undefined" ? window.location.pathname : "",
+) => {
+  const normalizedPath = normalizePath(pathname);
+  const isGoetheSelfCheck = A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath);
+  const needsLegacySubmissionCleanup = A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath);
+  if (!isGoetheSelfCheck && !needsLegacySubmissionCleanup) return false;
+
+  const main = root.querySelector?.("main.layout-main") || root.querySelector?.("main") || root.body;
+  if (!main) return false;
+
+  let changed = false;
+  if (needsLegacySubmissionCleanup) {
+    changed = cleanLegacySubmissionNoise(main) || changed;
+  }
+
+  if (normalizedPath.includes("a2-day-25-")) {
+    changed = cleanDay25ReadingLabels(main) || changed;
+    return changed;
+  }
+
+  if (!isGoetheSelfCheck) return changed;
+  if (normalizedPath.includes("a2-day-27-")) return cleanDay27(root, main) || changed;
+  if (normalizedPath.includes("a2-day-28-")) return cleanDay28(root, main) || changed;
+  return cleanLegacyGoetheDay(root, main) || changed;
+};
+
 export const cleanA2GoetheListeningOnlyWorkbook = (
   root = document,
   pathname = typeof window !== "undefined" ? window.location.pathname : "",
 ) => {
   const normalizedPath = normalizePath(pathname);
   if (!A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath)) return false;
-
-  const main = root.querySelector?.("main.layout-main") || root.querySelector?.("main") || root.body;
-  if (!main) return false;
-
-  if (normalizedPath.includes("a2-day-27-")) return cleanDay27(root, main);
-  return cleanDay28(root, main);
+  return cleanA2WorkbookPresentation(root, normalizedPath);
 };
 
 export const __TESTING__ = {
@@ -188,4 +360,7 @@ export const __TESTING__ = {
   normalizeText,
   findListeningPanel,
   removeDirectChildContaining,
+  removeGenericSubmissionReminders,
+  removeLegacyFinalSubmissionCards,
+  cleanDay25ReadingLabels,
 };

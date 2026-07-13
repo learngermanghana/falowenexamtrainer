@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { cleanA2GoetheListeningOnlyWorkbook } from "./a2GoetheListeningOnlyCleanup";
+import {
+  A2_GOETHE_LISTENING_ONLY_PATHS,
+  cleanA2GoetheListeningOnlyWorkbook,
+  cleanA2WorkbookPresentation,
+} from "./a2GoetheListeningOnlyCleanup";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
@@ -56,7 +60,14 @@ const legacyDays22To26 = [
   },
 ];
 
+const genericReminder =
+  "Reminder: Practise here, then submit only your final answers through the Submit tab.";
+
 describe("shared A2 workbook regression", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
   it("keeps affected A2 days on the shared workbook shell from 8dfa9f7", () => {
     [day16, day18, day19, day20, day21].forEach((source) => {
       expect(source).toContain("A2StandardTabbedWorkbookPage");
@@ -124,7 +135,7 @@ describe("shared A2 workbook regression", () => {
   it("adds working standard six-tab navigation only to Days 22 to 26", () => {
     expect(legacyNavigation).toContain("A2_DAYS_22_TO_26_PATHS");
     expect(legacyNavigation).toContain('button.type = "button"');
-    expect(legacyNavigation).not.toContain("a2-day-21-ein-wochenende-planen-workbook");
+    expect(legacyNavigation).not.toContain("A2_DAYS_21_TO_26_PATHS");
 
     legacyDays22To26.forEach(({ route }) => {
       expect(legacyNavigation).toContain(route);
@@ -137,6 +148,85 @@ describe("shared A2 workbook regression", () => {
     expect(legacyNavigationImpl).toContain("ContextualAssignmentSubmissionPage");
     expect(routeServices).toContain("A2LegacyStandardWorkbookNavigation");
     expect(routeServices).toContain("<A2LegacyStandardWorkbookNavigation />");
+  });
+
+  it("classifies the Goethe self-check lessons and keeps Day 25 as reading", () => {
+    [21, 22, 23, 24, 26, 27, 28].forEach((day) => {
+      const route = legacyDays22To26.find((item) => item.day === day)?.route ||
+        (day === 21
+          ? "/campus/course/a2-day-21-ein-wochenende-planen-workbook"
+          : day === 27
+            ? "/campus/course/a2-day-27-digitale-kommunikation-workbook"
+            : "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook");
+      expect(A2_GOETHE_LISTENING_ONLY_PATHS.has(route)).toBe(true);
+    });
+    expect(A2_GOETHE_LISTENING_ONLY_PATHS.has("/campus/course/a2-day-25-tagesablauf-workbook")).toBe(false);
+    expect(day25).toContain("Teil 4 · Lesen");
+    expect(day25).toContain("There is no Hören assignment in this workbook");
+  });
+
+  it("removes repeated Day 22 reminders and the old always-visible submission card", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <details><p>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören: complete the tasks and send only your final answers through the Submit tab.</p></details>
+        <section id="day22-reading">
+          <h2>Teil 3 · Lesen (Exercise)</h2>
+          <div><strong>Aufgabe 1</strong><div role="note">${genericReminder}</div></div>
+          <div><strong>Aufgabe 2</strong><div role="note">${genericReminder}</div></div>
+          <div><strong>Aufgabe 3</strong><div role="note">${genericReminder}</div></div>
+        </section>
+        <section id="day22-listening">
+          <h2>Teil 4 · Hören (Exercise)</h2>
+          <p>Please be aware that this is a Goethe-standard Hörverstehen test, and the answers are already provided in the YouTube video.</p>
+          <a href="https://youtu.be/wK9JOG5lhdc">Open Hören video</a>
+          <div role="note">${genericReminder}</div>
+        </section>
+        <section id="old-final-submission">
+          <h2>Final Submission</h2>
+          <p>After you complete all Teile, submit your final answers in the submission area.</p>
+          <a href="/campus/course?submitWork=1">Go to Submission Area</a>
+        </section>
+      </main>
+    `;
+
+    expect(
+      cleanA2WorkbookPresentation(
+        document,
+        "/campus/course/a2-day-22-die-woche-planung-workbook",
+      ),
+    ).toBe(true);
+    expect(document.querySelectorAll('[role="note"]')).toHaveLength(0);
+    expect(document.querySelector("#old-final-submission")).toBeNull();
+    expect(document.querySelector("#day22-listening a")).not.toBeNull();
+    expect(document.querySelector("#day22-listening h2").textContent).toContain("Goethe Self-Check");
+    expect(document.body.textContent).toContain("Teil 4 is self-check practice and is not submitted");
+  });
+
+  it("labels Day 25 Teil 4 as Lesen and removes legacy reminder noise", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <div data-a2-standard-legacy-nav-root="day-25">
+          <div data-workbook-tab-navigation>
+            <button><span>Teil 1</span><span>Sprechen</span></button>
+            <button><span>Teil 2</span><span>Schreiben</span></button>
+            <button><span>Teil 3</span><span>Lesen</span></button>
+            <button id="day25-teil4"><span>Teil 4</span><span>Hören</span></button>
+          </div>
+        </div>
+        <details><p>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören: complete the tasks and send only your final answers through the Submit tab.</p></details>
+        <section><h2>Teil 4 · Lesen</h2><div role="note">${genericReminder}</div></section>
+      </main>
+    `;
+
+    expect(
+      cleanA2WorkbookPresentation(
+        document,
+        "/campus/course/a2-day-25-tagesablauf-workbook",
+      ),
+    ).toBe(true);
+    expect(document.querySelector("#day25-teil4 span:nth-child(2)").textContent).toBe("Lesen");
+    expect(document.body.textContent).toContain("This workbook has no Hören assignment");
+    expect(document.querySelectorAll('[role="note"]')).toHaveLength(0);
   });
 
   it("leaves Days 27 and 28 on their native working standard navigation", () => {

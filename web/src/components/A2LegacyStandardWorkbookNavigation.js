@@ -5,7 +5,8 @@ import A2LegacyStandardWorkbookNavigationImpl, {
 } from "./A2LegacyStandardWorkbookNavigationImpl";
 import {
   A2_GOETHE_LISTENING_ONLY_PATHS,
-  cleanA2GoetheListeningOnlyWorkbook,
+  A2_LEGACY_SUBMISSION_CLEANUP_PATHS,
+  cleanA2WorkbookPresentation,
 } from "./a2GoetheListeningOnlyCleanup";
 
 export const A2_DAYS_22_TO_26_PATHS = new Set([
@@ -22,7 +23,9 @@ export default function A2LegacyStandardWorkbookNavigation() {
   const location = useLocation();
   const normalizedPath = normalizePath(location.pathname);
   const isSupportedRoute = A2_DAYS_22_TO_26_PATHS.has(normalizedPath);
-  const isGoetheListeningOnlyRoute = A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath);
+  const shouldCleanPresentation =
+    A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath) ||
+    A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath);
 
   useEffect(() => {
     if (!isSupportedRoute) return undefined;
@@ -54,19 +57,19 @@ export default function A2LegacyStandardWorkbookNavigation() {
   }, [isSupportedRoute, normalizedPath]);
 
   useEffect(() => {
-    if (!isGoetheListeningOnlyRoute) return undefined;
+    if (!shouldCleanPresentation) return undefined;
 
     let scheduled = false;
-    const applyListeningOnlyCleanup = () => {
+    const applyWorkbookCleanup = () => {
       scheduled = false;
-      cleanA2GoetheListeningOnlyWorkbook(document, normalizedPath);
+      cleanA2WorkbookPresentation(document, normalizedPath);
     };
 
     const schedule = () => {
       if (scheduled) return;
       scheduled = true;
       const enqueue = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
-      enqueue(applyListeningOnlyCleanup);
+      enqueue(applyWorkbookCleanup);
     };
 
     schedule();
@@ -74,7 +77,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [isGoetheListeningOnlyRoute, normalizedPath]);
+  }, [normalizedPath, shouldCleanPresentation]);
 
   if (!isSupportedRoute) return null;
   return <A2LegacyStandardWorkbookNavigationImpl />;
