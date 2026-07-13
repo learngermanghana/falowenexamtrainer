@@ -45,7 +45,7 @@ describe("A1WorkbookSectionTabs", () => {
     expect(groups[1].elements.map((element) => element.id)).toEqual(["teil2", "support"]);
   });
 
-  it("adds the Teil division to a native tutor-marked Assignment and Submit shell", () => {
+  it("does not hide a workbook that already has native Assignment and Submit tabs", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div id="native-workbook-root">
@@ -61,14 +61,14 @@ describe("A1WorkbookSectionTabs", () => {
     expect(hasNativeTutorMarkedWorkbookTabs(main)).toBe(true);
     expect(
       applyA1WorkbookSectionTabs(document, {
-        pathname: "/campus/course/a1-day-11-understanding-time-workbook",
-        search: "",
+        pathname: "/campus/course/lesson/A1/11",
+        search: "?chapter=7",
       })
-    ).toBe(true);
+    ).toBe(false);
     expect(document.querySelector("#native-workbook-root").style.display).toBe("");
-    expect(document.querySelector('[data-a1-workbook-overview="true"]')).not.toBeNull();
-    expect(document.querySelector("#teil1").style.display).toBe("none");
-    expect(document.querySelector("#teil2").style.display).toBe("none");
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
+    expect(document.querySelector("#teil1").style.display).toBe("");
+    expect(document.querySelector("#teil2").style.display).toBe("");
   });
 
   it("shows a compact overview first and only the selected Teil after clicking", () => {
