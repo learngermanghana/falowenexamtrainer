@@ -104,7 +104,7 @@ export const LESSON_RADIO_DICTIONARY = {
     6: {
       key: "b1-day6-stadt-oder-land-falowen-radio",
       title: "Leben in der Stadt oder auf dem Land? 2.6",
-      youtubeId: "houqw5Dg3eY",
+      youtubeId: "6zpR_jF26l0",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf den Vergleich zwischen Stadt- und Landleben ein. Danach gehst du weiter zum Workbook.",
@@ -204,6 +204,14 @@ export const LESSON_RADIO_DICTIONARY = {
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Berufswege, Ziele und den Wunschberuf ein. Danach gehst du weiter zum Workbook.",
+    },
+    19: {
+      key: "b1-day19-vorstellungsgespraech-falowen-radio",
+      title: "Vorstellungsgespräch 6.19",
+      youtubeId: "xgtjgiQBL2k",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Vorstellungsgespräche, berufliche Erfahrungen und passende Antworten ein. Danach gehst du weiter zum Workbook.",
     },
     20: {
       key: "b1-day20-wie-wird-man-falowen-radio",
