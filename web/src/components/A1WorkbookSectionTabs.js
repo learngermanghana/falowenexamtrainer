@@ -26,6 +26,12 @@ export const getA1TeilNumber = (value = "") => {
 
 const findMainRoot = (root = document) => root.querySelector("main.layout-main") || root.querySelector("main") || root.body;
 
+export const hasNativeTutorMarkedWorkbookTabs = (mainRoot) =>
+  Array.from(mainRoot?.querySelectorAll?.('[role="tablist"]') || []).some((tablist) => {
+    const labels = Array.from(tablist.querySelectorAll("button")).map((button) => normalizeText(button.textContent));
+    return labels.includes("assignment") && labels.includes("submit");
+  });
+
 const getTopLevelChild = (mainRoot, element) => {
   let current = element;
   while (current?.parentElement && current.parentElement !== mainRoot) current = current.parentElement;
@@ -199,6 +205,8 @@ const restoreManagedElements = (root = document) => {
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
   const mainRoot = findMainRoot(root);
+  if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) return false;
+
   const navigation = mainRoot.querySelector(`[${NAV_ATTRIBUTE}="true"]`);
   if (!navigation) return false;
 
