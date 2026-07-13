@@ -15,8 +15,8 @@ on:
       - "web/src/components/A1WorkbookSectionTabs.js"
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
-      - "web/src/components/A2Day16WohlbefindenUndEntspannungWorkbookPage.js"
-      - "web/src/components/A2Day16CustomWorkbook.test.js"
+      - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2WorkbookIntegrity.test.js"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
 
@@ -67,5 +67,10 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A2Day16CustomWorkbook.test.js
+      - name: Audit all A2 workbook routes and content
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2WorkbookIntegrity.test.js
       - working-directory: web
         run: npm run build
