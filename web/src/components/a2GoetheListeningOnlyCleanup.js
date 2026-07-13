@@ -148,10 +148,12 @@ const cleanDay25ReadingLabels = (main) => {
   let changed = false;
   const nav = main?.querySelector?.('[data-a2-standard-legacy-nav-root] [data-workbook-tab-navigation]');
   const teil4Button = Array.from(nav?.querySelectorAll?.("button") || []).find((button) => {
-    const text = normalizeText(button.textContent);
-    return /teil\s*4\b/.test(text) && /horen|hoeren/.test(text);
+    const spans = Array.from(button.querySelectorAll("span"));
+    const label = normalizeText(button.getAttribute("aria-label") || spans[0]?.textContent || "");
+    const description = normalizeText(spans[1]?.textContent || "");
+    return /teil\s*4\b/.test(label) && /horen|hoeren/.test(description);
   });
-  const description = teil4Button?.querySelectorAll?.("span")?.[1] || null;
+  const description = Array.from(teil4Button?.querySelectorAll?.("span") || [])[1] || null;
   if (description && description.textContent !== "Lesen") {
     description.textContent = "Lesen";
     changed = true;
