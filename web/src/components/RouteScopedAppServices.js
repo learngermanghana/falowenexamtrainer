@@ -17,7 +17,7 @@ import UniversalWorkbookLessonNavigator from "./UniversalWorkbookLessonNavigator
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
-import QuestionOfDayWritingTemplateInjector from "./QuestionOfDayWritingTemplateInjector";
+import QuestionOfDayWritingTemplateController from "./QuestionOfDayWritingTemplateController";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
@@ -217,7 +217,7 @@ export default function RouteScopedAppServices() {
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <ExamQuestionCheatSheetInjector />
-      <QuestionOfDayWritingTemplateInjector />
+      <QuestionOfDayWritingTemplateController />
       <AutoGrammarStartGuide />
       <BookPdfDownloadInjector />
       {isA1DynamicLesson ? <A1ChapterSpecificLessonStateReset /> : null}
