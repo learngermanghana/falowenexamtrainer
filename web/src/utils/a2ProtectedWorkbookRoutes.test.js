@@ -21,7 +21,7 @@ const expectedRoutes = {
 };
 
 describe("protected A2 workbook routes", () => {
-  test("keeps Day 20 on the dynamic lesson page used by the last known-good release", () => {
+  test("keeps Day 20 on the dynamic lesson hub without forcing the workbook", () => {
     expect(PROTECTED_A2_WORKBOOK_DAYS).toEqual([21, 22, 23, 24, 25, 26, 27, 28]);
 
     expect(
@@ -37,12 +37,12 @@ describe("protected A2 workbook routes", () => {
     ).toBe("");
   });
 
-  test("redirects the old simplified Day 20 URL back to the dynamic lesson page", () => {
+  test("keeps the restored Day 20 workbook directly accessible", () => {
     expect(
       resolveProtectedA2WorkbookRedirect({
         pathname: A2_DAY20_LEGACY_WORKBOOK_PATH,
       }),
-    ).toBe(A2_DAY20_DYNAMIC_LESSON_PATH);
+    ).toBe("");
   });
 
   test("continues protecting generic A2 Days 21 to 28 with their custom workbook pages", () => {
@@ -77,7 +77,7 @@ describe("protected A2 workbook routes", () => {
     ).toBe(expectedRoutes[21]);
   });
 
-  test("keeps the legacy Day 20 content file available without forcing students onto it", () => {
+  test("keeps the later Day 20 Hören workbook content", () => {
     const source = fs.readFileSync(
       path.resolve(__dirname, "../components/A2Day20TypischeReklamationssituationenWorkbookPage.js"),
       "utf8",
@@ -88,7 +88,9 @@ describe("protected A2 workbook routes", () => {
     expect(source).toContain("Sprechen wie bei einer Mini-Präsentation");
     expect(source).toContain("Zentrales Thema: Reklamieren");
     expect(source).toContain("Teil 2 · Schreiben (Formeller Brief)");
-    expect(source).toContain("Hören 4 · Damals (Back Then)");
+    expect(source).toContain("pH1X3E7vOao");
+    expect(source).toContain("Warum bringt Laura den Wasserkocher zurück?");
+    expect(source).toContain("RadioFirstWorkbookGate");
     expect(source).not.toContain("A2StandardTabbedWorkbookPage");
   });
 });

@@ -16,12 +16,10 @@ const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") ||
 export const resolveProtectedA2WorkbookRedirect = ({ pathname = "", search = "" } = {}) => {
   const normalizedPath = normalizePath(pathname);
 
-  // Day 20 used the dynamic lesson page in the last known-good release. That
-  // page supplies the shared Goethe speaking tools. Redirect old saved links
-  // away from the legacy simplified workbook so refreshes also recover.
-  if (normalizedPath === A2_DAY20_LEGACY_WORKBOOK_PATH) {
-    return A2_DAY20_DYNAMIC_LESSON_PATH;
-  }
+  // Day 20 starts on the dynamic lesson hub, but its dedicated workbook must
+  // remain directly accessible from the Workbook resource, bookmarks and open
+  // browser tabs. Do not redirect the restored workbook back to the lesson hub.
+  if (normalizedPath === A2_DAY20_LEGACY_WORKBOOK_PATH) return "";
 
   const match = normalizedPath.match(A2_LESSON_ROUTE_PATTERN);
   if (!match) return "";

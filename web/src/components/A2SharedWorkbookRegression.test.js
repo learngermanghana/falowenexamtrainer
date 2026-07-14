@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { ADDITIONAL_A2_RADIO_ENTRIES } from "../data/additionalA2RadioEntries";
 import {
   A2_GOETHE_LISTENING_ONLY_PATHS,
   cleanA2GoetheListeningOnlyWorkbook,
@@ -77,15 +78,21 @@ describe("shared A2 workbook regression", () => {
     });
   });
 
-  it("keeps the restored full Day 20 legacy lesson instead of the generic template", () => {
+  it("keeps the later complete Day 20 workbook with the approved YouTube Hören", () => {
     expect(day20.length).toBeGreaterThan(15000);
     expect(day20).not.toContain("A2StandardTabbedWorkbookPage");
     expect(day20).toContain("Zentrales Thema: Reklamieren");
     expect(day20).toContain("Sprechen wie bei einer Mini-Präsentation");
     expect(day20).toContain("Teil 2 · Schreiben (Formeller Brief)");
-    expect(day20).toContain("Hören 4 · Damals (Back Then)");
-    expect(day20).toContain("1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3");
-    expect(countPrompts(day20)).toBe(13);
+    expect(day20).toContain("SpeakingMindMap");
+    expect(day20).toContain("RadioFirstWorkbookGate");
+    expect(day20).toContain("https://www.youtube.com/embed/pH1X3E7vOao?rel=0");
+    expect(day20).toContain("https://youtu.be/pH1X3E7vOao");
+    expect(day20).toContain("Warum bringt Laura den Wasserkocher zurück?");
+    expect(day20).toContain("Was bittet Laura den Kundenservice zu schicken?");
+    expect(day20).not.toContain("1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3");
+    expect(day20).not.toContain("1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD");
+    expect(countPrompts(day20)).toBe(10);
   });
 
   it("keeps the shared Teil 1 speaking experience", () => {
@@ -93,6 +100,8 @@ describe("shared A2 workbook regression", () => {
     expect(standardShell).toContain("SpeakingPracticeTimerCard");
     expect(standardShell).toContain('<CourseInlinePracticePanel type="speaking" />');
     expect(standardShell).toContain('activeTab === "sprechen"');
+    expect(day20).toContain("SpeakingMindMap");
+    expect(day20).toContain('<CourseInlinePracticePanel type="speaking" />');
     expect(day26).toContain("SpeakingMindMap");
     expect(day26).toContain('type="speaking"');
   });
@@ -324,7 +333,9 @@ describe("shared A2 workbook regression", () => {
   it("keeps lesson-specific media and restored sources", () => {
     expect(day18).toContain('hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"');
     expect(day20).toContain("Typische Reklamationssituationen üben");
-    expect(day20).toContain("1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD");
+    expect(day20).toContain("pH1X3E7vOao");
+    expect(ADDITIONAL_A2_RADIO_ENTRIES[20]?.youtubeId).toBe("5CtL1P74sW8");
+    expect(ADDITIONAL_A2_RADIO_ENTRIES[20]?.youtubeId).not.toBe("P_ruQxHKzPg");
   });
 
   it("does not remount the rejected legacy A2 completion injector", () => {
