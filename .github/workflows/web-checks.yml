@@ -76,6 +76,12 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js
 
+      - name: Test authoritative live class session selection
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassOfficialRepair.test.js
+
       - name: Test speaking tools
         working-directory: web
         env:

@@ -5,6 +5,8 @@ export { normalizeCurriculumIds, findCanonicalClass } from "./canonicalLiveClass
 
 const GHANA_TIMEZONE = "Africa/Accra";
 const COURSE_LEVEL_PATTERN = /\b(A1|A2|B1|B2|C1|C2)\b/i;
+const OFFICIAL_CURRICULUM_SOURCE = "coursedictionarydaygroups";
+const SUPERSEDED_STATUSES = new Set(["superseded", "deleted"]);
 
 function dateKey(value, timezone = GHANA_TIMEZONE) {
   const date = value instanceof Date ? value : new Date(value || 0);
@@ -19,6 +21,10 @@ function dateKey(value, timezone = GHANA_TIMEZONE) {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
+function normalize(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
 function normalizeClassIdentity(value) {
   return String(value || "")
     .normalize("NFD")
@@ -31,6 +37,38 @@ function normalizeClassIdentity(value) {
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function toMillis(value) {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.toDate === "function") return value.toDate().getTime();
+  if (typeof value?.seconds === "number") return value.seconds * 1000;
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+}
+
+function numericIndex(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function uniqueSessionsByDocument(sessions = []) {
+  const unique = new Map();
+  sessions.forEach((session, position) => {
+    const id = String(session?.id || "").trim();
+    const fallbackKey = [
+      toMillis(session?.startsAt),
+      toMillis(session?.endsAt),
+      String(session?.classId || session?.classRecordId || "").trim(),
+      String(session?.topic || session?.title || "").trim(),
+      position,
+    ].join("|");
+    const key = id ? `id:${id}` : `fallback:${fallbackKey}`;
+    if (!unique.has(key)) unique.set(key, session);
+  });
+  return [...unique.values()];
 }
 
 function extractCourseLevel(value) {
@@ -56,7 +94,6 @@ function sessionCurriculumLevels(session = {}) {
     session.courseLevel,
     session.assignment_id,
   ];
-
   return [...new Set(candidates.map(extractCourseLevel).filter(Boolean))];
 }
 
@@ -70,8 +107,8 @@ function getTeachingCurriculum(level = "") {
 function resolveCanonicalLesson(session = {}, position = 0, curriculum = []) {
   if (!curriculum.length) return null;
 
-  const curriculumIndex = Number(session.curriculumIndex);
-  if (Number.isInteger(curriculumIndex) && curriculumIndex >= 0 && curriculum[curriculumIndex]) {
+  const curriculumIndex = numericIndex(session.curriculumIndex);
+  if (curriculumIndex !== null && curriculum[curriculumIndex]) {
     return curriculum[curriculumIndex];
   }
 
@@ -92,8 +129,7 @@ function sanitizeCrossLevelSession(session = {}, expectedLevel = "", canonicalLe
   const sessionLevels = sessionCurriculumLevels(session);
   if (!sessionLevels.length || sessionLevels.includes(expectedLevel)) return session;
 
-  const keepAdminTopic = hasAdminVisibleTopic(session);
-  if (keepAdminTopic) {
+  if (hasAdminVisibleTopic(session)) {
     return {
       ...session,
       curriculumLevelMismatch: true,
@@ -143,38 +179,105 @@ function sessionBelongsToCanonicalClass(session = {}, klass = {}) {
   return canonicalNames.has(sessionName);
 }
 
-function scopeSummaryToCanonicalClass(summary, now = new Date()) {
-  if (!summary?.klass) return summary;
+function isSupersededSession(session = {}) {
+  const status = normalize(session.status || session.sessionStatus);
+  return SUPERSEDED_STATUSES.has(status)
+    || session.superseded === true
+    || session.isSuperseded === true
+    || Boolean(String(session.supersededBySessionId || "").trim());
+}
 
-  const expectedLevel = expectedClassLevel(summary.klass);
-  const normalizedKlass = expectedLevel
-    ? { ...summary.klass, levelId: expectedLevel, level: expectedLevel }
-    : summary.klass;
-  const curriculum = getTeachingCurriculum(expectedLevel);
-  let curriculumMismatchCount = 0;
-  let curriculumRepairCount = 0;
+function officialCurriculumIndex(session = {}) {
+  return numericIndex(session.curriculumIndex);
+}
 
-  const scopedSessions = (summary.sessions || [])
-    .filter((session) => sessionBelongsToCanonicalClass(session, summary.klass))
-    .map((session, position) => {
-      const canonicalLesson = resolveCanonicalLesson(session, position, curriculum);
-      const sanitized = sanitizeCrossLevelSession(session, expectedLevel, canonicalLesson);
-      if (sanitized.curriculumLevelMismatch) curriculumMismatchCount += 1;
-      if (sanitized.curriculumRepaired) curriculumRepairCount += 1;
-      return sanitized;
-    });
+function isOfficialRepairSession(session = {}) {
+  const source = normalize(session.curriculumSource).replace(/[^a-z0-9]+/g, "");
+  return source === OFFICIAL_CURRICULUM_SOURCE
+    && Number(session.curriculumVersion || 0) >= 2
+    && officialCurriculumIndex(session) !== null;
+}
 
-  const rebuilt = base.buildCanonicalLiveClassSummary({
-    klass: normalizedKlass,
-    sessions: scopedSessions,
-    zoomProfile: summary.zoom,
-    now,
+function expectedOfficialSessionCount(klass = {}) {
+  const candidates = [
+    klass.officialSessionCount,
+    klass.curriculumMappedSessionCount,
+    klass.generatedSessionCount,
+  ];
+  return candidates
+    .map(Number)
+    .find((value) => Number.isInteger(value) && value > 0) || 0;
+}
+
+function repairIsComplete(klass = {}) {
+  return normalize(klass.sessionRepairStatus) === "complete"
+    || normalize(klass.lastSessionChangeType) === "official-schedule-repair";
+}
+
+function repairSessionPreference(session = {}, klass = {}) {
+  const canonicalId = String(klass.id || "").trim();
+  const reason = normalize(session.rescheduleReason);
+  let score = 0;
+  if (!isSupersededSession(session)) score += 1000;
+  if (String(session.classId || "").trim() === canonicalId) score += 100;
+  if (String(session.classRecordId || "").trim() === canonicalId) score += 100;
+  if (reason.includes("official") && reason.includes("timetable repaired")) score += 80;
+  if (session.manualDateOverride === true) score += 40;
+  if (/^day\s+\d+\s*:/i.test(String(session.topic || session.title || "").trim())) score += 20;
+  score += Math.min(10, Number(session.curriculumVersion || 0));
+  return score;
+}
+
+function choosePreferredRepairSession(current, candidate, klass = {}) {
+  if (!current) return candidate;
+  const scoreDifference = repairSessionPreference(candidate, klass) - repairSessionPreference(current, klass);
+  if (scoreDifference !== 0) return scoreDifference > 0 ? candidate : current;
+
+  const candidateUpdated = Math.max(
+    toMillis(candidate.updatedAt),
+    toMillis(candidate.rescheduledAt),
+    toMillis(candidate.manualDateOverrideAt),
+  );
+  const currentUpdated = Math.max(
+    toMillis(current.updatedAt),
+    toMillis(current.rescheduledAt),
+    toMillis(current.manualDateOverrideAt),
+  );
+  if (candidateUpdated !== currentUpdated) return candidateUpdated > currentUpdated ? candidate : current;
+
+  return String(candidate.id || "").localeCompare(String(current.id || "")) > 0 ? candidate : current;
+}
+
+function selectAuthoritativeOfficialSessions(klass = {}, sessions = []) {
+  const uniqueSessions = uniqueSessionsByDocument(sessions);
+  const classScoped = uniqueSessions.filter((session) => sessionBelongsToCanonicalClass(session, klass));
+  const activeSessions = classScoped.filter((session) => !isSupersededSession(session));
+  const officialCandidates = activeSessions.filter(isOfficialRepairSession);
+  const byCurriculumIndex = new Map();
+
+  officialCandidates.forEach((session) => {
+    const index = officialCurriculumIndex(session);
+    byCurriculumIndex.set(index, choosePreferredRepairSession(byCurriculumIndex.get(index), session, klass));
   });
 
+  const expectedCount = expectedOfficialSessionCount(klass);
+  const authoritative = [...byCurriculumIndex.values()]
+    .filter((session) => !expectedCount || officialCurriculumIndex(session) < expectedCount)
+    .sort((left, right) => officialCurriculumIndex(left) - officialCurriculumIndex(right));
+  const hasFullCoverage = expectedCount > 0
+    && Array.from({ length: expectedCount }, (_, index) => byCurriculumIndex.has(index)).every(Boolean);
+  const canUseRepairWithoutCount = expectedCount === 0
+    && repairIsComplete(klass)
+    && authoritative.length > 0;
+  const shouldUseAuthoritative = hasFullCoverage || canUseRepairWithoutCount;
+  const selected = shouldUseAuthoritative ? authoritative : activeSessions;
+
   return {
-    ...rebuilt,
-    curriculumMismatchCount,
-    curriculumRepairCount,
+    sessions: selected,
+    authoritativeSchedule: shouldUseAuthoritative,
+    hiddenLegacySessionCount: Math.max(0, classScoped.length - selected.length),
+    expectedOfficialSessionCount: expectedCount,
+    officialCoverageCount: byCurriculumIndex.size,
   };
 }
 
@@ -188,8 +291,40 @@ function hideOldCompletedCard(summary, now = new Date()) {
 
 export function buildCanonicalLiveClassSummary(options = {}) {
   const now = options.now || new Date();
-  const summary = base.buildCanonicalLiveClassSummary(options);
-  return hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, now), now);
+  const klass = options.klass || {};
+  const selection = selectAuthoritativeOfficialSessions(klass, options.sessions || []);
+  const expectedLevel = expectedClassLevel(klass);
+  const normalizedKlass = expectedLevel
+    ? { ...klass, levelId: expectedLevel, level: expectedLevel }
+    : klass;
+  const curriculum = getTeachingCurriculum(expectedLevel);
+  let curriculumMismatchCount = 0;
+  let curriculumRepairCount = 0;
+
+  const sanitizedSessions = selection.sessions.map((session, position) => {
+    const canonicalLesson = resolveCanonicalLesson(session, position, curriculum);
+    const sanitized = sanitizeCrossLevelSession(session, expectedLevel, canonicalLesson);
+    if (sanitized.curriculumLevelMismatch) curriculumMismatchCount += 1;
+    if (sanitized.curriculumRepaired) curriculumRepairCount += 1;
+    return sanitized;
+  });
+
+  const rebuilt = base.buildCanonicalLiveClassSummary({
+    klass: normalizedKlass,
+    sessions: sanitizedSessions,
+    zoomProfile: options.zoomProfile || options.zoom || null,
+    now,
+  });
+
+  return hideOldCompletedCard({
+    ...rebuilt,
+    authoritativeSchedule: selection.authoritativeSchedule,
+    hiddenLegacySessionCount: selection.hiddenLegacySessionCount,
+    expectedOfficialSessionCount: selection.expectedOfficialSessionCount,
+    officialCoverageCount: selection.officialCoverageCount,
+    curriculumMismatchCount,
+    curriculumRepairCount,
+  }, now);
 }
 
 export function subscribeCanonicalLiveClass(options = {}) {
@@ -197,8 +332,29 @@ export function subscribeCanonicalLiveClass(options = {}) {
   return base.subscribeCanonicalLiveClass({
     ...options,
     onChange: (summary) => {
-      const now = new Date();
-      onChange?.(hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, now), now));
+      const rebuilt = buildCanonicalLiveClassSummary({
+        klass: summary.klass,
+        sessions: summary.sessions,
+        zoomProfile: summary.zoom,
+        now: new Date(),
+      });
+      onChange?.({
+        ...rebuilt,
+        hiddenOutOfDateRangeSessionCount:
+          Number(summary.hiddenOutOfDateRangeSessionCount || 0)
+          + Number(rebuilt.hiddenOutOfDateRangeSessionCount || 0),
+        hiddenUnmappedSessionCount:
+          Number(summary.hiddenUnmappedSessionCount || 0)
+          + Number(rebuilt.hiddenUnmappedSessionCount || 0),
+      });
     },
   });
 }
+
+export const __private__ = {
+  expectedOfficialSessionCount,
+  isOfficialRepairSession,
+  isSupersededSession,
+  selectAuthoritativeOfficialSessions,
+  uniqueSessionsByDocument,
+};
