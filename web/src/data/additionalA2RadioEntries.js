@@ -107,7 +107,7 @@ export const ADDITIONAL_A2_RADIO_ENTRIES = {
   20: {
     key: "a2-day20-typische-reklamationssituationen-falowen-radio",
     title: "Typische Reklamationssituationen üben 7.20",
-    youtubeId: "P_ruQxHKzPg",
+    youtubeId: "5CtL1P74sW8",
     duration: "",
     instruction:
       "Höre einfach zu und stimme dich auf typische Reklamationssituationen ein. Danach gehst du weiter zu Teil 1.",
