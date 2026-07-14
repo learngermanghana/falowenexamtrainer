@@ -23,6 +23,12 @@ function toDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function curriculumIndex(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
 function normalizeSession(snapshot) {
   const data = snapshot.data();
   const assignmentIds = base.normalizeCurriculumIds(data);
@@ -34,7 +40,7 @@ function normalizeSession(snapshot) {
     assignmentIds,
     chapterIds: assignmentIds,
     curriculumIds: assignmentIds,
-    curriculumIndex: Number(data.curriculumIndex || 0),
+    curriculumIndex: curriculumIndex(data.curriculumIndex),
     curriculumSource: String(data.curriculumSource || "").trim(),
     curriculumVersion: Number(data.curriculumVersion || 0),
   };
