@@ -2,7 +2,10 @@ import {
   A2_FORMAL_LETTER_TEMPLATE,
   A2_INFORMAL_LETTER_TEMPLATE,
 } from "./A2WritingWorkspaceSupport";
-import { inferQuestionOfDayTemplateId } from "./QuestionOfDayWritingTemplateController";
+import {
+  inferQuestionOfDayTemplateId,
+  readQuestionOfDayWritingPrompt,
+} from "./QuestionOfDayWritingTemplateController";
 import { __TESTING__ } from "./QuestionOfDayWritingTemplateInjector";
 
 const {
@@ -71,6 +74,8 @@ describe("Question of the Day writing templates", () => {
 
   test.each([
     ["A1", "Schreiben Sie eine E-Mail an Ihren Freund Patrick.", "informal"],
+    ["A1", "Ihr neuer Kollege, Herr Peter, hat Sie eingeladen.", "formal"],
+    ["A2", "Schreiben Sie eine Nachricht an Ihren Nachbarn.", "informal"],
     ["A2", "Schreiben Sie eine Beschwerde an eine Firma.", "formal"],
     [
       "B1",
@@ -102,5 +107,19 @@ describe("Question of the Day writing templates", () => {
     expect(
       templates.find((template) => template.id === recommendedId)?.kind,
     ).toBe(expectedKind);
+  });
+
+  test("captures the writing question but does not replace it with Submit-tab text", () => {
+    const section = document.createElement("section");
+    section.innerHTML = `
+      <div>
+        <h3>Schreiben</h3>
+        <p>Thema: Schreiben Sie einen Bericht über eine Kundenumfrage.</p>
+      </div>
+    `;
+    expect(readQuestionOfDayWritingPrompt(section)).toContain("Kundenumfrage");
+
+    section.innerHTML = `<div><h3>Submit</h3><textarea></textarea></div>`;
+    expect(readQuestionOfDayWritingPrompt(section)).toBe("");
   });
 });
