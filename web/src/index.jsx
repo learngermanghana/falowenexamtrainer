@@ -13,6 +13,9 @@ import RouteScopedBackgroundServices from './components/RouteScopedBackgroundSer
 import A1Day11DirectWorkbookRoute, {
   A1_DAY11_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day11DirectWorkbookRoute';
+import A1Day16Chapter9DirectWorkbookRoute, {
+  A1_DAY16_CHAPTER9_DIRECT_WORKBOOK_PATH,
+} from './components/A1Day16Chapter9DirectWorkbookRoute';
 import A1Day20Chapter123DirectWorkbookRoute, {
   A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day20Chapter123DirectWorkbookRoute';
@@ -42,6 +45,10 @@ const AuthenticatedAppRoutes = () => (
           <Route
             path={A1_DAY11_DIRECT_WORKBOOK_PATH}
             element={<A1Day11DirectWorkbookRoute />}
+          />
+          <Route
+            path={A1_DAY16_CHAPTER9_DIRECT_WORKBOOK_PATH}
+            element={<A1Day16Chapter9DirectWorkbookRoute />}
           />
           <Route
             path={A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH}
