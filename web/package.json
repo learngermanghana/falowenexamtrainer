@@ -31,6 +31,11 @@
   "overrides": {
     "typescript": "4.9.5"
   },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/src/testSetupFetchGlobals.js"
+    ]
+  },
   "scripts": {
     "sync:classes": "node scripts/sync-class-brochure-data.mjs",
     "audit:a1-curriculum": "node ../scripts/auditA1CourseBook.js",
