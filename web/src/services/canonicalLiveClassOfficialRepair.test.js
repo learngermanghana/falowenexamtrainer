@@ -1,4 +1,4 @@
-import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassService";
+import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassServiceV3";
 
 const A1_MUNICH_DATES = [
   "2026-06-19T18:00:00.000Z",
