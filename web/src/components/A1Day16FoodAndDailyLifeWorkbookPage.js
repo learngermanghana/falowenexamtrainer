@@ -1,14 +1,7 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
-
-import { styles } from "../styles";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
-
-const cardStyle = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-};
+import { styles } from "../styles";
 
 const sectionStyle = {
   ...styles.card,
@@ -108,18 +101,43 @@ const hoerenQuestions = [
   },
 ];
 
-const A1Day16FoodAndDailyLifeWorkbookPage = () => {
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 16 Workbook · Food and Negation + Food and Daily Life</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 9_10</p>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete all parts and submit your final answers in the submission area only (not directly on this page).
-        </p>
+const QuestionList = ({ questions }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {questions.map((question) => (
+      <div key={question.stem} style={questionBoxStyle}>
+        <strong>{question.stem}</strong>
+        {question.options.map((option) => (
+          <span key={option}>{option}</span>
+        ))}
       </div>
+    ))}
+  </div>
+);
+
+const A1Day16FoodAndDailyLifeWorkbookPage = () => (
+  <A1TutorMarkedWorkbookShell
+    day={16}
+    chapter="9"
+    fallbackAssignmentKey="A1-9"
+    title="A1 · Day 16 Workbook · Negation and Food"
+    subtitle="Chapter 9 · Tutor-marked assignment"
+    assignmentIntro="Complete all four parts below. Then open Submit and send your numbered answers and writing task to your tutor."
+    submitTitle="Submit A1 · Day 16 · Chapter 9"
+    submitDescription="This submission is locked to A1-9, so your Chapter 9 work is saved under the correct tutor-marked assignment."
+  >
+    <div data-a1-day16-chapter9-workbook-content="true" style={{ display: "grid", gap: 16 }}>
+      <section style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}>
+        <strong style={{ color: "#1d4ed8" }}>Tutor-marked assignment · A1-9</strong>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Use the Assignment tab to complete the workbook. When you finish, open the Submit tab and send your final answers.
+        </p>
+        <a
+          href="/campus/course/food-and-negation-day-16-9-10"
+          style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
+        >
+          Review grammar notes
+        </a>
+      </section>
 
       <section style={sectionStyle}>
         <img
@@ -130,7 +148,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => {
         />
         <h2 style={{ margin: 0 }}>Teil 1 · Lesen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instructions:</strong> Read the text below and choose the correct answer. One answer is correct.
+          <strong>Instructions:</strong> Read the text and choose the correct answer. Only one answer is correct.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Text:</strong> Ich gehe oft in den Supermarkt, um Lebensmittel zu kaufen. Ich mag frisches Obst und Gemüse.
@@ -144,48 +162,26 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => {
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 2 · Fragen zum Lesen</h2>
-        {readingQuestions.map((question) => (
-          <div key={question.stem} style={questionBoxStyle}>
-            <strong>{question.stem}</strong>
-            {question.options.map((option) => (
-              <span key={option}>{option}</span>
-            ))}
-          </div>
-        ))}
+        <QuestionList questions={readingQuestions} />
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören (Listening Comprehension)</h2>
+        <h2 style={{ margin: 0 }}>Teil 3 · Hörverstehen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Thema:</strong> Lebensmittel, Mögen und Negation.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete Hören from Google Drive, then return to submit answers.
+          <strong>Thema:</strong> Lebensmittel, mögen and negation. Listen to the material, then answer questions 1–5.
         </p>
         <CoursebookAudioPlayer
           url="https://drive.google.com/file/d/11v0Goh3UCihxHj3HQIjwaZtgrBjF3zME/view?usp=sharing"
-          linkLabel="Open Hören Material (Google Drive)"
+          linkLabel="Open listening material"
           linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
         />
-        {hoerenQuestions.map((question) => (
-          <div key={question.stem} style={questionBoxStyle}>
-            <strong>{question.stem}</strong>
-            {question.options.map((option) => (
-              <span key={option}>{option}</span>
-            ))}
-          </div>
-        ))}
+        <QuestionList questions={hoerenQuestions} />
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 4 · Schreiben Exercise</h2>
+        <h2 style={{ margin: 0 }}>Teil 4 · Schreiben</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Aufgabe:</strong> Schreiben Sie einen kurzen Text über Ihre Essgewohnheiten. Beantworten Sie dabei folgende
-          Fragen.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Write a short text about your eating habits. Answer the following questions. Use the structure: Subject + Verb +
-          Adverb + Food.
+          Schreiben Sie einen kurzen Text über Ihre Essgewohnheiten. Answer all three questions in complete sentences.
         </p>
         <ol style={{ margin: "0 0 0 20px", padding: 0, lineHeight: 1.7 }}>
           <li>Was mögen Sie gerne essen?</li>
@@ -193,22 +189,8 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => {
           <li>Was essen Sie zum Frühstück, Mittagessen und Abendessen?</li>
         </ol>
       </section>
-
-      <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <p style={{ margin: 0, fontWeight: 600 }}>
-          Submit your workbook answers in the submission area after finishing Teil 1–Teil 4.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Submit Workbook Answers
-        </a>
-      </div>
     </div>
-  );
-};
+  </A1TutorMarkedWorkbookShell>
+);
 
 export default A1Day16FoodAndDailyLifeWorkbookPage;
