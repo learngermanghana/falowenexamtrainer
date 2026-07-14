@@ -5,8 +5,10 @@ import {
 } from "../data/inAppWorkbookRoutes";
 import { normalizeLesson } from "../data/lessonModel";
 import {
+  A1_DAY12_WORKBOOK_PATH,
   SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
   shouldRenderWorkbookGuide,
+  shouldSuppressGenericWorkbookGuide,
 } from "../utils/autoWorkbookGuideRouting";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 
@@ -68,6 +70,18 @@ describe("AutoWorkbookStartGuide route matching", () => {
     ).toBe(true);
   });
 
+  test("A1 Day 12 shows its own workbook content instead of the duplicate global guide", () => {
+    expect(SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(A1_DAY12_WORKBOOK_PATH)).toBe(true);
+    expect(shouldSuppressGenericWorkbookGuide(A1_DAY12_WORKBOOK_PATH)).toBe(true);
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: A1_DAY12_WORKBOOK_PATH,
+        search: "?assignmentKey=A1-8&assignmentId=A1-8&level=A1",
+        match: { level: "A1", day: 12 },
+      })
+    ).toBe(false);
+  });
+
   test("A1 Day 18 Kapitel 12.1 has a workbook view distinct from grammar notes", () => {
     const route = getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.1" });
     expect(route).toBe(
@@ -103,12 +117,8 @@ describe("AutoWorkbookStartGuide route matching", () => {
     "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
   ])("A1 Day 18 grammar page %s does not mount workbook controls", (pathname) => {
     const match = { level: "A1", day: 18 };
-    expect(
-      shouldRenderWorkbookGuide({ pathname, search: "", match })
-    ).toBe(false);
-    expect(
-      shouldRenderWorkbookGuide({ pathname, search: "?view=workbook", match })
-    ).toBe(true);
+    expect(shouldRenderWorkbookGuide({ pathname, search: "", match })).toBe(false);
+    expect(shouldRenderWorkbookGuide({ pathname, search: "?view=workbook", match })).toBe(true);
   });
 
   test("every configured tutor-marked A1 workbook route receives submission support", () => {
@@ -140,7 +150,9 @@ describe("AutoWorkbookStartGuide route matching", () => {
     assignmentWorkbookRoutes.forEach((search, pathname) => {
       const match = index.get(pathname);
       expect(match).toBeTruthy();
-      expect(shouldRenderWorkbookGuide({ pathname, search, match })).toBe(true);
+      expect(shouldRenderWorkbookGuide({ pathname, search, match })).toBe(
+        pathname === A1_DAY12_WORKBOOK_PATH ? false : true
+      );
     });
   });
 
