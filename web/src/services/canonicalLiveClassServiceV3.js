@@ -5,7 +5,7 @@ export { normalizeCurriculumIds, findCanonicalClass } from "./canonicalLiveClass
 
 const GHANA_TIMEZONE = "Africa/Accra";
 const COURSE_LEVEL_PATTERN = /\b(A1|A2|B1|B2|C1|C2)\b/i;
-const OFFICIAL_CURRICULUM_SOURCE = "coursedictionary-day-groups";
+const OFFICIAL_CURRICULUM_SOURCE = "coursedictionarydaygroups";
 const SUPERSEDED_STATUSES = new Set(["superseded", "deleted"]);
 
 function dateKey(value, timezone = GHANA_TIMEZONE) {
