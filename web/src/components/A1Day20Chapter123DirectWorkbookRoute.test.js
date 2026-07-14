@@ -56,6 +56,22 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     );
   });
 
+  it("uses the approved direct formal and informal structure instead of tables", () => {
+    const pageSource = readComponentSource("LetterWritingIntroPage.js");
+
+    expect(pageSource).toContain("Formal Letter Structure");
+    expect(pageSource).toContain("Informal Letter Structure");
+    expect(pageSource).toContain(
+      "Ich freue mich im Voraus auf Ihre Antwort.",
+    );
+    expect(pageSource).toContain(
+      "Ich freue mich im Voraus auf deine Antwort.",
+    );
+    expect(pageSource).toContain('data-compact-letter-hero="true"');
+    expect(pageSource).not.toContain("ComparisonTable");
+    expect(pageSource).not.toContain("Form field");
+  });
+
   it("keeps the special grammar and workbook routes linked to the exact lesson hub", () => {
     const pageSource = readComponentSource("LetterWritingIntroPage.js");
     const backButtonSource = readComponentSource("navigation/AppBackButton.jsx");
