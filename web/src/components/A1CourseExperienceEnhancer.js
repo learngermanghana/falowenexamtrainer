@@ -8,6 +8,7 @@ const NAV_ATTRIBUTE = "data-a1-teil-navigation";
 const HEADER_ATTRIBUTE = "data-a1-lesson-header";
 const COURSE_CARD_ATTRIBUTE = "data-a1-course-card";
 const COURSE_ACTION_ATTRIBUTE = "data-a1-course-action";
+const COURSE_ACTIONS_ATTRIBUTE = "data-a1-course-actions";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -155,13 +156,46 @@ const ensureStyles = (root = document) => {
       font-size: clamp(1.05rem, 2.8vw, 1.2rem) !important;
       line-height: 1.3 !important;
     }
+    [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
+      align-items: center !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      justify-content: flex-end !important;
+      min-width: 148px;
+    }
     [${COURSE_ACTION_ATTRIBUTE}="true"] {
+      align-items: center !important;
+      background: #2563eb !important;
+      border: 1px solid #2563eb !important;
+      border-radius: 999px !important;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+      box-sizing: border-box !important;
+      color: #ffffff !important;
+      display: inline-flex !important;
+      font-size: 13px !important;
+      font-weight: 800 !important;
+      justify-content: center !important;
+      line-height: 1.2 !important;
       min-height: 44px !important;
-      padding-inline: 16px !important;
+      min-width: 132px !important;
+      padding: 10px 16px !important;
+      text-align: center !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+    }
+    [${COURSE_ACTION_ATTRIBUTE}="true"]:hover,
+    [${COURSE_ACTION_ATTRIBUTE}="true"]:focus-visible {
+      background: #1d4ed8 !important;
+      border-color: #1d4ed8 !important;
+      box-shadow: 0 10px 22px rgba(29, 78, 216, 0.3) !important;
+      transform: translateY(-1px);
     }
     @media (max-width: 640px) {
       [${NAV_ATTRIBUTE}="true"] { top: 4px; border-radius: 14px; }
       [${COURSE_CARD_ATTRIBUTE}="true"] { padding: 14px !important; }
+      [${COURSE_ACTIONS_ATTRIBUTE}="true"] { min-width: 132px; }
+      [${COURSE_ACTION_ATTRIBUTE}="true"] { min-width: 124px !important; }
     }
   `;
   root.head.appendChild(style);
@@ -311,20 +345,56 @@ const findCourseLevelSelect = (root = document) =>
     Array.from(select.options || []).some((option) => /^A1$/i.test(String(option.value || option.textContent || "").trim()))
   ) || null;
 
+const getActionPathname = (action) => {
+  const href = String(action?.getAttribute?.("href") || "").trim();
+  if (!href) return "";
+  try {
+    return new URL(href, "https://falowen.app").pathname;
+  } catch {
+    return href.split(/[?#]/)[0];
+  }
+};
+
+const isA1CourseLessonAction = (action) => {
+  if (!action) return false;
+  if (action.getAttribute(COURSE_ACTION_ATTRIBUTE) === "true") return true;
+  const pathname = normalizePath(getActionPathname(action));
+  if (/^\/campus\/course\/lesson\/A1\/\d+$/i.test(pathname)) return true;
+  return /^(open|start|continue|review) lesson$/i.test(String(action.textContent || "").trim());
+};
+
+const clearA1CourseBookAttributes = (root = document, { resetLabels = false } = {}) => {
+  root.querySelectorAll(`[${COURSE_ACTION_ATTRIBUTE}="true"]`).forEach((action) => {
+    action.removeAttribute(COURSE_ACTION_ATTRIBUTE);
+    if (resetLabels) {
+      action.textContent = "Open Lesson";
+      action.removeAttribute("aria-label");
+    }
+  });
+  root.querySelectorAll(`[${COURSE_ACTIONS_ATTRIBUTE}="true"]`).forEach((element) => element.removeAttribute(COURSE_ACTIONS_ATTRIBUTE));
+  root.querySelectorAll(`[${COURSE_CARD_ATTRIBUTE}="true"]`).forEach((element) => element.removeAttribute(COURSE_CARD_ATTRIBUTE));
+};
+
 export const applyA1CourseBookFormatting = (root = document, pathname = window.location?.pathname) => {
   if (!root?.querySelectorAll || normalizePath(pathname) !== COURSE_BOOK_PATH) return 0;
   const levelSelect = findCourseLevelSelect(root);
-  if (!levelSelect || String(levelSelect.value || "").trim().toUpperCase() !== "A1") return 0;
+  if (!levelSelect || String(levelSelect.value || "").trim().toUpperCase() !== "A1") {
+    clearA1CourseBookAttributes(root, { resetLabels: true });
+    return 0;
+  }
 
   let changed = 0;
-  Array.from(root.querySelectorAll("a")).forEach((action) => {
-    const currentLabel = normalizeText(action.textContent);
-    if (currentLabel !== "open lesson" && action.getAttribute(COURSE_ACTION_ATTRIBUTE) !== "true") return;
+  Array.from(root.querySelectorAll("article a")).forEach((action) => {
+    if (!isA1CourseLessonAction(action)) return;
     const card = action.closest("article");
     if (!card) return;
 
+    if (card.getAttribute(COURSE_CARD_ATTRIBUTE) !== "true") changed += 1;
     card.setAttribute(COURSE_CARD_ATTRIBUTE, "true");
+
+    if (action.getAttribute(COURSE_ACTION_ATTRIBUTE) !== "true") changed += 1;
     action.setAttribute(COURSE_ACTION_ATTRIBUTE, "true");
+    action.parentElement?.setAttribute(COURSE_ACTIONS_ATTRIBUTE, "true");
 
     Array.from(card.querySelectorAll("span")).forEach((chip) => {
       const text = String(chip.textContent || "").trim();
@@ -345,9 +415,9 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
     const nextLabel = resolveA1LessonActionLabel({ statusText: cardText, isCurrent });
     if (action.textContent !== nextLabel) {
       action.textContent = nextLabel;
-      action.setAttribute("aria-label", `${nextLabel}: ${card.querySelector("h3")?.textContent || "A1 lesson"}`);
       changed += 1;
     }
+    action.setAttribute("aria-label", `${nextLabel}: ${card.querySelector("h3")?.textContent || "A1 lesson"}`);
   });
 
   return changed;
@@ -360,6 +430,7 @@ const cleanupInjectedFormatting = (root = document) => {
     element.removeAttribute("id");
     element.removeAttribute("data-a1-generated-id");
   });
+  clearA1CourseBookAttributes(root, { resetLabels: true });
 };
 
 export default function A1CourseExperienceEnhancer() {
@@ -401,5 +472,8 @@ export const __TESTING__ = {
   normalizePath,
   normalizeText,
   findCourseLevelSelect,
+  getActionPathname,
+  isA1CourseLessonAction,
+  clearA1CourseBookAttributes,
   cleanupInjectedFormatting,
 };
