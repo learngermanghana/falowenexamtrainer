@@ -1,7 +1,7 @@
 import {
   buildCanonicalLiveClassSummary,
   normalizeCurriculumIds,
-} from "./canonicalLiveClassService";
+} from "./canonicalLiveClassServiceV3";
 
 describe("normalizeCurriculumIds", () => {
   test("uses chapterIds when assignmentIds exists but is empty", () => {
