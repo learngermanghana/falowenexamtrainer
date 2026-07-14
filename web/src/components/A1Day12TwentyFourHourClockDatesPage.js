@@ -3,6 +3,131 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
 const WORKBOOK_ROUTE = "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook";
+const KNOWLEDGE_TEST_PASS_MARK = 9;
+
+const KNOWLEDGE_TEST_QUESTIONS = Object.freeze([
+  {
+    id: "time-1",
+    topic: "24-hour clock",
+    prompt: "How do you say 18:45 formally in German?",
+    options: [
+      "achtzehn Uhr fünfundvierzig",
+      "acht Uhr fünfundvierzig",
+      "neunzehn Uhr fünfzehn",
+      "Viertel nach achtzehn",
+    ],
+    answer: "achtzehn Uhr fünfundvierzig",
+    explanation: "Formal 24-hour time follows: hour + Uhr + minutes.",
+  },
+  {
+    id: "time-2",
+    topic: "24-hour clock",
+    prompt: "What time is halb neun?",
+    options: ["08:30", "09:30", "08:09", "20:30"],
+    answer: "08:30",
+    explanation: "halb neun means halfway to nine, so it is 08:30.",
+  },
+  {
+    id: "time-3",
+    topic: "24-hour clock",
+    prompt: "Which 24-hour time means 2:15 PM?",
+    options: ["02:15", "12:15", "14:15", "22:15"],
+    answer: "14:15",
+    explanation: "For afternoon times, add 12 to the hour: 2 PM becomes 14:00.",
+  },
+  {
+    id: "time-4",
+    topic: "24-hour clock",
+    prompt: "A train leaves at 21:05. Which formal German time is correct?",
+    options: [
+      "einundzwanzig Uhr fünf",
+      "neun Uhr fünf",
+      "einundzwanzig Uhr fünfzig",
+      "fünf nach einundzwanzig Uhr abends",
+    ],
+    answer: "einundzwanzig Uhr fünf",
+    explanation: "Say the hour first, then Uhr, then the minutes.",
+  },
+  {
+    id: "time-5",
+    topic: "24-hour clock",
+    prompt: "What does 00:00 mean?",
+    options: ["Mittag", "Mitternacht", "halb null", "zwölf Uhr nachmittags"],
+    answer: "Mitternacht",
+    explanation: "00:00 is midnight: Mitternacht or null Uhr.",
+  },
+  {
+    id: "time-6",
+    topic: "24-hour clock",
+    prompt: "Which time is Viertel vor zehn?",
+    options: ["09:15", "09:45", "10:15", "10:45"],
+    answer: "09:45",
+    explanation: "Viertel vor zehn means fifteen minutes before ten.",
+  },
+  {
+    id: "date-1",
+    topic: "Dates",
+    prompt: "Complete: Heute ist ___ . (3 February)",
+    options: [
+      "der dritte Februar",
+      "am dritten Februar",
+      "der drei Februar",
+      "den dritten Februar",
+    ],
+    answer: "der dritte Februar",
+    explanation: "After Heute ist, use der + ordinal number + month.",
+  },
+  {
+    id: "date-2",
+    topic: "Dates",
+    prompt: "Complete: Ich habe ___ Geburtstag. (5 May)",
+    options: ["der fünfte Mai", "am fünften Mai", "im fünften Mai", "am fünf Mai"],
+    answer: "am fünften Mai",
+    explanation: "After am, the ordinal adjective takes the ending -en.",
+  },
+  {
+    id: "date-3",
+    topic: "Dates",
+    prompt: "How do you say 25 December as a date?",
+    options: [
+      "der fünfundzwanzigste Dezember",
+      "der fünfundzwanzig Dezember",
+      "am fünfundzwanzigste Dezember",
+      "der fünfundzwanzigsten Dezember",
+    ],
+    answer: "der fünfundzwanzigste Dezember",
+    explanation: "Numbers from 20 to 31 normally form the date ordinal with -ste.",
+  },
+  {
+    id: "date-4",
+    topic: "Dates",
+    prompt: "How is 7 August 2026 written in German numerical format?",
+    options: ["08.07.2026", "07.08.2026", "2026.08.07", "07/08/26"],
+    answer: "07.08.2026",
+    explanation: "German numerical dates normally follow day.month.year.",
+  },
+  {
+    id: "date-5",
+    topic: "Dates",
+    prompt: "Which ordinal form is correct for the number 8 in a date?",
+    options: ["achte", "achtte", "achtste", "achten"],
+    answer: "achte",
+    explanation: "The special date form is achte: der achte August.",
+  },
+  {
+    id: "date-6",
+    topic: "Dates",
+    prompt: "Complete: Der Kurs beginnt ___ . (20 June)",
+    options: [
+      "der zwanzigste Juni",
+      "am zwanzigsten Juni",
+      "im zwanzigsten Juni",
+      "am zwanzigste Juni",
+    ],
+    answer: "am zwanzigsten Juni",
+    explanation: "A date after beginnen is commonly introduced with am + ordinal ending -en.",
+  },
+]);
 
 const pageStyle = {
   ...styles.container,
@@ -52,16 +177,6 @@ const exampleStyle = {
   lineHeight: 1.7,
 };
 
-const inputStyle = {
-  width: "100%",
-  maxWidth: 420,
-  boxSizing: "border-box",
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid #cbd5e1",
-  fontSize: 16,
-};
-
 const Section = ({ title, children }) => (
   <section style={cardStyle}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -103,30 +218,35 @@ const Table = ({ headers, rows }) => (
   </div>
 );
 
-const normalize = (value = "") => String(value).trim().toLowerCase().replace(/\s+/g, " ");
-
 const A1Day12TwentyFourHourClockDatesPage = () => {
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
-  const setAnswer = (key, value) => setAnswers((current) => ({ ...current, [key]: value }));
+  const setAnswer = (key, value) => {
+    setAnswers((current) => ({ ...current, [key]: value }));
+    setShowResults(false);
+  };
 
   const results = useMemo(() => {
-    const checks = {
-      time1: normalize(answers.time1) === "vierzehn uhr zwanzig",
-      time2: ["7:30", "07:30"].includes(normalize(answers.time2)),
-      date1: normalize(answers.date1) === "der dritte februar",
-      date2: normalize(answers.date2) === "der fünfundzwanzigste dezember",
-      date3: normalize(answers.date3) === "am fünften mai",
-      date4: normalize(answers.date4) === "03.02.2024",
-    };
+    const correct = KNOWLEDGE_TEST_QUESTIONS.filter(
+      (question) => answers[question.id] === question.answer,
+    ).length;
+    const answered = KNOWLEDGE_TEST_QUESTIONS.filter(
+      (question) => Boolean(answers[question.id]),
+    ).length;
 
     return {
-      checks,
-      correct: Object.values(checks).filter(Boolean).length,
-      total: Object.keys(checks).length,
+      answered,
+      correct,
+      total: KNOWLEDGE_TEST_QUESTIONS.length,
+      passed: correct >= KNOWLEDGE_TEST_PASS_MARK,
     };
   }, [answers]);
+
+  const resetTest = () => {
+    setAnswers({});
+    setShowResults(false);
+  };
 
   return (
     <main style={pageStyle} data-a1-day12-grammar-notes="true">
@@ -283,45 +403,6 @@ const A1Day12TwentyFourHourClockDatesPage = () => {
         </SubSection>
       </Section>
 
-      <Section title="Quick practice">
-        <SubSection title="Write the answers">
-          {[
-            ["time1", "1. Say 14:20 formally in German.", "vierzehn Uhr zwanzig"],
-            ["time2", "2. What time is halb acht?", "7:30"],
-            ["date1", "3. Say 3 February in German.", "der dritte Februar"],
-            ["date2", "4. Say 25 December in German.", "der fünfundzwanzigste Dezember"],
-            ["date3", "5. Complete: Ich habe ___ Geburtstag. (5 May)", "am fünften Mai"],
-            ["date4", "6. Write 3 February 2024 in German numerical format.", "03.02.2024"],
-          ].map(([key, label, placeholder]) => (
-            <label key={key} style={{ display: "grid", gap: 6 }}>
-              <strong>{label}</strong>
-              <input
-                value={answers[key] || ""}
-                onChange={(event) => setAnswer(key, event.target.value)}
-                placeholder={placeholder}
-                style={inputStyle}
-              />
-            </label>
-          ))}
-        </SubSection>
-
-        <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => setShowResults(true)}>
-          Check answers
-        </button>
-
-        {showResults ? (
-          <div style={noteStyle} role="status">
-            <strong>Score: {results.correct}/{results.total}</strong>
-            <div>1. {results.checks.time1 ? "✅" : "❌"} vierzehn Uhr zwanzig</div>
-            <div>2. {results.checks.time2 ? "✅" : "❌"} 7:30</div>
-            <div>3. {results.checks.date1 ? "✅" : "❌"} der dritte Februar</div>
-            <div>4. {results.checks.date2 ? "✅" : "❌"} der fünfundzwanzigste Dezember</div>
-            <div>5. {results.checks.date3 ? "✅" : "❌"} am fünften Mai</div>
-            <div>6. {results.checks.date4 ? "✅" : "❌"} 03.02.2024</div>
-          </div>
-        ) : null}
-      </Section>
-
       <Section title="What to remember">
         <ul style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.7 }}>
           <li>Formal time: hour + Uhr + minutes.</li>
@@ -334,6 +415,138 @@ const A1Day12TwentyFourHourClockDatesPage = () => {
         <a href={WORKBOOK_ROUTE} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
           Open the Day 12 workbook
         </a>
+      </Section>
+
+      <Section title="Knowledge test: 24-hour clock and dates">
+        <div style={noteStyle}>
+          <strong>12 questions · Pass mark: {KNOWLEDGE_TEST_PASS_MARK}/12</strong>
+          <div>Answer all six clock questions and all six date questions before checking your score. Answers are not shown inside the question fields.</div>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
+          <strong>Answered: {results.answered}/{results.total}</strong>
+          <span style={{ color: "#64748b" }}>Choose one answer for every question.</span>
+        </div>
+
+        <div style={{ display: "grid", gap: 12 }} data-a1-day12-knowledge-test="true">
+          {KNOWLEDGE_TEST_QUESTIONS.map((question, index) => {
+            const selectedAnswer = answers[question.id] || "";
+            const isCorrect = selectedAnswer === question.answer;
+            const resultBorder = showResults
+              ? isCorrect
+                ? "#86efac"
+                : "#fca5a5"
+              : "#e2e8f0";
+
+            return (
+              <fieldset
+                key={question.id}
+                style={{
+                  ...subsectionStyle,
+                  margin: 0,
+                  borderColor: resultBorder,
+                  background: showResults ? (isCorrect ? "#f0fdf4" : "#fff7f7") : "#ffffff",
+                }}
+              >
+                <legend style={{ padding: "0 6px", fontWeight: 800 }}>
+                  {index + 1}. {question.prompt}
+                </legend>
+                <span style={{ color: "#475569", fontSize: 13, fontWeight: 800 }}>
+                  {question.topic}
+                </span>
+
+                <div style={{ display: "grid", gap: 8 }}>
+                  {question.options.map((option) => {
+                    const selected = selectedAnswer === option;
+                    return (
+                      <label
+                        key={option}
+                        style={{
+                          display: "flex",
+                          gap: 10,
+                          alignItems: "flex-start",
+                          padding: "10px 12px",
+                          border: `1px solid ${selected ? "#2563eb" : "#cbd5e1"}`,
+                          borderRadius: 10,
+                          background: selected ? "#eff6ff" : "#ffffff",
+                          cursor: "pointer",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name={question.id}
+                          value={option}
+                          checked={selected}
+                          onChange={(event) => setAnswer(question.id, event.target.value)}
+                          style={{ marginTop: 3 }}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                {showResults ? (
+                  <div
+                    style={{
+                      borderRadius: 10,
+                      padding: 10,
+                      background: isCorrect ? "#dcfce7" : "#fee2e2",
+                      color: isCorrect ? "#166534" : "#991b1b",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    <strong>{isCorrect ? "Correct." : `Correct answer: ${question.answer}`}</strong>
+                    <div>{question.explanation}</div>
+                  </div>
+                ) : null}
+              </fieldset>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          <button
+            type="button"
+            style={{
+              ...styles.primaryButton,
+              width: "fit-content",
+              opacity: results.answered === results.total ? 1 : 0.55,
+              cursor: results.answered === results.total ? "pointer" : "not-allowed",
+            }}
+            disabled={results.answered !== results.total}
+            onClick={() => setShowResults(true)}
+          >
+            Check my knowledge
+          </button>
+          <button
+            type="button"
+            style={{ ...styles.secondaryButton, width: "fit-content" }}
+            onClick={resetTest}
+          >
+            Reset test
+          </button>
+        </div>
+
+        {showResults ? (
+          <div
+            style={{
+              ...noteStyle,
+              borderColor: results.passed ? "#86efac" : "#fca5a5",
+              background: results.passed ? "#f0fdf4" : "#fff7f7",
+              color: results.passed ? "#166534" : "#991b1b",
+            }}
+            role="status"
+          >
+            <strong>Score: {results.correct}/{results.total}</strong>
+            <div>
+              {results.passed
+                ? "Passed. You are ready to continue to the workbook."
+                : "Not passed yet. Review the clock and date rules, reset the test, and try again."}
+            </div>
+          </div>
+        ) : null}
       </Section>
     </main>
   );
