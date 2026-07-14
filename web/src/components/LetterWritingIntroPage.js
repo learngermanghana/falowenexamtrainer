@@ -1,10 +1,12 @@
 import React, { memo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import AppBackButton from "./navigation/AppBackButton";
 
-const GRAMMAR_ROUTE = "/campus/course/letter-writing-intro-12-3";
-const WORKBOOK_ROUTE =
+export const A1_DAY20_CHAPTER123_GRAMMAR_ROUTE =
+  "/campus/course/letter-writing-intro-12-3";
+export const A1_DAY20_CHAPTER123_WORKBOOK_ROUTE =
   "/campus/course/letter-writing-intro-german-a1-day-12-3";
 
 const heroImageUrl =
@@ -119,7 +121,7 @@ const BulletList = ({ items }) => (
 
 export const resolveLetterWritingPageMode = (pathname = "") => {
   const normalized = String(pathname || "").replace(/\/+$/, "");
-  return normalized === GRAMMAR_ROUTE ? "grammar" : "workbook";
+  return normalized === A1_DAY20_CHAPTER123_GRAMMAR_ROUTE ? "grammar" : "workbook";
 };
 
 const FormalNotes = () => (
@@ -200,7 +202,7 @@ const GrammarNotesPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} data-a1-day20-chapter123-grammar-notes="true">
       <header style={heroStyle}>
         <div style={heroLayoutStyle}>
           <div style={heroContentStyle}>
@@ -213,10 +215,10 @@ const GrammarNotesPage = () => {
               and then write your answer with confidence.
             </p>
             <div style={noteBannerStyle}>
-              <strong>Read these notes first</strong>
+              <strong>Read these notes before the tutor-marked assignment</strong>
               <div>
-                Learn the structure, useful phrases, and the <strong>weil</strong> rule before
-                you move to the workbook questions.
+                Chapter 12.3 is not self-learning. After reading these notes, complete both
+                workbook letters and submit them to your tutor through the Submit tab.
               </div>
             </div>
           </div>
@@ -230,12 +232,10 @@ const GrammarNotesPage = () => {
 
       <Section title="A1 Schreiben exam overview">
         <p style={{ margin: 0, lineHeight: 1.75 }}>
-          In the A1 Schreiben exam, there are two important parts. <strong>Teil 1</strong> is
-          form filling, where you read a short situation and complete missing information.
-          <strong> Teil 2</strong> is letter writing, where you write a short formal or informal
-          text. In this course, your main focus is <strong>Teil 2</strong>, so you must learn the
-          correct greeting, useful phrases, question forms, and the word order with
-          <strong> weil</strong>.
+          In the A1 Schreiben exam, <strong>Teil 1</strong> is form filling and
+          <strong> Teil 2</strong> is letter writing. In this course, your main focus is Teil 2,
+          so you must learn the correct greeting, useful phrases, question forms, and the word
+          order with <strong>weil</strong>.
         </p>
       </Section>
 
@@ -249,31 +249,6 @@ const GrammarNotesPage = () => {
           >
             ▶ Open explanation video
           </a>
-        </InfoBox>
-      </Section>
-
-      <Section title="Teil 1 — Form filling">
-        <InfoBox title="How this part works">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Read the situation carefully and transfer only the required information into the
-            form. Do not write full sentences when the form asks for a name, number, place,
-            payment method, or date.
-          </p>
-        </InfoBox>
-        <InfoBox title="Example">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Eva Kadavy travels with her husband and two sons, stays in Seeheim, cannot pay by
-            credit card, and books the trip for Sunday.
-          </p>
-          <BulletList
-            items={[
-              "Anzahl der Personen: 4 / vier",
-              "Davon Kinder: 2 / zwei",
-              "Urlaubsort: 78014 Seeheim",
-              "Zahlungsweise: bar",
-              "Reisetermin: Sonntag / nächsten Sonntag",
-            ]}
-          />
         </InfoBox>
       </Section>
 
@@ -305,98 +280,93 @@ const GrammarNotesPage = () => {
         </InfoBox>
       </Section>
 
-      <Section title="Ready to write?">
+      <Section title="Ready for the tutor-marked assignment?">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The workbook now contains only the two exam-style questions: one informal letter and
-          one formal letter.
+          The workbook contains two required writing questions: one informal letter and one formal
+          letter. Submit both answers for tutor marking.
         </p>
         <button
           type="button"
           style={{ ...styles.primaryButton, width: "fit-content" }}
-          onClick={() => navigate(WORKBOOK_ROUTE)}
+          onClick={() => navigate(A1_DAY20_CHAPTER123_WORKBOOK_ROUTE)}
         >
-          Open letter-writing workbook
+          Open tutor-marked workbook
         </button>
       </Section>
     </main>
   );
 };
 
-const WorkbookPage = () => {
-  const navigate = useNavigate();
+const WorkbookQuestions = () => (
+  <div
+    data-a1-day20-chapter123-workbook-content="true"
+    style={{ display: "grid", gap: 16 }}
+  >
+    <section style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}>
+      <span style={eyebrowStyle}>Tutor-marked assignment · A1-12.3</span>
+      <h2 style={{ margin: 0 }}>Complete and submit both letters</h2>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Use the Assignment tab to read the questions. When both letters are ready, open the Submit
+        tab and send your final answers to your tutor.
+      </p>
+      <a
+        href={A1_DAY20_CHAPTER123_GRAMMAR_ROUTE}
+        style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
+      >
+        Review grammar notes
+      </a>
+    </section>
 
-  return (
-    <main style={pageStyle}>
-      <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 0 }}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={eyebrowStyle}>A1 · Day 20 · Kapitel 12.3 · Workbook</span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Letter Writing Workbook</h1>
-        <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-          Write both letters. Use the separate grammar notes page for structure, phrases, and
-          the <strong>weil</strong> rule.
-        </p>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate(GRAMMAR_ROUTE)}
-        >
-          Open grammar notes
-        </button>
-      </header>
+    <section style={questionCardStyle}>
+      <span style={{ ...eyebrowStyle, background: "#dcfce7", color: "#166534" }}>
+        Question 1 · Informal letter
+      </span>
+      <h2 style={{ margin: 0 }}>Birthday letter to a friend</h2>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Ihr Freund / Ihre Freundin hat Geburtstag. Schreiben Sie an ihn / sie:
+      </p>
+      <BulletList
+        items={[
+          "Warum schreiben Sie?",
+          "Gratulieren Sie ihm / ihr.",
+          "Fragen Sie, ob er / sie eine Feier plant und ob Sie mit Ihrer Familie kommen können.",
+        ]}
+      />
+    </section>
 
-      <section style={questionCardStyle}>
-        <span style={{ ...eyebrowStyle, background: "#dcfce7", color: "#166534" }}>
-          Question 1 · Informal letter
-        </span>
-        <h2 style={{ margin: 0 }}>Birthday letter to a friend</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Ihr Freund / Ihre Freundin hat Geburtstag. Schreiben Sie an ihn / sie:
-        </p>
-        <BulletList
-          items={[
-            "Warum schreiben Sie?",
-            "Gratulieren Sie ihm / ihr.",
-            "Fragen Sie, ob er / sie eine Feier plant und ob Sie mit Ihrer Familie kommen können.",
-          ]}
-        />
-      </section>
+    <section style={questionCardStyle}>
+      <span style={{ ...eyebrowStyle, background: "#ffedd5", color: "#9a3412" }}>
+        Question 2 · Formal letter
+      </span>
+      <h2 style={{ margin: 0 }}>Letter to a language school</h2>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
+      </p>
+      <BulletList
+        items={[
+          "Warum schreiben Sie?",
+          "Bitten Sie um Informationen über Kurse.",
+          "Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+        ]}
+      />
+    </section>
+  </div>
+);
 
-      <section style={questionCardStyle}>
-        <span style={{ ...eyebrowStyle, background: "#ffedd5", color: "#9a3412" }}>
-          Question 2 · Formal letter
-        </span>
-        <h2 style={{ margin: 0 }}>Letter to a language school</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
-        </p>
-        <BulletList
-          items={[
-            "Warum schreiben Sie?",
-            "Bitten Sie um Informationen über Kurse.",
-            "Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
-          ]}
-        />
-      </section>
-
-      <section style={{ ...styles.card, display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 0 }}>
-        <button
-          type="button"
-          style={styles.primaryButton}
-          onClick={() => navigate("/campus/course?submitWork=1")}
-        >
-          Go to Submit Assignment
-        </button>
-        <button
-          type="button"
-          style={styles.secondaryButton}
-          onClick={() => navigate(GRAMMAR_ROUTE)}
-        >
-          Review grammar notes
-        </button>
-      </section>
-    </main>
-  );
-};
+const WorkbookPage = () => (
+  <A1TutorMarkedWorkbookShell
+    day={20}
+    chapter="12.3"
+    fallbackAssignmentKey="A1-12.3"
+    title="A1 · Day 20 Workbook · Letter Writing"
+    subtitle="Kapitel 12.3 · Tutor-marked Schreiben assignment"
+    assignmentIntro="Write the informal and formal letters below. Then open Submit and send both final answers to your tutor."
+    submitTitle="Submit A1 · Day 20 · Kapitel 12.3"
+    submitDescription="This submission is locked to A1-12.3. Submit both the informal and formal letter for tutor marking."
+  >
+    <WorkbookQuestions />
+  </A1TutorMarkedWorkbookShell>
+);
 
 const LetterWritingIntroPage = () => {
   const location = useLocation();
