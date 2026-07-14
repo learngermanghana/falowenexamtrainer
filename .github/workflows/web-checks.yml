@@ -58,12 +58,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
-      - name: Capture cancelled-session assertion report
+      - name: Capture official date-range assertion report
         working-directory: web
         env:
           CI: true
         continue-on-error: true
-        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "excludes cancelled sessions from progress and next-session selection" --json --outputFile=canonical-summary-report.json
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "marks a class as ended and hides sessions outside the official end date" --json --outputFile=canonical-summary-report.json
 
       - name: Upload canonical summary report
         if: always()
