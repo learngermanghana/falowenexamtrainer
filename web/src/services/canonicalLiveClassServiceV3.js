@@ -281,9 +281,15 @@ function scopeSummaryToCanonicalClass(summary, now = new Date()) {
     zoomProfile: summary.zoom,
     now,
   });
+  const hiddenOutOfDateRangeSessionCount = Number(summary.hiddenOutOfDateRangeSessionCount || 0)
+    + Number(rebuilt.hiddenOutOfDateRangeSessionCount || 0);
+  const hiddenUnmappedSessionCount = Number(summary.hiddenUnmappedSessionCount || 0)
+    + Number(rebuilt.hiddenUnmappedSessionCount || 0);
 
   return {
     ...rebuilt,
+    hiddenOutOfDateRangeSessionCount,
+    hiddenUnmappedSessionCount,
     curriculumMismatchCount,
     curriculumRepairCount,
   };
