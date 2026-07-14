@@ -1,7 +1,11 @@
 import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
 
+export const A2_DAY20_LEGACY_WORKBOOK_PATH =
+  "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
+export const A2_DAY20_DYNAMIC_LESSON_PATH = "/campus/course/lesson/A2/20";
+
 export const PROTECTED_A2_WORKBOOK_DAYS = Object.freeze(
-  Array.from({ length: 9 }, (_, index) => 20 + index),
+  Array.from({ length: 8 }, (_, index) => 21 + index),
 );
 
 const PROTECTED_A2_DAY_SET = new Set(PROTECTED_A2_WORKBOOK_DAYS);
@@ -10,7 +14,16 @@ const A2_LESSON_ROUTE_PATTERN = /^\/campus\/course\/lesson\/A2\/(\d+)\/?$/i;
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 
 export const resolveProtectedA2WorkbookRedirect = ({ pathname = "", search = "" } = {}) => {
-  const match = normalizePath(pathname).match(A2_LESSON_ROUTE_PATTERN);
+  const normalizedPath = normalizePath(pathname);
+
+  // Day 20 used the dynamic lesson page in the last known-good release. That
+  // page supplies the shared Goethe speaking tools. Redirect old saved links
+  // away from the legacy simplified workbook so refreshes also recover.
+  if (normalizedPath === A2_DAY20_LEGACY_WORKBOOK_PATH) {
+    return A2_DAY20_DYNAMIC_LESSON_PATH;
+  }
+
+  const match = normalizedPath.match(A2_LESSON_ROUTE_PATTERN);
   if (!match) return "";
 
   const day = Number(match[1]);
