@@ -2,6 +2,8 @@ import { normalizeInAppPath } from "./courseWorkbookRoutes";
 
 export const A1_DAY6_WORKBOOK_PATH =
   "/campus/course/a1-day-6-family-and-hobbies-workbook";
+export const A1_DAY12_WORKBOOK_PATH =
+  "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook";
 export const A1_DAY18_CHAPTER121_PATH =
   "/campus/course/two-case-prepositions-wechselpraepositionen-day-18";
 export const A1_DAY18_CHAPTER122_GRAMMAR_PATH =
@@ -21,6 +23,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
   A1_DAY6_WORKBOOK_PATH,
+  A1_DAY12_WORKBOOK_PATH,
   A1_DAY18_CHAPTER121_PATH,
   A1_DAY18_CHAPTER122_GRAMMAR_PATH,
   A1_DAY18_CHAPTER122_WORKBOOK_PATH,
@@ -28,6 +31,9 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   A2_DAY21_WORKBOOK_PATH,
   B1_DAY4_WORKBOOK_PATH,
 ]);
+
+export const shouldSuppressGenericWorkbookGuide = (pathname = "") =>
+  normalizeInAppPath(pathname) === A1_DAY12_WORKBOOK_PATH;
 
 export const isSelfManagedB1LessonWorkbook = (pathname = "", search = "") => {
   const normalizedPathname = normalizeInAppPath(pathname);
