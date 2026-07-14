@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import {
+  A2_DAY20_DYNAMIC_LESSON_PATH,
+  A2_DAY20_LEGACY_WORKBOOK_PATH,
   PROTECTED_A2_WORKBOOK_DAYS,
   hideDuplicateFloatingCourseSubmitButton,
   isDuplicateFloatingCourseSubmitButton,
@@ -8,7 +10,6 @@ import {
 } from "./a2ProtectedWorkbookRoutes";
 
 const expectedRoutes = {
-  20: "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
   21: "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
   22: "/campus/course/a2-day-22-die-woche-planung-workbook",
   23: "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
@@ -20,14 +21,35 @@ const expectedRoutes = {
 };
 
 describe("protected A2 workbook routes", () => {
-  test("redirects generic A2 Days 20 to 28 to the existing custom workbook pages", () => {
-    expect(PROTECTED_A2_WORKBOOK_DAYS).toEqual([20, 21, 22, 23, 24, 25, 26, 27, 28]);
+  test("keeps Day 20 on the dynamic lesson page used by the last known-good release", () => {
+    expect(PROTECTED_A2_WORKBOOK_DAYS).toEqual([21, 22, 23, 24, 25, 26, 27, 28]);
 
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: A2_DAY20_DYNAMIC_LESSON_PATH,
+      }),
+    ).toBe("");
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: A2_DAY20_DYNAMIC_LESSON_PATH,
+        search: "?chapter=7.20",
+      }),
+    ).toBe("");
+  });
+
+  test("redirects the old simplified Day 20 URL back to the dynamic lesson page", () => {
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: A2_DAY20_LEGACY_WORKBOOK_PATH,
+      }),
+    ).toBe(A2_DAY20_DYNAMIC_LESSON_PATH);
+  });
+
+  test("continues protecting generic A2 Days 21 to 28 with their custom workbook pages", () => {
     PROTECTED_A2_WORKBOOK_DAYS.forEach((day) => {
       expect(
         resolveProtectedA2WorkbookRedirect({
           pathname: `/campus/course/lesson/A2/${day}`,
-          search: day === 20 ? "?chapter=7.20" : "",
         }),
       ).toBe(expectedRoutes[day]);
     });
@@ -37,25 +59,25 @@ describe("protected A2 workbook routes", () => {
     expect(resolveProtectedA2WorkbookRedirect({ pathname: "/campus/course/lesson/A2/19" })).toBe("");
     expect(
       resolveProtectedA2WorkbookRedirect({
-        pathname: "/campus/course/lesson/A2/20",
-        search: "?view=grammar&chapter=7.20",
+        pathname: "/campus/course/lesson/A2/21",
+        search: "?view=grammar&chapter=8.21",
       }),
     ).toBe("");
     expect(
       resolveProtectedA2WorkbookRedirect({
-        pathname: "/campus/course/lesson/A2/20",
-        search: "?view=learn&chapter=7.20",
+        pathname: "/campus/course/lesson/A2/21",
+        search: "?view=learn&chapter=8.21",
       }),
     ).toBe("");
     expect(
       resolveProtectedA2WorkbookRedirect({
-        pathname: "/campus/course/lesson/A2/20",
-        search: "?view=workbook&chapter=7.20",
+        pathname: "/campus/course/lesson/A2/21",
+        search: "?view=workbook&chapter=8.21",
       }),
-    ).toBe(expectedRoutes[20]);
+    ).toBe(expectedRoutes[21]);
   });
 
-  test("keeps the restored Day 20 Goethe-style speaking and full workbook content", () => {
+  test("keeps the legacy Day 20 content file available without forcing students onto it", () => {
     const source = fs.readFileSync(
       path.resolve(__dirname, "../components/A2Day20TypischeReklamationssituationenWorkbookPage.js"),
       "utf8",
