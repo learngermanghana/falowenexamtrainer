@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { getConfiguredInAppWorkbookRoute } from "./inAppWorkbookRoutes";
+import {
+  getConfiguredInAppWorkbookResourceRoute,
+  getConfiguredInAppWorkbookRoute,
+} from "./inAppWorkbookRoutes";
 
 const LESSON_LINK_CASES = [
   {
@@ -28,12 +31,6 @@ const LESSON_LINK_CASES = [
     workbookPath: "/campus/course/verboten-erlaubt-5-9",
   },
   {
-    lessonPath: "/campus/course/lesson/A1/20?chapter=12.3",
-    day: 20,
-    chapter: "12.3",
-    workbookPath: "/campus/course/letter-writing-intro-german-a1-day-12-3",
-  },
-  {
     lessonPath: "/campus/course/lesson/A1/21?chapter=13",
     day: 21,
     chapter: "13",
@@ -59,6 +56,9 @@ const LESSON_LINK_CASES = [
   },
 ];
 
+const DAY20_LESSON_PATH = "/campus/course/lesson/A1/20?chapter=12.3";
+const DAY20_WORKBOOK_PATH = "/campus/course/letter-writing-intro-german-a1-day-12-3";
+
 describe("A1 lesson links resolve to workbook pages", () => {
   const originalPath = window.location.pathname;
 
@@ -74,6 +74,15 @@ describe("A1 lesson links resolve to workbook pages", () => {
       expect(getConfiguredInAppWorkbookRoute({ level: "A1", day, chapter })).toBe(workbookPath);
     },
   );
+
+  it("keeps Day 20 Chapter 12.3 on the lesson resource hub", () => {
+    window.history.replaceState({}, "", DAY20_LESSON_PATH);
+
+    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 20, chapter: "12.3" })).toBe("");
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 20, chapter: "12.3" })).toBe(
+      DAY20_WORKBOOK_PATH,
+    );
+  });
 
   it("keeps the Day 19 to Day 24 destination pages registered", () => {
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
