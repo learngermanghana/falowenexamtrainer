@@ -7,10 +7,7 @@ import { __TESTING__ as templateLibrary } from "./QuestionOfDayWritingTemplateIn
 
 const TEMPLATE_HOST_ID = "falowen-question-of-day-writing-template-host";
 const SUPPORTED_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
-const {
-  buildQuestionOfDayWritingTemplates,
-  findWritingAnswerTextarea,
-} = templateLibrary;
+const { buildQuestionOfDayWritingTemplates, findWritingAnswerTextarea } = templateLibrary;
 
 const normalizeLevel = (value) => {
   const normalized = String(value || "").trim().toUpperCase();
@@ -18,28 +15,27 @@ const normalizeLevel = (value) => {
 };
 
 const readActiveLevel = () => normalizeLevel(loadPreferredLevel());
-
 const isExamQuestionRoute = (pathname = "") =>
   String(pathname || "").replace(/\/+$/, "") === "/exams/question";
 
 const findExamWarmupSection = () =>
-  Array.from(document.querySelectorAll("section")).find((section) =>
-    String(section.querySelector("h2")?.textContent || "").trim() === "Exam Warm-up"
+  Array.from(document.querySelectorAll("section")).find(
+    (section) => String(section.querySelector("h2")?.textContent || "").trim() === "Exam Warm-up",
   );
 
-const readWritingPromptText = (section) => {
+export const readQuestionOfDayWritingPrompt = (section) => {
   if (!section) return "";
   const heading = Array.from(section.querySelectorAll("h3")).find(
-    (node) => String(node.textContent || "").trim() === "Schreiben"
+    (node) => String(node.textContent || "").trim() === "Schreiben",
   );
-  const questionPanel = heading?.closest("div");
-  return String(questionPanel?.textContent || section.textContent || "").trim();
+  if (!heading) return "";
+  return String(heading.closest("div")?.textContent || "").trim();
 };
 
 export const inferQuestionOfDayTemplateId = (
   level,
   promptText,
-  templates = buildQuestionOfDayWritingTemplates(level)
+  templates = buildQuestionOfDayWritingTemplates(level),
 ) => {
   const text = String(promptText || "").toLowerCase();
   const findKind = (...kinds) => {
@@ -62,17 +58,20 @@ export const inferQuestionOfDayTemplateId = (
   if (/meinung|stellungnahme|kommentar|forum|leserbrief|erörterung|eroerterung|diskussion|artikel|blogbeitrag/.test(text)) {
     return findKind("opinion", "analysis", "report", "formal");
   }
-  if (/freund|freundin|bruder|schwester|familie|mutter|vater|partner|partnerin|persönliche nachricht|persoenliche nachricht/.test(text)) {
+  if (/herr\s+\p{L}+|frau\s+\p{L}+|firma|schule|hotel|arzt|ärztin|chef|professor|universität|amt|verein|bibliothek|touristeninformation|wohnungsgesellschaft|reiseveranstalter|gemeinde/i.test(text)) {
+    return findKind("formal", "opinion", "report", "analysis");
+  }
+  if (/freund|freundin|bruder|schwester|familie|mutter|vater|partner|partnerin|nachbar|nachbarin|kollege|kollegin|persönliche nachricht|persoenliche nachricht/.test(text)) {
     return findKind("informal", "formal");
   }
   return findKind("formal", "opinion", "report", "analysis", "informal");
 };
 
-const setNativeTextareaValue = (textarea, value) => {
+const setControlledTextareaValue = (textarea, value) => {
   if (!textarea) return false;
   const setter = Object.getOwnPropertyDescriptor(
     window.HTMLTextAreaElement.prototype,
-    "value"
+    "value",
   )?.set;
   if (setter) setter.call(textarea, value);
   else textarea.value = value;
@@ -82,32 +81,26 @@ const setNativeTextareaValue = (textarea, value) => {
   return true;
 };
 
-const selectSubmissionRegister = (kind) => {
+const selectRegister = (kind) => {
   const register = kind === "informal" ? "informal" : "formal";
-  document
-    .querySelector(`input[name="letterType"][value="${register}"]`)
-    ?.click();
+  document.querySelector(`input[name="letterType"][value="${register}"]`)?.click();
 };
 
 const TemplatePanel = ({ level, promptText }) => {
-  const templates = useMemo(
-    () => buildQuestionOfDayWritingTemplates(level),
-    [level]
-  );
+  const templates = useMemo(() => buildQuestionOfDayWritingTemplates(level), [level]);
   const recommendedId = useMemo(
     () => inferQuestionOfDayTemplateId(level, promptText, templates),
-    [level, promptText, templates]
+    [level, promptText, templates],
   );
-  const [message, setMessage] = useState("");
-
-  useEffect(() => setMessage(""), [level, promptText]);
-
   const orderedTemplates = useMemo(() => {
     const recommended = templates.find((template) => template.id === recommendedId);
     return recommended
       ? [recommended, ...templates.filter((template) => template.id !== recommendedId)]
       : templates;
   }, [recommendedId, templates]);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => setMessage(""), [level, promptText]);
 
   const insertTemplate = (template) => {
     const textarea = findWritingAnswerTextarea(findExamWarmupSection());
@@ -117,25 +110,19 @@ const TemplatePanel = ({ level, promptText }) => {
     }
 
     const current = String(textarea.value || "").trim();
-    const knownTemplate = templates.some(
-      (item) => current === String(item.template || "").trim()
+    const isKnownTemplate = templates.some(
+      (item) => current === String(item.template || "").trim(),
     );
-    if (current && !knownTemplate && current !== String(template.template || "").trim()) {
-      const shouldReplace = window.confirm(
-        "This will replace your current Question of the Day answer with the selected template. Continue?"
+    if (current && !isKnownTemplate && current !== String(template.template || "").trim()) {
+      const replace = window.confirm(
+        "This will replace your current Question of the Day answer with the selected template. Continue?",
       );
-      if (!shouldReplace) return;
+      if (!replace) return;
     }
 
-    if (!setNativeTextareaValue(textarea, template.template)) {
-      setMessage("The answer box could not be updated. Please try again.");
-      return;
-    }
-
-    selectSubmissionRegister(template.kind);
-    setMessage(
-      `${template.label} inserted. Replace every [bracket] with your own information.`
-    );
+    setControlledTextareaValue(textarea, template.template);
+    selectRegister(template.kind);
+    setMessage(`${template.label} inserted. Replace every [bracket] with your own information.`);
   };
 
   if (!orderedTemplates.length) return null;
@@ -159,18 +146,12 @@ const TemplatePanel = ({ level, promptText }) => {
         </p>
         {level === "A1" ? (
           <p style={{ margin: 0, color: "#1e3a8a", lineHeight: 1.6 }}>
-            <strong>A1:</strong> use short, simple German phrases in the body. The template already gives you the introduction and conclusion.
+            <strong>A1:</strong> use short, simple German phrases in the body. The introduction and conclusion are already provided.
           </p>
         ) : null}
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))",
-          gap: 8,
-        }}
-      >
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 8 }}>
         {orderedTemplates.map((template) => {
           const recommended = template.id === recommendedId;
           return (
@@ -178,6 +159,7 @@ const TemplatePanel = ({ level, promptText }) => {
               key={template.id}
               type="button"
               onClick={() => insertTemplate(template)}
+              title={template.useFor}
               style={{
                 ...(recommended ? styles.primaryButton : styles.secondaryButton),
                 minHeight: 72,
@@ -186,15 +168,9 @@ const TemplatePanel = ({ level, promptText }) => {
                 gap: 4,
                 alignContent: "center",
               }}
-              title={template.useFor}
             >
-              <span>
-                {recommended ? "Recommended · " : ""}
-                {template.label}
-              </span>
-              <small style={{ fontWeight: 500, lineHeight: 1.35 }}>
-                {template.useFor}
-              </small>
+              <span>{recommended ? "Recommended · " : ""}{template.label}</span>
+              <small style={{ fontWeight: 500, lineHeight: 1.35 }}>{template.useFor}</small>
             </button>
           );
         })}
@@ -203,11 +179,7 @@ const TemplatePanel = ({ level, promptText }) => {
       <p style={{ ...styles.helperText, margin: 0 }}>
         Formal register is selected automatically for opinion, report, analysis, proposal and speech tasks; informal is selected for personal letters.
       </p>
-      {message ? (
-        <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
-          {message}
-        </p>
-      ) : null}
+      {message ? <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>{message}</p> : null}
     </section>
   );
 };
@@ -221,9 +193,7 @@ export default function QuestionOfDayWritingTemplateController() {
 
   useEffect(() => {
     if (!enabled || typeof document === "undefined") {
-      if (typeof document !== "undefined") {
-        document.getElementById(TEMPLATE_HOST_ID)?.remove();
-      }
+      document.getElementById(TEMPLATE_HOST_ID)?.remove();
       setTarget(null);
       setPromptText("");
       return undefined;
@@ -231,38 +201,29 @@ export default function QuestionOfDayWritingTemplateController() {
 
     const install = () => {
       const section = findExamWarmupSection();
+      const capturedPrompt = readQuestionOfDayWritingPrompt(section);
+      if (capturedPrompt) {
+        setPromptText((current) => (current === capturedPrompt ? current : capturedPrompt));
+      }
+
       const textarea = findWritingAnswerTextarea(section);
       let host = document.getElementById(TEMPLATE_HOST_ID);
-
       if (textarea && !host) {
         host = document.createElement("div");
         host.id = TEMPLATE_HOST_ID;
         textarea.parentNode?.insertBefore(host, textarea);
-      }
-
-      if (!textarea && host) {
+      } else if (!textarea && host) {
         host.remove();
         host = null;
       }
-
-      const nextPromptText = readWritingPromptText(section);
-      setPromptText((current) =>
-        current === nextPromptText ? current : nextPromptText
-      );
       setTarget((current) => (current === host ? current : host));
-      return Boolean(host);
     };
 
     install();
-    const timers = [100, 350, 900, 1800].map((delay) =>
-      window.setTimeout(install, delay)
-    );
+    const timers = [100, 350, 900, 1800].map((delay) => window.setTimeout(install, delay));
     const observer = new MutationObserver(install);
     observer.observe(document.body, { childList: true, subtree: true });
-    const levelTimer = window.setInterval(
-      () => setLevel(readActiveLevel()),
-      800
-    );
+    const levelTimer = window.setInterval(() => setLevel(readActiveLevel()), 800);
 
     return () => {
       observer.disconnect();
@@ -274,15 +235,11 @@ export default function QuestionOfDayWritingTemplateController() {
   }, [enabled]);
 
   if (!enabled || !target) return null;
-
-  return createPortal(
-    <TemplatePanel level={level} promptText={promptText} />,
-    target
-  );
+  return createPortal(<TemplatePanel level={level} promptText={promptText} />, target);
 }
 
 export const __TESTING__ = {
   inferQuestionOfDayTemplateId,
   isExamQuestionRoute,
-  readWritingPromptText,
+  readQuestionOfDayWritingPrompt,
 };
