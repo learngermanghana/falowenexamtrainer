@@ -1,3 +1,4 @@
+import "./canonicalLiveClassTestSetup";
 import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassServiceV3";
 
 const A1_MUNICH_DATES = [
