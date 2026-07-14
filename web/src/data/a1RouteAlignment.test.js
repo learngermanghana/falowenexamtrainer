@@ -93,6 +93,18 @@ describe("A1 route integrity", () => {
     );
   });
 
+  it("keeps A1 chapter 12.3 grammar notes separate from its two-question workbook", () => {
+    const card = getA1CourseBookCard({ displayDay: 20, chapter: "12.3" });
+
+    expect(card?.grammarPage).toBe(
+      "/campus/course/letter-writing-intro-12-3",
+    );
+    expect(card?.workbookRoute).toBe(
+      "/campus/course/letter-writing-intro-german-a1-day-12-3",
+    );
+    expect(card?.grammarPage).not.toBe(card?.workbookRoute);
+  });
+
   it("preserves the A1 alignment whenever curriculum files are regenerated", () => {
     expect(syncScriptSource).toContain("alignA1CurriculumEntries");
     expect(syncScriptSource).toContain("getLessonsByLevel");
