@@ -1,0 +1,107 @@
+import fs from "fs";
+import path from "path";
+import {
+  PROTECTED_A2_WORKBOOK_DAYS,
+  hideDuplicateFloatingCourseSubmitButton,
+  isDuplicateFloatingCourseSubmitButton,
+  resolveProtectedA2WorkbookRedirect,
+} from "./a2ProtectedWorkbookRoutes";
+
+const expectedRoutes = {
+  20: "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
+  21: "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
+  22: "/campus/course/a2-day-22-die-woche-planung-workbook",
+  23: "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+  24: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
+  25: "/campus/course/a2-day-25-tagesablauf-workbook",
+  26: "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
+  27: "/campus/course/a2-day-27-digitale-kommunikation-workbook",
+  28: "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
+};
+
+describe("protected A2 workbook routes", () => {
+  test("redirects generic A2 Days 20 to 28 to the existing custom workbook pages", () => {
+    expect(PROTECTED_A2_WORKBOOK_DAYS).toEqual([20, 21, 22, 23, 24, 25, 26, 27, 28]);
+
+    PROTECTED_A2_WORKBOOK_DAYS.forEach((day) => {
+      expect(
+        resolveProtectedA2WorkbookRedirect({
+          pathname: `/campus/course/lesson/A2/${day}`,
+          search: day === 20 ? "?chapter=7.20" : "",
+        }),
+      ).toBe(expectedRoutes[day]);
+    });
+  });
+
+  test("does not redirect other A2 days or explicit grammar and learn views", () => {
+    expect(resolveProtectedA2WorkbookRedirect({ pathname: "/campus/course/lesson/A2/19" })).toBe("");
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: "/campus/course/lesson/A2/20",
+        search: "?view=grammar&chapter=7.20",
+      }),
+    ).toBe("");
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: "/campus/course/lesson/A2/20",
+        search: "?view=learn&chapter=7.20",
+      }),
+    ).toBe("");
+    expect(
+      resolveProtectedA2WorkbookRedirect({
+        pathname: "/campus/course/lesson/A2/20",
+        search: "?view=workbook&chapter=7.20",
+      }),
+    ).toBe(expectedRoutes[20]);
+  });
+
+  test("keeps the restored Day 20 Goethe-style speaking and full workbook content", () => {
+    const source = fs.readFileSync(
+      path.resolve(__dirname, "../components/A2Day20TypischeReklamationssituationenWorkbookPage.js"),
+      "utf8",
+    );
+
+    expect(source.length).toBeGreaterThan(15000);
+    expect(source).toContain("Teil 1 · Sprechen");
+    expect(source).toContain("Sprechen wie bei einer Mini-Präsentation");
+    expect(source).toContain("Zentrales Thema: Reklamieren");
+    expect(source).toContain("Teil 2 · Schreiben (Formeller Brief)");
+    expect(source).toContain("Hören 4 · Damals (Back Then)");
+    expect(source).not.toContain("A2StandardTabbedWorkbookPage");
+  });
+});
+
+describe("duplicate Course Book submit cleanup", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  test("hides only the fixed duplicate Submit button near Study Buddy", () => {
+    document.body.innerHTML = `
+      <button id="header-submit" type="button">Submit work</button>
+      <button id="floating-submit" type="button" aria-haspopup="dialog" aria-expanded="false" style="position: fixed">
+        <span>✍️</span><span>Submit</span>
+      </button>
+      <button id="workbook-submit" type="button">Submit</button>
+    `;
+
+    const floating = document.getElementById("floating-submit");
+    expect(isDuplicateFloatingCourseSubmitButton(floating)).toBe(true);
+    expect(hideDuplicateFloatingCourseSubmitButton(document)).toBe(1);
+    expect(floating.getAttribute("data-duplicate-course-submit-hidden")).toBe("true");
+    expect(floating.getAttribute("aria-hidden")).toBe("true");
+    expect(floating.style.display).toBe("none");
+
+    expect(document.getElementById("header-submit").style.display).toBe("");
+    expect(document.getElementById("workbook-submit").style.display).toBe("");
+  });
+
+  test("does not repeatedly count an already hidden duplicate", () => {
+    document.body.innerHTML = `
+      <button type="button" aria-haspopup="dialog" aria-expanded="false" style="position: fixed">Submit</button>
+    `;
+
+    expect(hideDuplicateFloatingCourseSubmitButton(document)).toBe(1);
+    expect(hideDuplicateFloatingCourseSubmitButton(document)).toBe(0);
+  });
+});

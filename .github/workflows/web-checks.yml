@@ -100,6 +100,18 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
+      - name: Test protected A2 route and duplicate Submit cleanup
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/a2ProtectedWorkbookRoutes.test.js
+
+      - name: Audit restored A2 workbook content
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2SharedWorkbookRegression.test.js
+
       - name: Test A2 and B1 workbook navigation
         working-directory: web
         env:
