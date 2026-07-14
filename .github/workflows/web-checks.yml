@@ -76,11 +76,35 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js
 
-      - name: Test canonical live class summary
+      - name: Test cancelled-session summary behavior
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "excludes cancelled sessions from progress and next-session selection"
+
+      - name: Test official date-range summary behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "marks a class as ended and hides sessions outside the official end date"
+
+      - name: Test admin topic preservation behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "preserves admin session topic and curriculum when a repair layer detects mismatch"
+
+      - name: Test Zoom fallback behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "uses the class Zoom details when a profile is unavailable"
+
+      - name: Test old-class record isolation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js -t "ignores sessions from an older class record with the same class name"
 
       - name: Test canonical class level protection
         working-directory: web
