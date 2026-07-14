@@ -10,6 +10,8 @@ export const A1_DAY16_CHAPTER10_WORKBOOK_PATH =
   "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook";
 export const A1_DAY20_CHAPTER123_WORKBOOK_PATH =
   "/campus/course/letter-writing-intro-german-a1-day-12-3";
+export const A1_DAY23_CHAPTER142_GRAMMAR_PATH =
+  "/campus/course/dative-and-accusative-verbs-14-2";
 export const A1_DAY18_CHAPTER121_PATH =
   "/campus/course/two-case-prepositions-wechselpraepositionen-day-18";
 export const A1_DAY18_CHAPTER122_GRAMMAR_PATH =
@@ -45,6 +47,7 @@ const GENERIC_GUIDE_SUPPRESSED_PATHS = new Set([
   A1_DAY16_CHAPTER9_WORKBOOK_PATH,
   A1_DAY16_CHAPTER10_WORKBOOK_PATH,
   A1_DAY20_CHAPTER123_WORKBOOK_PATH,
+  A1_DAY23_CHAPTER142_GRAMMAR_PATH,
 ]);
 
 export const shouldSuppressGenericWorkbookGuide = (pathname = "") =>
