@@ -12,10 +12,10 @@ export const A1_DAY20_CHAPTER123_LESSON_ROUTE =
   "/campus/course/lesson/A1/20?chapter=12.3";
 
 const heroImageUrl =
-  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=80";
+  "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1600&q=80";
 
 const pageStyle = { ...styles.container, display: "grid", gap: 16 };
-const sectionStyle = { ...styles.card, display: "grid", gap: 12, marginBottom: 0 };
+const sectionStyle = { ...styles.card, display: "grid", gap: 14, marginBottom: 0 };
 const infoBoxStyle = {
   border: "1px solid #e2e8f0",
   borderRadius: 14,
@@ -55,7 +55,7 @@ const exampleStyle = {
   borderRadius: 12,
   padding: 12,
   background: "#f8fbff",
-  lineHeight: 1.7,
+  lineHeight: 1.75,
 };
 const questionCardStyle = {
   border: "1px solid #bfdbfe",
@@ -65,17 +65,29 @@ const questionCardStyle = {
   gap: 12,
   background: "linear-gradient(135deg, #eff6ff, #ffffff 70%)",
 };
-const gridStyle = {
+const structureCardStyle = {
+  border: "1px solid #dbeafe",
+  borderRadius: 18,
+  padding: 18,
   display: "grid",
-  gap: 12,
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  gap: 16,
+  background: "linear-gradient(135deg, #ffffff, #f8fbff)",
 };
-const tableStyle = { width: "100%", borderCollapse: "collapse", fontSize: 15 };
-const tableCellStyle = {
-  border: "1px solid #cbd5e1",
-  padding: "9px 10px",
-  textAlign: "left",
-  verticalAlign: "top",
+const labelStyle = {
+  margin: 0,
+  color: "#1e3a8a",
+  fontSize: 14,
+  fontWeight: 900,
+  textTransform: "uppercase",
+  letterSpacing: ".04em",
+};
+const fixedEndingStyle = {
+  borderLeft: "4px solid #2563eb",
+  padding: "12px 14px",
+  background: "#eff6ff",
+  borderRadius: "0 12px 12px 0",
+  whiteSpace: "pre-line",
+  lineHeight: 1.8,
 };
 
 const Section = ({ title, children }) => (
@@ -95,34 +107,37 @@ const InfoBox = ({ title, children }) => (
 const BulletList = ({ items, ordered = false }) => {
   const Tag = ordered ? "ol" : "ul";
   return (
-    <Tag style={{ margin: 0, paddingLeft: 24, display: "grid", gap: 8, lineHeight: 1.68 }}>
+    <Tag style={{ margin: 0, paddingLeft: 24, display: "grid", gap: 8, lineHeight: 1.7 }}>
       {items.map((item) => (
-        <li key={item}>{item}</li>
+        <li key={typeof item === "string" ? item : undefined}>{item}</li>
       ))}
     </Tag>
   );
 };
 
-const ComparisonTable = ({ rows }) => (
-  <div style={{ overflowX: "auto" }}>
-    <table style={tableStyle}>
-      <thead>
-        <tr>
-          <th style={{ ...tableCellStyle, background: "#eff6ff" }}>Feature</th>
-          <th style={{ ...tableCellStyle, background: "#eff6ff" }}>Informal</th>
-          <th style={{ ...tableCellStyle, background: "#eff6ff" }}>Formal</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(([feature, informal, formal]) => (
-          <tr key={feature}>
-            <td style={tableCellStyle}>{feature}</td>
-            <td style={tableCellStyle}>{informal}</td>
-            <td style={tableCellStyle}>{formal}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+const WeilExplanation = ({ pronoun = "Ihnen" }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    <p style={{ margin: 0, lineHeight: 1.75 }}>
+      After <strong>weil</strong>, move the conjugated verb or modal verb to the end of the clause.
+    </p>
+    <div style={exampleStyle}>
+      <strong>Example 1</strong>
+      <br />
+      Ich kann nicht kommen.
+      <br />
+      Ich schreibe {pronoun}, weil ich nicht kommen <strong>kann</strong>.
+    </div>
+    <div style={exampleStyle}>
+      <strong>Example 2</strong>
+      <br />
+      Ich komme nicht.
+      <br />
+      Ich schreibe {pronoun}, weil ich nicht <strong>komme</strong>.
+    </div>
+    <div style={blueBannerStyle}>
+      <strong>Useful pattern:</strong>{" "}
+      Ich schreibe {pronoun}, weil ich den Termin absagen <strong>möchte</strong>.
+    </div>
   </div>
 );
 
@@ -136,369 +151,216 @@ const GrammarNotesPage = () => {
 
   return (
     <main style={pageStyle} data-a1-day20-chapter123-grammar-notes="true">
-      <header style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            alignItems: "stretch",
-          }}
-        >
-          <div
-            style={{
-              padding: 24,
-              display: "grid",
-              gap: 14,
-              background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 60%, #f8fafc 100%)",
-            }}
-          >
-            <AppBackButton
-              label="Back to Course Book"
-              fallbackPath="/campus/course"
-              onBack={() => navigate(A1_DAY20_CHAPTER123_LESSON_ROUTE, { replace: true })}
-            />
-            <span style={eyebrowStyle}>A1 · Day 20 · Kapitel 12.3 · Grammar Notes</span>
-            <h1 style={{ ...styles.title, margin: 0 }}>Letter Writing — Start Here</h1>
-            <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-              This is your first complete A1 letter-writing lesson. Learn the difference between a
-              form and a letter, choose formal or informal language, answer every task point, and
-              check your work before submitting it.
-            </p>
-            <div style={blueBannerStyle}>
-              <strong>Read these notes before the tutor-marked assignment.</strong>
-              <div>
-                The workbook uses the shared navigation: <strong>Overview, Teil 1, Teil 2</strong>,
-                and <strong>Submit</strong>.
-              </div>
-            </div>
-          </div>
-          <img
-            src={heroImageUrl}
-            alt="Notebook, pen, and coffee for German letter-writing practice"
-            style={{ width: "100%", height: "100%", minHeight: 260, objectFit: "cover" }}
-          />
+      <header
+        style={{ ...styles.card, display: "grid", gap: 14, padding: 16, marginBottom: 0 }}
+        data-compact-letter-hero="true"
+      >
+        <AppBackButton
+          label="Back to Course Book"
+          fallbackPath="/campus/course"
+          onBack={() => navigate(A1_DAY20_CHAPTER123_LESSON_ROUTE, { replace: true })}
+        />
+        <span style={eyebrowStyle}>A1 · Day 20 · Kapitel 12.3 · Grammar Notes</span>
+        <div style={{ display: "grid", gap: 7 }}>
+          <h1 style={{ ...styles.title, margin: 0 }}>Formal and Informal Letter Writing</h1>
+          <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
+            Learn how to begin the letter, organise the main body, use <strong>weil</strong>,
+            and finish with the correct fixed conclusion.
+          </p>
         </div>
+        <img
+          src={heroImageUrl}
+          alt="Notebook and pen prepared for writing a German letter"
+          loading="eager"
+          style={{
+            width: "100%",
+            height: 145,
+            objectFit: "cover",
+            objectPosition: "center 48%",
+            borderRadius: 14,
+            display: "block",
+          }}
+        />
       </header>
 
-      <Section title="Learning goals">
-        <BulletList
-          items={[
-            "Understand Schreiben Teil 1 (form filling) and Schreiben Teil 2 (short message or letter).",
-            "Recognise when to use du-language and when to use formal Sie-language.",
-            "Build a complete letter with greeting, opening, task points, closing, and name.",
-            "Write statements, W-questions, yes/no questions, and weil-clauses correctly.",
-            "Use a checklist before submitting the two workbook letters.",
-          ]}
-        />
-      </Section>
-
-      <Section title="First: form and letter are different">
+      <Section title="Before you write">
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          First decide who will receive your letter. Write a <strong>formal letter</strong> to a
+          school, company, office, travel agency, or an adult you do not know personally. Write an{" "}
+          <strong>informal letter</strong> to a friend or family member.
+        </p>
         <div style={orangeBannerStyle}>
-          <strong>Do not confuse the exam parts with the workbook tabs.</strong>
-          <div>
-            In the A1 writing exam, <strong>Teil 1</strong> is commonly a form and{" "}
-            <strong>Teil 2</strong> is a short message or letter. In this tutor workbook, Teil 1 and
-            Teil 2 simply mean Letter 1 and Letter 2.
-          </div>
-        </div>
-        <div style={gridStyle}>
-          <InfoBox title="Exam Schreiben Teil 1 · Formular">
-            <BulletList
-              items={[
-                "Read a short situation with personal information.",
-                "Transfer the information into empty fields.",
-                "Typical fields: name, birth date, address, phone, email, date, course, and signature.",
-                "Do not write a complete letter here.",
-              ]}
-            />
-          </InfoBox>
-          <InfoBox title="Exam Schreiben Teil 2 · Nachricht oder Brief">
-            <BulletList
-              items={[
-                "Read the situation and identify the recipient.",
-                "Answer every content point in complete sentences or questions.",
-                "Choose the correct formal or informal language.",
-                "Use a suitable greeting, closing, and name.",
-              ]}
-            />
-          </InfoBox>
+          Do not mix the two styles. Formal letters use <strong>Sie, Ihnen, Ihr/Ihre</strong>.
+          Informal letters use <strong>du, dir, dich, dein/deine</strong>.
         </div>
       </Section>
 
-      <Section title="Schreiben Teil 1: complete a form step by step">
-        <p style={{ margin: 0, lineHeight: 1.75 }}>
-          A form tests careful reading. Do not invent information. Copy the correct details from the
-          situation into the correct fields.
-        </p>
-        <InfoBox title="Example situation">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Maria Gómez was born on 14 March 1998. She lives at Gartenstraße 8, 60311 Frankfurt.
-            Her telephone number is 0176 23456789 and her email is maria.gomez@example.com. She
-            wants the evening German course.
-          </p>
-        </InfoBox>
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={{ ...tableCellStyle, background: "#eff6ff" }}>Form field</th>
-                <th style={{ ...tableCellStyle, background: "#eff6ff" }}>Correct entry</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Familienname", "Gómez"],
-                ["Vorname", "Maria"],
-                ["Geburtsdatum", "14.03.1998"],
-                ["Straße / Hausnummer", "Gartenstraße 8"],
-                ["PLZ / Ort", "60311 Frankfurt"],
-                ["Telefon", "0176 23456789"],
-                ["E-Mail", "maria.gomez@example.com"],
-                ["Kurs", "Abendkurs Deutsch"],
-              ].map(([field, value]) => (
-                <tr key={field}>
-                  <td style={tableCellStyle}>{field}</td>
-                  <td style={tableCellStyle}>{value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <BulletList
-          ordered
-          items={[
-            "Read the complete situation once.",
-            "Underline names, dates, numbers, addresses, and the requested service.",
-            "Match each detail to the correct field.",
-            "Copy spelling, capital letters, accents, and numbers carefully.",
-            "Use the date format requested by the form.",
-            "Check that no required field is empty.",
-          ]}
-        />
-      </Section>
+      <section style={structureCardStyle} aria-label="Formal Letter Structure">
+        <span style={{ ...eyebrowStyle, background: "#ffedd5", color: "#9a3412" }}>
+          Formal letter
+        </span>
+        <h2 style={{ margin: 0 }}>Formal Letter Structure</h2>
 
-      <Section title="Schreiben Teil 2: understand the letter task">
-        <p style={{ margin: 0, lineHeight: 1.75 }}>
-          Before writing, find the <strong>situation</strong>, the <strong>recipient</strong>, the{" "}
-          <strong>content points</strong>, and the correct <strong>register</strong> (formal or
-          informal).
-        </p>
-        <InfoBox title="The five-part letter plan">
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>1. Greeting</p>
           <BulletList
-            ordered
             items={[
-              "Anrede: choose the correct greeting.",
-              "Einleitung: say why you are writing.",
-              "Hauptteil: answer every task point clearly.",
-              "Schlusssatz: ask for an answer or add a friendly final sentence.",
-              "Gruß und Name: use the correct closing and write your name.",
+              <span key="formal-female">
+                <strong>Sehr geehrte Frau + surname,</strong> — use this for a female recipient.
+              </span>,
+              <span key="formal-male">
+                <strong>Sehr geehrter Herr + surname,</strong> — use this for a male recipient.
+              </span>,
+              <span key="formal-unknown">
+                <strong>Sehr geehrte Damen und Herren,</strong> — use this when the recipient is
+                unknown, for example a school or travel agency.
+              </span>,
             ]}
           />
-        </InfoBox>
-        <div style={exampleStyle}>
-          <strong>Planning formula:</strong>
-          <div style={{ marginTop: 6 }}>
-            Greeting → reason → point 1 → point 2 → point 3 → final sentence → closing → name
-          </div>
         </div>
-      </Section>
 
-      <Section title="Choose formal or informal language">
-        <ComparisonTable
-          rows={[
-            ["Recipient", "Friend or family", "School, company, office, unknown adult"],
-            ["Pronouns", "du, dir, dich, dein/deine", "Sie, Ihnen, Ihr/Ihre"],
-            ["Greeting", "Hallo / Liebe / Lieber", "Sehr geehrte ..."],
-            ["Request", "Kannst du ...?", "Könnten Sie bitte ...?"],
-            ["Closing", "Liebe Grüße / Viele Grüße", "Mit freundlichen Grüßen"],
-            ["Name", "Usually first name", "Usually first name and surname"],
-          ]}
-        />
-      </Section>
-
-      <Section title="Informal letter: du-language">
-        <div style={gridStyle}>
-          <InfoBox title="Greeting and closing">
-            <BulletList
-              items={[
-                "Hallo Anna, / Liebe Anna, / Lieber Paul,",
-                "After the greeting, write a comma.",
-                "End with Liebe Grüße or Viele Grüße.",
-                "Write your first name.",
-              ]}
-            />
-          </InfoBox>
-          <InfoBox title="Useful phrases">
-            <BulletList
-              items={[
-                "Wie geht es dir?",
-                "Ich schreibe dir, weil ...",
-                "Herzlichen Glückwunsch zum Geburtstag!",
-                "Machst du eine Feier?",
-                "Kann ich mit meiner Familie kommen?",
-                "Schreib mir bitte bald.",
-              ]}
-            />
-          </InfoBox>
-        </div>
-        <InfoBox title="Model informal letter">
-          <div style={{ whiteSpace: "pre-line", lineHeight: 1.75 }}>
-            {`Hallo Anna,\n\nwie geht es dir? Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte. Herzlichen Glückwunsch! Machst du eine Feier? Kann ich mit meiner Familie kommen?\n\nLiebe Grüße\nMia`}
-          </div>
-        </InfoBox>
-      </Section>
-
-      <Section title="Formal letter: Sie-language">
-        <div style={gridStyle}>
-          <InfoBox title="Greeting and closing">
-            <BulletList
-              items={[
-                "Sehr geehrte Frau Müller, / Sehr geehrter Herr Becker,",
-                "Use Sehr geehrte Damen und Herren, when the name is unknown.",
-                "End with Mit freundlichen Grüßen.",
-                "Write your first name and surname.",
-              ]}
-            />
-          </InfoBox>
-          <InfoBox title="Useful phrases">
-            <BulletList
-              items={[
-                "Ich schreibe Ihnen, weil ...",
-                "Ich interessiere mich für Ihren Deutschkurs.",
-                "Könnten Sie mir bitte Informationen schicken?",
-                "Wann beginnt der Kurs?",
-                "Wie viel kostet der Kurs?",
-                "Wie kann ich bezahlen?",
-              ]}
-            />
-          </InfoBox>
-        </div>
-        <InfoBox title="Model formal letter">
-          <div style={{ whiteSpace: "pre-line", lineHeight: 1.75 }}>
-            {`Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich mich für Ihren Deutschkurs interessiere. Wann beginnt der nächste Kurs? Wie viel kostet er und wie kann ich bezahlen?\n\nIch freue mich auf Ihre Antwort.\n\nMit freundlichen Grüßen\nMax Mustermann`}
-          </div>
-        </InfoBox>
-      </Section>
-
-      <Section title="Turn every task point into a sentence">
-        <div style={gridStyle}>
-          <InfoBox title="Informal birthday task">
-            <BulletList
-              items={[
-                "Reason: Ich schreibe dir, weil du Geburtstag hast.",
-                "Congratulation: Herzlichen Glückwunsch zum Geburtstag!",
-                "Celebration: Machst du eine Feier?",
-                "Family: Kann ich mit meiner Familie kommen?",
-              ]}
-            />
-          </InfoBox>
-          <InfoBox title="Formal language-school task">
-            <BulletList
-              items={[
-                "Reason: Ich interessiere mich für Ihren Deutschkurs.",
-                "Information: Könnten Sie mir bitte Informationen schicken?",
-                "Dates: Wann beginnt der nächste Kurs?",
-                "Price/payment: Wie viel kostet der Kurs und wie kann ich bezahlen?",
-              ]}
-            />
-          </InfoBox>
-        </div>
-      </Section>
-
-      <Section title="Question word order and the weil rule">
-        <div style={gridStyle}>
-          <InfoBox title="W-question">
-            <div style={exampleStyle}>
-              <strong>Question word + verb + subject</strong>
-              <br />
-              Wann beginnt der Kurs?
-              <br />
-              Wo findet die Feier statt?
-            </div>
-          </InfoBox>
-          <InfoBox title="Yes/no question">
-            <div style={exampleStyle}>
-              <strong>Verb + subject + rest</strong>
-              <br />
-              Machst du eine Feier?
-              <br />
-              Kann ich online bezahlen?
-            </div>
-          </InfoBox>
-        </div>
-        <InfoBox title="Weil = because">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            After <strong>weil</strong>, the conjugated verb moves to the end.
-          </p>
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>2. Opening and reason for writing</p>
           <div style={exampleStyle}>
-            Ich schreibe dir, weil du Geburtstag <strong>hast</strong>.
+            Ich hoffe, es geht Ihnen gut.
             <br />
-            Ich schreibe Ihnen, weil ich einen Deutschkurs besuchen <strong>möchte</strong>.
+            Ich schreibe Ihnen, weil [reason for writing].
+          </div>
+          <WeilExplanation pronoun="Ihnen" />
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>3. Main body</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>
+            Answer every task point clearly. Use the following connectors where they fit:
+          </p>
+          <BulletList
+            items={[
+              <span key="formal-ob">
+                <strong>Ich möchte wissen, ob ...</strong> — use this for an indirect yes/no
+                question.
+              </span>,
+              <span key="formal-deshalb">
+                <strong>deshalb</strong> — use this to show a result or consequence.
+              </span>,
+              <span key="formal-weil">
+                <strong>weil</strong> — use this to give a reason; the verb goes to the end.
+              </span>,
+            ]}
+          />
+          <p style={{ margin: 0, lineHeight: 1.75 }}>
+            Keep your sentences clear, well structured, and suitable for the situation.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>4. Conclusion</p>
+          <div style={fixedEndingStyle}>
+            {`Ich freue mich im Voraus auf Ihre Antwort.\n\nMit freundlichen Grüßen\n[Your full name]`}
+          </div>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Ich freue mich im Voraus auf Ihre Antwort.</strong> is the fixed conclusion for
+            this lesson.
+          </p>
+        </div>
+
+        <InfoBox title="Complete formal example">
+          <div style={{ whiteSpace: "pre-line", lineHeight: 1.8 }}>
+            {`Sehr geehrte Damen und Herren,\n\nich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte. Ich möchte wissen, ob der Kurs im August beginnt. Der Kurs ist wichtig für meine Arbeit, deshalb möchte ich bald anfangen. Wie viel kostet der Kurs und wie kann ich bezahlen?\n\nIch freue mich im Voraus auf Ihre Antwort.\n\nMit freundlichen Grüßen\nMax Mustermann`}
           </div>
         </InfoBox>
-      </Section>
+      </section>
 
-      <Section title="Writing rules and common mistakes">
-        <div style={gridStyle}>
-          <InfoBox title="Remember">
-            <BulletList
-              items={[
-                "German nouns begin with a capital letter.",
-                "Write a comma after the greeting and before weil.",
-                "Use a question mark after a direct question.",
-                "Aim for about 35–50 words per course letter unless the task says otherwise.",
-                "Clear A1 sentences are better than long, complicated sentences.",
-              ]}
-            />
-          </InfoBox>
-          <InfoBox title="Avoid">
-            <BulletList
-              items={[
-                "Mixing du and Sie.",
-                "Forgetting a task point.",
-                "Using statement order in a question.",
-                "Forgetting the verb at the end after weil.",
-                "Using the wrong greeting or closing.",
-                "Forgetting your name.",
-              ]}
-            />
-          </InfoBox>
+      <section style={structureCardStyle} aria-label="Informal Letter Structure">
+        <span style={{ ...eyebrowStyle, background: "#dcfce7", color: "#166534" }}>
+          Informal letter
+        </span>
+        <h2 style={{ margin: 0 }}>Informal Letter Structure</h2>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>1. Greeting</p>
+          <BulletList
+            items={[
+              <span key="informal-hallo">
+                <strong>Hallo [first name],</strong> — use this for both male and female friends.
+              </span>,
+              <span key="informal-liebe">
+                <strong>Liebe [first name],</strong> — use this for a female friend.
+              </span>,
+              <span key="informal-lieber">
+                <strong>Lieber [first name],</strong> — use this for a male friend.
+              </span>,
+            ]}
+          />
         </div>
-      </Section>
 
-      <Section title="Final checklist">
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>2. Opening and reason for writing</p>
+          <div style={exampleStyle}>
+            Wie geht es dir?
+            <br />
+            Ich hoffe, es geht dir gut.
+            <br />
+            Ich schreibe dir, weil [reason for writing].
+          </div>
+          <WeilExplanation pronoun="dir" />
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>3. Main body</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>
+            Answer every task point in friendly, simple sentences. Use these connectors where they
+            fit:
+          </p>
+          <BulletList
+            items={[
+              <span key="informal-ob">
+                <strong>Ich möchte wissen, ob ...</strong> — use this for an indirect yes/no
+                question.
+              </span>,
+              <span key="informal-deshalb">
+                <strong>deshalb</strong> — use this to show a result or consequence.
+              </span>,
+              <span key="informal-weil">
+                <strong>weil</strong> — use this to give a reason; the verb goes to the end.
+              </span>,
+            ]}
+          />
+          <p style={{ margin: 0, lineHeight: 1.75 }}>
+            Read your sentences again and make sure the language remains informal throughout.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>4. Conclusion</p>
+          <div style={fixedEndingStyle}>
+            {`Ich freue mich im Voraus auf deine Antwort.\n\nLiebe Grüße / Viele Grüße\n[Your first name]`}
+          </div>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            You may use either <strong>Liebe Grüße</strong> or <strong>Viele Grüße</strong>.
+          </p>
+        </div>
+
+        <InfoBox title="Complete informal example">
+          <div style={{ whiteSpace: "pre-line", lineHeight: 1.8 }}>
+            {`Hallo Anna,\n\nwie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte. Herzlichen Glückwunsch! Ich möchte wissen, ob du eine Feier planst. Ich bin am Samstag frei, deshalb kann ich kommen.\n\nIch freue mich im Voraus auf deine Antwort.\n\nLiebe Grüße\nMia`}
+          </div>
+        </InfoBox>
+      </section>
+
+      <Section title="Final check before the workbook">
         <BulletList
           ordered
           items={[
-            "Did I write to the correct person?",
-            "Did I choose du-language or Sie-language correctly?",
-            "Do I have the correct greeting?",
-            "Did I answer every task point?",
-            "Are my questions correctly formed?",
+            "Did I choose formal or informal language?",
+            "Did I use the correct greeting?",
+            "Did I explain why I am writing?",
+            "Did I answer every task point in the main body?",
             "Is the verb at the end after weil?",
-            "Do nouns begin with capital letters?",
-            "Do I have a suitable closing and my name?",
-            "Did I read the letter once more?",
+            "Did I use the correct fixed conclusion and closing?",
+            "Did I write my first name or full name as required?",
           ]}
         />
-      </Section>
-
-      <Section title="Watch the explanation">
-        <a
-          href="https://youtu.be/JtgoO2fmOpU"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
-        >
-          ▶ Open A1 Day 20 letter-writing video
-        </a>
-      </Section>
-
-      <Section title="Ready for the tutor-marked assignment?">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Use Overview, complete Teil 1 and Teil 2, and then submit the informal and formal letters
-          together.
-        </p>
         <button
           type="button"
           style={{ ...styles.primaryButton, width: "fit-content" }}
@@ -523,15 +385,11 @@ const WorkbookQuestions = () => (
         Use the shared navigation: <strong>Overview</strong>, <strong>Teil 1</strong>,{" "}
         <strong>Teil 2</strong>, and <strong>Submit</strong>. Write both letters before submitting.
       </p>
-      <div style={orangeBannerStyle}>
-        Here, Teil 1 and Teil 2 mean the two workbook letters. In the A1 exam, Schreiben Teil 1 is
-        normally the form and Schreiben Teil 2 is the short message or letter.
-      </div>
       <a
         href={A1_DAY20_CHAPTER123_GRAMMAR_ROUTE}
         style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
       >
-        Review the detailed grammar notes
+        Review the letter structures
       </a>
     </section>
 
