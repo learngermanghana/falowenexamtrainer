@@ -100,11 +100,17 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/courseWorkbookSubmission.test.js
 
+      - name: Test protected A2 Days 20 to 28
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2SharedWorkbookRegression.test.js src/utils/a2ProtectedWorkbookRoutes.test.js
+
       - name: Test A2 and B1 workbook navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2B1CourseBook.test.js src/components/A2Day16CustomWorkbook.test.js src/components/A2SharedWorkbookRegression.test.js src/utils/a2ProtectedWorkbookRoutes.test.js src/components/B2CourseBookContentAlignment.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2B1CourseBook.test.js src/components/A2Day16CustomWorkbook.test.js src/components/B2CourseBookContentAlignment.test.js
 
   build:
     runs-on: ubuntu-latest
