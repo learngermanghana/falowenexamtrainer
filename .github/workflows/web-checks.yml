@@ -76,11 +76,23 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js
 
-      - name: Test canonical live class session selection
+      - name: Test canonical live class summary
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js src/services/canonicalLiveClassLevelProtection.test.js src/services/canonicalLiveClassOfficialRepair.test.js
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassService.test.js
+
+      - name: Test canonical class level protection
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassLevelProtection.test.js
+
+      - name: Test authoritative repaired timetable selection
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassOfficialRepair.test.js
 
       - name: Test speaking tools
         working-directory: web
