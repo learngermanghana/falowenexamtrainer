@@ -5,6 +5,8 @@ export { normalizeCurriculumIds, findCanonicalClass } from "./canonicalLiveClass
 
 const GHANA_TIMEZONE = "Africa/Accra";
 const COURSE_LEVEL_PATTERN = /\b(A1|A2|B1|B2|C1|C2)\b/i;
+const OFFICIAL_CURRICULUM_SOURCE = "coursedictionary-day-groups";
+const SUPERSEDED_STATUSES = new Set(["superseded", "deleted"]);
 
 function dateKey(value, timezone = GHANA_TIMEZONE) {
   const date = value instanceof Date ? value : new Date(value || 0);
@@ -31,6 +33,19 @@ function normalizeClassIdentity(value) {
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function normalize(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function toMillis(value) {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.toDate === "function") return value.toDate().getTime();
+  if (typeof value?.seconds === "number") return value.seconds * 1000;
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
 }
 
 function extractCourseLevel(value) {
@@ -143,6 +158,102 @@ function sessionBelongsToCanonicalClass(session = {}, klass = {}) {
   return canonicalNames.has(sessionName);
 }
 
+function isSupersededSession(session = {}) {
+  const status = normalize(session.status || session.sessionStatus);
+  return SUPERSEDED_STATUSES.has(status)
+    || session.superseded === true
+    || session.isSuperseded === true
+    || Boolean(String(session.supersededBySessionId || "").trim());
+}
+
+function officialCurriculumIndex(session = {}) {
+  const index = Number(session.curriculumIndex);
+  return Number.isInteger(index) && index >= 0 ? index : null;
+}
+
+function isOfficialRepairSession(session = {}) {
+  return normalize(session.curriculumSource).replace(/[^a-z0-9]+/g, "") === OFFICIAL_CURRICULUM_SOURCE
+    && Number(session.curriculumVersion || 0) >= 2
+    && officialCurriculumIndex(session) !== null;
+}
+
+function expectedOfficialSessionCount(klass = {}) {
+  const candidates = [
+    klass.generatedSessionCount,
+    klass.curriculumMappedSessionCount,
+    klass.officialSessionCount,
+  ];
+  return candidates
+    .map(Number)
+    .find((value) => Number.isInteger(value) && value > 0) || 0;
+}
+
+function repairIsComplete(klass = {}) {
+  return normalize(klass.sessionRepairStatus) === "complete"
+    || normalize(klass.lastSessionChangeType) === "official-schedule-repair";
+}
+
+function repairSessionPreference(session = {}, klass = {}) {
+  const canonicalId = String(klass.id || "").trim();
+  let score = 0;
+  if (!isSupersededSession(session)) score += 1000;
+  if (String(session.classId || "").trim() === canonicalId) score += 100;
+  if (String(session.classRecordId || "").trim() === canonicalId) score += 100;
+  if (normalize(session.rescheduleReason).includes("official") && normalize(session.rescheduleReason).includes("timetable repaired")) score += 80;
+  if (session.manualDateOverride === true) score += 40;
+  if (/^day\s+\d+\s*:/i.test(String(session.topic || session.title || "").trim())) score += 20;
+  score += Math.min(10, Number(session.curriculumVersion || 0));
+  return score;
+}
+
+function choosePreferredRepairSession(current, candidate, klass = {}) {
+  if (!current) return candidate;
+  const scoreDifference = repairSessionPreference(candidate, klass) - repairSessionPreference(current, klass);
+  if (scoreDifference !== 0) return scoreDifference > 0 ? candidate : current;
+
+  const candidateUpdated = Math.max(
+    toMillis(candidate.updatedAt),
+    toMillis(candidate.rescheduledAt),
+    toMillis(candidate.manualDateOverrideAt),
+  );
+  const currentUpdated = Math.max(
+    toMillis(current.updatedAt),
+    toMillis(current.rescheduledAt),
+    toMillis(current.manualDateOverrideAt),
+  );
+  if (candidateUpdated !== currentUpdated) return candidateUpdated > currentUpdated ? candidate : current;
+
+  return String(candidate.id || "").localeCompare(String(current.id || "")) > 0 ? candidate : current;
+}
+
+function selectAuthoritativeOfficialSessions(klass = {}, sessions = []) {
+  const classScoped = sessions.filter((session) => sessionBelongsToCanonicalClass(session, klass));
+  const activeSessions = classScoped.filter((session) => !isSupersededSession(session));
+  const officialCandidates = activeSessions.filter(isOfficialRepairSession);
+  const byCurriculumIndex = new Map();
+
+  officialCandidates.forEach((session) => {
+    const index = officialCurriculumIndex(session);
+    byCurriculumIndex.set(index, choosePreferredRepairSession(byCurriculumIndex.get(index), session, klass));
+  });
+
+  const expectedCount = expectedOfficialSessionCount(klass);
+  const authoritative = [...byCurriculumIndex.values()]
+    .filter((session) => !expectedCount || officialCurriculumIndex(session) < expectedCount)
+    .sort((left, right) => officialCurriculumIndex(left) - officialCurriculumIndex(right));
+  const hasFullCoverage = expectedCount > 0
+    && Array.from({ length: expectedCount }, (_, index) => byCurriculumIndex.has(index)).every(Boolean);
+  const shouldUseAuthoritative = authoritative.length > 0 && (repairIsComplete(klass) || hasFullCoverage);
+  const selected = shouldUseAuthoritative ? authoritative : activeSessions;
+
+  return {
+    sessions: selected,
+    authoritativeSchedule: shouldUseAuthoritative,
+    hiddenLegacySessionCount: Math.max(0, classScoped.length - selected.length),
+    expectedOfficialSessionCount: expectedCount,
+  };
+}
+
 function scopeSummaryToCanonicalClass(summary, now = new Date()) {
   if (!summary?.klass) return summary;
 
@@ -188,8 +299,18 @@ function hideOldCompletedCard(summary, now = new Date()) {
 
 export function buildCanonicalLiveClassSummary(options = {}) {
   const now = options.now || new Date();
-  const summary = base.buildCanonicalLiveClassSummary(options);
-  return hideOldCompletedCard(scopeSummaryToCanonicalClass(summary, now), now);
+  const selection = selectAuthoritativeOfficialSessions(options.klass || {}, options.sessions || []);
+  const summary = base.buildCanonicalLiveClassSummary({
+    ...options,
+    sessions: selection.sessions,
+  });
+  const scoped = scopeSummaryToCanonicalClass(summary, now);
+  return hideOldCompletedCard({
+    ...scoped,
+    authoritativeSchedule: selection.authoritativeSchedule,
+    hiddenLegacySessionCount: selection.hiddenLegacySessionCount,
+    expectedOfficialSessionCount: selection.expectedOfficialSessionCount,
+  }, now);
 }
 
 export function subscribeCanonicalLiveClass(options = {}) {
