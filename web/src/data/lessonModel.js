@@ -7,6 +7,7 @@ import {
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
+import { applyA1Day16LessonResourceFixes } from "./a1Day16LessonResourceFixes";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
@@ -17,6 +18,7 @@ import {
 import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
+applyA1Day16LessonResourceFixes(LESSON_VIDEO_DICTIONARY);
 applyB1LessonVideoOverrides(LESSON_VIDEO_DICTIONARY);
 applyB2C1LessonVideoOverrides(LESSON_VIDEO_DICTIONARY);
 
