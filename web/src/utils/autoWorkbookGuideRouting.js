@@ -6,6 +6,8 @@ export const A1_DAY12_WORKBOOK_PATH =
   "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook";
 export const A1_DAY16_CHAPTER9_WORKBOOK_PATH =
   "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook";
+export const A1_DAY16_CHAPTER10_WORKBOOK_PATH =
+  "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook";
 export const A1_DAY20_CHAPTER123_WORKBOOK_PATH =
   "/campus/course/letter-writing-intro-german-a1-day-12-3";
 export const A1_DAY18_CHAPTER121_PATH =
@@ -25,7 +27,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
   "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
   "/campus/course/a1-day-2-kapitel-1-1-workbook",
   "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
-  "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
+  A1_DAY16_CHAPTER10_WORKBOOK_PATH,
   A1_DAY6_WORKBOOK_PATH,
   A1_DAY12_WORKBOOK_PATH,
   A1_DAY16_CHAPTER9_WORKBOOK_PATH,
@@ -41,6 +43,7 @@ export const SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS = new Set([
 const GENERIC_GUIDE_SUPPRESSED_PATHS = new Set([
   A1_DAY12_WORKBOOK_PATH,
   A1_DAY16_CHAPTER9_WORKBOOK_PATH,
+  A1_DAY16_CHAPTER10_WORKBOOK_PATH,
   A1_DAY20_CHAPTER123_WORKBOOK_PATH,
 ]);
 
