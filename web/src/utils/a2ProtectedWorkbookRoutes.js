@@ -36,7 +36,7 @@ export const isDuplicateFloatingCourseSubmitButton = (button) => {
   if (button.style?.position !== "fixed") return false;
 
   const text = normalizedButtonText(button);
-  return text === "submit" || text.endsWith(" submit");
+  return text === "submit" || text.endsWith("submit");
 };
 
 export const hideDuplicateFloatingCourseSubmitButton = (root = document) => {
