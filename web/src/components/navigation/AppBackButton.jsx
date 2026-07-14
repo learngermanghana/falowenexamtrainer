@@ -79,6 +79,16 @@ const buildLessonReturnIndex = () => {
   addCanonicalGrammarReturns(index, "A1", A1_GRAMMAR_ROUTE_ENTRIES);
   addCanonicalGrammarReturns(index, "A2", A2_GRAMMAR_ROUTE_ENTRIES);
 
+  // Day 20 Chapter 12.3 uses special direct routes that are not reliably
+  // represented by every generated schedule source. Keep their Course Book
+  // return deterministic instead of falling back to browser history.
+  const a1Day20Chapter123Lesson = "/campus/course/lesson/A1/20?chapter=12.3";
+  index.set("/campus/course/letter-writing-intro-12-3", a1Day20Chapter123Lesson);
+  index.set(
+    "/campus/course/letter-writing-intro-german-a1-day-12-3",
+    a1Day20Chapter123Lesson
+  );
+
   return index;
 };
 
