@@ -1,4 +1,4 @@
-import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassService";
+import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassServiceV3";
 
 describe("canonical live class level protection", () => {
   test("replaces A1 curriculum with the correct A2 lesson title", () => {
