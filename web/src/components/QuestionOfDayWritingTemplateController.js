@@ -58,7 +58,7 @@ export const inferQuestionOfDayTemplateId = (
   if (/meinung|stellungnahme|kommentar|forum|leserbrief|erörterung|eroerterung|diskussion|artikel|blogbeitrag/.test(text)) {
     return findKind("opinion", "analysis", "report", "formal");
   }
-  if (/herr\s+\p{L}+|frau\s+\p{L}+|firma|schule|hotel|arzt|ärztin|chef|professor|universität|amt|verein|bibliothek|touristeninformation|wohnungsgesellschaft|reiseveranstalter|gemeinde/i.test(text)) {
+  if (/\bherr\b|\bfrau\b|firma|schule|hotel|arzt|ärztin|chef|professor|universität|amt|verein|bibliothek|touristeninformation|wohnungsgesellschaft|reiseveranstalter|gemeinde/.test(text)) {
     return findKind("formal", "opinion", "report", "analysis");
   }
   if (/freund|freundin|bruder|schwester|familie|mutter|vater|partner|partnerin|nachbar|nachbarin|kollege|kollegin|persönliche nachricht|persoenliche nachricht/.test(text)) {
