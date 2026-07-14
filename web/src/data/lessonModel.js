@@ -1,5 +1,9 @@
 import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { getB1Day5RadioResource } from "./b1Day5Media";
+import {
+  applyB2C1LessonVideoOverrides,
+  getB2C1RadioResource,
+} from "./b2C1LessonMediaOverrides";
 import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
@@ -14,6 +18,7 @@ import { resolveStrictInAppWorkbookRoute } from "./strictInAppWorkbookRoutes";
 
 applyA1LessonVideoResourceOverrides(LESSON_VIDEO_DICTIONARY);
 applyB1LessonVideoOverrides(LESSON_VIDEO_DICTIONARY);
+applyB2C1LessonVideoOverrides(LESSON_VIDEO_DICTIONARY);
 
 export const LEVEL_CAPABILITIES = Object.freeze({
   A1: { radio: false, fourPartWorkbook: false, tutorSubmission: true, selfAssessment: false },
@@ -45,7 +50,9 @@ const mergeVideos = (...groups) => {
 const isTeacherVideo = (item = {}) =>
   `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
 const getLessonRadio = (level, day) =>
-  getLessonRadioResource(level, day) || getB1Day5RadioResource(level, day);
+  getB2C1RadioResource(level, day) ||
+  getLessonRadioResource(level, day) ||
+  getB1Day5RadioResource(level, day);
 
 const shouldHideGrammarBook = ({ level, day }) => level === "A1" && Number(day) === 5;
 
