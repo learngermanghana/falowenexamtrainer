@@ -52,6 +52,8 @@ export const shouldRenderWorkbookGuide = ({
   const searchParams = new URLSearchParams(search || "");
   const requestedView = searchParams.get("view");
 
+  if (shouldSuppressGenericWorkbookGuide(normalizedPathname)) return false;
+
   if (normalizedPathname === A1_DAY18_CHAPTER121_PATH) {
     return requestedView === "workbook";
   }
