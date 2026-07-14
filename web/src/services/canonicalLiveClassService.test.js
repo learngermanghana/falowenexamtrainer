@@ -1,3 +1,4 @@
+import "./canonicalLiveClassTestSetup";
 import {
   buildCanonicalLiveClassSummary,
   normalizeCurriculumIds,
