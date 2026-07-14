@@ -6,6 +6,7 @@ import {
 import { normalizeLesson } from "../data/lessonModel";
 import {
   A1_DAY12_WORKBOOK_PATH,
+  A1_DAY16_CHAPTER10_WORKBOOK_PATH,
   SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS,
   shouldRenderWorkbookGuide,
   shouldSuppressGenericWorkbookGuide,
@@ -82,6 +83,18 @@ describe("AutoWorkbookStartGuide route matching", () => {
     ).toBe(false);
   });
 
+  test("A1 Day 16 Chapter 10 does not receive a generic tutor lecture guide", () => {
+    expect(SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(A1_DAY16_CHAPTER10_WORKBOOK_PATH)).toBe(true);
+    expect(shouldSuppressGenericWorkbookGuide(A1_DAY16_CHAPTER10_WORKBOOK_PATH)).toBe(true);
+    expect(
+      shouldRenderWorkbookGuide({
+        pathname: A1_DAY16_CHAPTER10_WORKBOOK_PATH,
+        search: "?assignmentKey=A1-10&assignmentId=A1-10&level=A1",
+        match: { level: "A1", day: 16, resource: { chapter: "10" } },
+      })
+    ).toBe(false);
+  });
+
   test("A1 Day 18 Kapitel 12.1 has a workbook view distinct from grammar notes", () => {
     const route = getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.1" });
     expect(route).toBe(
@@ -121,7 +134,7 @@ describe("AutoWorkbookStartGuide route matching", () => {
     expect(shouldRenderWorkbookGuide({ pathname, search: "?view=workbook", match })).toBe(true);
   });
 
-  test("every configured tutor-marked A1 workbook route receives submission support", () => {
+  test("every configured tutor-marked A1 workbook route receives the correct guide behavior", () => {
     const index = buildWorkbookRouteIndex();
     const assignmentWorkbookRoutes = new Map();
 
@@ -151,7 +164,7 @@ describe("AutoWorkbookStartGuide route matching", () => {
       const match = index.get(pathname);
       expect(match).toBeTruthy();
       expect(shouldRenderWorkbookGuide({ pathname, search, match })).toBe(
-        pathname === A1_DAY12_WORKBOOK_PATH ? false : true
+        !shouldSuppressGenericWorkbookGuide(pathname)
       );
     });
   });
