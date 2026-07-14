@@ -1,3 +1,4 @@
+import "./canonicalLiveClassTestSetup";
 import { buildCanonicalLiveClassSummary } from "./canonicalLiveClassServiceV3";
 
 describe("canonical live class level protection", () => {
