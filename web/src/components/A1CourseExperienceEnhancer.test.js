@@ -79,23 +79,73 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(document.body.textContent).toContain("Original questions");
   });
 
-  it("refines A1 Course Book cards with German chapter labels and dynamic actions", () => {
+  it("applies one shared action design to every A1 lesson card regardless of the current button label", () => {
     document.body.innerHTML = `
-      <select><option value="A1" selected>A1</option><option value="A2">A2</option></select>
+      <select>
+        <option value="A1" selected>A1</option>
+        <option value="A2">A2</option>
+      </select>
       <article>
         <h3>Greetings</h3>
         <span>Chapter 0.1</span>
         <span>Tutor Marked Assignment</span>
         <span>Passed</span>
-        <a href="/lesson">Open Lesson</a>
+        <div><a href="/campus/course/lesson/A1/1?chapter=0.1">Open Lesson</a></div>
+      </article>
+      <article>
+        <h3>Personal Pronouns</h3>
+        <span>Chapter 1.1</span>
+        <span>Self-learning</span>
+        <span>In progress</span>
+        <div><a href="/campus/course/lesson/A1/2?chapter=1.1">Start lesson</a></div>
       </article>
     `;
 
     applyA1CourseBookFormatting(document, "/campus/course");
 
-    expect(document.querySelector("article").getAttribute("data-a1-course-card")).toBe("true");
-    expect(document.querySelector("article").textContent).toContain("Kapitel 0.1");
-    expect(document.querySelector("article").textContent).toContain("Assignment");
-    expect(document.querySelector("a").textContent).toBe("Review lesson");
+    const cards = Array.from(document.querySelectorAll("article"));
+    const actions = Array.from(document.querySelectorAll("article a"));
+
+    cards.forEach((card) => {
+      expect(card.getAttribute("data-a1-course-card")).toBe("true");
+      expect(card.textContent).toContain("Kapitel");
+    });
+    actions.forEach((action) => {
+      expect(action.getAttribute("data-a1-course-action")).toBe("true");
+      expect(action.parentElement.getAttribute("data-a1-course-actions")).toBe("true");
+    });
+
+    expect(actions[0].textContent).toBe("Review lesson");
+    expect(actions[1].textContent).toBe("Continue lesson");
+    expect(cards[0].textContent).toContain("Assignment");
+    expect(cards[1].textContent).toContain("Practice");
+  });
+
+  it("removes A1-only action attributes and restores the generic label after changing level", () => {
+    document.body.innerHTML = `
+      <select>
+        <option value="A1" selected>A1</option>
+        <option value="A2">A2</option>
+      </select>
+      <article>
+        <h3>Greetings</h3>
+        <span>Not started</span>
+        <div><a href="/campus/course/lesson/A1/1">Open Lesson</a></div>
+      </article>
+    `;
+
+    const select = document.querySelector("select");
+    const action = document.querySelector("a");
+
+    applyA1CourseBookFormatting(document, "/campus/course");
+    expect(action.textContent).toBe("Start lesson");
+    expect(action.getAttribute("data-a1-course-action")).toBe("true");
+
+    select.value = "A2";
+    applyA1CourseBookFormatting(document, "/campus/course");
+
+    expect(action.textContent).toBe("Open Lesson");
+    expect(action.hasAttribute("data-a1-course-action")).toBe(false);
+    expect(action.parentElement.hasAttribute("data-a1-course-actions")).toBe(false);
   });
 });
