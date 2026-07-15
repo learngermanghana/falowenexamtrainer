@@ -3,7 +3,7 @@ import {
   findCurrentOrNextSession,
   formatClassCountdown,
   resolveLevel,
-} from "./CourseBookNextClassIndicator";
+} from "../utils/courseBookNextClassLogic";
 
 describe("CourseBookNextClassIndicator", () => {
   test("handles a null student profile while authentication is loading", () => {
@@ -29,7 +29,6 @@ describe("CourseBookNextClassIndicator", () => {
 
     expect(formatClassCountdown(session, now)).toBe("Starts in 6 hours 20 minutes");
   });
-
 
   test("uses Ghana wall-clock fields for countdowns when browser timezone differs", () => {
     const now = new Date("2026-07-01T16:36:00.000Z");
