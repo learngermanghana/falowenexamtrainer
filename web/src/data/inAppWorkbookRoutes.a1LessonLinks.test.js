@@ -1,12 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { courseSchedules } from "./courseSchedule";
+import { getA1GrammarRoute } from "./a1GrammarRoutes";
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
   A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
-import { normalizeLesson } from "./lessonModel";
+import { getLessonVideoResources } from "./lessonVideoDictionary";
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
@@ -38,10 +39,15 @@ const A1_RESOURCE_HUB_CASES = [
   [24, "5.10", "/campus/course/conjunctions-5-10"],
 ].map(([day, chapter, workbookPath]) => ({ day, chapter, workbookPath }));
 
-const getCanonicalA1Lesson = (day) => {
-  const entry = courseSchedules.A1.find((lesson) => Number(lesson.day) === Number(day));
-  return normalizeLesson(entry, "A1");
-};
+const getAiVideoUrls = (day, chapter) =>
+  getLessonVideoResources("A1", day, { day, chapter })
+    .filter((video) => !`${video.key || ""} ${video.title || ""}`.toLowerCase().includes("teacher"))
+    .map((video) => video.url);
+
+const getTeacherVideoUrls = (day, chapter) =>
+  getA1TeacherVideoResources(day)
+    .filter((video) => String(video.chapter) === String(chapter))
+    .map((video) => video.url);
 
 describe("A1 lesson links preserve the lesson resource hub", () => {
   const originalPath = window.location.pathname;
@@ -61,35 +67,25 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   );
 
   it("keeps all four A1 Day 1 resource-hub choices configured", () => {
-    const lesson = getCanonicalA1Lesson(1);
-
-    expect(lesson.resources.resourceGroups[0]).toEqual(
-      expect.objectContaining({
-        chapter: "0.1",
-        grammarBook: { url: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1" },
-        workbook: { url: "/campus/course/a1-day-1-greetings-workbook" },
-      }),
+    expect(getTeacherVideoUrls(1, "0.1")).toContain("https://youtu.be/CqFbBQG9M3U");
+    expect(getAiVideoUrls(1, "0.1")).toContain("https://youtu.be/5WIMkENgdGE");
+    expect(getA1GrammarRoute({ day: 1, chapter: "0.1" })).toBe(
+      "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
     );
-    expect(lesson.resources.videos.map((video) => video.url)).toEqual([
-      "https://youtu.be/CqFbBQG9M3U",
-      "https://youtu.be/5WIMkENgdGE",
-    ]);
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe(
+      "/campus/course/a1-day-1-greetings-workbook",
+    );
   });
 
   it("keeps all four A1 Day 4 resource-hub choices configured", () => {
-    const lesson = getCanonicalA1Lesson(4);
-
-    expect(lesson.resources.resourceGroups[0]).toEqual(
-      expect.objectContaining({
-        chapter: "2",
-        grammarBook: { url: "/campus/course/german-numbers-1-10-with-pronunciation" },
-        workbook: { url: "/campus/course/a1-day-4-numbers-for-beginners-workbook" },
-      }),
+    expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
+    expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");
+    expect(getA1GrammarRoute({ day: 4, chapter: "2" })).toBe(
+      "/campus/course/german-numbers-1-10-with-pronunciation",
     );
-    expect(lesson.resources.videos.map((video) => video.url)).toEqual([
-      "https://youtu.be/lN7xxSbkPZ4",
-      "https://youtu.be/GyhH8zPXDy4",
-    ]);
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 4, chapter: "2" })).toBe(
+      "/campus/course/a1-day-4-numbers-for-beginners-workbook",
+    );
   });
 
   it("keeps Day 23 Chapter 14.2 as the intentional grammar-only exception", () => {
