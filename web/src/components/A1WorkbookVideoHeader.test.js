@@ -1,4 +1,5 @@
 import {
+  __private__,
   applyA1WorkbookVideoHeader,
   buildA1WorkbookVideoModel,
   extractYouTubeVideoId,
@@ -22,12 +23,31 @@ describe("A1 workbook AI video header", () => {
     document.body.innerHTML = "";
   });
 
-  test("extracts approved YouTube IDs from common URL formats", () => {
+  test("extracts approved YouTube IDs and rejects placeholder values", () => {
     expect(extractYouTubeVideoId("https://youtu.be/hLpPFOthVkU")).toBe("hLpPFOthVkU");
     expect(extractYouTubeVideoId("https://www.youtube.com/watch?v=hLpPFOthVkU&feature=share"))
       .toBe("hLpPFOthVkU");
     expect(extractYouTubeVideoId("https://www.youtube.com/embed/hLpPFOthVkU"))
       .toBe("hLpPFOthVkU");
+    expect(extractYouTubeVideoId("https://youtu.be/a1-day0-tutorial")).toBe("");
+  });
+
+  test("resolves every registered A1 workbook route by chapter and assignment identity", () => {
+    const registeredLessons = __private__.alignedA1Lessons.filter((lesson) => lesson.workbookRoute);
+    expect(registeredLessons.length).toBeGreaterThan(20);
+
+    registeredLessons.forEach((lesson) => {
+      const route = new URL(lesson.workbookRoute, "https://www.falowen.app");
+      route.searchParams.set("chapter", lesson.chapter);
+      if (lesson.assignmentId) route.searchParams.set("assignmentKey", lesson.assignmentId);
+
+      expect(
+        resolveA1WorkbookVideoLesson({
+          pathname: route.pathname,
+          search: route.search,
+        })?.id,
+      ).toBe(lesson.id);
+    });
   });
 
   test("resolves a tutor-marked named workbook from the aligned A1 catalogue", () => {
@@ -111,6 +131,13 @@ describe("A1 workbook AI video header", () => {
       "src",
       "https://www.youtube-nocookie.com/embed/hLpPFOthVkU",
     );
+
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
+      }),
+    ).toBe(1);
+    expect(document.querySelectorAll('[data-a1-workbook-video-header="true"]')).toHaveLength(1);
   });
 
   test("allows the learner to collapse and reopen the video", () => {
