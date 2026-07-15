@@ -23,7 +23,7 @@ test("shared loader uses the Admin endpoint and a last-known-good cache", async 
   assert.match(service, /defaultGoetheExamConfig/);
 });
 
-test("Exam File and Study Calendar are patched to the same hook", async () => {
+test("Exam File and Study Calendar react when the shared Admin config arrives", async () => {
   const [patch, hook] = await Promise.all([
     source("scripts/patch-goethe-exam-config-ui.mjs"),
     source("src/hooks/useGoetheExamConfig.js"),
@@ -32,6 +32,8 @@ test("Exam File and Study Calendar are patched to the same hook", async () => {
   assert.match(patch, /StudyCalendarPage\.js/);
   assert.match(patch, /Schedule synced from Falowen Admin/);
   assert.match(patch, /const goetheExamLevels = goetheExamConfig\.levels/);
+  assert.match(patch, /\[detectedLevel, goetheExamLevels, showAllLevels\]/);
+  assert.match(patch, /\[goetheExamLevels, selectedLevel\]/);
   assert.match(hook, /loadGoetheExamConfig/);
   assert.match(hook, /fallbackGoetheExamConfig/);
 });
