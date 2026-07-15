@@ -2,10 +2,14 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { alignA1CurriculumEntries } from "../data/a1RouteAlignment";
 import { getLessonsByLevel } from "../data/lessonCatalog";
+import { normalizeA1Lesson } from "../data/lessonModel";
 
 const HEADER_ATTRIBUTE = "data-a1-workbook-video-header";
 const HEADER_LESSON_ATTRIBUTE = "data-a1-workbook-video-lesson";
-const RADIO_GATE_SELECTOR = '[data-a1-radio-first-workbook-route="true"]';
+const RADIO_GATE_SELECTOR = [
+  '[data-a1-radio-first-workbook-route="true"]',
+  '[data-radio-first-workbook-gate="true"]',
+].join(", ");
 const NON_WORKBOOK_VIEWS = new Set(["grammar", "learn"]);
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
@@ -48,13 +52,11 @@ export const extractYouTubeVideoId = (value = "") => {
   return "";
 };
 
+export const getA1LessonVideoResource = (lesson = {}) =>
+  normalizeA1Lesson(lesson)?.resources?.aiVideo || null;
+
 export const getA1LessonVideoSource = (lesson = {}) =>
-  lesson.aiVideo ||
-  lesson.ai_video ||
-  lesson.grammarExplainerVideo ||
-  lesson.teacherVideo ||
-  lesson.video ||
-  "";
+  String(getA1LessonVideoResource(lesson)?.url || "").trim();
 
 const routeMatchesSearch = (routeUrl, currentSearchParams) => {
   if (!routeUrl) return false;
@@ -117,10 +119,12 @@ export const buildA1WorkbookVideoModel = ({ pathname = "", search = "" } = {}) =
   const lesson = resolveA1WorkbookVideoLesson({ pathname, search });
   if (!lesson) return null;
 
-  const sourceUrl = getA1LessonVideoSource(lesson);
+  const videoResource = getA1LessonVideoResource(lesson);
+  const sourceUrl = String(videoResource?.url || "").trim();
   const youtubeId = extractYouTubeVideoId(sourceUrl);
   return {
     lesson,
+    videoResource,
     lessonId: String(lesson.id || lesson.assignmentId || `${lesson.day}-${lesson.chapter}`),
     day: Number(lesson.day),
     chapter: String(lesson.chapter || ""),
@@ -214,7 +218,7 @@ const createVideoHeader = (model) => {
   setStyles(heading, { color: "#0f172a", fontSize: "18px", lineHeight: "1.35" });
 
   const description = document.createElement("p");
-  description.textContent = `${model.assessmentLabel} · Watch the explanation before you start the workbook.`;
+  description.textContent = `${model.assessmentLabel} · Watch the AI explanation before you start the workbook.`;
   setStyles(description, { color: "#475569", lineHeight: "1.55", margin: "0" });
 
   copy.append(eyebrow, heading, description);
