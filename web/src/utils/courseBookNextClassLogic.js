@@ -3,6 +3,7 @@ import { GHANA_TIMEZONE } from "./liveClassCardPresentation";
 
 const CANCELLED_STATUS = "cancelled";
 const COMPLETED_STATUS = "completed";
+export const COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE = "data-course-book-next-class-slot";
 
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
 
@@ -20,7 +21,7 @@ export const resolveLevel = (studentProfile = {}) => {
   return source.match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
 };
 
-export const findCourseBookStatGrid = (root = document) => {
+export const findCourseBookStatGrid = (root = typeof document !== "undefined" ? document : null) => {
   if (!root?.querySelectorAll) return null;
   const heading = Array.from(root.querySelectorAll("h2")).find(
     (element) => normalizeText(element.textContent) === "course book"
@@ -32,6 +33,38 @@ export const findCourseBookStatGrid = (root = document) => {
     (element) => normalizeText(element.textContent) === "lessons"
   );
   return lessonsLabel?.parentElement?.parentElement || null;
+};
+
+export const findOrCreateCourseBookNextClassMount = (
+  root = typeof document !== "undefined" ? document : null,
+  level = ""
+) => {
+  const statGrid = findCourseBookStatGrid(root);
+  if (!statGrid || String(level || "").trim().toUpperCase() !== "A1") return statGrid;
+
+  const hero = statGrid.closest("section");
+  const parent = hero?.parentElement;
+  if (!hero || !parent) return statGrid;
+
+  const existing = Array.from(parent.children).find(
+    (element) => element.getAttribute?.(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE) === "true"
+  );
+  if (existing) return existing;
+
+  const ownerDocument = hero.ownerDocument || (root?.createElement ? root : null);
+  if (!ownerDocument?.createElement) return statGrid;
+
+  const slot = ownerDocument.createElement("div");
+  slot.setAttribute(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE, "true");
+  slot.setAttribute("aria-label", "Next class information");
+  Object.assign(slot.style, {
+    display: "grid",
+    justifySelf: "end",
+    minWidth: "0",
+    width: "min(100%, 560px)",
+  });
+  hero.insertAdjacentElement("afterend", slot);
+  return slot;
 };
 
 const sessionStatus = (session = {}) => normalizeText(session.status || "scheduled");
