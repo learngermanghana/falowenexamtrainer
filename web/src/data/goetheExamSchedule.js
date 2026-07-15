@@ -2,8 +2,7 @@ export const goetheExamLevels = [
   {
     level: "A1",
     title: "Goethe-Zertifikat A1: Start Deutsch 1",
-    description:
-      "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    description: "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to A1 of the CEFR.",
     registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd1.cfm",
     price: "3,000 GHS",
     priceValue: 3000,
@@ -43,8 +42,7 @@ export const goetheExamLevels = [
   {
     level: "B1",
     title: "Goethe-Zertifikat B1",
-    description:
-      "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    description: "A German exam for young people and adults. It certifies independent language use at B1 level.",
     registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb1.cfm",
     price: "2,900 GHS",
     priceValue: 2900,
@@ -62,24 +60,30 @@ export const goetheExamLevels = [
       { date: "2026-12-03", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
     ],
   },
-  {
-    level: "B2",
-    title: "Goethe-Zertifikat B2",
-    description:
-      "A German exam for young people and adults. It certifies advanced language skills at the B2 level of the CEFR.",
-    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb2.cfm",
-    price: "Contact Goethe-Institut Accra",
-    location: "Goethe-Institut Accra",
-    exams: [],
-  },
-  {
-    level: "C1",
-    title: "Goethe-Zertifikat C1",
-    description:
-      "A German exam for adults. It certifies proficient language skills at the C1 level of the CEFR.",
-    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzc1.cfm",
-    price: "Contact Goethe-Institut Accra",
-    location: "Goethe-Institut Accra",
-    exams: [],
-  },
+  { level: "B2", title: "Goethe-Zertifikat B2", description: "A German exam for young people and adults. It certifies advanced language skills at B2 level.", registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb2.cfm", price: "Contact Goethe-Institut Accra", location: "Goethe-Institut Accra", exams: [] },
+  { level: "C1", title: "Goethe-Zertifikat C1", description: "A German exam for adults. It certifies proficient language skills at C1 level.", registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzc1.cfm", price: "Contact Goethe-Institut Accra", location: "Goethe-Institut Accra", exams: [] },
 ];
+
+export const defaultGoetheExamConfig = {
+  version: 1,
+  timezone: "Africa/Accra",
+  examFileUrl: "https://www.falowen.app/campus/examFile",
+  goetheUrl: "https://www.goethe.de/",
+  senderName: "Learn Language Education Academy",
+  replyTo: "learngermanghana@gmail.com",
+  reminder: {
+    minContractWeeks: 5,
+    reminderDays: [14, 3, 2, 1],
+    accountSetupDaysBefore: 7,
+    accountSetupCatchUp: true,
+    allowedStatuses: ["active", "paid", "enrolled"],
+    dailyHour: 6,
+    dailyMinute: 30,
+    openingWindows: [
+      { key: "EVE_1730", daysBefore: 1, hour: 17, minute: 30, label: "17:30 on the day before opening" },
+      { key: "PREMIDNIGHT_2330", daysBefore: 1, hour: 23, minute: 30, label: "23:30 on the day before opening" },
+      { key: "PRE6AM_0530", daysBefore: 0, hour: 5, minute: 30, label: "05:30 on the opening day" },
+    ],
+  },
+  levels: goetheExamLevels,
+};
