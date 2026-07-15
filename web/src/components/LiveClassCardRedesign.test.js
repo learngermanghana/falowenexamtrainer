@@ -90,7 +90,7 @@ describe("live class card UI protection", () => {
     expect(card).toContain("Open lesson");
     expect(card).toContain("View timetable");
     expect(card).toContain("Join class");
-    expect(card).toContain("Join opens at");
+    expect(card).toContain("liveClassJoinOpensAt");
     expect(card).toContain("After this");
     expect(card).toContain("Previously:");
   });
@@ -98,7 +98,7 @@ describe("live class card UI protection", () => {
   test("the full calendar places next class before progress and collapses the complete register", () => {
     const fullCard = source("./ClassCalendarCardV2.js");
     expect(fullCard.indexOf("<NextLiveClassCard")).toBeGreaterThan(-1);
-    expect(fullCard.indexOf("<NextLiveClassCard")).toBeLessThan(fullCard.indexOf("Course progress"));
+    expect(fullCard.indexOf("<NextLiveClassCard")).toBeLessThan(fullCard.indexOf("canonicalSummary.progress"));
     expect(fullCard).toContain("Upcoming sessions");
     expect(fullCard).toContain("showing the next");
     expect(fullCard).toContain("Show all {sessions.length} sessions");
