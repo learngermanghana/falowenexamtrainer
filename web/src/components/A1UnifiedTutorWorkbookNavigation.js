@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { getInlineCourseAssignments, normalizeCourseAssignmentKey } from "../utils/courseLessonAssignments";
-import { buildA1WorkbookContentGroups, findA1WorkbookTeilSections } from "./A1WorkbookSectionTabs";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
 import {
   A1_TUTOR_MARKED_ASSIGNMENT_KEYS,
@@ -12,19 +11,19 @@ import {
 } from "./WorkbookInlineEnhancements";
 
 const NAV_MOUNT_ATTRIBUTE = "data-a1-unified-tutor-workbook-nav";
-const OVERVIEW_MOUNT_ATTRIBUTE = "data-a1-unified-tutor-workbook-overview";
 const CREATED_SUBMISSION_HOST_ATTRIBUTE = "data-a1-unified-submission-host";
 const SUBMISSION_CONTROLLER_ATTRIBUTE = "data-a1-unified-submission-controller";
 const NATIVE_TABS_HIDDEN_ATTRIBUTE = "data-a1-unified-native-tabs-hidden";
 const NATIVE_TABS_DISPLAY_ATTRIBUTE = "data-a1-unified-native-tabs-display";
 const GROUP_DISPLAY_ATTRIBUTE = "data-a1-unified-group-display";
 const CONTROLLER_DISPLAY_ATTRIBUTE = "data-a1-unified-controller-display";
+const LEGACY_NAV_DISPLAY_ATTRIBUTE = "data-a1-native-tabs-legacy-nav-display";
+const LEGACY_META_DISPLAY_ATTRIBUTE = "data-a1-native-tabs-legacy-meta-display";
 
 const tutorMarkedKeySet = new Set(A1_TUTOR_MARKED_ASSIGNMENT_KEYS.map(normalizeCourseAssignmentKey));
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
-
 const getButtonLabel = (button) => normalizeText(button?.textContent);
 
 export const findA1NativeAssignmentTabList = (pageRoot) =>
@@ -32,6 +31,9 @@ export const findA1NativeAssignmentTabList = (pageRoot) =>
     const labels = Array.from(tabList.querySelectorAll("button")).map(getButtonLabel);
     return labels.includes("assignment") && labels.includes("submit");
   }) || null;
+
+export const shouldPreserveA1NativeAssignmentTabs = (pageRoot) =>
+  Boolean(findA1NativeAssignmentTabList(pageRoot));
 
 const findTabButton = (root, label) =>
   Array.from(root?.querySelectorAll?.("button") || []).find((button) => getButtonLabel(button) === label) || null;
@@ -83,10 +85,14 @@ export const restoreA1UnifiedWorkbookGroups = (pageRoot) => {
   Array.from(pageRoot?.querySelectorAll?.(`[${GROUP_DISPLAY_ATTRIBUTE}]`) || []).forEach(showGroupElement);
 };
 
-export const applyA1UnifiedWorkbookView = ({ groups = [], activeView = "overview" } = {}) => {
+export const applyA1UnifiedWorkbookView = ({ groups = [], activeView = "assignment" } = {}) => {
+  if (activeView === "assignment" || activeView === "overview") {
+    groups.forEach((group) => group.elements.forEach(showGroupElement));
+    return;
+  }
+
   const selectedTeil = /^teil-(\d+)$/i.exec(String(activeView || ""));
   const selectedNumber = selectedTeil ? Number(selectedTeil[1]) : null;
-
   groups.forEach((group) => {
     const shouldShow = Number(group.number) === selectedNumber;
     group.elements.forEach((element) => {
@@ -138,28 +144,36 @@ const buildDynamicA1Match = ({ pathname = "", search = "" } = {}) => {
 export const resolveA1UnifiedTutorWorkbookMatch = ({ pathname = "", search = "" } = {}) =>
   resolveA1WorkbookSubmissionMatch({ pathname, search }) || buildDynamicA1Match({ pathname, search });
 
-const getGroupSignature = (groups = []) =>
-  groups
-    .map((group) => `${group.number}:${normalizeText(group.heading?.textContent)}:${group.elements.length}`)
-    .join("|");
+const navButtonStyle = (selected, submit = false) => ({
+  ...styles.secondaryButton,
+  background: selected ? (submit ? "#166534" : "#2563eb") : submit ? "#ecfdf5" : "#ffffff",
+  borderColor: submit ? "#86efac" : selected ? "#2563eb" : "#93c5fd",
+  color: selected ? "#ffffff" : submit ? "#166534" : "#1d4ed8",
+  flex: "1 1 150px",
+  fontWeight: 900,
+  minHeight: 46,
+  padding: "10px 16px",
+});
 
-const getTeilLabel = (group) => {
-  const suffix = String(group?.heading?.textContent || "")
-    .replace(/^\s*Teil\s*\d+\s*[·:—-]?\s*/i, "")
-    .trim();
-  return suffix ? `Teil ${group.number} · ${suffix}` : `Teil ${group.number}`;
+const suppressLegacyChromeForNativeTabs = (main) => {
+  Array.from(main?.querySelectorAll?.('[data-a1-teil-navigation="true"]') || []).forEach((element) => {
+    rememberDisplay(element, LEGACY_NAV_DISPLAY_ATTRIBUTE);
+    element.style.display = "none";
+  });
+  Array.from(main?.querySelectorAll?.('[data-a1-lesson-meta="true"]') || []).forEach((element) => {
+    rememberDisplay(element, LEGACY_META_DISPLAY_ATTRIBUTE);
+    element.style.display = "none";
+  });
 };
 
-const navButtonStyle = (selected) => ({
-  ...styles.secondaryButton,
-  background: selected ? "#2563eb" : "#ffffff",
-  borderColor: selected ? "#2563eb" : "#93c5fd",
-  color: selected ? "#ffffff" : "#1d4ed8",
-  flex: "0 0 auto",
-  fontWeight: 900,
-  minHeight: 44,
-  padding: "9px 14px",
-});
+const restoreLegacyChrome = (main) => {
+  Array.from(main?.querySelectorAll?.(`[${LEGACY_NAV_DISPLAY_ATTRIBUTE}]`) || []).forEach((element) =>
+    restoreDisplay(element, LEGACY_NAV_DISPLAY_ATTRIBUTE),
+  );
+  Array.from(main?.querySelectorAll?.(`[${LEGACY_META_DISPLAY_ATTRIBUTE}]`) || []).forEach((element) =>
+    restoreDisplay(element, LEGACY_META_DISPLAY_ATTRIBUTE),
+  );
+};
 
 export default function A1UnifiedTutorWorkbookNavigation() {
   const location = useLocation();
@@ -169,31 +183,25 @@ export default function A1UnifiedTutorWorkbookNavigation() {
   );
   const routeKey = `${normalizePath(location.pathname)}|${match?.resource?.assignmentKey || ""}`;
   const requestedTab = new URLSearchParams(location.search || "").get("workbookTab");
-  const [activeView, setActiveView] = useState(requestedTab === "submit" ? "submit" : "overview");
+  const [activeView, setActiveView] = useState(requestedTab === "submit" ? "submit" : "assignment");
   const [navMount, setNavMount] = useState(null);
-  const [overviewMount, setOverviewMount] = useState(null);
   const [submissionHost, setSubmissionHost] = useState(null);
   const [ownsSubmissionHost, setOwnsSubmissionHost] = useState(false);
-  const [groups, setGroups] = useState([]);
   const pageRootRef = useRef(null);
-  const groupSignatureRef = useRef("");
-  const createdNodesRef = useRef({ nav: null, overview: null, submission: null });
+  const createdNodesRef = useRef({ nav: null, submission: null });
 
   useEffect(() => {
-    setActiveView(requestedTab === "submit" ? "submit" : "overview");
-  }, [routeKey]);
+    setActiveView(requestedTab === "submit" ? "submit" : "assignment");
+  }, [requestedTab, routeKey]);
 
   const activateAssignmentContent = useCallback(() => {
     const pageRoot = pageRootRef.current;
     if (!pageRoot) return;
-
-    const nativeTabList = findA1NativeAssignmentTabList(pageRoot);
-    const nativeAssignment = findTabButton(nativeTabList, "assignment");
-    if (nativeAssignment && nativeAssignment.getAttribute("aria-selected") !== "true") nativeAssignment.click();
+    restoreA1UnifiedWorkbookGroups(pageRoot);
 
     const controller = submissionHost?.querySelector?.('[aria-label="Workbook assignment navigation"]');
     const sharedAssignment = findTabButton(controller, "assignment");
-    if (sharedAssignment) sharedAssignment.click();
+    sharedAssignment?.click();
     if (controller) {
       rememberDisplay(controller, CONTROLLER_DISPLAY_ATTRIBUTE);
       controller.style.display = "none";
@@ -217,6 +225,11 @@ export default function A1UnifiedTutorWorkbookNavigation() {
     let scheduled = false;
     let attempts = 0;
 
+    const clearCreatedNodes = () => {
+      Object.values(createdNodesRef.current).forEach((node) => node?.remove?.());
+      createdNodesRef.current = { nav: null, submission: null };
+    };
+
     const install = () => {
       scheduled = false;
       if (disposed) return;
@@ -231,11 +244,21 @@ export default function A1UnifiedTutorWorkbookNavigation() {
       }
 
       pageRootRef.current = pageRoot;
-      const nativeTabList = hideA1NativeAssignmentTabs(pageRoot);
+      if (shouldPreserveA1NativeAssignmentTabs(pageRoot)) {
+        restoreA1NativeAssignmentTabs(pageRoot);
+        suppressLegacyChromeForNativeTabs(main);
+        clearCreatedNodes();
+        setNavMount(null);
+        setSubmissionHost(null);
+        setOwnsSubmissionHost(false);
+        return;
+      }
+
+      restoreLegacyChrome(main);
       let host = main.querySelector('[data-a1-workbook-submission-mount="true"]');
       let ownsHost = false;
 
-      if (!host && (nativeTabList || attempts > 24)) {
+      if (!host && attempts > 24) {
         host = main.querySelector(`[${CREATED_SUBMISSION_HOST_ATTRIBUTE}="true"]`);
         if (!host) {
           host = document.createElement("div");
@@ -262,25 +285,9 @@ export default function A1UnifiedTutorWorkbookNavigation() {
         createdNodesRef.current.nav = nextNavMount;
       }
 
-      let nextOverviewMount = main.querySelector(`[${OVERVIEW_MOUNT_ATTRIBUTE}="true"]`);
-      if (!nextOverviewMount) {
-        nextOverviewMount = document.createElement("div");
-        nextOverviewMount.setAttribute(OVERVIEW_MOUNT_ATTRIBUTE, "true");
-        host.parentElement?.insertBefore(nextOverviewMount, host);
-        createdNodesRef.current.overview = nextOverviewMount;
-      }
-
-      const nextGroups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
-      const nextSignature = getGroupSignature(nextGroups);
-      if (nextSignature !== groupSignatureRef.current) {
-        groupSignatureRef.current = nextSignature;
-        setGroups(nextGroups);
-      }
-
-      if (navMount !== nextNavMount) setNavMount(nextNavMount);
-      if (overviewMount !== nextOverviewMount) setOverviewMount(nextOverviewMount);
-      if (submissionHost !== host) setSubmissionHost(host);
-      if (ownsSubmissionHost !== ownsHost) setOwnsSubmissionHost(ownsHost);
+      setNavMount((current) => (current === nextNavMount ? current : nextNavMount));
+      setSubmissionHost((current) => (current === host ? current : host));
+      setOwnsSubmissionHost(ownsHost);
     };
 
     const scheduleInstall = () => {
@@ -299,54 +306,37 @@ export default function A1UnifiedTutorWorkbookNavigation() {
       observer.disconnect();
       restoreA1UnifiedWorkbookGroups(pageRootRef.current);
       restoreA1NativeAssignmentTabs(pageRootRef.current);
+      const main = document.querySelector("main.layout-main") || document.querySelector("main");
+      restoreLegacyChrome(main);
       const controller = submissionHost?.querySelector?.('[aria-label="Workbook assignment navigation"]');
       restoreDisplay(controller, CONTROLLER_DISPLAY_ATTRIBUTE);
       submissionHost?.removeAttribute?.(SUBMISSION_CONTROLLER_ATTRIBUTE);
-      Object.values(createdNodesRef.current).forEach((node) => node?.remove?.());
-      createdNodesRef.current = { nav: null, overview: null, submission: null };
+      clearCreatedNodes();
       pageRootRef.current = null;
-      groupSignatureRef.current = "";
       setNavMount(null);
-      setOverviewMount(null);
       setSubmissionHost(null);
       setOwnsSubmissionHost(false);
-      setGroups([]);
     };
   }, [match, routeKey]);
 
   useEffect(() => {
-    if (!match || !pageRootRef.current) return undefined;
+    if (!match || !pageRootRef.current || !navMount) return undefined;
 
     const applyView = () => {
       if (activeView === "submit") {
-        restoreA1UnifiedWorkbookGroups(pageRootRef.current);
         activateSubmit();
-        return;
+      } else {
+        activateAssignmentContent();
       }
-
-      activateAssignmentContent();
-      window.setTimeout(() => {
-        const pageRoot = pageRootRef.current;
-        if (!pageRoot) return;
-        const nextGroups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
-        const nextSignature = getGroupSignature(nextGroups);
-        if (nextSignature !== groupSignatureRef.current) {
-          groupSignatureRef.current = nextSignature;
-          setGroups(nextGroups);
-        }
-        applyA1UnifiedWorkbookView({ groups: nextGroups, activeView });
-      }, 0);
     };
 
     applyView();
     const timers = [60, 220, 700].map((delay) => window.setTimeout(applyView, delay));
     return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [activeView, activateAssignmentContent, activateSubmit, match, routeKey]);
+  }, [activeView, activateAssignmentContent, activateSubmit, match, navMount, routeKey]);
 
   if (!match || !navMount) return null;
 
-  const assignmentKey = match.resource.assignmentKey;
-  const chapter = match.resource.chapter || "";
   const navigation = createPortal(
     <section
       aria-label="Unified A1 tutor-marked workbook navigation"
@@ -355,8 +345,6 @@ export default function A1UnifiedTutorWorkbookNavigation() {
         position: "sticky",
         top: 8,
         zIndex: 35,
-        display: "grid",
-        gap: 10,
         border: "2px solid #2563eb",
         background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 74%)",
         margin: "0 0 12px",
@@ -365,70 +353,38 @@ export default function A1UnifiedTutorWorkbookNavigation() {
     >
       <style>{`
         [data-a1-teil-navigation="true"],
-        [data-a1-workbook-overview="true"],
         [${NATIVE_TABS_HIDDEN_ATTRIBUTE}="true"] { display: none !important; }
         [${SUBMISSION_CONTROLLER_ATTRIBUTE}="true"] > [aria-label="Workbook assignment navigation"] > div:first-child {
           display: none !important;
         }
       `}</style>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        <div>
-          <strong style={{ color: "#0f172a" }}>A1 · Day {match.day}{chapter ? ` · Kapitel ${chapter}` : ""}</strong>
-          <p style={{ margin: "3px 0 0", color: "#475569", fontSize: 12 }}>
-            Tutor Marked Assignment · {assignmentKey}
-          </p>
-        </div>
-        <span style={{ color: "#1d4ed8", fontSize: 12, fontWeight: 900 }}>One section at a time</span>
-      </div>
-      <div role="tablist" aria-label="A1 workbook sections" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
-        <button type="button" role="tab" aria-selected={activeView === "overview"} style={navButtonStyle(activeView === "overview")} onClick={() => setActiveView("overview")}>
-          Overview
+      <div
+        role="tablist"
+        aria-label="A1 workbook Assignment and Submit"
+        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === "assignment"}
+          style={navButtonStyle(activeView === "assignment")}
+          onClick={() => setActiveView("assignment")}
+        >
+          Assignment
         </button>
-        {groups.map((group) => {
-          const key = `teil-${group.number}`;
-          return (
-            <button key={key} type="button" role="tab" aria-selected={activeView === key} style={navButtonStyle(activeView === key)} onClick={() => setActiveView(key)}>
-              Teil {group.number}
-            </button>
-          );
-        })}
-        <button type="button" role="tab" aria-selected={activeView === "submit"} style={{ ...navButtonStyle(activeView === "submit"), background: activeView === "submit" ? "#166534" : "#ecfdf5", borderColor: "#86efac", color: activeView === "submit" ? "#ffffff" : "#166534" }} onClick={() => setActiveView("submit")}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === "submit"}
+          style={navButtonStyle(activeView === "submit", true)}
+          onClick={() => setActiveView("submit")}
+        >
           Submit
         </button>
       </div>
     </section>,
     navMount,
   );
-
-  const overview = overviewMount
-    ? createPortal(
-        activeView === "overview" ? (
-          <section
-            data-a1-unified-overview-card="true"
-            style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #bfdbfe", background: "#f8fbff", marginBottom: 12 }}
-          >
-            <div>
-              <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".05em" }}>
-                Workbook overview
-              </p>
-              <h2 style={{ margin: "4px 0" }}>Complete every Teil, then submit once</h2>
-              <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-                Open one Teil at a time. Your lesson content and questions remain unchanged. When all sections are complete, use Submit for the final tutor-marked answer.
-              </p>
-            </div>
-            <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-              {groups.map((group) => (
-                <button key={group.number} type="button" style={{ ...styles.secondaryButton, display: "grid", gap: 4, textAlign: "left", justifyItems: "start", borderColor: "#bfdbfe", background: "#ffffff", padding: 12 }} onClick={() => setActiveView(`teil-${group.number}`)}>
-                  <strong>Teil {group.number}</strong>
-                  <span style={{ color: "#475569", fontSize: 12 }}>{getTeilLabel(group).replace(/^Teil\s*\d+\s*[·:—-]?\s*/i, "") || "Assignment section"}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        ) : null,
-        overviewMount,
-      )
-    : null;
 
   const submissionController = ownsSubmissionHost && submissionHost
     ? createPortal(
@@ -440,7 +396,6 @@ export default function A1UnifiedTutorWorkbookNavigation() {
   return (
     <>
       {navigation}
-      {overview}
       {submissionController}
     </>
   );

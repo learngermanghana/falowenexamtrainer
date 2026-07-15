@@ -5,6 +5,7 @@ import {
   resolveA1UnifiedTutorWorkbookMatch,
   restoreA1NativeAssignmentTabs,
   restoreA1UnifiedWorkbookGroups,
+  shouldPreserveA1NativeAssignmentTabs,
 } from "./A1UnifiedTutorWorkbookNavigation";
 import { buildA1WorkbookContentGroups, findA1WorkbookTeilSections } from "./A1WorkbookSectionTabs";
 
@@ -89,7 +90,7 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     );
   });
 
-  it("turns an old all-in-one workbook into one visible Teil at a time", () => {
+  it("shows the complete assignment when Assignment is selected", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div id="workbook">
@@ -105,15 +106,15 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     const groups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
     expect(groups.map((group) => group.number)).toEqual([1, 2, 3]);
 
-    applyA1UnifiedWorkbookView({ groups, activeView: "overview" });
-    expect(document.querySelector("#teil1").style.display).toBe("none");
-    expect(document.querySelector("#teil2").style.display).toBe("none");
-    expect(document.querySelector("#teil3").style.display).toBe("none");
-
     applyA1UnifiedWorkbookView({ groups, activeView: "teil-2" });
     expect(document.querySelector("#teil1").style.display).toBe("none");
     expect(document.querySelector("#teil2").style.display).toBe("");
     expect(document.querySelector("#teil3").style.display).toBe("none");
+
+    applyA1UnifiedWorkbookView({ groups, activeView: "assignment" });
+    expect(document.querySelector("#teil1").style.display).toBe("");
+    expect(document.querySelector("#teil2").style.display).toBe("");
+    expect(document.querySelector("#teil3").style.display).toBe("");
 
     restoreA1UnifiedWorkbookGroups(pageRoot);
     expect(document.querySelector("#teil1").style.display).toBe("");
@@ -121,7 +122,24 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     expect(document.querySelector("#teil3").style.display).toBe("");
   });
 
-  it("reuses native Assignment content while hiding the duplicate old tab row", () => {
+  it("recognizes and preserves a workbook's native Assignment and Submit tabs", () => {
+    const pageRoot = document.createElement("div");
+    const tabList = document.createElement("div");
+    tabList.setAttribute("role", "tablist");
+    const assignment = document.createElement("button");
+    assignment.textContent = "Assignment";
+    assignment.setAttribute("aria-selected", "true");
+    const submit = document.createElement("button");
+    submit.textContent = "Submit";
+    tabList.append(assignment, submit);
+    pageRoot.appendChild(tabList);
+
+    expect(findA1NativeAssignmentTabList(pageRoot)).toBe(tabList);
+    expect(shouldPreserveA1NativeAssignmentTabs(pageRoot)).toBe(true);
+    expect(tabList.style.display).toBe("");
+  });
+
+  it("can still restore a native tab row hidden by an older page version", () => {
     const pageRoot = document.createElement("div");
     const tabList = document.createElement("div");
     tabList.setAttribute("role", "tablist");
@@ -134,7 +152,6 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     tabList.append(assignment, submit);
     pageRoot.appendChild(tabList);
 
-    expect(findA1NativeAssignmentTabList(pageRoot)).toBe(tabList);
     expect(hideA1NativeAssignmentTabs(pageRoot)).toBe(tabList);
     expect(assignment.click).toHaveBeenCalledTimes(1);
     expect(tabList.style.display).toBe("none");

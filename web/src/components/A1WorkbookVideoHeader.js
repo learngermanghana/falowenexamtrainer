@@ -96,6 +96,9 @@ export const resolveA1WorkbookVideoLesson = ({ pathname = "", search = "" } = {}
 
   const dynamicMatch = normalizedPathname.match(/^\/campus\/course\/lesson\/A1\/(\d+)$/i);
   if (dynamicMatch) {
+    // The dynamic lesson URL is the lesson/resource hub. It is a workbook only
+    // when the route explicitly requests view=workbook.
+    if (requestedView !== "workbook") return null;
     const day = Number(dynamicMatch[1]);
     return selectLessonCandidate(
       alignedA1Lessons.filter((lesson) => Number(lesson.day) === day),
@@ -204,7 +207,7 @@ const createVideoHeader = (model) => {
   setStyles(copy, { display: "grid", gap: "4px", minWidth: "0" });
 
   const eyebrow = document.createElement("span");
-  eyebrow.textContent = `AI lesson video · A1 · Day ${model.day} · Kapitel ${model.chapter}`;
+  eyebrow.textContent = "AI lesson video";
   setStyles(eyebrow, {
     color: "#1d4ed8",
     fontSize: "12px",
@@ -214,11 +217,11 @@ const createVideoHeader = (model) => {
   });
 
   const heading = document.createElement("strong");
-  heading.textContent = model.title;
+  heading.textContent = "Watch before you start the workbook";
   setStyles(heading, { color: "#0f172a", fontSize: "18px", lineHeight: "1.35" });
 
   const description = document.createElement("p");
-  description.textContent = `${model.assessmentLabel} · Watch the AI explanation before you start the workbook.`;
+  description.textContent = `${model.assessmentLabel} · Watch the AI explanation before you answer the questions.`;
   setStyles(description, { color: "#475569", lineHeight: "1.55", margin: "0" });
 
   copy.append(eyebrow, heading, description);

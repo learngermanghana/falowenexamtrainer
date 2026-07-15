@@ -32,12 +32,15 @@ describe("A1 workbook AI video header", () => {
     expect(extractYouTubeVideoId("https://youtu.be/a1-day0-tutorial")).toBe("");
   });
 
-  test("resolves every registered A1 workbook route by chapter and assignment identity", () => {
+  test("resolves every registered A1 workbook route in workbook context", () => {
     const registeredLessons = __private__.alignedA1Lessons.filter((lesson) => lesson.workbookRoute);
     expect(registeredLessons.length).toBeGreaterThan(20);
 
     registeredLessons.forEach((lesson) => {
       const route = new URL(lesson.workbookRoute, "https://www.falowen.app");
+      if (/^\/campus\/course\/lesson\/A1\/\d+$/i.test(route.pathname)) {
+        route.searchParams.set("view", "workbook");
+      }
       route.searchParams.set("chapter", lesson.chapter);
       if (lesson.assignmentId) route.searchParams.set("assignmentKey", lesson.assignmentId);
 
@@ -100,11 +103,18 @@ describe("A1 workbook AI video header", () => {
     );
   });
 
-  test("uses chapter and assignment identity on dynamic A1 lesson routes", () => {
+  test("does not embed on the dynamic A1 lesson hub unless view=workbook is explicit", () => {
+    expect(
+      resolveA1WorkbookVideoLesson({
+        pathname: "/campus/course/lesson/A1/1",
+        search: "?chapter=0.1",
+      }),
+    ).toBeNull();
+
     expect(
       resolveA1WorkbookVideoLesson({
         pathname: "/campus/course/lesson/A1/2",
-        search: "?chapter=1.1&assignmentKey=A1-1.1",
+        search: "?view=workbook&chapter=1.1&assignmentKey=A1-1.1",
       })?.id,
     ).toBe("A1-1.1");
 
@@ -114,6 +124,24 @@ describe("A1 workbook AI video header", () => {
         search: "?view=grammar&chapter=1.1",
       }),
     ).toBeNull();
+  });
+
+  test("removes an existing AI header when navigating from a workbook to the lesson hub", () => {
+    buildWorkbookDom();
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/a1-day-1-greetings-workbook",
+        search: "?assignmentKey=A1-0.1&radio=done",
+      }),
+    ).toBe(1);
+
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/lesson/A1/1",
+        search: "?chapter=0.1",
+      }),
+    ).toBe(0);
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
   });
 
   test("shows a coming-soon card when the workbook has no approved AI video", () => {
@@ -131,7 +159,7 @@ describe("A1 workbook AI video header", () => {
     expect(card.querySelector("iframe")).toBeNull();
   });
 
-  test("places the AI video after Back and before the workbook hero", () => {
+  test("places the AI video after Back and before the workbook hero without repeating the chapter title", () => {
     buildWorkbookDom();
 
     expect(
@@ -145,6 +173,9 @@ describe("A1 workbook AI video header", () => {
     const card = document.querySelector('[data-a1-workbook-video-header="true"]');
     expect(children.indexOf(card)).toBe(1);
     expect(card.nextElementSibling).toHaveAttribute("data-hero");
+    expect(card).toHaveTextContent("AI lesson video");
+    expect(card).not.toHaveTextContent("Kapitel 8");
+    expect(card).not.toHaveTextContent("24 Hour Clock");
     expect(card.querySelector("iframe")).toHaveAttribute(
       "src",
       "https://www.youtube-nocookie.com/embed/ZE24QSbGaSo",
