@@ -23,6 +23,10 @@ on:
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.test.js"
+      - "web/src/components/A1SharedTutorWorkbookNavigation.js"
+      - "web/src/components/A1SharedTutorWorkbookNavigation.test.js"
+      - "web/src/components/CourseBookBannerWidthFix.js"
+      - "web/src/components/CourseBookBannerWidthFix.test.js"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/RadioFirstWorkbookGate.js"
@@ -86,6 +90,16 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1UnifiedTutorWorkbookNavigation.test.js
+      - name: Test shared A1 tutor workbook navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SharedTutorWorkbookNavigation.test.js
+      - name: Test compact Course Book banner
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookBannerWidthFix.test.js
       - name: Test split A1 lesson chapter state
         working-directory: web
         env:
