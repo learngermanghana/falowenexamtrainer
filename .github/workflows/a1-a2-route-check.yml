@@ -15,6 +15,8 @@ on:
       - "web/src/data/lessonModel.js"
       - "web/src/data/additionalA2RadioEntries.js"
       - "web/src/utils/courseWorkbookRoutes.js"
+      - "web/src/utils/courseBookProgression.js"
+      - "web/src/utils/courseBookProgression.test.js"
       - "web/src/utils/a1ChapterSpecificLessonState.js"
       - "web/src/utils/a1ChapterSpecificLessonState.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
@@ -33,6 +35,8 @@ on:
       - "web/src/components/WorkbookStartGuide.test.js"
       - "web/src/components/RequestedLessonAiVideoHeader.jsx"
       - "web/src/components/RequestedLessonAiVideoHeader.test.jsx"
+      - "web/src/components/CourseBookLayoutStandardizer.js"
+      - "web/src/components/CourseBookLayoutStandardizer.test.js"
       - "web/src/components/RadioFirstWorkbookGate.js"
       - "web/src/components/A2Day*Workbook*.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
@@ -60,6 +64,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/components/WorkbookStartGuide.test.js
+      - name: Test pinned Day 0 Course Book behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/courseBookProgression.test.js src/components/CourseBookLayoutStandardizer.test.js
       - name: Test A1 lesson resource hubs
         working-directory: web
         env:
