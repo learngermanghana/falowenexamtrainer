@@ -11,6 +11,8 @@ const NON_WORKBOOK_VIEWS = new Set(["grammar", "learn"]);
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeToken = (value = "") => String(value || "").trim().toLowerCase();
 const normalizeAssignment = (value = "") => String(value || "").trim().toUpperCase();
+const validYouTubeId = (value = "") =>
+  /^[A-Za-z0-9_-]{11}$/.test(String(value || "")) ? String(value) : "";
 
 const alignedA1Lessons = alignA1CurriculumEntries(getLessonsByLevel("A1"));
 
@@ -25,17 +27,19 @@ const parseRoute = (value = "") => {
 export const extractYouTubeVideoId = (value = "") => {
   const raw = String(value || "").trim();
   if (!raw) return "";
-  if (/^[A-Za-z0-9_-]{11}$/.test(raw)) return raw;
+  if (validYouTubeId(raw)) return raw;
 
   try {
     const parsed = new URL(raw, "https://www.youtube.com");
     const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
-    if (host === "youtu.be") return parsed.pathname.split("/").filter(Boolean)[0] || "";
+    if (host === "youtu.be") {
+      return validYouTubeId(parsed.pathname.split("/").filter(Boolean)[0]);
+    }
     if (host.endsWith("youtube.com")) {
-      if (parsed.searchParams.get("v")) return parsed.searchParams.get("v") || "";
+      if (parsed.searchParams.get("v")) return validYouTubeId(parsed.searchParams.get("v"));
       const parts = parsed.pathname.split("/").filter(Boolean);
       const markerIndex = parts.findIndex((part) => ["embed", "shorts", "live"].includes(part));
-      if (markerIndex >= 0) return parts[markerIndex + 1] || "";
+      if (markerIndex >= 0) return validYouTubeId(parts[markerIndex + 1]);
     }
   } catch (_error) {
     return "";
@@ -136,6 +140,12 @@ const findTopLevelChild = (element, root) => {
   return current?.parentElement === root ? current : null;
 };
 
+const nextNonVideoHeaderSibling = (element) => {
+  let sibling = element?.nextElementSibling || null;
+  while (sibling?.hasAttribute?.(HEADER_ATTRIBUTE)) sibling = sibling.nextElementSibling;
+  return sibling;
+};
+
 export const findA1WorkbookVideoInsertionPoint = (root = document) => {
   const main = root?.querySelector?.("main.layout-main") || root?.querySelector?.("main");
   if (!main) return null;
@@ -151,7 +161,7 @@ export const findA1WorkbookVideoInsertionPoint = (root = document) => {
   const backBlock = backControl ? findTopLevelChild(backControl, pageRoot) : null;
 
   if (backBlock && heroBlock && backBlock !== heroBlock) {
-    return { container: pageRoot, reference: backBlock.nextElementSibling || null };
+    return { container: pageRoot, reference: nextNonVideoHeaderSibling(backBlock) };
   }
 
   if (heroBlock && heading.parentElement === heroBlock) {
@@ -170,6 +180,7 @@ const createVideoHeader = (model) => {
     border: "1px solid #93c5fd",
     borderRadius: "18px",
     boxShadow: "0 14px 30px rgba(37, 99, 235, 0.12)",
+    boxSizing: "border-box",
     display: "grid",
     gap: "12px",
     margin: "0",
