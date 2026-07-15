@@ -23,6 +23,7 @@ import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
 import A1UnifiedTutorWorkbookNavigation from "./A1UnifiedTutorWorkbookNavigation";
+import CourseBookLayoutStandardizer from "./CourseBookLayoutStandardizer";
 import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
 import B2CourseBookContentAlignment from "./B2CourseBookContentAlignment";
 import CourseDebugPanel from "./CourseDebugPanel";
@@ -213,6 +214,7 @@ export default function RouteScopedAppServices() {
       <A2LegacyStandardWorkbookNavigation />
       <A2ProtectedWorkbookRouteGuard />
       <A1UnifiedTutorWorkbookNavigation />
+      <CourseBookLayoutStandardizer />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <UniversalWorkbookLessonNavigator />
       <LockedSubmissionCardCompactor />

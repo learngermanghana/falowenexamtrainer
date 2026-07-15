@@ -43,6 +43,37 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     );
   });
 
+  it("resolves the exact A1 Day 12 workbook URL and keeps all four Teil sections", () => {
+    expect(
+      resolveA1UnifiedTutorWorkbookMatch({
+        pathname: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
+        search: "?assignmentKey=A1-8&assignmentId=A1-8&level=A1",
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        level: "A1",
+        day: 12,
+        resource: expect.objectContaining({ assignmentKey: "A1-8", chapter: "8" }),
+      }),
+    );
+
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <div id="day12-workbook">
+          <section><h2>Start here</h2></section>
+          <section id="day12-teil1"><h2>Teil 1: Lesen · Multiple Choice</h2></section>
+          <section id="day12-teil2"><h2>Teil 2: Lesen · Richtig oder Falsch</h2></section>
+          <section id="day12-teil3"><h2>Teil 3: Hörverstehen</h2></section>
+          <section id="day12-teil4"><h2>Teil 4: Vocabulary reminder</h2></section>
+        </div>
+      </main>
+    `;
+
+    const pageRoot = document.querySelector("#day12-workbook");
+    const groups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
+    expect(groups.map((group) => group.number)).toEqual([1, 2, 3, 4]);
+  });
+
   it("supports the existing dynamic A1 lesson links without replacing them", () => {
     expect(
       resolveA1UnifiedTutorWorkbookMatch({
