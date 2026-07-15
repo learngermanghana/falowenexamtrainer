@@ -12,6 +12,7 @@ import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
 import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
 import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
+import RequestedLessonAiVideoHeader from './components/RequestedLessonAiVideoHeader';
 import A1Day11DirectWorkbookRoute, {
   A1_DAY11_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day11DirectWorkbookRoute';
@@ -45,6 +46,7 @@ const AuthenticatedAppRoutes = () => (
       <ToastProvider>
         <RouteScopedAppServices />
         <A1RadioFirstWorkbookRoutes />
+        <RequestedLessonAiVideoHeader />
         <Routes>
           <Route
             path={A1_DAY11_DIRECT_WORKBOOK_PATH}
