@@ -3,10 +3,14 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { styles } from "../styles";
+import NextLiveClassCard from "./NextLiveClassCard";
 import { buildGhanaDateTime, findNextClassSession } from "../services/classCalendar";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
-import { GHANA_TIMEZONE, getGhanaDeviceTimeNotice } from "../utils/ghanaClassTime";
+import {
+  GHANA_TIMEZONE,
+  loadLiveClassSummaryCache,
+  saveLiveClassSummaryCache,
+} from "../utils/liveClassCardPresentation";
 
 const COURSE_BOOK_PATH = "/campus/course";
 const CANCELLED_STATUS = "cancelled";
@@ -140,26 +144,6 @@ export const formatClassCountdown = (session, now = new Date()) => {
   return `Starts in ${daysLabel}${hoursLabel}`;
 };
 
-const formatSessionDateTime = (session, locale = "en") => {
-  const start = sessionStart(session);
-  if (!start) return "Date and time not available";
-  const isEnglish = String(locale || "en").toLowerCase().startsWith("en");
-  const resolvedLocale = isEnglish ? "en-GB" : locale;
-  const date = new Intl.DateTimeFormat(resolvedLocale, {
-    timeZone: GHANA_TIMEZONE,
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(start);
-  const time = new Intl.DateTimeFormat(resolvedLocale, {
-    timeZone: GHANA_TIMEZONE,
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: isEnglish,
-  }).format(start);
-  return `${date} · ${time} Ghana time`;
-};
-
 const normalizeLegacySession = (session) => session
   ? {
       ...session,
@@ -173,10 +157,6 @@ const CourseBookNextClassIndicator = () => {
   const location = useLocation();
   const { i18n } = useTranslation();
   const { studentProfile } = useAuth();
-  const [portalTarget, setPortalTarget] = useState(null);
-  const [canonicalStatus, setCanonicalStatus] = useState("idle");
-  const [canonicalSummary, setCanonicalSummary] = useState(null);
-  const [now, setNow] = useState(() => new Date());
 
   const className = String(studentProfile?.className || "").trim();
   const classId = String(
@@ -185,6 +165,12 @@ const CourseBookNextClassIndicator = () => {
   const level = resolveLevel(studentProfile);
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
   const isCourseBook = location.pathname.replace(/\/+$/, "") === COURSE_BOOK_PATH;
+  const cacheIdentity = useMemo(() => ({ classId, className }), [classId, className]);
+
+  const [portalTarget, setPortalTarget] = useState(null);
+  const [canonicalStatus, setCanonicalStatus] = useState("idle");
+  const [canonicalSummary, setCanonicalSummary] = useState(() => loadLiveClassSummaryCache(cacheIdentity));
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     if (!isCourseBook) {
@@ -222,27 +208,29 @@ const CourseBookNextClassIndicator = () => {
   }, [isCourseBook]);
 
   useEffect(() => {
-    setCanonicalSummary(null);
     if (!isCourseBook || isSelfLearning || (!className && !classId)) {
       setCanonicalStatus("unavailable");
       return undefined;
     }
 
+    const cached = loadLiveClassSummaryCache(cacheIdentity);
+    if (cached) setCanonicalSummary(cached);
     setCanonicalStatus("loading");
     return subscribeCanonicalLiveClass({
       classId,
       className,
       onChange: (summary) => {
         setCanonicalSummary(summary);
+        saveLiveClassSummaryCache(cacheIdentity, summary);
         setCanonicalStatus("ready");
       },
-      onUnavailable: () => setCanonicalStatus("unavailable"),
+      onUnavailable: () => setCanonicalStatus(cached ? "cached" : "unavailable"),
       onError: (error) => {
         console.warn("Course Book next-class indicator could not load the live schedule", error);
-        setCanonicalStatus("unavailable");
+        setCanonicalStatus(cached ? "cached" : "unavailable");
       },
     });
-  }, [classId, className, isCourseBook, isSelfLearning]);
+  }, [cacheIdentity, classId, className, isCourseBook, isSelfLearning]);
 
   const nextSession = useMemo(() => {
     if (isSelfLearning) return null;
@@ -257,58 +245,55 @@ const CourseBookNextClassIndicator = () => {
   if (!isCourseBook || !portalTarget) return null;
 
   const locale = i18n.language || "en";
-  const countdown = nextSession
-    ? formatClassCountdown(nextSession, now)
-    : isSelfLearning
-      ? "Self-learning course"
-      : canonicalStatus === "loading"
-        ? "Checking schedule…"
-        : className
-          ? "No upcoming class"
-          : "No class assigned";
-  const detail = nextSession
-    ? formatSessionDateTime(nextSession, locale)
-    : isSelfLearning
-      ? "No live class is required"
-      : className || "Ask the school to assign your class";
   const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(className)}`;
-  const isLive = countdown === "Class is live now";
-  const timeZoneNotice = getGhanaDeviceTimeNotice(now, locale);
+  const displaySummary = canonicalSummary || {
+    klass: { name: className || "Your class", levelId: level },
+    sessions: nextSession ? [nextSession] : [],
+  };
 
   return createPortal(
-    <div
-      data-falowen-next-class-indicator="true"
-      style={{
-        border: "1px solid rgba(255,255,255,0.28)",
-        background: isLive ? "rgba(220,252,231,0.22)" : "rgba(255,255,255,0.16)",
-        borderRadius: 16,
-        padding: 12,
-        backdropFilter: "blur(8px)",
-        order: -1,
-        display: "grid",
-        gap: 4,
-        minWidth: 0,
-      }}
-    >
-      <p style={{ margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 700 }}>Next class</p>
-      <p style={{ margin: "4px 0 0", color: "#ffffff", fontSize: 17, fontWeight: 900, lineHeight: 1.2 }}>
-        {countdown}
-      </p>
-      <p style={{ margin: 0, color: "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>{detail}</p>
-      {timeZoneNotice ? (
-        <p style={{ margin: "4px 0 0", color: "#fef3c7", fontSize: 11, lineHeight: 1.35, fontWeight: 700 }}>
-          {timeZoneNotice.message}
+    nextSession ? (
+      <NextLiveClassCard
+        summary={displaySummary}
+        session={nextSession}
+        zoom={canonicalSummary?.zoom || {}}
+        now={now}
+        locale={locale}
+        fullCalendarLink={fullCalendarLink}
+        compact
+        updating={canonicalStatus === "loading" || canonicalStatus === "cached"}
+      />
+    ) : (
+      <div
+        data-falowen-next-class-indicator="true"
+        style={{
+          border: "1px solid rgba(255,255,255,0.28)",
+          background: "rgba(255,255,255,0.16)",
+          borderRadius: 16,
+          padding: 12,
+          backdropFilter: "blur(8px)",
+          order: -1,
+          display: "grid",
+          gap: 4,
+          minWidth: 0,
+        }}
+      >
+        <p style={{ margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 700 }}>Next class</p>
+        <p style={{ margin: "4px 0 0", color: "#ffffff", fontSize: 17, fontWeight: 900, lineHeight: 1.2 }}>
+          {isSelfLearning
+            ? "Self-learning course"
+            : canonicalStatus === "loading"
+              ? "Checking schedule…"
+              : className
+                ? "No upcoming class"
+                : "No class assigned"}
         </p>
-      ) : null}
-      {!isSelfLearning && className ? (
-        <a
-          href={fullCalendarLink}
-          style={{ ...styles.backTextLink, color: "#ffffff", width: "fit-content", marginTop: 3, fontSize: 12 }}
-        >
-          View class calendar
-        </a>
-      ) : null}
-    </div>,
+        <p style={{ margin: 0, color: "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>
+          {isSelfLearning ? "No live class is required" : className || "Ask the school to assign your class"}
+        </p>
+        {!isSelfLearning && className ? <a href={fullCalendarLink} style={{ color: "#ffffff", width: "fit-content", marginTop: 3, fontSize: 12 }}>View class calendar</a> : null}
+      </div>
+    ),
     portalTarget,
   );
 };
