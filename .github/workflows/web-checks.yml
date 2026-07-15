@@ -88,11 +88,47 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/LiveClassCardRedesign.test.js
 
-      - name: Test existing Course Book class indicator behavior
+      - name: Test indicator null-profile handling
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "handles a null student profile"
+
+      - name: Test indicator day countdown
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "shows days and hours"
+
+      - name: Test indicator hour countdown
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "shows hours and minutes"
+
+      - name: Test indicator Ghana wall clock
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "uses Ghana wall-clock fields"
+
+      - name: Test indicator live states
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "shows the live state|does not keep showing live"
+
+      - name: Test indicator session filtering
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "ignores cancelled, completed and stale live sessions"
+
+      - name: Test indicator Course Book placement
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js -t "finds the Course Book statistics grid"
 
       - name: Test speaking tools
         working-directory: web
