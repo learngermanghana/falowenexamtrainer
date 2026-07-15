@@ -4,6 +4,7 @@ import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
 import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import { B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG } from "./B1Day12AbenteuerInDerNaturWorkbookPage";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
@@ -105,6 +106,22 @@ describe("A2 and B1 course books", () => {
       "Ref",
       "Submit",
     ]);
+  });
+
+  test("uses YouTube instead of Google Drive for B1 Day 12 Teil 4 Hören", () => {
+    const config = B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG;
+
+    expect(config).toEqual(expect.objectContaining({
+      day: 12,
+      chapter: "4.12",
+      title: "Abenteuer in der Natur",
+    }));
+    expect(config.listening).toEqual(expect.objectContaining({
+      embedUrl: "https://www.youtube.com/embed/NSSr1__ngyU",
+      externalUrl: "https://youtu.be/NSSr1__ngyU",
+      videoTitle: "B1 Day 12 Abenteuer in der Natur Hören",
+    }));
+    expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
   });
 
   test("detects native workbook tabs only when at least three recognized buttons share a row", () => {
