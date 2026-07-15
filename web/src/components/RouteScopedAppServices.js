@@ -23,8 +23,10 @@ import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
 import A1UnifiedTutorWorkbookNavigation from "./A1UnifiedTutorWorkbookNavigation";
+import A1SharedTutorWorkbookNavigation from "./A1SharedTutorWorkbookNavigation";
 import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
 import B2CourseBookContentAlignment from "./B2CourseBookContentAlignment";
+import CourseBookBannerWidthFix from "./CourseBookBannerWidthFix";
 import CourseDebugPanel from "./CourseDebugPanel";
 
 const ADSENSE_SCRIPT_ID = "falowen-adsense-script";
@@ -213,7 +215,9 @@ export default function RouteScopedAppServices() {
       <A2LegacyStandardWorkbookNavigation />
       <A2ProtectedWorkbookRouteGuard />
       <A1UnifiedTutorWorkbookNavigation />
+      <A1SharedTutorWorkbookNavigation />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
+      {isCourseBook ? <CourseBookBannerWidthFix /> : null}
       <UniversalWorkbookLessonNavigator />
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
