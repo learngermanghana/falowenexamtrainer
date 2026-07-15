@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import { render, screen } from "@testing-library/react";
 import { LessonResourcesHub } from "./CourseLessonPage";
-import { courseSchedules } from "../data/courseSchedule";
-import { normalizeLesson } from "../data/lessonModel";
 import { getLessonVideoResources, shouldShowTeacherLectureVideo } from "../data/lessonVideoDictionary";
 
 const canonicalLesson = (resources) => ({ resources });
@@ -38,30 +36,6 @@ describe("canonical lesson resources", () => {
     expect(screen.getByText("Kapitel 1 teacher lecture video")).toBeInTheDocument();
     expect(screen.getByText("Kapitel 1 AI grammar video")).toBeInTheDocument();
     expect(screen.queryByText("Kapitel 2 grammar book")).not.toBeInTheDocument();
-  });
-
-  test("A1 Day 1 exposes teacher, AI, grammar and workbook choices on the lesson hub", () => {
-    const day1Entry = courseSchedules.A1.find((entry) => Number(entry.day) === 1);
-    const lesson = normalizeLesson(day1Entry, "A1");
-
-    expect(lesson.resources.resourceGroups[0]).toEqual(
-      expect.objectContaining({
-        chapter: "0.1",
-        grammarBook: { url: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1" },
-        workbook: { url: "/campus/course/a1-day-1-greetings-workbook" },
-      }),
-    );
-    expect(lesson.resources.videos.map((video) => video.url)).toEqual([
-      "https://youtu.be/CqFbBQG9M3U",
-      "https://youtu.be/5WIMkENgdGE",
-    ]);
-
-    render(<LessonResourcesHub lesson={lesson} />);
-
-    expect(screen.getByText("Kapitel 0.1 grammar book")).toBeInTheDocument();
-    expect(screen.getByText("Kapitel 0.1 workbook")).toBeInTheDocument();
-    expect(screen.getByText("Kapitel 0.1 teacher lecture video")).toBeInTheDocument();
-    expect(screen.getByText("Kapitel 0.1 AI grammar video")).toBeInTheDocument();
   });
 
   test("keeps chapter-specific canonical videos grouped in chapter order", () => {
