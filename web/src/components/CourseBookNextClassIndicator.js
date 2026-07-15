@@ -7,8 +7,10 @@ import NextLiveClassCard from "./NextLiveClassCard";
 import { findNextClassSession } from "../services/classCalendar";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
 import {
+  COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE,
   findCourseBookStatGrid,
   findCurrentOrNextSession,
+  findOrCreateCourseBookNextClassMount,
   formatClassCountdown,
   resolveLevel,
 } from "../utils/courseBookNextClassLogic";
@@ -20,6 +22,7 @@ import {
 export {
   findCourseBookStatGrid,
   findCurrentOrNextSession,
+  findOrCreateCourseBookNextClassMount,
   formatClassCountdown,
   resolveLevel,
 } from "../utils/courseBookNextClassLogic";
@@ -61,12 +64,22 @@ const CourseBookNextClassIndicator = () => {
       return undefined;
     }
 
-    const resolveTarget = () => setPortalTarget(findCourseBookStatGrid(document));
+    let standaloneMount = null;
+    const resolveTarget = () => {
+      const target = findOrCreateCourseBookNextClassMount(document, level);
+      if (target?.getAttribute?.(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE) === "true") {
+        standaloneMount = target;
+      }
+      setPortalTarget(target);
+    };
     resolveTarget();
     const observer = new MutationObserver(resolveTarget);
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [isCourseBook]);
+    return () => {
+      observer.disconnect();
+      if (standaloneMount?.parentNode) standaloneMount.parentNode.removeChild(standaloneMount);
+    };
+  }, [isCourseBook, level]);
 
   useEffect(() => {
     if (!isCourseBook) return undefined;
@@ -133,6 +146,7 @@ const CourseBookNextClassIndicator = () => {
     klass: { name: className || "Your class", levelId: level },
     sessions: nextSession ? [nextSession] : [],
   };
+  const standalone = portalTarget.getAttribute?.(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE) === "true";
 
   return createPortal(
     nextSession ? (
@@ -143,26 +157,29 @@ const CourseBookNextClassIndicator = () => {
         now={now}
         locale={locale}
         fullCalendarLink={fullCalendarLink}
-        compact
+        compact={!standalone}
         updating={canonicalStatus === "loading" || canonicalStatus === "cached"}
       />
     ) : (
       <div
         data-falowen-next-class-indicator="true"
         style={{
-          border: "1px solid rgba(255,255,255,0.28)",
-          background: "rgba(255,255,255,0.16)",
+          border: standalone ? "1px solid #bfdbfe" : "1px solid rgba(255,255,255,0.28)",
+          background: standalone
+            ? "linear-gradient(145deg, #eff6ff 0%, #ffffff 62%, #eef2ff 100%)"
+            : "rgba(255,255,255,0.16)",
           borderRadius: 16,
           padding: 12,
           backdropFilter: "blur(8px)",
-          order: -1,
+          boxShadow: standalone ? "0 12px 28px rgba(37,99,235,0.10)" : undefined,
+          order: standalone ? undefined : -1,
           display: "grid",
           gap: 4,
           minWidth: 0,
         }}
       >
-        <p style={{ margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 700 }}>Next class</p>
-        <p style={{ margin: "4px 0 0", color: "#ffffff", fontSize: 17, fontWeight: 900, lineHeight: 1.2 }}>
+        <p style={{ margin: 0, color: standalone ? "#1d4ed8" : "#bfdbfe", fontSize: 12, fontWeight: 700 }}>Next class</p>
+        <p style={{ margin: "4px 0 0", color: standalone ? "#0f172a" : "#ffffff", fontSize: 17, fontWeight: 900, lineHeight: 1.2 }}>
           {isSelfLearning
             ? "Self-learning course"
             : canonicalStatus === "loading"
@@ -171,10 +188,10 @@ const CourseBookNextClassIndicator = () => {
                 ? "No upcoming class"
                 : "No class assigned"}
         </p>
-        <p style={{ margin: 0, color: "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>
+        <p style={{ margin: 0, color: standalone ? "#475569" : "#dbeafe", fontSize: 12, lineHeight: 1.4 }}>
           {isSelfLearning ? "No live class is required" : className || "Ask the school to assign your class"}
         </p>
-        {!isSelfLearning && className ? <a href={fullCalendarLink} style={{ color: "#ffffff", width: "fit-content", marginTop: 3, fontSize: 12 }}>View class calendar</a> : null}
+        {!isSelfLearning && className ? <a href={fullCalendarLink} style={{ color: standalone ? "#1d4ed8" : "#ffffff", width: "fit-content", marginTop: 3, fontSize: 12 }}>View class calendar</a> : null}
       </div>
     ),
     portalTarget,
