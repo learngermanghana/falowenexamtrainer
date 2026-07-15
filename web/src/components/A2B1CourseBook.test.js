@@ -4,6 +4,9 @@ import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./A2Day2SmallTalkWorkbookEnhancedPage";
 import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import { B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG } from "./B1Day12AbenteuerInDerNaturWorkbookPage";
+import { B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG } from "./B1Day13EigeneFilmkritikWorkbookPage";
+import { B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG } from "./B1Day14TraditionellesDigitalesLernenWorkbookPage";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
@@ -105,6 +108,54 @@ describe("A2 and B1 course books", () => {
       "Ref",
       "Submit",
     ]);
+  });
+
+  test("uses YouTube instead of Google Drive for B1 Day 12 Teil 4 Hören", () => {
+    const config = B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG;
+
+    expect(config).toEqual(expect.objectContaining({
+      day: 12,
+      chapter: "4.12",
+      title: "Abenteuer in der Natur",
+    }));
+    expect(config.listening).toEqual(expect.objectContaining({
+      embedUrl: "https://www.youtube.com/embed/NSSr1__ngyU",
+      externalUrl: "https://youtu.be/NSSr1__ngyU",
+      videoTitle: "B1 Day 12 Abenteuer in der Natur Hören",
+    }));
+    expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
+  });
+
+  test("uses YouTube instead of Google Drive for B1 Day 13 Teil 4 Hören", () => {
+    const config = B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG;
+
+    expect(config).toEqual(expect.objectContaining({
+      day: 13,
+      chapter: "4.13",
+      title: "Eigene Filmkritik schreiben",
+    }));
+    expect(config.listening).toEqual(expect.objectContaining({
+      embedUrl: "https://www.youtube.com/embed/gFDy1atY9K4",
+      externalUrl: "https://youtu.be/gFDy1atY9K4",
+      videoTitle: "B1 Day 13 Eigene Filmkritik Hören",
+    }));
+    expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
+  });
+
+  test("uses YouTube instead of Google Drive for B1 Day 14 Teil 4 Hören", () => {
+    const config = B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG;
+
+    expect(config).toEqual(expect.objectContaining({
+      day: 14,
+      chapter: "5.14",
+      title: "Traditionelles vs. digitales Lernen",
+    }));
+    expect(config.listening).toEqual(expect.objectContaining({
+      embedUrl: "https://www.youtube.com/embed/PwA3HJ_V1HA",
+      externalUrl: "https://youtu.be/PwA3HJ_V1HA",
+      videoTitle: "B1 Day 14 Traditionelles vs digitales Lernen Hören",
+    }));
+    expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
   });
 
   test("detects native workbook tabs only when at least three recognized buttons share a row", () => {
