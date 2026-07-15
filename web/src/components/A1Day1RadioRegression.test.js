@@ -26,9 +26,10 @@ describe("A1 Day 1 Falowen Radio", () => {
     expect(source).toContain('chapter="0.1"');
   });
 
-  it("allows an explicit radio resource without changing existing A2 and B1 lookups", () => {
+  it("marks an active radio gate so workbook AI media cannot appear at the same time", () => {
     const source = read("RadioFirstWorkbookGate.js");
 
+    expect(source).toContain('data-radio-first-workbook-gate="true"');
     expect(source).toContain("const RadioFirstWorkbookGate = ({ level, day, children, resource = null })");
     expect(source).toContain("const radio = resource || getRadioResource(level, day)");
   });
