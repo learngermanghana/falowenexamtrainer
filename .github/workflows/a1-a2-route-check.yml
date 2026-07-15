@@ -5,6 +5,7 @@ on:
     paths:
       - "web/src/data/inAppWorkbookRoutes.json"
       - "web/src/data/inAppWorkbookRoutes.js"
+      - "web/src/data/inAppWorkbookRoutes.a1LessonLinks.test.js"
       - "web/src/data/strictInAppWorkbookRoutes.js"
       - "web/src/data/a1RouteAlignment.js"
       - "web/src/data/a1RouteAlignment.test.js"
@@ -46,6 +47,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+      - name: Test A1 lesson resource hubs
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js
       - name: Test A1 Course Book card routes
         working-directory: web
         env:
