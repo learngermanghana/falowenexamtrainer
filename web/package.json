@@ -33,9 +33,10 @@
   },
   "scripts": {
     "sync:classes": "node scripts/sync-class-brochure-data.mjs",
+    "sync:goethe-config-ui": "node scripts/patch-goethe-exam-config-ui.mjs",
     "audit:a1-curriculum": "node ../scripts/auditA1CourseBook.js",
-    "prestart": "npm run audit:a1-curriculum && npm run sync:classes",
-    "prebuild": "npm run audit:a1-curriculum && npm run sync:classes",
+    "prestart": "npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
+    "prebuild": "npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
     "start": "vite --host 0.0.0.0",
     "build": "vite build",
     "test": "jest",
