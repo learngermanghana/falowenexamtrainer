@@ -144,6 +144,9 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
   const primaryResource = firstResource(entry);
   const chapterText = primaryResource?.chapter ? ` Kapitel ${primaryResource.chapter}` : "";
   const isGrammarMode = mode === "grammar";
+  const isDuplicateA1WorkbookGuide = normalizeLevel(level) === "A1" && !isGrammarMode;
+
+  if (isDuplicateA1WorkbookGuide) return null;
 
   return (
     <section style={guideStyle}>
