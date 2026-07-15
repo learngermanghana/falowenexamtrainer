@@ -97,7 +97,10 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
   };
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 18 }}>
+    <div
+      data-radio-first-workbook-gate="true"
+      style={{ ...styles.container, display: "grid", gap: 18 }}
+    >
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
       <header
         style={{
