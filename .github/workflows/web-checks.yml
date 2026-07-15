@@ -62,7 +62,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js src/components/WorkbookInlineEnhancements.test.jsx src/a1WorkbookMobileSubmit.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js src/components/WorkbookInlineEnhancements.test.jsx src/components/A1Day13RevisionNumberCleanup.test.jsx src/a1WorkbookMobileSubmit.test.js
 
       - name: Test Preposition Case Coach
         working-directory: web

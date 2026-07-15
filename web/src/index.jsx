@@ -10,6 +10,7 @@ import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
+import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
 import A1Day11DirectWorkbookRoute, {
   A1_DAY11_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day11DirectWorkbookRoute';
@@ -38,6 +39,7 @@ const AuthenticatedAppRoutes = () => (
   <>
     <PublicAuthRouteBridge />
     <PublicAuthMobileRecovery />
+    <A1Day13RevisionNumberCleanup />
     <AuthProvider>
       <ToastProvider>
         <RouteScopedAppServices />
