@@ -39,6 +39,40 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Bildung und Lernen ein. Danach gehst du weiter zum Lernteil.",
     }),
+    26: Object.freeze({
+      key: "b2-day26-behoerden-termine-formelle-kommunikation-falowen-radio",
+      title: "Behörden, Termine und formelle Kommunikation 6.1",
+      youtubeId: "Bg_mSJcwkPE",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Behörden, Termine und formelle Kommunikation ein. Danach gehst du weiter zum Lernteil.",
+    }),
+  }),
+  C1: Object.freeze({
+    11: Object.freeze({
+      key: "c1-day11-engagement-ehrenamt-falowen-radio",
+      title: "Engagement und Ehrenamt 3.1",
+      youtubeId: "orR1ptbJtnc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Engagement, Ehrenamt und gesellschaftliche Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    12: Object.freeze({
+      key: "c1-day12-freizeit-kultur-falowen-radio",
+      title: "Freizeit und Kultur 3.2",
+      youtubeId: "TTK_idHXnZs",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Freizeit, Kultur und differenzierte Vergleiche ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    13: Object.freeze({
+      key: "c1-day13-mehrsprachigkeit-falowen-radio",
+      title: "Mehrsprachigkeit 3.3",
+      youtubeId: "noCqZEAmJew",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Mehrsprachigkeit, Identität und gesellschaftliche Kommunikation ein. Danach gehst du weiter zum Lernteil.",
+    }),
   }),
 });
 

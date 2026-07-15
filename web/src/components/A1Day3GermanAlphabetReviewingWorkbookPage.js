@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 
 import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
+import { getA1RadioResource } from "../data/a1RadioResources";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 
@@ -102,12 +104,12 @@ const videoPreviewStyle = {
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
   const level = "A1";
   const day = 2;
+  const radio = getA1RadioResource(day, "0.2");
   const [activeTab, setActiveTab] = useState("assignment");
   const assignmentKey = useMemo(() => {
     const alphabetAssignment = getInlineCourseAssignments(level, day).find((assignment) => assignment.chapter === "0.2");
     return alphabetAssignment?.assignmentKey || "A1-0.2";
   }, []);
-
 
   useEffect(() => {
     updatePageMeta({
@@ -117,182 +119,184 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
   }, []);
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+    <RadioFirstWorkbookGate level={level} day={day} resource={radio}>
+      <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+        <div style={cardStyle}>
+          <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 2 Workbook · German Alphabet + Reviewing
-        </h1>
+          <h1 style={{ ...styles.title, marginBottom: 0 }}>
+            A1 · Day 2 Workbook · German Alphabet + Reviewing
+          </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2 · Assignment for tutor marking</p>
+          <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2 · Assignment for tutor marking</p>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete the workbook in the Assignment tab, then use the Submit tab below to send final answers for this exact
-          assignment.
-        </p>
+          <p style={{ ...styles.subtitle, margin: 0 }}>
+            Complete the workbook in the Assignment tab, then use the Submit tab below to send final answers for this exact
+            assignment.
+          </p>
 
-        <div
-          role="tablist"
-          aria-label="A1 Day 2 workbook tabs"
-          style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid #dbeafe", paddingTop: 12 }}
-        >
-          {[
-            { key: "assignment", label: "Assignment" },
-            { key: "submit", label: "Submit" },
-          ].map((tab) => {
-            const selected = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  ...styles.secondaryButton,
-                  background: selected ? "#2563eb" : "#ffffff",
-                  borderColor: selected ? "#2563eb" : "#93c5fd",
-                  color: selected ? "#ffffff" : "#1d4ed8",
-                  fontWeight: 800,
-                  minWidth: 120,
-                }}
+          <div
+            role="tablist"
+            aria-label="A1 Day 2 workbook tabs"
+            style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid #dbeafe", paddingTop: 12 }}
+          >
+            {[
+              { key: "assignment", label: "Assignment" },
+              { key: "submit", label: "Submit" },
+            ].map((tab) => {
+              const selected = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    ...styles.secondaryButton,
+                    background: selected ? "#2563eb" : "#ffffff",
+                    borderColor: selected ? "#2563eb" : "#93c5fd",
+                    color: selected ? "#ffffff" : "#1d4ed8",
+                    fontWeight: 800,
+                    minWidth: 120,
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {activeTab === "assignment" ? (
+          <>
+            <section style={sectionStyle}>
+              <img
+                src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80"
+                alt="Open notebook with alphabet study notes on a classroom desk"
+                loading="lazy"
+                style={imageStyle}
+              />
+
+              <h2 style={{ margin: 0 }}>Teil 1 · Reading and Writing</h2>
+
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                <strong>Instruction:</strong> Read the text carefully and answer the questions below. Each question has one correct
+                answer.
+              </p>
+
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                <strong>Text:</strong> The German alphabet has 26 letters. There are also some additional letters like Ä, Ö, Ü, and
+                ß, which is called "Eszett" or "sharp S." Each letter has a name and a sound. The letters of the alphabet are: A,
+                B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z. The additional letters are: Ä, Ö, Ü,
+                and ß. The alphabet is often used to spell words, write names, and learn in school. For example: A as in Apfel
+                (apple), B as in Ball (ball), C as in Computer (computer), D as in Deutschland (Germany). It is important to know
+                the alphabet well in order to read and write correctly.
+              </p>
+            </section>
+
+            <section style={sectionStyle}>
+              <h2 style={{ margin: 0 }}>Teil 2 · Questions</h2>
+
+              {questions.map((question) => (
+                <div key={question.stem} style={questionBoxStyle}>
+                  <strong>{question.stem}</strong>
+                  <span style={{ color: "#4b5563" }}>Translation: {question.translation}</span>
+
+                  {question.options.map((option) => (
+                    <span key={option}>{option}</span>
+                  ))}
+                </div>
+              ))}
+            </section>
+
+            <section style={sectionStyle}>
+              <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                <strong>Instruction:</strong> Watch and listen to the embedded YouTube Hören video. Write the missing letters to
+                complete each word, then return and submit your answers.
+              </p>
+
+              <p style={{ margin: 0, color: "#4b5563" }}>
+                Complete Hören with the YouTube video below, then return to submit answers.
+              </p>
+
+              <iframe
+                title="A1 Day 2 German Alphabet Hören video"
+                src={DAY_2_ALPHABET_HOREN_EMBED_URL}
+                style={videoPreviewStyle}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+
+              <a
+                href={DAY_2_ALPHABET_HOREN_YOUTUBE_URL}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
               >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                Open Hören video on YouTube
+              </a>
 
-      {activeTab === "assignment" ? (
-        <>
-      <section style={sectionStyle}>
-        <img
-          src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80"
-          alt="Open notebook with alphabet study notes on a classroom desk"
-          loading="lazy"
-          style={imageStyle}
-        />
+              <div style={{ display: "grid", gap: 12 }}>
+                {listeningItems.map((item) => (
+                  <div key={item.number} style={listeningBoxStyle}>
+                    <strong style={{ fontSize: 16 }}>
+                      {item.number}. {item.prompt}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-        <h2 style={{ margin: 0 }}>Teil 1 · Reading and Writing</h2>
+            <section style={sectionStyle}>
+              <h2 style={{ margin: 0 }}>Vocabulary Notes · Alphabet in German</h2>
 
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instruction:</strong> Read the text carefully and answer the questions below. Each question has one correct
-          answer.
-        </p>
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                <strong>Additional Letters (Zusätzliche Buchstaben):</strong> Ä (A-Umlaut), Ö (O-Umlaut), Ü (U-Umlaut), ß (Eszett /
+                scharfes S).
+                <br />
+                <strong>Example Words (Beispielwörter):</strong> Apfel, Ball, Computer, Deutschland.
+                <br />
+                <strong>Useful Phrases:</strong> Wie buchstabiert man...?, Wie viele Buchstaben...?, Welche Buchstaben...?, Das
+                Alphabet, der Buchstabe, das Wort, das Lesen, das Schreiben, lernen, buchstabieren, richtig, falsch.
+              </p>
+            </section>
 
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text:</strong> The German alphabet has 26 letters. There are also some additional letters like Ä, Ö, Ü, and
-          ß, which is called "Eszett" or "sharp S." Each letter has a name and a sound. The letters of the alphabet are: A,
-          B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z. The additional letters are: Ä, Ö, Ü,
-          and ß. The alphabet is often used to spell words, write names, and learn in school. For example: A as in Apfel
-          (apple), B as in Ball (ball), C as in Computer (computer), D as in Deutschland (Germany). It is important to know
-          the alphabet well in order to read and write correctly.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Questions</h2>
-
-        {questions.map((question) => (
-          <div key={question.stem} style={questionBoxStyle}>
-            <strong>{question.stem}</strong>
-            <span style={{ color: "#4b5563" }}>Translation: {question.translation}</span>
-
-            {question.options.map((option) => (
-              <span key={option}>{option}</span>
-            ))}
-          </div>
-        ))}
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instruction:</strong> Watch and listen to the embedded YouTube Hören video. Write the missing letters to
-          complete each word, then return and submit your answers.
-        </p>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören with the YouTube video below, then return to submit answers.
-        </p>
-
-        <iframe
-          title="A1 Day 2 German Alphabet Hören video"
-          src={DAY_2_ALPHABET_HOREN_EMBED_URL}
-          style={videoPreviewStyle}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-
-        <a
-          href={DAY_2_ALPHABET_HOREN_YOUTUBE_URL}
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören video on YouTube
-        </a>
-
-        <div style={{ display: "grid", gap: 12 }}>
-          {listeningItems.map((item) => (
-            <div key={item.number} style={listeningBoxStyle}>
-              <strong style={{ fontSize: 16 }}>
-                {item.number}. {item.prompt}
-              </strong>
+            <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+              <p style={{ margin: 0, fontWeight: 600 }}>
+                Finished the workbook? Open the Submit tab above and paste your final answers there.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Vocabulary Notes · Alphabet in German</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Additional Letters (Zusätzliche Buchstaben):</strong> Ä (A-Umlaut), Ö (O-Umlaut), Ü (U-Umlaut), ß (Eszett /
-          scharfes S).
-          <br />
-          <strong>Example Words (Beispielwörter):</strong> Apfel, Ball, Computer, Deutschland.
-          <br />
-          <strong>Useful Phrases:</strong> Wie buchstabiert man...?, Wie viele Buchstaben...?, Welche Buchstaben...?, Das
-          Alphabet, der Buchstabe, das Wort, das Lesen, das Schreiben, lernen, buchstabieren, richtig, falsch.
-        </p>
-      </section>
-
-      <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <p style={{ margin: 0, fontWeight: 600 }}>
-          Finished the workbook? Open the Submit tab above and paste your final answers there.
-        </p>
+          </>
+        ) : (
+          <section style={{ ...sectionStyle, border: "1px solid #bfdbfe" }} aria-label="Submit A1 Day 2 workbook answers">
+            <div>
+              <p style={{ color: "#1d4ed8", fontSize: 13, fontWeight: 900, letterSpacing: ".04em", margin: 0, textTransform: "uppercase" }}>
+                Tutor-marked assignment
+              </p>
+              <h2 style={{ margin: "4px 0" }}>Submit A1 · Day 2 · German Alphabet</h2>
+              <p style={{ color: "#475569", margin: 0 }}>
+                This submission box is locked to {assignmentKey}, so your work is saved under the correct assignment.
+              </p>
+            </div>
+            <div className="a1-day2-workbook-submit-tab">
+              <style>{`.a1-day2-workbook-submit-tab > div > section:first-child { display: none !important; }
+                .a1-day2-workbook-submit-tab select { display: none !important; }`}</style>
+              <AssignmentSubmissionPage
+                submissionContext={{
+                  level,
+                  day,
+                  assignmentKey,
+                  canonicalAssignmentKey: assignmentKey,
+                }}
+              />
+            </div>
+          </section>
+        )}
       </div>
-        </>
-      ) : (
-        <section style={{ ...sectionStyle, border: "1px solid #bfdbfe" }} aria-label="Submit A1 Day 2 workbook answers">
-          <div>
-            <p style={{ color: "#1d4ed8", fontSize: 13, fontWeight: 900, letterSpacing: ".04em", margin: 0, textTransform: "uppercase" }}>
-              Tutor-marked assignment
-            </p>
-            <h2 style={{ margin: "4px 0" }}>Submit A1 · Day 2 · German Alphabet</h2>
-            <p style={{ color: "#475569", margin: 0 }}>
-              This submission box is locked to {assignmentKey}, so your work is saved under the correct assignment.
-            </p>
-          </div>
-          <div className="a1-day2-workbook-submit-tab">
-            <style>{`.a1-day2-workbook-submit-tab > div > section:first-child { display: none !important; }
-              .a1-day2-workbook-submit-tab select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
-              submissionContext={{
-                level,
-                day,
-                assignmentKey,
-                canonicalAssignmentKey: assignmentKey,
-              }}
-            />
-          </div>
-        </section>
-      )}
-    </div>
+    </RadioFirstWorkbookGate>
   );
 };
 
