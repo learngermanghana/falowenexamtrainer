@@ -83,6 +83,15 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
 
   if (
     normalizedLevel === "A1"
+    && normalizedDay === "1"
+    && normalizedChapter === "0.1"
+    && isA1LessonRoute()
+  ) {
+    return "";
+  }
+
+  if (
+    normalizedLevel === "A1"
     && normalizedDay === "20"
     && normalizedChapter === "12.3"
     && isA1LessonRoute()
