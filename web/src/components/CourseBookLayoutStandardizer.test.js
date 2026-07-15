@@ -20,6 +20,17 @@ describe("Course Book layout standardizer", () => {
     expect(source).toContain('normalizeText(button.textContent) === "submit"');
   });
 
+  it("keeps Day 0 pinned and removes its duplicate weekly card from A1 through C1", () => {
+    const layout = read("CourseBookLayoutStandardizer.js");
+    const progression = read("../utils/courseBookProgression.js");
+
+    expect(layout).toContain('new Set(["A1", "A2", "B1", "B2", "C1"])');
+    expect(layout).toContain("hidePinnedDayZeroLessonCards(document)");
+    expect(layout).toContain('data-course-book-orientation-video="true"');
+    expect(layout).toContain('data-falowen-pinned-day-zero-hidden');
+    expect(progression).toContain("!isPinnedCourseBookOrientationEntry(entry)");
+  });
+
   it("is mounted beside the existing shared A1 navigation service", () => {
     const services = read("RouteScopedAppServices.js");
     expect(services).toContain('import CourseBookLayoutStandardizer from "./CourseBookLayoutStandardizer"');
