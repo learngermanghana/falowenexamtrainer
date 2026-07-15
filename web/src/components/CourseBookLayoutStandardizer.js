@@ -5,6 +5,9 @@ const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").t
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const MANAGED_DISPLAY = "data-falowen-standard-nav-display";
 const INJECTED_TAB = "data-falowen-standard-nav-tab";
+const DAY_ZERO_HIDDEN = "data-falowen-pinned-day-zero-hidden";
+const EMPTY_WEEK_HIDDEN = "data-falowen-empty-week-hidden";
+const PINNED_ORIENTATION_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
 
 const rememberDisplay = (element) => {
   if (!element || element.hasAttribute(MANAGED_DISPLAY)) return;
@@ -23,6 +26,74 @@ const hideElement = (element) => {
   rememberDisplay(element);
   element.style.display = "none";
   element.setAttribute("aria-hidden", "true");
+};
+
+const findCourseBookHero = (root = document) => {
+  if (!root?.querySelectorAll) return null;
+  const heading = Array.from(root.querySelectorAll("h1, h2, h3")).find(
+    (element) => normalizeText(element.textContent) === "course book",
+  );
+  return heading?.closest("section") || null;
+};
+
+const readSelectedCourseLevel = (hero) => {
+  const selected = String(hero?.querySelector("select")?.value || "").trim().toUpperCase();
+  if (PINNED_ORIENTATION_LEVELS.has(selected)) return selected;
+  const text = String(hero?.textContent || "").toUpperCase();
+  return text.match(/\b(A1|A2|B1|B2|C1)\b/)?.[1] || "";
+};
+
+const isDayZeroLessonCard = (article) => {
+  if (!article?.querySelectorAll) return false;
+  return Array.from(article.querySelectorAll("div, span, p")).some((element) =>
+    /^day\s*0(?:\s|$)/i.test(String(element.textContent || "").trim()),
+  );
+};
+
+const restoreDayZeroManagedElements = (root = document) => {
+  root.querySelectorAll?.(`[${DAY_ZERO_HIDDEN}="true"]`).forEach((element) => {
+    showElement(element);
+    element.removeAttribute(DAY_ZERO_HIDDEN);
+  });
+  root.querySelectorAll?.(`[${EMPTY_WEEK_HIDDEN}="true"]`).forEach((element) => {
+    showElement(element);
+    element.removeAttribute(EMPTY_WEEK_HIDDEN);
+  });
+};
+
+export const hidePinnedDayZeroLessonCards = (root = document) => {
+  if (!root?.querySelectorAll || typeof window === "undefined") return 0;
+  restoreDayZeroManagedElements(root);
+  if (normalizePath(window.location.pathname) !== "/campus/course") return 0;
+
+  const hero = findCourseBookHero(root);
+  const level = readSelectedCourseLevel(hero);
+  if (!hero || !PINNED_ORIENTATION_LEVELS.has(level)) return 0;
+
+  const dayZeroCards = Array.from(root.querySelectorAll("article")).filter((article) => {
+    if (article.closest('[data-course-book-orientation-video="true"]')) return false;
+    return isDayZeroLessonCard(article);
+  });
+
+  dayZeroCards.forEach((article) => {
+    article.setAttribute(DAY_ZERO_HIDDEN, "true");
+    hideElement(article);
+  });
+
+  Array.from(root.querySelectorAll("section")).forEach((section) => {
+    const heading = Array.from(section.children || []).find(
+      (child) => /^h[1-6]$/i.test(child.tagName || "") && /^week\s+\d+/i.test(String(child.textContent || "").trim()),
+    );
+    if (!heading) return;
+    const lessonCards = Array.from(section.querySelectorAll(":scope > article"));
+    if (!lessonCards.length) return;
+    if (lessonCards.every((article) => article.getAttribute(DAY_ZERO_HIDDEN) === "true")) {
+      section.setAttribute(EMPTY_WEEK_HIDDEN, "true");
+      hideElement(section);
+    }
+  });
+
+  return dayZeroCards.length;
 };
 
 const compactCourseBookBanner = (root = document) => {
@@ -204,6 +275,7 @@ export default function CourseBookLayoutStandardizer() {
     let scheduled = false;
     const apply = () => {
       compactCourseBookBanner(document);
+      hidePinnedDayZeroLessonCards(document);
       standardizeA1TutorNavigation(document);
     };
     const schedule = () => {
@@ -220,12 +292,24 @@ export default function CourseBookLayoutStandardizer() {
     const timers = [60, 220, 700].map((delay) => window.setTimeout(schedule, delay));
     const observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("change", schedule, true);
+    document.addEventListener("click", schedule, true);
 
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
       observer.disconnect();
+      document.removeEventListener("change", schedule, true);
+      document.removeEventListener("click", schedule, true);
+      restoreDayZeroManagedElements(document);
     };
   }, [location.pathname, location.search]);
 
   return null;
 }
+
+export const __private__ = {
+  findCourseBookHero,
+  readSelectedCourseLevel,
+  isDayZeroLessonCard,
+  restoreDayZeroManagedElements,
+};
