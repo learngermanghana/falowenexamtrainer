@@ -11,6 +11,7 @@ import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
 import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
+import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
 import A1Day11DirectWorkbookRoute, {
   A1_DAY11_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day11DirectWorkbookRoute';
@@ -43,6 +44,7 @@ const AuthenticatedAppRoutes = () => (
     <AuthProvider>
       <ToastProvider>
         <RouteScopedAppServices />
+        <A1RadioFirstWorkbookRoutes />
         <Routes>
           <Route
             path={A1_DAY11_DIRECT_WORKBOOK_PATH}
