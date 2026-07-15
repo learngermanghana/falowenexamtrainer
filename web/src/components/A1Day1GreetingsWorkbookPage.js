@@ -1,6 +1,7 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
-
+import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import { getA1RadioResource } from "../data/a1RadioResources";
 import { styles } from "../styles";
 
 const sectionStyle = {
@@ -82,50 +83,54 @@ const questions = [
 ];
 
 const A1Day1GreetingsWorkbookPage = () => {
-  return (
-    <A1TutorMarkedWorkbookShell
-      day={1}
-      chapter="0.1"
-      fallbackAssignmentKey="A1-0.1"
-      title="A1 · Day 1 Workbook · Greetings"
-      subtitle="Chapter 0.1 · Tutor-marked assignment"
-      assignmentIntro="Complete the assignment, then open Submit to send only your Teil 2 answers for A1-0.1."
-      submitTitle="Submit A1 · Day 1 · Chapter 0.1"
-    >
-      <section style={sectionStyle}>
-        <img
-          src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70"
-          alt="Students greeting each other in a classroom"
-          loading="lazy"
-          style={imageStyle}
-        />
-        <h2 style={{ margin: 0, fontSize: 18 }}>Teil 1 · Reading Text</h2>
-        <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-          <strong>Instruction:</strong> Read the text and answer the questions below. Each has one correct answer.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-          <strong>Text:</strong> Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein
-          bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-          <strong>Translation:</strong> Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired.
-          Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!
-        </p>
-      </section>
+  const radio = getA1RadioResource(1);
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0, fontSize: 18 }}>Teil 2 · Multiple-Choice Questions</h2>
-        {questions.map((question) => (
-          <div key={question.stem} style={questionBoxStyle}>
-            <strong>{question.stem}</strong>
-            <span style={{ color: "#4b5563", fontSize: 12 }}>Translation: {question.translation}</span>
-            {question.options.map((option) => (
-              <span key={option}>{option}</span>
-            ))}
-          </div>
-        ))}
-      </section>
-    </A1TutorMarkedWorkbookShell>
+  return (
+    <RadioFirstWorkbookGate level="A1" day={1} resource={radio}>
+      <A1TutorMarkedWorkbookShell
+        day={1}
+        chapter="0.1"
+        fallbackAssignmentKey="A1-0.1"
+        title="A1 · Day 1 Workbook · Greetings"
+        subtitle="Chapter 0.1 · Tutor-marked assignment"
+        assignmentIntro="Complete the assignment, then open Submit to send only your Teil 2 answers for A1-0.1."
+        submitTitle="Submit A1 · Day 1 · Chapter 0.1"
+      >
+        <section style={sectionStyle}>
+          <img
+            src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70"
+            alt="Students greeting each other in a classroom"
+            loading="lazy"
+            style={imageStyle}
+          />
+          <h2 style={{ margin: 0, fontSize: 18 }}>Teil 1 · Reading Text</h2>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
+            <strong>Instruction:</strong> Read the text and answer the questions below. Each has one correct answer.
+          </p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
+            <strong>Text:</strong> Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein
+            bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!
+          </p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
+            <strong>Translation:</strong> Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired.
+            Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!
+          </p>
+        </section>
+
+        <section style={sectionStyle}>
+          <h2 style={{ margin: 0, fontSize: 18 }}>Teil 2 · Multiple-Choice Questions</h2>
+          {questions.map((question) => (
+            <div key={question.stem} style={questionBoxStyle}>
+              <strong>{question.stem}</strong>
+              <span style={{ color: "#4b5563", fontSize: 12 }}>Translation: {question.translation}</span>
+              {question.options.map((option) => (
+                <span key={option}>{option}</span>
+              ))}
+            </div>
+          ))}
+        </section>
+      </A1TutorMarkedWorkbookShell>
+    </RadioFirstWorkbookGate>
   );
 };
 

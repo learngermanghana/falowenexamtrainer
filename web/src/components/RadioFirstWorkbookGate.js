@@ -45,8 +45,8 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
 
 export const shouldShowRadioFirst = (level, day) => Boolean(getRadioResource(level, day));
 
-const RadioFirstWorkbookGate = ({ level, day, children }) => {
-  const radio = getRadioResource(level, day);
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
+  const radio = resource || getRadioResource(level, day);
   const location = useLocation();
   const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
