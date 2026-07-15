@@ -56,10 +56,12 @@ const LESSON_LINK_CASES = [
   },
 ];
 
+const DAY1_LESSON_PATH = "/campus/course/lesson/A1/1?chapter=0.1";
+const DAY1_WORKBOOK_PATH = "/campus/course/a1-day-1-greetings-workbook";
 const DAY20_LESSON_PATH = "/campus/course/lesson/A1/20?chapter=12.3";
 const DAY20_WORKBOOK_PATH = "/campus/course/letter-writing-intro-german-a1-day-12-3";
 
-describe("A1 lesson links resolve to workbook pages", () => {
+describe("A1 lesson links preserve the intended lesson flow", () => {
   const originalPath = window.location.pathname;
 
   afterEach(() => {
@@ -74,6 +76,15 @@ describe("A1 lesson links resolve to workbook pages", () => {
       expect(getConfiguredInAppWorkbookRoute({ level: "A1", day, chapter })).toBe(workbookPath);
     },
   );
+
+  it("keeps Day 1 Chapter 0.1 on the lesson resource hub", () => {
+    window.history.replaceState({}, "", DAY1_LESSON_PATH);
+
+    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe("");
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe(
+      DAY1_WORKBOOK_PATH,
+    );
+  });
 
   it("keeps Day 20 Chapter 12.3 on the lesson resource hub", () => {
     window.history.replaceState({}, "", DAY20_LESSON_PATH);
