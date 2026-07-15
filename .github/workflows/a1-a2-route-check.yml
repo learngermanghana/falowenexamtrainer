@@ -19,6 +19,8 @@ on:
       - "web/src/utils/a1ChapterSpecificLessonState.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "web/src/components/A1Day1RadioRegression.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
       - "web/src/components/A1WorkbookSectionTabs.js"
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.js"
@@ -31,6 +33,7 @@ on:
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
       - "web/src/components/RouteScopedAppServices.js"
+      - "web/src/index.jsx"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
 
@@ -96,6 +99,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1Day1RadioRegression.test.js
+      - name: Test A1 Day 13 and Day 21 Falowen Radio
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx
       - name: Test A2 Day 1 Falowen Radio
         working-directory: web
         env:

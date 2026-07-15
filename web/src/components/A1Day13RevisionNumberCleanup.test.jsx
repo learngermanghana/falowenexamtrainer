@@ -79,15 +79,15 @@ describe("A1 Day 13 revision number cleanup and answer checks", () => {
       .toBe("fünftausendsechshundertachtundsiebzig");
   });
 
-  test("adds check buttons only to numbers, time and typed price answers", () => {
+  test("adds check buttons to numbers, time, years and typed price answers", () => {
     addPracticeSection("Practice: Numbers from 1 to 10,000", ["56"]);
     addPracticeSection("Time Practice", ["2:15"]);
-    addPracticeSection("Price Question and Answer Practice", ["Wie viel kostet das Buch?"]);
     addPracticeSection("Year Practice", ["2025"]);
+    addPracticeSection("Price Question and Answer Practice", ["Wie viel kostet das Buch?"]);
 
-    expect(addA1Day13AnswerChecks()).toHaveLength(3);
-    expect(document.querySelectorAll('[data-a1-day13-answer-check="true"]')).toHaveLength(3);
-    expect(document.querySelectorAll("button")).toHaveLength(3);
+    expect(addA1Day13AnswerChecks()).toHaveLength(4);
+    expect(document.querySelectorAll('[data-a1-day13-answer-check="true"]')).toHaveLength(4);
+    expect(document.querySelectorAll("button")).toHaveLength(4);
   });
 
   test("marks a correct typed number and clears feedback after editing", () => {
@@ -113,6 +113,27 @@ describe("A1 Day 13 revision number cleanup and answer checks", () => {
     const feedback = clickCheck(card);
     expect(feedback.dataset.result).toBe("incorrect");
     expect(feedback).toHaveTextContent("Es ist Viertel nach zwei.");
+  });
+
+  test("checks the requested year answers and accepts a full-number variant", () => {
+    const [year2025, year1453] = addPracticeSection("Year Practice", ["2025", "1453"]);
+    addA1Day13AnswerChecks();
+
+    year2025.input.value = "zweitausendfünfundzwanzig";
+    expect(clickCheck(year2025.card).dataset.result).toBe("correct");
+
+    year1453.input.value = "eintausendvierhundertdreiundfünfzig";
+    expect(clickCheck(year1453.card).dataset.result).toBe("correct");
+  });
+
+  test("shows the approved model year after an incorrect response", () => {
+    const [{ card, input }] = addPracticeSection("Year Practice", ["2030"]);
+    addA1Day13AnswerChecks();
+
+    input.value = "zweitausenddreizehn";
+    const feedback = clickCheck(card);
+    expect(feedback.dataset.result).toBe("incorrect");
+    expect(feedback).toHaveTextContent("zweitausenddreißig");
   });
 
   test("accepts a correct kostet answer written with a numeric price", () => {
