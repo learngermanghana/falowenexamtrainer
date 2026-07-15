@@ -2,101 +2,72 @@ import fs from "fs";
 import path from "path";
 import { courseSchedules } from "./courseSchedule";
 import {
+  A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
 import { normalizeLesson } from "./lessonModel";
 
-const LESSON_LINK_CASES = [
-  {
-    lessonPath: "/campus/course/lesson/A1/17?chapter=11",
-    day: 17,
-    chapter: "11",
-    workbookPath: "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/18?chapter=12.1",
-    day: 18,
-    chapter: "12.1",
-    workbookPath: "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/18?chapter=12.2",
-    day: 18,
-    chapter: "12.2",
-    workbookPath: "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/19?chapter=5.9",
-    day: 19,
-    chapter: "5.9",
-    workbookPath: "/campus/course/verboten-erlaubt-5-9",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/21?chapter=13",
-    day: 21,
-    chapter: "13",
-    workbookPath: "/campus/course/a1-day-21-weather-workbook",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/22?chapter=14.1",
-    day: 22,
-    chapter: "14.1",
-    workbookPath: "/campus/course/a1-day-22-health-and-body-parts-workbook",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/23?chapter=14.2",
-    day: 23,
-    chapter: "14.2",
-    workbookPath: "/campus/course/dative-and-accusative-verbs-14-2",
-  },
-  {
-    lessonPath: "/campus/course/lesson/A1/24?chapter=5.10",
-    day: 24,
-    chapter: "5.10",
-    workbookPath: "/campus/course/conjunctions-5-10",
-  },
-];
+const A1_RESOURCE_HUB_CASES = [
+  [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
+  [2, "0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
+  [2, "1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
+  [3, "1.1", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
+  [3, "1.2", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"],
+  [4, "2", "/campus/course/a1-day-4-numbers-for-beginners-workbook"],
+  [5, "1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
+  [6, "2.3", "/campus/course/a1-day-6-family-and-hobbies-workbook"],
+  [7, "3", "/campus/course/a1-chapter-3-asking-about-prices-workbook"],
+  [8, "4", "/campus/course/a1-day-8-countries-and-languages-workbook"],
+  [9, "5", "/campus/course/a1-chapter-5-german-cases-workbook"],
+  [10, "6", "/campus/course/a1-day-10-objects-colors-possessive-articles-workbook"],
+  [11, "7", "/campus/course/a1-day-11-understanding-time-workbook"],
+  [12, "8", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook"],
+  [13, "3.5", "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook"],
+  [14, "3.6", "/campus/course/modal-verbs-day-14-3-6"],
+  [15, "4.7", "/campus/course/speaking-exams-intro-4-7"],
+  [16, "9", "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook"],
+  [16, "10", "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook"],
+  [17, "11", "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook"],
+  [18, "12.1", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook"],
+  [18, "12.2", "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook"],
+  [19, "5.9", "/campus/course/verboten-erlaubt-5-9"],
+  [20, "12.3", "/campus/course/letter-writing-intro-german-a1-day-12-3"],
+  [21, "13", "/campus/course/a1-day-21-weather-workbook"],
+  [22, "14.1", "/campus/course/a1-day-22-health-and-body-parts-workbook"],
+  [24, "5.10", "/campus/course/conjunctions-5-10"],
+].map(([day, chapter, workbookPath]) => ({ day, chapter, workbookPath }));
 
-const DAY1_LESSON_PATH = "/campus/course/lesson/A1/1?chapter=0.1";
-const DAY1_WORKBOOK_PATH = "/campus/course/a1-day-1-greetings-workbook";
-const DAY20_LESSON_PATH = "/campus/course/lesson/A1/20?chapter=12.3";
-const DAY20_WORKBOOK_PATH = "/campus/course/letter-writing-intro-german-a1-day-12-3";
+const getCanonicalA1Lesson = (day) => {
+  const entry = courseSchedules.A1.find((lesson) => Number(lesson.day) === Number(day));
+  return normalizeLesson(entry, "A1");
+};
 
-describe("A1 lesson links preserve the intended lesson flow", () => {
+describe("A1 lesson links preserve the lesson resource hub", () => {
   const originalPath = window.location.pathname;
 
   afterEach(() => {
     window.history.replaceState({}, "", originalPath || "/");
   });
 
-  test.each(LESSON_LINK_CASES)(
-    "$lessonPath resolves to $workbookPath",
-    ({ lessonPath, day, chapter, workbookPath }) => {
-      window.history.replaceState({}, "", lessonPath);
+  test.each(A1_RESOURCE_HUB_CASES)(
+    "Day $day Chapter $chapter opens the resource hub before $workbookPath",
+    ({ day, chapter, workbookPath }) => {
+      window.history.replaceState({}, "", `/campus/course/lesson/A1/${day}?chapter=${chapter}`);
 
-      expect(getConfiguredInAppWorkbookRoute({ level: "A1", day, chapter })).toBe(workbookPath);
+      expect(getConfiguredInAppWorkbookRoute({ level: "A1", day, chapter })).toBe("");
+      expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day, chapter })).toBe(workbookPath);
     },
   );
 
-  it("keeps Day 1 Chapter 0.1 on the lesson resource hub", () => {
-    window.history.replaceState({}, "", DAY1_LESSON_PATH);
-
-    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe("");
-    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe(
-      DAY1_WORKBOOK_PATH,
-    );
-  });
-
   it("keeps all four A1 Day 1 resource-hub choices configured", () => {
-    const day1Entry = courseSchedules.A1.find((entry) => Number(entry.day) === 1);
-    const lesson = normalizeLesson(day1Entry, "A1");
+    const lesson = getCanonicalA1Lesson(1);
 
     expect(lesson.resources.resourceGroups[0]).toEqual(
       expect.objectContaining({
         chapter: "0.1",
         grammarBook: { url: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1" },
-        workbook: { url: DAY1_WORKBOOK_PATH },
+        workbook: { url: "/campus/course/a1-day-1-greetings-workbook" },
       }),
     );
     expect(lesson.resources.videos.map((video) => video.url)).toEqual([
@@ -105,16 +76,32 @@ describe("A1 lesson links preserve the intended lesson flow", () => {
     ]);
   });
 
-  it("keeps Day 20 Chapter 12.3 on the lesson resource hub", () => {
-    window.history.replaceState({}, "", DAY20_LESSON_PATH);
+  it("keeps all four A1 Day 4 resource-hub choices configured", () => {
+    const lesson = getCanonicalA1Lesson(4);
 
-    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 20, chapter: "12.3" })).toBe("");
-    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 20, chapter: "12.3" })).toBe(
-      DAY20_WORKBOOK_PATH,
+    expect(lesson.resources.resourceGroups[0]).toEqual(
+      expect.objectContaining({
+        chapter: "2",
+        grammarBook: { url: "/campus/course/german-numbers-1-10-with-pronunciation" },
+        workbook: { url: "/campus/course/a1-day-4-numbers-for-beginners-workbook" },
+      }),
     );
+    expect(lesson.resources.videos.map((video) => video.url)).toEqual([
+      "https://youtu.be/lN7xxSbkPZ4",
+      "https://youtu.be/GyhH8zPXDy4",
+    ]);
   });
 
-  it("keeps the Day 19 to Day 24 destination pages registered", () => {
+  it("keeps Day 23 Chapter 14.2 as the intentional grammar-only exception", () => {
+    window.history.replaceState({}, "", "/campus/course/lesson/A1/23?chapter=14.2");
+
+    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe(
+      A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
+    );
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe("");
+  });
+
+  it("keeps the later A1 destination pages registered", () => {
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
 
