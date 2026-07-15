@@ -29,6 +29,8 @@ on:
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.test.js"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
+      - "web/src/components/WorkbookStartGuide.js"
+      - "web/src/components/WorkbookStartGuide.test.js"
       - "web/src/components/RadioFirstWorkbookGate.js"
       - "web/src/components/A2Day*Workbook*.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
@@ -51,11 +53,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test existing workbook route matcher
+      - name: Test workbook routes and supporting materials
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/components/WorkbookStartGuide.test.js
       - name: Test A1 lesson resource hubs
         working-directory: web
         env:
