@@ -32,12 +32,15 @@ describe("A1 workbook AI video header", () => {
     expect(extractYouTubeVideoId("https://youtu.be/a1-day0-tutorial")).toBe("");
   });
 
-  test("resolves every registered named A1 workbook route by chapter and assignment identity", () => {
+  test("resolves every registered A1 workbook route in workbook context", () => {
     const registeredLessons = __private__.alignedA1Lessons.filter((lesson) => lesson.workbookRoute);
     expect(registeredLessons.length).toBeGreaterThan(20);
 
     registeredLessons.forEach((lesson) => {
       const route = new URL(lesson.workbookRoute, "https://www.falowen.app");
+      if (/^\/campus\/course\/lesson\/A1\/\d+$/i.test(route.pathname)) {
+        route.searchParams.set("view", "workbook");
+      }
       route.searchParams.set("chapter", lesson.chapter);
       if (lesson.assignmentId) route.searchParams.set("assignmentKey", lesson.assignmentId);
 
