@@ -86,7 +86,13 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/LiveClassCardRedesign.test.js src/components/CourseBookNextClassIndicator.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/LiveClassCardRedesign.test.js
+
+      - name: Test existing Course Book class indicator behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseBookNextClassIndicator.test.js
 
       - name: Test speaking tools
         working-directory: web
