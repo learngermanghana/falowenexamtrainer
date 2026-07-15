@@ -1,9 +1,11 @@
 import fs from "fs";
 import path from "path";
+import { courseSchedules } from "./courseSchedule";
 import {
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
+import { normalizeLesson } from "./lessonModel";
 
 const LESSON_LINK_CASES = [
   {
@@ -84,6 +86,23 @@ describe("A1 lesson links preserve the intended lesson flow", () => {
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 1, chapter: "0.1" })).toBe(
       DAY1_WORKBOOK_PATH,
     );
+  });
+
+  it("keeps all four A1 Day 1 resource-hub choices configured", () => {
+    const day1Entry = courseSchedules.A1.find((entry) => Number(entry.day) === 1);
+    const lesson = normalizeLesson(day1Entry, "A1");
+
+    expect(lesson.resources.resourceGroups[0]).toEqual(
+      expect.objectContaining({
+        chapter: "0.1",
+        grammarBook: { url: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1" },
+        workbook: { url: DAY1_WORKBOOK_PATH },
+      }),
+    );
+    expect(lesson.resources.videos.map((video) => video.url)).toEqual([
+      "https://youtu.be/CqFbBQG9M3U",
+      "https://youtu.be/5WIMkENgdGE",
+    ]);
   });
 
   it("keeps Day 20 Chapter 12.3 on the lesson resource hub", () => {
