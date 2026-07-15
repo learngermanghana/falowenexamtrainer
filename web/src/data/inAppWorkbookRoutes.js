@@ -83,29 +83,17 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
 
   if (
     normalizedLevel === "A1"
-    && normalizedDay === "1"
-    && normalizedChapter === "0.1"
-    && isA1LessonRoute()
-  ) {
-    return "";
-  }
-
-  if (
-    normalizedLevel === "A1"
-    && normalizedDay === "20"
-    && normalizedChapter === "12.3"
-    && isA1LessonRoute()
-  ) {
-    return "";
-  }
-
-  if (
-    normalizedLevel === "A1"
     && normalizedDay === "23"
     && normalizedChapter === "14.2"
     && isA1LessonRoute()
   ) {
     return A1_DAY23_CHAPTER142_GRAMMAR_ROUTE;
+  }
+
+  // Course Book lesson cards should open the A1 lesson resource hub first.
+  // The workbook route remains available through the hub's Open workbook action.
+  if (normalizedLevel === "A1" && normalizedDay !== "0" && isA1LessonRoute()) {
+    return "";
   }
 
   return getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
