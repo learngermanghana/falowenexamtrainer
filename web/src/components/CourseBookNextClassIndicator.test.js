@@ -1,6 +1,8 @@
 import {
+  COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE,
   findCourseBookStatGrid,
   findCurrentOrNextSession,
+  findOrCreateCourseBookNextClassMount,
   formatClassCountdown,
   resolveLevel,
 } from "../utils/courseBookNextClassLogic";
@@ -96,17 +98,28 @@ describe("CourseBookNextClassIndicator", () => {
     expect(findCurrentOrNextSession(sessions, now)).toBe(expected);
   });
 
-  test("finds the Course Book statistics grid", () => {
+  test("finds the Course Book statistics grid and keeps the A1 live-class card outside it", () => {
     document.body.innerHTML = `
-      <section>
-        <div><h2>Course Book</h2></div>
-        <div data-testid="stats">
-          <div><p>Lessons</p><p>28</p></div>
-          <div><p>Assignments</p><p>19</p></div>
-        </div>
-      </section>
+      <div data-testid="course-root">
+        <section data-testid="hero">
+          <div><h2>Course Book</h2></div>
+          <div data-testid="stats">
+            <div><p>Lessons</p><p>28</p></div>
+            <div><p>Assignments</p><p>19</p></div>
+          </div>
+        </section>
+      </div>
     `;
 
-    expect(findCourseBookStatGrid(document)).toBe(document.querySelector('[data-testid="stats"]'));
+    const stats = document.querySelector('[data-testid="stats"]');
+    const hero = document.querySelector('[data-testid="hero"]');
+    expect(findCourseBookStatGrid(document)).toBe(stats);
+    expect(findOrCreateCourseBookNextClassMount(document, "A2")).toBe(stats);
+
+    const a1Mount = findOrCreateCourseBookNextClassMount(document, "A1");
+    expect(a1Mount).not.toBe(stats);
+    expect(a1Mount.getAttribute(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE)).toBe("true");
+    expect(a1Mount.previousElementSibling).toBe(hero);
+    expect(findOrCreateCourseBookNextClassMount(document, "A1")).toBe(a1Mount);
   });
 });
