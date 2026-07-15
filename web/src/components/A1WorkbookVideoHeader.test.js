@@ -24,11 +24,11 @@ describe("A1 workbook AI video header", () => {
   });
 
   test("extracts approved YouTube IDs and rejects placeholder values", () => {
-    expect(extractYouTubeVideoId("https://youtu.be/hLpPFOthVkU")).toBe("hLpPFOthVkU");
-    expect(extractYouTubeVideoId("https://www.youtube.com/watch?v=hLpPFOthVkU&feature=share"))
-      .toBe("hLpPFOthVkU");
-    expect(extractYouTubeVideoId("https://www.youtube.com/embed/hLpPFOthVkU"))
-      .toBe("hLpPFOthVkU");
+    expect(extractYouTubeVideoId("https://youtu.be/ZE24QSbGaSo")).toBe("ZE24QSbGaSo");
+    expect(extractYouTubeVideoId("https://www.youtube.com/watch?v=ZE24QSbGaSo&feature=share"))
+      .toBe("ZE24QSbGaSo");
+    expect(extractYouTubeVideoId("https://www.youtube.com/embed/ZE24QSbGaSo"))
+      .toBe("ZE24QSbGaSo");
     expect(extractYouTubeVideoId("https://youtu.be/a1-day0-tutorial")).toBe("");
   });
 
@@ -50,7 +50,25 @@ describe("A1 workbook AI video header", () => {
     });
   });
 
-  test("resolves a tutor-marked named workbook from the aligned A1 catalogue", () => {
+  test("uses the dedicated Day 1 AI video instead of the teacher lecture", () => {
+    const model = buildA1WorkbookVideoModel({
+      pathname: "/campus/course/a1-day-1-greetings-workbook",
+      search: "?assignmentKey=A1-0.1&assignmentId=A1-0.1&level=A1&radio=done",
+    });
+
+    expect(model).toEqual(
+      expect.objectContaining({
+        lessonId: "A1-0.1",
+        day: 1,
+        chapter: "0.1",
+        youtubeId: "5WIMkENgdGE",
+        sourceUrl: "https://youtu.be/5WIMkENgdGE",
+      }),
+    );
+    expect(model.youtubeId).not.toBe("CqFbBQG9M3U");
+  });
+
+  test("resolves a tutor-marked named workbook with its dedicated AI video", () => {
     const model = buildA1WorkbookVideoModel({
       pathname: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
       search: "?assignmentKey=A1-8&level=A1",
@@ -63,7 +81,7 @@ describe("A1 workbook AI video header", () => {
         chapter: "8",
         title: "24 Hour Clock",
         assessmentLabel: "Tutor-marked assignment",
-        youtubeId: "hLpPFOthVkU",
+        youtubeId: "ZE24QSbGaSo",
       }),
     );
   });
@@ -77,7 +95,7 @@ describe("A1 workbook AI video header", () => {
       expect.objectContaining({
         lessonId: "A1-3.6",
         assessmentLabel: "Self-practice",
-        youtubeId: "vMfOb_nPRNc",
+        youtubeId: "Wkj1-TnNUxY",
       }),
     );
   });
@@ -98,7 +116,7 @@ describe("A1 workbook AI video header", () => {
     ).toBeNull();
   });
 
-  test("shows a coming-soon card when the workbook has no approved video", () => {
+  test("shows a coming-soon card when the workbook has no approved AI video", () => {
     buildWorkbookDom();
 
     expect(
@@ -113,7 +131,7 @@ describe("A1 workbook AI video header", () => {
     expect(card.querySelector("iframe")).toBeNull();
   });
 
-  test("places the video after Back and before the workbook hero", () => {
+  test("places the AI video after Back and before the workbook hero", () => {
     buildWorkbookDom();
 
     expect(
@@ -129,7 +147,7 @@ describe("A1 workbook AI video header", () => {
     expect(card.nextElementSibling).toHaveAttribute("data-hero");
     expect(card.querySelector("iframe")).toHaveAttribute(
       "src",
-      "https://www.youtube-nocookie.com/embed/hLpPFOthVkU",
+      "https://www.youtube-nocookie.com/embed/ZE24QSbGaSo",
     );
 
     expect(
@@ -159,7 +177,34 @@ describe("A1 workbook AI video header", () => {
     expect(body.hidden).toBe(false);
   });
 
-  test("waits until the Falowen Radio gate is finished", () => {
+  test("shows only Falowen Radio before Day 1 Continue and the AI video afterwards", () => {
+    buildWorkbookDom();
+    const gate = document.createElement("div");
+    gate.setAttribute("data-radio-first-workbook-gate", "true");
+    document.body.appendChild(gate);
+
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/a1-day-1-greetings-workbook",
+        search: "?assignmentKey=A1-0.1&assignmentId=A1-0.1&level=A1",
+      }),
+    ).toBe(0);
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
+
+    gate.remove();
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/a1-day-1-greetings-workbook",
+        search: "?assignmentKey=A1-0.1&assignmentId=A1-0.1&level=A1&radio=done",
+      }),
+    ).toBe(1);
+    expect(document.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/5WIMkENgdGE",
+    );
+  });
+
+  test("still waits for route-scoped Falowen Radio gates", () => {
     buildWorkbookDom();
     const gate = document.createElement("div");
     gate.setAttribute("data-a1-radio-first-workbook-route", "true");
@@ -171,13 +216,5 @@ describe("A1 workbook AI video header", () => {
       }),
     ).toBe(0);
     expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
-
-    gate.remove();
-    expect(
-      applyA1WorkbookVideoHeader({
-        pathname: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
-        search: "?radio=done",
-      }),
-    ).toBe(1);
   });
 });
