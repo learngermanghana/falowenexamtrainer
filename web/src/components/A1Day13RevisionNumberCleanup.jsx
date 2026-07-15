@@ -46,6 +46,36 @@ export const A1_DAY13_TYPED_ANSWER_SECTIONS = Object.freeze({
       },
     },
   },
+  "Year Practice": {
+    compact: true,
+    answers: {
+      "1453": {
+        model: "vierzehnhundertdreiundfünfzig",
+        accepted: [
+          "vierzehnhundertdreiundfünfzig",
+          "eintausendvierhundertdreiundfünfzig",
+        ],
+      },
+      "1944": {
+        model: "neunzehnhundertvierundvierzig",
+        accepted: [
+          "neunzehnhundertvierundvierzig",
+          "eintausendneunhundertvierundvierzig",
+        ],
+      },
+      "1999": {
+        model: "neunzehnhundertneunundneunzig",
+        accepted: [
+          "neunzehnhundertneunundneunzig",
+          "eintausendneunhundertneunundneunzig",
+        ],
+      },
+      "2000": { model: "zweitausend" },
+      "2010": { model: "zweitausendzehn" },
+      "2025": { model: "zweitausendfünfundzwanzig" },
+      "2030": { model: "zweitausenddreißig" },
+    },
+  },
   "Price Question and Answer Practice": {
     answers: {
       "Wie viel kostet das Buch?": {
