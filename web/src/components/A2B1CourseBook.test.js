@@ -6,6 +6,7 @@ import Day0StudentWorkflowUpgrade from "./Day0StudentWorkflowUpgrade";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG } from "./B1Day12AbenteuerInDerNaturWorkbookPage";
 import { B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG } from "./B1Day13EigeneFilmkritikWorkbookPage";
+import { B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG } from "./B1Day14TraditionellesDigitalesLernenWorkbookPage";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
 
@@ -137,6 +138,22 @@ describe("A2 and B1 course books", () => {
       embedUrl: "https://www.youtube.com/embed/gFDy1atY9K4",
       externalUrl: "https://youtu.be/gFDy1atY9K4",
       videoTitle: "B1 Day 13 Eigene Filmkritik Hören",
+    }));
+    expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
+  });
+
+  test("uses YouTube instead of Google Drive for B1 Day 14 Teil 4 Hören", () => {
+    const config = B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG;
+
+    expect(config).toEqual(expect.objectContaining({
+      day: 14,
+      chapter: "5.14",
+      title: "Traditionelles vs. digitales Lernen",
+    }));
+    expect(config.listening).toEqual(expect.objectContaining({
+      embedUrl: "https://www.youtube.com/embed/PwA3HJ_V1HA",
+      externalUrl: "https://youtu.be/PwA3HJ_V1HA",
+      videoTitle: "B1 Day 14 Traditionelles vs digitales Lernen Hören",
     }));
     expect(JSON.stringify(config.listening)).not.toContain("drive.google.com");
   });
