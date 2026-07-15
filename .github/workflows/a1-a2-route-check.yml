@@ -21,6 +21,8 @@ on:
       - "web/src/components/A1Day1RadioRegression.test.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - "web/src/components/A1WorkbookVideoHeader.js"
+      - "web/src/components/A1WorkbookVideoHeader.test.js"
       - "web/src/components/A1WorkbookSectionTabs.js"
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.js"
@@ -89,6 +91,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1UnifiedTutorWorkbookNavigation.test.js
+      - name: Test A1 workbook AI video headers
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookVideoHeader.test.js
       - name: Test split A1 lesson chapter state
         working-directory: web
         env:
