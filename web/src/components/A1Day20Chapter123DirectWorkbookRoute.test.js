@@ -28,21 +28,23 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     );
   });
 
-  it("renders the letter-writing workbook through the same direct shell pattern as Day 11", () => {
+  it("renders the dedicated native shared workbook inside the direct authenticated shell", () => {
     const routeSource = readComponentSource(
       "A1Day20Chapter123DirectWorkbookRoute.js",
     );
 
     expect(routeSource).toContain(
-      'import LetterWritingIntroPage from "./LetterWritingIntroPage"',
+      'import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage"',
     );
     expect(routeSource).toContain("<main className=\"layout-main\"");
-    expect(routeSource).toContain("<LetterWritingIntroPage />");
+    expect(routeSource).toContain("<A1Day20LetterWritingWorkbookPage />");
   });
 
-  it("formats both letters as Teil sections for the unified A1 tutor navigation", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
+  it("owns both letters with explicit WorkbookSection keys for the shared navigation", () => {
+    const pageSource = readComponentSource("A1Day20LetterWritingWorkbookPage.js");
 
+    expect(pageSource).toContain('WorkbookSection sectionKey="teil-1"');
+    expect(pageSource).toContain('WorkbookSection sectionKey="teil-2"');
     expect(pageSource).toContain(
       "Teil 1 · Informal letter: Birthday message",
     );
@@ -52,31 +54,44 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     expect(getA1TeilNumber("Teil 1 · Informal letter: Birthday message")).toBe(1);
     expect(getA1TeilNumber("Teil 2 · Formal letter: Enquiry to a language school")).toBe(2);
     expect(pageSource).toContain(
-      "Overview</strong>, <strong>Teil 1</strong>",
+      "Use the shared navigation: <strong>Overview</strong>",
     );
   });
 
-  it("uses the approved direct formal and informal structure instead of tables", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
+  it("integrates Mark My Letter under both tasks instead of relying on global injection", () => {
+    const pageSource = readComponentSource("A1Day20LetterWritingWorkbookPage.js");
+    const autoMountSource = readComponentSource("A1CoursePracticeAutoMount.js");
 
-    expect(pageSource).toContain("Formal Letter Structure");
-    expect(pageSource).toContain("Informal Letter Structure");
-    expect(pageSource).toContain(
+    expect(pageSource).toContain('title="Mark My Informal Letter"');
+    expect(pageSource).toContain('title="Mark My Formal Letter"');
+    expect(pageSource).toContain('type="writing"');
+    expect(autoMountSource).not.toContain(
+      '"/campus/course/letter-writing-intro-german-a1-day-12-3",\n  "/campus/course/a1-day-21-weather-workbook"',
+    );
+  });
+
+  it("uses the approved direct formal and informal task structure", () => {
+    const pageSource = readComponentSource("A1Day20LetterWritingWorkbookPage.js");
+    const grammarSource = readComponentSource("LetterWritingIntroPage.js");
+
+    expect(pageSource).toContain("Letter 1 · Informal");
+    expect(pageSource).toContain("Letter 2 · Formal");
+    expect(pageSource).toContain("Schreiben Sie ungefähr 35–50 Wörter");
+    expect(grammarSource).toContain("Formal Letter Structure");
+    expect(grammarSource).toContain("Informal Letter Structure");
+    expect(grammarSource).toContain(
       "Ich freue mich im Voraus auf Ihre Antwort.",
     );
-    expect(pageSource).toContain(
+    expect(grammarSource).toContain(
       "Ich freue mich im Voraus auf deine Antwort.",
     );
-    expect(pageSource).toContain('data-compact-letter-hero="true"');
-    expect(pageSource).not.toContain("ComparisonTable");
-    expect(pageSource).not.toContain("Form field");
   });
 
   it("keeps the special grammar and workbook routes linked to the exact lesson hub", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
+    const grammarSource = readComponentSource("LetterWritingIntroPage.js");
     const backButtonSource = readComponentSource("navigation/AppBackButton.jsx");
 
-    expect(pageSource).toContain(
+    expect(grammarSource).toContain(
       '"/campus/course/lesson/A1/20?chapter=12.3"',
     );
     expect(backButtonSource).toContain(
