@@ -18,7 +18,7 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   21: Object.freeze({
     key: "a1-day21-weather-falowen-radio",
     title: "Weather · Kapitel 13",
-    youtubeId: "scaiyC3AD3E",
+    youtubeId: "fRYM7ojc0Yo",
     duration: "",
     instruction:
       "Listen carefully to the weather lesson. Then continue to the Kapitel 13 workbook assignment.",
