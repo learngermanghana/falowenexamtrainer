@@ -77,7 +77,18 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("keeps Day 2 Chapter 1.1 separate from the Chapter 0.2 alphabet content", () => {
+  it("keeps all four A1 Day 2 Chapter 1.1 resource-hub choices configured", () => {
+    expect(getTeacherVideoUrls(2, "1.1")).toContain("https://youtu.be/AjsnO1hxDs4");
+    expect(getAiVideoUrls(2, "1.1")).toContain("https://youtu.be/kqagu9qsOcc");
+    expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe(
+      "/campus/course/singular-pronouns-verb-conjugation-day-2",
+    );
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 2, chapter: "1.1" })).toBe(
+      "/campus/course/a1-day-2-kapitel-1-1-workbook",
+    );
+  });
+
+  it("keeps Day 2 Chapter 1.1 on the original two-part assignment", () => {
     const workbookSource = fs.readFileSync(
       path.resolve(__dirname, "../components/A1Day2Kapitel11WorkbookPage.js"),
       "utf8",
@@ -85,10 +96,22 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
 
     expect(workbookSource).toContain("Personal Pronouns and Verb Conjugation");
     expect(workbookSource).toContain('fallbackAssignmentKey="A1-1.1"');
-    expect(workbookSource).toContain("Teil 1 · Personalpronomen");
-    expect(workbookSource).toContain("Teil 2 · Verben konjugieren");
-    expect(workbookSource).toContain("ich lerne · du lernst · er/sie/es lernt");
-    expect(workbookSource).not.toContain("Welche Buchstaben sagt sie?");
+    expect(workbookSource).toContain("Teil 1 · Hören");
+    expect(workbookSource).toContain("Teil 2 · Schreiben");
+    expect(workbookSource).toContain("1. Wie heißt sie?");
+    expect(workbookSource).toContain("C) Anna");
+    expect(workbookSource).toContain("A) A, B, C, D, E, F, G");
+    expect(workbookSource).not.toContain("Teil 3 ·");
+  });
+
+  it("keeps A1 workbook navigation static while students read", () => {
+    const layoutSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/A1SharedAssignmentWorkbookLayout.jsx"),
+      "utf8",
+    );
+
+    expect(layoutSource).toContain('data-workbook-navigation-behavior="static"');
+    expect(layoutSource).not.toContain('position: "sticky"');
   });
 
   it("keeps both A1 Day 13 teacher videos and uses the new recording as video 2", () => {
