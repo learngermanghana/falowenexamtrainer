@@ -13,6 +13,8 @@ on:
       - "web/src/data/a1RouteAlignment.test.js"
       - "web/src/data/a1AssignmentRegistry.js"
       - "web/src/data/a1AssignmentRegistry.test.js"
+      - "web/src/data/a1CanonicalLessonCatalog.js"
+      - "web/src/data/a1CanonicalLessonCatalog.test.js"
       - "web/src/data/a1CanonicalLessonRoutes.js"
       - "web/src/data/a1CanonicalLessonRoutes.test.js"
       - "web/src/data/a1CourseBookCards.js"
@@ -157,7 +159,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/a1CanonicalLessonRoutes.test.js src/components/A1CanonicalChapterLessonRoute.test.jsx src/utils/a1ChapterSpecificLessonState.test.js src/components/A1ChapterSpecificLessonRouteBoundary.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/a1CanonicalLessonCatalog.test.js src/data/a1CanonicalLessonRoutes.test.js src/components/A1CanonicalChapterLessonRoute.test.jsx src/utils/a1ChapterSpecificLessonState.test.js src/components/A1ChapterSpecificLessonRouteBoundary.test.js
       - name: Test A1 letter-writing shared navigation
         working-directory: web
         env:
