@@ -26,6 +26,12 @@ describe("B1 workbook writing cheat sheet injector", () => {
     ).toBe(true);
     expect(
       __TESTING__.isB1WorkbookRoute(
+        "/campus/course/lesson/B1/2",
+        "?view=workbook&assignmentKey=B1-1.2&radio=done"
+      )
+    ).toBe(true);
+    expect(
+      __TESTING__.isB1WorkbookRoute(
         "/campus/course/lesson/B1/1",
         "?view=grammar"
       )
@@ -85,11 +91,34 @@ describe("B1 workbook writing cheat sheet injector", () => {
     );
   });
 
+  test("injects the B1 Day 2 clip only as Teil 2 Schreiben support", () => {
+    const root = buildWritingRoot();
+    const result = __TESTING__.ensureWritingVideoCard(root, 2);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: true,
+      reason: "inserted",
+      key: "b1-day2-freunde-fuers-leben-writing-video",
+    }));
+
+    const card = root.querySelector(
+      `[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`
+    );
+    expect(card).toHaveAttribute("aria-label", "B1 writing explanation video");
+    expect(card).toHaveTextContent("B1 Day 2 · Freunde fürs Leben · Schreiben explanation");
+    expect(card).not.toHaveTextContent("Falowen Radio");
+    expect(card).not.toHaveTextContent("AI lesson video");
+    expect(card.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/94IXPx5dTNY"
+    );
+  });
+
   test("does not duplicate the writing video when React updates the workbook", () => {
     const root = buildWritingRoot();
 
-    __TESTING__.ensureWritingVideoCard(root, 1);
-    const result = __TESTING__.ensureWritingVideoCard(root, 1);
+    __TESTING__.ensureWritingVideoCard(root, 2);
+    const result = __TESTING__.ensureWritingVideoCard(root, 2);
 
     expect(result.reason).toBe("already-mounted");
     expect(
@@ -100,7 +129,7 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("does not inject a card for an unmapped B1 writing assignment", () => {
     const root = buildWritingRoot();
 
-    const result = __TESTING__.ensureWritingVideoCard(root, 2);
+    const result = __TESTING__.ensureWritingVideoCard(root, 3);
 
     expect(result).toEqual(expect.objectContaining({
       mounted: false,
