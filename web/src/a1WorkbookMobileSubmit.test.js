@@ -42,14 +42,14 @@ describe("A1 mobile workbook submission", () => {
   });
 
   test("built-in A1 workbooks use one React-owned draft and submission form", () => {
-    const shellSource = readSource("components/A1TutorMarkedWorkbookShell.js");
+    const panelSource = readSource("components/A1CanonicalSubmissionPanel.jsx");
     const source = readSource("components/VerifiedCloudDraftSubmissionPage.js");
 
-    expect(shellSource).toContain('import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";');
-    expect(shellSource).not.toContain("PersistentAssignmentSubmissionPage");
-    expect(shellSource).toContain("submissionContextReady ? (");
-    expect(shellSource).toContain("<VerifiedCloudDraftSubmissionPage");
-    expect(shellSource).toContain('"12.3"');
+    expect(panelSource).toContain('import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";');
+    expect(panelSource).not.toContain("PersistentAssignmentSubmissionPage");
+    expect(panelSource).toContain("submissionContextReady ? (");
+    expect(panelSource).toContain("<VerifiedCloudDraftSubmissionPage");
+    expect(panelSource).toContain("canonicalAssignmentKey: assignmentKey");
     expect(source).toContain('data-cloud-draft-persistence": "react-owned"');
     expect(source).toContain("value={text}");
     expect(source).toContain("onChange={handleTextChange}");
@@ -61,15 +61,15 @@ describe("A1 mobile workbook submission", () => {
   });
 
   test("automatically resolves a cloud conflict with the visible answer before final submit", () => {
-    const shellSource = readSource("components/A1TutorMarkedWorkbookShell.js");
+    const panelSource = readSource("components/A1CanonicalSubmissionPanel.jsx");
 
-    expect(shellSource).toContain('data-auto-resolve-draft-conflicts="visible-version-on-submit"');
-    expect(shellSource).toContain("onSubmitCapture={handleSubmissionCapture}");
-    expect(shellSource).toContain('data-draft-conflict") === "true"');
-    expect(shellSource).toContain('=== "keep this device version"');
-    expect(shellSource).toContain('draftState === "saved"');
-    expect(shellSource).toContain("form.requestSubmit");
-    expect(shellSource).toContain("Draft conflict resolved automatically");
+    expect(panelSource).toContain('data-auto-resolve-draft-conflicts="visible-version-on-submit"');
+    expect(panelSource).toContain("onSubmitCapture={handleSubmissionCapture}");
+    expect(panelSource).toContain('data-draft-conflict") === "true"');
+    expect(panelSource).toContain('=== "keep this device version"');
+    expect(panelSource).toContain('draftState === "saved"');
+    expect(panelSource).toContain("form.requestSubmit");
+    expect(panelSource).toContain("Draft conflict resolved automatically");
   });
 
   test("all injected A1 workbooks use the verified cloud form while A2 and B1 keep the existing form", () => {
