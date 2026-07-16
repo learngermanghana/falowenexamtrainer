@@ -1,3 +1,9 @@
+import {
+  buildA1CanonicalChapterLessonRoute,
+  buildA1ShortChapterLessonRoute,
+  normalizeA1Chapter,
+} from "./a1CanonicalLessonRoutes";
+
 /**
  * Canonical ownership information for every tutor-marked A1 workbook.
  * Section labels are transcribed from the rendered workbook components and are
@@ -61,7 +67,9 @@ export const A1_ASSIGNMENT_REGISTRY = Object.freeze(Object.fromEntries(records.m
       day,
       chapter,
       title,
-      lessonRoute: `/campus/course/lesson/A1/${day}?chapter=${chapter}`,
+      lessonRoute: buildA1CanonicalChapterLessonRoute(chapter),
+      shortLessonRoute: buildA1ShortChapterLessonRoute(chapter),
+      legacyLessonRoute: `/campus/course/lesson/A1/${day}?chapter=${chapter}`,
       workbookRoute,
       ...routeParts,
       component,
@@ -73,6 +81,14 @@ export const A1_ASSIGNMENT_REGISTRY = Object.freeze(Object.fromEntries(records.m
 )));
 
 export const getA1Assignment = (assignmentKey) => A1_ASSIGNMENT_REGISTRY[assignmentKey] || null;
+
+export const getA1AssignmentByChapter = (chapter = "") => {
+  const normalizedChapter = normalizeA1Chapter(chapter);
+  if (!normalizedChapter) return null;
+  return Object.values(A1_ASSIGNMENT_REGISTRY).find(
+    (entry) => normalizeA1Chapter(entry.chapter) === normalizedChapter,
+  ) || null;
+};
 
 export const getA1AssignmentByRoute = (pathname, search = "") => {
   const normalizedPath = String(pathname || "").replace(/\/+$/, "") || "/";

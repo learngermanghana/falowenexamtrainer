@@ -1,9 +1,11 @@
 import {
   A1_ASSIGNMENT_ORDER,
   A1_ASSIGNMENT_REGISTRY,
+  getA1AssignmentByChapter,
   getA1AssignmentByRoute,
   getA1AssignmentNeighbors,
 } from "./a1AssignmentRegistry";
+import { buildA1CanonicalChapterLessonRoute } from "./a1CanonicalLessonRoutes";
 import { getAllowedWorkbookTabs } from "../components/A1SharedAssignmentWorkbookLayout";
 
 describe("canonical A1 assignment registry", () => {
@@ -16,12 +18,28 @@ describe("canonical A1 assignment registry", () => {
     const assignment = A1_ASSIGNMENT_REGISTRY[key];
     expect(assignment.assignmentKey).toBe(key);
     expect(assignment.chapter).toBe(key.slice(3));
+    expect(assignment.lessonRoute).toBe(buildA1CanonicalChapterLessonRoute(assignment.chapter));
+    expect(assignment.lessonRoute).not.toContain("?chapter=");
+    expect(assignment.legacyLessonRoute).toBe(
+      `/campus/course/lesson/A1/${assignment.day}?chapter=${assignment.chapter}`,
+    );
+    expect(getA1AssignmentByChapter(assignment.chapter)).toBe(assignment);
     expect(getA1AssignmentByRoute(assignment.workbookPath, assignment.workbookSearch)).toBe(assignment);
     expect(["native", "bridge"]).toContain(assignment.layoutMode);
     expect(new Set(assignment.sections.map(({ key: sectionKey }) => sectionKey)).size)
       .toBe(assignment.sections.length);
     expect(assignment.sections.every(({ key: sectionKey, label }) => label.startsWith(`Teil ${sectionKey.slice(5)}`))).toBe(true);
     expect(assignment.submissionEnabled).toBe(true);
+  });
+
+  test("gives dotted chapters the requested short, permanent aliases", () => {
+    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2"].shortLessonRoute).toBe(
+      "/campus/course/lesson/A1/0.2",
+    );
+    expect(A1_ASSIGNMENT_REGISTRY["A1-1.1"].shortLessonRoute).toBe(
+      "/campus/course/lesson/A1/1.1",
+    );
+    expect(A1_ASSIGNMENT_REGISTRY["A1-2"].shortLessonRoute).toBe("");
   });
 
   test.each(A1_ASSIGNMENT_ORDER)("%s has canonical previous/next navigation", (key) => {
