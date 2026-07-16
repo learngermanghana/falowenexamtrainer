@@ -119,6 +119,17 @@ export const getA1CanonicalLesson = (identity = "") => {
   return matches.length === 1 ? matches[0] : null;
 };
 
+export const getA1CanonicalLessonForLegacyRoute = ({ day, identity } = {}) => {
+  const normalized = normalizeA1Chapter(identity);
+  const numericDay = Number(day);
+  if (!normalized || !Number.isInteger(numericDay)) return null;
+
+  const dayMatches = A1_CANONICAL_LESSON_CATALOG.filter(
+    (lesson) => Number(lesson.day) === numericDay && lookupTokens(lesson).has(normalized),
+  );
+  return dayMatches.length === 1 ? dayMatches[0] : null;
+};
+
 export const getA1CanonicalLessonsForChapter = (chapter = "") => {
   const normalized = normalizeA1Chapter(chapter);
   return A1_CANONICAL_LESSON_CATALOG.filter((lesson) => lesson.chapter === normalized);
