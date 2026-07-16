@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
 import { shouldResetA1ChapterSpecificLessonState } from "../utils/a1ChapterSpecificLessonState";
+import { resolveA1WorkbookServiceScope } from "../utils/a1WorkbookServiceScope";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
 import MobileHeaderMenuInjector from "./MobileHeaderMenuInjector";
@@ -189,17 +190,18 @@ export default function RouteScopedAppServices() {
   if (isPublicAuthPath(location.pathname)) return null;
 
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
-  const params = new URLSearchParams(location.search || "");
-  const lessonView = String(params.get("view") || "").toLowerCase();
   const isCourseBook = normalizedPath === "/campus/course";
   const isA1Chapter7TimePage = normalizedPath === A1_CHAPTER7_TIME_PATH;
-  const isA1DynamicLesson = /^\/campus\/course\/lesson\/A1\/\d+$/i.test(normalizedPath);
-  const isA1NamedWorkbook = /^\/campus\/course\/a1-day-.*workbook$/i.test(normalizedPath);
+  const a1WorkbookScope = resolveA1WorkbookServiceScope({
+    pathname: location.pathname,
+    search: location.search,
+  });
+  const isA1DynamicLesson = a1WorkbookScope.isDynamicLesson;
   const isA1NamedGrammar = /^\/campus\/course\/a1-day-.*grammar.*$/i.test(normalizedPath);
-  const isA1LessonOrWorkbook = isA1DynamicLesson || isA1NamedWorkbook || isA1NamedGrammar;
-  const isA1WorkbookView =
-    isA1NamedWorkbook ||
-    (isA1DynamicLesson && lessonView !== "grammar" && lessonView !== "learn");
+  const isA1LessonOrWorkbook =
+    isA1DynamicLesson || a1WorkbookScope.isWorkbookView || isA1NamedGrammar;
+  const isA1WorkbookView = a1WorkbookScope.isWorkbookView;
+  const shouldMountA1WorkbookServices = a1WorkbookScope.shouldMountWorkbookServices;
   const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage;
 
   return (
@@ -216,8 +218,8 @@ export default function RouteScopedAppServices() {
       <A2LegacyStandardWorkbookNavigation />
       <A2ProtectedWorkbookRouteGuard />
       <B1WorkbookSubmissionContextSync />
-      <A1UnifiedTutorWorkbookNavigation />
-      <A1WorkbookVideoHeader />
+      {shouldMountA1WorkbookServices ? <A1UnifiedTutorWorkbookNavigation /> : null}
+      {shouldMountA1WorkbookServices ? <A1WorkbookVideoHeader /> : null}
       <CourseBookLayoutStandardizer />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       <UniversalWorkbookLessonNavigator />
