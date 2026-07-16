@@ -16,7 +16,8 @@ describe("canonical A1 assignment registry", () => {
     const assignment = A1_ASSIGNMENT_REGISTRY[key];
     expect(assignment.assignmentKey).toBe(key);
     expect(assignment.chapter).toBe(key.slice(3));
-    expect(getA1AssignmentByRoute(assignment.workbookRoute)).toBe(assignment);
+    expect(getA1AssignmentByRoute(assignment.workbookPath, assignment.workbookSearch)).toBe(assignment);
+    expect(["native", "bridge"]).toContain(assignment.layoutMode);
     expect(new Set(assignment.sections.map(({ key: sectionKey }) => sectionKey)).size)
       .toBe(assignment.sections.length);
     expect(assignment.sections.every(({ key: sectionKey, label }) => label.startsWith(`Teil ${sectionKey.slice(5)}`))).toBe(true);
@@ -28,6 +29,15 @@ describe("canonical A1 assignment registry", () => {
     const neighbors = getA1AssignmentNeighbors(key);
     expect(neighbors.previous?.assignmentKey || null).toBe(A1_ASSIGNMENT_ORDER[index - 1] || null);
     expect(neighbors.next?.assignmentKey || null).toBe(A1_ASSIGNMENT_ORDER[index + 1] || null);
+  });
+
+  test("keeps Day 18 neighbors on workbook views", () => {
+    expect(A1_ASSIGNMENT_REGISTRY["A1-12.1"].workbookRoute).toContain("view=workbook");
+    expect(A1_ASSIGNMENT_REGISTRY["A1-12.2"].workbookRoute).toContain("view=workbook");
+    expect(getA1AssignmentByRoute(
+      A1_ASSIGNMENT_REGISTRY["A1-12.1"].workbookPath,
+      "",
+    )).toBeNull();
   });
 
   test("tab models are derived only from declared sections", () => {
