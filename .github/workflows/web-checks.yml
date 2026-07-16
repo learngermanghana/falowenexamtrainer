@@ -80,7 +80,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassOfficialRepair.test.js
+        run: npm run test:ci -- --runTestsByPath src/services/canonicalLiveClassOfficialRepair.test.js src/services/canonicalLiveClassServiceV4.test.js
 
       - name: Test live class card redesign
         working-directory: web
