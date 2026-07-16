@@ -29,6 +29,15 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toBeNull();
   });
 
+  test("keeps Day 2 Falowen Radio on the canonical A1-1.1 workbook route", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-2-kapitel-1-1-workbook",
+        "?workbookTab=overview&assignmentKey=A1-1.1&level=A1",
+      ),
+    ).toEqual({ day: 2, chapter: "1.1" });
+  });
+
   test("uses the approved Day 13 revision video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
@@ -70,11 +79,17 @@ describe("A1 route-scoped Falowen Radio", () => {
     );
   });
 
-  test("uses the approved Day 22 Kapitel 14.1 health video on the dynamic lesson route", () => {
+  test("uses the approved Day 22 Kapitel 14.1 health video on dynamic and canonical routes", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
         "/campus/course/lesson/A1/22",
         "?chapter=14.1",
+      ),
+    ).toEqual({ day: 22, chapter: "14.1" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-22-health-and-body-parts-workbook",
+        "?workbookTab=overview&assignmentKey=A1-14.1&level=A1",
       ),
     ).toEqual({ day: 22, chapter: "14.1" });
     expect(getA1RadioResource(22)).toEqual(
