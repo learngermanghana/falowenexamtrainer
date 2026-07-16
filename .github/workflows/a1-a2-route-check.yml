@@ -3,6 +3,8 @@ name: A1 A2 workbook routes
 on:
   pull_request:
     paths:
+      - "functions/functionz/prompts.js"
+      - "functions/functionz/prompts.courseTask.test.js"
       - "web/src/data/inAppWorkbookRoutes.json"
       - "web/src/data/inAppWorkbookRoutes.js"
       - "web/src/data/inAppWorkbookRoutes.a1LessonLinks.test.js"
@@ -22,6 +24,8 @@ on:
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/data/additionalA2RadioEntries.js"
+      - "web/src/services/writingProgressService.js"
+      - "web/src/services/writingProgressService.test.js"
       - "web/src/utils/courseWorkbookRoutes.js"
       - "web/src/utils/courseBookProgression.js"
       - "web/src/utils/courseBookProgression.test.js"
@@ -40,6 +44,8 @@ on:
       - "web/src/components/A1TutorMarkedWorkbookShell.test.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
+      - "web/src/components/A1CourseBookLetterPracticePanel.js"
+      - "web/src/components/A1CourseBookLetterPracticePanel.test.js"
       - "web/src/components/A1CoursePracticeAutoMount.js"
       - "web/src/components/A1CoursePracticeAutoMount.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
@@ -148,6 +154,14 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1Day20LetterWritingWorkbookPage.test.js
+      - name: Test task-scoped A1 letter marker
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1CourseBookLetterPracticePanel.test.js src/services/writingProgressService.test.js
+      - name: Test A1 letter marker prompt contract
+        working-directory: functions/functionz
+        run: node prompts.courseTask.test.js
       - name: Test A1 letter-writing direct route
         working-directory: web
         env:
