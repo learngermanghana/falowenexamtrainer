@@ -1,5 +1,6 @@
 import {
   getA1LessonStateChapter,
+  getA1LessonStateResourceChapters,
   getA1RequestedLessonChapter,
   shouldResetA1ChapterSpecificLessonState,
 } from "./a1ChapterSpecificLessonState";
@@ -24,7 +25,7 @@ describe("A1 chapter-specific lesson state", () => {
     ["/campus/course/lesson/A1/16", "?chapter=10", "10", "9_10"],
     ["/campus/course/lesson/A1/18", "?chapter=12.2", "12.2", "12.1_12.2"],
   ])(
-    "resets matching-looking state on split A1 lessons because it can retain the first chapter content",
+    "resets combined state on split A1 lessons because it can retain sibling content",
     (pathname, search, displayChapter, chapter) => {
       expect(
         shouldResetA1ChapterSpecificLessonState({
@@ -35,6 +36,54 @@ describe("A1 chapter-specific lesson state", () => {
       ).toBe(true);
     },
   );
+
+  it("keeps correctly scoped Day 2 Chapter 0.2 state without remounting the page", () => {
+    expect(
+      shouldResetA1ChapterSpecificLessonState({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=0.2",
+        state: {
+          entry: {
+            displayChapter: "0.2",
+            chapter: "0.2",
+            lesen_hören: { chapter: "0.2" },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps correctly scoped Day 2 Chapter 1.1 state without remounting the page", () => {
+    expect(
+      shouldResetA1ChapterSpecificLessonState({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=1.1",
+        state: {
+          entry: {
+            displayChapter: "1.1",
+            chapter: "1.1",
+            lesen_hören: { chapter: "1.1" },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("resets Chapter 1.1 state when its nested resource still belongs to Chapter 0.2", () => {
+    expect(
+      shouldResetA1ChapterSpecificLessonState({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=1.1",
+        state: {
+          entry: {
+            displayChapter: "1.1",
+            chapter: "1.1",
+            lesen_hören: { chapter: "0.2" },
+          },
+        },
+      }),
+    ).toBe(true);
+  });
 
   it("keeps matching state on a normal single-chapter A1 lesson", () => {
     expect(
@@ -66,8 +115,15 @@ describe("A1 chapter-specific lesson state", () => {
     ).toBe(false);
   });
 
-  it("normalizes requested and state chapters", () => {
+  it("normalizes requested, state and nested resource chapters", () => {
     expect(getA1RequestedLessonChapter("?chapter=12.2")).toBe("12.2");
     expect(getA1LessonStateChapter({ entry: { displayChapter: "10" } })).toBe("10");
+    expect(
+      getA1LessonStateResourceChapters({
+        entry: {
+          lesen_hören: [{ chapter: "0.2" }, { displayChapter: "1.1" }],
+        },
+      }),
+    ).toEqual(["0.2", "1.1"]);
   });
 });
