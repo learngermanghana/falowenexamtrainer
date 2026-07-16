@@ -8,6 +8,9 @@ import {
 } from "../data/a1CanonicalLessonRoutes";
 
 export const getA1LegacyChapterLessonRedirect = ({ pathname = "", search = "" } = {}) => {
+  const searchParams = new URLSearchParams(String(search || ""));
+  if (searchParams.get("hub") === "1") return null;
+
   const legacyDay = getA1LegacyLessonDay(pathname);
   const requestedChapter = getA1RequestedChapterFromSearch(search);
   if (!legacyDay || !requestedChapter) return null;
