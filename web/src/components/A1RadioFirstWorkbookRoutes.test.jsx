@@ -46,6 +46,31 @@ describe("A1 route-scoped Falowen Radio", () => {
     );
   });
 
+  test("uses the approved Day 22 Kapitel 14.1 health video on the dynamic lesson route", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/22",
+        "?chapter=14.1",
+      ),
+    ).toEqual({ day: 22, chapter: "14.1" });
+    expect(getA1RadioResource(22)).toEqual(
+      expect.objectContaining({
+        key: "a1-day22-health-body-parts-falowen-radio",
+        title: "Health and Body Parts · Kapitel 14.1",
+        youtubeId: "23uCwszjahg",
+      }),
+    );
+  });
+
+  test("does not open the Day 22 radio for another chapter", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/22",
+        "?chapter=14.2",
+      ),
+    ).toBeNull();
+  });
+
   test("does not affect other A1 workbook routes", () => {
     expect(resolveA1RadioFirstWorkbookRoute("/campus/course/a1-day-12-24-hour-clock-and-dates-workbook"))
       .toBeNull();
