@@ -2,10 +2,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
-import {
-  getA1CorrectedChapterSpecificLessonSearch,
-  shouldResetA1ChapterSpecificLessonState,
-} from "../utils/a1ChapterSpecificLessonState";
+import { shouldResetA1ChapterSpecificLessonState } from "../utils/a1ChapterSpecificLessonState";
 import { resolveA1WorkbookServiceScope } from "../utils/a1WorkbookServiceScope";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
@@ -168,20 +165,6 @@ const A1ChapterSpecificLessonStateReset = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const correctedSearch = getA1CorrectedChapterSpecificLessonSearch({
-      pathname: location.pathname,
-      search: location.search,
-      state: location.state,
-    });
-
-    if (correctedSearch && correctedSearch !== location.search) {
-      navigate(
-        { pathname: location.pathname, search: correctedSearch },
-        { replace: true, state: location.state },
-      );
-      return;
-    }
-
     if (
       !shouldResetA1ChapterSpecificLessonState({
         pathname: location.pathname,
