@@ -10,6 +10,7 @@ import PublicClassSelectInjector from "./PublicClassSelectInjector";
 import MobileHeaderMenuInjector from "./MobileHeaderMenuInjector";
 import SubmitPageLevelGuidanceInjector from "./SubmitPageLevelGuidanceInjector";
 import SubmitSuccessScreenInjector from "./SubmitSuccessScreenInjector";
+import SubmissionMinimumWordGuard from "./SubmissionMinimumWordGuard";
 import CourseBookTerminologyInjector from "./CourseBookTerminologyInjector";
 import CourseCompletionExamGuidanceInjector from "./CourseCompletionExamGuidanceInjector";
 import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideoInjector";
@@ -221,6 +222,7 @@ export default function RouteScopedAppServices() {
       <MobileHeaderMenuInjector />
       <SubmitPageLevelGuidanceInjector />
       <SubmitSuccessScreenInjector />
+      <SubmissionMinimumWordGuard />
       <CourseBookTerminologyInjector />
       <CourseCompletionExamGuidanceInjector />
       <A2CourseBookOrientationVideoInjector />

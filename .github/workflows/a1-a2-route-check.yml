@@ -65,6 +65,8 @@ on:
       - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
+      - "web/src/components/SubmissionMinimumWordGuard.js"
+      - "web/src/components/SubmissionMinimumWordGuard.test.js"
       - "web/src/components/RouteScopedAppServices.js"
       - "web/src/a1WorkbookMobileSubmit.test.js"
       - "web/src/index.jsx"
@@ -133,11 +135,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js src/components/A1TutorMarkedWorkbookShell.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1UnifiedTutorWorkbookNavigation.test.js
-      - name: Test A1 mobile submission safeguards
+      - name: Test submission word-count feedback and A1 mobile safeguards
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/a1WorkbookMobileSubmit.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/SubmissionMinimumWordGuard.test.js src/a1WorkbookMobileSubmit.test.js
       - name: Test A1 workbook AI video headers
         working-directory: web
         env:
