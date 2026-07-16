@@ -10,7 +10,7 @@ const c1Day10IntegrationUndGesellschaft = makeLesson({
   videoResource: {
     title: "C1 Day 10 · AI video: Integration und Gesellschaft",
     description: "AI explanation for C1 Day 10, chapter 2.5: Integration, Teilhabe, Sprache, Chancengleichheit and gesellschaftlicher Zusammenhalt.",
-    url: "https://youtu.be/pyPbyCncfvI",
+    url: "https://youtu.be/S_c9eIH-rzY",
   },
   grammarFocus: "Konjunktiv I in Bericht und Kommentar: fremde Aussagen neutral wiedergeben und einordnen",
   objectives: [
