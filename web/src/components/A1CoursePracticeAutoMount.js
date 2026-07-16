@@ -7,14 +7,11 @@ import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
 const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
 const A1_DAY_19_VIDEO_ID = "gprnEZtMUPM";
 const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
-
-const LETTER_WRITING_INTRO_PATHS = new Set([
-  "/campus/course/letter-writing-intro-12-3",
-  "/campus/course/letter-writing-intro-german-a1-day-12-3",
-]);
+const LETTER_WRITING_GRAMMAR_PATH = "/campus/course/letter-writing-intro-12-3";
+const LETTER_WRITING_WORKBOOK_PATH =
+  "/campus/course/letter-writing-intro-german-a1-day-12-3";
 
 const WRITING_PATHS = new Set([
-  ...LETTER_WRITING_INTRO_PATHS,
   "/campus/course/a1-day-21-weather-workbook",
   "/campus/course/a1-day-22-health-and-body-parts-workbook",
 ]);
@@ -23,6 +20,15 @@ const normalizePath = (pathname = "") =>
   String(pathname || "")
     .toLowerCase()
     .replace(/\/+$/, "") || "/";
+
+export const shouldAutoMountA1WritingPractice = (pathname = "") =>
+  WRITING_PATHS.has(normalizePath(pathname));
+
+export const isA1LetterWritingCourseBookPath = (pathname = "") =>
+  normalizePath(pathname) === LETTER_WRITING_WORKBOOK_PATH;
+
+export const isA1LetterWritingGrammarPath = (pathname = "") =>
+  normalizePath(pathname) === LETTER_WRITING_GRAMMAR_PATH;
 
 const getPageContainer = () => {
   const main = document.querySelector("main") || document.body;
@@ -51,18 +57,14 @@ const prepareSpeakingLessonPage = (container) => {
   duplicateVideoLink?.closest("article")?.remove();
 };
 
-const prepareWritingLessonPage = (_container, pathname) => {
-  if (!LETTER_WRITING_INTRO_PATHS.has(pathname)) return;
-
+const prepareLetterGrammarPage = () => {
   const teacherVideoLink = Array.from(document.querySelectorAll("a")).find((link) => {
     const href = String(link.getAttribute("href") || link.href || "");
     const label = String(link.textContent || "").trim();
     return href.includes("youtu.be/") && /video öffnen/i.test(label);
   });
 
-  if (teacherVideoLink) {
-    teacherVideoLink.setAttribute("href", A1_DAY_12_TEACHER_VIDEO_URL);
-  }
+  if (teacherVideoLink) teacherVideoLink.setAttribute("href", A1_DAY_12_TEACHER_VIDEO_URL);
 };
 
 const insertSpeakingMount = (container, mount) => {
@@ -98,23 +100,6 @@ const insertWritingMount = (container, mount) => {
   container.appendChild(mount);
 };
 
-const getWritingPanelProps = (pathname) => {
-  if (!LETTER_WRITING_INTRO_PATHS.has(pathname)) return {};
-
-  return {
-    title: "Check both letters before submission",
-    writingContext: {
-      level: "A1",
-      courseLevel: "A1",
-      day: 12,
-      lessonId: "A1-day-12.3",
-      workbookId: "A1-day-12.3-letter-writing",
-      writingTaskId: "A1-day-12.3-letter-writing-practice",
-      taskTitle: "A1 Day 12.3 letter self-practice",
-    },
-  };
-};
-
 const A1CoursePracticeAutoMount = () => {
   const location = useLocation();
 
@@ -122,35 +107,36 @@ const A1CoursePracticeAutoMount = () => {
     if (typeof document === "undefined") return undefined;
     const pathname = normalizePath(location.pathname);
     const isCanonicalLessonPage = isA1Day19LessonRoute(location);
-    const isWritingPage = WRITING_PATHS.has(pathname);
-    if (!isCanonicalLessonPage && !isWritingPage) return undefined;
+    const isWritingPage = shouldAutoMountA1WritingPractice(pathname);
+    const isLetterGrammarPage = isA1LetterWritingGrammarPath(pathname);
+
+    if (!isCanonicalLessonPage && !isWritingPage && !isLetterGrammarPage) return undefined;
 
     document.getElementById("falowen-a1-practice-mount")?.remove();
 
+    if (isLetterGrammarPage) {
+      prepareLetterGrammarPage();
+      return undefined;
+    }
+
     const container =
       (isCanonicalLessonPage ? getCanonicalLessonArticle() : null) || getPageContainer();
-    if (isCanonicalLessonPage) {
-      prepareSpeakingLessonPage(container);
-    } else {
-      prepareWritingLessonPage(container, pathname);
-    }
+
+    if (isCanonicalLessonPage) prepareSpeakingLessonPage(container);
 
     const mount = document.createElement("div");
     mount.id = "falowen-a1-practice-mount";
     mount.style.margin = "16px 0";
 
-    if (isCanonicalLessonPage) {
-      insertSpeakingMount(container, mount);
-    } else {
-      insertWritingMount(container, mount);
-    }
+    if (isCanonicalLessonPage) insertSpeakingMount(container, mount);
+    else insertWritingMount(container, mount);
 
     const root = createRoot(mount);
     root.render(
       isCanonicalLessonPage ? (
         <A1ExamSpeakingPracticePanel />
       ) : (
-        <A1SimpleMarkMyLetterPanel {...getWritingPanelProps(pathname)} />
+        <A1SimpleMarkMyLetterPanel />
       ),
     );
 
