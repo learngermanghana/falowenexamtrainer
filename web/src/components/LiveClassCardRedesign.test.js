@@ -57,6 +57,24 @@ const summary = {
   ],
 };
 
+const a1BonnDay3 = {
+  id: "a1-bonn-2026-07-17",
+  classId: "a1-bonn",
+  className: "A1 Bonn Klasse",
+  topic: "Personal Information, Articles, Adjectives and W-Questions + Present-Tense Verb Conjugation Practice",
+  assignmentIds: ["A1-1.1-PRACTICE", "A1-1.2"],
+  curriculumDay: 3,
+  curriculumIndex: 2,
+  startsAt: "2026-07-17T11:00:00.000Z",
+  endsAt: "2026-07-17T12:00:00.000Z",
+  status: "scheduled",
+};
+
+const a1BonnSummary = {
+  klass: { id: "a1-bonn", name: "A1 Bonn Klasse", levelId: "A1" },
+  sessions: [a1BonnDay3],
+};
+
 describe("lesson-first live class presentation", () => {
   test("shows the correct A2 lesson identity and direct lesson route", () => {
     expect(liveClassLessonLabel(lesson20, "A2")).toBe("Lesson 20");
@@ -64,6 +82,16 @@ describe("lesson-first live class presentation", () => {
     expect(liveClassAssignmentLabel(lesson20)).toBe("A2-7.20");
     expect(liveClassLessonLink(summary, lesson20)).toBe("/campus/course/lesson/A2/20?chapter=7.20");
     expect(isRescheduledLiveClass(lesson20)).toBe(true);
+  });
+
+  test("uses the official A1 curriculum day instead of the chapter suffix", () => {
+    expect(liveClassLessonLabel(a1BonnDay3, "A1")).toBe("Day 3");
+    expect(liveClassCleanTitle(a1BonnDay3)).toBe(
+      "Personal Information, Articles, Adjectives and W-Questions + Present-Tense Verb Conjugation Practice",
+    );
+    expect(liveClassLessonLink(a1BonnSummary, a1BonnDay3)).toBe(
+      "/campus/course/lesson/A1/3?chapter=1.1-PRACTICE",
+    );
   });
 
   test("previews the next two active lessons and excludes cancellations", () => {
@@ -80,6 +108,15 @@ describe("lesson-first live class presentation", () => {
     expect(cached.klass.name).toBe("A2 Koln Klasse");
     expect(cached.sessions).toHaveLength(4);
     expect(cached.isCachedSummary).toBe(true);
+  });
+
+  test("does not load schedules stored by the previous seven-day cache", () => {
+    window.localStorage.clear();
+    window.localStorage.setItem(
+      "falowen:live-class-summary:v1:a2-koln",
+      JSON.stringify({ cachedAt: Date.now(), summary }),
+    );
+    expect(loadLiveClassSummaryCache({ classId: "a2-koln", className: "A2 Koln Klasse" })).toBeNull();
   });
 });
 
