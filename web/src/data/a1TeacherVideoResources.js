@@ -12,7 +12,8 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [10, "6", "Objects and Colors", "https://youtu.be/sDL5z3lsITk"],
   [11, "7", "Understanding Time", "https://youtu.be/qrkQJc5kQJQ"],
   [12, "8", "The 24-Hour Clock", "https://youtu.be/hLpPFOthVkU"],
-  [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/eqSc_5p5uyQ"],
+  [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/eqSc_5p5uyQ", 1],
+  [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/zizS5WdOYs8", 2],
   [14, "3.6", "Modal Verbs", "https://youtu.be/vMfOb_nPRNc"],
   [15, "4.7", "Introduction to Speaking Exams", "https://youtu.be/o9nn_hSDzw8"],
   [16, "9", "Negation", "https://youtu.be/yYIjI6P-qmw"],
@@ -27,17 +28,25 @@ const A1_TEACHER_VIDEO_ENTRIES = [
 ];
 
 export const A1_TEACHER_VIDEO_RESOURCES = Object.freeze(
-  A1_TEACHER_VIDEO_ENTRIES.map(([day, chapter, topic, url]) =>
-    Object.freeze({
+  A1_TEACHER_VIDEO_ENTRIES.map(([day, chapter, topic, url, requestedVideoNumber]) => {
+    const videoNumber = Number(requestedVideoNumber) || 1;
+    const hasExplicitNumber = requestedVideoNumber !== undefined && requestedVideoNumber !== null;
+    const keyNumberSuffix = videoNumber > 1 ? `-${videoNumber}` : "";
+    const videoLabel = hasExplicitNumber ? `Teacher video ${videoNumber}` : "Teacher lecture";
+
+    return Object.freeze({
       day,
       chapter,
       topic,
-      key: `a1-day${day}-chapter-${String(chapter).replace(/[^a-z0-9]+/gi, "-")}-teacher-video`,
-      title: `${topic} · Teacher lecture`,
-      description: `Recorded A1 teacher explanation for ${topic}.`,
+      videoNumber,
+      key: `a1-day${day}-chapter-${String(chapter).replace(/[^a-z0-9]+/gi, "-")}-teacher-video${keyNumberSuffix}`,
+      title: `${topic} · ${videoLabel}`,
+      description: hasExplicitNumber
+        ? `Recorded A1 teacher video ${videoNumber} for ${topic}.`
+        : `Recorded A1 teacher explanation for ${topic}.`,
       url,
-    })
-  )
+    });
+  })
 );
 
 export const getA1TeacherVideoResources = (day) =>
