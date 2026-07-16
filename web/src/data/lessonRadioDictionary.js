@@ -104,7 +104,7 @@ export const LESSON_RADIO_DICTIONARY = {
     6: {
       key: "b1-day6-stadt-oder-land-falowen-radio",
       title: "Leben in der Stadt oder auf dem Land? 2.6",
-      youtubeId: "6zpR_jF26l0",
+      youtubeId: "NPG03yU7O3E",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf den Vergleich zwischen Stadt- und Landleben ein. Danach gehst du weiter zum Workbook.",
