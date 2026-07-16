@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getA1AssignmentByRoute } from "../data/a1AssignmentRegistry";
 import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
 import { shouldResetA1ChapterSpecificLessonState } from "../utils/a1ChapterSpecificLessonState";
-import { shouldUseNativeA1WorkbookExperience } from "../utils/a1NativeWorkbookExperience";
 import { resolveA1WorkbookServiceScope } from "../utils/a1WorkbookServiceScope";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
@@ -27,6 +27,7 @@ import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
 import A1UnifiedTutorWorkbookNavigation from "./A1UnifiedTutorWorkbookNavigation";
 import A1WorkbookVideoHeader from "./A1WorkbookVideoHeader";
+import A1SharedAssignmentWorkbookBridge from "./A1SharedAssignmentWorkbookBridge";
 import CourseBookLayoutStandardizer from "./CourseBookLayoutStandardizer";
 import A1Chapter7SeparableVerbCleaner from "./A1Chapter7SeparableVerbCleaner";
 import B2CourseBookContentAlignment from "./B2CourseBookContentAlignment";
@@ -193,7 +194,8 @@ export default function RouteScopedAppServices() {
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
   const isCourseBook = normalizedPath === "/campus/course";
   const isA1Chapter7TimePage = normalizedPath === A1_CHAPTER7_TIME_PATH;
-  const useNativeA1WorkbookExperience = shouldUseNativeA1WorkbookExperience(normalizedPath);
+  const canonicalA1Assignment = getA1AssignmentByRoute(location.pathname, location.search);
+  const useCanonicalA1WorkbookExperience = Boolean(canonicalA1Assignment);
   const a1WorkbookScope = resolveA1WorkbookServiceScope({
     pathname: location.pathname,
     search: location.search,
@@ -204,12 +206,12 @@ export default function RouteScopedAppServices() {
     isA1DynamicLesson || a1WorkbookScope.isWorkbookView || isA1NamedGrammar;
   const isA1WorkbookView = a1WorkbookScope.isWorkbookView;
   const shouldMountA1WorkbookServices =
-    a1WorkbookScope.shouldMountWorkbookServices && !useNativeA1WorkbookExperience;
+    a1WorkbookScope.shouldMountWorkbookServices && !useCanonicalA1WorkbookExperience;
   const shouldMountA1WorkbookSectionServices =
-    isA1WorkbookView && !useNativeA1WorkbookExperience;
+    isA1WorkbookView && !useCanonicalA1WorkbookExperience;
   const shouldEnhanceA1Experience =
     (isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage) &&
-    !useNativeA1WorkbookExperience;
+    !useCanonicalA1WorkbookExperience;
 
   return (
     <>
@@ -227,9 +229,12 @@ export default function RouteScopedAppServices() {
       <B1WorkbookSubmissionContextSync />
       {shouldMountA1WorkbookServices ? <A1UnifiedTutorWorkbookNavigation /> : null}
       {shouldMountA1WorkbookServices ? <A1WorkbookVideoHeader /> : null}
+      {canonicalA1Assignment?.layoutMode === "bridge" ? (
+        <A1SharedAssignmentWorkbookBridge assignmentKey={canonicalA1Assignment.assignmentKey} />
+      ) : null}
       <CourseBookLayoutStandardizer />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
-      {!useNativeA1WorkbookExperience ? <UniversalWorkbookLessonNavigator /> : null}
+      {!useCanonicalA1WorkbookExperience ? <UniversalWorkbookLessonNavigator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <ExamQuestionCheatSheetInjector />
