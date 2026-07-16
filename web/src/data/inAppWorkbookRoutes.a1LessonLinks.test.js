@@ -91,6 +91,22 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(workbookSource).not.toContain("Welche Buchstaben sagt sie?");
   });
 
+  it("keeps both A1 Day 13 teacher videos and uses the new recording as video 2", () => {
+    const teacherVideos = getA1TeacherVideoResources(13).filter(
+      (video) => String(video.chapter) === "3.5",
+    );
+
+    expect(teacherVideos.map((video) => video.url)).toEqual([
+      "https://youtu.be/eqSc_5p5uyQ",
+      "https://youtu.be/zizS5WdOYs8",
+    ]);
+    expect(teacherVideos[1]).toMatchObject({
+      videoNumber: 2,
+      key: "a1-day13-chapter-3-5-teacher-video-2",
+      title: "Revision: Numbers, Time and Prices · Teacher video 2",
+    });
+  });
+
   it("keeps all four A1 Day 4 resource-hub choices configured", () => {
     expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
     expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");

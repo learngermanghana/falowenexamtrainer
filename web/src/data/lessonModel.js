@@ -4,7 +4,11 @@ import {
   applyB2C1LessonVideoOverrides,
   getB2C1RadioResource,
 } from "./b2C1LessonMediaOverrides";
-import { LESSON_VIDEO_DICTIONARY, getLessonVideoResources } from "./lessonVideoDictionary";
+import {
+  LESSON_VIDEO_DICTIONARY,
+  getLessonVideoResources,
+  normalizeVideoResources,
+} from "./lessonVideoDictionary";
 import { getAdditionalLessonVideoResources } from "./additionalLessonVideoResources";
 import { applyA1LessonVideoResourceOverrides } from "./a1LessonVideoResourceOverrides";
 import { applyA1Day16LessonResourceFixes } from "./a1Day16LessonResourceFixes";
@@ -136,6 +140,48 @@ const resourceGroups = (raw, level, day) => {
   return dedupeResourceGroups(groups);
 };
 
+const getRawLessonResourceEntries = (rawLesson = {}) => {
+  const nested = [
+    ...list(rawLesson.schreiben_sprechen),
+    ...list(rawLesson.lesen_hören),
+  ].filter(Boolean);
+  return nested.length ? nested : [rawLesson];
+};
+
+const getExplicitTeacherUrlsByChapter = (rawLesson = {}) => {
+  const byChapter = new Map();
+
+  getRawLessonResourceEntries(rawLesson).forEach((entry) => {
+    normalizeVideoResources(entry)
+      .filter(isTeacherVideo)
+      .forEach((video) => {
+        const aliases = chapterAliases(video.chapter || entry.chapter || rawLesson.chapter);
+        aliases.forEach((chapter) => {
+          if (!byChapter.has(chapter)) byChapter.set(chapter, new Set());
+          byChapter.get(chapter).add(video.url);
+        });
+      });
+  });
+
+  return byChapter;
+};
+
+const preferExplicitA1TeacherVideos = ({ level, rawLesson, videos = [] }) => {
+  if (level !== "A1") return videos;
+  const explicitTeacherUrls = getExplicitTeacherUrlsByChapter(rawLesson);
+  if (!explicitTeacherUrls.size) return videos;
+
+  return videos.filter((video) => {
+    if (!isTeacherVideo(video)) return true;
+    const aliases = chapterAliases(video.chapter || rawLesson.chapter);
+    const matchingExplicitUrls = aliases
+      .map((chapter) => explicitTeacherUrls.get(chapter))
+      .filter(Boolean);
+    if (!matchingExplicitUrls.length) return true;
+    return matchingExplicitUrls.some((urls) => urls.has(video.url));
+  });
+};
+
 const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => {
   if (level !== "A1") return videos;
   const singleGroupChapter = groups.length === 1 ? chapterKey(groups[0]?.chapter) : "";
@@ -148,10 +194,20 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   const existingUrls = new Set(videos.map((video) => video?.url).filter(Boolean));
   const missingTeacherVideos = getA1TeacherVideoResources(day).filter((video) => {
     const chapter = chapterKey(video.chapter);
-    return !existingUrls.has(video.url) && !chaptersWithTeacher.has(chapter);
+    const isSupplemental = Number(video.videoNumber) > 1;
+    return (
+      !existingUrls.has(video.url) &&
+      (isSupplemental || !chaptersWithTeacher.has(chapter))
+    );
   });
+  const primaryTeacherVideos = missingTeacherVideos.filter(
+    (video) => Number(video.videoNumber) <= 1,
+  );
+  const supplementalTeacherVideos = missingTeacherVideos.filter(
+    (video) => Number(video.videoNumber) > 1,
+  );
 
-  return mergeVideos(missingTeacherVideos, videos);
+  return mergeVideos(primaryTeacherVideos, videos, supplementalTeacherVideos);
 };
 
 const shouldKeepTeacherVideo = ({ level, day, video }) => {
@@ -184,10 +240,15 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     getLessonVideoResources(level, day, rawLesson),
     getAdditionalLessonVideoResources(level, day),
   );
+  const preferredConfiguredVideos = preferExplicitA1TeacherVideos({
+    level,
+    rawLesson,
+    videos: configuredVideos,
+  });
   const allVideos = addMissingA1TeacherVideos({
     level,
     day,
-    videos: configuredVideos,
+    videos: preferredConfiguredVideos,
     groups,
   });
   const videos = scopeLessonVideosToSelectedChapters(removeHiddenTeacherVideos(level, day, allVideos), groups);
