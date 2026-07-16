@@ -17,11 +17,15 @@ describe("native stable A1 workbook experience", () => {
     ).toBe(true);
   });
 
-  test("does not disable the shared experience for other A1 workbooks", () => {
+  test("disables legacy injection for every registered shared workbook", () => {
     expect(
       shouldUseNativeA1WorkbookExperience(
         "/campus/course/a1-day-2-kapitel-1-1-workbook",
       ),
-    ).toBe(false);
+    ).toBe(true);
+  });
+
+  test("does not affect an unrelated A1 grammar page", () => {
+    expect(shouldUseNativeA1WorkbookExperience("/campus/course/a1-day-9-nominative-and-accusative-cases")).toBe(false);
   });
 });
