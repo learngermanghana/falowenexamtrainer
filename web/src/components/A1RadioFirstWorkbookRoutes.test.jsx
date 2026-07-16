@@ -5,6 +5,30 @@ import {
 } from "./A1RadioFirstWorkbookRoutes";
 
 describe("A1 route-scoped Falowen Radio", () => {
+  test.each([
+    [2, "Uru9bvr14mw", "a1-day2-chapter-1-1-falowen-radio"],
+    [3, "y9LhKQkjsqM", "a1-day3-chapter-1-1-falowen-radio"],
+  ])("uses the approved Day %i Kapitel 1.1 radio video", (day, youtubeId, key) => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        `/campus/course/lesson/A1/${day}`,
+        "?chapter=1.1",
+      ),
+    ).toEqual({ day, chapter: "1.1" });
+    expect(getA1RadioResource(day)).toEqual(
+      expect.objectContaining({ key, youtubeId }),
+    );
+  });
+
+  test.each([2, 3])("does not open Day %i radio for another chapter", (day) => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        `/campus/course/lesson/A1/${day}`,
+        "?chapter=1.2",
+      ),
+    ).toBeNull();
+  });
+
   test("uses the approved Day 13 revision video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
