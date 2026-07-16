@@ -2,7 +2,7 @@ import {
   isA1LetterWritingCourseBookPath,
   isA1LetterWritingGrammarPath,
   shouldAutoMountA1WritingPractice,
-} from "./A1CoursePracticeAutoMount";
+} from "../utils/a1CoursePracticeRoutes";
 
 describe("A1CoursePracticeAutoMount route ownership", () => {
   test("does not globally inject Mark My Letter into either letter-writing route", () => {
