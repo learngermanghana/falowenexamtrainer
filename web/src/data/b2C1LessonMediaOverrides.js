@@ -12,17 +12,29 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    8: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day8-reisen-mobilitaet-ai-video",
+          chapter: "2.3",
+          title: "B2 Day 8 · Reisen und Mobilität · AI video",
+          description:
+            "AI video lesson for comparing transport, travel choices and sustainable mobility at B2 level.",
+          url: "https://youtu.be/RjRBspPCmCY",
+        }),
+      ]),
+    }),
   }),
   C1: Object.freeze({
     10: Object.freeze({
       videoResources: Object.freeze([
         Object.freeze({
-          key: "c1-day10-passiv-modalpassiv-ai-video",
+          key: "c1-day10-integration-gesellschaft-ai-video",
           chapter: "2.5",
-          title: "C1 Day 10 · Passiv und Modalpassiv · AI video",
+          title: "C1 Day 10 · Integration und Gesellschaft · AI video",
           description:
-            "AI video lesson for using Passiv and Modalpassiv to evaluate integration and society in a differentiated way.",
-          url: "https://youtu.be/y2AK9UHVKN8",
+            "AI video lesson for discussing integration, participation and social cohesion in a differentiated way.",
+          url: "https://youtu.be/S_c9eIH-rzY",
         }),
       ]),
     }),
