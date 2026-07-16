@@ -8,9 +8,11 @@ const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
 
 export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
+  "/campus/course/a1-day-2-kapitel-1-1-workbook": Object.freeze({ day: 2, chapter: "1.1" }),
   "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook": Object.freeze({ day: 13 }),
   "/campus/course/letter-writing-intro-german-a1-day-12-3": Object.freeze({ day: 20, chapter: "12.3" }),
   "/campus/course/a1-day-21-weather-workbook": Object.freeze({ day: 21, chapter: "13" }),
+  "/campus/course/a1-day-22-health-and-body-parts-workbook": Object.freeze({ day: 22, chapter: "14.1" }),
 });
 
 const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
