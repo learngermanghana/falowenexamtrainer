@@ -38,7 +38,7 @@ const renderCanonicalRoute = ({
   );
 
 describe("A1CanonicalChapterLessonRoute", () => {
-  test("routes Kapitel 1.1 to its own workbook even when stale state says 0.2", async () => {
+  test("routes Kapitel 1.1 to its lesson resource hub even when stale state says 0.2", async () => {
     renderCanonicalRoute({
       pathname: "/campus/course/lesson/A1/chapter/1.1",
       state: {
@@ -48,18 +48,18 @@ describe("A1CanonicalChapterLessonRoute", () => {
     });
 
     expect(
-      await screen.findByText("/campus/course/a1-day-2-kapitel-1-1-workbook"),
+      await screen.findByText("/campus/course/lesson/A1/2?chapter=1.1&hub=1"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("state")).toHaveTextContent("state-cleared");
   });
 
-  test("routes Kapitel 0.2 to the alphabet workbook", async () => {
+  test("routes Kapitel 0.2 to the alphabet lesson resource hub", async () => {
     renderCanonicalRoute({
       pathname: "/campus/course/lesson/A1/chapter/0.2",
     });
 
     expect(
-      await screen.findByText("/campus/course/a1-day-2-german-alphabet-reviewing-workbook"),
+      await screen.findByText("/campus/course/lesson/A1/2?chapter=0.2&hub=1"),
     ).toBeInTheDocument();
   });
 
@@ -70,11 +70,11 @@ describe("A1CanonicalChapterLessonRoute", () => {
     });
 
     expect(
-      await screen.findByText("/campus/course/a1-day-2-kapitel-1-1-workbook"),
+      await screen.findByText("/campus/course/lesson/A1/2?chapter=1.1&hub=1"),
     ).toBeInTheDocument();
   });
 
-  test("preserves required workbook and optional route query parameters", async () => {
+  test("preserves optional route query parameters on the resource hub", async () => {
     renderCanonicalRoute({
       pathname: "/campus/course/lesson/A1/chapter/12.1",
       search: "?radio=done&source=coursebook",
@@ -82,7 +82,7 @@ describe("A1CanonicalChapterLessonRoute", () => {
 
     expect(
       await screen.findByText(
-        "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook&radio=done&source=coursebook",
+        "/campus/course/lesson/A1/18?chapter=12.1&radio=done&source=coursebook&hub=1",
       ),
     ).toBeInTheDocument();
   });
@@ -95,12 +95,12 @@ describe("A1CanonicalChapterLessonRoute", () => {
     expect(await screen.findByText("/campus/course")).toBeInTheDocument();
   });
 
-  test("destination resolution is chapter-owned and does not accept navigation state", () => {
+  test("destination resolution is chapter-owned and opens the hub rather than the workbook", () => {
     expect(getA1CanonicalChapterDestination({ chapter: "1.1" })).toBe(
-      "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      "/campus/course/lesson/A1/2?chapter=1.1&hub=1",
     );
     expect(getA1CanonicalChapterDestination({ chapter: "0.2" })).toBe(
-      "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+      "/campus/course/lesson/A1/2?chapter=0.2&hub=1",
     );
   });
 });
