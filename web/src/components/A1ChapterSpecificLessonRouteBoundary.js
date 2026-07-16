@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { getA1CanonicalLesson } from "../data/a1CanonicalLessonCatalog";
+import { getA1CanonicalLessonForLegacyRoute } from "../data/a1CanonicalLessonCatalog";
 import {
   getA1LegacyLessonDay,
   getA1RequestedChapterFromSearch,
@@ -12,8 +12,11 @@ export const getA1LegacyChapterLessonRedirect = ({ pathname = "", search = "" } 
   const requestedChapter = getA1RequestedChapterFromSearch(search);
   if (!legacyDay || !requestedChapter) return null;
 
-  const lesson = getA1CanonicalLesson(requestedChapter);
-  if (!lesson || Number(lesson.day) !== Number(legacyDay)) return null;
+  const lesson = getA1CanonicalLessonForLegacyRoute({
+    day: legacyDay,
+    identity: requestedChapter,
+  });
+  if (!lesson) return null;
 
   return {
     pathname: lesson.lessonRoute,
