@@ -77,6 +77,20 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
+  it("keeps Day 2 Chapter 1.1 separate from the Chapter 0.2 alphabet content", () => {
+    const workbookSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/A1Day2Kapitel11WorkbookPage.js"),
+      "utf8",
+    );
+
+    expect(workbookSource).toContain("Personal Pronouns and Verb Conjugation");
+    expect(workbookSource).toContain('fallbackAssignmentKey="A1-1.1"');
+    expect(workbookSource).toContain("Teil 1 · Personalpronomen");
+    expect(workbookSource).toContain("Teil 2 · Verben konjugieren");
+    expect(workbookSource).toContain("ich lerne · du lernst · er/sie/es lernt");
+    expect(workbookSource).not.toContain("Welche Buchstaben sagt sie?");
+  });
+
   it("keeps all four A1 Day 4 resource-hub choices configured", () => {
     expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
     expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");
