@@ -1,5 +1,7 @@
 import {
+  getA1CorrectedChapterSpecificLessonSearch,
   getA1LessonStateChapter,
+  getA1LessonStateIdentityChapter,
   getA1LessonStateResourceChapters,
   getA1RequestedLessonChapter,
   shouldResetA1ChapterSpecificLessonState,
@@ -36,6 +38,49 @@ describe("A1 chapter-specific lesson state", () => {
       ).toBe(true);
     },
   );
+
+  it("corrects the exact reported Day 2 bug from chapter 1.1 back to the clicked A1-0.2 card", () => {
+    expect(
+      getA1CorrectedChapterSpecificLessonSearch({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=1.1",
+        state: {
+          assignmentKey: "A1-0.2",
+          entry: {
+            assignmentId: "A1-0.2",
+            title: "German Alphabet",
+            chapter: "0.2",
+            lesen_hören: { chapter: "0.2" },
+          },
+        },
+      }),
+    ).toBe("?chapter=0.2");
+  });
+
+  it("keeps Kapitel 1.1 when the clicked card identity is A1-1.1", () => {
+    expect(
+      getA1CorrectedChapterSpecificLessonSearch({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=1.1",
+        state: {
+          assignmentKey: "A1-1.1",
+          entry: { assignmentId: "A1-1.1", chapter: "1.1" },
+        },
+      }),
+    ).toBe("");
+  });
+
+  it("preserves unrelated query parameters while correcting the chapter", () => {
+    expect(
+      getA1CorrectedChapterSpecificLessonSearch({
+        pathname: "/campus/course/lesson/A1/2",
+        search: "?chapter=1.1&source=coursebook",
+        state: {
+          entry: { lessonId: "A1-0.2", chapter: "0.2" },
+        },
+      }),
+    ).toBe("?chapter=0.2&source=coursebook");
+  });
 
   it("keeps correctly scoped Day 2 Chapter 0.2 state without remounting the page", () => {
     expect(
@@ -115,9 +160,10 @@ describe("A1 chapter-specific lesson state", () => {
     ).toBe(false);
   });
 
-  it("normalizes requested, state and nested resource chapters", () => {
+  it("normalizes requested, identity, state and nested resource chapters", () => {
     expect(getA1RequestedLessonChapter("?chapter=12.2")).toBe("12.2");
     expect(getA1LessonStateChapter({ entry: { displayChapter: "10" } })).toBe("10");
+    expect(getA1LessonStateIdentityChapter({ entry: { assignmentId: "A1-0.2" } })).toBe("0.2");
     expect(
       getA1LessonStateResourceChapters({
         entry: {
