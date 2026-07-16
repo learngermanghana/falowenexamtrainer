@@ -9,6 +9,7 @@ const LEVELS = ["A1", "A2", "B1", "B2", "C1"];
 const HOST_ID = "falowen-universal-workbook-navigation";
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
 
 const normalizeCourseDestination = (value = "") => {
   const raw = String(value || "").trim();
@@ -37,25 +38,26 @@ const destinationParts = (destination = "") => {
   }
 };
 
-const lessonResources = (entry = {}) => [
-  entry,
-  ...toArray(entry.lesen_hören),
-  ...toArray(entry.schreiben_sprechen),
-];
+const navigationResources = (entry = {}) => {
+  const resources = [
+    ...toArray(entry.schreiben_sprechen),
+    ...toArray(entry.lesen_hören),
+  ].filter((resource) => resource && typeof resource === "object");
 
-const resolveEntryDestination = (level, entry = {}) => {
-  for (const resource of lessonResources(entry)) {
-    const chapter = resource?.chapter || entry?.chapter || "";
-    const fallback = resource?.workbook_link || resource?.workbookRoute || "";
-    const resolved = resolveStrictInAppWorkbookRoute({
-      level,
-      day: entry?.day,
-      chapter,
-      fallback,
-    });
-    const destination = normalizeCourseDestination(resolved);
-    if (destination) return destination;
-  }
+  return resources.length ? resources : [entry];
+};
+
+const resolveResourceDestination = (level, entry = {}, resource = {}) => {
+  const chapter = resource?.chapter || entry?.chapter || "";
+  const fallback = resource?.workbook_link || resource?.workbookRoute || entry?.workbook_link || entry?.workbookRoute || "";
+  const resolved = resolveStrictInAppWorkbookRoute({
+    level,
+    day: entry?.day,
+    chapter,
+    fallback,
+  });
+  const destination = normalizeCourseDestination(resolved);
+  if (destination) return destination;
 
   const day = Number(entry?.day);
   if (["B1", "B2", "C1"].includes(level) && Number.isFinite(day)) {
@@ -70,23 +72,40 @@ export const buildWorkbookNavigationEntries = (schedules = courseSchedules) => {
 
   LEVELS.forEach((level) => {
     const seenDestinations = new Set();
-    byLevel[level] = toArray(schedules?.[level])
-      .map((entry, index) => {
-        const destination = resolveEntryDestination(level, entry);
+    const entries = [];
+
+    toArray(schedules?.[level]).forEach((entry, scheduleIndex) => {
+      navigationResources(entry).forEach((resource, resourceIndex) => {
+        const destination = resolveResourceDestination(level, entry, resource);
         const destinationKey = destination.toLowerCase();
-        if (!destination || seenDestinations.has(destinationKey)) return null;
+        if (!destination || seenDestinations.has(destinationKey)) return;
         seenDestinations.add(destinationKey);
 
-        return {
+        const day = Number(entry?.day);
+        const chapter = String(resource?.chapter || entry?.chapter || "").trim();
+        const title = String(
+          resource?.topic ||
+            resource?.title ||
+            resource?.assignmentTitle ||
+            entry?.topic ||
+            entry?.title ||
+            `Day ${entry?.day}`
+        ).trim();
+
+        entries.push({
           level,
-          index,
-          day: Number(entry?.day),
-          chapter: String(entry?.chapter || "").trim(),
-          title: String(entry?.topic || entry?.title || `Day ${entry?.day}`).trim(),
+          index: entries.length,
+          scheduleIndex,
+          resourceIndex,
+          day,
+          chapter,
+          title,
           destination,
-        };
-      })
-      .filter(Boolean);
+        });
+      });
+    });
+
+    byLevel[level] = entries;
   });
 
   return byLevel;
@@ -121,7 +140,13 @@ export const resolveWorkbookNavigation = ({ pathname = "", search = "", schedule
     if (genericMatch) {
       currentLevel = genericMatch[1].toUpperCase();
       const day = Number(genericMatch[2]);
-      currentIndex = entriesByLevel[currentLevel].findIndex((entry) => entry.day === day);
+      const requestedChapter = normalizeChapter(new URLSearchParams(search || "").get("chapter"));
+      currentIndex = entriesByLevel[currentLevel].findIndex(
+        (entry) => entry.day === day && (!requestedChapter || normalizeChapter(entry.chapter) === requestedChapter)
+      );
+      if (currentIndex < 0) {
+        currentIndex = entriesByLevel[currentLevel].findIndex((entry) => entry.day === day);
+      }
     }
   }
 
