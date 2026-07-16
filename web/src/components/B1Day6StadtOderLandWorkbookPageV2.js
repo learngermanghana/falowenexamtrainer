@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -149,7 +149,7 @@ export default function B1Day6StadtOderLandWorkbookPageV2() {
           </WorkbookTaskCard>
           <div className="b1-day6-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
             <style>{`.b1-day6-submission-page > div > section:first-child { display: none !important; }.b1-day6-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 6, assignmentKey: "B1-2.6", canonicalAssignmentKey: "B1-2.6" }} />
+            <ContextualAssignmentSubmissionPage submissionContext={{ level: "B1", day: 6, assignmentKey: "B1-2.6", canonicalAssignmentKey: "B1-2.6" }} />
           </div>
         </section>
       )}
