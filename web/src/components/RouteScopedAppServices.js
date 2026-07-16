@@ -17,6 +17,7 @@ import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import UniversalWorkbookLessonNavigator from "./UniversalWorkbookLessonNavigator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
+import B1WorkbookSubmissionContextSync from "./B1WorkbookSubmissionContextSync";
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
 import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
@@ -214,6 +215,7 @@ export default function RouteScopedAppServices() {
       <A2CourseBookOrientationVideoInjector />
       <A2LegacyStandardWorkbookNavigation />
       <A2ProtectedWorkbookRouteGuard />
+      <B1WorkbookSubmissionContextSync />
       <A1UnifiedTutorWorkbookNavigation />
       <A1WorkbookVideoHeader />
       <CourseBookLayoutStandardizer />
