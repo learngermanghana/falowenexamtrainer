@@ -1,7 +1,7 @@
 export const GHANA_TIMEZONE = "Africa/Accra";
 
-const CACHE_PREFIX = "falowen:live-class-summary:v1:";
-const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const CACHE_PREFIX = "falowen:live-class-summary:v2:";
+const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
 const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
 export const asLiveClassDate = (value) => {
@@ -24,7 +24,19 @@ export const liveClassAssignmentLabel = (session = {}) => liveClassCurriculumIds
 export const liveClassTopic = (session = {}, fallback = "Live class") =>
   String(session.topic || session.title || liveClassAssignmentLabel(session) || fallback).replace(/\s+/g, " ").trim();
 
+const curriculumLevel = (session = {}) =>
+  liveClassCurriculumIds(session).join(" ").match(/\b(A1|A2|B1|B2|C1|C2)\b/i)?.[1]?.toUpperCase() || "";
+
+const a1CurriculumDay = (session = {}) => {
+  if (curriculumLevel(session) !== "A1") return null;
+  const day = Number(session.curriculumDay);
+  return Number.isInteger(day) && day >= 0 ? day : null;
+};
+
 export const liveClassLessonNumber = (session = {}) => {
+  const directA1Day = a1CurriculumDay(session);
+  if (directA1Day !== null) return directA1Day;
+
   const topic = liveClassTopic(session, "");
   const explicit = topic.match(/\b(?:day|lesson|session)\s*(\d+)\b/i)?.[1];
   if (explicit !== undefined) return Number(explicit);
@@ -39,6 +51,10 @@ export const liveClassLessonNumber = (session = {}) => {
 };
 
 export const liveClassLessonLabel = (session = {}, level = "") => {
+  const resolvedLevel = String(level || curriculumLevel(session)).trim().toUpperCase();
+  const number = liveClassLessonNumber(session);
+  if (resolvedLevel === "A1" && number !== null) return `Day ${number}`;
+
   const topic = liveClassTopic(session, "");
   const prefix = topic.match(/\b(day|lesson|session)\s*(\d+)\b/i);
   if (prefix) {
@@ -46,9 +62,8 @@ export const liveClassLessonLabel = (session = {}, level = "") => {
     return `${noun} ${prefix[2]}`;
   }
 
-  const number = liveClassLessonNumber(session);
-  if (number === null) return level || "Live class";
-  return String(level || "").toUpperCase() === "A1" && number === 0 ? "Day 0" : `Lesson ${number}`;
+  if (number === null) return resolvedLevel || "Live class";
+  return `Lesson ${number}`;
 };
 
 export const liveClassCleanTitle = (session = {}) => {
@@ -143,26 +158,52 @@ export const upcomingLiveClassSessions = (summary = {}, selectedSession = null, 
     .slice(0, limit);
 };
 
+const normalizeCacheIdentity = (value = "") => String(value || "").trim().toLowerCase();
+
 const cacheKey = ({ classId = "", className = "" } = {}) => {
-  const identity = String(classId || className || "unknown").trim().toLowerCase();
+  const identity = normalizeCacheIdentity(classId || className || "unknown");
   return `${CACHE_PREFIX}${encodeURIComponent(identity)}`;
+};
+
+const cachedSummaryMatchesIdentity = ({ classId = "", className = "" } = {}, summary = {}) => {
+  const requestedClassId = normalizeCacheIdentity(classId);
+  if (requestedClassId) {
+    const cachedIds = [summary?.klass?.id, summary?.klass?.classId]
+      .map(normalizeCacheIdentity)
+      .filter(Boolean);
+    return cachedIds.includes(requestedClassId);
+  }
+
+  const requestedClassName = normalizeCacheIdentity(className);
+  if (!requestedClassName) return true;
+  const cachedNames = [summary?.klass?.name, summary?.klass?.className]
+    .map(normalizeCacheIdentity)
+    .filter(Boolean);
+  return cachedNames.includes(requestedClassName);
 };
 
 export const loadLiveClassSummaryCache = (identity = {}) => {
   if (typeof window === "undefined") return null;
+  const key = cacheKey(identity);
   try {
-    const raw = window.localStorage.getItem(cacheKey(identity));
+    const raw = window.localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed?.summary || Date.now() - Number(parsed.cachedAt || 0) > CACHE_MAX_AGE_MS) return null;
+    const expired = Date.now() - Number(parsed.cachedAt || 0) > CACHE_MAX_AGE_MS;
+    const wrongClass = !cachedSummaryMatchesIdentity(identity, parsed?.summary);
+    if (!parsed?.summary || expired || wrongClass) {
+      window.localStorage.removeItem(key);
+      return null;
+    }
     return { ...parsed.summary, cachedAt: parsed.cachedAt, isCachedSummary: true };
   } catch {
+    window.localStorage.removeItem(key);
     return null;
   }
 };
 
 export const saveLiveClassSummaryCache = (identity = {}, summary = null) => {
-  if (typeof window === "undefined" || !summary) return;
+  if (typeof window === "undefined" || !summary || !cachedSummaryMatchesIdentity(identity, summary)) return;
   try {
     window.localStorage.setItem(cacheKey(identity), JSON.stringify({ cachedAt: Date.now(), summary }));
   } catch {

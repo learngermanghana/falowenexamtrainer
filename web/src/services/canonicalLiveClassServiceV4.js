@@ -15,6 +15,8 @@ export {
   normalizeCurriculumIds,
 } from "./canonicalLiveClassServiceV3";
 
+const OFFICIAL_CURRICULUM_SOURCE = "coursedictionarydaygroups";
+
 function toDate(value) {
   if (!value) return null;
   if (typeof value?.toDate === "function") return value.toDate();
@@ -29,9 +31,28 @@ function curriculumIndex(value) {
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
 }
 
+function normalizedCurriculumSource(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function canonicalCurriculumIndex(data = {}) {
+  const storedIndex = curriculumIndex(data.curriculumIndex);
+  if (storedIndex === null) return { storedIndex: null, canonicalIndex: null };
+
+  const isOfficialOneBasedIndex =
+    normalizedCurriculumSource(data.curriculumSource) === OFFICIAL_CURRICULUM_SOURCE
+    && Number(data.curriculumVersion || 0) >= 2;
+
+  return {
+    storedIndex,
+    canonicalIndex: isOfficialOneBasedIndex && storedIndex > 0 ? storedIndex - 1 : storedIndex,
+  };
+}
+
 function normalizeSession(snapshot) {
   const data = snapshot.data();
   const assignmentIds = base.normalizeCurriculumIds(data);
+  const { storedIndex, canonicalIndex } = canonicalCurriculumIndex(data);
   return {
     id: snapshot.id,
     ...data,
@@ -40,7 +61,8 @@ function normalizeSession(snapshot) {
     assignmentIds,
     chapterIds: assignmentIds,
     curriculumIds: assignmentIds,
-    curriculumIndex: curriculumIndex(data.curriculumIndex),
+    curriculumIndex: canonicalIndex,
+    storedCurriculumIndex: storedIndex,
     curriculumSource: String(data.curriculumSource || "").trim(),
     curriculumVersion: Number(data.curriculumVersion || 0),
   };
@@ -51,6 +73,17 @@ async function loadZoomProfile(klass) {
   if (!profileId || !db) return null;
   const snap = await getDoc(doc(db, "zoomProfiles", profileId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+async function findPreferredCanonicalClass({ classId, className, slug } = {}) {
+  const directClassId = String(classId || "").trim();
+  if (directClassId && db) {
+    const directSnapshot = await getDoc(doc(db, "classes", directClassId));
+    if (directSnapshot.exists()) {
+      return { id: directSnapshot.id, ...directSnapshot.data() };
+    }
+  }
+  return base.findCanonicalClass({ classId, className, slug });
 }
 
 function canonicalSessionLookups(klass = {}) {
@@ -82,7 +115,7 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
 
   (async () => {
     try {
-      const klass = await base.findCanonicalClass({ classId, className, slug });
+      const klass = await findPreferredCanonicalClass({ classId, className, slug });
       if (stopped) return;
       if (!klass) {
         onUnavailable?.();
@@ -125,3 +158,9 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
     unsubscribe.forEach((stop) => stop());
   };
 }
+
+export const __private__ = {
+  canonicalCurriculumIndex,
+  findPreferredCanonicalClass,
+  normalizeSession,
+};
