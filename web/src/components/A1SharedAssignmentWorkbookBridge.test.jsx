@@ -1,3 +1,5 @@
+jest.mock("./A1CanonicalSubmissionPanel", () => () => null);
+
 import { discoverA1BridgeSections } from "./A1SharedAssignmentWorkbookBridge";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
