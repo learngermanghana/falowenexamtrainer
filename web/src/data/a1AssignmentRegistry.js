@@ -34,7 +34,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
 const records = [
   ["A1-0.1", 1, "0.1", "Greetings and Asking About Well-being", "/campus/course/a1-day-1-greetings-workbook", "A1Day1GreetingsWorkbookPage", ["Teil 1 · Reading Text", "Teil 2 · Multiple-Choice Questions"]],
   ["A1-0.2", 2, "0.2", "German Alphabet", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", "A1Day3GermanAlphabetReviewingWorkbookPage", ["Teil 1 · Reading and Writing", "Teil 2 · Questions", "Teil 3 · Hören"]],
-  ["A1-1.1", 2, "1.1", "Personal Pronouns and Verb Conjugation", "/campus/course/a1-day-2-kapitel-1-1-workbook", "A1Day2Kapitel11WorkbookPage", ["Teil 1 · Personalpronomen", "Teil 2 · Verben konjugieren", "Teil 3 · Sätze ergänzen", "Teil 4 · Fehler korrigieren", "Teil 5 · Kurzer Text"]],
+  ["A1-1.1", 2, "1.1", "Personal Pronouns and Verb Conjugation", "/campus/course/a1-day-2-kapitel-1-1-workbook", "A1Day2Kapitel11WorkbookPage", ["Teil 1 · Hören", "Teil 2 · Schreiben"]],
   ["A1-1.2", 3, "1.2", "Personal Pronouns and Verb Conjugation", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", "A1Day3PronounsIntroducingYourselfWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Schreiben (Exercise)", "Teil 3 · Hören"]],
   ["A1-2", 4, "2", "Numbers", "/campus/course/a1-day-4-numbers-for-beginners-workbook", "A1Day4NumbersForBeginnersWorkbookPage", ["Teil 1: Reading / Writing", "Teil 2: Questions"]],
   ["A1-3", 7, "3", "Asking About Prices", "/campus/course/a1-chapter-3-asking-about-prices-workbook", "A1Chapter3AskingAboutPricesWorkbookPage", ["Teil 1: Preise und Kosten (Exercise 1)", "Teil 2: Writing About Family (Exercise 2)", "Teil 3: Hobbys (Exercise 3)"]],
@@ -105,7 +105,8 @@ export const getA1AssignmentNeighbors = (assignmentKey) => {
   return {
     previous: index > 0 ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index - 1]] : null,
     next: index >= 0 && index < A1_ASSIGNMENT_ORDER.length - 1
-      ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index + 1]] : null,
+      ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index + 1]]
+      : null,
   };
 };
 
