@@ -154,11 +154,16 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1Day20LetterWritingWorkbookPage.test.js
-      - name: Test task-scoped A1 letter marker
+      - name: Test A1 letter marker panel
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1CourseBookLetterPracticePanel.test.js src/services/writingProgressService.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1CourseBookLetterPracticePanel.test.js
+      - name: Test task-scoped writing progress IDs
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/writingProgressService.test.js
       - name: Test A1 letter marker prompt contract
         working-directory: functions/functionz
         run: node prompts.courseTask.test.js
