@@ -148,10 +148,20 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   const existingUrls = new Set(videos.map((video) => video?.url).filter(Boolean));
   const missingTeacherVideos = getA1TeacherVideoResources(day).filter((video) => {
     const chapter = chapterKey(video.chapter);
-    return !existingUrls.has(video.url) && !chaptersWithTeacher.has(chapter);
+    const isSupplemental = Number(video.videoNumber) > 1;
+    return (
+      !existingUrls.has(video.url) &&
+      (isSupplemental || !chaptersWithTeacher.has(chapter))
+    );
   });
+  const primaryTeacherVideos = missingTeacherVideos.filter(
+    (video) => Number(video.videoNumber) <= 1,
+  );
+  const supplementalTeacherVideos = missingTeacherVideos.filter(
+    (video) => Number(video.videoNumber) > 1,
+  );
 
-  return mergeVideos(missingTeacherVideos, videos);
+  return mergeVideos(primaryTeacherVideos, videos, supplementalTeacherVideos);
 };
 
 const shouldKeepTeacherVideo = ({ level, day, video }) => {
