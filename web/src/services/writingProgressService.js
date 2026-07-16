@@ -18,10 +18,20 @@ const MAX_ATTEMPT_PAGE_SIZE = 50;
 
 const normalizeOwnerKey = (value = "") => value.trim().toLowerCase();
 
-const buildDocId = ({ userId, studentCode, mode } = {}) => {
+const normalizeWorkspaceKey = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+
+const buildDocId = ({ userId, studentCode, mode, workspaceKey } = {}) => {
   const owner = normalizeOwnerKey(studentCode) || normalizeOwnerKey(userId);
   if (!owner) return "";
-  return `${owner}__${mode || "course"}`;
+  const baseId = `${owner}__${mode || "course"}`;
+  const workspace = normalizeWorkspaceKey(workspaceKey);
+  return workspace ? `${baseId}__${workspace}` : baseId;
 };
 
 const timestampToMillis = (value) => {
@@ -41,8 +51,9 @@ export const loadWritingProgress = async ({
   userId,
   studentCode,
   mode,
+  workspaceKey,
 } = {}) => {
-  const docId = buildDocId({ userId, studentCode, mode });
+  const docId = buildDocId({ userId, studentCode, mode, workspaceKey });
   if (!docId) return null;
 
   if (!isFirebaseConfigured || !db) {
@@ -66,15 +77,17 @@ export const saveWritingProgress = async ({
   userId,
   studentCode,
   mode,
+  workspaceKey,
   data,
 } = {}) => {
-  const docId = buildDocId({ userId, studentCode, mode });
+  const docId = buildDocId({ userId, studentCode, mode, workspaceKey });
   if (!docId || !userId) return false;
   const payload = {
     ...data,
     userId,
     studentCode: studentCode || null,
     mode: mode || "course",
+    workspaceKey: normalizeWorkspaceKey(workspaceKey) || null,
     updatedAt: new Date().toISOString(),
   };
 
@@ -101,9 +114,10 @@ export const saveWritingAttempt = async ({
   userId,
   studentCode,
   mode,
+  workspaceKey,
   attempt,
 } = {}) => {
-  const ownerId = buildDocId({ userId, studentCode, mode });
+  const ownerId = buildDocId({ userId, studentCode, mode, workspaceKey });
   if (!ownerId || !userId || !attempt || !isFirebaseConfigured || !db) {
     return false;
   }
@@ -118,6 +132,7 @@ export const saveWritingAttempt = async ({
         userId,
         studentCode: studentCode || null,
         mode: mode || "course",
+        workspaceKey: normalizeWorkspaceKey(workspaceKey) || null,
         createdAt: attempt.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp(),
       },
@@ -125,7 +140,7 @@ export const saveWritingAttempt = async ({
     );
     return true;
   } catch (error) {
-    console.error("Failed to save writing attempt to Firebase", error);
+    console.error("Failed to save writing attempt", error);
     return false;
   }
 };
@@ -134,12 +149,13 @@ export const loadWritingAttempts = async ({
   userId,
   studentCode,
   mode,
+  workspaceKey,
   pageSize = DEFAULT_ATTEMPT_PAGE_SIZE,
   level,
   lessonId,
   workbookId,
 } = {}) => {
-  const ownerId = buildDocId({ userId, studentCode, mode });
+  const ownerId = buildDocId({ userId, studentCode, mode, workspaceKey });
   if (!ownerId || !userId || !isFirebaseConfigured || !db) return [];
 
   try {
@@ -174,4 +190,9 @@ export const loadWritingAttempts = async ({
     console.error("Failed to load writing attempts from Firebase", error);
     return [];
   }
+};
+
+export const __TESTING__ = {
+  buildDocId,
+  normalizeWorkspaceKey,
 };

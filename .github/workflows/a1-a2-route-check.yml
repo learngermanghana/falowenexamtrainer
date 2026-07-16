@@ -3,6 +3,8 @@ name: A1 A2 workbook routes
 on:
   pull_request:
     paths:
+      - "functions/functionz/prompts.js"
+      - "functions/functionz/prompts.courseTask.test.js"
       - "web/src/data/inAppWorkbookRoutes.json"
       - "web/src/data/inAppWorkbookRoutes.js"
       - "web/src/data/inAppWorkbookRoutes.a1LessonLinks.test.js"
@@ -12,6 +14,7 @@ on:
       - "web/src/data/a1AssignmentRegistry.js"
       - "web/src/data/a1AssignmentRegistry.test.js"
       - "web/src/data/a1CourseBookCards.js"
+      - "web/src/data/a1Day20LetterWritingRoutes.js"
       - "web/src/data/a1RadioResources.js"
       - "web/src/data/b2C1LessonMediaOverrides.js"
       - "web/src/data/writingVideoResources.js"
@@ -21,11 +24,14 @@ on:
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/data/additionalA2RadioEntries.js"
+      - "web/src/services/writingProgressService.js"
+      - "web/src/services/writingProgressService.test.js"
       - "web/src/utils/courseWorkbookRoutes.js"
       - "web/src/utils/courseBookProgression.js"
       - "web/src/utils/courseBookProgression.test.js"
       - "web/src/utils/a1ChapterSpecificLessonState.js"
       - "web/src/utils/a1ChapterSpecificLessonState.test.js"
+      - "web/src/utils/a1CoursePracticeRoutes.js"
       - "web/src/utils/a1NativeWorkbookExperience.js"
       - "web/src/utils/a1NativeWorkbookExperience.test.js"
       - "web/src/utils/a1WorkbookServiceScope.js"
@@ -38,9 +44,17 @@ on:
       - "web/src/components/A1TutorMarkedWorkbookShell.test.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
+      - "web/src/components/A1CourseBookLetterPracticePanel.js"
+      - "web/src/components/A1CourseBookLetterPracticePanel.test.js"
+      - "web/src/components/A1CoursePracticeAutoMount.js"
+      - "web/src/components/A1CoursePracticeAutoMount.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "web/src/components/A1Day3GermanAlphabetReviewingWorkbookPage.js"
       - "web/src/components/A1Day1RadioRegression.test.js"
+      - "web/src/components/A1Day20LetterWritingWorkbookPage.js"
+      - "web/src/components/A1Day20LetterWritingWorkbookPage.test.js"
+      - "web/src/components/A1Day20Chapter123DirectWorkbookRoute.js"
+      - "web/src/components/A1Day20Chapter123DirectWorkbookRoute.test.js"
       - "web/src/components/A1Day21WeatherWorkbookPage.js"
       - "web/src/components/A1Day21WeatherWorkbookPage.test.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
@@ -135,6 +149,34 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js src/components/A1TutorMarkedWorkbookShell.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1UnifiedTutorWorkbookNavigation.test.js
+      - name: Test A1 letter-writing shared navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20LetterWritingWorkbookPage.test.js
+      - name: Test A1 letter marker panel
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1CourseBookLetterPracticePanel.test.js
+      - name: Test task-scoped writing progress IDs
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/services/writingProgressService.test.js
+      - name: Test A1 letter marker prompt contract
+        working-directory: functions/functionz
+        run: node prompts.courseTask.test.js
+      - name: Test A1 letter-writing direct route
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20Chapter123DirectWorkbookRoute.test.js
+      - name: Test A1 letter practice ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1CoursePracticeAutoMount.test.js
       - name: Test submission word-count feedback and A1 mobile safeguards
         working-directory: web
         env:

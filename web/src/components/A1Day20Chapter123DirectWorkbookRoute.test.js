@@ -1,89 +1,45 @@
 import fs from "fs";
 import path from "path";
-import { A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH } from "./A1Day20Chapter123DirectWorkbookRoute";
-import { getA1TeilNumber } from "./A1WorkbookSectionTabs";
+import {
+  A1_DAY20_CHAPTER123_GRAMMAR_ROUTE,
+  A1_DAY20_CHAPTER123_LESSON_ROUTE,
+  A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
+} from "../data/a1Day20LetterWritingRoutes";
 import inAppWorkbookRoutes from "../data/inAppWorkbookRoutes.json";
 
-const readIndexSource = () =>
-  fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
-
-const readComponentSource = (fileName) =>
+const readSource = (fileName) =>
   fs.readFileSync(path.resolve(__dirname, fileName), "utf8");
 
 describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
-  it("keeps the Course Book mapping and registered direct route identical", () => {
-    expect(A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH).toBe(
+  test("keeps the canonical grammar, workbook and lesson URLs", () => {
+    expect(A1_DAY20_CHAPTER123_GRAMMAR_ROUTE).toBe(
+      "/campus/course/letter-writing-intro-12-3",
+    );
+    expect(A1_DAY20_CHAPTER123_WORKBOOK_ROUTE).toBe(
       "/campus/course/letter-writing-intro-german-a1-day-12-3",
     );
+    expect(A1_DAY20_CHAPTER123_LESSON_ROUTE).toBe(
+      "/campus/course/lesson/A1/20?chapter=12.3",
+    );
     expect(inAppWorkbookRoutes.A1["20"]["12.3"]).toBe(
-      A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH,
-    );
-
-    const indexSource = readIndexSource();
-    expect(indexSource).toContain(
-      "path={A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH}",
-    );
-    expect(indexSource).toContain(
-      "element={<A1Day20Chapter123DirectWorkbookRoute />}",
+      A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
     );
   });
 
-  it("renders the letter-writing workbook through the same direct shell pattern as Day 11", () => {
-    const routeSource = readComponentSource(
-      "A1Day20Chapter123DirectWorkbookRoute.js",
-    );
+  test("registers and renders the dedicated A1 letter workbook", () => {
+    const indexSource = readSource("../index.jsx");
+    const routeSource = readSource("A1Day20Chapter123DirectWorkbookRoute.js");
 
+    expect(indexSource).toMatch(
+      /path=\{A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH\}[\s\S]*element=\{<A1Day20Chapter123DirectWorkbookRoute\s*\/>\}/,
+    );
     expect(routeSource).toContain(
-      'import LetterWritingIntroPage from "./LetterWritingIntroPage"',
+      'import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage"',
     );
-    expect(routeSource).toContain("<main className=\"layout-main\"");
-    expect(routeSource).toContain("<LetterWritingIntroPage />");
-  });
-
-  it("formats both letters as Teil sections for the unified A1 tutor navigation", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
-
-    expect(pageSource).toContain(
-      "Teil 1 · Informal letter: Birthday message",
+    expect(routeSource).toContain(
+      "A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH =",
     );
-    expect(pageSource).toContain(
-      "Teil 2 · Formal letter: Enquiry to a language school",
-    );
-    expect(getA1TeilNumber("Teil 1 · Informal letter: Birthday message")).toBe(1);
-    expect(getA1TeilNumber("Teil 2 · Formal letter: Enquiry to a language school")).toBe(2);
-    expect(pageSource).toContain(
-      "Overview</strong>, <strong>Teil 1</strong>",
-    );
-  });
-
-  it("uses the approved direct formal and informal structure instead of tables", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
-
-    expect(pageSource).toContain("Formal Letter Structure");
-    expect(pageSource).toContain("Informal Letter Structure");
-    expect(pageSource).toContain(
-      "Ich freue mich im Voraus auf Ihre Antwort.",
-    );
-    expect(pageSource).toContain(
-      "Ich freue mich im Voraus auf deine Antwort.",
-    );
-    expect(pageSource).toContain('data-compact-letter-hero="true"');
-    expect(pageSource).not.toContain("ComparisonTable");
-    expect(pageSource).not.toContain("Form field");
-  });
-
-  it("keeps the special grammar and workbook routes linked to the exact lesson hub", () => {
-    const pageSource = readComponentSource("LetterWritingIntroPage.js");
-    const backButtonSource = readComponentSource("navigation/AppBackButton.jsx");
-
-    expect(pageSource).toContain(
-      '"/campus/course/lesson/A1/20?chapter=12.3"',
-    );
-    expect(backButtonSource).toContain(
-      'index.set("/campus/course/letter-writing-intro-12-3", a1Day20Chapter123Lesson)',
-    );
-    expect(backButtonSource).toContain(
-      '"/campus/course/letter-writing-intro-german-a1-day-12-3"',
-    );
+    expect(routeSource).toContain("A1_DAY20_CHAPTER123_WORKBOOK_ROUTE");
+    expect(routeSource).toContain("<A1Day20LetterWritingWorkbookPage />");
   });
 });

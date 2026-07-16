@@ -184,9 +184,24 @@ const frenchIdeasPrompt = (level) =>
     `Keep it practical for a ${level} learner and end each reply with 'Your next recommended step:'.`
   );
 
+const getCourseTaskInstruction = (submissionContext) => {
+  const raw = String(submissionContext || "").trim();
+  if (!raw.toLowerCase().startsWith("course-task:")) return "";
+  const task = raw
+    .slice("course-task:".length)
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+  return task
+    ? `Exact course task: ${task}. Judge task completion, greeting, pronouns, tone and closing against this exact register. Do not mark a formal task as informal or an informal task as formal.`
+    : "";
+};
+
 const markPrompt = ({ schreibenLevel, studentName, program, submissionContext }) => {
   const isCampusSubmission = String(submissionContext || "").startsWith("campus");
   const isCampusImprovedSubmission = submissionContext === "campus-improved";
+  const courseTaskInstruction = getCourseTaskInstruction(submissionContext);
   const language = program === "french" ? "French" : "German";
   const normalizedLevel = String(schreibenLevel || "").toUpperCase();
   const isAdvancedGerman = program !== "french" && ["B1", "B2", "C1"].includes(normalizedLevel);
@@ -227,6 +242,7 @@ You help students prepare for A1, A2, B1, B2, and C1 ${language} exam letters or
 The student has submitted a ${schreibenLevel} ${language} letter or essay.
 Always answer in English inside the JSON string values.
 Student name: ${studentName}.
+${courseTaskInstruction}
 
 Return valid JSON only. No markdown. No explanation outside JSON. Do not wrap in code fences.
 Use exactly this JSON shape:
