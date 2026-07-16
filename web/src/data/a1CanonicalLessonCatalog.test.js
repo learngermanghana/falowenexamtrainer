@@ -1,6 +1,7 @@
 import {
   A1_CANONICAL_LESSON_CATALOG,
   getA1CanonicalLesson,
+  getA1CanonicalLessonForLegacyRoute,
   getA1CanonicalLessonsForChapter,
 } from "./a1CanonicalLessonCatalog";
 
@@ -42,7 +43,21 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLessonsForChapter("1.1")).toHaveLength(2);
   });
 
-  test("resolves every old chapter query to one deterministic catalog entry", () => {
+  test("uses the legacy day to disambiguate repeated Kapitel 1.1 resources", () => {
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 2, identity: "1.1" })).toMatchObject({
+      routeKey: "1.1",
+      destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1" })).toMatchObject({
+      routeKey: "1.1-practice",
+      destination: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1-PRACTICE" })).toMatchObject({
+      routeKey: "1.1-practice",
+    });
+  });
+
+  test("resolves every permanent route identity to one deterministic catalog entry", () => {
     [
       ["0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
       ["1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
