@@ -50,6 +50,41 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 
+  test("Day 13 chapter 3.5 exposes the new recording as Teacher Video 2", () => {
+    const configuredVideos = getA1TeacherVideoResources(13).filter(
+      (video) => video.chapter === "3.5"
+    );
+
+    expect(configuredVideos.map((video) => video.url)).toEqual([
+      "https://youtu.be/eqSc_5p5uyQ",
+      "https://youtu.be/zizS5WdOYs8",
+    ]);
+    expect(configuredVideos.map((video) => video.videoNumber)).toEqual([1, 2]);
+    expect(configuredVideos[0].title).toContain("Teacher video 1");
+    expect(configuredVideos[1]).toMatchObject({
+      key: "a1-day13-chapter-3-5-teacher-video-2",
+      title: "Revision: Numbers, Time and Prices · Teacher video 2",
+    });
+
+    const lesson = normalizeLesson(
+      {
+        day: 13,
+        chapter: "3.5",
+        lesen_hören: { chapter: "3.5" },
+      },
+      "A1"
+    );
+    const teacherVideos = lesson.resources.videos.filter((video) =>
+      `${video.key} ${video.title}`.toLowerCase().includes("teacher")
+    );
+
+    expect(teacherVideos.map((video) => video.url)).toEqual([
+      "https://youtu.be/eqSc_5p5uyQ",
+      "https://youtu.be/zizS5WdOYs8",
+    ]);
+    expect(new Set(teacherVideos.map((video) => video.key)).size).toBe(2);
+  });
+
   test("does not replace an existing curated teacher video for the same chapter", () => {
     const lesson = normalizeLesson(
       {
