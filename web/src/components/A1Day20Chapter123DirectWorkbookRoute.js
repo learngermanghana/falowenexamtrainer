@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import AuthGate from "./AuthGate";
-import LetterWritingIntroPage from "./LetterWritingIntroPage";
+import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage";
 
 export const A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH =
   "/campus/course/letter-writing-intro-german-a1-day-12-3";
@@ -26,7 +26,7 @@ export default function A1Day20Chapter123DirectWorkbookRoute() {
 
   return (
     <main className="layout-main" style={{ minWidth: 0 }}>
-      <LetterWritingIntroPage />
+      <A1Day20LetterWritingWorkbookPage />
     </main>
   );
 }
