@@ -2,7 +2,10 @@ const A1_LESSON_ROOT = "/campus/course/lesson/A1";
 const A1_CANONICAL_CHAPTER_SEGMENT = "chapter";
 
 export const normalizeA1Chapter = (value = "") =>
-  String(value || "").trim().replace(/^A1-/i, "").replace(/-practice$/i, "");
+  String(value || "")
+    .trim()
+    .replace(/^A1-/i, "")
+    .toLowerCase();
 
 export const buildA1CanonicalChapterLessonRoute = (chapter = "") => {
   const normalizedChapter = normalizeA1Chapter(chapter);
