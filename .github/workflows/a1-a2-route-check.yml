@@ -9,6 +9,8 @@ on:
       - "web/src/data/strictInAppWorkbookRoutes.js"
       - "web/src/data/a1RouteAlignment.js"
       - "web/src/data/a1RouteAlignment.test.js"
+      - "web/src/data/a1AssignmentRegistry.js"
+      - "web/src/data/a1AssignmentRegistry.test.js"
       - "web/src/data/a1CourseBookCards.js"
       - "web/src/data/a1RadioResources.js"
       - "web/src/data/b2C1LessonMediaOverrides.js"
@@ -28,9 +30,16 @@ on:
       - "web/src/utils/a1NativeWorkbookExperience.test.js"
       - "web/src/utils/a1WorkbookServiceScope.js"
       - "web/src/utils/a1WorkbookServiceScope.test.js"
+      - "web/src/components/A1CanonicalSubmissionPanel.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookLayout.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx"
+      - "web/src/components/A1TutorMarkedWorkbookShell.js"
+      - "web/src/components/A1TutorMarkedWorkbookShell.test.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
+      - "web/src/components/A1Day3GermanAlphabetReviewingWorkbookPage.js"
       - "web/src/components/A1Day1RadioRegression.test.js"
       - "web/src/components/A1Day21WeatherWorkbookPage.js"
       - "web/src/components/A1Day21WeatherWorkbookPage.test.js"
@@ -57,6 +66,7 @@ on:
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
       - "web/src/components/RouteScopedAppServices.js"
+      - "web/src/a1WorkbookMobileSubmit.test.js"
       - "web/src/index.jsx"
       - "scripts/applyA1RouteAlignment.js"
       - "package.json"
@@ -118,11 +128,16 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/a1NativeWorkbookExperience.test.js src/components/A1WorkbookSectionTabs.test.js
-      - name: Test unified A1 tutor workbook navigation
+      - name: Test canonical A1 shared workbook navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1UnifiedTutorWorkbookNavigation.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js src/components/A1TutorMarkedWorkbookShell.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1UnifiedTutorWorkbookNavigation.test.js
+      - name: Test A1 mobile submission safeguards
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/a1WorkbookMobileSubmit.test.js
       - name: Test A1 workbook AI video headers
         working-directory: web
         env:
