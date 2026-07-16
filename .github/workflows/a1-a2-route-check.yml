@@ -20,6 +20,8 @@ on:
       - "web/src/data/a1CourseBookCards.js"
       - "web/src/data/a1Day20LetterWritingRoutes.js"
       - "web/src/data/a1RadioResources.js"
+      - "web/src/data/a1TeacherVideoResources.js"
+      - "web/src/data/a1TeacherVideoResources.test.js"
       - "web/src/data/b2C1LessonMediaOverrides.js"
       - "web/src/data/writingVideoResources.js"
       - "web/src/data/writingVideoResources.test.js"
@@ -119,7 +121,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js src/data/a1TeacherVideoResources.test.js
       - name: Test A1 Day 20 and Day 21 workbook service scope
         working-directory: web
         env:
