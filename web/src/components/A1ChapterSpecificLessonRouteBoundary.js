@@ -20,5 +20,5 @@ export default function A1ChapterSpecificLessonRouteBoundary({ children }) {
     );
   }
 
-  return children;
+  return <>{children}</>;
 }
