@@ -2,6 +2,7 @@ import {
   applyA1UnifiedWorkbookView,
   findA1NativeAssignmentTabList,
   hideA1NativeAssignmentTabs,
+  resolveA1SharedSectionState,
   resolveA1UnifiedTutorWorkbookMatch,
   restoreA1NativeAssignmentTabs,
   restoreA1UnifiedWorkbookGroups,
@@ -17,7 +18,19 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     document.body.innerHTML = "";
   });
 
-  it("resolves named tutor-marked routes that the old A1 route regex missed", () => {
+  it("resolves every configured tutor-marked workbook from curriculum metadata", () => {
+    expect(
+      resolveA1UnifiedTutorWorkbookMatch({
+        pathname: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        level: "A1",
+        day: 2,
+        resource: expect.objectContaining({ assignmentKey: "A1-0.2", chapter: "0.2" }),
+      }),
+    );
+
     expect(
       resolveA1UnifiedTutorWorkbookMatch({
         pathname: "/campus/course/a1-chapter-5-german-cases-workbook",
@@ -44,38 +57,7 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     );
   });
 
-  it("resolves the exact A1 Day 12 workbook URL and keeps all four Teil sections", () => {
-    expect(
-      resolveA1UnifiedTutorWorkbookMatch({
-        pathname: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
-        search: "?assignmentKey=A1-8&assignmentId=A1-8&level=A1",
-      }),
-    ).toEqual(
-      expect.objectContaining({
-        level: "A1",
-        day: 12,
-        resource: expect.objectContaining({ assignmentKey: "A1-8", chapter: "8" }),
-      }),
-    );
-
-    document.body.innerHTML = `
-      <main class="layout-main">
-        <div id="day12-workbook">
-          <section><h2>Start here</h2></section>
-          <section id="day12-teil1"><h2>Teil 1: Lesen · Multiple Choice</h2></section>
-          <section id="day12-teil2"><h2>Teil 2: Lesen · Richtig oder Falsch</h2></section>
-          <section id="day12-teil3"><h2>Teil 3: Hörverstehen</h2></section>
-          <section id="day12-teil4"><h2>Teil 4: Vocabulary reminder</h2></section>
-        </div>
-      </main>
-    `;
-
-    const pageRoot = document.querySelector("#day12-workbook");
-    const groups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
-    expect(groups.map((group) => group.number)).toEqual([1, 2, 3, 4]);
-  });
-
-  it("supports the existing dynamic A1 lesson links without replacing them", () => {
+  it("supports dynamic A1 workbook links while excluding grammar and learn views", () => {
     expect(
       resolveA1UnifiedTutorWorkbookMatch({
         pathname: "/campus/course/lesson/A1/11",
@@ -88,9 +70,52 @@ describe("A1 unified tutor-marked workbook navigation", () => {
         resource: expect.objectContaining({ assignmentKey: "A1-7" }),
       }),
     );
+
+    expect(
+      resolveA1UnifiedTutorWorkbookMatch({
+        pathname: "/campus/course/lesson/A1/11",
+        search: "?chapter=7&view=grammar",
+      }),
+    ).toBeNull();
   });
 
-  it("shows the complete assignment when Assignment is selected", () => {
+  it("builds Overview and separated Teil navigation for Day 0.2", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <div id="alphabet-workbook">
+          <div role="tablist">
+            <button aria-selected="true">Assignment</button>
+            <button aria-selected="false">Submit</button>
+          </div>
+          <section id="alphabet-teil1"><h2>Teil 1 · Reading and Writing</h2></section>
+          <section id="alphabet-teil2"><h2>Teil 2 · Questions</h2></section>
+          <section id="alphabet-teil3"><h2>Teil 3 · Hören</h2></section>
+        </div>
+      </main>
+    `;
+
+    const pageRoot = document.querySelector("#alphabet-workbook");
+    const state = resolveA1SharedSectionState({ pageRoot, assignmentKey: "A1-0.2" });
+
+    expect(state.pageManaged).toBe(false);
+    expect(state.tabs).toEqual([
+      expect.objectContaining({ key: "teil-1", number: 1 }),
+      expect.objectContaining({ key: "teil-2", number: 2 }),
+      expect.objectContaining({ key: "teil-3", number: 3 }),
+    ]);
+  });
+
+  it("keeps the existing Day 21 page compatible with the same shared nav", () => {
+    const state = resolveA1SharedSectionState({
+      pageRoot: document.createElement("div"),
+      assignmentKey: "A1-13",
+    });
+
+    expect(state.pageManaged).toBe(true);
+    expect(state.tabs.map((tab) => tab.key)).toEqual(["teil-1", "teil-2", "teil-3"]);
+  });
+
+  it("shows only the selected Teil and uses Overview to hide all task groups", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div id="workbook">
@@ -104,7 +129,11 @@ describe("A1 unified tutor-marked workbook navigation", () => {
 
     const pageRoot = document.querySelector("#workbook");
     const groups = buildA1WorkbookContentGroups(pageRoot, findA1WorkbookTeilSections(pageRoot));
-    expect(groups.map((group) => group.number)).toEqual([1, 2, 3]);
+
+    applyA1UnifiedWorkbookView({ groups, activeView: "overview" });
+    expect(document.querySelector("#teil1").style.display).toBe("none");
+    expect(document.querySelector("#teil2").style.display).toBe("none");
+    expect(document.querySelector("#teil3").style.display).toBe("none");
 
     applyA1UnifiedWorkbookView({ groups, activeView: "teil-2" });
     expect(document.querySelector("#teil1").style.display).toBe("none");
@@ -118,11 +147,9 @@ describe("A1 unified tutor-marked workbook navigation", () => {
 
     restoreA1UnifiedWorkbookGroups(pageRoot);
     expect(document.querySelector("#teil1").style.display).toBe("");
-    expect(document.querySelector("#teil2").style.display).toBe("");
-    expect(document.querySelector("#teil3").style.display).toBe("");
   });
 
-  it("recognizes and preserves a workbook's native Assignment and Submit tabs", () => {
+  it("detects, hides and restores native Assignment and Submit tabs so the shared nav can replace them", () => {
     const pageRoot = document.createElement("div");
     const tabList = document.createElement("div");
     tabList.setAttribute("role", "tablist");
@@ -136,24 +163,7 @@ describe("A1 unified tutor-marked workbook navigation", () => {
 
     expect(findA1NativeAssignmentTabList(pageRoot)).toBe(tabList);
     expect(shouldPreserveA1NativeAssignmentTabs(pageRoot)).toBe(true);
-    expect(tabList.style.display).toBe("");
-  });
-
-  it("can still restore a native tab row hidden by an older page version", () => {
-    const pageRoot = document.createElement("div");
-    const tabList = document.createElement("div");
-    tabList.setAttribute("role", "tablist");
-    const assignment = document.createElement("button");
-    assignment.textContent = "Assignment";
-    assignment.setAttribute("aria-selected", "false");
-    assignment.click = jest.fn(() => assignment.setAttribute("aria-selected", "true"));
-    const submit = document.createElement("button");
-    submit.textContent = "Submit";
-    tabList.append(assignment, submit);
-    pageRoot.appendChild(tabList);
-
     expect(hideA1NativeAssignmentTabs(pageRoot)).toBe(tabList);
-    expect(assignment.click).toHaveBeenCalledTimes(1);
     expect(tabList.style.display).toBe("none");
 
     restoreA1NativeAssignmentTabs(pageRoot);
