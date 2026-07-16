@@ -15,6 +15,14 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully and revise numbers, time and prices. Then continue to the workbook practice.",
   }),
+  20: Object.freeze({
+    key: "a1-day20-letter-writing-intro-falowen-radio",
+    title: "Letter Writing Introduction · Kapitel 12.3",
+    youtubeId: "B-LFDrF0zsY",
+    duration: "",
+    instruction:
+      "Listen carefully to the letter-writing introduction. Then continue to the Kapitel 12.3 workbook assignment.",
+  }),
   21: Object.freeze({
     key: "a1-day21-weather-falowen-radio",
     title: "Weather · Kapitel 13",
