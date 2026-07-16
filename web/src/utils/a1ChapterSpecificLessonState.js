@@ -1,6 +1,4 @@
 const normalizeChapter = (value = "") => String(value || "").trim();
-
-const SPLIT_A1_LESSON_DAYS = new Set(["2", "16", "18"]);
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
 export const getA1RequestedLessonChapter = (search = "") =>
@@ -68,24 +66,19 @@ export const getA1LessonStateIdentityChapter = (state = {}) => {
   return "";
 };
 
-export const getA1CorrectedChapterSpecificLessonSearch = ({
-  pathname = "",
-  search = "",
-  state,
-} = {}) => {
-  const routeDay = getA1LessonRouteDay(pathname);
-  if (!routeDay || !SPLIT_A1_LESSON_DAYS.has(routeDay) || !state?.entry) return "";
+/**
+ * Deprecated compatibility helper.
+ *
+ * Chapter URLs are authoritative. Navigation state must never rewrite the
+ * requested chapter, even when that state belongs to a sibling assignment.
+ */
+export const getA1CorrectedChapterSpecificLessonSearch = () => "";
 
-  const requestedChapter = getA1RequestedLessonChapter(search);
-  const identityChapter = getA1LessonStateIdentityChapter(state);
-  if (!requestedChapter || !identityChapter || identityChapter === requestedChapter) return "";
-
-  const nextParams = new URLSearchParams(String(search || "").replace(/^\?/, ""));
-  nextParams.set("chapter", identityChapter);
-  const nextSearch = nextParams.toString();
-  return nextSearch ? `?${nextSearch}` : "";
-};
-
+/**
+ * Old day-based routes may still arrive with React Router state from a Course
+ * Book card. Clear that state whenever the URL already declares a chapter so
+ * the rendered lesson cannot inherit sibling content from browser history.
+ */
 export const shouldResetA1ChapterSpecificLessonState = ({
   pathname = "",
   search = "",
@@ -95,22 +88,5 @@ export const shouldResetA1ChapterSpecificLessonState = ({
   if (!routeDay) return false;
 
   const requestedChapter = getA1RequestedLessonChapter(search);
-  if (!requestedChapter || !state?.entry) return false;
-
-  const stateChapter = getA1LessonStateChapter(state);
-  if (!SPLIT_A1_LESSON_DAYS.has(routeDay)) {
-    return stateChapter !== requestedChapter;
-  }
-
-  // Split A1 days contain more than one chapter under the same day route. Keep a
-  // correctly scoped card in place so opening it does not cause a visible remount.
-  // Clear only stale or combined state that could display a sibling chapter's content.
-  const entryChapter = normalizeChapter(state.entry.chapter);
-  if (entryChapter && entryChapter !== requestedChapter) return true;
-  if (stateChapter !== requestedChapter) return true;
-
-  const resourceChapters = getA1LessonStateResourceChapters(state);
-  if (!resourceChapters.length) return false;
-
-  return resourceChapters.length !== 1 || resourceChapters[0] !== requestedChapter;
+  return Boolean(requestedChapter && state?.entry);
 };
