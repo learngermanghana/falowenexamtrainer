@@ -7,6 +7,22 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully and repeat the greetings and well-being questions. Then continue to the workbook assignment.",
   }),
+  2: Object.freeze({
+    key: "a1-day2-chapter-1-1-falowen-radio",
+    title: "A1 Day 2 · Kapitel 1.1",
+    youtubeId: "Uru9bvr14mw",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 1.1 lesson. Then continue to the Day 2 workbook assignment.",
+  }),
+  3: Object.freeze({
+    key: "a1-day3-chapter-1-1-falowen-radio",
+    title: "A1 Day 3 · Kapitel 1.1",
+    youtubeId: "y9LhKQkjsqM",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 1.1 lesson. Then continue to the Day 3 workbook assignment.",
+  }),
   13: Object.freeze({
     key: "a1-day13-revision-numbers-time-prices-falowen-radio",
     title: "Revision: Numbers, Time and Prices",
