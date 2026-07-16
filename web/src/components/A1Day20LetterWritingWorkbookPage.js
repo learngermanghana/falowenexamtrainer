@@ -1,10 +1,8 @@
 import React from "react";
 import { styles } from "../styles";
+import { A1_DAY20_CHAPTER123_GRAMMAR_ROUTE } from "../data/a1Day20LetterWritingRoutes";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-
-export const A1_DAY20_CHAPTER123_GRAMMAR_ROUTE =
-  "/campus/course/letter-writing-intro-12-3";
 
 const sectionStyle = {
   ...styles.card,
