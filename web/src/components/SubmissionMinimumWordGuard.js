@@ -127,6 +127,12 @@ const getPanel = () => {
   return panel;
 };
 
+export const hideMinimumWordPanel = () => {
+  if (typeof document === "undefined") return;
+  const panel = document.querySelector(`[${PANEL_ATTRIBUTE}="true"]`);
+  if (panel) panel.hidden = true;
+};
+
 const focusPanel = (panel) => {
   window.requestAnimationFrame(() => {
     panel.scrollIntoView?.({ behavior: "smooth", block: "center" });
@@ -215,7 +221,7 @@ export default function SubmissionMinimumWordGuard() {
     };
 
     const handleFocusCapture = (event) => {
-      activateTextarea(event.target);
+      if (!activateTextarea(event.target)) hideMinimumWordPanel();
     };
 
     const handleInputCapture = (event) => {
@@ -252,12 +258,14 @@ export default function SubmissionMinimumWordGuard() {
     document.addEventListener("input", handleInputCapture, true);
     document.addEventListener("submit", handleSubmitCapture, true);
     document.addEventListener("click", handleClickCapture, true);
+    window.addEventListener("popstate", hideMinimumWordPanel);
 
     return () => {
       document.removeEventListener("focusin", handleFocusCapture, true);
       document.removeEventListener("input", handleInputCapture, true);
       document.removeEventListener("submit", handleSubmitCapture, true);
       document.removeEventListener("click", handleClickCapture, true);
+      window.removeEventListener("popstate", hideMinimumWordPanel);
       activeTextarea?.removeAttribute?.("aria-invalid");
       activeTextarea?.removeAttribute?.("aria-describedby");
       document.querySelector(`[${PANEL_ATTRIBUTE}="true"]`)?.remove();
