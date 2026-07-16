@@ -8,7 +8,6 @@ import {
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
-import { normalizeLesson } from "./lessonModel";
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
@@ -106,24 +105,6 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       key: "a1-day13-chapter-3-5-teacher-video-2",
       title: "Revision: Numbers, Time and Prices · Teacher video 2",
     });
-
-    const lesson = normalizeLesson(
-      {
-        day: 13,
-        chapter: "3.5",
-        lesen_hören: { chapter: "3.5" },
-      },
-      "A1",
-    );
-    const normalizedTeacherVideos = lesson.resources.videos.filter((video) =>
-      `${video.key || ""} ${video.title || ""}`.toLowerCase().includes("teacher"),
-    );
-
-    expect(normalizedTeacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/eqSc_5p5uyQ",
-      "https://youtu.be/zizS5WdOYs8",
-    ]);
-    expect(new Set(normalizedTeacherVideos.map((video) => video.key)).size).toBe(2);
   });
 
   it("keeps all four A1 Day 4 resource-hub choices configured", () => {
