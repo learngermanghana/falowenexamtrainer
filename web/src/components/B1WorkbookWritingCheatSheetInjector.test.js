@@ -105,9 +105,13 @@ describe("B1 workbook writing cheat sheet injector", () => {
       `[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`
     );
     expect(card).toHaveAttribute("aria-label", "B1 writing explanation video");
+    expect(card).toHaveAttribute(
+      "data-writing-video-key",
+      "b1-day2-freunde-fuers-leben-writing-video"
+    );
+    expect(card).not.toHaveAttribute("data-a1-radio-first-workbook-route");
+    expect(card).not.toHaveAttribute("data-requested-lesson-ai-video");
     expect(card).toHaveTextContent("B1 Day 2 · Freunde fürs Leben · Schreiben explanation");
-    expect(card).not.toHaveTextContent("Falowen Radio");
-    expect(card).not.toHaveTextContent("AI lesson video");
     expect(card.querySelector("iframe")).toHaveAttribute(
       "src",
       "https://www.youtube.com/embed/94IXPx5dTNY"
