@@ -114,6 +114,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
   return (
     <nav
       data-workbook-navigation="shared"
+      data-workbook-navigation-behavior="static"
       role="tablist"
       aria-label={`${assignment.assignmentKey} workbook sections`}
       style={{
@@ -123,9 +124,6 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         display: "flex",
         gap: 8,
         flexWrap: "wrap",
-        position: "sticky",
-        top: 8,
-        zIndex: 35,
       }}
     >
       {tabs.map((tab) => (
