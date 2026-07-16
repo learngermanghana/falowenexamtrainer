@@ -1,4 +1,7 @@
 import React from "react";
+
+jest.mock("./A1CanonicalSubmissionPanel", () => () => null);
+
 import { splitA1WorkbookContent, WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 
 describe("A1TutorMarkedWorkbookShell section extraction", () => {
