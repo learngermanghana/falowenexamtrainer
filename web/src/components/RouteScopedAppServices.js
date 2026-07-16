@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isPublicAuthPath, normalizePublicPath } from "../lib/publicAuthRoutes";
 import { shouldResetA1ChapterSpecificLessonState } from "../utils/a1ChapterSpecificLessonState";
+import { shouldUseNativeA1WorkbookExperience } from "../utils/a1NativeWorkbookExperience";
 import { resolveA1WorkbookServiceScope } from "../utils/a1WorkbookServiceScope";
 import LandingPublicLanguageGuard from "./LandingPublicLanguageGuard";
 import PublicClassSelectInjector from "./PublicClassSelectInjector";
@@ -192,6 +193,7 @@ export default function RouteScopedAppServices() {
   const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
   const isCourseBook = normalizedPath === "/campus/course";
   const isA1Chapter7TimePage = normalizedPath === A1_CHAPTER7_TIME_PATH;
+  const useNativeA1WorkbookExperience = shouldUseNativeA1WorkbookExperience(normalizedPath);
   const a1WorkbookScope = resolveA1WorkbookServiceScope({
     pathname: location.pathname,
     search: location.search,
@@ -201,8 +203,13 @@ export default function RouteScopedAppServices() {
   const isA1LessonOrWorkbook =
     isA1DynamicLesson || a1WorkbookScope.isWorkbookView || isA1NamedGrammar;
   const isA1WorkbookView = a1WorkbookScope.isWorkbookView;
-  const shouldMountA1WorkbookServices = a1WorkbookScope.shouldMountWorkbookServices;
-  const shouldEnhanceA1Experience = isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage;
+  const shouldMountA1WorkbookServices =
+    a1WorkbookScope.shouldMountWorkbookServices && !useNativeA1WorkbookExperience;
+  const shouldMountA1WorkbookSectionServices =
+    isA1WorkbookView && !useNativeA1WorkbookExperience;
+  const shouldEnhanceA1Experience =
+    (isCourseBook || isA1LessonOrWorkbook || isA1Chapter7TimePage) &&
+    !useNativeA1WorkbookExperience;
 
   return (
     <>
@@ -222,7 +229,7 @@ export default function RouteScopedAppServices() {
       {shouldMountA1WorkbookServices ? <A1WorkbookVideoHeader /> : null}
       <CourseBookLayoutStandardizer />
       {isCourseBook ? <CourseBookNextClassIndicator /> : null}
-      <UniversalWorkbookLessonNavigator />
+      {!useNativeA1WorkbookExperience ? <UniversalWorkbookLessonNavigator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
       <ExamQuestionCheatSheetInjector />
@@ -230,8 +237,8 @@ export default function RouteScopedAppServices() {
       <BookPdfDownloadInjector />
       {isA1DynamicLesson ? <A1ChapterSpecificLessonStateReset /> : null}
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
-      {isA1WorkbookView ? <A1WorkbookSectionTabs /> : null}
-      {isA1WorkbookView ? <AutoOpenFirstA1WorkbookTeil /> : null}
+      {shouldMountA1WorkbookSectionServices ? <A1WorkbookSectionTabs /> : null}
+      {shouldMountA1WorkbookSectionServices ? <AutoOpenFirstA1WorkbookTeil /> : null}
       {isA1Chapter7TimePage ? <A1Chapter7SeparableVerbCleaner /> : null}
       {isCourseBook ? <B2CourseBookContentAlignment /> : null}
       {isCourseBook ? <A1CourseBookScopeCleaner /> : null}
