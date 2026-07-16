@@ -13,10 +13,27 @@ export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
   "/campus/course/a1-day-21-weather-workbook": Object.freeze({ day: 21, chapter: "13" }),
 });
 
+const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
+  22: Object.freeze({ day: 22, chapter: "14.1" }),
+});
+
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 
-export const resolveA1RadioFirstWorkbookRoute = (pathname = "") =>
-  A1_RADIO_FIRST_WORKBOOK_ROUTES[normalizePath(pathname)] || null;
+export const resolveA1RadioFirstWorkbookRoute = (pathname = "", search = "") => {
+  const normalizedPath = normalizePath(pathname);
+  const namedRoute = A1_RADIO_FIRST_WORKBOOK_ROUTES[normalizedPath];
+  if (namedRoute) return namedRoute;
+
+  const dynamicMatch = normalizedPath.match(/^\/campus\/course\/lesson\/A1\/(\d+)$/i);
+  if (!dynamicMatch) return null;
+
+  const day = Number(dynamicMatch[1]);
+  const configuredLesson = A1_DYNAMIC_RADIO_FIRST_LESSONS[day];
+  if (!configuredLesson) return null;
+
+  const requestedChapter = new URLSearchParams(search || "").get("chapter");
+  return requestedChapter === configuredLesson.chapter ? configuredLesson : null;
+};
 
 export const hasCompletedA1RadioFirstStep = (search = "") => {
   try {
@@ -28,7 +45,7 @@ export const hasCompletedA1RadioFirstStep = (search = "") => {
 
 export default function A1RadioFirstWorkbookRoutes() {
   const location = useLocation();
-  const route = resolveA1RadioFirstWorkbookRoute(location.pathname);
+  const route = resolveA1RadioFirstWorkbookRoute(location.pathname, location.search);
   const completed = hasCompletedA1RadioFirstStep(location.search);
   const resource = route ? getA1RadioResource(route.day) : null;
   const shouldShow = Boolean(route && resource && !completed);
