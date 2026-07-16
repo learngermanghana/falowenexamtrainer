@@ -11,6 +11,11 @@ on:
       - "web/src/data/a1RouteAlignment.test.js"
       - "web/src/data/a1CourseBookCards.js"
       - "web/src/data/a1RadioResources.js"
+      - "web/src/data/b2C1LessonMediaOverrides.js"
+      - "web/src/data/writingVideoResources.js"
+      - "web/src/data/writingVideoResources.test.js"
+      - "web/src/data/requestedLessonMediaMappings.test.js"
+      - "web/src/data/selfLearningLessons/c1/day10IntegrationUndGesellschaft.js"
       - "web/src/data/curriculumManifest.js"
       - "web/src/data/lessonModel.js"
       - "web/src/data/additionalA2RadioEntries.js"
@@ -37,6 +42,7 @@ on:
       - "web/src/components/A1WorkbookSectionTabs.test.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.js"
       - "web/src/components/A1UnifiedTutorWorkbookNavigation.test.js"
+      - "web/src/components/B1WorkbookWritingCheatSheetInjector.test.js"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/AutoWorkbookStartGuide.test.js"
       - "web/src/components/WorkbookStartGuide.js"
@@ -127,6 +133,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/RequestedLessonAiVideoHeader.test.jsx
+      - name: Test requested lesson media mappings
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/requestedLessonMediaMappings.test.js src/data/writingVideoResources.test.js src/components/B1WorkbookWritingCheatSheetInjector.test.js
       - name: Test split A1 lesson chapter state
         working-directory: web
         env:
@@ -137,7 +148,7 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1Day1RadioRegression.test.js
-      - name: Test A1 Day 13 and Day 21 Falowen Radio
+      - name: Test A1 Day 13, Day 21 and Day 22 Falowen Radio
         working-directory: web
         env:
           CI: true
