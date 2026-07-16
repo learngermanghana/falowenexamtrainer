@@ -1,5 +1,8 @@
 import fs from "fs";
 import path from "path";
+
+jest.mock("./A1Day20LetterWritingWorkbookPage", () => () => null);
+
 import { A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH } from "./A1Day20Chapter123DirectWorkbookRoute";
 import { getA1TeilNumber } from "./A1WorkbookSectionTabs";
 import inAppWorkbookRoutes from "../data/inAppWorkbookRoutes.json";
@@ -36,7 +39,7 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     expect(routeSource).toContain(
       'import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage"',
     );
-    expect(routeSource).toContain("<main className=\"layout-main\"");
+    expect(routeSource).toContain('<main className="layout-main"');
     expect(routeSource).toContain("<A1Day20LetterWritingWorkbookPage />");
   });
 
@@ -65,8 +68,11 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     expect(pageSource).toContain('title="Mark My Informal Letter"');
     expect(pageSource).toContain('title="Mark My Formal Letter"');
     expect(pageSource).toContain('type="writing"');
-    expect(autoMountSource).not.toContain(
-      '"/campus/course/letter-writing-intro-german-a1-day-12-3",\n  "/campus/course/a1-day-21-weather-workbook"',
+    expect(autoMountSource).toContain(
+      "export const isA1LetterWritingCourseBookPath",
+    );
+    expect(autoMountSource).toContain(
+      "if (!isCanonicalLessonPage && !isWritingPage && !isLetterGrammarPage)",
     );
   });
 
