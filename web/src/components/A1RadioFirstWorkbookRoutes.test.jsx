@@ -26,7 +26,7 @@ describe("A1 route-scoped Falowen Radio", () => {
       expect.objectContaining({
         key: "a1-day21-weather-falowen-radio",
         title: "Weather · Kapitel 13",
-        youtubeId: "3rCrrb3117E",
+        youtubeId: "scaiyC3AD3E",
       }),
     );
   });
