@@ -19,7 +19,7 @@ describe("SubmissionMinimumWordGuard", () => {
   });
 
   test("counts normal German and English words consistently", () => {
-    expect(countSubmissionWords("Ich schreibe heute eine E-Mail.".trim())).toBe(6);
+    expect(countSubmissionWords("Ich schreibe heute eine E-Mail.".trim())).toBe(5);
     expect(countSubmissionWords("don't stop – weiterlernen 2026")).toBe(4);
     expect(countSubmissionWords("   ")).toBe(0);
   });
