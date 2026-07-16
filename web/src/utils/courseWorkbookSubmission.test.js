@@ -6,6 +6,7 @@ import {
   getWorkbookNativeTabKey,
   getWorkbookNavigationTabs,
 } from "./courseWorkbookSubmission";
+import { resolveB1WorkbookSubmissionContext } from "./b1WorkbookSubmissionContext";
 
 describe("course workbook submission identities", () => {
   test("builds a canonical lock from the student scope and canonical assignment key", () => {
@@ -52,5 +53,46 @@ describe("course workbook tabs", () => {
     expect(getWorkbookNativeTabKey("Teil 1 · Sprechen")).toBe("teil1");
     expect(getWorkbookNativeTabKey("Teil 4 · Hören")).toBe("teil4");
     expect(getWorkbookNativeTabKey("5. Ref")).toBe("ref");
+  });
+});
+
+describe("B1 workbook submission context", () => {
+  test("auto-selects the assignment for a dynamic B1 workbook before Submit opens", () => {
+    const context = resolveB1WorkbookSubmissionContext({
+      pathname: "/campus/course/lesson/B1/15",
+      search: "?view=workbook",
+    });
+
+    expect(context).toEqual(
+      expect.objectContaining({
+        level: "B1",
+        day: 15,
+        assignmentKey: expect.stringMatching(/^B1-/),
+      })
+    );
+  });
+
+  test("keeps B1 grammar and lesson views outside the submit synchronizer", () => {
+    expect(
+      resolveB1WorkbookSubmissionContext({
+        pathname: "/campus/course/lesson/B1/15",
+        search: "?view=grammar",
+      })
+    ).toBeNull();
+  });
+
+  test("resolves named B1 workbook routes as well as dynamic routes", () => {
+    const context = resolveB1WorkbookSubmissionContext({
+      pathname: "/campus/course/b1-day-4-wohnung-suchen-workbook",
+      search: "",
+    });
+
+    expect(context).toEqual(
+      expect.objectContaining({
+        level: "B1",
+        day: 4,
+        assignmentKey: expect.stringMatching(/^B1-/),
+      })
+    );
   });
 });
