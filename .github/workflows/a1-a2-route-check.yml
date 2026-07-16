@@ -141,11 +141,21 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js src/components/A1TutorMarkedWorkbookShell.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1UnifiedTutorWorkbookNavigation.test.js
-      - name: Test A1 letter-writing shared navigation and practice
+      - name: Test A1 letter-writing shared navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day20LetterWritingWorkbookPage.test.js src/components/A1Day20Chapter123DirectWorkbookRoute.test.js src/components/A1CoursePracticeAutoMount.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20LetterWritingWorkbookPage.test.js
+      - name: Test A1 letter-writing direct route
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20Chapter123DirectWorkbookRoute.test.js
+      - name: Test A1 letter practice ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1CoursePracticeAutoMount.test.js
       - name: Test submission word-count feedback and A1 mobile safeguards
         working-directory: web
         env:
