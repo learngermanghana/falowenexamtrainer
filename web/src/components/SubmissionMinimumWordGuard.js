@@ -2,10 +2,9 @@ import { useEffect } from "react";
 
 export const MINIMUM_SUBMISSION_WORDS = 80;
 
-const ERROR_ATTRIBUTE = "data-submission-minimum-word-error";
-const PROGRESS_ATTRIBUTE = "data-submission-minimum-word-progress";
+const PANEL_ATTRIBUTE = "data-submission-minimum-word-panel";
+const PANEL_ID = "submission-minimum-word-panel";
 const HIDDEN_PROGRESS_ATTRIBUTE = "data-submission-word-progress-hidden";
-const ERROR_ID_PREFIX = "submission-minimum-word-error";
 
 const normalizeLabel = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
 
@@ -19,10 +18,7 @@ export const buildMinimumWordMessage = (wordCount, minimumWords = MINIMUM_SUBMIS
   const target = Math.max(1, Number(minimumWords) || MINIMUM_SUBMISSION_WORDS);
   const remaining = Math.max(0, target - current);
 
-  if (!remaining) {
-    return `${current} / ${target} words · Ready to submit.`;
-  }
-
+  if (!remaining) return `${current} / ${target} words · Ready to submit.`;
   return `${current} / ${target} words · Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
 };
 
@@ -73,6 +69,22 @@ const findResubmissionTextarea = (button) => {
   return null;
 };
 
+const isResubmissionTextarea = (textarea) => {
+  let container = textarea?.parentElement || null;
+  while (container && container !== document.body) {
+    const button = Array.from(container.querySelectorAll?.("button") || []).find(isResubmissionControl);
+    if (button && findResubmissionTextarea(button) === textarea) return true;
+    container = container.parentElement;
+  }
+  return false;
+};
+
+const isGuardedTextarea = (textarea) => {
+  if (!(textarea instanceof HTMLTextAreaElement)) return false;
+  const form = textarea.closest("form");
+  return findSubmissionTextarea(form) === textarea || isResubmissionTextarea(textarea);
+};
+
 const hideLegacyMinimumWordProgress = (textarea) => {
   const field = textarea?.parentElement;
   const legacyBar = field?.querySelector?.('[aria-label^="Minimum word target:"]');
@@ -82,109 +94,89 @@ const hideLegacyMinimumWordProgress = (textarea) => {
   legacyRoot.style.display = "none";
 };
 
-const getProgressElement = (textarea) => {
-  const field = textarea?.parentElement;
-  if (!field) return null;
+const getPanel = () => {
+  if (typeof document === "undefined") return null;
+  let panel = document.querySelector(`[${PANEL_ATTRIBUTE}="true"]`);
+  if (panel) return panel;
 
-  let progress = field.querySelector(`[${PROGRESS_ATTRIBUTE}="true"]`);
-  if (progress) return progress;
-
-  progress = document.createElement("div");
-  progress.setAttribute(PROGRESS_ATTRIBUTE, "true");
-  progress.setAttribute("aria-live", "polite");
-  Object.assign(progress.style, {
-    border: "1px solid #f59e0b",
-    borderRadius: "10px",
-    fontWeight: "800",
-    lineHeight: "1.5",
-    marginTop: "8px",
-    padding: "10px 12px",
+  panel = document.createElement("div");
+  panel.id = PANEL_ID;
+  panel.setAttribute(PANEL_ATTRIBUTE, "true");
+  panel.setAttribute("role", "status");
+  panel.setAttribute("aria-live", "polite");
+  panel.tabIndex = -1;
+  panel.hidden = true;
+  Object.assign(panel.style, {
+    border: "2px solid #f59e0b",
+    borderRadius: "14px",
+    bottom: "16px",
+    boxShadow: "0 16px 40px rgba(15, 23, 42, 0.22)",
+    boxSizing: "border-box",
+    fontSize: "16px",
+    fontWeight: "900",
+    left: "50%",
+    lineHeight: "1.55",
+    maxWidth: "720px",
+    padding: "14px 16px",
+    position: "fixed",
+    transform: "translateX(-50%)",
+    width: "calc(100% - 24px)",
+    zIndex: "10050",
   });
-  textarea.insertAdjacentElement("afterend", progress);
-  hideLegacyMinimumWordProgress(textarea);
-  return progress;
+  document.body.appendChild(panel);
+  return panel;
 };
 
-export const updateMinimumWordProgress = (
+const focusPanel = (panel) => {
+  window.requestAnimationFrame(() => {
+    panel.scrollIntoView?.({ behavior: "smooth", block: "center" });
+    try {
+      panel.focus({ preventScroll: true });
+    } catch (_error) {
+      panel.focus?.();
+    }
+  });
+};
+
+export const updateMinimumWordPanel = ({
   textarea,
   minimumWords = MINIMUM_SUBMISSION_WORDS,
-) => {
+  error = false,
+  focus = false,
+}) => {
   if (!textarea) return null;
+  const panel = getPanel();
+  if (!panel) return null;
+
   const wordCount = countSubmissionWords(textarea.value);
   const ready = wordCount >= minimumWords;
-  const progress = getProgressElement(textarea);
-  if (!progress) return { wordCount, ready };
+  const showError = error && !ready;
+  const message = showError
+    ? buildMinimumWordError(wordCount, minimumWords)
+    : buildMinimumWordMessage(wordCount, minimumWords);
 
-  progress.textContent = buildMinimumWordMessage(wordCount, minimumWords);
-  progress.style.background = ready ? "#ecfdf5" : "#fffbeb";
-  progress.style.borderColor = ready ? "#86efac" : "#f59e0b";
-  progress.style.color = ready ? "#166534" : "#92400e";
-  progress.setAttribute("data-word-count", String(wordCount));
-  progress.setAttribute("data-word-target-reached", ready ? "true" : "false");
+  if (panel.textContent !== message) panel.textContent = message;
+  panel.hidden = false;
+  panel.setAttribute("role", showError ? "alert" : "status");
+  panel.setAttribute("aria-live", showError ? "assertive" : "polite");
+  panel.setAttribute("data-word-count", String(wordCount));
+  panel.setAttribute("data-word-target-reached", ready ? "true" : "false");
+  panel.setAttribute("data-word-error-visible", showError ? "true" : "false");
+  panel.style.background = showError ? "#fef2f2" : ready ? "#ecfdf5" : "#fffbeb";
+  panel.style.borderColor = showError ? "#ef4444" : ready ? "#86efac" : "#f59e0b";
+  panel.style.color = showError ? "#991b1b" : ready ? "#166534" : "#92400e";
 
-  const error = textarea.closest("form")?.querySelector?.(`[${ERROR_ATTRIBUTE}="true"]`)
-    || textarea.parentElement?.querySelector?.(`[${ERROR_ATTRIBUTE}="true"]`);
-  if (error) {
-    if (ready) {
-      error.remove();
-      textarea.removeAttribute("aria-invalid");
-      textarea.removeAttribute("aria-describedby");
-    } else {
-      error.textContent = buildMinimumWordError(wordCount, minimumWords);
-    }
+  hideLegacyMinimumWordProgress(textarea);
+  if (showError) {
+    textarea.setAttribute("aria-invalid", "true");
+    textarea.setAttribute("aria-describedby", PANEL_ID);
+  } else if (ready) {
+    textarea.removeAttribute("aria-invalid");
+    textarea.removeAttribute("aria-describedby");
   }
 
-  return { wordCount, ready, progress };
-};
-
-const focusMinimumWordError = (error) => {
-  window.requestAnimationFrame(() => {
-    error.scrollIntoView?.({ behavior: "smooth", block: "center" });
-    try {
-      error.focus({ preventScroll: true });
-    } catch (_error) {
-      error.focus?.();
-    }
-  });
-};
-
-export const showMinimumWordError = (
-  textarea,
-  minimumWords = MINIMUM_SUBMISSION_WORDS,
-) => {
-  if (!textarea) return null;
-  const wordCount = countSubmissionWords(textarea.value);
-  const form = textarea.closest("form");
-  const host = form || textarea.parentElement;
-  if (!host) return null;
-
-  let error = host.querySelector(`[${ERROR_ATTRIBUTE}="true"]`);
-  if (!error) {
-    error = document.createElement("div");
-    error.setAttribute(ERROR_ATTRIBUTE, "true");
-    error.setAttribute("role", "alert");
-    error.setAttribute("aria-live", "assertive");
-    error.tabIndex = -1;
-    error.id = `${ERROR_ID_PREFIX}-${Math.random().toString(36).slice(2, 9)}`;
-    Object.assign(error.style, {
-      background: "#fef2f2",
-      border: "2px solid #ef4444",
-      borderRadius: "12px",
-      color: "#991b1b",
-      fontSize: "16px",
-      fontWeight: "900",
-      lineHeight: "1.55",
-      padding: "14px",
-    });
-    host.insertBefore(error, host.firstChild);
-  }
-
-  error.textContent = buildMinimumWordError(wordCount, minimumWords);
-  textarea.setAttribute("aria-invalid", "true");
-  textarea.setAttribute("aria-describedby", error.id);
-  updateMinimumWordProgress(textarea, minimumWords);
-  focusMinimumWordError(error);
-  return error;
+  if (focus) focusPanel(panel);
+  return { panel, wordCount, ready, showError };
 };
 
 export const blockShortSubmission = ({
@@ -194,42 +186,45 @@ export const blockShortSubmission = ({
 }) => {
   if (!textarea) return false;
   const wordCount = countSubmissionWords(textarea.value);
-  updateMinimumWordProgress(textarea, minimumWords);
-  if (wordCount >= minimumWords) return false;
+  if (wordCount >= minimumWords) {
+    updateMinimumWordPanel({ textarea, minimumWords });
+    return false;
+  }
 
   event?.preventDefault?.();
   event?.stopPropagation?.();
   event?.stopImmediatePropagation?.();
   event?.nativeEvent?.stopImmediatePropagation?.();
-  showMinimumWordError(textarea, minimumWords);
+  updateMinimumWordPanel({ textarea, minimumWords, error: true, focus: true });
   return true;
-};
-
-const decorateSubmissionControls = (root = document) => {
-  Array.from(root.querySelectorAll?.("form") || []).forEach((form) => {
-    const textarea = findSubmissionTextarea(form);
-    if (textarea) updateMinimumWordProgress(textarea);
-  });
-
-  Array.from(root.querySelectorAll?.("button") || [])
-    .filter(isResubmissionControl)
-    .forEach((button) => {
-      const textarea = findResubmissionTextarea(button);
-      if (textarea) updateMinimumWordProgress(textarea);
-    });
 };
 
 export default function SubmissionMinimumWordGuard() {
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
-    let scheduled = false;
+    let activeTextarea = null;
 
-    const scheduleDecoration = () => {
-      if (scheduled) return;
-      scheduled = true;
-      window.requestAnimationFrame(() => {
-        scheduled = false;
-        decorateSubmissionControls(document);
+    const activateTextarea = (textarea) => {
+      if (!isGuardedTextarea(textarea)) return false;
+      activeTextarea = textarea;
+      updateMinimumWordPanel({
+        textarea,
+        error: textarea.getAttribute("aria-invalid") === "true",
+      });
+      return true;
+    };
+
+    const handleFocusCapture = (event) => {
+      activateTextarea(event.target);
+    };
+
+    const handleInputCapture = (event) => {
+      const textarea = event.target;
+      if (!isGuardedTextarea(textarea)) return;
+      activeTextarea = textarea;
+      updateMinimumWordPanel({
+        textarea,
+        error: textarea.getAttribute("aria-invalid") === "true",
       });
     };
 
@@ -240,6 +235,7 @@ export default function SubmissionMinimumWordGuard() {
       if (submitter && !isFinalAssignmentSubmitControl(submitter)) return;
       const textarea = findSubmissionTextarea(form);
       if (!textarea) return;
+      activeTextarea = textarea;
       blockShortSubmission({ event, textarea });
     };
 
@@ -248,29 +244,23 @@ export default function SubmissionMinimumWordGuard() {
       if (!isResubmissionControl(button)) return;
       const textarea = findResubmissionTextarea(button);
       if (!textarea) return;
+      activeTextarea = textarea;
       blockShortSubmission({ event, textarea });
     };
 
-    const handleInputCapture = (event) => {
-      const textarea = event.target;
-      if (!(textarea instanceof HTMLTextAreaElement)) return;
-      if (!textarea.parentElement?.querySelector?.(`[${PROGRESS_ATTRIBUTE}="true"]`)) return;
-      updateMinimumWordProgress(textarea);
-    };
-
-    decorateSubmissionControls(document);
-    const observer = new MutationObserver(scheduleDecoration);
-    observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("focusin", handleFocusCapture, true);
+    document.addEventListener("input", handleInputCapture, true);
     document.addEventListener("submit", handleSubmitCapture, true);
     document.addEventListener("click", handleClickCapture, true);
-    document.addEventListener("input", handleInputCapture, true);
 
     return () => {
-      observer.disconnect();
+      document.removeEventListener("focusin", handleFocusCapture, true);
+      document.removeEventListener("input", handleInputCapture, true);
       document.removeEventListener("submit", handleSubmitCapture, true);
       document.removeEventListener("click", handleClickCapture, true);
-      document.removeEventListener("input", handleInputCapture, true);
-      document.querySelectorAll(`[${PROGRESS_ATTRIBUTE}="true"], [${ERROR_ATTRIBUTE}="true"]`).forEach((node) => node.remove());
+      activeTextarea?.removeAttribute?.("aria-invalid");
+      activeTextarea?.removeAttribute?.("aria-describedby");
+      document.querySelector(`[${PANEL_ATTRIBUTE}="true"]`)?.remove();
       document.querySelectorAll(`[${HIDDEN_PROGRESS_ATTRIBUTE}]`).forEach((node) => {
         node.style.display = node.getAttribute(HIDDEN_PROGRESS_ATTRIBUTE) || "";
         node.removeAttribute(HIDDEN_PROGRESS_ATTRIBUTE);
@@ -282,10 +272,12 @@ export default function SubmissionMinimumWordGuard() {
 }
 
 export const __TESTING__ = {
-  decorateSubmissionControls,
   findEditableTextarea,
   findResubmissionTextarea,
   findSubmissionTextarea,
+  getPanel,
   isFinalAssignmentSubmitControl,
+  isGuardedTextarea,
   isResubmissionControl,
+  isResubmissionTextarea,
 };
