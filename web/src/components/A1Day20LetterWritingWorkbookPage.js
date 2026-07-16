@@ -2,7 +2,7 @@ import React from "react";
 import { styles } from "../styles";
 import { A1_DAY20_CHAPTER123_GRAMMAR_ROUTE } from "../data/a1Day20LetterWritingRoutes";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
-import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 
 const sectionStyle = {
   ...styles.card,
@@ -56,47 +56,33 @@ const BulletList = ({ items, ordered = false }) => {
   );
 };
 
-const letterPracticeContext = ({ type, title, taskId, placeholder }) => ({
-  level: "A1",
-  courseLevel: "A1",
-  day: 20,
-  chapter: "12.3",
-  assignmentKey: "A1-12.3",
-  lessonId: "A1-day-20-chapter-12.3",
-  workbookId: "A1-12.3-letter-writing-workbook",
-  writingTaskId: taskId,
-  taskTitle: title,
-  letterType: type,
-  draftPlaceholder: placeholder,
-});
-
 const InformalLetterPractice = () => (
-  <CourseInlinePracticePanel
-    type="writing"
+  <A1CourseBookLetterPracticePanel
     title="Mark My Informal Letter"
     description="Write or paste your birthday letter here. Falowen will mark it and explain the corrections before you copy the improved version to Submit."
-    defaultOpen
-    writingContext={letterPracticeContext({
-      type: "informal",
-      title: "Informal birthday letter to a friend",
-      taskId: "A1-12.3-teil-1-informal-letter",
-      placeholder: "Hallo Anna,\n\nwie geht es dir? Ich schreibe dir, weil ...\n\nLiebe Grüße\nMia",
-    })}
+    taskId="A1-12.3-teil-1-informal-letter"
+    taskTitle="Informal birthday letter to a friend"
+    taskContext="informal birthday note to a friend using du, dir and an informal closing"
+    letterType="informal"
+    promptType="note"
+    placeholder={"Hallo Anna,\n\nwie geht es dir? Ich schreibe dir, weil ...\n\nLiebe Grüße\nMia"}
+    minimumWords={35}
+    maximumWords={50}
   />
 );
 
 const FormalLetterPractice = () => (
-  <CourseInlinePracticePanel
-    type="writing"
+  <A1CourseBookLetterPracticePanel
     title="Mark My Formal Letter"
     description="Write or paste your enquiry to the language school here. Improve it with the feedback before copying the final version to Submit."
-    defaultOpen
-    writingContext={letterPracticeContext({
-      type: "formal",
-      title: "Formal enquiry to a language school",
-      taskId: "A1-12.3-teil-2-formal-letter",
-      placeholder: "Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ...\n\nMit freundlichen Grüßen\nMax Mustermann",
-    })}
+    taskId="A1-12.3-teil-2-formal-letter"
+    taskTitle="Formal enquiry to a language school"
+    taskContext="formal email to a language school using Sie, Ihnen, a formal greeting and a formal closing"
+    letterType="formal"
+    promptType="email"
+    placeholder={"Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ...\n\nMit freundlichen Grüßen\nMax Mustermann"}
+    minimumWords={35}
+    maximumWords={50}
   />
 );
 
