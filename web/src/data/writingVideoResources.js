@@ -9,6 +9,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this video before writing. It explains how to understand the task, organise your text and cover every required point.",
       url: "https://youtu.be/nG1PUrvrS_s",
     },
+    2: {
+      key: "b1-day2-freunde-fuers-leben-writing-video",
+      title: "B1 Day 2 · Freunde fürs Leben · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before drafting the email about a lifelong friend. It is a writing-support resource, not an AI video or Falowen Radio.",
+      url: "https://youtu.be/94IXPx5dTNY",
+    },
   },
   B2: {
     1: {
