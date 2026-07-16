@@ -17,6 +17,9 @@ describe("canonical A1 chapter lesson routes", () => {
     expect(buildA1CanonicalChapterLessonRoute("A1-1.1")).toBe(
       "/campus/course/lesson/A1/chapter/1.1",
     );
+    expect(buildA1CanonicalChapterLessonRoute("A1-1.1-PRACTICE")).toBe(
+      "/campus/course/lesson/A1/chapter/1.1-practice",
+    );
     expect(buildA1CanonicalChapterLessonRoute("2")).toBe(
       "/campus/course/lesson/A1/chapter/2",
     );
@@ -29,6 +32,9 @@ describe("canonical A1 chapter lesson routes", () => {
     expect(buildA1ShortChapterLessonRoute("1.1")).toBe(
       "/campus/course/lesson/A1/1.1",
     );
+    expect(buildA1ShortChapterLessonRoute("1.1-practice")).toBe(
+      "/campus/course/lesson/A1/1.1-practice",
+    );
     expect(buildA1ShortChapterLessonRoute("2")).toBe("");
   });
 
@@ -36,7 +42,7 @@ describe("canonical A1 chapter lesson routes", () => {
     expect(getA1CanonicalLessonChapter("/campus/course/lesson/A1/chapter/12.2")).toBe("12.2");
     expect(getA1LegacyLessonDay("/campus/course/lesson/A1/18")).toBe("18");
     expect(getA1RequestedChapterFromSearch("?chapter=12.2&source=coursebook")).toBe("12.2");
-    expect(normalizeA1Chapter("A1-1.1-PRACTICE")).toBe("1.1");
+    expect(normalizeA1Chapter("A1-1.1-PRACTICE")).toBe("1.1-practice");
   });
 
   test("removes the legacy chapter query while preserving unrelated parameters", () => {
