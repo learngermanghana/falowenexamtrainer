@@ -78,6 +78,22 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
     expect(onRender).toHaveBeenCalledTimes(1);
   });
 
+  test("uses Day 3 to keep the repeated Kapitel 1.1 self-practice route separate", async () => {
+    const onRender = jest.fn();
+
+    renderBoundary({
+      pathname: "/campus/course/lesson/A1/3",
+      search: "?chapter=1.1",
+      state: { entry: { chapter: "1.1" } },
+      onRender,
+    });
+
+    expect(
+      await screen.findByText("/campus/course/lesson/A1/chapter/1.1-practice"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("lesson-state")).toHaveTextContent("state-cleared");
+  });
+
   test("preserves unrelated URL parameters while removing the legacy chapter query", async () => {
     const onRender = jest.fn();
 
@@ -102,7 +118,7 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
     expect(onRender).toHaveBeenCalledTimes(1);
   });
 
-  test("resolves redirects from URL identity only", () => {
+  test("resolves redirects from URL identity and legacy day only", () => {
     expect(
       getA1LegacyChapterLessonRedirect({
         pathname: "/campus/course/lesson/A1/2",
@@ -110,6 +126,15 @@ describe("A1ChapterSpecificLessonRouteBoundary", () => {
       }),
     ).toEqual({
       pathname: "/campus/course/lesson/A1/chapter/1.1",
+      search: "",
+    });
+    expect(
+      getA1LegacyChapterLessonRedirect({
+        pathname: "/campus/course/lesson/A1/3",
+        search: "?chapter=1.1",
+      }),
+    ).toEqual({
+      pathname: "/campus/course/lesson/A1/chapter/1.1-practice",
       search: "",
     });
   });
