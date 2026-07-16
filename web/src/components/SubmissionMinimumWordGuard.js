@@ -5,8 +5,14 @@ export const MINIMUM_SUBMISSION_WORDS = 80;
 const PANEL_ATTRIBUTE = "data-submission-minimum-word-panel";
 const PANEL_ID = "submission-minimum-word-panel";
 const HIDDEN_PROGRESS_ATTRIBUTE = "data-submission-word-progress-hidden";
+const EXPLICIT_TARGET_ATTRIBUTES = ["data-minimum-words", "data-min-words", "data-word-target"];
 
 const normalizeLabel = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+
+const toPositiveInteger = (value) => {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+};
 
 export const countSubmissionWords = (value = "") => {
   const matches = String(value || "").match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu);
@@ -50,10 +56,12 @@ const findEditableTextarea = (root) =>
     (textarea) => !textarea.disabled && !textarea.readOnly,
   ) || null;
 
+const findFinalAssignmentSubmitControl = (form) =>
+  Array.from(form?.querySelectorAll?.("button[type='submit'], input[type='submit']") || [])
+    .find(isFinalAssignmentSubmitControl) || null;
+
 const findSubmissionTextarea = (form) => {
-  if (!form) return null;
-  const controls = Array.from(form.querySelectorAll("button[type='submit'], input[type='submit']"));
-  if (!controls.some(isFinalAssignmentSubmitControl)) return null;
+  if (!form || !findFinalAssignmentSubmitControl(form)) return null;
   return findEditableTextarea(form);
 };
 
@@ -69,21 +77,77 @@ const findResubmissionTextarea = (button) => {
   return null;
 };
 
-const isResubmissionTextarea = (textarea) => {
+const findResubmissionControlForTextarea = (textarea) => {
   let container = textarea?.parentElement || null;
   while (container && container !== document.body) {
     const button = Array.from(container.querySelectorAll?.("button") || []).find(isResubmissionControl);
-    if (button && findResubmissionTextarea(button) === textarea) return true;
+    if (button && findResubmissionTextarea(button) === textarea) return button;
     container = container.parentElement;
   }
-  return false;
+  return null;
 };
 
-const isGuardedTextarea = (textarea) => {
-  if (!(textarea instanceof HTMLTextAreaElement)) return false;
-  const form = textarea.closest("form");
-  return findSubmissionTextarea(form) === textarea || isResubmissionTextarea(textarea);
+const readExplicitMinimumWords = (textarea, control) => {
+  const form = textarea?.closest?.("form");
+  const explicitContainer = textarea?.closest?.(
+    EXPLICIT_TARGET_ATTRIBUTES.map((attribute) => `[${attribute}]`).join(", "),
+  );
+  const candidates = [textarea, control, form, explicitContainer].filter(Boolean);
+
+  for (const candidate of candidates) {
+    for (const attribute of EXPLICIT_TARGET_ATTRIBUTES) {
+      const target = toPositiveInteger(candidate.getAttribute?.(attribute));
+      if (target) return target;
+    }
+  }
+  return null;
 };
+
+export const parseMinimumWordsFromProgressLabel = (value = "") => {
+  const text = String(value || "");
+  const match = text.match(/(?:\bof\b|\/)\s*(\d+)\s*words?\b/i)
+    || text.match(/minimum[^\d]*(\d+)\s*words?\b/i);
+  return match?.[1] ? toPositiveInteger(match[1]) : null;
+};
+
+const readRenderedMinimumWords = (textarea) => {
+  const field = textarea?.parentElement;
+  const form = textarea?.closest?.("form");
+  const progress = field?.querySelector?.('[aria-label*="word"]')
+    || form?.querySelector?.('[aria-label*="word"]');
+  return parseMinimumWordsFromProgressLabel(progress?.getAttribute?.("aria-label"));
+};
+
+const isCanonicalA1Submission = (textarea, control) => Boolean(
+  control?.matches?.("[data-a1-final-submit-button]")
+  || textarea?.closest?.('[data-a1-built-in-submission], [data-cloud-draft-persistence="react-owned"]'),
+);
+
+export const resolveMinimumSubmissionWords = ({ textarea, control = null } = {}) => {
+  if (!textarea) return null;
+  return readExplicitMinimumWords(textarea, control)
+    || readRenderedMinimumWords(textarea)
+    || (isCanonicalA1Submission(textarea, control) ? MINIMUM_SUBMISSION_WORDS : null);
+};
+
+const resolveTextareaContext = (textarea) => {
+  if (!(textarea instanceof HTMLTextAreaElement)) return null;
+  const form = textarea.closest("form");
+  const finalControl = findFinalAssignmentSubmitControl(form);
+  if (finalControl && findSubmissionTextarea(form) === textarea) {
+    const minimumWords = resolveMinimumSubmissionWords({ textarea, control: finalControl });
+    return minimumWords ? { control: finalControl, minimumWords, mode: "submission" } : null;
+  }
+
+  const resubmissionControl = findResubmissionControlForTextarea(textarea);
+  if (resubmissionControl) {
+    const minimumWords = resolveMinimumSubmissionWords({ textarea, control: resubmissionControl });
+    return minimumWords ? { control: resubmissionControl, minimumWords, mode: "resubmission" } : null;
+  }
+  return null;
+};
+
+const isGuardedTextarea = (textarea) => Boolean(resolveTextareaContext(textarea));
 
 const hideLegacyMinimumWordProgress = (textarea) => {
   const field = textarea?.parentElement;
@@ -166,6 +230,7 @@ export const updateMinimumWordPanel = ({
   panel.setAttribute("role", showError ? "alert" : "status");
   panel.setAttribute("aria-live", showError ? "assertive" : "polite");
   panel.setAttribute("data-word-count", String(wordCount));
+  panel.setAttribute("data-word-target", String(minimumWords));
   panel.setAttribute("data-word-target-reached", ready ? "true" : "false");
   panel.setAttribute("data-word-error-visible", showError ? "true" : "false");
   panel.style.background = showError ? "#fef2f2" : ready ? "#ecfdf5" : "#fffbeb";
@@ -211,25 +276,30 @@ export default function SubmissionMinimumWordGuard() {
     let activeTextarea = null;
 
     const activateTextarea = (textarea) => {
-      if (!isGuardedTextarea(textarea)) return false;
+      const context = resolveTextareaContext(textarea);
+      if (!context) return false;
       activeTextarea = textarea;
       updateMinimumWordPanel({
         textarea,
+        minimumWords: context.minimumWords,
         error: textarea.getAttribute("aria-invalid") === "true",
       });
       return true;
     };
 
     const handleFocusCapture = (event) => {
+      if (event.target?.matches?.(`[${PANEL_ATTRIBUTE}="true"]`)) return;
       if (!activateTextarea(event.target)) hideMinimumWordPanel();
     };
 
     const handleInputCapture = (event) => {
       const textarea = event.target;
-      if (!isGuardedTextarea(textarea)) return;
+      const context = resolveTextareaContext(textarea);
+      if (!context) return;
       activeTextarea = textarea;
       updateMinimumWordPanel({
         textarea,
+        minimumWords: context.minimumWords,
         error: textarea.getAttribute("aria-invalid") === "true",
       });
     };
@@ -237,12 +307,14 @@ export default function SubmissionMinimumWordGuard() {
     const handleSubmitCapture = (event) => {
       const form = event.target;
       if (!(form instanceof HTMLFormElement)) return;
-      const submitter = event.submitter || null;
+      const submitter = event.submitter || findFinalAssignmentSubmitControl(form);
       if (submitter && !isFinalAssignmentSubmitControl(submitter)) return;
       const textarea = findSubmissionTextarea(form);
       if (!textarea) return;
+      const minimumWords = resolveMinimumSubmissionWords({ textarea, control: submitter });
+      if (!minimumWords) return;
       activeTextarea = textarea;
-      blockShortSubmission({ event, textarea });
+      blockShortSubmission({ event, textarea, minimumWords });
     };
 
     const handleClickCapture = (event) => {
@@ -250,8 +322,10 @@ export default function SubmissionMinimumWordGuard() {
       if (!isResubmissionControl(button)) return;
       const textarea = findResubmissionTextarea(button);
       if (!textarea) return;
+      const minimumWords = resolveMinimumSubmissionWords({ textarea, control: button });
+      if (!minimumWords) return;
       activeTextarea = textarea;
-      blockShortSubmission({ event, textarea });
+      blockShortSubmission({ event, textarea, minimumWords });
     };
 
     document.addEventListener("focusin", handleFocusCapture, true);
@@ -281,11 +355,13 @@ export default function SubmissionMinimumWordGuard() {
 
 export const __TESTING__ = {
   findEditableTextarea,
+  findFinalAssignmentSubmitControl,
+  findResubmissionControlForTextarea,
   findResubmissionTextarea,
   findSubmissionTextarea,
   getPanel,
   isFinalAssignmentSubmitControl,
   isGuardedTextarea,
   isResubmissionControl,
-  isResubmissionTextarea,
+  resolveTextareaContext,
 };
