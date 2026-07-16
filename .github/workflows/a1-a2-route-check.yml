@@ -21,6 +21,8 @@ on:
       - "web/src/utils/a1ChapterSpecificLessonState.test.js"
       - "web/src/utils/a1WorkbookServiceScope.js"
       - "web/src/utils/a1WorkbookServiceScope.test.js"
+      - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
+      - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
       - "web/src/components/A1Day1GreetingsWorkbookPage.js"
       - "web/src/components/A1Day1RadioRegression.test.js"
       - "web/src/components/A1Day21WeatherWorkbookPage.js"
@@ -127,7 +129,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js
+        run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js src/components/A1ChapterSpecificLessonRouteBoundary.test.js
       - name: Test A1 Day 1 Falowen Radio
         working-directory: web
         env:
