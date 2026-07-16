@@ -31,6 +31,14 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the weather lesson. Then continue to the Kapitel 13 workbook assignment.",
   }),
+  22: Object.freeze({
+    key: "a1-day22-health-body-parts-falowen-radio",
+    title: "Health and Body Parts · Kapitel 14.1",
+    youtubeId: "23uCwszjahg",
+    duration: "",
+    instruction:
+      "Listen carefully to the health and body-parts lesson. Then continue to the Kapitel 14.1 workbook assignment.",
+  }),
 });
 
 export const getA1RadioResource = (day = "") =>
