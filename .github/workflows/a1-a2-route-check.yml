@@ -13,6 +13,8 @@ on:
       - "web/src/data/a1RouteAlignment.test.js"
       - "web/src/data/a1AssignmentRegistry.js"
       - "web/src/data/a1AssignmentRegistry.test.js"
+      - "web/src/data/a1CanonicalLessonRoutes.js"
+      - "web/src/data/a1CanonicalLessonRoutes.test.js"
       - "web/src/data/a1CourseBookCards.js"
       - "web/src/data/a1Day20LetterWritingRoutes.js"
       - "web/src/data/a1RadioResources.js"
@@ -36,6 +38,8 @@ on:
       - "web/src/utils/a1NativeWorkbookExperience.test.js"
       - "web/src/utils/a1WorkbookServiceScope.js"
       - "web/src/utils/a1WorkbookServiceScope.test.js"
+      - "web/src/components/A1CanonicalChapterLessonRoute.jsx"
+      - "web/src/components/A1CanonicalChapterLessonRoute.test.jsx"
       - "web/src/components/A1CanonicalSubmissionPanel.jsx"
       - "web/src/components/A1SharedAssignmentWorkbookLayout.jsx"
       - "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
@@ -149,6 +153,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js src/components/A1TutorMarkedWorkbookShell.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1UnifiedTutorWorkbookNavigation.test.js
+      - name: Test permanent A1 chapter lesson routes
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1CanonicalLessonRoutes.test.js src/components/A1CanonicalChapterLessonRoute.test.jsx src/utils/a1ChapterSpecificLessonState.test.js src/components/A1ChapterSpecificLessonRouteBoundary.test.js
       - name: Test A1 letter-writing shared navigation
         working-directory: web
         env:
@@ -197,11 +206,6 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/requestedLessonMediaMappings.test.js src/data/writingVideoResources.test.js src/components/B1WorkbookWritingCheatSheetInjector.test.js
-      - name: Test split A1 lesson chapter state
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/utils/a1ChapterSpecificLessonState.test.js src/components/A1ChapterSpecificLessonRouteBoundary.test.js
       - name: Test A1 Day 1 Falowen Radio
         working-directory: web
         env:
