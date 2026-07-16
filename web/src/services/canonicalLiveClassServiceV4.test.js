@@ -1,17 +1,15 @@
-const mockGetDoc = jest.fn();
-const mockDoc = jest.fn((...parts) => parts.join("/"));
-
 jest.mock("../firebase", () => ({
   db: {},
   collection: jest.fn(),
-  doc: mockDoc,
-  getDoc: mockGetDoc,
+  doc: jest.fn((...parts) => parts.join("/")),
+  getDoc: jest.fn(),
   getDocs: jest.fn(),
   onSnapshot: jest.fn(),
   query: jest.fn(),
   where: jest.fn(),
 }));
 
+import { doc, getDoc } from "../firebase";
 import { __private__ } from "./canonicalLiveClassServiceV4";
 
 describe("canonical live class V4 compatibility", () => {
@@ -41,7 +39,7 @@ describe("canonical live class V4 compatibility", () => {
   });
 
   test("uses the student's exact class document before matching duplicate class names", async () => {
-    mockGetDoc.mockResolvedValue({
+    getDoc.mockResolvedValue({
       id: "a1-bonn-current",
       exists: () => true,
       data: () => ({
@@ -59,7 +57,7 @@ describe("canonical live class V4 compatibility", () => {
       className: "A1 Bonn Klasse",
     });
 
-    expect(mockDoc).toHaveBeenCalledWith({}, "classes", "a1-bonn-current");
+    expect(doc).toHaveBeenCalledWith({}, "classes", "a1-bonn-current");
     expect(klass.id).toBe("a1-bonn-current");
     expect(klass.scheduleRules.map((rule) => rule.day)).toEqual(["wed", "thu", "fri"]);
   });
