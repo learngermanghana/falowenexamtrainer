@@ -1,3 +1,17 @@
+jest.mock("../firebase", () => ({
+  db: {},
+  collection: jest.fn(),
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  getDocs: jest.fn(),
+  isFirebaseConfigured: true,
+  limit: jest.fn(),
+  query: jest.fn(),
+  serverTimestamp: jest.fn(),
+  setDoc: jest.fn(),
+  where: jest.fn(),
+}));
+
 import { __TESTING__ } from "./writingProgressService";
 
 describe("writingProgressService workspace identity", () => {
