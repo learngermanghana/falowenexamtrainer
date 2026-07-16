@@ -5,7 +5,7 @@ import {
   buildMinimumWordError,
   buildMinimumWordMessage,
   countSubmissionWords,
-  updateMinimumWordProgress,
+  updateMinimumWordPanel,
 } from "./SubmissionMinimumWordGuard";
 
 describe("SubmissionMinimumWordGuard", () => {
@@ -32,7 +32,7 @@ describe("SubmissionMinimumWordGuard", () => {
     expect(buildMinimumWordMessage(80)).toBe("80 / 80 words · Ready to submit.");
   });
 
-  test("blocks a short final submission and focuses the visible error", () => {
+  test("blocks a short final submission and focuses the visible error panel", () => {
     document.body.innerHTML = `
       <form>
         <label>
@@ -55,17 +55,18 @@ describe("SubmissionMinimumWordGuard", () => {
     expect(blockShortSubmission({ event, textarea })).toBe(true);
     expect(event.preventDefault).toHaveBeenCalled();
 
-    const error = form.querySelector('[data-submission-minimum-word-error="true"]');
-    expect(error).not.toBeNull();
-    expect(error.getAttribute("role")).toBe("alert");
-    expect(error.textContent).toContain("Please type at least 80 words before submitting.");
-    expect(error.textContent).toContain("Add 68 more words.");
-    expect(document.activeElement).toBe(error);
-    expect(error.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center" });
+    const panel = document.querySelector('[data-submission-minimum-word-panel="true"]');
+    expect(panel).not.toBeNull();
+    expect(panel.getAttribute("role")).toBe("alert");
+    expect(panel.textContent).toContain("Please type at least 80 words before submitting.");
+    expect(panel.textContent).toContain("Add 68 more words.");
+    expect(document.activeElement).toBe(panel);
+    expect(panel.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center" });
     expect(textarea.getAttribute("aria-invalid")).toBe("true");
+    expect(textarea.getAttribute("aria-describedby")).toBe(panel.id);
   });
 
-  test("updates the prominent counter and allows submission at 80 words", () => {
+  test("shows ready status and allows submission at 80 words", () => {
     document.body.innerHTML = `
       <form>
         <label>
@@ -81,10 +82,10 @@ describe("SubmissionMinimumWordGuard", () => {
     const textarea = form.querySelector("textarea");
     textarea.value = Array.from({ length: MINIMUM_SUBMISSION_WORDS }, (_, index) => `word${index}`).join(" ");
 
-    const progressState = updateMinimumWordProgress(textarea);
+    const progressState = updateMinimumWordPanel({ textarea });
     expect(progressState.ready).toBe(true);
-    expect(form.querySelector('[data-submission-minimum-word-progress="true"]').textContent)
-      .toBe("80 / 80 words · Ready to submit.");
+    expect(progressState.panel.textContent).toBe("80 / 80 words · Ready to submit.");
+    expect(progressState.panel.getAttribute("data-word-target-reached")).toBe("true");
 
     const event = {
       preventDefault: jest.fn(),
@@ -105,7 +106,9 @@ describe("SubmissionMinimumWordGuard", () => {
     `;
 
     const button = document.querySelector("button");
+    const corrected = document.querySelector("#corrected");
     expect(__TESTING__.isResubmissionControl(button)).toBe(true);
-    expect(__TESTING__.findResubmissionTextarea(button).id).toBe("corrected");
+    expect(__TESTING__.findResubmissionTextarea(button)).toBe(corrected);
+    expect(__TESTING__.isGuardedTextarea(corrected)).toBe(true);
   });
 });
