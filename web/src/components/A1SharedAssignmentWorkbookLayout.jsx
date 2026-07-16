@@ -10,34 +10,29 @@ export const WorkbookSection = ({ sectionKey, children }) => (
 const contentError = (assignmentKey, message) =>
   new Error(`[A1 workbook ${assignmentKey}] ${message}`);
 
-export const validateWorkbookSections = (assignment, sectionElements, { allowPartialSections = false } = {}) => {
+export const validateWorkbookSections = (assignment, sectionElements) => {
   const declared = assignment.sections.map(({ key }) => key);
   if (new Set(declared).size !== declared.length) {
     throw contentError(assignment.assignmentKey, "declares duplicate section keys.");
   }
 
   const rendered = sectionElements.map((element) => element.props.sectionKey);
-  if (!allowPartialSections) {
-    declared.forEach((key) => {
-      const matches = rendered.filter((renderedKey) => renderedKey === key).length;
-      if (!matches) {
-        throw contentError(
-          assignment.assignmentKey,
-          `declares ${key}, but no WorkbookSection with sectionKey="${key}" was rendered.`,
-        );
-      }
-      if (matches > 1) {
-        throw contentError(assignment.assignmentKey, `renders WorkbookSection sectionKey="${key}" more than once.`);
-      }
-    });
-  }
+  declared.forEach((key) => {
+    const matches = rendered.filter((renderedKey) => renderedKey === key).length;
+    if (!matches) {
+      throw contentError(
+        assignment.assignmentKey,
+        `declares ${key}, but no WorkbookSection with sectionKey="${key}" was rendered.`,
+      );
+    }
+    if (matches > 1) {
+      throw contentError(assignment.assignmentKey, `renders WorkbookSection sectionKey="${key}" more than once.`);
+    }
+  });
 
-  rendered.forEach((key, index) => {
+  rendered.forEach((key) => {
     if (!declared.includes(key)) {
       throw contentError(assignment.assignmentKey, `renders undeclared WorkbookSection sectionKey="${key}".`);
-    }
-    if (rendered.indexOf(key) !== index) {
-      throw contentError(assignment.assignmentKey, `renders WorkbookSection sectionKey="${key}" more than once.`);
     }
   });
 
@@ -171,26 +166,22 @@ export default function A1SharedAssignmentWorkbookLayout({
   children,
   overview,
   renderSubmission,
-  allowPartialSections = false,
 }) {
   const assignment = getA1Assignment(assignmentKey);
   if (!assignment) throw contentError(assignmentKey, "has no canonical registry record.");
 
   const sectionElements = Children.toArray(children).filter(isValidElement);
-  if (process.env.NODE_ENV !== "production") {
-    validateWorkbookSections(assignment, sectionElements, { allowPartialSections });
-  }
+  if (process.env.NODE_ENV !== "production") validateWorkbookSections(assignment, sectionElements);
 
   const renderedKeys = new Set(sectionElements.map((element) => element.props.sectionKey));
   const availableSections = assignment.sections.filter(({ key }) => renderedKeys.has(key));
-  const navigationSections = allowPartialSections ? assignment.sections : availableSections;
-  const { activeTab, fallbackTab, openTab } = useA1WorkbookTabState({ assignment, sections: navigationSections });
+  const { activeTab, fallbackTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections });
 
   return (
     <div data-a1-shared-workbook={assignmentKey} style={{ display: "grid", gap: 16 }}>
       <A1SharedWorkbookTabBar
         assignment={assignment}
-        sections={navigationSections}
+        sections={availableSections}
         activeTab={activeTab}
         onSelect={openTab}
       />
