@@ -1,34 +1,17 @@
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocation } from "react-router-dom";
+import {
+  isA1LetterWritingGrammarPath,
+  normalizeA1CoursePracticePath,
+  shouldAutoMountA1WritingPractice,
+} from "../utils/a1CoursePracticeRoutes";
 import A1ExamSpeakingPracticePanel from "./A1ExamSpeakingPracticePanel";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
 
 const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
 const A1_DAY_19_VIDEO_ID = "gprnEZtMUPM";
 const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
-const LETTER_WRITING_GRAMMAR_PATH = "/campus/course/letter-writing-intro-12-3";
-const LETTER_WRITING_WORKBOOK_PATH =
-  "/campus/course/letter-writing-intro-german-a1-day-12-3";
-
-const WRITING_PATHS = new Set([
-  "/campus/course/a1-day-21-weather-workbook",
-  "/campus/course/a1-day-22-health-and-body-parts-workbook",
-]);
-
-const normalizePath = (pathname = "") =>
-  String(pathname || "")
-    .toLowerCase()
-    .replace(/\/+$/, "") || "/";
-
-export const shouldAutoMountA1WritingPractice = (pathname = "") =>
-  WRITING_PATHS.has(normalizePath(pathname));
-
-export const isA1LetterWritingCourseBookPath = (pathname = "") =>
-  normalizePath(pathname) === LETTER_WRITING_WORKBOOK_PATH;
-
-export const isA1LetterWritingGrammarPath = (pathname = "") =>
-  normalizePath(pathname) === LETTER_WRITING_GRAMMAR_PATH;
 
 const getPageContainer = () => {
   const main = document.querySelector("main") || document.body;
@@ -36,7 +19,7 @@ const getPageContainer = () => {
 };
 
 const isA1Day19LessonRoute = (location) => {
-  const path = normalizePath(location.pathname);
+  const path = normalizeA1CoursePracticePath(location.pathname);
   const chapter = new URLSearchParams(location.search || "").get("chapter");
   return path === A1_DAY_19_LESSON_PATH && String(chapter || "").trim() === "5.9";
 };
@@ -105,7 +88,7 @@ const A1CoursePracticeAutoMount = () => {
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
-    const pathname = normalizePath(location.pathname);
+    const pathname = normalizeA1CoursePracticePath(location.pathname);
     const isCanonicalLessonPage = isA1Day19LessonRoute(location);
     const isWritingPage = shouldAutoMountA1WritingPractice(pathname);
     const isLetterGrammarPage = isA1LetterWritingGrammarPath(pathname);
