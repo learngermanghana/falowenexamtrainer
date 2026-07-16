@@ -6,11 +6,21 @@ jest.mock("./A1CanonicalSubmissionPanel", () => ({ assignment }) => (
   <div data-testid="canonical-submit">Submit {assignment.assignmentKey}</div>
 ));
 
-jest.mock("./CourseInlinePracticePanel", () => ({ title, writingContext }) => (
+jest.mock("./A1CourseBookLetterPracticePanel", () => ({
+  title,
+  taskId,
+  letterType,
+  promptType,
+  placeholder,
+  taskContext,
+}) => (
   <div
     data-testid="letter-practice"
-    data-task-id={writingContext.writingTaskId}
-    data-letter-type={writingContext.letterType}
+    data-task-id={taskId}
+    data-letter-type={letterType}
+    data-prompt-type={promptType}
+    data-placeholder={placeholder}
+    data-task-context={taskContext}
   >
     {title}
   </div>
@@ -62,7 +72,7 @@ describe("A1 Day 20 letter-writing workbook", () => {
     expect(screen.getByTestId("canonical-submit")).toHaveTextContent("A1-12.3");
   });
 
-  test("places one task-specific Mark My Letter tool below each letter", () => {
+  test("places two independently configured Mark My Letter tools below the tasks", () => {
     render(
       <MemoryRouter>
         <A1Day20LetterWritingWorkbookPage />
@@ -71,21 +81,27 @@ describe("A1 Day 20 letter-writing workbook", () => {
 
     const practicePanels = screen.getAllByTestId("letter-practice");
     expect(practicePanels).toHaveLength(2);
-    expect(screen.getByText("Mark My Informal Letter")).toHaveAttribute(
+
+    const informal = screen.getByText("Mark My Informal Letter");
+    const formal = screen.getByText("Mark My Formal Letter");
+
+    expect(informal).toHaveAttribute(
       "data-task-id",
       "A1-12.3-teil-1-informal-letter",
     );
-    expect(screen.getByText("Mark My Formal Letter")).toHaveAttribute(
+    expect(formal).toHaveAttribute(
       "data-task-id",
       "A1-12.3-teil-2-formal-letter",
     );
-    expect(screen.getByText("Mark My Informal Letter")).toHaveAttribute(
-      "data-letter-type",
-      "informal",
+    expect(informal).toHaveAttribute("data-letter-type", "informal");
+    expect(formal).toHaveAttribute("data-letter-type", "formal");
+    expect(informal).toHaveAttribute("data-prompt-type", "note");
+    expect(formal).toHaveAttribute("data-prompt-type", "email");
+    expect(informal.getAttribute("data-placeholder")).toContain("Hallo Anna");
+    expect(formal.getAttribute("data-placeholder")).toContain(
+      "Sehr geehrte Damen und Herren",
     );
-    expect(screen.getByText("Mark My Formal Letter")).toHaveAttribute(
-      "data-letter-type",
-      "formal",
-    );
+    expect(informal.getAttribute("data-task-context")).toContain("informal");
+    expect(formal.getAttribute("data-task-context")).toContain("formal email");
   });
 });
