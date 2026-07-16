@@ -45,10 +45,10 @@ const AuthenticatedAppRoutes = () => (
     <A1Day13RevisionNumberCleanup />
     <AuthProvider>
       <ToastProvider>
-        <RouteScopedAppServices />
-        <A1RadioFirstWorkbookRoutes />
-        <RequestedLessonAiVideoHeader />
         <A1ChapterSpecificLessonRouteBoundary>
+          <RouteScopedAppServices />
+          <A1RadioFirstWorkbookRoutes />
+          <RequestedLessonAiVideoHeader />
           <Routes>
             <Route
               path={A1_DAY11_DIRECT_WORKBOOK_PATH}
