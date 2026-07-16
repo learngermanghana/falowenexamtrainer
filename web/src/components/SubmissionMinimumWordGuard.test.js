@@ -5,6 +5,7 @@ import {
   buildMinimumWordError,
   buildMinimumWordMessage,
   countSubmissionWords,
+  hideMinimumWordPanel,
   updateMinimumWordPanel,
 } from "./SubmissionMinimumWordGuard";
 
@@ -94,6 +95,17 @@ describe("SubmissionMinimumWordGuard", () => {
     };
     expect(blockShortSubmission({ event, textarea })).toBe(false);
     expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  test("hides the panel after the student leaves the submission controls", () => {
+    document.body.innerHTML = "<textarea></textarea>";
+    const textarea = document.querySelector("textarea");
+    textarea.value = "eins zwei drei";
+    const { panel } = updateMinimumWordPanel({ textarea });
+    expect(panel.hidden).toBe(false);
+
+    hideMinimumWordPanel();
+    expect(panel.hidden).toBe(true);
   });
 
   test("finds the corrected-text field for a resubmission button", () => {
