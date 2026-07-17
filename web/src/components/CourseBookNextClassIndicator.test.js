@@ -66,7 +66,7 @@ describe("CourseBookNextClassIndicator", () => {
     expect(formatClassCountdown(session, now)).toBe("Class has ended");
   });
 
-  test("ignores cancelled, past completed and stale live sessions", () => {
+  test("ignores cancelled, completed and stale live sessions", () => {
     const now = new Date("2026-07-01T10:00:00.000Z");
     const expected = {
       id: "upcoming",
