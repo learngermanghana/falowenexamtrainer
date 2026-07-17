@@ -17,14 +17,16 @@ const secondaryBtn = styles.secondaryButton || styles.primaryButton;
 const softBlue = { border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14 };
 const softAmber = { border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 14, padding: 14 };
 const softGreen = { border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14 };
+const detailsStyle = { border: "1px solid #dbeafe", borderRadius: 14, background: "#ffffff", overflow: "hidden" };
+const summaryStyle = { cursor: "pointer", fontWeight: 800, padding: "13px 14px", background: "#eff6ff" };
 
 const modalVerbs = [
-  { verb: "können", meaning: "can / to be able to", example: "Ich kann heute mit dem Zug fahren." },
+  { verb: "können", meaning: "can / to be able to", example: "Ich kann am Hauptbahnhof aussteigen." },
   { verb: "müssen", meaning: "must / to have to", example: "Wir müssen in Hannover umsteigen." },
-  { verb: "dürfen", meaning: "may / to be allowed to", example: "Darf ich diesen Zug nehmen?" },
-  { verb: "wollen", meaning: "to want to", example: "Wir wollen am Samstag fahren." },
-  { verb: "sollen", meaning: "should / to be supposed to", example: "Soll ich einen Sitzplatz reservieren?" },
-  { verb: "möchten", meaning: "would like", example: "Ich möchte eine Fahrkarte kaufen." },
+  { verb: "dürfen", meaning: "may / to be allowed to", example: "Die Fahrgäste dürfen jetzt einsteigen." },
+  { verb: "wollen", meaning: "to want to", example: "Wir wollen früh abfahren." },
+  { verb: "sollen", meaning: "should / to be supposed to", example: "Du sollst um 16:08 Uhr ankommen." },
+  { verb: "möchten", meaning: "would like", example: "Ich möchte morgen zurückfahren." },
 ];
 
 const modalConjugations = [
@@ -34,6 +36,51 @@ const modalConjugations = [
   { pronoun: "wir", können: "können", müssen: "müssen", dürfen: "dürfen", wollen: "wollen", sollen: "sollen", möchten: "möchten" },
   { pronoun: "ihr", können: "könnt", müssen: "müsst", dürfen: "dürft", wollen: "wollt", sollen: "sollt", möchten: "möchtet" },
   { pronoun: "Sie / sie", können: "können", müssen: "müssen", dürfen: "dürfen", wollen: "wollen", sollen: "sollen", möchten: "möchten" },
+];
+
+const separableVerbs = [
+  {
+    display: "ab|fahren",
+    prefix: "ab-",
+    meaning: "to depart",
+    withoutModal: "Der Zug fährt um 14:20 Uhr ab.",
+    withModal: "Der Zug muss um 14:20 Uhr abfahren.",
+  },
+  {
+    display: "an|kommen",
+    prefix: "an-",
+    meaning: "to arrive",
+    withoutModal: "Der Zug kommt um 16:08 Uhr an.",
+    withModal: "Der Zug soll um 16:08 Uhr ankommen.",
+  },
+  {
+    display: "um|steigen",
+    prefix: "um-",
+    meaning: "to change trains",
+    withoutModal: "Wir steigen in Hannover um.",
+    withModal: "Wir müssen in Hannover umsteigen.",
+  },
+  {
+    display: "ein|steigen",
+    prefix: "ein-",
+    meaning: "to get on",
+    withoutModal: "Die Fahrgäste steigen jetzt ein.",
+    withModal: "Die Fahrgäste dürfen jetzt einsteigen.",
+  },
+  {
+    display: "aus|steigen",
+    prefix: "aus-",
+    meaning: "to get off",
+    withoutModal: "Ich steige am Hauptbahnhof aus.",
+    withModal: "Ich muss am Hauptbahnhof aussteigen.",
+  },
+  {
+    display: "zurück|fahren",
+    prefix: "zurück-",
+    meaning: "to travel back",
+    withoutModal: "Wir fahren am Sonntag zurück.",
+    withModal: "Wir möchten am Sonntag zurückfahren.",
+  },
 ];
 
 const trainBoardRows = [
@@ -67,60 +114,60 @@ const travelVocabulary = [
 
 const knowledgeQuestions = [
   {
-    id: "conjugation-ich",
-    prompt: "Complete: Ich ___ heute mit dem Zug fahren.",
-    options: ["kann", "können", "kannst"],
-    answer: "kann",
-    explanation: "With ich, können becomes kann.",
+    id: "prefix-abfahren",
+    prompt: "Which prefix belongs to abfahren?",
+    options: ["ab-", "an-", "um-"],
+    answer: "ab-",
+    explanation: "The separable prefix in abfahren is ab-: ab|fahren.",
   },
   {
-    id: "conjugation-du",
-    prompt: "Complete: Du ___ eine Fahrkarte kaufen.",
-    options: ["musst", "muss", "müssen"],
-    answer: "musst",
-    explanation: "With du, müssen becomes musst.",
+    id: "without-modal-abfahren",
+    prompt: "Choose the correct sentence without a modal verb.",
+    options: ["Der Zug fährt um 14:20 Uhr ab.", "Der Zug abfährt um 14:20 Uhr.", "Der Zug fährt ab um 14:20 Uhr ab."],
+    answer: "Der Zug fährt um 14:20 Uhr ab.",
+    explanation: "Without a modal verb, the prefix moves to the end: fährt ... ab.",
   },
   {
-    id: "moegen-moechten",
-    prompt: "Which sentence politely asks for a ticket?",
-    options: ["Ich mag eine Fahrkarte.", "Ich möchte eine Fahrkarte.", "Ich muss eine Fahrkarte."],
-    answer: "Ich möchte eine Fahrkarte.",
-    explanation: "möchten expresses a polite wish. mögen normally expresses liking.",
+    id: "with-modal-abfahren",
+    prompt: "Choose the correct sentence with a modal verb.",
+    options: ["Der Zug muss um 14:20 Uhr abfahren.", "Der Zug muss um 14:20 Uhr fährt ab.", "Der Zug abfahren muss um 14:20 Uhr."],
+    answer: "Der Zug muss um 14:20 Uhr abfahren.",
+    explanation: "After a modal verb, abfahren stays together as a complete infinitive at the end.",
   },
   {
-    id: "word-order",
+    id: "modal-ankommen",
+    prompt: "Complete: Der Zug soll um 16:08 Uhr ___.",
+    options: ["ankommen", "kommt ... an", "an ... kommen"],
+    answer: "ankommen",
+    explanation: "With sollen, the complete infinitive ankommen stays together at the end.",
+  },
+  {
+    id: "modal-umsteigen",
     prompt: "Choose the correct word order.",
-    options: ["Ich kann Deutsch sprechen.", "Ich kann sprechen Deutsch.", "Ich Deutsch kann sprechen."],
-    answer: "Ich kann Deutsch sprechen.",
-    explanation: "The conjugated modal verb is in position 2 and the infinitive goes to the end.",
-  },
-  {
-    id: "permission",
-    prompt: "Complete: ___ ich diesen Zug nehmen?",
-    options: ["Darf", "Möchte", "Muss"],
-    answer: "Darf",
-    explanation: "Darf ich ...? asks for permission: May I ...?",
-  },
-  {
-    id: "advice",
-    prompt: "Which modal verb normally gives advice or says what someone should do?",
-    options: ["sollen", "wollen", "dürfen"],
-    answer: "sollen",
-    explanation: "sollen is used for advice, recommendations and instructions from another person.",
-  },
-  {
-    id: "modal-transfer",
-    prompt: "Choose the correct sentence with a separable verb and a modal verb.",
     options: ["Wir müssen in Hannover umsteigen.", "Wir müssen in Hannover steigen um.", "Wir umsteigen müssen in Hannover."],
     answer: "Wir müssen in Hannover umsteigen.",
-    explanation: "After a modal verb, the complete infinitive umsteigen stays together at the end.",
+    explanation: "The modal verb is conjugated and umsteigen stays together at the end.",
   },
   {
-    id: "separable-depart",
-    prompt: "Complete without a modal verb: Der Zug ___ um 14:20 Uhr ___.",
-    options: ["fährt ... ab", "ab ... fährt", "muss ... fährt"],
-    answer: "fährt ... ab",
-    explanation: "Without a modal verb, abfahren separates: fährt ... ab.",
+    id: "modal-einsteigen",
+    prompt: "Complete: Die Fahrgäste dürfen jetzt ___.",
+    options: ["einsteigen", "steigen ... ein", "ein ... steigen"],
+    answer: "einsteigen",
+    explanation: "After dürfen, use the complete infinitive einsteigen.",
+  },
+  {
+    id: "modal-aussteigen",
+    prompt: "Which sentence is correct?",
+    options: ["Ich muss am Hauptbahnhof aussteigen.", "Ich muss am Hauptbahnhof steige aus.", "Ich aussteigen muss am Hauptbahnhof."],
+    answer: "Ich muss am Hauptbahnhof aussteigen.",
+    explanation: "The complete infinitive aussteigen goes to the end.",
+  },
+  {
+    id: "modal-zurueckfahren",
+    prompt: "Complete: Wir möchten am Sonntag ___.",
+    options: ["zurückfahren", "fahren ... zurück", "zurück ... fahren"],
+    answer: "zurückfahren",
+    explanation: "After möchten, zurückfahren stays together at the end.",
   },
   {
     id: "board-platform",
@@ -183,18 +230,18 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" }} />
           <div style={{ position: "absolute", left: 14, right: 14, bottom: 12, color: "white" }}>
-            <div style={{ fontWeight: 800, fontSize: 19 }}>A1 · Day 14 · Modal Verbs</div>
-            <div style={{ opacity: 0.94, fontSize: 13 }}>können · müssen · dürfen · wollen · sollen · möchten</div>
+            <div style={{ fontWeight: 800, fontSize: 19 }}>A1 · Day 14 · Modal Verbs with Separable Verbs</div>
+            <div style={{ opacity: 0.94, fontSize: 13 }}>ab|fahren · an|kommen · um|steigen · ein|steigen · aus|steigen</div>
           </div>
         </div>
 
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
           <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
           <div style={{ display: "grid", gap: 6 }}>
-            <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 14 Workbook · Modal Verbs</h1>
-            <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 3.6 · Core grammar first · Train travel application</p>
+            <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 14 Workbook · Modal Verbs with Separable Verbs</h1>
+            <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 3.6 · Trennbare Verben after modal verbs</p>
             <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.7 }}>
-              Learn the meaning, conjugation and sentence position of the most important A1 modal verbs. Then apply them in a practical train-station situation.
+              You already know how modal verbs work with normal main verbs. This lesson focuses on what changes when the second verb is separable.
             </p>
           </div>
         </div>
@@ -202,17 +249,17 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="1) Learning goals">
         <div style={softBlue}>
-          This lesson teaches modal verbs first. The detailed train board, ticket and vocabulary are available later as optional extra practice.
+          The new point is simple: after a modal verb, a separable verb stays together as one complete infinitive at the end.
         </div>
         <ul style={listStyle}>
-          <li>Choose the correct modal verb for ability, obligation, permission, intention, advice and polite wishes.</li>
-          <li>Conjugate <strong>können, müssen, dürfen, wollen, sollen</strong> and <strong>möchten</strong>.</li>
-          <li>Put the conjugated modal verb in position 2 and the infinitive at the end.</li>
-          <li>Understand the difference between <strong>mögen</strong> and <strong>möchten</strong>.</li>
+          <li>Recognise common prefixes such as <strong>ab-, an-, ein-, aus-, um-</strong> and <strong>zurück-</strong>.</li>
+          <li>Compare a separable verb with and without a modal verb.</li>
+          <li>Keep the prefix and verb together after <strong>können, müssen, dürfen, wollen, sollen</strong> and <strong>möchten</strong>.</li>
+          <li>Build correct sentences such as <strong>Wir müssen in Hannover umsteigen.</strong></li>
         </ul>
       </SectionCard>
 
-      <SectionCard title="2) Meaning and usage">
+      <SectionCard title="2) Quick modal-verb review">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10 }}>
           {modalVerbs.map((item) => (
             <div key={item.verb} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 13, background: "#f8fafc" }}>
@@ -222,16 +269,11 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           ))}
         </div>
         <div style={softAmber}>
-          <strong>mögen and möchten are not used in the same way.</strong><br />
-          <strong>mögen = to like:</strong> Ich mag Zugreisen. Ich mag Kaffee.<br />
-          <strong>möchten = would like:</strong> Ich möchte eine Fahrkarte. Ich möchte nach Hamburg fahren.
+          <strong>Remember:</strong> <strong>mögen</strong> means to like: <em>Ich mag Zugreisen.</em> <strong>möchten</strong> expresses a polite wish: <em>Ich möchte morgen zurückfahren.</em>
         </div>
       </SectionCard>
 
-      <SectionCard title="3) Conjugation table">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The singular forms often change strongly. Learn <strong>ich</strong>, <strong>du</strong> and <strong>er / sie / es</strong> carefully.
-        </p>
+      <SectionCard title="3) Quick conjugation review">
         <div style={{ overflowX: "auto", border: "1px solid #dbeafe", borderRadius: 14 }}>
           <table aria-label="Modal verb conjugation table" style={{ width: "100%", minWidth: 760, borderCollapse: "collapse", background: "white" }}>
             <thead>
@@ -253,61 +295,66 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             </tbody>
           </table>
         </div>
-        <div style={softGreen}>
-          <strong>Notice:</strong> ich and er / sie / es have the same form: <em>ich kann</em> and <em>er kann</em>; <em>ich muss</em> and <em>sie muss</em>.
-        </div>
       </SectionCard>
 
-      <SectionCard title="4) Sentence structure">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The modal verb is conjugated in position 2. The second verb stays in the infinitive and goes to the end.
-        </p>
+      <SectionCard title="4) Modal verbs with separable verbs · Trennbare Verben">
         <div style={softBlue}>
-          <strong>Pattern:</strong> Subject + modal verb + time / place / details + infinitive.<br />
-          <strong>Example:</strong> Ich <strong>möchte</strong> morgen nach Hamburg <strong>fahren</strong>.
+          <strong>Sentence pattern:</strong> Subject + conjugated modal verb + details + complete separable infinitive.<br />
+          <strong>Example:</strong> Wir <strong>müssen</strong> in Hannover <strong>umsteigen</strong>.
         </div>
+
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
-          <div style={softGreen}>
-            <strong>Correct</strong><br />
-            Ich kann Deutsch sprechen.<br />
-            Wir müssen in Hannover umsteigen.
-          </div>
           <div style={softAmber}>
-            <strong>Common mistakes</strong><br />
-            <s>Ich kann spreche Deutsch.</s><br />
-            <s>Wir müssen steigen in Hannover um.</s>
+            <strong>Without a modal verb</strong><br />
+            The verb separates. The prefix moves to the end.<br /><br />
+            Der Zug <strong>fährt</strong> um 14:20 Uhr <strong>ab</strong>.
+          </div>
+          <div style={softGreen}>
+            <strong>With a modal verb</strong><br />
+            The separable verb stays together as an infinitive at the end.<br /><br />
+            Der Zug <strong>muss</strong> um 14:20 Uhr <strong>abfahren</strong>.
           </div>
         </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          {separableVerbs.map((item) => (
+            <article key={item.display} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#ffffff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
+                <strong style={{ fontSize: "1.05rem" }}>{item.display}</strong>
+                <span><strong>Prefix:</strong> {item.prefix} · {item.meaning}</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 8, marginTop: 10 }}>
+                <div style={softAmber}><strong>No modal:</strong><br />{item.withoutModal}</div>
+                <div style={softGreen}><strong>With modal:</strong><br />{item.withModal}</div>
+              </div>
+            </article>
+          ))}
+        </div>
+
         <div style={softBlue}>
-          <strong>Separable verb rule:</strong> Without a modal verb: <em>Der Zug fährt um 14:20 Uhr ab.</em> With a modal verb, keep the infinitive together: <em>Der Zug muss um 14:20 Uhr abfahren.</em>
+          <strong>Three steps:</strong>
+          <ol style={{ ...listStyle, marginTop: 8 }}>
+            <li>Conjugate the modal verb: <strong>müssen → wir müssen</strong>.</li>
+            <li>Keep the prefix attached to the verb: <strong>um + steigen → umsteigen</strong>.</li>
+            <li>Put the complete infinitive at the end: <strong>Wir müssen in Hannover umsteigen.</strong></li>
+          </ol>
+        </div>
+
+        <div style={softAmber}>
+          <strong>Do not separate the second verb after a modal verb.</strong><br />
+          <s>Wir müssen in Hannover steigen um.</s><br />
+          <strong>Correct:</strong> Wir müssen in Hannover umsteigen.
         </div>
       </SectionCard>
 
-      <SectionCard title="5) Practical application · Eine Fahrkarte buchen">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
-          <div style={softAmber}><strong>Destination</strong><br />Ich möchte nach Hamburg fahren.</div>
-          <div style={softAmber}><strong>Journey type</strong><br />Eine einfache Fahrt, bitte.<br />Hin und zurück, bitte.</div>
-          <div style={softAmber}><strong>Permission or possibility</strong><br />Darf ich diesen Zug nehmen?<br />Kann ich mit Karte bezahlen?</div>
-          <div style={softAmber}><strong>Obligation</strong><br />Muss ich umsteigen?</div>
-        </div>
-        <div style={{ ...softGreen, display: "grid", gap: 7 }}>
-          <strong>Model dialogue</strong>
-          <span><strong>Reisender:</strong> Guten Tag. Ich möchte eine Fahrkarte nach Hamburg.</span>
-          <span><strong>Mitarbeiterin:</strong> Einfach oder hin und zurück?</span>
-          <span><strong>Reisender:</strong> Hin und zurück, bitte. Muss ich umsteigen?</span>
-          <span><strong>Mitarbeiterin:</strong> Nein. Sie können direkt fahren.</span>
-          <span><strong>Reisender:</strong> Kann ich mit Karte bezahlen?</span>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="6) Extra train reading practice">
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800, padding: "4px 0" }}>
-            Open departure board, ticket and vocabulary
-          </summary>
-          <div style={{ display: "grid", gap: 16, marginTop: 14 }}>
-            <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: "1rem" }}>Die Abfahrtstafel · Departure board</h3>
+      <SectionCard title="5) Extra train reading practice">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          The practice resources are shown below. Each part is open by default and can be collapsed or expanded separately.
+        </p>
+        <div style={{ display: "grid", gap: 12 }}>
+          <details open style={detailsStyle}>
+            <summary style={summaryStyle}>Departure board · Die Abfahrtstafel</summary>
+            <div style={{ padding: 14 }}>
               <div aria-label="German train departure board" style={{ borderRadius: 14, border: "1px solid #334155", background: "#0f172a", color: "#f8fafc", overflow: "hidden" }}>
                 <div style={{ padding: "12px 14px", fontWeight: 800, letterSpacing: 0.5, borderBottom: "1px solid #475569" }}>
                   ABFAHRT · DEPARTURES
@@ -329,9 +376,11 @@ const A1Day14ModalVerbsWorkbookPage = () => {
                 </div>
               </div>
             </div>
+          </details>
 
-            <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: "1rem" }}>Die Fahrkarte · Ticket</h3>
+          <details open style={detailsStyle}>
+            <summary style={summaryStyle}>Ticket · Die Fahrkarte</summary>
+            <div style={{ padding: 14 }}>
               <div aria-label="Example German train ticket" style={{ border: "2px solid #1d4ed8", borderRadius: 18, overflow: "hidden", background: "#ffffff", boxShadow: "0 10px 24px rgba(15,23,42,.08)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: 16, background: "linear-gradient(135deg,#1d4ed8,#1e3a8a)", color: "white" }}>
                   <div><strong style={{ fontSize: 20 }}>FALOWEN BAHN</strong><br /><span>Digitales Ticket</span></div>
@@ -348,49 +397,38 @@ const A1Day14ModalVerbsWorkbookPage = () => {
                 <div style={{ padding: 14 }}><strong>Direktverbindung:</strong> kein Umstieg</div>
               </div>
             </div>
+          </details>
 
-            <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: "1rem" }}>Essential vocabulary</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8 }}>
-                {travelVocabulary.map(([german, english]) => (
-                  <div key={german} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 11, background: "#f8fafc" }}>
-                    <strong>{german}</strong><br /><span style={{ color: "#475569" }}>{english}</span>
-                  </div>
-                ))}
-              </div>
+          <details open style={detailsStyle}>
+            <summary style={summaryStyle}>Vocabulary · Wortschatz</summary>
+            <div style={{ padding: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8 }}>
+              {travelVocabulary.map(([german, english]) => (
+                <div key={german} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 11, background: "#f8fafc" }}>
+                  <strong>{german}</strong><br /><span style={{ color: "#475569" }}>{english}</span>
+                </div>
+              ))}
             </div>
-          </div>
-        </details>
-      </SectionCard>
-
-      <SectionCard title="7) Speaking practice · At the ticket counter">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Work with a partner. Student A is the traveller. Student B works at the ticket counter. Use at least three different modal verbs.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
-          <div style={softBlue}>
-            <strong>Student A must include:</strong>
-            <ul style={listStyle}>
-              <li>Ich möchte ...</li>
-              <li>Muss ich ...?</li>
-              <li>Kann ich ...?</li>
-              <li>Darf ich ...?</li>
-            </ul>
-          </div>
-          <div style={softAmber}>
-            <strong>Student B should answer with:</strong>
-            <ul style={listStyle}>
-              <li>Sie können ...</li>
-              <li>Sie müssen nicht ...</li>
-              <li>Sie dürfen ...</li>
-              <li>Sie sollen ...</li>
-            </ul>
-          </div>
+          </details>
         </div>
       </SectionCard>
 
-      <SectionCard title="8) Knowledge test">
-        <p style={{ margin: 0 }}>Answer all ten questions. The final two questions use the optional train-reading practice.</p>
+      <SectionCard title="6) Sentence-building practice">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Change each sentence so that it contains a modal verb. Keep the separable infinitive together at the end.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
+          <div style={softAmber}><strong>Der Zug fährt um 14:20 Uhr ab.</strong><br />→ Der Zug muss um 14:20 Uhr abfahren.</div>
+          <div style={softAmber}><strong>Wir steigen in Hannover um.</strong><br />→ Wir müssen in Hannover umsteigen.</div>
+          <div style={softAmber}><strong>Die Fahrgäste steigen jetzt ein.</strong><br />→ Die Fahrgäste dürfen jetzt einsteigen.</div>
+          <div style={softAmber}><strong>Ich steige am Hauptbahnhof aus.</strong><br />→ Ich muss am Hauptbahnhof aussteigen.</div>
+        </div>
+        <div style={softGreen}>
+          <strong>Your turn:</strong> Write one sentence each with <strong>ankommen, abfahren, umsteigen, einsteigen</strong> and <strong>aussteigen</strong>. Use a different modal verb where possible.
+        </div>
+      </SectionCard>
+
+      <SectionCard title="7) Knowledge test">
+        <p style={{ margin: 0 }}>Answer all ten questions. The final two questions use the train-reading practice above.</p>
         <div style={{ display: "grid", gap: 14 }}>
           {knowledgeQuestions.map((question, index) => {
             const selected = selectedAnswers[question.id];
@@ -435,19 +473,19 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           <div role="status" style={score >= 7 ? softGreen : softAmber}>
             <strong>Score: {score} / {knowledgeQuestions.length}</strong><br />
             {score >= 7
-              ? "Good understanding. Review any incorrect conjugations and practise the model dialogue aloud."
-              : "Review the meanings, conjugation table and sentence-position rule, then try the test again."}
+              ? "Good understanding. Review any incorrect separable prefixes and practise the sentence pairs aloud."
+              : "Review the prefix list and the difference between sentences with and without modal verbs, then try again."}
           </div>
         ) : null}
       </SectionCard>
 
-      <SectionCard title="9) Final self-check">
+      <SectionCard title="8) Final self-check">
         <ul style={listStyle}>
-          <li>I understand the main meanings of können, müssen, dürfen, wollen, sollen and möchten.</li>
-          <li>I can conjugate the modal verbs with ich, du, er / sie / es, wir, ihr and Sie.</li>
-          <li>I understand that mögen means to like and möchten means would like.</li>
-          <li>I can put the modal verb in position 2 and the infinitive at the end.</li>
-          <li>I can use modal verbs in a practical ticket-counter conversation.</li>
+          <li>I can recognise common separable prefixes such as ab-, an-, ein-, aus-, um- and zurück-.</li>
+          <li>I can separate the verb when there is no modal verb: <strong>Der Zug fährt ab.</strong></li>
+          <li>I can keep the infinitive together after a modal verb: <strong>Der Zug muss abfahren.</strong></li>
+          <li>I can place the conjugated modal verb in position 2 and the complete separable infinitive at the end.</li>
+          <li>I can build sentences with ankommen, abfahren, umsteigen, einsteigen and aussteigen.</li>
         </ul>
       </SectionCard>
     </div>
