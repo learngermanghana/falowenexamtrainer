@@ -31,6 +31,14 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the German numbers lesson. Then continue to the Kapitel 2 workbook assignment.",
   }),
+  5: Object.freeze({
+    key: "a1-day5-introducing-yourself-articles-falowen-radio",
+    title: "Introducing Yourself and Articles · Kapitel 1.3",
+    youtubeId: "4yGJ9-Fz19A",
+    duration: "",
+    instruction:
+      "Listen carefully to the lesson on introductions, articles, adjectives and W-questions. Then continue to the Day 5 workbook.",
+  }),
   13: Object.freeze({
     key: "a1-day13-revision-numbers-time-prices-falowen-radio",
     title: "Revision: Numbers, Time and Prices",
