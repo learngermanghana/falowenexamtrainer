@@ -6,6 +6,7 @@ import {
   liveClassCleanTitle,
   liveClassLessonLabel,
   liveClassLessonLink,
+  liveClassSessionStatus,
   loadLiveClassSummaryCache,
   saveLiveClassSummaryCache,
   upcomingLiveClassSessions,
@@ -94,6 +95,15 @@ describe("lesson-first live class presentation", () => {
     );
   });
 
+  test("uses the Admin session time when a repaired future session has a stale completed status", () => {
+    expect(
+      liveClassSessionStatus(
+        { ...a1BonnDay3, status: "completed" },
+        new Date("2026-07-17T09:45:00.000Z"),
+      ),
+    ).toBe("Today");
+  });
+
   test("previews the next two active lessons and excludes cancellations", () => {
     expect(
       upcomingLiveClassSessions(summary, lesson20, new Date("2026-07-15T12:00:00.000Z"), 2)
@@ -110,10 +120,10 @@ describe("lesson-first live class presentation", () => {
     expect(cached.isCachedSummary).toBe(true);
   });
 
-  test("does not load schedules stored by the previous seven-day cache", () => {
+  test("does not load schedules stored by the previous cache version", () => {
     window.localStorage.clear();
     window.localStorage.setItem(
-      "falowen:live-class-summary:v1:a2-koln",
+      "falowen:live-class-summary:v2:a2-koln",
       JSON.stringify({ cachedAt: Date.now(), summary }),
     );
     expect(loadLiveClassSummaryCache({ classId: "a2-koln", className: "A2 Koln Klasse" })).toBeNull();
