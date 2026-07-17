@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-07-16T18:02:07.910Z",
-  "success": true,
-  "endpoint": "https://www.falowen.app/api/public/classes",
-  "httpStatus": "200",
-  "error": ""
+  "checkedAt": "2026-07-17T08:59:36.783Z",
+  "success": false,
+  "endpoint": "",
+  "httpStatus": "",
+  "error": "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog returned 404"
 }
