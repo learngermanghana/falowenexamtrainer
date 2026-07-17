@@ -124,7 +124,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
 
     expect(indexSource).toContain("A1ChapterResourceHubRoute");
-    expect(indexSource).toContain('path="/campus/course/lesson/A1/:day"');
+    expect(indexSource).toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
     expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
   });
