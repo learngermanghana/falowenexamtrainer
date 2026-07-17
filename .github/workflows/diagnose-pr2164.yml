@@ -1,9 +1,10 @@
 name: Diagnose PR 2164
 
 on:
-  push:
-    branches:
-      - fix/day3-radio-title-a1-word-minimum
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/diagnose-pr2164.yml"
 
 permissions:
   contents: read
