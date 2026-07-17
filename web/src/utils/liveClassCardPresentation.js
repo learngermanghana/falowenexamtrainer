@@ -1,6 +1,6 @@
 export const GHANA_TIMEZONE = "Africa/Accra";
 
-const CACHE_PREFIX = "falowen:live-class-summary:v2:";
+const CACHE_PREFIX = "falowen:live-class-summary:v3:";
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
 const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
@@ -100,10 +100,11 @@ export const liveClassLessonLink = (summary = {}, session = {}) => {
 export const liveClassSessionStatus = (session = {}, now = new Date()) => {
   const stored = String(session.status || session.sessionStatus || "scheduled").trim().toLowerCase();
   if (stored === "cancelled") return "Cancelled";
-  if (stored === "completed") return "Completed";
   const start = asLiveClassDate(session.startsAt)?.getTime() || 0;
   const end = asLiveClassDate(session.endsAt)?.getTime() || 0;
   const current = now.getTime();
+  if (stored === "completed" && end && end < current) return "Completed";
+  if (stored === "completed" && !start && !end) return "Completed";
   if (stored === "live" || (start && current >= start && (!end || current <= end))) return "Live now";
   if (end && end < current) return "Completed";
   if (start) {
