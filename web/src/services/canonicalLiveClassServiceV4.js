@@ -10,12 +10,53 @@ import {
 import * as base from "./canonicalLiveClassServiceV3";
 
 export {
-  buildCanonicalLiveClassSummary,
   findCanonicalClass,
   normalizeCurriculumIds,
 } from "./canonicalLiveClassServiceV3";
 
 const OFFICIAL_CURRICULUM_SOURCE = "coursedictionarydaygroups";
+const OFFICIAL_SESSION_REQUIREMENTS = Object.freeze({
+  A1: 25,
+  A2: 28,
+  B1: 28,
+});
+
+function extractClassLevel(klass = {}) {
+  const source = [
+    klass.levelId,
+    klass.level,
+    klass.name,
+    klass.className,
+    klass.slug,
+  ].join(" ").toUpperCase();
+  return source.match(/\b(A1|A2|B1)\b/)?.[1] || "";
+}
+
+function applyOfficialSessionRequirement(klass = {}) {
+  if (!klass || typeof klass !== "object") return klass;
+  const requiredCount = OFFICIAL_SESSION_REQUIREMENTS[extractClassLevel(klass)];
+  if (!requiredCount) return klass;
+
+  if (
+    Number(klass.officialSessionCount) === requiredCount
+    && Number(klass.curriculumMappedSessionCount) === requiredCount
+  ) {
+    return klass;
+  }
+
+  return {
+    ...klass,
+    officialSessionCount: requiredCount,
+    curriculumMappedSessionCount: requiredCount,
+  };
+}
+
+export function buildCanonicalLiveClassSummary(options = {}) {
+  return base.buildCanonicalLiveClassSummary({
+    ...options,
+    klass: applyOfficialSessionRequirement(options.klass || {}),
+  });
+}
 
 function toDate(value) {
   if (!value) return null;
@@ -80,10 +121,11 @@ async function findPreferredCanonicalClass({ classId, className, slug } = {}) {
   if (directClassId && db) {
     const directSnapshot = await getDoc(doc(db, "classes", directClassId));
     if (directSnapshot.exists()) {
-      return { id: directSnapshot.id, ...directSnapshot.data() };
+      return applyOfficialSessionRequirement({ id: directSnapshot.id, ...directSnapshot.data() });
     }
   }
-  return base.findCanonicalClass({ classId, className, slug });
+  const matched = await base.findCanonicalClass({ classId, className, slug });
+  return applyOfficialSessionRequirement(matched);
 }
 
 function canonicalSessionLookups(klass = {}) {
@@ -105,7 +147,7 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
 
   const emit = () => {
     if (stopped || !currentClass) return;
-    onChange?.(base.buildCanonicalLiveClassSummary({
+    onChange?.(buildCanonicalLiveClassSummary({
       klass: currentClass,
       sessions: [...sessionBuckets.values()].flat(),
       zoomProfile,
@@ -130,7 +172,7 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
         doc(db, "classes", klass.id),
         async (snapshot) => {
           if (!snapshot.exists() || stopped) return;
-          currentClass = { id: snapshot.id, ...snapshot.data() };
+          currentClass = applyOfficialSessionRequirement({ id: snapshot.id, ...snapshot.data() });
           zoomProfile = await loadZoomProfile(currentClass).catch(() => null);
           emit();
         },
@@ -160,7 +202,9 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
 }
 
 export const __private__ = {
+  applyOfficialSessionRequirement,
   canonicalCurriculumIndex,
+  extractClassLevel,
   findPreferredCanonicalClass,
   normalizeSession,
 };
