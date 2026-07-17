@@ -1,0 +1,38 @@
+name: Debug A1 hub
+
+on:
+  push:
+    branches:
+      - fix/a1-day2-hub-and-media
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Capture A1 hub test output
+        working-directory: web
+        shell: bash
+        run: |
+          set +e
+          CI=true npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js > a1-hub-test.log 2>&1
+          echo "$?" > a1-hub-test.status
+          exit 0
+      - name: Upload diagnostic output
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-hub-test-output
+          path: |
+            web/a1-hub-test.log
+            web/a1-hub-test.status
