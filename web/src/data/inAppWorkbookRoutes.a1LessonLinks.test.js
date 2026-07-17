@@ -2,12 +2,15 @@ import fs from "fs";
 import path from "path";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
+import { courseSchedules } from "./courseSchedule";
 import {
   A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
+import { normalizeLesson } from "./lessonModel";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
+import { findCourseBookEntry } from "../utils/courseBookEntries";
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
@@ -86,6 +89,44 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 2, chapter: "1.1" })).toBe(
       "/campus/course/a1-day-2-kapitel-1-1-workbook",
     );
+  });
+
+  it("builds the Day 2 Kapitel 1.1 hub with only the selected chapter resources", () => {
+    const entry = findCourseBookEntry({
+      entries: courseSchedules.A1,
+      level: "A1",
+      day: 2,
+      chapter: "1.1",
+    });
+    const lesson = normalizeLesson(entry, "A1");
+
+    expect(entry.chapter).toBe("1.1");
+    expect(lesson.resources.resourceGroups).toEqual([
+      {
+        chapter: "1.1",
+        grammarBook: { url: "/campus/course/singular-pronouns-verb-conjugation-day-2" },
+        workbook: { url: "/campus/course/a1-day-2-kapitel-1-1-workbook" },
+      },
+    ]);
+    expect(lesson.resources.videos.map((video) => video.url)).toEqual(
+      expect.arrayContaining([
+        "https://youtu.be/AjsnO1hxDs4",
+        "https://youtu.be/kqagu9qsOcc",
+      ]),
+    );
+  });
+
+  it("mounts the chapter hub route before the app can redirect straight to a workbook", () => {
+    const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
+    const hubRouteSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/A1ChapterResourceHubRoute.jsx"),
+      "utf8",
+    );
+
+    expect(indexSource).toContain("A1ChapterResourceHubRoute");
+    expect(indexSource).toContain('path="/campus/course/lesson/A1/:day"');
+    expect(hubRouteSource).toContain('query.get("hub") === "1"');
+    expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
   });
 
   it("keeps Day 2 Chapter 1.1 on the original two-part assignment", () => {
