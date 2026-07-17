@@ -52,6 +52,8 @@ on:
       - "web/src/components/A1TutorMarkedWorkbookShell.test.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
+      - "web/src/components/A1ChapterResourceHubRoute.jsx"
+      - "web/src/components/CourseLessonDirectOpen.test.jsx"
       - "web/src/components/A1CourseBookLetterPracticePanel.js"
       - "web/src/components/A1CourseBookLetterPracticePanel.test.js"
       - "web/src/components/A1CoursePracticeAutoMount.js"
@@ -117,6 +119,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/courseBookProgression.test.js src/components/CourseBookLayoutStandardizer.test.js
+      - name: Test B2 and C1 lessons opened in a fresh tab
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseLessonDirectOpen.test.jsx
       - name: Test A1 lesson resource hubs
         working-directory: web
         env:
@@ -220,7 +227,7 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1Day1RadioRegression.test.js
-      - name: Test A1 Day 13, Day 21 and Day 22 Falowen Radio
+      - name: Test A1 Day 4, Day 13, Day 21 and Day 22 Falowen Radio
         working-directory: web
         env:
           CI: true
