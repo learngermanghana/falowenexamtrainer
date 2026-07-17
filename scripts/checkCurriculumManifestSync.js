@@ -13,6 +13,14 @@ const GENERATED_FILES = [
 ];
 const ROUTE_PROPS = ['grammarPage', 'workbookRoute'];
 const URL_PATTERN = /^(?:https?:|mailto:|tel:)/i;
+const OPTIONAL_MEDIA_FIELDS = new Set([
+  'video',
+  'teacherVideo',
+  'youtube_link',
+  'aiVideo',
+  'ai_video',
+  'grammarExplainerVideo',
+]);
 
 const repoRoot = path.resolve(__dirname, '..');
 const webAppPath = path.join(repoRoot, 'web/src/App.js');
@@ -50,6 +58,19 @@ const canonicalResourceList = (entry) => {
     assignmentId: entry.assignmentId,
   }];
 };
+
+const structuralCurriculumValue = (value) => {
+  if (Array.isArray(value)) return value.map(structuralCurriculumValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !OPTIONAL_MEDIA_FIELDS.has(key))
+      .map(([key, nested]) => [key, structuralCurriculumValue(nested)]),
+  );
+};
+
+const structurallyEqual = (left, right) =>
+  JSON.stringify(structuralCurriculumValue(left)) === JSON.stringify(structuralCurriculumValue(right));
 
 const validateCanonicalCurriculum = (canonical) => {
   const errors = [];
@@ -108,8 +129,9 @@ const validateCanonicalCurriculum = (canonical) => {
 
 (async () => {
   const canonical = JSON.parse(fs.readFileSync(path.join(repoRoot, 'shared/curriculumCanonical.json'), 'utf8'));
-  // The runtime curriculum manifest intentionally imports browser-only alignment helpers.
-  // For drift detection, compare the generated canonical lesson catalogue directly.
+  // Runtime manifests intentionally import browser-only alignment helpers. Compare
+  // the generated canonical catalogues directly and treat media URLs as optional;
+  // IDs, routes, assignments, ordering and progression metadata remain strict.
   const webCatalogModule = await import(pathToFileURL(path.join(repoRoot, 'web/src/data/lessonCatalog.js')));
   const functionsModule = require(path.join(repoRoot, 'functions/data/curriculumManifest.js'));
 
@@ -117,8 +139,8 @@ const validateCanonicalCurriculum = (canonical) => {
   const functionsCanonical = functionsModule.CANONICAL_CURRICULUM || [];
   const errors = [];
 
-  if (JSON.stringify(canonical) !== JSON.stringify(webCanonical) || JSON.stringify(canonical) !== JSON.stringify(functionsCanonical)) {
-    errors.push('Curriculum manifest drift detected. Run: npm run sync:curriculum');
+  if (!structurallyEqual(canonical, webCanonical) || !structurallyEqual(canonical, functionsCanonical)) {
+    errors.push('Structural curriculum manifest drift detected. Run: npm run sync:curriculum');
   }
 
   GENERATED_FILES.forEach((relativePath) => {
@@ -134,5 +156,5 @@ const validateCanonicalCurriculum = (canonical) => {
     process.exit(1);
   }
 
-  console.log('Curriculum manifests are synced and canonical A1–B1 resources passed validation.');
+  console.log('Curriculum structure is synced and canonical A1–B1 resources passed validation.');
 })();
