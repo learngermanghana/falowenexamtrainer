@@ -13,7 +13,7 @@ const DRAFT_COLLECTION = "submissionDrafts";
 const SUBMISSION_COLLECTION = "submissions";
 const LOCK_COLLECTION = "submissionLocks";
 const AUTOSAVE_DELAY_MS = 900;
-const MIN_SUBMISSION_CHARACTERS = 80;
+const MIN_SUBMISSION_CHARACTERS = 20;
 const MAX_SUBMISSION_CHARACTERS = 2500;
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
