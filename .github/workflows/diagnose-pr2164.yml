@@ -22,17 +22,17 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Capture curriculum test output
+      - name: Capture targeted test output
         shell: bash
         run: |
           set +e
           cd web
-          CI=true npm run test:ci -- --runTestsByPath src/data/a1CourseBookCards.test.js src/data/a1RouteAlignment.test.js src/utils/courseBookEntries.test.js > ../pr2164-tests.log 2>&1
+          CI=true npm run test:ci -- --runTestsByPath src/data/a1CourseBookCards.test.js src/data/a1RouteAlignment.test.js src/utils/courseBookEntries.test.js src/data/a1LessonTitleOverrides.test.js src/utils/submissionWordMinimums.test.js > ../pr2164-tests.log 2>&1
           status=$?
           cd ..
-          tail -n 240 pr2164-tests.log
+          tail -n 260 pr2164-tests.log
           exit $status
-      - name: Upload curriculum test log
+      - name: Upload targeted test log
         if: always()
         uses: actions/upload-artifact@v4
         with:
