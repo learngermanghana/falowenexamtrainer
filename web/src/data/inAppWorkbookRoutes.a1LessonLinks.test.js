@@ -11,7 +11,7 @@ import { getLessonVideoResources } from "./lessonVideoDictionary";
 import {
   buildA1ChapterResourceHubState,
   resolveA1ChapterResourceHubEntry,
-} from "../components/A1ChapterResourceHubRoute";
+} from "../utils/a1ChapterResourceHubState";
 import {
   getRequiredChecklist,
   syncSubmitCompletionGuide,
@@ -100,7 +100,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   it("mounts the A1 chapter hub route before the app can redirect straight to a workbook", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
     const hubRouteSource = fs.readFileSync(
-      path.resolve(__dirname, "../components/A1ChapterResourceHubRoute.jsx"),
+      path.resolve(__dirname, "../utils/a1ChapterResourceHubState.jsx"),
       "utf8",
     );
 
