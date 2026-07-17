@@ -11,11 +11,12 @@ export const isA1ChapterResourceHubRequest = ({ level = "", search = "" } = {}) 
   );
 };
 
-export default function A1ChapterResourceHubRoute({ fallback = null }) {
+export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
   const location = useLocation();
   const params = useParams();
+  const routeLevel = params.level || level;
 
-  if (isA1ChapterResourceHubRequest({ level: params.level, search: location.search })) {
+  if (isA1ChapterResourceHubRequest({ level: routeLevel, search: location.search })) {
     return <CourseLessonPageLegacy />;
   }
 
