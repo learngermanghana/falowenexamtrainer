@@ -39,6 +39,30 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the lesson on introductions, articles, adjectives and W-questions. Then continue to the Day 5 workbook.",
   }),
+  6: Object.freeze({
+    key: "a1-day6-chapter-2-3-falowen-radio",
+    chapter: "2.3",
+    title: "A1 Day 6 · Kapitel 2.3",
+    youtubeId: "0joiZBDlffk",
+    duration: "",
+    instruction: "Listen carefully to the Kapitel 2.3 episode. Then continue to the lesson resources.",
+  }),
+  7: Object.freeze({
+    key: "a1-day7-chapter-3-falowen-radio",
+    chapter: "3",
+    title: "A1 Day 7 · Kapitel 3",
+    youtubeId: "hQNDEyMrXds",
+    duration: "",
+    instruction: "Listen carefully to the Kapitel 3 episode. Then continue to the lesson resources.",
+  }),
+  8: Object.freeze({
+    key: "a1-day8-chapter-4-falowen-radio",
+    chapter: "4",
+    title: "A1 Day 8 · Kapitel 4",
+    youtubeId: "o1LAiSqPLag",
+    duration: "",
+    instruction: "Listen carefully to the Kapitel 4 episode. Then continue to the lesson resources.",
+  }),
   13: Object.freeze({
     key: "a1-day13-revision-numbers-time-prices-falowen-radio",
     title: "Revision: Numbers, Time and Prices",
@@ -73,5 +97,9 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   }),
 });
 
-export const getA1RadioResource = (day = "") =>
-  A1_RADIO_RESOURCES[Number(day)] || null;
+export const getA1RadioResource = (day = "", chapter = "") => {
+  const resource = A1_RADIO_RESOURCES[Number(day)] || null;
+  const requestedChapter = String(chapter ?? "").trim();
+  if (resource?.chapter && requestedChapter && resource.chapter !== requestedChapter) return null;
+  return resource;
+};

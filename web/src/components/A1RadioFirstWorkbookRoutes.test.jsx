@@ -6,6 +6,30 @@ import {
 
 describe("A1 route-scoped Falowen Radio", () => {
   test.each([
+    [6, "2.3", "0joiZBDlffk", "a1-day6-chapter-2-3-falowen-radio"],
+    [7, "3", "hQNDEyMrXds", "a1-day7-chapter-3-falowen-radio"],
+    [8, "4", "o1LAiSqPLag", "a1-day8-chapter-4-falowen-radio"],
+  ])("maps only A1 Day %i Kapitel %s to its requested Falowen Radio", (day, chapter, youtubeId, key) => {
+    const route = resolveA1RadioFirstWorkbookRoute(
+      `/campus/course/lesson/A1/${day}`,
+      `?chapter=${chapter}&hub=1`,
+    );
+    expect(route).toEqual({ day, chapter });
+    expect(getA1RadioResource(route.day, route.chapter)).toEqual(
+      expect.objectContaining({ key, chapter, youtubeId }),
+    );
+    expect(getA1RadioResource(day, `${chapter}.wrong`)).toBeNull();
+  });
+
+  test("navigation does not retain another lesson's radio", () => {
+    const visited = [[6, "2.3"], [7, "3"], [8, "4"]].map(([day, chapter]) =>
+      getA1RadioResource(day, chapter)?.youtubeId,
+    );
+    expect(visited).toEqual(["0joiZBDlffk", "hQNDEyMrXds", "o1LAiSqPLag"]);
+    expect(new Set(visited).size).toBe(3);
+  });
+
+  test.each([
     [2, "Uru9bvr14mw", "a1-day2-chapter-1-1-falowen-radio"],
     [3, "DnfWKdi6DsA", "a1-day3-chapter-1-1-falowen-radio"],
   ])("uses the approved Day %i Kapitel 1.1 radio video", (day, youtubeId, key) => {

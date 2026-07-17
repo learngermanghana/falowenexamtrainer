@@ -22,6 +22,9 @@ const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
   3: Object.freeze({ day: 3, chapter: "1.1" }),
   4: Object.freeze({ day: 4, chapter: "2" }),
   5: Object.freeze({ day: 5, chapter: "1.3" }),
+  6: Object.freeze({ day: 6, chapter: "2.3" }),
+  7: Object.freeze({ day: 7, chapter: "3" }),
+  8: Object.freeze({ day: 8, chapter: "4" }),
   22: Object.freeze({ day: 22, chapter: "14.1" }),
 });
 
@@ -55,7 +58,7 @@ export default function A1RadioFirstWorkbookRoutes() {
   const location = useLocation();
   const route = resolveA1RadioFirstWorkbookRoute(location.pathname, location.search);
   const completed = hasCompletedA1RadioFirstStep(location.search);
-  const resource = route ? getA1RadioResource(route.day) : null;
+  const resource = route ? getA1RadioResource(route.day, route.chapter) : null;
   const shouldShow = Boolean(route && resource && !completed);
 
   useEffect(() => {
