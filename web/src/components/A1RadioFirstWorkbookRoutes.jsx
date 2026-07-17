@@ -18,6 +18,7 @@ export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
 const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
   2: Object.freeze({ day: 2, chapter: "1.1" }),
   3: Object.freeze({ day: 3, chapter: "1.1" }),
+  4: Object.freeze({ day: 4, chapter: "2" }),
   22: Object.freeze({ day: 22, chapter: "14.1" }),
 });
 
