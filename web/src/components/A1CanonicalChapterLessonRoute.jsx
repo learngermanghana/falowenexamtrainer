@@ -1,12 +1,13 @@
 import React from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import { getA1CanonicalLesson } from "../data/a1CanonicalLessonCatalog";
-import {
-  mergeA1LessonSearchIntoWorkbookRoute,
-  normalizeA1Chapter,
-} from "../data/a1CanonicalLessonRoutes";
+import { normalizeA1Chapter } from "../data/a1CanonicalLessonRoutes";
 
-const mergeSearchIntoLessonDestination = (destination = "", search = "") => {
+const mergeSearchIntoDestination = (
+  destination = "",
+  search = "",
+  { resourceHub = false } = {},
+) => {
   const parsed = new URL(destination, "https://www.falowen.app");
   const incoming = new URLSearchParams(String(search || "").replace(/^\?/, ""));
 
@@ -15,6 +16,8 @@ const mergeSearchIntoLessonDestination = (destination = "", search = "") => {
   incoming.forEach((value, key) => {
     if (!parsed.searchParams.has(key)) parsed.searchParams.set(key, value);
   });
+  if (resourceHub) parsed.searchParams.set("hub", "1");
+
   const query = parsed.searchParams.toString();
   return `${parsed.pathname}${query ? `?${query}` : ""}`;
 };
@@ -22,13 +25,15 @@ const mergeSearchIntoLessonDestination = (destination = "", search = "") => {
 export const getA1CanonicalChapterDestination = ({ chapter = "", search = "" } = {}) => {
   const lesson = getA1CanonicalLesson(chapter);
   if (!lesson) return "/campus/course";
-  // Assignment chapters own a dedicated workbook URL. Going through the
-  // shared day hub can select the first resource for that day (for example,
-  // Day 2 Kapitel 0.2) instead of the chapter the student clicked.
+
+  // Tutor-marked chapters must open their chapter-scoped lesson hub first so
+  // students can use the grammar book, teacher video and AI video before the workbook.
   if (lesson.kind === "assignment") {
-    return mergeA1LessonSearchIntoWorkbookRoute(lesson.destination, search);
+    return mergeSearchIntoDestination(lesson.legacyLessonRoute, search, { resourceHub: true });
   }
-  return mergeSearchIntoLessonDestination(lesson.destination, search);
+
+  // Practice and grammar-only chapters keep their dedicated destination.
+  return mergeSearchIntoDestination(lesson.destination, search);
 };
 
 export default function A1CanonicalChapterLessonRoute({ chapter: fixedChapter = "" }) {
