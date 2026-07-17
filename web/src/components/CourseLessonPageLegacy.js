@@ -4,7 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
-import { findCourseBookEntry } from "../utils/courseBookEntries";
+import { resolveLessonRouteEntry } from "../utils/lessonRouteEntry";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -399,11 +399,14 @@ const CourseLessonPage = () => {
     [location.search]
   );
   const entry = useMemo(() => {
-    if (location.state?.entry) return location.state.entry;
-    return findCourseBookEntry({
+    // Route identity wins over navigation state. React Router keeps location
+    // state around during client-side transitions, so accepting it blindly can
+    // briefly (or permanently) render the previously visited chapter.
+    return resolveLessonRouteEntry({
       entries: courseSchedules[level] || [],
       day,
       chapter: requestedChapter,
+      stateEntry: location.state?.entry,
     });
   }, [day, level, location.state, requestedChapter]);
 
@@ -442,7 +445,7 @@ const CourseLessonPage = () => {
         <div style={styles.card}>
           <h1 style={{ marginTop: 0 }}>Lesson not found</h1>
           <p style={{ marginBottom: 0 }}>
-            We could not find Day {day} for {level || "this level"}.
+            We could not find {requestedChapter ? `Kapitel ${requestedChapter} on ` : ""}Day {day} for {level || "this level"}.
           </p>
         </div>
       </div>
