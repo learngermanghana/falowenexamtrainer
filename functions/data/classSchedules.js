@@ -34,12 +34,12 @@ const classCatalog = {
   },
   "A1 Bonn Klasse": {
     orientationDate: "2026-07-07",
-    startDate: "2026-07-08",
-    endDate: "2026-09-01",
+    startDate: "2026-07-15",
+    endDate: "2026-09-10",
     schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
       { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:00" },
+      { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
   },
   "A1 Dortmund Klasse": {
