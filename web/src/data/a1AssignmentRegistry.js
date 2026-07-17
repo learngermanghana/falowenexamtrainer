@@ -35,7 +35,7 @@ const records = [
   ["A1-0.1", 1, "0.1", "Greetings and Asking About Well-being", "/campus/course/a1-day-1-greetings-workbook", "A1Day1GreetingsWorkbookPage", ["Teil 1 · Reading Text", "Teil 2 · Multiple-Choice Questions"]],
   ["A1-0.2", 2, "0.2", "German Alphabet", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", "A1Day3GermanAlphabetReviewingWorkbookPage", ["Teil 1 · Reading and Writing", "Teil 2 · Questions", "Teil 3 · Hören"]],
   ["A1-1.1", 2, "1.1", "Personal Pronouns and Verb Conjugation", "/campus/course/a1-day-2-kapitel-1-1-workbook", "A1Day2Kapitel11WorkbookPage", ["Teil 1 · Hören", "Teil 2 · Schreiben"]],
-  ["A1-1.2", 3, "1.2", "Personal Pronouns and Verb Conjugation", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", "A1Day3PronounsIntroducingYourselfWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Schreiben (Exercise)", "Teil 3 · Hören"]],
+  ["A1-1.2", 3, "1.2", "Introducing Yourself", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", "A1Day3PronounsIntroducingYourselfWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Schreiben (Exercise)", "Teil 3 · Hören"]],
   ["A1-2", 4, "2", "Numbers", "/campus/course/a1-day-4-numbers-for-beginners-workbook", "A1Day4NumbersForBeginnersWorkbookPage", ["Teil 1: Reading / Writing", "Teil 2: Questions"]],
   ["A1-3", 7, "3", "Asking About Prices", "/campus/course/a1-chapter-3-asking-about-prices-workbook", "A1Chapter3AskingAboutPricesWorkbookPage", ["Teil 1: Preise und Kosten (Exercise 1)", "Teil 2: Writing About Family (Exercise 2)", "Teil 3: Hobbys (Exercise 3)"]],
   ["A1-4", 8, "4", "Countries and Languages", "/campus/course/a1-day-8-countries-and-languages-workbook", "A1Day8CountriesAndLanguagesWorkbookPage", ["Teil 1 · Countries and Languages Part 1: Translation", "Teil 2 · Essay: Germany's Neighbors", "Teil 3 · Germany's Neighbors (Hören)"]],
@@ -99,15 +99,3 @@ export const getA1AssignmentByRoute = (pathname, search = "") => {
     return Array.from(requiredSearch.entries()).every(([key, value]) => actualSearch.get(key) === value);
   }) || null;
 };
-
-export const getA1AssignmentNeighbors = (assignmentKey) => {
-  const index = A1_ASSIGNMENT_ORDER.indexOf(assignmentKey);
-  return {
-    previous: index > 0 ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index - 1]] : null,
-    next: index >= 0 && index < A1_ASSIGNMENT_ORDER.length - 1
-      ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index + 1]]
-      : null,
-  };
-};
-
-export const __TESTING__ = { NATIVE_SHARED_LAYOUT_COMPONENTS, parseRoute };
