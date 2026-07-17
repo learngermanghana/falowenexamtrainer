@@ -102,18 +102,21 @@ export const resolveLessonRouteEntry = ({
   chapter = "",
   stateEntry = null,
 } = {}) => {
+  const requestedChapter = String(chapter || "").trim();
+  const canonicalA1Entry = requestedChapter
+    ? resolveCanonicalA1LessonRouteEntry({ day, chapter: requestedChapter })
+    : null;
   const requestedLevel = String(level || "").trim().toUpperCase()
     || entryLevel(stateEntry)
     || entries.map(entryLevel).find(Boolean)
-    || "";
-  const requestedChapter = String(chapter || "").trim();
+    || (canonicalA1Entry ? "A1" : "");
 
   // A1 hub URLs must resolve from the immutable lesson catalog. Runtime course
-  // schedule data is mutable and can be split by other modules, which previously
-  // removed valid Day 2 Kapitel 1.1 and Day 7 Kapitel 3 entries.
-  if (requestedLevel === "A1" && requestedChapter) {
-    const canonicalA1Entry = resolveCanonicalA1LessonRouteEntry({ day, chapter: requestedChapter });
-    if (canonicalA1Entry) return canonicalA1Entry;
+  // schedule data is mutable and can be split by other modules. Some legacy page
+  // callers do not pass the route level, so a unique canonical A1 day/chapter
+  // match is also allowed to establish the missing level.
+  if (requestedLevel === "A1" && canonicalA1Entry) {
+    return canonicalA1Entry;
   }
 
   if (stateEntryMatchesRoute({ stateEntry, level: requestedLevel, day, chapter: requestedChapter })) {
