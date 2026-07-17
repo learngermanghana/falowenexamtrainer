@@ -80,7 +80,7 @@ const AuthenticatedAppRoutes = () => (
               element={<A1Day20Chapter123DirectWorkbookRoute />}
             />
             <Route
-              path="/campus/course/lesson/A1/:day"
+              path="/campus/course/lesson/:level/:day"
               element={<A1ChapterResourceHubRoute fallback={<App />} />}
             />
             <Route path="*" element={<App />} />
