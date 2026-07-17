@@ -2,7 +2,6 @@ import { buildGhanaDateTime } from "../services/classCalendar";
 import { GHANA_TIMEZONE } from "./liveClassCardPresentation";
 
 const CANCELLED_STATUS = "cancelled";
-const COMPLETED_STATUS = "completed";
 export const COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE = "data-course-book-next-class-slot";
 
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -118,7 +117,7 @@ export const findCurrentOrNextSession = (sessions = [], now = new Date()) => {
   return [...sessions]
     .filter((session) => {
       const status = sessionStatus(session);
-      if (status === CANCELLED_STATUS || status === COMPLETED_STATUS) return false;
+      if (status === CANCELLED_STATUS) return false;
       const start = sessionStart(session)?.getTime() || 0;
       const end = sessionEnd(session)?.getTime() || 0;
       if (end && end < nowMs) return false;
