@@ -50,6 +50,25 @@ function requiredSessionCount(klass = {}) {
   return OFFICIAL_SESSION_REQUIREMENTS[level] || 0;
 }
 
+function hasCompleteOfficialRepair(klass = {}) {
+  const requiredCount = requiredSessionCount(klass);
+  if (!requiredCount) return false;
+  const repairComplete = normalize(klass.sessionRepairStatus).toLowerCase() === "complete"
+    || normalize(klass.lastSessionChangeType).toLowerCase() === "official-schedule-repair";
+  return repairComplete
+    && Number(klass.curriculumMappedSessionCount) === requiredCount;
+}
+
+function classStartDate(klass = {}) {
+  return normalize(klass.configuredStartDate || klass.startDate).slice(0, 10);
+}
+
+function sameClassCohort(left = {}, right = {}) {
+  const leftStart = classStartDate(left);
+  const rightStart = classStartDate(right);
+  return Boolean(leftStart && rightStart && leftStart === rightStart);
+}
+
 function officialRepairScore(klass = {}, requestedClassName = "") {
   const requestedIdentity = normalizeIdentity(requestedClassName);
   const candidateIdentities = [klass.name, klass.className, klass.slug]
@@ -117,10 +136,22 @@ async function findPreferredCanonicalClass({ classId, className, slug } = {}) {
 
   const resolvedClassName = normalize(className || directClass?.name || directClass?.className);
   const exactNameCandidates = await findClassesByExactName(resolvedClassName).catch(() => []);
-  const authoritative = chooseAuthoritativeClass(
-    directClass ? [directClass, ...exactNameCandidates] : exactNameCandidates,
-    resolvedClassName,
-  );
+
+  if (directClass) {
+    if (hasCompleteOfficialRepair(directClass)) {
+      return base.__private__.applyOfficialSessionRequirement(directClass);
+    }
+    const sameCohortCandidates = exactNameCandidates.filter((candidate) =>
+      sameClassCohort(candidate, directClass)
+    );
+    const repairedSameCohort = chooseAuthoritativeClass(sameCohortCandidates, resolvedClassName);
+    if (hasCompleteOfficialRepair(repairedSameCohort)) {
+      return base.__private__.applyOfficialSessionRequirement(repairedSameCohort);
+    }
+    return base.__private__.applyOfficialSessionRequirement(directClass);
+  }
+
+  const authoritative = chooseAuthoritativeClass(exactNameCandidates, resolvedClassName);
   if (authoritative) {
     return base.__private__.applyOfficialSessionRequirement(authoritative);
   }
@@ -214,6 +245,8 @@ export function subscribeCanonicalLiveClass({ classId, className, slug, onChange
 
 export const __private__ = {
   chooseAuthoritativeClass,
+  hasCompleteOfficialRepair,
+  sameClassCohort,
   findClassesByExactName,
   findPreferredCanonicalClass,
   officialRepairScore,
