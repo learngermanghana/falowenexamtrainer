@@ -76,6 +76,24 @@ describe("canonical live class V5 class-record selection", () => {
     expect(klass.sessionRepairStatus).toBe("complete");
   });
 
+  test("does not move a student to a different same-name cohort", async () => {
+    const futureRepairedClass = {
+      ...repairedBonnClass,
+      id: "a1-bonn-future",
+      startDate: "2026-10-01",
+      endDate: "2026-11-27",
+    };
+    getDoc.mockResolvedValue(classSnapshot(staleBonnClass.id, staleBonnClass));
+    getDocs.mockResolvedValue(querySnapshot(futureRepairedClass));
+
+    const klass = await __private__.findPreferredCanonicalClass({
+      classId: staleBonnClass.id,
+      className: "A1 Bonn Klasse",
+    });
+
+    expect(klass.id).toBe(staleBonnClass.id);
+  });
+
   test("keeps an exact class record when no repaired duplicate exists", async () => {
     const uniqueClass = {
       id: "a1-accra-current",
