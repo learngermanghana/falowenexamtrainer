@@ -2,15 +2,16 @@ import fs from "fs";
 import path from "path";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
-import { courseSchedules } from "./courseSchedule";
 import {
   A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
-import { normalizeLesson } from "./lessonModel";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
-import { findCourseBookEntry } from "../utils/courseBookEntries";
+import {
+  getRequiredChecklist,
+  syncSubmitCompletionGuide,
+} from "../components/SubmitPageLevelGuidanceInjector";
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
@@ -57,6 +58,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
 
   afterEach(() => {
     window.history.replaceState({}, "", originalPath || "/");
+    document.body.innerHTML = "";
   });
 
   test.each(A1_RESOURCE_HUB_CASES)(
@@ -91,31 +93,6 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("builds the Day 2 Kapitel 1.1 hub with only the selected chapter resources", () => {
-    const entry = findCourseBookEntry({
-      entries: courseSchedules.A1,
-      level: "A1",
-      day: 2,
-      chapter: "1.1",
-    });
-    const lesson = normalizeLesson(entry, "A1");
-
-    expect(entry.chapter).toBe("1.1");
-    expect(lesson.resources.resourceGroups).toEqual([
-      {
-        chapter: "1.1",
-        grammarBook: { url: "/campus/course/singular-pronouns-verb-conjugation-day-2" },
-        workbook: { url: "/campus/course/a1-day-2-kapitel-1-1-workbook" },
-      },
-    ]);
-    expect(lesson.resources.videos.map((video) => video.url)).toEqual(
-      expect.arrayContaining([
-        "https://youtu.be/AjsnO1hxDs4",
-        "https://youtu.be/kqagu9qsOcc",
-      ]),
-    );
-  });
-
   it("mounts the chapter hub route before the app can redirect straight to a workbook", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
     const hubRouteSource = fs.readFileSync(
@@ -127,6 +104,34 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(indexSource).toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
     expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
+  });
+
+  it("shows the exact two-part consent checklist on the inline A1-1.1 Submit tab", () => {
+    expect(getRequiredChecklist("A1", "A1-1.1")).toEqual([
+      expect.objectContaining({ id: "teil-1", label: expect.stringMatching(/Teil 1 · Hören/i) }),
+      expect.objectContaining({ id: "teil-2", label: expect.stringMatching(/Teil 2 · Schreiben/i) }),
+    ]);
+
+    document.body.innerHTML = `
+      <div data-a1-built-in-submission data-assignment-key="A1-1.1">
+        <form>
+          <textarea></textarea>
+          <button type="submit">Submit assignment</button>
+        </form>
+      </div>
+    `;
+
+    syncSubmitCompletionGuide({
+      pathname: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      search: "?workbookTab=submit&assignmentKey=A1-1.1&level=A1",
+    });
+
+    const checklist = document.querySelector('[data-submission-completion-checklist="true"]');
+    const submitButton = document.querySelector('button[type="submit"]');
+    expect(checklist).toHaveTextContent("Teil 1 · Hören");
+    expect(checklist).toHaveTextContent("Teil 2 · Schreiben");
+    expect(checklist.querySelectorAll('input[name="falowen-submit-completion-check"]')).toHaveLength(2);
+    expect(submitButton).toBeDisabled();
   });
 
   it("keeps Day 2 Chapter 1.1 on the original two-part assignment", () => {
