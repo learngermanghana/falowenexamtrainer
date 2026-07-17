@@ -1,0 +1,12 @@
+{
+  "className": "A1 Bonn Klasse",
+  "source": "Falowen Admin live timetable",
+  "effectiveStartDate": "2026-07-15",
+  "effectiveEndDate": "2026-09-10",
+  "timezone": "Africa/Accra",
+  "schedule": [
+    { "day": "Wednesday", "startTime": "11:00", "endTime": "12:00" },
+    { "day": "Thursday", "startTime": "11:00", "endTime": "12:00" },
+    { "day": "Friday", "startTime": "11:00", "endTime": "12:00" }
+  ]
+}
