@@ -44,15 +44,15 @@ const classCatalogDictionary = {
   },
   "A1 Bonn Klasse": {
     orientationDate: "2026-07-07",
-    startDate: "2026-07-08",
-    endDate: "2026-09-01",
+    startDate: "2026-07-15",
+    endDate: "2026-09-10",
     schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
       { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:00" },
+      { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
     docUrl:
-      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-07-08&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-07-15&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A1 Dortmund Klasse": {
     startDate: "2026-03-09",
