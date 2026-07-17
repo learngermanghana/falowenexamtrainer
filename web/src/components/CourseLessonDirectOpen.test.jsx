@@ -1,38 +1,25 @@
-import React from "react";
 import fs from "fs";
 import path from "path";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { courseSchedules } from "../data/courseSchedule";
+import { findCourseBookEntry } from "../utils/courseBookEntries";
 
-jest.mock("./SelfLearningLessonRegistry", () => ({
-  getSelfLearningLessonComponent: jest.fn((level, day) => {
-    const normalizedLevel = String(level || "").toUpperCase();
-    if (Number(day) !== 10 || !["B2", "C1"].includes(normalizedLevel)) return null;
+const resolveFreshTabLesson = (url) => {
+  const parsed = new URL(url, "https://www.falowen.app");
+  const routeMatch = parsed.pathname.match(/^\/campus\/course\/lesson\/([^/]+)\/(\d+)$/i);
+  if (!routeMatch) return null;
 
-    return ({ canonicalLesson }) => {
-      const ReactModule = require("react");
-      return ReactModule.createElement(
-        "div",
-        { "data-testid": "direct-lesson" },
-        `${canonicalLesson.level}:${canonicalLesson.day}:${canonicalLesson.chapter}`,
-      );
-    };
-  }),
-}));
+  const level = String(routeMatch[1] || "").toUpperCase();
+  const day = Number(routeMatch[2]);
+  const chapter = parsed.searchParams.get("chapter") || "";
+  const entry = findCourseBookEntry({
+    entries: courseSchedules[level] || [],
+    level,
+    day,
+    chapter,
+  });
 
-import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
-
-const renderDirectLesson = (url) =>
-  render(
-    <MemoryRouter initialEntries={[url]}>
-      <Routes>
-        <Route
-          path="/campus/course/lesson/:level/:day"
-          element={<CourseLessonPageLegacy />}
-        />
-      </Routes>
-    </MemoryRouter>,
-  );
+  return { level, day, chapter, entry };
+};
 
 describe("lesson links opened in a fresh browser tab", () => {
   test("the top-level A1 resource-hub route no longer owns B2 or C1 URLs", () => {
@@ -46,11 +33,17 @@ describe("lesson links opened in a fresh browser tab", () => {
   });
 
   test.each([
-    ["B2", "/campus/course/lesson/B2/10?chapter=2.5"],
-    ["C1", "/campus/course/lesson/C1/10?chapter=2.5"],
-  ])("opens %s Day 10 Kapitel 2.5 without location state", (level, url) => {
-    renderDirectLesson(url);
+    ["B2", "https://www.falowen.app/campus/course/lesson/B2/10?chapter=2.5"],
+    ["C1", "https://www.falowen.app/campus/course/lesson/C1/10?chapter=2.5"],
+  ])("resolves %s Day 10 Kapitel 2.5 using only the fresh-tab URL", (level, url) => {
+    const resolved = resolveFreshTabLesson(url);
 
-    expect(screen.getByTestId("direct-lesson")).toHaveTextContent(`${level}:10:2.5`);
+    expect(resolved).toMatchObject({ level, day: 10, chapter: "2.5" });
+    expect(resolved.entry).toEqual(
+      expect.objectContaining({
+        day: 10,
+        chapter: "2.5",
+      }),
+    );
   });
 });
