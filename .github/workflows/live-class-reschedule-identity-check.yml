@@ -13,6 +13,7 @@ on:
       - 'scripts/applyA1RouteAlignment.js'
       - 'scripts/applyB2LessonContentAlignment.js'
       - 'scripts/checkCurriculumManifestSync.js'
+      - 'scripts/reportCurriculumManifestDrift.js'
       - '.github/workflows/live-class-reschedule-identity-check.yml'
   push:
     branches: [main]
@@ -23,6 +24,8 @@ on:
       - 'web/package.json'
       - 'scripts/applyA1RouteAlignment.js'
       - 'scripts/applyB2LessonContentAlignment.js'
+      - 'scripts/checkCurriculumManifestSync.js'
+      - 'scripts/reportCurriculumManifestDrift.js'
   workflow_dispatch:
 
 jobs:
@@ -38,7 +41,8 @@ jobs:
         shell: bash
         run: |
           set +e
-          node scripts/checkCurriculumManifestSync.js > curriculum-check.log 2>&1
+          node scripts/reportCurriculumManifestDrift.js > curriculum-check.log 2>&1
+          node scripts/checkCurriculumManifestSync.js >> curriculum-check.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           cat curriculum-check.log
