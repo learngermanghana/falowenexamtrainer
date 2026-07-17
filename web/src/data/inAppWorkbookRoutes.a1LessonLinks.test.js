@@ -93,7 +93,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("mounts the chapter hub route before the app can redirect straight to a workbook", () => {
+  it("mounts the A1 chapter hub route before the app can redirect straight to a workbook", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
     const hubRouteSource = fs.readFileSync(
       path.resolve(__dirname, "../components/A1ChapterResourceHubRoute.jsx"),
@@ -101,7 +101,9 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
 
     expect(indexSource).toContain("A1ChapterResourceHubRoute");
-    expect(indexSource).toContain('path="/campus/course/lesson/:level/:day"');
+    expect(indexSource).toContain('path="/campus/course/lesson/A1/:day"');
+    expect(indexSource).toContain('<A1ChapterResourceHubRoute level="A1" fallback={<App />} />');
+    expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
     expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
   });
