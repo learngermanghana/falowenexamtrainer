@@ -3,9 +3,16 @@
 // Edit shared/curriculumCanonical.json and run npm run sync:curriculum.
 
 import { getLessonsByLevel, getLessonDisplayData } from "./lessonCatalog.js";
+import { applyA1LessonTitleOverride } from "./a1LessonTitleOverrides";
 import { alignA1CurriculumEntries } from "./a1RouteAlignment";
 
-const ALIGNED_A1_LESSONS = alignA1CurriculumEntries(getLessonsByLevel("A1"));
+const applyRequestedA1TitleCorrection = (lesson = {}) =>
+  String(lesson.id || lesson.assignmentId || "").trim().toUpperCase() === "A1-1.2"
+    ? applyA1LessonTitleOverride(lesson)
+    : lesson;
+
+const ALIGNED_A1_LESSONS = alignA1CurriculumEntries(getLessonsByLevel("A1"))
+  .map((lesson) => applyRequestedA1TitleCorrection(lesson));
 const A1_COURSE_BOOK_CARDS = Object.freeze(ALIGNED_A1_LESSONS.map((lesson) => Object.freeze({
   lessonId: lesson.id,
   ...getLessonDisplayData(lesson),

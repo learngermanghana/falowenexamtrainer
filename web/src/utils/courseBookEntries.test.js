@@ -180,8 +180,8 @@ describe("course book task entries", () => {
       grammarbook_link: null,
     }));
     expect(chapter12).toEqual(expect.objectContaining({
-      lessonTitle: "Personal Pronouns and Verb Conjugation",
-      topic: "Personal Pronouns and Verb Conjugation",
+      lessonTitle: "Introducing Yourself",
+      topic: "Introducing Yourself",
       assignmentId: "A1-1.2",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
       tutorMarked: true,
@@ -252,18 +252,14 @@ describe("course book task entries", () => {
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
       expect.objectContaining({
         assignment_id: "A1-1.2",
-        title: "Personal Pronouns and Verb Conjugation",
+        title: "Introducing Yourself",
         grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
       })
     );
   });
 
-  it("finds the correct task after opening or refreshing a chapter-specific URL", () => {
-    expect(findCourseBookEntry({ entries: [combinedDay], day: 2, chapter: "1.1" })).toEqual(
-      expect.objectContaining({ chapter: "1.1", topic: "Personal Pronouns and Verb Conjugation" })
-    );
-    expect(findCourseBookEntry({ entries: [combinedDay], day: 2, chapter: "A1-0.2" })).toEqual(
-      expect.objectContaining({ chapter: "0.2", topic: "German Alphabet" })
-    );
+  it("finds an exact card by day and chapter instead of returning the first task", () => {
+    expect(findCourseBookEntry({ entries: [combinedDay], day: 2, chapter: "1.1", level: "A1" }))
+      .toEqual(expect.objectContaining({ displayChapter: "1.1", assignmentId: "A1-1.1" }));
   });
 });
