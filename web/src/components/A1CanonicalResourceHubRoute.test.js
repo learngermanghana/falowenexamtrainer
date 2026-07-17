@@ -1,7 +1,8 @@
 import { getA1CanonicalChapterDestination } from "./A1CanonicalChapterLessonRoute";
 import {
+  buildA1ChapterResourceHubState,
   isA1ChapterResourceHubRequest,
-  shouldClearA1ChapterResourceHubState,
+  shouldNormalizeA1ChapterResourceHubState,
 } from "./A1ChapterResourceHubRoute";
 import { getA1LegacyChapterLessonRedirect } from "./A1ChapterSpecificLessonRouteBoundary";
 
@@ -31,23 +32,42 @@ describe("A1 canonical resource hub handoff", () => {
     ).toBe(true);
   });
 
-  test("clears stale Kapitel 0.2 route state before Kapitel 1.1 is rendered", () => {
+  test("replaces stale Kapitel 0.2 state with the authoritative A1 Day 2 context", () => {
     expect(
-      shouldClearA1ChapterResourceHubState({
+      shouldNormalizeA1ChapterResourceHubState({
         level: "A1",
+        day: "2",
         search: "?chapter=1.1&hub=1",
         state: {
+          level: "A1",
           day: 2,
           entry: { day: 2, chapter: "0.2", topic: "German Alphabet" },
         },
       }),
     ).toBe(true);
 
+    expect(buildA1ChapterResourceHubState({ level: "a1", day: 2 })).toEqual({
+      level: "A1",
+      day: "2",
+    });
+  });
+
+  test("seeds missing route context once and then renders without another redirect", () => {
     expect(
-      shouldClearA1ChapterResourceHubState({
+      shouldNormalizeA1ChapterResourceHubState({
         level: "A1",
+        day: "2",
         search: "?chapter=1.1&hub=1",
         state: null,
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldNormalizeA1ChapterResourceHubState({
+        level: "A1",
+        day: "2",
+        search: "?chapter=1.1&hub=1",
+        state: { level: "A1", day: "2" },
       }),
     ).toBe(false);
   });
