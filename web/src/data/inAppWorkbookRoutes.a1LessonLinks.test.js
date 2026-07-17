@@ -8,6 +8,10 @@ import {
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
+import {
+  getRequiredChecklist,
+  syncSubmitCompletionGuide,
+} from "../components/SubmitPageLevelGuidanceInjector";
 
 const A1_RESOURCE_HUB_CASES = [
   [1, "0.1", "/campus/course/a1-day-1-greetings-workbook"],
@@ -54,6 +58,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
 
   afterEach(() => {
     window.history.replaceState({}, "", originalPath || "/");
+    document.body.innerHTML = "";
   });
 
   test.each(A1_RESOURCE_HUB_CASES)(
@@ -86,6 +91,47 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 2, chapter: "1.1" })).toBe(
       "/campus/course/a1-day-2-kapitel-1-1-workbook",
     );
+  });
+
+  it("mounts the chapter hub route before the app can redirect straight to a workbook", () => {
+    const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
+    const hubRouteSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/A1ChapterResourceHubRoute.jsx"),
+      "utf8",
+    );
+
+    expect(indexSource).toContain("A1ChapterResourceHubRoute");
+    expect(indexSource).toContain('path="/campus/course/lesson/:level/:day"');
+    expect(hubRouteSource).toContain('query.get("hub") === "1"');
+    expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
+  });
+
+  it("shows the exact two-part consent checklist on the inline A1-1.1 Submit tab", () => {
+    expect(getRequiredChecklist("A1", "A1-1.1")).toEqual([
+      expect.objectContaining({ id: "teil-1", label: expect.stringMatching(/Teil 1 · Hören/i) }),
+      expect.objectContaining({ id: "teil-2", label: expect.stringMatching(/Teil 2 · Schreiben/i) }),
+    ]);
+
+    document.body.innerHTML = `
+      <div data-a1-built-in-submission data-assignment-key="A1-1.1">
+        <form>
+          <textarea></textarea>
+          <button type="submit">Submit assignment</button>
+        </form>
+      </div>
+    `;
+
+    syncSubmitCompletionGuide({
+      pathname: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      search: "?workbookTab=submit&assignmentKey=A1-1.1&level=A1",
+    });
+
+    const checklist = document.querySelector('[data-submission-completion-checklist="true"]');
+    const submitButton = document.querySelector('button[type="submit"]');
+    expect(checklist).toHaveTextContent("Teil 1 · Hören");
+    expect(checklist).toHaveTextContent("Teil 2 · Schreiben");
+    expect(checklist.querySelectorAll('input[name="falowen-submit-completion-check"]')).toHaveLength(2);
+    expect(submitButton).toBeDisabled();
   });
 
   it("keeps Day 2 Chapter 1.1 on the original two-part assignment", () => {
