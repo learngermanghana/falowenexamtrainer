@@ -1,0 +1,29 @@
+name: A1 hub routes and modal workbook
+
+on:
+  pull_request:
+    paths:
+      - "web/src/utils/lessonRouteEntry.js"
+      - "web/src/components/a1LessonWorkbookRoutes.regression.test.jsx"
+      - "web/src/components/A1Day14ModalVerbsWorkbookPage.js"
+      - "web/src/components/A1Day14ModalVerbsWorkbookPage.test.js"
+      - ".github/workflows/a1-hub-modal-workbook.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test A1 hub routes and practical modal workbook
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/a1LessonWorkbookRoutes.regression.test.jsx src/components/A1Day14ModalVerbsWorkbookPage.test.js
