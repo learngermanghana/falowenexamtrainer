@@ -99,3 +99,15 @@ export const getA1AssignmentByRoute = (pathname, search = "") => {
     return Array.from(requiredSearch.entries()).every(([key, value]) => actualSearch.get(key) === value);
   }) || null;
 };
+
+export const getA1AssignmentNeighbors = (assignmentKey) => {
+  const index = A1_ASSIGNMENT_ORDER.indexOf(assignmentKey);
+  return {
+    previous: index > 0 ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index - 1]] : null,
+    next: index >= 0 && index < A1_ASSIGNMENT_ORDER.length - 1
+      ? A1_ASSIGNMENT_REGISTRY[A1_ASSIGNMENT_ORDER[index + 1]]
+      : null,
+  };
+};
+
+export const __TESTING__ = { NATIVE_SHARED_LAYOUT_COMPONENTS, parseRoute };
