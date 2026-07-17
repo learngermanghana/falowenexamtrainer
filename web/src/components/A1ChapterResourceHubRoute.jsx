@@ -1,23 +1,50 @@
 import React from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
+import { courseSchedules } from "../data/courseSchedule";
+import { findCourseBookEntry } from "../utils/courseBookEntries";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeDay = (value = "") => String(value ?? "").trim();
+const normalizeChapter = (value = "") => String(value || "").trim();
+
+export const getRequestedA1Chapter = (search = "") => {
+  const query = new URLSearchParams(String(search || ""));
+  return normalizeChapter(query.get("chapter"));
+};
 
 export const isA1ChapterResourceHubRequest = ({ level = "", search = "" } = {}) => {
   const query = new URLSearchParams(String(search || ""));
   return (
     normalizeLevel(level) === "A1" &&
     query.get("hub") === "1" &&
-    Boolean(String(query.get("chapter") || "").trim())
+    Boolean(getRequestedA1Chapter(search))
   );
 };
 
-export const buildA1ChapterResourceHubState = ({ level = "A1", day = "" } = {}) => ({
-  level: normalizeLevel(level) || "A1",
-  day: normalizeDay(day),
-});
+export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}) => {
+  const requestedChapter = normalizeChapter(chapter);
+  if (!requestedChapter) return null;
+
+  const entry = findCourseBookEntry({
+    entries: courseSchedules.A1 || [],
+    day,
+    chapter: requestedChapter,
+    level: "A1",
+  });
+  const resolvedChapter = normalizeChapter(entry?.displayChapter || entry?.chapter);
+  return resolvedChapter === requestedChapter ? entry : null;
+};
+
+export const buildA1ChapterResourceHubState = ({ level = "A1", day = "", search = "" } = {}) => {
+  const chapter = getRequestedA1Chapter(search);
+  const entry = resolveA1ChapterResourceHubEntry({ day, chapter });
+  return {
+    level: normalizeLevel(level) || "A1",
+    day: normalizeDay(day),
+    ...(entry ? { entry } : {}),
+  };
+};
 
 export const shouldNormalizeA1ChapterResourceHubState = ({
   level = "",
@@ -27,12 +54,16 @@ export const shouldNormalizeA1ChapterResourceHubState = ({
 } = {}) => {
   if (!isA1ChapterResourceHubRequest({ level, search })) return false;
 
-  const expectedState = buildA1ChapterResourceHubState({ level, day });
+  const expectedState = buildA1ChapterResourceHubState({ level, day, search });
+  const requestedChapter = getRequestedA1Chapter(search);
+  const stateChapter = normalizeChapter(state?.entry?.displayChapter || state?.entry?.chapter);
+
   return (
     !state ||
-    Boolean(state.entry) ||
     normalizeLevel(state.level) !== expectedState.level ||
-    normalizeDay(state.day) !== expectedState.day
+    normalizeDay(state.day) !== expectedState.day ||
+    (Boolean(expectedState.entry) && stateChapter !== requestedChapter) ||
+    (!expectedState.entry && Boolean(state?.entry))
   );
 };
 
@@ -46,9 +77,8 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
     search: location.search,
   });
 
-  // The chapter in the URL is authoritative. Course Book navigation can carry a
-  // stale Day 2 entry for Kapitel 0.2. Replace that state with only the A1/day
-  // context required by the legacy lesson page, then resolve Kapitel 1.1 from the URL.
+  // The chapter in the URL is authoritative. Replace any stale Day 2 state with
+  // the exact chapter entry before the legacy lesson page renders its resources.
   if (
     shouldNormalizeA1ChapterResourceHubState({
       level: routeLevel,
@@ -61,7 +91,11 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
       <Navigate
         to={{ pathname: location.pathname, search: location.search, hash: location.hash }}
         replace
-        state={buildA1ChapterResourceHubState({ level: routeLevel, day: routeDay })}
+        state={buildA1ChapterResourceHubState({
+          level: routeLevel,
+          day: routeDay,
+          search: location.search,
+        })}
       />
     );
   }
