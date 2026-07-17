@@ -55,7 +55,7 @@ import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPag
 import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
 import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
-import A1Day6FamilyAndHobbiesWorkbookPage from "./components/A1Day6FamilyAndHobbiesWorkbookPage";
+import A1WorkbookRoutePage from "./components/A1WorkbookRoutePage";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -762,7 +762,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-6-family-and-hobbies-workbook"
-            element={<A1Day6FamilyAndHobbiesWorkbookPage />}
+            element={<A1WorkbookRoutePage />}
           />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
           <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={withRadioWorkbookGate("A2", 2, <A2Day2PersonenBeschreibenWorkbookPage />)} />
