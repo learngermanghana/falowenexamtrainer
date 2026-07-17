@@ -2,6 +2,7 @@
   "name": "falowen-exam-coach-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -34,9 +35,10 @@
   "scripts": {
     "sync:classes": "node scripts/sync-class-brochure-data.mjs",
     "sync:goethe-config-ui": "node scripts/patch-goethe-exam-config-ui.mjs",
+    "sync:live-class-session-identity": "node scripts/patch-live-class-session-identity.mjs",
     "audit:a1-curriculum": "node ../scripts/auditA1CourseBook.js",
-    "prestart": "npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
-    "prebuild": "npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
+    "prestart": "npm run sync:live-class-session-identity && npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
+    "prebuild": "npm run sync:live-class-session-identity && npm run audit:a1-curriculum && npm run sync:classes && npm run sync:goethe-config-ui",
     "start": "vite --host 0.0.0.0",
     "build": "vite build",
     "test": "jest",
