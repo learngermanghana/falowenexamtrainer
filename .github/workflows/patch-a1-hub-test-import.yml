@@ -1,0 +1,32 @@
+name: Patch A1 hub test import
+
+on:
+  push:
+    branches:
+      - fix/a1-day2-hub-and-media
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/a1-day2-hub-and-media
+          fetch-depth: 0
+      - name: Point the regression test at the pure resolver
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i 's#../components/A1ChapterResourceHubRoute#../utils/a1ChapterResourceHubState#' web/src/data/inAppWorkbookRoutes.a1LessonLinks.test.js
+          if git diff --quiet; then
+            echo "Import already updated."
+            exit 0
+          fi
+          git config user.name "falowen-ci"
+          git config user.email "actions@users.noreply.github.com"
+          git add web/src/data/inAppWorkbookRoutes.a1LessonLinks.test.js
+          git commit -m "Test A1 hub resolution without loading Firebase"
+          git push origin HEAD:fix/a1-day2-hub-and-media
