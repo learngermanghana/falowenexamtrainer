@@ -56,7 +56,7 @@ const validateCanonicalCurriculum = (canonical) => {
   const assignmentIds = new Map();
   const appSource = fs.existsSync(webAppPath) ? fs.readFileSync(webAppPath, 'utf8') : '';
 
-  canonical.forEach((entry, entryIndex) => {
+  canonical.forEach((entry) => {
     const label = `${entry.level || '??'} day ${entry.day ?? '??'} ${entry.assignmentId || '(no assignmentId)'}`;
     const level = String(entry.level || '').toUpperCase();
     const assignmentId = String(entry.assignmentId || '').trim();
@@ -108,10 +108,12 @@ const validateCanonicalCurriculum = (canonical) => {
 
 (async () => {
   const canonical = JSON.parse(fs.readFileSync(path.join(repoRoot, 'shared/curriculumCanonical.json'), 'utf8'));
-  const webModule = await import(pathToFileURL(path.join(repoRoot, 'web/src/data/curriculumManifest.js')));
+  // The runtime curriculum manifest intentionally imports browser-only alignment helpers.
+  // For drift detection, compare the generated canonical lesson catalogue directly.
+  const webCatalogModule = await import(pathToFileURL(path.join(repoRoot, 'web/src/data/lessonCatalog.js')));
   const functionsModule = require(path.join(repoRoot, 'functions/data/curriculumManifest.js'));
 
-  const webCanonical = webModule.CANONICAL_CURRICULUM || [];
+  const webCanonical = webCatalogModule.lessonCatalog || [];
   const functionsCanonical = functionsModule.CANONICAL_CURRICULUM || [];
   const errors = [];
 
