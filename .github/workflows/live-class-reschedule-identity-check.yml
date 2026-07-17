@@ -13,7 +13,6 @@ on:
       - 'scripts/applyA1RouteAlignment.js'
       - 'scripts/applyB2LessonContentAlignment.js'
       - 'scripts/checkCurriculumManifestSync.js'
-      - 'scripts/reportCurriculumManifestDrift.js'
       - '.github/workflows/live-class-reschedule-identity-check.yml'
   push:
     branches: [main]
@@ -25,7 +24,6 @@ on:
       - 'scripts/applyA1RouteAlignment.js'
       - 'scripts/applyB2LessonContentAlignment.js'
       - 'scripts/checkCurriculumManifestSync.js'
-      - 'scripts/reportCurriculumManifestDrift.js'
   workflow_dispatch:
 
 jobs:
@@ -41,20 +39,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Generate curriculum files from the canonical source
-        run: npm run sync:curriculum
-      - name: Upload canonical generated files
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-generated-curriculum
-          path: |
-            web/src/data/lessonCatalog.js
-            functions/data/lessonCatalog.js
-            web/src/data/curriculumManifest.js
-            functions/data/curriculumManifest.js
-            web/src/data/a1CourseBookCards.js
-          if-no-files-found: error
-      - name: Run curriculum checker against generated output
+      - name: Check curriculum structure from a clean checkout
         run: node scripts/checkCurriculumManifestSync.js
       - name: Install web dependencies
         working-directory: web
