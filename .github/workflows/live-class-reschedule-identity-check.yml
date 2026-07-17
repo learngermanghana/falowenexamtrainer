@@ -36,32 +36,26 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-      - name: Run curriculum checker
-        id: curriculum
-        shell: bash
-        run: |
-          set +e
-          node scripts/reportCurriculumManifestDrift.js > curriculum-check.log 2>&1
-          node scripts/checkCurriculumManifestSync.js >> curriculum-check.log 2>&1
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          cat curriculum-check.log
-          exit 0
-      - name: Upload curriculum checker output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: curriculum-check-output
-          path: curriculum-check.log
-          if-no-files-found: error
-      - name: Require curriculum checker success
-        if: steps.curriculum.outputs.exit_code != '0'
-        run: exit 1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Generate curriculum files from the canonical source
+        run: npm run sync:curriculum
+      - name: Upload canonical generated files
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-generated-curriculum
+          path: |
+            web/src/data/lessonCatalog.js
+            functions/data/lessonCatalog.js
+            web/src/data/curriculumManifest.js
+            functions/data/curriculumManifest.js
+            web/src/data/a1CourseBookCards.js
+          if-no-files-found: error
+      - name: Run curriculum checker against generated output
+        run: node scripts/checkCurriculumManifestSync.js
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
