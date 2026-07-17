@@ -1,0 +1,39 @@
+name: Diagnose PR 2164
+
+on:
+  push:
+    branches:
+      - fix/day3-radio-title-a1-word-minimum
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Capture build output
+        shell: bash
+        run: |
+          set +e
+          cd web
+          npm run build > ../pr2164-build.log 2>&1
+          status=$?
+          cd ..
+          tail -n 160 pr2164-build.log
+          exit $status
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr2164-build-log
+          path: pr2164-build.log
