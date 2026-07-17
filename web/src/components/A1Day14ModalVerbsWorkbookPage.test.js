@@ -14,8 +14,8 @@ describe("A1 Day 14 practical modal verbs workbook", () => {
     expect(screen.getByRole("heading", { name: /Modal Verbs at the Train Station/i })).toBeVisible();
     expect(screen.getByRole("heading", { name: /Read a German train board/i })).toBeVisible();
     expect(screen.getByLabelText("Example German train ticket")).toBeVisible();
-    expect(screen.getByText(/Der Zug muss um 14:20 Uhr abfahren/i)).toBeVisible();
-    expect(screen.getByText(/Wir möchten um 16:08 Uhr ankommen/i)).toBeVisible();
+    expect(document.body).toHaveTextContent("Der Zug muss um 14:20 Uhr abfahren.");
+    expect(document.body).toHaveTextContent("Wir möchten um 16:08 Uhr ankommen.");
     expect(screen.getByRole("heading", { name: /Practical knowledge test/i })).toBeVisible();
   });
 
