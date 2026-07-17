@@ -38,6 +38,31 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toEqual({ day: 2, chapter: "1.1" });
   });
 
+  test("uses the approved Day 4 Kapitel 2 German numbers video from the resource hub", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/4",
+        "?chapter=2&hub=1",
+      ),
+    ).toEqual({ day: 4, chapter: "2" });
+    expect(getA1RadioResource(4)).toEqual(
+      expect.objectContaining({
+        key: "a1-day4-german-numbers-falowen-radio",
+        title: "German Numbers · Kapitel 2",
+        youtubeId: "lMeNuJCloD0",
+      }),
+    );
+  });
+
+  test("does not open the Day 4 radio for another chapter", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/4",
+        "?chapter=2.1&hub=1",
+      ),
+    ).toBeNull();
+  });
+
   test("uses the approved Day 13 revision video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
