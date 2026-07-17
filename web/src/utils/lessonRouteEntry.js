@@ -102,7 +102,10 @@ export const resolveLessonRouteEntry = ({
   chapter = "",
   stateEntry = null,
 } = {}) => {
-  const requestedLevel = String(level || "").trim().toUpperCase();
+  const requestedLevel = String(level || "").trim().toUpperCase()
+    || entryLevel(stateEntry)
+    || entries.map(entryLevel).find(Boolean)
+    || "";
   const requestedChapter = String(chapter || "").trim();
 
   // A1 hub URLs must resolve from the immutable lesson catalog. Runtime course
