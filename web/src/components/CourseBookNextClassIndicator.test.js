@@ -83,8 +83,8 @@ describe("CourseBookNextClassIndicator", () => {
       {
         id: "completed",
         status: "completed",
-        startsAt: new Date("2026-07-01T13:00:00.000Z"),
-        endsAt: new Date("2026-07-01T14:30:00.000Z"),
+        startsAt: new Date("2026-07-01T08:00:00.000Z"),
+        endsAt: new Date("2026-07-01T09:30:00.000Z"),
       },
       {
         id: "stale-live",
@@ -96,6 +96,28 @@ describe("CourseBookNextClassIndicator", () => {
     ];
 
     expect(findCurrentOrNextSession(sessions, now)).toBe(expected);
+  });
+
+  test("uses the repaired Admin Day 3 time even when its stored status is stale", () => {
+    const now = new Date("2026-07-17T09:45:00.000Z");
+    const adminDay3 = {
+      id: "a1-bonn-admin-day-3",
+      status: "completed",
+      curriculumDay: 3,
+      assignmentIds: ["A1-1.1-PRACTICE", "A1-1.2"],
+      topic: "Day 3: Personal Information, Articles, Adjectives and W-Questions",
+      startsAt: new Date("2026-07-17T11:00:00.000Z"),
+      endsAt: new Date("2026-07-17T12:00:00.000Z"),
+    };
+    const adminDay6 = {
+      id: "a1-bonn-admin-day-6",
+      status: "scheduled",
+      curriculumDay: 6,
+      startsAt: new Date("2026-07-22T11:00:00.000Z"),
+      endsAt: new Date("2026-07-22T12:00:00.000Z"),
+    };
+
+    expect(findCurrentOrNextSession([adminDay3, adminDay6], now)).toBe(adminDay3);
   });
 
   test("finds the Course Book statistics grid and keeps the A1 live-class card outside it", () => {
