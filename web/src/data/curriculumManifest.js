@@ -8,8 +8,8 @@ import {
   getCurriculumEntriesForLevel as getRawCurriculumEntriesForLevel,
   normalizeLevel,
 } from "./lessonCatalog.js";
-import { alignA1CurriculumEntries } from "./a1RouteAlignment";
-import { alignB2CurriculumEntries } from "./b2LessonContentAlignment";
+import { alignA1CurriculumEntries } from "./a1RouteAlignment.js";
+import { alignB2CurriculumEntries } from "./b2LessonContentAlignment.js";
 
 const alignRuntimeCurriculumEntries = (entries = []) =>
   alignB2CurriculumEntries(alignA1CurriculumEntries(entries));

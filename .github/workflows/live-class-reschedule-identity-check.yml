@@ -1,0 +1,60 @@
+name: Live Class Reschedule Identity Check
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/utils/liveClassSessionIdentity.js'
+      - 'web/src/utils/liveClassSessionIdentity.test.js'
+      - 'web/scripts/patch-live-class-session-identity.mjs'
+      - 'web/src/services/canonicalLiveClassServiceV2.js'
+      - 'web/src/data/curriculumManifest.js'
+      - 'web/src/data/a1CourseBookCards.js'
+      - 'web/package.json'
+      - 'scripts/applyA1RouteAlignment.js'
+      - 'scripts/applyB2LessonContentAlignment.js'
+      - 'scripts/checkCurriculumManifestSync.js'
+      - '.github/workflows/live-class-reschedule-identity-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/utils/liveClassSessionIdentity.js'
+      - 'web/scripts/patch-live-class-session-identity.mjs'
+      - 'web/src/data/curriculumManifest.js'
+      - 'web/package.json'
+      - 'scripts/applyA1RouteAlignment.js'
+      - 'scripts/applyB2LessonContentAlignment.js'
+      - 'scripts/checkCurriculumManifestSync.js'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Check curriculum structure from a clean checkout
+        run: node scripts/checkCurriculumManifestSync.js
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Apply live-class lesson identity patch
+        working-directory: web
+        run: |
+          node --check scripts/patch-live-class-session-identity.mjs
+          node scripts/patch-live-class-session-identity.mjs
+          grep -F 'dedupeCanonicalSessions(sessions' src/services/canonicalLiveClassServiceV2.js
+      - name: Test equal-time and rescheduled lesson selection
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/liveClassSessionIdentity.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build

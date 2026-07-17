@@ -3,8 +3,8 @@
 // Edit shared/curriculumCanonical.json and run npm run sync:curriculum.
 
 import { getLessonsByLevel, getLessonDisplayData } from "./lessonCatalog.js";
-import { applyA1LessonTitleOverride } from "./a1LessonTitleOverrides";
-import { alignA1CurriculumEntries } from "./a1RouteAlignment";
+import { applyA1LessonTitleOverride } from "./a1LessonTitleOverrides.js";
+import { alignA1CurriculumEntries } from "./a1RouteAlignment.js";
 
 const applyRequestedA1TitleCorrection = (lesson = {}) =>
   String(lesson.id || lesson.assignmentId || "").trim().toUpperCase() === "A1-1.2"
