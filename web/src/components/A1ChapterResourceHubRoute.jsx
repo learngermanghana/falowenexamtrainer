@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -29,30 +29,10 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
     search: location.search,
   });
 
-  // The chapter in the URL is authoritative. Replace any stale Day 2 state with
-  // the exact chapter entry before the legacy lesson page renders its resources.
-  if (
-    shouldNormalizeA1ChapterResourceHubState({
-      level: routeLevel,
-      day: routeDay,
-      search: location.search,
-      state: location.state,
-    })
-  ) {
-    return (
-      <Navigate
-        to={{ pathname: location.pathname, search: location.search, hash: location.hash }}
-        replace
-        state={buildA1ChapterResourceHubState({
-          level: routeLevel,
-          day: routeDay,
-          search: location.search,
-        })}
-      />
-    );
-  }
-
   if (isResourceHubRequest) {
+    // CourseLessonPageLegacy resolves the URL chapter authoritatively. Rendering it
+    // directly avoids a replace-navigation/remount cycle when another service
+    // clears or rewrites transient location state (the Day 7 blinking bug).
     return <CourseLessonPageLegacy />;
   }
 

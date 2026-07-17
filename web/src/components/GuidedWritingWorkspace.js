@@ -48,6 +48,38 @@ Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
 
 Zusammenfassend lässt sich sagen, dass [kurzes Fazit].`;
 
+export const C1_OPINION_ESSAY_TEMPLATE = `C1 OPINION ESSAY · Use this for Meinungsbeitrag, Stellungnahme or argument writing
+
+INTRODUCTION
+In der heutigen Zeit wird häufig über [Thema] diskutiert.
+
+Meiner Meinung nach ist dieses Thema von großer Bedeutung, da es sowohl [Aspekt 1] als auch [Aspekt 2] betrifft.
+
+Im Folgenden werde ich zunächst die Vorteile erläutern, anschließend auf mögliche Einwände eingehen und schließlich eine ausgewogene Lösung vorstellen.
+
+ADVANTAGES
+Einerseits bietet [Thema] zahlreiche Vorteile. Ein wesentlicher Vorteil besteht darin, dass [Vorteil / Begründung]. Darüber hinaus sollte berücksichtigt werden, dass [weiterer Vorteil oder Beispiel].
+
+DISADVANTAGES
+Andererseits sollte berücksichtigt werden, dass [Nachteil / Problem]. Dies kann beispielsweise dazu führen, dass [Folge oder konkretes Beispiel].
+
+COUNTERARGUMENT
+Natürlich gibt es auch andere Meinungen. Einige Menschen vertreten die Auffassung, dass [Gegenargument].
+
+OWN POSITION
+Dennoch bin ich der Auffassung, dass [eigene Position stärken und begründen].
+
+PROPOSED SOLUTION
+Eine mögliche Lösung beziehungsweise Alternative bestünde darin, [Vorschlag oder Maßnahme]. Auf diese Weise könnten sowohl [Interesse 1] als auch [Interesse 2] angemessen berücksichtigt werden.
+
+CONCLUSION
+Zusammenfassend lässt sich sagen, dass [kurzes Fazit und eigene Position].
+
+OPTIONAL UNIVERSAL CLOSING SENTENCES
+1. Letztlich kommt es darauf an, eine ausgewogene Lösung zu finden, die sowohl die Bedürfnisse des Einzelnen als auch die Interessen der Gesellschaft berücksichtigt.
+
+2. Nur durch einen verantwortungsvollen und differenzierten Umgang mit diesem Thema können langfristig positive Ergebnisse erzielt werden.`;
+
 const PLANNING_NOTES_PLACEHOLDER = `Write short points first. English is okay.
 
 1. What is the problem?
@@ -185,7 +217,11 @@ const getMainWritingPrompt = (config = {}) =>
 const getTemplateForMode = ({ formalMode, opinionMode, config }) => {
   if (config?.starterTemplate) return config.starterTemplate;
   if (formalMode) return config?.formalTemplate || FORMAL_LETTER_TEMPLATE;
-  if (opinionMode) return config?.opinionTemplate || OPINION_ESSAY_TEMPLATE;
+  if (opinionMode) {
+    const isC1 = String(config?.level || "").trim().toUpperCase() === "C1"
+      || /^C1\b/i.test(String(config?.taskType || config?.writingTaskType || "").trim());
+    return config?.opinionTemplate || (isC1 ? C1_OPINION_ESSAY_TEMPLATE : OPINION_ESSAY_TEMPLATE);
+  }
   return config?.template || "";
 };
 

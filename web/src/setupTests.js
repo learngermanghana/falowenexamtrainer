@@ -2,6 +2,16 @@
 import "@testing-library/jest-dom";
 import { TextDecoder, TextEncoder } from "util";
 
+// Firebase Auth performs an instanceof check while its node bundle is loaded.
+// jsdom does not currently copy Node's Fetch API Response constructor.
+if (!globalThis.Response) {
+  Object.defineProperty(globalThis, "Response", {
+    configurable: true,
+    writable: true,
+    value: class Response {},
+  });
+}
+
 // React Router's web APIs expect these browser globals. Node provides the
 // standards-compatible implementation, but jsdom does not expose it by default.
 if (!globalThis.TextEncoder) {
