@@ -10,6 +10,7 @@ import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
+import SelfLearningLessonDirectNavigationFix from './components/SelfLearningLessonDirectNavigationFix';
 import A1CanonicalChapterLessonRoute from './components/A1CanonicalChapterLessonRoute';
 import A1ChapterSpecificLessonRouteBoundary from './components/A1ChapterSpecificLessonRouteBoundary';
 import A1ChapterResourceHubRoute from './components/A1ChapterResourceHubRoute';
@@ -53,6 +54,7 @@ const AuthenticatedAppRoutes = () => (
       <ToastProvider>
         <A1ChapterSpecificLessonRouteBoundary>
           <RouteScopedAppServices />
+          <SelfLearningLessonDirectNavigationFix />
           <A1RadioFirstWorkbookRoutes />
           <RequestedLessonAiVideoHeader />
           <Routes>

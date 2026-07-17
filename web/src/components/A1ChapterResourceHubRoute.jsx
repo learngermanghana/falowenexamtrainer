@@ -1,39 +1,20 @@
 import React from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
+import {
+  buildA1ChapterResourceHubState,
+  getRequestedA1Chapter,
+  isA1ChapterResourceHubRequest,
+  resolveA1ChapterResourceHubEntry,
+  shouldNormalizeA1ChapterResourceHubState,
+} from "../utils/a1ChapterResourceHubState";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 
-const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
-const normalizeDay = (value = "") => String(value ?? "").trim();
-
-export const isA1ChapterResourceHubRequest = ({ level = "", search = "" } = {}) => {
-  const query = new URLSearchParams(String(search || ""));
-  return (
-    normalizeLevel(level) === "A1" &&
-    query.get("hub") === "1" &&
-    Boolean(String(query.get("chapter") || "").trim())
-  );
-};
-
-export const buildA1ChapterResourceHubState = ({ level = "A1", day = "" } = {}) => ({
-  level: normalizeLevel(level) || "A1",
-  day: normalizeDay(day),
-});
-
-export const shouldNormalizeA1ChapterResourceHubState = ({
-  level = "",
-  day = "",
-  search = "",
-  state = null,
-} = {}) => {
-  if (!isA1ChapterResourceHubRequest({ level, search })) return false;
-
-  const expectedState = buildA1ChapterResourceHubState({ level, day });
-  return (
-    !state ||
-    Boolean(state.entry) ||
-    normalizeLevel(state.level) !== expectedState.level ||
-    normalizeDay(state.day) !== expectedState.day
-  );
+export {
+  buildA1ChapterResourceHubState,
+  getRequestedA1Chapter,
+  isA1ChapterResourceHubRequest,
+  resolveA1ChapterResourceHubEntry,
+  shouldNormalizeA1ChapterResourceHubState,
 };
 
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
@@ -41,14 +22,15 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   const params = useParams();
   const routeLevel = params.level || level;
   const routeDay = params.day;
+
+  // The extracted resolver owns the hub contract: query.get("hub") === "1".
   const isResourceHubRequest = isA1ChapterResourceHubRequest({
     level: routeLevel,
     search: location.search,
   });
 
-  // The chapter in the URL is authoritative. Course Book navigation can carry a
-  // stale Day 2 entry for Kapitel 0.2. Replace that state with only the A1/day
-  // context required by the legacy lesson page, then resolve Kapitel 1.1 from the URL.
+  // The chapter in the URL is authoritative. Replace any stale Day 2 state with
+  // the exact chapter entry before the legacy lesson page renders its resources.
   if (
     shouldNormalizeA1ChapterResourceHubState({
       level: routeLevel,
@@ -61,7 +43,11 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
       <Navigate
         to={{ pathname: location.pathname, search: location.search, hash: location.hash }}
         replace
-        state={buildA1ChapterResourceHubState({ level: routeLevel, day: routeDay })}
+        state={buildA1ChapterResourceHubState({
+          level: routeLevel,
+          day: routeDay,
+          search: location.search,
+        })}
       />
     );
   }

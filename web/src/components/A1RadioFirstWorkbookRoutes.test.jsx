@@ -74,6 +74,36 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toBeNull();
   });
 
+  test("uses the approved Day 5 introductions and articles video", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
+      ),
+    ).toEqual({ day: 5, chapter: "1.3" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/5",
+        "?chapter=1.3&hub=1",
+      ),
+    ).toEqual({ day: 5, chapter: "1.3" });
+    expect(getA1RadioResource(5)).toEqual(
+      expect.objectContaining({
+        key: "a1-day5-introducing-yourself-articles-falowen-radio",
+        title: "Introducing Yourself and Articles · Kapitel 1.3",
+        youtubeId: "4yGJ9-Fz19A",
+      }),
+    );
+  });
+
+  test("does not open the Day 5 radio for another chapter", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/5",
+        "?chapter=1.2&hub=1",
+      ),
+    ).toBeNull();
+  });
+
   test("uses the approved Day 13 revision video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(

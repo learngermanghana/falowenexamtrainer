@@ -9,6 +9,10 @@ import {
 } from "./inAppWorkbookRoutes";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
 import {
+  buildA1ChapterResourceHubState,
+  resolveA1ChapterResourceHubEntry,
+} from "../utils/a1ChapterResourceHubState";
+import {
   getRequiredChecklist,
   syncSubmitCompletionGuide,
 } from "../components/SubmitPageLevelGuidanceInjector";
@@ -106,6 +110,30 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
     expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
+  });
+
+  it("makes the requested Day 2 Kapitel 1.1 entry authoritative even after radio completion", () => {
+    const search = "?chapter=1.1&hub=1&radio=done";
+    const entry = resolveA1ChapterResourceHubEntry({ day: 2, chapter: "1.1" });
+    const state = buildA1ChapterResourceHubState({ level: "A1", day: 2, search });
+
+    expect(entry).toEqual(expect.objectContaining({ chapter: "1.1" }));
+    expect(entry.topic).toMatch(/Personal Pronouns/i);
+    expect(state.entry).toEqual(expect.objectContaining({ chapter: "1.1" }));
+    expect(state.entry.chapter).not.toBe("0.2");
+  });
+
+  it("embeds the approved YouTube Hören video in A1 Day 3 Kapitel 1.2 and removes Drive", () => {
+    const workbookSource = fs.readFileSync(
+      path.resolve(__dirname, "../components/A1Day3PronounsIntroducingYourselfWorkbookPage.js"),
+      "utf8",
+    );
+
+    expect(workbookSource).toContain('const HOEREN_YOUTUBE_ID = "3p-Vl1HsOok"');
+    expect(workbookSource).toContain("youtube-nocookie.com/embed");
+    expect(workbookSource).toContain("A1 Day 3 Kapitel 1.2 Hören");
+    expect(workbookSource).not.toContain("drive.google.com");
+    expect(workbookSource).not.toContain("CoursebookAudioPlayer");
   });
 
   it("shows the exact two-part consent checklist on the inline A1-1.1 Submit tab", () => {

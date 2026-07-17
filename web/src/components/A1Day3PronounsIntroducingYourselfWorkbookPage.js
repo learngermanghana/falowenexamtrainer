@@ -2,7 +2,8 @@ import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
-import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+
+const HOEREN_YOUTUBE_ID = "3p-Vl1HsOok";
 
 const sectionStyle = {
   ...styles.card,
@@ -24,6 +25,15 @@ const questionBoxStyle = {
   display: "grid",
   gap: 8,
   background: "#fff",
+};
+
+const videoFrameStyle = {
+  position: "relative",
+  width: "100%",
+  paddingTop: "56.25%",
+  borderRadius: 12,
+  overflow: "hidden",
+  background: "#000",
 };
 
 const multipleChoiceQuestions = [
@@ -111,13 +121,17 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-        <CoursebookAudioPlayer
-          url="https://drive.google.com/file/d/13LAdG1vlR6Bcid2NycKO0BEROpuHv7-f/view?usp=sharing"
-          linkLabel="Open Hören Material (Google Drive)"
-          linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        />
+        <div style={videoFrameStyle} data-a1-day3-hoeren-youtube={HOEREN_YOUTUBE_ID}>
+          <iframe
+            title="A1 Day 3 Kapitel 1.2 Hören"
+            src={`https://www.youtube-nocookie.com/embed/${HOEREN_YOUTUBE_ID}`}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören from Google Drive, then return to submit answers.
+          Listen to the embedded Hören video, then answer the questions below.
         </p>
 
         <h3 style={{ margin: 0 }}>Fragen und Multiple-Choice-Antworten</h3>
