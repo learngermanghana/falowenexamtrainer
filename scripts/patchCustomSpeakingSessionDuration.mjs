@@ -60,7 +60,7 @@ replaceOnce(
     logSpeakingChatEvent("chat_session_timeout", { durationSeconds: CUSTOM_SPEAKING_CHAT_SESSION_SECONDS });
   }, [customSessionSecondsLeft, customSessionState]);`,
   `    appendCustomCoachText(
-      \`Session complete 🎉\\nYou practised for ${customSessionDurationMinutes} minutes.\\nStart a new session when you are ready.\\n\\nQuick summary:\\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\\n• Next speaking task: give a 45-second opinion and one reason.\`
+      \`Session complete 🎉\\nYou practised for \${customSessionDurationMinutes} minutes.\\nStart a new session when you are ready.\\n\\nQuick summary:\\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\\n• Next speaking task: give a 45-second opinion and one reason.\`
     );
     logSpeakingChatEvent("chat_session_timeout", {
       durationMinutes: customSessionDurationMinutes,
@@ -133,7 +133,7 @@ replaceOnce(
 
 replaceOnce(
   `{customSessionState === "ended" ? "Start new session" : "Start session"}`,
-  `{customSessionState === "ended" ? \`Start new ${customSessionDurationMinutes}-minute session\` : \`Start ${customSessionDurationMinutes}-minute session\`}`,
+  `{customSessionState === "ended" ? \`Start new \${customSessionDurationMinutes}-minute session\` : \`Start \${customSessionDurationMinutes}-minute session\`}`,
   "dynamic start button label",
 );
 
