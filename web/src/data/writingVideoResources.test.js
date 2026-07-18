@@ -8,6 +8,7 @@ describe("writing video resources", () => {
     ["B1", 1, "https://youtu.be/nG1PUrvrS_s"],
     ["B1", 2, "https://youtu.be/94IXPx5dTNY"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
+    ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
   ])("returns the requested %s Day %i writing video", (level, day, url) => {
@@ -21,6 +22,19 @@ describe("writing video resources", () => {
       expect.objectContaining({
         key: "b1-day2-freunde-fuers-leben-writing-video",
         title: expect.stringContaining("Schreiben explanation"),
+      }),
+    );
+  });
+
+  test("classifies B2 Day 12 as a letter-writing guide", () => {
+    expect(getWritingVideoResource("B2", 12)).toEqual(
+      expect.objectContaining({
+        key: "b2-day12-kultur-freizeit-letter-writing-video",
+        format: "letter",
+        title: expect.stringContaining("Brief schreiben"),
+        badge: "Watch before writing · Letter guide",
+        heading: "Learn how to write this B2 letter",
+        url: "https://youtu.be/3xWokVVz8cs",
       }),
     );
   });
@@ -40,6 +54,7 @@ describe("writing video resources", () => {
   test.each([
     ["https://youtu.be/w8TaNHk-a0U", "https://www.youtube.com/embed/w8TaNHk-a0U"],
     ["https://youtu.be/94IXPx5dTNY", "https://www.youtube.com/embed/94IXPx5dTNY"],
+    ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],
     ["https://www.youtube.com/watch?v=nG1PUrvrS_s", "https://www.youtube.com/embed/nG1PUrvrS_s"],
     ["https://youtube.com/embed/VdczhJS9ClY", "https://www.youtube.com/embed/VdczhJS9ClY"],
     ["https://youtu.be/tpj8TV8DaH8", "https://www.youtube.com/embed/tpj8TV8DaH8"],

@@ -36,8 +36,33 @@ updateFile("web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js", 
   return source.replace(marker, `${marker}\n${videoBlock}`);
 });
 
+updateFile("web/src/components/WritingCheatSheetTabs.js", (source) => {
+  let updated = source;
+  const badgeBefore = "        Watch before writing · Essay Ideas";
+  const badgeAfter = '        {writingVideo.badge || "Watch before writing · Essay Ideas"}';
+  const headingBefore = "          Get ideas for this exact essay";
+  const headingAfter = '          {writingVideo.heading || "Get ideas for this exact essay"}';
+
+  if (!updated.includes(badgeAfter)) {
+    if (!updated.includes(badgeBefore)) {
+      throw new Error("Writing support badge anchor was not found.");
+    }
+    updated = updated.replace(badgeBefore, badgeAfter);
+  }
+
+  if (!updated.includes(headingAfter)) {
+    if (!updated.includes(headingBefore)) {
+      throw new Error("Writing support heading anchor was not found.");
+    }
+    updated = updated.replace(headingBefore, headingAfter);
+  }
+
+  return updated;
+});
+
 const a2Source = fs.readFileSync(path.join(root, "web/src/components/A2Day3ComparisonsWorkbookPage.js"), "utf8");
 const c1Source = fs.readFileSync(path.join(root, "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js"), "utf8");
+const writingTabsSource = fs.readFileSync(path.join(root, "web/src/components/WritingCheatSheetTabs.js"), "utf8");
 
 if (a2Source.includes("https://youtu.be/Ml50uHYxBx8")) {
   throw new Error("The old A2 Day 1.3 listening link is still present.");
@@ -48,5 +73,11 @@ if (!a2Source.includes("https://youtu.be/z0hve7zCDEo")) {
 if (!c1Source.includes("https://youtu.be/51cNSMK5F0g?si=npQ1tReOKcrLhY-T")) {
   throw new Error("The C1 Day 11 AI video is missing.");
 }
+if (!writingTabsSource.includes('writingVideo.badge || "Watch before writing · Essay Ideas"')) {
+  throw new Error("Writing support does not use resource-specific badge text.");
+}
+if (!writingTabsSource.includes('writingVideo.heading || "Get ideas for this exact essay"')) {
+  throw new Error("Writing support does not use resource-specific heading text.");
+}
 
-console.log("Applied A2 Day 1.3 listening and C1 Day 11 AI video updates.");
+console.log("Applied requested course media and writing support labels.");
