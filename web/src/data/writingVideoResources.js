@@ -25,6 +25,16 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this video before writing. It explains the task, the recommended structure and how to develop a clear B2 opinion text.",
       url: "https://youtu.be/w8TaNHk-a0U",
     },
+    12: {
+      key: "b2-day12-kultur-freizeit-letter-writing-video",
+      format: "letter",
+      title: "B2 Day 12 · Kultur und Freizeit · Brief schreiben",
+      description:
+        "Watch this Schreiben lesson before starting the task. It teaches you how to understand the letter prompt, organise the opening, cover every required point, connect your ideas and finish with an appropriate closing.",
+      badge: "Watch before writing · Letter guide",
+      heading: "Learn how to write this B2 letter",
+      url: "https://youtu.be/3xWokVVz8cs",
+    },
   },
   C1: {
     8: {
