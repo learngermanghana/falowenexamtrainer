@@ -58,11 +58,11 @@ describe("requested B1 and B2 AI lesson videos", () => {
     ).toBeNull();
   });
 
-  test("resolves the approved B1 Day 15 video only in workbook view", () => {
+  test("resolves the approved B1 Day 15 video only after the radio step is complete", () => {
     expect(
       resolveRequestedLessonAiVideo({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook",
+        search: "?view=workbook&radio=done",
       }),
     ).toEqual(
       expect.objectContaining({
@@ -70,6 +70,13 @@ describe("requested B1 and B2 AI lesson videos", () => {
         videoId: "bWiBTVo0EU4",
       }),
     );
+
+    expect(
+      resolveRequestedLessonAiVideo({
+        pathname: "/campus/course/lesson/B1/15",
+        search: "?view=workbook",
+      }),
+    ).toBeNull();
 
     expect(
       resolveRequestedLessonAiVideo({
@@ -101,13 +108,13 @@ describe("requested B1 and B2 AI lesson videos", () => {
     );
   });
 
-  test("adds the B1 AI video above the workbook guidance", () => {
+  test("adds the B1 AI video above the workbook guidance after radio completion", () => {
     buildB1WorkbookDom();
 
     expect(
       applyRequestedLessonAiVideoHeader({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook",
+        search: "?view=workbook&radio=done",
       }),
     ).toBe(1);
 
@@ -119,6 +126,18 @@ describe("requested B1 and B2 AI lesson videos", () => {
       "src",
       "https://www.youtube-nocookie.com/embed/bWiBTVo0EU4",
     );
+  });
+
+  test("does not add the B1 AI video on the radio-first entrance", () => {
+    buildB1WorkbookDom();
+
+    expect(
+      applyRequestedLessonAiVideoHeader({
+        pathname: "/campus/course/lesson/B1/15",
+        search: "?view=workbook",
+      }),
+    ).toBe(0);
+    expect(document.querySelector('[data-requested-lesson-ai-video="true"]')).toBeNull();
   });
 
   test("does not inject either video on unrelated lesson routes", () => {
