@@ -16,6 +16,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before drafting the email about a lifelong friend. It is a writing-support resource, not an AI video or Falowen Radio.",
       url: "https://youtu.be/94IXPx5dTNY",
     },
+    3: {
+      key: "b1-day3-erfolgsgeschichten-writing-video",
+      title: "B1 Day 3 · Erfolgsgeschichten · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before drafting the email to Frau Wolmer. It explains how to apologise politely, give a reason and use an appropriate greeting and closing.",
+      url: "https://youtu.be/8uAMihJTzvo",
+    },
   },
   B2: {
     1: {
