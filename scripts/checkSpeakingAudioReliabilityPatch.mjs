@@ -7,6 +7,7 @@ const checks = [
   ["web/src/components/SpeakingPage.js", [
     'from "../lib/speakingAudio"',
     'from "../lib/speakingSessionDuration"',
+    'from "../lib/speakingExamLock"',
     "createSpeakingMediaRecorder(stream)",
     "buildRecordedAudioBlob(audioChunksRef.current, recorder)",
     "recorder.start(1000)",
@@ -16,6 +17,39 @@ const checks = [
     "Choose your chat time",
     "durationMinutes: customSessionDurationMinutes",
     "speakingChatSessionSeconds(customSessionDurationMinutes)",
+    "lockedLevel: lockedLevelProp",
+    "lockedTeil: lockedTeilProp",
+    "getVisibleSpeakingTabs({ isCourseMode, examOnly })",
+    "if (saved?.selectedTeil && !normalizedLockedTeil)",
+    "Teil {normalizedLockedTeil}",
+  ]],
+  ["web/src/components/SpeakingExamIntroPage.js", [
+    'import A1Teil3SpeakingPracticePanel from "./A1Teil3SpeakingPracticePanel"',
+    "<A1Teil3SpeakingPracticePanel />",
+  ]],
+  ["web/src/components/A1Teil3SpeakingPracticePanel.js", [
+    'lockedLevel="A1"',
+    'lockedTeil="3"',
+    "examOnly",
+    'contextLabel="Goethe A1 · Sprechen Teil 3"',
+  ]],
+  ["web/src/lib/speakingExamLock.js", [
+    "normalizeLockedSpeakingLevel",
+    "normalizeLockedSpeakingTeil",
+    "getVisibleSpeakingTabs",
+    "resolveInitialSpeakingFilters",
+  ]],
+  ["web/src/components/SelfLearningLessonRegistry.js", [
+    "TeacherLectureSupportingMaterials",
+    "removeTeacherLectureFromCanonicalLesson",
+    "removeTeacherLectureFromLesson",
+    "<SelfLearningLessonFrame",
+  ]],
+  ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", [
+    'data-teacher-lecture-support="links-only"',
+    "Open teacher lecture",
+    "The AI lesson stays embedded above",
+    "removeTeacherLectureFromCanonicalLesson",
   ]],
   ["web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js", [
     'from "../../lib/speakingAudio"',
@@ -70,6 +104,10 @@ const checks = [
   ]],
 ];
 
+const forbidden = [
+  ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", "<iframe"],
+];
+
 const failures = [];
 for (const [relativePath, markers] of checks) {
   const source = fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -80,8 +118,15 @@ for (const [relativePath, markers] of checks) {
   }
 }
 
-if (failures.length) {
-  throw new Error(`Speaking audio reliability contract failed:\n- ${failures.join("\n- ")}`);
+for (const [relativePath, marker] of forbidden) {
+  const source = fs.readFileSync(path.join(root, relativePath), "utf8");
+  const ok = !source.includes(marker);
+  console.log(`${ok ? "PASS" : "FAIL"} ${relativePath}: excludes ${marker}`);
+  if (!ok) failures.push(`${relativePath}: must exclude ${marker}`);
 }
 
-console.log("Speaking audio reliability source contract passed.");
+if (failures.length) {
+  throw new Error(`Speaking and self-learning video contract failed:\n- ${failures.join("\n- ")}`);
+}
+
+console.log("Speaking and self-learning video source contract passed.");
