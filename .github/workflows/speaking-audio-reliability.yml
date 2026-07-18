@@ -32,15 +32,25 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Apply speaking audio reliability patch
+      - name: Apply and validate speaking audio patch
+        shell: bash
         run: |
-          node --check scripts/patchSpeakingAudioReliability.mjs
-          node --check scripts/runSpeakingAudioReliabilityPatch.mjs
-          node --check scripts/checkSpeakingAudioReliabilityPatch.mjs
-          node scripts/runSpeakingAudioReliabilityPatch.mjs
-          node --check functions/functionz/app.js
-          node --check functions/functionz/speakingAudioReliability.js
-          node --test tests/speaking-audio-reliability.test.mjs
+          set +e
+          status=0
+          {
+            echo '== patch script syntax =='
+            node --check scripts/patchSpeakingAudioReliability.mjs || status=$?
+            node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
+            echo '== apply patch =='
+            node scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            echo '== backend syntax =='
+            node --check functions/functionz/app.js || status=$?
+            node --check functions/functionz/speakingAudioReliability.js || status=$?
+            echo '== pure helper tests =='
+            node --test tests/speaking-audio-reliability.test.mjs || status=$?
+          } 2>&1 | tee speaking-audio-apply.log
+          exit "$status"
 
       - name: Audit patched source contracts
         id: contract
@@ -55,8 +65,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: speaking-audio-contract-${{ github.run_id }}
-          path: speaking-audio-contract.log
+          name: speaking-audio-diagnostics-${{ github.run_id }}
+          path: |
+            speaking-audio-apply.log
+            speaking-audio-contract.log
           if-no-files-found: warn
           retention-days: 7
 
