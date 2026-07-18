@@ -6,11 +6,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const checks = [
   ["web/src/components/SpeakingPage.js", [
     'from "../lib/speakingAudio"',
+    'from "../lib/speakingSessionDuration"',
     "createSpeakingMediaRecorder(stream)",
     "buildRecordedAudioBlob(audioChunksRef.current, recorder)",
     "recorder.start(1000)",
     "playAudioElement(currentAudio)",
     "recordingMaxSeconds",
+    "CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS.map",
+    "Choose your chat time",
+    "durationMinutes: customSessionDurationMinutes",
+    "speakingChatSessionSeconds(customSessionDurationMinutes)",
   ]],
   ["web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js", [
     'from "../../lib/speakingAudio"',
@@ -37,6 +42,17 @@ const checks = [
     "if (error?.response) throw error",
     "timeout: 120000",
   ]],
+  ["web/src/services/presentationCoachService.js", [
+    'from "../lib/speakingSessionDuration"',
+    "normalizeSpeakingChatDurationMinutes(sessionContext?.durationMinutes)",
+    "full ${durationMinutes}-minute session",
+    "sessionContext,",
+  ]],
+  ["web/src/lib/speakingSessionDuration.js", [
+    "[10, 20, 30]",
+    "normalizeSpeakingChatDurationMinutes",
+    "speakingChatSessionSeconds",
+  ]],
   ["functions/functionz/app.js", [
     'require("./speakingAudioReliability")',
     "transcribeAudioFile({ file, getOpenAIClient })",
@@ -45,7 +61,7 @@ const checks = [
     "NO_SPEECH_DETECTED|TRANSCRIPTION_",
   ]],
   ["functions/functionz/speakingAudioReliability.js", [
-    "gpt-4o-mini-transcribe",
+    "gpt-4o-transcribe",
     '"video/webm"',
     "AUDIO_FORMAT_UNSUPPORTED",
     "NO_SPEECH_DETECTED",
