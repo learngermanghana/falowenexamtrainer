@@ -17,3 +17,4 @@ if (alreadyApplied) {
 
 await import(`./fixSpeakingAudioFrontendPatch.mjs?run=${Date.now()}`);
 await import(`./fixSpeakingAudioBackendPatch.mjs?run=${Date.now()}`);
+await import(`./patchCustomSpeakingSessionDuration.mjs?run=${Date.now()}`);

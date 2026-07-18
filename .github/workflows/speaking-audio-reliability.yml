@@ -6,14 +6,20 @@ on:
       - 'web/src/components/SpeakingPage.js'
       - 'web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js'
       - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
+      - 'web/src/components/A2Day3ComparisonsWorkbookPage.js'
+      - 'web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js'
       - 'web/src/lib/speakingAudio.js'
+      - 'web/src/lib/speakingSessionDuration.js'
       - 'web/src/services/coachService.js'
       - 'web/src/services/speechTrainerService.js'
+      - 'web/src/services/presentationCoachService.js'
       - 'functions/functionz/app.js'
       - 'functions/functionz/speakingAudioReliability.js'
       - 'scripts/patchSpeakingAudioReliability.mjs'
       - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
       - 'scripts/fixSpeakingAudioBackendPatch.mjs'
+      - 'scripts/patchCustomSpeakingSessionDuration.mjs'
+      - 'scripts/patchRequestedCourseMedia.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'tests/speaking-audio-reliability.test.mjs'
@@ -44,10 +50,13 @@ jobs:
             node --check scripts/patchSpeakingAudioReliability.mjs || status=$?
             node --check scripts/fixSpeakingAudioFrontendPatch.mjs || status=$?
             node --check scripts/fixSpeakingAudioBackendPatch.mjs || status=$?
+            node --check scripts/patchCustomSpeakingSessionDuration.mjs || status=$?
+            node --check scripts/patchRequestedCourseMedia.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
-            echo '== apply patch =='
+            echo '== apply patches =='
             node scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            node scripts/patchRequestedCourseMedia.mjs || status=$?
             echo '== backend syntax =='
             node --check functions/functionz/app.js || status=$?
             node --check functions/functionz/speakingAudioReliability.js || status=$?
@@ -80,11 +89,30 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Test speaking UI regressions
+        shell: bash
+        working-directory: web
+        run: |
+          set +e
+          CI=true npm run test:ci -- --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js 2>&1 | tee ../speaking-ui-tests.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+
+      - name: Upload speaking UI diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speaking-ui-diagnostics-${{ github.run_id }}
+          path: speaking-ui-tests.log
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Build production web app
         working-directory: web
         run: npm run build
 
-      - name: Confirm idempotent patch runner
+      - name: Confirm idempotent patch runners
         run: |
           node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/patchRequestedCourseMedia.mjs
           node scripts/checkSpeakingAudioReliabilityPatch.mjs
