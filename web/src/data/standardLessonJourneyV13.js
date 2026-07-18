@@ -54,7 +54,7 @@ export const getWorkspaceWritingPrompt = (lesson = {}, config = {}) => {
 
 const withClearWorkspacePrompt = (lesson = {}, config = {}) => {
   const level = normalizeLevel(lesson.level || config.level);
-  if (!['B2', 'C1'].includes(level)) return config;
+  if (!["B2", "C1"].includes(level)) return config;
 
   const originalPrompt = lesson.writingTopic
     || config.writingTopic
@@ -65,7 +65,9 @@ const withClearWorkspacePrompt = (lesson = {}, config = {}) => {
     ? lesson.writingPromptBullets.filter(Boolean)
     : Array.isArray(lesson.writingBuilder?.structure)
       ? lesson.writingBuilder.structure.filter(Boolean)
-      : [];
+      : Array.isArray(config.writingPromptBullets)
+        ? config.writingPromptBullets.filter(Boolean)
+        : [];
 
   return {
     ...config,
