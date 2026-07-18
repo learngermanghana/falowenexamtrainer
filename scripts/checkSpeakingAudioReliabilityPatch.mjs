@@ -41,13 +41,14 @@ const checks = [
     "transcribeAudioFile({ file, getOpenAIClient })",
     ".slice(0, 8000)",
     "SPEAKING_QUOTA_REACHED",
-    "TRANSCRIPTION_FAILED",
+    "NO_SPEECH_DETECTED|TRANSCRIPTION_",
   ]],
   ["functions/functionz/speakingAudioReliability.js", [
     "gpt-4o-mini-transcribe",
     "AUDIO_FORMAT_UNSUPPORTED",
     "NO_SPEECH_DETECTED",
     "TRANSCRIPTION_TIMEOUT",
+    "TRANSCRIPTION_FAILED",
   ]],
 ];
 
