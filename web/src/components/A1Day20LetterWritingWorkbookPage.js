@@ -1,6 +1,9 @@
 import React from "react";
 import { styles } from "../styles";
-import { A1_DAY20_CHAPTER123_GRAMMAR_ROUTE } from "../data/a1Day20LetterWritingRoutes";
+import {
+  A1_DAY20_CHAPTER123_GRAMMAR_ROUTE,
+  A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE,
+} from "../data/a1Day20LetterWritingRoutes";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 
@@ -56,6 +59,21 @@ const BulletList = ({ items, ordered = false }) => {
   );
 };
 
+const GrammarNotesAction = () => (
+  <a
+    href={A1_DAY20_CHAPTER123_GRAMMAR_ROUTE}
+    data-a1-day20-grammar-notes-action="persistent"
+    style={{
+      ...styles.primaryButton,
+      ...styles.primaryButtonLink,
+      minHeight: 42,
+      width: "fit-content",
+    }}
+  >
+    Open grammar notes
+  </a>
+);
+
 const InformalLetterPractice = () => (
   <A1CourseBookLetterPracticePanel
     title="Mark My Informal Letter"
@@ -102,7 +120,7 @@ const WorkbookOverview = () => (
       href={A1_DAY20_CHAPTER123_GRAMMAR_ROUTE}
       style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
     >
-      Review the letter structures
+      Open grammar notes
     </a>
   </section>
 );
@@ -200,6 +218,9 @@ export default function A1Day20LetterWritingWorkbookPage() {
       assignmentIntro="Use Overview, complete Teil 1 and Teil 2, check both drafts with Mark My Letter, then open Submit and send both final letters to your tutor."
       submitTitle="Submit A1 · Day 20 · Kapitel 12.3"
       submitDescription="This submission is locked to A1-12.3. Submit both the informal and formal letter for tutor marking."
+      backLabel="Back to lesson"
+      backTo={A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE}
+      headerActions={<GrammarNotesAction />}
     >
       <WorkbookOverview />
       <WorkbookSection sectionKey="teil-1">
