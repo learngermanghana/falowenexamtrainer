@@ -37,7 +37,7 @@ test("maps structured transcription failures to useful student messages", () => 
   assert.match(userFacingAudioError({ response: { data: { code: "TRANSCRIPTION_TIMEOUT" } } }), /took too long/i);
 });
 
-test("backend accepts common browser formats and preserves extensions", () => {
+test("backend accepts common browser and WebView formats", () => {
   assert.equal(backend.extensionForMimeType("audio/mp4;codecs=mp4a.40.2"), "m4a");
   assert.equal(backend.extensionForMimeType("audio/webm;codecs=opus"), "webm");
   const valid = backend.validateAudioFile({
@@ -47,6 +47,14 @@ test("backend accepts common browser formats and preserves extensions", () => {
     originalname: "answer.m4a",
   });
   assert.equal(valid.mimeType, "audio/mp4");
+
+  const webViewCapture = backend.validateAudioFile({
+    buffer: Buffer.from("webview-audio"),
+    size: 13,
+    mimetype: "video/webm;codecs=opus",
+    originalname: "answer.webm",
+  });
+  assert.equal(webViewCapture.mimeType, "video/webm");
 });
 
 test("backend rejects empty and unsupported audio with stable codes", () => {
