@@ -13,6 +13,7 @@ on:
       - 'functions/functionz/speakingAudioReliability.js'
       - 'scripts/patchSpeakingAudioReliability.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
+      - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'tests/speaking-audio-reliability.test.mjs'
       - 'web/package.json'
       - '.github/workflows/speaking-audio-reliability.yml'
@@ -31,10 +32,14 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Validate patch and pure audio helpers
+      - name: Apply and audit speaking audio reliability patch
         run: |
           node --check scripts/patchSpeakingAudioReliability.mjs
           node --check scripts/runSpeakingAudioReliabilityPatch.mjs
+          node --check scripts/checkSpeakingAudioReliabilityPatch.mjs
+          node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/checkSpeakingAudioReliabilityPatch.mjs
+          node --check functions/functionz/app.js
           node --check functions/functionz/speakingAudioReliability.js
           node --test tests/speaking-audio-reliability.test.mjs
 
@@ -42,16 +47,11 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Apply patches and build production web app
+      - name: Build production web app
         working-directory: web
         run: npm run build
 
-      - name: Validate patched frontend and backend contracts
+      - name: Confirm idempotent patch runner
         run: |
           node scripts/runSpeakingAudioReliabilityPatch.mjs
-          node --check functions/functionz/app.js
-          grep -F 'createSpeakingMediaRecorder' web/src/components/SpeakingPage.js
-          grep -F 'Send recording to AI' web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js
-          grep -F 'gpt-4o-mini-transcribe' functions/functionz/speakingAudioReliability.js
-          grep -F 'TRANSCRIPTION_FAILED' functions/functionz/app.js
-          grep -F 'recorder.start(1000)' web/src/components/SpeakingPage.js
+          node scripts/checkSpeakingAudioReliabilityPatch.mjs
