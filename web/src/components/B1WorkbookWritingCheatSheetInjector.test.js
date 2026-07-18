@@ -32,6 +32,17 @@ describe("B1 workbook writing cheat sheet injector", () => {
     ).toBe(true);
     expect(
       __TESTING__.isB1WorkbookRoute(
+        "/campus/course/b1-day-4-wohnung-suchen-workbook",
+        "?assignmentKey=B1-2.4&assignmentId=B1-2.4&level=B1&radio=done"
+      )
+    ).toBe(true);
+    expect(
+      __TESTING__.getB1WorkbookDay(
+        "/campus/course/b1-day-4-wohnung-suchen-workbook"
+      )
+    ).toBe(4);
+    expect(
+      __TESTING__.isB1WorkbookRoute(
         "/campus/course/lesson/B1/1",
         "?view=grammar"
       )
@@ -138,6 +149,26 @@ describe("B1 workbook writing cheat sheet injector", () => {
     );
   });
 
+  test("injects the requested B1 Day 4 Wohnung suchen Schreiben video", () => {
+    const root = buildWritingRoot();
+    const result = __TESTING__.ensureWritingVideoCard(root, 4);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: true,
+      reason: "inserted",
+      key: "b1-day4-wohnung-suchen-writing-video",
+    }));
+
+    const card = root.querySelector(
+      `[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`
+    );
+    expect(card).toHaveTextContent("B1 Day 4 · Wohnung suchen · Schreiben explanation");
+    expect(card.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/mHQiEdVVRSQ"
+    );
+  });
+
   test("does not duplicate the writing video when React updates the workbook", () => {
     const root = buildWritingRoot();
 
@@ -153,7 +184,7 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("does not inject a card for an unmapped B1 writing assignment", () => {
     const root = buildWritingRoot();
 
-    const result = __TESTING__.ensureWritingVideoCard(root, 4);
+    const result = __TESTING__.ensureWritingVideoCard(root, 5);
 
     expect(result).toEqual(expect.objectContaining({
       mounted: false,
