@@ -7,7 +7,10 @@ on:
     paths:
       - 'functions/**'
       - 'scripts/patchSpeakingAudioReliability.mjs'
+      - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
+      - 'scripts/fixSpeakingAudioBackendPatch.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
+      - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'firebase.json'
       - '.firebaserc'
       - 'firestore.rules'
@@ -42,12 +45,15 @@ jobs:
       - name: Apply speaking audio reliability patch
         run: |
           node --check scripts/patchSpeakingAudioReliability.mjs
+          node --check scripts/fixSpeakingAudioFrontendPatch.mjs
+          node --check scripts/fixSpeakingAudioBackendPatch.mjs
           node --check scripts/runSpeakingAudioReliabilityPatch.mjs
+          node --check scripts/checkSpeakingAudioReliabilityPatch.mjs
           node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/checkSpeakingAudioReliabilityPatch.mjs
           node --check functions/functionz/speakingAudioReliability.js
           node --check functions/functionz/app.js
-          grep -F 'gpt-4o-mini-transcribe' functions/functionz/speakingAudioReliability.js
-          grep -F 'TRANSCRIPTION_FAILED' functions/functionz/app.js
+          node --test tests/speaking-audio-reliability.test.mjs
 
       - name: Install functions dependencies
         working-directory: functions
