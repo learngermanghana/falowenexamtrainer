@@ -23,7 +23,7 @@ export const REQUESTED_LESSON_AI_VIDEOS = Object.freeze([
     level: "B1",
     day: 15,
     pathname: "/campus/course/lesson/B1/15",
-    requiredParams: Object.freeze({ view: "workbook" }),
+    requiredParams: Object.freeze({ view: "workbook", radio: "done" }),
     title: "Medien und Arbeiten im Homeoffice",
     videoId: "bWiBTVo0EU4",
     description:
