@@ -23,6 +23,7 @@ const checks = [
     "createSpeakingMediaRecorder(stream)",
     "buildRecordedAudioBlob(chunks, recorder)",
     "recorder.start(1000)",
+    "`Maximum ${formatTime(maxRecordingSeconds)}; recording stops automatically.`",
   ]],
   ["web/src/services/coachService.js", [
     'from "../lib/speakingAudio"',
@@ -45,6 +46,7 @@ const checks = [
   ]],
   ["functions/functionz/speakingAudioReliability.js", [
     "gpt-4o-mini-transcribe",
+    '"video/webm"',
     "AUDIO_FORMAT_UNSUPPORTED",
     "NO_SPEECH_DETECTED",
     "TRANSCRIPTION_TIMEOUT",
