@@ -1,17 +1,25 @@
 import { callAI } from "./aiClient";
+import {
+  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
+  normalizeSpeakingChatDurationMinutes,
+  speakingChatSessionSeconds,
+} from "../lib/speakingSessionDuration";
 
-export const CUSTOM_SPEAKING_CHAT_SESSION_SECONDS = 10 * 60;
+export const CUSTOM_SPEAKING_CHAT_SESSION_SECONDS = speakingChatSessionSeconds(
+  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
+);
 
 const getCourseSpeakingContext = () => {
   if (typeof window === "undefined") return null;
   return window.__FALOWEN_COURSE_SPEAKING_CONTEXT__ || null;
 };
 
-const buildTopicLockedMessage = ({ message, mode, lessonContext }) => {
+const buildTopicLockedMessage = ({ message, mode, lessonContext, sessionContext }) => {
   const context = lessonContext || getCourseSpeakingContext();
   const isCourseSpeaking = String(mode || "").toLowerCase() === "speaking" && context?.topicLock;
   if (!isCourseSpeaking) return message;
 
+  const durationMinutes = normalizeSpeakingChatDurationMinutes(sessionContext?.durationMinutes);
   const topic = context.topic || context.question || context.lessonTitle || "the current workbook speaking topic";
   const allowedScope = context.allowedScope || context.instructions || context.support || "Ask follow-up questions only inside this topic.";
 
@@ -19,7 +27,7 @@ const buildTopicLockedMessage = ({ message, mode, lessonContext }) => {
 Lesson topic: ${topic}
 Allowed scope: ${allowedScope}
 Rules for the assistant:
-1. Stay on the lesson topic for the full 10-minute session.
+1. Stay on the lesson topic for the full ${durationMinutes}-minute session.
 2. You may ask follow-up questions, but every question must connect directly to the lesson topic.
 3. If the student changes to an unrelated topic, briefly answer only if necessary, then redirect back to the lesson topic.
 4. Do not switch to politics, religion, celebrity gossip, or unrelated social issues unless the lesson topic itself is about that.
@@ -83,7 +91,12 @@ export const requestCustomSpeakingChatReply = async ({ message, level, history, 
   return callAI({
     path: "/speaking/custom-chat",
     payload: {
-      message: buildTopicLockedMessage({ message, mode: mode || "Speaking", lessonContext: mergedLessonContext }),
+      message: buildTopicLockedMessage({
+        message,
+        mode: mode || "Speaking",
+        lessonContext: mergedLessonContext,
+        sessionContext,
+      }),
       level,
       history,
       mode: mode || "Speaking",
