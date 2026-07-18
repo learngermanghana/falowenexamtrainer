@@ -53,4 +53,24 @@ describe("requested lesson media mappings", () => {
       }),
     );
   });
+
+  test("maps the requested B2 Day 9 and Day 12 AI videos to the correct chapters", () => {
+    const dictionary = { B2: {}, C1: {} };
+    applyB2C1LessonVideoOverrides(dictionary);
+
+    expect(dictionary.B2[9].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "b2-day9-wohnen-nachbarschaft-ai-video",
+        chapter: "2.4",
+        url: "https://youtu.be/-JeT2wS94uk",
+      }),
+    );
+    expect(dictionary.B2[12].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "b2-day12-kultur-freizeit-ai-video",
+        chapter: "3.2",
+        url: "https://youtu.be/foXp2VHEf1I",
+      }),
+    );
+  });
 });
