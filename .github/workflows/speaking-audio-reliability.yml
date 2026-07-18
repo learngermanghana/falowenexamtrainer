@@ -1,0 +1,90 @@
+name: Speaking Audio Reliability
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/SpeakingPage.js'
+      - 'web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js'
+      - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
+      - 'web/src/lib/speakingAudio.js'
+      - 'web/src/services/coachService.js'
+      - 'web/src/services/speechTrainerService.js'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/speakingAudioReliability.js'
+      - 'scripts/patchSpeakingAudioReliability.mjs'
+      - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
+      - 'scripts/fixSpeakingAudioBackendPatch.mjs'
+      - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
+      - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
+      - 'tests/speaking-audio-reliability.test.mjs'
+      - 'web/package.json'
+      - '.github/workflows/speaking-audio-reliability.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Apply and validate speaking audio patch
+        shell: bash
+        run: |
+          set +e
+          status=0
+          {
+            echo '== patch script syntax =='
+            node --check scripts/patchSpeakingAudioReliability.mjs || status=$?
+            node --check scripts/fixSpeakingAudioFrontendPatch.mjs || status=$?
+            node --check scripts/fixSpeakingAudioBackendPatch.mjs || status=$?
+            node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
+            echo '== apply patch =='
+            node scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            echo '== backend syntax =='
+            node --check functions/functionz/app.js || status=$?
+            node --check functions/functionz/speakingAudioReliability.js || status=$?
+            echo '== pure helper tests =='
+            node --test tests/speaking-audio-reliability.test.mjs || status=$?
+          } 2>&1 | tee speaking-audio-apply.log
+          exit "$status"
+
+      - name: Audit patched source contracts
+        id: contract
+        shell: bash
+        run: |
+          set +e
+          node scripts/checkSpeakingAudioReliabilityPatch.mjs 2>&1 | tee speaking-audio-contract.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+
+      - name: Upload speaking audio diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speaking-audio-diagnostics-${{ github.run_id }}
+          path: |
+            speaking-audio-apply.log
+            speaking-audio-contract.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
+
+      - name: Confirm idempotent patch runner
+        run: |
+          node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/checkSpeakingAudioReliabilityPatch.mjs
