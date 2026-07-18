@@ -8,6 +8,10 @@ import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
 import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
+import TeacherLectureSupportingMaterials, {
+  removeTeacherLectureFromCanonicalLesson,
+  removeTeacherLectureFromLesson,
+} from "./selfLearning/TeacherLectureSupportingMaterials";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
@@ -112,35 +116,63 @@ export const SELF_LEARNING_LESSONS = {
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
 
+const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => (
+  <>
+    {children}
+    <TeacherLectureSupportingMaterials lesson={lesson} canonicalLesson={canonicalLesson} />
+  </>
+);
+
+const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  const day = Number(lesson?.day || 0);
+  const pageLesson = removeTeacherLectureFromLesson(lesson);
+  const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
+
+  let page;
+  if (day === 0) {
+    page = (
+      <SelfLearningEditableLessonPageV2
+        lesson={pageLesson}
+        falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+      />
+    );
+  } else if (normalizedLevel === "C1" && day >= 8 && day <= 10) {
+    page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 25 && day <= 28) {
+    page = <B2Day25To28GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 21 && day <= 24) {
+    page = <B2Day21To24GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 17 && day <= 20) {
+    page = <B2Day17To20GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 7 && day <= 16) {
+    page = <B2Day7To16GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 1 && day <= 6) {
+    page = <B2Day1To4GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else {
+    page = <StandardLessonWritingCoachPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  }
+
+  return (
+    <SelfLearningLessonFrame lesson={lesson} canonicalLesson={canonicalLesson}>
+      {page}
+    </SelfLearningLessonFrame>
+  );
+};
+
 const componentRegistry = Object.fromEntries(
   Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) =>
     lessons.map((lesson) => [
       lessonKey(level, lesson.day),
-      ({ canonicalLesson }) => (
-        Number(lesson.day) === 0 ? (
-          <SelfLearningEditableLessonPageV2 lesson={lesson} falowenRadio={canonicalLesson?.resources?.falowenRadio || null} />
-        ) : String(level).toUpperCase() === "C1" && Number(lesson.day) >= 8 && Number(lesson.day) <= 10 ? (
-          <C1Day8To10GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 25 && Number(lesson.day) <= 28 ? (
-          <B2Day25To28GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 21 && Number(lesson.day) <= 24 ? (
-          <B2Day21To24GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 17 && Number(lesson.day) <= 20 ? (
-          <B2Day17To20GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 7 && Number(lesson.day) <= 16 ? (
-          <B2Day7To16GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : String(level).toUpperCase() === "B2" && Number(lesson.day) >= 1 && Number(lesson.day) <= 6 ? (
-          <B2Day1To4GuidedLessonPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        ) : (
-          <StandardLessonWritingCoachPage lesson={lesson} canonicalLesson={canonicalLesson} />
-        )
-      ),
-    ])
-  )
+      ({ canonicalLesson }) => renderSelfLearningPage({ level, lesson, canonicalLesson }),
+    ]),
+  ),
 );
 
 const B1RadioLessonComponent = ({ canonicalLesson }) => (
-  <B1TutorLessonPage canonicalLesson={canonicalLesson} />
+  <SelfLearningLessonFrame canonicalLesson={canonicalLesson}>
+    <B1TutorLessonPage canonicalLesson={removeTeacherLectureFromCanonicalLesson(canonicalLesson)} />
+  </SelfLearningLessonFrame>
 );
 
 const hasB1Radio = (day) =>
