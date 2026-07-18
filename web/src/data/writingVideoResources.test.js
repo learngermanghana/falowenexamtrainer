@@ -7,6 +7,7 @@ describe("writing video resources", () => {
   test.each([
     ["B1", 1, "https://youtu.be/nG1PUrvrS_s"],
     ["B1", 2, "https://youtu.be/94IXPx5dTNY"],
+    ["B1", 3, "https://youtu.be/8uAMihJTzvo"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
@@ -22,6 +23,16 @@ describe("writing video resources", () => {
       expect.objectContaining({
         key: "b1-day2-freunde-fuers-leben-writing-video",
         title: expect.stringContaining("Schreiben explanation"),
+      }),
+    );
+  });
+
+  test("keeps the B1 Day 3 resource inside the Schreiben section", () => {
+    expect(getWritingVideoResource("B1", 3)).toEqual(
+      expect.objectContaining({
+        key: "b1-day3-erfolgsgeschichten-writing-video",
+        title: expect.stringContaining("Erfolgsgeschichten"),
+        url: "https://youtu.be/8uAMihJTzvo",
       }),
     );
   });
@@ -48,12 +59,13 @@ describe("writing video resources", () => {
   });
 
   test("returns null when no writing video has been added", () => {
-    expect(getWritingVideoResource("B1", 3)).toBeNull();
+    expect(getWritingVideoResource("B1", 4)).toBeNull();
   });
 
   test.each([
     ["https://youtu.be/w8TaNHk-a0U", "https://www.youtube.com/embed/w8TaNHk-a0U"],
     ["https://youtu.be/94IXPx5dTNY", "https://www.youtube.com/embed/94IXPx5dTNY"],
+    ["https://youtu.be/8uAMihJTzvo", "https://www.youtube.com/embed/8uAMihJTzvo"],
     ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],
     ["https://www.youtube.com/watch?v=nG1PUrvrS_s", "https://www.youtube.com/embed/nG1PUrvrS_s"],
     ["https://youtube.com/embed/VdczhJS9ClY", "https://www.youtube.com/embed/VdczhJS9ClY"],
