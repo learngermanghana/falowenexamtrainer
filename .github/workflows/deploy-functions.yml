@@ -7,6 +7,7 @@ on:
     paths:
       - 'functions/**'
       - 'scripts/patchSpeakingAudioReliability.mjs'
+      - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'firebase.json'
       - '.firebaserc'
       - 'firestore.rules'
@@ -41,7 +42,8 @@ jobs:
       - name: Apply speaking audio reliability patch
         run: |
           node --check scripts/patchSpeakingAudioReliability.mjs
-          node scripts/patchSpeakingAudioReliability.mjs
+          node --check scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/runSpeakingAudioReliabilityPatch.mjs
           node --check functions/functionz/speakingAudioReliability.js
           node --check functions/functionz/app.js
           grep -F 'gpt-4o-mini-transcribe' functions/functionz/speakingAudioReliability.js
