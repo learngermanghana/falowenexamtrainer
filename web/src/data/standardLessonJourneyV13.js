@@ -8,9 +8,80 @@ export {
   getStandardWritingCloudField,
 } from "./standardLessonJourneyV12";
 
+const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
+
+const isOpinionWriting = (lesson = {}, config = {}) => {
+  const text = [
+    lesson.writingTaskType,
+    lesson.writingTopic,
+    config.taskType,
+    config.title,
+    config.prompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return /opinion essay|meinungsbeitrag|stellungnahme|erörterung|eroerterung|diskussionsbeitrag|argument writing|argumentation/.test(text);
+};
+
+const isFormalWriting = (lesson = {}, config = {}) => {
+  const text = [
+    lesson.writingTaskType,
+    lesson.writingTopic,
+    config.taskType,
+    config.title,
+    config.prompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return /formal|formell|formelle|e-mail|email|letter|brief|anfrage|beschwerde|bewerbung|absage|termin/.test(text)
+    && !isOpinionWriting(lesson, config);
+};
+
+export const getWorkspaceWritingPrompt = (lesson = {}, config = {}) => {
+  const level = normalizeLevel(lesson.level || config.level || "German");
+  const textType = isOpinionWriting(lesson, config)
+    ? "opinion essay"
+    : isFormalWriting(lesson, config)
+      ? "formal text"
+      : "text";
+
+  return `Write one complete ${level} ${textType}. Use the clearly formatted Schreibaufgabe above and address every required point.`;
+};
+
+const withClearWorkspacePrompt = (lesson = {}, config = {}) => {
+  const level = normalizeLevel(lesson.level || config.level);
+  if (!['B2', 'C1'].includes(level)) return config;
+
+  const originalPrompt = lesson.writingTopic
+    || config.writingTopic
+    || config.prompt
+    || config.topic
+    || "";
+  const promptBullets = Array.isArray(lesson.writingPromptBullets)
+    ? lesson.writingPromptBullets.filter(Boolean)
+    : Array.isArray(lesson.writingBuilder?.structure)
+      ? lesson.writingBuilder.structure.filter(Boolean)
+      : [];
+
+  return {
+    ...config,
+    topic: getWorkspaceWritingPrompt(lesson, config),
+    prompt: originalPrompt,
+    writingTopic: originalPrompt,
+    writingPromptBullets: promptBullets,
+  };
+};
+
 export const getStandardWritingConfig = (lesson = {}) => {
-  const level = String(lesson.level || "").trim().toUpperCase();
+  const level = normalizeLevel(lesson.level);
   const day = Number(lesson.day || 0);
-  if (level === "C1" && day === 16) return c1Day16QuestionWritingBuilder;
-  return getPreviousWritingConfig(lesson);
+  const config = level === "C1" && day === 16
+    ? c1Day16QuestionWritingBuilder
+    : getPreviousWritingConfig(lesson);
+
+  return withClearWorkspacePrompt(lesson, config);
 };
