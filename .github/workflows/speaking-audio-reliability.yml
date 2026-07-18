@@ -12,6 +12,8 @@ on:
       - 'functions/functionz/app.js'
       - 'functions/functionz/speakingAudioReliability.js'
       - 'scripts/patchSpeakingAudioReliability.mjs'
+      - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
+      - 'scripts/fixSpeakingAudioBackendPatch.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'tests/speaking-audio-reliability.test.mjs'
@@ -40,6 +42,8 @@ jobs:
           {
             echo '== patch script syntax =='
             node --check scripts/patchSpeakingAudioReliability.mjs || status=$?
+            node --check scripts/fixSpeakingAudioFrontendPatch.mjs || status=$?
+            node --check scripts/fixSpeakingAudioBackendPatch.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
             echo '== apply patch =='
