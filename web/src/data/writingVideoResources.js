@@ -23,6 +23,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before drafting the email to Frau Wolmer. It explains how to apologise politely, give a reason and use an appropriate greeting and closing.",
       url: "https://youtu.be/8uAMihJTzvo",
     },
+    4: {
+      key: "b1-day4-wohnung-suchen-writing-video",
+      title: "B1 Day 4 · Wohnung suchen · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before starting the apartment-search writing task. Use it to understand the prompt, organise the message and cover every required point.",
+      url: "https://youtu.be/mHQiEdVVRSQ",
+    },
   },
   B2: {
     1: {
@@ -31,6 +38,13 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this video before writing. It explains the task, the recommended structure and how to develop a clear B2 opinion text.",
       url: "https://youtu.be/w8TaNHk-a0U",
+    },
+    3: {
+      key: "b2-day3-oeffentliches-privates-leben-writing-video",
+      title: "B2 Day 3 · Öffentliches und privates Leben · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting your B2 text. It explains how to understand the task, structure the response and address every required point.",
+      url: "https://youtu.be/qCO2p1Ahy7U",
     },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",
@@ -57,6 +71,13 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this video before writing. It explains how to analyse the task, organise a differentiated C1 response and address all required content points.",
       url: "https://youtu.be/tpj8TV8DaH8",
+    },
+    10: {
+      key: "c1-day10-integration-gesellschaft-writing-video",
+      title: "C1 Day 10 · Integration und Gesellschaft · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the writing page before drafting your C1 response. It explains how to analyse the task, build a differentiated argument and cover every required point.",
+      url: "https://youtu.be/I5OU_ZXz4c0",
     },
   },
 };
