@@ -3,6 +3,7 @@ import path from "path";
 import {
   A1_DAY20_CHAPTER123_GRAMMAR_ROUTE,
   A1_DAY20_CHAPTER123_LESSON_ROUTE,
+  A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE,
   A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
 } from "../data/a1Day20LetterWritingRoutes";
 import inAppWorkbookRoutes from "../data/inAppWorkbookRoutes.json";
@@ -11,7 +12,7 @@ const readSource = (fileName) =>
   fs.readFileSync(path.resolve(__dirname, fileName), "utf8");
 
 describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
-  test("keeps the canonical grammar, workbook and lesson URLs", () => {
+  test("keeps the canonical grammar, workbook, lesson and resource hub URLs", () => {
     expect(A1_DAY20_CHAPTER123_GRAMMAR_ROUTE).toBe(
       "/campus/course/letter-writing-intro-12-3",
     );
@@ -20,6 +21,9 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     );
     expect(A1_DAY20_CHAPTER123_LESSON_ROUTE).toBe(
       "/campus/course/lesson/A1/20?chapter=12.3",
+    );
+    expect(A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE).toBe(
+      "/campus/course/lesson/A1/20?chapter=12.3&hub=1",
     );
     expect(inAppWorkbookRoutes.A1["20"]["12.3"]).toBe(
       A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
