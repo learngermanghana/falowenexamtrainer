@@ -5,8 +5,16 @@ import { useToast } from "../../context/ToastContext";
 import { requestSpeakingTextAnalysis } from "../../services/presentationCoachService";
 import { analyzeAudio } from "../../services/coachService";
 import { triggerInteractionFeedback } from "../../services/interactionFeedback";
+import {
+  SPEAKING_AUDIO_MIN_SECONDS,
+  buildRecordedAudioBlob,
+  createSpeakingMediaRecorder,
+  formatAudioBytes,
+  maxSpeakingRecordingSeconds,
+  revokeObjectUrl,
+  userFacingAudioError,
+} from "../../lib/speakingAudio";
 
-const MIN_RECORDING_SECONDS = 3;
 const audioCaptureConstraints = {
   echoCancellation: true,
   noiseSuppression: true,
@@ -39,8 +47,7 @@ const parseRubric = (text) => {
 const rubricToPercent = (rubric) => {
   if (!rubric) return null;
   const values = [rubric.grammar, rubric.vocabulary, rubric.pronunciationReadiness, rubric.structure];
-  const total = values.reduce((sum, value) => sum + Number(value || 0), 0);
-  return Math.round((total / 20) * 100);
+  return Math.round((values.reduce((sum, value) => sum + Number(value || 0), 0) / 20) * 100);
 };
 
 const formatTime = (seconds = 0) => {
@@ -68,17 +75,39 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordingError, setRecordingError] = useState("");
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [processingStage, setProcessingStage] = useState("");
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
   const recordingIntervalRef = useRef(null);
   const recordingSecondsRef = useRef(0);
+  const maxSeconds = maxSpeakingRecordingSeconds({ level: lesson.level, context: "workbook" });
+
+  const stopStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  const clearRecording = () => {
+    revokeObjectUrl(audioUrl);
+    setAudioUrl("");
+    setAudioBlob(null);
+    setAudioDuration(0);
+    setRecordingError("");
+  };
 
   useEffect(() => () => {
     if (recordingIntervalRef.current) window.clearInterval(recordingIntervalRef.current);
-    if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
-  }, []);
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+    stopStream();
+    revokeObjectUrl(audioUrl);
+  }, [audioUrl]);
 
   const percentScore = useMemo(() => rubricToPercent(rubric), [rubric]);
 
@@ -93,6 +122,7 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
     setError("");
     setFeedback("");
     setTranscript("");
+    setProcessingStage("Preparing your typed answer…");
 
     try {
       const response = await requestSpeakingTextAnalysis({
@@ -105,50 +135,39 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
       const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
       setRubric(parseRubric(replyText));
       setFeedback(replyText);
-      triggerInteractionFeedback({
-        sound: "success",
-        toastMessage: "Speaking feedback ready.",
-        toastVariant: "success",
-        showToast,
-        vibratePattern: [45],
-      });
+      triggerInteractionFeedback({ sound: "success", toastMessage: "Speaking feedback ready.", toastVariant: "success", showToast, vibratePattern: [45] });
     } catch (err) {
       setError(err?.message || "Could not reach the speaking coach.");
-      triggerInteractionFeedback({
-        sound: "error",
-        toastMessage: "Speaking coach is unavailable right now.",
-        toastVariant: "error",
-        showToast,
-        vibratePattern: [120],
-      });
+      triggerInteractionFeedback({ sound: "error", toastMessage: "Speaking coach is unavailable right now.", toastVariant: "error", showToast, vibratePattern: [120] });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const stopStream = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+      setProcessingStage("");
     }
   };
 
   const startRecording = async () => {
     if (isRecording || loading) return;
+    clearRecording();
     setRecordingError("");
     setError("");
+    setFeedback("");
+    setTranscript("");
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: audioCaptureConstraints });
       streamRef.current = stream;
-      const recorder = new MediaRecorder(stream);
+      const recorder = createSpeakingMediaRecorder(stream);
       audioChunksRef.current = [];
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) audioChunksRef.current.push(event.data);
       };
 
-      recorder.onstop = async () => {
+      recorder.onerror = () => {
+        setRecordingError("The browser could not continue recording. Please record again.");
+      };
+
+      recorder.onstop = () => {
         const elapsed = recordingSecondsRef.current;
         if (recordingIntervalRef.current) {
           window.clearInterval(recordingIntervalRef.current);
@@ -157,56 +176,26 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
         setIsRecording(false);
         setRecordingSeconds(0);
         recordingSecondsRef.current = 0;
+        stopStream();
 
-        if (elapsed < MIN_RECORDING_SECONDS) {
-          setRecordingError(`Please record for at least ${MIN_RECORDING_SECONDS} seconds.`);
-          stopStream();
+        if (elapsed < SPEAKING_AUDIO_MIN_SECONDS) {
+          setRecordingError(`Please record for at least ${SPEAKING_AUDIO_MIN_SECONDS} seconds.`);
           return;
         }
 
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        setLoading(true);
-        setFeedback("");
-        setTranscript("");
-
         try {
-          const response = await analyzeAudio({
-            audioBlob: blob,
-            teil: "Self-learning speaking",
-            level: lesson.level,
-            question: speakingTopic || lesson.tasks?.speaking || lesson.topic,
-            userId: user?.uid || "",
-            idToken,
-          });
-          const heard = String(response?.transcript || "").trim();
-          const replyText = String(response?.feedback || "").trim() || "I could not analyze that recording. Please try again.";
-          setTranscript(heard);
-          setRubric(parseRubric(replyText));
-          setFeedback(replyText);
-          triggerInteractionFeedback({
-            sound: "success",
-            toastMessage: "Voice feedback ready.",
-            toastVariant: "success",
-            showToast,
-            vibratePattern: [45],
-          });
+          const blob = buildRecordedAudioBlob(audioChunksRef.current, recorder);
+          const nextUrl = URL.createObjectURL(blob);
+          setAudioBlob(blob);
+          setAudioUrl(nextUrl);
+          setAudioDuration(elapsed);
         } catch (err) {
-          setError(err?.message || "Could not analyze your recording right now.");
-          triggerInteractionFeedback({
-            sound: "error",
-            toastMessage: "Could not analyze your recording.",
-            toastVariant: "error",
-            showToast,
-            vibratePattern: [120],
-          });
-        } finally {
-          setLoading(false);
-          stopStream();
+          setRecordingError(userFacingAudioError(err));
         }
       };
 
       mediaRecorderRef.current = recorder;
-      recorder.start();
+      recorder.start(1000);
       setIsRecording(true);
       setRecordingSeconds(0);
       recordingSecondsRef.current = 0;
@@ -214,18 +203,55 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
         setRecordingSeconds((value) => {
           const nextValue = value + 1;
           recordingSecondsRef.current = nextValue;
+          if (nextValue >= maxSeconds && recorder.state === "recording") {
+            window.setTimeout(() => recorder.stop(), 0);
+          }
           return nextValue;
         });
       }, 1000);
     } catch (err) {
-      setRecordingError(err?.message || "Microphone access was blocked.");
+      setRecordingError(userFacingAudioError(err, "Microphone access was blocked."));
       stopStream();
     }
   };
 
   const stopRecording = () => {
-    if (!mediaRecorderRef.current || mediaRecorderRef.current.state !== "recording") return;
-    mediaRecorderRef.current.stop();
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+  };
+
+  const submitRecording = async () => {
+    if (!audioBlob || loading) return;
+    setLoading(true);
+    setError("");
+    setFeedback("");
+    setTranscript("");
+    setProcessingStage("Uploading your recording…");
+
+    try {
+      setProcessingStage("Transcribing your German…");
+      const response = await analyzeAudio({
+        audioBlob,
+        durationSeconds: audioDuration,
+        teil: "Self-learning speaking",
+        level: lesson.level,
+        question: speakingTopic || lesson.tasks?.speaking || lesson.topic,
+        userId: user?.uid || "",
+        idToken,
+      });
+      setProcessingStage("Preparing Goethe feedback…");
+      const heard = String(response?.transcript || "").trim();
+      const replyText = String(response?.feedback || "").trim() || "I could not analyze that recording. Please try again.";
+      setTranscript(heard);
+      setRubric(parseRubric(replyText));
+      setFeedback(replyText);
+      triggerInteractionFeedback({ sound: "success", toastMessage: "Voice feedback ready.", toastVariant: "success", showToast, vibratePattern: [45] });
+    } catch (err) {
+      setError(userFacingAudioError(err));
+      triggerInteractionFeedback({ sound: "error", toastMessage: "Could not analyze your recording.", toastVariant: "error", showToast, vibratePattern: [120] });
+    } finally {
+      setLoading(false);
+      setProcessingStage("");
+    }
   };
 
   return (
@@ -233,7 +259,7 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <div>
           <strong>Speech AI practice</strong>
-          <p style={{ margin: "4px 0 0", color: "#4b5563" }}>Practise here without leaving this lesson.</p>
+          <p style={{ margin: "4px 0 0", color: "#4b5563" }}>Record, listen, retake, then send. Your clip stays available when transcription fails.</p>
         </div>
         {percentScore !== null ? <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Score: {percentScore}/100</span> : null}
       </div>
@@ -249,15 +275,29 @@ export default function EmbeddedSpeechPracticePanel({ lesson, speakingTopic, onS
         />
       </div>
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" style={styles.primaryButton} onClick={analyzeText} disabled={loading || !draft.trim()}>
-          {loading ? "Checking…" : "Check typed answer"}
+          {loading && !audioBlob ? "Checking…" : "Check typed answer"}
         </button>
         <button type="button" style={styles.secondaryButton} onClick={isRecording ? stopRecording : startRecording} disabled={loading}>
-          {isRecording ? `Stop & send (${formatTime(recordingSeconds)})` : "🎙️ Record voice"}
+          {isRecording ? `Stop recording (${formatTime(recordingSeconds)})` : audioBlob ? "🎙️ Record again" : "🎙️ Record voice"}
         </button>
+        <span style={{ ...styles.helperText, margin: 0 }}>Maximum {formatTime(maxSeconds)}; the recorder stops automatically.</span>
       </div>
 
+      {audioBlob && audioUrl ? (
+        <div style={{ border: "1px solid #c7d2fe", background: "#fff", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Your recording is ready</strong>
+          <span style={{ ...styles.helperText, margin: 0 }}>{formatTime(audioDuration)} · {formatAudioBytes(audioBlob.size)} · {audioBlob.type || "browser audio"}</span>
+          <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }} onError={() => setRecordingError("This device cannot play the captured format. Please record again in an updated browser.")} />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={styles.primaryButton} onClick={submitRecording} disabled={loading}>{loading ? "Processing…" : "Send recording to AI"}</button>
+            <button type="button" style={styles.secondaryButton} onClick={clearRecording} disabled={loading}>Remove clip</button>
+          </div>
+        </div>
+      ) : null}
+
+      {processingStage ? <p style={{ margin: 0, color: "#4338ca", fontWeight: 700 }}>{processingStage}</p> : null}
       {recordingError ? <p style={{ margin: 0, color: "#b91c1c" }}>{recordingError}</p> : null}
       {error ? <p style={{ margin: 0, color: "#b91c1c" }}>{error}</p> : null}
       {transcript ? (
