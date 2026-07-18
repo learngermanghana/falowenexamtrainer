@@ -1,0 +1,57 @@
+name: Speaking Audio Reliability
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/SpeakingPage.js'
+      - 'web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js'
+      - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
+      - 'web/src/lib/speakingAudio.js'
+      - 'web/src/services/coachService.js'
+      - 'web/src/services/speechTrainerService.js'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/speakingAudioReliability.js'
+      - 'scripts/patchSpeakingAudioReliability.mjs'
+      - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
+      - 'tests/speaking-audio-reliability.test.mjs'
+      - 'web/package.json'
+      - '.github/workflows/speaking-audio-reliability.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Validate patch and pure audio helpers
+        run: |
+          node --check scripts/patchSpeakingAudioReliability.mjs
+          node --check scripts/runSpeakingAudioReliabilityPatch.mjs
+          node --check functions/functionz/speakingAudioReliability.js
+          node --test tests/speaking-audio-reliability.test.mjs
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Apply patches and build production web app
+        working-directory: web
+        run: npm run build
+
+      - name: Validate patched frontend and backend contracts
+        run: |
+          node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node --check functions/functionz/app.js
+          grep -F 'createSpeakingMediaRecorder' web/src/components/SpeakingPage.js
+          grep -F 'Send recording to AI' web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js
+          grep -F 'gpt-4o-mini-transcribe' functions/functionz/speakingAudioReliability.js
+          grep -F 'TRANSCRIPTION_FAILED' functions/functionz/app.js
+          grep -F 'recorder.start(1000)' web/src/components/SpeakingPage.js
