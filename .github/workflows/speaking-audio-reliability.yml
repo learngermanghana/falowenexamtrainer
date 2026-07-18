@@ -89,6 +89,24 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Test speaking UI regressions
+        shell: bash
+        working-directory: web
+        run: |
+          set +e
+          CI=true npm run test:ci -- --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js 2>&1 | tee ../speaking-ui-tests.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+
+      - name: Upload speaking UI diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speaking-ui-diagnostics-${{ github.run_id }}
+          path: speaking-ui-tests.log
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Build production web app
         working-directory: web
         run: npm run build
