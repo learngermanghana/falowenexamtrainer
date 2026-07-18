@@ -9,6 +9,11 @@ import {
   resolveSupportedAudioMimeType,
   userFacingAudioError,
 } from "../web/src/lib/speakingAudio.js";
+import {
+  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,
+  normalizeSpeakingChatDurationMinutes,
+  speakingChatSessionSeconds,
+} from "../web/src/lib/speakingSessionDuration.js";
 
 const require = createRequire(import.meta.url);
 const backend = require("../functions/functionz/speakingAudioReliability.js");
@@ -30,6 +35,13 @@ test("uses task-aware maximum durations", () => {
   assert.equal(maxSpeakingRecordingSeconds({ level: "A2", context: "exam" }), 180);
   assert.equal(maxSpeakingRecordingSeconds({ level: "B2", context: "workbook" }), 240);
   assert.equal(maxSpeakingRecordingSeconds({ level: "C1", context: "workbook" }), 300);
+});
+
+test("offers only 10, 20, and 30 minute speaking chats", () => {
+  assert.deepEqual(CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS, [10, 20, 30]);
+  assert.equal(normalizeSpeakingChatDurationMinutes(20), 20);
+  assert.equal(normalizeSpeakingChatDurationMinutes(99), 10);
+  assert.equal(speakingChatSessionSeconds(30), 1800);
 });
 
 test("maps structured transcription failures to useful student messages", () => {
@@ -71,4 +83,37 @@ test("backend rejects empty and unsupported audio with stable codes", () => {
 test("audio extensions remain compatible with accepted transcription formats", () => {
   assert.equal(extensionForAudioMimeType("audio/ogg;codecs=opus"), "ogg");
   assert.equal(extensionForAudioMimeType("audio/mpeg"), "mp3");
+});
+
+test("backend defaults to the high accuracy GPT-4o transcription model", async () => {
+  const previousModel = process.env.OPENAI_TRANSCRIPTION_MODEL;
+  delete process.env.OPENAI_TRANSCRIPTION_MODEL;
+  let requestedModel = "";
+
+  try {
+    const result = await backend.transcribeAudioFile({
+      file: {
+        buffer: Buffer.from("recorded-german-answer"),
+        size: 22,
+        mimetype: "audio/webm",
+        originalname: "answer.webm",
+      },
+      getOpenAIClient: () => ({
+        audio: {
+          transcriptions: {
+            create: async ({ model }) => {
+              requestedModel = model;
+              return { text: "Guten Tag, ich lerne Deutsch." };
+            },
+          },
+        },
+      }),
+    });
+
+    assert.equal(requestedModel, "gpt-4o-transcribe");
+    assert.equal(result.model, "gpt-4o-transcribe");
+  } finally {
+    if (previousModel === undefined) delete process.env.OPENAI_TRANSCRIPTION_MODEL;
+    else process.env.OPENAI_TRANSCRIPTION_MODEL = previousModel;
+  }
 });
