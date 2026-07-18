@@ -22,4 +22,23 @@ describe("A2 Day 1 Small Talk Falowen Radio", () => {
     expect(source).toContain('chapter="1.1"');
     expect(source).toContain('workbookId="A2Day1SmallTalk"');
   });
+
+  it("keeps Teil 4 as the original five-question listening task", () => {
+    const source = read("A2Day2SmallTalkWorkbookEnhancedPage.js");
+    const listeningBlock = source.match(/const listeningQuestions = \[([\s\S]*?)\n\];/);
+    const answerManifest = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "../../../functions/data/answerKeyManifest.json"), "utf8"),
+    );
+    const smallTalkKey = answerManifest["A2 1.1 Small Talk"];
+
+    expect(listeningBlock).not.toBeNull();
+    expect((listeningBlock?.[1].match(/stem:/g) || [])).toHaveLength(5);
+    expect(Object.keys(smallTalkKey.answers.teil3)).toHaveLength(7);
+    expect(Object.keys(smallTalkKey.answers.teil4)).toHaveLength(5);
+    expect(source).toContain('hoerenQuestions={listeningQuestions}');
+    expect(source).toContain("beantworte alle fünf Fragen");
+    expect(source).not.toContain('hoerenQuestions={readingQuestions}');
+    expect(source).toContain('stem: "Was hat Lena am Samstag vor?"');
+    expect(source).toContain('stem: "Was schlägt Lena für das nächste Treffen vor?"');
+  });
 });

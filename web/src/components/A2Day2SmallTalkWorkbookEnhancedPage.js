@@ -164,6 +164,29 @@ const readingQuestions = [
   },
 ];
 
+const listeningQuestions = [
+  {
+    stem: "Was hat Lena am Samstag vor?",
+    options: ["A. Spazieren mit Freundin", "B. Ins Kino gehen", "C. Tennis spielen", "D. Spaziergang im Park"],
+  },
+  {
+    stem: "Warum freut sich Lena auf den Actionfilm?",
+    options: ["A. Sie liebt spannende Geschichten", "B. Sie mag Comedy", "C. Sie hat ihn schon gesehen", "D. Sie liebt Horror"],
+  },
+  {
+    stem: "Welche Sportart betreibt Lena regelmäßig?",
+    options: ["A. Tennis", "B. Schwimmen", "C. Laufen", "D. Yoga"],
+  },
+  {
+    stem: "Wie war das Wetter am letzten Wochenende?",
+    options: ["A. Regnerisch und kühl", "B. Sonnig und warm", "C. Bewölkt und windig", "D. Kalt und frostig"],
+  },
+  {
+    stem: "Was schlägt Lena für das nächste Treffen vor?",
+    options: ["A. Ins Kino", "B. Tennis", "C. Spaziergang", "D. Kaffee trinken"],
+  },
+];
+
 const speakingContent = (
   <>
     <WorkbookTaskCard eyebrow="Group practice" title="Zentrales Thema: Small Talk" practiceOnly>
@@ -292,9 +315,9 @@ const SmallTalkWorkbook = () => (
     schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ..."}
     lesenText={readingText}
     lesenQuestions={readingQuestions}
-    hoerenTask="Höre den Text „Mein Gespräch mit Lisa“. Beantworte danach dieselben sieben Verständnisfragen."
+    hoerenTask="Höre den Text zweimal und beantworte alle fünf Fragen. Achte auf Lenas Pläne, den Film, Sport, das Wetter und das nächste Treffen."
     hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
-    hoerenQuestions={readingQuestions}
+    hoerenQuestions={listeningQuestions}
   />
 );
 
