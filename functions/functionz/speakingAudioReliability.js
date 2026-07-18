@@ -13,6 +13,7 @@ const ALLOWED_AUDIO_TYPES = [
   "audio/wav",
   "audio/x-wav",
   "audio/mpeg",
+  "video/webm",
   "video/mp4",
   "application/octet-stream",
 ];
