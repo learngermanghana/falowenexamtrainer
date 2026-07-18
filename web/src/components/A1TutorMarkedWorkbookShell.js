@@ -1,4 +1,5 @@
 import React, { Children, isValidElement } from "react";
+import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
@@ -74,8 +75,13 @@ const A1TutorMarkedWorkbookShell = ({
   assignmentIntro,
   submitTitle,
   submitDescription,
+  backLabel = "Back to Course Book",
+  backFallbackPath = "/campus/course",
+  backTo = "",
+  headerActions = null,
   children,
 }) => {
+  const navigate = useNavigate();
   const assignment = getA1Assignment(fallbackAssignmentKey);
   if (!assignment) throw new Error(`Unknown canonical A1 assignment: ${fallbackAssignmentKey}`);
 
@@ -107,9 +113,21 @@ const A1TutorMarkedWorkbookShell = ({
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+        <AppBackButton
+          label={backLabel}
+          fallbackPath={backFallbackPath}
+          onBack={backTo ? () => navigate(backTo, { replace: true }) : undefined}
+        />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>{title}</h1>
         {subtitle ? <p style={{ ...styles.subtitle, margin: 0 }}>{subtitle}</p> : null}
+        {headerActions ? (
+          <div
+            data-a1-workbook-header-actions="true"
+            style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}
+          >
+            {headerActions}
+          </div>
+        ) : null}
       </header>
 
       <A1SharedAssignmentWorkbookLayout
