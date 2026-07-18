@@ -4,12 +4,20 @@ on:
   pull_request:
     paths:
       - 'web/src/components/SpeakingPage.js'
+      - 'web/src/components/SpeakingExamIntroPage.js'
+      - 'web/src/components/A1Teil3SpeakingPracticePanel.js'
+      - 'web/src/components/A1Teil3SpeakingPracticePanel.test.jsx'
+      - 'web/src/components/SelfLearningLessonRegistry.js'
+      - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.js'
+      - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.test.jsx'
       - 'web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js'
       - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
       - 'web/src/components/A2Day3ComparisonsWorkbookPage.js'
       - 'web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js'
       - 'web/src/lib/speakingAudio.js'
       - 'web/src/lib/speakingSessionDuration.js'
+      - 'web/src/lib/speakingExamLock.js'
+      - 'web/src/lib/speakingExamLock.test.js'
       - 'web/src/services/coachService.js'
       - 'web/src/services/speechTrainerService.js'
       - 'web/src/services/presentationCoachService.js'
@@ -19,6 +27,7 @@ on:
       - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
       - 'scripts/fixSpeakingAudioBackendPatch.mjs'
       - 'scripts/patchCustomSpeakingSessionDuration.mjs'
+      - 'scripts/patchLockedA1Teil3Speaking.mjs'
       - 'scripts/patchRequestedCourseMedia.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
@@ -51,6 +60,7 @@ jobs:
             node --check scripts/fixSpeakingAudioFrontendPatch.mjs || status=$?
             node --check scripts/fixSpeakingAudioBackendPatch.mjs || status=$?
             node --check scripts/patchCustomSpeakingSessionDuration.mjs || status=$?
+            node --check scripts/patchLockedA1Teil3Speaking.mjs || status=$?
             node --check scripts/patchRequestedCourseMedia.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
@@ -89,12 +99,18 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Test speaking UI regressions
+      - name: Test speaking and self-learning UI regressions
         shell: bash
         working-directory: web
         run: |
           set +e
-          CI=true npm run test:ci -- --runTestsByPath src/components/SpeakingMindMap.test.js src/components/SpeakingPracticeTimerCard.test.js 2>&1 | tee ../speaking-ui-tests.log
+          CI=true npm run test:ci -- --runTestsByPath \
+            src/components/SpeakingMindMap.test.js \
+            src/components/SpeakingPracticeTimerCard.test.js \
+            src/lib/speakingExamLock.test.js \
+            src/components/A1Teil3SpeakingPracticePanel.test.jsx \
+            src/components/selfLearning/TeacherLectureSupportingMaterials.test.jsx \
+            2>&1 | tee ../speaking-ui-tests.log
           status=${PIPESTATUS[0]}
           exit "$status"
 
