@@ -1,7 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { A1_DAY20_CHAPTER123_GRAMMAR_ROUTE } from "../data/a1Day20LetterWritingRoutes";
 
 jest.mock("./A1CanonicalSubmissionPanel", () => ({ assignment }) => (
   <div data-testid="canonical-submit">Submit {assignment.assignmentKey}</div>
@@ -50,34 +49,28 @@ describe("A1 Day 20 letter-writing workbook", () => {
     const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Informal letter/i });
     const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · Formal letter/i });
     const submitTab = screen.getByRole("tab", { name: "Submit" });
-    const persistentGrammarLink = container.querySelector(
-      '[data-a1-day20-grammar-notes-action="persistent"]',
-    );
 
     expect(overviewTab).toHaveAttribute("aria-selected", "true");
     expect(teilOneTab).toHaveAttribute("aria-selected", "false");
     expect(teilTwoTab).toHaveAttribute("aria-selected", "false");
     expect(submitTab).toHaveAttribute("aria-selected", "false");
-    expect(persistentGrammarLink).toHaveAttribute("href", A1_DAY20_CHAPTER123_GRAMMAR_ROUTE);
+    expect(screen.queryByRole("link", { name: /open grammar notes/i })).not.toBeInTheDocument();
 
     fireEvent.click(teilOneTab);
     expect(teilOneTab).toHaveAttribute("aria-selected", "true");
     expect(
       container.querySelector('[data-workbook-section="teil-1"]').parentElement,
     ).not.toHaveAttribute("hidden");
-    expect(persistentGrammarLink).toBeVisible();
 
     fireEvent.click(teilTwoTab);
     expect(teilTwoTab).toHaveAttribute("aria-selected", "true");
     expect(
       container.querySelector('[data-workbook-section="teil-2"]').parentElement,
     ).not.toHaveAttribute("hidden");
-    expect(persistentGrammarLink).toBeVisible();
 
     fireEvent.click(submitTab);
     expect(submitTab).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("canonical-submit")).toHaveTextContent("A1-12.3");
-    expect(persistentGrammarLink).toBeVisible();
   });
 
   test("places two independently configured Mark My Letter tools below the tasks", () => {

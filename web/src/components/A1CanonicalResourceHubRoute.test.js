@@ -7,6 +7,11 @@ import {
   shouldNormalizeA1ChapterResourceHubState,
 } from "./A1ChapterResourceHubRoute";
 import { getA1LegacyChapterLessonRedirect } from "./A1ChapterSpecificLessonRouteBoundary";
+import { normalizeLesson } from "../data/lessonModel";
+import {
+  A1_DAY20_CHAPTER123_GRAMMAR_ROUTE,
+  A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
+} from "../data/a1Day20LetterWritingRoutes";
 
 
 describe("A1 canonical resource hub handoff", () => {
@@ -89,5 +94,20 @@ describe("A1 canonical resource hub handoff", () => {
         state: normalizedState,
       }),
     ).toBe(false);
+  });
+
+  test("keeps Day 20 Kapitel 12.3 grammar notes on the lesson resource hub", () => {
+    const entry = resolveA1ChapterResourceHubEntry({ day: 20, chapter: "12.3" });
+    const lesson = normalizeLesson(entry, "A1");
+
+    expect(entry).toEqual(
+      expect.objectContaining({ day: 20, chapter: "12.3" }),
+    );
+    expect(lesson.resources.grammarBook?.url).toBe(
+      A1_DAY20_CHAPTER123_GRAMMAR_ROUTE,
+    );
+    expect(lesson.resources.workbook?.url).toBe(
+      A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
+    );
   });
 });
