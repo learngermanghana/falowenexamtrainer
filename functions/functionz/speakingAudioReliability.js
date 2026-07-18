@@ -64,7 +64,7 @@ async function writeTempAudioFile(file) {
   return tempPath;
 }
 
-async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-mini-transcribe" }) {
+async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
   const tempPath = await writeTempAudioFile(file);
   const client = getOpenAIClient();
 
