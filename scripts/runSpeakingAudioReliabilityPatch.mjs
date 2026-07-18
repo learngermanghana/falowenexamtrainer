@@ -14,3 +14,5 @@ if (alreadyApplied) {
 } else {
   await import("./patchSpeakingAudioReliability.mjs");
 }
+
+await import(`./fixSpeakingAudioBackendPatch.mjs?run=${Date.now()}`);
