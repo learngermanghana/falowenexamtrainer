@@ -24,6 +24,30 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    9: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day9-wohnen-nachbarschaft-ai-video",
+          chapter: "2.4",
+          title: "B2 Day 9 · Wohnen und Nachbarschaft · AI video",
+          description:
+            "AI video lesson for discussing housing, neighbourhood problems, indirect questions and polite complaints at B2 level.",
+          url: "https://youtu.be/-JeT2wS94uk",
+        }),
+      ]),
+    }),
+    12: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day12-kultur-freizeit-ai-video",
+          chapter: "3.2",
+          title: "B2 Day 12 · Kultur und Freizeit · AI video",
+          description:
+            "AI video lesson for discussing culture and leisure while using temporal clauses accurately at B2 level.",
+          url: "https://youtu.be/foXp2VHEf1I",
+        }),
+      ]),
+    }),
   }),
   C1: Object.freeze({
     10: Object.freeze({
