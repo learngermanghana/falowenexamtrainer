@@ -25,32 +25,38 @@ test("old question-only drafts remain automatic", () => {
   expect(migrateGuidedWritingState({ answers: { a: "one" }, view: "questions" }).combinedDraftMode).toBe("auto");
 });
 
-test("C1 opinion writing uses the approved topic-neutral model", () => {
-  expect(C1_OPINION_ESSAY_TEMPLATE).toContain("[Fragestellung / Titel]");
+test("C1 opinion writing uses the approved concise model with recommendation and outlook", () => {
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "[Thema] kann nicht nur [positive Funktion], sondern auch [weitere Wirkung]",
+    "In der heutigen Zeit wird häufig über [Thema] diskutiert.",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Ein gutes Beispiel hierfür ist [konkretes Beispiel]",
+    "da es sowohl [Bereich 1] als auch [Bereich 2] betrifft",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Deshalb sind [Schutzprinzip 1] und [Schutzprinzip 2] von entscheidender Bedeutung",
+    "Ein wesentlicher Vorteil besteht darin, dass [Vorteil und Erklärung]",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "gleichermaßen eine wichtige Verantwortung tragen",
+    "Andererseits sollte berücksichtigt werden, dass [Nachteil oder Problem]",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "sowohl Chancen als auch Risiken mit sich bringt",
+    "Einige Menschen sind der Ansicht, dass [Gegenargument]",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "weder [extreme Position 1] noch [extreme Position 2]",
+    "Dennoch bin ich der Auffassung, dass [eigene Position mit Begründung]",
+  );
+  expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
+    "sowohl Chancen als auch Herausforderungen mit sich bringt",
+  );
+  expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
+    "Daher wäre es empfehlenswert, [konkrete Maßnahme oder ausgewogene Lösung]",
+  );
+  expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
+    "langfristig ein angemessener Ausgleich zwischen [Aspekt 1] und [Aspekt 2] geschaffen werden",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("INTRODUCTION");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("ADVANTAGES");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("PROPOSED SOLUTION");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("personalisierte Werbung");
-  expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("Unternehmen");
-  expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("Verbraucherinnen");
 });
 
 test.each(LEGACY_C1_OPINION_ESSAY_TEMPLATES)(
