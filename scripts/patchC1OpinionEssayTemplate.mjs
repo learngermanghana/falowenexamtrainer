@@ -64,7 +64,7 @@ Eine ausgewogene Lösung bestünde darin, [Vorschlag oder Maßnahme]. Dadurch k�
 CONCLUSION
 Zusammenfassend lässt sich sagen, dass [Thema] weder ausschließlich positiv noch grundsätzlich negativ bewertet werden sollte. Vielmehr kommt es darauf an, die verschiedenen Perspektiven sorgfältig abzuwägen und eine Lösung zu finden, die sowohl praktikabel als auch langfristig sinnvoll ist.\`;`;
 
-const approvedTemplate = `export const C1_OPINION_ESSAY_TEMPLATE = \`[Fragestellung / Titel]
+const legacyTemplateV3 = `export const C1_OPINION_ESSAY_TEMPLATE = \`[Fragestellung / Titel]
 
 In der heutigen Zeit wird häufig über [Thema] diskutiert. Meiner Meinung nach ist dieses Thema von großer Bedeutung, da es sowohl [Akteur oder Gruppe 1] als auch [Akteur oder Gruppe 2] betrifft. [Thema] kann nicht nur [positive Funktion], sondern auch [weitere Wirkung]. Im Folgenden werde ich zunächst die Vorteile erläutern, anschließend auf mögliche Einwände eingehen und schließlich eine ausgewogene Lösung vorstellen.
 
@@ -78,8 +78,20 @@ Dennoch bin ich der Auffassung, dass [Akteur 1], [Akteur 2] sowie [Akteur 3] gle
 
 Zusammenfassend lässt sich sagen, dass [Thema] sowohl Chancen als auch Risiken mit sich bringt. Aus diesem Grund sollte [Thema] weder [extreme Position 1] noch [extreme Position 2] werden. Stattdessen ist ein ausgewogenes System erforderlich, das [Aspekt 1], [Aspekt 2], [Aspekt 3] und [Aspekt 4] miteinander verbindet.\`;`;
 
+const approvedTemplate = `export const C1_OPINION_ESSAY_TEMPLATE = \`In der heutigen Zeit wird häufig über [Thema] diskutiert. Meiner Meinung nach ist dieses Thema von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Im Folgenden werde ich zunächst die Vorteile erläutern, anschließend auf mögliche Einwände eingehen und schließlich eine ausgewogene Lösung vorstellen.
+
+Einerseits bietet [Thema] zahlreiche Vorteile. Ein wesentlicher Vorteil besteht darin, dass [Vorteil und Erklärung].
+
+Andererseits sollte berücksichtigt werden, dass [Nachteil oder Problem].
+
+Natürlich gibt es auch andere Meinungen. Einige Menschen sind der Ansicht, dass [Gegenargument].
+
+Dennoch bin ich der Auffassung, dass [eigene Position mit Begründung].
+
+Zusammenfassend lässt sich sagen, dass [Thema] sowohl Chancen als auch Herausforderungen mit sich bringt. Meines Erachtens kommt es darauf an, die Vorteile sinnvoll zu nutzen und gleichzeitig mögliche negative Folgen zu begrenzen. Daher wäre es empfehlenswert, [konkrete Maßnahme oder ausgewogene Lösung]. Auf diese Weise könnte langfristig ein angemessener Ausgleich zwischen [Aspekt 1] und [Aspekt 2] geschaffen werden.\`;`;
+
 if (!source.includes(approvedTemplate)) {
-  const replaceableTemplate = [legacyTemplateV2, legacyTemplateV1].find((template) =>
+  const replaceableTemplate = [legacyTemplateV3, legacyTemplateV2, legacyTemplateV1].find((template) =>
     source.includes(template),
   );
   if (!replaceableTemplate) {
@@ -96,7 +108,7 @@ const getTemplateBody = (declaration) => {
   return declaration.slice(start + 1, end);
 };
 
-const legacyTemplateBodies = [legacyTemplateV1, legacyTemplateV2].map(getTemplateBody);
+const legacyTemplateBodies = [legacyTemplateV1, legacyTemplateV2, legacyTemplateV3].map(getTemplateBody);
 const migrationBlock = `
 export const LEGACY_C1_OPINION_ESSAY_TEMPLATES = ${JSON.stringify(legacyTemplateBodies, null, 2)};
 
@@ -174,19 +186,20 @@ if (!source.includes(migratedFinalEssayBlock)) {
 
 if (changed) {
   fs.writeFileSync(filePath, source, "utf8");
-  console.log("Applied the approved topic-neutral C1 opinion essay template.");
+  console.log("Applied the approved C1 opinion essay template with recommendation and outlook.");
 } else {
   console.log("The approved C1 opinion essay template is already applied.");
 }
 
 const requiredMarkers = [
-  "[Fragestellung / Titel]",
-  "[Thema] kann nicht nur [positive Funktion], sondern auch [weitere Wirkung]",
-  "Ein gutes Beispiel hierfür ist [konkretes Beispiel]",
-  "Deshalb sind [Schutzprinzip 1] und [Schutzprinzip 2] von entscheidender Bedeutung",
-  "gleichermaßen eine wichtige Verantwortung tragen",
-  "sowohl Chancen als auch Risiken mit sich bringt",
-  "weder [extreme Position 1] noch [extreme Position 2]",
+  "da es sowohl [Bereich 1] als auch [Bereich 2] betrifft",
+  "Ein wesentlicher Vorteil besteht darin, dass [Vorteil und Erklärung]",
+  "Andererseits sollte berücksichtigt werden, dass [Nachteil oder Problem]",
+  "Einige Menschen sind der Ansicht, dass [Gegenargument]",
+  "Dennoch bin ich der Auffassung, dass [eigene Position mit Begründung]",
+  "sowohl Chancen als auch Herausforderungen mit sich bringt",
+  "Daher wäre es empfehlenswert, [konkrete Maßnahme oder ausgewogene Lösung]",
+  "langfristig ein angemessener Ausgleich zwischen [Aspekt 1] und [Aspekt 2]",
   "LEGACY_C1_OPINION_ESSAY_TEMPLATES.some",
   "const storedFinalEssay = migrateC1OpinionTemplateDraft",
 ];
