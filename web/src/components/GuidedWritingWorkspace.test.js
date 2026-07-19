@@ -1,4 +1,9 @@
-import { C1_OPINION_ESSAY_TEMPLATE, migrateGuidedWritingState } from "./GuidedWritingWorkspace";
+import {
+  C1_OPINION_ESSAY_TEMPLATE,
+  LEGACY_C1_OPINION_ESSAY_TEMPLATE,
+  migrateC1OpinionTemplateDraft,
+  migrateGuidedWritingState,
+} from "./GuidedWritingWorkspace";
 import b2 from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
 import c1 from "../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
 
@@ -37,4 +42,25 @@ test("C1 opinion writing uses a universal structured template", () => {
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("[Aspekt 1]");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("OPTIONAL UNIVERSAL CLOSING SENTENCES");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("Meiner Meinung nach [eigene Meinung].");
+});
+
+test("an untouched saved legacy C1 opinion template upgrades automatically", () => {
+  expect(
+    migrateC1OpinionTemplateDraft({
+      text: LEGACY_C1_OPINION_ESSAY_TEMPLATE,
+      level: "C1",
+      opinionMode: true,
+    }),
+  ).toBe(C1_OPINION_ESSAY_TEMPLATE);
+});
+
+test("a learner-edited C1 draft is never overwritten by template migration", () => {
+  const editedDraft = `${LEGACY_C1_OPINION_ESSAY_TEMPLATE}\n\nMein eigener Satz.`;
+  expect(
+    migrateC1OpinionTemplateDraft({
+      text: editedDraft,
+      level: "C1",
+      opinionMode: true,
+    }),
+  ).toBe(editedDraft);
 });
