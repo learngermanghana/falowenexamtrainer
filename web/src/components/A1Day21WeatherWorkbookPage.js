@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
+import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import { styles } from "../styles";
 
 const DAY21_ASSIGNMENT_KEY = "A1-13";
@@ -204,6 +205,23 @@ const Teil3Content = () => (
         <strong>Body tip:</strong> Schreiben Sie im Hauptteil über das Wetter (z. B. starker Regen, Sturm oder Schnee) als Grund.
       </p>
     </div>
+    <A1CourseBookLetterPracticePanel
+      title="Mark My Weather Letter"
+      description="Write or paste your E-Mail to Bina here. Falowen will mark it and explain the corrections before you copy the improved version to Submit."
+      taskId="A1-13-teil-3-weather-letter"
+      taskTitle="Weather reason email to Bina"
+      taskContext="email to Bina declining a wedding invitation with a weather reason and suggesting another time"
+      letterType="informal"
+      promptType="email"
+      placeholder={"Liebe Bina,\n\nich schreibe dir, weil ...\n\nLiebe Grüße\n..."}
+      minimumWords={35}
+      maximumWords={50}
+      assignmentKey={DAY21_ASSIGNMENT_KEY}
+      workbookId="A1-13-weather-workbook"
+      day={21}
+      chapter="13"
+      lessonId="A1-day-21-chapter-13"
+    />
   </section>
 );
 
@@ -219,7 +237,7 @@ const A1Day21WeatherWorkbookPage = () => (
     fallbackAssignmentKey={DAY21_ASSIGNMENT_KEY}
     title="A1 · Day 21 Workbook · Weather"
     subtitle="Kapitel 13 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, then open Submit and send your final answers to your tutor."
+    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit and send your final answers to your tutor."
     submitTitle="Submit A1 · Day 21 · Kapitel 13"
     submitDescription="This submission is locked to A1-13. Submit your reading answers and final writing task for tutor marking."
   >

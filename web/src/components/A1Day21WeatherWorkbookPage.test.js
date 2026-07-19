@@ -29,4 +29,12 @@ describe("A1 Day 21 Weather workbook", () => {
     expect(source).toContain("Sommerurlaub in Spanien");
     expect(source).toContain("Schreiben Sie eine E-Mail an Bina");
   });
+
+  it("adds Mark My Letter to the Schreiben task with A1-13 metadata", () => {
+    expect(source).toContain('import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel"');
+    expect(source).toContain('title="Mark My Weather Letter"');
+    expect(source).toContain('taskId="A1-13-teil-3-weather-letter"');
+    expect(source).toContain('assignmentKey={DAY21_ASSIGNMENT_KEY}');
+    expect(source).toContain('workbookId="A1-13-weather-workbook"');
+  });
 });
