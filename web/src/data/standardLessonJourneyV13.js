@@ -1,5 +1,6 @@
 import { getStandardWritingConfig as getPreviousWritingConfig } from "./standardLessonJourneyV12";
 import c1Day16QuestionWritingBuilder from "./writingQuestionBuilders/c1Day16TechnologieImAlltag";
+import { C1_APPROVED_OPINION_ESSAY_TEMPLATE } from "./c1ApprovedOpinionEssayTemplate";
 
 export {
   getStandardBrainMap,
@@ -68,6 +69,7 @@ const withClearWorkspacePrompt = (lesson = {}, config = {}) => {
       : Array.isArray(config.writingPromptBullets)
         ? config.writingPromptBullets.filter(Boolean)
         : [];
+  const useApprovedC1OpinionTemplate = level === "C1" && isOpinionWriting(lesson, config);
 
   return {
     ...config,
@@ -75,6 +77,9 @@ const withClearWorkspacePrompt = (lesson = {}, config = {}) => {
     prompt: originalPrompt,
     writingTopic: originalPrompt,
     writingPromptBullets: promptBullets,
+    ...(useApprovedC1OpinionTemplate
+      ? { opinionTemplate: C1_APPROVED_OPINION_ESSAY_TEMPLATE }
+      : {}),
   };
 };
 
