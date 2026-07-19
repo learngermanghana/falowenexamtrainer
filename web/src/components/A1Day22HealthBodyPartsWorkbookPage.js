@@ -1,13 +1,9 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
-
+import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
+import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import { styles } from "../styles";
 
-const cardStyle = {
-  ...styles.card,
-  display: "grid",
-  gap: 14,
-};
+const DAY22_ASSIGNMENT_KEY = "A1-14.1";
 
 const sectionStyle = {
   ...styles.card,
@@ -149,21 +145,17 @@ const vocabItems = [
   "j. Stomach / Belly – ___________",
 ];
 
-const A1Day22HealthBodyPartsWorkbookPage = () => {
+const HealthOverview = () => (
+  <section style={sectionStyle} data-a1-day22-health-overview="true">
+    <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Complete Teil 1, write the Teil 2 E-Mail, check it with Mark My Letter, finish Teil 3 vocabulary, then open Submit.
+    </p>
+  </section>
+);
 
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={cardStyle}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 22 Workbook · Health and Body Parts</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 14.1</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete each Teil below and submit your final answers in the submission area (not on this page).
-        </p>
-      </div>
-
-      <section style={sectionStyle}>
+const Teil1Content = () => (
+      <section style={sectionStyle} data-a1-day22-health-teil="1">
         <img
           src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80"
           alt="Doctor speaking with a patient in a clinic about health and appointments"
@@ -203,8 +195,10 @@ const A1Day22HealthBodyPartsWorkbookPage = () => {
           </div>
         ))}
       </section>
+);
 
-      <section style={sectionStyle}>
+const Teil2Content = () => (
+      <section style={sectionStyle} data-a1-day22-health-teil="2">
         <h2 style={{ margin: 0 }}>Teil 2 · Schreiben: E-Mail an Felix</h2>
 
         <div style={infoBoxStyle}>
@@ -229,9 +223,29 @@ const A1Day22HealthBodyPartsWorkbookPage = () => {
             <li>Schluss und Abschied / Conclusion &amp; Final Greeting</li>
           </ol>
         </div>
-      </section>
 
-      <section style={sectionStyle}>
+        <A1CourseBookLetterPracticePanel
+          title="Mark My Health Letter"
+          description="Write or paste your E-Mail to Felix here. Falowen will mark it and explain the corrections before you copy the improved version to Submit."
+          taskId="A1-14.1-teil-2-health-letter"
+          taskTitle="Health reason email to Felix"
+          taskContext="email to Felix declining a birthday invitation with a health reason and asking for another appointment"
+          letterType="informal"
+          promptType="email"
+          placeholder={"Lieber Felix,\n\nich schreibe dir, weil ...\n\nLiebe Grüße\n..."}
+          minimumWords={35}
+          maximumWords={50}
+          assignmentKey={DAY22_ASSIGNMENT_KEY}
+          workbookId="A1-14.1-health-body-parts-workbook"
+          day={22}
+          chapter="14.1"
+          lessonId="A1-day-22-chapter-14.1"
+        />
+      </section>
+);
+
+const Teil3Content = () => (
+      <section style={sectionStyle} data-a1-day22-health-teil="3">
         <h2 style={{ margin: 0 }}>Teil 3 · Wortschatz: Translate into German</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Write the correct German word for each body part below.
@@ -244,31 +258,22 @@ const A1Day22HealthBodyPartsWorkbookPage = () => {
           ))}
         </div>
       </section>
+);
 
-      <section
-        style={{
-          ...styles.card,
-          border: "1px solid #bfdbfe",
-          background: "#eff6ff",
-          display: "grid",
-          gap: 10,
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Final Submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Submit all answers in the submission area. Do not submit answers directly on this workbook page.
-        </p>
-        <a
-          href="/campus/course?submitWork=1"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, textDecoration: "none", justifySelf: "start" }}
-        >
-          Open Submission Area
-        </a>
-      </section>
-    </div>
-  );
-};
+const A1Day22HealthBodyPartsWorkbookPage = () => (
+  <A1TutorMarkedWorkbookShell
+    fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
+    title="A1 · Day 22 Workbook · Health and Body Parts"
+    subtitle="Kapitel 14.1 · Tutor-marked Lesen & Schreiben assignment"
+    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit and send your final answers to your tutor."
+    submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
+    submitDescription="This submission is locked to A1-14.1. Submit your reading answers, final writing task and vocabulary answers for tutor marking."
+  >
+    <HealthOverview />
+    <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>
+    <WorkbookSection sectionKey="teil-2"><Teil2Content /></WorkbookSection>
+    <WorkbookSection sectionKey="teil-3"><Teil3Content /></WorkbookSection>
+  </A1TutorMarkedWorkbookShell>
+);
 
 export default A1Day22HealthBodyPartsWorkbookPage;

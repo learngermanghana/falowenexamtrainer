@@ -29,6 +29,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day16FoodAndDailyLifeWorkbookPage",
   "A1Day20LetterWritingWorkbookPage",
   "A1Day21WeatherWorkbookPage",
+  "A1Day22HealthBodyPartsWorkbookPage",
 ]);
 
 const records = [
