@@ -52,6 +52,11 @@ describe("A2 Day 9 Hören and coursebook speaking cleanup", () => {
 
   test("keeps the Goethe free chat and Quick starters visible in A2 and B1 Teil 1", () => {
     const cleanupSource = readWebFile("public/course-speaking-chat-cleanup.js");
+    const a2WorkbookSource = readWebFile("src/components/A2StandardTabbedWorkbookPage.js");
+    const b1WorkbookSource = readWebFile("src/components/B1StandardWorkbookPage.js");
+
+    expect(a2WorkbookSource).toContain('<CourseInlinePracticePanel type="speaking" />');
+    expect(b1WorkbookSource).toContain('<CourseInlinePracticePanel type="speaking" />');
     expect(cleanupSource).toContain('const HIDDEN_COURSE_LEVELS = "b2|c1"');
     expect(cleanupSource).toContain('const RESTORED_COURSE_LEVELS = "a2|b1"');
     expect(cleanupSource).not.toContain('const COURSE_LEVELS = "a2|b1|b2|c1"');
