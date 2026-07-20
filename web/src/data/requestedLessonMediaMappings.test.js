@@ -29,6 +29,21 @@ describe("requested lesson media mappings", () => {
     expect(resource.key).not.toContain("ai-video");
   });
 
+  test("maps the requested B1 Day 5 and Day 21 clips to Teil 2 Schreiben", () => {
+    expect(getWritingVideoResource("B1", 5)).toEqual(
+      expect.objectContaining({
+        key: "b1-day5-besichtigungstermin-writing-video",
+        url: "https://youtu.be/n1whPCP2KzA",
+      }),
+    );
+    expect(getWritingVideoResource("B1", 21)).toEqual(
+      expect.objectContaining({
+        key: "b1-day21-lebensformen-heute-writing-video",
+        url: "https://youtu.be/1JYyJfnumig",
+      }),
+    );
+  });
+
   test("uses the approved C1 Day 10 Chapter 2.5 AI video in both lesson sources", () => {
     expect(c1Day10IntegrationUndGesellschaft.videoResource).toEqual(
       expect.objectContaining({ url: "https://youtu.be/S_c9eIH-rzY" }),
