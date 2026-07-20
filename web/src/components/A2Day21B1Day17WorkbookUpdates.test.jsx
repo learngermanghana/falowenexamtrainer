@@ -4,13 +4,14 @@ import A2Day21EinWochenendePlanenWorkbookPage from "./A2Day21EinWochenendePlanen
 import { B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG } from "./B1Day17WieLerntManAmBestenWorkbookPage";
 
 jest.mock("./A2StandardTabbedWorkbookPage", () => function MockA2Workbook({ sprechenContent }) {
-  return <main>{sprechenContent}</main>;
+  return <main data-testid="a2-teil-1-content">{sprechenContent}</main>;
 });
 
 describe("A2 Day 21 and B1 Day 17 workbook updates", () => {
   test("shows a discussion question and the existing Day 21 interactive brain map", () => {
     render(<A2Day21EinWochenendePlanenWorkbookPage />);
 
+    expect(screen.getByTestId("a2-teil-1-content")).toBeInTheDocument();
     expect(screen.getByText("Frage für die Diskussion")).toBeInTheDocument();
     expect(
       screen.getByText(/Wie planst du dein ideales Wochenende\?/i),
