@@ -84,7 +84,7 @@ const WRITING_VIDEO_RESOURCES = {
       title: "C1 Day 11 · Engagement und Ehrenamt · Schreiben explanation",
       description:
         "Watch this Schreiben video on the Write page before drafting your C1 discussion post. Use it to analyse the task, organise a differentiated argument, address the counterargument and develop concrete measures.",
-      url: "https://youtu.be/F67RRmGNK1c",
+      url: "https://youtu.be/I5OU_ZXz4c0",
     },
   },
 };
