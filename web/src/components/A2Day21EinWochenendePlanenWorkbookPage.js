@@ -1,5 +1,7 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const sectionStyle = {
   display: "grid",
@@ -26,6 +28,17 @@ const sprechenContent = (
     <p style={{ margin: 0, lineHeight: 1.7 }}>
       <strong>Ein Wochenende planen</strong>
     </p>
+
+    <div style={{ ...questionBoxStyle, background: "#eff6ff", borderColor: "#93c5fd" }}>
+      <strong>Frage für die Diskussion</strong>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Wie planst du dein ideales Wochenende? Was möchtest du am Samstag und Sonntag machen,
+        mit wem möchtest du Zeit verbringen und warum?
+      </p>
+    </div>
+
+    <SpeakingMindMap config={getA2SpeakingMindMap(21)} />
+
     <p style={{ margin: 0, lineHeight: 1.7 }}>
       <strong>Instructions</strong>
     </p>
