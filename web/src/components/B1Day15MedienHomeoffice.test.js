@@ -6,7 +6,7 @@ import {
 import B1Day15MedienHomeofficeGrammarNotesPage from "./B1Day15MedienHomeofficeGrammarNotesPage";
 
 describe("B1 Day 15 Medien und Arbeiten im Homeoffice", () => {
-  test("contains the complete workbook assignment", () => {
+  test("contains the complete workbook assignment and approved Teil 4 video", () => {
     const config = B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG;
 
     expect(config.day).toBe(15);
@@ -16,9 +16,10 @@ describe("B1 Day 15 Medien und Arbeiten im Homeoffice", () => {
     expect(config.writing.sourceText).toContain("Moderne Medien wie E-Mails");
     expect(config.reading.text.questions).toHaveLength(7);
     expect(config.listening.questions).toHaveLength(5);
-    expect(config.listening.embedUrl).toContain(
-      "1fQg01JCqIdttaf9bYPGiNlFrb7urCnGU/preview"
-    );
+    expect(config.listening.videoId).toBe("8_-AA6tpbUI");
+    expect(config.listening.externalUrl).toBe("https://youtu.be/8_-AA6tpbUI");
+    expect(config.listening.embedUrl).toBeUndefined();
+    expect(JSON.stringify(config)).not.toContain("1fQg01JCqIdttaf9bYPGiNlFrb7urCnGU");
     expect(config.submitListening).toBe(true);
   });
 
