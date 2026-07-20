@@ -19,15 +19,15 @@ export const REQUESTED_LESSON_AI_VIDEOS = Object.freeze([
       "Watch this AI explanation before continuing with the B2 lesson activities.",
   }),
   Object.freeze({
-    key: "b1-day15-workbook-ai-video",
+    key: "b1-day15-lesson-hub-ai-video",
     level: "B1",
     day: 15,
     pathname: "/campus/course/lesson/B1/15",
-    requiredParams: Object.freeze({ view: "workbook", radio: "done" }),
+    requiredParams: Object.freeze({ chapter: "5.15", hub: "1" }),
     title: "Medien und Arbeiten im Homeoffice",
     videoId: "bWiBTVo0EU4",
     description:
-      "Watch this AI explanation before completing the B1 workbook assignment.",
+      "Watch this AI explanation from the lesson hub before opening the B1 workbook assignment.",
   }),
 ]);
 
