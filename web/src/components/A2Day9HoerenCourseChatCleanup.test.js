@@ -79,6 +79,22 @@ describe("A2 Day 9 Hören and coursebook speaking cleanup", () => {
     expect(document.getElementById("quick-starters")).toBeVisible();
   });
 
+  test("restores a chat panel hidden before navigating from B2 to A2", () => {
+    const cleanupSource = readWebFile("public/course-speaking-chat-cleanup.js");
+    window.history.pushState({}, "", "/campus/course/lesson/B2/4?chapter=1.4");
+    document.body.innerHTML = speakingChatFixture();
+    window.eval(cleanupSource);
+
+    expect(window.cleanCourseSpeakingChat()).toBe(true);
+    const panel = document.querySelector('[data-course-inline-practice="speaking"]');
+    expect(panel).toHaveStyle({ display: "none" });
+
+    window.history.pushState({}, "", "/campus/course/lesson/A2/21?view=workbook");
+    expect(window.cleanCourseSpeakingChat()).toBe(true);
+    expect(panel).toBeVisible();
+    expect(panel).not.toHaveAttribute("data-course-free-chat-hidden");
+  });
+
   test("does not remove the standalone speaking exam room", () => {
     const cleanupSource = readWebFile("public/course-speaking-chat-cleanup.js");
     window.history.pushState({}, "", "/exams/speaking");
