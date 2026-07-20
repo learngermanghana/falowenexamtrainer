@@ -1,4 +1,6 @@
 (function () {
+  // A2 and B1 use the Goethe free chat as part of Teil 1 speaking practice.
+  // Only the larger B2/C1 coursebook integration should be suppressed here.
   const HIDDEN_COURSE_LEVELS = "b2|c1";
   const RESTORED_COURSE_LEVELS = "a2|b1";
   const INLINE_PANEL_SELECTOR = '[data-course-inline-practice="speaking"]';
