@@ -1,5 +1,118 @@
-import React from "react";
+import React, { useEffect } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import {
+  getWritingVideoResource,
+  getYouTubeEmbedUrl,
+} from "../data/writingVideoResources";
+
+const WRITING_VIDEO_ATTRIBUTE = "data-b1-day21-writing-video";
+
+const Day21WritingVideoInjector = () => {
+  useEffect(() => {
+    const resource = getWritingVideoResource("B1", 21);
+    const embedUrl = getYouTubeEmbedUrl(resource?.url);
+    if (!resource || !embedUrl) return undefined;
+
+    const root = document.getElementById("root") || document.body;
+
+    const mountVideo = () => {
+      const existing = root.querySelector(`[${WRITING_VIDEO_ATTRIBUTE}]`);
+      const writingSection = Array.from(root.querySelectorAll("section")).find((section) => {
+        const heading = String(section.querySelector("h2")?.textContent || "").toLowerCase();
+        return heading.includes("teil 2") && heading.includes("schreiben");
+      });
+
+      if (!writingSection) {
+        existing?.remove();
+        return false;
+      }
+
+      if (existing && writingSection.contains(existing)) return true;
+      existing?.remove();
+
+      const card = document.createElement("div");
+      card.setAttribute(WRITING_VIDEO_ATTRIBUTE, "true");
+      card.setAttribute("aria-label", "B1 Day 21 writing explanation video");
+      Object.assign(card.style, {
+        display: "grid",
+        gap: "12px",
+        border: "1px solid #bfdbfe",
+        borderRadius: "16px",
+        padding: "14px",
+        background: "#eff6ff",
+      });
+
+      const badge = document.createElement("span");
+      badge.textContent = "Writing Video · Essay Ideas";
+      Object.assign(badge.style, {
+        width: "fit-content",
+        borderRadius: "999px",
+        padding: "5px 10px",
+        background: "#dbeafe",
+        color: "#1e3a8a",
+        fontSize: ".82rem",
+        fontWeight: "800",
+      });
+      card.appendChild(badge);
+
+      const heading = document.createElement("h3");
+      heading.textContent = resource.title;
+      Object.assign(heading.style, { margin: "0", color: "#1e3a8a" });
+      card.appendChild(heading);
+
+      const description = document.createElement("p");
+      description.textContent = resource.description;
+      Object.assign(description.style, {
+        margin: "0",
+        color: "#475569",
+        lineHeight: "1.7",
+      });
+      card.appendChild(description);
+
+      const frameWrap = document.createElement("div");
+      Object.assign(frameWrap.style, {
+        position: "relative",
+        width: "100%",
+        paddingTop: "56.25%",
+        borderRadius: "14px",
+        overflow: "hidden",
+        background: "#0f172a",
+      });
+
+      const iframe = document.createElement("iframe");
+      iframe.title = resource.title;
+      iframe.src = embedUrl;
+      iframe.loading = "lazy";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      Object.assign(iframe.style, {
+        position: "absolute",
+        inset: "0",
+        width: "100%",
+        height: "100%",
+        border: "0",
+      });
+      frameWrap.appendChild(iframe);
+      card.appendChild(frameWrap);
+
+      const anchor = writingSection.querySelector('[data-course-inline-practice="writing"]');
+      if (anchor) writingSection.insertBefore(card, anchor);
+      else writingSection.appendChild(card);
+      return true;
+    };
+
+    mountVideo();
+    const observer = new MutationObserver(mountVideo);
+    observer.observe(root, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      root.querySelector(`[${WRITING_VIDEO_ATTRIBUTE}]`)?.remove();
+    };
+  }, []);
+
+  return null;
+};
 
 const config = {
   day: 21,
@@ -106,5 +219,10 @@ const config = {
 };
 
 export default function B1Day21LebensformenHeuteWorkbookPage() {
-  return <B1StandardWorkbookPage config={config} />;
+  return (
+    <>
+      <B1StandardWorkbookPage config={config} />
+      <Day21WritingVideoInjector />
+    </>
+  );
 }
