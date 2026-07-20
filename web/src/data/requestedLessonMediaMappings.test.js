@@ -4,6 +4,7 @@ import {
   applyB2C1LessonVideoOverrides,
 } from "./b2C1LessonMediaOverrides";
 import c1Day10IntegrationUndGesellschaft from "./selfLearningLessons/c1/day10IntegrationUndGesellschaft";
+import c1Day11EngagementUndEhrenamt from "./selfLearningLessons/c1/day11EngagementUndEhrenamt";
 import { getWritingVideoResource } from "./writingVideoResources";
 
 describe("requested lesson media mappings", () => {
@@ -41,18 +42,31 @@ describe("requested lesson media mappings", () => {
     );
   });
 
-  test("uses the approved C1 Day 11 video only as Schreiben support on the Write page", () => {
-    const resource = getWritingVideoResource("C1", 11);
+  test("keeps the C1 Day 11 AI and Schreiben videos as separate resources", () => {
+    const writingResource = getWritingVideoResource("C1", 11);
+    const aiResource = B2_C1_LESSON_VIDEO_OVERRIDES.C1[11].videoResources[0];
 
-    expect(resource).toEqual(
+    expect(c1Day11EngagementUndEhrenamt.videoResource).toEqual(
       expect.objectContaining({
-        key: "c1-day11-engagement-ehrenamt-writing-video",
         url: "https://youtu.be/F67RRmGNK1c",
       }),
     );
-    expect(resource.key).toContain("writing-video");
-    expect(resource.key).not.toContain("ai-video");
-    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[11]).toBeUndefined();
+    expect(aiResource).toEqual(
+      expect.objectContaining({
+        key: "c1-day11-engagement-ehrenamt-ai-video",
+        chapter: "3.1",
+        url: "https://youtu.be/F67RRmGNK1c",
+      }),
+    );
+    expect(writingResource).toEqual(
+      expect.objectContaining({
+        key: "c1-day11-engagement-ehrenamt-writing-video",
+        url: "https://youtu.be/I5OU_ZXz4c0",
+      }),
+    );
+    expect(aiResource.key).toContain("ai-video");
+    expect(writingResource.key).toContain("writing-video");
+    expect(aiResource.url).not.toBe(writingResource.url);
   });
 
   test("adds the approved B2 Day 8 Chapter 2.3 AI video to the lesson dictionary", () => {
