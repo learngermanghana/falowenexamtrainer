@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
-  test("focuses on separable prefixes and keeps train resources visible and expandable", () => {
+  test("explains normal and separable main verbs and keeps train resources visible", () => {
     render(
       <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6"]}>
         <A1Day14ModalVerbsWorkbookPage />
@@ -13,9 +13,13 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
 
     expect(screen.getByRole("heading", { name: /Modal Verbs with Separable Verbs/i })).toBeVisible();
     expect(screen.getByRole("table", { name: /Modal verb conjugation table/i })).toBeVisible();
-    expect(document.body).toHaveTextContent("ab|fahren");
-    expect(document.body).toHaveTextContent("um|steigen");
+    expect(document.body).toHaveTextContent("Subject + conjugated modal verb + details + main verb in the infinitive form");
+    expect(document.body).toHaveTextContent("Normal main verb: kaufen · to buy");
+    expect(document.body).toHaveTextContent("Separable main verb: ab|fahren · to depart");
+    expect(document.body).toHaveTextContent("Ich möchte eine Fahrkarte kaufen.");
     expect(document.body).toHaveTextContent("Der Zug muss um 14:20 Uhr abfahren.");
+    expect(document.body).toHaveTextContent("The train has to depart at 2:20 p.m.");
+    expect(document.body).toHaveTextContent("We would like to travel back on Sunday.");
     expect(screen.queryByRole("heading", { name: /Practical application · Eine Fahrkarte buchen/i })).not.toBeInTheDocument();
 
     const departureSummary = screen.getByText("Departure board · Die Abfahrtstafel");
