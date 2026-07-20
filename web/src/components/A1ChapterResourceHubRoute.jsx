@@ -7,7 +7,9 @@ import {
   resolveA1ChapterResourceHubEntry,
   shouldNormalizeA1ChapterResourceHubState,
 } from "../utils/a1ChapterResourceHubState";
+import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
+import TeacherLectureSupportingMaterials from "./selfLearning/TeacherLectureSupportingMaterials";
 
 export {
   buildA1ChapterResourceHubState,
@@ -16,6 +18,19 @@ export {
   resolveA1ChapterResourceHubEntry,
   shouldNormalizeA1ChapterResourceHubState,
 };
+
+const getPinnedTeacherLectures = ({ level = "", day = 0, chapter = "" } = {}) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  const normalizedDay = Number(day);
+  const normalizedChapter = String(chapter || "").trim();
+  if (normalizedLevel !== "A1" || !normalizedDay || !normalizedChapter) return [];
+
+  return getA1TeacherVideoResources(normalizedDay).filter(
+    (resource) => String(resource.chapter || "").trim() === normalizedChapter,
+  );
+};
+
+const getPinnedTeacherLecture = (options = {}) => getPinnedTeacherLectures(options)[0] || null;
 
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
   const location = useLocation();
@@ -30,11 +45,29 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   });
 
   if (isResourceHubRequest) {
+    const requestedChapter = new URLSearchParams(location.search || "").get("chapter") || "";
+    const teacherLectures = getPinnedTeacherLectures({
+      level: routeLevel,
+      day: routeDay,
+      chapter: requestedChapter,
+    });
+
     // CourseLessonPageLegacy resolves the URL chapter authoritatively. Rendering it
     // directly avoids a replace-navigation/remount cycle when another service
     // clears or rewrites transient location state (the Day 7 blinking bug).
-    return <CourseLessonPageLegacy />;
+    return (
+      <>
+        {teacherLectures.length ? (
+          <TeacherLectureSupportingMaterials
+            lesson={{ resources: { videos: teacherLectures } }}
+          />
+        ) : null}
+        <CourseLessonPageLegacy />
+      </>
+    );
   }
 
   return fallback;
 }
+
+export { getPinnedTeacherLecture, getPinnedTeacherLectures };

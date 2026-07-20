@@ -116,10 +116,10 @@ export const SELF_LEARNING_LESSONS = {
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
 
-const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => (
+export const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => (
   <>
-    {children}
     <TeacherLectureSupportingMaterials lesson={lesson} canonicalLesson={canonicalLesson} />
+    {children}
   </>
 );
 
