@@ -17,6 +17,17 @@ const buildB2LessonDom = () => {
   `;
 };
 
+const buildB1LessonHubDom = () => {
+  document.body.innerHTML = `
+    <main class="layout-main">
+      <div data-lesson-hub-header="true">
+        <h1>Medien und Arbeiten im Homeoffice</h1>
+      </div>
+      <section data-resource-hub="true">Lesson resources</section>
+    </main>
+  `;
+};
+
 const buildB1WorkbookDom = () => {
   document.body.innerHTML = `
     <main class="layout-main">
@@ -58,15 +69,15 @@ describe("requested B1 and B2 AI lesson videos", () => {
     ).toBeNull();
   });
 
-  test("resolves the approved B1 Day 15 video only after the radio step is complete", () => {
+  test("resolves the B1 Day 15 AI video only on the lesson hub", () => {
     expect(
       resolveRequestedLessonAiVideo({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook&radio=done",
+        search: "?chapter=5.15&hub=1",
       }),
     ).toEqual(
       expect.objectContaining({
-        key: "b1-day15-workbook-ai-video",
+        key: "b1-day15-lesson-hub-ai-video",
         videoId: "bWiBTVo0EU4",
       }),
     );
@@ -74,7 +85,7 @@ describe("requested B1 and B2 AI lesson videos", () => {
     expect(
       resolveRequestedLessonAiVideo({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook",
+        search: "?view=workbook&radio=done",
       }),
     ).toBeNull();
 
@@ -108,33 +119,33 @@ describe("requested B1 and B2 AI lesson videos", () => {
     );
   });
 
-  test("adds the B1 AI video above the workbook guidance after radio completion", () => {
-    buildB1WorkbookDom();
+  test("adds the B1 AI video to the lesson hub before the resource cards", () => {
+    buildB1LessonHubDom();
 
     expect(
       applyRequestedLessonAiVideoHeader({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook&radio=done",
+        search: "?chapter=5.15&hub=1",
       }),
     ).toBe(1);
 
-    const header = document.querySelector('[data-workbook-header="true"]');
+    const header = document.querySelector('[data-lesson-hub-header="true"]');
     const card = document.querySelector('[data-requested-lesson-ai-video="true"]');
     expect(header.nextElementSibling).toBe(card);
-    expect(card.nextElementSibling).toHaveAttribute("data-guidance", "true");
+    expect(card.nextElementSibling).toHaveAttribute("data-resource-hub", "true");
     expect(card.querySelector("iframe")).toHaveAttribute(
       "src",
       "https://www.youtube-nocookie.com/embed/bWiBTVo0EU4",
     );
   });
 
-  test("does not add the B1 AI video on the radio-first entrance", () => {
+  test("does not add the B1 AI video anywhere inside the workbook tabs", () => {
     buildB1WorkbookDom();
 
     expect(
       applyRequestedLessonAiVideoHeader({
         pathname: "/campus/course/lesson/B1/15",
-        search: "?view=workbook",
+        search: "?view=workbook&assignmentKey=B1-5.15&radio=done",
       }),
     ).toBe(0);
     expect(document.querySelector('[data-requested-lesson-ai-video="true"]')).toBeNull();

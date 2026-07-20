@@ -10,7 +10,21 @@ describe("Falowen class brochure download", () => {
 
     expect(indexSource).toContain('id="downloadBrochureButton"');
     expect(indexSource).toContain('src="/classes/brochure-download.js');
+    expect(indexSource).toContain('src="/classes/brochure-download-visible.js');
     expect(indexSource).not.toContain('onclick="window.print()"');
+    expect(indexSource.indexOf("brochure-download-visible.js")).toBeGreaterThan(
+      indexSource.indexOf("brochure-download.js"),
+    );
+  });
+
+  test("keeps the download button below the visible class schedule action", () => {
+    const source = publicClassFile("brochure-download-visible.js");
+
+    expect(source).toContain('document.getElementById("classScheduleCta")');
+    expect(source).toContain('document.getElementById("mainSignupCta")');
+    expect(source).toContain('anchor.insertAdjacentElement("afterend", button)');
+    expect(source).toContain("brochure-download-cta");
+    expect(source).toContain("new MutationObserver(scheduleEnsure)");
   });
 
   test("generates a branded two-page PDF with a print fallback", () => {

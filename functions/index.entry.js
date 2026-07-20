@@ -22,6 +22,7 @@ require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
 const exportedFunctions = require("./index.notifications");
 const lessonProgressFunctions = require("./lessonProgress");
 const { submitAssignmentResubmission } = require("./resubmission");
+const { submitHistoricalAssignmentResubmission } = require("./historicalResubmission");
 const { publicClassesCatalog } = require("./publicClassesCatalog");
 
 Object.entries(lessonProgressFunctions).forEach(([name, fn]) => {
@@ -29,10 +30,11 @@ Object.entries(lessonProgressFunctions).forEach(([name, fn]) => {
   exportedFunctions[name] = fn;
 });
 
-// Keep the resubmission callable isolated from the legacy monolithic index so
-// its validation, score lookup, cooldown and transaction logic can be deployed
+// Keep the resubmission callables isolated from the legacy monolithic index so
+// their validation, score lookup, cooldown and transaction logic can be deployed
 // safely without depending on compound submission queries.
 exportedFunctions.submitAssignmentResubmission = submitAssignmentResubmission;
+exportedFunctions.submitHistoricalAssignmentResubmission = submitHistoricalAssignmentResubmission;
 exportedFunctions.publicClassesCatalog = publicClassesCatalog;
 
 module.exports = exportedFunctions;
