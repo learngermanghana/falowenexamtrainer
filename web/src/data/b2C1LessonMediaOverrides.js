@@ -62,6 +62,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    11: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day11-engagement-ehrenamt-ai-video",
+          chapter: "3.1",
+          title: "C1 Day 11 · Engagement und Ehrenamt · AI video",
+          description:
+            "AI video lesson for evaluating volunteering, social responsibility, motivation, obstacles and sustainable support at C1 level.",
+          url: "https://youtu.be/F67RRmGNK1c",
+        }),
+      ]),
+    }),
   }),
 });
 
@@ -74,6 +86,16 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Bildung und Lernen ein. Danach gehst du weiter zum Lernteil.",
+    }),
+  }),
+  C1: Object.freeze({
+    11: Object.freeze({
+      key: "c1-day11-engagement-ehrenamt-falowen-radio",
+      title: "Engagement und Ehrenamt 3.1",
+      youtubeId: "orR1ptbJtnc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Engagement, Ehrenamt und gesellschaftliche Verantwortung ein. Danach gehst du weiter zum Lernteil.",
     }),
   }),
 });
