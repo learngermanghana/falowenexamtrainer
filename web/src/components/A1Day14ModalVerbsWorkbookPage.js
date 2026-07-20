@@ -44,42 +44,54 @@ const separableVerbs = [
     prefix: "ab-",
     meaning: "to depart",
     withoutModal: "Der Zug fährt um 14:20 Uhr ab.",
+    withoutModalEnglish: "The train departs at 2:20 p.m.",
     withModal: "Der Zug muss um 14:20 Uhr abfahren.",
+    withModalEnglish: "The train has to depart at 2:20 p.m.",
   },
   {
     display: "an|kommen",
     prefix: "an-",
     meaning: "to arrive",
     withoutModal: "Der Zug kommt um 16:08 Uhr an.",
+    withoutModalEnglish: "The train arrives at 4:08 p.m.",
     withModal: "Der Zug soll um 16:08 Uhr ankommen.",
+    withModalEnglish: "The train is supposed to arrive at 4:08 p.m.",
   },
   {
     display: "um|steigen",
     prefix: "um-",
     meaning: "to change trains",
     withoutModal: "Wir steigen in Hannover um.",
+    withoutModalEnglish: "We change trains in Hanover.",
     withModal: "Wir müssen in Hannover umsteigen.",
+    withModalEnglish: "We have to change trains in Hanover.",
   },
   {
     display: "ein|steigen",
     prefix: "ein-",
     meaning: "to get on",
     withoutModal: "Die Fahrgäste steigen jetzt ein.",
+    withoutModalEnglish: "The passengers are getting on now.",
     withModal: "Die Fahrgäste dürfen jetzt einsteigen.",
+    withModalEnglish: "The passengers are allowed to get on now.",
   },
   {
     display: "aus|steigen",
     prefix: "aus-",
     meaning: "to get off",
     withoutModal: "Ich steige am Hauptbahnhof aus.",
+    withoutModalEnglish: "I get off at the central station.",
     withModal: "Ich muss am Hauptbahnhof aussteigen.",
+    withModalEnglish: "I have to get off at the central station.",
   },
   {
     display: "zurück|fahren",
     prefix: "zurück-",
     meaning: "to travel back",
     withoutModal: "Wir fahren am Sonntag zurück.",
+    withoutModalEnglish: "We travel back on Sunday.",
     withModal: "Wir möchten am Sonntag zurückfahren.",
+    withModalEnglish: "We would like to travel back on Sunday.",
   },
 ];
 
@@ -125,49 +137,49 @@ const knowledgeQuestions = [
     prompt: "Choose the correct sentence without a modal verb.",
     options: ["Der Zug fährt um 14:20 Uhr ab.", "Der Zug abfährt um 14:20 Uhr.", "Der Zug fährt ab um 14:20 Uhr ab."],
     answer: "Der Zug fährt um 14:20 Uhr ab.",
-    explanation: "Without a modal verb, the prefix moves to the end: fährt ... ab.",
+    explanation: "Without a modal verb, the separable main verb is conjugated and the prefix moves to the end: fährt ... ab.",
   },
   {
     id: "with-modal-abfahren",
     prompt: "Choose the correct sentence with a modal verb.",
     options: ["Der Zug muss um 14:20 Uhr abfahren.", "Der Zug muss um 14:20 Uhr fährt ab.", "Der Zug abfahren muss um 14:20 Uhr."],
     answer: "Der Zug muss um 14:20 Uhr abfahren.",
-    explanation: "After a modal verb, abfahren stays together as a complete infinitive at the end.",
+    explanation: "After a modal verb, the separable main verb abfahren stays together in the infinitive form at the end.",
   },
   {
     id: "modal-ankommen",
     prompt: "Complete: Der Zug soll um 16:08 Uhr ___.",
     options: ["ankommen", "kommt ... an", "an ... kommen"],
     answer: "ankommen",
-    explanation: "With sollen, the complete infinitive ankommen stays together at the end.",
+    explanation: "With sollen, the separable main verb ankommen stays together at the end.",
   },
   {
     id: "modal-umsteigen",
     prompt: "Choose the correct word order.",
     options: ["Wir müssen in Hannover umsteigen.", "Wir müssen in Hannover steigen um.", "Wir umsteigen müssen in Hannover."],
     answer: "Wir müssen in Hannover umsteigen.",
-    explanation: "The modal verb is conjugated and umsteigen stays together at the end.",
+    explanation: "The modal verb is conjugated and the separable main verb umsteigen stays together at the end.",
   },
   {
     id: "modal-einsteigen",
     prompt: "Complete: Die Fahrgäste dürfen jetzt ___.",
     options: ["einsteigen", "steigen ... ein", "ein ... steigen"],
     answer: "einsteigen",
-    explanation: "After dürfen, use the complete infinitive einsteigen.",
+    explanation: "After dürfen, use the complete separable main verb einsteigen at the end.",
   },
   {
     id: "modal-aussteigen",
     prompt: "Which sentence is correct?",
     options: ["Ich muss am Hauptbahnhof aussteigen.", "Ich muss am Hauptbahnhof steige aus.", "Ich aussteigen muss am Hauptbahnhof."],
     answer: "Ich muss am Hauptbahnhof aussteigen.",
-    explanation: "The complete infinitive aussteigen goes to the end.",
+    explanation: "The separable main verb aussteigen goes to the end in the infinitive form.",
   },
   {
     id: "modal-zurueckfahren",
     prompt: "Complete: Wir möchten am Sonntag ___.",
     options: ["zurückfahren", "fahren ... zurück", "zurück ... fahren"],
     answer: "zurückfahren",
-    explanation: "After möchten, zurückfahren stays together at the end.",
+    explanation: "After möchten, the separable main verb zurückfahren stays together at the end.",
   },
   {
     id: "board-platform",
@@ -190,6 +202,12 @@ const SectionCard = ({ title, children }) => (
     <h2 style={sectionTitle}>{title}</h2>
     {children}
   </section>
+);
+
+const Translation = ({ children }) => (
+  <div style={{ marginTop: 5, color: "#475569", fontSize: ".92rem", lineHeight: 1.55 }}>
+    <strong>English:</strong> {children}
+  </div>
 );
 
 const A1Day14ModalVerbsWorkbookPage = () => {
@@ -241,7 +259,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 14 Workbook · Modal Verbs with Separable Verbs</h1>
             <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 3.6 · Trennbare Verben after modal verbs</p>
             <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.7 }}>
-              You already know how modal verbs work with normal main verbs. This lesson focuses on what changes when the second verb is separable.
+              You already know how modal verbs work with normal main verbs. This lesson shows what changes when the main verb is separable.
             </p>
           </div>
         </div>
@@ -249,11 +267,12 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="1) Learning goals">
         <div style={softBlue}>
-          The new point is simple: after a modal verb, a separable verb stays together as one complete infinitive at the end.
+          The important idea is simple: the modal verb is conjugated, while the <strong>main verb</strong> goes to the end in the infinitive form. A separable main verb stays together at the end.
         </div>
         <ul style={listStyle}>
+          <li>Identify the modal verb and the main verb in a sentence.</li>
+          <li>Compare a normal main verb with a separable main verb.</li>
           <li>Recognise common prefixes such as <strong>ab-, an-, ein-, aus-, um-</strong> and <strong>zurück-</strong>.</li>
-          <li>Compare a separable verb with and without a modal verb.</li>
           <li>Keep the prefix and verb together after <strong>können, müssen, dürfen, wollen, sollen</strong> and <strong>möchten</strong>.</li>
           <li>Build correct sentences such as <strong>Wir müssen in Hannover umsteigen.</strong></li>
         </ul>
@@ -297,23 +316,44 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="4) Modal verbs with separable verbs · Trennbare Verben">
+      <SectionCard title="4) Modal verb + main verb">
         <div style={softBlue}>
-          <strong>Sentence pattern:</strong> Subject + conjugated modal verb + details + complete separable infinitive.<br />
-          <strong>Example:</strong> Wir <strong>müssen</strong> in Hannover <strong>umsteigen</strong>.
+          <strong>Sentence pattern:</strong> Subject + conjugated modal verb + details + <strong>main verb in the infinitive form</strong>.<br />
+          <strong>German pattern:</strong> Subjekt + konjugiertes Modalverb + Angaben + Hauptverb im Infinitiv.
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
           <div style={softAmber}>
-            <strong>Without a modal verb</strong><br />
-            The verb separates. The prefix moves to the end.<br /><br />
-            Der Zug <strong>fährt</strong> um 14:20 Uhr <strong>ab</strong>.
+            <strong>Normal main verb: kaufen · to buy</strong><br /><br />
+            <strong>No modal:</strong> Ich kaufe eine Fahrkarte.<br />
+            <Translation>I buy a ticket.</Translation><br />
+            <strong>With modal:</strong> Ich möchte eine Fahrkarte kaufen.
+            <Translation>I would like to buy a ticket.</Translation>
           </div>
           <div style={softGreen}>
-            <strong>With a modal verb</strong><br />
-            The separable verb stays together as an infinitive at the end.<br /><br />
-            Der Zug <strong>muss</strong> um 14:20 Uhr <strong>abfahren</strong>.
+            <strong>Separable main verb: ab|fahren · to depart</strong><br /><br />
+            <strong>No modal:</strong> Der Zug fährt um 14:20 Uhr ab.<br />
+            <Translation>The train departs at 2:20 p.m.</Translation><br />
+            <strong>With modal:</strong> Der Zug muss um 14:20 Uhr abfahren.
+            <Translation>The train has to depart at 2:20 p.m.</Translation>
           </div>
+        </div>
+
+        <div style={softAmber}>
+          <strong>See the difference:</strong>
+          <ul style={{ ...listStyle, marginTop: 8 }}>
+            <li>A normal main verb has no separable prefix: <strong>kaufen</strong>.</li>
+            <li>A separable main verb has a prefix: <strong>ab|fahren</strong>.</li>
+            <li>Without a modal verb, the separable prefix moves to the end: <strong>fährt ... ab</strong>.</li>
+            <li>With a modal verb, the complete separable main verb stays together at the end: <strong>muss ... abfahren</strong>.</li>
+          </ul>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="5) Separable main verbs · Trennbare Hauptverben">
+        <div style={softBlue}>
+          <strong>Pattern for a separable main verb:</strong> Subject + conjugated modal verb + details + <strong>complete separable main verb</strong>.<br />
+          <strong>Example:</strong> Wir <strong>müssen</strong> in Hannover <strong>umsteigen</strong>.
         </div>
 
         <div style={{ display: "grid", gap: 10 }}>
@@ -321,11 +361,19 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             <article key={item.display} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#ffffff" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
                 <strong style={{ fontSize: "1.05rem" }}>{item.display}</strong>
-                <span><strong>Prefix:</strong> {item.prefix} · {item.meaning}</span>
+                <span><strong>Prefix:</strong> {item.prefix} · <strong>English:</strong> {item.meaning}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 8, marginTop: 10 }}>
-                <div style={softAmber}><strong>No modal:</strong><br />{item.withoutModal}</div>
-                <div style={softGreen}><strong>With modal:</strong><br />{item.withModal}</div>
+                <div style={softAmber}>
+                  <strong>No modal:</strong><br />
+                  {item.withoutModal}
+                  <Translation>{item.withoutModalEnglish}</Translation>
+                </div>
+                <div style={softGreen}>
+                  <strong>With modal:</strong><br />
+                  {item.withModal}
+                  <Translation>{item.withModalEnglish}</Translation>
+                </div>
               </div>
             </article>
           ))}
@@ -335,19 +383,19 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           <strong>Three steps:</strong>
           <ol style={{ ...listStyle, marginTop: 8 }}>
             <li>Conjugate the modal verb: <strong>müssen → wir müssen</strong>.</li>
-            <li>Keep the prefix attached to the verb: <strong>um + steigen → umsteigen</strong>.</li>
-            <li>Put the complete infinitive at the end: <strong>Wir müssen in Hannover umsteigen.</strong></li>
+            <li>Keep the prefix attached to the main verb: <strong>um + steigen → umsteigen</strong>.</li>
+            <li>Put the complete separable main verb at the end: <strong>Wir müssen in Hannover umsteigen.</strong></li>
           </ol>
         </div>
 
         <div style={softAmber}>
-          <strong>Do not separate the second verb after a modal verb.</strong><br />
+          <strong>Do not separate the main verb after a modal verb.</strong><br />
           <s>Wir müssen in Hannover steigen um.</s><br />
           <strong>Correct:</strong> Wir müssen in Hannover umsteigen.
         </div>
       </SectionCard>
 
-      <SectionCard title="5) Extra train reading practice">
+      <SectionCard title="6) Extra train reading practice">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           The practice resources are shown below. Each part is open by default and can be collapsed or expanded separately.
         </p>
@@ -412,9 +460,9 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="6) Sentence-building practice">
+      <SectionCard title="7) Sentence-building practice">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Change each sentence so that it contains a modal verb. Keep the separable infinitive together at the end.
+          Change each sentence so that it contains a modal verb. Keep the separable main verb together at the end.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
           <div style={softAmber}><strong>Der Zug fährt um 14:20 Uhr ab.</strong><br />→ Der Zug muss um 14:20 Uhr abfahren.</div>
@@ -427,7 +475,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="7) Knowledge test">
+      <SectionCard title="8) Knowledge test">
         <p style={{ margin: 0 }}>Answer all ten questions. The final two questions use the train-reading practice above.</p>
         <div style={{ display: "grid", gap: 14 }}>
           {knowledgeQuestions.map((question, index) => {
@@ -479,13 +527,14 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         ) : null}
       </SectionCard>
 
-      <SectionCard title="8) Final self-check">
+      <SectionCard title="9) Final self-check">
         <ul style={listStyle}>
+          <li>I can identify the conjugated modal verb and the main verb.</li>
+          <li>I know that the main verb goes to the end in the infinitive form after a modal verb.</li>
           <li>I can recognise common separable prefixes such as ab-, an-, ein-, aus-, um- and zurück-.</li>
-          <li>I can separate the verb when there is no modal verb: <strong>Der Zug fährt ab.</strong></li>
-          <li>I can keep the infinitive together after a modal verb: <strong>Der Zug muss abfahren.</strong></li>
-          <li>I can place the conjugated modal verb in position 2 and the complete separable infinitive at the end.</li>
-          <li>I can build sentences with ankommen, abfahren, umsteigen, einsteigen and aussteigen.</li>
+          <li>I can separate the main verb when there is no modal verb: <strong>Der Zug fährt ab.</strong></li>
+          <li>I can keep the separable main verb together after a modal verb: <strong>Der Zug muss abfahren.</strong></li>
+          <li>I can explain the difference between a normal main verb such as <strong>kaufen</strong> and a separable main verb such as <strong>abfahren</strong>.</li>
         </ul>
       </SectionCard>
     </div>
