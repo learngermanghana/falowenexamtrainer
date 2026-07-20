@@ -101,7 +101,7 @@ export default function A2Day9UrlaubWorkbookPage() {
         },
       ]}
       hoerenTask="Sieh dir das eingebettete Video über Annas letzten Sommerurlaub an. Achte auf das Reiseziel, die Dauer, besondere Orte, Aktivitäten und Annas Wunsch. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/bQlIXyfcUFc"
+      hoerenAudioUrl="https://youtu.be/Q6PjXP6Ccik"
       hoerenQuestions={[
         {
           stem: "Wohin ist Anna im letzten Sommerurlaub gereist?",
