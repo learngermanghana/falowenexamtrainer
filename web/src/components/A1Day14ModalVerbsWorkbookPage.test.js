@@ -14,7 +14,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     const lectureLink = screen.getByRole("link", { name: /Open teacher lecture/i });
     expect(screen.getByText("Supporting materials")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Teacher lecture" })).toBeVisible();
-    expect(screen.getByText(/Modal verbs with separable verbs/i)).toBeVisible();
+    expect(screen.getByText("Teacher lecture · Modal verbs with separable verbs")).toBeVisible();
     expect(lectureLink).toHaveAttribute("href", "https://youtu.be/GJw1aJehYHU");
     expect(lectureLink).toHaveAttribute("target", "_blank");
     expect(container.querySelector("iframe")).not.toBeInTheDocument();
