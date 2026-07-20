@@ -2,8 +2,11 @@ import { getA1RadioResource } from "./a1RadioResources";
 import {
   B2_C1_LESSON_VIDEO_OVERRIDES,
   applyB2C1LessonVideoOverrides,
+  getB2C1RadioResource,
 } from "./b2C1LessonMediaOverrides";
+import { normalizeB2C1Lesson } from "./lessonModel";
 import c1Day10IntegrationUndGesellschaft from "./selfLearningLessons/c1/day10IntegrationUndGesellschaft";
+import c1Day11EngagementUndEhrenamt from "./selfLearningLessons/c1/day11EngagementUndEhrenamt";
 import { getWritingVideoResource } from "./writingVideoResources";
 
 describe("requested lesson media mappings", () => {
@@ -53,6 +56,36 @@ describe("requested lesson media mappings", () => {
         chapter: "2.5",
         url: "https://youtu.be/S_c9eIH-rzY",
       }),
+    );
+  });
+
+  test("restores C1 Day 11 Chapter 3.1 AI video and Falowen Radio", () => {
+    const normalized = normalizeB2C1Lesson(c1Day11EngagementUndEhrenamt, "C1");
+
+    expect(c1Day11EngagementUndEhrenamt.videoResource).toEqual(
+      expect.objectContaining({
+        title: "C1 Day 11 · Engagement und Ehrenamt · AI video",
+        url: "https://youtu.be/F67RRmGNK1c",
+      }),
+    );
+    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[11].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "c1-day11-engagement-ehrenamt-ai-video",
+        chapter: "3.1",
+        url: "https://youtu.be/F67RRmGNK1c",
+      }),
+    );
+    expect(getB2C1RadioResource(" c1 ", "11")).toEqual(
+      expect.objectContaining({
+        key: "c1-day11-engagement-ehrenamt-falowen-radio",
+        youtubeId: "orR1ptbJtnc",
+      }),
+    );
+    expect(normalized.resources.aiVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/F67RRmGNK1c" }),
+    );
+    expect(normalized.resources.falowenRadio).toEqual(
+      expect.objectContaining({ youtubeId: "orR1ptbJtnc" }),
     );
   });
 
