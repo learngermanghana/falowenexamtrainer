@@ -68,8 +68,7 @@
 
   const cleanCourseSpeakingChat = () => {
     if (isRestoredCourseLesson()) {
-      restoreCourseSpeakingChat();
-      return false;
+      return restoreCourseSpeakingChat();
     }
     if (!isHiddenCourseLesson()) return false;
 
