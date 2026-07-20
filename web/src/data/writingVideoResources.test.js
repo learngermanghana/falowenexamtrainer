@@ -11,6 +11,7 @@ describe("writing video resources", () => {
     ["B1", 4, "https://youtu.be/mHQiEdVVRSQ"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
+    ["B2", 4, "https://youtu.be/ltTxYa_T2xc"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
@@ -46,6 +47,17 @@ describe("writing video resources", () => {
         key: "b1-day4-wohnung-suchen-writing-video",
         title: expect.stringContaining("Wohnung suchen"),
         url: "https://youtu.be/mHQiEdVVRSQ",
+      }),
+    );
+  });
+
+  test("maps B2 Day 4 Chapter 1.4 to its Schreiben video", () => {
+    expect(getWritingVideoResource("B2", 4)).toEqual(
+      expect.objectContaining({
+        key: "b2-day4-bildung-lernen-writing-video",
+        chapter: "1.4",
+        title: expect.stringContaining("Bildung und Lernen"),
+        url: "https://youtu.be/ltTxYa_T2xc",
       }),
     );
   });
@@ -96,6 +108,7 @@ describe("writing video resources", () => {
     ["https://youtu.be/8uAMihJTzvo", "https://www.youtube.com/embed/8uAMihJTzvo"],
     ["https://youtu.be/mHQiEdVVRSQ", "https://www.youtube.com/embed/mHQiEdVVRSQ"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
+    ["https://youtu.be/ltTxYa_T2xc", "https://www.youtube.com/embed/ltTxYa_T2xc"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
     ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],
     ["https://www.youtube.com/watch?v=nG1PUrvrS_s", "https://www.youtube.com/embed/nG1PUrvrS_s"],
