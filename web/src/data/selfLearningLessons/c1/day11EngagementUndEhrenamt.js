@@ -7,6 +7,11 @@ const c1Day11EngagementUndEhrenamt = makeLesson({
   title: "Engagement und Ehrenamt",
   topic: "Freiwilligenarbeit, gesellschaftliche Verantwortung, Motivation und nachhaltige Unterstützung beurteilen",
   heroImage: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "C1 Day 11 · AI video: Engagement und Ehrenamt",
+    description: "AI explanation for C1 Day 11, chapter 3.1: Ehrenamt, gesellschaftliche Verantwortung, Motivation, Hindernisse and sustainable support.",
+    url: "https://youtu.be/F67RRmGNK1c",
+  },
   grammarFocus: "Textverknüpfung mit Konnektoren: Argumente, Gegensätze, Folgen, Ziele und Schlussfolgerungen kohärent verbinden",
   objectives: [
     "Ich kann die gesellschaftliche Bedeutung ehrenamtlichen Engagements differenziert erklären.",
