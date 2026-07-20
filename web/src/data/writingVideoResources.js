@@ -46,6 +46,14 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video on the Write page before drafting your B2 text. It explains how to understand the task, structure the response and address every required point.",
       url: "https://youtu.be/qCO2p1Ahy7U",
     },
+    4: {
+      key: "b2-day4-bildung-lernen-writing-video",
+      chapter: "1.4",
+      title: "B2 Day 4 · Bildung und Lernen · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the B2 Day 4 text. Use it to understand the Chapter 1.4 task, organise the response and cover every required point.",
+      url: "https://youtu.be/ltTxYa_T2xc",
+    },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",
       format: "letter",
