@@ -62,6 +62,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    11: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day11-engagement-ehrenamt-ai-video",
+          chapter: "3.1",
+          title: "C1 Day 11 · Engagement und Ehrenamt · AI video",
+          description:
+            "AI video lesson for discussing voluntary work, social responsibility, motivation and sustainable support at C1 level.",
+          url: "https://youtu.be/F67RRmGNK1c",
+        }),
+      ]),
+    }),
   }),
 });
 
