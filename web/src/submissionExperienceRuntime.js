@@ -18,20 +18,14 @@ const HISTORICAL_RESUBMISSION_ID = "falowen-historical-resubmission";
 const PASS_MARK = 60;
 
 const normalizeKey = (value = "") =>
-  String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/_/g, "-")
-    .replace(/\s+/g, "");
-
-const normalizeComparableKey = (value = "") => normalizeKey(value).replace(/[^A-Z0-9]/g, "");
+  String(value || "").trim().toUpperCase().replace(/_/g, "-").replace(/\s+/g, "");
+const comparableKey = (value = "") => normalizeKey(value).replace(/[^A-Z0-9]/g, "");
 
 const toScore = (value) => {
   if (value === null || value === undefined || String(value).trim() === "") return null;
   const match = String(value).match(/-?\d+(?:\.\d+)?/);
-  if (!match) return null;
-  const score = Number(match[0]);
-  return Number.isFinite(score) ? score : null;
+  const parsed = match ? Number(match[0]) : NaN;
+  return Number.isFinite(parsed) ? parsed : null;
 };
 
 const toMillis = (value) => {
@@ -43,35 +37,39 @@ const toMillis = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const extractKeyFromText = (value = "") =>
+const extractKey = (value = "") =>
   String(value || "").match(/\b(A1|A2|B1|B2|C1)-\d+(?:\.\d+)?\b/i)?.[0] || "";
 
-const rowAliases = (row = {}) => [
+const aliasesFor = (row = {}) => [
   row.canonicalAssignmentKey,
   row.assignmentKey,
   row.assignmentId,
   row.assignment_id,
   row.explicitId,
-  extractKeyFromText(row.assignment || row.assignmentTitle || row.title),
+  extractKey(row.assignment || row.assignmentTitle || row.title),
 ].filter(Boolean);
 
 export const findLatestAssignmentResult = (rows = [], assignmentKey = "") => {
-  const target = normalizeComparableKey(assignmentKey);
+  const target = comparableKey(assignmentKey);
   if (!target) return null;
-
   return rows
-    .filter((row) => rowAliases(row).some((alias) => normalizeComparableKey(alias) === target))
+    .filter((row) => aliasesFor(row).some((alias) => comparableKey(alias) === target))
     .map((row) => ({
       ...row,
       normalizedScore: toScore(row.score ?? row.finalScore ?? row.percentage ?? row.mark ?? row.grade),
     }))
     .filter((row) => typeof row.normalizedScore === "number")
     .sort(
-      (left, right) =>
-        toMillis(right.markedAt || right.scoredAt || right.date || right.updatedAt || right.createdAt) -
-        toMillis(left.markedAt || left.scoredAt || left.date || left.updatedAt || left.createdAt),
+      (a, b) =>
+        toMillis(b.markedAt || b.scoredAt || b.date || b.updatedAt || b.createdAt) -
+        toMillis(a.markedAt || a.scoredAt || a.date || a.updatedAt || a.createdAt),
     )[0] || null;
 };
+
+const findSubmissionForm = (root = document) =>
+  Array.from(root.querySelectorAll("form")).find(
+    (form) => form.querySelector("textarea") && form.querySelector('button[type="submit"]'),
+  ) || null;
 
 const findChecklistBlock = (card) =>
   Array.from(card?.children || []).find((child) =>
@@ -80,29 +78,36 @@ const findChecklistBlock = (card) =>
     ),
   ) || null;
 
-const findSubmissionForm = (root = document) =>
-  Array.from(root.querySelectorAll("form")).find(
-    (form) => form.querySelector("textarea") && form.querySelector('button[type="submit"]'),
-  ) || null;
+const checklistIdentity = (block) => {
+  const title = Array.from(block?.querySelectorAll?.("strong") || [])
+    .map((item) => String(item.textContent || "").trim())
+    .join("|");
+  const ids = Array.from(block?.querySelectorAll?.('input[type="checkbox"]') || [])
+    .map((input) => input.getAttribute("data-check-id") || input.name || input.value || "")
+    .join("|");
+  return `${title}::${ids}`;
+};
 
-const syncChecklistClone = (originalBlock, cloneBlock) => {
+const syncChecklistClone = (originalBlock, cloneBlock, bind = false) => {
   const originals = new Map(
     Array.from(originalBlock.querySelectorAll('input[type="checkbox"]')).map((input) => [
-      input.getAttribute("data-check-id") || input.value || String(input.name || ""),
+      input.getAttribute("data-check-id") || input.value || input.name || "",
       input,
     ]),
   );
-
   Array.from(cloneBlock.querySelectorAll('input[type="checkbox"]')).forEach((clone) => {
-    const key = clone.getAttribute("data-check-id") || clone.value || String(clone.name || "");
+    const key = clone.getAttribute("data-check-id") || clone.value || clone.name || "";
     const original = originals.get(key);
     clone.removeAttribute("name");
     if (!original) return;
     clone.checked = original.checked;
-    clone.addEventListener("change", () => {
-      original.checked = clone.checked;
-      original.dispatchEvent(new Event("change", { bubbles: true }));
-    });
+    if (bind && clone.dataset.syncBound !== "true") {
+      clone.dataset.syncBound = "true";
+      clone.addEventListener("change", () => {
+        original.checked = clone.checked;
+        original.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    }
   });
 };
 
@@ -116,14 +121,23 @@ export const moveCompletionChecklistBelowEditor = (root = document) => {
   const editorContainer = textarea.closest("label") || textarea.parentElement;
   if (!editorContainer?.parentElement) return false;
 
-  root.getElementById?.(MOVED_CHECKLIST_ID)?.remove();
-  const clone = originalBlock.cloneNode(true);
+  const identity = checklistIdentity(originalBlock);
+  let clone = root.getElementById?.(MOVED_CHECKLIST_ID);
+  if (clone?.dataset.sourceIdentity === identity) {
+    originalBlock.hidden = true;
+    syncChecklistClone(originalBlock, clone, false);
+    if (editorContainer.nextElementSibling !== clone) editorContainer.insertAdjacentElement("afterend", clone);
+    return true;
+  }
+
+  clone?.remove();
+  clone = originalBlock.cloneNode(true);
   clone.id = MOVED_CHECKLIST_ID;
   clone.hidden = false;
   clone.style.display = "grid";
+  clone.dataset.sourceIdentity = identity;
   clone.setAttribute("data-checklist-below-editor", "true");
-  syncChecklistClone(originalBlock, clone);
-
+  syncChecklistClone(originalBlock, clone, true);
   originalBlock.hidden = true;
   originalBlock.setAttribute("data-original-checklist-hidden", "true");
   editorContainer.insertAdjacentElement("afterend", clone);
@@ -133,38 +147,37 @@ export const moveCompletionChecklistBelowEditor = (root = document) => {
 const getAssignmentContext = (root = document) => {
   const params = new URLSearchParams(window.location.search || "");
   const inlineRoot = root.querySelector("[data-a1-built-in-submission][data-assignment-key]");
-  const selectedAssignment = Array.from(root.querySelectorAll("select")).find((select) =>
+  const assignmentSelect = Array.from(root.querySelectorAll("select")).find((select) =>
     Array.from(select.options || []).some((option) => /A1-|A2-|B1-|Day\s*\d+/i.test(option.textContent || option.value || "")),
   );
-  const assignmentTitle = String(selectedAssignment?.selectedOptions?.[0]?.textContent || "").trim();
+  const assignmentTitle = String(assignmentSelect?.selectedOptions?.[0]?.textContent || "").trim();
   const assignmentKey = normalizeKey(
-    params.get("assignmentKey") ||
-      params.get("assignmentId") ||
-      inlineRoot?.getAttribute("data-assignment-key") ||
-      extractKeyFromText(assignmentTitle),
+    params.get("assignmentKey") || params.get("assignmentId") ||
+      inlineRoot?.getAttribute("data-assignment-key") || extractKey(assignmentTitle),
   );
   const level = assignmentKey.match(/^(A1|A2|B1|B2|C1)-/)?.[1] || String(params.get("level") || "").toUpperCase();
   const day = Number(assignmentTitle.match(/\bDay\s*(\d+)/i)?.[1] || params.get("day") || 0);
   const chapter = assignmentTitle.match(/\b(?:Chapter|Kapitel)\s*([0-9.]+)/i)?.[1] || assignmentKey.split("-")[1] || "";
-
   return { assignmentKey, assignmentTitle, level, day, chapter };
 };
 
 const findStudentProfile = async (user) => {
   if (!db || !user?.email) return null;
-  const emails = [...new Set([user.email, user.email.toLowerCase()].filter(Boolean))];
-  for (const email of emails) {
-    const snapshot = await getDocs(query(collection(db, "students"), where("email", "==", email), limit(1)));
-    if (!snapshot.empty) return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+  for (const email of [...new Set([user.email, user.email.toLowerCase()])]) {
+    try {
+      const snapshot = await getDocs(query(collection(db, "students"), where("email", "==", email), limit(1)));
+      if (!snapshot.empty) return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+    } catch (_error) {
+      // Try the next normalized email form.
+    }
   }
   return null;
 };
 
 const fetchScoreRowsFromFirestore = async (studentCode) => {
   if (!db || !studentCode) return [];
-  const codes = [...new Set([studentCode, String(studentCode).toLowerCase(), String(studentCode).toUpperCase()])];
   const requests = [];
-  codes.forEach((code) => {
+  [...new Set([studentCode, String(studentCode).toLowerCase(), String(studentCode).toUpperCase()])].forEach((code) => {
     requests.push(getDocs(query(collection(db, "scores"), where("studentcode", "==", code))));
     requests.push(getDocs(query(collection(db, "scores"), where("studentCode", "==", code))));
   });
@@ -178,12 +191,11 @@ const fetchScoreRowsFromFirestore = async (studentCode) => {
 };
 
 const loadResultRows = async (user, studentCode) => {
-  const token = await user.getIdToken();
   try {
-    const apiRows = await fetchStudentResultsHistory({ idToken: token, studentCode });
+    const apiRows = await fetchStudentResultsHistory({ idToken: await user.getIdToken(), studentCode });
     if (Array.isArray(apiRows) && apiRows.length) return apiRows;
   } catch (_error) {
-    // Fall through to the same Firestore score source used by the tutor dashboard.
+    // Use Firestore as a fallback for historical score rows.
   }
   return fetchScoreRowsFromFirestore(studentCode);
 };
@@ -195,7 +207,7 @@ const hasNativeResubmissionForm = (root = document) =>
     ),
   );
 
-const createField = ({ label, placeholder, minHeight = 130 }) => {
+const createField = (label, placeholder, minHeight) => {
   const wrapper = document.createElement("label");
   wrapper.style.display = "grid";
   wrapper.style.gap = "6px";
@@ -203,14 +215,11 @@ const createField = ({ label, placeholder, minHeight = 130 }) => {
   title.textContent = label;
   const textarea = document.createElement("textarea");
   textarea.placeholder = placeholder;
-  textarea.style.minHeight = `${minHeight}px`;
-  textarea.style.width = "100%";
-  textarea.style.boxSizing = "border-box";
-  textarea.style.border = "1px solid #94a3b8";
-  textarea.style.borderRadius = "12px";
-  textarea.style.padding = "12px";
-  textarea.style.font = "inherit";
-  textarea.style.lineHeight = "1.6";
+  Object.assign(textarea.style, {
+    minHeight: `${minHeight}px`, width: "100%", boxSizing: "border-box",
+    border: "1px solid #94a3b8", borderRadius: "12px", padding: "12px",
+    font: "inherit", lineHeight: "1.6",
+  });
   wrapper.append(title, textarea);
   return { wrapper, textarea };
 };
@@ -251,15 +260,10 @@ const renderHistoricalResubmission = ({ root = document, context, result, profil
   section.id = HISTORICAL_RESUBMISSION_ID;
   section.setAttribute("data-historical-resubmission", "true");
   Object.assign(section.style, {
-    border: "2px solid #f59e0b",
-    borderRadius: "16px",
+    border: "2px solid #f59e0b", borderRadius: "16px",
     background: "linear-gradient(135deg, #fffbeb, #ffffff)",
-    padding: "14px",
-    display: "grid",
-    gap: "12px",
-    marginTop: "12px",
+    padding: "14px", display: "grid", gap: "12px", marginTop: "12px",
   });
-
   const heading = document.createElement("h3");
   heading.textContent = "Resubmission unlocked";
   heading.style.margin = "0";
@@ -267,17 +271,16 @@ const renderHistoricalResubmission = ({ root = document, context, result, profil
   summary.style.margin = "0";
   summary.style.lineHeight = "1.6";
   summary.textContent = `${context.assignmentKey} was marked ${Math.round(result.normalizedScore)}/100 (FAIL). Submit the complete corrected task below. The pass mark is ${PASS_MARK}%.`;
-
-  const corrected = createField({
-    label: "Corrected complete answer",
-    placeholder: "Complete every missing and incorrect question. Submit only your corrected answers.",
-    minHeight: 190,
-  });
-  const improvement = createField({
-    label: "What did you improve?",
-    placeholder: "Example: I completed Q1–Q9 and corrected the personal-pronoun answer.",
-    minHeight: 90,
-  });
+  const corrected = createField(
+    "Corrected complete answer",
+    "Complete every missing and incorrect question. Submit only your corrected answers.",
+    190,
+  );
+  const improvement = createField(
+    "What did you improve?",
+    "Example: I completed Q1–Q9 and corrected the personal-pronoun answer.",
+    90,
+  );
   const message = document.createElement("p");
   message.style.margin = "0";
   message.setAttribute("role", "status");
@@ -285,15 +288,9 @@ const renderHistoricalResubmission = ({ root = document, context, result, profil
   button.type = "button";
   button.textContent = "Submit corrected work";
   Object.assign(button.style, {
-    border: "0",
-    borderRadius: "12px",
-    padding: "12px 16px",
-    background: "#1d4ed8",
-    color: "#ffffff",
-    font: "inherit",
-    fontWeight: "800",
-    cursor: "pointer",
-    width: "fit-content",
+    border: "0", borderRadius: "12px", padding: "12px 16px",
+    background: "#1d4ed8", color: "#fff", font: "inherit",
+    fontWeight: "800", cursor: "pointer", width: "fit-content",
   });
 
   button.addEventListener("click", async () => {
@@ -309,21 +306,14 @@ const renderHistoricalResubmission = ({ root = document, context, result, profil
       message.style.color = "#b91c1c";
       return;
     }
-
     button.disabled = true;
     button.textContent = "Submitting…";
     message.textContent = "";
     try {
       const callable = httpsCallable(functions, "submitHistoricalAssignmentResubmission");
-      const payload = buildHistoricalResubmissionPayload({
-        context,
-        result,
-        profile,
-        user,
-        correctedText,
-        improvementSummary,
-      });
-      const response = await callable(payload);
+      const response = await callable(buildHistoricalResubmissionPayload({
+        context, result, profile, user, correctedText, improvementSummary,
+      }));
       message.textContent = `Resubmission sent successfully. Attempt ${response?.data?.attempt || 2}/3 is awaiting tutor marking.`;
       message.style.color = "#166534";
       corrected.textarea.disabled = true;
@@ -348,19 +338,16 @@ let lastHistoricalLookup = "";
 
 const applySubmissionExperience = async () => {
   moveCompletionChecklistBelowEditor(document);
-
   const context = getAssignmentContext(document);
   if (!activeUser || !context.assignmentKey || hasNativeResubmissionForm(document)) return;
   const lookupKey = `${activeUser.uid}:${context.assignmentKey}`;
   if (lookupKey === lastHistoricalLookup && document.getElementById(HISTORICAL_RESUBMISSION_ID)) return;
   lastHistoricalLookup = lookupKey;
-
   try {
     const profile = await findStudentProfile(activeUser);
     const studentCode = profile?.studentCode || profile?.studentcode || profile?.id || "";
     if (!studentCode) return;
-    const rows = await loadResultRows(activeUser, studentCode);
-    const result = findLatestAssignmentResult(rows, context.assignmentKey);
+    const result = findLatestAssignmentResult(await loadResultRows(activeUser, studentCode), context.assignmentKey);
     if (!result || result.normalizedScore >= PASS_MARK) return;
     renderHistoricalResubmission({ context, result, profile, user: activeUser });
   } catch (error) {
@@ -377,7 +364,7 @@ const schedule = () => {
   }, 80);
 };
 
-if (typeof window !== "undefined" && typeof document !== "undefined") {
+if (process.env.NODE_ENV !== "test" && typeof window !== "undefined" && typeof document !== "undefined") {
   if (auth) {
     onIdTokenChanged(auth, (user) => {
       activeUser = user;
