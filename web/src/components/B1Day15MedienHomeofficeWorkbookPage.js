@@ -238,10 +238,8 @@ export const B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG = {
     image:
       "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "Hörübung über Digitalisierung",
-    embedUrl:
-      "https://drive.google.com/file/d/1fQg01JCqIdttaf9bYPGiNlFrb7urCnGU/preview",
-    externalUrl:
-      "https://drive.google.com/file/d/1fQg01JCqIdttaf9bYPGiNlFrb7urCnGU/view?usp=sharing",
+    videoId: "8_-AA6tpbUI",
+    externalUrl: "https://youtu.be/8_-AA6tpbUI",
     videoTitle: "B1 Day 15 Medien und Arbeiten im Homeoffice Hören",
     submitRequired: true,
     selfCheckText:
