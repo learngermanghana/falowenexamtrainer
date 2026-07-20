@@ -11,6 +11,7 @@ export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
   "/campus/course/a1-day-2-kapitel-1-1-workbook": Object.freeze({ day: 2, chapter: "1.1" }),
   "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook": Object.freeze({ day: 3, chapter: "1.1" }),
   "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook": Object.freeze({ day: 5, chapter: "1.3" }),
+  "/campus/course/a1-chapter-5-german-cases-workbook": Object.freeze({ day: 9, chapter: "5" }),
   "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook": Object.freeze({ day: 13 }),
   "/campus/course/letter-writing-intro-german-a1-day-12-3": Object.freeze({ day: 20, chapter: "12.3" }),
   "/campus/course/a1-day-21-weather-workbook": Object.freeze({ day: 21, chapter: "13" }),
@@ -25,6 +26,8 @@ const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
   6: Object.freeze({ day: 6, chapter: "2.3" }),
   7: Object.freeze({ day: 7, chapter: "3" }),
   8: Object.freeze({ day: 8, chapter: "4" }),
+  9: Object.freeze({ day: 9, chapter: "5" }),
+  11: Object.freeze({ day: 11, chapter: "7" }),
   22: Object.freeze({ day: 22, chapter: "14.1" }),
 });
 
