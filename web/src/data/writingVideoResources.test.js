@@ -9,6 +9,8 @@ describe("writing video resources", () => {
     ["B1", 2, "https://youtu.be/94IXPx5dTNY"],
     ["B1", 3, "https://youtu.be/8uAMihJTzvo"],
     ["B1", 4, "https://youtu.be/mHQiEdVVRSQ"],
+    ["B1", 5, "https://youtu.be/n1whPCP2KzA"],
+    ["B1", 21, "https://youtu.be/1JYyJfnumig"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
@@ -50,6 +52,23 @@ describe("writing video resources", () => {
     );
   });
 
+  test("maps B1 Day 5 and Day 21 to their Teil 2 Schreiben videos", () => {
+    expect(getWritingVideoResource("B1", 5)).toEqual(
+      expect.objectContaining({
+        key: "b1-day5-besichtigungstermin-writing-video",
+        title: expect.stringContaining("Besichtigungstermin"),
+        url: "https://youtu.be/n1whPCP2KzA",
+      }),
+    );
+    expect(getWritingVideoResource("B1", 21)).toEqual(
+      expect.objectContaining({
+        key: "b1-day21-lebensformen-heute-writing-video",
+        title: expect.stringContaining("Lebensformen heute"),
+        url: "https://youtu.be/1JYyJfnumig",
+      }),
+    );
+  });
+
   test("maps B2 Day 3 and C1 Day 10 to their writing pages", () => {
     expect(getWritingVideoResource("B2", 3)).toEqual(
       expect.objectContaining({
@@ -87,7 +106,7 @@ describe("writing video resources", () => {
   });
 
   test("returns null when no writing video has been added", () => {
-    expect(getWritingVideoResource("B1", 5)).toBeNull();
+    expect(getWritingVideoResource("B1", 6)).toBeNull();
   });
 
   test.each([
@@ -95,6 +114,8 @@ describe("writing video resources", () => {
     ["https://youtu.be/94IXPx5dTNY", "https://www.youtube.com/embed/94IXPx5dTNY"],
     ["https://youtu.be/8uAMihJTzvo", "https://www.youtube.com/embed/8uAMihJTzvo"],
     ["https://youtu.be/mHQiEdVVRSQ", "https://www.youtube.com/embed/mHQiEdVVRSQ"],
+    ["https://youtu.be/n1whPCP2KzA", "https://www.youtube.com/embed/n1whPCP2KzA"],
+    ["https://youtu.be/1JYyJfnumig", "https://www.youtube.com/embed/1JYyJfnumig"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
     ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],
