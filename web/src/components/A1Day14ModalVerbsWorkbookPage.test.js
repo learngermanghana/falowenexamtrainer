@@ -4,6 +4,22 @@ import { MemoryRouter } from "react-router-dom";
 import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
+  test("shows the linked teacher lecture above the lesson without embedding it", () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6"]}>
+        <A1Day14ModalVerbsWorkbookPage />
+      </MemoryRouter>,
+    );
+
+    const lectureLink = screen.getByRole("link", { name: /Open teacher lecture/i });
+    expect(screen.getByText("Supporting materials")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Teacher lecture" })).toBeVisible();
+    expect(screen.getByText(/Modal verbs with separable verbs/i)).toBeVisible();
+    expect(lectureLink).toHaveAttribute("href", "https://youtu.be/GJw1aJehYHU");
+    expect(lectureLink).toHaveAttribute("target", "_blank");
+    expect(container.querySelector("iframe")).not.toBeInTheDocument();
+  });
+
   test("explains normal and separable main verbs and keeps train resources visible", () => {
     render(
       <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6"]}>
@@ -31,6 +47,16 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(vocabularySummary.closest("details")).toHaveAttribute("open");
     expect(screen.getByLabelText("German train departure board")).toBeVisible();
     expect(screen.getByLabelText("Example German train ticket")).toBeVisible();
+  });
+
+  test("does not show the Day 14 lecture on the A2 Day 17 query route", () => {
+    render(
+      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?level=A2&day=17"]}>
+        <A1Day14ModalVerbsWorkbookPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole("link", { name: /Open teacher lecture/i })).not.toBeInTheDocument();
   });
 
   test("scores and resets the separable-verb knowledge test", () => {
