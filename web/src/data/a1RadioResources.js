@@ -67,10 +67,19 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     key: "a1-day9-german-cases-falowen-radio",
     chapter: "5",
     title: "German Cases · Kapitel 5",
-    youtubeId: "1XWJ8-J7VKw",
+    youtubeId: "DV8dSaI076o",
     duration: "",
     instruction:
       "Listen carefully to the German cases episode. Then continue to the Kapitel 5 teacher lecture and lesson resources.",
+  }),
+  11: Object.freeze({
+    key: "a1-day11-understanding-time-falowen-radio",
+    chapter: "7",
+    title: "Understanding Time · Kapitel 7",
+    youtubeId: "asJsRtaR1x0",
+    duration: "",
+    instruction:
+      "Listen carefully to the Understanding Time episode. Then continue to the Kapitel 7 teacher lecture and lesson resources.",
   }),
   13: Object.freeze({
     key: "a1-day13-revision-numbers-time-prices-falowen-radio",
