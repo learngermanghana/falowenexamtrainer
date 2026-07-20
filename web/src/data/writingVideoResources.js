@@ -30,6 +30,20 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before starting the apartment-search writing task. Use it to understand the prompt, organise the message and cover every required point.",
       url: "https://youtu.be/mHQiEdVVRSQ",
     },
+    5: {
+      key: "b1-day5-besichtigungstermin-writing-video",
+      title: "B1 Day 5 · Der Besichtigungstermin · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before drafting the polite email to the landlord. It explains how to show interest, request or suggest a viewing appointment, ask for confirmation and include contact details.",
+      url: "https://youtu.be/n1whPCP2KzA",
+    },
+    21: {
+      key: "b1-day21-lebensformen-heute-writing-video",
+      title: "B1 Day 21 · Lebensformen heute · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before responding to Mara's opinion. It explains how to compare family life, shared accommodation and single life, present advantages and disadvantages, and justify your own view.",
+      url: "https://youtu.be/1JYyJfnumig",
+    },
   },
   B2: {
     1: {
