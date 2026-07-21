@@ -98,6 +98,15 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully and revise numbers, time and prices. Then continue to the workbook practice.",
   }),
+  14: Object.freeze({
+    key: "a1-day14-modal-verbs-separable-verbs-falowen-radio",
+    chapter: "3.6",
+    title: "Modal Verbs with Separable Verbs · Kapitel 3.6",
+    youtubeId: "GeHygJE7Hww",
+    duration: "",
+    instruction:
+      "Listen carefully to the modal-verbs episode. Then continue to the tutor lecture, AI lesson video and workbook activities.",
+  }),
   20: Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
     title: "Letter Writing Introduction · Kapitel 12.3",
