@@ -1,8 +1,17 @@
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { getA1RadioResource } from "../data/a1RadioResources";
+import A1ChapterResourceHubRoute, {
+  A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
+} from "./A1ChapterResourceHubRoute";
 import {
   hasCompletedA1RadioFirstStep,
   resolveA1RadioFirstWorkbookRoute,
 } from "./A1RadioFirstWorkbookRoutes";
+import A1SpeakingExamIntroEntryRoute, {
+  A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
+} from "./A1SpeakingExamIntroEntryRoute";
 
 describe("A1 route-scoped Falowen Radio", () => {
   test.each([
@@ -140,6 +149,78 @@ describe("A1 route-scoped Falowen Radio", () => {
         youtubeId: "owCQscHPmzQ",
       }),
     );
+  });
+
+  test("keeps separate Falowen Radio episodes for Day 16 Kapitel 9 and Kapitel 10", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/16",
+        "?chapter=10&hub=1",
+      ),
+    ).toEqual({ day: 16, chapter: "10" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
+      ),
+    ).toEqual({ day: 16, chapter: "10" });
+    expect(getA1RadioResource(16, "10")).toEqual(
+      expect.objectContaining({
+        key: "a1-day16-food-daily-life-kapitel-10-falowen-radio",
+        chapter: "10",
+        youtubeId: "lp7ePIbp-Ws",
+      }),
+    );
+    expect(getA1RadioResource(16, "9")).toEqual(
+      expect.objectContaining({
+        key: "a1-day16-negation-food-daily-life-falowen-radio",
+        chapter: "9",
+        youtubeId: "cQAsQ14a77c",
+      }),
+    );
+    expect(getA1RadioResource(16, "11")).toBeNull();
+  });
+
+  test("routes the speaking self-learning entry through supporting resources before its workbook", async () => {
+    render(
+      <MemoryRouter initialEntries={[A1_SPEAKING_EXAM_INTRO_ENTRY_PATH]}>
+        <Routes>
+          <Route
+            path={A1_SPEAKING_EXAM_INTRO_ENTRY_PATH}
+            element={<A1SpeakingExamIntroEntryRoute workbookElement={<div>Speaking workbook</div>} />}
+          />
+          <Route
+            path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
+            element={<A1ChapterResourceHubRoute level="A1" />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Kapitel 4.7 teacher lecture video")).toBeVisible();
+    expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
+      "href",
+      "https://youtu.be/o9nn_hSDzw8",
+    );
+    expect(screen.getByRole("link", { name: /Open workbook/i })).toHaveAttribute(
+      "href",
+      "/campus/course/speaking-exams-intro-4-7?view=workbook",
+    );
+    expect(screen.queryByText("Speaking workbook")).not.toBeInTheDocument();
+  });
+
+  test("opens the speaking workbook only after the supporting-resource link is selected", () => {
+    render(
+      <MemoryRouter initialEntries={[`${A1_SPEAKING_EXAM_INTRO_ENTRY_PATH}?view=workbook`]}>
+        <Routes>
+          <Route
+            path={A1_SPEAKING_EXAM_INTRO_ENTRY_PATH}
+            element={<A1SpeakingExamIntroEntryRoute workbookElement={<div>Speaking workbook</div>} />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Speaking workbook")).toBeVisible();
   });
 
   test("uses the approved Day 20 Kapitel 12.3 letter-writing video", () => {
