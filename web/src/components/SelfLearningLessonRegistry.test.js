@@ -5,6 +5,11 @@ import { normalizeLesson } from "../data/lessonModel";
 
 jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),
+  useLocation: () => ({
+    pathname: "/campus/course/lesson/B2/1",
+    search: "",
+    hash: "",
+  }),
 }));
 
 jest.mock("../context/ToastContext", () => ({
@@ -20,7 +25,7 @@ const radio = {
 
 const renderRegisteredLesson = (level, day, falowenRadio = null) => {
   const Component = getSelfLearningLessonComponent(level, day);
-  render(<Component canonicalLesson={{ resources: { falowenRadio } }} />);
+  render(<Component canonicalLesson={{ level, day, topic: "Test lesson", resources: { falowenRadio } }} />);
 };
 
 describe("self-learning lesson Falowen Radio integration", () => {
@@ -32,13 +37,15 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.queryByRole("button", { name: /continue to teil/i })).not.toBeInTheDocument();
   });
 
-  test.each(["B2", "C1"])("%s lesson without Radio does not show an empty Radio card", (level) => {
+  test.each(["B2", "C1"])("%s lesson without Radio opens the shared materials selector", (level) => {
     renderRegisteredLesson(level, 1);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
+    expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
   });
 
-  test("A1 remains outside the self-learning registry and without Radio capability", () => {
+  test("A1 remains outside the B2/C1 self-learning registry and without generic Radio capability", () => {
     expect(getSelfLearningLessonComponent("A1", 1)).toBeNull();
     expect(normalizeLesson({ day: 1 }, "A1").resources.falowenRadio).toBeNull();
   });
