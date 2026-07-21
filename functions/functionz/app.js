@@ -20,6 +20,7 @@ const bcrypt = require("bcryptjs");
 
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -189,6 +190,18 @@ const DAILY_LIMITS = {
   speaking: 25,
   speechTrainer: 25,
   nextTask: 30,
+  tts: 30,
+};
+
+
+const TTS_LEVEL_SPEED = { A2: 0.88, B1: 0.94, B2: 1.0, C1: 1.03 };
+const TTS_ALLOWED_LEVELS = Object.keys(TTS_LEVEL_SPEED);
+const TTS_INSTRUCTIONS =
+  "Speak in clear, natural Standard German. Use a friendly conversational tone. Pronounce German words carefully for a language learner. Do not announce formatting, markdown, bullet symbols, or labels.";
+
+const normalizeTtsLevel = (level) => {
+  const normalized = String(level || "").trim().toUpperCase();
+  return TTS_ALLOWED_LEVELS.includes(normalized) ? normalized : null;
 };
 
 const DEFAULT_TUITION_CURRENCY = "GHS";
@@ -911,28 +924,9 @@ app.post("/admin/purge-expired-students", async (req, res) => {
 
 app.get("/scores/summary", scoresSummaryHandler);
 
-const writeTempFile = async (file) => {
-  const fileName = file?.originalname || "audio.webm";
-  const tempPath = path.join(os.tmpdir(), `${Date.now()}-${fileName}`);
-  await fsPromises.writeFile(tempPath, file.buffer);
-  return tempPath;
-};
-
-const transcribeAudio = async (fileBuffer) => {
-  const client = getOpenAIClient();
-  const tempPath = await writeTempFile(fileBuffer);
-
-  try {
-    const transcription = await client.audio.transcriptions.create({
-      file: fs.createReadStream(tempPath),
-      model: "whisper-1",
-      language: "de",
-    });
-
-    return transcription?.text?.trim();
-  } finally {
-    await fsPromises.unlink(tempPath).catch(() => undefined);
-  }
+const transcribeAudio = async (file) => {
+  const result = await transcribeAudioFile({ file, getOpenAIClient });
+  return result.text;
 };
 
 
@@ -979,7 +973,7 @@ const downloadAudioFromUrl = async (audioUrl) => {
 
   return {
     buffer,
-    originalname: "speech-trainer-remote.webm",
+    originalname: `speech-trainer-remote.${extensionForRemoteAudio(contentType)}`,
     mimetype: contentType,
     size: buffer.length,
   };
@@ -1222,7 +1216,7 @@ function sanitizePresentationHistory(messages = []) {
     .filter((item) => item && (item.role === "user" || item.role === "assistant"))
     .map((item) => ({
       role: item.role,
-      content: String(item.content || "").slice(0, 1200),
+      content: String(item.content || "").slice(0, 8000),
     }))
     .filter((item) => item.content.trim())
     .slice(-20);
@@ -2676,12 +2670,6 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
 
-    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
-    if (!quota.allowed) {
-      log.warn("quota.blocked", { route: "/speaking/analyze", uid: authedUser.uid, category: "speaking" });
-      return res.status(429).json({ error: "Daily speaking analysis limit reached" });
-    }
-
     let audioFile = req.file;
     if (!audioFile && audioUrl) {
       audioFile = await downloadAudioFromUrl(audioUrl);
@@ -2689,8 +2677,10 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
 
     if (!audioFile) return res.status(400).json({ error: "Audio file is required" });
 
-    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 1800);
-    if (!transcript) return res.status(500).json({ error: "Could not transcribe audio" });
+    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 8000);
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
+    if (!quota.allowed) return res.status(429).json({ error: "Daily speaking analysis limit reached", code: "SPEAKING_QUOTA_REACHED" });
 
     const messages = [
       { role: "system", content: speakingPrompt({ teil, level, contextType, question, interactionMode }) },
@@ -2715,7 +2705,8 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
   } catch (err) {
     console.error("/speaking/analyze error", err);
     auditAIRequest({ route: "/speaking/analyze", uid: authedUser?.uid, email: authedUser?.email, success: false });
-    return res.status(500).json({ error: err.message || "Failed to analyze speaking" });
+    if (/^(AUDIO_|NO_SPEECH_DETECTED|TRANSCRIPTION_)/.test(String(err?.code || ""))) { const mapped = audioHttpError(err); return res.status(mapped.status).json(mapped.body); }
+    return res.status(500).json({ error: err.message || "Failed to analyze speaking", code: "SPEAKING_ANALYSIS_FAILED" });
   }
 });
 
@@ -2841,17 +2832,6 @@ app.post("/speech-trainer/feedback", audioUpload, async (req, res) => {
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
 
-    const quota = await enforceUserQuota({
-      uid: authedUser.uid,
-      category: "speechTrainer",
-      limit: DAILY_LIMITS.speechTrainer,
-    });
-
-    if (!quota.allowed) {
-      log.warn("quota.blocked", { route: "/speech-trainer/feedback", uid: authedUser.uid, category: "speechTrainer" });
-      return res.status(429).json({ error: "Daily speech trainer limit reached" });
-    }
-
     let audioFile = req.file;
     if (!audioFile && audioUrl) {
       audioFile = await downloadAudioFromUrl(audioUrl);
@@ -2861,7 +2841,10 @@ app.post("/speech-trainer/feedback", audioUpload, async (req, res) => {
       return res.status(400).json({ error: "Audio recording is required" });
     }
 
-    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 1500);
+    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 8000);
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speechTrainer", limit: DAILY_LIMITS.speechTrainer });
+    if (!quota.allowed) return res.status(429).json({ error: "Daily speech trainer limit reached", code: "SPEAKING_QUOTA_REACHED" });
 
     const messages = [
       { role: "system", content: speechTrainerPrompt({ level, note: String(note || "").trim() }) },
@@ -2887,7 +2870,8 @@ app.post("/speech-trainer/feedback", audioUpload, async (req, res) => {
   } catch (err) {
     console.error("/speech-trainer/feedback error", err);
     auditAIRequest({ route: "/speech-trainer/feedback", uid: authedUser?.uid, email: authedUser?.email, success: false });
-    return res.status(500).json({ error: err.message || "Failed to run speech trainer" });
+    if (/^(AUDIO_|NO_SPEECH_DETECTED|TRANSCRIPTION_)/.test(String(err?.code || ""))) { const mapped = audioHttpError(err); return res.status(mapped.status).json(mapped.body); }
+    return res.status(500).json({ error: err.message || "Failed to run speech trainer", code: "SPEECH_TRAINER_FAILED" });
   }
 });
 
@@ -2920,7 +2904,7 @@ app.post("/chatbuddy/respond", audioUpload, async (req, res) => {
     }
 
     let transcript = "";
-    if (req.file) transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1200);
+    if (req.file) transcript = ((await transcribeAudio(req.file)) || "").slice(0, 8000);
 
     const trimmedMessage = String(message || "").trim();
     const combinedMessage = [trimmedMessage, transcript ? `Audio transcript: ${transcript}` : null]
@@ -2959,6 +2943,99 @@ app.post("/chatbuddy/respond", audioUpload, async (req, res) => {
   }
 });
 
+
+
+app.post("/speech/synthesize", async (req, res) => {
+  let authedUser;
+  const route = "/speech/synthesize";
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
+    const level = normalizeTtsLevel(req.body?.level);
+
+    if (!text) {
+      return res.status(400).json({ error: "Text is required", code: "missing_text" });
+    }
+    if (text.length > 1200) {
+      return res.status(400).json({ error: "Text must be at most 1200 characters", code: "text_too_long" });
+    }
+    if (!level) {
+      return res.status(400).json({ error: "Level must be one of A2, B1, B2, or C1", code: "invalid_level" });
+    }
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "tts", limit: DAILY_LIMITS.tts });
+    if (!quota.allowed) {
+      log.warn("quota.blocked", { route, uid: authedUser.uid, category: "tts" });
+      return res.status(429).json({ error: "Daily speech synthesis limit reached", code: "quota_reached" });
+    }
+
+    const model = process.env.OPENAI_TTS_MODEL || "gpt-4o-mini-tts";
+    const voice = process.env.OPENAI_TTS_VOICE || "marin";
+    const speed = TTS_LEVEL_SPEED[level];
+    const startedAt = Date.now();
+
+    try {
+      incrementCounter("openai_tts_requests", model);
+      const speech = await getOpenAIClient().audio.speech.create({
+        model,
+        voice,
+        input: text,
+        response_format: "mp3",
+        speed,
+        instructions: TTS_INSTRUCTIONS,
+      });
+      const buffer = Buffer.from(await speech.arrayBuffer());
+      incrementCounter("openai_tts_success", model);
+      log.info("speech.synthesize.success", {
+        uid: authedUser.uid,
+        level,
+        model,
+        voice,
+        speed,
+        textLength: text.length,
+        durationMs: Date.now() - startedAt,
+        quotaRemaining: quota.remaining,
+      });
+      await auditAIRequest({
+        route,
+        uid: authedUser.uid,
+        email: authedUser.email,
+        metadata: { level, model, voice, speed, textLength: text.length, quotaRemaining: quota.remaining },
+        success: true,
+      });
+      return res
+        .status(200)
+        .set({ "Content-Type": "audio/mpeg", "Cache-Control": "private, max-age=3600" })
+        .send(buffer);
+    } catch (err) {
+      incrementCounter("openai_tts_errors", err?.code || err?.status || "unknown");
+      log.error("speech.synthesize.failed", {
+        uid: authedUser.uid,
+        level,
+        model,
+        textLength: text.length,
+        durationMs: Date.now() - startedAt,
+        errorMessage: err?.message || "unknown",
+        errorCode: err?.code || err?.status || "unknown",
+      });
+      await auditAIRequest({
+        route,
+        uid: authedUser.uid,
+        email: authedUser.email,
+        metadata: { level, model, textLength: text.length, errorCode: err?.code || err?.status || "unknown" },
+        success: false,
+      });
+      return res.status(502).json({ error: "Speech generation failed", code: "speech_generation_failed" });
+    }
+  } catch (err) {
+    console.error("/speech/synthesize error", err);
+    await auditAIRequest({ route, uid: authedUser?.uid, email: authedUser?.email, success: false });
+    return res.status(500).json({ error: "Failed to synthesize speech", code: "speech_synthesize_failed" });
+  }
+});
 
 app.post("/speaking/custom-chat", async (req, res) => {
   let authedUser;

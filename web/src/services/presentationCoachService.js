@@ -1,4 +1,4 @@
-import { callAI } from "./aiClient";
+import { backendUrl, callAI } from "./aiClient";
 import {
   DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
   normalizeSpeakingChatDurationMinutes,
@@ -35,6 +35,33 @@ Rules for the assistant:
 
 Student message:
 ${message}`;
+};
+
+
+export const requestCoachSpeech = async ({ text, level, idToken, signal } = {}) => {
+  const response = await fetch(`${backendUrl}/speech/synthesize`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+    },
+    body: JSON.stringify({ text, level }),
+    signal,
+  });
+
+  if (!response.ok) {
+    let errorMessage = `Failed to generate speech (HTTP ${response.status})`;
+    try {
+      const data = await response.json();
+      errorMessage = data?.error || data?.message || errorMessage;
+    } catch (error) {
+      // Keep the generic error when the backend did not return JSON.
+    }
+    throw new Error(errorMessage);
+  }
+
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
 };
 
 export const requestPresentationCoachReply = async ({ message, level, history, idToken }) =>

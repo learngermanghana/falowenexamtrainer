@@ -297,3 +297,16 @@ rows into the approval spreadsheet with the helper script at
 
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
+
+## AI speech synthesis configuration
+
+Falowen's free Goethe Sprechen custom chat can generate asynchronous German MP3 replies for A2, B1, B2, and C1 coach messages. The feature uses the existing server-side `OPENAI_API_KEY`; do not expose this key in browser code.
+
+Optional text-to-speech overrides:
+
+```text
+OPENAI_TTS_MODEL=gpt-4o-mini-tts
+OPENAI_TTS_VOICE=marin
+```
+
+When these variables are omitted, the backend uses the defaults shown above.
