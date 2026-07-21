@@ -114,12 +114,15 @@ const Day21WritingVideoInjector = () => {
   return null;
 };
 
+export const B1_DAY21_HAS_TEIL4 = false;
+
 const config = {
   day: 21,
   chapter: "7.21",
   assignmentKey: "B1-7.21",
   workbookId: "B1Day21LebensformenHeute",
   title: "Lebensformen heute",
+  subtitle: "This workbook contains Teil 1, Teil 2 and Teil 3 only. There is no Teil 4 for this lesson.",
   heroImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
   heroAlt: "People discussing modern living arrangements",
   speaking: {
@@ -196,33 +199,45 @@ const config = {
       ],
     },
   },
-  listening: {
-    title: "Hören Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Listen twice if possible. Answer every question shown in the video, listen for names, places, reasons and opinions, and write your answer letters before checking the solutions.",
-    submitRequired: true,
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for German listening practice",
-    videoId: "iyydRu3oY4I",
-    externalUrl: "https://youtu.be/iyydRu3oY4I",
-    selfCheckText: "The solutions are provided in the video. Mark your own Hören result, then submit your Hören answer letters or result together with Schreiben and Lesen.",
-    steps: [
-      "Schauen Sie zuerst nur auf die Aufgaben und Antwortmöglichkeiten im Video.",
-      "Hören Sie den Test möglichst zweimal.",
-      "Notieren Sie zu jeder Aufgabe Ihren Antwortbuchstaben.",
-      "Kontrollieren Sie mit den Lösungen im Video und tragen Sie Ihr Ergebnis im Submit-Tab ein.",
-    ],
-  },
-  submitListening: true,
+  submitListening: false,
+  submitTitle: "Submit Teil 2 and Teil 3.",
+  submitNote: "Teil 1 is group practice. There is no Teil 4 in this workbook.",
+  submitInstructions: "Paste your final 80–100 word opinion text and your five reading answer letters into the form below.",
   submitWritingDescription: "Paste your final 80–100 word opinion text.",
   submitReadingDescription: "Paste your five reading answer letters.",
-  submitListeningDescription: "Paste your Hören answer letters or your checked Hören result from the video.",
 };
 
 export default function B1Day21LebensformenHeuteWorkbookPage() {
   return (
-    <>
+    <div data-b1-day21-no-listening="true">
+      <style>{`
+        [data-b1-day21-no-listening="true"] [role="tab"][aria-label="Teil 4"] {
+          display: none !important;
+        }
+        [data-b1-day21-no-listening="true"] [data-workbook-tab-navigation] > p {
+          display: none !important;
+        }
+      `}</style>
+      <div
+        data-b1-day21-no-teil4-notice="true"
+        role="note"
+        style={{
+          width: "min(calc(100% - 24px), 960px)",
+          margin: "12px auto 0",
+          border: "1px solid #f59e0b",
+          borderRadius: 14,
+          padding: 12,
+          background: "#fffbeb",
+          color: "#92400e",
+          fontWeight: 800,
+          lineHeight: 1.55,
+          boxSizing: "border-box",
+        }}
+      >
+        This workbook has Teil 1 · Sprechen, Teil 2 · Schreiben and Teil 3 · Lesen. There is no Teil 4 · Hören for this lesson.
+      </div>
       <B1StandardWorkbookPage config={config} />
       <Day21WritingVideoInjector />
-    </>
+    </div>
   );
 }
