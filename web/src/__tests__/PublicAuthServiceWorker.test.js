@@ -20,6 +20,6 @@ describe("authentication routes in the service worker", () => {
   });
 
   it("changes the cache version for installed apps", () => {
-    expect(source).toContain('`${CACHE_PREFIX}-v11`');
+    expect(source).toContain('`${CACHE_PREFIX}-v13`');
   });
 });
