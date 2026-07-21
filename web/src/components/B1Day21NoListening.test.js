@@ -17,7 +17,7 @@ jest.mock("./A2B1WorkbookGuidance", () => ({
 }));
 
 describe("B1 Day 21 workbook parts", () => {
-  test("states that there is no Teil 4 and hides the Hören tab", () => {
+  test("states that there is no Teil 4 and removes the Hören tab", () => {
     const { container } = render(
       <MemoryRouter>
         <B1Day21LebensformenHeuteWorkbookPage />
@@ -29,8 +29,7 @@ describe("B1 Day 21 workbook parts", () => {
     expect(notice).toBeVisible();
     expect(notice).toHaveTextContent("There is no Teil 4 · Hören for this lesson");
 
-    const teil4Tab = screen.getByRole("tab", { name: "Teil 4", hidden: true });
-    expect(teil4Tab).not.toBeVisible();
+    expect(screen.queryByRole("tab", { name: "Teil 4" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /Teil 4 · Hören/i })).not.toBeInTheDocument();
   });
 
