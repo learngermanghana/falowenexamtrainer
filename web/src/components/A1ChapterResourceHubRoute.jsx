@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -33,32 +33,28 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   if (!isResourceHubRequest) return fallback;
 
   // The outer route contains a literal /A1/ segment, so CourseLessonPageLegacy
-  // cannot read a `level` URL param. Normalize the route identity into location
-  // state once, then render the lesson page directly. This avoids mounting a
-  // descendant <Routes> tree, which could disappear after the Radio Continue
-  // reload and leave the A1 hub on a blank/frozen page.
-  if (
-    shouldNormalizeA1ChapterResourceHubState({
-      level: routeLevel,
-      day: params.day,
-      search: location.search,
-      state: location.state,
-    })
-  ) {
-    const normalizedState = buildA1ChapterResourceHubState({
-      level: routeLevel,
-      day: params.day,
-      search: location.search,
-    });
+  // cannot read a `level` URL param. Build the route identity in memory instead
+  // of replacing the current history entry; Firefox can throw
+  // `DOMException: The operation is insecure` during startup when an immediate
+  // same-URL <Navigate replace> tries to normalize only history.state.
+  const routeState = shouldNormalizeA1ChapterResourceHubState({
+    level: routeLevel,
+    day: params.day,
+    search: location.search,
+    state: location.state,
+  })
+    ? buildA1ChapterResourceHubState({
+        level: routeLevel,
+        day: params.day,
+        search: location.search,
+      })
+    : location.state;
 
-    return (
-      <Navigate
-        replace
-        to={`${location.pathname}${location.search}${location.hash || ""}`}
-        state={{ ...(location.state || {}), ...normalizedState }}
-      />
-    );
-  }
-
-  return <CourseLessonPageLegacy />;
+  return (
+    <CourseLessonPageLegacy
+      routeLevel={routeLevel}
+      routeDay={params.day}
+      routeState={routeState}
+    />
+  );
 }

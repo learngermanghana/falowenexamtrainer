@@ -389,11 +389,11 @@ const TextBlock = ({ title, children }) => {
   );
 };
 
-const CourseLessonPage = () => {
+const CourseLessonPage = ({ routeState = null, routeLevel = "", routeDay = null } = {}) => {
   const location = useLocation();
   const params = useParams();
-  const level = normalizeLevel(location.state?.level || params.level);
-  const day = location.state?.day ?? params.day;
+  const level = normalizeLevel(params.level || routeLevel || location.state?.level || routeState?.level);
+  const day = params.day ?? routeDay ?? location.state?.day ?? routeState?.day;
   const requestedChapter = useMemo(
     () => new URLSearchParams(location.search || "").get("chapter") || "",
     [location.search]
@@ -406,9 +406,9 @@ const CourseLessonPage = () => {
       entries: courseSchedules[level] || [],
       day,
       chapter: requestedChapter,
-      stateEntry: location.state?.entry,
+      stateEntry: location.state?.entry || routeState?.entry,
     });
-  }, [day, level, location.state, requestedChapter]);
+  }, [day, level, location.state, requestedChapter, routeState]);
 
   if (level === "B1") {
     const query = new URLSearchParams(location.search);

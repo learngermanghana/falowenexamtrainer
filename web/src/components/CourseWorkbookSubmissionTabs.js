@@ -175,6 +175,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
   const nativeTabRowRef = useRef(null);
   const syncInFlightRef = useRef(false);
   const lastClickedRef = useRef({ key: "", button: null });
+  const lastSubmissionContextSignatureRef = useRef("");
 
   const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "";
   const studentScopeKey = useMemo(
@@ -245,10 +246,15 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     search.set("assignmentId", assignmentKey);
     search.set("level", level);
 
+    const nextSearchText = `?${search.toString()}`;
+    const nextSignature = `${location.pathname}${nextSearchText}${location.hash}|${normalizedAssignmentKey}|${level}|${day}`;
+    if (lastSubmissionContextSignatureRef.current === nextSignature) return;
+    lastSubmissionContextSignatureRef.current = nextSignature;
+
     navigate(
       {
         pathname: location.pathname,
-        search: `?${search.toString()}`,
+        search: nextSearchText,
         hash: location.hash,
       },
       {
@@ -349,6 +355,7 @@ const CourseWorkbookSubmissionTabs = ({ hostRef, match }) => {
     setActiveTab(defaultTab);
     setLockReady(false);
     lastClickedRef.current = { key: "", button: null };
+    lastSubmissionContextSignatureRef.current = "";
     nativeTabRowRef.current = null;
     setNativeTabRowDetected(false);
     setNativeTabRowVersion((version) => version + 1);

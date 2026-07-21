@@ -19,7 +19,7 @@ test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for
   );
 
   expect(await screen.findByText("A1")).toBeVisible();
-  expect(screen.getByText("Kapitel 0.1 teacher lecture video")).toBeVisible();
+  expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 0.1 teacher lecture video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
     "href",
     "https://youtu.be/CqFbBQG9M3U",
