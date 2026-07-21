@@ -21,6 +21,24 @@ describe("canonical lesson model", () => {
     expect(lesson.resources.workbook.url).toBe("workbook");
     expect(lesson.submission.assignmentId).toBe("keep-me");
   });
+  test("keeps AI video inside the workbook flow but removes it from a canonical A1 lesson hub", () => {
+    const hubLesson = normalizeA1Lesson({
+      day: 1,
+      chapter: "0.1",
+      hideAiVideoInLessonHub: true,
+      lesen_hören: { chapter: "0.1" },
+    });
+    expect(hubLesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/CqFbBQG9M3U" }),
+    );
+    expect(hubLesson.resources.aiVideo).toBeNull();
+    expect(hubLesson.resources.videos.every((video) => /teacher/i.test(`${video.key} ${video.title}`))).toBe(true);
+
+    const workbookLesson = normalizeA1Lesson({ day: 1, chapter: "0.1" });
+    expect(workbookLesson.resources.aiVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/5WIMkENgdGE" }),
+    );
+  });
   test("keeps A2/B1 workbook capabilities", () => expect(normalizeA2B1Lesson({ day: 9 }, "B1").lessonType).toBe("fourPartWorkbook"));
   test.each(["B2", "C1"])("keeps %s self-learning compatibility", (level) => {
     const lesson = normalizeB2C1Lesson({ day: 1, assignment: true }, level);
