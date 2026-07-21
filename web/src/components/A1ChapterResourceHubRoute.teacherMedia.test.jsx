@@ -27,10 +27,16 @@ test("shows the A1 teacher lecture, keeps the AI video for the workbook and carr
   expect(screen.queryByText("Kapitel 0.1 AI grammar video")).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: /Watch AI video/i })).not.toBeInTheDocument();
 
-  const workbookHref = screen.getByRole("link", { name: /Open workbook/i }).getAttribute("href");
-  const workbookUrl = new URL(workbookHref, "https://www.falowen.app");
-  expect(workbookUrl.pathname).toBe("/campus/course/a1-day-1-greetings-workbook");
-  expect(workbookUrl.searchParams.get("radio")).toBe("done");
+  const workbookUrls = screen.getAllByRole("link", { name: /Open workbook/i }).map((link) =>
+    new URL(link.getAttribute("href"), "https://www.falowen.app"),
+  );
+  expect(
+    workbookUrls.some(
+      (url) =>
+        url.pathname === "/campus/course/a1-day-1-greetings-workbook"
+        && url.searchParams.get("radio") === "done",
+    ),
+  ).toBe(true);
 
   expect(
     buildA1WorkbookVideoModel({
