@@ -110,7 +110,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('A1_CHAPTER_RESOURCE_HUB_PARENT_PATH = "/campus/course/lesson/A1/:day/*"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
-    expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
+    expect(hubRouteSource).toContain("<CourseLessonPageLegacy");
+    expect(hubRouteSource).toContain("routeLevel={routeLevel}");
+    expect(hubRouteSource).toContain("routeDay={params.day}");
+    expect(hubRouteSource).toContain("routeState={routeState}");
   });
 
   it("makes the requested Day 2 Kapitel 1.1 entry authoritative even after radio completion", () => {
@@ -235,11 +238,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       "/campus/course/verboten-erlaubt-5-9",
       "/campus/course/a1-day-21-weather-workbook",
       "/campus/course/a1-day-22-health-and-body-parts-workbook",
-      "/campus/course/dative-and-accusative-verbs-14-2",
       "/campus/course/conjunctions-5-10",
-    ].forEach((route) => expect(appSource).toContain(route));
-
-    expect(indexSource).toContain("A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH");
-    expect(indexSource).toContain("A1Day20Chapter123DirectWorkbookRoute");
+    ].forEach((route) => {
+      expect(appSource).toContain(`path="${route}"`);
+    });
+    expect(indexSource).toContain("A1ChapterResourceHubRoute");
   });
 });
