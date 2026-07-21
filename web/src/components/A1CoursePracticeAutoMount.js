@@ -7,16 +7,15 @@ import {
   normalizeA1CoursePracticePath,
   shouldAutoMountA1WritingPractice,
 } from "../utils/a1CoursePracticeRoutes";
-import { styles } from "../styles";
 import A1ExamSpeakingPracticePanel from "./A1ExamSpeakingPracticePanel";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
-import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
+import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
+import { getA1RadioResource } from "../data/a1RadioResources";
 
 const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
 const A1_DAY_19_NAMED_PATH = "/campus/course/verboten-erlaubt-5-9";
 const A1_DAY_19_AI_VIDEO_URL = "https://youtu.be/gprnEZtMUPM";
 const A1_DAY_19_TEACHER_VIDEO_URL = "https://youtu.be/ZfXw4fRQ0Tg";
-const A1_DAY_19_SUBMIT_URL = "/campus/submit?level=A1&assignmentKey=A1-5.9&assignmentId=A1-5.9";
 const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
 
 const getPageContainer = () => {
@@ -78,6 +77,27 @@ const insertSpeakingMount = (container, mount) => {
   }
 };
 
+const hideDay19LearningContent = (container, mount) => {
+  const hidden = Array.from(container?.children || [])
+    .filter((child) => child !== mount)
+    .map((child) => ({ child, display: child.style.display }));
+
+  hidden.forEach(({ child }) => {
+    child.dataset.selfLearningJourneyHidden = "true";
+    child.style.display = "none";
+  });
+
+  let restored = false;
+  return () => {
+    if (restored) return;
+    restored = true;
+    hidden.forEach(({ child, display }) => {
+      delete child.dataset.selfLearningJourneyHidden;
+      child.style.display = display;
+    });
+  };
+};
+
 const findSectionByHeading = (container, headingText) =>
   Array.from(container.querySelectorAll("section")).find((section) => {
     const heading = section.querySelector("h2");
@@ -95,48 +115,33 @@ const insertWritingMount = (container, mount) => {
   container.appendChild(mount);
 };
 
-const Day19SelfLearningSupport = () => (
-  <div
-    data-a1-day19-self-learning-support="true"
-    data-radio-first-workbook-gate="true"
-    style={{ display: "grid", gap: 12 }}
-  >
-    <SelfLearningSupportingMaterials
-      teacherVideo={{
-        url: A1_DAY_19_TEACHER_VIDEO_URL,
-        title: "Goethe A1 Speaking Confidence Lab · Teacher lecture",
-        description: "Recorded teacher explanation for the Day 19 speaking lesson.",
-      }}
-      aiVideo={{
-        url: A1_DAY_19_AI_VIDEO_URL,
-        title: "Goethe A1 Speaking Practice · AI video",
-        description: "AI-supported exam practice for Teil 1, Teil 2 and Teil 3.",
-      }}
-      description="Use the same supporting-materials layout as tutor-marked workbooks. Open the videos first, then complete the self-learning activities below."
-    />
+const Day19LearningContent = ({ onEnter, includeSpeakingPanel }) => {
+  useEffect(() => {
+    onEnter?.();
+  }, [onEnter]);
 
-    <section
-      data-a1-day19-submission-entry="true"
-      style={{
-        ...styles.card,
-        border: "1px solid #bfdbfe",
-        background: "linear-gradient(135deg, #eff6ff, #ffffff)",
-        display: "grid",
-        gap: 9,
-      }}
-    >
-      <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1d4ed8" }}>
-        Final submission
-      </span>
-      <h2 style={{ margin: 0 }}>Submit your Day 19 speaking assignment</h2>
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-        Complete the speaking practice, then submit your final written transcript or final answers for tutor review.
-      </p>
-      <a href={A1_DAY_19_SUBMIT_URL} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
-        Open Submit assignment
-      </a>
-    </section>
-  </div>
+  return includeSpeakingPanel ? <A1ExamSpeakingPracticePanel /> : null;
+};
+
+const Day19SelfLearningJourney = ({ onEnter, includeSpeakingPanel }) => (
+  <SelfLearningJourneyGate
+    level="A1"
+    day={19}
+    title="Verboten, erlaubt und Goethe A1 Sprechen · Kapitel 5.9"
+    radio={getA1RadioResource(19, "5.9")}
+    teacherVideo={{
+      url: A1_DAY_19_TEACHER_VIDEO_URL,
+      title: "Goethe A1 Speaking Confidence Lab · Teacher lecture",
+      description: "Recorded teacher explanation for the Day 19 speaking lesson.",
+    }}
+    aiVideo={{
+      url: A1_DAY_19_AI_VIDEO_URL,
+      title: "Goethe A1 Speaking Practice · AI video",
+      description: "AI-supported exam practice for Teil 1, Teil 2 and Teil 3.",
+    }}
+  >
+    <Day19LearningContent onEnter={onEnter} includeSpeakingPanel={includeSpeakingPanel} />
+  </SelfLearningJourneyGate>
 );
 
 const A1CoursePracticeAutoMount = () => {
@@ -171,12 +176,17 @@ const A1CoursePracticeAutoMount = () => {
     if (isCanonicalLessonPage || isNamedDay19Page) insertSpeakingMount(container, mount);
     else insertWritingMount(container, mount);
 
+    const restoreDay19Content = isCanonicalLessonPage || isNamedDay19Page
+      ? hideDay19LearningContent(container, mount)
+      : () => {};
+
     const root = createRoot(mount);
     root.render(
-      isNamedDay19Page ? (
-        <Day19SelfLearningSupport />
-      ) : isCanonicalLessonPage ? (
-        <A1ExamSpeakingPracticePanel />
+      isCanonicalLessonPage || isNamedDay19Page ? (
+        <Day19SelfLearningJourney
+          onEnter={restoreDay19Content}
+          includeSpeakingPanel={isCanonicalLessonPage}
+        />
       ) : (
         <A1SimpleMarkMyLetterPanel />
       ),
@@ -189,6 +199,7 @@ const A1CoursePracticeAutoMount = () => {
 
     return () => {
       observer?.disconnect();
+      restoreDay19Content();
       root.unmount();
       mount.remove();
     };
