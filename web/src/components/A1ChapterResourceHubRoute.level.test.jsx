@@ -6,14 +6,13 @@ import A1ChapterResourceHubRoute, {
 } from "./A1ChapterResourceHubRoute";
 
 jest.mock("./CourseLessonPageLegacy", () => {
-  const { useLocation, useParams } = require("react-router-dom");
+  const { useParams } = require("react-router-dom");
 
-  return function A1HubLevelProbe() {
-    const location = useLocation();
+  return function A1HubLevelProbe({ routeLevel = "", routeDay = "", routeState = null } = {}) {
     const { day } = useParams();
     return (
       <div data-testid="a1-hub-params">
-        {location.state?.level}:{location.state?.day}:{day}
+        {routeState?.level || routeLevel}:{routeState?.day || routeDay}:{day}
       </div>
     );
   };
@@ -27,7 +26,7 @@ describe("A1 chapter hub route identity", () => {
   test.each([
     ["/campus/course/lesson/A1/1?chapter=0.1&hub=1", "A1:1:1"],
     ["/campus/course/lesson/A1/2?chapter=1.1&hub=1&radio=done", "A1:2:2"],
-  ])("normalizes route state and renders the hub for %s", async (url, expected) => {
+  ])("builds route state in memory and renders the hub for %s", async (url, expected) => {
     render(
       <MemoryRouter initialEntries={[url]}>
         <Routes>
