@@ -14,7 +14,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [12, "8", "The 24-Hour Clock", "https://youtu.be/hLpPFOthVkU"],
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/eqSc_5p5uyQ", 1],
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/zizS5WdOYs8", 2],
-  [14, "3.6", "Modal Verbs", "https://youtu.be/vMfOb_nPRNc"],
+  [14, "3.6", "Modal Verbs", "https://youtu.be/GJw1aJehYHU"],
   [15, "4.7", "Introduction to Speaking Exams", "https://youtu.be/o9nn_hSDzw8"],
   [16, "9", "Negation", "https://youtu.be/yYIjI6P-qmw"],
   [17, "11", "Instructions and Directions", "https://youtu.be/9wvr4iwGsIc"],
