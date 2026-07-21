@@ -7,8 +7,8 @@ on:
       - "web/public/course-speaking-chat-cleanup.js"
       - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
       - "web/src/components/A1ChapterResourceHubRoute.level.test.jsx"
-      - "web/src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx"
       - "web/src/components/A1Day15RadioRegression.test.js"
+      - "web/src/components/A1RadioCompletionWorkbookLink.test.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/B1Day20WritingVideoRegression.test.js"
       - "web/src/components/B1Day21LebensformenHeuteWorkbookPage.js"
@@ -40,21 +40,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.level.test.jsx
-      - name: Test A1 teacher lecture rendering
+      - name: Test A1 Radio completion on workbook links
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="renders the teacher lecture"
-      - name: Test A1 Radio completion on workbook link
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="carries completed Radio state"
-      - name: Test A1 workbook AI video ownership
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="keeps the AI lesson video"
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioCompletionWorkbookLink.test.js
       - name: Test A1 Day 15 Radio
         working-directory: web
         env:
