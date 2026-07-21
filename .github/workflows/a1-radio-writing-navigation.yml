@@ -1,0 +1,54 @@
+name: A1 Radio, writing media and navigation safety
+
+on:
+  pull_request:
+    paths:
+      - "vercel.json"
+      - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
+      - "web/src/components/A1ChapterResourceHubRoute.level.test.jsx"
+      - "web/src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx"
+      - "web/src/components/A1Day15RadioRegression.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/B1Day20WritingVideoRegression.test.js"
+      - "web/src/components/B1Day21LebensformenHeuteWorkbookPage.js"
+      - "web/src/components/B1Day21NoListening.test.js"
+      - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
+      - "web/src/data/a1RadioResources.js"
+      - "web/src/data/writingVideoResources.js"
+      - "web/src/data/writingVideoResources.test.js"
+      - "web/src/utils/a1ChapterResourceHubState.js"
+      - "web/src/utils/lessonRouteEntry.js"
+      - ".github/workflows/a1-radio-writing-navigation.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test requested Radio, writing and navigation updates
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/A1ChapterResourceHubRoute.level.test.jsx
+          src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx
+          src/components/A1Day15RadioRegression.test.js
+          src/components/A1SpeakingExamIntroEntryRoute.test.jsx
+          src/components/B1Day20WritingVideoRegression.test.js
+          src/components/B1Day21NoListening.test.js
+          src/components/WritingCheatSheetTabs.writingVideo.test.js
+          src/data/writingVideoResources.test.js
+          src/__tests__/CourseSpeakingChatCleanupSafety.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build
