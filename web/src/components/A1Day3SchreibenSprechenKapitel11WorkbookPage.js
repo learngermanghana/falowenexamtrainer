@@ -178,6 +178,7 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
     <div ref={rootRef}>
       <section
         data-a1-workbook-owned-media="true"
+        data-radio-first-workbook-gate="true"
         aria-labelledby="a1-day3-practice-videos-title"
         style={videoSectionStyle}
       >
