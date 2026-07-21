@@ -6,7 +6,7 @@ import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from "./A1ChapterResourceHubRoute";
 
-test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for the workbook", async () => {
+test("shows the A1 teacher lecture, keeps the AI video for the workbook and carries Radio completion", async () => {
   render(
     <MemoryRouter initialEntries={["/campus/course/lesson/A1/1?chapter=0.1&hub=1&radio=done"]}>
       <Routes>
@@ -26,6 +26,11 @@ test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for
   );
   expect(screen.queryByText("Kapitel 0.1 AI grammar video")).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: /Watch AI video/i })).not.toBeInTheDocument();
+
+  const workbookHref = screen.getByRole("link", { name: /Open workbook/i }).getAttribute("href");
+  const workbookUrl = new URL(workbookHref, "https://www.falowen.app");
+  expect(workbookUrl.pathname).toBe("/campus/course/a1-day-1-greetings-workbook");
+  expect(workbookUrl.searchParams.get("radio")).toBe("done");
 
   expect(
     buildA1WorkbookVideoModel({
