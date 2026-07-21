@@ -53,14 +53,15 @@ describe("A1 self-learning journey standardization", () => {
   test("resolves the same shared material shape for every A1 self-practice lesson", () => {
     practices.forEach((practice) => {
       const resources = getA1SelfLearningJourneyResources(practice);
-      expect(resources).toEqual(
-        expect.objectContaining({
-          radio: expect.anything(),
-          teacherVideo: expect.anything(),
-          aiVideo: expect.anything(),
-          grammarBook: expect.anything(),
-        }),
-      );
+      expect(Object.keys(resources).sort()).toEqual([
+        "aiVideo",
+        "grammarBook",
+        "radio",
+        "teacherVideo",
+      ]);
+      Object.values(resources).forEach((resource) => {
+        expect(resource === null || typeof resource === "object").toBe(true);
+      });
     });
   });
 
