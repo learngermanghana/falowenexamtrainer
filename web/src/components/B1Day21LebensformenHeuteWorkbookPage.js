@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import {
   getWritingVideoResource,
@@ -109,6 +109,29 @@ const Day21WritingVideoInjector = () => {
       observer.disconnect();
       root.querySelector(`[${WRITING_VIDEO_ATTRIBUTE}]`)?.remove();
     };
+  }, []);
+
+  return null;
+};
+
+const Day21NoListeningTabGuard = () => {
+  useLayoutEffect(() => {
+    const root = document.querySelector('[data-b1-day21-no-listening="true"]');
+    if (!root) return undefined;
+
+    const hideTeil4Tab = () => {
+      const tab = root.querySelector('[role="tab"][aria-label="Teil 4"]');
+      if (!tab) return;
+      tab.hidden = true;
+      tab.setAttribute("aria-hidden", "true");
+      tab.tabIndex = -1;
+    };
+
+    hideTeil4Tab();
+    const observer = new MutationObserver(hideTeil4Tab);
+    observer.observe(root, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
   }, []);
 
   return null;
@@ -237,6 +260,7 @@ export default function B1Day21LebensformenHeuteWorkbookPage() {
         This workbook has Teil 1 · Sprechen, Teil 2 · Schreiben and Teil 3 · Lesen. There is no Teil 4 · Hören for this lesson.
       </div>
       <B1StandardWorkbookPage config={config} />
+      <Day21NoListeningTabGuard />
       <Day21WritingVideoInjector />
     </div>
   );
