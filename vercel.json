@@ -22,6 +22,15 @@
           "value": "/"
         }
       ]
+    },
+    {
+      "source": "/course-speaking-chat-cleanup.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
     }
   ],
   "routes": [
