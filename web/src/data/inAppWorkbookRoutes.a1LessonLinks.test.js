@@ -75,7 +75,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     },
   );
 
-  it("keeps all four A1 Day 1 resource-hub choices configured", () => {
+  it("keeps the Day 1 teacher, AI, grammar and workbook resources configured for their separate stages", () => {
     expect(getTeacherVideoUrls(1, "0.1")).toContain("https://youtu.be/CqFbBQG9M3U");
     expect(getAiVideoUrls(1, "0.1")).toContain("https://youtu.be/5WIMkENgdGE");
     expect(getA1GrammarRoute({ day: 1, chapter: "0.1" })).toBe(
@@ -86,7 +86,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("keeps all four A1 Day 2 Chapter 1.1 resource-hub choices configured", () => {
+  it("keeps the Day 2 Chapter 1.1 resources configured for their separate stages", () => {
     expect(getTeacherVideoUrls(2, "1.1")).toContain("https://youtu.be/AjsnO1hxDs4");
     expect(getAiVideoUrls(2, "1.1")).toContain("https://youtu.be/kqagu9qsOcc");
     expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe(
@@ -97,7 +97,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("mounts the A1 chapter hub route before the app can redirect straight to a workbook", () => {
+  it("mounts the wildcard-safe A1 chapter hub route before the app can redirect straight to a workbook", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
     const hubRouteSource = fs.readFileSync(
       path.resolve(__dirname, "../components/A1ChapterResourceHubRoute.jsx"),
@@ -105,9 +105,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
 
     expect(indexSource).toContain("A1ChapterResourceHubRoute");
-    expect(indexSource).toContain('path="/campus/course/lesson/A1/:day"');
+    expect(indexSource).toContain("path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}");
     expect(indexSource).toContain('<A1ChapterResourceHubRoute level="A1" fallback={<App />} />');
     expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
+    expect(hubRouteSource).toContain('A1_CHAPTER_RESOURCE_HUB_PARENT_PATH = "/campus/course/lesson/A1/:day/*"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
     expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
   });
@@ -206,7 +207,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     });
   });
 
-  it("keeps all four A1 Day 4 resource-hub choices configured", () => {
+  it("keeps the A1 Day 4 resources configured for their separate stages", () => {
     expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
     expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");
     expect(getA1GrammarRoute({ day: 4, chapter: "2" })).toBe(

@@ -13,7 +13,9 @@ import RouteScopedBackgroundServices from './components/RouteScopedBackgroundSer
 import SelfLearningLessonDirectNavigationFix from './components/SelfLearningLessonDirectNavigationFix';
 import A1CanonicalChapterLessonRoute from './components/A1CanonicalChapterLessonRoute';
 import A1ChapterSpecificLessonRouteBoundary from './components/A1ChapterSpecificLessonRouteBoundary';
-import A1ChapterResourceHubRoute from './components/A1ChapterResourceHubRoute';
+import A1ChapterResourceHubRoute, {
+  A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
+} from './components/A1ChapterResourceHubRoute';
 import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
 import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
 import RequestedLessonAiVideoHeader from './components/RequestedLessonAiVideoHeader';
@@ -82,7 +84,7 @@ const AuthenticatedAppRoutes = () => (
               element={<A1Day20Chapter123DirectWorkbookRoute />}
             />
             <Route
-              path="/campus/course/lesson/A1/:day"
+              path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
               element={<A1ChapterResourceHubRoute level="A1" fallback={<App />} />}
             />
             <Route path="*" element={<App />} />

@@ -54,7 +54,7 @@ const mergeVideos = (...groups) => {
   return groups.flat().filter((item) => item?.url && !seen.has(item.url) && seen.add(item.url));
 };
 const isTeacherVideo = (item = {}) =>
-  `${item.key || ""} ${item.title || ""}`.toLowerCase().includes("teacher");
+  /teacher|tutor lecture/.test(`${item.key || ""} ${item.title || ""}`.toLowerCase());
 const getLessonRadio = (level, day) =>
   getB2C1RadioResource(level, day) ||
   getLessonRadioResource(level, day) ||
@@ -284,6 +284,13 @@ export const scopeLessonVideosToSelectedChapters = (videos = [], groups = []) =>
   });
 };
 
+export const applyLessonHubVideoPolicy = ({ level = "", rawLesson = {}, videos = [] } = {}) => {
+  if (level === "A1" && rawLesson.hideAiVideoInLessonHub) {
+    return videos.filter(isTeacherVideo);
+  }
+  return videos;
+};
+
 export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level) => {
   const level = levelKey(requestedLevel);
   const day = Number(rawLesson.day ?? rawLesson.assignmentDay ?? 0);
@@ -311,7 +318,11 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     videos: preferredConfiguredVideos,
     groups,
   });
-  const videos = scopeLessonVideosToSelectedChapters(removeHiddenTeacherVideos(level, day, allVideos), groups);
+  const chapterScopedVideos = scopeLessonVideosToSelectedChapters(
+    removeHiddenTeacherVideos(level, day, allVideos),
+    groups,
+  );
+  const videos = applyLessonHubVideoPolicy({ level, rawLesson, videos: chapterScopedVideos });
   const assignmentId = rawLesson.assignmentId || rawLesson.assignment_id || null;
   return {
     level,

@@ -1,7 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import A1ChapterResourceHubRoute from "./A1ChapterResourceHubRoute";
+import A1ChapterResourceHubRoute, {
+  A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
+} from "./A1ChapterResourceHubRoute";
 
 let mockMountCount = 0;
 let mockUnmountCount = 0;
@@ -28,7 +30,7 @@ test("Day 7 chapter hub stays mounted without replace navigation or repeated fet
     <MemoryRouter initialEntries={["/campus/course/lesson/A1/7?chapter=3&hub=1"]}>
       <Routes>
         <Route
-          path="/campus/course/lesson/A1/:day"
+          path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
           element={<A1ChapterResourceHubRoute level="A1" />}
         />
       </Routes>
@@ -45,7 +47,10 @@ test("Day 7 chapter hub stays mounted without replace navigation or repeated fet
   view.rerender(
     <MemoryRouter initialEntries={["/campus/course/lesson/A1/7?chapter=3&hub=1"]}>
       <Routes>
-        <Route path="/campus/course/lesson/A1/:day" element={<A1ChapterResourceHubRoute level="A1" />} />
+        <Route
+          path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
+          element={<A1ChapterResourceHubRoute level="A1" />}
+        />
       </Routes>
     </MemoryRouter>,
   );

@@ -9,6 +9,8 @@ import {
 } from "../utils/a1ChapterResourceHubState";
 import CourseLessonPageLegacy from "./CourseLessonPageLegacy";
 
+export const A1_CHAPTER_RESOURCE_HUB_PARENT_PATH = "/campus/course/lesson/A1/:day/*";
+
 export {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
