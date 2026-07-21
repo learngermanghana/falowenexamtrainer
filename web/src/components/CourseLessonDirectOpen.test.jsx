@@ -26,11 +26,13 @@ const resolveFreshTabLesson = (url) => {
 };
 
 describe("B2 and C1 lesson links", () => {
-  test("the top-level A1 resource-hub route no longer owns B2 or C1 URLs", () => {
+  test("the top-level wildcard-safe A1 resource-hub route no longer owns B2 or C1 URLs", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
+    const hubSource = fs.readFileSync(path.resolve(__dirname, "./A1ChapterResourceHubRoute.jsx"), "utf8");
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
 
-    expect(indexSource).toContain('path="/campus/course/lesson/A1/:day"');
+    expect(hubSource).toContain('A1_CHAPTER_RESOURCE_HUB_PARENT_PATH = "/campus/course/lesson/A1/:day/*"');
+    expect(indexSource).toContain("path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}");
     expect(indexSource).toContain('<A1ChapterResourceHubRoute level="A1" fallback={<App />} />');
     expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
     expect(appSource).toContain('path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />}');
