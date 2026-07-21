@@ -46,6 +46,13 @@ const findSectionRoot = (pageRoot, heading) => {
   return getTopLevelChild(pageRoot, heading) || heading.parentElement;
 };
 
+const findExistingBridgeHosts = (pageRoot) =>
+  Array.from(
+    pageRoot?.querySelectorAll?.(
+      `[${NAV_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
+    ) || [],
+  );
+
 const rememberElement = (element) => {
   if (!element || element.hasAttribute(ORIGINAL_DISPLAY_ATTRIBUTE)) return;
   element.setAttribute(ORIGINAL_DISPLAY_ATTRIBUTE, element.style.display || "");
@@ -114,32 +121,38 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     let cancelled = false;
     let frame = null;
     let attempts = 0;
+    let installedRoot = null;
     let installedSections = [];
     let createdHosts = [];
+
+    const retryInstall = () => {
+      attempts += 1;
+      if (attempts < 120) frame = window.requestAnimationFrame(install);
+    };
 
     const install = () => {
       if (cancelled) return;
       const main = document.querySelector("main.layout-main") || document.querySelector("main");
       const pageRoot = findWorkbookPageRoot(main);
       if (!main || !pageRoot) {
-        attempts += 1;
-        if (attempts < 120) frame = window.requestAnimationFrame(install);
+        retryInstall();
         return;
       }
 
       const sections = discoverA1BridgeSections({ pageRoot, assignment });
-      if (sections.length !== assignment.sections.length && attempts < 120) {
-        attempts += 1;
-        frame = window.requestAnimationFrame(install);
+      if (sections.length !== assignment.sections.length) {
+        retryInstall();
         return;
       }
 
-      const existingHosts = Array.from(
-        pageRoot.querySelectorAll(
-          `[${NAV_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
-        ),
-      );
-      existingHosts.forEach((host) => host.remove());
+      // Never delete a host that another React portal may still own. During
+      // StrictMode remounts and route transitions, wait for that bridge's own
+      // cleanup instead; removing its host can make React reconcile against a
+      // detached reference node and throw Node.insertBefore DOMException.
+      if (findExistingBridgeHosts(pageRoot).length) {
+        retryInstall();
+        return;
+      }
 
       const navHost = document.createElement("div");
       navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");
@@ -153,6 +166,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
       pageRoot.prepend(navHost, submissionHost);
       pageRoot.appendChild(footerHost);
+      installedRoot = pageRoot;
       createdHosts = [navHost, submissionHost, footerHost];
       installedSections = sections;
 
@@ -171,18 +185,24 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       cancelled = true;
       if (frame !== null) window.cancelAnimationFrame(frame);
       installedSections.forEach(({ element }) => restoreElement(element));
-      createdHosts.forEach((host) => host.remove());
+      createdHosts.forEach((host) => {
+        if (installedRoot && host.parentNode === installedRoot) installedRoot.removeChild(host);
+      });
     };
   }, [assignment.assignmentKey]);
 
   useEffect(() => {
     mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));
-    if (mountState.submissionHost) {
+    if (mountState.submissionHost?.isConnected) {
       mountState.submissionHost.style.display = activeTab === "submit" ? "" : "none";
     }
   }, [activeTab, mountState.sections, mountState.submissionHost]);
 
-  if (!mountState.navHost) return null;
+  const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;
+  const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;
+  const footerHost = mountState.footerHost?.isConnected ? mountState.footerHost : null;
+
+  if (!navHost) return null;
 
   return (
     <>
@@ -193,21 +213,22 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
           activeTab={activeTab}
           onSelect={openTab}
         />,
-        mountState.navHost,
+        navHost,
       )}
-      {mountState.submissionHost ? createPortal(
+      {submissionHost ? createPortal(
         <A1CanonicalSubmissionPanel assignment={assignment} />,
-        mountState.submissionHost,
+        submissionHost,
       ) : null}
-      {mountState.footerHost ? createPortal(
+      {footerHost ? createPortal(
         <A1AssignmentNeighborLinks assignmentKey={assignment.assignmentKey} />,
-        mountState.footerHost,
+        footerHost,
       ) : null}
     </>
   );
 }
 
 export const __TESTING__ = {
+  findExistingBridgeHosts,
   findSectionRoot,
   findWorkbookPageRoot,
   getTeilKey,

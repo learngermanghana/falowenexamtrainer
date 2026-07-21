@@ -1,3 +1,4 @@
+import { normalizeLesson } from "../data/lessonModel";
 import {
   resolveCanonicalA1LessonRouteEntry,
 } from "../utils/lessonRouteEntry";
@@ -20,19 +21,20 @@ describe("A1 speaking-exam self-learning entry flow", () => {
     );
   });
 
-  test("the supporting hub contains the teacher lecture and a separate workbook link", () => {
+  test("the supporting hub contains teacher and AI videos plus a separate workbook link", () => {
     const entry = resolveCanonicalA1LessonRouteEntry({ day: 15, chapter: "4.7" });
+    const resources = normalizeLesson(entry, "A1").resources;
 
     expect(entry).toEqual(
       expect.objectContaining({
         level: "A1",
         day: 15,
         chapter: "4.7",
-        hideAiVideoInLessonHub: true,
         video: "https://youtu.be/o9nn_hSDzw8",
         workbookRoute: "/campus/course/speaking-exams-intro-4-7?view=workbook",
       }),
     );
+    expect(entry).not.toHaveProperty("hideAiVideoInLessonHub");
     expect(entry.resources).toEqual([
       expect.objectContaining({
         chapter: "4.7",
@@ -40,6 +42,12 @@ describe("A1 speaking-exam self-learning entry flow", () => {
         workbook_link: "/campus/course/speaking-exams-intro-4-7?view=workbook",
       }),
     ]);
+    expect(resources.teacherVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/o9nn_hSDzw8" }),
+    );
+    expect(resources.aiVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/FLe36q-tONA" }),
+    );
   });
 
   test("preserves unrelated query parameters while preventing a redirect loop", () => {

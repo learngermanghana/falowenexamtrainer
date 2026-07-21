@@ -1,6 +1,9 @@
 jest.mock("./A1CanonicalSubmissionPanel", () => () => null);
 
-import { discoverA1BridgeSections } from "./A1SharedAssignmentWorkbookBridge";
+import {
+  __TESTING__,
+  discoverA1BridgeSections,
+} from "./A1SharedAssignmentWorkbookBridge";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
 describe("A1SharedAssignmentWorkbookBridge", () => {
@@ -49,5 +52,25 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
 
     expect(sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
     expect(sections.map(({ element }) => element.id)).toEqual(["one", "two", "three"]);
+  });
+
+  test("detects existing bridge portal hosts without removing them", () => {
+    document.body.innerHTML = `
+      <main>
+        <div id="workbook">
+          <div data-a1-canonical-bridge-nav="true"></div>
+          <div data-a1-canonical-bridge-submission="true"></div>
+          <h1>Numbers</h1>
+          <div data-a1-canonical-bridge-footer="true"></div>
+        </div>
+      </main>
+    `;
+
+    const pageRoot = document.querySelector("#workbook");
+    const existingHosts = __TESTING__.findExistingBridgeHosts(pageRoot);
+
+    expect(existingHosts).toHaveLength(3);
+    expect(existingHosts.every((host) => host.isConnected)).toBe(true);
+    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(3);
   });
 });

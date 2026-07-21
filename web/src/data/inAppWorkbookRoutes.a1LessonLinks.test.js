@@ -110,7 +110,10 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(indexSource).not.toContain('path="/campus/course/lesson/:level/:day"');
     expect(hubRouteSource).toContain('A1_CHAPTER_RESOURCE_HUB_PARENT_PATH = "/campus/course/lesson/A1/:day/*"');
     expect(hubRouteSource).toContain('query.get("hub") === "1"');
-    expect(hubRouteSource).toContain("<CourseLessonPageLegacy />");
+    expect(hubRouteSource).toContain("<CourseLessonPageLegacy");
+    expect(hubRouteSource).toContain("routeLevel={routeLevel}");
+    expect(hubRouteSource).toContain("routeDay={params.day}");
+    expect(hubRouteSource).toContain("routeState={routeState}");
   });
 
   it("makes the requested Day 2 Kapitel 1.1 entry authoritative even after radio completion", () => {
