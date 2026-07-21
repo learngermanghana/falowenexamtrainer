@@ -24,6 +24,7 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   const params = useParams();
   const routeLevel = params.level || level || "A1";
 
+  // The extracted resolver owns the hub contract: query.get("hub") === "1".
   const isResourceHubRequest = isA1ChapterResourceHubRequest({
     level: routeLevel,
     search: location.search,
