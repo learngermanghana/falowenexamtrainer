@@ -41,11 +41,23 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.test.js
 
-      - name: Test all B2 and C1 self-learning registrations
+      - name: Test B2 and C1 registry coverage
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="shared radio and materials journey"
+
+      - name: Test B1 tutor journey preservation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="B1"
+
+      - name: Test C1 speaking-content standards
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="C1 Day"
 
       - name: Test every A1 self-practice route
         working-directory: web
