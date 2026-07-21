@@ -34,16 +34,26 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test A1 Radio and chapter hub flow
+      - name: Test A1 hub route mock
         working-directory: web
         env:
           CI: true
-        run: >-
-          npm run test:ci -- --runTestsByPath
-          src/components/A1ChapterResourceHubRoute.level.test.jsx
-          src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx
-          src/components/A1Day15RadioRegression.test.js
-          src/components/A1SpeakingExamIntroEntryRoute.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.level.test.jsx
+      - name: Test A1 teacher media and Radio completion
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx
+      - name: Test A1 Day 15 Radio
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day15RadioRegression.test.js
+      - name: Test A1 speaking resource entry
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SpeakingExamIntroEntryRoute.test.jsx
       - name: Test requested Schreiben videos
         working-directory: web
         env:
