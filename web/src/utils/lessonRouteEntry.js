@@ -2,6 +2,7 @@ import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getLessonsByLevel, toLegacyCurriculumEntry } from "../data/lessonCatalog";
 import { findCourseBookEntry } from "./courseBookEntries";
 
+const FALOWEN_ORIGIN = "https://www.falowen.app";
 const normalizeToken = (value = "") => String(value || "").trim().toLowerCase();
 const entryDay = (entry = {}) => Number(entry?.displayDay ?? entry?.day);
 const entryChapter = (entry = {}) => normalizeToken(entry?.displayChapter || entry?.chapter);
@@ -50,10 +51,27 @@ const patchCanonicalResource = ({ lesson, workbookRoute }) => ({
 export const addA1WorkbookHubBypass = ({ lesson = {}, workbookRoute = "" } = {}) => {
   if (lesson.id !== "A1-4.7" || !workbookRoute) return workbookRoute;
 
-  const parsed = new URL(workbookRoute, "https://www.falowen.app");
+  const parsed = new URL(workbookRoute, FALOWEN_ORIGIN);
   parsed.searchParams.set("view", "workbook");
   const query = parsed.searchParams.toString();
   return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+};
+
+export const addCompletedRadioToWorkbookRoute = (workbookRoute = "", search = "") => {
+  if (!workbookRoute) return workbookRoute;
+
+  const sourceQuery = new URLSearchParams(String(search || "").replace(/^\?/, ""));
+  if (sourceQuery.get("radio") !== "done") return workbookRoute;
+
+  try {
+    const parsed = new URL(workbookRoute, FALOWEN_ORIGIN);
+    if (parsed.origin !== FALOWEN_ORIGIN) return workbookRoute;
+    parsed.searchParams.set("radio", "done");
+    const query = parsed.searchParams.toString();
+    return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+  } catch (_error) {
+    return workbookRoute;
+  }
 };
 
 export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) => {
@@ -122,10 +140,19 @@ export const resolveLessonRouteEntry = ({
     || entries.map(entryLevel).find(Boolean)
     || (canonicalA1Entry ? "A1" : "");
 
-  // A1 hub URLs must resolve from the immutable lesson catalog. Runtime course
-  // schedule data is mutable and can be split by other modules. Some legacy page
-  // callers do not pass the route level, so a unique canonical A1 day/chapter
-  // match is also allowed to establish the missing level.
+  // The A1 hub normalizer stores a route-matched canonical entry in navigation
+  // state. Prefer that matching state so completion flags such as radio=done can
+  // be carried into the workbook link without trusting stale state from another
+  // chapter.
+  if (
+    requestedLevel === "A1"
+    && stateEntryMatchesRoute({ stateEntry, level: requestedLevel, day, chapter: requestedChapter })
+  ) {
+    return stateEntry;
+  }
+
+  // A1 hub URLs otherwise resolve from the immutable lesson catalog. Runtime
+  // course schedule data is mutable and can be split by other modules.
   if (requestedLevel === "A1" && canonicalA1Entry) {
     return canonicalA1Entry;
   }
