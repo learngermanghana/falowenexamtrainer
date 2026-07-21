@@ -16,8 +16,6 @@ const requestedLessons = [
     radioKey: "a1-day9-german-cases-falowen-radio",
     radioTitle: "German Cases · Kapitel 5",
     radioId: "DV8dSaI076o",
-    teacherTitle: "German Cases · Teacher lecture",
-    teacherUrl: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
   },
   {
     day: 11,
@@ -25,9 +23,14 @@ const requestedLessons = [
     radioKey: "a1-day11-understanding-time-falowen-radio",
     radioTitle: "Understanding Time · Kapitel 7",
     radioId: "asJsRtaR1x0",
-    teacherTitle: "Understanding Time · Teacher lecture",
-    teacherUrl: "https://youtu.be/qrkQJc5kQJQ",
   },
+];
+
+const chapterHubs = [
+  { day: 2, chapter: "1.1" },
+  { day: 3, chapter: "1.1" },
+  { day: 9, chapter: "5" },
+  { day: 11, chapter: "7" },
 ];
 
 describe("A1 tutor-marked lesson media", () => {
@@ -53,9 +56,9 @@ describe("A1 tutor-marked lesson media", () => {
     },
   );
 
-  test.each(requestedLessons)(
-    "pins the configured Day $day teacher lecture above the chapter hub",
-    ({ day, chapter, teacherTitle, teacherUrl }) => {
+  test.each(chapterHubs)(
+    "keeps Day $day Kapitel $chapter materials inside the canonical chapter hub",
+    ({ day, chapter }) => {
       const { container } = render(
         <MemoryRouter
           initialEntries={[
@@ -71,17 +74,14 @@ describe("A1 tutor-marked lesson media", () => {
         </MemoryRouter>,
       );
 
-      const teacherLink = screen.getByRole("link", { name: /Open teacher lecture/i });
-      const support = container.querySelector("[data-teacher-lecture-support='links-only']");
-      const hub = screen.getByTestId("legacy-a1-resource-hub");
-
-      expect(screen.getByText("Supporting materials")).toBeVisible();
-      expect(screen.getByText(teacherTitle)).toBeVisible();
-      expect(teacherLink).toHaveAttribute("href", teacherUrl);
-      expect(teacherLink).toHaveAttribute("target", "_blank");
-      expect(container.querySelector("iframe")).not.toBeInTheDocument();
-      expect(support).toBe(container.firstElementChild);
-      expect(hub).toBeVisible();
+      expect(screen.getByTestId("legacy-a1-resource-hub")).toBeVisible();
+      expect(
+        container.querySelector("[data-teacher-lecture-support='links-only']"),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Supporting materials")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: /Open teacher lecture/i }),
+      ).not.toBeInTheDocument();
     },
   );
 });
