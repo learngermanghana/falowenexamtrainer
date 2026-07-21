@@ -1,1 +1,2 @@
 Production redeploy trigger for the merged self-learning media, assignment submission, and C1 Day 11 speaking fixes.
+Retry after the previous Vercel build-rate window cleared.
