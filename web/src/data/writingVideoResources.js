@@ -37,6 +37,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before drafting the polite email to the landlord. It explains how to show interest, request or suggest a viewing appointment, ask for confirmation and include contact details.",
       url: "https://youtu.be/n1whPCP2KzA",
     },
+    20: {
+      key: "b1-day20-beruf-qualifikationen-writing-video",
+      title: "B1 Day 20 · Ausbildung und Qualifikationen · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before responding to Felix. It explains how to compare Ausbildung and practical experience, justify your opinion and include a relevant example.",
+      url: "https://youtu.be/og1iVBKnIb0",
+    },
     21: {
       key: "b1-day21-lebensformen-heute-writing-video",
       title: "B1 Day 21 · Lebensformen heute · Schreiben explanation",
@@ -100,6 +107,13 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this Schreiben video on the writing page before drafting your C1 response. It explains how to analyse the task, build a differentiated argument and cover every required point.",
       url: "https://youtu.be/I5OU_ZXz4c0",
+    },
+    11: {
+      key: "c1-day11-engagement-ehrenamt-writing-video",
+      title: "C1 Day 11 · Engagement und Ehrenamt · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the C1 discussion post. It explains how to structure the argument, address the counterpoint about state responsibility and develop concrete support measures.",
+      url: "https://youtu.be/Ww6gq3lmmpk",
     },
   },
 };
