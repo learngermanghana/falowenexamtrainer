@@ -1,18 +1,22 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from "./A1ChapterResourceHubRoute";
 
-jest.mock("./CourseLessonPageLegacy", () => function A1HubLevelProbe() {
-  const location = useLocation();
-  const { day } = useParams();
-  return (
-    <div data-testid="a1-hub-params">
-      {location.state?.level}:{location.state?.day}:{day}
-    </div>
-  );
+jest.mock("./CourseLessonPageLegacy", () => {
+  const { useLocation, useParams } = require("react-router-dom");
+
+  return function A1HubLevelProbe() {
+    const location = useLocation();
+    const { day } = useParams();
+    return (
+      <div data-testid="a1-hub-params">
+        {location.state?.level}:{location.state?.day}:{day}
+      </div>
+    );
+  };
 });
 
 describe("A1 chapter hub route identity", () => {

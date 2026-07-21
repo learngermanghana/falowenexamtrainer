@@ -1,4 +1,7 @@
 (function () {
+  if (window.__falowenCourseSpeakingChatCleanupInstalled) return;
+  window.__falowenCourseSpeakingChatCleanupInstalled = true;
+
   // A2 and B1 use the Goethe free chat as part of Teil 1 speaking practice.
   // Only the larger B2/C1 coursebook integration should be suppressed here.
   const HIDDEN_COURSE_LEVELS = "b2|c1";
@@ -6,6 +9,7 @@
   const INLINE_PANEL_SELECTOR = '[data-course-inline-practice="speaking"]';
   const HIDDEN_ATTRIBUTE = "data-course-free-chat-hidden";
   let scheduled = false;
+  let lastLocationHref = window.location.href;
 
   const normalizePath = (value = "") =>
     String(value || "")
@@ -97,22 +101,21 @@
     }, 0);
   };
 
-  const wrapHistoryMethod = (methodName) => {
-    const original = window.history?.[methodName];
-    if (typeof original !== "function") return;
-    window.history[methodName] = function patchedHistoryMethod(...args) {
-      const result = original.apply(this, args);
-      scheduleCleanup();
-      return result;
-    };
+  // Do not replace pushState or replaceState. Firefox can reject patched History
+  // methods during rapid React Router navigation with "The operation is insecure"
+  // or "Too many calls to Location or History APIs". Watching the URL is enough,
+  // and the MutationObserver below covers route-driven DOM updates.
+  const watchLocation = () => {
+    const currentHref = window.location.href;
+    if (currentHref === lastLocationHref) return;
+    lastLocationHref = currentHref;
+    scheduleCleanup();
   };
-
-  wrapHistoryMethod("pushState");
-  wrapHistoryMethod("replaceState");
 
   const observer = new MutationObserver(scheduleCleanup);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
+  window.setInterval(watchLocation, 250);
   window.addEventListener("popstate", scheduleCleanup);
   document.addEventListener("DOMContentLoaded", scheduleCleanup);
   window.addEventListener("load", scheduleCleanup);

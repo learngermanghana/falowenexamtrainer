@@ -10,6 +10,7 @@ describe("writing video resources", () => {
     ["B1", 3, "https://youtu.be/8uAMihJTzvo"],
     ["B1", 4, "https://youtu.be/mHQiEdVVRSQ"],
     ["B1", 5, "https://youtu.be/n1whPCP2KzA"],
+    ["B1", 20, "https://youtu.be/og1iVBKnIb0"],
     ["B1", 21, "https://youtu.be/1JYyJfnumig"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
@@ -17,6 +18,7 @@ describe("writing video resources", () => {
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
     ["C1", 10, "https://youtu.be/I5OU_ZXz4c0"],
+    ["C1", 11, "https://youtu.be/Ww6gq3lmmpk"],
   ])("returns the requested %s Day %i writing video", (level, day, url) => {
     expect(getWritingVideoResource(level, day)).toEqual(
       expect.objectContaining({ url }),
@@ -52,12 +54,19 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B1 Day 5 and Day 21 to their Teil 2 Schreiben videos", () => {
+  test("maps B1 Day 5, Day 20 and Day 21 to their Teil 2 Schreiben videos", () => {
     expect(getWritingVideoResource("B1", 5)).toEqual(
       expect.objectContaining({
         key: "b1-day5-besichtigungstermin-writing-video",
         title: expect.stringContaining("Besichtigungstermin"),
         url: "https://youtu.be/n1whPCP2KzA",
+      }),
+    );
+    expect(getWritingVideoResource("B1", 20)).toEqual(
+      expect.objectContaining({
+        key: "b1-day20-beruf-qualifikationen-writing-video",
+        title: expect.stringContaining("Ausbildung und Qualifikationen"),
+        url: "https://youtu.be/og1iVBKnIb0",
       }),
     );
     expect(getWritingVideoResource("B1", 21)).toEqual(
@@ -69,7 +78,7 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B2 Day 3 and C1 Day 10 to their writing pages", () => {
+  test("maps B2 Day 3 and C1 Day 10 and Day 11 to their writing pages", () => {
     expect(getWritingVideoResource("B2", 3)).toEqual(
       expect.objectContaining({
         key: "b2-day3-oeffentliches-privates-leben-writing-video",
@@ -80,6 +89,12 @@ describe("writing video resources", () => {
       expect.objectContaining({
         key: "c1-day10-integration-gesellschaft-writing-video",
         url: "https://youtu.be/I5OU_ZXz4c0",
+      }),
+    );
+    expect(getWritingVideoResource("C1", 11)).toEqual(
+      expect.objectContaining({
+        key: "c1-day11-engagement-ehrenamt-writing-video",
+        url: "https://youtu.be/Ww6gq3lmmpk",
       }),
     );
   });
@@ -115,9 +130,11 @@ describe("writing video resources", () => {
     ["https://youtu.be/8uAMihJTzvo", "https://www.youtube.com/embed/8uAMihJTzvo"],
     ["https://youtu.be/mHQiEdVVRSQ", "https://www.youtube.com/embed/mHQiEdVVRSQ"],
     ["https://youtu.be/n1whPCP2KzA", "https://www.youtube.com/embed/n1whPCP2KzA"],
+    ["https://youtu.be/og1iVBKnIb0", "https://www.youtube.com/embed/og1iVBKnIb0"],
     ["https://youtu.be/1JYyJfnumig", "https://www.youtube.com/embed/1JYyJfnumig"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
+    ["https://youtu.be/Ww6gq3lmmpk", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
     ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],
     ["https://www.youtube.com/watch?v=nG1PUrvrS_s", "https://www.youtube.com/embed/nG1PUrvrS_s"],
     ["https://youtube.com/embed/VdczhJS9ClY", "https://www.youtube.com/embed/VdczhJS9ClY"],

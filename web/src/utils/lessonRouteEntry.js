@@ -2,6 +2,7 @@ import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getLessonsByLevel, toLegacyCurriculumEntry } from "../data/lessonCatalog";
 import { findCourseBookEntry } from "./courseBookEntries";
 
+const FALOWEN_ORIGIN = "https://www.falowen.app";
 const normalizeToken = (value = "") => String(value || "").trim().toLowerCase();
 const entryDay = (entry = {}) => Number(entry?.displayDay ?? entry?.day);
 const entryChapter = (entry = {}) => normalizeToken(entry?.displayChapter || entry?.chapter);
@@ -50,10 +51,72 @@ const patchCanonicalResource = ({ lesson, workbookRoute }) => ({
 export const addA1WorkbookHubBypass = ({ lesson = {}, workbookRoute = "" } = {}) => {
   if (lesson.id !== "A1-4.7" || !workbookRoute) return workbookRoute;
 
-  const parsed = new URL(workbookRoute, "https://www.falowen.app");
+  const parsed = new URL(workbookRoute, FALOWEN_ORIGIN);
   parsed.searchParams.set("view", "workbook");
   const query = parsed.searchParams.toString();
   return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+};
+
+export const addCompletedRadioToWorkbookRoute = (workbookRoute = "", search = "") => {
+  if (!workbookRoute) return workbookRoute;
+
+  const sourceQuery = new URLSearchParams(String(search || "").replace(/^\?/, ""));
+  if (sourceQuery.get("radio") !== "done") return workbookRoute;
+
+  try {
+    const parsed = new URL(workbookRoute, FALOWEN_ORIGIN);
+    if (parsed.origin !== FALOWEN_ORIGIN) return workbookRoute;
+    parsed.searchParams.set("radio", "done");
+    const query = parsed.searchParams.toString();
+    return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+  } catch (_error) {
+    return workbookRoute;
+  }
+};
+
+const getEntryWorkbookRoute = (entry = {}) => {
+  const direct = entry.workbookRoute || entry.workbook_link || "";
+  if (direct) return direct;
+  const resources = [
+    ...(Array.isArray(entry.resources) ? entry.resources : []),
+    ...(Array.isArray(entry.lesen_hören) ? entry.lesen_hören : []),
+    ...(Array.isArray(entry.schreiben_sprechen) ? entry.schreiben_sprechen : []),
+    entry.primaryResource,
+  ].filter(Boolean);
+  return resources.find((resource) => resource.workbookRoute || resource.workbook_link)?.workbookRoute
+    || resources.find((resource) => resource.workbookRoute || resource.workbook_link)?.workbook_link
+    || "";
+};
+
+const patchResourceWorkbookRoute = (resource = null, workbookRoute = "") => {
+  if (!resource || typeof resource !== "object" || !workbookRoute) return resource;
+  return {
+    ...resource,
+    workbookRoute,
+    workbook_link: workbookRoute,
+  };
+};
+
+export const mergeA1HubWorkbookRoute = (canonicalEntry = null, stateEntry = null) => {
+  if (!canonicalEntry || !stateEntry) return canonicalEntry;
+  const workbookRoute = getEntryWorkbookRoute(stateEntry);
+  if (!workbookRoute) return canonicalEntry;
+
+  return {
+    ...canonicalEntry,
+    workbookRoute,
+    workbook_link: workbookRoute,
+    resources: Array.isArray(canonicalEntry.resources)
+      ? canonicalEntry.resources.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.resources,
+    primaryResource: patchResourceWorkbookRoute(canonicalEntry.primaryResource, workbookRoute),
+    lesen_hören: Array.isArray(canonicalEntry.lesen_hören)
+      ? canonicalEntry.lesen_hören.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.lesen_hören,
+    schreiben_sprechen: Array.isArray(canonicalEntry.schreiben_sprechen)
+      ? canonicalEntry.schreiben_sprechen.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.schreiben_sprechen,
+  };
 };
 
 export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) => {
@@ -121,18 +184,21 @@ export const resolveLessonRouteEntry = ({
     || entryLevel(stateEntry)
     || entries.map(entryLevel).find(Boolean)
     || (canonicalA1Entry ? "A1" : "");
+  const matchingStateEntry = stateEntryMatchesRoute({
+    stateEntry,
+    level: requestedLevel,
+    day,
+    chapter: requestedChapter,
+  }) ? stateEntry : null;
 
-  // A1 hub URLs must resolve from the immutable lesson catalog. Runtime course
-  // schedule data is mutable and can be split by other modules. Some legacy page
-  // callers do not pass the route level, so a unique canonical A1 day/chapter
-  // match is also allowed to establish the missing level.
+  // Keep the immutable canonical A1 teacher/AI metadata, but merge a matching
+  // hub state's workbook URL so durable flags such as radio=done survive the
+  // transition into the workbook.
   if (requestedLevel === "A1" && canonicalA1Entry) {
-    return canonicalA1Entry;
+    return mergeA1HubWorkbookRoute(canonicalA1Entry, matchingStateEntry);
   }
 
-  if (stateEntryMatchesRoute({ stateEntry, level: requestedLevel, day, chapter: requestedChapter })) {
-    return stateEntry;
-  }
+  if (matchingStateEntry) return matchingStateEntry;
 
   const resolved = findCourseBookEntry({
     entries,

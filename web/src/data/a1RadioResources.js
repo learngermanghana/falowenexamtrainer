@@ -110,6 +110,15 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the modal-verbs episode. Then continue to the tutor lecture and lesson resources. The AI lesson video opens inside the workbook.",
   }),
+  15: Object.freeze({
+    key: "a1-day15-speaking-exams-introduction-falowen-radio",
+    chapter: "4.7",
+    title: "Speaking Exams Introduction · Kapitel 4.7",
+    youtubeId: "HfNlBfUwGBo",
+    duration: "",
+    instruction:
+      "Listen carefully to the speaking-exam introduction. Then continue to the teacher lecture and supporting resources before opening the workbook.",
+  }),
   16: Object.freeze({
     key: "a1-day16-negation-food-daily-life-falowen-radio",
     chapter: "9",

@@ -11,6 +11,7 @@ describe("WritingCheatSheetTabs writing videos", () => {
     ["B2", 1, "B2 Day 1 · Persönliche Identität · Writing explanation", "https://www.youtube.com/embed/w8TaNHk-a0U"],
     ["C1", 8, "C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation", "https://www.youtube.com/embed/VdczhJS9ClY"],
     ["C1", 9, "C1 Day 9 · Chapter 2.4 · Writing explanation", "https://www.youtube.com/embed/tpj8TV8DaH8"],
+    ["C1", 11, "C1 Day 11 · Engagement und Ehrenamt · Schreiben explanation", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
   ])("shows the mapped %s Day %i video between the question and editor", (level, day, title, src) => {
     render(
       <WritingCheatSheetTabs level={level} day={day}>
