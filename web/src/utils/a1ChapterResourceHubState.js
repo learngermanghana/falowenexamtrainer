@@ -1,7 +1,6 @@
-import {
-  addCompletedRadioToWorkbookRoute,
-  resolveCanonicalA1LessonRouteEntry,
-} from "./lessonRouteEntry";
+import { courseSchedules } from "../data/courseSchedule";
+import { findCourseBookEntry } from "./courseBookEntries";
+import { addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeDay = (value = "") => String(value ?? "").trim();
@@ -25,7 +24,12 @@ export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}
   const requestedChapter = normalizeChapter(chapter);
   if (!requestedChapter) return null;
 
-  const entry = resolveCanonicalA1LessonRouteEntry({ day, chapter: requestedChapter });
+  const entry = findCourseBookEntry({
+    entries: courseSchedules.A1 || [],
+    day,
+    chapter: requestedChapter,
+    level: "A1",
+  });
   const resolvedChapter = normalizeChapter(entry?.displayChapter || entry?.chapter);
   return resolvedChapter === requestedChapter ? entry : null;
 };
@@ -48,7 +52,10 @@ export const addRadioCompletionToA1HubEntry = (entry = null, search = "") => {
   const query = new URLSearchParams(String(search || ""));
   if (query.get("radio") !== "done") return entry;
 
-  const workbookRoute = addCompletedRadioToWorkbookRoute(entry.workbookRoute || "", search);
+  const workbookRoute = addCompletedRadioToWorkbookRoute(
+    entry.workbookRoute || entry.workbook_link || "",
+    search,
+  );
   const resources = Array.isArray(entry.resources)
     ? entry.resources.map((resource) => addRadioCompletionToResource(resource, search))
     : entry.resources;
@@ -63,6 +70,7 @@ export const addRadioCompletionToA1HubEntry = (entry = null, search = "") => {
   return {
     ...entry,
     workbookRoute,
+    workbook_link: workbookRoute || entry.workbook_link,
     resources,
     primaryResource,
     lesen_hören: lesenHoeren,
@@ -94,8 +102,8 @@ export const shouldNormalizeA1ChapterResourceHubState = ({
   const expectedState = buildA1ChapterResourceHubState({ level, day, search });
   const requestedChapter = getRequestedA1Chapter(search);
   const stateChapter = normalizeChapter(state?.entry?.displayChapter || state?.entry?.chapter);
-  const expectedWorkbookRoute = expectedState.entry?.workbookRoute || "";
-  const stateWorkbookRoute = state?.entry?.workbookRoute || "";
+  const expectedWorkbookRoute = expectedState.entry?.workbookRoute || expectedState.entry?.workbook_link || "";
+  const stateWorkbookRoute = state?.entry?.workbookRoute || state?.entry?.workbook_link || "";
 
   return (
     !state ||
