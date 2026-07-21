@@ -103,6 +103,7 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
   const defaultTab = requestedWorkbookTab === "submit" ? "submit" : level === "A1" ? "assignment" : "teil1";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const lastClickedRef = useRef({ key: "", button: null });
+  const lastSubmissionContextSignatureRef = useRef("");
 
   const submissionEnabled =
     navigationTabs.length > 0 &&
@@ -149,10 +150,15 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
     search.set("assignmentId", assignmentKey);
     search.set("level", level);
 
+    const nextSearchText = `?${search.toString()}`;
+    const nextSignature = `${location.pathname}${nextSearchText}${location.hash}|${normalizedAssignmentKey}|${level}|${day}`;
+    if (lastSubmissionContextSignatureRef.current === nextSignature) return;
+    lastSubmissionContextSignatureRef.current = nextSignature;
+
     navigate(
       {
         pathname: location.pathname,
-        search: `?${search.toString()}`,
+        search: nextSearchText,
         hash: location.hash,
       },
       {
@@ -186,6 +192,7 @@ const WorkbookTopSubmissionTabs = ({ hostRef, match }) => {
   useEffect(() => {
     setActiveTab(defaultTab);
     lastClickedRef.current = { key: "", button: null };
+    lastSubmissionContextSignatureRef.current = "";
   }, [defaultTab, location.pathname]);
 
   useEffect(() => {

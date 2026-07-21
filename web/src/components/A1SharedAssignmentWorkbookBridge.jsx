@@ -134,6 +134,13 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         return;
       }
 
+      const existingHosts = Array.from(
+        pageRoot.querySelectorAll(
+          `[${NAV_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
+        ),
+      );
+      existingHosts.forEach((host) => host.remove());
+
       const navHost = document.createElement("div");
       navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");
       navHost.setAttribute("data-assignment-key", assignment.assignmentKey);
@@ -144,8 +151,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       footerHost.setAttribute(FOOTER_HOST_ATTRIBUTE, "true");
       footerHost.setAttribute("data-assignment-key", assignment.assignmentKey);
 
-      pageRoot.insertBefore(navHost, pageRoot.firstChild);
-      pageRoot.insertBefore(submissionHost, navHost.nextSibling);
+      pageRoot.prepend(navHost, submissionHost);
       pageRoot.appendChild(footerHost);
       createdHosts = [navHost, submissionHost, footerHost];
       installedSections = sections;
@@ -166,9 +172,8 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       if (frame !== null) window.cancelAnimationFrame(frame);
       installedSections.forEach(({ element }) => restoreElement(element));
       createdHosts.forEach((host) => host.remove());
-      setMountState({ navHost: null, submissionHost: null, footerHost: null, sections: [] });
     };
-  }, [assignment.assignmentKey, assignment.sections]);
+  }, [assignment.assignmentKey]);
 
   useEffect(() => {
     mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));
