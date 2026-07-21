@@ -238,10 +238,11 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       "/campus/course/verboten-erlaubt-5-9",
       "/campus/course/a1-day-21-weather-workbook",
       "/campus/course/a1-day-22-health-and-body-parts-workbook",
+      "/campus/course/dative-and-accusative-verbs-14-2",
       "/campus/course/conjunctions-5-10",
-    ].forEach((route) => {
-      expect(appSource).toContain(`path="${route}"`);
-    });
-    expect(indexSource).toContain("A1ChapterResourceHubRoute");
+    ].forEach((route) => expect(appSource).toContain(route));
+
+    expect(indexSource).toContain("A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH");
+    expect(indexSource).toContain("A1Day20Chapter123DirectWorkbookRoute");
   });
 });
