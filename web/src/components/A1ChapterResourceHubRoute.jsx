@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes, useLocation, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -22,28 +22,42 @@ export {
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
   const location = useLocation();
   const params = useParams();
-  const routeLevel = params.level || level;
+  const routeLevel = params.level || level || "A1";
 
-  // The extracted resolver owns the hub contract: query.get("hub") === "1".
   const isResourceHubRequest = isA1ChapterResourceHubRequest({
     level: routeLevel,
     search: location.search,
   });
 
-  if (isResourceHubRequest) {
-    // The outer A1 route uses a literal /A1/ segment, so it does not expose a
-    // `level` route parameter to CourseLessonPageLegacy. Re-match the current
-    // location with a parameterized route so the canonical normalizer receives
-    // A1 and can load the teacher lecture configured for every chapter.
+  if (!isResourceHubRequest) return fallback;
+
+  // The outer route contains a literal /A1/ segment, so CourseLessonPageLegacy
+  // cannot read a `level` URL param. Normalize the route identity into location
+  // state once, then render the lesson page directly. This avoids mounting a
+  // descendant <Routes> tree, which could disappear after the Radio Continue
+  // reload and leave the A1 hub on a blank/frozen page.
+  if (
+    shouldNormalizeA1ChapterResourceHubState({
+      level: routeLevel,
+      day: params.day,
+      search: location.search,
+      state: location.state,
+    })
+  ) {
+    const normalizedState = buildA1ChapterResourceHubState({
+      level: routeLevel,
+      day: params.day,
+      search: location.search,
+    });
+
     return (
-      <Routes location={location}>
-        <Route
-          path="/campus/course/lesson/:level/:day"
-          element={<CourseLessonPageLegacy />}
-        />
-      </Routes>
+      <Navigate
+        replace
+        to={`${location.pathname}${location.search}${location.hash || ""}`}
+        state={{ ...(location.state || {}), ...normalizedState }}
+      />
     );
   }
 
-  return fallback;
+  return <CourseLessonPageLegacy />;
 }
