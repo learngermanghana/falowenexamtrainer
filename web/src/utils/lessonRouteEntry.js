@@ -74,6 +74,51 @@ export const addCompletedRadioToWorkbookRoute = (workbookRoute = "", search = ""
   }
 };
 
+const getEntryWorkbookRoute = (entry = {}) => {
+  const direct = entry.workbookRoute || entry.workbook_link || "";
+  if (direct) return direct;
+  const resources = [
+    ...(Array.isArray(entry.resources) ? entry.resources : []),
+    ...(Array.isArray(entry.lesen_hören) ? entry.lesen_hören : []),
+    ...(Array.isArray(entry.schreiben_sprechen) ? entry.schreiben_sprechen : []),
+    entry.primaryResource,
+  ].filter(Boolean);
+  return resources.find((resource) => resource.workbookRoute || resource.workbook_link)?.workbookRoute
+    || resources.find((resource) => resource.workbookRoute || resource.workbook_link)?.workbook_link
+    || "";
+};
+
+const patchResourceWorkbookRoute = (resource = null, workbookRoute = "") => {
+  if (!resource || typeof resource !== "object" || !workbookRoute) return resource;
+  return {
+    ...resource,
+    workbookRoute,
+    workbook_link: workbookRoute,
+  };
+};
+
+export const mergeA1HubWorkbookRoute = (canonicalEntry = null, stateEntry = null) => {
+  if (!canonicalEntry || !stateEntry) return canonicalEntry;
+  const workbookRoute = getEntryWorkbookRoute(stateEntry);
+  if (!workbookRoute) return canonicalEntry;
+
+  return {
+    ...canonicalEntry,
+    workbookRoute,
+    workbook_link: workbookRoute,
+    resources: Array.isArray(canonicalEntry.resources)
+      ? canonicalEntry.resources.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.resources,
+    primaryResource: patchResourceWorkbookRoute(canonicalEntry.primaryResource, workbookRoute),
+    lesen_hören: Array.isArray(canonicalEntry.lesen_hören)
+      ? canonicalEntry.lesen_hören.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.lesen_hören,
+    schreiben_sprechen: Array.isArray(canonicalEntry.schreiben_sprechen)
+      ? canonicalEntry.schreiben_sprechen.map((resource) => patchResourceWorkbookRoute(resource, workbookRoute))
+      : canonicalEntry.schreiben_sprechen,
+  };
+};
+
 export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) => {
   const requestedDay = Number(day);
   const requestedChapter = normalizeToken(chapter);
@@ -139,27 +184,21 @@ export const resolveLessonRouteEntry = ({
     || entryLevel(stateEntry)
     || entries.map(entryLevel).find(Boolean)
     || (canonicalA1Entry ? "A1" : "");
+  const matchingStateEntry = stateEntryMatchesRoute({
+    stateEntry,
+    level: requestedLevel,
+    day,
+    chapter: requestedChapter,
+  }) ? stateEntry : null;
 
-  // The A1 hub normalizer stores a route-matched canonical entry in navigation
-  // state. Prefer that matching state so completion flags such as radio=done can
-  // be carried into the workbook link without trusting stale state from another
-  // chapter.
-  if (
-    requestedLevel === "A1"
-    && stateEntryMatchesRoute({ stateEntry, level: requestedLevel, day, chapter: requestedChapter })
-  ) {
-    return stateEntry;
-  }
-
-  // A1 hub URLs otherwise resolve from the immutable lesson catalog. Runtime
-  // course schedule data is mutable and can be split by other modules.
+  // Keep the immutable canonical A1 teacher/AI metadata, but merge a matching
+  // hub state's workbook URL so durable flags such as radio=done survive the
+  // transition into the workbook.
   if (requestedLevel === "A1" && canonicalA1Entry) {
-    return canonicalA1Entry;
+    return mergeA1HubWorkbookRoute(canonicalA1Entry, matchingStateEntry);
   }
 
-  if (stateEntryMatchesRoute({ stateEntry, level: requestedLevel, day, chapter: requestedChapter })) {
-    return stateEntry;
-  }
+  if (matchingStateEntry) return matchingStateEntry;
 
   const resolved = findCourseBookEntry({
     entries,
