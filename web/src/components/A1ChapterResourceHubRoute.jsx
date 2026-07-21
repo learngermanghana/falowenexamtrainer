@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -29,10 +29,18 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   });
 
   if (isResourceHubRequest) {
-    // The canonical lesson page already renders the teacher video, grammar book,
-    // workbook and AI video together. Render it directly so the A1 hub remains
-    // the single source of truth and the Day 7 route stays mounted without flicker.
-    return <CourseLessonPageLegacy />;
+    // The outer A1 route uses a literal /A1/ segment, so it does not expose a
+    // `level` route parameter to CourseLessonPageLegacy. Re-match the current
+    // location with a parameterized route so the canonical normalizer receives
+    // A1 and can load the teacher lecture configured for every chapter.
+    return (
+      <Routes location={location}>
+        <Route
+          path="/campus/course/lesson/:level/:day"
+          element={<CourseLessonPageLegacy />}
+        />
+      </Routes>
+    );
   }
 
   return fallback;
