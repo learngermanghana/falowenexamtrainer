@@ -105,7 +105,16 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     youtubeId: "GeHygJE7Hww",
     duration: "",
     instruction:
-      "Listen carefully to the modal-verbs episode. Then continue to the tutor lecture, AI lesson video and workbook activities.",
+      "Listen carefully to the modal-verbs episode. Then continue to the tutor lecture and lesson resources. The AI lesson video opens inside the workbook.",
+  }),
+  16: Object.freeze({
+    key: "a1-day16-negation-food-daily-life-falowen-radio",
+    chapter: "9",
+    title: "Negation, Food and Daily Life · Kapitel 9",
+    youtubeId: "cQAsQ14a77c",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 9 episode. Then continue to the teacher lecture and lesson resources. The AI lesson video opens inside the workbook.",
   }),
   20: Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
