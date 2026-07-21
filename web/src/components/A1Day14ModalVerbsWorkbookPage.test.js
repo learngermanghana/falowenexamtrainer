@@ -2,52 +2,40 @@ import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { getA1RadioResource } from "../data/a1RadioResources";
+import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
+import { buildA1WorkbookVideoModel } from "./A1WorkbookVideoHeader";
 import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
-  test("shows the updated embedded self-learning materials without a full-screen gap", () => {
+  test("separates chapter media from the workbook AI video", () => {
     const { container } = render(
       <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
-    const materials = container.querySelector("[data-a1-day14-self-learning-materials='true']");
-    expect(materials).toBeVisible();
-    expect(materials).toHaveStyle({ minHeight: "0" });
-    expect(screen.getByText("Self-learning materials")).toBeVisible();
-    expect(
-      screen.getByRole("heading", { name: "Watch and listen before starting the lesson" }),
-    ).toBeVisible();
-    expect(screen.getByText(/Recommended order: Falowen Radio, tutor lecture, AI lesson video/i)).toBeVisible();
-
-    const radioFrame = screen.getByTitle(/Falowen Radio · Modal verbs with separable verbs/i);
-    const tutorFrame = screen.getByTitle(
-      /Tutor lecture · Teacher explanation · Modal verbs and separable verbs/i,
-    );
-    expect(radioFrame).toHaveAttribute(
-      "src",
-      "https://www.youtube-nocookie.com/embed/GeHygJE7Hww",
-    );
-    expect(tutorFrame).toHaveAttribute(
-      "src",
-      "https://www.youtube-nocookie.com/embed/GJw1aJehYHU",
-    );
-
-    expect(screen.getByRole("link", { name: /Open Falowen Radio on YouTube/i })).toHaveAttribute(
-      "href",
-      "https://youtu.be/GeHygJE7Hww",
-    );
-    expect(screen.getByRole("link", { name: /Open tutor lecture on YouTube/i })).toHaveAttribute(
-      "href",
-      "https://youtu.be/GJw1aJehYHU",
-    );
-    expect(container.querySelectorAll("iframe")).toHaveLength(2);
+    expect(container.querySelector("[data-a1-day14-self-learning-materials='true']")).not.toBeInTheDocument();
     expect(container.querySelector("[data-teacher-lecture-support='links-only']")).not.toBeInTheDocument();
+    expect(container.querySelector("iframe")).not.toBeInTheDocument();
+
+    expect(getA1TeacherVideoResources(14)).toEqual([
+      expect.objectContaining({
+        chapter: "3.6",
+        url: "https://youtu.be/GJw1aJehYHU",
+      }),
+    ]);
+
+    expect(buildA1WorkbookVideoModel({ pathname: "/campus/course/modal-verbs-day-14-3-6" })).toEqual(
+      expect.objectContaining({
+        lessonId: "A1-3.6",
+        assessmentLabel: "Self-practice",
+        youtubeId: "Wkj1-TnNUxY",
+      }),
+    );
   });
 
-  test("maps the Day 14 page to the requested Falowen Radio-first flow", () => {
+  test("maps the Day 14 chapter to the requested Falowen Radio-first flow", () => {
     expect(getA1RadioResource(14, "3.6")).toEqual(
       expect.objectContaining({
         key: "a1-day14-modal-verbs-separable-verbs-falowen-radio",
@@ -89,15 +77,14 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(screen.getByLabelText("Example German train ticket")).toBeVisible();
   });
 
-  test("does not show the A1 self-learning media on the A2 Day 17 query route", () => {
-    const { container } = render(
+  test("still switches to the A2 Day 17 grammar page in its shared query context", () => {
+    render(
       <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?level=A2&day=17"]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
-    expect(container.querySelector("[data-a1-day14-self-learning-materials='true']")).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Open tutor lecture on YouTube/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /A1 · Day 14 Workbook/i })).not.toBeInTheDocument();
   });
 
   test("scores and resets the separable-verb knowledge test", () => {
