@@ -1,8 +1,10 @@
-const restoreNativeHistoryMethod = (methodName) => {
-  if (typeof window === "undefined") return false;
+const isLegacyHistoryPatch = (method) =>
+  typeof method === "function" && (
+    method.name === "patchedHistoryMethod" ||
+    String(method).includes("scheduleCleanup")
+  );
 
-  const history = window.history;
-  const prototype = window.History?.prototype;
+const restoreHistoryMethodOnTarget = (history, prototype, methodName) => {
   const current = history?.[methodName];
   const nativeMethod = prototype?.[methodName];
 
@@ -10,11 +12,7 @@ const restoreNativeHistoryMethod = (methodName) => {
     return false;
   }
 
-  const looksLikeLegacyCleanupPatch =
-    current.name === "patchedHistoryMethod" ||
-    String(current).includes("scheduleCleanup");
-
-  if (!looksLikeLegacyCleanupPatch) return false;
+  if (!isLegacyHistoryPatch(current)) return false;
 
   try {
     delete history[methodName];
@@ -22,22 +20,49 @@ const restoreNativeHistoryMethod = (methodName) => {
     // Some WebViews expose History methods as non-configurable instance fields.
   }
 
-  if (history[methodName]?.name === "patchedHistoryMethod") {
-    try {
+  if (!isLegacyHistoryPatch(history[methodName])) return true;
+
+  const replacement = nativeMethod.bind(history);
+  const descriptor = Object.getOwnPropertyDescriptor(history, methodName);
+
+  try {
+    if (descriptor && Object.prototype.hasOwnProperty.call(descriptor, "value")) {
+      if (!descriptor.writable) return false;
+
+      // A non-configurable data property may still have its value replaced when
+      // it is writable, but none of its descriptor flags may be relaxed.
       Object.defineProperty(history, methodName, {
-        configurable: true,
-        writable: true,
-        value: nativeMethod.bind(history),
+        ...descriptor,
+        value: replacement,
       });
-    } catch (_error) {
+    } else if (typeof descriptor?.set === "function") {
+      descriptor.set.call(history, replacement);
+    } else {
+      history[methodName] = replacement;
+    }
+  } catch (_error) {
+    try {
+      // Assignment also preserves a non-configurable writable descriptor.
+      history[methodName] = replacement;
+    } catch (_assignmentError) {
       return false;
     }
   }
 
-  return history[methodName]?.name !== "patchedHistoryMethod";
+  return !isLegacyHistoryPatch(history[methodName]);
+};
+
+const restoreNativeHistoryMethod = (methodName) => {
+  if (typeof window === "undefined") return false;
+
+  return restoreHistoryMethodOnTarget(
+    window.history,
+    window.History?.prototype,
+    methodName,
+  );
 };
 
 restoreNativeHistoryMethod("pushState");
 restoreNativeHistoryMethod("replaceState");
 
-export { restoreNativeHistoryMethod };
+export { restoreHistoryMethodOnTarget, restoreNativeHistoryMethod };
