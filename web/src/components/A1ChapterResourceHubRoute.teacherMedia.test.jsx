@@ -6,9 +6,9 @@ import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from "./A1ChapterResourceHubRoute";
 
-test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for the workbook", async () => {
+const renderHub = (url) =>
   render(
-    <MemoryRouter initialEntries={["/campus/course/lesson/A1/1?chapter=0.1&hub=1&radio=done"]}>
+    <MemoryRouter initialEntries={[url]}>
       <Routes>
         <Route
           path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
@@ -18,14 +18,20 @@ test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for
     </MemoryRouter>,
   );
 
+test("shows both the A1 teacher lecture and AI video in the chapter hub", async () => {
+  renderHub("/campus/course/lesson/A1/1?chapter=0.1&hub=1&radio=done");
+
   expect(await screen.findByText("A1")).toBeVisible();
   expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 0.1 teacher lecture video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
     "href",
     "https://youtu.be/CqFbBQG9M3U",
   );
-  expect(screen.queryByText("Kapitel 0.1 AI grammar video")).not.toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: /Watch AI video/i })).not.toBeInTheDocument();
+  expect(screen.getByText((_, element) => element?.textContent === "🤖 Kapitel 0.1 AI grammar video")).toBeVisible();
+  expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
+    "href",
+    "https://youtu.be/5WIMkENgdGE",
+  );
 
   expect(
     buildA1WorkbookVideoModel({
@@ -38,5 +44,21 @@ test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for
       youtubeId: "5WIMkENgdGE",
       sourceUrl: "https://youtu.be/5WIMkENgdGE",
     }),
+  );
+});
+
+test("shows the configured AI video beside the teacher lecture for A1 Day 12", async () => {
+  renderHub("/campus/course/lesson/A1/12?chapter=8&hub=1");
+
+  expect(await screen.findByText("24 Hour Clock")).toBeVisible();
+  expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 8 teacher lecture video")).toBeVisible();
+  expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
+    "href",
+    "https://youtu.be/hLpPFOthVkU",
+  );
+  expect(screen.getByText((_, element) => element?.textContent === "🤖 Kapitel 8 AI grammar video")).toBeVisible();
+  expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
+    "href",
+    "https://youtu.be/ZE24QSbGaSo",
   );
 });
