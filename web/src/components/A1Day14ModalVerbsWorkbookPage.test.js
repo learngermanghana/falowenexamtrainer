@@ -6,13 +6,16 @@ import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
-  test("shows the updated embedded self-learning materials", () => {
+  test("shows the updated embedded self-learning materials without a full-screen gap", () => {
     const { container } = render(
       <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
+    const materials = container.querySelector("[data-a1-day14-self-learning-materials='true']");
+    expect(materials).toBeVisible();
+    expect(materials).toHaveStyle({ minHeight: "0" });
     expect(screen.getByText("Self-learning materials")).toBeVisible();
     expect(
       screen.getByRole("heading", { name: "Watch and listen before starting the lesson" }),
