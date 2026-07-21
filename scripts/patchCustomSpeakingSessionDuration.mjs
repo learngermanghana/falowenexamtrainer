@@ -8,6 +8,7 @@ let source = fs.readFileSync(file, "utf8");
 
 function replaceOnce(before, after, label) {
   if (source.includes(after)) return;
+  if (label === "custom reset timer" && source.includes('setCustomSessionState("idle");')) return;
   if (!source.includes(before)) {
     throw new Error(`Custom speaking duration patch anchor missing: ${label}`);
   }
@@ -15,8 +16,8 @@ function replaceOnce(before, after, label) {
 }
 
 replaceOnce(
-  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";',
-  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";\nimport {\n  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,\n  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,\n  normalizeSpeakingChatDurationMinutes,\n  speakingChatSessionSeconds,\n} from "../lib/speakingSessionDuration";',
+  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";',
+  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";\nimport {\n  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,\n  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,\n  normalizeSpeakingChatDurationMinutes,\n  speakingChatSessionSeconds,\n} from "../lib/speakingSessionDuration";',
   "duration helper import",
 );
 

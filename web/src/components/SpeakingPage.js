@@ -4,11 +4,32 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
-import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import {
+  getVisibleSpeakingTabs,
+  normalizeLockedSpeakingLevel,
+  normalizeLockedSpeakingTeil,
+  resolveInitialSpeakingFilters,
+} from "../lib/speakingExamLock";
+import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import {
+  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,
+  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
+  normalizeSpeakingChatDurationMinutes,
+  speakingChatSessionSeconds,
+} from "../lib/speakingSessionDuration";
 import { logStudentActivity } from "../services/studyBuddyService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import {
+  SPEAKING_AUDIO_MIN_SECONDS as MIN_RECORDING_SECONDS,
+  buildRecordedAudioBlob,
+  createSpeakingMediaRecorder,
+  maxSpeakingRecordingSeconds,
+  playAudioElement,
+  revokeObjectUrl,
+  userFacingAudioError,
+} from "../lib/speakingAudio";
 
 const parseTeilNumber = (teilLabel = "") => {
   const match = String(teilLabel).match(/teil\s*(\d+)/i);
@@ -58,8 +79,18 @@ const formatClock = (date) =>
   });
 
 const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
-const MIN_RECORDING_SECONDS = 3;
 const GERMAN_KEYS = ["ä", "ö", "ü", "ß"];
+const COACH_TTS_LEVELS = new Set(["A2", "B1", "B2", "C1"]);
+const AUDIO_REPLIES_STORAGE_KEY = "falowen.customSpeaking.audioReplies";
+const AUTOPLAY_REPLIES_STORAGE_KEY = "falowen.customSpeaking.autoplayReplies";
+
+const readStoredBoolean = (key, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = window.localStorage.getItem(key);
+  if (value === null) return fallback;
+  return value === "true";
+};
+
 const audioCaptureConstraints = {
   echoCancellation: true,
   noiseSuppression: true,
@@ -67,19 +98,32 @@ const audioCaptureConstraints = {
   channelCount: 1,
 };
 
-const SpeakingPage = ({ mode = "exam" }) => {
+const SpeakingPage = ({
+  mode = "exam",
+  lockedLevel: lockedLevelProp = "",
+  lockedTeil: lockedTeilProp = "",
+  examOnly = false,
+  contextLabel = "",
+}) => {
   const { level: examLevel } = useExam();
   const { idToken, user, studentProfile } = useAuth();
   const { showToast } = useToast();
   const isExamMode = mode === "exam";
   const isCourseMode = mode === "course";
+  const normalizedLockedLevel = normalizeLockedSpeakingLevel(lockedLevelProp);
+  const normalizedLockedTeil = normalizeLockedSpeakingTeil(lockedTeilProp);
+  const initialSpeakingFilters = resolveInitialSpeakingFilters({
+    lockedLevel: normalizedLockedLevel,
+    lockedTeil: normalizedLockedTeil,
+    examLevel,
+  });
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
   const [activeSpeakingTab, setActiveSpeakingTab] = useState(isCourseMode ? "custom" : "exam");
-  const [selectedLevel, setSelectedLevel] = useState((examLevel || "A1").toUpperCase());
-  const [selectedTeil, setSelectedTeil] = useState("all");
+  const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
+  const [selectedTeil, setSelectedTeil] = useState(initialSpeakingFilters.teil);
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
   const [chatMessages, setChatMessages] = useState([
     {
@@ -105,7 +149,10 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [customDraftMessage, setCustomDraftMessage] = useState("");
   const [customChatLoading, setCustomChatLoading] = useState(false);
   const [customChatError, setCustomChatError] = useState("");
+  const [audioRepliesEnabled, setAudioRepliesEnabled] = useState(() => readStoredBoolean(AUDIO_REPLIES_STORAGE_KEY, true));
+  const [autoPlayRepliesEnabled, setAutoPlayRepliesEnabled] = useState(() => readStoredBoolean(AUTOPLAY_REPLIES_STORAGE_KEY, true));
   const [customSessionState, setCustomSessionState] = useState("idle");
+  const [customSessionDurationMinutes, setCustomSessionDurationMinutes] = useState(DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES);
   const [customSessionSecondsLeft, setCustomSessionSecondsLeft] = useState(CUSTOM_SPEAKING_CHAT_SESSION_SECONDS);
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
@@ -115,6 +162,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordingError, setRecordingError] = useState("");
   const [playingMessageId, setPlayingMessageId] = useState("");
+  const [playbackError, setPlaybackError] = useState("");
   const [isCompactViewport, setIsCompactViewport] = useState(false);
 
   const customSessionTimeoutLoggedRef = useRef(false);
@@ -125,18 +173,99 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const recordingIntervalRef = useRef(null);
   const recordingSecondsRef = useRef(0);
   const audioRefs = useRef({});
+  const audioObjectUrlsRef = useRef(new Set());
   const messagesEndRef = useRef(null);
+  const coachAudioUrlsRef = useRef(new Set());
+  const speechControllersRef = useRef({});
+  const customConversationGenerationRef = useRef(0);
   const customMessagesEndRef = useRef(null);
+
+
+  const stopAudio = (messageId) => {
+    const audio = audioRefs.current[messageId];
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    if (playingMessageId === messageId) setPlayingMessageId("");
+  };
+
+  const revokeCoachAudioUrl = (url) => {
+    if (!url || !coachAudioUrlsRef.current.has(url)) return;
+    Object.entries(audioRefs.current).forEach(([messageId, audio]) => {
+      if (audio?.src === url) stopAudio(messageId);
+    });
+    URL.revokeObjectURL(url);
+    coachAudioUrlsRef.current.delete(url);
+  };
+
+  const abortPendingSpeechRequests = () => {
+    Object.values(speechControllersRef.current).forEach((controller) => controller.abort());
+    speechControllersRef.current = {};
+  };
+
+  const isCoachTtsEligible = () => activeSpeakingTab === "custom" && COACH_TTS_LEVELS.has(String(selectedLevel || "").toUpperCase());
+
+  const updateCustomCoachMessage = (messageId, updater) => {
+    setCustomChatMessages((current) => current.map((message) => (message.id === messageId ? updater(message) : message)));
+  };
+
+  const attachCustomCoachAudio = (messageId, audioUrl) => {
+    coachAudioUrlsRef.current.add(audioUrl);
+    updateCustomCoachMessage(messageId, (message) => {
+      if (message.audioUrl && message.audioUrl !== audioUrl) revokeCoachAudioUrl(message.audioUrl);
+      return { ...message, audioUrl, audioLoading: false, audioError: false };
+    });
+  };
+
+  const markCustomCoachAudioFailed = (messageId) => {
+    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: false, audioError: true }));
+  };
+
+  const requestSpeechForCustomCoachMessage = (messageId, text) => {
+    if (!audioRepliesEnabled || !isCoachTtsEligible() || !text) return;
+    const generation = customConversationGenerationRef.current;
+    const controller = new AbortController();
+    speechControllersRef.current[messageId]?.abort();
+    speechControllersRef.current[messageId] = controller;
+    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: true, audioError: false }));
+    requestCoachSpeech({ text, level: selectedLevel, idToken, signal: controller.signal })
+      .then((audioUrl) => {
+        delete speechControllersRef.current[messageId];
+        if (generation !== customConversationGenerationRef.current) {
+          URL.revokeObjectURL(audioUrl);
+          return;
+        }
+        attachCustomCoachAudio(messageId, audioUrl);
+        if (autoPlayRepliesEnabled) {
+          window.setTimeout(() => {
+            const audio = audioRefs.current[messageId];
+            if (!audio) return;
+            Object.entries(audioRefs.current).forEach(([id, other]) => {
+              if (id !== messageId && other) { other.pause(); other.currentTime = 0; }
+            });
+            audio.play().then(() => setPlayingMessageId(messageId)).catch(() => {});
+          }, 0);
+        }
+      })
+      .catch((error) => {
+        delete speechControllersRef.current[messageId];
+        if (error?.name !== "AbortError") markCustomCoachAudioFailed(messageId);
+      });
+  };
+
+  const retryCustomCoachAudio = (message) => {
+    if (!message?.id || !message?.text) return;
+    requestSpeechForCustomCoachMessage(message.id, message.text);
+  };
 
   const customSessionLabel = `${String(Math.floor(customSessionSecondsLeft / 60)).padStart(2, "0")}:${String(customSessionSecondsLeft % 60).padStart(2, "0")}`;
   const isCustomSessionEnded = customSessionState === "ended";
+  const recordingMaxSeconds = maxSpeakingRecordingSeconds({ level: selectedLevel, context: activeSpeakingTab === "custom" ? "presentation" : "exam" });
 
   const visibleSpeakingTabs = useMemo(
-    () => (isCourseMode ? [{ key: "custom", label: "Custom chat" }] : [
-      { key: "exam", label: "Exam prompts" },
-      { key: "custom", label: "Custom chat" },
-    ]),
-    [isCourseMode]
+    () => getVisibleSpeakingTabs({ isCourseMode, examOnly }),
+    [examOnly, isCourseMode]
   );
 
   const logSpeakingChatEvent = (event, metadata = {}) => {
@@ -151,16 +280,19 @@ const SpeakingPage = ({ mode = "exam" }) => {
   };
 
   const startCustomSession = (source = "manual") => {
+    const durationMinutes = normalizeSpeakingChatDurationMinutes(customSessionDurationMinutes);
+    const durationSeconds = speakingChatSessionSeconds(durationMinutes);
+    setCustomSessionDurationMinutes(durationMinutes);
     setCustomSessionState("running");
-    setCustomSessionSecondsLeft(CUSTOM_SPEAKING_CHAT_SESSION_SECONDS);
+    setCustomSessionSecondsLeft(durationSeconds);
     setCustomChatError("");
     customSessionTimeoutLoggedRef.current = false;
-    logSpeakingChatEvent("chat_session_start", { source, durationSeconds: CUSTOM_SPEAKING_CHAT_SESSION_SECONDS });
+    logSpeakingChatEvent("chat_session_start", { source, durationMinutes, durationSeconds });
   };
 
   const endCustomSession = (source = "manual") => {
     setCustomSessionState("ended");
-    appendCustomCoachText(`Session complete 🎉\nYou practised in a focused session.\nStart a new session when you are ready.`);
+    appendCustomCoachText(`Session complete 🎉\nYour ${customSessionDurationMinutes}-minute practice session is closed.\nStart a new session when you are ready.`);
     logSpeakingChatEvent("chat_session_end", { source, secondsLeft: customSessionSecondsLeft });
   };
 
@@ -203,16 +335,24 @@ const SpeakingPage = ({ mode = "exam" }) => {
     customSessionTimeoutLoggedRef.current = true;
     setCustomSessionState("ended");
     appendCustomCoachText(
-      `Session complete 🎉\nYou practised for 10 minutes.\nStart a new session when you are ready.\n\nQuick summary:\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\n• Next speaking task: give a 45-second opinion and one reason.`
+      `Session complete 🎉\nYou practised for ${customSessionDurationMinutes} minutes.\nStart a new session when you are ready.\n\nQuick summary:\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\n• Next speaking task: give a 45-second opinion and one reason.`
     );
-    logSpeakingChatEvent("chat_session_timeout", { durationSeconds: CUSTOM_SPEAKING_CHAT_SESSION_SECONDS });
-  }, [customSessionSecondsLeft, customSessionState]);
+    logSpeakingChatEvent("chat_session_timeout", {
+      durationMinutes: customSessionDurationMinutes,
+      durationSeconds: speakingChatSessionSeconds(customSessionDurationMinutes),
+    });
+  }, [customSessionDurationMinutes, customSessionSecondsLeft, customSessionState]);
 
   useEffect(() => {
-    if (isExamMode && examLevel) {
+    if (normalizedLockedLevel) {
+      setSelectedLevel(normalizedLockedLevel);
+    } else if (isExamMode && examLevel) {
       setSelectedLevel(String(examLevel).toUpperCase());
     }
-  }, [examLevel, isExamMode]);
+    if (normalizedLockedTeil) {
+      setSelectedTeil(normalizedLockedTeil);
+    }
+  }, [examLevel, isExamMode, normalizedLockedLevel, normalizedLockedTeil]);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
@@ -293,11 +433,11 @@ const SpeakingPage = ({ mode = "exam" }) => {
       const saved = await loadSpeakingProgress({ userId, studentCode, mode });
       if (cancelled) return;
       setCompletedQuestionIds(saved?.completedQuestionIds || {});
-      const shouldUseSavedLevel = !(isExamMode && examLevel);
+      const shouldUseSavedLevel = !normalizedLockedLevel && !(isExamMode && examLevel);
       if (saved?.selectedLevel && shouldUseSavedLevel) {
         setSelectedLevel(String(saved.selectedLevel).toUpperCase());
       }
-      if (saved?.selectedTeil) setSelectedTeil(saved.selectedTeil);
+      if (saved?.selectedTeil && !normalizedLockedTeil) setSelectedTeil(saved.selectedTeil);
       setProgressLoaded(true);
     };
 
@@ -306,7 +446,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
     return () => {
       cancelled = true;
     };
-  }, [examLevel, isExamMode, mode, studentCode, userId]);
+  }, [examLevel, isExamMode, mode, normalizedLockedLevel, normalizedLockedTeil, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
@@ -336,6 +476,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
   useEffect(() => {
     const audioElements = audioRefs.current;
+    const objectUrls = audioObjectUrlsRef.current;
 
     return () => {
       if (recordingIntervalRef.current) window.clearInterval(recordingIntervalRef.current);
@@ -345,6 +486,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
       Object.values(audioElements).forEach((audio) => {
         if (audio) audio.pause();
       });
+      objectUrls.forEach((url) => revokeObjectUrl(url));
+      objectUrls.clear();
     };
   }, []);
 
@@ -438,17 +581,22 @@ const SpeakingPage = ({ mode = "exam" }) => {
     }
   };
 
-  const appendCustomCoachText = (text) => {
+  const appendCustomCoachText = (text, { withAudio = false } = {}) => {
+    const id = `custom-coach-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setCustomChatMessages((current) => [
       ...current,
       {
-        id: `custom-coach-${Date.now()}`,
+        id,
         role: "coach",
         type: "text",
         text,
+        audioUrl: null,
+        audioLoading: Boolean(withAudio && audioRepliesEnabled && isCoachTtsEligible()),
+        audioError: false,
         createdAt: new Date().toISOString(),
       },
     ]);
+    return id;
   };
 
   const requestCustomChatReply = async (messageText, historyMessages = customChatMessages) => {
@@ -468,6 +616,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
       lessonContext: { lessonTitle: isCourseMode ? "Course Book custom speaking chat" : "Free custom speaking practice" },
       sessionContext: {
         state: customSessionState === "running" ? "running" : customSessionState === "ended" ? "ended" : "starting",
+        durationMinutes: customSessionDurationMinutes,
         minutesLeft: customSessionSecondsLeft / 60,
       },
     });
@@ -517,7 +666,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
     try {
       const replyText = await requestCustomChatReply(trimmed);
-      appendCustomCoachText(replyText);
+      const coachMessageId = appendCustomCoachText(replyText, { withAudio: true });
+      setCustomChatLoading(false);
+      requestSpeechForCustomCoachMessage(coachMessageId, replyText);
       notifyCustomChatSuccess();
     } catch (error) {
       setCustomChatError(error?.message || "Could not reach the custom Sprechen chat.");
@@ -539,7 +690,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
         audio: audioCaptureConstraints,
       });
       streamRef.current = stream;
-      const recorder = new MediaRecorder(stream);
+      const recorder = createSpeakingMediaRecorder(stream);
       audioChunksRef.current = [];
 
       recorder.ondataavailable = (event) => {
@@ -564,8 +715,23 @@ const SpeakingPage = ({ mode = "exam" }) => {
           return;
         }
 
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        let blob;
+        try {
+          blob = buildRecordedAudioBlob(audioChunksRef.current, recorder);
+        } catch (error) {
+          setRecordingError(userFacingAudioError(error));
+          setRecordingSeconds(0);
+          recordingSecondsRef.current = 0;
+          setIsRecording(false);
+          setRecordingMode("");
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+          }
+          return;
+        }
         const url = URL.createObjectURL(blob);
+        audioObjectUrlsRef.current.add(url);
         const duration = elapsedRecordingSeconds;
 
         const voiceMessage = {
@@ -594,6 +760,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
               question: "Free custom speaking conversation",
               userId,
               idToken,
+              durationSeconds: duration,
             });
 
             const transcript = String(response?.transcript || "").trim();
@@ -607,11 +774,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
             )));
             appendCustomCoachText(`Transcript I heard: ${transcript}`);
             const replyText = await requestCustomChatReply(transcript);
-            appendCustomCoachText(replyText);
+            const coachMessageId = appendCustomCoachText(replyText, { withAudio: true });
+            setCustomChatLoading(false);
+            requestSpeechForCustomCoachMessage(coachMessageId, replyText);
             notifyCustomChatSuccess();
           } catch (error) {
-            setCustomChatError(error?.message || "Could not reach the custom Sprechen chat.");
-            appendCustomCoachText("Der freie Sprechen-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.");
+            const message = userFacingAudioError(error, "Could not reach the custom Sprechen chat.");
+            setCustomChatError(message);
+            appendCustomCoachText(message);
             notifyCustomChatError();
           } finally {
             setCustomChatLoading(false);
@@ -634,6 +804,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
               question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
               userId,
               idToken,
+              durationSeconds: duration,
             });
 
             const transcript = String(response?.transcript || "").trim();
@@ -655,8 +826,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
               vibratePattern: [45],
             });
           } catch (error) {
-            setChatError(error?.message || "Could not reach the AI coach.");
-            appendCoachText("I couldn't analyze your recording right now. Please try again in a moment.");
+            const message = userFacingAudioError(error, "Could not reach the AI coach.");
+            setChatError(message);
+            appendCoachText(message);
             triggerInteractionFeedback({
               sound: "error",
               toastMessage: "Could not analyze your recording right now.",
@@ -676,7 +848,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
       };
 
       mediaRecorderRef.current = recorder;
-      recorder.start();
+      recorder.start(1000);
       setRecordingSeconds(0);
       recordingSecondsRef.current = 0;
       setIsRecording(true);
@@ -685,6 +857,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
         setRecordingSeconds((value) => {
           const nextValue = value + 1;
           recordingSecondsRef.current = nextValue;
+          if (nextValue >= recordingMaxSeconds && recorder.state === "recording") {
+            window.setTimeout(() => recorder.stop(), 0);
+          }
           return nextValue;
         });
       }, 1000);
@@ -698,9 +873,10 @@ const SpeakingPage = ({ mode = "exam" }) => {
     mediaRecorderRef.current.stop();
   };
 
-  const toggleAudioPlayback = (messageId) => {
+  const toggleAudioPlayback = async (messageId) => {
     const currentAudio = audioRefs.current[messageId];
     if (!currentAudio) return;
+    setPlaybackError("");
 
     if (playingMessageId && playingMessageId !== messageId) {
       const previousAudio = audioRefs.current[playingMessageId];
@@ -716,12 +892,33 @@ const SpeakingPage = ({ mode = "exam" }) => {
       return;
     }
 
-    currentAudio.play();
-    setPlayingMessageId(messageId);
+    try {
+      await playAudioElement(currentAudio);
+      setPlayingMessageId(messageId);
+    } catch (error) {
+      setPlayingMessageId("");
+      setPlaybackError(error?.message || "Playback could not start.");
+    }
+  };
+
+  const releaseMessageAudio = (messages = []) => {
+    messages.forEach((message) => {
+      if (!message?.audioUrl) return;
+      revokeObjectUrl(message.audioUrl);
+      audioObjectUrlsRef.current.delete(message.audioUrl);
+    });
   };
 
   const clearConversation = () => {
+    setPlaybackError("");
     if (activeSpeakingTab === "custom") {
+      releaseMessageAudio(customChatMessages);
+      customConversationGenerationRef.current += 1;
+      abortPendingSpeechRequests();
+      customChatMessages.forEach((message) => revokeCoachAudioUrl(message.audioUrl));
+      setCustomSessionState("idle");
+      setCustomSessionSecondsLeft(speakingChatSessionSeconds(customSessionDurationMinutes));
+      customSessionTimeoutLoggedRef.current = false;
       setCustomChatMessages([
         {
           id: `custom-welcome-${Date.now()}`,
@@ -733,10 +930,12 @@ const SpeakingPage = ({ mode = "exam" }) => {
       ]);
       setCustomChatError("");
       setCustomDraftMessage("");
+      setPlayingMessageId("");
       setRecordingMode("");
       return;
     }
 
+    releaseMessageAudio(chatMessages);
     setChatMessages([
       {
         id: `welcome-${Date.now()}`,
@@ -753,12 +952,35 @@ const SpeakingPage = ({ mode = "exam" }) => {
     setRecordingMode("");
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(AUDIO_REPLIES_STORAGE_KEY, String(audioRepliesEnabled));
+    if (!audioRepliesEnabled) {
+      abortPendingSpeechRequests();
+      setCustomChatMessages((current) => current.map((message) => {
+        if (message.audioUrl) revokeCoachAudioUrl(message.audioUrl);
+        return { ...message, audioUrl: null, audioLoading: false, audioError: false };
+      }));
+    }
+  }, [audioRepliesEnabled]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(AUTOPLAY_REPLIES_STORAGE_KEY, String(autoPlayRepliesEnabled));
+  }, [autoPlayRepliesEnabled]);
+
+  useEffect(() => () => {
+    customConversationGenerationRef.current += 1;
+    abortPendingSpeechRequests();
+    Object.values(audioRefs.current).forEach((audio) => audio?.pause());
+    coachAudioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    coachAudioUrlsRef.current.clear();
+  }, []);
+
   const completedCount = useMemo(
     () => Object.values(completedQuestionIds).filter(Boolean).length,
     [completedQuestionIds]
   );
 
-  const totalCount = speakingQuestionDictionary.filter((question) => question.level === selectedLevel).length;
+  const totalCount = baseFilteredQuestions.length;
 
   return (
     <div style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
@@ -786,7 +1008,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             <p style={{ margin: 0, opacity: 0.85, fontSize: 13 }}>Online • Ready to practice</p>
             <h1 style={{ margin: "4px 0 0", fontSize: 28 }}>Goethe Speaking Exam Coach</h1>
             <p style={{ margin: "6px 0 0", opacity: 0.9, fontSize: 13 }}>
-              Speaking Exams {examLevel ? `• Level ${examLevel}` : ""}
+              {contextLabel || `Speaking Exams${selectedLevel ? ` • Level ${selectedLevel}` : ""}${normalizedLockedTeil ? ` • Teil ${normalizedLockedTeil}` : ""}`}
             </p>
           </div>
           <button style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
@@ -839,6 +1061,16 @@ const SpeakingPage = ({ mode = "exam" }) => {
                 <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                   Talk freely about school, work, travel, family, daily life, or any topic. The AI keeps the conversation at your level, corrects gently, and asks a new German question.
                 </p>
+              </div>
+
+              <div style={{ ...styles.card, margin: 0, padding: 10, display: "grid", gap: 8 }}>
+                <label style={{ ...styles.label, margin: 0 }}>Audio replies</label>
+                <button type="button" style={styles.secondaryButton} onClick={() => setAudioRepliesEnabled((value) => !value)}>
+                  Audio replies: {audioRepliesEnabled ? "On" : "Off"}
+                </button>
+                <button type="button" style={styles.secondaryButton} onClick={() => setAutoPlayRepliesEnabled((value) => !value)} disabled={!audioRepliesEnabled}>
+                  Auto-play replies: {autoPlayRepliesEnabled ? "On" : "Off"}
+                </button>
               </div>
 
               <div style={{ display: "grid", gap: 6 }}>
@@ -923,13 +1155,43 @@ const SpeakingPage = ({ mode = "exam" }) => {
                                 if (node) {
                                   audioRefs.current[message.id] = node;
                                   node.onended = () => setPlayingMessageId("");
+                                  node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); };
                                 }
                               }}
                               src={message.audioUrl}
                             />
                           </div>
                         ) : (
-                          <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                          <div style={{ display: "grid", gap: 8 }}>
+                            <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                            {!isStudent && audioRepliesEnabled && COACH_TTS_LEVELS.has(String(selectedLevel || "").toUpperCase()) ? (
+                              message.audioLoading ? (
+                                <span style={{ fontSize: 12, color: "#64748B" }}>🔊 Preparing audio…</span>
+                              ) : message.audioUrl ? (
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <button
+                                    type="button"
+                                    aria-label={playingMessageId === message.id ? "Pause German reply" : "Play German reply"}
+                                    style={{ ...styles.secondaryButton, padding: "6px 10px" }}
+                                    onClick={() => toggleAudioPlayback(message.id)}
+                                  >
+                                    {playingMessageId === message.id ? "⏸" : "▶"} Listen
+                                  </button>
+                                  <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
+                                    {waveHeights.slice(0, 10).map((height, index) => (
+                                      <span key={`${message.id}-reply-wave-${index}`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
+                                    ))}
+                                  </div>
+                                  <audio ref={(node) => { if (node) { audioRefs.current[message.id] = node; node.onended = () => setPlayingMessageId("");
+                                  node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); }; } }} src={message.audioUrl} />
+                                </div>
+                              ) : message.audioError ? (
+                                <button type="button" aria-label="Retry German audio" style={{ ...styles.secondaryButton, padding: "6px 10px", justifySelf: "start" }} onClick={() => retryCustomCoachAudio(message)}>
+                                  Retry audio
+                                </button>
+                              ) : null
+                            ) : null}
+                          </div>
                         )}
                         <p style={{ margin: "6px 0 0", opacity: 0.75, fontSize: 11 }}>{formatClock(message.createdAt)}</p>
                       </div>
@@ -956,19 +1218,47 @@ const SpeakingPage = ({ mode = "exam" }) => {
               </div>
 
               <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
+                <div style={{ ...styles.card, margin: 0, padding: 10, background: "#ECFDF5", border: "1px solid #A7F3D0", display: "grid", gap: 8 }}>
+                  <div>
+                    <strong style={{ fontSize: 13 }}>Choose your chat time</strong>
+                    <p style={{ margin: "3px 0 0", fontSize: 12, color: "#047857" }}>Paste your speaking question or topic, choose 10, 20, or 30 minutes, then start chatting.</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} aria-label="Speaking chat duration">
+                    {CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS.map((minutes) => {
+                      const selected = customSessionDurationMinutes === minutes;
+                      return (
+                        <button
+                          key={minutes}
+                          type="button"
+                          style={{ ...(selected ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, padding: "6px 12px", fontSize: 12, background: selected ? "#059669" : undefined }}
+                          onClick={() => {
+                            if (customSessionState === "running") return;
+                            setCustomSessionDurationMinutes(minutes);
+                            setCustomSessionSecondsLeft(speakingChatSessionSeconds(minutes));
+                          }}
+                          disabled={customSessionState === "running"}
+                        >
+                          {minutes} minutes
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {customSessionState === "running" ? <span style={{ fontSize: 11, color: "#047857" }}>The time is locked until this session ends.</span> : null}
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }} aria-live="polite">
                   {customSessionState === "running" ? (
                     <button type="button" style={{ ...styles.secondaryButton, borderRadius: 999, padding: "5px 10px", fontSize: 12 }} onClick={() => endCustomSession("manual")}>End</button>
                   ) : (
-                    <button type="button" style={{ ...styles.secondaryButton, borderRadius: 999, padding: "5px 10px", fontSize: 12 }} onClick={() => startCustomSession(customSessionState === "ended" ? "new_session" : "manual")}>{customSessionState === "ended" ? "Start new session" : "Start session"}</button>
+                    <button type="button" style={{ ...styles.secondaryButton, borderRadius: 999, padding: "5px 10px", fontSize: 12 }} onClick={() => startCustomSession(customSessionState === "ended" ? "new_session" : "manual")}>{customSessionState === "ended" ? `Start new ${customSessionDurationMinutes}-minute session` : `Start ${customSessionDurationMinutes}-minute session`}</button>
                   )}
                   <span style={{ fontSize: 12, fontWeight: 800, color: "#047857" }}>Session: {customSessionLabel}</span>
                 </div>
-                {customSessionState === "ended" ? <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>Session complete 🎉 Start a new session when you are ready.</p> : null}
+                {customSessionState === "ended" ? <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>Session complete 🎉 Choose a duration and start a new session when you are ready.</p> : null}
                 <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>
                   Free chat mode: write in German when you can. You may use English if you are stuck.
                 </p>
                 {customChatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{customChatError}</p> : null}
+                {playbackError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{playbackError}</p> : null}
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button
                     type="button"
@@ -978,13 +1268,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
                   >
                     {isRecording && recordingMode === "custom" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Record voice"}
                   </button>
-                  {recordingError && recordingMode === "custom" ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+                  {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+            {playbackError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{playbackError}</p> : null}
                 </div>
                 <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
                   <textarea
                     ref={customDraftRef}
                     style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
-                    placeholder="Start a free German conversation..."
+                    placeholder="Paste your speaking question or start a German conversation..."
                     value={customDraftMessage}
                     onChange={(event) => setCustomDraftMessage(event.target.value)}
                     onKeyDown={(event) => {
@@ -1053,12 +1344,16 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
             <div style={{ display: "grid", gap: 6 }}>
               <label style={styles.label}>Teil</label>
-              <select style={styles.select} value={selectedTeil} onChange={(event) => setSelectedTeil(event.target.value)}>
-                <option value="all">All</option>
-                <option value="1">Teil 1</option>
-                <option value="2">Teil 2</option>
-                <option value="3">Teil 3</option>
-              </select>
+              {normalizedLockedTeil ? (
+                <div style={{ ...styles.input, background: "#EEF2FF", fontWeight: 700 }}>Teil {normalizedLockedTeil}</div>
+              ) : (
+                <select style={styles.select} value={selectedTeil} onChange={(event) => setSelectedTeil(event.target.value)}>
+                  <option value="all">All</option>
+                  <option value="1">Teil 1</option>
+                  <option value="2">Teil 2</option>
+                  <option value="3">Teil 3</option>
+                </select>
+              )}
             </div>
 
             <div style={{ display: "grid", gap: 6 }}>
@@ -1079,9 +1374,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
             >
               {isRecording && recordingMode === "exam" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
             </button>
-            {recordingError && recordingMode === "exam" ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+            {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds.
+              Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds. Maximum {formatTime(recordingMaxSeconds)}; recording stops automatically.
             </p>
 
             <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
@@ -1167,6 +1462,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
                               if (node) {
                                 audioRefs.current[message.id] = node;
                                 node.onended = () => setPlayingMessageId("");
+                                  node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); };
                               }
                             }}
                             src={message.audioUrl}
