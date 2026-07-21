@@ -158,8 +158,14 @@ const removeLegacyDuplicatedA1TeacherVideos = ({ level, day, rawLesson, videos =
   );
   if (!configuredPrimaryTeachers.size) return videos;
 
+  const explicitTeacherUrls = new Set();
   const duplicatedLegacyUrls = new Set();
+
   getRawLessonResourceEntries(rawLesson).forEach((entry) => {
+    normalizeVideoResources(entry)
+      .filter(isTeacherVideo)
+      .forEach((video) => explicitTeacherUrls.add(String(video.url || "").trim()));
+
     const chapter = chapterKey(entry.chapter || rawLesson.chapter);
     const genericUrl = first(entry.video, entry.youtube_link, entry.tutorial_video_url);
     const teacherUrl = first(
@@ -183,10 +189,17 @@ const removeLegacyDuplicatedA1TeacherVideos = ({ level, day, rawLesson, videos =
     }
   });
 
-  if (!duplicatedLegacyUrls.size) return videos;
-  return videos.filter(
-    (video) => !(isTeacherVideo(video) && duplicatedLegacyUrls.has(String(video.url || "").trim())),
-  );
+  return videos.filter((video) => {
+    if (!isTeacherVideo(video)) return true;
+
+    const url = String(video.url || "").trim();
+    const chapter = chapterKey(video.chapter || rawLesson.chapter);
+    const configuredTeacherUrl = configuredPrimaryTeachers.get(chapter);
+
+    if (!configuredTeacherUrl || configuredTeacherUrl === url) return true;
+    if (duplicatedLegacyUrls.has(url)) return false;
+    return explicitTeacherUrls.has(url);
+  });
 };
 
 const getExplicitTeacherUrlsByChapter = (rawLesson = {}) => {
