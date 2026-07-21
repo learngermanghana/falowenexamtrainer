@@ -1,19 +1,22 @@
 import { getSelfLearningLessonComponent, SELF_LEARNING_LESSONS } from "./SelfLearningLessonRegistry";
 import { LESSON_RADIO_DICTIONARY } from "../data/lessonRadioDictionary";
 
-test("uses the shared four-stage journey for B2 and C1 lessons", () => {
-  expect(typeof getSelfLearningLessonComponent("B2", 1)).toBe("function");
-  expect(typeof getSelfLearningLessonComponent("B2", 28)).toBe("function");
-  expect(typeof getSelfLearningLessonComponent("C1", 2)).toBe("function");
-  expect(typeof getSelfLearningLessonComponent("C1", 28)).toBe("function");
+test("uses the shared radio and materials journey for every B2 and C1 self-learning lesson", () => {
+  SELF_LEARNING_LESSONS.B2.forEach((lesson) => {
+    expect(typeof getSelfLearningLessonComponent("B2", lesson.day)).toBe("function");
+  });
+  SELF_LEARNING_LESSONS.C1.forEach((lesson) => {
+    expect(typeof getSelfLearningLessonComponent("C1", lesson.day)).toBe("function");
+  });
 });
 
-test("keeps normal B1 lessons on the original tutor-marked structure", () => {
-  expect(getSelfLearningLessonComponent("B1", 1)).toBeNull();
-  expect(getSelfLearningLessonComponent("B1", 28)).toBeNull();
+test("keeps B1 radio lessons on the original tutor-marked structure", () => {
+  expect(typeof getSelfLearningLessonComponent("B1", 1)).toBe("function");
+  expect(typeof getSelfLearningLessonComponent("B1", 28)).toBe("function");
 });
 
 test("uses the B1 radio entrance only when that B1 day has an episode", () => {
+  const originalB1 = LESSON_RADIO_DICTIONARY.B1;
   LESSON_RADIO_DICTIONARY.B1 = {
     99: {
       key: "b1-day99-test-radio",
@@ -23,8 +26,9 @@ test("uses the B1 radio entrance only when that B1 day has an episode", () => {
   };
 
   expect(typeof getSelfLearningLessonComponent("B1", 99)).toBe("function");
+  expect(getSelfLearningLessonComponent("B1", 1)).toBeNull();
 
-  delete LESSON_RADIO_DICTIONARY.B1;
+  LESSON_RADIO_DICTIONARY.B1 = originalB1;
 });
 
 test("does not replace B1 Day 0 orientation", () => {
