@@ -178,7 +178,7 @@ const guidanceHtml = (copy, level, assignment, checklist) => `
     <span style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;white-space:nowrap;">${escapeHtml(copy.badge)}</span>
   </div>
   <div style="border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px;display:grid;gap:8px;">
-    <strong style="font-size:13px;color:#111827;">Confirm every required Teil${assignment ? ` · ${escapeHtml(assignment)}` : ""}</strong>
+    <strong style="font-size:13px;color:#111827;">Required final answers${assignment ? ` · ${escapeHtml(assignment)}` : ""}</strong>
     <div style="display:grid;gap:8px;color:#374151;font-size:14px;">
       ${checklist
         .map(

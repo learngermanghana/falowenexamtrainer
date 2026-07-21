@@ -7,11 +7,15 @@ import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
 import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
+import C1Day11GoetheSpeakingSelfLearningPage from "./C1Day11GoetheSpeakingSelfLearningPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
-import TeacherLectureSupportingMaterials, {
+import {
+  isTeacherLectureResource,
   removeTeacherLectureFromCanonicalLesson,
   removeTeacherLectureFromLesson,
+  resolveTeacherLectureResources,
 } from "./selfLearning/TeacherLectureSupportingMaterials";
+import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
@@ -115,19 +119,65 @@ export const SELF_LEARNING_LESSONS = {
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-export const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => (
-  <>
-    <TeacherLectureSupportingMaterials lesson={lesson} canonicalLesson={canonicalLesson} />
-    {children}
-  </>
-);
+const resolveAiVideoResource = ({ lesson = null, canonicalLesson = null } = {}) => {
+  const candidates = [
+    lesson?.videoResource,
+    ...toArray(lesson?.resources?.videos),
+    ...toArray(canonicalLesson?.resources?.videos),
+  ];
+  return candidates.find((resource) => resource?.url && !isTeacherLectureResource(resource)) || null;
+};
+
+const removeAllDisplayedVideosFromLesson = (lesson = null) => {
+  const withoutTeacher = removeTeacherLectureFromLesson(lesson);
+  if (!withoutTeacher) return withoutTeacher;
+  return {
+    ...withoutTeacher,
+    videoResource: null,
+    resources: {
+      ...(withoutTeacher.resources || {}),
+      videos: [],
+    },
+  };
+};
+
+const removeAllDisplayedVideosFromCanonicalLesson = (canonicalLesson = null) => {
+  const withoutTeacher = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
+  if (!withoutTeacher) return withoutTeacher;
+  return {
+    ...withoutTeacher,
+    resources: {
+      ...(withoutTeacher.resources || {}),
+      videos: [],
+    },
+  };
+};
+
+export const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => {
+  const teacherVideo = resolveTeacherLectureResources({ lesson, canonicalLesson })[0] || null;
+  const aiVideo = resolveAiVideoResource({ lesson, canonicalLesson });
+
+  return (
+    <>
+      <div style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}>
+        <SelfLearningSupportingMaterials
+          teacherVideo={teacherVideo}
+          aiVideo={aiVideo}
+          description="Open the teacher lecture and AI lesson here first. The same media order is used across all self-learning lessons."
+        />
+      </div>
+      {children}
+    </>
+  );
+};
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
-  const pageLesson = removeTeacherLectureFromLesson(lesson);
-  const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
+  const pageLesson = removeAllDisplayedVideosFromLesson(lesson);
+  const pageCanonicalLesson = removeAllDisplayedVideosFromCanonicalLesson(canonicalLesson);
 
   let page;
   if (day === 0) {
@@ -137,6 +187,8 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
         falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
       />
     );
+  } else if (normalizedLevel === "C1" && day === 11) {
+    page = <C1Day11GoetheSpeakingSelfLearningPage />;
   } else if (normalizedLevel === "C1" && day >= 8 && day <= 10) {
     page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 25 && day <= 28) {
@@ -171,7 +223,7 @@ const componentRegistry = Object.fromEntries(
 
 const B1RadioLessonComponent = ({ canonicalLesson }) => (
   <SelfLearningLessonFrame canonicalLesson={canonicalLesson}>
-    <B1TutorLessonPage canonicalLesson={removeTeacherLectureFromCanonicalLesson(canonicalLesson)} />
+    <B1TutorLessonPage canonicalLesson={removeAllDisplayedVideosFromCanonicalLesson(canonicalLesson)} />
   </SelfLearningLessonFrame>
 );
 

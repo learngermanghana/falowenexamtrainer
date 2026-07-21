@@ -45,7 +45,7 @@ const practiceSteps = [
   },
 ];
 
-const A1ExamSpeakingPracticePanel = () => (
+const A1ExamSpeakingPracticePanel = ({ showVideo = true }) => (
   <section
     id="embedded-a1-speaking-practice"
     data-a1-speaking-practice="embedded"
@@ -75,42 +75,44 @@ const A1ExamSpeakingPracticePanel = () => (
       </p>
     </div>
 
-    <div style={{ display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-        <div>
-          <p style={{ margin: 0, color: "#4f46e5", fontWeight: 800 }}>AI VIDEO LESSON</p>
-          <h3 style={{ margin: "4px 0 0" }}>Goethe A1 Speaking Practice</h3>
+    {showVideo ? (
+      <div style={{ display: "grid", gap: 10 }} data-a1-speaking-ai-video="embedded">
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <p style={{ margin: 0, color: "#4f46e5", fontWeight: 800 }}>AI VIDEO LESSON</p>
+            <h3 style={{ margin: "4px 0 0" }}>Goethe A1 Speaking Practice</h3>
+          </div>
+          <a
+            href={`https://youtu.be/${AI_VIDEO_ID}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+          >
+            Open video on YouTube
+          </a>
         </div>
-        <a
-          href={`https://youtu.be/${AI_VIDEO_ID}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-        >
-          Open video on YouTube
-        </a>
-      </div>
 
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          paddingTop: "56.25%",
-          borderRadius: 16,
-          overflow: "hidden",
-          background: "#0f172a",
-          boxShadow: "0 12px 28px rgba(15, 23, 42, 0.16)",
-        }}
-      >
-        <iframe
-          src={`https://www.youtube.com/embed/${AI_VIDEO_ID}`}
-          title="Goethe A1 Speaking Practice AI video"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-        />
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            paddingTop: "56.25%",
+            borderRadius: 16,
+            overflow: "hidden",
+            background: "#0f172a",
+            boxShadow: "0 12px 28px rgba(15, 23, 42, 0.16)",
+          }}
+        >
+          <iframe
+            src={`https://www.youtube.com/embed/${AI_VIDEO_ID}`}
+            title="Goethe A1 Speaking Practice AI video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+          />
+        </div>
       </div>
-    </div>
+    ) : null}
 
     <div style={softPanel}>
       <strong>Use this simple practice order</strong>

@@ -112,6 +112,14 @@ export const alignA1CurriculumEntry = (entry = {}, parentContext = {}) => {
     aligned.schreiben_sprechen = alignCollection(entry.schreiben_sprechen, context);
   }
 
+  if (day === 19 && chapter === "5.9") {
+    aligned.assignment = true;
+    aligned.tutorMarked = true;
+    aligned.selfPractice = false;
+    aligned.submissionRequired = true;
+    aligned.progressionEligible = true;
+  }
+
   return aligned;
 };
 
