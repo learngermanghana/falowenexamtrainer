@@ -68,7 +68,7 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
         },
       ]}
       hoerenTask="Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung und submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/_aE8T9knMdY"
+      hoerenAudioUrl="https://youtu.be/WuA8Xabn-Uw"
       hoerenQuestions={[
         {
           stem: "Welche Wohnung ist 70 Quadratmeter groß?",
