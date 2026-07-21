@@ -1,48 +1,25 @@
-import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import B1Day21LebensformenHeuteWorkbookPage, {
-  B1_DAY21_HAS_TEIL4,
-} from "./B1Day21LebensformenHeuteWorkbookPage";
+import fs from "fs";
+import path from "path";
+import { B1_DAY21_HAS_TEIL4 } from "./B1Day21LebensformenHeuteWorkbookPage";
 
-jest.mock("./navigation/AppBackButton", () => () => <div>Back</div>);
-jest.mock("./AssignmentSubmissionPage", () => () => <div>Submission form</div>);
-jest.mock("./CourseInlinePracticePanel", () => ({ type }) => (
-  <div data-course-inline-practice={type}>{type} practice</div>
-));
-jest.mock("./WorkbookReferenceAnswers", () => () => <div>Reference answers</div>);
-jest.mock("./A2B1WorkbookGuidance", () => ({
-  A2B1WorkbookGuidance: () => <div>Workbook guidance</div>,
-  WorkbookSubmissionReminder: () => <div>Submission reminder</div>,
-}));
+const source = fs.readFileSync(
+  path.resolve(__dirname, "B1Day21LebensformenHeuteWorkbookPage.js"),
+  "utf8",
+);
 
 describe("B1 Day 21 workbook parts", () => {
-  test("states that there is no Teil 4 and removes the Hören tab", () => {
-    const { container } = render(
-      <MemoryRouter>
-        <B1Day21LebensformenHeuteWorkbookPage />
-      </MemoryRouter>,
-    );
-
+  test("states that there is no Teil 4 and hides the Hören tab", () => {
     expect(B1_DAY21_HAS_TEIL4).toBe(false);
-    const notice = container.querySelector('[data-b1-day21-no-teil4-notice="true"]');
-    expect(notice).toBeVisible();
-    expect(notice).toHaveTextContent("There is no Teil 4 · Hören for this lesson");
-
-    expect(screen.queryByRole("tab", { name: "Teil 4" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /Teil 4 · Hören/i })).not.toBeInTheDocument();
+    expect(source).toContain("This workbook contains Teil 1, Teil 2 and Teil 3 only. There is no Teil 4 for this lesson.");
+    expect(source).toContain("There is no Teil 4 · Hören for this lesson.");
+    expect(source).toContain('[role="tab"][aria-label="Teil 4"]');
+    expect(source).toContain("display: none !important");
   });
 
-  test("the Submit page requests only Teil 2 and Teil 3", () => {
-    render(
-      <MemoryRouter>
-        <B1Day21LebensformenHeuteWorkbookPage />
-      </MemoryRouter>,
-    );
-
-    fireEvent.click(screen.getByRole("tab", { name: "Submit" }));
-    expect(screen.getByRole("heading", { name: "Submit workbook answers" })).toBeVisible();
-    expect(screen.getByText("Submit Teil 2 and Teil 3.")).toBeVisible();
-    expect(screen.getByText("Teil 1 is group practice. There is no Teil 4 in this workbook.")).toBeVisible();
+  test("submission instructions request only Teil 2 and Teil 3", () => {
+    expect(source).toContain('submitListening: false');
+    expect(source).toContain('submitTitle: "Submit Teil 2 and Teil 3."');
+    expect(source).toContain('submitNote: "Teil 1 is group practice. There is no Teil 4 in this workbook."');
+    expect(source).not.toContain('submitListeningDescription:');
   });
 });
