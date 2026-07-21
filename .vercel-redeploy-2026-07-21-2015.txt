@@ -1,0 +1,3 @@
+Vercel production redeploy trigger for the A1 hub video and portal-race fix merged in PR #2219.
+Target production commit: 25b57dac9e1792caea13290e65ef40d807fdafc2.
+Created 2026-07-21.
