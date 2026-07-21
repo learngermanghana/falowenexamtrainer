@@ -1,3 +1,6 @@
+const chapterRadioKey = (day = "", chapter = "") =>
+  `${Number(day)}:${String(chapter || "").trim()}`;
+
 export const A1_RADIO_RESOURCES = Object.freeze({
   1: Object.freeze({
     key: "a1-day1-greetings-wellbeing-falowen-radio",
@@ -142,9 +145,26 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   }),
 });
 
+export const A1_CHAPTER_RADIO_RESOURCES = Object.freeze({
+  [chapterRadioKey(16, "10")]: Object.freeze({
+    key: "a1-day16-food-daily-life-kapitel-10-falowen-radio",
+    chapter: "10",
+    title: "Food and Daily Life · Kapitel 10",
+    youtubeId: "lp7ePIbp-Ws",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 10 episode. Then continue to the supporting lesson resources and workbook.",
+  }),
+});
+
 export const getA1RadioResource = (day = "", chapter = "") => {
-  const resource = A1_RADIO_RESOURCES[Number(day)] || null;
   const requestedChapter = String(chapter ?? "").trim();
+  const chapterSpecific = requestedChapter
+    ? A1_CHAPTER_RADIO_RESOURCES[chapterRadioKey(day, requestedChapter)] || null
+    : null;
+  if (chapterSpecific) return chapterSpecific;
+
+  const resource = A1_RADIO_RESOURCES[Number(day)] || null;
   if (resource?.chapter && requestedChapter && resource.chapter !== requestedChapter) return null;
   return resource;
 };

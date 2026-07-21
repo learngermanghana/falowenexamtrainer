@@ -142,6 +142,35 @@ describe("A1 route-scoped Falowen Radio", () => {
     );
   });
 
+  test("keeps separate Falowen Radio episodes for Day 16 Kapitel 9 and Kapitel 10", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/16",
+        "?chapter=10&hub=1",
+      ),
+    ).toEqual({ day: 16, chapter: "10" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
+      ),
+    ).toEqual({ day: 16, chapter: "10" });
+    expect(getA1RadioResource(16, "10")).toEqual(
+      expect.objectContaining({
+        key: "a1-day16-food-daily-life-kapitel-10-falowen-radio",
+        chapter: "10",
+        youtubeId: "lp7ePIbp-Ws",
+      }),
+    );
+    expect(getA1RadioResource(16, "9")).toEqual(
+      expect.objectContaining({
+        key: "a1-day16-negation-food-daily-life-falowen-radio",
+        chapter: "9",
+        youtubeId: "cQAsQ14a77c",
+      }),
+    );
+    expect(getA1RadioResource(16, "11")).toBeNull();
+  });
+
   test("uses the approved Day 20 Kapitel 12.3 letter-writing video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
