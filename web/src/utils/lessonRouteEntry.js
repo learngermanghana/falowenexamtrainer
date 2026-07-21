@@ -88,6 +88,7 @@ export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) =
     grammarPage: lesson.grammarPage || "",
     workbookRoute,
     video: lesson.teacherVideo || lesson.video || "",
+    hideAiVideoInLessonHub: true,
     resources: [resource],
     primaryResource: resource,
     lesen_hören: resourceSection === "lesen_hören" ? [resource] : undefined,
