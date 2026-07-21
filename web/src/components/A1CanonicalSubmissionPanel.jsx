@@ -15,6 +15,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   const navigate = useNavigate();
   const submitRootRef = useRef(null);
   const autoResolveInFlightRef = useRef(false);
+  const lastContextNavigationRef = useRef("");
   const [autoResolveMessage, setAutoResolveMessage] = useState("");
   const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
   const requestedTab = searchParams.get("workbookTab");
@@ -27,6 +28,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
   useEffect(() => {
     autoResolveInFlightRef.current = false;
+    lastContextNavigationRef.current = "";
     setAutoResolveMessage("");
   }, [assignmentKey]);
 
@@ -39,8 +41,13 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     nextSearch.set("assignmentId", assignmentKey);
     nextSearch.set("level", "A1");
 
+    const nextSearchText = `?${nextSearch.toString()}`;
+    const nextSignature = `${location.pathname}${nextSearchText}|${assignmentKey}|${assignment.day}`;
+    if (lastContextNavigationRef.current === nextSignature) return;
+    lastContextNavigationRef.current = nextSignature;
+
     navigate(
-      { pathname: location.pathname, search: `?${nextSearch.toString()}` },
+      { pathname: location.pathname, search: nextSearchText },
       {
         replace: true,
         state: {
