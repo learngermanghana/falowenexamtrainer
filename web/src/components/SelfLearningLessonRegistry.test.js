@@ -38,7 +38,7 @@ describe("self-learning lesson Falowen Radio integration", () => {
   });
 
   test.each(["B2", "C1"])("%s lesson without Radio opens the shared materials selector", (level) => {
-    renderRegisteredLesson(level, 1);
+    renderRegisteredLesson(level, 28);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
     expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
@@ -50,11 +50,19 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(normalizeLesson({ day: 1 }, "A1").resources.falowenRadio).toBeNull();
   });
 
-  test.each(["A2", "B1"])("%s keeps four-part workbook behaviour", (level) => {
-    const lesson = normalizeLesson({ day: 1 }, level);
+  test("A2 keeps its four-part workbook behaviour and does not use the self-learning registry", () => {
+    const lesson = normalizeLesson({ day: 1 }, "A2");
 
     expect(lesson.lessonType).toBe("fourPartWorkbook");
     expect(lesson.capabilities.fourPartWorkbook).toBe(true);
-    expect(getSelfLearningLessonComponent(level, 1)).toBeNull();
+    expect(getSelfLearningLessonComponent("A2", 1)).toBeNull();
+  });
+
+  test("B1 keeps its four-part tutor-marked workbook behind its Radio entrance", () => {
+    const lesson = normalizeLesson({ day: 1 }, "B1");
+
+    expect(lesson.lessonType).toBe("fourPartWorkbook");
+    expect(lesson.capabilities.fourPartWorkbook).toBe(true);
+    expect(typeof getSelfLearningLessonComponent("B1", 1)).toBe("function");
   });
 });
