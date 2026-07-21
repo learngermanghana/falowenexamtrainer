@@ -15,6 +15,7 @@ on:
       - "web/src/components/B1Day21NoListening.test.js"
       - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
       - "web/src/data/a1RadioResources.js"
+      - "web/src/data/strictInAppWorkbookRoutes.js"
       - "web/src/data/writingVideoResources.js"
       - "web/src/data/writingVideoResources.test.js"
       - "web/src/utils/a1ChapterResourceHubState.js"
