@@ -28,6 +28,9 @@ import A1Day16Chapter9DirectWorkbookRoute, {
 import A1Day20Chapter123DirectWorkbookRoute, {
   A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH,
 } from './components/A1Day20Chapter123DirectWorkbookRoute';
+import A1SpeakingExamIntroEntryRoute, {
+  A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
+} from './components/A1SpeakingExamIntroEntryRoute';
 import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
@@ -82,6 +85,10 @@ const AuthenticatedAppRoutes = () => (
             <Route
               path={A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH}
               element={<A1Day20Chapter123DirectWorkbookRoute />}
+            />
+            <Route
+              path={A1_SPEAKING_EXAM_INTRO_ENTRY_PATH}
+              element={<A1SpeakingExamIntroEntryRoute workbookElement={<App />} />}
             />
             <Route
               path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
