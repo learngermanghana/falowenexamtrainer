@@ -28,6 +28,7 @@ const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
   8: Object.freeze({ day: 8, chapter: "4" }),
   9: Object.freeze({ day: 9, chapter: "5" }),
   11: Object.freeze({ day: 11, chapter: "7" }),
+  12: Object.freeze({ day: 12, chapter: "8" }),
   22: Object.freeze({ day: 22, chapter: "14.1" }),
 });
 

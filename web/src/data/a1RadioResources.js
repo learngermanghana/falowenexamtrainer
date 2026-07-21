@@ -81,6 +81,15 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the Understanding Time episode. Then continue to the Kapitel 7 teacher lecture and lesson resources.",
   }),
+  12: Object.freeze({
+    key: "a1-day12-24-hour-clock-dates-falowen-radio",
+    chapter: "8",
+    title: "The 24 Hour Clock and Dates · Kapitel 8",
+    youtubeId: "nfr-oVo4lco",
+    duration: "",
+    instruction:
+      "Listen carefully to the 24-hour clock and dates episode. Then continue to the Kapitel 8 lesson resources.",
+  }),
   13: Object.freeze({
     key: "a1-day13-revision-numbers-time-prices-falowen-radio",
     title: "Revision: Numbers, Time and Prices",

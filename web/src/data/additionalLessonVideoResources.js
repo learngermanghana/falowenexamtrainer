@@ -95,6 +95,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/JTq-kJXh7ZQ",
       },
     ],
+    18: [
+      {
+        key: "b1-day18-wege-zum-wunschberuf-ai-video",
+        chapter: "6.18",
+        title: "B1 Day 18 · Wege zum Wunschberuf · AI video",
+        description:
+          "AI video lesson for describing career paths, qualifications, applications and ways to reach a dream job.",
+        url: "https://youtu.be/kCFkWHcOakc",
+      },
+    ],
     19: [
       {
         key: "b1-day19-vorstellungsgespraech-ai-video",
