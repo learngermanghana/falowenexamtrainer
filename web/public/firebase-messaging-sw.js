@@ -7,8 +7,9 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v12`;
+const CACHE_NAME = `${CACHE_PREFIX}-v13`;
 const OFFLINE_URL = "/offline.html";
+const VERSIONED_ASSET_PREFIX = "/assets/";
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
 const PUBLIC_AUTH_PATHS = [
@@ -21,7 +22,6 @@ const PUBLIC_AUTH_PATHS = [
 ];
 
 const STATIC_ASSETS = [
-  "/",
   OFFLINE_URL,
   "/manifest.json",
   "/favicon.ico",
@@ -36,6 +36,8 @@ const isPublicAuthPath = (pathname = "") => {
     (path) => normalized === path || normalized.startsWith(`${path}/`)
   );
 };
+const isVersionedBuildAsset = (url) =>
+  url?.origin === self.location.origin && url.pathname.startsWith(VERSIONED_ASSET_PREFIX);
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
   const params = new URLSearchParams();
@@ -156,6 +158,10 @@ self.addEventListener("notificationclick", (event) => {
 self.addEventListener("message", (event) => {
   if (event?.data?.type === "INIT_FIREBASE") {
     initializeMessaging(event.data.payload);
+    return;
+  }
+  if (event?.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
   }
 });
 
@@ -186,10 +192,10 @@ self.addEventListener("activate", (event) => {
 
 const cacheNetworkResponse = async (request, response) => {
   const requestUrl = new URL(request.url);
-  if (isPublicAuthPath(requestUrl.pathname)) return response;
+  if (isPublicAuthPath(requestUrl.pathname) || !response?.ok) return response;
 
   const cache = await caches.open(CACHE_NAME);
-  cache.put(request, response.clone());
+  await cache.put(request, response.clone());
   return response;
 };
 
@@ -231,7 +237,7 @@ const handleStaticRequest = async (request) => {
     if (cached) {
       return cached;
     }
-    return caches.match(OFFLINE_URL);
+    return Response.error();
   }
 };
 
@@ -250,10 +256,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (requestUrl.origin === self.location.origin) {
-    const cacheableDestinations = ["style", "script", "image", "font"];
-    if (cacheableDestinations.includes(request.destination)) {
-      event.respondWith(handleStaticRequest(request));
-    }
+  if (requestUrl.origin !== self.location.origin) return;
+
+  // Vite filenames are content-hashed and deployment-specific. Let the browser
+  // request them directly so an older service worker can never replace a JS/CSS
+  // module with an offline HTML response or reject the module request.
+  if (isVersionedBuildAsset(requestUrl)) {
+    return;
+  }
+
+  const cacheableDestinations = ["image", "font"];
+  if (cacheableDestinations.includes(request.destination)) {
+    event.respondWith(handleStaticRequest(request));
   }
 });
