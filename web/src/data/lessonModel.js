@@ -148,6 +148,47 @@ const getRawLessonResourceEntries = (rawLesson = {}) => {
   return nested.length ? nested : [rawLesson];
 };
 
+const removeLegacyDuplicatedA1TeacherVideos = ({ level, day, rawLesson, videos = [] }) => {
+  if (level !== "A1") return videos;
+
+  const configuredPrimaryTeachers = new Map(
+    getA1TeacherVideoResources(day)
+      .filter((video) => Number(video.videoNumber) <= 1)
+      .map((video) => [chapterKey(video.chapter), String(video.url || "").trim()]),
+  );
+  if (!configuredPrimaryTeachers.size) return videos;
+
+  const duplicatedLegacyUrls = new Set();
+  getRawLessonResourceEntries(rawLesson).forEach((entry) => {
+    const chapter = chapterKey(entry.chapter || rawLesson.chapter);
+    const genericUrl = first(entry.video, entry.youtube_link, entry.tutorial_video_url);
+    const teacherUrl = first(
+      entry.teacher_video,
+      entry.teacherVideo,
+      entry.teacher_lecture_url,
+      entry.teacherLectureUrl,
+      entry.teacher_explanation_url,
+      entry.teacherExplanationUrl,
+    );
+    const configuredTeacherUrl = configuredPrimaryTeachers.get(chapter);
+
+    if (
+      genericUrl &&
+      teacherUrl &&
+      genericUrl === teacherUrl &&
+      configuredTeacherUrl &&
+      configuredTeacherUrl !== teacherUrl
+    ) {
+      duplicatedLegacyUrls.add(teacherUrl);
+    }
+  });
+
+  if (!duplicatedLegacyUrls.size) return videos;
+  return videos.filter(
+    (video) => !(isTeacherVideo(video) && duplicatedLegacyUrls.has(String(video.url || "").trim())),
+  );
+};
+
 const getExplicitTeacherUrlsByChapter = (rawLesson = {}) => {
   const byChapter = new Map();
 
@@ -240,10 +281,16 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     getLessonVideoResources(level, day, rawLesson),
     getAdditionalLessonVideoResources(level, day),
   );
+  const cleanedConfiguredVideos = removeLegacyDuplicatedA1TeacherVideos({
+    level,
+    day,
+    rawLesson,
+    videos: configuredVideos,
+  });
   const preferredConfiguredVideos = preferExplicitA1TeacherVideos({
     level,
     rawLesson,
-    videos: configuredVideos,
+    videos: cleanedConfiguredVideos,
   });
   const allVideos = addMissingA1TeacherVideos({
     level,
