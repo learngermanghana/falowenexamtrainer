@@ -92,6 +92,7 @@ export const SelfLearningMaterialsSelector = ({
   teacherVideo = null,
   aiVideo = null,
   grammarBook = null,
+  onOpenWorkbook = null,
   children,
 }) => {
   const location = useLocation();
@@ -119,12 +120,18 @@ export const SelfLearningMaterialsSelector = ({
   if (enteredLearningContent) return children;
 
   const enterWorkbook = () => {
-    const nextSearch = buildCompletedMaterialsSearch(location.search);
+    const nextLocation = {
+      pathname: location.pathname,
+      search: buildCompletedMaterialsSearch(location.search),
+      hash: location.hash || "",
+    };
+
+    if (typeof onOpenWorkbook === "function" && onOpenWorkbook(nextLocation) === true) {
+      return;
+    }
+
     setEnteredLearningContent(true);
-    navigate(
-      { pathname: location.pathname, search: nextSearch, hash: location.hash || "" },
-      { replace: true },
-    );
+    navigate(nextLocation, { replace: true });
   };
 
   let number = 0;
@@ -251,6 +258,7 @@ const SelfLearningJourneyGate = ({
   teacherVideo = null,
   aiVideo = null,
   grammarBook = null,
+  onOpenWorkbook = null,
   children,
 }) => {
   const materials = (
@@ -261,6 +269,7 @@ const SelfLearningJourneyGate = ({
       teacherVideo={teacherVideo}
       aiVideo={aiVideo}
       grammarBook={grammarBook}
+      onOpenWorkbook={onOpenWorkbook}
     >
       {children}
     </SelfLearningMaterialsSelector>
