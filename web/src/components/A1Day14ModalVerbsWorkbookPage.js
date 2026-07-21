@@ -112,7 +112,14 @@ const SelfLearningVideoCard = ({ resource }) => (
 export const A1Day14SelfLearningMaterials = () => (
   <div
     data-a1-day14-self-learning-materials="true"
-    style={{ ...styles.container, display: "grid", gap: 12, paddingBottom: 0, paddingTop: 0 }}
+    style={{
+      ...styles.container,
+      display: "grid",
+      gap: 12,
+      minHeight: 0,
+      paddingBottom: 0,
+      paddingTop: 0,
+    }}
   >
     <section
       style={{
