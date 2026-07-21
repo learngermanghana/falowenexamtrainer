@@ -15,7 +15,7 @@ import {
   removeTeacherLectureFromLesson,
   resolveTeacherLectureResources,
 } from "./selfLearning/TeacherLectureSupportingMaterials";
-import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
+import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
@@ -130,6 +130,16 @@ const resolveAiVideoResource = ({ lesson = null, canonicalLesson = null } = {}) 
   return candidates.find((resource) => resource?.url && !isTeacherLectureResource(resource)) || null;
 };
 
+const resolveGrammarBookResource = ({ lesson = null, canonicalLesson = null } = {}) => {
+  const canonicalResources = canonicalLesson?.resources || {};
+  const lessonResources = lesson?.resources || {};
+  return canonicalResources.grammarBook
+    || canonicalResources.resourceGroups?.find((group) => group?.grammarBook?.url)?.grammarBook
+    || lessonResources.grammarBook
+    || lessonResources.resourceGroups?.find((group) => group?.grammarBook?.url)?.grammarBook
+    || null;
+};
+
 const removeAllDisplayedVideosFromLesson = (lesson = null) => {
   const withoutTeacher = removeTeacherLectureFromLesson(lesson);
   if (!withoutTeacher) return withoutTeacher;
@@ -155,21 +165,35 @@ const removeAllDisplayedVideosFromCanonicalLesson = (canonicalLesson = null) => 
   };
 };
 
-export const SelfLearningLessonFrame = ({ lesson = null, canonicalLesson = null, children }) => {
+export const SelfLearningLessonFrame = ({
+  level = "",
+  day = 0,
+  lesson = null,
+  canonicalLesson = null,
+  children,
+}) => {
+  const normalizedLevel = String(level || lesson?.level || canonicalLesson?.level || "").toUpperCase();
+  const resolvedDay = Number(day || lesson?.day || canonicalLesson?.day || 0);
   const teacherVideo = resolveTeacherLectureResources({ lesson, canonicalLesson })[0] || null;
   const aiVideo = resolveAiVideoResource({ lesson, canonicalLesson });
+  const grammarBook = resolveGrammarBookResource({ lesson, canonicalLesson });
+  const radio = canonicalLesson?.resources?.falowenRadio
+    || getLessonRadioResource(normalizedLevel, resolvedDay)
+    || null;
+  const title = lesson?.title || lesson?.topic || canonicalLesson?.topic || `Day ${resolvedDay}`;
 
   return (
-    <>
-      <div style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}>
-        <SelfLearningSupportingMaterials
-          teacherVideo={teacherVideo}
-          aiVideo={aiVideo}
-          description="Open the teacher lecture and AI lesson here first. The same media order is used across all self-learning lessons."
-        />
-      </div>
+    <SelfLearningJourneyGate
+      level={normalizedLevel}
+      day={resolvedDay}
+      title={title}
+      radio={radio}
+      teacherVideo={teacherVideo}
+      aiVideo={aiVideo}
+      grammarBook={grammarBook}
+    >
       {children}
-    </>
+    </SelfLearningJourneyGate>
   );
 };
 
@@ -184,7 +208,7 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
     page = (
       <SelfLearningEditableLessonPageV2
         lesson={pageLesson}
-        falowenRadio={canonicalLesson?.resources?.falowenRadio || null}
+        falowenRadio={null}
       />
     );
   } else if (normalizedLevel === "C1" && day === 11) {
@@ -206,7 +230,12 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   }
 
   return (
-    <SelfLearningLessonFrame lesson={lesson} canonicalLesson={canonicalLesson}>
+    <SelfLearningLessonFrame
+      level={normalizedLevel}
+      day={day}
+      lesson={lesson}
+      canonicalLesson={canonicalLesson}
+    >
       {page}
     </SelfLearningLessonFrame>
   );
@@ -222,9 +251,7 @@ const componentRegistry = Object.fromEntries(
 );
 
 const B1RadioLessonComponent = ({ canonicalLesson }) => (
-  <SelfLearningLessonFrame canonicalLesson={canonicalLesson}>
-    <B1TutorLessonPage canonicalLesson={removeAllDisplayedVideosFromCanonicalLesson(canonicalLesson)} />
-  </SelfLearningLessonFrame>
+  <B1TutorLessonPage canonicalLesson={canonicalLesson} />
 );
 
 const hasB1Radio = (day) =>

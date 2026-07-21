@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocation } from "react-router-dom";
 import {
@@ -7,42 +6,137 @@ import {
   normalizeA1CoursePracticePath,
   shouldAutoMountA1WritingPractice,
 } from "../utils/a1CoursePracticeRoutes";
-import { styles } from "../styles";
-import A1ExamSpeakingPracticePanel from "./A1ExamSpeakingPracticePanel";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
-import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
+import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
+import { isTeacherLectureResource } from "./selfLearning/TeacherLectureSupportingMaterials";
+import { getA1RadioResource } from "../data/a1RadioResources";
+import {
+  A1_CANONICAL_LESSON_CATALOG,
+  getA1CanonicalLessonForLegacyRoute,
+} from "../data/a1CanonicalLessonCatalog";
+import { courseSchedules } from "../data/courseSchedule";
+import { normalizeLesson } from "../data/lessonModel";
 
-const A1_DAY_19_LESSON_PATH = "/campus/course/lesson/a1/19";
-const A1_DAY_19_NAMED_PATH = "/campus/course/verboten-erlaubt-5-9";
 const A1_DAY_19_AI_VIDEO_URL = "https://youtu.be/gprnEZtMUPM";
 const A1_DAY_19_TEACHER_VIDEO_URL = "https://youtu.be/ZfXw4fRQ0Tg";
-const A1_DAY_19_SUBMIT_URL = "/campus/submit?level=A1&assignmentKey=A1-5.9&assignmentId=A1-5.9";
 const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
+const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
+  (lesson) => lesson.kind === "practice",
+);
+
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
+const routePath = (value = "") => normalizeA1CoursePracticePath(String(value || "").split(/[?#]/)[0]);
 
 const getPageContainer = () => {
   const main = document.querySelector("main") || document.body;
   return main.querySelector("div[style*='display: grid']") || main.firstElementChild || main;
 };
 
-const isA1Day19LessonRoute = (location) => {
-  const path = normalizeA1CoursePracticePath(location.pathname);
-  const chapter = new URLSearchParams(location.search || "").get("chapter");
-  return path === A1_DAY_19_LESSON_PATH && String(chapter || "").trim() === "5.9";
-};
-
-const isA1Day19NamedRoute = (location) =>
-  normalizeA1CoursePracticePath(location.pathname) === A1_DAY_19_NAMED_PATH;
-
-const getCanonicalLessonArticle = () => {
+const getCanonicalLessonArticle = (day) => {
   const main = document.querySelector("main") || document.body;
   return Array.from(main.querySelectorAll("article")).find((article) => {
     const header = Array.from(article.children).find((child) => child.tagName === "HEADER");
     const headerText = String(header?.textContent || "");
-    return Boolean(header && /\bA1\b/i.test(headerText) && /Day\s*19/i.test(headerText));
+    return Boolean(header && /\bA1\b/i.test(headerText) && new RegExp(`Day\\s*${Number(day)}`, "i").test(headerText));
   });
 };
 
-const prepareSpeakingLessonPage = (container) => {
+export const getA1SelfLearningPracticeForLocation = (location = {}) => {
+  const pathname = routePath(location.pathname);
+  const direct = A1_SELF_LEARNING_PRACTICES.find((lesson) =>
+    [lesson.destination, lesson.lessonRoute, lesson.shortLessonRoute]
+      .filter(Boolean)
+      .some((candidate) => routePath(candidate) === pathname),
+  );
+  if (direct) return direct;
+
+  const legacy = pathname.match(/^\/campus\/course\/lesson\/a1\/(\d+)$/i);
+  if (!legacy) return null;
+  const chapter = new URLSearchParams(location.search || "").get("chapter") || "";
+  const lesson = getA1CanonicalLessonForLegacyRoute({
+    day: Number(legacy[1]),
+    identity: chapter,
+  });
+  return lesson?.kind === "practice" ? lesson : null;
+};
+
+const resourceMatchesPractice = (resource = {}, practice = {}) => {
+  const resourceChapter = normalizeChapter(resource.chapter || resource.displayChapter);
+  if (resourceChapter && resourceChapter === normalizeChapter(practice.chapter)) return true;
+  const workbook = routePath(resource.workbook_link || resource.workbookRoute || "");
+  return Boolean(workbook && workbook === routePath(practice.destination));
+};
+
+const scopeA1PracticeLesson = (practice) => {
+  const rawLesson = (courseSchedules.A1 || []).find(
+    (lesson) => Number(lesson?.day || lesson?.assignmentDay) === Number(practice.day),
+  );
+  if (!rawLesson) {
+    return {
+      level: "A1",
+      day: practice.day,
+      chapter: practice.chapter,
+      topic: practice.title,
+      assignment: false,
+      progressionEligible: false,
+    };
+  }
+
+  const schreiben = toArray(rawLesson.schreiben_sprechen);
+  const lesen = toArray(rawLesson.lesen_hören);
+  const matchingSchreiben = schreiben.find((resource) => resourceMatchesPractice(resource, practice));
+  const matchingLesen = lesen.find((resource) => resourceMatchesPractice(resource, practice));
+
+  return {
+    ...rawLesson,
+    level: "A1",
+    day: Number(practice.day),
+    chapter: practice.chapter,
+    topic: practice.title,
+    title: practice.title,
+    assignment: false,
+    tutorMarked: false,
+    selfPractice: true,
+    submissionRequired: false,
+    progressionEligible: false,
+    schreiben_sprechen: matchingSchreiben || null,
+    lesen_hören: matchingLesen || null,
+  };
+};
+
+export const getA1SelfLearningJourneyResources = (practice) => {
+  const normalized = normalizeLesson(scopeA1PracticeLesson(practice), "A1");
+  const videos = normalized?.resources?.videos || [];
+  const teacherVideo = videos.find(isTeacherLectureResource)
+    || (Number(practice.day) === 19
+      ? {
+          url: A1_DAY_19_TEACHER_VIDEO_URL,
+          title: "Goethe A1 Speaking Confidence Lab · Teacher lecture",
+          description: "Recorded teacher explanation for the Day 19 speaking lesson.",
+        }
+      : null);
+  const aiVideo = videos.find((video) => !isTeacherLectureResource(video))
+    || (Number(practice.day) === 19
+      ? {
+          url: A1_DAY_19_AI_VIDEO_URL,
+          title: "Goethe A1 Speaking Practice · AI video",
+          description: "AI-supported exam practice for Teil 1, Teil 2 and Teil 3.",
+        }
+      : null);
+  const grammarBook = normalized?.resources?.grammarBook
+    || normalized?.resources?.resourceGroups?.find((group) => group?.grammarBook?.url)?.grammarBook
+    || null;
+
+  return {
+    radio: getA1RadioResource(practice.day, practice.chapter),
+    teacherVideo,
+    aiVideo,
+    grammarBook,
+  };
+};
+
+const prepareDay19Page = (container) => {
   container?.querySelector('[data-a1-speaking-ai-video="embedded"]')?.remove();
   document.querySelector('[data-a1-workbook-video-header="true"]')?.remove();
 
@@ -62,7 +156,7 @@ const prepareLetterGrammarPage = () => {
   if (teacherVideoLink) teacherVideoLink.setAttribute("href", A1_DAY_12_TEACHER_VIDEO_URL);
 };
 
-const insertSpeakingMount = (container, mount) => {
+const insertPracticeMount = (container, mount) => {
   if (container?.tagName === "ARTICLE") {
     const header = Array.from(container.children).find((child) => child.tagName === "HEADER");
     if (header) {
@@ -76,6 +170,27 @@ const insertSpeakingMount = (container, mount) => {
   } else {
     container.appendChild(mount);
   }
+};
+
+const hideSelfLearningContent = (container, mount) => {
+  const hidden = Array.from(container?.children || [])
+    .filter((child) => child !== mount)
+    .map((child) => ({ child, display: child.style.display }));
+
+  hidden.forEach(({ child }) => {
+    child.dataset.selfLearningJourneyHidden = "true";
+    child.style.display = "none";
+  });
+
+  let restored = false;
+  return () => {
+    if (restored) return;
+    restored = true;
+    hidden.forEach(({ child, display }) => {
+      delete child.dataset.selfLearningJourneyHidden;
+      child.style.display = display;
+    });
+  };
 };
 
 const findSectionByHeading = (container, headingText) =>
@@ -95,49 +210,38 @@ const insertWritingMount = (container, mount) => {
   container.appendChild(mount);
 };
 
-const Day19SelfLearningSupport = () => (
-  <div
-    data-a1-day19-self-learning-support="true"
-    data-radio-first-workbook-gate="true"
-    style={{ display: "grid", gap: 12 }}
-  >
-    <SelfLearningSupportingMaterials
-      teacherVideo={{
-        url: A1_DAY_19_TEACHER_VIDEO_URL,
-        title: "Goethe A1 Speaking Confidence Lab · Teacher lecture",
-        description: "Recorded teacher explanation for the Day 19 speaking lesson.",
-      }}
-      aiVideo={{
-        url: A1_DAY_19_AI_VIDEO_URL,
-        title: "Goethe A1 Speaking Practice · AI video",
-        description: "AI-supported exam practice for Teil 1, Teil 2 and Teil 3.",
-      }}
-      description="Use the same supporting-materials layout as tutor-marked workbooks. Open the videos first, then complete the self-learning activities below."
-    />
+const A1PracticeLearningContent = ({ onEnter }) => {
+  useEffect(() => {
+    onEnter?.();
+  }, [onEnter]);
+  return null;
+};
 
-    <section
-      data-a1-day19-submission-entry="true"
-      style={{
-        ...styles.card,
-        border: "1px solid #bfdbfe",
-        background: "linear-gradient(135deg, #eff6ff, #ffffff)",
-        display: "grid",
-        gap: 9,
-      }}
+const mergeJourneyStateIntoDestination = (destination, nextLocation) => {
+  const parsed = new URL(destination, "https://www.falowen.app");
+  const params = new URLSearchParams(nextLocation?.search || "");
+  params.forEach((value, key) => parsed.searchParams.set(key, value));
+  parsed.searchParams.set("materials", "done");
+  return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+};
+
+const A1SelfLearningJourney = ({ practice, onEnter, onOpenWorkbook }) => {
+  const resources = getA1SelfLearningJourneyResources(practice);
+  return (
+    <SelfLearningJourneyGate
+      level="A1"
+      day={practice.day}
+      title={`${practice.title} · Kapitel ${practice.chapter}`}
+      radio={resources.radio}
+      teacherVideo={resources.teacherVideo}
+      aiVideo={resources.aiVideo}
+      grammarBook={resources.grammarBook}
+      onOpenWorkbook={onOpenWorkbook}
     >
-      <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1d4ed8" }}>
-        Final submission
-      </span>
-      <h2 style={{ margin: 0 }}>Submit your Day 19 speaking assignment</h2>
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-        Complete the speaking practice, then submit your final written transcript or final answers for tutor review.
-      </p>
-      <a href={A1_DAY_19_SUBMIT_URL} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
-        Open Submit assignment
-      </a>
-    </section>
-  </div>
-);
+      <A1PracticeLearningContent onEnter={onEnter} />
+    </SelfLearningJourneyGate>
+  );
+};
 
 const A1CoursePracticeAutoMount = () => {
   const location = useLocation();
@@ -145,50 +249,65 @@ const A1CoursePracticeAutoMount = () => {
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
     const pathname = normalizeA1CoursePracticePath(location.pathname);
-    const isCanonicalLessonPage = isA1Day19LessonRoute(location);
-    const isNamedDay19Page = isA1Day19NamedRoute(location);
+    const practice = getA1SelfLearningPracticeForLocation(location);
     const isWritingPage = shouldAutoMountA1WritingPractice(pathname);
     const isLetterGrammarPage = isA1LetterWritingGrammarPath(pathname);
 
-    if (!isCanonicalLessonPage && !isNamedDay19Page && !isWritingPage && !isLetterGrammarPage) return undefined;
+    if (!practice && !isWritingPage && !isLetterGrammarPage) return undefined;
 
     document.getElementById("falowen-a1-practice-mount")?.remove();
 
-    if (isLetterGrammarPage) {
+    if (isLetterGrammarPage && !practice) {
       prepareLetterGrammarPage();
       return undefined;
     }
 
-    const container =
-      (isCanonicalLessonPage ? getCanonicalLessonArticle() : null) || getPageContainer();
+    const currentIsDestination = practice
+      ? routePath(practice.destination) === routePath(location.pathname)
+      : false;
+    const container = practice
+      ? (currentIsDestination ? null : getCanonicalLessonArticle(practice.day)) || getPageContainer()
+      : getPageContainer();
 
-    if (isCanonicalLessonPage || isNamedDay19Page) prepareSpeakingLessonPage(container);
+    if (practice && Number(practice.day) === 19) prepareDay19Page(container);
 
     const mount = document.createElement("div");
     mount.id = "falowen-a1-practice-mount";
     mount.style.margin = "16px 0";
 
-    if (isCanonicalLessonPage || isNamedDay19Page) insertSpeakingMount(container, mount);
+    if (practice) insertPracticeMount(container, mount);
     else insertWritingMount(container, mount);
+
+    const restoreContent = practice ? hideSelfLearningContent(container, mount) : () => {};
+    const openWorkbook = practice && !currentIsDestination
+      ? (nextLocation) => {
+          const href = mergeJourneyStateIntoDestination(practice.destination, nextLocation);
+          window.location.assign(href);
+          return true;
+        }
+      : null;
 
     const root = createRoot(mount);
     root.render(
-      isNamedDay19Page ? (
-        <Day19SelfLearningSupport />
-      ) : isCanonicalLessonPage ? (
-        <A1ExamSpeakingPracticePanel />
+      practice ? (
+        <A1SelfLearningJourney
+          practice={practice}
+          onEnter={restoreContent}
+          onOpenWorkbook={openWorkbook}
+        />
       ) : (
         <A1SimpleMarkMyLetterPanel />
       ),
     );
 
-    const observer = isNamedDay19Page
-      ? new MutationObserver(() => prepareSpeakingLessonPage(container))
+    const observer = practice && Number(practice.day) === 19
+      ? new MutationObserver(() => prepareDay19Page(container))
       : null;
     observer?.observe(container, { childList: true, subtree: true });
 
     return () => {
       observer?.disconnect();
+      restoreContent();
       root.unmount();
       mount.remove();
     };

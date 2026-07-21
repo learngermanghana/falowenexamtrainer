@@ -1,0 +1,76 @@
+name: Self-learning journeys
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1CoursePracticeAutoMount.js"
+      - "web/src/components/A1SelfLearningJourneyStandardization.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/SelfLearningLessonRegistry.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.standardization.test.js"
+      - "web/src/components/selfLearning/SelfLearningJourneyGate.js"
+      - "web/src/components/selfLearning/SelfLearningJourneyGate.test.js"
+      - "web/src/data/a1Day19SubmissionRestoration.test.js"
+      - "web/src/data/a1RouteAlignment.js"
+      - "web/src/data/a1CanonicalLessonCatalog.js"
+      - "web/src/data/a1CourseBookCards.js"
+      - ".github/workflows/self-learning-journey-check.yml"
+
+jobs:
+  self-learning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: Test shared materials selector
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/selfLearning/SelfLearningJourneyGate.test.js
+
+      - name: Test B2 and C1 Radio journey
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.test.js
+
+      - name: Test B2 and C1 registry coverage
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="shared radio and materials journey"
+
+      - name: Test B1 tutor journey preservation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="B1"
+
+      - name: Test C1 speaking-content standards
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.standardization.test.js --testNamePattern="C1 Day"
+
+      - name: Test every A1 self-practice route
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SelfLearningJourneyStandardization.test.js
+
+      - name: Test A1 Day 19 self-learning status
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1Day19SubmissionRestoration.test.js
+
+      - name: Build web app
+        working-directory: web
+        run: npm run build
