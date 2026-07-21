@@ -58,7 +58,7 @@ describe("A1 tutor-marked lesson media", () => {
 
   test.each(chapterHubs)(
     "keeps Day $day Kapitel $chapter materials inside the canonical chapter hub",
-    ({ day, chapter }) => {
+    async ({ day, chapter }) => {
       const { container } = render(
         <MemoryRouter
           initialEntries={[
@@ -67,14 +67,14 @@ describe("A1 tutor-marked lesson media", () => {
         >
           <Routes>
             <Route
-              path="/campus/course/lesson/:level/:day"
+              path="/campus/course/lesson/:level/:day/*"
               element={<A1ChapterResourceHubRoute />}
             />
           </Routes>
         </MemoryRouter>,
       );
 
-      expect(screen.getByTestId("legacy-a1-resource-hub")).toBeVisible();
+      expect(await screen.findByTestId("legacy-a1-resource-hub")).toBeVisible();
       expect(
         container.querySelector("[data-teacher-lecture-support='links-only']"),
       ).not.toBeInTheDocument();
