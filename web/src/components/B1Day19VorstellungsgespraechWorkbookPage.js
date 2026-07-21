@@ -30,6 +30,46 @@ const QuestionList = ({ items }) => (
   </div>
 );
 
+const WritingSupportVideo = () => (
+  <article
+    data-b1-day19-writing-video="true"
+    style={{
+      ...box,
+      background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
+      borderColor: "#93c5fd",
+      gap: 12,
+    }}
+  >
+    <div style={{ display: "grid", gap: 4 }}>
+      <span style={{ color: "#1d4ed8", fontSize: ".78rem", fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase" }}>
+        Teil 2 · Writing support video
+      </span>
+      <strong style={{ fontSize: "1.05rem" }}>Watch before writing your opinion</strong>
+      <p style={{ color: "#475569", lineHeight: 1.6, margin: 0 }}>
+        Use the video to review the writing task, structure and useful expressions. Then write your own answer and submit it in the Submit tab.
+      </p>
+    </div>
+    <div style={{ aspectRatio: "16 / 9", background: "#020617", borderRadius: 14, overflow: "hidden", position: "relative", width: "100%" }}>
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/clZoeBjLesQ"
+        title="B1 Day 19 Teil 2 Schreiben support video"
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        style={{ border: 0, height: "100%", inset: 0, position: "absolute", width: "100%" }}
+      />
+    </div>
+    <a
+      href="https://youtu.be/clZoeBjLesQ"
+      target="_blank"
+      rel="noreferrer"
+      style={{ ...styles.linkButton, width: "fit-content" }}
+    >
+      Open writing video on YouTube
+    </a>
+  </article>
+);
+
 const energyQuestions = [
   { number: 1, stem: "In diesem Text geht es um ...", options: ["a) die neue Technologie von Eckhard Meier.", "b) die umweltfreundliche Stromproduktion in Feldheim.", "c) einen Studiengang an der Universität Göttingen."] },
   { number: 2, stem: "Die Wissenschaftler wollten zeigen, dass ...", options: ["a) ein ganzes Dorf von modernen Energien leben kann.", "b) eine Bio-Gasanlage mehr Strom produziert, als ein Dorf braucht.", "c) man größere Mengen Strom sparen kann."] },
@@ -86,6 +126,7 @@ export default function B1Day19VorstellungsgespraechWorkbookPage() {
           <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind Vorstellungsgespräche schwierig? Schreiben Sie Ihre Meinung." submissionNote="Write about 80 words and submit your final text in the Submit tab.">
             <p style={{ margin: 0 }}>Situation: Emma findet, dass ein Vorstellungsgespräch stressig sein kann. Reagieren Sie auf ihre Meinung. Schreiben Sie, ob Sie zustimmen, warum Vorstellungsgespräche schwierig sein können, wie man sich vorbereiten kann und was für Erfolg wichtig ist.</p>
           </WorkbookTaskCard>
+          <WritingSupportVideo />
           <div style={highlight}><strong>Emma</strong><p style={{ margin: 0 }}>Ein Vorstellungsgespräch kann stressig sein. Ich stimme dem zu, denn man muss viele Fragen beantworten und einen guten Eindruck machen. Dennoch kann man sich gut vorbereiten, zum Beispiel mit Übungsgesprächen. Ich finde, dass Selbstbewusstsein und eine gute Vorbereitung helfen, erfolgreich zu sein. Was denken Sie darüber?</p></div>
           <div style={box}><strong>Structure</strong><ol style={list}><li>Einleitung: Thema nennen</li><li>Emmas Meinung kurz aufgreifen</li><li>Eigene Meinung mit Gründen</li><li>Vorbereitung und Tipps</li><li>Kurzer Schluss</li></ol></div>
           <div style={box}><strong>Redemittel</strong><ul style={list}><li>Ich stimme Emma zu, denn ...</li><li>Meiner Meinung nach sind Vorstellungsgespräche schwierig, weil ...</li><li>Man sollte sich gut vorbereiten, indem man ...</li><li>Außerdem würde ich ...</li></ul></div>
