@@ -40,11 +40,21 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.level.test.jsx
-      - name: Test A1 teacher media and Radio completion
+      - name: Test A1 teacher lecture rendering
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="renders the teacher lecture"
+      - name: Test A1 Radio completion on workbook link
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="carries completed Radio state"
+      - name: Test A1 workbook AI video ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.teacherMedia.test.jsx --testNamePattern="keeps the AI lesson video"
       - name: Test A1 Day 15 Radio
         working-directory: web
         env:
