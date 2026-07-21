@@ -19,7 +19,7 @@ jest.mock("./CourseLessonPageLegacy", () => function StableLessonProbe() {
   return <div data-testid="stable-lesson">{location.pathname}{location.search}</div>;
 });
 
-test("Day 7 chapter hub stays mounted without replace navigation or repeated fetching", () => {
+test("Day 7 chapter hub normalizes once and stays mounted without repeated fetching", async () => {
   mockMountCount = 0;
   mockUnmountCount = 0;
   const originalFetch = global.fetch;
@@ -37,7 +37,7 @@ test("Day 7 chapter hub stays mounted without replace navigation or repeated fet
     </MemoryRouter>,
   );
 
-  expect(screen.getByTestId("stable-lesson")).toHaveTextContent(
+  expect(await screen.findByTestId("stable-lesson")).toHaveTextContent(
     "/campus/course/lesson/A1/7?chapter=3&hub=1",
   );
   expect(mockMountCount).toBe(1);

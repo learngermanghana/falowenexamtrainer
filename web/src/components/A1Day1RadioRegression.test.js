@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getA1RadioResource } from "../data/a1RadioResources";
+import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
@@ -13,6 +14,21 @@ describe("A1 Day 1 Falowen Radio", () => {
         youtubeId: "rqnqC3AyfDk",
       }),
     );
+  });
+
+  it("opens Falowen Radio before the canonical Day 1 Kapitel 0.1 hub", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/1",
+        "?chapter=0.1&hub=1",
+      ),
+    ).toEqual({ day: 1, chapter: "0.1" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/1",
+        "?chapter=0.2&hub=1",
+      ),
+    ).toBeNull();
   });
 
   it("keeps the existing A1 Day 1 assignment behind the radio gate", () => {

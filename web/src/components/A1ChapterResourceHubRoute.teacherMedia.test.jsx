@@ -6,7 +6,7 @@ import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from "./A1ChapterResourceHubRoute";
 
-test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for the workbook", () => {
+test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for the workbook", async () => {
   render(
     <MemoryRouter initialEntries={["/campus/course/lesson/A1/1?chapter=0.1&hub=1&radio=done"]}>
       <Routes>
@@ -18,7 +18,7 @@ test("shows the A1 teacher lecture in the chapter hub and keeps the AI video for
     </MemoryRouter>,
   );
 
-  expect(screen.getByText("A1")).toBeVisible();
+  expect(await screen.findByText("A1")).toBeVisible();
   expect(screen.getByText("Kapitel 0.1 teacher lecture video")).toBeVisible();
   expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
     "href",
