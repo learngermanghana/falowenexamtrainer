@@ -47,6 +47,15 @@ const patchCanonicalResource = ({ lesson, workbookRoute }) => ({
     : {}),
 });
 
+export const addA1WorkbookHubBypass = ({ lesson = {}, workbookRoute = "" } = {}) => {
+  if (lesson.id !== "A1-4.7" || !workbookRoute) return workbookRoute;
+
+  const parsed = new URL(workbookRoute, "https://www.falowen.app");
+  parsed.searchParams.set("view", "workbook");
+  const query = parsed.searchParams.toString();
+  return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+};
+
 export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) => {
   const requestedDay = Number(day);
   const requestedChapter = normalizeToken(chapter);
@@ -59,9 +68,10 @@ export const resolveCanonicalA1LessonRouteEntry = ({ day, chapter = "" } = {}) =
 
   const lesson = matches[0];
   const registeredAssignment = getA1Assignment(lesson.assignmentId);
-  const workbookRoute = registeredAssignment?.day === requestedDay
+  const rawWorkbookRoute = registeredAssignment?.day === requestedDay
     ? registeredAssignment.workbookRoute
     : lesson.workbookRoute || "";
+  const workbookRoute = addA1WorkbookHubBypass({ lesson, workbookRoute: rawWorkbookRoute });
   const resource = patchCanonicalResource({ lesson, workbookRoute });
   const legacy = toLegacyCurriculumEntry(lesson);
   const assignmentId = lesson.assignmentId || null;
