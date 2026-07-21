@@ -1,0 +1,44 @@
+name: Self-learning journeys
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1CoursePracticeAutoMount.js"
+      - "web/src/components/A1SelfLearningJourneyStandardization.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/SelfLearningLessonRegistry.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.standardization.test.js"
+      - "web/src/components/selfLearning/SelfLearningJourneyGate.js"
+      - "web/src/components/selfLearning/SelfLearningJourneyGate.test.js"
+      - "web/src/data/a1Day19SubmissionRestoration.test.js"
+      - "web/src/data/a1RouteAlignment.js"
+      - "web/src/data/a1CanonicalLessonCatalog.js"
+      - "web/src/data/a1CourseBookCards.js"
+      - ".github/workflows/self-learning-journey-check.yml"
+
+jobs:
+  self-learning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test shared self-learning journey
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/selfLearning/SelfLearningJourneyGate.test.js
+          src/components/SelfLearningLessonRegistry.test.js
+          src/components/SelfLearningLessonRegistry.standardization.test.js
+          src/components/A1SelfLearningJourneyStandardization.test.js
+          src/data/a1Day19SubmissionRestoration.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build
