@@ -5,6 +5,8 @@ on:
     paths:
       - "web/src/utils/lessonRouteEntry.js"
       - "web/src/components/a1LessonWorkbookRoutes.regression.test.jsx"
+      - "web/src/components/A1SpeakingExamIntroEntryRoute.jsx"
+      - "web/src/components/A1SpeakingExamIntroEntryRoute.test.jsx"
       - "web/src/components/A1Day14ModalVerbsWorkbookPage.js"
       - "web/src/components/A1Day14ModalVerbsWorkbookPage.test.js"
       - ".github/workflows/a1-hub-modal-workbook.yml"
@@ -26,4 +28,4 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/a1LessonWorkbookRoutes.regression.test.jsx src/components/A1Day14ModalVerbsWorkbookPage.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/a1LessonWorkbookRoutes.regression.test.jsx src/components/A1SpeakingExamIntroEntryRoute.test.jsx src/components/A1Day14ModalVerbsWorkbookPage.test.js
