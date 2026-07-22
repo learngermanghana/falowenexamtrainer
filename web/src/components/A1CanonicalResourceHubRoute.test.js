@@ -96,6 +96,22 @@ describe("A1 canonical resource hub handoff", () => {
     ).toBe(false);
   });
 
+  test("preserves completed radio on tutor-marked workbook links from the teacher lecture hub", () => {
+    const state = buildA1ChapterResourceHubState({
+      level: "A1",
+      day: "1",
+      search: "?chapter=0.1&hub=1&radio=done",
+    });
+    const lesson = normalizeLesson(state.entry, "A1");
+
+    expect(state.entry.workbookRoute).toBe(
+      "/campus/course/a1-day-1-greetings-workbook?radio=done",
+    );
+    expect(lesson.resources.workbook?.url).toBe(
+      "/campus/course/a1-day-1-greetings-workbook?radio=done",
+    );
+  });
+
   test("keeps Day 20 Kapitel 12.3 grammar notes on the lesson resource hub", () => {
     const entry = resolveA1ChapterResourceHubEntry({ day: 20, chapter: "12.3" });
     const lesson = normalizeLesson(entry, "A1");

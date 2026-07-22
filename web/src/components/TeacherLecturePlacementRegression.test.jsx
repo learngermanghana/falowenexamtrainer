@@ -9,7 +9,7 @@ const teacherVideo = {
 };
 
 describe("teacher lecture placement", () => {
-  test("shows self-learning teacher lectures before the lesson content", () => {
+  test("does not add a separate B2/C1 materials page before the lesson content", () => {
     const { container } = render(
       <SelfLearningLessonFrame
         canonicalLesson={{
@@ -23,16 +23,11 @@ describe("teacher lecture placement", () => {
       </SelfLearningLessonFrame>,
     );
 
-    const support = container.querySelector("[data-teacher-lecture-support='links-only']");
     const lesson = screen.getByTestId("self-learning-lesson");
 
-    expect(support).toBe(container.firstElementChild);
-    expect(screen.getByText("B2 Day 4 · Teacher lecture")).toBeVisible();
-    expect(screen.getByRole("link", { name: /Open teacher lecture/i })).toHaveAttribute(
-      "href",
-      teacherVideo.url,
-    );
+    expect(container.querySelector("[data-teacher-lecture-support='links-only']")).not.toBeInTheDocument();
+    expect(screen.queryByText("B2 Day 4 · Teacher lecture")).not.toBeInTheDocument();
     expect(lesson).toBeVisible();
-    expect(container.querySelector("iframe")).not.toBeInTheDocument();
+    expect(container.firstElementChild).toBe(lesson);
   });
 });

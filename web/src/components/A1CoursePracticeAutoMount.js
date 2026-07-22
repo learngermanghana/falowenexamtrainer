@@ -269,6 +269,11 @@ const A1CoursePracticeAutoMount = () => {
       ? (currentIsDestination ? null : getCanonicalLessonArticle(practice.day)) || getPageContainer()
       : getPageContainer();
 
+    if (practice && currentIsDestination) {
+      if (Number(practice.day) === 19) prepareDay19Page(container);
+      return undefined;
+    }
+
     if (practice && Number(practice.day) === 19) prepareDay19Page(container);
 
     const mount = document.createElement("div");

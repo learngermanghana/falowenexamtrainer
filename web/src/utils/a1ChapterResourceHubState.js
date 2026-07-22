@@ -1,5 +1,6 @@
 import { courseSchedules } from "../data/courseSchedule";
 import { findCourseBookEntry } from "./courseBookEntries";
+import { addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeDay = (value = "") => String(value ?? "").trim();
@@ -33,9 +34,49 @@ export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}
   return resolvedChapter === requestedChapter ? entry : null;
 };
 
+const patchWorkbookRoute = (resource = null, search = "") => {
+  if (!resource || typeof resource !== "object") return resource;
+  const workbookRoute = addCompletedRadioToWorkbookRoute(
+    resource.workbookRoute || resource.workbook_link || "",
+    search,
+  );
+  if (!workbookRoute) return resource;
+  return {
+    ...resource,
+    workbookRoute,
+    workbook_link: workbookRoute,
+  };
+};
+
+const preserveCompletedRadioOnEntry = (entry = null, search = "") => {
+  if (!entry) return entry;
+  const workbookRoute = addCompletedRadioToWorkbookRoute(
+    entry.workbookRoute || entry.workbook_link || "",
+    search,
+  );
+
+  return {
+    ...entry,
+    ...(workbookRoute ? { workbookRoute, workbook_link: workbookRoute } : {}),
+    resources: Array.isArray(entry.resources)
+      ? entry.resources.map((resource) => patchWorkbookRoute(resource, search))
+      : entry.resources,
+    primaryResource: patchWorkbookRoute(entry.primaryResource, search),
+    lesen_hören: Array.isArray(entry.lesen_hören)
+      ? entry.lesen_hören.map((resource) => patchWorkbookRoute(resource, search))
+      : patchWorkbookRoute(entry.lesen_hören, search),
+    schreiben_sprechen: Array.isArray(entry.schreiben_sprechen)
+      ? entry.schreiben_sprechen.map((resource) => patchWorkbookRoute(resource, search))
+      : patchWorkbookRoute(entry.schreiben_sprechen, search),
+  };
+};
+
 export const buildA1ChapterResourceHubState = ({ level = "A1", day = "", search = "" } = {}) => {
   const chapter = getRequestedA1Chapter(search);
-  const entry = resolveA1ChapterResourceHubEntry({ day, chapter });
+  const entry = preserveCompletedRadioOnEntry(
+    resolveA1ChapterResourceHubEntry({ day, chapter }),
+    search,
+  );
   return {
     level: normalizeLevel(level) || "A1",
     day: normalizeDay(day),

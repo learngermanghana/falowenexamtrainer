@@ -10,12 +10,9 @@ import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import C1Day11GoetheSpeakingSelfLearningPage from "./C1Day11GoetheSpeakingSelfLearningPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import {
-  isTeacherLectureResource,
   removeTeacherLectureFromCanonicalLesson,
   removeTeacherLectureFromLesson,
-  resolveTeacherLectureResources,
 } from "./selfLearning/TeacherLectureSupportingMaterials";
-import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
@@ -119,26 +116,6 @@ export const SELF_LEARNING_LESSONS = {
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
-const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-
-const resolveAiVideoResource = ({ lesson = null, canonicalLesson = null } = {}) => {
-  const candidates = [
-    lesson?.videoResource,
-    ...toArray(lesson?.resources?.videos),
-    ...toArray(canonicalLesson?.resources?.videos),
-  ];
-  return candidates.find((resource) => resource?.url && !isTeacherLectureResource(resource)) || null;
-};
-
-const resolveGrammarBookResource = ({ lesson = null, canonicalLesson = null } = {}) => {
-  const canonicalResources = canonicalLesson?.resources || {};
-  const lessonResources = lesson?.resources || {};
-  return canonicalResources.grammarBook
-    || canonicalResources.resourceGroups?.find((group) => group?.grammarBook?.url)?.grammarBook
-    || lessonResources.grammarBook
-    || lessonResources.resourceGroups?.find((group) => group?.grammarBook?.url)?.grammarBook
-    || null;
-};
 
 const removeAllDisplayedVideosFromLesson = (lesson = null) => {
   const withoutTeacher = removeTeacherLectureFromLesson(lesson);
@@ -165,37 +142,7 @@ const removeAllDisplayedVideosFromCanonicalLesson = (canonicalLesson = null) => 
   };
 };
 
-export const SelfLearningLessonFrame = ({
-  level = "",
-  day = 0,
-  lesson = null,
-  canonicalLesson = null,
-  children,
-}) => {
-  const normalizedLevel = String(level || lesson?.level || canonicalLesson?.level || "").toUpperCase();
-  const resolvedDay = Number(day || lesson?.day || canonicalLesson?.day || 0);
-  const teacherVideo = resolveTeacherLectureResources({ lesson, canonicalLesson })[0] || null;
-  const aiVideo = resolveAiVideoResource({ lesson, canonicalLesson });
-  const grammarBook = resolveGrammarBookResource({ lesson, canonicalLesson });
-  const radio = canonicalLesson?.resources?.falowenRadio
-    || getLessonRadioResource(normalizedLevel, resolvedDay)
-    || null;
-  const title = lesson?.title || lesson?.topic || canonicalLesson?.topic || `Day ${resolvedDay}`;
-
-  return (
-    <SelfLearningJourneyGate
-      level={normalizedLevel}
-      day={resolvedDay}
-      title={title}
-      radio={radio}
-      teacherVideo={teacherVideo}
-      aiVideo={aiVideo}
-      grammarBook={grammarBook}
-    >
-      {children}
-    </SelfLearningJourneyGate>
-  );
-};
+export const SelfLearningLessonFrame = ({ children }) => children;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const normalizedLevel = String(level || "").toUpperCase();
