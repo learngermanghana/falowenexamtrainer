@@ -1,5 +1,24 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+
+const writingListStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+
+const schreibenContent = (
+  <WorkbookTaskCard eyebrow="Schreibaufgabe" title="E-Mail an Alex">
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail:
+    </p>
+    <ol style={writingListStyle}>
+      <li>Sagen Sie, dass Sie Zeit haben und etwas zusammen machen möchten.</li>
+      <li>Fragen Sie, ob er am Wochenende frei ist.</li>
+      <li>Fragen Sie, ob er einen Vorschlag für eine Aktivität hat.</li>
+    </ol>
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      <strong>Optional:</strong> Schreiben Sie 5 Sätze über Ihre Freizeit mit Ideen aus Ihrer Brain Map.
+    </p>
+  </WorkbookTaskCard>
+);
 
 const restaurantReadingText = `Im Restaurant
 
@@ -42,7 +61,8 @@ export default function A2Day5FreizeitWorkbookPage() {
       chapter="2.5"
       workbookId="A2Day5Freizeit"
       topicPrompt="Welche Freizeitaktivitäten machst du gern und warum?"
-      schreibenTask="Schreiben Sie eine kurze E-Mail über Ihre Freizeit. Nennen Sie zwei Aktivitäten, sagen Sie, wann Sie sie machen, und erklären Sie, warum Sie sie mögen."
+      schreibenTask="Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail."
+      schreibenContent={schreibenContent}
       lesenText={restaurantReadingText}
       lesenQuestions={[
         {
