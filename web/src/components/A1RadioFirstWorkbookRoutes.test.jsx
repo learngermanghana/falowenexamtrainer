@@ -171,6 +171,27 @@ describe("A1 route-scoped Falowen Radio", () => {
     expect(getA1RadioResource(16, "11")).toBeNull();
   });
 
+  test.each([
+    [17, "11", "8Mh4PCSm6QE", "a1-day17-chapter-11-falowen-radio"],
+    [18, "12.1", "G6khh2VagPA", "a1-day18-chapter-12-1-falowen-radio"],
+  ])("uses the approved Day %i Kapitel %s Falowen Radio video", (day, chapter, youtubeId, key) => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        `/campus/course/lesson/A1/${day}`,
+        `?chapter=${chapter}&hub=1`,
+      ),
+    ).toEqual({ day, chapter });
+    expect(getA1RadioResource(day, chapter)).toEqual(
+      expect.objectContaining({ key, chapter, youtubeId }),
+    );
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        `/campus/course/lesson/A1/${day}`,
+        `?chapter=${chapter}.wrong&hub=1`,
+      ),
+    ).toBeNull();
+  });
+
   test("uses the approved Day 20 Kapitel 12.3 letter-writing video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
