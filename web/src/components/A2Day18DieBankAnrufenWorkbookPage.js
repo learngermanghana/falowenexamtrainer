@@ -1,5 +1,24 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+
+const writingListStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+
+const schreibenContent = (
+  <WorkbookTaskCard eyebrow="Schreibaufgabe" title="Scenario 2: Resolving Account Issues">
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Schreiben Sie einen Brief an Ihre Bank in Ghana.
+    </p>
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Sie sind jetzt in Ghana und Ihre Karte wurde gesperrt. Schreiben Sie einen Brief an Ihre Bank in Ghana, in dem Sie:
+    </p>
+    <ol style={writingListStyle}>
+      <li>fragen, ob Ihre Karte entsperrt werden kann.</li>
+      <li>fragen, welche Dokumente oder Informationen dafür benötigt werden.</li>
+      <li>fragen, wie lange der Vorgang dauern wird.</li>
+    </ol>
+  </WorkbookTaskCard>
+);
 
 export default function A2Day18DieBankAnrufenWorkbookPage() {
   return (
@@ -9,7 +28,8 @@ export default function A2Day18DieBankAnrufenWorkbookPage() {
       chapter="7.18"
       workbookId="A2Day18DieBankAnrufen"
       topicPrompt="Sie rufen bei einer Bank an. Warum rufen Sie an? Welche Informationen brauchen Sie? Welche höflichen Fragen stellen Sie?"
-      schreibenTask="Schreiben Sie einen kurzen formellen Brief oder eine E-Mail an Ihre Bank. Ihre Karte wurde gesperrt. Fragen Sie, ob die Karte entsperrt werden kann, welche Dokumente oder Informationen benötigt werden und wie lange der Vorgang dauert."
+      schreibenTask="Sie sind jetzt in Ghana und Ihre Karte wurde gesperrt. Schreiben Sie einen Brief an Ihre Bank in Ghana."
+      schreibenContent={schreibenContent}
       lesenText="Sie vergleichen verschiedene Banken. Die Deutsche Bank bietet Kontoeröffnung, Beratung und Online-Banking an und ist Montag bis Freitag von 9 bis 17 Uhr geöffnet. Die Sparkasse ist zentral gelegen, berät neue Kunden und öffnet Montag bis Freitag von 8 bis 18 Uhr. Die Volksbank hat Filialen in den Vororten. Die ING-DiBa bietet Online-Kontoeröffnung und telefonische Beratung, aber keine persönlichen Filialen."
       lesenQuestions={[
         { stem: "Welche Bank hat die längsten Öffnungszeiten?", options: ["A) Deutsche Bank", "B) Sparkasse", "C) Volksbank", "D) ING-DiBa"] },

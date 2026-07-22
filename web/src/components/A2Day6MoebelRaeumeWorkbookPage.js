@@ -1,5 +1,24 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+
+const writingListStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+
+const schreibenContent = (
+  <WorkbookTaskCard eyebrow="Schreibaufgabe" title="Nachricht über dein Zimmer">
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      <strong>Anleitung:</strong> Schreibe eine Nachricht an deine Freundin oder deinen Freund über dein Zimmer.
+    </p>
+    <p style={{ margin: 0, lineHeight: 1.7 }}>Dein Text soll folgende Punkte enthalten:</p>
+    <ol style={writingListStyle}>
+      <li>Beschreibe mindestens zwei Räume in deiner Wohnung.</li>
+      <li>Nenne mindestens fünf Möbel und sage, wo sie stehen (Wo? + Dativ).</li>
+      <li>
+        Beschreibe zwei Veränderungen (Wohin? + Akkusativ), z. B. du stellst einen Stuhl neben den Tisch.
+      </li>
+    </ol>
+  </WorkbookTaskCard>
+);
 
 const newInTownReadingText = `Neu in der Stadt
 
@@ -18,7 +37,8 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
       chapter="3.6"
       workbookId="A2Day6MoebelRaeume"
       topicPrompt="Beschreibe deine Wohnung, die Zimmer und wichtige Möbel."
-      schreibenTask="Schreiben Sie eine kurze Wohnungsbeschreibung. Beschreiben Sie mindestens zwei Zimmer, nennen Sie Möbel und sagen Sie, wo die Möbel stehen."
+      schreibenTask="Schreibe eine Nachricht an deine Freundin oder deinen Freund über dein Zimmer."
+      schreibenContent={schreibenContent}
       lesenText={newInTownReadingText}
       lesenQuestions={[
         {

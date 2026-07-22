@@ -1,0 +1,30 @@
+name: A2 original Teil 2 prompts
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2DayOriginalWorkbookTeil2Prompts.test.js"
+      - "web/src/components/A2SharedWorkbookRegression.test.js"
+      - ".github/workflows/a2-original-teil2-prompts.yml"
+
+jobs:
+  verify-prompts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Verify historical A2 writing tasks
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2DayOriginalWorkbookTeil2Prompts.test.js src/components/A2SharedWorkbookRegression.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build
