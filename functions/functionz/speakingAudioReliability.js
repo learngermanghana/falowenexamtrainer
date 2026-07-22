@@ -64,13 +64,30 @@ async function writeTempAudioFile(file) {
   return tempPath;
 }
 
+const waitForReadStreamOpen = (stream) =>
+  new Promise((resolve, reject) => {
+    const handleOpen = () => {
+      stream.off("error", handleError);
+      resolve();
+    };
+    const handleError = (error) => {
+      stream.off("open", handleOpen);
+      reject(error);
+    };
+    stream.once("open", handleOpen);
+    stream.once("error", handleError);
+  });
+
 async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.OPENAI_TRANSCRIPTION_MODEL || "gpt-4o-transcribe" }) {
   const tempPath = await writeTempAudioFile(file);
   const client = getOpenAIClient();
+  let audioStream = null;
 
   try {
+    audioStream = fs.createReadStream(tempPath);
+    await waitForReadStreamOpen(audioStream);
     const transcription = await client.audio.transcriptions.create({
-      file: fs.createReadStream(tempPath),
+      file: audioStream,
       model,
       language: "de",
     });
@@ -90,6 +107,7 @@ async function transcribeAudioFile({ file, getOpenAIClient, model = process.env.
       error,
     );
   } finally {
+    audioStream?.destroy();
     await fsPromises.unlink(tempPath).catch(() => undefined);
   }
 }
