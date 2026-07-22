@@ -16,6 +16,10 @@ jest.mock("../context/ToastContext", () => ({
   useToast: () => ({ showToast: jest.fn() }),
 }));
 
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ studentProfile: null, user: null }),
+}));
+
 const radio = {
   key: "test-radio",
   title: "Test Radio Episode",
@@ -34,15 +38,15 @@ describe("self-learning lesson Falowen Radio integration", () => {
 
     expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
     expect(screen.getByText("Test Radio Episode")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /continue to teil/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /continue to teil/i })).toBeInTheDocument();
   });
 
-  test.each(["B2", "C1"])("%s lesson without Radio opens the shared materials selector", (level) => {
+  test.each(["B2", "C1"])("%s lesson without Radio opens the lesson UI directly", (level) => {
     renderRegisteredLesson(level, 28);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
-    expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
   });
 
   test("A1 remains outside the B2/C1 self-learning registry and without generic Radio capability", () => {
