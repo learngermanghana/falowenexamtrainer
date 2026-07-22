@@ -5,7 +5,7 @@ import { getA1RadioResource } from "../data/a1RadioResources";
 import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import { buildA1WorkbookVideoModel } from "./A1WorkbookVideoHeader";
-import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
+import A1Day14ModalVerbsWorkbookPage, { isSharedA2Day17Context } from "./A1Day14ModalVerbsWorkbookPage";
 
 const route = "/campus/course/modal-verbs-day-14-3-6";
 const workbookRoute = `${route}?radio=done&materials=done`;
@@ -86,13 +86,18 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(screen.getByLabelText("Example German train ticket")).toBeVisible();
   });
 
-  test("still switches to the A2 Day 17 grammar page in its shared query context", () => {
-    render(
-      <MemoryRouter initialEntries={[`${route}?level=A2&day=17&materials=done`]}>
+  test("bypasses A1 materials and opens A2 Day 17 immediately in its shared query context", () => {
+    const sharedRoute = `${route}?level=A2&day=17&radio=done`;
+    expect(isSharedA2Day17Context("?level=A2&day=17&radio=done")).toBe(true);
+
+    const { container } = render(
+      <MemoryRouter initialEntries={[sharedRoute]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
+    expect(container.querySelector('[data-self-learning-materials-selector="true"]')).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /A2 • 6\.17 In die Apotheke gehen/i })).toBeVisible();
     expect(screen.queryByRole("heading", { name: /A1 · Day 14 Workbook/i })).not.toBeInTheDocument();
   });
 
