@@ -47,6 +47,11 @@ describe("A2 workbook DOM safety and listening media", () => {
     fireEvent.click(screen.getByRole("button", { name: /Teil 3 · Lesen/i }));
     expect(screen.getByRole("heading", { name: /Teil 3 · Lesen/i })).toBeVisible();
     expect(() => safelyCleanA2Day22Presentation(document)).not.toThrow();
+    expect(screen.getByText("Aufgabe 1 · Gülcan schreibt Sonja, dass ...")).toBeVisible();
+    expect(screen.getByText("Aufgabe 2 · In der ersten Woche haben andere Studierende ...")).toBeVisible();
+    expect(screen.getByText("Aufgabe 3 · In der Wohngemeinschaft ...")).toBeVisible();
+    expect(screen.getByText("Aufgabe 4 · Gülcan findet es wichtig, ...")).toBeVisible();
+    expect(screen.getByText("Aufgabe 5 · Während Sonjas Besuch ...")).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: /Teil 4 · Hören/i }));
     expect(() => safelyCleanA2Day22Presentation(document)).not.toThrow();
