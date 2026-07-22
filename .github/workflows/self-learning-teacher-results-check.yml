@@ -1,0 +1,44 @@
+name: Self-learning teacher and results feedback
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchSheetResultFeedbackPresentation.mjs"
+      - "web/package.json"
+      - "web/src/components/A1CoursePracticeAutoMount.js"
+      - "web/src/components/A1SelfLearningDestinationMaterials.test.js"
+      - "web/src/components/ResultHistory.js"
+      - "web/src/components/ResultHistory.sheetFeedback.test.js"
+      - "web/src/services/resultsSheetService.js"
+      - "web/src/services/resultsSheetService.test.js"
+      - ".github/workflows/self-learning-teacher-results-check.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test A1 self-learning destination materials
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SelfLearningDestinationMaterials.test.js src/components/A1SelfLearningJourneyStandardization.test.js
+      - name: Test Sheet feedback and objective links
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/ResultHistory.sheetFeedback.test.js src/services/resultsSheetService.test.js
+      - name: Confirm Sheet feedback patch is idempotent
+        working-directory: web
+        run: npm run sync:sheet-result-feedback && npm run sync:sheet-result-feedback
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
