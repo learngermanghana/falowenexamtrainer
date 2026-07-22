@@ -14,6 +14,13 @@ const A2_DAY20_PATH = "/campus/course/a2-day-20-typische-reklamationssituationen
 const A2_DAY22_PATH = "/campus/course/a2-day-22-die-woche-planung-workbook";
 const DAY22_SELF_CHECK_NOTE =
   "Watch the Goethe past-paper video and check your answers there. Teil 4 is self-check practice and is not submitted. The school evaluates only Teil 2 · Schreiben and Teil 3 · Lesen for this workbook.";
+const DAY22_READING_QUESTION_STEMS = [
+  "Gülcan schreibt Sonja, dass ...",
+  "In der ersten Woche haben andere Studierende ...",
+  "In der Wohngemeinschaft ...",
+  "Gülcan findet es wichtig, ...",
+  "Während Sonjas Besuch ...",
+];
 
 A2_LEGACY_STANDARD_NAV_BY_PATH[A2_DAY20_PATH] = {
   day: 20,
@@ -53,11 +60,35 @@ const hideWithoutDetaching = (element) => {
   return !alreadyHidden;
 };
 
+const restoreDay22ReadingQuestionStems = (main) => {
+  const readingHeading = Array.from(main.querySelectorAll("h2, h3")).find(
+    (heading) => normalizeText(heading.textContent) === "aufgaben teil 3",
+  );
+  const readingPanel = readingHeading?.closest("section") || readingHeading?.parentElement;
+  if (!readingPanel) return false;
+
+  let changed = false;
+  Array.from(readingPanel.querySelectorAll("strong")).forEach((label) => {
+    const match = normalizeText(label.textContent).match(/^aufgabe ([1-5])/);
+    if (!match) return;
+    const questionNumber = Number(match[1]);
+    const stem = DAY22_READING_QUESTION_STEMS[questionNumber - 1];
+    if (!stem) return;
+    const completeLabel = `Aufgabe ${questionNumber} · ${stem}`;
+    if (label.textContent === completeLabel) return;
+    label.textContent = completeLabel;
+    label.setAttribute("data-a2-day22-reading-question", String(questionNumber));
+    changed = true;
+  });
+
+  return changed;
+};
+
 export const safelyCleanA2Day22Presentation = (root = document) => {
   const main = root?.querySelector?.("main.layout-main") || root?.querySelector?.("main") || root?.body;
   if (!main) return false;
 
-  let changed = false;
+  let changed = restoreDay22ReadingQuestionStems(main);
 
   Array.from(main.querySelectorAll('[role="note"]')).forEach((note) => {
     const text = normalizeText(note.textContent);
