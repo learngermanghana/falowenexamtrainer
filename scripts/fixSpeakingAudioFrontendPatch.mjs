@@ -120,4 +120,22 @@ if (!speakingPage.includes("message.audioRequested === true")) {
 }
 
 fs.writeFileSync(speakingPagePath, speakingPage, "utf8");
-console.log("Reset stale speaking audio preferences and scoped backfill to intended coach replies.");
+
+const embeddedPanelsPath = path.join(
+  root,
+  "web/src/components/selfLearning/EmbeddedPracticePanels.js",
+);
+let embeddedPanels = fs.readFileSync(embeddedPanelsPath, "utf8");
+const unlockedCourseCoach = '<SpeakingPage mode="course" />';
+const routeLockedCourseCoach =
+  '<SpeakingPage mode="course" lockedLevel={getCourseLessonRouteMeta().level} />';
+
+if (embeddedPanels.includes(unlockedCourseCoach)) {
+  embeddedPanels = embeddedPanels.replace(unlockedCourseCoach, routeLockedCourseCoach);
+}
+if (!embeddedPanels.includes(routeLockedCourseCoach)) {
+  throw new Error("Embedded course speaking coach does not inherit the lesson level.");
+}
+fs.writeFileSync(embeddedPanelsPath, embeddedPanels, "utf8");
+
+console.log("Reset stale speaking audio preferences, scoped backfill to intended coach replies, and locked course audio to the lesson level.");
