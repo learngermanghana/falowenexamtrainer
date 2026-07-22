@@ -22,3 +22,71 @@ if (
 
 fs.writeFileSync(trainerPath, source, "utf8");
 console.log("Normalized speaking recorder time-limit UI.");
+
+const speakingPagePath = path.join(root, "web/src/components/SpeakingPage.js");
+let speakingPage = fs.readFileSync(speakingPagePath, "utf8");
+
+const legacyAudioRepliesKey =
+  'const AUDIO_REPLIES_STORAGE_KEY = "falowen.customSpeaking.audioReplies";';
+const versionedAudioRepliesKey =
+  'const AUDIO_REPLIES_STORAGE_KEY = "falowen.customSpeaking.audioReplies.v2";';
+
+if (speakingPage.includes(legacyAudioRepliesKey)) {
+  speakingPage = speakingPage.replace(legacyAudioRepliesKey, versionedAudioRepliesKey);
+}
+
+const autoplayPreferenceEffect = `  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(AUTOPLAY_REPLIES_STORAGE_KEY, String(autoPlayRepliesEnabled));
+  }, [autoPlayRepliesEnabled]);`;
+
+const latestReplyAudioMarker = "latestCoachMessageNeedingAudio";
+const latestReplyAudioEffect = `
+
+  useEffect(() => {
+    if (!audioRepliesEnabled || activeSpeakingTab !== "custom" || !isCoachTtsEligible()) return;
+
+    const latestCoachMessageNeedingAudio = [...customChatMessages]
+      .reverse()
+      .find(
+        (message) =>
+          message.role === "coach" &&
+          message.type === "text" &&
+          String(message.id || "").startsWith("custom-coach-") &&
+          Boolean(String(message.text || "").trim()) &&
+          !message.audioUrl &&
+          !message.audioLoading &&
+          !message.audioError,
+      );
+
+    if (!latestCoachMessageNeedingAudio) return;
+    requestSpeechForCustomCoachMessage(
+      latestCoachMessageNeedingAudio.id,
+      latestCoachMessageNeedingAudio.text,
+    );
+  }, [
+    activeSpeakingTab,
+    audioRepliesEnabled,
+    customChatMessages,
+    isCoachTtsEligible,
+    requestSpeechForCustomCoachMessage,
+  ]);`;
+
+if (!speakingPage.includes(latestReplyAudioMarker)) {
+  if (!speakingPage.includes(autoplayPreferenceEffect)) {
+    throw new Error("Could not find the speaking audio preference effect insertion point.");
+  }
+  speakingPage = speakingPage.replace(
+    autoplayPreferenceEffect,
+    `${autoplayPreferenceEffect}${latestReplyAudioEffect}`,
+  );
+}
+
+if (!speakingPage.includes(versionedAudioRepliesKey)) {
+  throw new Error("Speaking audio replies still use the stale preference key.");
+}
+if (!speakingPage.includes(latestReplyAudioMarker)) {
+  throw new Error("Speaking audio replies do not backfill the latest coach response.");
+}
+
+fs.writeFileSync(speakingPagePath, speakingPage, "utf8");
+console.log("Reset stale speaking audio preferences and backfilled the latest coach reply.");
