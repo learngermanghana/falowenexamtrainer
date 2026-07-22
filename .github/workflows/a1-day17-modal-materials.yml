@@ -23,11 +23,16 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test A1 Day 17 native navigation and Day 14 materials
+      - name: Test A1 Day 17 native navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx src/components/A1Day14ModalVerbsWorkbookPage.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx
+      - name: Test A1 Day 14 supporting materials
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day14ModalVerbsWorkbookPage.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
