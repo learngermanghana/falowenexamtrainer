@@ -21,8 +21,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - working-directory: web
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
       - name: Test A1 Day 17 native navigation
         working-directory: web
         env:
