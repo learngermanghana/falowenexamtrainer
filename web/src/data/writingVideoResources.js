@@ -60,6 +60,14 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this video before writing. It explains the task, the recommended structure and how to develop a clear B2 opinion text.",
       url: "https://youtu.be/w8TaNHk-a0U",
     },
+    2: {
+      key: "b2-day2-beziehungen-kommunikation-writing-video",
+      chapter: "1.2",
+      title: "B2 Day 2 · Beziehungen und Kommunikation · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the B2 Day 2 text. It explains how to understand the Chapter 1.2 task, organise the response and cover every required point.",
+      url: "https://youtu.be/eozUFkeHBYc",
+    },
     3: {
       key: "b2-day3-oeffentliches-privates-leben-writing-video",
       title: "B2 Day 3 · Öffentliches und privates Leben · Schreiben explanation",

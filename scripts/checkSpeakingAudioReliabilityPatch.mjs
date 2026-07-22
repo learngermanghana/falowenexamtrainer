@@ -56,6 +56,10 @@ const checks = [
     "The AI lesson stays embedded above",
     "removeTeacherLectureFromCanonicalLesson",
   ]],
+  ["web/src/components/selfLearning/EmbeddedPracticePanels.js", [
+    '<SpeakingPage mode="course" lockedLevel={getCourseLessonRouteMeta().level} />',
+    "getCourseLessonRouteMeta",
+  ]],
   ["web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js", [
     'from "../../lib/speakingAudio"',
     "Send recording to AI",
@@ -112,6 +116,7 @@ const checks = [
 const forbidden = [
   ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", "<iframe"],
   ["web/src/components/SpeakingPage.js", 'falowen.customSpeaking.audioReplies";'],
+  ["web/src/components/selfLearning/EmbeddedPracticePanels.js", '<SpeakingPage mode="course" />'],
 ];
 
 const failures = [];
