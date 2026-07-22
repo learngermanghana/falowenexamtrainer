@@ -1,0 +1,42 @@
+name: Workbook submission auto-selection
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "web/package.json"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/utils/workbookSubmissionContext.js"
+      - "web/src/utils/workbookSubmissionContext.test.js"
+      - ".github/workflows/workbook-submission-auto-selection.yml"
+
+jobs:
+  workbook-context:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Apply assignment selection patch twice
+        run: |
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test workbook assignment context
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/workbookSubmissionContext.test.js
+      - name: Test A1 A2 B1 workbook routes
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1A2WorkbookRoutes.test.jsx src/components/A2B1WorkbookNavigation.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
