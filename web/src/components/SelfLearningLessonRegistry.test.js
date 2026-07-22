@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import { normalizeLesson } from "../data/lessonModel";
 
@@ -29,8 +29,16 @@ const radio = {
 
 const renderRegisteredLesson = (level, day, falowenRadio = null) => {
   const Component = getSelfLearningLessonComponent(level, day);
-  render(<Component canonicalLesson={{ level, day, topic: "Test lesson", resources: { falowenRadio } }} />);
+  return render(
+    <Component
+      canonicalLesson={{ level, day, topic: "Test lesson", resources: { falowenRadio } }}
+    />,
+  );
 };
+
+beforeEach(() => {
+  window.scrollTo = jest.fn();
+});
 
 describe("self-learning lesson Falowen Radio integration", () => {
   test.each(["B2", "C1"])("%s lesson with a Radio entry shows the listening-only resource", (level) => {
@@ -41,12 +49,37 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.getByRole("button", { name: /continue to teil/i })).toBeInTheDocument();
   });
 
+  test.each([
+    ["B2", "B2 AI lesson video: Persönliche Identität", "https://www.youtube.com/embed/HhUUkc8zgEc"],
+    ["C1", "Video explanation: Relativsätze mit Präpositionen", "https://www.youtube.com/embed/u41XmMwb5PU"],
+  ])("%s opens the lesson-owned AI video after Falowen Radio", (level, title, src) => {
+    renderRegisteredLesson(level, 1, radio);
+
+    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
+
+    expect(screen.getByRole("heading", { name: "AI video" })).toBeInTheDocument();
+    expect(screen.getByTitle(title)).toHaveAttribute("src", src);
+    expect(screen.queryByTitle("Test Radio Episode")).not.toBeInTheDocument();
+  });
+
   test.each(["B2", "C1"])("%s lesson without Radio opens the lesson UI directly", (level) => {
     renderRegisteredLesson(level, 28);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
     expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
+  });
+
+  test.each([
+    ["B2", 1, "B2 Day 1 · Persönliche Identität · Writing explanation", "https://www.youtube.com/embed/w8TaNHk-a0U"],
+    ["C1", 8, "C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation", "https://www.youtube.com/embed/VdczhJS9ClY"],
+  ])("%s Day %i keeps the saved Schreiben video on the Write page", (level, day, title, src) => {
+    renderRegisteredLesson(level, day);
+
+    fireEvent.click(screen.getByRole("button", { name: "3. Write" }));
+
+    expect(screen.getByText("Watch before writing · Essay Ideas")).toBeInTheDocument();
+    expect(screen.getByTitle(title)).toHaveAttribute("src", src);
   });
 
   test("A1 remains outside the B2/C1 self-learning registry and without generic Radio capability", () => {

@@ -117,38 +117,15 @@ export const SELF_LEARNING_LESSONS = {
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
 
-const removeAllDisplayedVideosFromLesson = (lesson = null) => {
-  const withoutTeacher = removeTeacherLectureFromLesson(lesson);
-  if (!withoutTeacher) return withoutTeacher;
-  return {
-    ...withoutTeacher,
-    videoResource: null,
-    resources: {
-      ...(withoutTeacher.resources || {}),
-      videos: [],
-    },
-  };
-};
-
-const removeAllDisplayedVideosFromCanonicalLesson = (canonicalLesson = null) => {
-  const withoutTeacher = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
-  if (!withoutTeacher) return withoutTeacher;
-  return {
-    ...withoutTeacher,
-    resources: {
-      ...(withoutTeacher.resources || {}),
-      videos: [],
-    },
-  };
-};
-
 export const SelfLearningLessonFrame = ({ children }) => children;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
-  const pageLesson = removeAllDisplayedVideosFromLesson(lesson);
-  const pageCanonicalLesson = removeAllDisplayedVideosFromCanonicalLesson(canonicalLesson);
+  // Keep the lesson-owned AI video inside Learn. Only remove teacher lectures
+  // from the tab data so they cannot replace or duplicate the AI lesson.
+  const pageLesson = removeTeacherLectureFromLesson(lesson);
+  const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
 
   let page;
   if (day === 0) {

@@ -1,0 +1,74 @@
+name: Restore B2 C1 lesson structure
+
+on:
+  pull_request:
+    paths:
+      - "scripts/runSpeakingAudioReliabilityPatch.mjs"
+      - "web/src/data/a1RadioResources.js"
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/SelfLearningLessonRegistry.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.restoreStructure.test.js"
+      - "web/src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js"
+      - "web/src/components/A2B1UnchangedBySelfLearningRestore.test.js"
+      - "web/src/components/WritingCheatSheetTabs.js"
+      - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
+      - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - "web/src/components/A1Day3ApprovedRadioRegression.test.js"
+      - ".github/workflows/restore-b2-c1-lesson-structure.yml"
+
+jobs:
+  lesson-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test B2 and C1 Learn, Speak and Write structure
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/SelfLearningLessonRegistry.test.js
+          src/components/SelfLearningLessonRegistry.mediaRoles.test.js
+          src/components/SelfLearningLessonRegistry.restoreStructure.test.js
+          src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js
+          src/components/A2B1UnchangedBySelfLearningRestore.test.js
+          src/components/WritingCheatSheetTabs.writingVideo.test.js
+          src/__tests__/CourseSpeakingChatCleanupSafety.test.js
+      - name: Test restored A1 Day 3 Falowen Radio route
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/A1RadioFirstWorkbookRoutes.test.jsx
+          src/components/A1Day3ApprovedRadioRegression.test.js
+      - name: Build web app
+        id: production-build
+        continue-on-error: true
+        working-directory: web
+        run: npm run build > build.log 2>&1
+      - name: Upload build diagnostics
+        if: steps.production-build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: b2-c1-build-log
+          path: web/build.log
+          if-no-files-found: error
+      - name: Report build failure
+        if: steps.production-build.outcome == 'failure'
+        working-directory: web
+        run: |
+          tail -n 100 build.log
+          exit 1
