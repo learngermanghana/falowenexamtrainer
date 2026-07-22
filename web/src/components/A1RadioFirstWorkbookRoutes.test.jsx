@@ -192,6 +192,28 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toBeNull();
   });
 
+  test("uses the approved Day 19 Kapitel 5.9 Falowen Radio on dynamic and canonical routes", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/19",
+        "?chapter=5.9&hub=1",
+      ),
+    ).toEqual({ day: 19, chapter: "5.9" });
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/verboten-erlaubt-5-9",
+      ),
+    ).toEqual({ day: 19, chapter: "5.9" });
+    expect(getA1RadioResource(19, "5.9")).toEqual(
+      expect.objectContaining({
+        key: "a1-day19-verboten-erlaubt-falowen-radio",
+        chapter: "5.9",
+        youtubeId: "wjBYShPq-RM",
+      }),
+    );
+    expect(getA1RadioResource(19, "5.10")).toBeNull();
+  });
+
   test("uses the approved Day 20 Kapitel 12.3 letter-writing video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
