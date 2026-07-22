@@ -3,6 +3,57 @@ import { requestCoachSpeech } from "../services/presentationCoachService";
 
 export const COACH_TTS_LEVELS = new Set(["A2", "B1", "B2", "C1"]);
 
+export const describeCoachSpeechError = (error = {}) => {
+  const status = Number(error?.status || 0);
+  const code = String(error?.code || "speech_request_failed");
+
+  if (status === 429 || code === "quota_reached") {
+    return {
+      message: "Daily German audio limit reached. Text chat still works; audio will be available again after the quota resets.",
+      code,
+      retryable: false,
+    };
+  }
+
+  if (status === 401 || status === 403) {
+    return {
+      message: "Your audio session is no longer authorised. Refresh the page and sign in again.",
+      code,
+      retryable: false,
+    };
+  }
+
+  if (status === 400 || code === "missing_text" || code === "text_too_long" || code === "invalid_level") {
+    return {
+      message: error?.message || "This reply cannot be converted to audio. Continue with the written reply.",
+      code,
+      retryable: false,
+    };
+  }
+
+  if (code === "invalid_audio_response") {
+    return {
+      message: "The audio service returned an invalid file. Try the audio again.",
+      code,
+      retryable: true,
+    };
+  }
+
+  if (status >= 500 || code === "network_error" || error?.retryable === true) {
+    return {
+      message: "The German audio service is temporarily unavailable. Try this reply again.",
+      code,
+      retryable: true,
+    };
+  }
+
+  return {
+    message: error?.message || "The German audio reply could not be prepared.",
+    code,
+    retryable: error?.retryable !== false,
+  };
+};
+
 export const useCustomCoachSpeech = ({
   selectedLevel,
   activeSpeakingTab,
@@ -54,12 +105,34 @@ export const useCustomCoachSpeech = ({
     coachAudioUrlsRef.current.add(audioUrl);
     updateCustomCoachMessage(messageId, (message) => {
       if (message.audioUrl && message.audioUrl !== audioUrl) revokeCoachAudioUrl(message.audioUrl);
-      return { ...message, audioUrl, audioLoading: false, audioError: false };
+      return {
+        ...message,
+        audioUrl,
+        audioLoading: false,
+        audioError: false,
+        audioErrorMessage: "",
+        audioErrorCode: "",
+        audioRetryable: true,
+      };
     });
   }, [revokeCoachAudioUrl, updateCustomCoachMessage]);
 
-  const markCustomCoachAudioFailed = useCallback((messageId) => {
-    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: false, audioError: true }));
+  const markCustomCoachAudioFailed = useCallback((messageId, error) => {
+    const details = describeCoachSpeechError(error);
+    console.warn("Goethe coach audio request failed", {
+      messageId,
+      status: Number(error?.status || 0),
+      code: details.code,
+      retryable: details.retryable,
+    });
+    updateCustomCoachMessage(messageId, (message) => ({
+      ...message,
+      audioLoading: false,
+      audioError: true,
+      audioErrorMessage: details.message,
+      audioErrorCode: details.code,
+      audioRetryable: details.retryable,
+    }));
   }, [updateCustomCoachMessage]);
 
   const requestSpeechForMessage = useCallback((messageId, text) => {
@@ -68,7 +141,14 @@ export const useCustomCoachSpeech = ({
     const controller = new AbortController();
     speechControllersRef.current[messageId]?.abort();
     speechControllersRef.current[messageId] = controller;
-    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: true, audioError: false }));
+    updateCustomCoachMessage(messageId, (message) => ({
+      ...message,
+      audioLoading: true,
+      audioError: false,
+      audioErrorMessage: "",
+      audioErrorCode: "",
+      audioRetryable: true,
+    }));
 
     requestCoachSpeech({ text, level: selectedLevel, idToken, signal: controller.signal })
       .then((audioUrl) => {
@@ -94,12 +174,12 @@ export const useCustomCoachSpeech = ({
       })
       .catch((error) => {
         delete speechControllersRef.current[messageId];
-        if (error?.name !== "AbortError") markCustomCoachAudioFailed(messageId);
+        if (error?.name !== "AbortError") markCustomCoachAudioFailed(messageId, error);
       });
   }, [attachCustomCoachAudio, audioRefs, audioRepliesEnabled, autoPlayRepliesEnabled, idToken, isCoachTtsEligible, markCustomCoachAudioFailed, selectedLevel, setPlayingMessageId, updateCustomCoachMessage]);
 
   const retrySpeechForMessage = useCallback((message) => {
-    if (!message?.id || !message?.text) return;
+    if (!message?.id || !message?.text || message?.audioRetryable === false) return;
     requestSpeechForMessage(message.id, message.text);
   }, [requestSpeechForMessage]);
 
@@ -117,7 +197,15 @@ export const useCustomCoachSpeech = ({
       abortPendingSpeechRequests();
       setCustomChatMessages((current) => current.map((message) => {
         if (message.audioUrl) revokeCoachAudioUrl(message.audioUrl);
-        return { ...message, audioUrl: null, audioLoading: false, audioError: false };
+        return {
+          ...message,
+          audioUrl: null,
+          audioLoading: false,
+          audioError: false,
+          audioErrorMessage: "",
+          audioErrorCode: "",
+          audioRetryable: true,
+        };
       }));
     }
   }, [abortPendingSpeechRequests, audioRepliesEnabled, revokeCoachAudioUrl, setCustomChatMessages]);
