@@ -7,7 +7,6 @@ import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
 import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
-import C1Day11GoetheSpeakingSelfLearningPage from "./C1Day11GoetheSpeakingSelfLearningPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import {
   removeTeacherLectureFromCanonicalLesson,
@@ -117,6 +116,9 @@ export const SELF_LEARNING_LESSONS = {
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
 
+// B2 and C1 own their Radio-first journey inside the standout workbook pages.
+// Keep this frame deliberately transparent so no generic materials selector can
+// appear between Falowen Radio and Learn / Speak / Write / Finish.
 export const SelfLearningLessonFrame = ({ children }) => children;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
@@ -135,8 +137,6 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
         falowenRadio={null}
       />
     );
-  } else if (normalizedLevel === "C1" && day === 11) {
-    page = <C1Day11GoetheSpeakingSelfLearningPage />;
   } else if (normalizedLevel === "C1" && day >= 8 && day <= 10) {
     page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 25 && day <= 28) {
