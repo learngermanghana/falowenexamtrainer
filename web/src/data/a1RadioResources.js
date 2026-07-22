@@ -146,6 +146,15 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the Kapitel 12.1 episode. Then continue to the lesson resources and workbook.",
   }),
+  19: Object.freeze({
+    key: "a1-day19-verboten-erlaubt-falowen-radio",
+    chapter: "5.9",
+    title: "Verboten und erlaubt · Kapitel 5.9",
+    youtubeId: "wjBYShPq-RM",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 5.9 episode. Then continue to the self-learning materials and workbook.",
+  }),
   20: Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
     title: "Letter Writing Introduction · Kapitel 12.3",
