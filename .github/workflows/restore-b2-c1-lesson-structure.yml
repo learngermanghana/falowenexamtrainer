@@ -53,5 +53,20 @@ jobs:
           src/components/A1RadioFirstWorkbookRoutes.test.jsx
           src/components/A1Day3ApprovedRadioRegression.test.js
       - name: Build web app
+        id: production-build
+        continue-on-error: true
         working-directory: web
-        run: npm run build
+        run: npm run build > build.log 2>&1
+      - name: Upload build diagnostics
+        if: steps.production-build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: b2-c1-build-log
+          path: web/build.log
+          if-no-files-found: error
+      - name: Report build failure
+        if: steps.production-build.outcome == 'failure'
+        working-directory: web
+        run: |
+          tail -n 100 build.log
+          exit 1
