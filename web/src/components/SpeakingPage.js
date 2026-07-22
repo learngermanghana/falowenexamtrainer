@@ -10,7 +10,7 @@ import {
   normalizeLockedSpeakingTeil,
   resolveInitialSpeakingFilters,
 } from "../lib/speakingExamLock";
-import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
 import {
   CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,
   DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
@@ -30,6 +30,7 @@ import {
   revokeObjectUrl,
   userFacingAudioError,
 } from "../lib/speakingAudio";
+import { COACH_TTS_LEVELS, useCustomCoachSpeech } from "../hooks/useCustomCoachSpeech";
 
 const parseTeilNumber = (teilLabel = "") => {
   const match = String(teilLabel).match(/teil\s*(\d+)/i);
@@ -80,7 +81,6 @@ const formatClock = (date) =>
 
 const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
 const GERMAN_KEYS = ["ä", "ö", "ü", "ß"];
-const COACH_TTS_LEVELS = new Set(["A2", "B1", "B2", "C1"]);
 const AUDIO_REPLIES_STORAGE_KEY = "falowen.customSpeaking.audioReplies";
 const AUTOPLAY_REPLIES_STORAGE_KEY = "falowen.customSpeaking.autoplayReplies";
 
@@ -175,89 +175,25 @@ const SpeakingPage = ({
   const audioRefs = useRef({});
   const audioObjectUrlsRef = useRef(new Set());
   const messagesEndRef = useRef(null);
-  const coachAudioUrlsRef = useRef(new Set());
-  const speechControllersRef = useRef({});
-  const customConversationGenerationRef = useRef(0);
   const customMessagesEndRef = useRef(null);
 
 
-  const stopAudio = (messageId) => {
-    const audio = audioRefs.current[messageId];
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    if (playingMessageId === messageId) setPlayingMessageId("");
-  };
-
-  const revokeCoachAudioUrl = (url) => {
-    if (!url || !coachAudioUrlsRef.current.has(url)) return;
-    Object.entries(audioRefs.current).forEach(([messageId, audio]) => {
-      if (audio?.src === url) stopAudio(messageId);
-    });
-    URL.revokeObjectURL(url);
-    coachAudioUrlsRef.current.delete(url);
-  };
-
-  const abortPendingSpeechRequests = () => {
-    Object.values(speechControllersRef.current).forEach((controller) => controller.abort());
-    speechControllersRef.current = {};
-  };
-
-  const isCoachTtsEligible = () => activeSpeakingTab === "custom" && COACH_TTS_LEVELS.has(String(selectedLevel || "").toUpperCase());
-
-  const updateCustomCoachMessage = (messageId, updater) => {
-    setCustomChatMessages((current) => current.map((message) => (message.id === messageId ? updater(message) : message)));
-  };
-
-  const attachCustomCoachAudio = (messageId, audioUrl) => {
-    coachAudioUrlsRef.current.add(audioUrl);
-    updateCustomCoachMessage(messageId, (message) => {
-      if (message.audioUrl && message.audioUrl !== audioUrl) revokeCoachAudioUrl(message.audioUrl);
-      return { ...message, audioUrl, audioLoading: false, audioError: false };
-    });
-  };
-
-  const markCustomCoachAudioFailed = (messageId) => {
-    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: false, audioError: true }));
-  };
-
-  const requestSpeechForCustomCoachMessage = (messageId, text) => {
-    if (!audioRepliesEnabled || !isCoachTtsEligible() || !text) return;
-    const generation = customConversationGenerationRef.current;
-    const controller = new AbortController();
-    speechControllersRef.current[messageId]?.abort();
-    speechControllersRef.current[messageId] = controller;
-    updateCustomCoachMessage(messageId, (message) => ({ ...message, audioLoading: true, audioError: false }));
-    requestCoachSpeech({ text, level: selectedLevel, idToken, signal: controller.signal })
-      .then((audioUrl) => {
-        delete speechControllersRef.current[messageId];
-        if (generation !== customConversationGenerationRef.current) {
-          URL.revokeObjectURL(audioUrl);
-          return;
-        }
-        attachCustomCoachAudio(messageId, audioUrl);
-        if (autoPlayRepliesEnabled) {
-          window.setTimeout(() => {
-            const audio = audioRefs.current[messageId];
-            if (!audio) return;
-            Object.entries(audioRefs.current).forEach(([id, other]) => {
-              if (id !== messageId && other) { other.pause(); other.currentTime = 0; }
-            });
-            audio.play().then(() => setPlayingMessageId(messageId)).catch(() => {});
-          }, 0);
-        }
-      })
-      .catch((error) => {
-        delete speechControllersRef.current[messageId];
-        if (error?.name !== "AbortError") markCustomCoachAudioFailed(messageId);
-      });
-  };
-
-  const retryCustomCoachAudio = (message) => {
-    if (!message?.id || !message?.text) return;
-    requestSpeechForCustomCoachMessage(message.id, message.text);
-  };
+  const {
+    requestSpeechForMessage: requestSpeechForCustomCoachMessage,
+    retrySpeechForMessage: retryCustomCoachAudio,
+    cleanupCoachSpeech,
+    isCoachTtsEligible,
+  } = useCustomCoachSpeech({
+    selectedLevel,
+    activeSpeakingTab,
+    idToken,
+    audioRepliesEnabled,
+    autoPlayRepliesEnabled,
+    audioRefs,
+    playingMessageId,
+    setPlayingMessageId,
+    setCustomChatMessages,
+  });
 
   const customSessionLabel = `${String(Math.floor(customSessionSecondsLeft / 60)).padStart(2, "0")}:${String(customSessionSecondsLeft % 60).padStart(2, "0")}`;
   const isCustomSessionEnded = customSessionState === "ended";
@@ -913,9 +849,7 @@ const SpeakingPage = ({
     setPlaybackError("");
     if (activeSpeakingTab === "custom") {
       releaseMessageAudio(customChatMessages);
-      customConversationGenerationRef.current += 1;
-      abortPendingSpeechRequests();
-      customChatMessages.forEach((message) => revokeCoachAudioUrl(message.audioUrl));
+      cleanupCoachSpeech(customChatMessages);
       setCustomSessionState("idle");
       setCustomSessionSecondsLeft(speakingChatSessionSeconds(customSessionDurationMinutes));
       customSessionTimeoutLoggedRef.current = false;
@@ -954,26 +888,11 @@ const SpeakingPage = ({
 
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(AUDIO_REPLIES_STORAGE_KEY, String(audioRepliesEnabled));
-    if (!audioRepliesEnabled) {
-      abortPendingSpeechRequests();
-      setCustomChatMessages((current) => current.map((message) => {
-        if (message.audioUrl) revokeCoachAudioUrl(message.audioUrl);
-        return { ...message, audioUrl: null, audioLoading: false, audioError: false };
-      }));
-    }
   }, [audioRepliesEnabled]);
 
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(AUTOPLAY_REPLIES_STORAGE_KEY, String(autoPlayRepliesEnabled));
   }, [autoPlayRepliesEnabled]);
-
-  useEffect(() => () => {
-    customConversationGenerationRef.current += 1;
-    abortPendingSpeechRequests();
-    Object.values(audioRefs.current).forEach((audio) => audio?.pause());
-    coachAudioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    coachAudioUrlsRef.current.clear();
-  }, []);
 
   const completedCount = useMemo(
     () => Object.values(completedQuestionIds).filter(Boolean).length,
