@@ -7,7 +7,9 @@ import {
   shouldAutoMountA1WritingPractice,
 } from "../utils/a1CoursePracticeRoutes";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
-import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
+import SelfLearningJourneyGate, {
+  hasCompletedSelfLearningMaterials,
+} from "./selfLearning/SelfLearningJourneyGate";
 import { isTeacherLectureResource } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import {
@@ -27,6 +29,13 @@ const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
 const routePath = (value = "") => normalizeA1CoursePracticePath(String(value || "").split(/[?#]/)[0]);
+const hasCompletedRadioFromSearch = (search = "") => {
+  try {
+    return new URLSearchParams(search || "").get("radio") === "done";
+  } catch (_error) {
+    return false;
+  }
+};
 
 const getPageContainer = () => {
   const main = document.querySelector("main") || document.body;
@@ -268,10 +277,19 @@ const A1CoursePracticeAutoMount = () => {
     const container = practice
       ? (currentIsDestination ? null : getCanonicalLessonArticle(practice.day)) || getPageContainer()
       : getPageContainer();
+    const journeyResources = practice ? getA1SelfLearningJourneyResources(practice) : null;
+    const radioCompleted = hasCompletedRadioFromSearch(location.search);
+    const materialsCompleted = hasCompletedSelfLearningMaterials(location.search);
 
     if (practice && currentIsDestination) {
       if (Number(practice.day) === 19) prepareDay19Page(container);
-      return undefined;
+
+      // The canonical workbook page already owns the Falowen Radio gate. Once
+      // Radio is complete, mount the shared materials selector on that same
+      // destination so teacher, AI and grammar resources are not skipped.
+      if (materialsCompleted || (journeyResources?.radio && !radioCompleted)) {
+        return undefined;
+      }
     }
 
     if (practice && Number(practice.day) === 19) prepareDay19Page(container);

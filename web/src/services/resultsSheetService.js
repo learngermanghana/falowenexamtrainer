@@ -110,6 +110,16 @@ const getOptionalJsonValue = (value) => {
   }
 };
 
+const normalizeResultLink = (value = "") => {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+
+  const hyperlinkFormula = trimmed.match(/^=HYPERLINK\(\s*"([^"]+)"/i);
+  if (hyperlinkFormula?.[1]) return hyperlinkFormula[1].trim();
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith("/")) return trimmed;
+  return "";
+};
+
 const fetchCsv = async (url) => {
   const withBust = url.includes("?") ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
   const response = await fetch(withBust);
@@ -144,7 +154,22 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     studentcode: findIndexByHeader(headerRow, ["studentcode", "student code", "code"]),
     score: findIndexByHeader(headerRow, ["score", "mark", "marks", "final score", "final_score", "finalscore"]),
     comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment", "ai feedback", "aifeedback"]),
-    link: findIndexByHeader(headerRow, ["link", "url"]),
+    link: findIndexByHeader(headerRow, [
+      "link",
+      "url",
+      "objective link",
+      "objective url",
+      "objective answer",
+      "objective answers",
+      "objective answer link",
+      "objective answers link",
+      "objective answers url",
+      "answer link",
+      "answers link",
+      "view objective answers",
+      "objective response link",
+      "objective responses link",
+    ]),
     date: findIndexByHeader(headerRow, ["date", "createdat", "created_at", "timestamp", "time"]),
     assignmentId: findIndexByHeader(headerRow, [
       "assignment_id",
@@ -178,7 +203,7 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     studentcode: getValue(row, indices.studentcode),
     score: getValue(row, indices.score),
     comments: getValue(row, indices.comments),
-    link: getValue(row, indices.link),
+    link: normalizeResultLink(getValue(row, indices.link)),
     date: getValue(row, indices.date),
     assignment_id: getValue(row, indices.assignmentId),
     assignmentId: getValue(row, indices.assignmentId),
