@@ -112,7 +112,7 @@ replaceOnce(
                                   </button>
                                   <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
                                     {waveHeights.slice(0, 10).map((height, index) => (
-                                      <span key={\`${message.id}-reply-wave-${index}\`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
+                                      <span key={\`\${message.id}-reply-wave-\${index}\`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
                                     ))}
                                   </div>
                                   <audio ref={(node) => { if (node) { audioRefs.current[message.id] = node; node.onended = () => setPlayingMessageId("");
@@ -131,7 +131,7 @@ replaceOnce(
                                     </button>
                                     <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
                                       {waveHeights.slice(0, 10).map((height, index) => (
-                                        <span key={\`${message.id}-reply-wave-${index}\`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
+                                        <span key={\`\${message.id}-reply-wave-\${index}\`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
                                       ))}
                                     </div>
                                     {message.audioUrl ? (
