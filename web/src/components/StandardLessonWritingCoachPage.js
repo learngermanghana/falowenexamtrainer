@@ -51,7 +51,27 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   const isGuidedC1ExtraBlock = level === "C1" && day > 23 && day < 27;
   const isGuidedC1LastBlock = level === "C1" && day > 26 && day < 29;
   const isCompactC1Lesson = level === "C1" && day >= 8 && day <= 16;
-  const LessonPage = isGuidedB2Lesson ? B2Day1To4GuidedLessonPage : isGuidedC1Lesson ? C1Day1To6GuidedLessonPage : isGuidedC1LastBlock ? C1LastGuidedLessonPage : isGuidedC1ExtraBlock ? C1ExtraGuidedLessonPage : isGuidedC1FinalBlock ? C1FinalGuidedLessonPage : isGuidedC1LaterBlock ? C1LaterGuidedLessonPage : isGuidedC1MoreBlock ? C1MoreGuidedLessonPage : isGuidedC1NextBlock ? C1NextGuidedLessonPage : (isGuidedC1Day7 || isGuidedC1Day11) ? C1Day8To10GuidedLessonPage : isCompactC1Lesson ? CompactC1LessonPage : StandardFourStageLessonPage;
+  const LessonPage = isGuidedB2Lesson
+    ? B2Day1To4GuidedLessonPage
+    : (isGuidedC1Lesson || isGuidedC1Day11)
+      ? C1Day1To6GuidedLessonPage
+      : isGuidedC1LastBlock
+        ? C1LastGuidedLessonPage
+        : isGuidedC1ExtraBlock
+          ? C1ExtraGuidedLessonPage
+          : isGuidedC1FinalBlock
+            ? C1FinalGuidedLessonPage
+            : isGuidedC1LaterBlock
+              ? C1LaterGuidedLessonPage
+              : isGuidedC1MoreBlock
+                ? C1MoreGuidedLessonPage
+                : isGuidedC1NextBlock
+                  ? C1NextGuidedLessonPage
+                  : isGuidedC1Day7
+                    ? C1Day8To10GuidedLessonPage
+                    : isCompactC1Lesson
+                      ? CompactC1LessonPage
+                      : StandardFourStageLessonPage;
   const resolvedCanonicalLesson = resolveCanonicalLessonForPage(lesson, canonicalLesson);
   const location = useLocation();
   const rootRef = useRef(null);
