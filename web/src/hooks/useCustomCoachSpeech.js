@@ -9,7 +9,7 @@ export const describeCoachSpeechError = (error = {}) => {
 
   if (status === 429 || code === "quota_reached") {
     return {
-      message: "Daily German audio limit reached. Text chat still works; audio will be available again after the quota resets.",
+      message: "Daily German audio limit reached. Using your device's German voice for this reply.",
       code,
       retryable: false,
     };
@@ -17,7 +17,7 @@ export const describeCoachSpeechError = (error = {}) => {
 
   if (status === 401 || status === 403) {
     return {
-      message: "Your audio session is no longer authorised. Refresh the page and sign in again.",
+      message: "The server audio session is no longer authorised. Using your device's German voice; refresh and sign in again for the studio voice.",
       code,
       retryable: false,
     };
@@ -25,7 +25,7 @@ export const describeCoachSpeechError = (error = {}) => {
 
   if (status === 400 || code === "missing_text" || code === "text_too_long" || code === "invalid_level") {
     return {
-      message: error?.message || "This reply cannot be converted to audio. Continue with the written reply.",
+      message: error?.message || "This reply cannot be converted by the server voice.",
       code,
       retryable: false,
     };
@@ -33,7 +33,7 @@ export const describeCoachSpeechError = (error = {}) => {
 
   if (code === "invalid_audio_response") {
     return {
-      message: "The audio service returned an invalid file. Try the audio again.",
+      message: "The server returned an invalid audio file. Using your device's German voice instead.",
       code,
       retryable: true,
     };
@@ -41,17 +41,30 @@ export const describeCoachSpeechError = (error = {}) => {
 
   if (status >= 500 || code === "network_error" || error?.retryable === true) {
     return {
-      message: "The German audio service is temporarily unavailable. Try this reply again.",
+      message: "The studio German voice is temporarily unavailable. Using your device's German voice instead.",
       code,
       retryable: true,
     };
   }
 
   return {
-    message: error?.message || "The German audio reply could not be prepared.",
+    message: error?.message || "The studio German audio reply could not be prepared.",
     code,
     retryable: error?.retryable !== false,
   };
+};
+
+const supportsBrowserSpeech = () =>
+  typeof window !== "undefined" &&
+  Boolean(window.speechSynthesis) &&
+  typeof window.SpeechSynthesisUtterance === "function";
+
+const browserSpeechRateForLevel = (level = "") => {
+  const normalized = String(level || "").toUpperCase();
+  if (normalized === "A2") return 0.88;
+  if (normalized === "B1") return 0.94;
+  if (normalized === "C1") return 1.03;
+  return 1;
 };
 
 export const useCustomCoachSpeech = ({
@@ -68,6 +81,43 @@ export const useCustomCoachSpeech = ({
   const coachAudioUrlsRef = useRef(new Set());
   const speechControllersRef = useRef({});
   const customConversationGenerationRef = useRef(0);
+  const browserSpeechMessageIdRef = useRef("");
+
+  const stopBrowserSpeech = useCallback(() => {
+    if (supportsBrowserSpeech()) window.speechSynthesis.cancel();
+    browserSpeechMessageIdRef.current = "";
+    setPlayingMessageId("");
+  }, [setPlayingMessageId]);
+
+  const playBrowserSpeechForMessage = useCallback((messageId, text) => {
+    if (!supportsBrowserSpeech() || !messageId || !String(text || "").trim()) return false;
+
+    window.speechSynthesis.cancel();
+    const utterance = new window.SpeechSynthesisUtterance(String(text).trim());
+    utterance.lang = "de-DE";
+    utterance.rate = browserSpeechRateForLevel(selectedLevel);
+    const germanVoice = window.speechSynthesis
+      .getVoices()
+      .find((voice) => String(voice?.lang || "").toLowerCase().startsWith("de"));
+    if (germanVoice) utterance.voice = germanVoice;
+
+    browserSpeechMessageIdRef.current = messageId;
+    utterance.onstart = () => setPlayingMessageId(messageId);
+    utterance.onend = () => {
+      if (browserSpeechMessageIdRef.current === messageId) {
+        browserSpeechMessageIdRef.current = "";
+        setPlayingMessageId("");
+      }
+    };
+    utterance.onerror = () => {
+      if (browserSpeechMessageIdRef.current === messageId) {
+        browserSpeechMessageIdRef.current = "";
+        setPlayingMessageId("");
+      }
+    };
+    window.speechSynthesis.speak(utterance);
+    return true;
+  }, [selectedLevel, setPlayingMessageId]);
 
   const stopAudio = useCallback((messageId) => {
     const audio = audioRefs.current[messageId];
@@ -75,8 +125,9 @@ export const useCustomCoachSpeech = ({
       audio.pause();
       audio.currentTime = 0;
     }
+    if (browserSpeechMessageIdRef.current === messageId) stopBrowserSpeech();
     if (playingMessageId === messageId) setPlayingMessageId("");
-  }, [audioRefs, playingMessageId, setPlayingMessageId]);
+  }, [audioRefs, playingMessageId, setPlayingMessageId, stopBrowserSpeech]);
 
   const revokeCoachAudioUrl = useCallback((url) => {
     if (!url || !coachAudioUrlsRef.current.has(url)) return;
@@ -108,6 +159,7 @@ export const useCustomCoachSpeech = ({
       return {
         ...message,
         audioUrl,
+        browserSpeech: false,
         audioLoading: false,
         audioError: false,
         audioErrorMessage: "",
@@ -127,6 +179,7 @@ export const useCustomCoachSpeech = ({
     });
     updateCustomCoachMessage(messageId, (message) => ({
       ...message,
+      browserSpeech: false,
       audioLoading: false,
       audioError: true,
       audioErrorMessage: details.message,
@@ -134,6 +187,25 @@ export const useCustomCoachSpeech = ({
       audioRetryable: details.retryable,
     }));
   }, [updateCustomCoachMessage]);
+
+  const useBrowserSpeechFallback = useCallback((messageId, text, error) => {
+    if (!supportsBrowserSpeech()) return false;
+    const details = describeCoachSpeechError(error);
+    updateCustomCoachMessage(messageId, (message) => ({
+      ...message,
+      audioUrl: null,
+      browserSpeech: true,
+      audioLoading: false,
+      audioError: false,
+      audioErrorMessage: details.message,
+      audioErrorCode: details.code,
+      audioRetryable: details.retryable,
+    }));
+    if (autoPlayRepliesEnabled) {
+      window.setTimeout(() => playBrowserSpeechForMessage(messageId, text), 0);
+    }
+    return true;
+  }, [autoPlayRepliesEnabled, playBrowserSpeechForMessage, updateCustomCoachMessage]);
 
   const requestSpeechForMessage = useCallback((messageId, text) => {
     if (!audioRepliesEnabled || !isCoachTtsEligible() || !text) return;
@@ -174,32 +246,43 @@ export const useCustomCoachSpeech = ({
       })
       .catch((error) => {
         delete speechControllersRef.current[messageId];
-        if (error?.name !== "AbortError") markCustomCoachAudioFailed(messageId, error);
+        if (error?.name === "AbortError") return;
+        if (!useBrowserSpeechFallback(messageId, text, error)) {
+          markCustomCoachAudioFailed(messageId, error);
+        }
       });
-  }, [attachCustomCoachAudio, audioRefs, audioRepliesEnabled, autoPlayRepliesEnabled, idToken, isCoachTtsEligible, markCustomCoachAudioFailed, selectedLevel, setPlayingMessageId, updateCustomCoachMessage]);
+  }, [attachCustomCoachAudio, audioRefs, audioRepliesEnabled, autoPlayRepliesEnabled, idToken, isCoachTtsEligible, markCustomCoachAudioFailed, selectedLevel, setPlayingMessageId, updateCustomCoachMessage, useBrowserSpeechFallback]);
 
   const retrySpeechForMessage = useCallback((message) => {
-    if (!message?.id || !message?.text || message?.audioRetryable === false) return;
+    if (!message?.id || !message?.text) return;
+    if (message.browserSpeech) {
+      playBrowserSpeechForMessage(message.id, message.text);
+      return;
+    }
+    if (message?.audioRetryable === false) return;
     requestSpeechForMessage(message.id, message.text);
-  }, [requestSpeechForMessage]);
+  }, [playBrowserSpeechForMessage, requestSpeechForMessage]);
 
   const cleanupCoachSpeech = useCallback((messages = []) => {
     customConversationGenerationRef.current += 1;
     abortPendingSpeechRequests();
+    stopBrowserSpeech();
     Object.values(audioRefs.current).forEach((audio) => audio?.pause());
     messages.forEach((message) => revokeCoachAudioUrl(message?.audioUrl));
     coachAudioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     coachAudioUrlsRef.current.clear();
-  }, [abortPendingSpeechRequests, audioRefs, revokeCoachAudioUrl]);
+  }, [abortPendingSpeechRequests, audioRefs, revokeCoachAudioUrl, stopBrowserSpeech]);
 
   useEffect(() => {
     if (!audioRepliesEnabled) {
       abortPendingSpeechRequests();
+      stopBrowserSpeech();
       setCustomChatMessages((current) => current.map((message) => {
         if (message.audioUrl) revokeCoachAudioUrl(message.audioUrl);
         return {
           ...message,
           audioUrl: null,
+          browserSpeech: false,
           audioLoading: false,
           audioError: false,
           audioErrorMessage: "",
@@ -208,13 +291,15 @@ export const useCustomCoachSpeech = ({
         };
       }));
     }
-  }, [abortPendingSpeechRequests, audioRepliesEnabled, revokeCoachAudioUrl, setCustomChatMessages]);
+  }, [abortPendingSpeechRequests, audioRepliesEnabled, revokeCoachAudioUrl, setCustomChatMessages, stopBrowserSpeech]);
 
   useEffect(() => () => cleanupCoachSpeech(), []);
 
   return {
     requestSpeechForMessage,
     retrySpeechForMessage,
+    playBrowserSpeechForMessage,
+    stopBrowserSpeech,
     abortPendingSpeechRequests,
     revokeCoachAudioUrl,
     cleanupCoachSpeech,
