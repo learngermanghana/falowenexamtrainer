@@ -128,6 +128,24 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     instruction:
       "Listen carefully to the Kapitel 9 episode. Then continue to the teacher lecture and lesson resources. The AI lesson video opens inside the workbook.",
   }),
+  17: Object.freeze({
+    key: "a1-day17-chapter-11-falowen-radio",
+    chapter: "11",
+    title: "A1 Day 17 · Kapitel 11",
+    youtubeId: "8Mh4PCSm6QE",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 11 episode. Then continue to the lesson resources and workbook.",
+  }),
+  18: Object.freeze({
+    key: "a1-day18-chapter-12-1-falowen-radio",
+    chapter: "12.1",
+    title: "A1 Day 18 · Kapitel 12.1",
+    youtubeId: "G6khh2VagPA",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 12.1 episode. Then continue to the lesson resources and workbook.",
+  }),
   20: Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
     title: "Letter Writing Introduction · Kapitel 12.3",
