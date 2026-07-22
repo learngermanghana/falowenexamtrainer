@@ -22,6 +22,9 @@ const checks = [
     "getVisibleSpeakingTabs({ isCourseMode, examOnly })",
     "if (saved?.selectedTeil && !normalizedLockedTeil)",
     "Teil {normalizedLockedTeil}",
+    'falowen.customSpeaking.audioReplies.v2',
+    "latestCoachMessageNeedingAudio",
+    "requestSpeechForCustomCoachMessage(",
   ]],
   ["web/src/components/SpeakingExamIntroPage.js", [
     'import A1Teil3SpeakingPracticePanel from "./A1Teil3SpeakingPracticePanel"',
@@ -72,7 +75,7 @@ const checks = [
   ]],
   ["web/src/services/speechTrainerService.js", [
     'from "../lib/speakingAudio"',
-    "filenameForAudioBlob(audioBlob, \"speech-trainer\")",
+    'filenameForAudioBlob(audioBlob, "speech-trainer")',
     "if (error?.response) throw error",
     "timeout: 120000",
   ]],
@@ -106,6 +109,7 @@ const checks = [
 
 const forbidden = [
   ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", "<iframe"],
+  ["web/src/components/SpeakingPage.js", 'falowen.customSpeaking.audioReplies";'],
 ];
 
 const failures = [];
