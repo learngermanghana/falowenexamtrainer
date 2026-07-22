@@ -3,6 +3,8 @@ name: Restore B2 C1 lesson structure
 on:
   pull_request:
     paths:
+      - "scripts/runSpeakingAudioReliabilityPatch.mjs"
+      - "web/src/data/a1RadioResources.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
@@ -44,7 +46,7 @@ jobs:
           src/components/A2B1UnchangedBySelfLearningRestore.test.js
           src/components/WritingCheatSheetTabs.writingVideo.test.js
           src/__tests__/CourseSpeakingChatCleanupSafety.test.js
-      - name: Test approved A1 Day 3 Falowen Radio route
+      - name: Test restored A1 Day 3 Falowen Radio route
         working-directory: web
         env:
           CI: true
