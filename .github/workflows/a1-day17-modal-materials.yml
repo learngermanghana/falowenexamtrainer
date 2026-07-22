@@ -25,10 +25,25 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
       - name: Test A1 Day 17 native navigation
+        id: day17-test
+        continue-on-error: true
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx > day17-test.log 2>&1
+      - name: Upload Day 17 diagnostics
+        if: steps.day17-test.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-day17-test-log
+          path: web/day17-test.log
+          if-no-files-found: error
+      - name: Report Day 17 failure
+        if: steps.day17-test.outcome == 'failure'
+        working-directory: web
+        run: |
+          tail -n 120 day17-test.log
+          exit 1
       - name: Test A1 Day 14 supporting materials
         working-directory: web
         env:
