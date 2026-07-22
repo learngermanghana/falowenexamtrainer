@@ -21,6 +21,14 @@ describe("course speaking chat cleanup navigation safety", () => {
     expect(cleanupScript).toContain("new MutationObserver(scheduleCleanup)");
   });
 
+  test("restores the Goethe speaking coach for B2 and C1 instead of hiding it", () => {
+    expect(cleanupScript).toContain('const COURSE_LEVELS = "a1|a2|b1|b2|c1"');
+    expect(cleanupScript).toContain("return restoreCourseSpeakingChat()");
+    expect(cleanupScript).not.toContain("HIDDEN_COURSE_LEVELS");
+    expect(cleanupScript).not.toContain("hideQuickStartersFallback");
+    expect(cleanupScript).not.toContain("const hideElement");
+  });
+
   test("installs only once", () => {
     expect(cleanupScript).toContain("__falowenCourseSpeakingChatCleanupInstalled");
   });
