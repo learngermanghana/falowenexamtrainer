@@ -26,6 +26,9 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Ensure Vite React build plugin is present
+        working-directory: web
+        run: npm install --no-save --legacy-peer-deps --no-audit --no-fund @vitejs/plugin-react@5.1.1
       - name: Test A1 self-learning destination materials
         working-directory: web
         env:
