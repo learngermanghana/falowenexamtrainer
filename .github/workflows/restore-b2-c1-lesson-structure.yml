@@ -12,6 +12,7 @@ on:
       - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - "web/src/components/A1Day3ApprovedRadioRegression.test.js"
       - ".github/workflows/restore-b2-c1-lesson-structure.yml"
 
 jobs:
@@ -41,7 +42,10 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/A1RadioFirstWorkbookRoutes.test.jsx
+          src/components/A1Day3ApprovedRadioRegression.test.js
       - name: Build web app
         working-directory: web
         run: npm run build
