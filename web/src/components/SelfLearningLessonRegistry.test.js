@@ -47,6 +47,8 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
     expect(screen.getByText("Test Radio Episode")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /continue to teil/i })).toBeInTheDocument();
+    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
   });
 
   test.each([
@@ -60,6 +62,8 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.getByRole("heading", { name: "AI video" })).toBeInTheDocument();
     expect(screen.getByTitle(title)).toHaveAttribute("src", src);
     expect(screen.queryByTitle("Test Radio Episode")).not.toBeInTheDocument();
+    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
   });
 
   test.each(["B2", "C1"])("%s lesson without Radio opens the lesson UI directly", (level) => {
@@ -67,7 +71,27 @@ describe("self-learning lesson Falowen Radio integration", () => {
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
     expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
+  });
+
+  test("C1 Engagement und Ehrenamt uses the Day 1 standout Radio-to-tabs workbook", () => {
+    renderRegisteredLesson("C1", 11, radio);
+
+    expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
+    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "1. Learn" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
+
+    expect(screen.getByRole("heading", { name: /Engagement und Ehrenamt/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "2. Speak" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "3. Write" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "4. Finish" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "5. Ref" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Teil 1 · Sprechen/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
   });
 
   test.each([
