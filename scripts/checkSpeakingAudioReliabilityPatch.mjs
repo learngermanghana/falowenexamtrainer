@@ -22,11 +22,15 @@ const checks = [
     "getVisibleSpeakingTabs({ isCourseMode, examOnly })",
     "if (saved?.selectedTeil && !normalizedLockedTeil)",
     "Teil {normalizedLockedTeil}",
-    'falowen.customSpeaking.audioReplies.v2',
+    "falowen.customSpeaking.audioReplies.v2",
     "audioRequested: Boolean(withAudio),",
     "latestCoachMessageNeedingAudio",
     "message.audioRequested === true",
     "requestSpeechForCustomCoachMessage(",
+    "message.audioUrl || message.browserSpeech",
+    "playBrowserSpeechForMessage(messageId, message.text)",
+    "stopBrowserSpeech()",
+    "message.audioErrorMessage",
   ]],
   ["web/src/components/SpeakingExamIntroPage.js", [
     'import A1Teil3SpeakingPracticePanel from "./A1Teil3SpeakingPracticePanel"',
@@ -66,30 +70,25 @@ const checks = [
     "<audio controls",
     "recorder.start(1000)",
   ]],
-  ["web/src/components/speechTrainer/InlineSpeechTrainer.js", [
-    'from "../../lib/speakingAudio"',
-    "createSpeakingMediaRecorder(stream)",
-    "buildRecordedAudioBlob(chunks, recorder)",
-    "recorder.start(1000)",
-    "`Maximum ${formatTime(maxRecordingSeconds)}; recording stops automatically.`",
-  ]],
-  ["web/src/services/coachService.js", [
-    'from "../lib/speakingAudio"',
-    "filenameForAudioBlob(audioBlob)",
-    "if (error?.response) throw error",
-    "timeout: 120000",
-  ]],
-  ["web/src/services/speechTrainerService.js", [
-    'from "../lib/speakingAudio"',
-    'filenameForAudioBlob(audioBlob, "speech-trainer")',
-    "if (error?.response) throw error",
-    "timeout: 120000",
+  ["web/src/hooks/useCustomCoachSpeech.js", [
+    'from "../services/presentationCoachService"',
+    "requestCoachSpeech({ text, level: selectedLevel, idToken, signal: controller.signal })",
+    "window.SpeechSynthesisUtterance",
+    "window.speechSynthesis.speak(utterance)",
+    "browserSpeech: true",
+    "useBrowserSpeechFallback(messageId, text, error)",
+    "audioErrorMessage",
+    "audioRetryable",
   ]],
   ["web/src/services/presentationCoachService.js", [
     'from "../lib/speakingSessionDuration"',
     "normalizeSpeakingChatDurationMinutes(sessionContext?.durationMinutes)",
     "full ${durationMinutes}-minute session",
     "sessionContext,",
+    "MAX_COACH_SPEECH_CHARACTERS",
+    "normalizeCoachSpeechText",
+    "invalid_audio_response",
+    'response.headers?.get?.("content-type")',
   ]],
   ["web/src/lib/speakingSessionDuration.js", [
     "[10, 20, 30]",
@@ -102,6 +101,9 @@ const checks = [
     ".slice(0, 8000)",
     "SPEAKING_QUOTA_REACHED",
     "NO_SPEECH_DETECTED|TRANSCRIPTION_",
+    "Use this reliable structure for every learner message",
+    "'Bessere Version:'",
+    "max_tokens: 520",
   ]],
   ["functions/functionz/speakingAudioReliability.js", [
     "gpt-4o-transcribe",
@@ -110,6 +112,8 @@ const checks = [
     "NO_SPEECH_DETECTED",
     "TRANSCRIPTION_TIMEOUT",
     "TRANSCRIPTION_FAILED",
+    "waitForReadStreamOpen",
+    "audioStream?.destroy()",
   ]],
 ];
 
@@ -117,6 +121,8 @@ const forbidden = [
   ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", "<iframe"],
   ["web/src/components/SpeakingPage.js", 'falowen.customSpeaking.audioReplies";'],
   ["web/src/components/selfLearning/EmbeddedPracticePanels.js", '<SpeakingPage mode="course" />'],
+  ["functions/functionz/app.js", "Keep concise: maximum 6 short lines"],
+  ["functions/functionz/app.js", "Keep replies short and phone-friendly"],
 ];
 
 const failures = [];

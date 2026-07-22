@@ -11,6 +11,8 @@ on:
       - 'scripts/fixSpeakingAudioBackendPatch.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
+      - 'scripts/patchCustomSpeakingReplyStyle.mjs'
+      - 'tests/custom-speaking-reply-style.test.mjs'
       - 'firebase.json'
       - '.firebaserc'
       - 'firestore.rules'
@@ -42,18 +44,21 @@ jobs:
           cache: npm
           cache-dependency-path: functions/package-lock.json
 
-      - name: Apply speaking audio reliability patch
+      - name: Apply speaking audio and reply-style patches
         run: |
           node --check scripts/patchSpeakingAudioReliability.mjs
           node --check scripts/fixSpeakingAudioFrontendPatch.mjs
           node --check scripts/fixSpeakingAudioBackendPatch.mjs
           node --check scripts/runSpeakingAudioReliabilityPatch.mjs
           node --check scripts/checkSpeakingAudioReliabilityPatch.mjs
+          node --check scripts/patchCustomSpeakingReplyStyle.mjs
           node scripts/runSpeakingAudioReliabilityPatch.mjs
           node scripts/checkSpeakingAudioReliabilityPatch.mjs
+          node scripts/patchCustomSpeakingReplyStyle.mjs
           node --check functions/functionz/speakingAudioReliability.js
           node --check functions/functionz/app.js
           node --test tests/speaking-audio-reliability.test.mjs
+          node --test tests/custom-speaking-reply-style.test.mjs
 
       - name: Install functions dependencies
         working-directory: functions

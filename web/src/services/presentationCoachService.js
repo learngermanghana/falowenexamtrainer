@@ -9,6 +9,41 @@ export const CUSTOM_SPEAKING_CHAT_SESSION_SECONDS = speakingChatSessionSeconds(
   DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
 );
 
+export const MAX_COACH_SPEECH_CHARACTERS = 1100;
+
+export const normalizeCoachSpeechText = (value = "", maxLength = MAX_COACH_SPEECH_CHARACTERS) => {
+  const normalized = String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  const safeMaxLength = Math.max(80, Number(maxLength) || MAX_COACH_SPEECH_CHARACTERS);
+  if (normalized.length <= safeMaxLength) return normalized;
+
+  const candidate = normalized.slice(0, safeMaxLength - 1).trimEnd();
+  const sentenceBoundary = Math.max(
+    candidate.lastIndexOf(". "),
+    candidate.lastIndexOf("! "),
+    candidate.lastIndexOf("? "),
+    candidate.lastIndexOf("\n"),
+  );
+  const minimumUsefulBoundary = Math.floor(safeMaxLength * 0.6);
+  const clipped = sentenceBoundary >= minimumUsefulBoundary
+    ? candidate.slice(0, sentenceBoundary + 1).trimEnd()
+    : candidate;
+
+  return `${clipped}…`;
+};
+
+const makeSpeechRequestError = (message, { status = 0, code = "speech_request_failed", retryable = true } = {}) => {
+  const error = new Error(message);
+  error.status = Number(status) || 0;
+  error.code = code;
+  error.retryable = Boolean(retryable);
+  return error;
+};
+
 const getCourseSpeakingContext = () => {
   if (typeof window === "undefined") return null;
   return window.__FALOWEN_COURSE_SPEAKING_CONTEXT__ || null;
@@ -37,30 +72,66 @@ Student message:
 ${message}`;
 };
 
-
 export const requestCoachSpeech = async ({ text, level, idToken, signal } = {}) => {
-  const response = await fetch(`${backendUrl}/speech/synthesize`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-    },
-    body: JSON.stringify({ text, level }),
-    signal,
-  });
+  const speechText = normalizeCoachSpeechText(text);
+  if (!speechText) {
+    throw makeSpeechRequestError("There is no coach reply to read aloud.", {
+      status: 400,
+      code: "missing_text",
+      retryable: false,
+    });
+  }
+
+  let response;
+  try {
+    response = await fetch(`${backendUrl}/speech/synthesize`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+      },
+      body: JSON.stringify({ text: speechText, level }),
+      signal,
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") throw error;
+    throw makeSpeechRequestError("Could not connect to the German audio service.", {
+      code: "network_error",
+      retryable: true,
+    });
+  }
 
   if (!response.ok) {
-    let errorMessage = `Failed to generate speech (HTTP ${response.status})`;
+    let data = null;
+    let raw = "";
     try {
-      const data = await response.json();
-      errorMessage = data?.error || data?.message || errorMessage;
-    } catch (error) {
-      // Keep the generic error when the backend did not return JSON.
+      raw = await response.text();
+      data = raw ? JSON.parse(raw) : null;
+    } catch (_error) {
+      data = null;
     }
-    throw new Error(errorMessage);
+
+    const errorMessage = data?.error || data?.message || raw || `Failed to generate speech (HTTP ${response.status})`;
+    const errorCode = data?.code || `http_${response.status}`;
+    const retryable = response.status >= 500 || response.status === 408 || response.status === 425;
+    throw makeSpeechRequestError(errorMessage, {
+      status: response.status,
+      code: errorCode,
+      retryable,
+    });
   }
 
   const blob = await response.blob();
+  const responseContentType = response.headers?.get?.("content-type") || "";
+  const audioContentType = responseContentType || blob?.type || "";
+  if (!/^audio\//i.test(audioContentType)) {
+    throw makeSpeechRequestError("The audio service returned an invalid response.", {
+      status: 502,
+      code: "invalid_audio_response",
+      retryable: true,
+    });
+  }
+
   return URL.createObjectURL(blob);
 };
 
