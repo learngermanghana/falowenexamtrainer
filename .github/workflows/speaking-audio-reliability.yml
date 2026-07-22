@@ -7,6 +7,7 @@ on:
       - 'web/src/components/SpeakingExamIntroPage.js'
       - 'web/src/components/A1Teil3SpeakingPracticePanel.js'
       - 'web/src/components/A1Teil3SpeakingPracticePanel.test.jsx'
+      - 'web/src/components/GoetheCoachAudioFailureUi.test.js'
       - 'web/src/components/SelfLearningLessonRegistry.js'
       - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.js'
       - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.test.jsx'
@@ -14,6 +15,8 @@ on:
       - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
       - 'web/src/components/A2Day3ComparisonsWorkbookPage.js'
       - 'web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js'
+      - 'web/src/hooks/useCustomCoachSpeech.js'
+      - 'web/src/hooks/useCustomCoachSpeech.test.js'
       - 'web/src/lib/speakingAudio.js'
       - 'web/src/lib/speakingSessionDuration.js'
       - 'web/src/lib/speakingExamLock.js'
@@ -21,17 +24,21 @@ on:
       - 'web/src/services/coachService.js'
       - 'web/src/services/speechTrainerService.js'
       - 'web/src/services/presentationCoachService.js'
+      - 'web/src/services/presentationCoachService.test.js'
       - 'functions/functionz/app.js'
       - 'functions/functionz/speakingAudioReliability.js'
       - 'scripts/patchSpeakingAudioReliability.mjs'
       - 'scripts/fixSpeakingAudioFrontendPatch.mjs'
       - 'scripts/fixSpeakingAudioBackendPatch.mjs'
       - 'scripts/patchCustomSpeakingSessionDuration.mjs'
+      - 'scripts/patchCustomSpeakingReplyStyle.mjs'
+      - 'scripts/patchGoetheCoachAudioFeedback.mjs'
       - 'scripts/patchLockedA1Teil3Speaking.mjs'
       - 'scripts/patchRequestedCourseMedia.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'tests/speaking-audio-reliability.test.mjs'
+      - 'tests/custom-speaking-reply-style.test.mjs'
       - 'web/package.json'
       - '.github/workflows/speaking-audio-reliability.yml'
   workflow_dispatch:
@@ -49,7 +56,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Apply and validate speaking audio patch
+      - name: Apply and validate speaking audio and reply patches
         shell: bash
         run: |
           set +e
@@ -60,18 +67,23 @@ jobs:
             node --check scripts/fixSpeakingAudioFrontendPatch.mjs || status=$?
             node --check scripts/fixSpeakingAudioBackendPatch.mjs || status=$?
             node --check scripts/patchCustomSpeakingSessionDuration.mjs || status=$?
+            node --check scripts/patchCustomSpeakingReplyStyle.mjs || status=$?
+            node --check scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
             node --check scripts/patchLockedA1Teil3Speaking.mjs || status=$?
             node --check scripts/patchRequestedCourseMedia.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
             echo '== apply patches =='
             node scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
+            node scripts/patchCustomSpeakingReplyStyle.mjs || status=$?
+            node scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
             node scripts/patchRequestedCourseMedia.mjs || status=$?
             echo '== backend syntax =='
             node --check functions/functionz/app.js || status=$?
             node --check functions/functionz/speakingAudioReliability.js || status=$?
             echo '== pure helper tests =='
             node --test tests/speaking-audio-reliability.test.mjs || status=$?
+            node --test tests/custom-speaking-reply-style.test.mjs || status=$?
           } 2>&1 | tee speaking-audio-apply.log
           exit "$status"
 
@@ -110,6 +122,9 @@ jobs:
             src/lib/speakingExamLock.test.js \
             src/components/A1Teil3SpeakingPracticePanel.test.jsx \
             src/components/selfLearning/TeacherLectureSupportingMaterials.test.jsx \
+            src/services/presentationCoachService.test.js \
+            src/hooks/useCustomCoachSpeech.test.js \
+            src/components/GoetheCoachAudioFailureUi.test.js \
             2>&1 | tee ../speaking-ui-tests.log
           status=${PIPESTATUS[0]}
           exit "$status"
@@ -130,5 +145,7 @@ jobs:
       - name: Confirm idempotent patch runners
         run: |
           node scripts/runSpeakingAudioReliabilityPatch.mjs
+          node scripts/patchCustomSpeakingReplyStyle.mjs
+          node scripts/patchGoetheCoachAudioFeedback.mjs
           node scripts/patchRequestedCourseMedia.mjs
           node scripts/checkSpeakingAudioReliabilityPatch.mjs
