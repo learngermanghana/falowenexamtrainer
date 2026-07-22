@@ -7,6 +7,8 @@ on:
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
       - "web/src/components/SelfLearningLessonRegistry.restoreStructure.test.js"
+      - "web/src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js"
+      - "web/src/components/A2B1UnchangedBySelfLearningRestore.test.js"
       - "web/src/components/WritingCheatSheetTabs.js"
       - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
       - "web/public/course-speaking-chat-cleanup.js"
@@ -38,6 +40,8 @@ jobs:
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
           src/components/SelfLearningLessonRegistry.restoreStructure.test.js
+          src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js
+          src/components/A2B1UnchangedBySelfLearningRestore.test.js
           src/components/WritingCheatSheetTabs.writingVideo.test.js
           src/__tests__/CourseSpeakingChatCleanupSafety.test.js
       - name: Test approved A1 Day 3 Falowen Radio route
