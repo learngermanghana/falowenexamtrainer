@@ -1,0 +1,45 @@
+name: Restore B2 C1 lesson structure
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/SelfLearningLessonRegistry.test.js"
+      - "web/src/components/WritingCheatSheetTabs.js"
+      - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
+      - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - ".github/workflows/restore-b2-c1-lesson-structure.yml"
+
+jobs:
+  lesson-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test B2 and C1 Learn, Speak and Write structure
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/SelfLearningLessonRegistry.test.js
+          src/components/WritingCheatSheetTabs.writingVideo.test.js
+          src/__tests__/CourseSpeakingChatCleanupSafety.test.js
+      - name: Test approved A1 Day 3 Falowen Radio route
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx
+      - name: Build web app
+        working-directory: web
+        run: npm run build
