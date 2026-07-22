@@ -31,7 +31,7 @@ describe("A1 route-scoped Falowen Radio", () => {
 
   test.each([
     [2, "Uru9bvr14mw", "a1-day2-chapter-1-1-falowen-radio"],
-    [3, "DnfWKdi6DsA", "a1-day3-chapter-1-1-falowen-radio"],
+    [3, "y9LhKQkjsqM", "a1-day3-chapter-1-1-falowen-radio"],
   ])("uses the approved Day %i Kapitel 1.1 radio video", (day, youtubeId, key) => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
@@ -62,14 +62,14 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toEqual({ day: 2, chapter: "1.1" });
   });
 
-  test("opens the new Day 3 Falowen Radio on the direct Kapitel 1.1 workbook route", () => {
+  test("opens the restored Day 3 Falowen Radio on the direct Kapitel 1.1 workbook route", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
         "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
       ),
     ).toEqual({ day: 3, chapter: "1.1" });
     expect(getA1RadioResource(3)).toEqual(
-      expect.objectContaining({ youtubeId: "DnfWKdi6DsA" }),
+      expect.objectContaining({ youtubeId: "y9LhKQkjsqM" }),
     );
   });
 
