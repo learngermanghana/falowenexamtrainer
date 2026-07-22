@@ -9,4 +9,13 @@ describe("Goethe coach audio failure UI", () => {
     expect(source).toContain("message.audioRetryable !== false");
     expect(source).toContain('aria-label="Retry German audio"');
   });
+
+  test("plays a device German voice when the server MP3 is unavailable", () => {
+    const source = fs.readFileSync(path.resolve(__dirname, "SpeakingPage.js"), "utf8");
+
+    expect(source).toContain("message.audioUrl || message.browserSpeech");
+    expect(source).toContain("playBrowserSpeechForMessage(messageId, message.text)");
+    expect(source).toContain("stopBrowserSpeech()");
+    expect(source).toContain("This device has no German browser voice available.");
+  });
 });
