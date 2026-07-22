@@ -4,6 +4,10 @@ import { MemoryRouter } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import A1Day17InstructionsDirectionsKapitel11WorkbookPage from "./A1Day17InstructionsDirectionsKapitel11WorkbookPage";
 
+jest.mock("./VerifiedCloudDraftSubmissionPage", () => () => (
+  <div data-testid="verified-cloud-draft-submission" />
+));
+
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {
