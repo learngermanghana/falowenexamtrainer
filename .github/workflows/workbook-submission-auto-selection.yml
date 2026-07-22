@@ -32,11 +32,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/utils/workbookSubmissionContext.test.js
-      - name: Test A1 A2 B1 workbook routes
+      - name: Test A2 workbook portal navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1A2WorkbookRoutes.test.jsx src/components/A2B1WorkbookNavigation.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx
       - name: Build production web app
         working-directory: web
         run: npm run build
