@@ -23,7 +23,9 @@ const checks = [
     "if (saved?.selectedTeil && !normalizedLockedTeil)",
     "Teil {normalizedLockedTeil}",
     'falowen.customSpeaking.audioReplies.v2',
+    "audioRequested: Boolean(withAudio),",
     "latestCoachMessageNeedingAudio",
+    "message.audioRequested === true",
     "requestSpeechForCustomCoachMessage(",
   ]],
   ["web/src/components/SpeakingExamIntroPage.js", [

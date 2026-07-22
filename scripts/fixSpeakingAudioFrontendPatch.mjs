@@ -35,11 +35,35 @@ if (speakingPage.includes(legacyAudioRepliesKey)) {
   speakingPage = speakingPage.replace(legacyAudioRepliesKey, versionedAudioRepliesKey);
 }
 
+const audioIntentMarker = "audioRequested: Boolean(withAudio),";
+const audioIntentAnchor = `        audioUrl: null,
+        audioLoading: Boolean(withAudio && audioRepliesEnabled && isCoachTtsEligible()),`;
+const audioIntentReplacement = `        audioUrl: null,
+        audioRequested: Boolean(withAudio),
+        audioLoading: Boolean(withAudio && audioRepliesEnabled && isCoachTtsEligible()),`;
+
+if (!speakingPage.includes(audioIntentMarker)) {
+  if (!speakingPage.includes(audioIntentAnchor)) {
+    throw new Error("Could not find the custom coach message audio-intent insertion point.");
+  }
+  speakingPage = speakingPage.replace(audioIntentAnchor, audioIntentReplacement);
+}
+
 const autoplayPreferenceEffect = `  useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(AUTOPLAY_REPLIES_STORAGE_KEY, String(autoPlayRepliesEnabled));
   }, [autoPlayRepliesEnabled]);`;
 
 const latestReplyAudioMarker = "latestCoachMessageNeedingAudio";
+const unsafeBackfillPredicate = `          String(message.id || "").startsWith("custom-coach-") &&
+          Boolean(String(message.text || "").trim()) &&`;
+const scopedBackfillPredicate = `          String(message.id || "").startsWith("custom-coach-") &&
+          message.audioRequested === true &&
+          Boolean(String(message.text || "").trim()) &&`;
+
+if (speakingPage.includes(unsafeBackfillPredicate)) {
+  speakingPage = speakingPage.replace(unsafeBackfillPredicate, scopedBackfillPredicate);
+}
+
 const latestReplyAudioEffect = `
 
   useEffect(() => {
@@ -52,6 +76,7 @@ const latestReplyAudioEffect = `
           message.role === "coach" &&
           message.type === "text" &&
           String(message.id || "").startsWith("custom-coach-") &&
+          message.audioRequested === true &&
           Boolean(String(message.text || "").trim()) &&
           !message.audioUrl &&
           !message.audioLoading &&
@@ -84,9 +109,15 @@ if (!speakingPage.includes(latestReplyAudioMarker)) {
 if (!speakingPage.includes(versionedAudioRepliesKey)) {
   throw new Error("Speaking audio replies still use the stale preference key.");
 }
+if (!speakingPage.includes(audioIntentMarker)) {
+  throw new Error("Custom coach messages do not preserve whether audio was requested.");
+}
 if (!speakingPage.includes(latestReplyAudioMarker)) {
   throw new Error("Speaking audio replies do not backfill the latest coach response.");
 }
+if (!speakingPage.includes("message.audioRequested === true")) {
+  throw new Error("Speaking audio backfill is not restricted to intended coach replies.");
+}
 
 fs.writeFileSync(speakingPagePath, speakingPage, "utf8");
-console.log("Reset stale speaking audio preferences and backfilled the latest coach reply.");
+console.log("Reset stale speaking audio preferences and scoped backfill to intended coach replies.");
