@@ -1,0 +1,54 @@
+name: A1 Day 17 and modal materials
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1Day17StandardWorkbookPage.js"
+      - "web/src/components/A1Day17InstructionsDirectionsKapitel11WorkbookPage.js"
+      - "web/src/components/A1Day17StandardWorkbookPage.test.jsx"
+      - "web/src/components/A1Day14ModalVerbsWorkbookPage.js"
+      - "web/src/components/A1Day14ModalVerbsWorkbookPage.test.js"
+      - "web/src/data/a1AssignmentRegistry.js"
+      - ".github/workflows/a1-day17-modal-materials.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test A1 Day 17 native navigation
+        id: day17-test
+        continue-on-error: true
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx > day17-test.log 2>&1
+      - name: Upload Day 17 diagnostics
+        if: steps.day17-test.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: a1-day17-test-log
+          path: web/day17-test.log
+          if-no-files-found: error
+      - name: Report Day 17 failure
+        if: steps.day17-test.outcome == 'failure'
+        working-directory: web
+        run: |
+          tail -n 120 day17-test.log
+          exit 1
+      - name: Test A1 Day 14 supporting materials
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day14ModalVerbsWorkbookPage.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
