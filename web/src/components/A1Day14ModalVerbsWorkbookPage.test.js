@@ -7,16 +7,27 @@ import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import { buildA1WorkbookVideoModel } from "./A1WorkbookVideoHeader";
 import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 
+const route = "/campus/course/modal-verbs-day-14-3-6";
+const workbookRoute = `${route}?radio=done&materials=done`;
+
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
-  test("separates chapter media from the workbook AI video", () => {
+  test("shows the saved teacher lecture and AI lesson in the native materials step", () => {
     const { container } = render(
-      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
+      <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
-    expect(container.querySelector("[data-a1-day14-self-learning-materials='true']")).not.toBeInTheDocument();
-    expect(container.querySelector("[data-teacher-lecture-support='links-only']")).not.toBeInTheDocument();
+    expect(container.querySelector('[data-self-learning-materials-selector="true"]')).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Choose your learning material/i })).toBeVisible();
+    expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
+      "href",
+      "https://youtu.be/GJw1aJehYHU",
+    );
+    expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
+      "href",
+      "https://youtu.be/Wkj1-TnNUxY",
+    );
     expect(container.querySelector("iframe")).not.toBeInTheDocument();
 
     expect(getA1TeacherVideoResources(14)).toEqual([
@@ -26,7 +37,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
       }),
     ]);
 
-    expect(buildA1WorkbookVideoModel({ pathname: "/campus/course/modal-verbs-day-14-3-6" })).toEqual(
+    expect(buildA1WorkbookVideoModel({ pathname: route })).toEqual(
       expect.objectContaining({
         lessonId: "A1-3.6",
         assessmentLabel: "Self-practice",
@@ -43,14 +54,12 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
         youtubeId: "GeHygJE7Hww",
       }),
     );
-    expect(
-      resolveA1RadioFirstWorkbookRoute("/campus/course/modal-verbs-day-14-3-6", ""),
-    ).toEqual({ day: 14, chapter: "3.6" });
+    expect(resolveA1RadioFirstWorkbookRoute(route, "")).toEqual({ day: 14, chapter: "3.6" });
   });
 
   test("explains normal and separable main verbs and keeps train resources visible", () => {
     render(
-      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
+      <MemoryRouter initialEntries={[workbookRoute]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
@@ -79,7 +88,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
 
   test("still switches to the A2 Day 17 grammar page in its shared query context", () => {
     render(
-      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?level=A2&day=17"]}>
+      <MemoryRouter initialEntries={[`${route}?level=A2&day=17&materials=done`]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
@@ -89,7 +98,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
 
   test("scores and resets the separable-verb knowledge test", () => {
     render(
-      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
+      <MemoryRouter initialEntries={[workbookRoute]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
