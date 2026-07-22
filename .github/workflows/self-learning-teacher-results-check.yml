@@ -40,5 +40,20 @@ jobs:
         working-directory: web
         run: npm run sync:sheet-result-feedback && npm run sync:sheet-result-feedback
       - name: Build production web app
+        id: production-build
+        continue-on-error: true
         working-directory: web
-        run: npm run build
+        run: npm run build > build.log 2>&1
+      - name: Upload build diagnostics
+        if: steps.production-build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-learning-results-build-log
+          path: web/build.log
+          if-no-files-found: error
+      - name: Report build failure
+        if: steps.production-build.outcome == 'failure'
+        working-directory: web
+        run: |
+          tail -n 120 build.log
+          exit 1
