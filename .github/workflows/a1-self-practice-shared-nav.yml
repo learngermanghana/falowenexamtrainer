@@ -39,11 +39,21 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1SelfPracticeRegistry.test.js src/data/a1CanonicalLessonCatalog.test.js src/components/A1SelfLearningJourneyStandardization.test.js src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
-      - name: Test shared self-practice navigation and Day 5 final workbook
+      - name: Test shared self-practice navigation
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx src/components/A1Day5FinalWorkbookOpenFix.test.jsx src/components/A1Day5PersonalInformationSingleReference.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx
+      - name: Test Day 5 completed workbook opener
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day5FinalWorkbookOpenFix.test.jsx
+      - name: Test Day 5 single bilingual personal-information reference
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day5PersonalInformationSingleReference.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
