@@ -38,6 +38,7 @@ describe("B1WritingWorkspace", () => {
     const draft = screen.getByLabelText("B1 writing draft");
     const marker = screen.getByTestId("mark-my-letter-ui");
 
+    expect(screen.getByText("Schreiben Sie einen Meinungsbeitrag.")).toBeVisible();
     expect(planning).toBeVisible();
     expect(draft).toBeVisible();
     expect(marker).toBeVisible();
@@ -55,11 +56,11 @@ describe("B1WritingWorkspace", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "Formal letter" }));
     fireEvent.click(screen.getByRole("button", { name: /Insert Formal letter template into Schreiben/i }));
-    expect(screen.getByLabelText("B1 writing draft")).toHaveValue(expect.stringContaining("Sehr geehrte Damen und Herren"));
+    expect(screen.getByLabelText("B1 writing draft").value).toContain("Sehr geehrte Damen und Herren");
 
     fireEvent.change(screen.getByLabelText("B1 writing draft"), { target: { value: "" } });
     fireEvent.click(screen.getByRole("tab", { name: "Informal letter" }));
     fireEvent.click(screen.getByRole("button", { name: /Insert Informal letter template into Schreiben/i }));
-    expect(screen.getByLabelText("B1 writing draft")).toHaveValue(expect.stringContaining("Liebe/r [Name]"));
+    expect(screen.getByLabelText("B1 writing draft").value).toContain("Liebe/r [Name]");
   });
 });
