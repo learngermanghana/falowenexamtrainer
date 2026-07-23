@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - "web/src/data/a1CanonicalLessonCatalog.js"
+      - "web/src/data/a1CanonicalLessonCatalog.test.js"
       - "web/src/data/a1RadioResources.js"
       - "web/src/data/a1SelfPracticeRegistry.test.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/A1SelfLearningMaterialsRouteGate.test.jsx"
+      - "web/src/components/A1SelfLearningJourneyStandardization.test.js"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.jsx"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.test.jsx"
       - "web/src/index.jsx"
@@ -33,7 +35,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/a1SelfPracticeRegistry.test.js src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/data/a1SelfPracticeRegistry.test.js src/data/a1CanonicalLessonCatalog.test.js src/components/A1SelfLearningJourneyStandardization.test.js src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
       - name: Test shared self-practice navigation
         working-directory: web
         env:
