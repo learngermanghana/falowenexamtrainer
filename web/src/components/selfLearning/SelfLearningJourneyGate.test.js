@@ -75,6 +75,35 @@ describe("SelfLearningJourneyGate", () => {
     expect(screen.getByText("Self-learning content is open")).toBeInTheDocument();
   });
 
+  test("renders the A1 materials step when auto-mounted outside the parent Router", () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook?radio=done",
+    );
+
+    render(
+      <SelfLearningJourneyGate
+        level="A1"
+        day={5}
+        title="Introducing Yourself and Articles · Kapitel 1.3"
+        radio={{
+          key: "a1-day5-introducing-yourself-articles-falowen-radio",
+          title: "Introducing Yourself and Articles · Kapitel 1.3",
+          youtubeId: "4yGJ9-Fz19A",
+        }}
+        aiVideo={{ url: "https://youtu.be/a1-test-video" }}
+      >
+        <div>Day 5 workbook content</div>
+      </SelfLearningJourneyGate>,
+    );
+
+    expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
+
+    window.history.replaceState({}, "", "/");
+  });
+
   test("preserves existing query parameters when materials are completed", () => {
     expect(buildCompletedMaterialsSearch("?radio=done&chapter=3.1")).toBe("?radio=done&chapter=3.1&materials=done");
     expect(hasCompletedSelfLearningMaterials("?radio=done&materials=done")).toBe(true);
