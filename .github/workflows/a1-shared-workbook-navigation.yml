@@ -1,0 +1,40 @@
+name: A1 shared workbook navigation
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.delayedJourney.test.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookLayout.jsx"
+      - "web/src/data/a1AssignmentRegistry.js"
+      - "web/src/data/a1AssignmentRegistry.test.js"
+      - ".github/workflows/a1-shared-workbook-navigation.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Test all 19 A1 assignment identities and neighbors
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js
+      - name: Test delayed materials to workbook navigation handoff
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SharedAssignmentWorkbookBridge.delayedJourney.test.jsx src/components/A1SharedAssignmentWorkbookBridge.test.jsx
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
