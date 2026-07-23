@@ -10,6 +10,7 @@ const RADIO_COMPLETE_VALUE = "done";
 export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
   "/campus/course/a1-day-2-kapitel-1-1-workbook": Object.freeze({ day: 2, chapter: "1.1" }),
   "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook": Object.freeze({ day: 3, chapter: "1.1" }),
+  "/campus/course/a1-day-3-kapitel-1-2-workbook": Object.freeze({ day: 3, chapter: "1.2" }),
   "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook": Object.freeze({ day: 5, chapter: "1.3" }),
   "/campus/course/a1-day-6-family-and-hobbies-workbook": Object.freeze({ day: 6, chapter: "2.3" }),
   "/campus/course/a1-chapter-5-german-cases-workbook": Object.freeze({ day: 9, chapter: "5" }),
