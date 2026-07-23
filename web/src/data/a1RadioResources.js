@@ -185,6 +185,15 @@ export const A1_RADIO_RESOURCES = Object.freeze({
 });
 
 export const A1_CHAPTER_RADIO_RESOURCES = Object.freeze({
+  [chapterRadioKey(3, "1.2")]: Object.freeze({
+    key: "a1-day3-chapter-1-2-falowen-radio",
+    chapter: "1.2",
+    title: "A1 Day 3 · Kapitel 1.2",
+    youtubeId: "XrSTHS60LI4",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 1.2 episode. Then continue to the lesson resources and workbook.",
+  }),
   [chapterRadioKey(16, "10")]: Object.freeze({
     key: "a1-day16-food-daily-life-kapitel-10-falowen-radio",
     chapter: "10",
