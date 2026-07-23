@@ -174,6 +174,7 @@ describe("A1 route-scoped Falowen Radio", () => {
   test.each([
     [17, "11", "8Mh4PCSm6QE", "a1-day17-chapter-11-falowen-radio"],
     [18, "12.1", "G6khh2VagPA", "a1-day18-chapter-12-1-falowen-radio"],
+    [18, "12.2", "d_iHJMUUl6o", "a1-day18-chapter-12-2-falowen-radio"],
   ])("uses the approved Day %i Kapitel %s Falowen Radio video", (day, chapter, youtubeId, key) => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
@@ -214,29 +215,43 @@ describe("A1 route-scoped Falowen Radio", () => {
     expect(getA1RadioResource(19, "5.10")).toBeNull();
   });
 
-  test("uses the approved Day 20 Kapitel 12.3 letter-writing video", () => {
+  test("uses the requested Day 20 Kapitel 12.3 Falowen Radio on dynamic and canonical routes", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/20",
+        "?chapter=12.3&hub=1",
+      ),
+    ).toEqual({ day: 20, chapter: "12.3" });
     expect(
       resolveA1RadioFirstWorkbookRoute(
         "/campus/course/letter-writing-intro-german-a1-day-12-3/",
       ),
     ).toEqual({ day: 20, chapter: "12.3" });
-    expect(getA1RadioResource(20)).toEqual(
+    expect(getA1RadioResource(20, "12.3")).toEqual(
       expect.objectContaining({
         key: "a1-day20-letter-writing-intro-falowen-radio",
         title: "Letter Writing Introduction · Kapitel 12.3",
-        youtubeId: "B-LFDrF0zsY",
+        chapter: "12.3",
+        youtubeId: "Ve-iOgbgSw4",
       }),
     );
   });
 
-  test("uses the approved Day 21 Kapitel 13 weather video", () => {
+  test("uses the requested Day 21 Kapitel 13 Falowen Radio on dynamic and canonical routes", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/21",
+        "?chapter=13&hub=1",
+      ),
+    ).toEqual({ day: 21, chapter: "13" });
     expect(resolveA1RadioFirstWorkbookRoute("/campus/course/a1-day-21-weather-workbook/"))
       .toEqual({ day: 21, chapter: "13" });
-    expect(getA1RadioResource(21)).toEqual(
+    expect(getA1RadioResource(21, "13")).toEqual(
       expect.objectContaining({
         key: "a1-day21-weather-falowen-radio",
         title: "Weather · Kapitel 13",
-        youtubeId: "fRYM7ojc0Yo",
+        chapter: "13",
+        youtubeId: "Ve-iOgbgSw4",
       }),
     );
   });
