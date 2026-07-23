@@ -37,7 +37,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js src/components/B1WritingWorkspace.test.jsx src/components/WritingCheatSheetTabs.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js src/components/B1WritingWorkspace.test.jsx src/components/WritingCheatSheetTabs.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
