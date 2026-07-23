@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  useInRouterContext,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import AppBackButton from "../navigation/AppBackButton";
 import RadioFirstWorkbookGate from "../RadioFirstWorkbookGate";
 import { styles } from "../../styles";
@@ -93,6 +98,7 @@ export const SelfLearningMaterialsSelector = ({
   aiVideo = null,
   grammarBook = null,
   onOpenWorkbook = null,
+  forceDocumentNavigation = false,
   children,
 }) => {
   const location = useLocation();
@@ -127,6 +133,17 @@ export const SelfLearningMaterialsSelector = ({
     };
 
     if (typeof onOpenWorkbook === "function" && onOpenWorkbook(nextLocation) === true) {
+      return;
+    }
+
+    if (
+      forceDocumentNavigation
+      && typeof window !== "undefined"
+      && typeof window.location?.assign === "function"
+    ) {
+      window.location.assign(
+        `${nextLocation.pathname}${nextLocation.search || ""}${nextLocation.hash || ""}`,
+      );
       return;
     }
 
@@ -250,7 +267,7 @@ export const SelfLearningMaterialsSelector = ({
   );
 };
 
-const SelfLearningJourneyGate = ({
+const SelfLearningJourneyContent = ({
   level,
   day,
   title = "",
@@ -259,6 +276,7 @@ const SelfLearningJourneyGate = ({
   aiVideo = null,
   grammarBook = null,
   onOpenWorkbook = null,
+  forceDocumentNavigation = false,
   children,
 }) => {
   const materials = (
@@ -270,6 +288,7 @@ const SelfLearningJourneyGate = ({
       aiVideo={aiVideo}
       grammarBook={grammarBook}
       onOpenWorkbook={onOpenWorkbook}
+      forceDocumentNavigation={forceDocumentNavigation}
     >
       {children}
     </SelfLearningMaterialsSelector>
@@ -281,6 +300,20 @@ const SelfLearningJourneyGate = ({
     <RadioFirstWorkbookGate level={level} day={day} resource={radio}>
       {materials}
     </RadioFirstWorkbookGate>
+  );
+};
+
+const SelfLearningJourneyGate = (props) => {
+  const inRouterContext = useInRouterContext();
+
+  if (inRouterContext) {
+    return <SelfLearningJourneyContent {...props} />;
+  }
+
+  return (
+    <BrowserRouter>
+      <SelfLearningJourneyContent {...props} forceDocumentNavigation />
+    </BrowserRouter>
   );
 };
 
