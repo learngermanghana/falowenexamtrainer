@@ -1,4 +1,5 @@
 import { getA1RadioResource } from "./a1RadioResources";
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
   B2_C1_LESSON_VIDEO_OVERRIDES,
   applyB2C1LessonVideoOverrides,
@@ -13,6 +14,34 @@ describe("requested lesson media mappings", () => {
         key: "a1-day22-health-body-parts-falowen-radio",
         youtubeId: "23uCwszjahg",
       }),
+    );
+  });
+
+  test("maps A1 Day 3 Kapitel 1.2 to its requested Falowen Radio video without replacing Kapitel 1.1", () => {
+    expect(getA1RadioResource(3, "1.2")).toEqual(
+      expect.objectContaining({
+        key: "a1-day3-chapter-1-2-falowen-radio",
+        chapter: "1.2",
+        youtubeId: "XrSTHS60LI4",
+      }),
+    );
+    expect(getA1RadioResource(3, "1.1")).toEqual(
+      expect.objectContaining({
+        key: "a1-day3-chapter-1-1-falowen-radio",
+        youtubeId: "y9LhKQkjsqM",
+      }),
+    );
+  });
+
+  test("adds the requested A1 Day 24 conjunctions clip as teacher video 2", () => {
+    expect(getA1TeacherVideoResources(24)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          chapter: "5.10",
+          videoNumber: 2,
+          url: "https://youtu.be/XpcC3uvBcwo",
+        }),
+      ]),
     );
   });
 
