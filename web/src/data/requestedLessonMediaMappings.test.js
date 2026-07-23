@@ -58,17 +58,33 @@ describe("requested lesson media mappings", () => {
     expect(resource.key).not.toContain("ai-video");
   });
 
-  test("maps the requested B1 Day 5 and Day 21 clips to Teil 2 Schreiben", () => {
+  test("maps the requested B1 Day 5, Day 6 and Day 21 clips to Schreiben", () => {
     expect(getWritingVideoResource("B1", 5)).toEqual(
       expect.objectContaining({
         key: "b1-day5-besichtigungstermin-writing-video",
         url: "https://youtu.be/n1whPCP2KzA",
       }),
     );
+    expect(getWritingVideoResource("B1", 6)).toEqual(
+      expect.objectContaining({
+        key: "b1-day6-stadt-oder-land-writing-video",
+        url: "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD",
+      }),
+    );
     expect(getWritingVideoResource("B1", 21)).toEqual(
       expect.objectContaining({
         key: "b1-day21-lebensformen-heute-writing-video",
         url: "https://youtu.be/1JYyJfnumig",
+      }),
+    );
+  });
+
+  test("maps B2 Day 5 to its requested Schreiben video", () => {
+    expect(getWritingVideoResource("B2", 5)).toEqual(
+      expect.objectContaining({
+        key: "b2-day5-bildung-lernen-writing-video",
+        chapter: "1.5",
+        url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
       }),
     );
   });
