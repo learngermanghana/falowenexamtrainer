@@ -40,8 +40,10 @@ const A1_DYNAMIC_RADIO_FIRST_LESSONS = Object.freeze({
   15: Object.freeze(["4.7"]),
   16: Object.freeze(["9", "10"]),
   17: Object.freeze(["11"]),
-  18: Object.freeze(["12.1"]),
+  18: Object.freeze(["12.1", "12.2"]),
   19: Object.freeze(["5.9"]),
+  20: Object.freeze(["12.3"]),
+  21: Object.freeze(["13"]),
   22: Object.freeze(["14.1"]),
 });
 
