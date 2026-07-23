@@ -1,5 +1,9 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import {
+  hasCompletedA1PracticeMaterials,
+  resolveA1SharedPracticeLesson,
+} from "./A1SharedPracticeWorkbookNavigation";
 
 const NAV_ATTRIBUTE = "data-a1-teil-navigation";
 const OVERVIEW_ATTRIBUTE = "data-a1-workbook-overview";
@@ -204,6 +208,10 @@ const restoreManagedElements = (root = document) => {
 
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
+  if (resolveA1SharedPracticeLesson({ pathname: locationLike?.pathname }) && hasCompletedA1PracticeMaterials(locationLike?.search)) {
+    restoreManagedElements(root);
+    return false;
+  }
   const mainRoot = findMainRoot(root);
 
   if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) {

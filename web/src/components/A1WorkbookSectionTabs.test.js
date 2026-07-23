@@ -146,6 +146,27 @@ describe("A1WorkbookSectionTabs", () => {
     expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
   });
 
+  it("does not hide self-practice content after the self-learning materials are complete", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1</button><button>Teil 2</button></nav>
+        <section id="practice-one"><h2>Teil 1 · Articles</h2><p>Articles practice</p></section>
+        <section id="practice-two"><h2>Teil 2 · Adjectives</h2><p>Adjectives practice</p></section>
+      </main>
+    `;
+
+    expect(
+      applyA1WorkbookSectionTabs(document, {
+        pathname: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
+        search: "?radio=done&materials=done&workbookTab=section-1",
+      })
+    ).toBe(false);
+
+    expect(document.querySelector("#practice-one").style.display).toBe("");
+    expect(document.querySelector("#practice-two").style.display).toBe("");
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
+  });
+
   it("restores a practice workbook when its Teil heading is removed after mount", () => {
     document.body.innerHTML = `
       <main class="layout-main">
