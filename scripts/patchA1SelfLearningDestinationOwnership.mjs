@@ -14,6 +14,14 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
+const replaceTextOnce = (text, before, after, label) => {
+  if (text.includes(after)) return text;
+  if (!text.includes(before)) {
+    throw new Error(`A1 self-learning destination patch anchor missing: ${label}`);
+  }
+  return text.replace(before, after);
+};
+
 replaceOnce(
   `const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.kind === "practice",
@@ -94,4 +102,83 @@ replaceOnce(
 );
 
 fs.writeFileSync(sourcePath, source, "utf8");
-console.log("Applied native A1 self-learning destination ownership.");
+
+const sharedNavigationPath = path.join(
+  repositoryRoot,
+  "web/src/components/A1SharedPracticeWorkbookNavigation.jsx",
+);
+let sharedNavigationSource = fs.readFileSync(sharedNavigationPath, "utf8");
+
+sharedNavigationSource = replaceTextOnce(
+  sharedNavigationSource,
+  `const firstSectionHeading = (section) =>
+  Array.from(section?.querySelectorAll?.("h2, h3") || []).find((heading) => normalizeText(heading.textContent)) || null;`,
+  `const practiceSectionElements = (root) => {
+  if (!root?.querySelectorAll) return [];
+  const teilHeadings = Array.from(root.querySelectorAll("h2, h3")).filter((heading) =>
+    /^Teil\\s*\\d+\\b/i.test(normalizeText(heading.textContent)),
+  );
+  if (!teilHeadings.length) return topLevelPracticeSections(root);
+
+  const elements = teilHeadings
+    .map((heading) => {
+      let current = heading.parentElement;
+      let best = current;
+
+      while (current && current !== root) {
+        const containsAnotherTeil = teilHeadings.some(
+          (candidate) => candidate !== heading && current.contains(candidate),
+        );
+        if (containsAnotherTeil) break;
+        best = current;
+        current = current.parentElement;
+      }
+
+      return best || heading.parentElement;
+    })
+    .filter(Boolean);
+
+  return elements.filter((element, index) => elements.indexOf(element) === index);
+};
+
+const firstSectionHeading = (section) =>
+  Array.from(section?.querySelectorAll?.("h2, h3") || []).find((heading) => normalizeText(heading.textContent)) || null;`,
+  "shared self-practice div-card section discovery",
+);
+
+sharedNavigationSource = replaceTextOnce(
+  sharedNavigationSource,
+  `export const findA1PracticeSections = (root) =>
+  topLevelPracticeSections(root)`,
+  `export const findA1PracticeSections = (root) =>
+  practiceSectionElements(root)`,
+  "shared self-practice section source",
+);
+
+fs.writeFileSync(sharedNavigationPath, sharedNavigationSource, "utf8");
+
+const sectionTabsPath = path.join(repositoryRoot, "web/src/components/A1WorkbookSectionTabs.js");
+let sectionTabsSource = fs.readFileSync(sectionTabsPath, "utf8");
+
+sectionTabsSource = replaceTextOnce(
+  sectionTabsSource,
+  `  const mainRoot = findMainRoot(root);
+
+  if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) {`,
+  `  const mainRoot = findMainRoot(root);
+
+  // Shared self-practice navigation is the single owner of completed practice
+  // workbooks. The legacy controller must release any elements it previously
+  // hid, otherwise its Overview state can leave the selected Teil blank.
+  if (mainRoot.querySelector('[data-a1-shared-practice-navigation="true"]')) {
+    restoreManagedElements(root);
+    return false;
+  }
+
+  if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) {`,
+  "legacy workbook tabs yield to shared self-practice navigation",
+);
+
+fs.writeFileSync(sectionTabsPath, sectionTabsSource, "utf8");
+
+console.log("Applied native A1 self-learning destination ownership and workbook tab compatibility.");
