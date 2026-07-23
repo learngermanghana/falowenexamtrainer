@@ -6,6 +6,7 @@ on:
       - "web/src/data/a1RadioResources.js"
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - "web/src/components/A1PracticeRadioJourneyRegression.test.jsx"
       - "web/src/components/A1SelfLearningMaterialsRouteGate.test.jsx"
       - "web/src/components/CourseInlinePracticePanel.js"
       - "web/src/components/CourseInlinePracticePanel.test.js"
@@ -32,7 +33,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1PracticeRadioJourneyRegression.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
       - name: Test B1 writing workspace component
         working-directory: web
         env:
