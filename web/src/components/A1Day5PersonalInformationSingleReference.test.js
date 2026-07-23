@@ -26,8 +26,8 @@ describe("A1 Day 5 personal-information reference", () => {
       "Familienstand",
       "Kinder",
       "Alter",
-    ].forEach((label) => {
-      expect(contributionSource).toContain(`label: \"${label}\"`);
+    ].forEach((german) => {
+      expect(contributionSource).toContain(`german: \"${german}\"`);
     });
   });
 });
