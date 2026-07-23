@@ -19,16 +19,19 @@ const expectedPractices = [
   [24, "5.10", "/campus/course/conjunctions-5-10"],
 ];
 
-const FakePracticeWorkbook = () => (
-  <main className="layout-main">
-    <div data-testid="practice-page">
-      <header><h1>A1 Day 5 self-practice</h1></header>
-      <section data-testid="practice-section-1"><h2>Teil 1 · Articles</h2><p>Articles practice</p></section>
-      <section data-testid="practice-section-2"><h2>Teil 2 · Adjectives</h2><p>Adjectives practice</p></section>
-      <section data-testid="practice-section-3"><h2>Teil 3 · Personal Information</h2><p>Introduction practice</p></section>
-    </div>
-  </main>
-);
+const FakePracticeWorkbook = ({ remountOnSearch = false }) => {
+  const location = useLocation();
+  return (
+    <main className="layout-main">
+      <div data-testid="practice-page" key={remountOnSearch ? location.search : "stable"}>
+        <header><h1>A1 Day 5 self-practice</h1></header>
+        <section data-testid="practice-section-1"><h2>Teil 1 · Articles</h2><p>Articles practice</p></section>
+        <section data-testid="practice-section-2"><h2>Teil 2 · Adjectives</h2><p>Adjectives practice</p></section>
+        <section data-testid="practice-section-3"><h2>Teil 3 · Personal Information</h2><p>Introduction practice</p></section>
+      </div>
+    </main>
+  );
+};
 
 const LocationProbe = () => {
   const location = useLocation();
@@ -50,11 +53,11 @@ describe("A1 shared self-practice navigation", () => {
     });
   });
 
-  test("shows Overview and section tabs only after materials are complete, with no Submit tab", async () => {
+  test("uses one tab row, opens Teil 1 immediately, and switches visible workbook content", async () => {
     render(
       <MemoryRouter
         initialEntries={[
-          "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook?radio=done&materials=done",
+          "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook?radio=done&materials=done&workbookTab=overview",
         ]}
       >
         <FakePracticeWorkbook />
@@ -65,22 +68,48 @@ describe("A1 shared self-practice navigation", () => {
 
     const navigation = await screen.findByRole("region", { name: "A1 self-practice workbook navigation" });
     expect(navigation).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tab", { name: "Teil 1" })).toBeVisible();
+    expect(screen.queryByRole("tab", { name: "Overview" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Choose a section")).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Teil 1" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tab", { name: "Teil 2" })).toBeVisible();
     expect(screen.getByRole("tab", { name: "Teil 3" })).toBeVisible();
     expect(screen.queryByRole("tab", { name: "Submit" })).not.toBeInTheDocument();
     expect(screen.getByText(/Nothing on this page is sent for tutor marking/i)).toBeVisible();
 
-    expect(screen.getByTestId("practice-section-1")).not.toBeVisible();
-    fireEvent.click(screen.getByRole("tab", { name: "Teil 1" }));
     await waitFor(() => expect(screen.getByTestId("practice-section-1")).toBeVisible());
     expect(screen.getByTestId("practice-section-2")).not.toBeVisible();
 
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
+    await waitFor(() => expect(screen.getByTestId("practice-section-2")).toBeVisible());
+    expect(screen.getByTestId("practice-section-1")).not.toBeVisible();
+
     const search = screen.getByTestId("practice-location").textContent;
-    expect(search).toContain("workbookTab=section-1");
+    expect(search).toContain("workbookTab=section-2");
     expect(search).not.toContain("assignmentKey");
     expect(search).not.toContain("assignmentId");
+  });
+
+  test("keeps the selected Teil visible when a query update remounts the workbook DOM", async () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook?radio=done&materials=done&workbookTab=section-1",
+        ]}
+      >
+        <FakePracticeWorkbook remountOnSearch />
+        <A1SharedPracticeWorkbookNavigation />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole("tab", { name: "Teil 2" });
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("practice-location").textContent).toContain("workbookTab=section-2");
+      expect(screen.getByTestId("practice-section-2")).toBeVisible();
+      expect(screen.getByTestId("practice-section-1")).not.toBeVisible();
+    });
   });
 
   test("does not compete with Falowen Radio or supporting materials", async () => {
