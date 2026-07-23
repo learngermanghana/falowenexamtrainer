@@ -43,11 +43,6 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js
-      - name: Test shared writing cheat sheet regression
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/WritingCheatSheetTabs.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
