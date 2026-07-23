@@ -112,6 +112,12 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
             Note the points you must answer before writing the full text.
           </p>
         </div>
+        {writingContext.taskTitle ? (
+          <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#fff" }}>
+            <strong>Writing task</strong>
+            <p style={{ margin: "6px 0 0", lineHeight: 1.7 }}>{writingContext.taskTitle}</p>
+          </div>
+        ) : null}
         {supportItems.length ? (
           <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.7 }}>
             {supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
