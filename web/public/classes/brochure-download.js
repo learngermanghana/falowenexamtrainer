@@ -2,7 +2,7 @@
   const HTML2CANVAS_URL = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
   const JSPDF_URL = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
   const DEFAULT_LOCATION = "Ghana, Accra - Awoshie";
-  const DEFAULT_WHATSAPP = "+233 24 111 3054";
+  const DEFAULT_WHATSAPP = "233205706589";
 
   const text = (selector, fallback = "") =>
     String(document.querySelector(selector)?.textContent || fallback).replace(/\s+/g, " ").trim();
@@ -215,7 +215,7 @@
 
         <section class="pdf-cta">
           <div><strong>Register for ${escapeHtml(data.classTitle)}</strong><span>Create your Falowen account, choose this class and complete payment.</span></div>
-          <div class="pdf-cta-url">www.falowen.app/classes</div>
+          <div class="pdf-cta-url">www.falowen.app</div>
         </section>
 
         <div class="pdf-two-cards">
@@ -272,7 +272,7 @@
         <section class="pdf-contact">
           <div><strong>Ready to begin?</strong><span>Register online or contact the academy for support.</span></div>
           <div class="pdf-contact-grid">
-            <span><b>Website</b> www.falowen.app/classes</span>
+            <span><b>Website</b> www.falowen.app</span>
             <span><b>WhatsApp</b> ${DEFAULT_WHATSAPP}</span>
             <span><b>Email</b> info@falowen.app</span>
             <span><b>Location</b> ${escapeHtml(data.location)}</span>
