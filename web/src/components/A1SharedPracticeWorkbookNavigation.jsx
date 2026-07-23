@@ -9,6 +9,9 @@ const MANAGED_ATTRIBUTE = "data-a1-practice-nav-managed";
 const PREVIOUS_DISPLAY_ATTRIBUTE = "data-a1-practice-nav-previous-display";
 const LEGACY_NAV_HIDDEN_ATTRIBUTE = "data-a1-practice-legacy-nav-hidden";
 const LEGACY_NAV_DISPLAY_ATTRIBUTE = "data-a1-practice-legacy-nav-display";
+const LEGACY_NAV_VALUE_ATTRIBUTE = "data-a1-practice-legacy-nav-value";
+const LEGACY_TAB_MANAGED_ATTRIBUTE = "data-a1-tab-managed";
+const LEGACY_TAB_PREVIOUS_DISPLAY_ATTRIBUTE = "data-a1-tab-previous-display";
 const SHARED_VIEW_PARAM = "workbookTab";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
@@ -44,6 +47,15 @@ const topLevelPracticeSections = (root) => {
 const firstSectionHeading = (section) =>
   Array.from(section?.querySelectorAll?.("h2, h3") || []).find((heading) => normalizeText(heading.textContent)) || null;
 
+const isPracticeInfrastructureSection = (element) =>
+  Boolean(
+    element?.hasAttribute?.(NAV_ATTRIBUTE) ||
+    element?.hasAttribute?.("data-a1-workbook-overview") ||
+    element?.hasAttribute?.("data-a1-workbook-video-header") ||
+    element?.hasAttribute?.("data-a1-radio-first-workbook-route") ||
+    element?.hasAttribute?.("data-a1-self-learning-destination-overlay"),
+  );
+
 const makeSectionLabel = (headingText, index) => {
   const text = normalizeText(headingText);
   const teil = text.match(/^Teil\s*(\d+)\b/i);
@@ -57,18 +69,19 @@ const makeSectionLabel = (headingText, index) => {
 
 export const findA1PracticeSections = (root) =>
   topLevelPracticeSections(root)
-    .map((element, index) => {
+    .filter((element) => !isPracticeInfrastructureSection(element))
+    .map((element) => {
       const heading = firstSectionHeading(element);
       const title = normalizeText(heading?.textContent);
       if (!heading || !title) return null;
-      return {
-        key: `section-${index + 1}`,
-        label: makeSectionLabel(title, index),
-        title,
-        element,
-      };
+      return { title, element };
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((section, index) => ({
+      ...section,
+      key: `section-${index + 1}`,
+      label: makeSectionLabel(section.title, index),
+    }));
 
 const findPracticePageRoot = (main) => {
   if (!main) return null;
@@ -115,11 +128,31 @@ const restorePracticeSections = (root = document) => {
   });
 };
 
+const releaseLegacyWorkbookSectionManagement = (root = document) => {
+  Array.from(root.querySelectorAll?.(`[${LEGACY_TAB_MANAGED_ATTRIBUTE}]`) || []).forEach((element) => {
+    const previous = element.getAttribute(LEGACY_TAB_PREVIOUS_DISPLAY_ATTRIBUTE);
+    element.style.display = previous || "";
+    element.removeAttribute("aria-hidden");
+    element.removeAttribute(LEGACY_TAB_MANAGED_ATTRIBUTE);
+    element.removeAttribute(LEGACY_TAB_PREVIOUS_DISPLAY_ATTRIBUTE);
+  });
+  Array.from(root.querySelectorAll?.('[data-a1-workbook-overview="true"]') || []).forEach((element) => element.remove());
+  Array.from(root.querySelectorAll?.("[data-a1-active-workbook-view]") || []).forEach((element) =>
+    element.removeAttribute("data-a1-active-workbook-view"),
+  );
+};
+
 const hideLegacyPracticeNavigation = (root) => {
   Array.from(root?.querySelectorAll?.('[data-a1-teil-navigation="true"]') || []).forEach((element) => {
-    if (element.hasAttribute(LEGACY_NAV_HIDDEN_ATTRIBUTE)) return;
-    element.setAttribute(LEGACY_NAV_HIDDEN_ATTRIBUTE, "true");
-    element.setAttribute(LEGACY_NAV_DISPLAY_ATTRIBUTE, element.style.display || "");
+    if (!element.hasAttribute(LEGACY_NAV_HIDDEN_ATTRIBUTE)) {
+      element.setAttribute(LEGACY_NAV_HIDDEN_ATTRIBUTE, "true");
+      element.setAttribute(LEGACY_NAV_DISPLAY_ATTRIBUTE, element.style.display || "");
+      element.setAttribute(LEGACY_NAV_VALUE_ATTRIBUTE, element.getAttribute("data-a1-teil-navigation") || "");
+    }
+    // The legacy section-tab service only manages navigation whose value is exactly
+    // "true". Changing the value keeps the old enhancer from recreating the nav while
+    // preventing it from hiding the self-practice content behind a second tab system.
+    element.setAttribute("data-a1-teil-navigation", "shared-practice");
     element.style.display = "none";
   });
 };
@@ -127,8 +160,12 @@ const hideLegacyPracticeNavigation = (root) => {
 const restoreLegacyPracticeNavigation = (root = document) => {
   Array.from(root.querySelectorAll?.(`[${LEGACY_NAV_HIDDEN_ATTRIBUTE}]`) || []).forEach((element) => {
     element.style.display = element.getAttribute(LEGACY_NAV_DISPLAY_ATTRIBUTE) || "";
+    const previousValue = element.getAttribute(LEGACY_NAV_VALUE_ATTRIBUTE);
+    if (previousValue) element.setAttribute("data-a1-teil-navigation", previousValue);
+    else element.removeAttribute("data-a1-teil-navigation");
     element.removeAttribute(LEGACY_NAV_HIDDEN_ATTRIBUTE);
     element.removeAttribute(LEGACY_NAV_DISPLAY_ATTRIBUTE);
+    element.removeAttribute(LEGACY_NAV_VALUE_ATTRIBUTE);
   });
 };
 
@@ -181,13 +218,17 @@ export default function A1SharedPracticeWorkbookNavigation() {
       frame = null;
       if (disposed) return;
       const main = document.querySelector("main.layout-main") || document.querySelector("main");
+      if (!main) return;
+
+      hideLegacyPracticeNavigation(main);
+      releaseLegacyWorkbookSectionManagement(main);
+
       const pageRoot = findPracticePageRoot(main);
       const nextSections = findA1PracticeSections(pageRoot);
-      if (!main || !pageRoot || !nextSections.length) return;
+      if (!pageRoot || !nextSections.length) return;
 
       pageRootRef.current = pageRoot;
       sectionElementsRef.current = nextSections;
-      hideLegacyPracticeNavigation(pageRoot);
 
       let host = main.querySelector(`[${NAV_ATTRIBUTE}="true"]`);
       if (!host) {
@@ -259,7 +300,8 @@ export default function A1SharedPracticeWorkbookNavigation() {
       if (validView === section.key) showElement(section.element);
       else hideElement(section.element);
     });
-    hideLegacyPracticeNavigation(pageRootRef.current);
+    hideLegacyPracticeNavigation(document);
+    releaseLegacyWorkbookSectionManagement(document);
     syncLocation(validView);
   }, [activeView, materialsDone, navMount, practice, sections, syncLocation]);
 
@@ -327,28 +369,15 @@ export default function A1SharedPracticeWorkbookNavigation() {
             border: "1px solid #bfdbfe",
             borderRadius: 14,
             display: "grid",
-            gap: 10,
+            gap: 6,
             marginTop: 12,
             padding: 12,
           }}
         >
-          <strong>Choose a section</strong>
+          <strong>Workbook overview</strong>
           <p style={{ color: "#475569", lineHeight: 1.6, margin: 0 }}>
-            Work through the sections at your own pace. Use the buttons below to focus on one part at a time.
+            Choose a Teil from the navigation above to open that part of the workbook.
           </p>
-          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-            {sections.map((section) => (
-              <button
-                key={section.key}
-                type="button"
-                style={{ ...styles.secondaryButton, textAlign: "left" }}
-                onClick={() => selectView(section.key)}
-              >
-                <strong>{section.label}</strong>
-                <span style={{ display: "block", fontWeight: 500, marginTop: 4 }}>{section.title}</span>
-              </button>
-            ))}
-          </div>
         </div>
       ) : null}
     </section>,
@@ -358,8 +387,10 @@ export default function A1SharedPracticeWorkbookNavigation() {
 
 export const __TESTING__ = {
   findPracticePageRoot,
+  isPracticeInfrastructureSection,
   makeSectionLabel,
   normalizePath,
+  releaseLegacyWorkbookSectionManagement,
   requestedPracticeView,
   restoreLegacyPracticeNavigation,
   restorePracticeSections,
