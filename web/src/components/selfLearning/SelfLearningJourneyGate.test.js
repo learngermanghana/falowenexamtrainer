@@ -90,7 +90,7 @@ describe("SelfLearningJourneyGate", () => {
         radio={{
           key: "a1-day5-introducing-yourself-articles-falowen-radio",
           title: "Introducing Yourself and Articles · Kapitel 1.3",
-          youtubeId: "4yGJ9-Fz19A",
+          youtubeId: "XrSTHS60LI4",
         }}
         aiVideo={{ url: "https://youtu.be/a1-test-video" }}
       >
