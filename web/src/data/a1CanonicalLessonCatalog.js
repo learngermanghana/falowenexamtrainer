@@ -37,6 +37,14 @@ const PRACTICE_LESSONS = [
     aliases: ["A1-1.1-PRACTICE"],
   }),
   practice({
+    routeKey: "1.2-practice",
+    chapter: "1.2",
+    day: 3,
+    title: "Kapitel 1.2 Self-practice",
+    destination: "/campus/course/a1-day-3-kapitel-1-2-workbook",
+    aliases: ["A1-1.2-PRACTICE"],
+  }),
+  practice({
     chapter: "1.3",
     day: 5,
     title: "Introducing Yourself and Articles",
@@ -86,13 +94,20 @@ const PRACTICE_LESSONS = [
   }),
 ];
 
+const legacyPracticeIdentity = (lesson) => {
+  if (lesson.kind !== "practice" || !String(lesson.routeKey || "").endsWith("-practice")) {
+    return lesson.chapter;
+  }
+  return `${lesson.chapter}-PRACTICE`;
+};
+
 export const A1_CANONICAL_LESSON_CATALOG = Object.freeze(
   [...ASSIGNMENT_LESSONS, ...PRACTICE_LESSONS].map((lesson) => Object.freeze({
     ...lesson,
     lessonRoute: buildA1CanonicalChapterLessonRoute(lesson.routeKey),
     shortLessonRoute: buildA1ShortChapterLessonRoute(lesson.routeKey),
     legacyLessonRoute: `/campus/course/lesson/A1/${lesson.day}?chapter=${encodeURIComponent(
-      lesson.routeKey === "1.1-practice" ? "1.1-PRACTICE" : lesson.chapter,
+      legacyPracticeIdentity(lesson),
     )}`,
   })),
 );
@@ -138,5 +153,6 @@ export const getA1CanonicalLessonsForChapter = (chapter = "") => {
 export const __TESTING__ = {
   ASSIGNMENT_LESSONS,
   PRACTICE_LESSONS,
+  legacyPracticeIdentity,
   lookupTokens,
 };
