@@ -134,12 +134,20 @@ const restoreLegacyPracticeNavigation = (root = document) => {
 
 const requestedPracticeView = (search = "") => {
   const value = String(new URLSearchParams(search || "").get(SHARED_VIEW_PARAM) || "").trim().toLowerCase();
-  return value === "overview" || /^section-\d+$/.test(value) ? value : "";
+  // Older links used "overview". The simplified navigator now opens the first
+  // real workbook section instead of showing a second, duplicated menu.
+  if (value === "overview") return "section-1";
+  return /^section-\d+$/.test(value) ? value : "";
 };
 
 const sameSectionList = (left = [], right = []) =>
   left.length === right.length &&
-  left.every((section, index) => section.key === right[index]?.key && section.title === right[index]?.title);
+  left.every(
+    (section, index) =>
+      section.key === right[index]?.key &&
+      section.title === right[index]?.title &&
+      section.element === right[index]?.element,
+  );
 
 const navButtonStyle = (selected) => ({
   ...styles.secondaryButton,
@@ -161,7 +169,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
   );
   const materialsDone = hasCompletedA1PracticeMaterials(location.search);
   const requestedView = requestedPracticeView(location.search);
-  const [activeView, setActiveView] = useState(requestedView || "overview");
+  const [activeView, setActiveView] = useState(requestedView || "section-1");
   const [navMount, setNavMount] = useState(null);
   const [sections, setSections] = useState([]);
   const pageRootRef = useRef(null);
@@ -169,7 +177,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
   const createdHostRef = useRef(null);
 
   useEffect(() => {
-    setActiveView(requestedView || "overview");
+    setActiveView(requestedView || "section-1");
   }, [location.pathname, requestedView]);
 
   useEffect(() => {
@@ -200,6 +208,9 @@ export default function A1SharedPracticeWorkbookNavigation() {
       }
 
       setNavMount((current) => (current === host ? current : host));
+      // Include DOM identity in the comparison. Route/search updates can replace
+      // workbook nodes while keeping identical headings; stale element refs were
+      // the reason a clicked Teil could remain hidden in production.
       setSections((current) => (sameSectionList(current, nextSections) ? current : nextSections));
     };
 
@@ -247,9 +258,9 @@ export default function A1SharedPracticeWorkbookNavigation() {
 
   useEffect(() => {
     if (!practice || !materialsDone || !navMount || !sections.length) return;
-    const validView = activeView === "overview" || sections.some((section) => section.key === activeView)
+    const validView = sections.some((section) => section.key === activeView)
       ? activeView
-      : "overview";
+      : sections[0].key;
     if (validView !== activeView) {
       setActiveView(validView);
       return;
@@ -295,15 +306,6 @@ export default function A1SharedPracticeWorkbookNavigation() {
         aria-label="A1 shared self-practice sections"
         style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
       >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeView === "overview"}
-          style={navButtonStyle(activeView === "overview")}
-          onClick={() => selectView("overview")}
-        >
-          Overview
-        </button>
         {sections.map((section) => (
           <button
             key={section.key}
@@ -318,39 +320,6 @@ export default function A1SharedPracticeWorkbookNavigation() {
           </button>
         ))}
       </div>
-
-      {activeView === "overview" ? (
-        <div
-          data-a1-self-practice-overview="true"
-          style={{
-            background: "rgba(255,255,255,.9)",
-            border: "1px solid #bfdbfe",
-            borderRadius: 14,
-            display: "grid",
-            gap: 10,
-            marginTop: 12,
-            padding: 12,
-          }}
-        >
-          <strong>Choose a section</strong>
-          <p style={{ color: "#475569", lineHeight: 1.6, margin: 0 }}>
-            Work through the sections at your own pace. Use the buttons below to focus on one part at a time.
-          </p>
-          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-            {sections.map((section) => (
-              <button
-                key={section.key}
-                type="button"
-                style={{ ...styles.secondaryButton, textAlign: "left" }}
-                onClick={() => selectView(section.key)}
-              >
-                <strong>{section.label}</strong>
-                <span style={{ display: "block", fontWeight: 500, marginTop: 4 }}>{section.title}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
     </section>,
     navMount,
   );
