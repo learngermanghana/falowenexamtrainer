@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-import C1Day1To6GrammarNotes from "./C1Day1To6GrammarNotes";
+import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -142,7 +142,7 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
   const fullEssay = getAdvancedWritingPhase(lesson.level, lesson.day) === "full-essay";
   const effectiveWritingComplete = fullEssay ? progress.aiWritingDone : writing.complete;
   const finishRequirements = [
-    { key: "learn", label: "read the complete guided grammar notes and tick the Learn checkbox", complete: progress.learnDone },
+    { key: "learn", label: "answer all Learn knowledge questions correctly", complete: progress.learnDone },
     { key: "speak", label: "complete a speaking practice", complete: progress.speakDone },
     { key: "write", label: fullEssay ? "use AI Analyse / Mark My Letter and review the corrections" : "complete the guided writing questions", complete: effectiveWritingComplete },
     { key: "confidence", label: "choose your confidence level", complete: Boolean(progress.confidence) },
@@ -193,9 +193,13 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
             <strong>{video.title || "Lesson video"}</strong>
             {video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "C1 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
-          </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the guided grammar notes.</NoteBox>}
+          </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the knowledge questions below.</NoteBox>}
         </Section>
-        <C1Day1To6GrammarNotes day={lesson.day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} />
+        <C1KnowledgeChoicePractice
+          lesson={lesson}
+          completed={progress.learnDone}
+          onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))}
+        />
       </> : null}
 
       {active === "speak" ? <Section title="Speaking builder">
@@ -219,7 +223,7 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
 
       {active === "finish" ? <Section title={`Finish C1 Day ${lesson.day}`}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
-          <ProgressCard label="Learn" complete={progress.learnDone} detail="Video and full guided grammar notes reviewed" />
+          <ProgressCard label="Learn" complete={progress.learnDone} detail="All multiple-choice knowledge questions answered correctly" />
           <ProgressCard label="Speak" complete={progress.speakDone} detail="Speaking practice completed" />
           <ProgressCard label="Write" complete={effectiveWritingComplete} detail={fullEssay ? "AI analysis reviewed and errors improved" : `${writing.completedQuestions}/${writing.totalQuestions} questions · ${writing.wordCount} final words`} />
         </div>
