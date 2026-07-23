@@ -33,11 +33,21 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
-      - name: Test restored B1 Teil 2 writing workspace
+      - name: Test B1 writing workspace component
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js src/components/B1WritingWorkspace.test.jsx src/components/WritingCheatSheetTabs.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/B1WritingWorkspace.test.jsx
+      - name: Test B1 course writing integration
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js
+      - name: Test shared writing cheat sheet regression
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/WritingCheatSheetTabs.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
