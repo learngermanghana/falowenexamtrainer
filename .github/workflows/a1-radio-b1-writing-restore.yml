@@ -1,0 +1,48 @@
+name: A1 Radio and B1 writing restore
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/a1RadioResources.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.test.jsx"
+      - "web/src/components/A1SelfLearningMaterialsRouteGate.test.jsx"
+      - "web/src/components/CourseInlinePracticePanel.js"
+      - "web/src/components/CourseInlinePracticePanel.test.js"
+      - "web/src/components/B1WritingWorkspace.js"
+      - "web/src/components/B1WritingWorkspace.test.jsx"
+      - ".github/workflows/a1-radio-b1-writing-restore.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test requested A1 Radio and self-learning routes
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
+      - name: Test B1 writing workspace component
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/B1WritingWorkspace.test.jsx
+      - name: Test B1 course writing integration
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/CourseInlinePracticePanel.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build

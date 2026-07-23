@@ -5,6 +5,7 @@ import SpeakingMindMap from "./SpeakingMindMap";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
+import B1WritingWorkspace from "./B1WritingWorkspace";
 
 const currentPath = () => {
   if (typeof window === "undefined") return "";
@@ -120,6 +121,9 @@ const CourseInlinePracticePanel = ({
       taskTitle: merged.taskTitle || title || "Teil 2 writing task",
     };
   }, [title, type, writingContext]);
+  const isB1Writing =
+    type === "writing" &&
+    String(resolvedWritingContext.level || resolvedWritingContext.courseLevel || "").toUpperCase() === "B1";
 
   useEffect(() => {
     if (type !== "speaking" || typeof window === "undefined") return undefined;
@@ -132,7 +136,9 @@ const CourseInlinePracticePanel = ({
   }, [resolvedSpeakingContext, type]);
 
   const renderedPractice = config.render(resolvedWritingContext);
-  const practiceContent = type === "writing" ? (
+  const practiceContent = isB1Writing ? (
+    <B1WritingWorkspace writingContext={resolvedWritingContext} />
+  ) : type === "writing" ? (
     <WritingCheatSheetTabs
       level={resolvedWritingContext.level || resolvedWritingContext.courseLevel}
       day={resolvedWritingContext.day}
@@ -142,10 +148,12 @@ const CourseInlinePracticePanel = ({
   ) : (
     renderedPractice
   );
-  const panelTitle = title || config.defaultTitle;
-  const panelDescription = type === "speaking"
-    ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
-    : description || config.defaultDescription;
+  const panelTitle = isB1Writing ? "Teil 2 writing workspace" : title || config.defaultTitle;
+  const panelDescription = isB1Writing
+    ? "Plan your Stichpunkte, write the complete Schreiben, use the formal, informal or opinion template when helpful, then open Mark My Letter to check and improve your final text."
+    : type === "speaking"
+      ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
+      : description || config.defaultDescription;
 
   return (
     <Fragment>
@@ -173,7 +181,7 @@ const CourseInlinePracticePanel = ({
           aria-expanded={isOpen}
           aria-controls={panelId}
         >
-          {isOpen ? "Hide practice" : config.closedButtonLabel}
+          {isOpen ? "Hide practice" : isB1Writing ? "Open Teil 2 writing workspace" : config.closedButtonLabel}
         </button>
         {isOpen ? (
           <div

@@ -157,16 +157,18 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   }),
   20: Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
+    chapter: "12.3",
     title: "Letter Writing Introduction · Kapitel 12.3",
-    youtubeId: "B-LFDrF0zsY",
+    youtubeId: "Ve-iOgbgSw4",
     duration: "",
     instruction:
       "Listen carefully to the letter-writing introduction. Then continue to the Kapitel 12.3 workbook assignment.",
   }),
   21: Object.freeze({
     key: "a1-day21-weather-falowen-radio",
+    chapter: "13",
     title: "Weather · Kapitel 13",
-    youtubeId: "fRYM7ojc0Yo",
+    youtubeId: "Ve-iOgbgSw4",
     duration: "",
     instruction:
       "Listen carefully to the weather lesson. Then continue to the Kapitel 13 workbook assignment.",
@@ -190,6 +192,15 @@ export const A1_CHAPTER_RADIO_RESOURCES = Object.freeze({
     duration: "",
     instruction:
       "Listen carefully to the Kapitel 10 episode. Then continue to the supporting lesson resources and workbook.",
+  }),
+  [chapterRadioKey(18, "12.2")]: Object.freeze({
+    key: "a1-day18-chapter-12-2-falowen-radio",
+    chapter: "12.2",
+    title: "A1 Day 18 · Kapitel 12.2",
+    youtubeId: "d_iHJMUUl6o",
+    duration: "",
+    instruction:
+      "Listen carefully to the Kapitel 12.2 episode. Then continue to the lesson resources and workbook.",
   }),
 });
 
