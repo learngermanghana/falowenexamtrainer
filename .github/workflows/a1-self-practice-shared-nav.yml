@@ -10,6 +10,9 @@ on:
       - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
       - "web/src/components/A1SelfLearningMaterialsRouteGate.test.jsx"
       - "web/src/components/A1SelfLearningJourneyStandardization.test.js"
+      - "web/src/components/A1Day5FinalWorkbookOpenFix.jsx"
+      - "web/src/components/A1Day5FinalWorkbookOpenFix.test.jsx"
+      - "web/src/components/A1Day5PersonalInformationSingleReference.test.js"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.jsx"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.test.jsx"
       - "web/src/index.jsx"
@@ -41,6 +44,16 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx
+      - name: Test Day 5 completed workbook opener
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day5FinalWorkbookOpenFix.test.jsx
+      - name: Test Day 5 single bilingual personal-information reference
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day5PersonalInformationSingleReference.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
