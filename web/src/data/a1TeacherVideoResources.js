@@ -24,7 +24,8 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [21, "13", "Weather", "https://youtu.be/ijEY8XVrsZs"],
   [22, "14.1", "Health and Body Parts", "https://youtu.be/hktvDESwX3k"],
   [23, "14.2", "Dative and Accusative Verbs", "https://youtu.be/J98JJU2v4Uw"],
-  [24, "5.10", "Conjunctions", "https://youtu.be/8l1LiXGYqFA"],
+  [24, "5.10", "Conjunctions", "https://youtu.be/8l1LiXGYqFA", 1],
+  [24, "5.10", "Conjunctions", "https://youtu.be/XpcC3uvBcwo", 2],
 ];
 
 export const A1_TEACHER_VIDEO_RESOURCES = Object.freeze(

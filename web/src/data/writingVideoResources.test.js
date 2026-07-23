@@ -10,10 +10,12 @@ describe("writing video resources", () => {
     ["B1", 3, "https://youtu.be/8uAMihJTzvo"],
     ["B1", 4, "https://youtu.be/mHQiEdVVRSQ"],
     ["B1", 5, "https://youtu.be/n1whPCP2KzA"],
+    ["B1", 6, "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD"],
     ["B1", 20, "https://youtu.be/og1iVBKnIb0"],
     ["B1", 21, "https://youtu.be/1JYyJfnumig"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
+    ["B2", 5, "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
@@ -54,12 +56,19 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B1 Day 5, Day 20 and Day 21 to their Teil 2 Schreiben videos", () => {
+  test("maps B1 Day 5, Day 6, Day 20 and Day 21 to their Teil 2 Schreiben videos", () => {
     expect(getWritingVideoResource("B1", 5)).toEqual(
       expect.objectContaining({
         key: "b1-day5-besichtigungstermin-writing-video",
         title: expect.stringContaining("Besichtigungstermin"),
         url: "https://youtu.be/n1whPCP2KzA",
+      }),
+    );
+    expect(getWritingVideoResource("B1", 6)).toEqual(
+      expect.objectContaining({
+        key: "b1-day6-stadt-oder-land-writing-video",
+        title: expect.stringContaining("Stadt oder Land"),
+        url: "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD",
       }),
     );
     expect(getWritingVideoResource("B1", 20)).toEqual(
@@ -74,6 +83,17 @@ describe("writing video resources", () => {
         key: "b1-day21-lebensformen-heute-writing-video",
         title: expect.stringContaining("Lebensformen heute"),
         url: "https://youtu.be/1JYyJfnumig",
+      }),
+    );
+  });
+
+  test("maps B2 Day 5 to the Bildung und Lernen Write page", () => {
+    expect(getWritingVideoResource("B2", 5)).toEqual(
+      expect.objectContaining({
+        key: "b2-day5-bildung-lernen-writing-video",
+        chapter: "1.5",
+        title: expect.stringContaining("Bildung und Lernen"),
+        url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
       }),
     );
   });
@@ -121,7 +141,7 @@ describe("writing video resources", () => {
   });
 
   test("returns null when no writing video has been added", () => {
-    expect(getWritingVideoResource("B1", 6)).toBeNull();
+    expect(getWritingVideoResource("B1", 7)).toBeNull();
   });
 
   test.each([
@@ -130,9 +150,11 @@ describe("writing video resources", () => {
     ["https://youtu.be/8uAMihJTzvo", "https://www.youtube.com/embed/8uAMihJTzvo"],
     ["https://youtu.be/mHQiEdVVRSQ", "https://www.youtube.com/embed/mHQiEdVVRSQ"],
     ["https://youtu.be/n1whPCP2KzA", "https://www.youtube.com/embed/n1whPCP2KzA"],
+    ["https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD", "https://www.youtube.com/embed/bklCB9MdTcA"],
     ["https://youtu.be/og1iVBKnIb0", "https://www.youtube.com/embed/og1iVBKnIb0"],
     ["https://youtu.be/1JYyJfnumig", "https://www.youtube.com/embed/1JYyJfnumig"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
+    ["https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL", "https://www.youtube.com/embed/-6_zmU9ibJI"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
     ["https://youtu.be/Ww6gq3lmmpk", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
     ["https://youtu.be/3xWokVVz8cs", "https://www.youtube.com/embed/3xWokVVz8cs"],

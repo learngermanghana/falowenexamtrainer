@@ -1,4 +1,5 @@
 import { getA1RadioResource } from "./a1RadioResources";
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
   B2_C1_LESSON_VIDEO_OVERRIDES,
   applyB2C1LessonVideoOverrides,
@@ -16,6 +17,34 @@ describe("requested lesson media mappings", () => {
     );
   });
 
+  test("maps A1 Day 3 Kapitel 1.2 to its requested Falowen Radio video without replacing Kapitel 1.1", () => {
+    expect(getA1RadioResource(3, "1.2")).toEqual(
+      expect.objectContaining({
+        key: "a1-day3-chapter-1-2-falowen-radio",
+        chapter: "1.2",
+        youtubeId: "XrSTHS60LI4",
+      }),
+    );
+    expect(getA1RadioResource(3, "1.1")).toEqual(
+      expect.objectContaining({
+        key: "a1-day3-chapter-1-1-falowen-radio",
+        youtubeId: "y9LhKQkjsqM",
+      }),
+    );
+  });
+
+  test("adds the requested A1 Day 24 conjunctions clip as teacher video 2", () => {
+    expect(getA1TeacherVideoResources(24)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          chapter: "5.10",
+          videoNumber: 2,
+          url: "https://youtu.be/XpcC3uvBcwo",
+        }),
+      ]),
+    );
+  });
+
   test("keeps B1 Day 2 as a Schreiben support video", () => {
     const resource = getWritingVideoResource("B1", 2);
     expect(resource).toEqual(
@@ -29,17 +58,33 @@ describe("requested lesson media mappings", () => {
     expect(resource.key).not.toContain("ai-video");
   });
 
-  test("maps the requested B1 Day 5 and Day 21 clips to Teil 2 Schreiben", () => {
+  test("maps the requested B1 Day 5, Day 6 and Day 21 clips to Schreiben", () => {
     expect(getWritingVideoResource("B1", 5)).toEqual(
       expect.objectContaining({
         key: "b1-day5-besichtigungstermin-writing-video",
         url: "https://youtu.be/n1whPCP2KzA",
       }),
     );
+    expect(getWritingVideoResource("B1", 6)).toEqual(
+      expect.objectContaining({
+        key: "b1-day6-stadt-oder-land-writing-video",
+        url: "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD",
+      }),
+    );
     expect(getWritingVideoResource("B1", 21)).toEqual(
       expect.objectContaining({
         key: "b1-day21-lebensformen-heute-writing-video",
         url: "https://youtu.be/1JYyJfnumig",
+      }),
+    );
+  });
+
+  test("maps B2 Day 5 to its requested Schreiben video", () => {
+    expect(getWritingVideoResource("B2", 5)).toEqual(
+      expect.objectContaining({
+        key: "b2-day5-bildung-lernen-writing-video",
+        chapter: "1.5",
+        url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
       }),
     );
   });

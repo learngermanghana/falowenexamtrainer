@@ -37,6 +37,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before drafting the polite email to the landlord. It explains how to show interest, request or suggest a viewing appointment, ask for confirmation and include contact details.",
       url: "https://youtu.be/n1whPCP2KzA",
     },
+    6: {
+      key: "b1-day6-stadt-oder-land-writing-video",
+      title: "B1 Day 6 · Stadt oder Land · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before writing your opinion about city and country life. Use it to compare both places, react to the given opinion and justify your own decision clearly.",
+      url: "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD",
+    },
     20: {
       key: "b1-day20-beruf-qualifikationen-writing-video",
       title: "B1 Day 20 · Ausbildung und Qualifikationen · Schreiben explanation",
@@ -82,6 +89,14 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this Schreiben video on the Write page before drafting the B2 Day 4 text. Use it to understand the Chapter 1.4 task, organise the response and cover every required point.",
       url: "https://youtu.be/ltTxYa_T2xc",
+    },
+    5: {
+      key: "b2-day5-bildung-lernen-writing-video",
+      chapter: "1.5",
+      title: "B2 Day 5 · Bildung und Lernen · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the B2 Day 5 opinion text. Use it to compare learning formats, explain why Weiterbildung matters and cover all required points clearly.",
+      url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
     },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",

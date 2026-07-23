@@ -62,6 +62,29 @@ describe("B2 and C1 lesson links", () => {
     );
   });
 
+  test.each([
+    [
+      "Day 23 Kapitel 14.2",
+      "https://www.falowen.app/campus/course/lesson/A1/23?chapter=14.2",
+      "/campus/course/dative-and-accusative-verbs-14-2",
+    ],
+    [
+      "Day 24 Kapitel 5.10",
+      "https://www.falowen.app/campus/course/lesson/A1/24?chapter=5.10",
+      "/campus/course/conjunctions-5-10",
+    ],
+  ])("opens A1 practice-only %s on its owned page", (_label, url, destination) => {
+    expect(isSelfLearningCourseDestination(url)).toBe(true);
+    expect(getSelfLearningCourseDestination(url)).toBe(destination);
+  });
+
+  test("does not bypass the A1 assignment hub for Day 3 Kapitel 1.2", () => {
+    const url = "https://www.falowen.app/campus/course/lesson/A1/3?chapter=1.2";
+
+    expect(isSelfLearningCourseDestination(url)).toBe(false);
+    expect(getSelfLearningCourseDestination(url)).toBe("");
+  });
+
   test("the direct navigation fix is mounted for authenticated course links", () => {
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
 
