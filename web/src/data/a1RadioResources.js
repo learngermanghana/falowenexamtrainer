@@ -38,7 +38,7 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   5: Object.freeze({
     key: "a1-day5-introducing-yourself-articles-falowen-radio",
     title: "Introducing Yourself and Articles · Kapitel 1.3",
-    youtubeId: "4yGJ9-Fz19A",
+    youtubeId: "XrSTHS60LI4",
     duration: "",
     instruction:
       "Listen carefully to the lesson on introductions, articles, adjectives and W-questions. Then continue to the Day 5 workbook.",
