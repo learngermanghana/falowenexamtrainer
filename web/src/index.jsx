@@ -18,6 +18,7 @@ import A1ChapterResourceHubRoute, {
 } from './components/A1ChapterResourceHubRoute';
 import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
 import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
+import A1SharedPracticeWorkbookNavigation from './components/A1SharedPracticeWorkbookNavigation';
 import RequestedLessonAiVideoHeader from './components/RequestedLessonAiVideoHeader';
 import A1Day11DirectWorkbookRoute, {
   A1_DAY11_DIRECT_WORKBOOK_PATH,
@@ -61,6 +62,7 @@ const AuthenticatedAppRoutes = () => (
           <RouteScopedAppServices />
           <SelfLearningLessonDirectNavigationFix />
           <A1RadioFirstWorkbookRoutes />
+          <A1SharedPracticeWorkbookNavigation />
           <RequestedLessonAiVideoHeader />
           <Routes>
             <Route

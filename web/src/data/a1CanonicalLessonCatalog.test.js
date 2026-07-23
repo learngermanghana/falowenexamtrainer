@@ -8,7 +8,7 @@ import {
 const EXPECTED_ROUTE_KEYS = [
   "0.1", "0.2", "1.1", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
   "12.1", "12.2", "12.3", "13", "14.1",
-  "1.1-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "14.2", "5.10",
+  "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "14.2", "5.10",
 ];
 
 describe("A1 canonical lesson catalog", () => {
@@ -43,7 +43,23 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLessonsForChapter("1.1")).toHaveLength(2);
   });
 
-  test("uses the legacy day to disambiguate repeated Kapitel 1.1 resources", () => {
+  test("keeps tutor-marked Kapitel 1.2 and its self-practice route separate", () => {
+    expect(getA1CanonicalLesson("1.2")).toMatchObject({
+      routeKey: "1.2",
+      day: 3,
+      assignmentKey: "A1-1.2",
+      destination: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+    });
+    expect(getA1CanonicalLesson("A1-1.2-PRACTICE")).toMatchObject({
+      routeKey: "1.2-practice",
+      day: 3,
+      assignmentKey: null,
+      destination: "/campus/course/a1-day-3-kapitel-1-2-workbook",
+    });
+    expect(getA1CanonicalLessonsForChapter("1.2")).toHaveLength(2);
+  });
+
+  test("uses the legacy day and explicit PRACTICE identity to disambiguate split resources", () => {
     expect(getA1CanonicalLessonForLegacyRoute({ day: 2, identity: "1.1" })).toMatchObject({
       routeKey: "1.1",
       destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
@@ -55,6 +71,14 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1-PRACTICE" })).toMatchObject({
       routeKey: "1.1-practice",
     });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "A1-1.2" })).toMatchObject({
+      routeKey: "1.2",
+      assignmentKey: "A1-1.2",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.2-PRACTICE" })).toMatchObject({
+      routeKey: "1.2-practice",
+      assignmentKey: null,
+    });
   });
 
   test("resolves every permanent route identity to one deterministic catalog entry", () => {
@@ -62,6 +86,7 @@ describe("A1 canonical lesson catalog", () => {
       ["0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
       ["1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
       ["1.1-PRACTICE", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
+      ["1.2-PRACTICE", "/campus/course/a1-day-3-kapitel-1-2-workbook"],
       ["1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
       ["14.2", "/campus/course/dative-and-accusative-verbs-14-2"],
     ].forEach(([identity, destination]) => {

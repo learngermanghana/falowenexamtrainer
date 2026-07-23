@@ -1,0 +1,46 @@
+name: A1 self-practice shared navigation
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/a1CanonicalLessonCatalog.js"
+      - "web/src/data/a1CanonicalLessonCatalog.test.js"
+      - "web/src/data/a1RadioResources.js"
+      - "web/src/data/a1SelfPracticeRegistry.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/A1SelfLearningMaterialsRouteGate.test.jsx"
+      - "web/src/components/A1SelfLearningJourneyStandardization.test.js"
+      - "web/src/components/A1SharedPracticeWorkbookNavigation.jsx"
+      - "web/src/components/A1SharedPracticeWorkbookNavigation.test.jsx"
+      - "web/src/index.jsx"
+      - "scripts/patchA1SelfLearningDestinationOwnership.mjs"
+      - ".github/workflows/a1-self-practice-shared-nav.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test self-practice registry and Radio isolation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a1SelfPracticeRegistry.test.js src/data/a1CanonicalLessonCatalog.test.js src/components/A1SelfLearningJourneyStandardization.test.js src/components/A1RadioFirstWorkbookRoutes.test.jsx src/components/A1SelfLearningMaterialsRouteGate.test.jsx
+      - name: Test shared self-practice navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx
+      - name: Build production web app
+        working-directory: web
+        run: npm run build

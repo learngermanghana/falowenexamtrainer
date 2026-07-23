@@ -20,6 +20,7 @@ export const A1_RADIO_RESOURCES = Object.freeze({
   }),
   3: Object.freeze({
     key: "a1-day3-chapter-1-1-falowen-radio",
+    chapter: "1.1",
     title: "A1 Day 3 · Kapitel 1.1",
     youtubeId: "y9LhKQkjsqM",
     duration: "",
