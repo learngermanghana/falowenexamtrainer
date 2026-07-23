@@ -3,6 +3,14 @@ import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import {
+  getA1SelfLearningJourneyResources,
+  getA1SelfLearningPracticeForLocation,
+} from "./A1CoursePracticeAutoMount";
+import {
+  hasCompletedSelfLearningMaterials,
+  SelfLearningMaterialsSelector,
+} from "./selfLearning/SelfLearningJourneyGate";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
@@ -76,10 +84,22 @@ export default function A1RadioFirstWorkbookRoutes() {
   const route = resolveA1RadioFirstWorkbookRoute(location.pathname, location.search);
   const completed = hasCompletedA1RadioFirstStep(location.search);
   const resource = route ? getA1RadioResource(route.day, route.chapter) : null;
-  const shouldShow = Boolean(route && resource && !completed);
+  const shouldShowRadio = Boolean(route && resource && !completed);
+
+  const practice = getA1SelfLearningPracticeForLocation(location);
+  const practiceIsDestination = Boolean(
+    practice && normalizePath(practice.destination) === normalizePath(location.pathname),
+  );
+  const journeyResources = practice ? getA1SelfLearningJourneyResources(practice) : null;
+  const materialsCompleted = hasCompletedSelfLearningMaterials(location.search);
+  const shouldShowMaterials = Boolean(
+    practiceIsDestination &&
+    !materialsCompleted &&
+    (!journeyResources?.radio || completed),
+  );
 
   useEffect(() => {
-    if (!shouldShow || typeof document === "undefined") return undefined;
+    if ((!shouldShowRadio && !shouldShowMaterials) || typeof document === "undefined") return undefined;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -87,26 +107,58 @@ export default function A1RadioFirstWorkbookRoutes() {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [shouldShow]);
+  }, [shouldShowMaterials, shouldShowRadio]);
 
-  if (!shouldShow || typeof document === "undefined") return null;
+  if (typeof document === "undefined") return null;
 
-  return createPortal(
-    <div
-      data-a1-radio-first-workbook-route="true"
-      style={{
-        background: "#f8fafc",
-        inset: 0,
-        overflowY: "auto",
-        padding: "18px 12px 40px",
-        position: "fixed",
-        zIndex: 10000,
-      }}
-    >
-      <RadioFirstWorkbookGate level="A1" day={route.day} resource={resource}>
-        {null}
-      </RadioFirstWorkbookGate>
-    </div>,
-    document.body,
-  );
+  if (shouldShowRadio) {
+    return createPortal(
+      <div
+        data-a1-radio-first-workbook-route="true"
+        style={{
+          background: "#f8fafc",
+          inset: 0,
+          overflowY: "auto",
+          padding: "18px 12px 40px",
+          position: "fixed",
+          zIndex: 10000,
+        }}
+      >
+        <RadioFirstWorkbookGate level="A1" day={route.day} resource={resource}>
+          {null}
+        </RadioFirstWorkbookGate>
+      </div>,
+      document.body,
+    );
+  }
+
+  if (shouldShowMaterials) {
+    return createPortal(
+      <div
+        data-a1-self-learning-materials-route="true"
+        style={{
+          background: "#f8fafc",
+          inset: 0,
+          overflowY: "auto",
+          padding: "18px 12px 40px",
+          position: "fixed",
+          zIndex: 9990,
+        }}
+      >
+        <SelfLearningMaterialsSelector
+          level="A1"
+          day={practice.day}
+          title={`${practice.title} · Kapitel ${practice.chapter}`}
+          teacherVideo={journeyResources?.teacherVideo}
+          aiVideo={journeyResources?.aiVideo}
+          grammarBook={journeyResources?.grammarBook}
+        >
+          {null}
+        </SelfLearningMaterialsSelector>
+      </div>,
+      document.body,
+    );
+  }
+
+  return null;
 }
