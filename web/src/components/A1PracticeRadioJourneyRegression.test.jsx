@@ -25,6 +25,15 @@ describe("A1 practice radio journey regressions", () => {
     );
   });
 
+  test("Day 5 uses the requested XrSTHS60LI4 Falowen Radio episode", () => {
+    expect(getA1RadioResource(5, "1.3")).toEqual(
+      expect.objectContaining({
+        key: "a1-day5-introducing-yourself-articles-falowen-radio",
+        youtubeId: "XrSTHS60LI4",
+      }),
+    );
+  });
+
   test("Day 3 Kapitel 1.2 assignment-style legacy route is not mistaken for the self-practice route", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
@@ -49,7 +58,7 @@ describe("A1 practice radio journey regressions", () => {
         radio={{
           key: "a1-day5-introducing-yourself-articles-falowen-radio",
           title: "Introducing Yourself and Articles · Kapitel 1.3",
-          youtubeId: "4yGJ9-Fz19A",
+          youtubeId: "XrSTHS60LI4",
         }}
         aiVideo={{ url: "https://youtu.be/test-a1-ai" }}
       >
