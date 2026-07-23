@@ -71,19 +71,6 @@ const adjectivePairs = [
   ["sauber", "schmutzig", "clean", "dirty"],
 ];
 
-const personalInfoPrompts = [
-  ["Familienname", "Mein Familienname ist …"],
-  ["Vorname", "Mein Vorname ist …"],
-  ["Herkunft", "Ich komme aus …"],
-  ["Geburtsort", "Ich bin in … geboren."],
-  ["Adresse", "Meine Adresse ist …"],
-  ["Postleitzahl", "Meine Postleitzahl ist …"],
-  ["Telefonnummer", "Meine Telefonnummer ist …"],
-  ["Familienstand", "Ich bin ledig / verheiratet / geschieden / verwitwet."],
-  ["Kinder", "Ich habe … Kinder. / Ich habe keine Kinder."],
-  ["Alter", "Ich bin … Jahre alt."],
-];
-
 const wWordQuestions = [
   { stem: "1. ___ heißt du?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wie", explanation: "Use Wie to ask about a name.", englishHint: "What is your name?" },
   { stem: "2. ___ ist das Buch?", options: ["Wer", "Wie", "Was", "Wo", "Woher"], answer: "Wo", explanation: "Use Wo to ask about a place.", englishHint: "Where is the book?" },
@@ -287,13 +274,6 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
       </SectionCard>
 
       <SectionCard title="Teil 3 · Personal Information" subtitle="Schreibe eine kurze Vorstellung mit 6–8 Sätzen.">
-        <div style={{ ...infoBoxStyle, gap: 8 }}>
-          {personalInfoPrompts.map(([label, starter], index) => (
-            <div key={label} style={{ lineHeight: 1.6 }}>
-              <strong>{index + 1}. {label}:</strong> {starter}
-            </div>
-          ))}
-        </div>
         <PersonalInformationContributionBox
           lessonId={discussionLesson.id}
           lessonLabel={discussionLesson.label}
