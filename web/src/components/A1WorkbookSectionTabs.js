@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { A1_CANONICAL_LESSON_CATALOG } from "../data/a1CanonicalLessonCatalog";
 
 const NAV_ATTRIBUTE = "data-a1-teil-navigation";
 const OVERVIEW_ATTRIBUTE = "data-a1-workbook-overview";
@@ -10,6 +11,15 @@ const LISTENER_ATTRIBUTE = "data-a1-section-tab-listener";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+
+const SHARED_PRACTICE_PATHS = new Set(
+  A1_CANONICAL_LESSON_CATALOG
+    .filter((lesson) => lesson.kind === "practice")
+    .map((lesson) => normalizePath(lesson.destination)),
+);
+
+export const isA1SharedPracticeWorkbookPath = (pathname = "") =>
+  SHARED_PRACTICE_PATHS.has(normalizePath(pathname));
 
 export const isA1WorkbookLessonPath = (pathname = "") => {
   const normalized = normalizePath(pathname);
@@ -204,6 +214,12 @@ const restoreManagedElements = (root = document) => {
 
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
+  if (isA1SharedPracticeWorkbookPath(locationLike?.pathname)) {
+    // Shared self-practice pages own their navigation. Keeping this legacy manager off
+    // those routes prevents a second overview/nav from hiding the selected practice Teil.
+    restoreManagedElements(root);
+    return false;
+  }
   const mainRoot = findMainRoot(root);
 
   if (hasNativeTutorMarkedWorkbookTabs(mainRoot)) {
