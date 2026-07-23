@@ -119,19 +119,32 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
     let cancelled = false;
+    let installed = false;
     let frame = null;
     let attempts = 0;
+    let observer = null;
     let installedRoot = null;
     let installedSections = [];
     let createdHosts = [];
 
+    const scheduleInstall = () => {
+      if (cancelled || installed || frame !== null) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        install();
+      });
+    };
+
     const retryInstall = () => {
       attempts += 1;
-      if (attempts < 120) frame = window.requestAnimationFrame(install);
+      if (attempts < 120) scheduleInstall();
+      // After the short eager window, the MutationObserver below stays armed.
+      // This matters for self-learning journeys: a learner may spend minutes on
+      // Radio/supporting materials before the actual workbook enters the DOM.
     };
 
     const install = () => {
-      if (cancelled) return;
+      if (cancelled || installed) return;
       const main = document.querySelector("main.layout-main") || document.querySelector("main");
       const pageRoot = findWorkbookPageRoot(main);
       if (!main || !pageRoot) {
@@ -166,6 +179,8 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
       pageRoot.prepend(navHost, submissionHost);
       pageRoot.appendChild(footerHost);
+      installed = true;
+      observer?.disconnect();
       installedRoot = pageRoot;
       createdHosts = [navHost, submissionHost, footerHost];
       installedSections = sections;
@@ -180,9 +195,13 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       setMountState({ navHost, submissionHost, footerHost, sections });
     };
 
-    frame = window.requestAnimationFrame(install);
+    observer = new MutationObserver(scheduleInstall);
+    observer.observe(document.body, { childList: true, subtree: true });
+    scheduleInstall();
+
     return () => {
       cancelled = true;
+      observer?.disconnect();
       if (frame !== null) window.cancelAnimationFrame(frame);
       installedSections.forEach(({ element }) => restoreElement(element));
       createdHosts.forEach((host) => {
