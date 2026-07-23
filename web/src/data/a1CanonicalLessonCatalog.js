@@ -139,9 +139,13 @@ export const getA1CanonicalLessonForLegacyRoute = ({ day, identity } = {}) => {
   const numericDay = Number(day);
   if (!normalized || !Number.isInteger(numericDay)) return null;
 
-  const dayMatches = A1_CANONICAL_LESSON_CATALOG.filter(
-    (lesson) => Number(lesson.day) === numericDay && lookupTokens(lesson).has(normalized),
+  const lessonsForDay = A1_CANONICAL_LESSON_CATALOG.filter(
+    (lesson) => Number(lesson.day) === numericDay,
   );
+  const exactRouteKey = lessonsForDay.find((lesson) => lesson.routeKey === normalized);
+  if (exactRouteKey) return exactRouteKey;
+
+  const dayMatches = lessonsForDay.filter((lesson) => lookupTokens(lesson).has(normalized));
   return dayMatches.length === 1 ? dayMatches[0] : null;
 };
 
