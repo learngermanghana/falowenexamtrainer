@@ -111,7 +111,7 @@ const WRITING_VIDEO_RESOURCES = {
       title: "B2 Day 6 · Migration und Integration · Schreiben explanation",
       description:
         "Watch this Schreiben video on the Write page before drafting the B2 Day 6 opinion text. Use it to organise the integration argument, explain difficulties, propose measures and describe their benefits clearly.",
-      url: "https://youtu.be/0hMcnhgRj8Q",
+      url: "https://youtu.be/19WaMcKL8v4",
     },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",
