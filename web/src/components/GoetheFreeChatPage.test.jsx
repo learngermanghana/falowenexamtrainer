@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import GoetheFreeChatPage from "./GoetheFreeChatPage";
@@ -48,4 +50,15 @@ test("keeps current 10, 20 and 30 minute practice choices", () => {
   expect(screen.getByRole("button", { name: "10 minutes" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "20 minutes" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "30 minutes" })).toBeInTheDocument();
+});
+
+test("stacks the shared Goethe Free Chat on phone-sized screens", () => {
+  const css = fs.readFileSync(path.resolve(__dirname, "../goetheFreeChatMobile.css"), "utf8");
+
+  expect(css).toContain('@media (max-width: 720px)');
+  expect(css).toContain('[data-goethe-free-chat="text-first"] > div');
+  expect(css).toContain('grid-template-columns: minmax(0, 1fr) !important;');
+  expect(css).toContain('max-width: 94% !important;');
+  expect(css).toContain('overflow-wrap: anywhere;');
+  expect(css).toContain('grid-template-columns: minmax(0, 1fr);');
 });
