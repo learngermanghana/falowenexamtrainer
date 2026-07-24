@@ -43,70 +43,81 @@ export const getC1SpeakGrammarData = (lesson, branchesOverride = null) => {
   };
 };
 
-export default function C1SpeakGrammarGuide({ lesson, branchesOverride = null }) {
+export default function C1SpeakGrammarGuide({
+  lesson,
+  branchesOverride = null,
+  showGrammar = true,
+  showSpeaking = true,
+}) {
   const guide = getC1SpeakGrammarData(lesson, branchesOverride);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <section style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #bfdbfe", borderRadius: 16 }}>
-        <div style={{ display: "grid", gap: 5 }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Grammar for speaking</span>
-          <h3 style={{ margin: 0 }}>{guide.grammarTitle}</h3>
-          {guide.grammarFocus ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}><strong>Fokus:</strong> {guide.grammarFocus}</p> : null}
-        </div>
-
-        {guide.explanations.map((text) => (
-          <p key={text} style={{ margin: 0, lineHeight: 1.7 }}>{text}</p>
-        ))}
-
-        {guide.rules.length ? (
-          <div>
-            <strong>Kernregeln</strong>
-            <ul style={{ ...listStyle, marginTop: 8 }}>{guide.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>
+      {showGrammar ? (
+        <section style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #bfdbfe", borderRadius: 16 }}>
+          <div style={{ display: "grid", gap: 5 }}>
+            <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Grammar lesson</span>
+            <h3 style={{ margin: 0 }}>{guide.grammarTitle}</h3>
+            {guide.grammarFocus ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}><strong>Fokus:</strong> {guide.grammarFocus}</p> : null}
           </div>
-        ) : null}
 
-        {guide.examples.length ? (
-          <div>
-            <strong>Beispiele für deine Antwort</strong>
-            <ul style={{ ...listStyle, marginTop: 8 }}>{guide.examples.map((example) => <li key={example}>{example}</li>)}</ul>
-          </div>
-        ) : null}
+          {guide.explanations.map((text) => (
+            <p key={text} style={{ margin: 0, lineHeight: 1.7 }}>{text}</p>
+          ))}
 
-        {guide.miniExercise ? <NoteBox tone="green"><strong>Kurz üben:</strong> {guide.miniExercise}</NoteBox> : null}
-      </section>
+          {guide.rules.length ? (
+            <div>
+              <strong>Kernregeln</strong>
+              <ul style={{ ...listStyle, marginTop: 8 }}>{guide.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>
+            </div>
+          ) : null}
 
-      <NoteBox tone="amber"><strong>Sprechfrage:</strong> {guide.question}</NoteBox>
+          {guide.examples.length ? (
+            <div>
+              <strong>Beispiele</strong>
+              <ul style={{ ...listStyle, marginTop: 8 }}>{guide.examples.map((example) => <li key={example}>{example}</li>)}</ul>
+            </div>
+          ) : null}
 
-      {guide.branches.length ? (
-        <div style={panelStyle}>
-          <h3 style={{ margin: 0 }}>Fragen und Punkte für deine Antwort</h3>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-            Wähle passende Punkte, beantworte die Leitfragen und nutze dabei die Grammatik aus dem Abschnitt oben.
-          </p>
-          <ul style={listStyle}>
-            {guide.branches.map((branch) => (
-              <li key={branch.id || branch.title}>
-                <strong>{branch.title}:</strong> {(branch.keywords || []).join(", ")}
-                {branch.prompt ? <div style={{ marginTop: 3, color: "#334155" }}>{branch.prompt}</div> : null}
-              </li>
-            ))}
-          </ul>
-        </div>
+          {guide.miniExercise ? <NoteBox tone="green"><strong>Kurz üben:</strong> {guide.miniExercise}</NoteBox> : null}
+        </section>
       ) : null}
 
-      {guide.plan.length ? (
-        <div style={{ ...panelStyle, background: "#f8fafc" }}>
-          <h3 style={{ margin: 0 }}>Aufbau deiner Antwort</h3>
-          <ol style={listStyle}>{guide.plan.map((item) => <li key={item}>{item}</li>)}</ol>
-        </div>
-      ) : null}
+      {showSpeaking ? (
+        <>
+          <NoteBox tone="amber"><strong>Sprechfrage:</strong> {guide.question}</NoteBox>
 
-      {guide.starters.length ? (
-        <NoteBox>
-          <strong>Nützliche Satzanfänge</strong>
-          <ul style={{ ...listStyle, marginTop: 8 }}>{guide.starters.map((item) => <li key={item}>{item}</li>)}</ul>
-        </NoteBox>
+          {guide.branches.length ? (
+            <div style={panelStyle}>
+              <h3 style={{ margin: 0 }}>Fragen und Punkte für deine Antwort</h3>
+              <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
+                Wähle passende Punkte und beantworte die Leitfragen. Nutze dabei die Grammatik aus dem Learn-Teil.
+              </p>
+              <ul style={listStyle}>
+                {guide.branches.map((branch) => (
+                  <li key={branch.id || branch.title}>
+                    <strong>{branch.title}:</strong> {(branch.keywords || []).join(", ")}
+                    {branch.prompt ? <div style={{ marginTop: 3, color: "#334155" }}>{branch.prompt}</div> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {guide.plan.length ? (
+            <div style={{ ...panelStyle, background: "#f8fafc" }}>
+              <h3 style={{ margin: 0 }}>Aufbau deiner Antwort</h3>
+              <ol style={listStyle}>{guide.plan.map((item) => <li key={item}>{item}</li>)}</ol>
+            </div>
+          ) : null}
+
+          {guide.starters.length ? (
+            <NoteBox>
+              <strong>Nützliche Satzanfänge</strong>
+              <ul style={{ ...listStyle, marginTop: 8 }}>{guide.starters.map((item) => <li key={item}>{item}</li>)}</ul>
+            </NoteBox>
+          ) : null}
+        </>
       ) : null}
     </div>
   );
