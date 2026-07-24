@@ -55,10 +55,10 @@ const autoplayPreferenceEffect = `  useEffect(() => {
 
 const latestReplyAudioMarker = "latestCoachMessageNeedingAudio";
 const unsafeBackfillPredicate = `          String(message.id || "").startsWith("custom-coach-") &&
-          Boolean(String(message.text || "").trim()) &&`;
+           Boolean(String(message.text || "").trim()) &&`;
 const scopedBackfillPredicate = `          String(message.id || "").startsWith("custom-coach-") &&
-          message.audioRequested === true &&
-          Boolean(String(message.text || "").trim()) &&`;
+           message.audioRequested === true &&
+           Boolean(String(message.text || "").trim()) &&`;
 
 if (speakingPage.includes(unsafeBackfillPredicate)) {
   speakingPage = speakingPage.replace(unsafeBackfillPredicate, scopedBackfillPredicate);
@@ -129,13 +129,19 @@ let embeddedPanels = fs.readFileSync(embeddedPanelsPath, "utf8");
 const unlockedCourseCoach = '<SpeakingPage mode="course" />';
 const routeLockedCourseCoach =
   '<SpeakingPage mode="course" lockedLevel={getCourseLessonRouteMeta().level} />';
+const stableCourseCoach =
+  '<GoetheFreeChatPage lockedLevel={getCourseLessonRouteMeta().level} />';
 
-if (embeddedPanels.includes(unlockedCourseCoach)) {
-  embeddedPanels = embeddedPanels.replace(unlockedCourseCoach, routeLockedCourseCoach);
+if (embeddedPanels.includes(stableCourseCoach)) {
+  console.log("Stable course Goethe Free Chat mount is already active; leaving it untouched.");
+} else {
+  if (embeddedPanels.includes(unlockedCourseCoach)) {
+    embeddedPanels = embeddedPanels.replace(unlockedCourseCoach, routeLockedCourseCoach);
+  }
+  if (!embeddedPanels.includes(routeLockedCourseCoach)) {
+    throw new Error("Embedded course speaking coach does not inherit the lesson level.");
+  }
+  fs.writeFileSync(embeddedPanelsPath, embeddedPanels, "utf8");
 }
-if (!embeddedPanels.includes(routeLockedCourseCoach)) {
-  throw new Error("Embedded course speaking coach does not inherit the lesson level.");
-}
-fs.writeFileSync(embeddedPanelsPath, embeddedPanels, "utf8");
 
-console.log("Reset stale speaking audio preferences, scoped backfill to intended coach replies, and locked course audio to the lesson level.");
+console.log("Reset stale speaking audio preferences, scoped backfill to intended coach replies, and preserved the course speaking mount contract.");
