@@ -29,6 +29,21 @@ const isCourseLessonHub = (pathname = "", search = "") => {
   return !new URLSearchParams(search || "").has("view");
 };
 
+const getDynamicLessonViewReturn = (pathname = "", search = "") => {
+  const normalizedPath = normalizeInAppPath(pathname);
+  if (!/^\/campus\/course\/lesson\/[^/]+\/[^/]+$/i.test(normalizedPath)) return "";
+
+  const params = new URLSearchParams(search || "");
+  if (!params.has("view")) return "";
+
+  // Workbook/grammar views often reuse the exact lesson pathname and differ
+  // only by query params. Returning through browser history can therefore land
+  // on another workbook entry or the same page. Strip view/assignment state
+  // and return deterministically to the lesson hub. Preserve chapter context.
+  const chapter = String(params.get("chapter") || "").trim();
+  return `${normalizedPath}${chapter ? `?chapter=${encodeURIComponent(chapter)}` : ""}`;
+};
+
 const addCanonicalGrammarReturns = (index, level, entries) => {
   entries.forEach(({ day, chapter, route }) => {
     const pathname = normalizeInAppPath(route);
@@ -150,9 +165,10 @@ const AppBackButton = ({
     }
 
     const explicitReturn = getExplicitLessonReturn(location.search);
+    const dynamicLessonViewReturn = getDynamicLessonViewReturn(location.pathname, location.search);
     const indexedReturn = lessonReturnIndex.get(normalizeInAppPath(location.pathname)) || "";
     const referrerReturn = getReferrerLessonReturn();
-    const lessonReturn = explicitReturn || indexedReturn || referrerReturn;
+    const lessonReturn = explicitReturn || dynamicLessonViewReturn || indexedReturn || referrerReturn;
 
     if (lessonReturn) {
       navigate(lessonReturn, { replace: true });
