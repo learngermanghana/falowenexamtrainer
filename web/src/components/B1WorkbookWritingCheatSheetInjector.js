@@ -7,6 +7,7 @@ import {
 } from "../data/writingVideoResources";
 
 const WRITING_VIDEO_CARD_ATTRIBUTE = "data-b1-writing-video-support";
+const REACT_WRITING_VIDEO_SELECTOR = '[data-writing-video-support="true"]';
 
 const isB1WorkbookRoute = (pathname = "", search = "") => {
   const path = String(pathname || "").replace(/\/+$/, "");
@@ -163,6 +164,15 @@ const ensureWritingVideoCard = (root, day) => {
     return { mounted: false, reason: "writing-section-not-mounted", day };
   }
 
+  // The restored B1 React writing workspace owns its Schreiben video now.
+  // The legacy DOM injector is kept only as a compatibility fallback for older
+  // workbook layouts. If the React-owned card exists, remove any legacy card
+  // and do not mount a second iframe.
+  if (writingSection.querySelector(REACT_WRITING_VIDEO_SELECTOR)) {
+    existing?.remove();
+    return { mounted: true, reason: "react-owned", day, key: resource.key };
+  }
+
   if (
     existing
     && writingSection.contains(existing)
@@ -262,6 +272,7 @@ export default function B1WorkbookWritingCheatSheetInjector() {
 
 export const __TESTING__ = {
   WRITING_VIDEO_CARD_ATTRIBUTE,
+  REACT_WRITING_VIDEO_SELECTOR,
   createWritingVideoCard,
   ensureWritingVideoCard,
   findWritingInsertAnchor,
