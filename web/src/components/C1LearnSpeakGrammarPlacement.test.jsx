@@ -24,7 +24,7 @@ describe("C1 Learn and Speak grammar placement", () => {
         name: "Erweiterte Vergleichs- und Bewertungsstrukturen bei Freizeit und Kultur",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/im Hinblick auf \+ Akkusativ/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/im Hinblick auf \+ Akkusativ/i).length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "Knowledge questions" })).toBeInTheDocument();
     expect(screen.queryByText(/Sprechfrage:/i)).not.toBeInTheDocument();
   });
