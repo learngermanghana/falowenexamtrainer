@@ -15,6 +15,14 @@ export const describeCoachSpeechError = (error = {}) => {
     };
   }
 
+  if (status === 404 || code === "speech_route_unavailable") {
+    return {
+      message: "The studio German audio route is unavailable. Using your device's German voice for coach replies.",
+      code,
+      retryable: false,
+    };
+  }
+
   if (status === 401 || status === 403) {
     return {
       message: "The server audio session is no longer authorised. Using your device's German voice; refresh and sign in again for the studio voice.",
@@ -82,6 +90,7 @@ export const useCustomCoachSpeech = ({
   const speechControllersRef = useRef({});
   const customConversationGenerationRef = useRef(0);
   const browserSpeechMessageIdRef = useRef("");
+  const serverSpeechUnavailableRef = useRef(false);
 
   const stopBrowserSpeech = useCallback(() => {
     if (supportsBrowserSpeech()) window.speechSynthesis.cancel();
@@ -209,6 +218,17 @@ export const useCustomCoachSpeech = ({
 
   const requestSpeechForMessage = useCallback((messageId, text) => {
     if (!audioRepliesEnabled || !isCoachTtsEligible() || !text) return;
+    if (serverSpeechUnavailableRef.current) {
+      if (!useBrowserSpeechFallback(messageId, text, { status: 404, code: "speech_route_unavailable", retryable: false })) {
+        markCustomCoachAudioFailed(messageId, {
+          status: 404,
+          code: "speech_route_unavailable",
+          message: "The studio German audio route is unavailable. Please use the visible coach reply text.",
+          retryable: false,
+        });
+      }
+      return;
+    }
     const generation = customConversationGenerationRef.current;
     const controller = new AbortController();
     speechControllersRef.current[messageId]?.abort();
@@ -247,6 +267,7 @@ export const useCustomCoachSpeech = ({
       .catch((error) => {
         delete speechControllersRef.current[messageId];
         if (error?.name === "AbortError") return;
+        if (Number(error?.status || 0) === 404) serverSpeechUnavailableRef.current = true;
         if (!useBrowserSpeechFallback(messageId, text, error)) {
           markCustomCoachAudioFailed(messageId, error);
         }

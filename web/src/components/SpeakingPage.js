@@ -402,15 +402,18 @@ const SpeakingPage = ({
     });
   }, [completedQuestionIds, mode, progressLoaded, selectedLevel, selectedQuestionId, selectedTeil, studentCode, userId]);
 
+  const chatMessageCount = chatMessages.length;
+  const customChatMessageCount = customChatMessages.length;
+
   useEffect(() => {
     if (activeSpeakingTab !== "exam") return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [activeSpeakingTab, chatMessages, chatLoading]);
+  }, [activeSpeakingTab, chatMessageCount, chatLoading]);
 
   useEffect(() => {
     if (activeSpeakingTab !== "custom") return;
     customMessagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [activeSpeakingTab, customChatLoading, customChatMessages]);
+  }, [activeSpeakingTab, customChatMessageCount, customChatLoading]);
 
   useEffect(() => {
     const audioElements = audioRefs.current;
