@@ -10,7 +10,7 @@ const b2Day6MigrationUndIntegration = makeLesson({
   videoResource: {
     title: "B2 AI lesson video: Migration und Integration",
     description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
-    url: "",
+    url: "https://youtu.be/LORxwfzaAyU",
   },
   grammarFocus: "Konzessive Nebensätze mit obwohl / auch wenn, trotzdem und differenzierte Argumentation",
   objectives: [
