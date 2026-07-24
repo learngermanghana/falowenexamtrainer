@@ -23,6 +23,8 @@ jobs:
       FIREBASE_PROJECT_ID: falowen-examiner-trainer
       GOOGLE_CLOUD_PROJECT: falowen-examiner-trainer
       GCLOUD_PROJECT: falowen-examiner-trainer
+      CLOUD_RUN_SERVICE: api
+      CLOUD_RUN_REGION: europe-west1
       HEALTH_URL: https://api-awc2au65xa-ew.a.run.app/health
       PAYSTACK_POLICY_URL: https://api-awc2au65xa-ew.a.run.app/paystack/webhook
 
@@ -59,6 +61,11 @@ jobs:
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: '${{ env.FIREBASE_PROJECT_ID }}'
+
       - name: Deploy exam trainer API
         shell: bash
         run: |
@@ -70,6 +77,17 @@ jobs:
           status=$?
           tail -n 180 firebase-deploy.log || true
           exit "$status"
+
+      - name: Apply API runtime capacity
+        shell: bash
+        run: |
+          gcloud run services update "$CLOUD_RUN_SERVICE" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --region "$CLOUD_RUN_REGION" \
+            --cpu 1 \
+            --concurrency 20 \
+            --max 2 \
+            --quiet
 
       - name: Verify API health
         shell: bash
