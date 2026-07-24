@@ -197,18 +197,17 @@ export const useCustomCoachSpeech = ({
     }));
   }, [updateCustomCoachMessage]);
 
-  const useBrowserSpeechFallback = useCallback((messageId, text, error) => {
+  const useBrowserSpeechForMessage = useCallback((messageId, text, details = null) => {
     if (!supportsBrowserSpeech()) return false;
-    const details = describeCoachSpeechError(error);
     updateCustomCoachMessage(messageId, (message) => ({
       ...message,
       audioUrl: null,
       browserSpeech: true,
       audioLoading: false,
       audioError: false,
-      audioErrorMessage: details.message,
-      audioErrorCode: details.code,
-      audioRetryable: details.retryable,
+      audioErrorMessage: details?.message || "",
+      audioErrorCode: details?.code || "browser_speech",
+      audioRetryable: false,
     }));
     if (autoPlayRepliesEnabled) {
       window.setTimeout(() => playBrowserSpeechForMessage(messageId, text), 0);
@@ -216,17 +215,25 @@ export const useCustomCoachSpeech = ({
     return true;
   }, [autoPlayRepliesEnabled, playBrowserSpeechForMessage, updateCustomCoachMessage]);
 
+  const useBrowserSpeechFallback = useCallback((messageId, text, error) => {
+    const details = describeCoachSpeechError(error);
+    return useBrowserSpeechForMessage(messageId, text, details);
+  }, [useBrowserSpeechForMessage]);
+
   const requestSpeechForMessage = useCallback((messageId, text) => {
     if (!audioRepliesEnabled || !isCoachTtsEligible() || !text) return;
+
+    // Free Sprechen chat is browser-voice first. This avoids a second backend/OpenAI
+    // request for every coach reply and keeps the feature usable during API bursts.
+    if (useBrowserSpeechForMessage(messageId, text)) return;
+
     if (serverSpeechUnavailableRef.current) {
-      if (!useBrowserSpeechFallback(messageId, text, { status: 404, code: "speech_route_unavailable", retryable: false })) {
-        markCustomCoachAudioFailed(messageId, {
-          status: 404,
-          code: "speech_route_unavailable",
-          message: "The studio German audio route is unavailable. Please use the visible coach reply text.",
-          retryable: false,
-        });
-      }
+      markCustomCoachAudioFailed(messageId, {
+        status: 404,
+        code: "speech_route_unavailable",
+        message: "The studio German audio route is unavailable. Please use the visible coach reply text.",
+        retryable: false,
+      });
       return;
     }
     const generation = customConversationGenerationRef.current;
@@ -272,7 +279,7 @@ export const useCustomCoachSpeech = ({
           markCustomCoachAudioFailed(messageId, error);
         }
       });
-  }, [attachCustomCoachAudio, audioRefs, audioRepliesEnabled, autoPlayRepliesEnabled, idToken, isCoachTtsEligible, markCustomCoachAudioFailed, selectedLevel, setPlayingMessageId, updateCustomCoachMessage, useBrowserSpeechFallback]);
+  }, [attachCustomCoachAudio, audioRefs, audioRepliesEnabled, autoPlayRepliesEnabled, idToken, isCoachTtsEligible, markCustomCoachAudioFailed, selectedLevel, setPlayingMessageId, updateCustomCoachMessage, useBrowserSpeechFallback, useBrowserSpeechForMessage]);
 
   const retrySpeechForMessage = useCallback((message) => {
     if (!message?.id || !message?.text) return;
