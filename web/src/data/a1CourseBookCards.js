@@ -6,13 +6,8 @@ import { getLessonsByLevel, getLessonDisplayData } from "./lessonCatalog.js";
 import { applyA1LessonTitleOverride } from "./a1LessonTitleOverrides.js";
 import { alignA1CurriculumEntries } from "./a1RouteAlignment.js";
 
-const applyRequestedA1TitleCorrection = (lesson = {}) =>
-  String(lesson.id || lesson.assignmentId || "").trim().toUpperCase() === "A1-1.2"
-    ? applyA1LessonTitleOverride(lesson)
-    : lesson;
-
 const ALIGNED_A1_LESSONS = alignA1CurriculumEntries(getLessonsByLevel("A1"))
-  .map((lesson) => applyRequestedA1TitleCorrection(lesson));
+  .map((lesson) => applyA1LessonTitleOverride(lesson));
 const A1_COURSE_BOOK_CARDS = Object.freeze(ALIGNED_A1_LESSONS.map((lesson) => Object.freeze({
   lessonId: lesson.id,
   ...getLessonDisplayData(lesson),
