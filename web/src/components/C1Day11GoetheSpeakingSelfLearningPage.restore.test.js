@@ -32,8 +32,10 @@ describe("C1 Engagement und Ehrenamt standout workbook", () => {
     expect(standoutSource).toContain('write: "3. Write"');
   });
 
-  test("keeps the Goethe speaking coach inside the Speak tab", () => {
+  test("keeps the stable Goethe free speaking chat inside the Speak tab", () => {
     expect(standoutSource).toContain("<EmbeddedSpeechPracticePanel />");
-    expect(practiceSource).toContain('<SpeakingPage mode="course" />');
+    expect(practiceSource).toContain('import GoetheFreeChatPage from "../GoetheFreeChatPage";');
+    expect(practiceSource).toContain('<GoetheFreeChatPage lockedLevel={getCourseLessonRouteMeta().level} />');
+    expect(practiceSource).not.toContain('<SpeakingPage mode="course"');
   });
 });

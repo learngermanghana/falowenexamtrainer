@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import SpeakingMindMap from "./SpeakingMindMap";
-import SpeakingPage from "./SpeakingPage";
+import GoetheFreeChatPage from "./GoetheFreeChatPage";
 import WritingPage from "./WritingPage";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import B1WritingWorkspace from "./B1WritingWorkspace";
@@ -56,7 +56,13 @@ const practiceConfig = {
       "Teil 1 is for practice and class discussion only. You do not submit it as an assignment. Use this AI speaking coach to prepare your answer before class.",
     label: "Custom speaking chat",
     closedButtonLabel: "Open custom speaking chat",
-    render: () => <SpeakingPage mode="course" />,
+    render: (speakingContext) => (
+      <GoetheFreeChatPage
+        lockedLevel={speakingContext.level}
+        contextLabel={speakingContext.topic || speakingContext.question || "Workbook speaking practice"}
+        speakingContext={speakingContext}
+      />
+    ),
   },
   writing: {
     defaultTitle: "Mark My Letter",
@@ -135,7 +141,9 @@ const CourseInlinePracticePanel = ({
     };
   }, [resolvedSpeakingContext, type]);
 
-  const renderedPractice = config.render(resolvedWritingContext);
+  const renderedPractice = config.render(
+    type === "speaking" ? resolvedSpeakingContext : resolvedWritingContext,
+  );
   const practiceContent = isB1Writing ? (
     <B1WritingWorkspace writingContext={resolvedWritingContext} />
   ) : type === "writing" ? (

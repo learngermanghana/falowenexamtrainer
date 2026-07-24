@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - 'web/src/components/SpeakingPage.js'
+      - 'web/src/components/GoetheFreeChatPage.js'
+      - 'web/src/components/GoetheFreeChatPage.test.jsx'
+      - 'web/src/components/GoetheFreeChatMounts.test.js'
+      - 'web/src/components/CourseInlinePracticePanel.js'
+      - 'web/src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js'
       - 'web/src/components/SpeakingExamIntroPage.js'
       - 'web/src/components/A1Teil3SpeakingPracticePanel.js'
       - 'web/src/components/A1Teil3SpeakingPracticePanel.test.jsx'
@@ -11,6 +16,7 @@ on:
       - 'web/src/components/SelfLearningLessonRegistry.js'
       - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.js'
       - 'web/src/components/selfLearning/TeacherLectureSupportingMaterials.test.jsx'
+      - 'web/src/components/selfLearning/EmbeddedPracticePanels.js'
       - 'web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js'
       - 'web/src/components/speechTrainer/InlineSpeechTrainer.js'
       - 'web/src/components/A2Day3ComparisonsWorkbookPage.js'
@@ -33,6 +39,7 @@ on:
       - 'scripts/patchCustomSpeakingSessionDuration.mjs'
       - 'scripts/patchCustomSpeakingReplyStyle.mjs'
       - 'scripts/patchGoetheCoachAudioFeedback.mjs'
+      - 'scripts/patchCourseGoetheFreeChatMounts.mjs'
       - 'scripts/patchLockedA1Teil3Speaking.mjs'
       - 'scripts/patchRequestedCourseMedia.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
@@ -56,7 +63,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Apply and validate speaking audio and reply patches
+      - name: Apply and validate speaking audio and course free-chat patches
         shell: bash
         run: |
           set +e
@@ -69,6 +76,7 @@ jobs:
             node --check scripts/patchCustomSpeakingSessionDuration.mjs || status=$?
             node --check scripts/patchCustomSpeakingReplyStyle.mjs || status=$?
             node --check scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
+            node --check scripts/patchCourseGoetheFreeChatMounts.mjs || status=$?
             node --check scripts/patchLockedA1Teil3Speaking.mjs || status=$?
             node --check scripts/patchRequestedCourseMedia.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
@@ -77,6 +85,7 @@ jobs:
             node scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node scripts/patchCustomSpeakingReplyStyle.mjs || status=$?
             node scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
+            node scripts/patchCourseGoetheFreeChatMounts.mjs || status=$?
             node scripts/patchRequestedCourseMedia.mjs || status=$?
             echo '== backend syntax =='
             node --check functions/functionz/app.js || status=$?
@@ -117,6 +126,9 @@ jobs:
         run: |
           set +e
           CI=true npm run test:ci -- --runTestsByPath \
+            src/components/GoetheFreeChatPage.test.jsx \
+            src/components/GoetheFreeChatMounts.test.js \
+            src/components/C1Day11GoetheSpeakingSelfLearningPage.restore.test.js \
             src/components/SpeakingMindMap.test.js \
             src/components/SpeakingPracticeTimerCard.test.js \
             src/lib/speakingExamLock.test.js \
@@ -147,5 +159,6 @@ jobs:
           node scripts/runSpeakingAudioReliabilityPatch.mjs
           node scripts/patchCustomSpeakingReplyStyle.mjs
           node scripts/patchGoetheCoachAudioFeedback.mjs
+          node scripts/patchCourseGoetheFreeChatMounts.mjs
           node scripts/patchRequestedCourseMedia.mjs
           node scripts/checkSpeakingAudioReliabilityPatch.mjs
