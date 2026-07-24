@@ -3,10 +3,10 @@ import { A1_LESSON_TITLE_OVERRIDES, applyA1LessonTitleOverride } from "./a1Lesso
 import { A1_ASSIGNMENT_REGISTRY } from "./a1AssignmentRegistry";
 
 const EXPECTED_EARLY_TITLES = [
-  ["A1-1.1", 2, "1.1", "Personal Pronouns and Verb Conjugation"],
+  ["A1-1.1", 2, "1.1", "Personal Pronouns and Basic Verb Conjugation"],
   ["A1-1.1-practice", 3, "1.1", "Personal Information, Articles, Adjectives and W-Questions"],
   ["A1-1.2", 3, "1.2", "Present-Tense Verb Conjugation Practice"],
-  ["A1-1.3", 5, "1.3", "Introducing Yourself and Articles"],
+  ["A1-1.3", 5, "1.3", "Self-Introduction Practice with Articles"],
 ];
 
 describe("A1 lesson title corrections", () => {
@@ -30,9 +30,9 @@ describe("A1 lesson title corrections", () => {
     expect(new Set(titles).size).toBe(titles.length);
   });
 
-  test("uses the same Kapitel 1.2 title in the tutor-marked assignment registry", () => {
+  test("uses the same distinct tutor-marked titles in the assignment registry", () => {
     expect(A1_ASSIGNMENT_REGISTRY["A1-1.1"])
-      .toMatchObject({ day: 2, chapter: "1.1", title: "Personal Pronouns and Verb Conjugation" });
+      .toMatchObject({ day: 2, chapter: "1.1", title: "Personal Pronouns and Basic Verb Conjugation" });
     expect(A1_ASSIGNMENT_REGISTRY["A1-1.2"])
       .toMatchObject({ day: 3, chapter: "1.2", title: "Present-Tense Verb Conjugation Practice" });
   });
