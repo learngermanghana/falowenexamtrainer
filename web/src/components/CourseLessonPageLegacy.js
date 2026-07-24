@@ -4,8 +4,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
-import { getA1RadioResource } from "../data/a1RadioResources";
-import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import { resolveLessonRouteEntry } from "../utils/lessonRouteEntry";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
@@ -601,11 +599,6 @@ const CourseLessonPage = ({ routeState = null, routeLevel = "", routeDay = null 
         <LessonResourcesHub
           lesson={canonicalLesson}
           hideVideoUrls={isOrientationLesson ? [DAY0_AI_ORIENTATION_VIDEO.url] : []}
-          falowenRadio={
-            level === "A1" && resolveA1RadioFirstWorkbookRoute(location.pathname, location.search)
-              ? getA1RadioResource(day, requestedChapter)
-              : null
-          }
         />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
