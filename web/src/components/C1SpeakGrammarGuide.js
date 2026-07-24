@@ -46,7 +46,7 @@ export const getC1SpeakGrammarData = (lesson, branchesOverride = null) => {
 export default function C1SpeakGrammarGuide({
   lesson,
   branchesOverride = null,
-  showGrammar = true,
+  showGrammar = false,
   showSpeaking = true,
 }) {
   const guide = getC1SpeakGrammarData(lesson, branchesOverride);
