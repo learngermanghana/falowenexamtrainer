@@ -5,10 +5,11 @@ import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import {
-  STANDARD_WORKBOOK_TABS,
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   WorkbookTabNav,
   WorkbookTaskCard,
 } from "./StandardWorkbookComponents";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { styles } from "../styles";
 
 const card = {
@@ -175,7 +176,7 @@ const getYouTubeEmbedUrl = (listening = {}) => {
 };
 
 export default function B1StandardWorkbookPage({ config }) {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("grammar");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -201,18 +202,24 @@ export default function B1StandardWorkbookPage({ config }) {
         </span>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · {config.title}</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          {config.subtitle || "Select Teil 1–4 below. The highlighted card at the top of each section tells you exactly what to answer."}
+          {config.subtitle || "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."}
         </p>
         <SectionImage image={config.heroImage} alt={config.heroAlt} />
         <WorkbookTabNav
           activeTab={activeTab}
           onChange={setActiveTab}
-          tabs={STANDARD_WORKBOOK_TABS}
+          tabs={A2_B1_WORKBOOK_TABS_WITH_GRAMMAR}
           ariaLabel={`B1 Day ${config.day} workbook sections`}
         />
       </div>
 
       <A2B1WorkbookGuidance level="B1" />
+
+      {activeTab === "grammar" && (
+        <section style={card}>
+          <A2B1GrammarNotesTab level="B1" day={config.day} />
+        </section>
+      )}
 
       {activeTab === "sprechen" && (
         <section style={card}>

@@ -29,7 +29,7 @@ jest.mock("./A1CourseBookLetterPracticePanel", () => ({
 import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage";
 
 describe("A1 Day 20 letter-writing workbook", () => {
-  test("renders the canonical shared Overview, Teil 1, Teil 2 and Submit navigation", () => {
+  test("renders the canonical shared Grammar, Overview, Teil 1, Teil 2 and Submit navigation", () => {
     const { container } = render(
       <MemoryRouter
         initialEntries={[
@@ -45,12 +45,14 @@ describe("A1 Day 20 letter-writing workbook", () => {
     });
     expect(navigation).toHaveAttribute("data-workbook-navigation", "shared");
 
+    const grammarTab = screen.getByRole("tab", { name: "Grammar" });
     const overviewTab = screen.getByRole("tab", { name: "Overview" });
     const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Informal letter/i });
     const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · Formal letter/i });
     const submitTab = screen.getByRole("tab", { name: "Submit" });
 
-    expect(overviewTab).toHaveAttribute("aria-selected", "true");
+    expect(grammarTab).toHaveAttribute("aria-selected", "true");
+    expect(overviewTab).toHaveAttribute("aria-selected", "false");
     expect(teilOneTab).toHaveAttribute("aria-selected", "false");
     expect(teilTwoTab).toHaveAttribute("aria-selected", "false");
     expect(submitTab).toHaveAttribute("aria-selected", "false");

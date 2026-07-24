@@ -15,7 +15,8 @@ web/src/components/A1TutorMarkedWorkbookShell.js
 
 Rules:
 
-- A1 tutor-marked workbooks have only two visible workbook tabs: **Assignment** and **Submit**.
+- A1 tutor-marked workbooks may include an in-workbook **Grammar** tab before the assignment content when the chapter already has in-app grammar notes.
+- The assignment and submission flow must stay inside the workbook: **Grammar** (when available), **Overview/Assignment**, lesson-specific **Teil** tabs, and **Submit**.
 - Do not use the A2/B1 `WorkbookTabNav` or the A2/B1 `Teil 1`, `Teil 2`, `Teil 3`, `Teil 4`, `Ref`, `Submit` tab structure for A1.
 - Do not send students to the generic `/campus/course?submitWork=1` page from A1 tutor-marked workbooks.
 - The Submit tab must render `AssignmentSubmissionPage` inside the workbook page.

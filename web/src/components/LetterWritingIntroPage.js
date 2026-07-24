@@ -146,7 +146,7 @@ export const resolveLetterWritingPageMode = (pathname = "") => {
   return normalized === A1_DAY20_CHAPTER123_GRAMMAR_ROUTE ? "grammar" : "workbook";
 };
 
-const GrammarNotesPage = () => {
+export const LetterWritingGrammarNotesPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -492,7 +492,7 @@ const WorkbookPage = () => (
 const LetterWritingIntroPage = () => {
   const location = useLocation();
   const mode = resolveLetterWritingPageMode(location.pathname);
-  return mode === "grammar" ? <GrammarNotesPage /> : <WorkbookPage />;
+  return mode === "grammar" ? <LetterWritingGrammarNotesPage /> : <WorkbookPage />;
 };
 
 export default memo(LetterWritingIntroPage);

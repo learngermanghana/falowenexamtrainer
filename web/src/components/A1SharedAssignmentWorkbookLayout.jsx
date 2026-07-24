@@ -43,17 +43,18 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
   });
 };
 
-export const getAllowedWorkbookTabs = (sections) => [
+export const getAllowedWorkbookTabs = (sections, hasGrammar = false) => [
+  ...(hasGrammar ? ["grammar"] : []),
   sections.length ? "overview" : "assignment",
   ...sections.map(({ key }) => key),
   "submit",
 ];
 
-export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections }) => {
+export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections), [sections]);
-  const fallbackTab = sections.length ? "overview" : "assignment";
+  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar), [hasGrammar, sections]);
+  const fallbackTab = hasGrammar ? "grammar" : sections.length ? "overview" : "assignment";
   const requestedTab = new URLSearchParams(location.search).get("workbookTab");
   const activeTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
 
@@ -106,10 +107,19 @@ const tabButtonStyle = (selected, submit = false) => ({
   padding: "10px 14px",
 });
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect }) => {
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
   const tabs = sections.length
-    ? [{ key: "overview", label: "Overview" }, ...sections, { key: "submit", label: "Submit", submit: true }]
-    : [{ key: "assignment", label: "Assignment" }, { key: "submit", label: "Submit", submit: true }];
+    ? [
+      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
+      { key: "overview", label: "Overview" },
+      ...sections,
+      { key: "submit", label: "Submit", submit: true },
+    ]
+    : [
+      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
+      { key: "assignment", label: "Assignment" },
+      { key: "submit", label: "Submit", submit: true },
+    ];
 
   return (
     <nav
@@ -162,6 +172,7 @@ export const A1AssignmentNeighborLinks = ({ assignmentKey }) => {
 export default function A1SharedAssignmentWorkbookLayout({
   assignmentKey,
   children,
+  grammar,
   overview,
   renderSubmission,
 }) {
@@ -173,7 +184,9 @@ export default function A1SharedAssignmentWorkbookLayout({
 
   const renderedKeys = new Set(sectionElements.map((element) => element.props.sectionKey));
   const availableSections = assignment.sections.filter(({ key }) => renderedKeys.has(key));
-  const { activeTab, fallbackTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections });
+  const hasGrammar = Boolean(grammar);
+  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
+  const overviewTab = availableSections.length ? "overview" : "assignment";
 
   return (
     <div data-a1-shared-workbook={assignmentKey} style={{ display: "grid", gap: 16 }}>
@@ -182,10 +195,16 @@ export default function A1SharedAssignmentWorkbookLayout({
         sections={availableSections}
         activeTab={activeTab}
         onSelect={openTab}
+        hasGrammar={hasGrammar}
       />
 
       <div data-workbook-content>
-        <div hidden={activeTab !== fallbackTab}>{overview}</div>
+        {hasGrammar ? (
+          <div hidden={activeTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
+            {grammar}
+          </div>
+        ) : null}
+        <div hidden={activeTab !== overviewTab}>{overview}</div>
         {sectionElements.map((element) => (
           <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
             {element}
