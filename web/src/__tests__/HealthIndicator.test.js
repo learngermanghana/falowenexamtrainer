@@ -28,11 +28,12 @@ describe("HealthIndicator", () => {
     );
   });
 
-  it("shows offline when the request fails", async () => {
+  it("shows reconnecting instead of offline after a transient request failure", async () => {
     global.fetch.mockRejectedValue(new Error("Network error"));
 
     render(<HealthIndicator />);
 
-    await waitFor(() => expect(screen.getByText(/API offline/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/API reconnecting/i)).toBeInTheDocument());
+    expect(screen.queryByText(/API offline/i)).not.toBeInTheDocument();
   });
 });

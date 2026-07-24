@@ -11,19 +11,22 @@ const statusCopy = {
   ok: "API online",
   offline: "API offline",
   loading: "Checking API...",
+  retrying: "API reconnecting...",
 };
 
 const statusColor = {
   ok: "#16a34a",
   offline: "#dc2626",
   loading: "#6b7280",
+  retrying: "#6b7280",
 };
 
 const isDay0CoursePath = (pathname = "") =>
   pathname.startsWith("/campus/course/") && pathname.includes("day-0");
 
 function HealthIndicator() {
-  // Check once on mount instead of polling Cloud Run from every open student tab.
+  // Check once on mount. If that first request hits a transient Cloud Run/CORS
+  // failure, useHealthStatus retries briefly and then stops instead of polling forever.
   const { status } = useHealthStatus({ pollIntervalMs: 0 });
   const { isOffline } = useOfflineStatus();
   const location = useLocation();
