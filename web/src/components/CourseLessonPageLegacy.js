@@ -4,6 +4,8 @@ import { useLocation, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
+import { getA1RadioResource } from "../data/a1RadioResources";
+import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 import { resolveLessonRouteEntry } from "../utils/lessonRouteEntry";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
@@ -239,7 +241,7 @@ const OrientationAiVideoHero = () => (
   </section>
 );
 
-export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
+export const LessonResourcesHub = ({ lesson, hideVideoUrls = [], falowenRadio = null }) => {
   const resources = lesson?.resources || {};
   const hiddenVideoUrls = new Set(hideVideoUrls);
   const seenVideoUrls = new Set();
@@ -250,9 +252,15 @@ export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
     seenVideoUrls.add(video.url);
     return true;
   });
-  const lessonResources = (resources.resourceGroups || []).filter(
-    (resource) => resource.grammarBook || resource.workbook,
-  );
+  const hideIntegratedGrammarBook = new Set(["A1", "A2", "B1"]).has(normalizeLevel(lesson?.level));
+  const lessonResources = (resources.resourceGroups || [])
+    .map((resource) => ({
+      ...resource,
+      grammarBook: hideIntegratedGrammarBook ? null : resource.grammarBook,
+    }))
+    .filter((resource) => resource.grammarBook || resource.workbook);
+  const radioResource = falowenRadio || resources.falowenRadio || null;
+  const radioUrl = radioResource?.url || (radioResource?.youtubeId ? `https://youtu.be/${radioResource.youtubeId}` : "");
   const groupedVideoUrls = new Set();
   let resourceNumber = 0;
   const nextNumber = () => String(++resourceNumber);
@@ -307,11 +315,25 @@ export const LessonResourcesHub = ({ lesson, hideVideoUrls = [] }) => {
             lineHeight: 1.45,
           }}
         >
-          Use the available videos, then study the grammar or open the workbook.
+          Use the available videos and workbook materials for this lesson.
         </p>
       </div>
 
       <div style={{ display: "grid", gap: 8 }}>
+        {radioResource ? (
+          <LessonResourceCard
+            number={nextNumber()}
+            icon="🎙️"
+            title="Falowen Radio"
+            description={
+              radioResource.instruction ||
+              "Listen to the lesson radio warm-up before opening the workbook materials."
+            }
+            actionLabel="Listen to radio"
+            url={radioUrl}
+          />
+        ) : null}
+
         {lessonResources.map((resource, index) => {
           const chapterLabel = resource.chapter
             ? `Kapitel ${resource.chapter}`
@@ -579,6 +601,11 @@ const CourseLessonPage = ({ routeState = null, routeLevel = "", routeDay = null 
         <LessonResourcesHub
           lesson={canonicalLesson}
           hideVideoUrls={isOrientationLesson ? [DAY0_AI_ORIENTATION_VIDEO.url] : []}
+          falowenRadio={
+            level === "A1" && resolveA1RadioFirstWorkbookRoute(location.pathname, location.search)
+              ? getA1RadioResource(day, requestedChapter)
+              : null
+          }
         />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
