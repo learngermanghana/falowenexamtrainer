@@ -53,6 +53,15 @@ describe("A1 shared self-practice navigation", () => {
     });
   });
 
+
+  test("resolves the shared Day 6-style section navigation for every A1 self-practice workbook", () => {
+    expectedPractices.forEach(([day, chapter, pathname]) => {
+      expect(resolveA1SharedPracticeLesson({ pathname })).toEqual(
+        expect.objectContaining({ day, chapter, kind: "practice", assignmentKey: null }),
+      );
+    });
+  });
+
   test("uses one tab row, opens Teil 1 immediately, and switches visible workbook content", async () => {
     render(
       <MemoryRouter

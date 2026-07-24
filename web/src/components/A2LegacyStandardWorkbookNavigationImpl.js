@@ -96,6 +96,20 @@ export const findA2LegacyWorkbookTabRow = (root = document) => {
   );
 };
 
+export const insertA2LegacyPortalMountBefore = (parent, mount, referenceNode) => {
+  if (!parent || !mount || !referenceNode) return false;
+  if (referenceNode.parentNode !== parent || !parent.contains(referenceNode)) return false;
+
+  try {
+    parent.insertBefore(mount, referenceNode);
+    return mount.parentNode === parent;
+  } catch (error) {
+    if (error?.name !== "NotFoundError") throw error;
+    mount.remove();
+    return false;
+  }
+};
+
 const findNativeTabButton = (row, standardKey) => {
   const legacyKey = STANDARD_TO_LEGACY_KEY[standardKey] || standardKey;
   if (!row || !legacyKey) return null;
@@ -148,10 +162,23 @@ export default function A2LegacyStandardWorkbookNavigation() {
       nativeRowRef.current = null;
     };
 
-    const removeMount = () => {
-      navMountRef.current?.remove();
-      navMountRef.current = null;
-      setNavRoot(null);
+    const retireMount = (mount = navMountRef.current) => {
+      if (!mount) return;
+      if (navMountRef.current === mount) navMountRef.current = null;
+      setNavRoot((current) => (current === mount ? null : current));
+
+      let attempts = 0;
+      const removeAfterPortalUnmount = () => {
+        if (!mount.isConnected) return;
+        if (!mount.hasChildNodes()) {
+          mount.remove();
+          return;
+        }
+        attempts += 1;
+        if (attempts < 8) window.setTimeout(removeAfterPortalUnmount, 0);
+      };
+
+      window.setTimeout(removeAfterPortalUnmount, 0);
     };
 
     const decorate = () => {
@@ -163,8 +190,11 @@ export default function A2LegacyStandardWorkbookNavigation() {
       if (!main || !row || !row.parentNode) return;
 
       if (nativeRowRef.current && nativeRowRef.current !== row) {
+        const previousMount = navMountRef.current;
         restoreNativeRow();
-        removeMount();
+        retireMount(previousMount);
+        scheduleDecorate();
+        return;
       }
 
       nativeRowRef.current = row;
@@ -175,17 +205,28 @@ export default function A2LegacyStandardWorkbookNavigation() {
       }
       row.style.display = "none";
 
-      let mount = row.parentNode.querySelector(":scope > [data-a2-standard-legacy-nav-root]");
+      const rowParent = row.parentNode;
+      if (!rowParent || row.parentNode !== rowParent || !rowParent.contains(row)) return;
+
+      let mount = rowParent.querySelector(":scope > [data-a2-standard-legacy-nav-root]");
       if (!mount) {
         mount = document.createElement("div");
         mount.setAttribute("data-a2-standard-legacy-nav-root", `day-${config.day}`);
         mount.style.width = "100%";
         mount.style.marginTop = "8px";
-        row.parentNode.insertBefore(mount, row);
+        if (!insertA2LegacyPortalMountBefore(rowParent, mount, row)) {
+          scheduleDecorate();
+          return;
+        }
+      }
+
+      if (!mount.isConnected || mount.parentNode !== rowParent) {
+        scheduleDecorate();
+        return;
       }
 
       navMountRef.current = mount;
-      setNavRoot(mount);
+      setNavRoot((current) => (current === mount ? current : mount));
     };
 
     const scheduleDecorate = () => {
@@ -203,7 +244,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
       disposed = true;
       observer.disconnect();
       restoreNativeRow();
-      removeMount();
+      retireMount();
       setPanelRoot(null);
     };
   }, [config]);

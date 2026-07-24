@@ -181,6 +181,8 @@ const SpeakingPage = ({
   const {
     requestSpeechForMessage: requestSpeechForCustomCoachMessage,
     retrySpeechForMessage: retryCustomCoachAudio,
+    playBrowserSpeechForMessage,
+    stopBrowserSpeech,
     cleanupCoachSpeech,
     isCoachTtsEligible,
   } = useCustomCoachSpeech({
@@ -810,11 +812,24 @@ const SpeakingPage = ({
   };
 
   const toggleAudioPlayback = async (messageId) => {
-    const currentAudio = audioRefs.current[messageId];
-    if (!currentAudio) return;
+    const message = [...customChatMessages, ...chatMessages].find((item) => item?.id === messageId);
     setPlaybackError("");
 
+    if (message?.browserSpeech) {
+      if (playingMessageId === messageId) {
+        stopBrowserSpeech();
+        return;
+      }
+      const started = playBrowserSpeechForMessage(messageId, message.text);
+      if (!started) setPlaybackError("This device has no German browser voice available.");
+      return;
+    }
+
+    const currentAudio = audioRefs.current[messageId];
+    if (!currentAudio) return;
+
     if (playingMessageId && playingMessageId !== messageId) {
+      stopBrowserSpeech();
       const previousAudio = audioRefs.current[playingMessageId];
       if (previousAudio) {
         previousAudio.pause();
@@ -1086,28 +1101,44 @@ const SpeakingPage = ({
                             {!isStudent && audioRepliesEnabled && COACH_TTS_LEVELS.has(String(selectedLevel || "").toUpperCase()) ? (
                               message.audioLoading ? (
                                 <span style={{ fontSize: 12, color: "#64748B" }}>🔊 Preparing audio…</span>
-                              ) : message.audioUrl ? (
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <button
-                                    type="button"
-                                    aria-label={playingMessageId === message.id ? "Pause German reply" : "Play German reply"}
-                                    style={{ ...styles.secondaryButton, padding: "6px 10px" }}
-                                    onClick={() => toggleAudioPlayback(message.id)}
-                                  >
-                                    {playingMessageId === message.id ? "⏸" : "▶"} Listen
-                                  </button>
-                                  <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
-                                    {waveHeights.slice(0, 10).map((height, index) => (
-                                      <span key={`${message.id}-reply-wave-${index}`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
-                                    ))}
+                              ) : message.audioUrl || message.browserSpeech ? (
+                                <div style={{ display: "grid", gap: 6, justifyItems: "start" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <button
+                                      type="button"
+                                      aria-label={playingMessageId === message.id ? "Pause German reply" : "Play German reply"}
+                                      style={{ ...styles.secondaryButton, padding: "6px 10px" }}
+                                      onClick={() => toggleAudioPlayback(message.id)}
+                                    >
+                                      {playingMessageId === message.id ? "⏸" : "▶"} Listen
+                                    </button>
+                                    <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
+                                      {waveHeights.slice(0, 10).map((height, index) => (
+                                        <span key={`${message.id}-reply-wave-${index}`} style={{ display: "inline-block", width: 3, height: Math.max(6, height - 6), borderRadius: 999, background: "#86EFAC" }} />
+                                      ))}
+                                    </div>
+                                    {message.audioUrl ? (
+                                      <audio ref={(node) => { if (node) { audioRefs.current[message.id] = node; node.onended = () => setPlayingMessageId("");
+                                      node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); }; } }} src={message.audioUrl} />
+                                    ) : null}
                                   </div>
-                                  <audio ref={(node) => { if (node) { audioRefs.current[message.id] = node; node.onended = () => setPlayingMessageId("");
-                                  node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); }; } }} src={message.audioUrl} />
+                                  {message.browserSpeech && message.audioErrorMessage ? (
+                                    <span role="status" style={{ fontSize: 12, color: "#475569", lineHeight: 1.45 }}>
+                                      {message.audioErrorMessage}
+                                    </span>
+                                  ) : null}
                                 </div>
                               ) : message.audioError ? (
-                                <button type="button" aria-label="Retry German audio" style={{ ...styles.secondaryButton, padding: "6px 10px", justifySelf: "start" }} onClick={() => retryCustomCoachAudio(message)}>
-                                  Retry audio
-                                </button>
+                                <div style={{ display: "grid", gap: 6, justifyItems: "start" }}>
+                                  <span role="status" style={{ fontSize: 12, color: "#92400E", lineHeight: 1.45 }}>
+                                    {message.audioErrorMessage || "The German audio reply could not be prepared."}
+                                  </span>
+                                  {message.audioRetryable !== false ? (
+                                    <button type="button" aria-label="Retry German audio" style={{ ...styles.secondaryButton, padding: "6px 10px", justifySelf: "start" }} onClick={() => retryCustomCoachAudio(message)}>
+                                      Retry audio
+                                    </button>
+                                  ) : null}
+                                </div>
                               ) : null
                             ) : null}
                           </div>

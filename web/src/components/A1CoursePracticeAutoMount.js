@@ -25,6 +25,9 @@ const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
 const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.kind === "practice",
 );
+const A1_NATIVE_DESTINATION_MATERIAL_PATHS = new Set([
+  "/campus/course/modal-verbs-day-14-3-6",
+]);
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
@@ -282,11 +285,12 @@ const A1CoursePracticeAutoMount = () => {
     const materialsCompleted = hasCompletedSelfLearningMaterials(location.search);
 
     if (practice && currentIsDestination) {
+      if (A1_NATIVE_DESTINATION_MATERIAL_PATHS.has(pathname)) return undefined;
       if (Number(practice.day) === 19) prepareDay19Page(container);
 
-      // The canonical workbook page already owns the Falowen Radio gate. Once
-      // Radio is complete, mount the shared materials selector on that same
-      // destination so teacher, AI and grammar resources are not skipped.
+      // The fixed destination overlay owns the materials step. Radio-first
+      // destinations wait for the route-level radio gate, while routes without
+      // radio open their supporting materials immediately.
       if (materialsCompleted || (journeyResources?.radio && !radioCompleted)) {
         return undefined;
       }
@@ -298,10 +302,31 @@ const A1CoursePracticeAutoMount = () => {
     mount.id = "falowen-a1-practice-mount";
     mount.style.margin = "16px 0";
 
-    if (practice) insertPracticeMount(container, mount);
-    else insertWritingMount(container, mount);
+    const isDestinationOverlay = Boolean(practice && currentIsDestination);
+    let restoreContent;
 
-    const restoreContent = practice ? hideSelfLearningContent(container, mount) : () => {};
+    if (isDestinationOverlay) {
+      const previousBodyOverflow = document.body.style.overflow;
+      mount.setAttribute("data-a1-self-learning-destination-overlay", "true");
+      Object.assign(mount.style, {
+        background: "#f8fafc",
+        inset: "0",
+        margin: "0",
+        overflowY: "auto",
+        padding: "18px 12px 40px",
+        position: "fixed",
+        zIndex: "9999",
+      });
+      document.body.style.overflow = "hidden";
+      document.body.appendChild(mount);
+      restoreContent = () => {
+        document.body.style.overflow = previousBodyOverflow;
+      };
+    } else {
+      if (practice) insertPracticeMount(container, mount);
+      else insertWritingMount(container, mount);
+      restoreContent = practice ? hideSelfLearningContent(container, mount) : () => {};
+    }
     const openWorkbook = practice && !currentIsDestination
       ? (nextLocation) => {
           const href = mergeJourneyStateIntoDestination(practice.destination, nextLocation);
