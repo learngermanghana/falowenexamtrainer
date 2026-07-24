@@ -1,6 +1,6 @@
 const A1_LESSON_TITLE_OVERRIDES = Object.freeze({
   "A1-1.1": "Personal Pronouns and Basic Verb Conjugation",
-  "A1-1.2": "Introducing Yourself",
+  "A1-1.2": "Present-Tense Verb Conjugation Practice",
   "A1-2": "Numbers, Phone Numbers and Addresses",
   "A1-1.3": "Self-Introduction Practice with Articles",
   "A1-3.5": "Numbers, Time and Prices Revision",

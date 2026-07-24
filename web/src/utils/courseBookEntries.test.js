@@ -26,11 +26,11 @@ describe("course book task entries", () => {
     expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
     expect(entries.map((entry) => entry.lessonTitle)).toEqual([
       "German Alphabet",
-      "Personal Pronouns and Verb Conjugation",
+      "Personal Pronouns and Basic Verb Conjugation",
     ]);
     expect(entries.map((entry) => entry.topic)).toEqual([
       "German Alphabet",
-      "Personal Pronouns and Verb Conjugation",
+      "Personal Pronouns and Basic Verb Conjugation",
     ]);
     expect(entries.every((entry) => entry.day === 2 && entry.displayDay === 2)).toBe(true);
     expect(entries.every((entry) => entry.resourceType === COURSE_BOOK_RESOURCE_TYPES.readingListening)).toBe(true);
@@ -55,12 +55,12 @@ describe("course book task entries", () => {
     expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
     expect(entries.map((entry) => entry.lessonTitle)).toEqual([
       "German Alphabet",
-      "Personal Pronouns and Verb Conjugation",
+      "Personal Pronouns and Basic Verb Conjugation",
     ]);
     expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
     expect(entries.map((entry) => entry.topic)).toEqual([
       "German Alphabet",
-      "Personal Pronouns and Verb Conjugation",
+      "Personal Pronouns and Basic Verb Conjugation",
     ]);
   });
 
@@ -70,7 +70,7 @@ describe("course book task entries", () => {
 
     expect(byDay(2).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
       ["0.2", "German Alphabet"],
-      ["1.1", "Personal Pronouns and Verb Conjugation"],
+      ["1.1", "Personal Pronouns and Basic Verb Conjugation"],
     ]);
 
     expect(byDay(16).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
@@ -180,8 +180,8 @@ describe("course book task entries", () => {
       grammarbook_link: null,
     }));
     expect(chapter12).toEqual(expect.objectContaining({
-      lessonTitle: "Introducing Yourself",
-      topic: "Introducing Yourself",
+      lessonTitle: "Present-Tense Verb Conjugation Practice",
+      topic: "Present-Tense Verb Conjugation Practice",
       assignmentId: "A1-1.2",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
       tutorMarked: true,
@@ -252,7 +252,7 @@ describe("course book task entries", () => {
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
       expect.objectContaining({
         assignment_id: "A1-1.2",
-        title: "Introducing Yourself",
+        title: "Present-Tense Verb Conjugation Practice",
         grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
       })
     );
