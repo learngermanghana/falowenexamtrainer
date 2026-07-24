@@ -13,6 +13,10 @@ import { getAccessibleLevels, normalizeCourseLevel } from "../utils/levelAccess"
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
+  findWorkbookContextAssignment,
+  resolveWorkbookSubmissionContext,
+} from "../utils/workbookSubmissionContext";
+import {
   addDoc,
   collection,
   db,
@@ -605,15 +609,16 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     () => normalizePreferredLevel(studentProfile?.level || studentProfile?.className),
     [studentProfile?.className, studentProfile?.level]
   );
-  const requestedSubmitLevel = useMemo(
+  const workbookSubmissionContext = useMemo(
     () =>
-      normalizeCourseLevel(
-        submissionContext?.level ||
-          location?.state?.level ||
-          new URLSearchParams(location?.search || "").get("level")
-      ),
-    [location?.search, location?.state?.level, submissionContext?.level]
+      resolveWorkbookSubmissionContext({
+        submissionContext,
+        locationState: location?.state,
+        search: location?.search || "",
+      }),
+    [location?.search, location?.state, submissionContext]
   );
+  const requestedSubmitLevel = normalizeCourseLevel(workbookSubmissionContext.level);
   const accessibleSubmitLevels = useMemo(
     () => getAccessibleLevels(preferredLevel, Object.keys(courseSchedules)),
     [preferredLevel]
@@ -976,27 +981,29 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     [assignmentDictionary, buildChapterKey, selectedSubmitLevel]
   );
 
-  const requestedAssignmentKey = useMemo(
+  const requestedAssignmentKey = workbookSubmissionContext.assignmentKey;
+
+  const requestedAssignmentMatch = useMemo(
     () =>
-      location?.state?.assignmentKey ||
-      location?.state?.canonicalAssignmentKey ||
-      new URLSearchParams(location?.search || "").get("assignmentKey") ||
-      "",
-    [location?.search, location?.state]
+      findWorkbookContextAssignment({
+        assignmentDictionary,
+        assignmentKey: requestedAssignmentKey,
+        day: workbookSubmissionContext.day,
+        chapter: workbookSubmissionContext.chapter,
+      }),
+    [
+      assignmentDictionary,
+      requestedAssignmentKey,
+      workbookSubmissionContext.chapter,
+      workbookSubmissionContext.day,
+    ]
   );
 
-  const requestedAssignmentMatch = useMemo(() => {
-    if (!requestedAssignmentKey || !assignmentDictionary.length) return null;
-    const requestedNormalized = normalizeAssignmentIdentity(requestedAssignmentKey);
-    return (
-      assignmentDictionary.find(
-        (entry) => normalizeAssignmentIdentity(entry.assignmentKey || entry.canonicalAssignmentId || "") === requestedNormalized
-      ) || null
-    );
-  }, [assignmentDictionary, requestedAssignmentKey]);
-
   const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);
-  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);
+  const isWorkbookSubmissionContext = workbookSubmissionContext.locked;
+  const isAssignmentContextLocked = Boolean(
+    isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)
+  );
 
   const selectedAssignmentEntry = useMemo(
     () => assignmentDictionary.find((item) => item.label === form.assignmentTitle) || null,
@@ -2477,9 +2484,36 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
         <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
+          {isWorkbookSubmissionContext ? (
+            <div
+              data-workbook-submission-context="locked"
+              style={{
+                border: "1px solid #bfdbfe",
+                borderRadius: 12,
+                background: "#eff6ff",
+                display: "grid",
+                gap: 4,
+                padding: 12,
+              }}
+            >
+              <span style={{ color: "#1d4ed8", fontSize: 12, fontWeight: 800, textTransform: "uppercase" }}>
+                Submitting for
+              </span>
+              <strong style={{ color: "#0f172a" }}>
+                {requestedAssignmentMatch?.label ||
+                  [workbookSubmissionContext.level, workbookSubmissionContext.day ? `Day ${workbookSubmissionContext.day}` : "", workbookSubmissionContext.chapter ? `Chapter ${workbookSubmissionContext.chapter}` : ""]
+                    .filter(Boolean)
+                    .join(" · ")}
+              </strong>
+              <span style={styles.helperText}>
+                The workbook selected this assignment automatically. Continue with the answer fields below.
+              </span>
+            </div>
+          ) : null}
           <div
+            data-manual-submission-selectors="true"
             style={{
-              display: "grid",
+              display: isWorkbookSubmissionContext ? "none" : "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
               gap: 10,
             }}

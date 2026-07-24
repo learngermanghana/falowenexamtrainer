@@ -189,6 +189,23 @@ const getNextStep = (item = {}) => {
   return "You passed this task. Still revise the feedback so the same mistakes do not appear in your next work.";
 };
 
+export const hasStructuredResultFeedback = (item = {}) => {
+  const objectiveDetails = normalizeObject(item.objectiveDetails);
+  const hasWritingScore =
+    item.writingScore !== null && item.writingScore !== undefined && item.writingScore !== "";
+
+  return Boolean(
+    String(item.markingReason || "").trim() ||
+      String(item.improvementSummary || "").trim() ||
+      normalizeArray(item.corrections).length ||
+      normalizeArray(item.wrongAnswers).length ||
+      normalizeArray(item.scoreBreakdown).length ||
+      Object.keys(objectiveDetails).length ||
+      Number(item.objectiveTotal || 0) > 0 ||
+      hasWritingScore
+  );
+};
+
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -219,7 +236,8 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const navigate = useNavigate();
   const breakdownRows = getScoreBreakdownRows(item);
   const wrongObjectiveRows = getWrongObjectiveRows(item);
-  const correctionPoints = getCorrectionPoints(item);
+  const hasStructuredFeedback = hasStructuredResultFeedback(item);
+  const correctionPoints = hasStructuredFeedback ? getCorrectionPoints(item) : [];
   const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/course?submitWork=1";
   const passed = item.numericScore >= PASS_MARK;
 
@@ -252,10 +270,12 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         </div>
       </div>
 
-      <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
-        <h4 style={{ ...styles.resultHeading, margin: 0 }}>Why you got this score</h4>
-        <p style={{ ...styles.resultText, margin: 0 }}>{getWhyThisScore(item)}</p>
-      </div>
+      {hasStructuredFeedback ? (
+        <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
+          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Why you got this score</h4>
+          <p style={{ ...styles.resultText, margin: 0 }}>{getWhyThisScore(item)}</p>
+        </div>
+      ) : null}
 
       <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, background: "#ffffff", overflow: "hidden" }}>
         <div style={{ padding: 10, background: "#f8fafc", fontWeight: 800 }}>Score breakdown</div>
@@ -315,19 +335,29 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         </div>
       ) : null}
 
-      <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12, display: "grid", gap: 8 }}>
-        <h4 style={{ ...styles.resultHeading, margin: 0 }}>Next step</h4>
-        <p style={{ ...styles.resultText, margin: 0 }}>{getNextStep(item)}</p>
-        {!passed ? (
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, width: "fit-content" }}
-            onClick={() => navigate(resubmitTarget)}
-          >
-            Improve and resubmit
-          </button>
-        ) : null}
-      </div>
+      {hasStructuredFeedback ? (
+        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12, display: "grid", gap: 8 }}>
+          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Next step</h4>
+          <p style={{ ...styles.resultText, margin: 0 }}>{getNextStep(item)}</p>
+          {!passed ? (
+            <button
+              type="button"
+              style={{ ...styles.primaryButton, width: "fit-content" }}
+              onClick={() => navigate(resubmitTarget)}
+            >
+              Improve and resubmit
+            </button>
+          ) : null}
+        </div>
+      ) : !passed ? (
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, width: "fit-content" }}
+          onClick={() => navigate(resubmitTarget)}
+        >
+          Improve and resubmit
+        </button>
+      ) : null}
     </div>
   );
 };

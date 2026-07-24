@@ -7,9 +7,10 @@ import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 const practices = A1_CANONICAL_LESSON_CATALOG.filter((lesson) => lesson.kind === "practice");
 
 describe("A1 self-learning destination ownership", () => {
-  test("keeps all nine A1 self-learning books in the canonical practice catalog", () => {
+  test("keeps all ten A1 self-learning books in the canonical practice catalog", () => {
     expect(practices.map(({ day, chapter, destination }) => ({ day, chapter, destination }))).toEqual([
       { day: 3, chapter: "1.1", destination: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook" },
+      { day: 3, chapter: "1.2", destination: "/campus/course/a1-day-3-kapitel-1-2-workbook" },
       { day: 5, chapter: "1.3", destination: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook" },
       { day: 6, chapter: "2.3", destination: "/campus/course/a1-day-6-family-and-hobbies-workbook" },
       { day: 13, chapter: "3.5", destination: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook" },
@@ -23,7 +24,16 @@ describe("A1 self-learning destination ownership", () => {
 
   test("every practice destination with Falowen Radio has a route-level radio gate", () => {
     const radioPractices = practices.filter((practice) => getA1RadioResource(practice.day, practice.chapter));
-    expect(radioPractices.map((practice) => practice.day)).toEqual([3, 5, 6, 13, 14, 15, 19]);
+    expect(radioPractices.map((practice) => `${practice.day}:${practice.chapter}`)).toEqual([
+      "3:1.1",
+      "3:1.2",
+      "5:1.3",
+      "6:2.3",
+      "13:3.5",
+      "14:3.6",
+      "15:4.7",
+      "19:5.9",
+    ]);
 
     radioPractices.forEach((practice) => {
       expect(resolveA1RadioFirstWorkbookRoute(practice.destination, "")).toEqual(
