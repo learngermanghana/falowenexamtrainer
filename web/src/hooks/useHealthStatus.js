@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { getBackendUrl } from "../services/backendUrl";
 
+const HEALTH_RETRY_DELAYS_MS = [3000, 10000];
+
 export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [status, setStatus] = useState("loading");
   const [lastChecked, setLastChecked] = useState(null);
 
-  const refresh = useCallback(async () => {
+  const checkHealth = useCallback(async () => {
     if (typeof navigator !== "undefined" && !navigator.onLine) {
-      setStatus("offline");
-      return;
+      return false;
     }
 
     const url = `${getBackendUrl()}/health`;
@@ -21,26 +22,69 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
       }
 
       const data = await response.json();
-      setStatus("ok");
       setLastChecked(data?.timestamp || new Date().toISOString());
+      return true;
     } catch (error) {
-      setStatus("offline");
+      return false;
     }
   }, []);
 
-  useEffect(() => {
-    let timerId;
+  const refresh = useCallback(async () => {
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setStatus("offline");
+      return false;
+    }
 
-    refresh();
+    setStatus("loading");
+    const ok = await checkHealth();
+    setStatus(ok ? "ok" : "offline");
+    return ok;
+  }, [checkHealth]);
+
+  useEffect(() => {
+    let intervalId;
+    let retryTimerId;
+    let cancelled = false;
+
+    const runCheck = async (attempt = 0) => {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        if (!cancelled) setStatus("offline");
+        return;
+      }
+
+      const ok = await checkHealth();
+      if (cancelled) return;
+
+      if (ok) {
+        setStatus("ok");
+        return;
+      }
+
+      const retryDelay = HEALTH_RETRY_DELAYS_MS[attempt];
+      if (Number.isFinite(retryDelay)) {
+        setStatus("retrying");
+        retryTimerId = setTimeout(() => runCheck(attempt + 1), retryDelay);
+        return;
+      }
+
+      setStatus("offline");
+    };
+
+    runCheck();
 
     if (pollIntervalMs) {
-      timerId = setInterval(refresh, pollIntervalMs);
+      intervalId = setInterval(() => {
+        if (retryTimerId) clearTimeout(retryTimerId);
+        runCheck();
+      }, pollIntervalMs);
     }
 
     return () => {
-      if (timerId) clearInterval(timerId);
+      cancelled = true;
+      if (intervalId) clearInterval(intervalId);
+      if (retryTimerId) clearTimeout(retryTimerId);
     };
-  }, [pollIntervalMs, refresh]);
+  }, [checkHealth, pollIntervalMs]);
 
   return { status, lastChecked, refresh };
 }
