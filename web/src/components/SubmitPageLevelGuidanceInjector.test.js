@@ -39,7 +39,7 @@ describe("SubmitPageLevelGuidanceInjector completion checklist", () => {
     document.body.innerHTML = `
       <div data-a1-built-in-submission data-assignment-key="A1-1.1">
         <form>
-          <textarea></textarea>
+          <label>Your text<textarea></textarea></label>
           <button type="submit">Submit assignment</button>
         </form>
       </div>
@@ -57,6 +57,7 @@ describe("SubmitPageLevelGuidanceInjector completion checklist", () => {
     const submitButton = document.querySelector('button[type="submit"]');
 
     expect(checks).toHaveLength(2);
+    expect(card.previousElementSibling).toBe(document.querySelector("textarea").closest("label"));
     expect(card).toHaveTextContent("Teil 1 · Hören");
     expect(card).toHaveTextContent("Teil 2 · Schreiben");
     expect(submitButton).toBeDisabled();
