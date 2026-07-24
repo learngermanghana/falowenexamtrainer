@@ -40,6 +40,8 @@ beforeAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
   window.localStorage.clear();
+  Object.defineProperty(window, "speechSynthesis", { configurable: true, value: undefined });
+  Object.defineProperty(window, "SpeechSynthesisUtterance", { configurable: true, value: undefined });
   URL.createObjectURL = jest.fn(() => "blob:coach-audio");
   URL.revokeObjectURL = jest.fn();
   HTMLMediaElement.prototype.play = jest.fn(() => Promise.resolve());
@@ -87,28 +89,36 @@ test("failed TTS keeps coach text visible and retry only requests speech again",
 });
 
 
-test("speech route 404 falls back once and skips repeated server audio calls", async () => {
-  const synth = { cancel: jest.fn(), speak: jest.fn((utterance) => utterance.onend?.()), getVoices: jest.fn(() => [{ lang: "de-DE", name: "German" }]) };
+test("browser German speech is preferred and skips server TTS", async () => {
+  const spokenUtterances = [];
+  const synth = {
+    cancel: jest.fn(),
+    speak: jest.fn((utterance) => {
+      spokenUtterances.push(utterance);
+      utterance.onstart?.();
+      utterance.onend?.();
+    }),
+    getVoices: jest.fn(() => [{ lang: "de-DE", name: "German" }]),
+  };
   Object.defineProperty(window, "speechSynthesis", { configurable: true, value: synth });
-  window.SpeechSynthesisUtterance = jest.fn(function SpeechSynthesisUtterance(text) { this.text = text; });
-  const notFound = new Error("Not found");
-  notFound.status = 404;
-  notFound.code = "http_404";
-  requestCoachSpeech.mockRejectedValue(notFound);
+  Object.defineProperty(window, "SpeechSynthesisUtterance", {
+    configurable: true,
+    value: jest.fn(function SpeechSynthesisUtterance(text) { this.text = text; }),
+  });
   renderCustomChat();
 
   fireEvent.change(screen.getByPlaceholderText(/Paste your speaking question/i), { target: { value: "Erste Frage" } });
   fireEvent.click(screen.getByRole("button", { name: "Send" }));
+
   expect(await screen.findByText("Natürlich! Wie war dein Tag?")).toBeInTheDocument();
-  expect(await screen.findByText(/studio German audio route is unavailable/i)).toBeInTheDocument();
-
-  requestCustomSpeakingChatReply.mockResolvedValueOnce({ reply: "Gerne, erzähl mir mehr." });
-  fireEvent.change(screen.getByPlaceholderText(/Paste your speaking question/i), { target: { value: "Zweite Frage" } });
-  fireEvent.click(screen.getByRole("button", { name: "Send" }));
-
-  expect(await screen.findByText("Gerne, erzähl mir mehr.")).toBeInTheDocument();
   await flushPromises();
-  expect(requestCoachSpeech).toHaveBeenCalledTimes(1);
+
+  expect(requestCustomSpeakingChatReply).toHaveBeenCalledTimes(1);
+  expect(requestCoachSpeech).not.toHaveBeenCalled();
+  expect(synth.speak).toHaveBeenCalledTimes(1);
+  expect(spokenUtterances[0]?.lang).toBe("de-DE");
+  expect(screen.queryByText(/studio German audio route is unavailable/i)).not.toBeInTheDocument();
+  expect(screen.queryByText("🔊 Preparing audio…")).not.toBeInTheDocument();
 });
 
 test("turning audio replies off prevents TTS calls", async () => {
