@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
+import './goetheFreeChatMobile.css';
 import './i18n';
 import App from './App';
 import AppStartupBoundary from './components/AppStartupBoundary';
