@@ -34,7 +34,7 @@ describe("C1 Day 1-12 Learn and Speak coverage", () => {
     });
   });
 
-  test("every lesson keeps full grammar data for the Speak stage", () => {
+  test("every lesson keeps full grammar data for Learn and speaking data for Speak", () => {
     lessons.forEach((lesson) => {
       const guide = getC1SpeakGrammarData(lesson);
       expect(guide.grammarTitle).toBeTruthy();
@@ -46,7 +46,18 @@ describe("C1 Day 1-12 Learn and Speak coverage", () => {
     });
   });
 
-  test("all C1 guided page blocks mount the shared Speak grammar guide", () => {
+  test("shared C1 Learn practice owns the grammar lesson while Speak defaults to speaking only", () => {
+    const knowledgeSource = readComponent("C1KnowledgeChoicePractice.js");
+    const guideSource = readComponent("C1SpeakGrammarGuide.js");
+
+    expect(knowledgeSource).toContain('<C1SpeakGrammarGuide lesson={lesson} showGrammar showSpeaking={false} />');
+    expect(guideSource).toContain("showGrammar = false");
+    expect(guideSource).toContain("showSpeaking = true");
+    expect(guideSource).toContain("Grammar lesson");
+    expect(guideSource).toContain("Nutze dabei die Grammatik aus dem Learn-Teil.");
+  });
+
+  test("all guided C1 speaking blocks keep the shared speaking guide without moving grammar back to Speak", () => {
     const earlySource = readComponent("C1Day1To6GuidedLessonPage.js");
     const middleSource = readComponent("C1Day8To10GuidedLessonPage.js");
     const day12Source = readComponent("C1Day12To14GuidedLessonPage.js");
@@ -57,6 +68,7 @@ describe("C1 Day 1-12 Learn and Speak coverage", () => {
     expect(middleSource).toContain("<C1SpeakGrammarGuide lesson={lesson}");
     expect(day12Source).toContain('import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide"');
     expect(day12Source).toContain("day === 12 ? <C1SpeakGrammarGuide lesson={lesson} />");
+    expect(day12Source).toContain("day === 12 ? <C1KnowledgeChoicePractice lesson={lesson}");
   });
 
   test("C1 Day 12 Learn and Speak use the intended Freizeit und Kultur grammar", () => {
