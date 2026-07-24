@@ -189,7 +189,58 @@ describe("B1 workbook writing cheat sheet injector", () => {
     );
   });
 
-  test("does not duplicate the writing video when React updates the workbook", () => {
+  test("keeps the requested B1 Day 7 mapping as a legacy fallback", () => {
+    const root = buildWritingRoot();
+    const result = __TESTING__.ensureWritingVideoCard(root, 7);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: true,
+      reason: "inserted",
+      key: "b1-day7-fast-food-hausmannskost-writing-video",
+    }));
+    expect(root.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/oGOn3zKpNjo"
+    );
+  });
+
+  test("does not duplicate a video owned by the restored React B1 writing workspace", () => {
+    const root = buildWritingRoot();
+    const writingSection = __TESTING__.findWritingSection(root);
+    const reactOwnedCard = document.createElement("section");
+    reactOwnedCard.setAttribute("data-writing-video-support", "true");
+    reactOwnedCard.textContent = "React-owned B1 Day 7 writing video";
+    writingSection.appendChild(reactOwnedCard);
+
+    const result = __TESTING__.ensureWritingVideoCard(root, 7);
+
+    expect(result).toEqual(expect.objectContaining({
+      mounted: true,
+      reason: "react-owned",
+      key: "b1-day7-fast-food-hausmannskost-writing-video",
+    }));
+    expect(
+      root.querySelector(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)
+    ).toBeNull();
+    expect(root.querySelectorAll(__TESTING__.REACT_WRITING_VIDEO_SELECTOR)).toHaveLength(1);
+  });
+
+  test("removes a legacy injected card after the React writing workspace takes ownership", () => {
+    const root = buildWritingRoot();
+    __TESTING__.ensureWritingVideoCard(root, 7);
+    expect(root.querySelector(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)).not.toBeNull();
+
+    const writingSection = __TESTING__.findWritingSection(root);
+    const reactOwnedCard = document.createElement("section");
+    reactOwnedCard.setAttribute("data-writing-video-support", "true");
+    writingSection.appendChild(reactOwnedCard);
+
+    const result = __TESTING__.ensureWritingVideoCard(root, 7);
+    expect(result.reason).toBe("react-owned");
+    expect(root.querySelector(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)).toBeNull();
+  });
+
+  test("does not duplicate the legacy writing video when React updates an older workbook", () => {
     const root = buildWritingRoot();
 
     __TESTING__.ensureWritingVideoCard(root, 2);
@@ -204,7 +255,7 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("does not inject a card for an unmapped B1 writing assignment", () => {
     const root = buildWritingRoot();
 
-    const result = __TESTING__.ensureWritingVideoCard(root, 6);
+    const result = __TESTING__.ensureWritingVideoCard(root, 8);
 
     expect(result).toEqual(expect.objectContaining({
       mounted: false,
