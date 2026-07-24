@@ -17,18 +17,12 @@ const normalizeBaseUrl = (rawUrl) => {
   // Remove trailing slashes for consistency
   let normalized = raw.replace(/\/+$/, "");
 
-  // If someone sets the env var to the function root (".../api"),
-  // avoid building URLs like "/api/grammar/ask" when routes live at "/grammar/ask".
-  if (normalized.toLowerCase().endsWith("/api")) {
-    normalized = normalized.slice(0, -4);
-  }
-
   return normalized;
 };
 
 /**
- * Normalize the backend base URL so callers don't accidentally include
- * a trailing "/api" segment when routes are mounted at the root.
+ * Normalize the backend base URL without removing intentional path prefixes
+ * such as /api, because some deployments mount the AI routes there.
  */
 export function getBackendUrl() {
   return normalizeBaseUrl(DEFAULT_BACKEND_URL);
