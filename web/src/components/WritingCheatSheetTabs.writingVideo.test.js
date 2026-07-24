@@ -10,9 +10,11 @@ describe("WritingCheatSheetTabs writing videos", () => {
     ["B1", 1, "B1 Day 1 · Traumwelt · Writing explanation", "https://www.youtube.com/embed/nG1PUrvrS_s"],
     ["B2", 1, "B2 Day 1 · Persönliche Identität · Writing explanation", "https://www.youtube.com/embed/w8TaNHk-a0U"],
     ["B2", 2, "B2 Day 2 · Beziehungen und Kommunikation · Schreiben explanation", "https://www.youtube.com/embed/eozUFkeHBYc"],
+    ["B2", 6, "B2 Day 6 · Migration und Integration · Schreiben explanation", "https://www.youtube.com/embed/0hMcnhgRj8Q"],
     ["C1", 8, "C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation", "https://www.youtube.com/embed/VdczhJS9ClY"],
     ["C1", 9, "C1 Day 9 · Chapter 2.4 · Writing explanation", "https://www.youtube.com/embed/tpj8TV8DaH8"],
     ["C1", 11, "C1 Day 11 · Engagement und Ehrenamt · Schreiben explanation", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
+    ["C1", 12, "C1 Day 12 · Freizeit und Kultur · Schreiben explanation", "https://www.youtube.com/embed/0lWMEqPU6x4"],
   ])("shows the mapped %s Day %i video between the question and editor", (level, day, title, src) => {
     render(
       <WritingCheatSheetTabs level={level} day={day}>
@@ -36,7 +38,7 @@ describe("WritingCheatSheetTabs writing videos", () => {
 
   test("does not show a writing video for an unmapped assignment", () => {
     render(
-      <WritingCheatSheetTabs level="B2" day={5}>
+      <WritingCheatSheetTabs level="B2" day={7}>
         <WritingQuestion />
         <WritingEditor />
       </WritingCheatSheetTabs>,
