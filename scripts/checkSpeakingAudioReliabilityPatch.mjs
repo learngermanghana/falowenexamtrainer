@@ -61,8 +61,16 @@ const checks = [
     "removeTeacherLectureFromCanonicalLesson",
   ]],
   ["web/src/components/selfLearning/EmbeddedPracticePanels.js", [
-    '<SpeakingPage mode="course" lockedLevel={getCourseLessonRouteMeta().level} />',
+    'import GoetheFreeChatPage from "../GoetheFreeChatPage";',
+    '<GoetheFreeChatPage lockedLevel={getCourseLessonRouteMeta().level} />',
     "getCourseLessonRouteMeta",
+  ]],
+  ["web/src/components/GoetheFreeChatPage.js", [
+    "requestCustomSpeakingChatReply",
+    "analyzeAudio",
+    "CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS.map",
+    'data-goethe-free-chat="text-first"',
+    "Record voice",
   ]],
   ["web/src/components/selfLearning/EmbeddedSpeechPracticePanel.js", [
     'from "../../lib/speakingAudio"',
@@ -121,6 +129,11 @@ const forbidden = [
   ["web/src/components/selfLearning/TeacherLectureSupportingMaterials.js", "<iframe"],
   ["web/src/components/SpeakingPage.js", 'falowen.customSpeaking.audioReplies";'],
   ["web/src/components/selfLearning/EmbeddedPracticePanels.js", '<SpeakingPage mode="course" />'],
+  ["web/src/components/selfLearning/EmbeddedPracticePanels.js", '<SpeakingPage mode="course" lockedLevel={getCourseLessonRouteMeta().level} />'],
+  ["web/src/components/GoetheFreeChatPage.js", "requestCoachSpeech"],
+  ["web/src/components/GoetheFreeChatPage.js", "useCustomCoachSpeech"],
+  ["web/src/components/GoetheFreeChatPage.js", "Audio replies:"],
+  ["web/src/components/GoetheFreeChatPage.js", "Play German reply"],
   ["functions/functionz/app.js", "Keep concise: maximum 6 short lines"],
   ["functions/functionz/app.js", "Keep replies short and phone-friendly"],
 ];
