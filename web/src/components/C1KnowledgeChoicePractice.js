@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
 
 const shellStyle = {
   ...styles.card,
@@ -66,12 +67,15 @@ export default function C1KnowledgeChoicePractice({ lesson, completed = false, o
 
   if (!items.length) {
     return (
-      <section style={shellStyle}>
-        <h2 style={{ margin: 0, fontSize: "1.2rem" }}>Knowledge practice</h2>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-          Multiple-choice knowledge questions are not available for this lesson yet.
-        </p>
-      </section>
+      <>
+        <C1SpeakGrammarGuide lesson={lesson} showGrammar showSpeaking={false} />
+        <section style={shellStyle}>
+          <h2 style={{ margin: 0, fontSize: "1.2rem" }}>Knowledge practice</h2>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
+            Multiple-choice knowledge questions are not available for this lesson yet.
+          </p>
+        </section>
+      </>
     );
   }
 
@@ -99,112 +103,115 @@ export default function C1KnowledgeChoicePractice({ lesson, completed = false, o
   };
 
   return (
-    <section style={shellStyle} aria-label={`C1 Day ${lesson.day} knowledge practice`}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#eef2ff", color: "#3730a3" }}>Learn by choosing</span>
-          <h2 style={{ margin: 0, fontSize: "1.25rem" }}>Knowledge questions</h2>
+    <>
+      <C1SpeakGrammarGuide lesson={lesson} showGrammar showSpeaking={false} />
+      <section style={shellStyle} aria-label={`C1 Day ${lesson.day} knowledge practice`}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <span style={{ ...styles.badge, width: "fit-content", background: "#eef2ff", color: "#3730a3" }}>Learn by choosing</span>
+            <h2 style={{ margin: 0, fontSize: "1.25rem" }}>Knowledge questions</h2>
+          </div>
+          <span style={{ ...styles.badge, background: allCorrect || completed ? "#dcfce7" : "#eff6ff", color: allCorrect || completed ? "#166534" : "#1d4ed8" }}>
+            {correctCount}/{items.length} correct
+          </span>
         </div>
-        <span style={{ ...styles.badge, background: allCorrect || completed ? "#dcfce7" : "#eff6ff", color: allCorrect || completed ? "#166534" : "#1d4ed8" }}>
-          {correctCount}/{items.length} correct
-        </span>
-      </div>
 
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-        Click one answer at a time. Falowen explains the answer immediately, so you learn while answering instead of reading a long block of notes.
-      </p>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
+          Read the grammar lesson above, then answer one question at a time. Falowen explains each answer immediately.
+        </p>
 
-      <div style={{ height: 9, background: "#e2e8f0", borderRadius: 999, overflow: "hidden" }} aria-label={`${progressPercent}% complete`}>
-        <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb", transition: "width .2s ease" }} />
-      </div>
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {items.map((question, index) => {
-          const questionCorrect = answers[index] === question.answer;
-          return (
-            <button
-              key={`${question.question}-${index}`}
-              type="button"
-              onClick={() => setCurrentIndex(index)}
-              style={{
-                ...(index === safeIndex ? styles.primaryButton : styles.secondaryButton),
-                minWidth: 46,
-                minHeight: 40,
-                borderRadius: 999,
-                padding: "7px 12px",
-                background: questionCorrect && index !== safeIndex ? "#dcfce7" : undefined,
-                color: questionCorrect && index !== safeIndex ? "#166534" : undefined,
-              }}
-              aria-label={`Question ${index + 1}${questionCorrect ? ", correct" : ""}`}
-            >
-              {questionCorrect ? "✓ " : ""}{index + 1}
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={{ border: "1px solid #e2e8f0", borderRadius: 16, padding: 16, background: "#ffffff", display: "grid", gap: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-          <strong>Question {safeIndex + 1} of {items.length}</strong>
-          {lesson?.grammarLesson?.title ? <span style={{ color: "#64748b", fontSize: 13 }}>{lesson.grammarLesson.title}</span> : null}
+        <div style={{ height: 9, background: "#e2e8f0", borderRadius: 999, overflow: "hidden" }} aria-label={`${progressPercent}% complete`}>
+          <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb", transition: "width .2s ease" }} />
         </div>
-        <h3 style={{ margin: 0, fontSize: "1.08rem", lineHeight: 1.5 }}>{item.question}</h3>
 
-        <div style={{ display: "grid", gap: 9 }}>
-          {item.options.map((option) => {
-            const optionSelected = selected === option;
-            const optionCorrect = option === item.answer;
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {items.map((question, index) => {
+            const questionCorrect = answers[index] === question.answer;
             return (
               <button
-                key={option}
+                key={`${question.question}-${index}`}
                 type="button"
-                onClick={() => choose(option)}
-                style={optionStyle({ selected: optionSelected, correct: optionCorrect, revealedCorrect: isAnswered && optionCorrect && !optionSelected })}
+                onClick={() => setCurrentIndex(index)}
+                style={{
+                  ...(index === safeIndex ? styles.primaryButton : styles.secondaryButton),
+                  minWidth: 46,
+                  minHeight: 40,
+                  borderRadius: 999,
+                  padding: "7px 12px",
+                  background: questionCorrect && index !== safeIndex ? "#dcfce7" : undefined,
+                  color: questionCorrect && index !== safeIndex ? "#166534" : undefined,
+                }}
+                aria-label={`Question ${index + 1}${questionCorrect ? ", correct" : ""}`}
               >
-                {option}
+                {questionCorrect ? "✓ " : ""}{index + 1}
               </button>
             );
           })}
         </div>
 
-        {isAnswered ? (
-          <div
-            role="status"
-            style={{
-              border: `1px solid ${isCorrect ? "#86efac" : "#fecaca"}`,
-              borderRadius: 14,
-              padding: 12,
-              background: isCorrect ? "#f0fdf4" : "#fef2f2",
-              color: isCorrect ? "#14532d" : "#991b1b",
-              lineHeight: 1.65,
-            }}
-          >
-            <strong>{isCorrect ? "Correct." : "Not correct yet. Try another answer."}</strong>{" "}
-            {item.explanation || "Review the answer and try again."}
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 16, padding: 16, background: "#ffffff", display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+            <strong>Question {safeIndex + 1} of {items.length}</strong>
+            {lesson?.grammarLesson?.title ? <span style={{ color: "#64748b", fontSize: 13 }}>{lesson.grammarLesson.title}</span> : null}
+          </div>
+          <h3 style={{ margin: 0, fontSize: "1.08rem", lineHeight: 1.5 }}>{item.question}</h3>
+
+          <div style={{ display: "grid", gap: 9 }}>
+            {item.options.map((option) => {
+              const optionSelected = selected === option;
+              const optionCorrect = option === item.answer;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => choose(option)}
+                  style={optionStyle({ selected: optionSelected, correct: optionCorrect, revealedCorrect: isAnswered && optionCorrect && !optionSelected })}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+
+          {isAnswered ? (
+            <div
+              role="status"
+              style={{
+                border: `1px solid ${isCorrect ? "#86efac" : "#fecaca"}`,
+                borderRadius: 14,
+                padding: 12,
+                background: isCorrect ? "#f0fdf4" : "#fef2f2",
+                color: isCorrect ? "#14532d" : "#991b1b",
+                lineHeight: 1.65,
+              }}
+            >
+              <strong>{isCorrect ? "Correct." : "Not correct yet. Try another answer."}</strong>{" "}
+              {item.explanation || "Review the answer and try again."}
+            </div>
+          ) : null}
+
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+            <button type="button" style={styles.secondaryButton} onClick={() => setCurrentIndex((index) => Math.max(index - 1, 0))} disabled={safeIndex === 0}>
+              Previous
+            </button>
+            {safeIndex < items.length - 1 ? (
+              <button type="button" style={{ ...styles.primaryButton, opacity: isCorrect ? 1 : 0.5 }} onClick={next} disabled={!isCorrect}>
+                Next question
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        {allCorrect || completed ? (
+          <div style={{ border: "1px solid #86efac", borderRadius: 14, padding: 12, background: "#f0fdf4", color: "#14532d", lineHeight: 1.65 }}>
+            <strong>Learn complete.</strong> You answered all knowledge questions correctly. You can continue to Speak when you are ready.
           </div>
         ) : null}
 
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={styles.secondaryButton} onClick={() => setCurrentIndex((index) => Math.max(index - 1, 0))} disabled={safeIndex === 0}>
-            Previous
-          </button>
-          {safeIndex < items.length - 1 ? (
-            <button type="button" style={{ ...styles.primaryButton, opacity: isCorrect ? 1 : 0.5 }} onClick={next} disabled={!isCorrect}>
-              Next question
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      {allCorrect || completed ? (
-        <div style={{ border: "1px solid #86efac", borderRadius: 14, padding: 12, background: "#f0fdf4", color: "#14532d", lineHeight: 1.65 }}>
-          <strong>Learn complete.</strong> You answered all knowledge questions correctly. You can continue to Speak when you are ready.
-        </div>
-      ) : null}
-
-      <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={reset}>
-        Restart knowledge questions
-      </button>
-    </section>
+        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={reset}>
+          Restart knowledge questions
+        </button>
+      </section>
+    </>
   );
 }
