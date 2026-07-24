@@ -180,8 +180,8 @@ describe("course book task entries", () => {
       grammarbook_link: null,
     }));
     expect(chapter12).toEqual(expect.objectContaining({
-      lessonTitle: "Introducing Yourself",
-      topic: "Introducing Yourself",
+      lessonTitle: "Present-Tense Verb Conjugation Practice",
+      topic: "Present-Tense Verb Conjugation Practice",
       assignmentId: "A1-1.2",
       assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
       tutorMarked: true,
@@ -252,7 +252,7 @@ describe("course book task entries", () => {
     expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
       expect.objectContaining({
         assignment_id: "A1-1.2",
-        title: "Introducing Yourself",
+        title: "Present-Tense Verb Conjugation Practice",
         grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
       })
     );
