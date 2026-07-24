@@ -1,0 +1,65 @@
+name: Deploy Falowen Firestore Rules
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'firestore.rules'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/deploy-firestore-rules.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: falowenexamtrainer-firestore-rules
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FIREBASE_PROJECT_ID: falowen-examiner-trainer
+      GOOGLE_CLOUD_PROJECT: falowen-examiner-trainer
+      GCLOUD_PROJECT: falowen-examiner-trainer
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
+
+      - name: Deploy Firestore security rules
+        shell: bash
+        run: |
+          set +e
+          firebase deploy \
+            --project "$FIREBASE_PROJECT_ID" \
+            --only firestore:rules \
+            --debug > firebase-rules-deploy.log 2>&1
+          status=$?
+          tail -n 180 firebase-rules-deploy.log || true
+          exit "$status"
+
+      - name: Upload Firestore deployment diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firestore-rules-deploy-diagnostics-${{ github.run_id }}
+          path: |
+            firebase-rules-deploy.log
+            firebase-debug.log
+          if-no-files-found: warn
+          retention-days: 7
