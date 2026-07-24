@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
@@ -48,6 +48,7 @@ export const shouldShowRadioFirst = (level, day) => Boolean(getRadioResource(lev
 const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
   const radio = resource || getRadioResource(level, day);
   const location = useLocation();
+  const navigate = useNavigate();
   const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
   const [isContinuing, setIsContinuing] = useState(false);
@@ -96,12 +97,20 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
     setHasEnteredWorkbook(true);
   };
 
+  const handleBackToCourseBook = () => {
+    navigate("/campus/course", { replace: true });
+  };
+
   return (
     <div
       data-radio-first-workbook-gate="true"
       style={{ ...styles.container, display: "grid", gap: 18 }}
     >
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+      <AppBackButton
+        label="Back to Course Book"
+        fallbackPath="/campus/course"
+        onBack={handleBackToCourseBook}
+      />
       <header
         style={{
           ...styles.card,
