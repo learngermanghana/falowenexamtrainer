@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import A1Day1GreetingsGrammarPage from "./A1Day1GreetingsGrammarPage";
 import GermanAlphabetGrammarNotesPage from "./GermanAlphabetGrammarNotesPage";
 import SingularPronounsConjugationPage from "./SingularPronounsConjugationPage";
@@ -14,9 +14,14 @@ import A1Day16FoodAndNegationGrammarPage from "./A1Day16FoodAndNegationGrammarPa
 import DirectionsImperativePage from "./DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./TwoCasePrepositionsPage";
 import DativeArticlesMitBeiZuPage from "./DativeArticlesMitBeiZuPage";
-import { LetterWritingGrammarNotesPage } from "./LetterWritingIntroPage";
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
+
+const LetterWritingGrammarNotesPage = lazy(() =>
+  import("./LetterWritingIntroPage").then((module) => ({
+    default: module.LetterWritingGrammarNotesPage,
+  })),
+);
 
 const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
   "A1-0.1": A1Day1GreetingsGrammarPage,
@@ -55,7 +60,11 @@ const A1WorkbookGrammarNotes = ({ assignmentKey }) => {
     );
   }
 
-  return <GrammarNotes />;
+  return (
+    <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
+      <GrammarNotes />
+    </Suspense>
+  );
 };
 
 export default A1WorkbookGrammarNotes;
