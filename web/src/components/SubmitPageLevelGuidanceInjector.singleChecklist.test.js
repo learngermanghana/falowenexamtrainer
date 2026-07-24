@@ -22,7 +22,7 @@ describe("A2 submission completion checklist", () => {
     expect(
       syncSubmitCompletionGuide({
         pathname: "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
-        search: "?radio=done&level=A2&assignmentKey=A2-6.16&assignmentId=A2-6.16",
+        search: "?radio=done&workbookTab=submit&level=A2&assignmentKey=A2-6.16&assignmentId=A2-6.16",
         root: document,
       }),
     ).toBe(true);
@@ -32,6 +32,7 @@ describe("A2 submission completion checklist", () => {
     const checks = Array.from(card.querySelectorAll('input[name="falowen-submit-completion-check"]'));
 
     expect(card).toHaveTextContent("Required final answers");
+    expect(card.previousElementSibling).toBe(document.querySelector("textarea").closest("label"));
     expect(card).not.toHaveTextContent("Confirm every required Teil");
     expect(checks).toHaveLength(3);
     expect(document.querySelectorAll('[data-checklist-below-editor="true"]')).toHaveLength(0);
@@ -43,7 +44,7 @@ describe("A2 submission completion checklist", () => {
 
     syncSubmitCompletionGuide({
       pathname: "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
-      search: "?radio=done&level=A2&assignmentKey=A2-6.16&assignmentId=A2-6.16",
+      search: "?radio=done&workbookTab=submit&level=A2&assignmentKey=A2-6.16&assignmentId=A2-6.16",
       root: document,
     });
 

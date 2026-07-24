@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 export const MINIMUM_SUBMISSION_WORDS = 80;
+export const A1_MINIMUM_SUBMISSION_WORDS = 20;
 
 const PANEL_ATTRIBUTE = "data-submission-minimum-word-panel";
 const PANEL_ID = "submission-minimum-word-panel";
@@ -127,7 +128,7 @@ export const resolveMinimumSubmissionWords = ({ textarea, control = null } = {})
   if (!textarea) return null;
   return readExplicitMinimumWords(textarea, control)
     || readRenderedMinimumWords(textarea)
-    || (isCanonicalA1Submission(textarea, control) ? MINIMUM_SUBMISSION_WORDS : null);
+    || (isCanonicalA1Submission(textarea, control) ? A1_MINIMUM_SUBMISSION_WORDS : null);
 };
 
 const resolveTextareaContext = (textarea) => {

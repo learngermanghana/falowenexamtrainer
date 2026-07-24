@@ -194,6 +194,26 @@ const guidanceHtml = (copy, level, assignment, checklist) => `
   <div style="font-size:12px;color:#64748b;">Detected assignment: <strong>${escapeHtml(assignment || "Select an assignment")}</strong> · Level: <strong>${escapeHtml(level || "A1")}</strong></div>
 `;
 
+
+const findEditorContainer = (form) => {
+  const textarea = form?.querySelector?.("textarea");
+  if (!textarea) return null;
+  return textarea.closest?.("label") || textarea.parentElement;
+};
+
+const placeGuidanceBelowEditor = (card, form) => {
+  const editorContainer = findEditorContainer(form);
+  if (editorContainer?.parentElement) {
+    if (editorContainer.nextElementSibling !== card) {
+      editorContainer.insertAdjacentElement("afterend", card);
+    }
+    return;
+  }
+  if (card.parentElement !== form.parentElement) {
+    form.parentElement?.insertBefore(card, form);
+  }
+};
+
 const getSubmitButton = (form) =>
   form?.querySelector('button[type="submit"]') ||
   Array.from(form?.querySelectorAll("button") || []).find((button) =>
@@ -278,10 +298,9 @@ export const syncSubmitCompletionGuide = ({
     card.style.display = "grid";
     card.style.gap = "10px";
     card.style.boxShadow = "0 10px 24px rgba(15,23,42,.06)";
-    form.parentElement?.insertBefore(card, form);
-  } else if (card.parentElement !== form.parentElement) {
-    card.remove();
-    form.parentElement?.insertBefore(card, form);
+    placeGuidanceBelowEditor(card, form);
+  } else {
+    placeGuidanceBelowEditor(card, form);
   }
 
   card.__falowenSubmissionForm = form;

@@ -14,6 +14,7 @@ const SUBMISSION_COLLECTION = "submissions";
 const LOCK_COLLECTION = "submissionLocks";
 const AUTOSAVE_DELAY_MS = 900;
 const MIN_SUBMISSION_CHARACTERS = 20;
+const MIN_SUBMISSION_WORDS = 20;
 const MAX_SUBMISSION_CHARACTERS = 2500;
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
@@ -644,10 +645,19 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
       });
       return;
     }
+    const submissionWordCount = submissionText ? submissionText.split(/\s+/).filter(Boolean).length : 0;
     if (submissionText.length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
         error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
+        success: "",
+      });
+      return;
+    }
+    if (submissionWordCount < MIN_SUBMISSION_WORDS) {
+      setStatus({
+        loading: false,
+        error: `Please type at least ${MIN_SUBMISSION_WORDS} words before submitting. You currently have ${submissionWordCount} word${submissionWordCount === 1 ? "" : "s"}.`,
         success: "",
       });
       return;
@@ -897,7 +907,8 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
     );
   }
 
-  const wordCount = normalizeText(text) ? normalizeText(text).split(/\s+/).length : 0;
+  const wordCount = normalizeText(text) ? normalizeText(text).split(/\s+/).filter(Boolean).length : 0;
+  const hasMinimumWords = wordCount >= MIN_SUBMISSION_WORDS;
 
   return (
     <div {...debugAttributes} style={{ display: "grid", gap: 12 }}>
@@ -1006,13 +1017,16 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
               autoCorrect="off"
               spellCheck={false}
               maxLength={MAX_SUBMISSION_CHARACTERS}
+              data-minimum-words={MIN_SUBMISSION_WORDS}
               style={{ ...styles.textArea, minHeight: 220 }}
               placeholder={ready ? "Type your answer here or paste it in." : "Checking the newest cloud draft…"}
               disabled={!ready || status.loading}
             />
             <span style={styles.helperText}>
               {text.length.toLocaleString()} / {MAX_SUBMISSION_CHARACTERS.toLocaleString()} characters · {wordCount} words ·{" "}
-              {text.trim().length < MIN_SUBMISSION_CHARACTERS
+              {!hasMinimumWords
+                ? `Minimum ${MIN_SUBMISSION_WORDS} words before submitting`
+                : text.trim().length < MIN_SUBMISSION_CHARACTERS
                 ? `Minimum ${MIN_SUBMISSION_CHARACTERS} characters`
                 : "Ready to submit"}
             </span>
@@ -1088,7 +1102,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
                 opacity: 1,
                 visibility: "visible",
               }}
-              disabled={!ready || status.loading}
+              disabled={!ready || status.loading || !hasMinimumWords}
             >
               {finalSubmissionState.state === "saving" ? "Submitting…" : "Submit assignment"}
             </button>
