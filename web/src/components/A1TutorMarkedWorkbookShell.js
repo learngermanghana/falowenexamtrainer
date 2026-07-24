@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
+import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { styles } from "../styles";
 
@@ -132,6 +133,7 @@ const A1TutorMarkedWorkbookShell = ({
 
       <A1SharedAssignmentWorkbookLayout
         assignmentKey={assignment.assignmentKey}
+        grammar={<A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />}
         overview={overview}
         renderSubmission={(canonical) => (
           <A1CanonicalSubmissionPanel

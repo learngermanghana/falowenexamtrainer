@@ -9,12 +9,13 @@ import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1Workbook
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import { styles } from "../styles";
 import {
-  STANDARD_WORKBOOK_TABS,
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   WorkbookTabNav,
   WorkbookTaskCard,
 } from "./StandardWorkbookComponents";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 
-const tabs = STANDARD_WORKBOOK_TABS;
+const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
 const card = {
   ...styles.card,
@@ -205,7 +206,7 @@ const A2StandardTabbedWorkbookPage = ({
   hoerenAudioUrl,
   hoerenQuestions = [],
 }) => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState("grammar");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -226,7 +227,7 @@ const A2StandardTabbedWorkbookPage = ({
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
+          Select Grammar, Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
         </p>
 
         <div
@@ -252,6 +253,12 @@ const A2StandardTabbedWorkbookPage = ({
       </div>
 
       <A2B1WorkbookGuidance />
+
+      {activeTab === "grammar" && (
+        <div style={card}>
+          <A2B1GrammarNotesTab level="A2" day={day} />
+        </div>
+      )}
 
       {activeTab === "sprechen" && (
         <div style={card}>

@@ -107,7 +107,8 @@ describe("shared A2 workbook regression", () => {
   });
 
   it("keeps Ref and Submit in the shared A2 shell", () => {
-    expect(standardShell).toContain("STANDARD_WORKBOOK_TABS");
+    expect(standardShell).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
+    expect(standardShell).toContain('activeTab === "grammar"');
     expect(standardShell).toContain('activeTab === "references"');
     expect(standardShell).toContain('activeTab === "submit"');
     expect(standardShell).toContain("WorkbookReferenceAnswers");

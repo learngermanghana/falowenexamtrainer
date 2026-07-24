@@ -10,6 +10,11 @@ export const A2_B1_WORKBOOK_TABS = [
   { key: "submit", label: "Submit", description: "Send work" },
 ];
 
+export const A2_B1_WORKBOOK_TABS_WITH_GRAMMAR = [
+  { key: "grammar", label: "Grammar", description: "Notes" },
+  ...A2_B1_WORKBOOK_TABS,
+];
+
 export const B2_C1_WORKBOOK_TABS = [
   { key: "learn", label: "Learn", description: "Input" },
   { key: "write", label: "Write", description: "Practice" },

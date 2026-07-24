@@ -1,0 +1,113 @@
+import React from "react";
+import A2Day2Kapitel12GrammarNotesPage from "./A2Day2Kapitel12GrammarNotesPage";
+import ComparingThingsAndPeopleGrammarPage from "./ComparingThingsAndPeopleGrammarPage";
+import WoTreffenUnsGrammarPage from "./WoTreffenUnsGrammarPage";
+import A2Day5FreizeitSeparableVerbsGrammarPage from "./A2Day5FreizeitSeparableVerbsGrammarPage";
+import A2Day6TwoCasePrepositionsGrammarPage from "./A2Day6TwoCasePrepositionsGrammarPage";
+import A2Day7RelativeClausesWohnungGrammarPage from "./A2Day7RelativeClausesWohnungGrammarPage";
+import A2Day8ImperativeGrammarPage from "./A2Day8ImperativeGrammarPage";
+import A2Day9PerfektGrammarPage from "./A2Day9PerfektGrammarPage";
+import A2Day10PraeteritumGrammarPage from "./A2Day10PraeteritumGrammarPage";
+import A2Day11ComparativeFormsGrammarPage from "./A2Day11ComparativeFormsGrammarPage";
+import A2Day12MeinTraumberufGrammarPage from "./A2Day12MeinTraumberufGrammarPage";
+import A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage from "./A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage";
+import A2Day14BerufUndKarriereUmZuGrammarPage from "./A2Day14BerufUndKarriereUmZuGrammarPage";
+import A2Day15MeinLieblingssportSeitDativGrammarPage from "./A2Day15MeinLieblingssportSeitDativGrammarPage";
+import A2Day16WohlbefindenReflexiveVerbenGrammarPage from "./A2Day16WohlbefindenReflexiveVerbenGrammarPage";
+import A2Day17InDieApothekeModalverbenFragenGrammarPage from "./A2Day17InDieApothekeModalverbenFragenGrammarPage";
+import A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage from "./A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage";
+import A2Day19EinkaufenOderDennGrammarPage from "./A2Day19EinkaufenOderDennGrammarPage";
+import A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage from "./A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage";
+import A2Day21EinWochenendePlanenWennObFallsGrammarPage from "./A2Day21EinWochenendePlanenWennObFallsGrammarPage";
+import A2Day22DieWochePlanungGrammarPage from "./A2Day22DieWochePlanungGrammarPage";
+import A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage";
+import A2Day24EinenUrlaubPlanenGrammarPage from "./A2Day24EinenUrlaubPlanenGrammarPage";
+import A2Day28UeberDieZukunftSprechenGrammarPage from "./A2Day28UeberDieZukunftSprechenGrammarPage";
+import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
+import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
+import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
+import B1Day4WohnungSuchenGrammarNotesPage from "./B1Day4WohnungSuchenGrammarNotesPage";
+import B1Day5BesichtigungsterminGrammarNotesPage from "./B1Day5BesichtigungsterminGrammarNotesPage";
+import B1Day6StadtOderLandGrammarNotesPage from "./B1Day6StadtOderLandGrammarNotesPage";
+import B1Day7FastFoodHausmannskostGrammarNotesPage from "./B1Day7FastFoodHausmannskostGrammarNotesPage";
+import B1Day8AllesFuerDieGesundheitGrammarNotesPage from "./B1Day8AllesFuerDieGesundheitGrammarNotesPage";
+import B1Day9WorkLifeBalanceGrammarNotesPage from "./B1Day9WorkLifeBalanceGrammarNotesPage";
+import B1Day10DigitaleAuszeitGrammarNotesPage from "./B1Day10DigitaleAuszeitGrammarNotesPage";
+import B1Day11TeamspieleGrammarNotesPage from "./B1Day11TeamspieleGrammarNotesPage";
+import B1Day12AbenteuerInDerNaturGrammarNotesPage from "./B1Day12AbenteuerInDerNaturGrammarNotesPage";
+import B1Day13EigeneFilmkritikGrammarNotesPage from "./B1Day13EigeneFilmkritikGrammarNotesPage";
+import B1Day14TraditionellesDigitalesLernenGrammarNotesPage from "./B1Day14TraditionellesDigitalesLernenGrammarNotesPage";
+import B1Day15MedienHomeofficeGrammarNotesPage from "./B1Day15MedienHomeofficeGrammarNotesPage";
+import B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage from "./B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage";
+import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschberufGrammarNotesPage";
+import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
+import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
+
+const GRAMMAR_NOTES_BY_LEVEL_DAY = {
+  A2: {
+    2: A2Day2Kapitel12GrammarNotesPage,
+    3: ComparingThingsAndPeopleGrammarPage,
+    4: WoTreffenUnsGrammarPage,
+    5: A2Day5FreizeitSeparableVerbsGrammarPage,
+    6: A2Day6TwoCasePrepositionsGrammarPage,
+    7: A2Day7RelativeClausesWohnungGrammarPage,
+    8: A2Day8ImperativeGrammarPage,
+    9: A2Day9PerfektGrammarPage,
+    10: A2Day10PraeteritumGrammarPage,
+    11: A2Day11ComparativeFormsGrammarPage,
+    12: A2Day12MeinTraumberufGrammarPage,
+    13: A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage,
+    14: A2Day14BerufUndKarriereUmZuGrammarPage,
+    15: A2Day15MeinLieblingssportSeitDativGrammarPage,
+    16: A2Day16WohlbefindenReflexiveVerbenGrammarPage,
+    17: A2Day17InDieApothekeModalverbenFragenGrammarPage,
+    18: A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage,
+    19: A2Day19EinkaufenOderDennGrammarPage,
+    20: A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage,
+    21: A2Day21EinWochenendePlanenWennObFallsGrammarPage,
+    22: A2Day22DieWochePlanungGrammarPage,
+    23: A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage,
+    24: A2Day24EinenUrlaubPlanenGrammarPage,
+    28: A2Day28UeberDieZukunftSprechenGrammarPage,
+  },
+  B1: {
+    1: B1Day1TraumweltGrammarNotesPage,
+    2: B1Day2FreundeFuersLebenGrammarNotesPage,
+    3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
+    4: B1Day4WohnungSuchenGrammarNotesPage,
+    5: B1Day5BesichtigungsterminGrammarNotesPage,
+    6: B1Day6StadtOderLandGrammarNotesPage,
+    7: B1Day7FastFoodHausmannskostGrammarNotesPage,
+    8: B1Day8AllesFuerDieGesundheitGrammarNotesPage,
+    9: B1Day9WorkLifeBalanceGrammarNotesPage,
+    10: B1Day10DigitaleAuszeitGrammarNotesPage,
+    11: B1Day11TeamspieleGrammarNotesPage,
+    12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
+    13: B1Day13EigeneFilmkritikGrammarNotesPage,
+    14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage,
+    15: B1Day15MedienHomeofficeGrammarNotesPage,
+    16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage,
+    18: B1Day18WegeZumWunschberufGrammarNotesPage,
+    19: B1Day19VorstellungsgespraechGrammarNotesPage,
+    21: B1Day21LebensformenHeuteGrammarNotesPage,
+  },
+};
+
+export const getA2B1GrammarNotesComponent = (level, day) =>
+  GRAMMAR_NOTES_BY_LEVEL_DAY[String(level || "").toUpperCase()]?.[Number(day)] || null;
+
+export const A2B1GrammarNotesTab = ({ level, day }) => {
+  const GrammarNotes = getA2B1GrammarNotesComponent(level, day);
+  if (!GrammarNotes) {
+    return (
+      <section style={{ display: "grid", gap: 10 }}>
+        <h2 style={{ margin: 0 }}>Grammar Notes</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Grammar notes have not been added for this workbook day yet. Continue with Teil 1–4, Ref and Submit.
+        </p>
+      </section>
+    );
+  }
+
+  return <GrammarNotes />;
+};
