@@ -74,6 +74,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    12: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day12-freizeit-kultur-ai-video",
+          chapter: "3.2",
+          title: "C1 Day 12 · Freizeit und Kultur · AI video",
+          description:
+            "AI video lesson for evaluating cultural participation, quality of life, access and public cultural funding at C1 level.",
+          url: "https://youtu.be/LpsmADd4U30",
+        }),
+      ]),
+    }),
   }),
 });
 
