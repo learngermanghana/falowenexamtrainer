@@ -7,6 +7,14 @@ const c1Day12FreizeitUndKultur = makeLesson({
   title: "Freizeit und Kultur",
   topic: "Kulturelle Angebote, soziale Teilhabe, Lebensqualität und kommunale Kulturförderung differenziert bewerten",
   heroImage: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    key: "c1-day12-freizeit-kultur-ai-video",
+    chapter: "3.2",
+    title: "C1 Day 12 · Freizeit und Kultur · AI video",
+    description:
+      "AI video lesson for evaluating cultural participation, quality of life, access and public cultural funding at C1 level.",
+    url: "https://youtu.be/LpsmADd4U30",
+  },
   grammarFocus: "Erweiterte Vergleichs- und Bewertungsstrukturen: im Hinblick auf, insofern ... als, einerseits ... andererseits und je ... desto",
   objectives: [
     "Ich kann kulturelle Angebote im Hinblick auf Teilhabe, Lebensqualität und Zugänglichkeit differenziert bewerten.",
