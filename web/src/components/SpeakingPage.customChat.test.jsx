@@ -101,7 +101,10 @@ test("browser German speech is preferred and skips server TTS", async () => {
     getVoices: jest.fn(() => [{ lang: "de-DE", name: "German" }]),
   };
   Object.defineProperty(window, "speechSynthesis", { configurable: true, value: synth });
-  window.SpeechSynthesisUtterance = jest.fn(function SpeechSynthesisUtterance(text) { this.text = text; });
+  Object.defineProperty(window, "SpeechSynthesisUtterance", {
+    configurable: true,
+    value: jest.fn(function SpeechSynthesisUtterance(text) { this.text = text; }),
+  });
   renderCustomChat();
 
   fireEvent.change(screen.getByPlaceholderText(/Paste your speaking question/i), { target: { value: "Erste Frage" } });
