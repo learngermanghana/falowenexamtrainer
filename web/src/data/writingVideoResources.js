@@ -44,6 +44,13 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before writing your opinion about city and country life. Use it to compare both places, react to the given opinion and justify your own decision clearly.",
       url: "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD",
     },
+    7: {
+      key: "b1-day7-fast-food-hausmannskost-writing-video",
+      title: "B1 Day 7 · Fast Food vs. Hausmannskost · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before writing your opinion about Fertiggerichte and healthy eating. Use it to react to the given opinion, explain advantages and disadvantages and give your own practical solution.",
+      url: "https://youtu.be/oGOn3zKpNjo",
+    },
     20: {
       key: "b1-day20-beruf-qualifikationen-writing-video",
       title: "B1 Day 20 · Ausbildung und Qualifikationen · Schreiben explanation",
@@ -98,6 +105,14 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video on the Write page before drafting the B2 Day 5 opinion text. Use it to compare learning formats, explain why Weiterbildung matters and cover all required points clearly.",
       url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
     },
+    6: {
+      key: "b2-day6-migration-integration-writing-video",
+      chapter: "2.1",
+      title: "B2 Day 6 · Migration und Integration · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the B2 Day 6 opinion text. Use it to organise the integration argument, explain difficulties, propose measures and describe their benefits clearly.",
+      url: "https://youtu.be/0hMcnhgRj8Q",
+    },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",
       format: "letter",
@@ -137,6 +152,14 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this Schreiben video on the Write page before drafting the C1 discussion post. It explains how to structure the argument, address the counterpoint about state responsibility and develop concrete support measures.",
       url: "https://youtu.be/Ww6gq3lmmpk",
+    },
+    12: {
+      key: "c1-day12-freizeit-kultur-writing-video",
+      chapter: "3.2",
+      title: "C1 Day 12 · Freizeit und Kultur · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the C1 argumentative text. Use it to structure the discussion of cultural participation, benefits, challenges, funding models and your final position.",
+      url: "https://youtu.be/0lWMEqPU6x4",
     },
   },
 };
