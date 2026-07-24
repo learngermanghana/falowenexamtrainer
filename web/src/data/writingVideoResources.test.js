@@ -17,7 +17,7 @@ describe("writing video resources", () => {
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
     ["B2", 5, "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL"],
-    ["B2", 6, "https://youtu.be/0hMcnhgRj8Q"],
+    ["B2", 6, "https://youtu.be/19WaMcKL8v4"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
@@ -111,7 +111,7 @@ describe("writing video resources", () => {
         key: "b2-day6-migration-integration-writing-video",
         chapter: "2.1",
         title: expect.stringContaining("Migration und Integration"),
-        url: "https://youtu.be/0hMcnhgRj8Q",
+        url: "https://youtu.be/19WaMcKL8v4",
       }),
     );
   });
@@ -181,7 +181,7 @@ describe("writing video resources", () => {
     ["https://youtu.be/1JYyJfnumig", "https://www.youtube.com/embed/1JYyJfnumig"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
     ["https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL", "https://www.youtube.com/embed/-6_zmU9ibJI"],
-    ["https://youtu.be/0hMcnhgRj8Q", "https://www.youtube.com/embed/0hMcnhgRj8Q"],
+    ["https://youtu.be/19WaMcKL8v4", "https://www.youtube.com/embed/19WaMcKL8v4"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
     ["https://youtu.be/Ww6gq3lmmpk", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
     ["https://youtu.be/0lWMEqPU6x4", "https://www.youtube.com/embed/0lWMEqPU6x4"],

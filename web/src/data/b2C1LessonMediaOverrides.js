@@ -8,7 +8,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 6 · Migration und Integration · AI video",
           description:
             "AI video lesson for using obwohl, auch wenn and trotzdem when discussing migration and integration.",
-          url: "https://youtu.be/BJHleTU9ycY",
+          url: "https://youtu.be/LORxwfzaAyU",
         }),
       ]),
     }),
@@ -108,6 +108,14 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Engagement und Ehrenamt ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    12: Object.freeze({
+      key: "c1-day12-freizeit-kultur-falowen-radio",
+      title: "Freizeit und Kultur 3.2",
+      youtubeId: "54qgZXZ8bdM",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Freizeit, Kultur, Teilhabe und Lebensqualität ein. Danach gehst du weiter zum Lernteil.",
     }),
   }),
 });
