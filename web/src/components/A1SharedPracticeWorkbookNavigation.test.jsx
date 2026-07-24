@@ -33,6 +33,18 @@ const FakePracticeWorkbook = ({ remountOnSearch = false }) => {
   );
 };
 
+
+const FakeDivCardPracticeWorkbook = () => (
+  <main className="layout-main">
+    <div data-testid="practice-page">
+      <div><h1>A1 Day 6 self-practice</h1></div>
+      <div data-testid="practice-section-1"><h2>Teil 1 · Family Vocabulary</h2><p>Family content only</p></div>
+      <div data-testid="practice-section-2"><h2>Teil 2 · Writing About Your Family</h2><p>Writing content only</p></div>
+      <div data-testid="practice-section-3"><h2>Teil 3 · Languages</h2><p>Language content only</p></div>
+    </div>
+  </main>
+);
+
 const LocationProbe = () => {
   const location = useLocation();
   return <output data-testid="practice-location">{location.search}</output>;
@@ -96,6 +108,30 @@ describe("A1 shared self-practice navigation", () => {
     expect(search).toContain("workbookTab=section-2");
     expect(search).not.toContain("assignmentKey");
     expect(search).not.toContain("assignmentId");
+  });
+
+
+  test("keeps Day 6 div-card Teil content separated by the selected tab", async () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          "/campus/course/a1-day-6-family-and-hobbies-workbook?radio=done&materials=done&workbookTab=section-1",
+        ]}
+      >
+        <FakeDivCardPracticeWorkbook />
+        <A1SharedPracticeWorkbookNavigation />
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole("tab", { name: "Teil 1" });
+    await waitFor(() => expect(screen.getByTestId("practice-section-1")).toBeVisible());
+    expect(screen.getByTestId("practice-section-2")).not.toBeVisible();
+    expect(screen.getByTestId("practice-section-3")).not.toBeVisible();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
+    await waitFor(() => expect(screen.getByTestId("practice-section-2")).toBeVisible());
+    expect(screen.getByTestId("practice-section-1")).not.toBeVisible();
+    expect(screen.getByTestId("practice-section-3")).not.toBeVisible();
   });
 
   test("keeps the selected Teil visible when a query update remounts the workbook DOM", async () => {

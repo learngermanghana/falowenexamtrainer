@@ -33,16 +33,28 @@ export const hasCompletedA1PracticeMaterials = (search = "") => {
   }
 };
 
-const topLevelPracticeSections = (root) => {
-  if (!root?.querySelectorAll) return [];
-  return Array.from(root.querySelectorAll("section")).filter((section) => {
-    const ancestorSection = section.parentElement?.closest?.("section");
-    return !ancestorSection || !root.contains(ancestorSection);
-  });
-};
-
 const firstSectionHeading = (section) =>
   Array.from(section?.querySelectorAll?.("h2, h3") || []).find((heading) => normalizeText(heading.textContent)) || null;
+
+const getTopLevelPracticeChild = (root, element) => {
+  let current = element;
+  while (current?.parentElement && current.parentElement !== root) current = current.parentElement;
+  return current?.parentElement === root ? current : null;
+};
+
+const topLevelPracticeSections = (root) => {
+  if (!root?.querySelectorAll) return [];
+  const seen = new Set();
+  return Array.from(root.querySelectorAll("h2, h3"))
+    .filter((heading) => /^\s*(Teil|Section)\s*\d+\b/i.test(normalizeText(heading.textContent)))
+    .map((heading) => getTopLevelPracticeChild(root, heading) || heading.closest("section") || heading.parentElement)
+    .filter(Boolean)
+    .filter((element) => {
+      if (seen.has(element)) return false;
+      seen.add(element);
+      return true;
+    });
+};
 
 const makeSectionLabel = (headingText, index) => {
   const text = normalizeText(headingText);
