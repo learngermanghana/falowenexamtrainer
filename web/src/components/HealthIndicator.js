@@ -23,7 +23,8 @@ const isDay0CoursePath = (pathname = "") =>
   pathname.startsWith("/campus/course/") && pathname.includes("day-0");
 
 function HealthIndicator() {
-  const { status } = useHealthStatus({ pollIntervalMs: 60000 });
+  // Check once on mount instead of polling Cloud Run from every open student tab.
+  const { status } = useHealthStatus({ pollIntervalMs: 0 });
   const { isOffline } = useOfflineStatus();
   const location = useLocation();
   const navigate = useNavigate();
