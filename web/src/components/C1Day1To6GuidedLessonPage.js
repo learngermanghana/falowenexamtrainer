@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
+import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -30,7 +31,6 @@ const card = {
   boxShadow: "0 10px 26px rgba(15,23,42,.06)",
 };
 const fieldLabel = { display: "flex", gap: 9, alignItems: "center", fontWeight: 800 };
-const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const Section = ({ title, children }) => (
   <section style={card}>
@@ -80,24 +80,7 @@ const SpeakingBuilder = ({ lesson }) => {
   const branches = day === 2
     ? c1Day2LearningSpeakingGuide.speaking.branches
     : (lesson.speakingBuilder?.branches || []);
-  const question = String(lesson.speakingTopic || "").replace(/^Sprechen:\s*/i, "");
-
-  return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <NoteBox tone="amber"><strong>Sprechfrage:</strong> {question}</NoteBox>
-      <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff" }}>
-        <h3 style={{ margin: "0 0 8px" }}>Punkte für deine Antwort</h3>
-        <p style={{ margin: "0 0 8px", color: "#475569" }}>Wähle passende Punkte aus, verknüpfe sie und gib Gründe sowie konkrete Beispiele.</p>
-        <ul style={listStyle}>
-          {branches.map((branch) => (
-            <li key={branch.id || branch.title}>
-              <strong>{branch.title}:</strong> {(branch.keywords || []).join(", ")}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
+  return <C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches} />;
 };
 
 export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = null }) {
