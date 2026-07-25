@@ -1754,6 +1754,10 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const latestSubmissionActionAt = useMemo(() => {
     const latest = recentSubmissions.reduce((acc, item) => {
+      // A submission for another assignment must never block this assignment.
+      // The 10-minute cooldown only protects repeat attempts for the selected task.
+      if (!isSameSelectedAssignment(item)) return acc;
+
       const statusLabel = safeLower(item?.status);
       if (!["submitted", "resubmitted"].includes(statusLabel)) return acc;
 
@@ -1764,7 +1768,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }, null);
 
     return latest;
-  }, [recentSubmissions]);
+  }, [isSameSelectedAssignment, recentSubmissions]);
 
   const nextAllowedSubmissionAt = useMemo(() => {
     if (!latestSubmissionActionAt) return null;
