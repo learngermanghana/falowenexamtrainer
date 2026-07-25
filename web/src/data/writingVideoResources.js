@@ -51,6 +51,14 @@ const WRITING_VIDEO_RESOURCES = {
         "Watch this Schreiben video inside Teil 2 before writing your opinion about Fertiggerichte and healthy eating. Use it to react to the given opinion, explain advantages and disadvantages and give your own practical solution.",
       url: "https://youtu.be/oGOn3zKpNjo",
     },
+    8: {
+      key: "b1-day8-gesundheit-writing-video",
+      chapter: "3.8",
+      title: "B1 Day 8 · Gesundheit · Schreiben explanation",
+      description:
+        "Watch this Schreiben video inside Teil 2 before drafting the B1 Day 8 writing task. Use it to understand the Gesundheit prompt, organise the response and cover every required point clearly.",
+      url: "https://youtu.be/kGQWOEfhP-k",
+    },
     20: {
       key: "b1-day20-beruf-qualifikationen-writing-video",
       title: "B1 Day 20 · Ausbildung und Qualifikationen · Schreiben explanation",
@@ -112,6 +120,14 @@ const WRITING_VIDEO_RESOURCES = {
       description:
         "Watch this Schreiben video on the Write page before drafting the B2 Day 6 opinion text. Use it to organise the integration argument, explain difficulties, propose measures and describe their benefits clearly.",
       url: "https://youtu.be/19WaMcKL8v4",
+    },
+    7: {
+      key: "b2-day7-gesellschaftliche-vielfalt-writing-video",
+      chapter: "2.2",
+      title: "B2 Day 7 · Gesellschaftliche Vielfalt · Schreiben explanation",
+      description:
+        "Watch this Schreiben video on the Write page before drafting the B2 Day 7 text. Use it to understand the Chapter 2.2 task, organise the response and cover every required point clearly.",
+      url: "https://youtu.be/pzvyE35CZbI",
     },
     12: {
       key: "b2-day12-kultur-freizeit-letter-writing-video",
