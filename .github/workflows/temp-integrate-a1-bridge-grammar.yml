@@ -1,0 +1,148 @@
+name: Apply A1 bridge grammar integration patch
+
+on:
+  push:
+    branches:
+      - agent/integrate-a1-bridge-grammar-notes
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/integrate-a1-bridge-grammar-notes
+          fetch-depth: 0
+
+      - name: Integrate registered grammar notes into bridge workbooks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              source = p.read_text()
+              if new in source:
+                  return
+              if old not in source:
+                  raise SystemExit(f"Expected block not found in {path}: {old[:100]!r}")
+              p.write_text(source.replace(old, new, 1))
+
+          bridge = "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
+          replace_once(
+              bridge,
+              'import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";\n',
+              'import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";\nimport A1WorkbookGrammarNotes, { getA1GrammarNotesComponent } from "./A1WorkbookGrammarNotes";\n',
+          )
+          replace_once(
+              bridge,
+              'const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";\nconst SUBMISSION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-submission";',
+              'const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";\nconst GRAMMAR_HOST_ATTRIBUTE = "data-a1-canonical-bridge-grammar";\nconst SUBMISSION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-submission";',
+          )
+          replace_once(
+              bridge,
+              '`[${NAV_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,',
+              '`[${NAV_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,',
+          )
+          replace_once(
+              bridge,
+              '    navHost: null,\n    submissionHost: null,',
+              '    navHost: null,\n    grammarHost: null,\n    submissionHost: null,',
+          )
+          replace_once(
+              bridge,
+              '  const availableSections = useMemo(\n    () => mountState.sections.map(({ element, ...section }) => section),\n    [mountState.sections],\n  );\n  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections });',
+              '  const availableSections = useMemo(\n    () => mountState.sections.map(({ element, ...section }) => section),\n    [mountState.sections],\n  );\n  const hasGrammar = Boolean(getA1GrammarNotesComponent(assignment.assignmentKey));\n  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });',
+          )
+          replace_once(
+              bridge,
+              '      const navHost = document.createElement("div");\n      navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");\n      navHost.setAttribute("data-assignment-key", assignment.assignmentKey);\n      const submissionHost = document.createElement("div");',
+              '      const navHost = document.createElement("div");\n      navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");\n      navHost.setAttribute("data-assignment-key", assignment.assignmentKey);\n      const grammarHost = document.createElement("div");\n      grammarHost.setAttribute(GRAMMAR_HOST_ATTRIBUTE, "true");\n      grammarHost.setAttribute("data-assignment-key", assignment.assignmentKey);\n      const submissionHost = document.createElement("div");',
+          )
+          replace_once(
+              bridge,
+              '      pageRoot.prepend(navHost, submissionHost);',
+              '      pageRoot.prepend(navHost, grammarHost, submissionHost);',
+          )
+          replace_once(
+              bridge,
+              '      createdHosts = [navHost, submissionHost, footerHost];',
+              '      createdHosts = [navHost, grammarHost, submissionHost, footerHost];',
+          )
+          replace_once(
+              bridge,
+              '      setMountState({ navHost, submissionHost, footerHost, sections });',
+              '      setMountState({ navHost, grammarHost, submissionHost, footerHost, sections });',
+          )
+          replace_once(
+              bridge,
+              '  useEffect(() => {\n    mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));\n    if (mountState.submissionHost?.isConnected) {',
+              '  useEffect(() => {\n    mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));\n    if (mountState.grammarHost?.isConnected) {\n      mountState.grammarHost.style.display = activeTab === "grammar" ? "" : "none";\n    }\n    if (mountState.submissionHost?.isConnected) {',
+          )
+          replace_once(
+              bridge,
+              '  }, [activeTab, mountState.sections, mountState.submissionHost]);',
+              '  }, [activeTab, mountState.grammarHost, mountState.sections, mountState.submissionHost]);',
+          )
+          replace_once(
+              bridge,
+              '  const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;\n  const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;',
+              '  const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;\n  const grammarHost = mountState.grammarHost?.isConnected ? mountState.grammarHost : null;\n  const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;',
+          )
+          replace_once(
+              bridge,
+              '          onSelect={openTab}\n        />,',
+              '          onSelect={openTab}\n          hasGrammar={hasGrammar}\n        />,',
+          )
+          replace_once(
+              bridge,
+              '        navHost,\n      )}\n      {submissionHost ? createPortal(',
+              '        navHost,\n      )}\n      {grammarHost && hasGrammar ? createPortal(\n        <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />,\n        grammarHost,\n      ) : null}\n      {submissionHost ? createPortal(',
+          )
+
+          grammar = "web/src/components/A1WorkbookGrammarNotes.js"
+          replace_once(
+              grammar,
+              'import TwoCasePrepositionsPage from "./TwoCasePrepositionsPage";',
+              'import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";',
+          )
+          replace_once(
+              grammar,
+              'import DativeArticlesMitBeiZuPage from "./DativeArticlesMitBeiZuPage";',
+              'import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage";',
+          )
+          replace_once(grammar, '  "A1-12.1": TwoCasePrepositionsPage,', '  "A1-12.1": TwoCasePrepositionsPageLegacy,')
+          replace_once(grammar, '  "A1-12.2": DativeArticlesMitBeiZuPage,', '  "A1-12.2": DativeArticlesMitBeiZuGrammarNotes,')
+
+          dative = "web/src/components/DativeArticlesMitBeiZuPage.js"
+          replace_once(dative, 'const GrammarNotes = () => {', 'export const DativeArticlesMitBeiZuGrammarNotes = () => {')
+          replace_once(dative, '  return <GrammarNotes />;', '  return <DativeArticlesMitBeiZuGrammarNotes />;')
+
+          test = "web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx"
+          replace_once(
+              test,
+              '          <div data-a1-canonical-bridge-nav="true"></div>\n          <div data-a1-canonical-bridge-submission="true"></div>',
+              '          <div data-a1-canonical-bridge-nav="true"></div>\n          <div data-a1-canonical-bridge-grammar="true"></div>\n          <div data-a1-canonical-bridge-submission="true"></div>',
+          )
+          replace_once(test, '    expect(existingHosts).toHaveLength(3);', '    expect(existingHosts).toHaveLength(4);')
+          replace_once(
+              test,
+              '    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(3);',
+              '    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(4);',
+          )
+          PY
+
+      - name: Commit grammar integration
+        run: |
+          if git diff --quiet -- web/src/components/A1SharedAssignmentWorkbookBridge.jsx web/src/components/A1WorkbookGrammarNotes.js web/src/components/DativeArticlesMitBeiZuPage.js web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx; then
+            echo "Grammar integration already applied."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/A1SharedAssignmentWorkbookBridge.jsx web/src/components/A1WorkbookGrammarNotes.js web/src/components/DativeArticlesMitBeiZuPage.js web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx
+          git commit -m "Integrate grammar notes into A1 bridge workbooks"
+          git push origin HEAD:agent/integrate-a1-bridge-grammar-notes
