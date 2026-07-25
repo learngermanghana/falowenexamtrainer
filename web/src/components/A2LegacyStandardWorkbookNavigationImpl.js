@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { STANDARD_WORKBOOK_TABS, WorkbookTabNav } from "./StandardWorkbookComponents";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 
@@ -259,7 +260,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
       return;
     }
 
-    if (tabKey === "references" || tabKey === "submit") {
+    if (tabKey === "grammar" || tabKey === "references" || tabKey === "submit") {
       setPortalTab(tabKey);
       return;
     }
@@ -285,6 +286,7 @@ export default function A2LegacyStandardWorkbookNavigation() {
           onChange={selectTab}
           tabs={STANDARD_WORKBOOK_TABS}
           ariaLabel={`A2 Day ${config.day} workbook sections`}
+          renderLegacyGrammarPanel={false}
         />,
         navRoot,
       )
@@ -298,7 +300,9 @@ export default function A2LegacyStandardWorkbookNavigation() {
             data-a2-standard-legacy-panel={portalTab}
             style={{ ...styles.card, display: "grid", gap: 12, border: "2px solid #2563eb" }}
           >
-            {portalTab === "references" ? (
+            {portalTab === "grammar" ? (
+              <A2B1GrammarNotesTab level="A2" day={config.day} />
+            ) : portalTab === "references" ? (
               <WorkbookReferenceAnswers
                 level="A2"
                 lesson={{
