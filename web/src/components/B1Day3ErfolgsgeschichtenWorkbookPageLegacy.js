@@ -174,11 +174,11 @@ const B1Day3ErfolgsgeschichtenWorkbookPage = () => {
           >
             <p style={{ margin: 0 }}>Read the questions first. Listen for Herr Müller's routine, the heating problem, his reaction and how he feels at the end.</p>
           </WorkbookTaskCard>
-          <a href="https://youtu.be/bINimMVUjCc" target="_blank" rel="noreferrer" style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}>
+          <a href="https://youtu.be/h6-k4YGP3OU" target="_blank" rel="noreferrer" style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}>
             Open Hören video on YouTube
           </a>
           <iframe
-            src="https://www.youtube.com/embed/bINimMVUjCc?rel=0"
+            src="https://www.youtube.com/embed/h6-k4YGP3OU?rel=0"
             title="B1 Day 3 Erfolgsgeschichten Teil 4 Hören video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
