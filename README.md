@@ -47,6 +47,22 @@ Example:
 </A1TutorMarkedWorkbookShell>
 ```
 
+## A2/B1 workbook tab standard
+The default in-app A2/B1 workbook sequence is:
+
+**Grammar → Teil 1 → Teil 2 → Teil 3 → Teil 4 → Ref → Submit**
+
+Rules:
+
+- Grammar notes are first-class workbook content for A2/B1 and should open from the **Grammar** tab instead of being restored as a separate grammar supporting-material card.
+- `web/src/components/A2B1WorkbookGrammarNotes.js` is the source of truth for which A2/B1 day owns which grammar-notes component.
+- Newer shared workbook pages should use `A2_B1_WORKBOOK_TABS_WITH_GRAMMAR` and render `A2B1GrammarNotesTab` for the Grammar section.
+- Older A2/B1 workbook pages that still pass `STANDARD_WORKBOOK_TABS` rely on `WorkbookTabNav` to add the Grammar tab from the workbook's `A2 Day N` / `B1 Day N` aria label. Do not replace this with a separate hand-built grammar link.
+- `A2LegacyStandardWorkbookNavigationImpl` owns Grammar as portal content on restored legacy A2 routes and must keep `renderLegacyGrammarPanel={false}` so the Grammar notes are rendered once, not twice.
+- Intentional lesson-specific exceptions must remain intact. For example, a workbook that genuinely has no Teil 4 must not have Teil 4 reintroduced just to match the default sequence.
+- When changing a legacy Teil 4 Hören YouTube resource, update both the external YouTube link and the embedded player URL, then keep a regression assertion for the requested video ID.
+- Keep `web/src/components/A2B1LegacyGrammarTabRegression.test.js` passing. It protects the seven-tab order, the no-double-Grammar behavior, the legacy A2 adapter, and requested legacy Hören media.
+
 ## Prerequisites
 - Node.js 18+ and npm
 - An OpenAI API key with access to the `gpt-4o-mini` family
