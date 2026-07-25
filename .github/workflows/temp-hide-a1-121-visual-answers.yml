@@ -1,0 +1,67 @@
+name: Hide A1 12.1 visual answers
+
+on:
+  push:
+    branches:
+      - agent/hide-a1-121-visual-answers
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/hide-a1-121-visual-answers
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Remove German answers from visual clues
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          page = Path('web/src/components/TwoCasePrepositionsPageLegacy.js')
+          source = page.read_text()
+          replacements = {
+              'emojiLine2: "onto the table / auf den Tisch",': 'emojiLine2: "onto the table",',
+              'emojiLine2: "vor dem Baum",': 'emojiLine2: "in front of the tree",',
+              'emojiLine2: "⬇️ behind / dahinter: 🚗",': 'emojiLine2: "⬇️ behind the house: 🚗",',
+              'emojiLine2: "attached to the door / an der Tür",': 'emojiLine2: "attached to the door",',
+              'emojiLine2: "next to / neben",': 'emojiLine2: "next to the sofa",',
+              'emojiLine2: "inside / in",': 'emojiLine2: "inside the room",',
+          }
+          for old, new in replacements.items():
+              if old not in source:
+                  raise SystemExit(f'Missing expected visual clue: {old}')
+              source = source.replace(old, new, 1)
+          page.write_text(source)
+
+          test = Path('web/src/components/TwoCasePrepositionsPageLegacy.content.test.js')
+          test_source = test.read_text()
+          marker = '''    expect(source).toContain("Answered: {answeredVisual} of {visualGame.length}");\n  });'''
+          replacement = '''    expect(source).toContain("Answered: {answeredVisual} of {visualGame.length}");\n    [\n      'emojiLine2: "onto the table / auf den Tisch"',\n      'emojiLine2: "vor dem Baum"',\n      'emojiLine2: "⬇️ behind / dahinter: 🚗"',\n      'emojiLine2: "attached to the door / an der Tür"',\n      'emojiLine2: "next to / neben"',\n      'emojiLine2: "inside / in"',\n    ].forEach((answerReveal) => expect(source).not.toContain(answerReveal));\n    [\n      'emojiLine2: "onto the table"',\n      'emojiLine2: "in front of the tree"',\n      'emojiLine2: "⬇️ behind the house: 🚗"',\n      'emojiLine2: "attached to the door"',\n      'emojiLine2: "next to the sofa"',\n      'emojiLine2: "inside the room"',\n    ].forEach((englishClue) => expect(source).toContain(englishClue));\n  });'''
+          if marker not in test_source:
+              raise SystemExit('Missing content-test marker')
+          test.write_text(test_source.replace(marker, replacement, 1))
+          PY
+      - name: Test A1 12.1 grammar and build
+        working-directory: web
+        run: |
+          npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+          CI=true npm run test:ci -- --runTestsByPath src/components/TwoCasePrepositionsPageLegacy.content.test.js src/components/TwoCasePrepositionsPage.test.js
+          npm run build
+      - name: Commit visual clue fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/TwoCasePrepositionsPageLegacy.js web/src/components/TwoCasePrepositionsPageLegacy.content.test.js
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Hide German answers in A1 12.1 visual game"
+          git push origin HEAD:agent/hide-a1-121-visual-answers
