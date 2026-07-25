@@ -12,8 +12,8 @@ import TwelveHourClockPage from "./TwelveHourClockPage";
 import A1Day12TwentyFourHourClockDatesPage from "./A1Day12TwentyFourHourClockDatesPage";
 import A1Day16FoodAndNegationGrammarPage from "./A1Day16FoodAndNegationGrammarPage";
 import DirectionsImperativePage from "./DirectionsImperativePage";
-import TwoCasePrepositionsPage from "./TwoCasePrepositionsPage";
-import DativeArticlesMitBeiZuPage from "./DativeArticlesMitBeiZuPage";
+import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";
+import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage";
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
 
@@ -37,8 +37,8 @@ const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
   "A1-8": A1Day12TwentyFourHourClockDatesPage,
   "A1-9": A1Day16FoodAndNegationGrammarPage,
   "A1-11": DirectionsImperativePage,
-  "A1-12.1": TwoCasePrepositionsPage,
-  "A1-12.2": DativeArticlesMitBeiZuPage,
+  "A1-12.1": TwoCasePrepositionsPageLegacy,
+  "A1-12.2": DativeArticlesMitBeiZuGrammarNotes,
   "A1-12.3": LetterWritingGrammarNotesPage,
   "A1-13": WeatherPerfektLetterPage,
   "A1-14.1": HealthBodyPartsPage,

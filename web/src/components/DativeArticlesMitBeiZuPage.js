@@ -204,7 +204,7 @@ const DativeArticleTable = () => (
   </div>
 );
 
-const GrammarNotes = () => {
+export const DativeArticlesMitBeiZuGrammarNotes = () => {
   const location = useLocation();
   const [answers, setAnswers] = useState({});
   const [showSummary, setShowSummary] = useState(false);
@@ -451,7 +451,7 @@ const DativeArticlesMitBeiZuPage = () => {
     return <A1Day18Kapitel122WorkbookPage />;
   }
 
-  return <GrammarNotes />;
+  return <DativeArticlesMitBeiZuGrammarNotes />;
 };
 
 export default DativeArticlesMitBeiZuPage;

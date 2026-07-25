@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
+import A1WorkbookGrammarNotes, { getA1GrammarNotesComponent } from "./A1WorkbookGrammarNotes";
 import {
   A1AssignmentNeighborLinks,
   A1SharedWorkbookTabBar,
@@ -9,6 +10,7 @@ import {
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
 const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";
+const GRAMMAR_HOST_ATTRIBUTE = "data-a1-canonical-bridge-grammar";
 const SUBMISSION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-submission";
 const FOOTER_HOST_ATTRIBUTE = "data-a1-canonical-bridge-footer";
 const ORIGINAL_DISPLAY_ATTRIBUTE = "data-a1-canonical-original-display";
@@ -49,7 +51,7 @@ const findSectionRoot = (pageRoot, heading) => {
 const findExistingBridgeHosts = (pageRoot) =>
   Array.from(
     pageRoot?.querySelectorAll?.(
-      `[${NAV_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
+      `[${NAV_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
     ) || [],
   );
 
@@ -106,6 +108,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
   const [mountState, setMountState] = useState({
     navHost: null,
+    grammarHost: null,
     submissionHost: null,
     footerHost: null,
     sections: [],
@@ -114,7 +117,8 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     () => mountState.sections.map(({ element, ...section }) => section),
     [mountState.sections],
   );
-  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections });
+  const hasGrammar = Boolean(getA1GrammarNotesComponent(assignment.assignmentKey));
+  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -170,6 +174,9 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       const navHost = document.createElement("div");
       navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");
       navHost.setAttribute("data-assignment-key", assignment.assignmentKey);
+      const grammarHost = document.createElement("div");
+      grammarHost.setAttribute(GRAMMAR_HOST_ATTRIBUTE, "true");
+      grammarHost.setAttribute("data-assignment-key", assignment.assignmentKey);
       const submissionHost = document.createElement("div");
       submissionHost.setAttribute(SUBMISSION_HOST_ATTRIBUTE, "true");
       submissionHost.setAttribute("data-assignment-key", assignment.assignmentKey);
@@ -177,12 +184,12 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       footerHost.setAttribute(FOOTER_HOST_ATTRIBUTE, "true");
       footerHost.setAttribute("data-assignment-key", assignment.assignmentKey);
 
-      pageRoot.prepend(navHost, submissionHost);
+      pageRoot.prepend(navHost, grammarHost, submissionHost);
       pageRoot.appendChild(footerHost);
       installed = true;
       observer?.disconnect();
       installedRoot = pageRoot;
-      createdHosts = [navHost, submissionHost, footerHost];
+      createdHosts = [navHost, grammarHost, submissionHost, footerHost];
       installedSections = sections;
 
       Array.from(pageRoot.querySelectorAll('[role="tablist"]')).forEach((tabList) => {
@@ -192,7 +199,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       Array.from(pageRoot.querySelectorAll('[data-a1-teil-navigation="true"], [aria-label="A1 Day 21 workbook navigation"]'))
         .forEach((element) => setElementVisible(element, false));
 
-      setMountState({ navHost, submissionHost, footerHost, sections });
+      setMountState({ navHost, grammarHost, submissionHost, footerHost, sections });
     };
 
     observer = new MutationObserver(scheduleInstall);
@@ -212,12 +219,16 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
   useEffect(() => {
     mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));
+    if (mountState.grammarHost?.isConnected) {
+      mountState.grammarHost.style.display = activeTab === "grammar" ? "" : "none";
+    }
     if (mountState.submissionHost?.isConnected) {
       mountState.submissionHost.style.display = activeTab === "submit" ? "" : "none";
     }
-  }, [activeTab, mountState.sections, mountState.submissionHost]);
+  }, [activeTab, mountState.grammarHost, mountState.sections, mountState.submissionHost]);
 
   const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;
+  const grammarHost = mountState.grammarHost?.isConnected ? mountState.grammarHost : null;
   const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;
   const footerHost = mountState.footerHost?.isConnected ? mountState.footerHost : null;
 
@@ -231,9 +242,14 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
           sections={availableSections}
           activeTab={activeTab}
           onSelect={openTab}
+          hasGrammar={hasGrammar}
         />,
         navHost,
       )}
+      {grammarHost && hasGrammar ? createPortal(
+        <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />,
+        grammarHost,
+      ) : null}
       {submissionHost ? createPortal(
         <A1CanonicalSubmissionPanel assignment={assignment} />,
         submissionHost,

@@ -59,6 +59,7 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
       <main>
         <div id="workbook">
           <div data-a1-canonical-bridge-nav="true"></div>
+          <div data-a1-canonical-bridge-grammar="true"></div>
           <div data-a1-canonical-bridge-submission="true"></div>
           <h1>Numbers</h1>
           <div data-a1-canonical-bridge-footer="true"></div>
@@ -69,8 +70,8 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     const pageRoot = document.querySelector("#workbook");
     const existingHosts = __TESTING__.findExistingBridgeHosts(pageRoot);
 
-    expect(existingHosts).toHaveLength(3);
+    expect(existingHosts).toHaveLength(4);
     expect(existingHosts.every((host) => host.isConnected)).toBe(true);
-    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(3);
+    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(4);
   });
 });
