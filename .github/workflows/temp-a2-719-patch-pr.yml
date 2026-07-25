@@ -1,0 +1,56 @@
+name: Apply scoped A2 7.19 cooldown patch
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - ".github/workflows/temp-a2-719-patch-pr.yml"
+      - ".github/workflows/web-checks.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Apply assignment-scoped cooldown fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          target = Path("web/src/components/AssignmentSubmissionPage.js")
+          source = target.read_text()
+          guard = '    const latest = recentSubmissions.reduce((acc, item) => {\n      const statusLabel = safeLower(item?.status);'
+          guarded = '    const latest = recentSubmissions.reduce((acc, item) => {\n      // A submission for another assignment must never block this assignment.\n      // The 10-minute cooldown only protects repeat attempts for the selected task.\n      if (!isSameSelectedAssignment(item)) return acc;\n\n      const statusLabel = safeLower(item?.status);'
+          deps = '  }, [recentSubmissions]);\n\n  const nextAllowedSubmissionAt = useMemo'
+          scoped_deps = '  }, [isSameSelectedAssignment, recentSubmissions]);\n\n  const nextAllowedSubmissionAt = useMemo'
+
+          if guard in source:
+              source = source.replace(guard, guarded, 1)
+          elif guarded not in source:
+              raise SystemExit("Cooldown reducer anchor was not found")
+
+          if deps in source:
+              source = source.replace(deps, scoped_deps, 1)
+          elif scoped_deps not in source:
+              raise SystemExit("Cooldown dependency anchor was not found")
+
+          target.write_text(source)
+          PY
+
+      - name: Restore normal workflow files and commit fix
+        run: |
+          git checkout origin/main -- .github/workflows/web-checks.yml
+          rm -f .github/workflows/temp-a2-719-patch-pr.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/src/components/AssignmentSubmissionPage.js .github/workflows/web-checks.yml .github/workflows/temp-a2-719-patch-pr.yml
+          git diff --cached --quiet || git commit -m "Scope submission cooldown to selected assignment"
+          git push origin HEAD:${{ github.head_ref }}
