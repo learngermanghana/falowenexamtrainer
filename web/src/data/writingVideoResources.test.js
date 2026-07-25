@@ -12,12 +12,14 @@ describe("writing video resources", () => {
     ["B1", 5, "https://youtu.be/n1whPCP2KzA"],
     ["B1", 6, "https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD"],
     ["B1", 7, "https://youtu.be/oGOn3zKpNjo"],
+    ["B1", 8, "https://youtu.be/kGQWOEfhP-k"],
     ["B1", 20, "https://youtu.be/og1iVBKnIb0"],
     ["B1", 21, "https://youtu.be/1JYyJfnumig"],
     ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
     ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
     ["B2", 5, "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL"],
     ["B2", 6, "https://youtu.be/19WaMcKL8v4"],
+    ["B2", 7, "https://youtu.be/pzvyE35CZbI"],
     ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
@@ -59,7 +61,7 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B1 Day 5, Day 6, Day 7, Day 20 and Day 21 to their Teil 2 Schreiben videos", () => {
+  test("maps B1 Day 5, Day 6, Day 7, Day 8, Day 20 and Day 21 to their Teil 2 Schreiben videos", () => {
     expect(getWritingVideoResource("B1", 5)).toEqual(
       expect.objectContaining({
         key: "b1-day5-besichtigungstermin-writing-video",
@@ -81,6 +83,14 @@ describe("writing video resources", () => {
         url: "https://youtu.be/oGOn3zKpNjo",
       }),
     );
+    expect(getWritingVideoResource("B1", 8)).toEqual(
+      expect.objectContaining({
+        key: "b1-day8-gesundheit-writing-video",
+        chapter: "3.8",
+        title: expect.stringContaining("Gesundheit"),
+        url: "https://youtu.be/kGQWOEfhP-k",
+      }),
+    );
     expect(getWritingVideoResource("B1", 20)).toEqual(
       expect.objectContaining({
         key: "b1-day20-beruf-qualifikationen-writing-video",
@@ -97,7 +107,7 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B2 Day 5 and Day 6 to their Write pages", () => {
+  test("maps B2 Day 5, Day 6 and Day 7 to their Write pages", () => {
     expect(getWritingVideoResource("B2", 5)).toEqual(
       expect.objectContaining({
         key: "b2-day5-bildung-lernen-writing-video",
@@ -112,6 +122,14 @@ describe("writing video resources", () => {
         chapter: "2.1",
         title: expect.stringContaining("Migration und Integration"),
         url: "https://youtu.be/19WaMcKL8v4",
+      }),
+    );
+    expect(getWritingVideoResource("B2", 7)).toEqual(
+      expect.objectContaining({
+        key: "b2-day7-gesellschaftliche-vielfalt-writing-video",
+        chapter: "2.2",
+        title: expect.stringContaining("Gesellschaftliche Vielfalt"),
+        url: "https://youtu.be/pzvyE35CZbI",
       }),
     );
   });
@@ -166,7 +184,7 @@ describe("writing video resources", () => {
   });
 
   test("returns null when no writing video has been added", () => {
-    expect(getWritingVideoResource("B1", 8)).toBeNull();
+    expect(getWritingVideoResource("B1", 9)).toBeNull();
   });
 
   test.each([
@@ -177,11 +195,13 @@ describe("writing video resources", () => {
     ["https://youtu.be/n1whPCP2KzA", "https://www.youtube.com/embed/n1whPCP2KzA"],
     ["https://youtu.be/bklCB9MdTcA?si=qGzQjqY9xuypNTJD", "https://www.youtube.com/embed/bklCB9MdTcA"],
     ["https://youtu.be/oGOn3zKpNjo", "https://www.youtube.com/embed/oGOn3zKpNjo"],
+    ["https://youtu.be/kGQWOEfhP-k", "https://www.youtube.com/embed/kGQWOEfhP-k"],
     ["https://youtu.be/og1iVBKnIb0", "https://www.youtube.com/embed/og1iVBKnIb0"],
     ["https://youtu.be/1JYyJfnumig", "https://www.youtube.com/embed/1JYyJfnumig"],
     ["https://youtu.be/qCO2p1Ahy7U", "https://www.youtube.com/embed/qCO2p1Ahy7U"],
     ["https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL", "https://www.youtube.com/embed/-6_zmU9ibJI"],
     ["https://youtu.be/19WaMcKL8v4", "https://www.youtube.com/embed/19WaMcKL8v4"],
+    ["https://youtu.be/pzvyE35CZbI", "https://www.youtube.com/embed/pzvyE35CZbI"],
     ["https://youtu.be/I5OU_ZXz4c0", "https://www.youtube.com/embed/I5OU_ZXz4c0"],
     ["https://youtu.be/Ww6gq3lmmpk", "https://www.youtube.com/embed/Ww6gq3lmmpk"],
     ["https://youtu.be/0lWMEqPU6x4", "https://www.youtube.com/embed/0lWMEqPU6x4"],
