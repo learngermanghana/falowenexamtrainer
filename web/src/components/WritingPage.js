@@ -36,6 +36,7 @@ import WritingHistorySection, {
 } from "./WritingHistorySection";
 import WritingLibraryTab from "./WritingLibraryTab";
 import PrepositionCaseCoachField from "./PrepositionCaseCoachField";
+import LiveGermanWritingCoach from "./LiveGermanWritingCoach";
 import {
   makeReferenceId,
   normalizeReferenceNotes,
@@ -2336,6 +2337,7 @@ const WritingPage = ({
               style={styles.textArea}
               rows={9}
             />
+            <LiveGermanWritingCoach text={typedAnswer} onChange={setTypedAnswer} />
             <PrepositionCaseCoachField
               text={typedAnswer}
               level={level}
