@@ -170,7 +170,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2B1CourseBook.test.js src/components/A2Day16CustomWorkbook.test.js src/components/B2CourseBookContentAlignment.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2B1CourseBook.test.js src/components/A2B1LegacyGrammarTabRegression.test.js src/components/A2Day16CustomWorkbook.test.js src/components/B2CourseBookContentAlignment.test.js
 
   build:
     runs-on: ubuntu-latest
