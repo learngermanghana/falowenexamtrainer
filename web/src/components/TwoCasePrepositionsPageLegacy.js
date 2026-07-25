@@ -201,7 +201,7 @@ const visualGame = [
   {
     label: "Put the bag onto the table",
     emojiLine1: "🎒  ➡️  🟫",
-    emojiLine2: "onto the table / auf den Tisch",
+    emojiLine2: "onto the table",
     helper: "I put the bag onto the table. This shows movement: Wohin?",
     sentence: "Ich lege die Tasche ______ den Tisch.",
     answer: "auf",
@@ -209,7 +209,7 @@ const visualGame = [
   {
     label: "Boy in front of the tree",
     emojiLine1: "👦  FRONT  🌳",
-    emojiLine2: "vor dem Baum",
+    emojiLine2: "in front of the tree",
     helper: "The boy is in front of the tree.",
     sentence: "Der Junge steht ______ dem Baum.",
     answer: "vor",
@@ -217,7 +217,7 @@ const visualGame = [
   {
     label: "Car behind the house",
     emojiLine1: "🏠  HOUSE",
-    emojiLine2: "⬇️ behind / dahinter: 🚗",
+    emojiLine2: "⬇️ behind the house: 🚗",
     helper: "The car is behind the house.",
     sentence: "Das Auto steht ______ dem Haus.",
     answer: "hinter",
@@ -225,7 +225,7 @@ const visualGame = [
   {
     label: "Lamp attached to the door",
     emojiLine1: "🚪  +  💡",
-    emojiLine2: "attached to the door / an der Tür",
+    emojiLine2: "attached to the door",
     helper: "The lamp is attached to the door.",
     sentence: "Die Lampe hängt ______ der Tür.",
     answer: "an",
@@ -233,7 +233,7 @@ const visualGame = [
   {
     label: "Dog next to the sofa",
     emojiLine1: "🐶  ↔️  🛋",
-    emojiLine2: "next to / neben",
+    emojiLine2: "next to the sofa",
     helper: "The dog is sitting next to the sofa.",
     sentence: "Der Hund sitzt ______ dem Sofa.",
     answer: "neben",
@@ -241,7 +241,7 @@ const visualGame = [
   {
     label: "Box in the room",
     emojiLine1: "🏠  📦  🏠",
-    emojiLine2: "inside / in",
+    emojiLine2: "inside the room",
     helper: "The box is in the room.",
     sentence: "Die Kiste ist ______ dem Zimmer.",
     answer: "in",

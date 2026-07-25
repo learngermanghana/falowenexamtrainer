@@ -29,5 +29,21 @@ describe("A1 12.1 bilingual grammar notes", () => {
     expect(source).toContain('label: "Box in the room"');
     expect(source).toContain('answer: "in"');
     expect(source).toContain("Answered: {answeredVisual} of {visualGame.length}");
+    [
+      'emojiLine2: "onto the table / auf den Tisch"',
+      'emojiLine2: "vor dem Baum"',
+      'emojiLine2: "⬇️ behind / dahinter: 🚗"',
+      'emojiLine2: "attached to the door / an der Tür"',
+      'emojiLine2: "next to / neben"',
+      'emojiLine2: "inside / in"',
+    ].forEach((answerReveal) => expect(source).not.toContain(answerReveal));
+    [
+      'emojiLine2: "onto the table"',
+      'emojiLine2: "in front of the tree"',
+      'emojiLine2: "⬇️ behind the house: 🚗"',
+      'emojiLine2: "attached to the door"',
+      'emojiLine2: "next to the sofa"',
+      'emojiLine2: "inside the room"',
+    ].forEach((englishClue) => expect(source).toContain(englishClue));
   });
 });
