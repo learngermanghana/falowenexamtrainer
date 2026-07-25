@@ -1,5 +1,11 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { styles } from "../styles";
+
+const LazyA2B1GrammarNotesTab = lazy(() =>
+  import("./A2B1WorkbookGrammarNotes").then((module) => ({
+    default: module.A2B1GrammarNotesTab,
+  })),
+);
 
 export const A2_B1_WORKBOOK_TABS = [
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
@@ -23,6 +29,22 @@ export const B2_C1_WORKBOOK_TABS = [
 ];
 
 export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;
+
+export const getA2B1WorkbookContextFromAriaLabel = (ariaLabel = "") => {
+  const match = String(ariaLabel || "").match(/\b(A2|B1)\s+Day\s+(\d+)\b/i);
+  if (!match) return null;
+  return { level: match[1].toUpperCase(), day: Number(match[2]) };
+};
+
+export const getWorkbookTabsWithLegacyGrammar = ({ tabs = STANDARD_WORKBOOK_TABS, ariaLabel = "" } = {}) => {
+  const context = getA2B1WorkbookContextFromAriaLabel(ariaLabel);
+  const integratesLegacyGrammar = tabs === STANDARD_WORKBOOK_TABS && Boolean(context);
+  return {
+    context,
+    integratesLegacyGrammar,
+    tabs: integratesLegacyGrammar ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR : tabs,
+  };
+};
 
 export const getWorkbookTabsForLevel = (level) => {
   const normalizedLevel = String(level || "").toUpperCase();
@@ -104,57 +126,85 @@ export const WorkbookTabNav = ({
   onChange,
   tabs = STANDARD_WORKBOOK_TABS,
   ariaLabel = "Workbook sections",
+  renderLegacyGrammarPanel = true,
 }) => {
-  const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
-  const tabNames = tabs.map((tab) => tab.label).join(", ");
+  const {
+    context: legacyGrammarContext,
+    integratesLegacyGrammar,
+    tabs: effectiveTabs,
+  } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
+  const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
+  const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");
 
   return (
-    <nav
-      aria-label={ariaLabel}
-      data-workbook-tab-navigation
-      style={{
-        position: "relative",
-        zIndex: 30,
-        display: "grid",
-        gap: 10,
-        width: "100%",
-        padding: 12,
-        border: "2px solid #2563eb",
-        borderRadius: 18,
-        background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 70%)",
-        boxShadow: "0 14px 30px rgba(15, 23, 42, 0.12)",
-        opacity: 1,
-        visibility: "visible",
-      }}
-    >
-      <div
-        role="tablist"
+    <>
+      <nav
         aria-label={ariaLabel}
+        data-workbook-tab-navigation
         style={{
+          position: "relative",
+          zIndex: 30,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))",
           gap: 10,
           width: "100%",
-          overflow: "visible",
+          padding: 12,
+          border: "2px solid #2563eb",
+          borderRadius: 18,
+          background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 70%)",
+          boxShadow: "0 14px 30px rgba(15, 23, 42, 0.12)",
           opacity: 1,
           visibility: "visible",
         }}
       >
-        {tabs.map((tab) => (
-          <TabButton
-            key={tab.key}
-            active={tab.key === activeTab}
-            onClick={() => onChange(tab.key)}
-            label={tab.label}
-            description={tab.description}
-          />
-        ))}
-      </div>
+        <div
+          role="tablist"
+          aria-label={ariaLabel}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))",
+            gap: 10,
+            width: "100%",
+            overflow: "visible",
+            opacity: 1,
+            visibility: "visible",
+          }}
+        >
+          {effectiveTabs.map((tab) => (
+            <TabButton
+              key={tab.key}
+              active={tab.key === activeTab}
+              onClick={() => onChange(tab.key)}
+              label={tab.label}
+              description={tab.description}
+            />
+          ))}
+        </div>
 
-      <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
-        Tab {activeIndex + 1} of {tabs.length} · Select {tabNames}.
-      </p>
-    </nav>
+        <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
+          Tab {activeIndex + 1} of {effectiveTabs.length} · Select {tabNames}.
+        </p>
+      </nav>
+
+      {integratesLegacyGrammar && renderLegacyGrammarPanel && activeTab === "grammar" && legacyGrammarContext ? (
+        <section
+          data-a2-b1-legacy-grammar-panel="true"
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 12,
+            marginTop: 12,
+            border: "2px solid #2563eb",
+          }}
+        >
+          <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
+            <LazyA2B1GrammarNotesTab
+              level={legacyGrammarContext.level}
+              day={legacyGrammarContext.day}
+            />
+          </Suspense>
+        </section>
+      ) : null}
+    </>
   );
 };
 
