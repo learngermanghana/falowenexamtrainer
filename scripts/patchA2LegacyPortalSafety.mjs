@@ -6,7 +6,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const targetPath = path.join(root, "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js");
 const navigationWrapperPath = path.join(root, "web/src/components/A2LegacyStandardWorkbookNavigation.js");
 const guidancePath = path.join(root, "web/src/components/A2B1WorkbookGuidance.js");
-const day23Path = "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook";
+const inPageSharedNavPaths = [
+  "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+  "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
+  "/campus/course/a2-day-25-tagesablauf-workbook",
+  "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
+];
 let source = fs.readFileSync(targetPath, "utf8");
 let navigationWrapperSource = fs.readFileSync(navigationWrapperPath, "utf8");
 let guidanceSource = fs.readFileSync(guidancePath, "utf8");
@@ -149,25 +154,32 @@ source = source.replace(
 );
 
 const supportedRouteAnchor = "  const isSupportedRoute = A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath);";
-const day23SafeSupportedRoute = `  const isSupportedRoute =
-    A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath) && normalizedPath !== "${day23Path}";`;
-if (!navigationWrapperSource.includes(day23SafeSupportedRoute)) {
-  if (!navigationWrapperSource.includes(supportedRouteAnchor)) {
+const previousDay23Guard = `  const isSupportedRoute =
+    A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath) && normalizedPath !== "${inPageSharedNavPaths[0]}";`;
+const safeSupportedRoute = `  const isSupportedRoute =
+    A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath) &&
+    !${JSON.stringify(inPageSharedNavPaths)}.includes(normalizedPath);`;
+if (!navigationWrapperSource.includes(safeSupportedRoute)) {
+  if (navigationWrapperSource.includes(previousDay23Guard)) {
+    navigationWrapperSource = navigationWrapperSource.replace(previousDay23Guard, safeSupportedRoute);
+  } else if (navigationWrapperSource.includes(supportedRouteAnchor)) {
+    navigationWrapperSource = navigationWrapperSource.replace(supportedRouteAnchor, safeSupportedRoute);
+  } else {
     throw new Error("Could not find the A2 legacy supported-route guard.");
   }
-  navigationWrapperSource = navigationWrapperSource.replace(supportedRouteAnchor, day23SafeSupportedRoute);
 }
 
 const forcedPathsAnchor = `  "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
 ];`;
-const day23ForcedPaths = `  "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
-  "${day23Path}",
+const forcedPathLines = inPageSharedNavPaths.map((route) => `  "${route}",`).join("\n");
+const expandedForcedPaths = `  "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
+${forcedPathLines}
 ];`;
-if (!guidanceSource.includes(`  "${day23Path}",`)) {
+if (!inPageSharedNavPaths.every((route) => guidanceSource.includes(`  "${route}",`))) {
   if (!guidanceSource.includes(forcedPathsAnchor)) {
     throw new Error("Could not find the forced A2 shared-tab route list.");
   }
-  guidanceSource = guidanceSource.replace(forcedPathsAnchor, day23ForcedPaths);
+  guidanceSource = guidanceSource.replace(forcedPathsAnchor, expandedForcedPaths);
 }
 
 if (!source.includes(helperMarker)) {
@@ -188,14 +200,14 @@ if (source.includes("row.parentNode.insertBefore(mount, row)")) {
 if (source.includes("navMountRef.current?.remove()")) {
   throw new Error("A2 legacy portal host is still removed before React unmounts.");
 }
-if (!navigationWrapperSource.includes(day23SafeSupportedRoute)) {
-  throw new Error("A2 Day 23 is still routed through the legacy portal navigation.");
+if (!navigationWrapperSource.includes(safeSupportedRoute)) {
+  throw new Error("A2 Days 23-26 are still routed through the legacy portal navigation.");
 }
-if (!guidanceSource.includes(`  "${day23Path}",`)) {
-  throw new Error("A2 Day 23 is not forced onto the in-page shared workbook navigation.");
+if (!inPageSharedNavPaths.every((route) => guidanceSource.includes(`  "${route}",`))) {
+  throw new Error("A2 Days 23-26 are not all forced onto the in-page shared workbook navigation.");
 }
 
 fs.writeFileSync(targetPath, source, "utf8");
 fs.writeFileSync(navigationWrapperPath, navigationWrapperSource, "utf8");
 fs.writeFileSync(guidancePath, guidanceSource, "utf8");
-console.log("Staged A2 legacy portal safety and routed Day 23 through the in-page shared tabs.");
+console.log("Staged A2 legacy portal safety and routed Days 23-26 through the in-page shared tabs.");
