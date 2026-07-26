@@ -55,6 +55,7 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
 
   it("keeps A2 Day 23 on native shared tabs so Teil 2 and Teil 3 open directly", () => {
     const source = read("A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js");
+    const legacyWrapper = read("A2LegacyStandardWorkbookNavigation.js");
 
     expect(source).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
     expect(source).toContain('useState("grammar")');
@@ -65,6 +66,9 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(source).toContain('activeTab === "submit"');
     expect(source).not.toContain('activeTab === "teil2"');
     expect(source).not.toContain('activeTab === "teil3"');
+    expect(legacyWrapper).toContain("const isNativeDay23 = normalizedPath === A2_DAY23_PATH");
+    expect(legacyWrapper).toContain("A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath) && !isNativeDay23");
+    expect(legacyWrapper).toContain("!isNativeDay23 &&");
   });
 
   it("does not double-integrate grammar on newer A2/B1 workbook pages", () => {
