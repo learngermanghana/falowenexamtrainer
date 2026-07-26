@@ -6,6 +6,7 @@ import A2LegacyStandardWorkbookNavigationImpl, {
   insertA2LegacyPortalMountBefore,
 } from "./A2LegacyStandardWorkbookNavigationImpl";
 import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
+import A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage";
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
 
@@ -20,11 +21,8 @@ jest.mock("./CourseInlinePracticePanel", () => ({ type }) => <div>{type} practic
 jest.mock("./SpeakingMindMap", () => () => <div>Speaking mind map</div>);
 jest.mock("./SpeakingPracticeTimerCard", () => () => <div>Speaking timer</div>);
 
-const DAY23_TO_26 = [
-  {
-    day: 23,
-    path: "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
-  },
+const DAY23_PATH = "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook";
+const DAY24_TO_26 = [
   {
     day: 24,
     path: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
@@ -128,7 +126,45 @@ describe("A2 legacy portal safety", () => {
     });
   });
 
-  test.each(DAY23_TO_26)(
+  test("Day 23 owns native standard tabs, opens Teil 2 and Teil 3, and keeps Hören self-check only", async () => {
+    const day23Url = `${DAY23_PATH}?radio=done`;
+    window.history.pushState({}, "", day23Url);
+
+    render(
+      <MemoryRouter initialEntries={[day23Url]}>
+        <A2LegacyStandardWorkbookNavigation />
+        <main className="layout-main">
+          <A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />
+        </main>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("navigation", { name: "A2 Day 23 workbook sections" })).toBeVisible();
+    });
+    expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
+    expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
+    expect(document.querySelector('[data-a2-day23-native-guidance="true"]')).toBeTruthy();
+    expect(screen.getByText(/Teil 4 · Hören:.*self-check only/i)).toBeInTheDocument();
+    expect(screen.getByText(/do not send Hören through Submit/i)).toBeInTheDocument();
+
+    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
+    expect(screen.getByRole("heading", { name: /Teil 2 \(Schreiben\)/i })).toBeVisible();
+
+    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
+    expect(screen.getByRole("heading", { name: /Teil 3 \(Lesen\)/i })).toBeVisible();
+
+    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 4" }))).not.toThrow();
+    expect(screen.getByRole("heading", { name: /Teil 4 \(Hören\)/i })).toBeVisible();
+    expect(screen.getByText(/only parts that will be officially evaluated.*Lesen and Schreiben/i)).toBeInTheDocument();
+
+    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Submit" }))).not.toThrow();
+    expect(screen.getByRole("heading", { name: /Submit Workbook · Day 23/i })).toBeVisible();
+    expect(screen.getByText(/Submit only.*Teil 2.*Teil 3/i)).toBeInTheDocument();
+    expect(screen.getByText(/Do not submit Teil 1 or Teil 4/i)).toBeInTheDocument();
+  });
+
+  test.each(DAY24_TO_26)(
     "Day $day uses in-page shared tabs and opens Teil 2 and Teil 3 without a portal collision",
     async ({ day, path }) => {
       const url = `${path}?radio=done`;
