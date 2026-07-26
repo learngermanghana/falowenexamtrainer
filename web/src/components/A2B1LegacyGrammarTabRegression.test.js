@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { resolveA2B1WorkbookDayFromLocation } from "./A2B1WorkbookGuidance";
 import {
   A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   STANDARD_WORKBOOK_TABS,
@@ -29,6 +30,27 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
       expect(resolved.integratesLegacyGrammar).toBe(true);
       expect(resolved.tabs.map((tab) => tab.key)).toEqual(expectedTabOrder);
     });
+  });
+
+  it("resolves workbook days from both legacy A2 slugs and B1 lesson routes", () => {
+    expect(
+      resolveA2B1WorkbookDayFromLocation(
+        "A2",
+        "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
+      ),
+    ).toBe(10);
+    expect(resolveA2B1WorkbookDayFromLocation("B1", "/campus/course/lesson/B1/8?view=workbook")).toBe(8);
+  });
+
+  it("keeps the forced A2 fallback on the same Grammar-first shared tab contract", () => {
+    const guidance = read("A2B1WorkbookGuidance.js");
+    const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
+
+    expect(guidance).toContain('{ key: "grammar", legacyKey: "grammar"');
+    expect(guidance).toContain('useState("grammar")');
+    expect(guidance).toContain('`A2 Day ${workbookDay} workbook sections`');
+    expect(guidance).toContain("Grammar, Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit");
+    expect(day10).toContain("<A2B1WorkbookGuidance />");
   });
 
   it("does not double-integrate grammar on newer A2/B1 workbook pages", () => {
