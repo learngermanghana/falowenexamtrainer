@@ -17,6 +17,20 @@ const resolveWorkbookLevel = (level) => {
   return "";
 };
 
+export const resolveA2B1WorkbookDayFromLocation = (level, locationValue = "") => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  if (!["A2", "B1"].includes(normalizedLevel)) return null;
+
+  const source = String(locationValue || "");
+  const slugMatch = source.match(new RegExp(`${normalizedLevel.toLowerCase()}-day-(\\d+)`, "i"));
+  if (slugMatch) return Number(slugMatch[1]);
+
+  const lessonMatch = source.match(new RegExp(`/lesson/${normalizedLevel}/(\\d+)`, "i"));
+  if (lessonMatch) return Number(lessonMatch[1]);
+
+  return null;
+};
+
 const normalizeTabText = (value = "") =>
   String(value || "")
     .toLowerCase()
@@ -35,6 +49,7 @@ const FORCE_SHARED_A2_TAB_PATHS = [
 ];
 
 const UNIVERSAL_A2_WORKBOOK_TABS = [
+  { key: "grammar", legacyKey: "grammar", match: /\bgrammar\b|grammatik/i },
   { key: "sprechen", legacyKey: "teil1", match: /\bteil\s*1\b|sprechen|speak/i },
   { key: "schreiben", legacyKey: "teil2", match: /\bteil\s*2\b|schreiben|write/i },
   { key: "lesen", legacyKey: "teil3", match: /\bteil\s*3\b|lesen|read/i },
@@ -133,7 +148,14 @@ const clickExistingWorkbookTab = (tab) => {
 
 const UniversalA2WorkbookTabs = ({ level = "" }) => {
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const workbookDay = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return resolveA2B1WorkbookDayFromLocation(
+      workbookLevel,
+      `${window.location.pathname || ""}${window.location.search || ""}`,
+    );
+  }, [workbookLevel]);
+  const [activeTab, setActiveTab] = useState("grammar");
   const [showFallbackTabs, setShowFallbackTabs] = useState(false);
   const [showSubmit, setShowSubmit] = useState(false);
   const submitRef = useRef(null);
@@ -173,6 +195,11 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
     if (!tab) return;
 
     setActiveTab(tab.key);
+    if (tab.key === "grammar") {
+      setShowSubmit(false);
+      return;
+    }
+
     if (tab.key === "submit") {
       setShowSubmit(true);
       window.setTimeout(() => submitRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" }), 0);
@@ -198,7 +225,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       <div style={{ display: "grid", gap: 4 }}>
         <strong>A2 workbook navigation</strong>
         <span style={{ color: "#475569", fontSize: 13 }}>
-          Use the shared workbook tabs below: Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit.
+          Use the shared workbook tabs below: Grammar, Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit.
         </span>
       </div>
 
@@ -206,7 +233,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
         activeTab={activeTab}
         onChange={handleTabClick}
         tabs={STANDARD_WORKBOOK_TABS}
-        ariaLabel="A2 workbook sections"
+        ariaLabel={workbookDay ? `A2 Day ${workbookDay} workbook sections` : "A2 workbook sections"}
       />
 
       {showSubmit ? (
@@ -255,7 +282,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
         <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Use the tabs above to move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab in the Course Book when your final answers are ready.
+            Use <strong>Grammar</strong> first when you need the lesson notes, then move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab in the Course Book when your final answers are ready.
           </p>
           <p style={{ margin: 0 }}>
             <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
