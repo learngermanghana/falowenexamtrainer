@@ -53,6 +53,20 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(day10).toContain("<A2B1WorkbookGuidance />");
   });
 
+  it("keeps A2 Day 23 on native shared tabs so Teil 2 and Teil 3 open directly", () => {
+    const source = read("A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js");
+
+    expect(source).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
+    expect(source).toContain('useState("grammar")');
+    expect(source).toContain('ariaLabel="A2 Day 23 workbook sections"');
+    expect(source).toContain('activeTab === "schreiben"');
+    expect(source).toContain('activeTab === "lesen"');
+    expect(source).toContain('activeTab === "references"');
+    expect(source).toContain('activeTab === "submit"');
+    expect(source).not.toContain('activeTab === "teil2"');
+    expect(source).not.toContain('activeTab === "teil3"');
+  });
+
   it("does not double-integrate grammar on newer A2/B1 workbook pages", () => {
     const resolved = getWorkbookTabsWithLegacyGrammar({
       tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
