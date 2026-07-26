@@ -60,7 +60,7 @@ export const resolveA2FallbackSubmissionContext = (day) => {
 
   const assignment = getInlineCourseAssignments("A2", numericDay)[0] || null;
   const chapter = assignment?.chapter || config.fallbackChapter;
-  const assignmentKey = assignment?.assignmentKey || `A2-${chapter}`;
+  const assignmentKey = assignment?.assignmentKey || \`A2-\${chapter}\`;
 
   return {
     level: "A2",
@@ -103,10 +103,20 @@ const unsafeFallbackTabs = `  const fallbackTabs = useMemo(
         : STANDARD_WORKBOOK_TABS,
     [workbookDay],
   );`;
+const tabDescriptionOverrideDeclaration = '  const tabDescriptionOverrides = workbookDay === 25 ? { hoeren: "Lesen" } : null;';
 if (guidanceSource.includes(unsafeFallbackTabs)) {
   guidanceSource = guidanceSource.replace(
     unsafeFallbackTabs,
-    '  const tabDescriptionOverrides = workbookDay === 25 ? { hoeren: "Lesen" } : null;',
+    guidanceSource.includes(tabDescriptionOverrideDeclaration) ? "" : tabDescriptionOverrideDeclaration,
+  );
+} else if (!guidanceSource.includes(tabDescriptionOverrideDeclaration)) {
+  const submitRefAnchor = "  const submitRef = useRef(null);";
+  if (!guidanceSource.includes(submitRefAnchor)) {
+    throw new Error("Could not find universal A2 submit ref for Day 25 label override.");
+  }
+  guidanceSource = guidanceSource.replace(
+    submitRefAnchor,
+    `${submitRefAnchor}\n${tabDescriptionOverrideDeclaration}`,
   );
 }
 
@@ -179,6 +189,10 @@ standardSource = standardSource.replace(
   "          Tab {activeIndex + 1} of {displayTabs.length} · Select {tabNames}.",
 );
 
+const overrideDeclarationCount = guidanceSource.split(tabDescriptionOverrideDeclaration).length - 1;
+if (overrideDeclarationCount !== 1) {
+  throw new Error(`Expected exactly one Day 25 label override declaration, found ${overrideDeclarationCount}.`);
+}
 if (!guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
   throw new Error("Days 24-26 fallback submissions are not route-locked.");
 }
