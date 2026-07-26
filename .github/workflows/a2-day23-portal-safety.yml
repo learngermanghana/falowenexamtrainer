@@ -5,11 +5,14 @@ on:
     paths:
       - "scripts/patchA2LegacyPortalSafety.mjs"
       - "scripts/patchA2ReactOwnedDomCleanupSafety.mjs"
+      - "scripts/patchA2FallbackWorkbookSafety.mjs"
       - "web/package.json"
       - "web/src/components/a2GoetheListeningOnlyCleanup.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
+      - "web/src/components/StandardWorkbookComponents.js"
       - "web/src/components/A2LegacyPortalSafety.test.jsx"
       - "web/src/components/A2ReactOwnedCleanupSafety.test.jsx"
+      - "web/src/components/A2FallbackWorkbookSafety.test.jsx"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
       - ".github/workflows/a2-day23-portal-safety.yml"
 
@@ -23,20 +26,22 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Apply A2 DOM safety patches twice
+      - name: Apply A2 DOM and fallback safety patches twice
         run: |
           node scripts/patchA2LegacyPortalSafety.mjs
           node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
+          node scripts/patchA2FallbackWorkbookSafety.mjs
           node scripts/patchA2LegacyPortalSafety.mjs
           node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
+          node scripts/patchA2FallbackWorkbookSafety.mjs
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test A2 portal, React-owned cleanup and restored workbook contracts
+      - name: Test A2 portal, cleanup, fallback submission and Grammar contracts
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx src/components/A2SharedWorkbookRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx src/components/A2FallbackWorkbookSafety.test.jsx src/components/A2SharedWorkbookRegression.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
