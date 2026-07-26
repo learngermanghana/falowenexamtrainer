@@ -144,9 +144,11 @@ describe("A2 legacy portal safety", () => {
     });
     expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
     expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
-    expect(document.querySelector('[data-a2-day23-native-guidance="true"]')).toBeTruthy();
-    expect(screen.getByText(/Teil 4 · Hören:.*self-check only/i)).toBeInTheDocument();
-    expect(screen.getByText(/do not send Hören through Submit/i)).toBeInTheDocument();
+
+    const guidance = document.querySelector('[data-a2-day23-native-guidance="true"]');
+    expect(guidance).toBeTruthy();
+    expect(guidance.textContent).toMatch(/Teil 4 · Hören: self-check only/i);
+    expect(guidance.textContent).toMatch(/do not send Hören through Submit/i);
 
     expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
     expect(screen.getByRole("heading", { name: /Teil 2 \(Schreiben\)/i })).toBeVisible();
@@ -156,12 +158,15 @@ describe("A2 legacy portal safety", () => {
 
     expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 4" }))).not.toThrow();
     expect(screen.getByRole("heading", { name: /Teil 4 \(Hören\)/i })).toBeVisible();
-    expect(screen.getByText(/only parts that will be officially evaluated.*Lesen and Schreiben/i)).toBeInTheDocument();
+    expect(screen.getByText(/only parts that will be officially evaluated by the school are Lesen and Schreiben/i)).toBeInTheDocument();
 
     expect(() => fireEvent.click(screen.getByRole("tab", { name: "Submit" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Submit Workbook · Day 23/i })).toBeVisible();
-    expect(screen.getByText(/Submit only.*Teil 2.*Teil 3/i)).toBeInTheDocument();
-    expect(screen.getByText(/Do not submit Teil 1 or Teil 4/i)).toBeInTheDocument();
+    const submitHeading = screen.getByRole("heading", { name: /Submit Workbook · Day 23/i });
+    expect(submitHeading).toBeVisible();
+    const submitPanel = submitHeading.closest("section");
+    expect(submitPanel).toBeTruthy();
+    expect(submitPanel.textContent).toMatch(/Submit only Teil 2 · Schreiben and Teil 3 · Lesen/i);
+    expect(submitPanel.textContent).toMatch(/Do not submit Teil 1 or Teil 4 · Hören/i);
   });
 
   test.each(DAY24_TO_26)(
