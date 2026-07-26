@@ -10,6 +10,7 @@ on:
       - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
       - "web/src/components/A2LegacyPortalSafety.test.jsx"
       - "web/src/components/A2ReactOwnedCleanupSafety.test.jsx"
+      - "web/src/components/A2SharedWorkbookRegression.test.js"
       - ".github/workflows/a2-day23-portal-safety.yml"
 
 jobs:
@@ -31,11 +32,11 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test A2 portal and React-owned cleanup safety
+      - name: Test A2 portal, React-owned cleanup and restored workbook contracts
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx src/components/A2SharedWorkbookRegression.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
