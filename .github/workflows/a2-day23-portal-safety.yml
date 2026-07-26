@@ -1,16 +1,19 @@
-name: A2 Day 23 portal safety
+name: A2 workbook DOM safety
 
 on:
   pull_request:
     paths:
       - "scripts/patchA2LegacyPortalSafety.mjs"
+      - "scripts/patchA2ReactOwnedDomCleanupSafety.mjs"
       - "web/package.json"
+      - "web/src/components/a2GoetheListeningOnlyCleanup.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
       - "web/src/components/A2LegacyPortalSafety.test.jsx"
+      - "web/src/components/A2ReactOwnedCleanupSafety.test.jsx"
       - ".github/workflows/a2-day23-portal-safety.yml"
 
 jobs:
-  portal-safety:
+  dom-safety:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,18 +22,20 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Apply portal safety patch twice
+      - name: Apply A2 DOM safety patches twice
         run: |
           node scripts/patchA2LegacyPortalSafety.mjs
+          node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
           node scripts/patchA2LegacyPortalSafety.mjs
+          node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test Day 23 portal replacement race
+      - name: Test A2 portal and React-owned cleanup safety
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx
       - name: Build production web app
         working-directory: web
         run: npm run build
