@@ -45,11 +45,17 @@ describe("B2 Day 11 Falowen Radio resource ownership", () => {
     const normalized = normalizeB2C1Lesson(lesson, "B2");
     expect(normalized.resources.videos.map((resource) => resource?.url)).not.toContain(RADIO_YOUTUBE_URL);
 
+    const courseScheduleSource = fs.readFileSync(
+      path.resolve(__dirname, "./courseSchedule.js"),
+      "utf8",
+    );
+    expect(courseScheduleSource).not.toContain(`video: "${RADIO_YOUTUBE_URL}"`);
+    expect(courseScheduleSource).not.toContain(`youtube_link: "${RADIO_YOUTUBE_URL}"`);
+
     const patchSource = fs.readFileSync(
       path.resolve(__dirname, "../../../scripts/patchRequestedCourseMedia.mjs"),
       "utf8",
     );
-    expect(patchSource).not.toContain(`video: "${RADIO_YOUTUBE_URL}"`);
-    expect(patchSource).not.toContain(`youtube_link: "${RADIO_YOUTUBE_URL}"`);
+    expect(patchSource).toContain("B2 Day 11 Falowen Radio must not be injected into ordinary lesson video fields.");
   });
 });
