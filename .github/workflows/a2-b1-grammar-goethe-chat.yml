@@ -1,0 +1,37 @@
+name: A2 B1 Grammar Goethe chat
+
+on:
+  pull_request:
+    paths:
+      - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/components/A2Day9HoerenCourseChatCleanup.test.js"
+      - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
+      - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
+      - "web/src/components/A2StandardTabbedWorkbookPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/CourseInlinePracticePanel.js"
+      - "web/src/components/StandardWorkbookComponents.js"
+      - "README.md"
+      - ".github/workflows/a2-b1-grammar-goethe-chat.yml"
+
+jobs:
+  grammar-chat-ownership:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test A2 and B1 Grammar chat ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js src/components/A2B1LegacyGrammarTabRegression.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
