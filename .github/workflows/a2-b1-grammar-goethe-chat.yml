@@ -31,7 +31,13 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js
+        shell: bash
+        run: |
+          set +e
+          npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js > /tmp/grammar-chat-test.log 2>&1
+          status=$?
+          tail -n 80 /tmp/grammar-chat-test.log
+          exit $status
       - name: Test existing A2 B1 Grammar tab contract
         working-directory: web
         env:
