@@ -4,9 +4,14 @@ on:
   pull_request:
     paths:
       - "web/src/components/A1SharedAssignmentWorkbookLayout.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
+      - "web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx"
+      - "web/src/components/A1TutorMarkedOverviewGuidance.jsx"
       - "web/src/components/A1TutorMarkedWorkbookShell.js"
       - "web/src/components/A1TutorMarkedWorkbookNavigation.test.js"
+      - "web/src/components/RouteScopedAppServices.js"
       - "web/src/data/a1AssignmentRegistry.js"
+      - "README.md"
       - ".github/workflows/a1-tutor-marked-overview-first.yml"
 
 jobs:
@@ -26,7 +31,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx
       - name: Build production web app
         working-directory: web
         run: npm run build
