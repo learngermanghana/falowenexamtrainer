@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
       - "web/src/components/A2Day9HoerenCourseChatCleanup.test.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigation.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
@@ -27,6 +28,11 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Test course speaking cleanup safety
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/__tests__/CourseSpeakingChatCleanupSafety.test.js
       - name: Test A2 and B1 Grammar chat visibility
         working-directory: web
         env:
