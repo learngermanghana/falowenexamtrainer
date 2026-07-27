@@ -36,6 +36,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    10: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day10-konsum-geld-ai-video",
+          chapter: "2.5",
+          title: "B2 Day 10 · Konsum und Geld · AI video",
+          description:
+            "AI video lesson for discussing consumption, money, advertising and purchasing decisions at B2 level.",
+          url: "https://youtu.be/vRgpiPZ5AAw",
+        }),
+      ]),
+    }),
     12: Object.freeze({
       videoResources: Object.freeze([
         Object.freeze({
@@ -83,6 +95,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           description:
             "AI video lesson for evaluating cultural participation, quality of life, access and public cultural funding at C1 level.",
           url: "https://youtu.be/LpsmADd4U30",
+        }),
+      ]),
+    }),
+    14: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day14-innovation-zukunft-ai-video",
+          chapter: "3.4",
+          title: "C1 Day 14 · Innovation und Zukunft · AI video",
+          description:
+            "AI video lesson for evaluating technological change, future scenarios, opportunities and risks at C1 level.",
+          url: "https://youtu.be/GEQNr4JedlM",
         }),
       ]),
     }),
