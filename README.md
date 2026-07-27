@@ -55,6 +55,7 @@ The default in-app A2/B1 workbook sequence is:
 Rules:
 
 - Grammar notes are first-class workbook content for A2/B1 and should open from the **Grammar** tab instead of being restored as a separate grammar supporting-material card.
+- The **Goethe Free Chat / AI speaking coach belongs only to Teil 1 · Sprechen**. It must never be visible while the **Grammar** tab or a dedicated A2/B1 grammar-notes view is active. `web/public/course-speaking-chat-cleanup.js` is the cross-layout safety guard for legacy workbooks whose old Teil 1 DOM can remain mounted behind a Grammar portal.
 - `web/src/components/A2B1WorkbookGrammarNotes.js` is the source of truth for which A2/B1 day owns which grammar-notes component.
 - Newer shared workbook pages should use `A2_B1_WORKBOOK_TABS_WITH_GRAMMAR` and render `A2B1GrammarNotesTab` for the Grammar section.
 - Older A2/B1 workbook pages that still pass `STANDARD_WORKBOOK_TABS` rely on `WorkbookTabNav` to add the Grammar tab from the workbook's `A2 Day N` / `B1 Day N` aria label. Do not replace this with a separate hand-built grammar link.
@@ -266,8 +267,6 @@ password resets. To set it up:
    placement history here.
 4. (Optional) Under **Cloud Messaging**, create a Web Push certificate key and set `REACT_APP_FIREBASE_VAPID_KEY` to enable
    browser notifications.
-5. For server-side features (Paystack webhook, Sheets sync), deploy the Cloud Functions as described below so they can access
-   the same project resources.
 
 ### Firestore data used by the app
 Client-side data access currently centers around these collections and subcollections:
@@ -293,37 +292,39 @@ If your new signup flow writes student records to Firestore, you can mirror thos
 rows into the approval spreadsheet with the helper script at
 `functionz/googleSheetsSync.js`:
 
-1. Create a Google Cloud service account with "Google Sheets API" access and a
-   Firebase Admin SDK key. Download the JSON key file and either point
-   `GOOGLE_SERVICE_ACCOUNT_FILE` to it or base64-encode it into
-   `GOOGLE_SERVICE_ACCOUNT_KEY`.
-2. Share the destination sheet (e.g., your approval sheet) with the service
-   account email. Set `GOOGLE_SHEETS_ID` to the sheet ID (the long string in the
-   sheet URL) and optionally `GOOGLE_SHEETS_RANGE` to change the tab/range
-   (default: `Signups!A:E`).
-3. Ensure each Firestore signup document contains `firstName`, `lastName`,
-   `email`, `level`, `createdAt`, and a boolean `syncedToSheets: false` field so
-   the script can find unsent entries. The script marks `syncedToSheets` true
-   and adds a `syncedAt` timestamp after a successful append.
-4. Run the sync from the repository root:
-   ```
-   GOOGLE_SHEETS_ID="<target_sheet_id>" \
-   GOOGLE_SERVICE_ACCOUNT_FILE=./service-account.json \
-   node functionz/googleSheetsSync.js
-   ```
-
-You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
-for near-real-time mirroring between Firebase and Google Sheets.
-
-## AI speech synthesis configuration
-
-Falowen's free Goethe Sprechen custom chat can generate asynchronous German MP3 replies for A2, B1, B2, and C1 coach messages. The feature uses the existing server-side `OPENAI_API_KEY`; do not expose this key in browser code.
-
-Optional text-to-speech overrides:
-
-```text
-OPENAI_TTS_MODEL=gpt-4o-mini-tts
-OPENAI_TTS_VOICE=marin
+```bash
+npm --prefix functions install
 ```
 
-When these variables are omitted, the backend uses the defaults shown above.
+The main function calls `syncStudentToSheet(profile)` after writing the Firestore document. Configure a service account that has edit access to the sheet and set these environment variables before deploying the function:
+
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` (replace literal `\n` with real newlines)
+- `GOOGLE_SHEETS_SPREADSHEET_ID`
+- `GOOGLE_SHEETS_STUDENTS_RANGE` (optional, defaults to `Students!A:H`)
+
+The target worksheet must include a header row with at least the columns `email`, `studentCode`, `name`, `className`, `level`, `tuitionFee`, `amountPaid`, `balanceDue`, `paymentStatus`, `startDate`, `endDate`. The sync helper uses these headers to place values in the right columns, so the order of columns in the sheet can change without breaking synchronization.
+
+### Secure endpoint for Google Apps Script
+
+`functionz/sheetSyncApi.js` exposes `/sheet-sync/push-student`, an authenticated endpoint that the Apps Script can call to push a row back into Firestore. Set `SHEET_SYNC_TOKEN` (or `SHEET_SYNC_SECRET`) in the Cloud Functions environment and include it as an `x-sheet-sync-token` header from Apps Script. Requests without a valid token are rejected with HTTP 401.
+
+### Deploying the Firestore rules
+
+The repo ships with a `firestore.rules` file. Deploy it so the client can read the data written by the functions:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+### Optional server-to-server Firebase credentials
+
+Some serverless providers do not mount a service-account file. `functions/functionz/firebaseAdmin.js` first tries `GOOGLE_APPLICATION_CREDENTIALS`, then falls back to `FIREBASE_SERVICE_ACCOUNT` (the JSON service-account contents), or the `FIREBASE_SERVICE_ACCOUNT_BASE64` variant. This keeps the backend portable across Cloud Functions, Vercel and other hosts.
+
+### Google sign-in
+
+The web app supports Google authentication through `GoogleAuthProvider`. If you enable the provider in the Firebase console, add your web app domains under **Authentication → Settings → Authorized domains** so the popup can complete successfully.
+
+## Deploy to Vercel
+
+The repository includes `vercel.json` so Vercel can build the frontend in `web/` and serve it from the project root. `vercel.json` rewrites all routes to `index.html` for client-side routing; no extra configuration is needed.
