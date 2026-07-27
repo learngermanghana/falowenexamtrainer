@@ -27,11 +27,16 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Test A2 and B1 Grammar chat ownership
+      - name: Test A2 and B1 Grammar chat visibility
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js src/components/A2B1LegacyGrammarTabRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js
+      - name: Test existing A2 B1 Grammar tab contract
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2B1LegacyGrammarTabRegression.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
