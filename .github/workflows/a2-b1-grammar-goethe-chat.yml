@@ -28,29 +28,10 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
       - name: Test A2 and B1 Grammar chat visibility
-        id: grammar_chat_test
         working-directory: web
         env:
           CI: true
-        shell: bash
-        run: |
-          set +e
-          npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js > /tmp/grammar-chat-test.log 2>&1
-          status=$?
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          tail -n 80 /tmp/grammar-chat-test.log
-          exit 0
-      - name: Upload Grammar chat Jest log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: grammar-chat-jest-log
-          path: /tmp/grammar-chat-test.log
-          if-no-files-found: error
-          retention-days: 1
-      - name: Fail when Grammar chat visibility test failed
-        if: steps.grammar_chat_test.outputs.status != '0'
-        run: exit 1
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js
       - name: Test existing A2 B1 Grammar tab contract
         working-directory: web
         env:
