@@ -1,13 +1,56 @@
 jest.mock("./A1CanonicalSubmissionPanel", () => () => null);
 
-import {
+import React from "react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import A1SharedAssignmentWorkbookBridge, {
   __TESTING__,
   discoverA1BridgeSections,
 } from "./A1SharedAssignmentWorkbookBridge";
+import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
+
+const BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-3", "A1-5", "A1-12.1", "A1-12.2"];
+
+const renderBridgeWorkbook = (assignmentKey) => {
+  const assignment = getA1Assignment(assignmentKey);
+  const sections = assignment.sections
+    .map(({ label }, index) => `<section id="section-${index + 1}"><h2>${label}</h2><p>Assignment content</p></section>`)
+    .join("");
+
+  document.body.innerHTML = `
+    <main>
+      <div id="workbook">
+        <h1>${assignment.title}</h1>
+        <p id="overview-copy">Read the assignment overview.</p>
+        ${sections}
+      </div>
+    </main>
+    <div id="react-root"></div>
+  `;
+
+  const container = document.querySelector("#react-root");
+  render(
+    <MemoryRouter initialEntries={[assignment.workbookRoute]}>
+      <A1SharedAssignmentWorkbookBridge assignmentKey={assignmentKey} />
+    </MemoryRouter>,
+    { container },
+  );
+
+  return assignment;
+};
 
 describe("A1SharedAssignmentWorkbookBridge", () => {
   beforeEach(() => {
+    document.body.innerHTML = "";
+    if (!window.requestAnimationFrame) {
+      window.requestAnimationFrame = (callback) => window.setTimeout(callback, 0);
+      window.cancelAnimationFrame = (id) => window.clearTimeout(id);
+    }
+  });
+
+  afterEach(() => {
+    cleanup();
     document.body.innerHTML = "";
   });
 
@@ -59,6 +102,7 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
       <main>
         <div id="workbook">
           <div data-a1-canonical-bridge-nav="true"></div>
+          <div data-a1-canonical-bridge-overview-guidance="true"></div>
           <div data-a1-canonical-bridge-grammar="true"></div>
           <div data-a1-canonical-bridge-submission="true"></div>
           <h1>Numbers</h1>
@@ -70,8 +114,36 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     const pageRoot = document.querySelector("#workbook");
     const existingHosts = __TESTING__.findExistingBridgeHosts(pageRoot);
 
-    expect(existingHosts).toHaveLength(4);
+    expect(existingHosts).toHaveLength(5);
     expect(existingHosts.every((host) => host.isConnected)).toBe(true);
-    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(4);
+    expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-overview-guidance], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(5);
   });
+
+  test.each(BRIDGE_ASSIGNMENT_KEYS)(
+    "%s opens with the shared Grammar guidance on Overview",
+    async (assignmentKey) => {
+      const assignment = renderBridgeWorkbook(assignmentKey);
+      expect(assignment.layoutMode).toBe("bridge");
+
+      const guidanceHost = await waitFor(() => {
+        const host = document.querySelector(
+          `[data-a1-canonical-bridge-overview-guidance="true"][data-assignment-key="${assignmentKey}"]`,
+        );
+        expect(host).not.toBeNull();
+        return host;
+      });
+
+      expect(guidanceHost.style.display).toBe("");
+      expect(guidanceHost.textContent).toContain("How to complete this assignment");
+      expect(guidanceHost.textContent).toContain(A1_TUTOR_MARKED_OVERVIEW_GUIDANCE);
+
+      const grammarButton = Array.from(document.querySelectorAll('[role="tab"]')).find(
+        (button) => button.textContent === "Grammar",
+      );
+      expect(grammarButton).toBeTruthy();
+      fireEvent.click(grammarButton);
+
+      await waitFor(() => expect(guidanceHost.style.display).toBe("none"));
+    },
+  );
 });
