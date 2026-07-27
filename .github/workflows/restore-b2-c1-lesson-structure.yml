@@ -47,7 +47,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/b2Day11FalowenRadio.test.js
+        run: npx jest --runInBand --runTestsByPath src/data/b2Day11FalowenRadio.test.js
       - name: Test B2 and C1 Learn, Speak and Write structure
         working-directory: web
         env:
