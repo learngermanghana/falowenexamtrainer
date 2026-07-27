@@ -9,6 +9,7 @@ on:
       - "functions/data/curriculumManifest.js"
       - "scripts/applyB2LessonContentAlignment.js"
       - "scripts/checkCurriculumManifestSync.js"
+      - "scripts/testB2CurriculumStructuralParity.js"
       - ".github/workflows/b2-curriculum-parity.yml"
 
 jobs:
@@ -19,5 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Regression test nested B2 alignment metadata
+        run: node scripts/testB2CurriculumStructuralParity.js
       - name: Verify B2 web and Functions curriculum parity
         run: node scripts/checkCurriculumManifestSync.js
