@@ -36,6 +36,43 @@ updateFile("web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js", 
   return source.replace(marker, `${marker}\n${videoBlock}`);
 });
 
+updateFile("web/src/data/courseSchedule.js", (source) => {
+  const oldBlock = `      day: 11,
+      topic: "Engagement und Ehrenamt",
+      chapter: "3.1",
+      goal: "Verknüpfen Sie Argumente präzise und entwickeln Sie eine differenzierte Position zu freiwilligem Engagement.",
+      instruction: "Schauen Sie das Video, wiederholen Sie die Grammatik und bearbeiten Sie das Arbeitsbuch.",
+      grammar_topic: "Textverknüpfung mit Konnektoren",
+      assignment: true,
+      lesen_hören: {
+        video: "",
+        youtube_link: "",
+        grammarbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+        workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+      },
+    },`;
+  const newBlock = `      day: 11,
+      topic: "Engagement und Ehrenamt",
+      chapter: "3.1",
+      goal: "Verknüpfen Sie Argumente präzise und entwickeln Sie eine differenzierte Position zu freiwilligem Engagement.",
+      instruction: "Schauen Sie das Video, wiederholen Sie die Grammatik und bearbeiten Sie das Arbeitsbuch.",
+      grammar_topic: "Textverknüpfung mit Konnektoren",
+      assignment: true,
+      lesen_hören: {
+        video: "https://youtu.be/AWEHnJd1o3M",
+        youtube_link: "https://youtu.be/AWEHnJd1o3M",
+        grammarbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+        workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+      },
+    },`;
+
+  if (source.includes(newBlock)) return source;
+  if (!source.includes(oldBlock)) {
+    throw new Error("B2 Day 11 chapter 3.1 Falowen Radio resource anchor was not found.");
+  }
+  return source.replace(oldBlock, newBlock);
+});
+
 updateFile("web/src/components/WritingCheatSheetTabs.js", (source) => {
   let updated = source;
   const badgeBefore = "        Watch before writing · Essay Ideas";
@@ -62,6 +99,7 @@ updateFile("web/src/components/WritingCheatSheetTabs.js", (source) => {
 
 const a2Source = fs.readFileSync(path.join(root, "web/src/components/A2Day3ComparisonsWorkbookPage.js"), "utf8");
 const c1Source = fs.readFileSync(path.join(root, "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js"), "utf8");
+const courseScheduleSource = fs.readFileSync(path.join(root, "web/src/data/courseSchedule.js"), "utf8");
 const writingTabsSource = fs.readFileSync(path.join(root, "web/src/components/WritingCheatSheetTabs.js"), "utf8");
 
 if (a2Source.includes("https://youtu.be/Ml50uHYxBx8")) {
@@ -72,6 +110,9 @@ if (!a2Source.includes("https://youtu.be/z0hve7zCDEo")) {
 }
 if (!c1Source.includes("https://youtu.be/51cNSMK5F0g?si=npQ1tReOKcrLhY-T")) {
   throw new Error("The C1 Day 11 AI video is missing.");
+}
+if (!courseScheduleSource.includes('video: "https://youtu.be/AWEHnJd1o3M"') || !courseScheduleSource.includes('youtube_link: "https://youtu.be/AWEHnJd1o3M"')) {
+  throw new Error("The B2 Day 11 chapter 3.1 Falowen Radio video is missing.");
 }
 if (!writingTabsSource.includes('writingVideo.badge || "Watch before writing · Essay Ideas"')) {
   throw new Error("Writing support does not use resource-specific badge text.");
