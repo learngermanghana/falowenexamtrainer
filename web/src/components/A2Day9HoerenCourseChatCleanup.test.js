@@ -65,7 +65,7 @@ describe("A2/B1 coursebook speaking cleanup", () => {
     expect(window.cleanCourseSpeakingChat()).toBe(true);
 
     expect(document.querySelector('[data-course-inline-practice="speaking"]')).toHaveStyle({ display: "none" });
-    expect(document.getElementById("embedded-wrapper")).toHaveStyle({ display: "none" });
+    expect(document.getElementById("speaking-page-root")).toHaveStyle({ display: "none" });
     expect(document.getElementById("quick-starters")).toHaveStyle({ display: "none" });
   });
 
@@ -77,7 +77,7 @@ describe("A2/B1 coursebook speaking cleanup", () => {
     window.cleanCourseSpeakingChat();
 
     expect(document.querySelector('[data-course-inline-practice="speaking"]')).toHaveStyle({ display: "none" });
-    expect(document.getElementById("embedded-wrapper")).toHaveStyle({ display: "none" });
+    expect(document.getElementById("speaking-page-root")).toHaveStyle({ display: "none" });
   });
 
   test.each([
