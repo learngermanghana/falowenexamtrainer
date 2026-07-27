@@ -35,8 +35,8 @@ authSource = replaceOnce(
 
 signupSource = replaceOnce(
   signupSource,
-  `    }${context.video ? \` I came from YouTube lesson ${context.video}.\` : ""} Please help me continue.\`\n`,
-  `    }${context.video ? \` I came from YouTube lesson ${context.video}.\` : ""} I need help with the application form or admissions process.\`\n`,
+  `    }\${context.video ? \` I came from YouTube lesson \${context.video}.\` : ""} Please help me continue.\`\n`,
+  `    }\${context.video ? \` I came from YouTube lesson \${context.video}.\` : ""} I need help with the application form or admissions process.\`\n`,
   "signup WhatsApp support message",
 );
 
@@ -49,8 +49,8 @@ signupSource = replaceOnce(
 
 signupSource = replaceOnce(
   signupSource,
-  `      <a\n        href={\`https://wa.me/233205706589?text=${message}\`}\n`,
-  `      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55, fontSize: 13 }}>\n        Need help with the form or admissions? WhatsApp is optional and only for administrative support.\n      </p>\n      <a\n        href={\`https://wa.me/233205706589?text=${message}\`}\n        aria-label="Contact Admissions Support on WhatsApp"\n`,
+  `      <a\n        href={\`https://wa.me/233205706589?text=\${message}\`}\n`,
+  `      <p style={{ margin: 0, color: "#475569", lineHeight: 1.55, fontSize: 13 }}>\n        Need help with the form or admissions? WhatsApp is optional and only for administrative support.\n      </p>\n      <a\n        href={\`https://wa.me/233205706589?text=\${message}\`}\n        aria-label="Contact Admissions Support on WhatsApp"\n`,
   "optional WhatsApp support explanation",
 );
 
