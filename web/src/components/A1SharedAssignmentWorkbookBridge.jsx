@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
+import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
 import A1WorkbookGrammarNotes, { getA1GrammarNotesComponent } from "./A1WorkbookGrammarNotes";
 import {
   A1AssignmentNeighborLinks,
@@ -10,6 +11,7 @@ import {
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
 const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";
+const OVERVIEW_GUIDANCE_HOST_ATTRIBUTE = "data-a1-canonical-bridge-overview-guidance";
 const GRAMMAR_HOST_ATTRIBUTE = "data-a1-canonical-bridge-grammar";
 const SUBMISSION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-submission";
 const FOOTER_HOST_ATTRIBUTE = "data-a1-canonical-bridge-footer";
@@ -51,7 +53,7 @@ const findSectionRoot = (pageRoot, heading) => {
 const findExistingBridgeHosts = (pageRoot) =>
   Array.from(
     pageRoot?.querySelectorAll?.(
-      `[${NAV_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
+      `[${NAV_HOST_ATTRIBUTE}="true"], [${OVERVIEW_GUIDANCE_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
     ) || [],
   );
 
@@ -108,6 +110,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
   const [mountState, setMountState] = useState({
     navHost: null,
+    overviewGuidanceHost: null,
     grammarHost: null,
     submissionHost: null,
     footerHost: null,
@@ -174,6 +177,9 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       const navHost = document.createElement("div");
       navHost.setAttribute(NAV_HOST_ATTRIBUTE, "true");
       navHost.setAttribute("data-assignment-key", assignment.assignmentKey);
+      const overviewGuidanceHost = document.createElement("div");
+      overviewGuidanceHost.setAttribute(OVERVIEW_GUIDANCE_HOST_ATTRIBUTE, "true");
+      overviewGuidanceHost.setAttribute("data-assignment-key", assignment.assignmentKey);
       const grammarHost = document.createElement("div");
       grammarHost.setAttribute(GRAMMAR_HOST_ATTRIBUTE, "true");
       grammarHost.setAttribute("data-assignment-key", assignment.assignmentKey);
@@ -184,12 +190,12 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       footerHost.setAttribute(FOOTER_HOST_ATTRIBUTE, "true");
       footerHost.setAttribute("data-assignment-key", assignment.assignmentKey);
 
-      pageRoot.prepend(navHost, grammarHost, submissionHost);
+      pageRoot.prepend(navHost, overviewGuidanceHost, grammarHost, submissionHost);
       pageRoot.appendChild(footerHost);
       installed = true;
       observer?.disconnect();
       installedRoot = pageRoot;
-      createdHosts = [navHost, grammarHost, submissionHost, footerHost];
+      createdHosts = [navHost, overviewGuidanceHost, grammarHost, submissionHost, footerHost];
       installedSections = sections;
 
       Array.from(pageRoot.querySelectorAll('[role="tablist"]')).forEach((tabList) => {
@@ -199,7 +205,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       Array.from(pageRoot.querySelectorAll('[data-a1-teil-navigation="true"], [aria-label="A1 Day 21 workbook navigation"]'))
         .forEach((element) => setElementVisible(element, false));
 
-      setMountState({ navHost, grammarHost, submissionHost, footerHost, sections });
+      setMountState({ navHost, overviewGuidanceHost, grammarHost, submissionHost, footerHost, sections });
     };
 
     observer = new MutationObserver(scheduleInstall);
@@ -219,15 +225,19 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
   useEffect(() => {
     mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));
+    if (mountState.overviewGuidanceHost?.isConnected) {
+      mountState.overviewGuidanceHost.style.display = activeTab === "overview" ? "" : "none";
+    }
     if (mountState.grammarHost?.isConnected) {
       mountState.grammarHost.style.display = activeTab === "grammar" ? "" : "none";
     }
     if (mountState.submissionHost?.isConnected) {
       mountState.submissionHost.style.display = activeTab === "submit" ? "" : "none";
     }
-  }, [activeTab, mountState.grammarHost, mountState.sections, mountState.submissionHost]);
+  }, [activeTab, mountState.grammarHost, mountState.overviewGuidanceHost, mountState.sections, mountState.submissionHost]);
 
   const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;
+  const overviewGuidanceHost = mountState.overviewGuidanceHost?.isConnected ? mountState.overviewGuidanceHost : null;
   const grammarHost = mountState.grammarHost?.isConnected ? mountState.grammarHost : null;
   const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;
   const footerHost = mountState.footerHost?.isConnected ? mountState.footerHost : null;
@@ -246,6 +256,10 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         />,
         navHost,
       )}
+      {overviewGuidanceHost ? createPortal(
+        <A1TutorMarkedOverviewGuidance />,
+        overviewGuidanceHost,
+      ) : null}
       {grammarHost && hasGrammar ? createPortal(
         <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />,
         grammarHost,
