@@ -10,7 +10,7 @@ import A1SharedAssignmentWorkbookBridge, {
 import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
-const BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-3", "A1-5", "A1-12.1", "A1-12.2"];
+const GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-3", "A1-5", "A1-12.1", "A1-12.2"];
 
 const renderBridgeWorkbook = (assignmentKey) => {
   const assignment = getA1Assignment(assignmentKey);
@@ -119,7 +119,7 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-overview-guidance], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(5);
   });
 
-  test.each(BRIDGE_ASSIGNMENT_KEYS)(
+  test.each(GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS)(
     "%s opens with the shared Grammar guidance on Overview",
     async (assignmentKey) => {
       const assignment = renderBridgeWorkbook(assignmentKey);
@@ -146,4 +146,29 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
       await waitFor(() => expect(guidanceHost.style.display).toBe("none"));
     },
   );
+
+  test("A1-10 omits Grammar guidance because the bridge has no Grammar tab", async () => {
+    const assignment = renderBridgeWorkbook("A1-10");
+    expect(assignment.layoutMode).toBe("bridge");
+
+    const guidanceHost = await waitFor(() => {
+      const host = document.querySelector(
+        '[data-a1-canonical-bridge-overview-guidance="true"][data-assignment-key="A1-10"]',
+      );
+      expect(host).not.toBeNull();
+      return host;
+    });
+
+    await waitFor(() => {
+      const tabLabels = Array.from(document.querySelectorAll('[role="tab"]')).map(
+        (button) => button.textContent,
+      );
+      expect(tabLabels).toContain("Overview");
+      expect(tabLabels).not.toContain("Grammar");
+    });
+
+    expect(guidanceHost.style.display).toBe("none");
+    expect(guidanceHost.querySelector('[data-a1-tutor-marked-grammar-guidance="true"]')).toBeNull();
+    expect(guidanceHost.textContent).not.toContain("open the Grammar tab");
+  });
 });

@@ -226,7 +226,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
   useEffect(() => {
     mountState.sections.forEach(({ key, element }) => setElementVisible(element, activeTab === key));
     if (mountState.overviewGuidanceHost?.isConnected) {
-      mountState.overviewGuidanceHost.style.display = activeTab === "overview" ? "" : "none";
+      mountState.overviewGuidanceHost.style.display = hasGrammar && activeTab === "overview" ? "" : "none";
     }
     if (mountState.grammarHost?.isConnected) {
       mountState.grammarHost.style.display = activeTab === "grammar" ? "" : "none";
@@ -234,7 +234,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     if (mountState.submissionHost?.isConnected) {
       mountState.submissionHost.style.display = activeTab === "submit" ? "" : "none";
     }
-  }, [activeTab, mountState.grammarHost, mountState.overviewGuidanceHost, mountState.sections, mountState.submissionHost]);
+  }, [activeTab, hasGrammar, mountState.grammarHost, mountState.overviewGuidanceHost, mountState.sections, mountState.submissionHost]);
 
   const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;
   const overviewGuidanceHost = mountState.overviewGuidanceHost?.isConnected ? mountState.overviewGuidanceHost : null;
@@ -256,7 +256,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         />,
         navHost,
       )}
-      {overviewGuidanceHost ? createPortal(
+      {overviewGuidanceHost && hasGrammar ? createPortal(
         <A1TutorMarkedOverviewGuidance />,
         overviewGuidanceHost,
       ) : null}
