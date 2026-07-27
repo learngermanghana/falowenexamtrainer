@@ -4,6 +4,7 @@ import {
   B2_C1_LESSON_VIDEO_OVERRIDES,
   applyB2C1LessonVideoOverrides,
 } from "./b2C1LessonMediaOverrides";
+import { normalizeB2C1Lesson } from "./lessonModel";
 import c1Day10IntegrationUndGesellschaft from "./selfLearningLessons/c1/day10IntegrationUndGesellschaft";
 import { getWritingVideoResource } from "./writingVideoResources";
 
@@ -132,5 +133,46 @@ describe("requested lesson media mappings", () => {
         url: "https://youtu.be/foXp2VHEf1I",
       }),
     );
+  });
+
+  test("maps B2 Day 10 and C1 Day 14 to the requested AI videos without changing Radio ownership", () => {
+    expect(B2_C1_LESSON_VIDEO_OVERRIDES.B2[10].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "b2-day10-konsum-geld-ai-video",
+        chapter: "2.5",
+        url: "https://youtu.be/vRgpiPZ5AAw",
+      }),
+    );
+    expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[14].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "c1-day14-innovation-zukunft-ai-video",
+        chapter: "3.4",
+        url: "https://youtu.be/GEQNr4JedlM",
+      }),
+    );
+
+    const b2Day10 = normalizeB2C1Lesson(
+      { level: "B2", day: 10, chapter: "2.5", title: "Konsum und Geld" },
+      "B2",
+    );
+    const c1Day14 = normalizeB2C1Lesson(
+      { level: "C1", day: 14, chapter: "3.4", title: "Innovation und Zukunft" },
+      "C1",
+    );
+
+    expect(b2Day10.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "2.5",
+        url: "https://youtu.be/vRgpiPZ5AAw",
+      }),
+    );
+    expect(c1Day14.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        chapter: "3.4",
+        url: "https://youtu.be/GEQNr4JedlM",
+      }),
+    );
+    expect(b2Day10.resources.falowenRadio).toBeNull();
+    expect(c1Day14.resources.falowenRadio).toBeNull();
   });
 });
