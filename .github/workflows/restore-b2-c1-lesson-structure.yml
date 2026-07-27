@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - "scripts/runSpeakingAudioReliabilityPatch.mjs"
+      - "scripts/patchRequestedCourseMedia.mjs"
       - "web/src/data/a1RadioResources.js"
+      - "web/src/data/b2C1LessonMediaOverrides.js"
+      - "web/src/data/b2Day11FalowenRadio.test.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
@@ -40,12 +43,13 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test B2 and C1 Learn, Speak and Write structure
+      - name: Test B2 and C1 Learn, Speak, Write and Falowen Radio structure
         working-directory: web
         env:
           CI: true
         run: >-
           npm run test:ci -- --runTestsByPath
+          src/data/b2Day11FalowenRadio.test.js
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
           src/components/SelfLearningLessonRegistry.restoreStructure.test.js
