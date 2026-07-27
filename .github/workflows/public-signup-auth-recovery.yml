@@ -1,0 +1,42 @@
+name: Public signup auth recovery
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchPublicSignupAuthRecovery.mjs"
+      - "scripts/checkPublicSignupAuthRecovery.js"
+      - "web/src/App.js"
+      - "web/src/context/AuthContext.js"
+      - "web/src/components/SignUpPage.js"
+      - "web/src/components/SignUpPageLegacy.js"
+      - "web/package.json"
+      - ".github/workflows/public-signup-auth-recovery.yml"
+
+jobs:
+  signup-recovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Apply signup auth recovery safeguards
+        run: node scripts/patchPublicSignupAuthRecovery.mjs
+      - name: Verify signup auth and WhatsApp support contracts
+        run: node scripts/checkPublicSignupAuthRecovery.js
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
+      - name: Verify support copy reached the production bundle
+        working-directory: web
+        run: |
+          grep -R -q "Contact Admissions Support on WhatsApp" dist
+          if grep -R -q "Continue on WhatsApp" dist; then
+            echo "Old confusing WhatsApp continuation label is still present in the production bundle."
+            exit 1
+          fi
