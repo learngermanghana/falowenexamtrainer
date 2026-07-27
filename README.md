@@ -287,27 +287,47 @@ Client-side data access currently centers around these collections and subcollec
   set to `false`; they can log in and request a new verification email (or you can click the triple-dot menu in the Users table
   to **Send verification email** from the console). No data is lost—the flag flips to `true` as soon as they verify.
 
-## Automate Firebase signups to Google Sheets
-If your new signup flow writes student records to Firestore, you can mirror those
-rows into the approval spreadsheet with the helper script at
-`functionz/googleSheetsSync.js`:
+## Export Firestore records to Google Sheets
+The checked-in Google Sheets integration is a standalone batch script:
+
+```
+functions/functionz/googleSheetsSync.js
+```
+
+It is **not** called automatically by the signup flow, and this repository does not currently include a Sheets-to-Firestore push API. Install the Functions dependencies before running it:
 
 ```bash
 npm --prefix functions install
 ```
 
-The main function calls `syncStudentToSheet(profile)` after writing the Firestore document. Configure a service account that has edit access to the sheet and set these environment variables before deploying the function:
+Required variables:
 
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` (replace literal `\n` with real newlines)
-- `GOOGLE_SHEETS_SPREADSHEET_ID`
-- `GOOGLE_SHEETS_STUDENTS_RANGE` (optional, defaults to `Students!A:H`)
+- `GOOGLE_SHEETS_ID` — destination spreadsheet ID.
+- `GOOGLE_SHEETS_RANGE` — destination tab/range, for example `students!A:Z`.
 
-The target worksheet must include a header row with at least the columns `email`, `studentCode`, `name`, `className`, `level`, `tuitionFee`, `amountPaid`, `balanceDue`, `paymentStatus`, `startDate`, `endDate`. The sync helper uses these headers to place values in the right columns, so the order of columns in the sheet can change without breaking synchronization.
+Authentication can use one of the credential forms implemented by the script:
 
-### Secure endpoint for Google Apps Script
+- `GOOGLE_SERVICE_ACCOUNT_FILE` or `GOOGLE_APPLICATION_CREDENTIALS` pointing to a service-account JSON file.
+- `GOOGLE_SERVICE_ACCOUNT_JSON` or `FIREBASE_SERVICE_ACCOUNT_JSON` containing the JSON directly.
+- `GOOGLE_SERVICE_ACCOUNT_JSON_B64` or `FIREBASE_SERVICE_ACCOUNT_JSON_B64` containing base64-encoded JSON.
+- Application Default Credentials when running in a Google environment with access to the Sheets API.
 
-`functionz/sheetSyncApi.js` exposes `/sheet-sync/push-student`, an authenticated endpoint that the Apps Script can call to push a row back into Firestore. Set `SHEET_SYNC_TOKEN` (or `SHEET_SYNC_SECRET`) in the Cloud Functions environment and include it as an `x-sheet-sync-token` header from Apps Script. Requests without a valid token are rejected with HTTP 401.
+Share the destination spreadsheet with the service account when using service-account credentials, and make sure the Google Sheets API is enabled for that project.
+
+Useful optional variables supported by the script include `FIRESTORE_COLLECTION` (default `students`), `SYNC_FIELD` (default `syncedToSheets`), `SYNC_ALL`, `SCAN_LIMIT`, `SHEETS_BATCH_SIZE`, `DEDUPE`, and `DEDUPE_COLUMN`.
+
+The script reads the worksheet header row and maps values by Firestore field name. Unless `SYNC_ALL=1` is set, it reads documents where the sync field is `false`. After a successful append it sets that sync field to `true`. For the `students` collection, deduplication is enabled by default and normally uses column `B` for the student code.
+
+Example from the repository root:
+
+```bash
+GOOGLE_SHEETS_ID="<target_sheet_id>" \
+GOOGLE_SHEETS_RANGE="students!A:Z" \
+GOOGLE_SERVICE_ACCOUNT_FILE="./service-account.json" \
+node functions/functionz/googleSheetsSync.js
+```
+
+Run or schedule this script separately when a batch export is required; do not document it as a realtime signup hook unless such a hook is actually added to the codebase.
 
 ### Deploying the Firestore rules
 
@@ -316,10 +336,6 @@ The repo ships with a `firestore.rules` file. Deploy it so the client can read t
 ```bash
 firebase deploy --only firestore:rules
 ```
-
-### Optional server-to-server Firebase credentials
-
-Some serverless providers do not mount a service-account file. `functions/functionz/firebaseAdmin.js` first tries `GOOGLE_APPLICATION_CREDENTIALS`, then falls back to `FIREBASE_SERVICE_ACCOUNT` (the JSON service-account contents), or the `FIREBASE_SERVICE_ACCOUNT_BASE64` variant. This keeps the backend portable across Cloud Functions, Vercel and other hosts.
 
 ### Google sign-in
 
