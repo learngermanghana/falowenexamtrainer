@@ -6,6 +6,7 @@ on:
       - "scripts/patchRequestedCourseMedia.mjs"
       - "web/src/data/b2C1LessonMediaOverrides.js"
       - "web/src/data/b2LessonContentAlignment.js"
+      - "web/src/data/b2LessonContentAlignment.test.js"
       - "web/src/data/lessonModel.js"
       - "web/src/data/courseSchedule.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
@@ -26,11 +27,14 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test B2 Day 11 Falowen Radio ownership
+      - name: Test B2 Radio ownership and Days 8-28 content alignment
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/data/b2Day11FalowenRadio.test.js
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/data/b2Day11FalowenRadio.test.js
+          src/data/b2LessonContentAlignment.test.js
       - name: Build production web app with media guards
         working-directory: web
         run: npm run build
