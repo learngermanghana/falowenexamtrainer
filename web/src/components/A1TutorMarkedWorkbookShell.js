@@ -107,6 +107,23 @@ const A1TutorMarkedWorkbookShell = ({
       <p style={{ ...styles.card, margin: 0 }}>
         {assignmentIntro || `Complete every section, then submit ${assignment.assignmentKey}.`}
       </p>
+      <div
+        data-a1-tutor-marked-grammar-guidance="true"
+        style={{
+          ...styles.card,
+          margin: 0,
+          border: "1px solid #bfdbfe",
+          background: "#eff6ff",
+          display: "grid",
+          gap: 6,
+        }}
+      >
+        <strong>How to complete this assignment</strong>
+        <p style={{ margin: 0, lineHeight: 1.6 }}>
+          Start here in Overview. Before you begin the Teil sections, open the Grammar tab and read the grammar notes carefully.
+          Use the rules and examples from Grammar when you complete the assignment, then review your answers before you submit.
+        </p>
+      </div>
       {overviewNodes}
     </div>
   );
