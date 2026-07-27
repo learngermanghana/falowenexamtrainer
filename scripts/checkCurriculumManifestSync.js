@@ -152,6 +152,24 @@ const validateCanonicalCurriculum = (canonical) => {
     errors.push('B2 lesson content alignment drift detected between web and Functions. Run: npm run sync:curriculum');
   }
 
+  const functionsB2Entries = functionsModule.getCurriculumEntriesForLevel('B2') || [];
+  Object.values(webB2Alignment).forEach((alignment) => {
+    const serverEntry = functionsB2Entries.find((entry) => Number(entry.day) === Number(alignment.day));
+    if (!serverEntry) {
+      errors.push(`Functions B2 curriculum is missing aligned Day ${alignment.day}.`);
+      return;
+    }
+    if (
+      serverEntry.chapter !== alignment.chapter
+      || serverEntry.title !== alignment.title
+      || serverEntry.topic !== alignment.title
+      || serverEntry.goal !== alignment.goal
+      || serverEntry.grammar_topic !== alignment.grammar_topic
+    ) {
+      errors.push(`Functions B2 Day ${alignment.day} does not consume the shared web alignment metadata.`);
+    }
+  });
+
   const functionsB2AlignmentSource = fs.readFileSync(path.join(repoRoot, 'functions/data/b2LessonContentAlignment.js'), 'utf8');
   if (!functionsB2AlignmentSource.startsWith(B2_FUNCTIONS_ALIGNMENT_HEADER)) {
     errors.push('functions/data/b2LessonContentAlignment.js: missing generated-file warning header');
@@ -170,5 +188,5 @@ const validateCanonicalCurriculum = (canonical) => {
     process.exit(1);
   }
 
-  console.log('Curriculum structure and B2 web/Functions alignment are synced; canonical A1–B1 resources passed validation.');
+  console.log('Curriculum structure and B2 web/Functions alignment are synced; Functions consumes the aligned B2 metadata.');
 })();
