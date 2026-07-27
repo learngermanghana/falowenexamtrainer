@@ -44,8 +44,8 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
 };
 
 export const getAllowedWorkbookTabs = (sections, hasGrammar = false) => [
-  ...(hasGrammar ? ["grammar"] : []),
   sections.length ? "overview" : "assignment",
+  ...(hasGrammar ? ["grammar"] : []),
   ...sections.map(({ key }) => key),
   "submit",
 ];
@@ -54,7 +54,7 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   const location = useLocation();
   const navigate = useNavigate();
   const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar), [hasGrammar, sections]);
-  const fallbackTab = hasGrammar ? "grammar" : sections.length ? "overview" : "assignment";
+  const fallbackTab = sections.length ? "overview" : "assignment";
   const requestedTab = new URLSearchParams(location.search).get("workbookTab");
   const activeTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
 
@@ -110,14 +110,14 @@ const tabButtonStyle = (selected, submit = false) => ({
 export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
   const tabs = sections.length
     ? [
-      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       { key: "overview", label: "Overview" },
+      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...sections,
       { key: "submit", label: "Submit", submit: true },
     ]
     : [
-      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       { key: "assignment", label: "Assignment" },
+      ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       { key: "submit", label: "Submit", submit: true },
     ];
 
@@ -199,12 +199,12 @@ export default function A1SharedAssignmentWorkbookLayout({
       />
 
       <div data-workbook-content>
+        <div hidden={activeTab !== overviewTab}>{overview}</div>
         {hasGrammar ? (
           <div hidden={activeTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
             {grammar}
           </div>
         ) : null}
-        <div hidden={activeTab !== overviewTab}>{overview}</div>
         {sectionElements.map((element) => (
           <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
             {element}
