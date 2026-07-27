@@ -175,4 +175,35 @@ describe("requested lesson media mappings", () => {
     expect(b2Day10.resources.falowenRadio).toBeNull();
     expect(c1Day14.resources.falowenRadio).toBeNull();
   });
+
+  test("maps B2 Day 11 Chapter 3.1 to the requested AI video while preserving Falowen Radio", () => {
+    expect(B2_C1_LESSON_VIDEO_OVERRIDES.B2[11].videoResources[0]).toEqual(
+      expect.objectContaining({
+        key: "b2-day11-gesellschaft-integration-ai-video",
+        chapter: "3.1",
+        url: "https://youtu.be/TC85wRlhtCc",
+      }),
+    );
+
+    const b2Day11 = normalizeB2C1Lesson(
+      { level: "B2", day: 11, chapter: "3.1", title: "Gesellschaft und Integration" },
+      "B2",
+    );
+
+    expect(b2Day11.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        key: "b2-day11-gesellschaft-integration-ai-video",
+        chapter: "3.1",
+        url: "https://youtu.be/TC85wRlhtCc",
+      }),
+    );
+    expect(b2Day11.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        key: "b2-day11-gesellschaft-integration-falowen-radio",
+        youtubeId: "AWEHnJd1o3M",
+      }),
+    );
+    expect(b2Day11.resources.aiVideo.url).not.toContain("AWEHnJd1o3M");
+    expect(b2Day11.resources.falowenRadio.youtubeId).not.toBe("TC85wRlhtCc");
+  });
 });
