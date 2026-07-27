@@ -37,6 +37,45 @@ describe("B2CourseBookContentAlignment", () => {
     expect(article.getAttribute("data-b2-content-aligned")).toBe("8");
   });
 
+  it.each([
+    [14, "3.4", "Wohnen und Zusammenleben", "Steigerung der Adjektive", "Freundschaft und soziale Beziehungen", "Relativsätze", "Freundschaft, Vertrauen"],
+    [15, "3.5", "Kunst und Kultur", "Satzbau und Satzstellung", "Ernährung und Konsumverhalten", "Konzessive und alternative Strukturen", "Ernährung, Konsumentscheidungen"],
+    [16, "4.1", "Wissenschaft und Forschung", "Partizipialkonstruktionen", "Digitalisierung im Alltag", "Passiv und Nominalisierung", "Digitale Prozesse"],
+    [17, "4.2", "Feste und Traditionen", "Alte Grammatik", "Mobilität und Stadtleben", "Vergleiche und lokale Präpositionen", "Mobilität, Stadtplanung"],
+    [18, "4.3", "Freizeit und Hobbys", "Pronominaladverbien", "Natur, Klima und Verantwortung", "Konditionale und konsekutive Sätze", "Bedingungen, Folgen"],
+    [19, "4.4", "Ernährung und Esskultur", "Indirekte Rede", "Freiwilligenarbeit und Engagement", "Finale und kausale Strukturen", "Motivation, Ziele"],
+  ])(
+    "aligns stale Day %i Course Book metadata to the opened lesson",
+    (day, chapter, oldTitle, oldGrammar, title, grammar, goal) => {
+      document.body.innerHTML = `
+        <select><option value="B2" selected>B2</option></select>
+        <article>
+          <div>
+            <div>
+              <h3>${oldTitle}</h3>
+              <div>
+                <span>Chapter ${chapter}</span>
+                <span>${oldGrammar}</span>
+                <span>Self-learning</span>
+              </div>
+            </div>
+            <a href="/campus/course/lesson/B2/${day}?chapter=${chapter}">Open Lesson</a>
+          </div>
+          <p>Old lesson goal.</p>
+          <p><strong>Instruction:</strong> Open the lesson.</p>
+        </article>
+      `;
+
+      expect(applyB2CourseBookContentAlignment(document, "/campus/course")).toBe(1);
+      const article = document.querySelector("article");
+      expect(article.querySelector("h3").textContent).toBe(title);
+      expect(article.textContent).toContain(grammar);
+      expect(article.textContent).toContain(goal);
+      expect(article.textContent).not.toContain(oldTitle);
+      expect(article.getAttribute("data-b2-content-aligned")).toBe(String(day));
+    },
+  );
+
   it("aligns the compact next-lesson card", () => {
     document.body.innerHTML = `
       <select><option value="B2" selected>B2</option></select>
