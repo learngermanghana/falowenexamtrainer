@@ -43,13 +43,17 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test B2 and C1 Learn, Speak, Write and Falowen Radio structure
+      - name: Test B2 Day 11 Falowen Radio ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/b2Day11FalowenRadio.test.js
+      - name: Test B2 and C1 Learn, Speak and Write structure
         working-directory: web
         env:
           CI: true
         run: >-
           npm run test:ci -- --runTestsByPath
-          src/data/b2Day11FalowenRadio.test.js
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
           src/components/SelfLearningLessonRegistry.restoreStructure.test.js
