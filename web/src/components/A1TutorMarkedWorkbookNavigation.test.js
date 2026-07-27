@@ -5,7 +5,7 @@ import {
   getAllowedWorkbookTabs,
   useA1WorkbookTabState,
 } from "./A1SharedAssignmentWorkbookLayout";
-import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedWorkbookShell";
+import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
 
 const sections = [
   { key: "teil-1", label: "Teil 1" },
