@@ -73,6 +73,28 @@ const structuralCurriculumValue = (value) => {
 const structurallyEqual = (left, right) =>
   JSON.stringify(structuralCurriculumValue(left)) === JSON.stringify(structuralCurriculumValue(right));
 
+const getB2AlignmentExpectedProjection = (alignment = {}) => ({
+  ...alignment,
+  topic: alignment.title,
+  lessonTitle: alignment.title,
+  assignmentTitle: alignment.title,
+});
+
+const getB2AlignmentProjectionFields = (alignment = {}) =>
+  [...new Set([
+    ...Object.keys(alignment),
+    'topic',
+    'lessonTitle',
+    'assignmentTitle',
+  ])];
+
+const getB2AlignmentProjectionDrift = (entry = {}, alignment = {}) => {
+  const expected = getB2AlignmentExpectedProjection(alignment);
+  return getB2AlignmentProjectionFields(alignment).filter(
+    (field) => entry?.[field] !== expected[field],
+  );
+};
+
 const validateCanonicalCurriculum = (canonical) => {
   const errors = [];
   const assignmentIds = new Map();
@@ -154,19 +176,44 @@ const validateCanonicalCurriculum = (canonical) => {
 
   const functionsB2Entries = functionsModule.getCurriculumEntriesForLevel('B2') || [];
   Object.values(webB2Alignment).forEach((alignment) => {
+    const rawWebEntry = webCanonical.find((entry) =>
+      String(entry.level || '').toUpperCase() === 'B2'
+      && Number(entry.day) === Number(alignment.day)
+    );
     const serverEntry = functionsB2Entries.find((entry) => Number(entry.day) === Number(alignment.day));
+
+    if (!rawWebEntry) {
+      errors.push(`Web B2 canonical curriculum is missing aligned Day ${alignment.day}.`);
+      return;
+    }
     if (!serverEntry) {
       errors.push(`Functions B2 curriculum is missing aligned Day ${alignment.day}.`);
       return;
     }
-    if (
-      serverEntry.chapter !== alignment.chapter
-      || serverEntry.title !== alignment.title
-      || serverEntry.topic !== alignment.title
-      || serverEntry.goal !== alignment.goal
-      || serverEntry.grammar_topic !== alignment.grammar_topic
-    ) {
-      errors.push(`Functions B2 Day ${alignment.day} does not consume the shared web alignment metadata.`);
+
+    const webRuntimeEntry = webB2AlignmentModule.alignB2CurriculumEntry(rawWebEntry);
+    const functionsRuntimeEntry = functionsB2AlignmentModule.alignB2CurriculumEntry(rawWebEntry);
+    const webDrift = getB2AlignmentProjectionDrift(webRuntimeEntry, alignment);
+    const functionsHelperDrift = getB2AlignmentProjectionDrift(functionsRuntimeEntry, alignment);
+    const functionsManifestDrift = getB2AlignmentProjectionDrift(serverEntry, alignment);
+
+    if (webDrift.length) {
+      errors.push(`Web B2 Day ${alignment.day} aligned runtime projection drifted in: ${webDrift.join(', ')}.`);
+    }
+    if (functionsHelperDrift.length) {
+      errors.push(`Functions B2 Day ${alignment.day} alignment helper drifted in: ${functionsHelperDrift.join(', ')}.`);
+    }
+    if (functionsManifestDrift.length) {
+      errors.push(`Functions B2 Day ${alignment.day} runtime manifest drifted in: ${functionsManifestDrift.join(', ')}.`);
+    }
+
+    const projectionFields = getB2AlignmentProjectionFields(alignment);
+    const webFunctionsRuntimeMismatch = projectionFields.filter(
+      (field) => webRuntimeEntry?.[field] !== functionsRuntimeEntry?.[field]
+        || webRuntimeEntry?.[field] !== serverEntry?.[field],
+    );
+    if (webFunctionsRuntimeMismatch.length) {
+      errors.push(`B2 Day ${alignment.day} web/Functions runtime mismatch in: ${webFunctionsRuntimeMismatch.join(', ')}.`);
     }
   });
 
@@ -188,5 +235,5 @@ const validateCanonicalCurriculum = (canonical) => {
     process.exit(1);
   }
 
-  console.log('Curriculum structure and B2 web/Functions alignment are synced; Functions consumes the aligned B2 metadata.');
+  console.log('Curriculum structure and complete B2 aligned runtime projection are synced across web and Functions.');
 })();
