@@ -99,6 +99,14 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Bildung und Lernen ein. Danach gehst du weiter zum Lernteil.",
     }),
+    11: Object.freeze({
+      key: "b2-day11-gesellschaft-integration-falowen-radio",
+      title: "Gesellschaft und Integration 3.1",
+      youtubeId: "AWEHnJd1o3M",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Gesellschaft, Integration und Teilhabe ein. Danach gehst du weiter zum Lernteil.",
+    }),
   }),
   C1: Object.freeze({
     11: Object.freeze({
