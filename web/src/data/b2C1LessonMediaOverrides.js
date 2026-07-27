@@ -48,6 +48,18 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    11: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day11-gesellschaft-integration-ai-video",
+          chapter: "3.1",
+          title: "B2 Day 11 · Gesellschaft und Integration · AI video",
+          description:
+            "AI video lesson for discussing society, integration and participation at B2 level.",
+          url: "https://youtu.be/TC85wRlhtCc",
+        }),
+      ]),
+    }),
     12: Object.freeze({
       videoResources: Object.freeze([
         Object.freeze({
