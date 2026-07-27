@@ -1,0 +1,23 @@
+name: B2 curriculum parity
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/b2LessonContentAlignment.js"
+      - "functions/data/b2LessonContentAlignment.js"
+      - "web/src/data/curriculumManifest.js"
+      - "functions/data/curriculumManifest.js"
+      - "scripts/applyB2LessonContentAlignment.js"
+      - "scripts/checkCurriculumManifestSync.js"
+      - ".github/workflows/b2-curriculum-parity.yml"
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify B2 web and Functions curriculum parity
+        run: node scripts/checkCurriculumManifestSync.js
