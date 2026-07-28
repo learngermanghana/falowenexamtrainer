@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { resolveA2B1WorkbookDayFromLocation } from "./A2B1WorkbookGuidance";
+import A2StarterConjunctionsPage from "./A2StarterConjunctionsPage";
+import { getA2B1GrammarNotesComponent } from "./A2B1WorkbookGrammarNotes";
 import {
   A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   STANDARD_WORKBOOK_TABS,
@@ -40,6 +42,21 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
       ),
     ).toBe(10);
     expect(resolveA2B1WorkbookDayFromLocation("B1", "/campus/course/lesson/B1/8?view=workbook")).toBe(8);
+  });
+
+  it("connects the Small Talk workbook to its already-created A2 Day 1 grammar notes", () => {
+    const smallTalkWorkbook = read("A2Day2SmallTalkWorkbookEnhancedPage.js");
+    const existingGrammarPage = read("A2StarterConjunctionsPage.js");
+
+    expect(smallTalkWorkbook).toContain("day={1}");
+    expect(smallTalkWorkbook).toContain('chapter="1.1"');
+    expect(smallTalkWorkbook).toContain('workbookId="A2Day1SmallTalk"');
+    expect(smallTalkWorkbook).toContain('<RadioFirstWorkbookGate level="A2" day={1}>');
+
+    expect(existingGrammarPage).toContain("Topic: Small talk • Day 1 • Chapter 1.1");
+    expect(existingGrammarPage).toContain("A2 Starter Grammar Note: weil, deshalb, denn");
+    expect(getA2B1GrammarNotesComponent("A2", 1)).toBe(A2StarterConjunctionsPage);
+    expect(getA2B1GrammarNotesComponent("A2", 2)).not.toBe(A2StarterConjunctionsPage);
   });
 
   it("keeps the forced A2 fallback on the same Grammar-first shared tab contract", () => {

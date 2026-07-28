@@ -1,4 +1,5 @@
 import React from "react";
+import A2StarterConjunctionsPage from "./A2StarterConjunctionsPage";
 import A2Day2Kapitel12GrammarNotesPage from "./A2Day2Kapitel12GrammarNotesPage";
 import ComparingThingsAndPeopleGrammarPage from "./ComparingThingsAndPeopleGrammarPage";
 import WoTreffenUnsGrammarPage from "./WoTreffenUnsGrammarPage";
@@ -45,6 +46,7 @@ import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeute
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
   A2: {
+    1: A2StarterConjunctionsPage,
     2: A2Day2Kapitel12GrammarNotesPage,
     3: ComparingThingsAndPeopleGrammarPage,
     4: WoTreffenUnsGrammarPage,
