@@ -72,6 +72,42 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    13: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day13-chapter-3-3-ai-video",
+          chapter: "3.3",
+          title: "B2 Day 13 · Chapter 3.3 · AI video",
+          description:
+            "AI video lesson for the B2 Day 13 Chapter 3.3 course topic.",
+          url: "https://youtu.be/MGtC8QQrdSs",
+        }),
+      ]),
+    }),
+    14: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day14-chapter-3-4-ai-video",
+          chapter: "3.4",
+          title: "B2 Day 14 · Chapter 3.4 · AI video",
+          description:
+            "AI video lesson for the B2 Day 14 Chapter 3.4 course topic.",
+          url: "https://youtu.be/Hqowo8xhrpw",
+        }),
+      ]),
+    }),
+    15: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day15-chapter-3-5-ai-video",
+          chapter: "3.5",
+          title: "B2 Day 15 · Chapter 3.5 · AI video",
+          description:
+            "AI video lesson for the B2 Day 15 Chapter 3.5 course topic.",
+          url: "https://youtu.be/5fdtLPqHe7A",
+        }),
+      ]),
+    }),
   }),
   C1: Object.freeze({
     10: Object.freeze({
