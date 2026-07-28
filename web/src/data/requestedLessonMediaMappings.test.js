@@ -47,6 +47,20 @@ describe("requested lesson media mappings", () => {
     );
   });
 
+  test("replaces A1 Day 18 Chapter 12.1 with the requested teacher lecture", () => {
+    const day18TeacherVideos = getA1TeacherVideoResources(18);
+
+    expect(day18TeacherVideos).toEqual([
+      expect.objectContaining({
+        key: "a1-day18-chapter-12-1-teacher-video",
+        chapter: "12.1",
+        topic: "Two-Case Prepositions",
+        url: "https://youtu.be/WzmgAmmmTJs",
+      }),
+    ]);
+    expect(JSON.stringify(day18TeacherVideos)).not.toContain("-vTEvx9a8Ts");
+  });
+
   test("keeps B1 Day 2 as a Schreiben support video", () => {
     const resource = getWritingVideoResource("B1", 2);
     expect(resource).toEqual(
@@ -132,6 +146,47 @@ describe("requested lesson media mappings", () => {
     );
     expect(b2Day6.resources.aiVideo.url).not.toContain("LjxT4I6BmFw");
     expect(b2Day6.resources.falowenRadio.youtubeId).not.toBe("LORxwfzaAyU");
+  });
+
+  test("maps B2 Day 8 and Day 9 to the requested Falowen Radio videos without replacing AI video ownership", () => {
+    const b2Day8 = normalizeB2C1Lesson(
+      { level: "B2", day: 8, chapter: "2.3", title: "Reisen und Mobilität" },
+      "B2",
+    );
+    const b2Day9 = normalizeB2C1Lesson(
+      { level: "B2", day: 9, chapter: "2.4", title: "Wohnen und Nachbarschaft" },
+      "B2",
+    );
+
+    expect(b2Day8.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        key: "b2-day8-reisen-mobilitaet-falowen-radio",
+        youtubeId: "hxB5dwtbo6Q",
+      }),
+    );
+    expect(b2Day8.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        key: "b2-day8-reisen-mobilitaet-ai-video",
+        chapter: "2.3",
+        url: "https://youtu.be/RjRBspPCmCY",
+      }),
+    );
+    expect(b2Day8.resources.aiVideo.url).not.toContain("hxB5dwtbo6Q");
+
+    expect(b2Day9.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        key: "b2-day9-wohnen-nachbarschaft-falowen-radio",
+        youtubeId: "kVvR1zgJE-s",
+      }),
+    );
+    expect(b2Day9.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        key: "b2-day9-wohnen-nachbarschaft-ai-video",
+        chapter: "2.4",
+        url: "https://youtu.be/-JeT2wS94uk",
+      }),
+    );
+    expect(b2Day9.resources.aiVideo.url).not.toContain("kVvR1zgJE-s");
   });
 
   test("adds the approved B2 Day 8 Chapter 2.3 AI video to the lesson dictionary", () => {

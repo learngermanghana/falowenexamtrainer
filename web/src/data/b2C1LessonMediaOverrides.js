@@ -143,6 +143,22 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       instruction:
         "Höre aufmerksam zu und stimme dich auf Migration, Integration und gesellschaftliche Teilhabe ein. Danach gehst du weiter zum Lernteil.",
     }),
+    8: Object.freeze({
+      key: "b2-day8-reisen-mobilitaet-falowen-radio",
+      title: "Reisen und Mobilität 2.3",
+      youtubeId: "hxB5dwtbo6Q",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Reisen, Mobilität und nachhaltige Verkehrsmittel ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    9: Object.freeze({
+      key: "b2-day9-wohnen-nachbarschaft-falowen-radio",
+      title: "Wohnen und Nachbarschaft 2.4",
+      youtubeId: "kVvR1zgJE-s",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Wohnen, Nachbarschaft und das Zusammenleben ein. Danach gehst du weiter zum Lernteil.",
+    }),
     11: Object.freeze({
       key: "b2-day11-gesellschaft-integration-falowen-radio",
       title: "Gesellschaft und Integration 3.1",
