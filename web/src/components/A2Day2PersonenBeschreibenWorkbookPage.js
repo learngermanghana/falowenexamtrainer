@@ -263,9 +263,9 @@ const listeningQuestions = [
 
 const speakingContent = (
   <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Personen beschreiben" practiceOnly>
+    <WorkbookTaskCard eyebrow="Teil 1 · Practice and class discussion" title="Personen beschreiben" practiceOnly>
       <p style={paragraph}>
-        In this chapter, we’ll engage in group exercises discussing these topics. Following this, your tutor will revise the questions and invite you to write a brief essay about yourself.
+        Teil 1 is for speaking practice and class discussion. Describe people using the topics and useful expressions below. Your tutor will review the questions with the class. Then use the ideas and vocabulary from this discussion in Teil 2 to write the letter about your boss.
       </p>
     </WorkbookTaskCard>
 
