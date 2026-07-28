@@ -18,7 +18,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [15, "4.7", "Introduction to Speaking Exams", "https://youtu.be/o9nn_hSDzw8"],
   [16, "9", "Negation", "https://youtu.be/yYIjI6P-qmw"],
   [17, "11", "Instructions and Directions", "https://youtu.be/9wvr4iwGsIc"],
-  [18, "12.1", "Two-Case Prepositions", "https://youtu.be/-vTEvx9a8Ts"],
+  [18, "12.1", "Two-Case Prepositions", "https://youtu.be/WzmgAmmmTJs"],
   [19, "5.9", "Goethe A1 Speaking Confidence Lab", "https://youtu.be/ZfXw4fRQ0Tg"],
   [20, "12.3", "Introduction to Letter Writing", "https://youtu.be/JtgoO2fmOpU"],
   [21, "13", "Weather", "https://youtu.be/ijEY8XVrsZs"],
