@@ -1,6 +1,7 @@
 import { getA1RadioResource } from "./a1RadioResources";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
+  B2_C1_LESSON_RADIO_OVERRIDES,
   B2_C1_LESSON_VIDEO_OVERRIDES,
   applyB2C1LessonVideoOverrides,
 } from "./b2C1LessonMediaOverrides";
@@ -100,6 +101,37 @@ describe("requested lesson media mappings", () => {
         url: "https://youtu.be/S_c9eIH-rzY",
       }),
     );
+  });
+
+  test("maps B2 Day 6 Chapter 2.1 to the requested Falowen Radio while preserving its AI video", () => {
+    expect(B2_C1_LESSON_RADIO_OVERRIDES.B2[6]).toEqual(
+      expect.objectContaining({
+        key: "b2-day6-migration-integration-falowen-radio",
+        title: "Migration und Integration 2.1",
+        youtubeId: "LjxT4I6BmFw",
+      }),
+    );
+
+    const b2Day6 = normalizeB2C1Lesson(
+      { level: "B2", day: 6, chapter: "2.1", title: "Migration und Integration" },
+      "B2",
+    );
+
+    expect(b2Day6.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        key: "b2-day6-migration-integration-falowen-radio",
+        youtubeId: "LjxT4I6BmFw",
+      }),
+    );
+    expect(b2Day6.resources.aiVideo).toEqual(
+      expect.objectContaining({
+        key: "b2-day6-migration-integration-ai-video",
+        chapter: "2.1",
+        url: "https://youtu.be/LORxwfzaAyU",
+      }),
+    );
+    expect(b2Day6.resources.aiVideo.url).not.toContain("LjxT4I6BmFw");
+    expect(b2Day6.resources.falowenRadio.youtubeId).not.toBe("LORxwfzaAyU");
   });
 
   test("adds the approved B2 Day 8 Chapter 2.3 AI video to the lesson dictionary", () => {
