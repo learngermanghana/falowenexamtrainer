@@ -59,6 +59,16 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(getA2B1GrammarNotesComponent("A2", 2)).not.toBe(A2StarterConjunctionsPage);
   });
 
+  it("explains that Personen beschreiben Teil 1 prepares the Teil 2 letter", () => {
+    const source = read("A2Day2PersonenBeschreibenWorkbookPage.js");
+
+    expect(source).toContain('eyebrow="Teil 1 · Practice and class discussion"');
+    expect(source).toContain("Teil 1 is for speaking practice and class discussion.");
+    expect(source).toContain("Then use the ideas and vocabulary from this discussion in Teil 2 to write the letter about your boss.");
+    expect(source).not.toContain("invite you to write a brief essay about yourself");
+    expect(source).not.toContain("In this chapter, we’ll engage in group exercises discussing these topics");
+  });
+
   it("keeps the forced A2 fallback on the same Grammar-first shared tab contract", () => {
     const guidance = read("A2B1WorkbookGuidance.js");
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
