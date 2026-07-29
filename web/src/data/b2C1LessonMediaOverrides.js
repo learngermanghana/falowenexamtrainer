@@ -203,6 +203,30 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       instruction:
         "Höre aufmerksam zu und stimme dich auf Gesellschaft, Integration und Teilhabe ein. Danach gehst du weiter zum Lernteil.",
     }),
+    12: Object.freeze({
+      key: "b2-day12-kultur-freizeit-falowen-radio",
+      title: "Kultur und Freizeit 3.2",
+      youtubeId: "juDa8R56Mtc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Kultur, Freizeit und soziale Teilhabe ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    13: Object.freeze({
+      key: "b2-day13-familie-generationen-falowen-radio",
+      title: "Familie und Generationen 3.3",
+      youtubeId: "9LLc7AAqrOc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Familie, Generationen und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    14: Object.freeze({
+      key: "b2-day14-freundschaft-beziehungen-falowen-radio",
+      title: "Freundschaft und soziale Beziehungen 3.4",
+      youtubeId: "BdO8p8C-aSs",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Freundschaft, Vertrauen und soziale Beziehungen ein. Danach gehst du weiter zum Lernteil.",
+    }),
   }),
   C1: Object.freeze({
     11: Object.freeze({
