@@ -38,6 +38,22 @@ test("Exam File and Study Calendar react when the shared Admin config arrives", 
   assert.match(hook, /fallbackGoetheExamConfig/);
 });
 
+test("Exam File prioritizes visible Goethe registration guidance", async () => {
+  const examFile = await source("src/components/MyExamFilePage.js");
+
+  assert.match(examFile, /How to register for your Goethe exam/);
+  assert.match(examFile, /Create or open Goethe account/);
+  assert.match(examFile, /Official registration link/);
+  assert.match(examFile, /Bookable to Open/);
+  assert.match(examFile, /Register now/);
+  assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
+
+  assert.doesNotMatch(examFile, /Submitted assignments \(locked\)/);
+  assert.doesNotMatch(examFile, /Level leaderboard/);
+  assert.doesNotMatch(examFile, /Teacher feedback history/);
+  assert.doesNotMatch(examFile, /title="Downloadables"/);
+});
+
 test("build lifecycle always applies the idempotent shared-config patch", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   assert.match(packageJson.scripts.prebuild, /sync:goethe-config-ui/);
