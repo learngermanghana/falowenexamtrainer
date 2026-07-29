@@ -3,17 +3,14 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useExam } from "../context/ExamContext";
-import { fetchScoreSummary } from "../services/scoreSummaryService";
-import { fetchStudentResultsHistory } from "../services/resultsApi";
-import { downloadClassCalendar } from "../services/classCalendar";
 import { downloadExamReminder } from "../services/examCalendar";
-import { computeExamReadiness } from "../lib/examReadiness";
-import { goetheExamLevels } from "../data/goetheExamSchedule";
-import { toDate, toDateMs } from "../lib/dateUtils";
+import { useGoetheExamConfig } from "../hooks/useGoetheExamConfig";
+import { toDate } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
-import { jsPDF } from "jspdf";
 
-// ---------- helpers ----------
+const GOETHE_ACCOUNT_URL =
+  "https://login.goethe.de/cas/login?service=https%3A%2F%2Fwww.goethe.de%2Fservices%2Fcas%2Fservice%2Fgoethe%2F&locale=de&renew=false";
+
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = toDate(value);
@@ -26,16 +23,20 @@ const formatDate = (value) => {
     : "";
 };
 
-const formatDateTime = (value) => {
-  if (!value) return "";
+const startOfScheduleDay = (value) => {
   const parsed = toDate(value);
-  return parsed ? parsed.toLocaleString() : "";
+  if (!parsed) return null;
+  const date = new Date(parsed);
+  date.setHours(0, 0, 0, 0);
+  return date;
 };
 
-const toTime = (row) => {
-  const raw = row?.date ?? row?.created_at ?? row?.createdAt ?? 0;
-  const t = toDateMs(raw);
-  return Number.isNaN(t) ? 0 : t;
+const endOfScheduleDay = (value) => {
+  const parsed = toDate(value);
+  if (!parsed) return null;
+  const date = new Date(parsed);
+  date.setHours(23, 59, 59, 999);
+  return date;
 };
 
 const getCountdownLabel = (targetDate, now) => {
@@ -51,40 +52,13 @@ const getCountdownLabel = (targetDate, now) => {
   return `${days}d ${hours}h ${minutes}m left`;
 };
 
-// Sheets/CSV often returns "85" or "85/100" as string
-const parseScore = (value) => {
-  if (value === null || value === undefined || value === "") return null;
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-
-  const cleaned = String(value).trim().replace(",", ".");
-  const match = cleaned.match(/(\d+(\.\d+)?)/);
-  if (!match) return null;
-
-  const num = Number(match[1]);
-  return Number.isFinite(num) ? num : null;
+const getRegistrationStatus = (registrationStart, registrationEnd, now) => {
+  if (!registrationStart || !registrationEnd) return "Date pending";
+  if (now < registrationStart) return "Bookable";
+  if (now > registrationEnd) return "Closed";
+  return "Open";
 };
 
-const initialAssignmentState = {
-  loading: false,
-  completed: [],
-  failedLessons: [],
-  missedLessons: [],
-  nextRecommendation: null,
-  blocked: false,
-  lastAssignment: null,
-  retriesThisWeek: 0,
-  totalAssignments: null,
-  completedCount: 0,
-  pointsEarned: null,
-  expectedPoints: null,
-  leaderboard: null,
-  leaderboardGeneratedAt: "",
-  error: "",
-};
-
-const initialFeedbackState = { loading: false, items: [], error: "" };
-
-// ---------- UI bits ----------
 const StatCard = ({ label, value, sub, icon }) => (
   <div
     style={{
@@ -138,82 +112,46 @@ const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
         </div>
         {subtitle ? <div style={{ marginLeft: 22, fontSize: 12, color: "#6B7280" }}>{subtitle}</div> : null}
       </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        {right}
-      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>{right}</div>
     </summary>
 
     <div style={{ padding: 12 }}>{children}</div>
   </details>
 );
 
-// ---------- PDF helpers ----------
-const pdfKeyValueBlock = (doc, startY, pairs) => {
-  let y = startY;
-  pairs.forEach(([k, v]) => {
-    doc.setFont("helvetica", "bold");
-    doc.text(`${k}:`, 14, y);
-    doc.setFont("helvetica", "normal");
-
-    const text = String(v ?? "—");
-    const lines = doc.splitTextToSize(text, 130);
-    doc.text(lines, 60, y);
-    y += 8 * Math.max(1, lines.length);
-  });
-  return y;
+const primaryLinkStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: 44,
+  padding: "10px 14px",
+  borderRadius: 10,
+  background: "#2563eb",
+  color: "#ffffff",
+  fontWeight: 900,
+  textDecoration: "none",
+  textAlign: "center",
+  boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
 };
 
-const downloadSimplePdf = ({ filename, title, subtitle, pairs, footer }) => {
-  const doc = new jsPDF();
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(title, 14, 18);
-
-  if (subtitle) {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(subtitle, 14, 26);
-  }
-
-  doc.setDrawColor(220);
-  doc.line(14, 30, 196, 30);
-
-  doc.setFontSize(12);
-  const endY = pdfKeyValueBlock(doc, 40, pairs);
-
-  doc.setDrawColor(220);
-  doc.line(14, endY + 4, 196, endY + 4);
-
-  if (footer) {
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    const footerLines = doc.splitTextToSize(String(footer), 180);
-    doc.text(footerLines, 14, endY + 14);
-  }
-
-  doc.save(filename);
-};
-
-// ---------- component ----------
 const MyExamFilePage = () => {
-  const { studentProfile, user, idToken } = useAuth();
+  const { studentProfile } = useAuth();
   const { level, levelConfirmed } = useExam();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const formatMoney = useCallback((value) => formatCurrency(value, { locale }), [locale]);
+  const {
+    config: goetheExamConfig,
+    loading: examScheduleLoading,
+    source: examScheduleSource,
+  } = useGoetheExamConfig();
+  const goetheExamLevels = goetheExamConfig.levels;
 
-  const [assignmentState, setAssignmentState] = useState(initialAssignmentState);
-  const [feedbackState, setFeedbackState] = useState(initialFeedbackState);
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60 * 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const studentCode = useMemo(() => {
-    return studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
-  }, [studentProfile]);
 
   const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
 
@@ -224,9 +162,7 @@ const MyExamFilePage = () => {
   const [showAllLevels, setShowAllLevels] = useState(!detectedLevel);
 
   useEffect(() => {
-    if (!detectedLevel) {
-      setShowAllLevels(true);
-    }
+    if (!detectedLevel) setShowAllLevels(true);
   }, [detectedLevel]);
 
   const visibleExamLevels = useMemo(() => {
@@ -236,237 +172,113 @@ const MyExamFilePage = () => {
 
     const matchedLevels = goetheExamLevels.filter((levelInfo) => levelInfo.level === detectedLevel);
     return matchedLevels.length > 0 ? matchedLevels : goetheExamLevels;
-  }, [detectedLevel, showAllLevels]);
+  }, [detectedLevel, goetheExamLevels, showAllLevels]);
 
-  const loadAssignments = useCallback(async () => {
-    if (!studentCode) {
-      setAssignmentState({ ...initialAssignmentState, error: "Add your student code to see submitted assignments." });
-      return;
-    }
+  const summaryLevel = useMemo(
+    () => goetheExamLevels.find((levelInfo) => levelInfo.level === detectedLevel) || visibleExamLevels[0] || null,
+    [detectedLevel, goetheExamLevels, visibleExamLevels]
+  );
 
-    setAssignmentState((prev) => ({ ...prev, loading: true, error: "" }));
-    try {
-      const response = await fetchScoreSummary({ idToken, studentCode });
-      const student = response.student || {};
-      setAssignmentState({
-        loading: false,
-        completed: student.completedAssignments || [],
-        failedLessons: student.failedAssignments || [],
-        missedLessons: student.jumpedAssignments || student.missedAssignments || [],
-        nextRecommendation: student.nextRecommendation || null,
-        blocked: Boolean(student.recommendationBlocked),
-        lastAssignment: student.lastAssignment || null,
-        retriesThisWeek: student.retriesThisWeek || 0,
-        totalAssignments: student.totalAssignments ?? null,
-        completedCount: student.completedCount ?? (student.completedAssignments || []).length,
-        pointsEarned: student.pointsEarned ?? null,
-        expectedPoints: student.expectedPoints ?? null,
-        leaderboard: response.leaderboard || null,
-        leaderboardGeneratedAt: response.generatedAt || "",
-        error: "",
-      });
-    } catch (error) {
-      setAssignmentState({ ...initialAssignmentState, error: "Could not load score summary." });
-    }
-  }, [idToken, studentCode]);
+  const nextRegistration = useMemo(() => {
+    const exams = (summaryLevel?.exams || [])
+      .map((exam) => ({
+        exam,
+        registrationStart: startOfScheduleDay(exam.registrationStart),
+        registrationEnd: endOfScheduleDay(exam.registrationEnd),
+      }))
+      .filter(({ registrationEnd }) => registrationEnd && now <= registrationEnd)
+      .sort((a, b) => a.registrationStart.getTime() - b.registrationStart.getTime());
 
-  const loadFeedback = useCallback(async () => {
-    if (!studentCode) {
-      setFeedbackState({ ...initialFeedbackState, error: "Add your student code to see feedback history." });
-      return;
-    }
+    return exams[0] || null;
+  }, [now, summaryLevel]);
 
-    if (!idToken) {
-      setFeedbackState({ ...initialFeedbackState, error: "Sign in again to load feedback history." });
-      return;
-    }
-
-    setFeedbackState({ loading: true, items: [], error: "" });
-    try {
-      const rows = await fetchStudentResultsHistory({ idToken, studentCode });
-
-      const items = (rows || [])
-        .map((row) => ({ ...row, score: parseScore(row.score) }))
-        .slice()
-        .sort((a, b) => toTime(b) - toTime(a))
-        .filter((row) => row.comments || row.score !== null)
-        .slice(0, 12);
-
-      setFeedbackState({ loading: false, items, error: "" });
-    } catch (error) {
-      setFeedbackState({ loading: false, items: [], error: "Could not load teacher feedback right now." });
-    }
-  }, [idToken, studentCode]);
-
-  useEffect(() => {
-    loadAssignments();
-  }, [loadAssignments]);
-
-  useEffect(() => {
-    loadFeedback();
-  }, [loadFeedback]);
-
-  const readiness = useMemo(() => {
-    return computeExamReadiness({
-      completedAssignments: assignmentState.completed,
-      totalAssignments: assignmentState.totalAssignments,
-      t,
-    });
-  }, [assignmentState.completed, assignmentState.totalAssignments, t]);
-
-  const lockedAssignments = useMemo(() => {
-    return (assignmentState.completed || [])
-      .slice()
-      .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
-      .slice(0, 8);
-  }, [assignmentState.completed]);
-
-  const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
-  const lastFeedbackDate = useMemo(() => {
-    const latest = feedbackState.items?.[0];
-    return latest?.date || latest?.created_at || latest?.createdAt || "";
-  }, [feedbackState.items]);
-
-  const pointsSummary = useMemo(() => {
-    if (assignmentState.pointsEarned === null || assignmentState.expectedPoints === null) return "Not yet";
-    return `${assignmentState.pointsEarned}/${assignmentState.expectedPoints} pts`;
-  }, [assignmentState.expectedPoints, assignmentState.pointsEarned]);
-
-  const assignmentProgress = useMemo(() => {
-    if (assignmentState.totalAssignments === null) return "Assignments passed: —";
-    return `Assignments passed: ${assignmentState.completedCount}/${assignmentState.totalAssignments}`;
-  }, [assignmentState.completedCount, assignmentState.totalAssignments]);
-
-  const leaderboardRows = useMemo(() => assignmentState.leaderboard?.rows || [], [assignmentState.leaderboard]);
-  const qualificationMinimum = assignmentState.leaderboard?.qualificationMinimum ?? 3;
-  const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
-  const leaderboardUpdatedLabel = useMemo(() => {
-    const formatted = formatDateTime(assignmentState.leaderboardGeneratedAt);
-    return formatted ? `Last updated ${formatted}` : "";
-  }, [assignmentState.leaderboardGeneratedAt]);
-  const myLeaderboardEntry = useMemo(() => {
-    const normalizedCode = String(studentCode || "").toLowerCase();
-    return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
-  }, [leaderboardRows, studentCode]);
-  const normalizedStudentCode = String(studentCode || "").toLowerCase();
-
-  const nextRecLabel = useMemo(() => {
-    if (assignmentState.loading) return "Loading…";
-    if (assignmentState.error) return "Unavailable";
-    if (assignmentState.blocked) return "Blocked (fix failed tasks)";
-    if (!assignmentState.nextRecommendation) return "Not set yet";
-    return assignmentState.nextRecommendation.label || assignmentState.nextRecommendation.identifier || "Next task";
-  }, [assignmentState.blocked, assignmentState.error, assignmentState.loading, assignmentState.nextRecommendation]);
-
-  const downloadContract = () => {
-    const studentName = studentProfile?.name || user?.email || "Unknown";
-    downloadSimplePdf({
-      filename: "contract-summary.pdf",
-      title: "Falowen Learning Hub",
-      subtitle: "Contract Summary (Unofficial)",
-      pairs: [
-        ["Student", studentName],
-        ["Student code", studentCode || "—"],
-        ["Level", detectedLevel || "Not set"],
-        ["Class", className || "Not set"],
-        ["Payment status", studentProfile?.paymentStatus || "pending"],
-        ["Contract term", `${studentProfile?.contractTermMonths || "n/a"} months`],
-        ["Start date", formatDate(studentProfile?.contractStart) || "n/a"],
-        ["End date", formatDate(studentProfile?.contractEnd) || "n/a"],
-      ],
-      footer: "This is a generated summary for quick reference. Contact support for an official contract copy.",
-    });
-  };
-
-  const downloadReceipt = () => {
-    const generated = new Date().toLocaleString();
-    downloadSimplePdf({
-      filename: "receipt-log.pdf",
-      title: "Falowen Learning Hub",
-      subtitle: "Receipt Log (Unofficial)",
-      pairs: [
-        ["Generated", generated],
-        ["Student", studentProfile?.name || "—"],
-        ["Student code", studentCode || "—"],
-        ["Email", user?.email || "—"],
-        ["Level", detectedLevel || "—"],
-        ["Class", className || "—"],
-        ["Payment status", (studentProfile?.paymentStatus || "pending").toString()],
-      ],
-      footer: "This is a placeholder receipt log. Contact support for official invoices/receipts.",
-    });
-  };
+  const summaryRegistrationStatus = nextRegistration
+    ? getRegistrationStatus(nextRegistration.registrationStart, nextRegistration.registrationEnd, now)
+    : "Date pending";
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      {/* Report header */}
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Exam dossier</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>My Exam File</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam registration</p>
+            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>How to register for your Goethe exam</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              A quick report of your level, readiness, scores, and tutor feedback.
+              See when booking opens, prepare your Goethe account early, and use the clearly displayed official registration link.
             </p>
           </div>
 
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
-            <span style={styles.badge}>Student code: {studentCode || "not set"}</span>
+            <span style={styles.badge}>Level: {detectedLevel || "not set"}</span>
             {className ? <span style={styles.badge}>Class: {className}</span> : null}
           </div>
         </div>
 
-        {/* Top summary row */}
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <StatCard icon="🎓" label="Your level" value={detectedLevel || "Not set"} sub="Use Show all levels to check another exam." />
           <StatCard
-            icon="🎓"
-            label="Level"
-            value={detectedLevel || "Not set"}
-            sub={className ? `Class: ${className}` : "Add class name in your profile"}
+            icon={summaryRegistrationStatus === "Open" ? "🟢" : "📅"}
+            label="Registration status"
+            value={summaryRegistrationStatus}
+            sub={
+              nextRegistration
+                ? summaryRegistrationStatus === "Open"
+                  ? "Registration is open now. Book immediately."
+                  : `Bookable from ${formatDate(nextRegistration.exam.registrationStart)}`
+                : "No registration date is currently listed."
+            }
           />
-          <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
-          <StatCard
-            icon="🗓️"
-            label="Last feedback"
-            value={lastFeedbackDate ? formatDate(lastFeedbackDate) : (feedbackState.loading ? "Loading…" : "No feedback yet")}
-            sub="Latest marked task date"
-          />
-          <StatCard
-            icon={assignmentState.blocked ? "⛔" : "➡️"}
-            label="Next recommendation"
-            value={nextRecLabel}
-            sub={assignmentState.blocked ? "Pass failed identifiers to unlock" : "Based on your score sheet"}
-          />
-          <StatCard
-            icon="🏅"
-            label="Score progress"
-            value={pointsSummary}
-            sub={`${assignmentProgress} · Passes counted from 60+`}
-          />
-        </div>
-
-        {/* Readiness banner */}
-        <div
-          style={{
-            borderRadius: 14,
-            padding: 12,
-            background: readiness.tone,
-            border: "1px solid #e5e7eb",
-            display: "grid",
-            gap: 6,
-          }}
-        >
-          <div style={{ fontWeight: 900, display: "flex", alignItems: "center", gap: 8 }}>
-            <span aria-hidden>{readiness.icon}</span>
-            Exam readiness: {readiness.text}
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>{readiness.detail}</p>
+          <StatCard icon="📍" label="Exam centre" value={summaryLevel?.location || "Goethe-Institut Accra"} sub="Confirm the location on Goethe's page before payment." />
         </div>
       </section>
 
       <CollapsibleCard
-        title="Goethe exam countdowns (Accra)"
-        subtitle="Monitor upcoming exam dates and registration windows by level."
+        title="How to register"
+        subtitle="Complete these steps before and on the listed registration date."
+        defaultOpen
+        right={null}
+      >
+        <div style={{ display: "grid", gap: 14 }}>
+          <div
+            style={{
+              border: "2px solid #2563eb",
+              borderRadius: 14,
+              padding: 14,
+              background: "#eff6ff",
+              display: "grid",
+              gap: 10,
+            }}
+          >
+            <div style={{ fontWeight: 900, color: "#111827" }}>1. Create your Goethe account before registration day</div>
+            <div style={{ fontSize: 14, lineHeight: 1.55, color: "#374151" }}>
+              Do not wait until booking opens. Create the account now, confirm your login details, and keep them ready.
+            </div>
+            <a href={GOETHE_ACCOUNT_URL} target="_blank" rel="noreferrer" style={primaryLinkStyle}>
+              Create or open Goethe account →
+            </a>
+            <div style={{ fontSize: 12, color: "#4b5563", overflowWrap: "anywhere" }}>
+              Account link: <a href={GOETHE_ACCOUNT_URL} target="_blank" rel="noreferrer">{GOETHE_ACCOUNT_URL}</a>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            {[
+              ["2", "Check the Bookable date", "Find your level below. The listed date tells you exactly when registration becomes available."],
+              ["3", "Watch for Open", "On the registration date, the status automatically changes from Bookable to Open for the full day."],
+              ["4", "Register immediately", "When the status says Open, select Register now and complete the booking on Goethe's official page."],
+            ].map(([number, title, description]) => (
+              <div key={number} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
+                <div style={{ fontWeight: 900, color: "#111827" }}>{number}. {title}</div>
+                <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.5, color: "#6B7280" }}>{description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CollapsibleCard>
+
+      <CollapsibleCard
+        title="Goethe exam dates and registration links (Accra)"
+        subtitle="Bookable shows the future opening date. Open means you can register right away."
         defaultOpen
         right={
           detectedLevel ? (
@@ -476,7 +288,7 @@ const MyExamFilePage = () => {
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                setShowAllLevels((prev) => !prev);
+                setShowAllLevels((previous) => !previous);
               }}
             >
               {showAllLevels ? "Show my level only" : "Show all levels"}
@@ -487,12 +299,22 @@ const MyExamFilePage = () => {
         <div style={{ display: "grid", gap: 14 }}>
           {!detectedLevel ? (
             <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
-              No level set yet — showing all exam levels so you can browse upcoming dates.
+              No level is set yet, so all exam levels are shown.
             </div>
           ) : null}
           <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
-            Date format: month day, year (e.g., March 5, 2025). Exams are arranged by level and then by date.
+            Date format: month day, year (e.g., August 3, 2026). Registration dates are shown separately from exam dates.
           </div>
+          <div style={{ ...styles.helperText, margin: "-2px 0 0", color: examScheduleLoading ? "#92400e" : "#166534" }}>
+            {examScheduleLoading
+              ? "Updating Goethe schedule…"
+              : examScheduleSource === "admin"
+                ? "Schedule synced from Falowen Admin."
+                : examScheduleSource === "cache"
+                  ? "Showing the last saved Admin schedule while checking for updates."
+                  : "Showing the built-in schedule until Admin publishes an update."}
+          </div>
+
           {visibleExamLevels.map((levelInfo) => {
             const isDetectedLevel = levelInfo.level === detectedLevel;
             const formattedPrice =
@@ -501,426 +323,166 @@ const MyExamFilePage = () => {
               typeof levelInfo.modulePriceValue === "number"
                 ? t("examFile.modulePrice", { price: formatMoney(levelInfo.modulePriceValue) })
                 : levelInfo.modulePrice;
-            return (
-            <div
-              key={levelInfo.level}
-              style={{
-                border: isDetectedLevel ? "2px solid #2563eb" : "1px solid #e5e7eb",
-                borderRadius: 16,
-                padding: 14,
-                background: isDetectedLevel ? "#eff6ff" : "#ffffff",
-                display: "grid",
-                gap: 10,
-                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                <div>
-                  <div style={{ fontWeight: 900, fontSize: 16, color: "#111827" }}>
-                    {levelInfo.level} · {levelInfo.title}
-                  </div>
-                  <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
-                </div>
-                <div style={{ textAlign: "right", display: "grid", gap: 6, justifyItems: "end" }}>
-                  <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>{formattedPrice}</div>
-                  {formattedModulePrice ? (
-                    <div style={{ fontSize: 12, color: "#6B7280" }}>{formattedModulePrice}</div>
-                  ) : null}
-                  {levelInfo.registrationUrl ? (
-                    <button
-                      type="button"
-                      onClick={() => window.location.assign(levelInfo.registrationUrl)}
-                      style={{
-                        ...styles.secondaryButton,
-                        padding: "6px 10px",
-                        fontSize: 12,
-                        color: "#111827",
-                      }}
-                    >
-                      Register →
-                    </button>
-                  ) : null}
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gap: 8 }}>
-                {levelInfo.exams
-                  .slice()
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .filter((exam) => {
-                    const registrationEnd = new Date(exam.registrationEnd);
-                    return now <= registrationEnd;
-                  })
-                  .map((exam, index) => {
-                    const examDate = new Date(exam.date);
-                    const registrationStart = new Date(exam.registrationStart);
-                    const registrationEnd = new Date(exam.registrationEnd);
-                    const registrationStatus =
-                      now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
-                    const canRegister = registrationStatus === "Open" && Boolean(levelInfo.registrationUrl);
-                    const isSingleDayRegistration =
-                      registrationStart.toDateString() === registrationEnd.toDateString();
-                    const registrationLabel = isSingleDayRegistration
-                      ? `Registration day: ${formatDate(registrationStart)}`
-                      : `Registration window: ${formatDate(registrationStart)} - ${formatDate(
-                          registrationEnd
-                        )}`;
-                    const registrationBadgeStyles = {
-                      Open: {
-                        background: "#dcfce7",
-                        color: "#166534",
-                        borderColor: "#86efac",
-                      },
-                      Closed: {
-                        background: "#f3f4f6",
-                        color: "#6b7280",
-                        borderColor: "#e5e7eb",
-                      },
-                      Upcoming: {
-                        background: "#dbeafe",
-                        color: "#1d4ed8",
-                        borderColor: "#bfdbfe",
-                      },
-                    };
-                    return (
-                      <div
-                        key={`${levelInfo.level}-${exam.date}-${index}`}
-                        style={{
-                          border: "1px solid #f3f4f6",
-                          borderRadius: 12,
-                          padding: 10,
-                          display: "grid",
-                          gap: 6,
-                          background: "#f9fafb",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                          <div style={{ fontWeight: 800, color: "#111827" }}>
-                            📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
-                          </div>
-                          <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
-                            {getCountdownLabel(examDate, now)}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 13,
-                            color: "#6B7280",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <span>{registrationLabel}</span>
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              padding: "2px 8px",
-                              borderRadius: 999,
-                              fontSize: 11,
-                              fontWeight: 800,
-                              border: "1px solid",
-                              letterSpacing: "0.02em",
-                              textTransform: "uppercase",
-                              ...registrationBadgeStyles[registrationStatus],
-                            }}
-                          >
-                            {registrationStatus}
-                          </span>
-                          <button
-                            type="button"
-                            style={{ ...styles.secondaryButton, padding: "4px 8px", fontSize: 12 }}
-                            onClick={() => downloadExamReminder({ levelInfo, exam })}
-                          >
-                            Add reminder (.ics)
-                          </button>
-                          {levelInfo.registrationUrl ? (
-                            <button
-                              type="button"
-                              style={{
-                                ...styles.secondaryButton,
-                                padding: "4px 8px",
-                                fontSize: 12,
-                                opacity: canRegister ? 1 : 0.75,
-                                cursor: canRegister ? "pointer" : "not-allowed",
-                              }}
-                              disabled={!canRegister}
-                              title={canRegister ? "Open Goethe registration page" : "Registration is not open yet"}
-                              onClick={() => window.location.assign(levelInfo.registrationUrl)}
-                            >
-                              Register
-                            </button>
-                          ) : null}
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )})}
-        </div>
-      </CollapsibleCard>
-
-      {/* Assignments (collapsible) */}
-      <CollapsibleCard
-        title="Submitted assignments (locked)"
-        subtitle="Passed identifiers from the published score sheet."
-        defaultOpen={false}
-        right={<div style={styles.lockPill}>🔒 View only</div>}
-      >
-        {assignmentState.error ? <div style={styles.errorBox}>{assignmentState.error}</div> : null}
-        {assignmentState.loading ? <div style={styles.helperText}>Loading score summary ...</div> : null}
-
-        {!assignmentState.loading && !assignmentState.error && assignmentState.blocked ? (
-          <div style={{ ...styles.errorBox, background: "#fff7ed" }}>
-            Your next recommendation is blocked until you pass the failed identifiers.
-          </div>
-        ) : null}
-
-        {!assignmentState.loading && !assignmentState.error && lockedAssignments.length === 0 ? (
-          <div style={styles.helperText}>No passed identifiers detected yet.</div>
-        ) : null}
-
-        <div style={{ display: "grid", gap: 10 }}>
-          {lockedAssignments.map((entry, index) => (
-            <div
-              key={`${entry.identifier || index}-locked`}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 14,
-                padding: 12,
-                background: "#ffffff",
-                display: "grid",
-                gap: 6,
-                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div style={{ fontWeight: 850, color: "#111827" }}>{entry.label || `Identifier ${entry.identifier}`}</div>
-                <span style={styles.lockPill}>🔒 Locked</span>
-              </div>
-              <div style={{ fontSize: 13, color: "#6B7280" }}>
-                Identifier: <b style={{ color: "#111827" }}>{entry.identifier || "—"}</b> · Score:{" "}
-                <b style={{ color: "#111827" }}>{typeof entry.score === "number" ? `${entry.score}/100` : "Pending"}</b> · Date:{" "}
-                <b style={{ color: "#111827" }}>{formatDate(entry.date) || "—"}</b>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CollapsibleCard>
-
-      <CollapsibleCard
-        title={`Level leaderboard (${assignmentState.leaderboard?.level || detectedLevel || "Level"})`}
-        subtitle="Friendly ranking for your level — only scores 60+ count, qualify after 3 passed assignments. Ties break by total score, then passed count, then name."
-        defaultOpen={false}
-      >
-        {assignmentState.loading ? <div style={styles.helperText}>Loading leaderboard ...</div> : null}
-        {!assignmentState.loading && assignmentState.error ? (
-          <div style={styles.errorBox}>{assignmentState.error}</div>
-        ) : null}
-        {!assignmentState.loading && !assignmentState.error && leaderboardUpdatedLabel ? (
-          <div style={{ ...styles.helperText, margin: "0 0 10px" }}>{leaderboardUpdatedLabel}</div>
-        ) : null}
-
-        {!assignmentState.loading && !assignmentState.error && assignmentState.completedCount < qualificationMinimum ? (
-          <div style={{ ...styles.helperText, fontStyle: "italic" }}>
-            You&apos;ll join the leaderboard after {qualificationMinimum} passed assignments. Keep it steady — no rush!
-          </div>
-        ) : null}
-
-        {!assignmentState.loading && !assignmentState.error && leaderboardRows.length === 0 ? (
-          <div style={styles.helperText}>No qualified rankings yet for this level.</div>
-        ) : null}
-
-        {!assignmentState.loading && !assignmentState.error && leaderboardRows.length > 0 ? (
-          <div style={{ display: "grid", gap: 10 }}>
-            {myLeaderboardEntry ? (
-              <div
-                style={{
-                  border: "1px solid #dbeafe",
-                  background: "#eff6ff",
-                  borderRadius: 14,
-                  padding: 12,
-                  display: "grid",
-                  gap: 4,
-                }}
-              >
-                <div style={{ fontWeight: 900 }}>Your standing</div>
-                <div style={{ fontSize: 13, color: "#1f2937" }}>
-                  You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
-                  {myLeaderboardEntry.completedCount} / {Math.round((myLeaderboardEntry.expectedPoints || 0) / 100)}{" "}
-                  passed, {myLeaderboardEntry.failedCount || 0} failed, {myLeaderboardEntry.totalScore} points, and{" "}
-                  {myLeaderboardEntry.expectedPoints || 0} expected points.
-                </div>
-              </div>
-            ) : (
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                {leaderboardRows.length} students have qualified for this level.
-              </div>
-            )}
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                <thead>
-                  <tr style={{ textAlign: "left", color: "#6B7280" }}>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Passed</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Failed</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Expected points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topLeaderboardRows.map((row) => {
-                    const isCurrentUser =
-                      normalizedStudentCode && String(row.studentCode || "").toLowerCase() === normalizedStudentCode;
-                    return (
-                      <tr
-                        key={`${row.studentCode || row.name}-${row.rank}`}
-                        style={{
-                          background: isCurrentUser ? "#eef2ff" : "transparent",
-                          fontWeight: isCurrentUser ? 700 : 500,
-                        }}
-                      >
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>#{row.rank}</td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                          {row.name || "Student"}
-                        </td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                          {row.completedCount} / {Math.round((row.expectedPoints || 0) / 100)}
-                        </td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                          {row.failedCount || 0}
-                        </td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.totalScore}</td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                          {row.expectedPoints || 0}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : null}
-      </CollapsibleCard>
-
-      {/* Feedback (collapsible) */}
-      <CollapsibleCard
-        title="Teacher feedback history"
-        subtitle="Scores + tutor comments loaded from the published Google Sheet."
-        defaultOpen={false}
-        right={
-          <button
-            type="button"
-            style={styles.secondaryButton}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              loadFeedback();
-            }}
-            disabled={feedbackState.loading}
-          >
-            {feedbackState.loading ? "Reloading..." : "Reload"}
-          </button>
-        }
-      >
-        {feedbackState.error ? <div style={styles.errorBox}>{feedbackState.error}</div> : null}
-        {feedbackState.loading ? <div style={styles.helperText}>Loading feedback ...</div> : null}
-        {!feedbackState.loading && !feedbackState.error && feedbackItems.length === 0 ? (
-          <div style={styles.helperText}>No feedback recorded yet.</div>
-        ) : null}
-
-        <div style={{ display: "grid", gap: 10 }}>
-          {feedbackItems.map((entry, index) => {
-            const hasScore = entry.score !== null;
+            const upcomingExams = (levelInfo.exams || [])
+              .slice()
+              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .filter((exam) => {
+                const registrationEnd = endOfScheduleDay(exam.registrationEnd);
+                return registrationEnd && now <= registrationEnd;
+              });
 
             return (
               <div
-                key={`${entry.assignment || "assignment"}-${index}`}
+                key={levelInfo.level}
                 style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 14,
-                  padding: 12,
-                  background: "#ffffff",
+                  border: isDetectedLevel ? "2px solid #2563eb" : "1px solid #e5e7eb",
+                  borderRadius: 16,
+                  padding: 14,
+                  background: isDetectedLevel ? "#eff6ff" : "#ffffff",
                   display: "grid",
-                  gap: 8,
+                  gap: 12,
                   boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
-                  <div>
-                    <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>
-                      {entry.assignment || "Marked task"}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ minWidth: 0, flex: "1 1 260px" }}>
+                    <div style={{ fontWeight: 900, fontSize: 16, color: "#111827" }}>
+                      {levelInfo.level} · {levelInfo.title}
                     </div>
-                    <div style={{ fontSize: 12, color: "#6B7280" }}>📅 {formatDate(entry.date) || "Not set"}</div>
+                    <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
                   </div>
+                  <div style={{ display: "grid", gap: 6, alignContent: "start" }}>
+                    <div style={{ fontWeight: 900, fontSize: 15, color: "#111827", textAlign: "right" }}>{formattedPrice}</div>
+                    {formattedModulePrice ? <div style={{ fontSize: 12, color: "#6B7280", textAlign: "right" }}>{formattedModulePrice}</div> : null}
+                  </div>
+                </div>
 
-                  <span
+                {levelInfo.registrationUrl ? (
+                  <div
                     style={{
-                      padding: "6px 10px",
-                      borderRadius: 999,
-                      border: "1px solid #e5e7eb",
-                      background: hasScore ? "#EEF2FF" : "#F9FAFB",
-                      fontSize: 12,
-                      fontWeight: 900,
-                      color: "#111827",
-                      whiteSpace: "nowrap",
+                      border: "1px solid #bfdbfe",
+                      borderRadius: 12,
+                      padding: 12,
+                      background: "#ffffff",
+                      display: "grid",
+                      gap: 8,
                     }}
                   >
-                    {hasScore ? `Score: ${entry.score}/100` : "Not scored"}
-                  </span>
-                </div>
+                    <a href={levelInfo.registrationUrl} target="_blank" rel="noreferrer" style={primaryLinkStyle}>
+                      Open {levelInfo.level} Goethe registration page →
+                    </a>
+                    <div style={{ fontSize: 12, color: "#4b5563", overflowWrap: "anywhere" }}>
+                      Official registration link: <a href={levelInfo.registrationUrl} target="_blank" rel="noreferrer">{levelInfo.registrationUrl}</a>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={styles.errorBox}>The official registration link has not been added for this level yet.</div>
+                )}
 
-                <div style={{ fontSize: 14, lineHeight: 1.55, color: "#111827" }}>
-                  {entry.comments ? entry.comments : hasScore ? "No tutor comments for this task." : "No comments supplied."}
-                </div>
+                {upcomingExams.length === 0 ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    No future registration date is listed here yet. Open the official registration page above to check availability.
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {upcomingExams.map((exam, index) => {
+                      const examDate = startOfScheduleDay(exam.date);
+                      const registrationStart = startOfScheduleDay(exam.registrationStart);
+                      const registrationEnd = endOfScheduleDay(exam.registrationEnd);
+                      const registrationStatus = getRegistrationStatus(registrationStart, registrationEnd, now);
+                      const canRegister = registrationStatus === "Open" && Boolean(levelInfo.registrationUrl);
+                      const isSingleDayRegistration =
+                        registrationStart && registrationEnd && registrationStart.toDateString() === registrationEnd.toDateString();
+                      const registrationLabel = isSingleDayRegistration
+                        ? `Bookable from: ${formatDate(exam.registrationStart)}`
+                        : `Booking window: ${formatDate(exam.registrationStart)} - ${formatDate(exam.registrationEnd)}`;
+                      const registrationBadgeStyles = {
+                        Open: { background: "#dcfce7", color: "#166534", borderColor: "#86efac" },
+                        Closed: { background: "#f3f4f6", color: "#6b7280", borderColor: "#e5e7eb" },
+                        Bookable: { background: "#dbeafe", color: "#1d4ed8", borderColor: "#93c5fd" },
+                        "Date pending": { background: "#fef3c7", color: "#92400e", borderColor: "#fde68a" },
+                      };
 
-                {entry.link ? (
-                  <a href={entry.link} target="_blank" rel="noreferrer" style={{ fontWeight: 800 }}>
-                    Open marked file →
-                  </a>
-                ) : null}
+                      return (
+                        <div
+                          key={`${levelInfo.level}-${exam.date}-${index}`}
+                          style={{
+                            border: canRegister ? "2px solid #22c55e" : "1px solid #e5e7eb",
+                            borderRadius: 12,
+                            padding: 12,
+                            display: "grid",
+                            gap: 9,
+                            background: canRegister ? "#f0fdf4" : "#f9fafb",
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                            <div style={{ fontWeight: 800, color: "#111827" }}>
+                              📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
+                            </div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
+                              {getCountdownLabel(examDate, now)}
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 13, color: "#4b5563", fontWeight: 700 }}>{registrationLabel}</span>
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                padding: "3px 9px",
+                                borderRadius: 999,
+                                fontSize: 11,
+                                fontWeight: 900,
+                                border: "1px solid",
+                                letterSpacing: "0.02em",
+                                textTransform: "uppercase",
+                                ...registrationBadgeStyles[registrationStatus],
+                              }}
+                            >
+                              {registrationStatus}
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: 13, lineHeight: 1.5, color: canRegister ? "#166534" : "#6B7280" }}>
+                            {canRegister
+                              ? "Registration is open today. Select Register now and complete your booking immediately."
+                              : `The status will change from Bookable to Open on ${formatDate(exam.registrationStart)}.`}
+                          </div>
+
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            {levelInfo.registrationUrl ? (
+                              <a
+                                href={levelInfo.registrationUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                  ...primaryLinkStyle,
+                                  minHeight: 38,
+                                  padding: "7px 12px",
+                                  background: canRegister ? "#16a34a" : "#2563eb",
+                                  fontSize: 13,
+                                }}
+                              >
+                                {canRegister ? "Register now →" : "Open registration page →"}
+                              </a>
+                            ) : null}
+                            <button
+                              type="button"
+                              style={{ ...styles.secondaryButton, padding: "7px 10px", fontSize: 12 }}
+                              onClick={() => downloadExamReminder({ levelInfo, exam })}
+                            >
+                              Add exam reminder (.ics)
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
-        </div>
-      </CollapsibleCard>
-
-      {/* Downloadables (collapsible) */}
-      <CollapsibleCard
-        title="Downloadables"
-        subtitle="Calendar + professional PDFs for contract and receipt."
-        defaultOpen={false}
-        right={null}
-      >
-        <div style={{ display: "grid", gap: 10 }}>
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-            <button
-              type="button"
-              style={styles.buttonSecondary}
-              onClick={() => downloadClassCalendar(className)}
-              disabled={!className}
-              title={!className ? "Add your class name to download calendar" : ""}
-            >
-              📅 Download class calendar (.ics)
-            </button>
-
-            <button type="button" style={styles.buttonSecondary} onClick={downloadContract}>
-              📄 Download contract summary (PDF)
-            </button>
-
-            <button type="button" style={styles.buttonSecondary} onClick={downloadReceipt}>
-              🧾 Download receipt log (PDF)
-            </button>
-          </div>
-
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Calendar downloads need your class name. Contract and receipt PDFs use the profile details shown above.
-          </p>
         </div>
       </CollapsibleCard>
     </div>
