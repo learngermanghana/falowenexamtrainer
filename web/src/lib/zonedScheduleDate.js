@@ -2,7 +2,10 @@ import { toDate } from "./dateUtils";
 
 const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DEFAULT_TIMEZONE = "Africa/Accra";
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
 const formatterCache = new Map();
+const dayBoundaryCache = new Map();
 
 const normalizeTimeZone = (timeZone) => {
   const candidate = String(timeZone || DEFAULT_TIMEZONE).trim() || DEFAULT_TIMEZONE;
@@ -47,20 +50,6 @@ const readZonedParts = (date, timeZone) => {
   };
 };
 
-const getTimeZoneOffsetMs = (date, timeZone) => {
-  const parts = readZonedParts(date, timeZone);
-  const representedAsUtc = Date.UTC(
-    parts.year,
-    parts.month - 1,
-    parts.day,
-    parts.hour,
-    parts.minute,
-    parts.second,
-  );
-  const instantToSecond = Math.trunc(date.getTime() / 1000) * 1000;
-  return representedAsUtc - instantToSecond;
-};
-
 const getScheduleDateParts = (value, timeZone) => {
   if (!value) return null;
 
@@ -81,48 +70,79 @@ const getScheduleDateParts = (value, timeZone) => {
   return { year, month, day };
 };
 
-const zonedDateTimeToInstant = (
-  { year, month, day, hour, minute, second, millisecond },
-  timeZone,
-) => {
+const compareCivilDates = (left, right) => {
+  if (left.year !== right.year) return left.year - right.year;
+  if (left.month !== right.month) return left.month - right.month;
+  return left.day - right.day;
+};
+
+const pad = (number) => String(number).padStart(2, "0");
+const dateKeyFromParts = ({ year, month, day }) => `${year}-${pad(month)}-${pad(day)}`;
+
+const addCivilDays = ({ year, month, day }, amount) => {
+  const shifted = new Date(Date.UTC(year, month - 1, day + amount));
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth() + 1,
+    day: shifted.getUTCDate(),
+  };
+};
+
+const findFirstInstantAtOrAfterCivilDate = (targetParts, timeZone) => {
   const normalizedTimeZone = normalizeTimeZone(timeZone);
-  const wallClockAsUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+  const cacheKey = `${normalizedTimeZone}|${dateKeyFromParts(targetParts)}`;
+  const cached = dayBoundaryCache.get(cacheKey);
+  if (cached !== undefined) return new Date(cached);
 
-  let offset = getTimeZoneOffsetMs(new Date(wallClockAsUtc), normalizedTimeZone);
-  let instant = wallClockAsUtc - offset;
-  const refinedOffset = getTimeZoneOffsetMs(new Date(instant), normalizedTimeZone);
+  const utcMidnight = Date.UTC(targetParts.year, targetParts.month - 1, targetParts.day);
+  let lower = utcMidnight - 36 * HOUR_MS;
+  let upper = utcMidnight + 36 * HOUR_MS;
 
-  if (refinedOffset !== offset) {
-    offset = refinedOffset;
-    instant = wallClockAsUtc - offset;
+  while (compareCivilDates(readZonedParts(new Date(lower), normalizedTimeZone), targetParts) >= 0) {
+    lower -= DAY_MS;
+  }
+  while (compareCivilDates(readZonedParts(new Date(upper), normalizedTimeZone), targetParts) < 0) {
+    upper += DAY_MS;
   }
 
-  return new Date(instant + millisecond);
+  while (upper - lower > 1) {
+    const middle = lower + Math.floor((upper - lower) / 2);
+    const comparison = compareCivilDates(
+      readZonedParts(new Date(middle), normalizedTimeZone),
+      targetParts,
+    );
+    if (comparison >= 0) upper = middle;
+    else lower = middle;
+  }
+
+  dayBoundaryCache.set(cacheKey, upper);
+  return new Date(upper);
 };
 
 export const startOfScheduleDay = (value, timeZone = DEFAULT_TIMEZONE) => {
   const parts = getScheduleDateParts(value, timeZone);
   if (!parts) return null;
-  return zonedDateTimeToInstant(
-    { ...parts, hour: 0, minute: 0, second: 0, millisecond: 0 },
-    timeZone,
-  );
+
+  const firstInstant = findFirstInstantAtOrAfterCivilDate(parts, timeZone);
+  const firstInstantParts = readZonedParts(firstInstant, timeZone);
+  return compareCivilDates(firstInstantParts, parts) === 0 ? firstInstant : null;
 };
 
 export const endOfScheduleDay = (value, timeZone = DEFAULT_TIMEZONE) => {
   const parts = getScheduleDateParts(value, timeZone);
-  if (!parts) return null;
-  return zonedDateTimeToInstant(
-    { ...parts, hour: 23, minute: 59, second: 59, millisecond: 999 },
-    timeZone,
-  );
+  if (!parts || !startOfScheduleDay(value, timeZone)) return null;
+
+  const nextCivilDate = addCivilDays(parts, 1);
+  const nextBoundary = findFirstInstantAtOrAfterCivilDate(nextCivilDate, timeZone);
+  const finalInstant = new Date(nextBoundary.getTime() - 1);
+  return compareCivilDates(readZonedParts(finalInstant, timeZone), parts) === 0
+    ? finalInstant
+    : null;
 };
 
 export const scheduleDateKey = (value, timeZone = DEFAULT_TIMEZONE) => {
   const parts = getScheduleDateParts(value, timeZone);
-  if (!parts) return "";
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${parts.year}-${pad(parts.month)}-${pad(parts.day)}`;
+  return parts ? dateKeyFromParts(parts) : "";
 };
 
 export const formatScheduleDate = (
