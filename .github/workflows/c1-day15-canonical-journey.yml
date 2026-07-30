@@ -1,0 +1,44 @@
+name: C1 Day 15 canonical journey
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/C1Day15BildungUndLebenslangesLernenWorkbookPage.js"
+      - "web/src/components/C1Day15BildungUndLebenslangesLernenGrammarNotesPage.js"
+      - "web/src/components/C1Day15To17GuidedLessonPage.js"
+      - "web/src/components/C1Day15CanonicalJourney.test.js"
+      - "web/src/data/selfLearningLessons/c1/day15BildungUndLebenslangesLernen.js"
+      - "web/src/data/lessonModel.js"
+      - ".github/workflows/c1-day15-canonical-journey.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/C1Day15BildungUndLebenslangesLernenWorkbookPage.js"
+      - "web/src/components/C1Day15BildungUndLebenslangesLernenGrammarNotesPage.js"
+      - "web/src/components/C1Day15To17GuidedLessonPage.js"
+      - "web/src/components/C1Day15CanonicalJourney.test.js"
+      - "web/src/data/selfLearningLessons/c1/day15BildungUndLebenslangesLernen.js"
+      - "web/src/data/lessonModel.js"
+      - ".github/workflows/c1-day15-canonical-journey.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Test canonical C1 Day 15 routing and media
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/C1Day15CanonicalJourney.test.js
+      - name: Build Falowen web app
+        run: npm run build

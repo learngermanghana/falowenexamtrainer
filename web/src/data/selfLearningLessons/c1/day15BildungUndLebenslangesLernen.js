@@ -7,6 +7,14 @@ const c1Day15BildungUndLebenslangesLernen = makeLesson({
   title: "Bildung und lebenslanges Lernen",
   topic: "Weiterbildung, Chancengleichheit und die gemeinsame Verantwortung von Staat, Unternehmen und Lernenden differenziert bewerten",
   heroImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    key: "c1-day15-bildung-lebenslanges-lernen-ai-video",
+    chapter: "3.5",
+    title: "C1 Day 15 · Bildung und lebenslanges Lernen · AI video",
+    description:
+      "AI video lesson for evaluating lifelong learning, equal access, professional development and shared responsibility at C1 level.",
+    url: "https://youtu.be/yd036VzKm_U",
+  },
   grammarFocus: "Argumentative Satzmuster, Nominalisierung und formelle Textlogik: Gründe, Einwände, Bedingungen und Schlussfolgerungen präzise verbinden",
   objectives: [
     "Ich kann komplexe Bildungsfragen mit klaren argumentativen Satzmustern strukturieren.",
@@ -126,17 +134,18 @@ const c1Day15BildungUndLebenslangesLernen = makeLesson({
     reading: "Lies einen bildungspolitischen Kommentar und markiere These, argumentative Satzmuster, Nominalisierungen, Einwände und Schlussfolgerung.",
     listening: "Höre einen Beitrag über Weiterbildung und notiere Empfehlungen, Zugangshürden, Verantwortlichkeiten und Begründungen.",
   },
-  resources: {
-    grammarBook: {
-      title: "C1 Day 15 grammar notes",
-      url: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes",
-    },
-    workbook: {
-      title: "C1 Day 15 workbook",
-      url: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
-    },
-  },
   vocabulary: ["lebenslanges Lernen", "Weiterbildung", "Chancengleichheit", "Bildungszugang", "Finanzierungsmodell", "Anerkennung", "Eigenverantwortung", "Beschäftigungsfähigkeit"],
 });
+
+c1Day15BildungUndLebenslangesLernen.resources = {
+  grammarBook: {
+    title: "C1 Day 15 grammar notes",
+    url: "/campus/course/lesson/C1/15?chapter=3.5&view=grammar",
+  },
+  workbook: {
+    title: "C1 Day 15 workbook",
+    url: "/campus/course/lesson/C1/15?chapter=3.5&view=workbook",
+  },
+};
 
 export default c1Day15BildungUndLebenslangesLernen;
