@@ -23,7 +23,7 @@ describe("Question of the Day letter templates", () => {
       type: "informal",
     });
 
-    expect(result).toStartWith("My planning note");
+    expect(result.startsWith("My planning note")).toBe(true);
     expect(result).toContain("Liebe/r [Name]");
   });
 
