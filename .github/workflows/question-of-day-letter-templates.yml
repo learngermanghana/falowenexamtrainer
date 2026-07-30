@@ -1,0 +1,47 @@
+name: Question of the Day letter templates
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/QuestionOfDayPage.js"
+      - "web/src/components/QuestionOfDayPage.letterTemplates.test.js"
+      - "web/src/data/questionOfDayLetterTemplates.js"
+      - "web/src/data/questionOfDayLetterTemplates.test.js"
+      - "scripts/patchQuestionOfDayLetterTemplates.mjs"
+      - "web/package.json"
+      - ".github/workflows/question-of-day-letter-templates.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/QuestionOfDayPage.js"
+      - "web/src/components/QuestionOfDayPage.letterTemplates.test.js"
+      - "web/src/data/questionOfDayLetterTemplates.js"
+      - "web/src/data/questionOfDayLetterTemplates.test.js"
+      - "scripts/patchQuestionOfDayLetterTemplates.mjs"
+      - "web/package.json"
+      - ".github/workflows/question-of-day-letter-templates.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm ci
+      - name: Apply Question of the Day letter-template patch
+        working-directory: web
+        run: npm run sync:question-of-day-letter-templates
+      - name: Test templates and Submit-tab ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/questionOfDayLetterTemplates.test.js src/components/QuestionOfDayPage.letterTemplates.test.js
+      - name: Build Falowen web app
+        working-directory: web
+        run: npm run build
