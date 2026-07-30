@@ -28,10 +28,10 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: "Four forms you need first" })).toBeVisible();
-    expect(screen.getByText("ich darf", { selector: "strong" })).toBeVisible();
-    expect(screen.getByText("du darfst", { selector: "strong" })).toBeVisible();
-    expect(screen.getByText("Sie dürfen", { selector: "strong" })).toBeVisible();
-    expect(screen.getByText("darf nicht", { selector: "strong" })).toBeVisible();
+    expect(screen.getByText("Ich darf hier sitzen.")).toBeVisible();
+    expect(screen.getByText("Du darfst Wasser trinken.")).toBeVisible();
+    expect(screen.getByText("Sie dürfen hier warten.")).toBeVisible();
+    expect(screen.getByText("Man darf hier nicht rauchen.")).toBeVisible();
 
     const summary = screen.getByText("Show all forms");
     expect(summary.closest("details")).not.toHaveAttribute("open");
