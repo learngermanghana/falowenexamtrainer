@@ -43,6 +43,7 @@ import B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage from "./B1Day16Pr
 import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschberufGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
+import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
@@ -121,5 +122,10 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
     );
   }
 
-  return <GrammarNotes />;
+  return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <A2B1GrammarVideoCard level={level} day={day} />
+      <GrammarNotes />
+    </div>
+  );
 };
