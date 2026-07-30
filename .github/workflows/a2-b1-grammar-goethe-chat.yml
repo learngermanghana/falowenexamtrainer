@@ -5,6 +5,8 @@ on:
     paths:
       - "web/public/course-speaking-chat-cleanup.js"
       - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
+      - "web/src/components/A2B1GrammarVideoCard.jsx"
+      - "web/src/components/A2B1GrammarVideoCard.test.jsx"
       - "web/src/components/A2B1LegacyGrammarTabRegression.test.js"
       - "web/src/components/A2B1WorkbookGrammarNotes.js"
       - "web/src/components/A2Day2PersonenBeschreibenWorkbookPage.js"
@@ -43,6 +45,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A2Day9HoerenCourseChatCleanup.test.js
+      - name: Test A2 and B1 Grammar AI videos
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2B1GrammarVideoCard.test.jsx
       - name: Test existing A2 B1 Grammar tab contract
         working-directory: web
         env:
