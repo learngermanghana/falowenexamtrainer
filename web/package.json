@@ -48,7 +48,7 @@
     "sync:a2-fallback-workbook-safety": "node ../scripts/patchA2FallbackWorkbookSafety.mjs",
     "sync:a2-shared-regression-safety": "node ../scripts/patchA2SharedRegressionSafety.mjs",
     "sync:a1-tutor-nav-safety": "node ../scripts/patchA1TutorNavigationSelfPracticeSafety.mjs",
-    "sync:a1-day19-speaking-reliability": "node ../scripts/patchA1Day19CombinedPracticeAndSpeakingReliability.mjs",
+    "sync:a1-day19-speaking-reliability": "node ../scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs",
     "sync:workbook-submission-context": "node ../scripts/patchWorkbookSubmissionAutoSelection.mjs",
     "sync:public-signup-recovery": "node ../scripts/patchPublicSignupAuthRecovery.mjs",
     "audit:a1-curriculum": "node ../scripts/auditA1CourseBook.js",
