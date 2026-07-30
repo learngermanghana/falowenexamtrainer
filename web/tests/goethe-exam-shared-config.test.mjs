@@ -5,6 +5,21 @@ import { readFile } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
 
+const loadZonedScheduleModule = async () => {
+  const utilitySource = await source("src/lib/zonedScheduleDate.js");
+  const runnableSource = utilitySource.replace(
+    'import { toDate } from "./dateUtils";',
+    `const toDate = (value) => {
+      if (!value) return null;
+      if (value instanceof Date) return value;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };`,
+  );
+  const encoded = Buffer.from(runnableSource).toString("base64");
+  return import(`data:text/javascript;base64,${encoded}#${Date.now()}`);
+};
+
 test("Falowen keeps exact later Goethe registration campaigns as fallback", async () => {
   const schedule = await source("src/data/goetheExamSchedule.js");
   assert.match(schedule, /A1[\s\S]*2026-08-03/);
@@ -12,6 +27,7 @@ test("Falowen keeps exact later Goethe registration campaigns as fallback", asyn
   assert.match(schedule, /A2[\s\S]*2026-10-27/);
   assert.match(schedule, /B1[\s\S]*2026-08-05/);
   assert.match(schedule, /B1[\s\S]*2026-10-28/);
+  assert.match(schedule, /timezone: "Africa\/Accra"/);
   assert.match(schedule, /reminderDays: \[14, 3, 2, 1\]/);
 });
 
@@ -46,12 +62,66 @@ test("Exam File prioritizes visible Goethe registration guidance", async () => {
   assert.match(examFile, /Official registration link/);
   assert.match(examFile, /Bookable to Open/);
   assert.match(examFile, /Register now/);
-  assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
+  assert.match(examFile, /goetheExamConfig\.timezone/);
+  assert.match(examFile, /startOfScheduleDay\(exam\.registrationStart, scheduleTimeZone\)/);
+  assert.match(examFile, /endOfScheduleDay\(exam\.registrationEnd, scheduleTimeZone\)/);
+  assert.doesNotMatch(examFile, /\.setHours\(/);
 
   assert.doesNotMatch(examFile, /Submitted assignments \(locked\)/);
   assert.doesNotMatch(examFile, /Level leaderboard/);
   assert.doesNotMatch(examFile, /Teacher feedback history/);
   assert.doesNotMatch(examFile, /title="Downloadables"/);
+});
+
+test("registration boundaries use Africa/Accra even when the browser timezone is New York", async () => {
+  const originalTimeZone = process.env.TZ;
+  process.env.TZ = "America/New_York";
+
+  try {
+    const { startOfScheduleDay, endOfScheduleDay, formatScheduleDate } = await loadZonedScheduleModule();
+    const opening = startOfScheduleDay("2026-08-03", "Africa/Accra");
+    const closing = endOfScheduleDay("2026-08-03", "Africa/Accra");
+
+    assert.equal(opening.toISOString(), "2026-08-03T00:00:00.000Z");
+    assert.equal(closing.toISOString(), "2026-08-03T23:59:59.999Z");
+    assert.equal(formatScheduleDate("2026-08-03", { timeZone: "Africa/Accra" }), "August 3, 2026");
+
+    assert.ok(new Date("2026-08-02T23:59:59.999Z") < opening);
+    assert.ok(new Date("2026-08-03T12:00:00.000Z") >= opening);
+    assert.ok(new Date("2026-08-03T12:00:00.000Z") <= closing);
+    assert.ok(new Date("2026-08-04T00:00:00.000Z") > closing);
+  } finally {
+    if (originalTimeZone === undefined) delete process.env.TZ;
+    else process.env.TZ = originalTimeZone;
+  }
+});
+
+test("timezone helper also supports configured non-UTC IANA zones", async () => {
+  const { startOfScheduleDay, endOfScheduleDay } = await loadZonedScheduleModule();
+  assert.equal(
+    startOfScheduleDay("2026-08-03", "America/New_York").toISOString(),
+    "2026-08-03T04:00:00.000Z",
+  );
+  assert.equal(
+    endOfScheduleDay("2026-08-03", "America/New_York").toISOString(),
+    "2026-08-04T03:59:59.999Z",
+  );
+});
+
+test("nonexistent midnight resolves to the first valid instant on the requested civil date", async () => {
+  const { startOfScheduleDay, endOfScheduleDay, scheduleDateKey } = await loadZonedScheduleModule();
+  const timeZone = "America/Santiago";
+  const opening = startOfScheduleDay("2026-09-06", timeZone);
+  const closing = endOfScheduleDay("2026-09-06", timeZone);
+
+  assert.equal(opening.toISOString(), "2026-09-06T04:00:00.000Z");
+  assert.equal(scheduleDateKey(opening, timeZone), "2026-09-06");
+  assert.equal(
+    scheduleDateKey(new Date(opening.getTime() - 1), timeZone),
+    "2026-09-05",
+  );
+  assert.equal(closing.toISOString(), "2026-09-07T02:59:59.999Z");
+  assert.equal(scheduleDateKey(closing, timeZone), "2026-09-06");
 });
 
 test("build lifecycle always applies the idempotent shared-config patch", async () => {
