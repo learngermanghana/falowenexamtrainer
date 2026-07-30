@@ -5,39 +5,16 @@ import { useAuth } from "../context/AuthContext";
 import { useExam } from "../context/ExamContext";
 import { downloadExamReminder } from "../services/examCalendar";
 import { useGoetheExamConfig } from "../hooks/useGoetheExamConfig";
-import { toDate } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
+import {
+  endOfScheduleDay,
+  formatScheduleDate,
+  scheduleDateKey,
+  startOfScheduleDay,
+} from "../lib/zonedScheduleDate";
 
 const GOETHE_ACCOUNT_URL =
   "https://login.goethe.de/cas/login?service=https%3A%2F%2Fwww.goethe.de%2Fservices%2Fcas%2Fservice%2Fgoethe%2F&locale=de&renew=false";
-
-const formatDate = (value) => {
-  if (!value) return "";
-  const parsed = toDate(value);
-  return parsed
-    ? parsed.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "";
-};
-
-const startOfScheduleDay = (value) => {
-  const parsed = toDate(value);
-  if (!parsed) return null;
-  const date = new Date(parsed);
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
-const endOfScheduleDay = (value) => {
-  const parsed = toDate(value);
-  if (!parsed) return null;
-  const date = new Date(parsed);
-  date.setHours(23, 59, 59, 999);
-  return date;
-};
 
 const getCountdownLabel = (targetDate, now) => {
   if (!targetDate) return "Date not set";
@@ -84,14 +61,7 @@ const StatCard = ({ label, value, sub, icon }) => (
 );
 
 const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
-  <details
-    open={defaultOpen}
-    style={{
-      ...styles.card,
-      padding: 0,
-      overflow: "hidden",
-    }}
-  >
+  <details open={defaultOpen} style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
     <summary
       style={{
         listStyle: "none",
@@ -114,7 +84,6 @@ const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>{right}</div>
     </summary>
-
     <div style={{ padding: 12 }}>{children}</div>
   </details>
 );
@@ -134,6 +103,13 @@ const primaryLinkStyle = {
   boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
 };
 
+const registrationBadgeStyles = {
+  Open: { background: "#dcfce7", color: "#166534", borderColor: "#86efac" },
+  Closed: { background: "#f3f4f6", color: "#6b7280", borderColor: "#e5e7eb" },
+  Bookable: { background: "#dbeafe", color: "#1d4ed8", borderColor: "#93c5fd" },
+  "Date pending": { background: "#fef3c7", color: "#92400e", borderColor: "#fde68a" },
+};
+
 const MyExamFilePage = () => {
   const { studentProfile } = useAuth();
   const { level, levelConfirmed } = useExam();
@@ -146,6 +122,11 @@ const MyExamFilePage = () => {
     source: examScheduleSource,
   } = useGoetheExamConfig();
   const goetheExamLevels = goetheExamConfig.levels;
+  const scheduleTimeZone = goetheExamConfig.timezone || "Africa/Accra";
+  const formatDate = useCallback(
+    (value) => formatScheduleDate(value, { locale: "en-US", timeZone: scheduleTimeZone }),
+    [scheduleTimeZone],
+  );
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -154,7 +135,6 @@ const MyExamFilePage = () => {
   }, []);
 
   const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
-
   const detectedLevel = useMemo(() => {
     const raw = levelConfirmed ? level : studentProfile?.level || level || "";
     return String(raw || "").toUpperCase();
@@ -166,31 +146,27 @@ const MyExamFilePage = () => {
   }, [detectedLevel]);
 
   const visibleExamLevels = useMemo(() => {
-    if (!detectedLevel || showAllLevels) {
-      return goetheExamLevels;
-    }
-
+    if (!detectedLevel || showAllLevels) return goetheExamLevels;
     const matchedLevels = goetheExamLevels.filter((levelInfo) => levelInfo.level === detectedLevel);
     return matchedLevels.length > 0 ? matchedLevels : goetheExamLevels;
   }, [detectedLevel, goetheExamLevels, showAllLevels]);
 
   const summaryLevel = useMemo(
     () => goetheExamLevels.find((levelInfo) => levelInfo.level === detectedLevel) || visibleExamLevels[0] || null,
-    [detectedLevel, goetheExamLevels, visibleExamLevels]
+    [detectedLevel, goetheExamLevels, visibleExamLevels],
   );
 
   const nextRegistration = useMemo(() => {
     const exams = (summaryLevel?.exams || [])
       .map((exam) => ({
         exam,
-        registrationStart: startOfScheduleDay(exam.registrationStart),
-        registrationEnd: endOfScheduleDay(exam.registrationEnd),
+        registrationStart: startOfScheduleDay(exam.registrationStart, scheduleTimeZone),
+        registrationEnd: endOfScheduleDay(exam.registrationEnd, scheduleTimeZone),
       }))
       .filter(({ registrationEnd }) => registrationEnd && now <= registrationEnd)
       .sort((a, b) => a.registrationStart.getTime() - b.registrationStart.getTime());
-
     return exams[0] || null;
-  }, [now, summaryLevel]);
+  }, [now, scheduleTimeZone, summaryLevel]);
 
   const summaryRegistrationStatus = nextRegistration
     ? getRegistrationStatus(nextRegistration.registrationStart, nextRegistration.registrationEnd, now)
@@ -207,7 +183,6 @@ const MyExamFilePage = () => {
               See when booking opens, prepare your Goethe account early, and use the clearly displayed official registration link.
             </p>
           </div>
-
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
             <span style={styles.badge}>Level: {detectedLevel || "not set"}</span>
             {className ? <span style={styles.badge}>Class: {className}</span> : null}
@@ -228,7 +203,12 @@ const MyExamFilePage = () => {
                 : "No registration date is currently listed."
             }
           />
-          <StatCard icon="📍" label="Exam centre" value={summaryLevel?.location || "Goethe-Institut Accra"} sub="Confirm the location on Goethe's page before payment." />
+          <StatCard
+            icon="📍"
+            label="Exam centre"
+            value={summaryLevel?.location || "Goethe-Institut Accra"}
+            sub={`Registration timing follows ${scheduleTimeZone}.`}
+          />
         </div>
       </section>
 
@@ -239,16 +219,7 @@ const MyExamFilePage = () => {
         right={null}
       >
         <div style={{ display: "grid", gap: 14 }}>
-          <div
-            style={{
-              border: "2px solid #2563eb",
-              borderRadius: 14,
-              padding: 14,
-              background: "#eff6ff",
-              display: "grid",
-              gap: 10,
-            }}
-          >
+          <div style={{ border: "2px solid #2563eb", borderRadius: 14, padding: 14, background: "#eff6ff", display: "grid", gap: 10 }}>
             <div style={{ fontWeight: 900, color: "#111827" }}>1. Create your Goethe account before registration day</div>
             <div style={{ fontSize: 14, lineHeight: 1.55, color: "#374151" }}>
               Do not wait until booking opens. Create the account now, confirm your login details, and keep them ready.
@@ -264,7 +235,7 @@ const MyExamFilePage = () => {
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
             {[
               ["2", "Check the Bookable date", "Find your level below. The listed date tells you exactly when registration becomes available."],
-              ["3", "Watch for Open", "On the registration date, the status automatically changes from Bookable to Open for the full day."],
+              ["3", "Watch for Open", `On the registration date, the status automatically changes from Bookable to Open for the full day in ${scheduleTimeZone}.`],
               ["4", "Register immediately", "When the status says Open, select Register now and complete the booking on Goethe's official page."],
             ].map(([number, title, description]) => (
               <div key={number} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
@@ -278,7 +249,7 @@ const MyExamFilePage = () => {
 
       <CollapsibleCard
         title="Goethe exam dates and registration links (Accra)"
-        subtitle="Bookable shows the future opening date. Open means you can register right away."
+        subtitle={`Bookable shows the future opening date. Open means registration is available now in ${scheduleTimeZone}.`}
         defaultOpen
         right={
           detectedLevel ? (
@@ -298,12 +269,10 @@ const MyExamFilePage = () => {
       >
         <div style={{ display: "grid", gap: 14 }}>
           {!detectedLevel ? (
-            <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
-              No level is set yet, so all exam levels are shown.
-            </div>
+            <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>No level is set yet, so all exam levels are shown.</div>
           ) : null}
           <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
-            Date format: month day, year (e.g., August 3, 2026). Registration dates are shown separately from exam dates.
+            Date format: month day, year (e.g., August 3, 2026). Registration windows use {scheduleTimeZone}, not the browser timezone.
           </div>
           <div style={{ ...styles.helperText, margin: "-2px 0 0", color: examScheduleLoading ? "#92400e" : "#166534" }}>
             {examScheduleLoading
@@ -317,17 +286,19 @@ const MyExamFilePage = () => {
 
           {visibleExamLevels.map((levelInfo) => {
             const isDetectedLevel = levelInfo.level === detectedLevel;
-            const formattedPrice =
-              typeof levelInfo.priceValue === "number" ? formatMoney(levelInfo.priceValue) : levelInfo.price;
-            const formattedModulePrice =
-              typeof levelInfo.modulePriceValue === "number"
-                ? t("examFile.modulePrice", { price: formatMoney(levelInfo.modulePriceValue) })
-                : levelInfo.modulePrice;
+            const formattedPrice = typeof levelInfo.priceValue === "number" ? formatMoney(levelInfo.priceValue) : levelInfo.price;
+            const formattedModulePrice = typeof levelInfo.modulePriceValue === "number"
+              ? t("examFile.modulePrice", { price: formatMoney(levelInfo.modulePriceValue) })
+              : levelInfo.modulePrice;
             const upcomingExams = (levelInfo.exams || [])
               .slice()
-              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .sort((a, b) => {
+                const aDate = startOfScheduleDay(a.date, scheduleTimeZone);
+                const bDate = startOfScheduleDay(b.date, scheduleTimeZone);
+                return (aDate?.getTime() || 0) - (bDate?.getTime() || 0);
+              })
               .filter((exam) => {
-                const registrationEnd = endOfScheduleDay(exam.registrationEnd);
+                const registrationEnd = endOfScheduleDay(exam.registrationEnd, scheduleTimeZone);
                 return registrationEnd && now <= registrationEnd;
               });
 
@@ -346,9 +317,7 @@ const MyExamFilePage = () => {
               >
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
                   <div style={{ minWidth: 0, flex: "1 1 260px" }}>
-                    <div style={{ fontWeight: 900, fontSize: 16, color: "#111827" }}>
-                      {levelInfo.level} · {levelInfo.title}
-                    </div>
+                    <div style={{ fontWeight: 900, fontSize: 16, color: "#111827" }}>{levelInfo.level} · {levelInfo.title}</div>
                     <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
                   </div>
                   <div style={{ display: "grid", gap: 6, alignContent: "start" }}>
@@ -358,16 +327,7 @@ const MyExamFilePage = () => {
                 </div>
 
                 {levelInfo.registrationUrl ? (
-                  <div
-                    style={{
-                      border: "1px solid #bfdbfe",
-                      borderRadius: 12,
-                      padding: 12,
-                      background: "#ffffff",
-                      display: "grid",
-                      gap: 8,
-                    }}
-                  >
+                  <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#ffffff", display: "grid", gap: 8 }}>
                     <a href={levelInfo.registrationUrl} target="_blank" rel="noreferrer" style={primaryLinkStyle}>
                       Open {levelInfo.level} Goethe registration page →
                     </a>
@@ -386,22 +346,17 @@ const MyExamFilePage = () => {
                 ) : (
                   <div style={{ display: "grid", gap: 8 }}>
                     {upcomingExams.map((exam, index) => {
-                      const examDate = startOfScheduleDay(exam.date);
-                      const registrationStart = startOfScheduleDay(exam.registrationStart);
-                      const registrationEnd = endOfScheduleDay(exam.registrationEnd);
+                      const examDate = startOfScheduleDay(exam.date, scheduleTimeZone);
+                      const registrationStart = startOfScheduleDay(exam.registrationStart, scheduleTimeZone);
+                      const registrationEnd = endOfScheduleDay(exam.registrationEnd, scheduleTimeZone);
                       const registrationStatus = getRegistrationStatus(registrationStart, registrationEnd, now);
                       const canRegister = registrationStatus === "Open" && Boolean(levelInfo.registrationUrl);
                       const isSingleDayRegistration =
-                        registrationStart && registrationEnd && registrationStart.toDateString() === registrationEnd.toDateString();
+                        scheduleDateKey(exam.registrationStart, scheduleTimeZone) ===
+                        scheduleDateKey(exam.registrationEnd, scheduleTimeZone);
                       const registrationLabel = isSingleDayRegistration
                         ? `Bookable from: ${formatDate(exam.registrationStart)}`
                         : `Booking window: ${formatDate(exam.registrationStart)} - ${formatDate(exam.registrationEnd)}`;
-                      const registrationBadgeStyles = {
-                        Open: { background: "#dcfce7", color: "#166534", borderColor: "#86efac" },
-                        Closed: { background: "#f3f4f6", color: "#6b7280", borderColor: "#e5e7eb" },
-                        Bookable: { background: "#dbeafe", color: "#1d4ed8", borderColor: "#93c5fd" },
-                        "Date pending": { background: "#fef3c7", color: "#92400e", borderColor: "#fde68a" },
-                      };
 
                       return (
                         <div
@@ -416,12 +371,8 @@ const MyExamFilePage = () => {
                           }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                            <div style={{ fontWeight: 800, color: "#111827" }}>
-                              📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
-                            </div>
-                            <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
-                              {getCountdownLabel(examDate, now)}
-                            </div>
+                            <div style={{ fontWeight: 800, color: "#111827" }}>📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}</div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>{getCountdownLabel(examDate, now)}</div>
                           </div>
 
                           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -446,8 +397,8 @@ const MyExamFilePage = () => {
 
                           <div style={{ fontSize: 13, lineHeight: 1.5, color: canRegister ? "#166534" : "#6B7280" }}>
                             {canRegister
-                              ? "Registration is open today. Select Register now and complete your booking immediately."
-                              : `The status will change from Bookable to Open on ${formatDate(exam.registrationStart)}.`}
+                              ? `Registration is open now in ${scheduleTimeZone}. Select Register now and complete your booking immediately.`
+                              : `The status will change from Bookable to Open at midnight in ${scheduleTimeZone} on ${formatDate(exam.registrationStart)}.`}
                           </div>
 
                           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -456,13 +407,7 @@ const MyExamFilePage = () => {
                                 href={levelInfo.registrationUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{
-                                  ...primaryLinkStyle,
-                                  minHeight: 38,
-                                  padding: "7px 12px",
-                                  background: canRegister ? "#16a34a" : "#2563eb",
-                                  fontSize: 13,
-                                }}
+                                style={{ ...primaryLinkStyle, minHeight: 38, padding: "7px 12px", background: canRegister ? "#16a34a" : "#2563eb", fontSize: 13 }}
                               >
                                 {canRegister ? "Register now →" : "Open registration page →"}
                               </a>
