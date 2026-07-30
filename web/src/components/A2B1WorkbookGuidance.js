@@ -155,7 +155,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       `${window.location.pathname || ""}${window.location.search || ""}`,
     );
   }, [workbookLevel]);
-  const [activeTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useState("sprechen");
   const [showFallbackTabs, setShowFallbackTabs] = useState(false);
   const [showSubmit, setShowSubmit] = useState(false);
   const submitRef = useRef(null);

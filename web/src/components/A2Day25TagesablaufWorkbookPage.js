@@ -4,7 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
@@ -164,8 +164,6 @@ export default function A2Day25TagesablaufWorkbookPage() {
         </div>
         <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
       </div>
-
-      <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
         <div style={card}>

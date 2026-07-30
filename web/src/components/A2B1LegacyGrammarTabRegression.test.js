@@ -34,6 +34,28 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     });
   });
 
+  it("only shows Grammar when that workbook day has grammar notes", () => {
+    [
+      ["A2 Day 25 workbook sections", "A2"],
+      ["A2 Day 26 workbook sections", "A2"],
+      ["A2 Day 27 workbook sections", "A2"],
+      ["B1 Day 17 workbook sections", "B1"],
+      ["B1 Day 20 workbook sections", "B1"],
+    ].forEach(([ariaLabel]) => {
+      const resolved = getWorkbookTabsWithLegacyGrammar({
+        tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+        ariaLabel,
+      });
+
+      expect(resolved.tabs.map((tab) => tab.key)).not.toContain("grammar");
+    });
+
+    expect(getWorkbookTabsWithLegacyGrammar({
+      tabs: STANDARD_WORKBOOK_TABS,
+      ariaLabel: "A2 Day 28 workbook sections",
+    }).tabs[0].key).toBe("grammar");
+  });
+
   it("resolves workbook days from both legacy A2 slugs and B1 lesson routes", () => {
     expect(
       resolveA2B1WorkbookDayFromLocation(
@@ -74,7 +96,7 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
 
     expect(guidance).toContain('{ key: "grammar", legacyKey: "grammar"');
-    expect(guidance).toContain('useState("grammar")');
+    expect(guidance).toContain('useState("sprechen")');
     expect(guidance).toContain('`A2 Day ${workbookDay} workbook sections`');
     expect(guidance).toContain("Grammar, Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit");
     expect(day10).toContain("<A2B1WorkbookGuidance />");
