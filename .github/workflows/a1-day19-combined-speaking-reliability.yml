@@ -1,0 +1,44 @@
+name: A1 Day 19 combined speaking reliability
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchA1Day19CombinedPracticeAndSpeakingReliability.mjs"
+      - "scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs"
+      - "web/package.json"
+      - "web/src/components/VerbotenErlaubtPage.js"
+      - "web/src/components/VerbotenErlaubtPage.test.jsx"
+      - "web/src/components/A1ExamSpeakingPracticePanel.js"
+      - "web/src/components/A1CoursePracticeAutoMount.js"
+      - "web/src/components/SpeakingPage.js"
+      - "web/src/components/GoetheFreeChatPage.js"
+      - "web/src/components/A1Day19CombinedPracticeSpeakingReliability.test.js"
+      - "web/src/data/a1LessonVideoResourceOverrides.js"
+      - "web/src/data/additionalLessonVideoResources.js"
+      - "web/src/lib/speakingAudio.js"
+      - "web/src/lib/speakingAudioTranscriptRetry.test.js"
+      - ".github/workflows/a1-day19-combined-speaking-reliability.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Apply combined practice and speaking patch
+        run: node scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs
+      - name: Test combined cards, AI-video ownership and transcript retry
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/VerbotenErlaubtPage.test.jsx src/components/A1Day19CombinedPracticeSpeakingReliability.test.js src/lib/speakingAudioTranscriptRetry.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
