@@ -11,6 +11,7 @@ const RADIO_GATE_SELECTOR = [
   '[data-radio-first-workbook-gate="true"]',
 ].join(", ");
 const NON_WORKBOOK_VIEWS = new Set(["grammar", "learn"]);
+export const A1_GRAMMAR_VIDEO_ATTRIBUTE = "data-a1-grammar-video";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeToken = (value = "") => String(value || "").trim().toLowerCase();
@@ -133,6 +134,27 @@ export const buildA1WorkbookVideoModel = ({ pathname = "", search = "" } = {}) =
     chapter: String(lesson.chapter || ""),
     title: String(lesson.title || "A1 lesson"),
     assessmentLabel: lesson.submissionRequired ? "Tutor-marked assignment" : "Self-practice",
+    sourceUrl,
+    youtubeId,
+    embedUrl: youtubeId ? `https://www.youtube-nocookie.com/embed/${youtubeId}` : "",
+  };
+};
+
+export const buildA1AssignmentVideoModel = (assignmentKey = "") => {
+  const normalizedKey = normalizeAssignment(assignmentKey);
+  const lesson = alignedA1Lessons.find(
+    (candidate) => normalizeAssignment(candidate.assignmentId || candidate.id) === normalizedKey,
+  );
+  if (!lesson) return null;
+
+  const videoResource = getA1LessonVideoResource(lesson);
+  const sourceUrl = String(videoResource?.url || "").trim();
+  const youtubeId = extractYouTubeVideoId(sourceUrl);
+  return {
+    lesson,
+    videoResource,
+    lessonId: String(lesson.id || lesson.assignmentId || `${lesson.day}-${lesson.chapter}`),
+    title: String(lesson.title || "A1 lesson"),
     sourceUrl,
     youtubeId,
     embedUrl: youtubeId ? `https://www.youtube-nocookie.com/embed/${youtubeId}` : "",
@@ -309,7 +331,7 @@ export const applyA1WorkbookVideoHeader = ({
 
   const existing = root.querySelector(`[${HEADER_ATTRIBUTE}="true"]`);
   const model = buildA1WorkbookVideoModel({ pathname, search });
-  if (!model || root.querySelector(RADIO_GATE_SELECTOR)) {
+  if (!model || root.querySelector(RADIO_GATE_SELECTOR) || root.querySelector(`[${A1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)) {
     existing?.remove();
     return 0;
   }
