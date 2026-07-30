@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "scripts/patchA1Day19CombinedPracticeAndSpeakingReliability.mjs"
+      - "scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs"
       - "web/package.json"
       - "web/src/components/VerbotenErlaubtPage.js"
       - "web/src/components/VerbotenErlaubtPage.test.jsx"
@@ -32,7 +33,7 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Apply combined practice and speaking patch
-        run: node scripts/patchA1Day19CombinedPracticeAndSpeakingReliability.mjs
+        run: node scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs
       - name: Test combined cards, AI-video ownership and transcript retry
         working-directory: web
         env:
