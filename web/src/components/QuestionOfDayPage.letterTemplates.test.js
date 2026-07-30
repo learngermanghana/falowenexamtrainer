@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 const source = readFileSync(
-  fileURLToPath(new URL("./QuestionOfDayPage.js", import.meta.url)),
+  path.join(process.cwd(), "src/components/QuestionOfDayPage.js"),
   "utf8",
 );
 
