@@ -20,8 +20,10 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(screen.getByText("Im Computerraum darfst du Deutsch üben.")).toBeVisible();
     expect(screen.getAllByLabelText("Erlaubt")).toHaveLength(4);
     expect(screen.getAllByLabelText("Verboten")).toHaveLength(4);
-    expect(screen.getAllByRole("button", { name: "✓ Erlaubt" })).toHaveLength(8);
-    expect(screen.getAllByRole("button", { name: "✕ Verboten" })).toHaveLength(8);
+    expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(8);
+    expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(8);
+    expect(screen.getAllByText("✓").length).toBeGreaterThanOrEqual(12);
+    expect(screen.getAllByText("✕").length).toBeGreaterThanOrEqual(12);
   });
 
   test("shows reusable Teil 2 question-and-answer cards", () => {
@@ -47,7 +49,7 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
   test("gives a complete-sentence explanation after an exam choice", () => {
     renderPage();
 
-    fireEvent.click(screen.getAllByRole("button", { name: "✓ Erlaubt" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Erlaubt" })[0]);
 
     expect(screen.getByText(/Richtig\./)).toBeVisible();
     expect(screen.getByText(/Ama darf im Unterricht Wasser trinken/)).toBeVisible();
