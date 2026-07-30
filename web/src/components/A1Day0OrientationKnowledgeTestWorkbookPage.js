@@ -24,9 +24,10 @@ const config = {
     "Use the Submit tab only when the A1 workbook shows it. Some A1 pages are practice-only. Do not use A2/B1-style Teil 1, Teil 2, Teil 3 and Teil 4 instructions unless that exact A1 workbook shows them.",
   finishText:
     "There is no normal assignment submission for A1 Day 0. Finish the orientation check, review any correction and then continue to A1 Day 1.",
-  courseFlow: "Instruction → beginner video → grammar notes → workbook practice → Submit tab only when required",
+  courseFlow: "Falowen Radio → supporting materials → instruction → grammar notes → workbook practice → Submit only when required",
   courseNotes: [
     "Open the Course Book and choose the current A1 day.",
+    "Listen to Falowen Radio first and select Continue to open the supporting materials and workbook.",
     "Start with the instruction so you know whether the page is practice-only or tutor-marked.",
     "Watch the beginner video first when it is available.",
     "Read the grammar notes slowly and practise the examples aloud.",
@@ -42,6 +43,12 @@ const config = {
       options: ["Course Book", "Only WhatsApp", "Account"],
       answer: 0,
       explanation: "The Course Book is the main path for A1 daily lessons and workbook tasks.",
+    },
+    {
+      question: "What should you do when Falowen Radio appears at the start of an A1 lesson?",
+      options: ["Listen first, then select Continue", "Skip directly to Submit", "Leave the Course Book"],
+      answer: 0,
+      explanation: "Falowen Radio introduces the topic before the lesson materials and workbook practice.",
     },
     {
       question: "What should you do first when you open an A1 lesson?",
