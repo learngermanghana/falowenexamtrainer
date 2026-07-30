@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { styles } from "../styles";
+import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const LazyA2B1GrammarNotesTab = lazy(() =>
   import("./A2B1WorkbookGrammarNotes").then((module) => ({
@@ -38,11 +39,15 @@ export const getA2B1WorkbookContextFromAriaLabel = (ariaLabel = "") => {
 
 export const getWorkbookTabsWithLegacyGrammar = ({ tabs = STANDARD_WORKBOOK_TABS, ariaLabel = "" } = {}) => {
   const context = getA2B1WorkbookContextFromAriaLabel(ariaLabel);
-  const integratesLegacyGrammar = tabs === STANDARD_WORKBOOK_TABS && Boolean(context);
+  const grammarAvailable = Boolean(context && hasA2B1GrammarNotes(context.level, context.day));
+  const integratesLegacyGrammar = tabs === STANDARD_WORKBOOK_TABS && grammarAvailable;
+  const availableTabs = context && !grammarAvailable
+    ? tabs.filter((tab) => tab.key !== "grammar")
+    : tabs;
   return {
     context,
     integratesLegacyGrammar,
-    tabs: integratesLegacyGrammar ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR : tabs,
+    tabs: integratesLegacyGrammar ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR : availableTabs,
   };
 };
 

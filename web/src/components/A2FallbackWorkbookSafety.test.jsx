@@ -83,15 +83,15 @@ describe("A2 universal fallback safety", () => {
     },
   );
 
-  test("Day 25 keeps Grammar while relabeling Teil 4 as Lesen", async () => {
+  test("Day 25 hides unavailable Grammar while relabeling Teil 4 as Lesen", async () => {
     const day25 = fallbackCases.find(({ day }) => day === 25);
     const tablist = await renderFallback(day25);
 
     await waitFor(() => {
-      expect(within(tablist).getAllByRole("tab")).toHaveLength(7);
+      expect(within(tablist).getAllByRole("tab")).toHaveLength(6);
     });
 
-    expect(within(tablist).getByRole("tab", { name: "Grammar" })).toBeInTheDocument();
+    expect(within(tablist).queryByRole("tab", { name: "Grammar" })).not.toBeInTheDocument();
     expect(within(tablist).getByRole("tab", { name: "Teil 4" })).toHaveTextContent(/Lesen/i);
   });
 
