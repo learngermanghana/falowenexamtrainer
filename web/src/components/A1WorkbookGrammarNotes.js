@@ -16,6 +16,7 @@ import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";
 import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage";
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
+import A1GrammarVideoCard from "./A1GrammarVideoCard";
 
 const LetterWritingGrammarNotesPage = lazy(() =>
   import("./LetterWritingIntroPage").then((module) => ({
@@ -61,9 +62,12 @@ const A1WorkbookGrammarNotes = ({ assignmentKey }) => {
   }
 
   return (
-    <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
-      <GrammarNotes />
-    </Suspense>
+    <div style={{ display: "grid", gap: 16 }}>
+      <A1GrammarVideoCard assignmentKey={assignmentKey} />
+      <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
+        <GrammarNotes />
+      </Suspense>
+    </div>
   );
 };
 
