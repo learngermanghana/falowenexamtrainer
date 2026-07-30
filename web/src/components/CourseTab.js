@@ -16,6 +16,7 @@ import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/cour
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
+import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeLevel = (level) => normalizeCourseLevel(level);
@@ -736,6 +737,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
   const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
+  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";
   const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(normalizedSelectedCourseLevel);
   const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
@@ -840,7 +842,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   return (
-    <div data-a1-coursebook={isA1CourseBook ? "true" : undefined} style={{ display: "grid", gap: 14, paddingBottom: 80 }}>
+    <div
+      data-a1-coursebook={isA1CourseBook ? "true" : undefined}
+      data-a2-b1-coursebook={usesSharedA2B1Design ? "true" : undefined}
+      className={usesSharedA2B1Design ? "a2-b1-course-book" : undefined}
+      style={{ display: "grid", gap: 14, paddingBottom: 80 }}
+    >
       {activeSubTab === "classMembers" ? (
         isSelfLearningLevel ? (
           <section role="status" style={{ ...styles.card, borderColor: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a", padding: 14 }}>
@@ -874,7 +881,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
       {activeSubTab === "courseBook" ? (
         <>
-          <section style={courseBookStyles.hero}>
+          <section className="course-book-hero" style={courseBookStyles.hero}>
             <div data-a1-coursebook-hero-header="true" style={courseBookStyles.heroHeader}>
               <div>
                 <p style={courseBookStyles.heroEyebrow}>{selectedCourseLevel || "Course"} learning journey</p>
@@ -905,7 +912,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               </div>
             </div>
 
-            <div style={courseBookStyles.statGrid}>
+            <div className="course-book-stat-grid" style={courseBookStyles.statGrid}>
               <div style={courseBookStyles.statCard}>
                 <p style={courseBookStyles.statLabel}>Lessons</p>
                 <p style={courseBookStyles.statValue}>{decoratedSchedule.length}</p>
@@ -954,6 +961,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               aria-haspopup="dialog"
               aria-expanded={courseSubmitOpen}
               onClick={() => setCourseSubmitOpen(true)}
+              className="course-book-floating-submit"
               style={courseBookStyles.floatingSubmitButton}
             >
               <span style={{ fontSize: 18 }} aria-hidden="true">✍️</span>
@@ -964,7 +972,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           {canShowCourseSubmit && courseSubmitOpen ? (
             <div role="dialog" aria-modal="true" aria-label={`${selectedCourseLevel} assignment submit`} style={courseBookStyles.submitOverlay}>
               <div style={courseBookStyles.submitBackdrop} onClick={() => setCourseSubmitOpen(false)} />
-              <section style={courseBookStyles.submitPanel}>
+              <section className="course-book-submit-sheet" style={courseBookStyles.submitPanel}>
                 <div style={courseBookStyles.submitPanelHeader}>
                   <div>
                     <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase" }}>
@@ -1038,13 +1046,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               </section>
             )}
 
-          <section style={courseBookStyles.toolbar}>
+          <section className="course-book-toolbar" style={courseBookStyles.toolbar}>
             <div style={courseBookStyles.toolbarTop}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
                 <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visibleLessons.length} shown from {decoratedSchedule.length}</p>
               </div>
-              <div data-a1-coursebook-tabs="true" role="group" aria-label="Course Book lesson filters" style={courseBookStyles.filterRow}>
+              <div className="course-book-filter-row" data-a1-coursebook-tabs="true" role="group" aria-label="Course Book lesson filters" style={courseBookStyles.filterRow}>
                 {COURSE_BOOK_FILTERS.map((filter) => (
                   <button key={filter.key} type="button" style={activeFilter === filter.key ? courseBookStyles.filterButtonActive : courseBookStyles.filterButton} onClick={() => setActiveFilter(filter.key)}>
                     {filter.label}
@@ -1058,18 +1066,26 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           {weekEntries.length ? (
             <div style={{ display: "grid", gap: 14 }}>
               {weekEntries.map(([weekLabel, lessons]) => (
-                <section key={weekLabel} style={courseBookStyles.weekSection}>
-                  <div style={courseBookStyles.weekHeader}>
+                <details
+                  key={weekLabel}
+                  className="course-book-week"
+                  open={!usesSharedA2B1Design || !lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress))}
+                  style={courseBookStyles.weekSection}
+                >
+                  <summary className="course-book-week-summary" style={courseBookStyles.weekHeader}>
                     <h3 style={courseBookStyles.weekTitle}>{weekLabel}</h3>
                     <div style={courseBookStyles.weekLine} />
-                  </div>
+                    {usesSharedA2B1Design && lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress)) ? (
+                      <span className="course-book-week-complete">Completed · tap to review</span>
+                    ) : null}
+                  </summary>
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
                     const practiceMeta = practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly;
                     const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
-                      <article key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
+                      <article className="course-book-lesson-card" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
                         <div style={courseBookStyles.lessonTop}>
                           <div style={courseBookStyles.lessonMain}>
                             <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
@@ -1106,7 +1122,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               ) : null}
                             </div>
                           </div>
-                          <div style={courseBookStyles.lessonActions}>
+                          <div className="course-book-lesson-actions" style={courseBookStyles.lessonActions}>
                             {entry.isTutorMarked ? (
                               <>
                                 <span style={{ ...courseBookStyles.statusChip, color: entry.statusMeta.color, border: `1px solid ${entry.statusMeta.border}`, background: entry.statusMeta.background }}>
@@ -1137,7 +1153,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       </article>
                     );
                   })}
-                </section>
+                </details>
               ))}
             </div>
           ) : (
@@ -1146,6 +1162,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>
             </section>
           )}
+          {usesSharedA2B1Design ? (
+            <nav className="course-book-mobile-actions" aria-label="Course Book actions">
+              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson)}>
+                Continue
+              </button>
+              <button type="button" onClick={() => setCourseSubmitOpen(true)}>
+                Submit
+              </button>
+            </nav>
+          ) : null}
         </>
       ) : null}
     </div>

@@ -1,0 +1,163 @@
+.course-book-mobile-actions {
+  display: none;
+}
+
+.course-book-week-summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.course-book-week-summary::-webkit-details-marker {
+  display: none;
+}
+
+.course-book-week-complete {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+  .a2-b1-course-book {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .a2-b1-course-book .course-book-hero {
+    border-radius: 18px !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .a2-b1-course-book .course-book-hero h2 {
+    font-size: 24px !important;
+  }
+
+  .a2-b1-course-book .course-book-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .a2-b1-course-book .course-book-stat-grid > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .a2-b1-course-book .course-book-toolbar {
+    overflow: hidden;
+    padding-inline: 12px !important;
+  }
+
+  .a2-b1-course-book .course-book-filter-row {
+    flex-wrap: nowrap !important;
+    margin-inline: -12px;
+    overflow-x: auto;
+    padding: 2px 12px 8px;
+    scrollbar-width: none;
+  }
+
+  .a2-b1-course-book .course-book-filter-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .a2-b1-course-book .course-book-filter-row button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .a2-b1-course-book .course-book-week-summary {
+    min-height: 38px;
+  }
+
+  .a2-b1-course-book .course-book-week-summary::before {
+    color: #2563eb;
+    content: "▾";
+    font-size: 14px;
+    transition: transform 160ms ease;
+  }
+
+  .a2-b1-course-book .course-book-week:not([open]) .course-book-week-summary::before {
+    transform: rotate(-90deg);
+  }
+
+  .a2-b1-course-book .course-book-lesson-card {
+    border-radius: 16px !important;
+    padding: 14px !important;
+  }
+
+  .a2-b1-course-book .course-book-lesson-card > div:first-child,
+  .a2-b1-course-book .course-book-lesson-card > div:first-child > div:first-child {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .a2-b1-course-book .course-book-lesson-card > div:first-child > div:first-child > div:first-child {
+    align-self: flex-start;
+    min-height: 34px !important;
+    min-width: 64px !important;
+  }
+
+  .a2-b1-course-book .course-book-lesson-actions {
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100%;
+  }
+
+  .a2-b1-course-book .course-book-lesson-actions a {
+    flex: 1 0 100%;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .a2-b1-course-book .course-book-floating-submit {
+    display: none !important;
+  }
+
+  .a2-b1-course-book .course-book-mobile-actions {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid #dbeafe;
+    bottom: 0;
+    box-shadow: 0 -12px 30px rgba(15, 23, 42, 0.12);
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    left: 0;
+    padding: 10px max(14px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
+    position: fixed;
+    right: 0;
+    z-index: 45;
+  }
+
+  .a2-b1-course-book .course-book-mobile-actions button {
+    background: #fff;
+    border: 1px solid #2563eb;
+    border-radius: 12px;
+    color: #1d4ed8;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 900;
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+
+  .a2-b1-course-book .course-book-mobile-actions button:last-child {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+  }
+
+  .a2-b1-course-book .course-book-mobile-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .a2-b1-course-book .course-book-submit-sheet {
+    border-radius: 22px 22px 0 0;
+    bottom: 0 !important;
+    box-shadow: 0 -20px 48px rgba(15, 23, 42, 0.24) !important;
+    max-height: 88dvh;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+    top: auto !important;
+    width: 100% !important;
+  }
+}

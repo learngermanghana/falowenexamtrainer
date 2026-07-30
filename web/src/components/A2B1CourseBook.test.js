@@ -9,6 +9,8 @@ import { B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG } from "./B1Day13EigeneFilmk
 import { B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG } from "./B1Day14TraditionellesDigitalesLernenWorkbookPage";
 import { getWorkbookNavigationTabs } from "../utils/courseWorkbookSubmission";
 import { __TESTING__ as courseWorkbookSubmissionTabsTesting } from "./CourseWorkbookSubmissionTabs";
+import fs from "node:fs";
+import path from "node:path";
 
 jest.mock(
   "react-router-dom",
@@ -78,6 +80,19 @@ jest.mock("./SpeakingPracticeTimerCard", () => () => null);
 jest.mock("./CourseInlinePracticePanel", () => () => null);
 
 describe("A2 and B1 course books", () => {
+  test("share the responsive phone course-book presentation", () => {
+    const courseTabSource = fs.readFileSync(path.join(process.cwd(), "src/components/CourseTab.js"), "utf8");
+    const responsiveCss = fs.readFileSync(path.join(process.cwd(), "src/components/CourseTabResponsive.css"), "utf8");
+
+    expect(courseTabSource).toContain('normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1"');
+    expect(courseTabSource).toContain('className="course-book-mobile-actions"');
+    expect(courseTabSource).toContain('className="course-book-submit-sheet"');
+    expect(courseTabSource).toContain('className="course-book-week"');
+    expect(responsiveCss).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
+    expect(responsiveCss).toContain("overflow-x: auto");
+    expect(responsiveCss).toContain("max-height: 88dvh");
+  });
+
   test("describes the four workbook parts plus Ref and Submit", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
