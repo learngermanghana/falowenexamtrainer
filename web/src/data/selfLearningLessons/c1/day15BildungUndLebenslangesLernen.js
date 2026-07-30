@@ -134,17 +134,18 @@ const c1Day15BildungUndLebenslangesLernen = makeLesson({
     reading: "Lies einen bildungspolitischen Kommentar und markiere These, argumentative Satzmuster, Nominalisierungen, Einwände und Schlussfolgerung.",
     listening: "Höre einen Beitrag über Weiterbildung und notiere Empfehlungen, Zugangshürden, Verantwortlichkeiten und Begründungen.",
   },
-  resources: {
-    grammarBook: {
-      title: "C1 Day 15 grammar notes",
-      url: "/campus/course/lesson/C1/15?chapter=3.5&view=grammar",
-    },
-    workbook: {
-      title: "C1 Day 15 workbook",
-      url: "/campus/course/lesson/C1/15?chapter=3.5&view=workbook",
-    },
-  },
   vocabulary: ["lebenslanges Lernen", "Weiterbildung", "Chancengleichheit", "Bildungszugang", "Finanzierungsmodell", "Anerkennung", "Eigenverantwortung", "Beschäftigungsfähigkeit"],
 });
+
+c1Day15BildungUndLebenslangesLernen.resources = {
+  grammarBook: {
+    title: "C1 Day 15 grammar notes",
+    url: "/campus/course/lesson/C1/15?chapter=3.5&view=grammar",
+  },
+  workbook: {
+    title: "C1 Day 15 workbook",
+    url: "/campus/course/lesson/C1/15?chapter=3.5&view=workbook",
+  },
+};
 
 export default c1Day15BildungUndLebenslangesLernen;
