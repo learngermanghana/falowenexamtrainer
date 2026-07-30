@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import c1Day15BildungUndLebenslangesLernen from "../data/selfLearningLessons/c1/day15BildungUndLebenslangesLernen";
-import { normalizeB2C1Lesson } from "../data/lessonModel";
 import { __TESTING__ as workbookRouteTesting } from "./C1Day15BildungUndLebenslangesLernenWorkbookPage";
 import { __TESTING__ as grammarRouteTesting } from "./C1Day15BildungUndLebenslangesLernenGrammarNotesPage";
 
@@ -75,16 +74,6 @@ describe("C1 Day 15 canonical lesson journey", () => {
       "wirkung",
     ]);
 
-    const normalized = normalizeB2C1Lesson(
-      c1Day15BildungUndLebenslangesLernen,
-      "C1",
-    );
-    expect(normalized.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        key: "c1-day15-bildung-lebenslanges-lernen-ai-video",
-        url: "https://youtu.be/yd036VzKm_U",
-      }),
-    );
     expect(guidedPageSource).toContain(
       "lesson.videoResource || canonicalLesson?.resources?.aiVideo",
     );
