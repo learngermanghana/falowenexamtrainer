@@ -191,11 +191,71 @@ const ensureStyles = (root = document) => {
       box-shadow: 0 10px 22px rgba(29, 78, 216, 0.3) !important;
       transform: translateY(-1px);
     }
+    [data-a1-coursebook="true"] {
+      box-sizing: border-box;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: clip;
+      padding-bottom: max(80px, calc(64px + env(safe-area-inset-bottom))) !important;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    [data-a1-coursebook="true"] *,
+    [data-a1-coursebook="true"] *::before,
+    [data-a1-coursebook="true"] *::after {
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    [data-a1-coursebook="true"] button,
+    [data-a1-coursebook="true"] a,
+    [data-a1-coursebook="true"] select,
+    [data-a1-coursebook="true"] input {
+      min-height: 44px;
+    }
+    [data-a1-coursebook="true"] input[type="checkbox"] {
+      min-height: 24px;
+      min-width: 24px;
+    }
+    [data-a1-coursebook="true"] [data-a1-coursebook-tabs="true"] {
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+      margin-left: -4px;
+      margin-right: -4px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      padding: 4px;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+    [data-a1-coursebook="true"] [data-a1-coursebook-tabs="true"] button {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
     @media (max-width: 640px) {
       [${NAV_ATTRIBUTE}="true"] { top: 4px; border-radius: 14px; }
       [${COURSE_CARD_ATTRIBUTE}="true"] { padding: 14px !important; }
-      [${COURSE_ACTIONS_ATTRIBUTE}="true"] { min-width: 132px; }
-      [${COURSE_ACTION_ATTRIBUTE}="true"] { min-width: 124px !important; }
+      [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
+        align-items: stretch !important;
+        flex-direction: column !important;
+        min-width: 0;
+        width: 100%;
+      }
+      [${COURSE_ACTION_ATTRIBUTE}="true"] { min-width: 0 !important; width: 100%; }
+      [data-a1-coursebook="true"] { gap: 12px !important; }
+      [data-a1-coursebook="true"] [data-a1-coursebook-hero-header="true"],
+      [data-a1-coursebook="true"] [data-a1-coursebook-hero-actions="true"],
+      [data-a1-coursebook="true"] [data-a1-coursebook-next-card="true"] {
+        align-items: stretch !important;
+        flex-direction: column !important;
+        width: 100%;
+      }
+      [data-a1-coursebook="true"] [data-a1-coursebook-hero-actions="true"] > *,
+      [data-a1-coursebook="true"] [data-a1-coursebook-next-card="true"] > a {
+        width: 100%;
+      }
+      [data-a1-coursebook="true"] [data-a1-course-actions="true"] > * {
+        width: 100%;
+      }
     }
   `;
   root.head.appendChild(style);
@@ -476,4 +536,5 @@ export const __TESTING__ = {
   isA1CourseLessonAction,
   clearA1CourseBookAttributes,
   cleanupInjectedFormatting,
+  ensureStyles,
 };

@@ -5,6 +5,7 @@ import {
   getA1TeilNumber,
   parseA1LessonRoute,
   resolveA1LessonActionLabel,
+  __TESTING__,
 } from "./A1CourseExperienceEnhancer";
 
 describe("A1CourseExperienceEnhancer", () => {
@@ -147,5 +148,17 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(action.textContent).toBe("Open Lesson");
     expect(action.hasAttribute("data-a1-course-action")).toBe(false);
     expect(action.parentElement.hasAttribute("data-a1-course-actions")).toBe(false);
+  });
+
+  it("installs phone-safety styles that stay scoped to the A1 course book", () => {
+    __TESTING__.ensureStyles(document);
+
+    const css = document.getElementById("falowen-a1-course-experience-styles").textContent;
+    expect(css).toContain('[data-a1-coursebook="true"]');
+    expect(css).toContain("overflow-x: clip");
+    expect(css).toContain("env(safe-area-inset-bottom)");
+    expect(css).toContain('[data-a1-coursebook="true"] [data-a1-coursebook-tabs="true"]');
+    expect(css).toContain("flex-direction: column !important");
+    expect(css).toContain("min-height: 44px");
   });
 });
