@@ -840,7 +840,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   return (
-    <div style={{ display: "grid", gap: 14, paddingBottom: 80 }}>
+    <div data-a1-coursebook={isA1CourseBook ? "true" : undefined} style={{ display: "grid", gap: 14, paddingBottom: 80 }}>
       {activeSubTab === "classMembers" ? (
         isSelfLearningLevel ? (
           <section role="status" style={{ ...styles.card, borderColor: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a", padding: 14 }}>
@@ -875,7 +875,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       {activeSubTab === "courseBook" ? (
         <>
           <section style={courseBookStyles.hero}>
-            <div style={courseBookStyles.heroHeader}>
+            <div data-a1-coursebook-hero-header="true" style={courseBookStyles.heroHeader}>
               <div>
                 <p style={courseBookStyles.heroEyebrow}>{selectedCourseLevel || "Course"} learning journey</p>
                 <h2 style={courseBookStyles.heroTitle}>Course Book</h2>
@@ -885,7 +885,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 </p>
                 {lessonProgressError ? <p style={{ margin: "6px 0 0", color: "#fee2e2", fontSize: 13 }}>{lessonProgressError}</p> : null}
               </div>
-              <div style={courseBookStyles.heroActions}>
+              <div data-a1-coursebook-hero-actions="true" style={courseBookStyles.heroActions}>
                 <label style={{ display: "grid", gap: 4, minWidth: 120 }}>
                   <span style={{ color: "#dbeafe", fontSize: 12, fontWeight: 800 }}>Level</span>
                   <select style={courseBookStyles.heroSelect} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
@@ -995,7 +995,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           ) : null}
 
           {nextLesson ? (
-              <section style={courseBookStyles.nextCard}>
+              <section data-a1-coursebook-next-card="true" style={courseBookStyles.nextCard}>
                 <div style={{ display: "grid", gap: 5, minWidth: 0 }}>
                   <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>
                     {nextLesson.isTutorMarked ? "Next assignment" : "Next self-study lesson"}
@@ -1029,7 +1029,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 </a>
               </section>
             ) : (
-              <section style={courseBookStyles.nextCard}>
+              <section data-a1-coursebook-next-card="true" style={courseBookStyles.nextCard}>
                 <div>
                   <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
                   <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
@@ -1044,7 +1044,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
                 <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visibleLessons.length} shown from {decoratedSchedule.length}</p>
               </div>
-              <div style={courseBookStyles.filterRow}>
+              <div data-a1-coursebook-tabs="true" role="group" aria-label="Course Book lesson filters" style={courseBookStyles.filterRow}>
                 {COURSE_BOOK_FILTERS.map((filter) => (
                   <button key={filter.key} type="button" style={activeFilter === filter.key ? courseBookStyles.filterButtonActive : courseBookStyles.filterButton} onClick={() => setActiveFilter(filter.key)}>
                     {filter.label}
