@@ -108,6 +108,22 @@ test("timezone helper also supports configured non-UTC IANA zones", async () => 
   );
 });
 
+test("nonexistent midnight resolves to the first valid instant on the requested civil date", async () => {
+  const { startOfScheduleDay, endOfScheduleDay, scheduleDateKey } = await loadZonedScheduleModule();
+  const timeZone = "America/Santiago";
+  const opening = startOfScheduleDay("2026-09-06", timeZone);
+  const closing = endOfScheduleDay("2026-09-06", timeZone);
+
+  assert.equal(opening.toISOString(), "2026-09-06T04:00:00.000Z");
+  assert.equal(scheduleDateKey(opening, timeZone), "2026-09-06");
+  assert.equal(
+    scheduleDateKey(new Date(opening.getTime() - 1), timeZone),
+    "2026-09-05",
+  );
+  assert.equal(closing.toISOString(), "2026-09-07T02:59:59.999Z");
+  assert.equal(scheduleDateKey(closing, timeZone), "2026-09-06");
+});
+
 test("build lifecycle always applies the idempotent shared-config patch", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   assert.match(packageJson.scripts.prebuild, /sync:goethe-config-ui/);
