@@ -12,14 +12,17 @@ const renderPage = () => render(
 );
 
 describe("VerbotenErlaubtPage A1 exam practice", () => {
-  test("uses short darf and darf nicht rules with exam signs", () => {
+  test("combines every short rule with its matching question and exam choices", () => {
     renderPage();
 
+    expect(document.querySelectorAll("[data-combined-rule-question]")).toHaveLength(8);
     expect(screen.getByText("Im Kursraum darfst du nicht essen.")).toBeVisible();
+    expect(screen.getByText("Darf Kojo im Kursraum essen?")).toBeVisible();
     expect(screen.getByText("Im Unterricht darfst du nicht telefonieren.")).toBeVisible();
+    expect(screen.getByText("Darf Yaw im Unterricht telefonieren?")).toBeVisible();
     expect(screen.getByText("Im Computerraum darfst du Deutsch üben.")).toBeVisible();
-    expect(screen.getAllByLabelText("Erlaubt")).toHaveLength(4);
-    expect(screen.getAllByLabelText("Verboten")).toHaveLength(4);
+    expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
+    expect(screen.queryAllByLabelText("Verboten")).toHaveLength(0);
     expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(8);
     expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(8);
   });
