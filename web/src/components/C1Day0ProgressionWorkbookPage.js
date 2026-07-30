@@ -68,26 +68,26 @@ const questions = [
       "At C1, students are expected to express themselves with more precision, depth, structure, and flexibility than at B2.",
   },
   {
-    question: "What should students do in Teil 1?",
+    question: "What should students do in Speak?",
     options: [
-      "Copy the speaking question and paste it into the Speech page for practice",
+      "Practise the lesson prompt aloud and develop a clear argument",
       "Submit it to a tutor",
       "Skip it completely",
     ],
     answer: "A",
     explanation:
-      "Teil 1 is for independent speaking practice using the Speech page.",
+      "Speak is for active oral practice, stronger reasoning and confident delivery.",
   },
   {
-    question: "What should students do in Teil 2?",
+    question: "What should students do in Write?",
     options: [
-      "Paste the writing task into the Writing page and check their score",
+      "Plan, draft, check and improve their own response",
       "Wait for classroom correction",
       "Send it to a group discussion page",
     ],
     answer: "A",
     explanation:
-      "Teil 2 is for self-practice in writing using the Writing page.",
+      "Write provides the task and tools for planning, feedback and revision inside the lesson.",
   },
   {
     question: "What is different about C1 writing?",
@@ -101,26 +101,26 @@ const questions = [
       "C1 writing requires stronger structure, clearer reasoning, better vocabulary choice, and more critical depth.",
   },
   {
-    question: "How should students do Teil 3?",
+    question: "Where are reading and listening completed?",
     options: [
-      "Use the reading links provided in the lesson",
+      "In Finish, using the resources provided in the lesson",
       "Ignore the reading part",
       "Replace it with speaking",
     ],
     answer: "A",
     explanation:
-      "Teil 3 is completed through the reading links provided in the lesson.",
+      "Finish contains the reading, listening, vocabulary and completion work.",
   },
   {
-    question: "How should students do Teil 4?",
+    question: "What comes before Learn in a normal C1 lesson when an episode is available?",
     options: [
-      "Use the listening links provided in the lesson",
-      "Wait for a live class before listening",
-      "Do writing instead",
+      "Falowen Radio",
+      "Marking high confidence",
+      "The Exams Room",
     ],
     answer: "A",
     explanation:
-      "Teil 4 is completed through the listening links provided in the lesson.",
+      "Falowen Radio introduces the day's topic; select Continue after listening to begin Learn.",
   },
   {
     question: "After completing the workbook, what should students do?",
@@ -322,7 +322,7 @@ const C1Day0ProgressionWorkbookPage = () => {
         <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
           <li>Read how the C1 self-learning workbook works.</li>
           <li>Understand what changes from B2 to C1.</li>
-          <li>Learn what to do in Teil 1, Teil 2, Teil 3, and Teil 4.</li>
+          <li>Learn the current flow: Falowen Radio, Learn, Speak, Write and Finish.</li>
           <li>Learn how to practise speaking and writing independently.</li>
           <li>Complete the Day 0 knowledge test.</li>
           <li>Review the corrections immediately.</li>
@@ -330,36 +330,36 @@ const C1Day0ProgressionWorkbookPage = () => {
         </ol>
       </SectionCard>
 
-      <SectionCard title="How the C1 workbook works">
+      <SectionCard title="How the C1 lesson works">
         <p style={{ margin: 0 }}>
-          Each study day, read the instruction, review the lesson material,
-          use the workbook, and complete your practice by yourself.
+          Start each study day from the Course Book. When Falowen Radio appears, listen first and
+          select Continue. Then complete the lesson stages in order and practise actively by yourself.
         </p>
 
         <p style={{ margin: 0 }}>
-          The workbook contains <strong>four parts</strong>:
+          The current lesson contains <strong>four stages</strong>:
         </p>
 
         <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
           <li>
-            <strong>Teil 1: Sprechen</strong> — copy the question and paste it into the Speech page for practice.
+            <strong>Learn</strong> — understand the topic, goals, useful language and grammar focus.
           </li>
           <li>
-            <strong>Teil 2: Schreiben</strong> — paste the writing task into the Writing page and check your score yourself.
+            <strong>Speak</strong> — develop and practise your response aloud.
           </li>
           <li>
-            <strong>Teil 3: Lesen</strong> — use the reading links provided in the lesson.
+            <strong>Write</strong> — plan, draft, analyse and improve your own text inside the lesson.
           </li>
           <li>
-            <strong>Teil 4: Hören</strong> — use the listening links provided in the lesson.
+            <strong>Finish</strong> — complete reading, listening, vocabulary and lesson completion.
           </li>
         </ul>
       </SectionCard>
 
-      <SectionCard title="How to use Teil 1">
+      <SectionCard title="How to use Speak">
         <p style={{ margin: 0 }}>
-          For <strong>Teil 1</strong>, copy the speaking question from the workbook and paste it into the Speech page.
-          This helps you practise expressing, developing, and defending your ideas aloud, which is very important at C1.
+          In <strong>Speak</strong>, use the lesson prompt to practise expressing, developing and
+          defending your ideas aloud. Build a clear position, reasons, examples and nuance.
         </p>
 
         <p style={{ margin: 0 }}>
@@ -369,10 +369,11 @@ const C1Day0ProgressionWorkbookPage = () => {
         </p>
       </SectionCard>
 
-      <SectionCard title="How to use Teil 2">
+      <SectionCard title="How to use Write">
         <p style={{ margin: 0 }}>
-          For <strong>Teil 2</strong>, paste the writing question into the Writing page and write your answer there.
-          Then check your score and use the feedback to improve your structure, grammar, vocabulary choice, and precision.
+          In <strong>Write</strong>, use the writing task and the tools inside the lesson to plan and
+          draft your answer. Check the feedback, then improve your structure, grammar, vocabulary
+          choice and precision in your own revised version.
         </p>
 
         <p style={{ margin: 0 }}>
@@ -422,10 +423,11 @@ const C1Day0ProgressionWorkbookPage = () => {
         </p>
       </SectionCard>
 
-      <SectionCard title="How to use Teil 3 and Teil 4">
+      <SectionCard title="How to use Finish">
         <p style={{ margin: 0 }}>
-          For <strong>Teil 3</strong> and <strong>Teil 4</strong>, use the reading and listening links provided in the lesson.
-          These parts help you build the comprehension skills needed for C1.
+          In <strong>Finish</strong>, use the reading and listening resources provided in the lesson,
+          review the vocabulary and complete the day honestly. These activities build the
+          comprehension skills needed for C1.
         </p>
 
         <p style={{ margin: 0 }}>

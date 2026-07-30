@@ -10,9 +10,10 @@ const config = {
   testIntro: "Use the result to identify grammar, writing and argumentation areas to revise before B2 Day 1.",
   threshold: 70,
   selfLearning: true,
-  courseFlow: "Course Book → Learn → Speak → Write → Finish → record confidence honestly",
+  courseFlow: "Course Book → Falowen Radio → Learn → Speak → Write → Finish → record confidence honestly",
   courseNotes: [
     "B2 is a self-learning track. Start every study session from the Course Book instead of waiting for a live class.",
+    "Listen to Falowen Radio first and select Continue to open Learn, Speak, Write and Finish.",
     "Use Learn to understand the topic, useful language and grammar focus.",
     "Use Speak and Write for active production, then improve your work with Falowen AI feedback.",
     "Use Finish for reading, listening, vocabulary and lesson completion.",

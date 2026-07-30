@@ -7,10 +7,10 @@ const c1Day0Orientation = makeLesson({
   title: "Day 0 Orientation: Start your C1 course correctly",
   topic: "Read this first. This page explains how the C1 self-learning course works, what to do every study day, where to practise, how to use Falowen AI, and how to complete lessons without confusion.",
   heroImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
-  grammarFocus: "C1 course setup: Course Book, Study Buddy, Learn/Speak/Write/Finish, Falowen AI, Analyse My Text, Mark My Letter, References, Reading, Listening, Vocabulary and lesson completion",
+  grammarFocus: "C1 course setup: Course Book, Falowen Radio, Study Buddy, Learn/Speak/Write/Finish, Falowen AI, Analyse My Text, Mark My Letter, References, Reading, Listening, Vocabulary and lesson completion",
   objectives: [
     "I understand that Day 0 is an orientation page, not a normal writing or speaking task.",
-    "I know how the C1 course is organised inside Falowen: Course Book, Learn, Speak, Write and Finish.",
+    "I know how the C1 course is organised inside Falowen: Course Book, Falowen Radio, Learn, Speak, Write and Finish.",
     "I know where to practise speaking, writing, reading, listening and vocabulary.",
     "I know how to use Falowen AI and Study Buddy without only copying answers.",
     "I know how to mark lessons complete honestly and continue to Day 1.",
@@ -18,7 +18,7 @@ const c1Day0Orientation = makeLesson({
   explanation: [
     "Welcome to C1. Day 0 is your orientation. Read this page before Day 1 so you understand the system and do not feel lost.",
     "The C1 course is a self-learning course. That means you practise independently using the Course Book, Falowen AI, Study Buddy, writing support, speaking practice, reading/listening resources and your progress tools.",
-    "Your main home is the Course Book. Open the current day, follow the lesson order, practise actively, then return to the Course Book to mark your confidence or completion.",
+    "Your main home is the Course Book. Open the current day, listen to Falowen Radio first when it appears, select Continue, follow the lesson order and practise actively before marking confidence or completion.",
     "Use Study Buddy when you need quick direction. It gives shortcuts to Ask AI, Course book, Submit work, Falowen AI, Study calendar and Exams room.",
     "C1 is not only harder vocabulary. C1 means deeper thinking, more precise expression, stronger argumentation, better structure, and the ability to improve your own work after feedback.",
   ],
@@ -32,7 +32,7 @@ const c1Day0Orientation = makeLesson({
   grammarLesson: {
     title: "How your C1 self-learning course is designed",
     explanation: [
-      "Your daily flow is simple: Learn first, then Speak, then Write, then Finish. This keeps the course structured and prevents random practice.",
+      "Your daily flow is simple: listen to Falowen Radio first when it appears, then Learn, Speak, Write and Finish. This keeps the course structured and prevents random practice.",
       "Learn is where you understand the topic, lesson goals, grammar focus, thinking questions and useful language. At C1, do not rush this part. You need ideas before language becomes strong.",
       "Speak is where you practise explaining and defending your opinion aloud. At C1, give a clear position, develop it with reasoning, include examples and show nuance.",
       "Write is where you practise structured C1 texts. For Days 1–19, answer five focused questions, combine one section and use Analyse My Text for level-based feedback. From Day 20, use Mark My Letter for a complete essay. Use References for useful expressions and Study Buddy when a question is unclear.",
@@ -42,6 +42,7 @@ const c1Day0Orientation = makeLesson({
     ],
     rules: [
       "Start every study session from the Course Book.",
+      "Listen to Falowen Radio first and select Continue before Learn when an episode appears.",
       "Use Learn to understand the topic before speaking or writing.",
       "Use Speak to practise oral argumentation, pronunciation and confidence.",
       "Use Write and Analyse My Text for short sections on Days 1–19. From Day 20, use Mark My Letter for complete essays. Use References for saved phrases and Study Buddy for unclear questions.",
@@ -115,7 +116,7 @@ const c1Day0Orientation = makeLesson({
   phrases: [
     "Start from Course Book",
     "Use Study Buddy when you feel lost",
-    "Learn → Speak → Write → Finish",
+    "Falowen Radio → Learn → Speak → Write → Finish",
     "C1 means precision, depth and structure",
     "Use Falowen AI to improve, not copy blindly",
     "Mark My Letter: score, corrections, feedback and better version",
@@ -133,6 +134,7 @@ const c1Day0Orientation = makeLesson({
   vocabulary: [
     "Orientation",
     "Course Book",
+    "Falowen Radio",
     "Study Buddy",
     "Falowen AI",
     "Learn",

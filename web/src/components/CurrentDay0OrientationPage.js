@@ -18,7 +18,8 @@ const examRoomItems = [
 
 const defaultTodayTasks = [
   "Read how the current Course Book works for your level.",
-  "Understand the new Campus and Exams Room navigation.",
+  "Understand the current Falowen Home, Campus and Exams Room navigation.",
+  "Learn that Falowen Radio is the first listening step in a normal lesson.",
   "Learn where assignments are submitted.",
   "Read the study advice and enable notifications.",
   "Complete the final knowledge test from your previous level.",
@@ -222,12 +223,21 @@ const CurrentDay0OrientationPage = ({ config }) => {
             </>
           )}
         </NoteBox>
+
+        <NoteBox tone="amber">
+          <strong>Start with Falowen Radio.</strong> When an episode is available, listen to it
+          before continuing. It introduces the day&apos;s topic and prepares you for the lesson
+          material, speaking, grammar and workbook practice. Select <strong>Continue</strong> after
+          listening to open the rest of the lesson.
+        </NoteBox>
       </SectionCard>
 
       <SectionCard title="Current Falowen navigation">
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          From Falowen Home, choose <strong>Campus</strong> for your course, progress and class
-          tools. Choose <strong>Exams Room</strong> for separate exam-style practice.
+          From Falowen Home, choose <strong>Campus</strong> for the Course Book and the learning
+          tools available to your level. Choose <strong>Exams Room</strong> for separate
+          exam-style practice. Use the visible navigation tabs instead of looking for an old
+          student portal or external submission page.
         </p>
 
         <div
@@ -273,6 +283,10 @@ const CurrentDay0OrientationPage = ({ config }) => {
           <li>
             <strong>Falowen AI:</strong> practise and improve your own answer. Do not copy AI
             answers blindly.
+          </li>
+          <li>
+            <strong>Falowen Radio:</strong> listen first when it appears, then select Continue to
+            begin the rest of that day&apos;s lesson.
           </li>
           <li>
             <strong>Notifications:</strong> open Account and enable notifications for scores,

@@ -7,18 +7,18 @@ const b2Day0Orientation = makeLesson({
   title: "Day 0 Orientation: Start B2 correctly",
   topic: "Congratulations on starting B2. Learn the current Falowen navigation, understand the self-learning flow and check your B1 readiness before Day 1.",
   heroImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
-  grammarFocus: "Current B2 workflow: Falowen Home, Campus, Course Book, Learn, Speak, Write, Finish, Falowen AI, Results and Exams Room",
+  grammarFocus: "Current B2 workflow: Falowen Home, Campus, Course Book, Falowen Radio, Learn, Speak, Write, Finish, Falowen AI, Results and Exams Room",
   objectives: [
     "I understand that Day 0 is orientation and readiness checking, not a graded assignment.",
     "I know that Campus is for my course and Exams Room is for separate exam practice.",
-    "I know how to use Learn, Speak, Write and Finish in the current B2 Course Book.",
+    "I know to listen to Falowen Radio first, then use Learn, Speak, Write and Finish in the current B2 Course Book.",
     "I understand that normal B2 daily work uses self-learning completion instead of tutor assignment submission.",
     "I know how to use Falowen AI feedback and record confidence honestly.",
   ],
   explanation: [
     "Congratulations on beginning B2. This level requires clearer arguments, stronger structure, more precise vocabulary and more independent learning than B1.",
     "Start from Falowen Home. Open Campus for your Course Book, Vocab Practice, Results and Account. Open Exams Room for Question of the day, Reading, Speaking, Writing, Vocab, Listening, Resources and Exam File.",
-    "Your main daily path is the Course Book. Open the current day and follow Learn, Speak, Write and Finish in order.",
+    "Your main daily path is the Course Book. Open the current day, listen to Falowen Radio first, select Continue and follow Learn, Speak, Write and Finish in order.",
     "B2 is a self-learning track. The normal daily flow does not use tutor assignment submission. Practise actively, improve your answer with feedback and record your confidence only after real work.",
     "Exams Room is extra exam preparation. It does not replace the Course Book and is not where normal daily lessons are completed.",
   ],
@@ -39,6 +39,7 @@ const b2Day0Orientation = makeLesson({
     ],
     rules: [
       "Start every study session from the Course Book.",
+      "Listen to Falowen Radio first and select Continue before Learn.",
       "Use Learn before Speak and Write.",
       "Improve your own answer after AI feedback.",
       "Use Finish for reading, listening, vocabulary and completion.",
@@ -54,7 +55,7 @@ const b2Day0Orientation = makeLesson({
       "Short Finish block: complete one reading or listening activity and review new vocabulary.",
       "Exam block: open Exams Room and practise one timed task without replacing the daily lesson.",
     ],
-    miniExercise: "Explain the current B2 flow in your own words: Home → Campus → Course Book → Learn → Speak → Write → Finish. Then explain when you would use Exams Room.",
+    miniExercise: "Explain the current B2 flow in your own words: Home → Campus → Course Book → Falowen Radio → Learn → Speak → Write → Finish. Then explain when you would use Exams Room.",
     knowledgeTest: [
       {
         question: "What is Day 0?",
@@ -103,7 +104,7 @@ const b2Day0Orientation = makeLesson({
   phrases: [
     "Campus is for my course",
     "Exams Room is for separate exam practice",
-    "Course Book → Learn → Speak → Write → Finish",
+    "Course Book → Falowen Radio → Learn → Speak → Write → Finish",
     "Use AI feedback to improve my own answer",
     "Record confidence honestly",
     "Enable notifications in Account",
@@ -118,6 +119,7 @@ const b2Day0Orientation = makeLesson({
     "Falowen Home",
     "Campus",
     "Course Book",
+    "Falowen Radio",
     "Learn",
     "Speak",
     "Write",

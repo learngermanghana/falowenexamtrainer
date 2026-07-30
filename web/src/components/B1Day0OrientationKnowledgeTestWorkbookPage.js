@@ -10,9 +10,10 @@ const config = {
   testIntro: "Complete this A2 readiness check before B1 Day 1. It is a self-check, not a graded B1 assignment.",
   threshold: 70,
   selfLearning: false,
-  courseFlow: "Instruction → tutor or AI support → grammar notes → workbook tabs → Submit inside the workbook",
+  courseFlow: "Falowen Radio → instruction and lesson material → workbook tabs → Submit inside the workbook",
   courseNotes: [
     "Open the Course Book and choose the current B1 day.",
+    "Listen to Falowen Radio first and select Continue before starting the lesson and workbook tabs.",
     "B1 workbooks use Teil 1 Sprechen, Teil 2 Schreiben, Teil 3 Lesen, Teil 4 Hören, Ref and Submit.",
     "Teil 1 is speaking preparation and group practice. Prepare opinions, reasons and examples; it is normally not submitted.",
     "Complete Teil 2, Teil 3 and Teil 4, then submit them through the Submit tab in the same workbook.",

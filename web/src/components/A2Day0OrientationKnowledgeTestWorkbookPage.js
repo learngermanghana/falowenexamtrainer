@@ -10,9 +10,10 @@ const config = {
   testIntro: "Use the corrections to identify A1 topics to revise before Day 1.",
   threshold: 70,
   selfLearning: false,
-  courseFlow: "Instruction → videos and grammar → workbook tabs → Submit inside the same workbook",
+  courseFlow: "Falowen Radio → instruction and lesson material → workbook tabs → Submit inside the same workbook",
   courseNotes: [
     "Open the Course Book and choose the current day.",
+    "Listen to Falowen Radio first and select Continue before starting the lesson and workbook tabs.",
     "A2 workbooks normally show Teil 1 Sprechen, Teil 2 Schreiben, Teil 3 Lesen, Teil 4 Hören, Ref and Submit.",
     "Prepare Teil 1 for class practice. Complete and submit Teil 2, Teil 3 and Teil 4.",
     "Use the Submit tab in the same workbook; the correct assignment is selected automatically.",
