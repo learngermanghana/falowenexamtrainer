@@ -114,7 +114,7 @@ describe("A1 route-scoped Falowen Radio", () => {
       expect.objectContaining({
         key: "a1-day5-introducing-yourself-articles-falowen-radio",
         title: "Introducing Yourself and Articles · Kapitel 1.3",
-        youtubeId: "4yGJ9-Fz19A",
+        youtubeId: "XrSTHS60LI4",
       }),
     );
   });
