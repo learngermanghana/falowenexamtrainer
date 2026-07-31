@@ -116,16 +116,33 @@ const letterStyle = {
 };
 
 export const FORM_PRACTICE_FIELDS = [
-  { id: "familienname", label: "Familienname", answer: "Mensah", autoComplete: "family-name" },
-  { id: "vorname", label: "Vorname", answer: "Kwame", autoComplete: "given-name" },
-  { id: "geburtsdatum", label: "Geburtsdatum", answer: "14.06.1998", inputMode: "numeric" },
-  { id: "adresse", label: "Straße / Hausnummer", answer: "24 Market Road", autoComplete: "street-address" },
-  { id: "wohnort", label: "Wohnort", answer: "Accra", autoComplete: "address-level2" },
-  { id: "telefon", label: "Telefon", answer: "020 123 4567", inputMode: "tel", autoComplete: "tel" },
-  { id: "email", label: "E-Mail", answer: "kwame.mensah@example.com", inputMode: "email", autoComplete: "email" },
+  { id: "familienname", label: "Familienname", answer: "Mensah" },
+  { id: "vorname", label: "Vorname", answer: "Kwame" },
+  {
+    id: "geburtsdatum",
+    label: "Geburtsdatum",
+    answer: "14.06.1998",
+    inputMode: "text",
+    placeholder: "TT.MM.JJJJ",
+  },
+  { id: "adresse", label: "Straße / Hausnummer", answer: "24 Market Road" },
+  { id: "wohnort", label: "Wohnort", answer: "Accra" },
+  { id: "telefon", label: "Telefon", answer: "020 123 4567", inputMode: "tel" },
+  {
+    id: "email",
+    label: "E-Mail",
+    answer: "kwame.mensah@example.com",
+    inputMode: "email",
+  },
   { id: "kurs", label: "Kurs", answer: "Deutsch A1" },
   { id: "kurszeit", label: "Kurszeit", answer: "Abendkurs" },
-  { id: "kursbeginn", label: "Kursbeginn", answer: "12.08.2026", inputMode: "numeric" },
+  {
+    id: "kursbeginn",
+    label: "Kursbeginn",
+    answer: "12.08.2026",
+    inputMode: "text",
+    placeholder: "TT.MM.JJJJ",
+  },
 ];
 
 const createEmptyFormAnswers = () =>
@@ -183,7 +200,7 @@ const InteractiveFormPractice = () => {
         <strong> Check answers</strong>.
       </p>
 
-      <form onSubmit={checkAnswers} noValidate>
+      <form onSubmit={checkAnswers} noValidate autoComplete="off">
         <div style={{ display: "grid" }}>
           {FORM_PRACTICE_FIELDS.map((field) => {
             const correct = checked && isFormPracticeAnswerCorrect(field, answers[field.id]);
@@ -197,11 +214,12 @@ const InteractiveFormPractice = () => {
                 </label>
                 <input
                   id={field.id}
-                  name={field.id}
+                  name={`practice-${field.id}`}
                   value={answers[field.id]}
                   onChange={(event) => updateAnswer(field.id, event.target.value)}
                   inputMode={field.inputMode || "text"}
-                  autoComplete={field.autoComplete || "off"}
+                  placeholder={field.placeholder}
+                  autoComplete="off"
                   aria-invalid={incorrect ? "true" : "false"}
                   aria-describedby={checked ? feedbackId : undefined}
                   style={{
