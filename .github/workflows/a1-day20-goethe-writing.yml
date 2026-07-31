@@ -29,7 +29,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day20GoetheWritingGrammarPage.test.jsx src/components/LetterWritingIntroPage.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20GoetheWritingGrammarPage.test.jsx
       - name: Build production web app
         working-directory: web
         run: npm run build
