@@ -227,6 +227,54 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
       instruction:
         "Höre aufmerksam zu und stimme dich auf Freundschaft, Vertrauen und soziale Beziehungen ein. Danach gehst du weiter zum Lernteil.",
     }),
+    21: Object.freeze({
+      key: "b2-day21-migration-neue-lebenswege-falowen-radio",
+      title: "Migration und neue Lebenswege 5.1",
+      youtubeId: "vt2uLA4KZg0",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Migration, Integration und neue persönliche Chancen ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    22: Object.freeze({
+      key: "b2-day22-demokratie-mitbestimmung-falowen-radio",
+      title: "Demokratie und Mitbestimmung 5.2",
+      youtubeId: "L43S-6dJffA",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Demokratie, Beteiligung, Rechte und gesellschaftliche Verantwortung ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    23: Object.freeze({
+      key: "b2-day23-work-life-balance-falowen-radio",
+      title: "Work-Life-Balance 5.3",
+      youtubeId: "gGwzFPdmtSw",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Arbeit, Erholung, Stress und persönliche Grenzen ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    24: Object.freeze({
+      key: "b2-day24-wissenschaft-forschung-alltag-falowen-radio",
+      title: "Wissenschaft und Forschung im Alltag 5.4",
+      youtubeId: "VLnzMBbXvCo",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Forschung, Fortschritt sowie Nutzen und Risiken wissenschaftlicher Entwicklungen ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    25: Object.freeze({
+      key: "b2-day25-nachhaltiger-konsum-falowen-radio",
+      title: "Nachhaltiger Konsum 5.5",
+      youtubeId: "beZAKl9xudc",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf Kaufverhalten, Ressourcen und nachhaltige Entscheidungen ein. Danach gehst du weiter zum Lernteil.",
+    }),
+    26: Object.freeze({
+      key: "b2-day26-behoerden-termine-formelle-kommunikation-falowen-radio",
+      title: "Behörden, Termine und formelle Kommunikation 6.1",
+      youtubeId: "iudqbeWrwKQ",
+      duration: "",
+      instruction:
+        "Höre aufmerksam zu und stimme dich auf formelle Anliegen, Termine und höfliche Kommunikation ein. Danach gehst du weiter zum Lernteil.",
+    }),
   }),
   C1: Object.freeze({
     11: Object.freeze({
