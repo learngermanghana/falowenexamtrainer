@@ -47,12 +47,16 @@ describe("A1 Day 20 Goethe writing grammar page", () => {
         name: "Formal and informal letters: see the difference",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Sehr geehrte Damen und Herren,", { exact: false })).toBeInTheDocument();
-    expect(screen.getByText("Mit freundlichen Grüßen", { exact: false })).toBeInTheDocument();
-    expect(screen.getByText("Liebe Anna,", { exact: false })).toBeInTheDocument();
-    expect(screen.getByText("Liebe Grüße", { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/Sie, Ihnen, Ihr\/Ihre/i)).toBeInTheDocument();
-    expect(screen.getByText(/du, dir, dich, dein\/deine/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Sehr geehrte Damen und Herren,", { exact: false }).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Mit freundlichen Grüßen", { exact: false }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("Liebe Anna,", { exact: false }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Liebe Grüße", { exact: false }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Sie, Ihnen, Ihr\/Ihre/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/du, dir, dich, dein\/deine/i).length).toBeGreaterThan(0);
   });
 
   test("keeps the existing detailed letter-writing grammar lesson below the new overview", () => {
