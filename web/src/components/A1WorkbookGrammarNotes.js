@@ -18,10 +18,8 @@ import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
 import A1GrammarVideoCard from "./A1GrammarVideoCard";
 
-const LetterWritingGrammarNotesPage = lazy(() =>
-  import("./LetterWritingIntroPage").then((module) => ({
-    default: module.LetterWritingGrammarNotesPage,
-  })),
+const A1Day20GoetheWritingGrammarPage = lazy(() =>
+  import("./A1Day20GoetheWritingGrammarPage"),
 );
 
 const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
@@ -40,7 +38,7 @@ const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
   "A1-11": DirectionsImperativePage,
   "A1-12.1": TwoCasePrepositionsPageLegacy,
   "A1-12.2": DativeArticlesMitBeiZuGrammarNotes,
-  "A1-12.3": LetterWritingGrammarNotesPage,
+  "A1-12.3": A1Day20GoetheWritingGrammarPage,
   "A1-13": WeatherPerfektLetterPage,
   "A1-14.1": HealthBodyPartsPage,
 };
