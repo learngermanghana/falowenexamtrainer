@@ -33,7 +33,7 @@ describe("A1 Day 20 letter-writing workbook", () => {
     const { container } = render(
       <MemoryRouter
         initialEntries={[
-          "/campus/course/letter-writing-intro-german-a1-day-12-3?radio=done",
+          "/campus/course/letter-writing-intro-german-a1-day-12-3?radio=done&workbookTab=grammar&assignmentKey=A1-12.3&assignmentId=A1-12.3&level=A1",
         ]}
       >
         <A1Day20LetterWritingWorkbookPage />

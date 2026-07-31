@@ -232,7 +232,7 @@ describe("A1 route-scoped Falowen Radio", () => {
         key: "a1-day20-letter-writing-intro-falowen-radio",
         title: "Letter Writing Introduction · Kapitel 12.3",
         chapter: "12.3",
-        youtubeId: "Ve-iOgbgSw4",
+        youtubeId: "65Hs65fX9Ms",
       }),
     );
   });
