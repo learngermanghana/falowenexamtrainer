@@ -255,7 +255,7 @@ describe("B1 workbook writing cheat sheet injector", () => {
   test("does not inject a card for an unmapped B1 writing assignment", () => {
     const root = buildWritingRoot();
 
-    const result = __TESTING__.ensureWritingVideoCard(root, 8);
+    const result = __TESTING__.ensureWritingVideoCard(root, 9);
 
     expect(result).toEqual(expect.objectContaining({
       mounted: false,
