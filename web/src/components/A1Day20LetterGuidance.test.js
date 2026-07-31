@@ -1,9 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const currentDir = path.dirname(fileURLToPath(import.meta.url));
-const sourcePath = path.join(currentDir, "LetterWritingIntroPage.js");
+const sourcePath = path.join(process.cwd(), "src/components/LetterWritingIntroPage.js");
 const source = fs.readFileSync(sourcePath, "utf8");
 
 describe("A1 Day 20 letter guidance", () => {
