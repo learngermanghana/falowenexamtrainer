@@ -5,12 +5,6 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pagePath = path.join(root, "web/src/components/LetterWritingIntroPage.js");
 
-const replaceOnce = (source, before, after, label) => {
-  if (source.includes(after)) return source;
-  if (!source.includes(before)) throw new Error(`Could not find ${label}.`);
-  return source.replace(before, after);
-};
-
 let source = fs.readFileSync(pagePath, "utf8");
 
 const bodyRulesComponent = String.raw`const A1BodyRules = () => (
@@ -53,70 +47,39 @@ if (!source.includes("const A1BodyRules = () => (")) {
   source = source.replace(anchor, `${bodyRulesComponent}\n\n${anchor}`);
 }
 
-source = replaceOnce(
-  source,
-  String.raw`        <div style={{ display: "grid", gap: 8 }}>
-          <p style={labelStyle}>3. Main body</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Answer every task point clearly. Use the following connectors where they fit:
-          </p>
-          <BulletList
-            items={[
-              <span key="formal-ob">
-                <strong>Ich möchte wissen, ob ...</strong> — use this for an indirect yes/no
-                question.
-              </span>,
-              <span key="formal-deshalb">
-                <strong>deshalb</strong> — use this to show a result or consequence.
-              </span>,
-              <span key="formal-weil">
-                <strong>weil</strong> — use this to give a reason; the verb goes to the end.
-              </span>,
-            ]}
-          />
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Keep your sentences clear, well structured, and suitable for the situation.
-          </p>
-        </div>`,
-  String.raw`        <div style={{ display: "grid", gap: 8 }}>
+const simplifiedMainBody = String.raw`        <div style={{ display: "grid", gap: 8 }}>
           <p style={labelStyle}>3. Main body</p>
           <A1BodyRules />
-        </div>`,
-  "formal A1 body guidance",
-);
+        </div>
 
-source = replaceOnce(
-  source,
-  String.raw`        <div style={{ display: "grid", gap: 8 }}>
-          <p style={labelStyle}>3. Main body</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Answer every task point in friendly, simple sentences. Use these connectors where they
-            fit:
-          </p>
-          <BulletList
-            items={[
-              <span key="informal-ob">
-                <strong>Ich möchte wissen, ob ...</strong> — use this for an indirect yes/no
-                question.
-              </span>,
-              <span key="informal-deshalb">
-                <strong>deshalb</strong> — use this to show a result or consequence.
-              </span>,
-              <span key="informal-weil">
-                <strong>weil</strong> — use this to give a reason; the verb goes to the end.
-              </span>,
-            ]}
-          />
-          <p style={{ margin: 0, lineHeight: 1.75 }}>
-            Read your sentences again and make sure the language remains informal throughout.
-          </p>
-        </div>`,
-  String.raw`        <div style={{ display: "grid", gap: 8 }}>
-          <p style={labelStyle}>3. Main body</p>
-          <A1BodyRules />
-        </div>`,
-  "informal A1 body guidance",
-);
+`;
+
+const simplifySectionMainBody = (input, sectionLabel) => {
+  const sectionMarker = `aria-label="${sectionLabel}"`;
+  const sectionIndex = input.indexOf(sectionMarker);
+  if (sectionIndex < 0) throw new Error(`Could not find ${sectionLabel}.`);
+
+  const mainMarker = "          <p style={labelStyle}>3. Main body</p>";
+  const mainIndex = input.indexOf(mainMarker, sectionIndex);
+  if (mainIndex < 0) throw new Error(`Could not find ${sectionLabel} main body.`);
+
+  const conclusionMarker = String.raw`        <div style={{ display: "grid", gap: 8 }}>
+          <p style={labelStyle}>4. Conclusion</p>`;
+  const conclusionIndex = input.indexOf(conclusionMarker, mainIndex);
+  if (conclusionIndex < 0) throw new Error(`Could not find ${sectionLabel} conclusion.`);
+
+  const currentBlock = input.slice(mainIndex, conclusionIndex);
+  if (currentBlock.includes("<A1BodyRules />")) return input;
+
+  const blockStartMarker = '        <div style={{ display: "grid", gap: 8 }}>';
+  const blockStart = input.lastIndexOf(blockStartMarker, mainIndex);
+  if (blockStart < sectionIndex) throw new Error(`Could not find ${sectionLabel} main-body container.`);
+
+  return `${input.slice(0, blockStart)}${simplifiedMainBody}${input.slice(conclusionIndex)}`;
+};
+
+source = simplifySectionMainBody(source, "Formal Letter Structure");
+source = simplifySectionMainBody(source, "Informal Letter Structure");
 
 source = source.replace(
   "Sehr geehrte Damen und Herren,\\n\\nich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte. Ich möchte wissen, ob der Kurs im August beginnt. Der Kurs ist wichtig für meine Arbeit, deshalb möchte ich bald anfangen. Wie viel kostet der Kurs und wie kann ich bezahlen?\\n\\nIch freue mich im Voraus auf Ihre Antwort.\\n\\nMit freundlichen Grüßen\\nMax Mustermann",
