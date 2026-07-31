@@ -160,7 +160,7 @@ export const A1_RADIO_RESOURCES = Object.freeze({
     key: "a1-day20-letter-writing-intro-falowen-radio",
     chapter: "12.3",
     title: "Letter Writing Introduction · Kapitel 12.3",
-    youtubeId: "Ve-iOgbgSw4",
+    youtubeId: "65Hs65fX9Ms",
     duration: "",
     instruction:
       "Listen carefully to the letter-writing introduction. Then continue to the Kapitel 12.3 workbook assignment.",
