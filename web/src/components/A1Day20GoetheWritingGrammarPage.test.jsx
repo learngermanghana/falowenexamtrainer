@@ -1,6 +1,9 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import A1Day20GoetheWritingGrammarPage from "./A1Day20GoetheWritingGrammarPage";
+import { fireEvent, render, screen } from "@testing-library/react";
+import A1Day20GoetheWritingGrammarPage, {
+  FORM_PRACTICE_FIELDS,
+  getFormPracticeScore,
+} from "./A1Day20GoetheWritingGrammarPage";
 
 jest.mock("./LetterWritingIntroPage", () => ({
   LetterWritingGrammarNotesPage: () => (
@@ -9,6 +12,14 @@ jest.mock("./LetterWritingIntroPage", () => ({
     </section>
   ),
 }));
+
+const fillForm = (values = {}) => {
+  FORM_PRACTICE_FIELDS.forEach((field) => {
+    fireEvent.change(screen.getByLabelText(field.label), {
+      target: { value: values[field.id] ?? field.answer },
+    });
+  });
+};
 
 describe("A1 Day 20 Goethe writing grammar page", () => {
   test("explains that Goethe A1 Schreiben has form filling and letter writing", () => {
@@ -26,17 +37,60 @@ describe("A1 Day 20 Goethe writing grammar page", () => {
     expect(screen.getByText(/Teil 1 is a form, not a letter/i)).toBeInTheDocument();
   });
 
-  test("shows a completed form with exact personal and course details", () => {
+  test("keeps the completed form hidden until the student checks the activity", () => {
     render(<A1Day20GoetheWritingGrammarPage />);
 
+    expect(screen.getByRole("article", { name: "Interactive form practice" })).toBeInTheDocument();
+    expect(screen.getAllByRole("textbox")).toHaveLength(FORM_PRACTICE_FIELDS.length);
+    expect(screen.queryByRole("article", { name: "Completed form sample" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show completed form" })).not.toBeInTheDocument();
+  });
+
+  test("scores a completed form and reveals the model only after checking", () => {
+    render(<A1Day20GoetheWritingGrammarPage />);
+
+    fillForm();
+    fireEvent.click(screen.getByRole("button", { name: "Check answers" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `Your score: ${FORM_PRACTICE_FIELDS.length}/${FORM_PRACTICE_FIELDS.length}`,
+    );
+    expect(screen.getAllByText("Correct")).toHaveLength(FORM_PRACTICE_FIELDS.length);
+
+    fireEvent.click(screen.getByRole("button", { name: "Show completed form" }));
     const completedForm = screen.getByRole("article", { name: "Completed form sample" });
     expect(completedForm).toHaveTextContent("Familienname");
     expect(completedForm).toHaveTextContent("Mensah");
-    expect(completedForm).toHaveTextContent("Geburtsdatum");
     expect(completedForm).toHaveTextContent("14.06.1998");
     expect(completedForm).toHaveTextContent("kwame.mensah@example.com");
     expect(completedForm).toHaveTextContent("Abendkurs");
     expect(completedForm).toHaveTextContent("12.08.2026");
+  });
+
+  test("shows field-level corrections and lets the student reset", () => {
+    render(<A1Day20GoetheWritingGrammarPage />);
+
+    fillForm({ familienname: "Mensa" });
+    fireEvent.click(screen.getByRole("button", { name: "Check answers" }));
+
+    expect(screen.getByText("Correct answer: Mensah")).toBeInTheDocument();
+    expect(screen.getByLabelText("Familienname")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `Your score: ${FORM_PRACTICE_FIELDS.length - 1}/${FORM_PRACTICE_FIELDS.length}`,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset form" }));
+    expect(screen.getByLabelText("Familienname")).toHaveValue("");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  test("calculates scores independently of letter case and extra spaces", () => {
+    const answers = FORM_PRACTICE_FIELDS.reduce(
+      (result, field) => ({ ...result, [field.id]: `  ${field.answer.toUpperCase()}  ` }),
+      {},
+    );
+
+    expect(getFormPracticeScore(answers)).toBe(FORM_PRACTICE_FIELDS.length);
   });
 
   test("shows complete formal and informal samples and their language differences", () => {
