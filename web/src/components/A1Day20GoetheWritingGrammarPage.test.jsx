@@ -46,6 +46,22 @@ describe("A1 Day 20 Goethe writing grammar page", () => {
     expect(screen.queryByRole("button", { name: "Show completed form" })).not.toBeInTheDocument();
   });
 
+  test("prevents personal-data autofill and keeps dotted dates typeable on mobile", () => {
+    render(<A1Day20GoetheWritingGrammarPage />);
+
+    const practice = screen.getByRole("article", { name: "Interactive form practice" });
+    expect(practice.querySelector("form")).toHaveAttribute("autocomplete", "off");
+
+    FORM_PRACTICE_FIELDS.forEach((field) => {
+      expect(screen.getByLabelText(field.label)).toHaveAttribute("autocomplete", "off");
+    });
+
+    expect(screen.getByLabelText("Geburtsdatum")).toHaveAttribute("inputmode", "text");
+    expect(screen.getByLabelText("Geburtsdatum")).toHaveAttribute("placeholder", "TT.MM.JJJJ");
+    expect(screen.getByLabelText("Kursbeginn")).toHaveAttribute("inputmode", "text");
+    expect(screen.getByLabelText("Kursbeginn")).toHaveAttribute("placeholder", "TT.MM.JJJJ");
+  });
+
   test("scores a completed form and reveals the model only after checking", () => {
     render(<A1Day20GoetheWritingGrammarPage />);
 
