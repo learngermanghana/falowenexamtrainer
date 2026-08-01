@@ -16,14 +16,15 @@ const flowingMessages = `<div data-goethe-free-chat-messages="page-flow" style={
 const originalRecordControls = `<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857" }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
 const stableRecordControls = `<div data-goethe-free-chat-record-controls="stable" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857", alignSelf: "flex-start", flex: "0 0 auto", minHeight: 44 }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
 
-// The older patch checks for its fixed-height result before deciding it is
-// already applied. On repeated lifecycle runs, temporarily present those two
-// markers so that legacy idempotency succeeds; page flow is restored again
-// immediately after the import.
+// The course Goethe Free Chat had its own design before the Exams Room
+// recording-panel fix. Normalize any earlier page-flow/stable-control rewrite
+// back to that original design before the legacy patch runs, so the patch stays
+// rerunnable and can still add transcript retry/status behaviour.
 if (fs.existsSync(freeChatPath)) {
   let preparedFreeChat = fs.readFileSync(freeChatPath, "utf8");
-  preparedFreeChat = preparedFreeChat.replace(flowingChatSection, fixedChatSection);
-  preparedFreeChat = preparedFreeChat.replace(flowingMessages, fixedMessageScroller);
+  preparedFreeChat = preparedFreeChat.replace(flowingChatSection, originalChatSection);
+  preparedFreeChat = preparedFreeChat.replace(flowingMessages, originalMessageScroller);
+  preparedFreeChat = preparedFreeChat.replace(stableRecordControls, originalRecordControls);
   fs.writeFileSync(freeChatPath, preparedFreeChat);
 }
 
@@ -52,33 +53,24 @@ if (panel.includes(videoStart)) {
   fs.writeFileSync(panelPath, panel);
 }
 
-// PR #2323 constrained every course Goethe Free Chat to a viewport-height box
-// with its own transcript scroller. That kept the composer visible, but it also
-// cropped long A2-C1 conversations and forced learners to scroll inside a small
-// nested box. Restore normal document flow while keeping recording controls at
-// their natural content size.
+// The fixed-height layout belongs only to the Exams Room Goethe examiner chat.
+// Keep the Free Chat's original layout and compact Record button while retaining
+// the transcript retry and transcript-status changes applied above.
 let freeChat = fs.readFileSync(freeChatPath, "utf8");
+freeChat = freeChat.replace(fixedChatSection, originalChatSection);
+freeChat = freeChat.replace(flowingChatSection, originalChatSection);
+freeChat = freeChat.replace(fixedMessageScroller, originalMessageScroller);
+freeChat = freeChat.replace(flowingMessages, originalMessageScroller);
+freeChat = freeChat.replace(stableRecordControls, originalRecordControls);
 
-if (freeChat.includes(fixedChatSection)) {
-  freeChat = freeChat.replace(fixedChatSection, flowingChatSection);
-} else if (freeChat.includes(originalChatSection)) {
-  freeChat = freeChat.replace(originalChatSection, flowingChatSection);
-} else if (!freeChat.includes(flowingChatSection)) {
-  throw new Error("Could not restore Goethe Free Chat page-flow section.");
+if (!freeChat.includes(originalChatSection)) {
+  throw new Error("Could not restore the original Goethe Free Chat section.");
 }
-
-if (freeChat.includes(fixedMessageScroller)) {
-  freeChat = freeChat.replace(fixedMessageScroller, flowingMessages);
-} else if (freeChat.includes(originalMessageScroller)) {
-  freeChat = freeChat.replace(originalMessageScroller, flowingMessages);
-} else if (!freeChat.includes(flowingMessages)) {
-  throw new Error("Could not restore Goethe Free Chat message page flow.");
+if (!freeChat.includes(originalMessageScroller)) {
+  throw new Error("Could not restore the original Goethe Free Chat message area.");
 }
-
-if (freeChat.includes(originalRecordControls)) {
-  freeChat = freeChat.replace(originalRecordControls, stableRecordControls);
-} else if (!freeChat.includes(stableRecordControls)) {
-  throw new Error("Could not stabilize Goethe Free Chat recording controls.");
+if (!freeChat.includes(originalRecordControls)) {
+  throw new Error("Could not restore the original Goethe Free Chat recording controls.");
 }
 
 fs.writeFileSync(freeChatPath, freeChat);
