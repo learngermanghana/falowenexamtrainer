@@ -5,6 +5,28 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptsDir, "..");
 const patchPath = path.join(scriptsDir, "patchA1Day19CombinedPracticeAndSpeakingReliability.mjs");
+const freeChatPath = path.join(root, "web/src/components/GoetheFreeChatPage.js");
+
+const fixedChatSection = `<section style={{ height: "min(760px, 76vh)", minHeight: 540, maxHeight: 760, overflow: "hidden", display: "grid", gridTemplateRows: "minmax(0, 1fr) auto", background: "#e5e7eb" }}>`;
+const originalChatSection = `<section style={{ minHeight: 540, display: "grid", gridTemplateRows: "1fr auto", background: "#e5e7eb" }}>`;
+const flowingChatSection = `<section data-goethe-free-chat-conversation="page-flow" style={{ minHeight: 540, display: "grid", gridTemplateRows: "auto auto", background: "#e5e7eb" }}>`;
+const fixedMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", minHeight: 0, alignContent: "start" }}>`;
+const originalMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", alignContent: "start" }}>`;
+const flowingMessages = `<div data-goethe-free-chat-messages="page-flow" style={{ padding: 16, display: "grid", gap: 12, overflow: "visible", alignContent: "start" }}>`;
+const originalRecordControls = `<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857" }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
+const stableRecordControls = `<div data-goethe-free-chat-record-controls="stable" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857", alignSelf: "flex-start", flex: "0 0 auto", minHeight: 44 }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
+
+// The older patch checks for its fixed-height result before deciding it is
+// already applied. On repeated lifecycle runs, temporarily present those two
+// markers so that legacy idempotency succeeds; page flow is restored again
+// immediately after the import.
+if (fs.existsSync(freeChatPath)) {
+  let preparedFreeChat = fs.readFileSync(freeChatPath, "utf8");
+  preparedFreeChat = preparedFreeChat.replace(flowingChatSection, fixedChatSection);
+  preparedFreeChat = preparedFreeChat.replace(flowingMessages, fixedMessageScroller);
+  fs.writeFileSync(freeChatPath, preparedFreeChat);
+}
+
 let source = fs.readFileSync(patchPath, "utf8");
 
 // The patch writes a React template literal into SpeakingPage. Escape only
@@ -35,12 +57,7 @@ if (panel.includes(videoStart)) {
 // cropped long A2-C1 conversations and forced learners to scroll inside a small
 // nested box. Restore normal document flow while keeping recording controls at
 // their natural content size.
-const freeChatPath = path.join(root, "web/src/components/GoetheFreeChatPage.js");
 let freeChat = fs.readFileSync(freeChatPath, "utf8");
-
-const fixedChatSection = `<section style={{ height: "min(760px, 76vh)", minHeight: 540, maxHeight: 760, overflow: "hidden", display: "grid", gridTemplateRows: "minmax(0, 1fr) auto", background: "#e5e7eb" }}>`;
-const originalChatSection = `<section style={{ minHeight: 540, display: "grid", gridTemplateRows: "1fr auto", background: "#e5e7eb" }}>`;
-const flowingChatSection = `<section data-goethe-free-chat-conversation="page-flow" style={{ minHeight: 540, display: "grid", gridTemplateRows: "auto auto", background: "#e5e7eb" }}>`;
 
 if (freeChat.includes(fixedChatSection)) {
   freeChat = freeChat.replace(fixedChatSection, flowingChatSection);
@@ -50,10 +67,6 @@ if (freeChat.includes(fixedChatSection)) {
   throw new Error("Could not restore Goethe Free Chat page-flow section.");
 }
 
-const fixedMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", minHeight: 0, alignContent: "start" }}>`;
-const originalMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", alignContent: "start" }}>`;
-const flowingMessages = `<div data-goethe-free-chat-messages="page-flow" style={{ padding: 16, display: "grid", gap: 12, overflow: "visible", alignContent: "start" }}>`;
-
 if (freeChat.includes(fixedMessageScroller)) {
   freeChat = freeChat.replace(fixedMessageScroller, flowingMessages);
 } else if (freeChat.includes(originalMessageScroller)) {
@@ -61,9 +74,6 @@ if (freeChat.includes(fixedMessageScroller)) {
 } else if (!freeChat.includes(flowingMessages)) {
   throw new Error("Could not restore Goethe Free Chat message page flow.");
 }
-
-const originalRecordControls = `<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857" }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
-const stableRecordControls = `<div data-goethe-free-chat-record-controls="stable" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857", alignSelf: "flex-start", flex: "0 0 auto", minHeight: 44 }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
 
 if (freeChat.includes(originalRecordControls)) {
   freeChat = freeChat.replace(originalRecordControls, stableRecordControls);
