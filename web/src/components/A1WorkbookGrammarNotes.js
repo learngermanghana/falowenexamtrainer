@@ -16,6 +16,7 @@ import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";
 import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage";
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
+import A1Day21WeatherResources from "./A1Day21WeatherResources";
 import A1GrammarVideoCard from "./A1GrammarVideoCard";
 
 const A1Day20GoetheWritingGrammarPage = lazy(() =>
@@ -47,7 +48,8 @@ export const getA1GrammarNotesComponent = (assignmentKey) =>
   A1_GRAMMAR_NOTES_BY_ASSIGNMENT[String(assignmentKey || "").trim()] || null;
 
 const A1WorkbookGrammarNotes = ({ assignmentKey }) => {
-  const GrammarNotes = getA1GrammarNotesComponent(assignmentKey);
+  const normalizedAssignmentKey = String(assignmentKey || "").trim();
+  const GrammarNotes = getA1GrammarNotesComponent(normalizedAssignmentKey);
   if (!GrammarNotes) {
     return (
       <section style={{ display: "grid", gap: 10 }}>
@@ -61,7 +63,11 @@ const A1WorkbookGrammarNotes = ({ assignmentKey }) => {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <A1GrammarVideoCard assignmentKey={assignmentKey} />
+      {normalizedAssignmentKey === "A1-13" ? (
+        <A1Day21WeatherResources />
+      ) : (
+        <A1GrammarVideoCard assignmentKey={normalizedAssignmentKey} />
+      )}
       <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
         <GrammarNotes />
       </Suspense>
