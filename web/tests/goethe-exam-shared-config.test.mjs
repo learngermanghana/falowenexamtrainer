@@ -61,6 +61,17 @@ test("Exam File gives students only the essential registration actions", async (
   assert.doesNotMatch(examFile, /title="Downloadables"/);
 });
 
+test("pending registration entries expire after their exam day", async () => {
+  const examFile = await source("src/components/MyExamFilePage.js");
+
+  assert.match(examFile, /const isScheduleEntryCurrent = \(exam, now\) =>/);
+  assert.match(examFile, /if \(registrationEnd\) return now <= registrationEnd/);
+  assert.match(examFile, /const examEnd = endOfScheduleDay\(exam\?\.date\)/);
+  assert.match(examFile, /return Boolean\(examEnd && now <= examEnd\)/);
+  assert.equal((examFile.match(/isScheduleEntryCurrent\(exam, now\)/g) || []).length, 2);
+  assert.doesNotMatch(examFile, /!registrationEnd \|\| now <= registrationEnd/);
+});
+
 test("build lifecycle always applies the idempotent shared-config patch", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   assert.match(packageJson.scripts.prebuild, /sync:goethe-config-ui/);
