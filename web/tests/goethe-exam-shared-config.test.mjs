@@ -38,20 +38,38 @@ test("Exam File and Study Calendar react when the shared Admin config arrives", 
   assert.match(hook, /fallbackGoetheExamConfig/);
 });
 
-test("Exam File prioritizes visible Goethe registration guidance", async () => {
+test("Exam File gives students only the essential registration actions", async () => {
   const examFile = await source("src/components/MyExamFilePage.js");
 
-  assert.match(examFile, /How to register for your Goethe exam/);
+  assert.match(examFile, /Register in two steps/);
   assert.match(examFile, /Create or open Goethe account/);
-  assert.match(examFile, /Official registration link/);
-  assert.match(examFile, /Bookable to Open/);
-  assert.match(examFile, /Register now/);
+  assert.match(examFile, /Open the official registration page/);
+  assert.match(examFile, /The registration link is the same for every date/);
+  assert.match(examFile, /Registration: \{formatDate\(exam\.registrationStart\)\}/);
   assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
+  assert.match(examFile, /Schedule synced from Falowen Admin/);
 
+  assert.doesNotMatch(examFile, /downloadExamReminder/);
+  assert.doesNotMatch(examFile, /Add exam reminder/);
+  assert.doesNotMatch(examFile, /getCountdownLabel/);
+  assert.doesNotMatch(examFile, /Official registration link:/);
+  assert.doesNotMatch(examFile, /Account link:/);
+  assert.doesNotMatch(examFile, /How to register/);
   assert.doesNotMatch(examFile, /Submitted assignments \(locked\)/);
   assert.doesNotMatch(examFile, /Level leaderboard/);
   assert.doesNotMatch(examFile, /Teacher feedback history/);
   assert.doesNotMatch(examFile, /title="Downloadables"/);
+});
+
+test("pending registration entries expire after their exam day", async () => {
+  const examFile = await source("src/components/MyExamFilePage.js");
+
+  assert.match(examFile, /const isScheduleEntryCurrent = \(exam, now\) =>/);
+  assert.match(examFile, /if \(registrationEnd\) return now <= registrationEnd/);
+  assert.match(examFile, /const examEnd = endOfScheduleDay\(exam\?\.date\)/);
+  assert.match(examFile, /return Boolean\(examEnd && now <= examEnd\)/);
+  assert.equal((examFile.match(/isScheduleEntryCurrent\(exam, now\)/g) || []).length, 2);
+  assert.doesNotMatch(examFile, /!registrationEnd \|\| now <= registrationEnd/);
 });
 
 test("build lifecycle always applies the idempotent shared-config patch", async () => {
