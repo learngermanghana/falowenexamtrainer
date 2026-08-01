@@ -30,7 +30,7 @@ describe("A1 Day 19 combined practice and speaking reliability", () => {
     expect(source("src/components/A1CoursePracticeAutoMount.js")).not.toContain("A1_DAY_19_AI_VIDEO_URL");
   });
 
-  test("keeps long speaking chats inside a stable scrolling panel and shows transcript states", () => {
+  test("keeps exam speaking stable while course Goethe chat uses normal page scrolling", () => {
     const speakingPage = source("src/components/SpeakingPage.js");
     const freeChat = source("src/components/GoetheFreeChatPage.js");
 
@@ -41,7 +41,15 @@ describe("A1 Day 19 combined practice and speaking reliability", () => {
     expect(speakingPage).toContain("Transcript unavailable — record again.");
 
     expect(freeChat).toContain("analyzeSpeakingAudioWithTranscriptRetry");
-    expect(freeChat).toContain('maxHeight: 760');
     expect(freeChat).toContain("Transcript unavailable — record again.");
+    expect(freeChat).toContain('data-goethe-free-chat-conversation="page-flow"');
+    expect(freeChat).toContain('gridTemplateRows: "auto auto"');
+    expect(freeChat).toContain('data-goethe-free-chat-messages="page-flow"');
+    expect(freeChat).toContain('overflow: "visible"');
+    expect(freeChat).toContain('data-goethe-free-chat-record-controls="stable"');
+    expect(freeChat).toContain('flex: "0 0 auto"');
+    expect(freeChat).not.toContain('height: "min(760px, 76vh)"');
+    expect(freeChat).not.toContain('maxHeight: 760');
+    expect(freeChat).not.toContain('overflowY: "auto"');
   });
 });
