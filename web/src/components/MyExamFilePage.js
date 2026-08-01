@@ -38,6 +38,14 @@ const endOfScheduleDay = (value) => {
   return date;
 };
 
+const isScheduleEntryCurrent = (exam, now) => {
+  const registrationEnd = endOfScheduleDay(exam?.registrationEnd);
+  if (registrationEnd) return now <= registrationEnd;
+
+  const examEnd = endOfScheduleDay(exam?.date);
+  return Boolean(examEnd && now <= examEnd);
+};
+
 const getRegistrationStatus = (registrationStart, registrationEnd, now) => {
   if (!registrationStart || !registrationEnd) return "Date pending";
   if (now < registrationStart) return "Upcoming";
@@ -161,7 +169,7 @@ const MyExamFilePage = () => {
         registrationStart: startOfScheduleDay(exam.registrationStart),
         registrationEnd: endOfScheduleDay(exam.registrationEnd),
       }))
-      .filter(({ registrationEnd }) => !registrationEnd || now <= registrationEnd)
+      .filter(({ exam }) => isScheduleEntryCurrent(exam, now))
       .sort((a, b) => {
         const aTime = a.registrationStart?.getTime() ?? Number.MAX_SAFE_INTEGER;
         const bTime = b.registrationStart?.getTime() ?? Number.MAX_SAFE_INTEGER;
@@ -267,10 +275,7 @@ const MyExamFilePage = () => {
           const upcomingExams = (levelInfo.exams || [])
             .slice()
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            .filter((exam) => {
-              const registrationEnd = endOfScheduleDay(exam.registrationEnd);
-              return !registrationEnd || now <= registrationEnd;
-            });
+            .filter((exam) => isScheduleEntryCurrent(exam, now));
           const showLevelLink = !summaryLevel || levelInfo.level !== summaryLevel.level;
 
           return (
