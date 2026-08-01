@@ -29,3 +29,46 @@ if (panel.includes(videoStart)) {
   panel = `${panel.slice(0, startIndex)}${resourceNote}${panel.slice(endIndex + videoEnd.length)}`;
   fs.writeFileSync(panelPath, panel);
 }
+
+// PR #2323 constrained every course Goethe Free Chat to a viewport-height box
+// with its own transcript scroller. That kept the composer visible, but it also
+// cropped long A2-C1 conversations and forced learners to scroll inside a small
+// nested box. Restore normal document flow while keeping recording controls at
+// their natural content size.
+const freeChatPath = path.join(root, "web/src/components/GoetheFreeChatPage.js");
+let freeChat = fs.readFileSync(freeChatPath, "utf8");
+
+const fixedChatSection = `<section style={{ height: "min(760px, 76vh)", minHeight: 540, maxHeight: 760, overflow: "hidden", display: "grid", gridTemplateRows: "minmax(0, 1fr) auto", background: "#e5e7eb" }}>`;
+const originalChatSection = `<section style={{ minHeight: 540, display: "grid", gridTemplateRows: "1fr auto", background: "#e5e7eb" }}>`;
+const flowingChatSection = `<section data-goethe-free-chat-conversation="page-flow" style={{ minHeight: 540, display: "grid", gridTemplateRows: "auto auto", background: "#e5e7eb" }}>`;
+
+if (freeChat.includes(fixedChatSection)) {
+  freeChat = freeChat.replace(fixedChatSection, flowingChatSection);
+} else if (freeChat.includes(originalChatSection)) {
+  freeChat = freeChat.replace(originalChatSection, flowingChatSection);
+} else if (!freeChat.includes(flowingChatSection)) {
+  throw new Error("Could not restore Goethe Free Chat page-flow section.");
+}
+
+const fixedMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", minHeight: 0, alignContent: "start" }}>`;
+const originalMessageScroller = `<div style={{ padding: 16, display: "grid", gap: 12, overflowY: "auto", alignContent: "start" }}>`;
+const flowingMessages = `<div data-goethe-free-chat-messages="page-flow" style={{ padding: 16, display: "grid", gap: 12, overflow: "visible", alignContent: "start" }}>`;
+
+if (freeChat.includes(fixedMessageScroller)) {
+  freeChat = freeChat.replace(fixedMessageScroller, flowingMessages);
+} else if (freeChat.includes(originalMessageScroller)) {
+  freeChat = freeChat.replace(originalMessageScroller, flowingMessages);
+} else if (!freeChat.includes(flowingMessages)) {
+  throw new Error("Could not restore Goethe Free Chat message page flow.");
+}
+
+const originalRecordControls = `<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857" }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
+const stableRecordControls = `<div data-goethe-free-chat-record-controls="stable" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>\n              <button type="button" style={{ ...styles.primaryButton, background: "#047857", alignSelf: "flex-start", flex: "0 0 auto", minHeight: 44 }} onClick={isRecording ? stopRecording : startRecording} disabled={loading || isEnded}>`;
+
+if (freeChat.includes(originalRecordControls)) {
+  freeChat = freeChat.replace(originalRecordControls, stableRecordControls);
+} else if (!freeChat.includes(stableRecordControls)) {
+  throw new Error("Could not stabilize Goethe Free Chat recording controls.");
+}
+
+fs.writeFileSync(freeChatPath, freeChat);
