@@ -225,7 +225,7 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
     videoResources: [
       {
         key: "a1-day21-weather-ai-video",
-        chapter: "14",
+        chapter: "13",
         title: "A1 Day 21 · Weather · AI video",
         description:
           "AI video lesson for describing the weather and answering simple weather questions in German.",
