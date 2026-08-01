@@ -2,6 +2,7 @@ import React, { Children, isValidElement } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
+import A1Day21WeatherResources from "./A1Day21WeatherResources";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
@@ -110,6 +111,7 @@ const A1TutorMarkedWorkbookShell = ({
       <p style={{ ...styles.card, margin: 0 }}>
         {assignmentIntro || `Complete every section, then submit ${assignment.assignmentKey}.`}
       </p>
+      {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       <A1TutorMarkedOverviewGuidance />
       {overviewNodes}
     </div>
