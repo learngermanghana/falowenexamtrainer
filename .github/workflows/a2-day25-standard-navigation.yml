@@ -1,0 +1,42 @@
+name: A2 Day 25 standard navigation
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A2Day25TagesablaufWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGuidance.js"
+      - "web/src/components/A2Day25StandardNavigation.test.js"
+      - "scripts/patchA2Day25StandardNavigation.mjs"
+      - "web/package.json"
+      - ".github/workflows/a2-day25-standard-navigation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  navigation-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test Day 25 standard navigation
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A2Day25StandardNavigation.test.js
+
+      - name: Build web app
+        working-directory: web
+        run: npm run build
