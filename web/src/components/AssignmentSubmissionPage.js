@@ -32,12 +32,16 @@ import {
   setDoc,
   where,
 } from "../firebase";
+import {
+  DEFAULT_ASSIGNMENT_SUBMISSION_WORDS,
+  buildAssignmentSubmissionWordError,
+  getAssignmentSubmissionWordMinimum,
+} from "../utils/assignmentSubmissionWordMinimum";
 
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 20;
-const MIN_SUBMISSION_WORDS = 20;
 const MIN_RESUBMISSION_IMPROVEMENT_WORDS = 8;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
 const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
@@ -1029,6 +1033,14 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return normalizeLevel(selectedAssignmentEntry?.level || selectedSubmitLevel);
   }, [selectedAssignmentEntry?.level, selectedSubmitLevel]);
 
+  const minimumSubmissionWords = useMemo(
+    () => getAssignmentSubmissionWordMinimum({
+      level: selectedAssignmentLevel,
+      chapter: selectedAssignmentChapter,
+    }),
+    [selectedAssignmentChapter, selectedAssignmentLevel]
+  );
+
   const selectedCanonicalAssignmentKey = useMemo(
     () =>
       form.assignmentTitle
@@ -2004,6 +2016,21 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
+    const submissionWordCount = countWords(form.submissionText);
+    if (submissionWordCount < minimumSubmissionWords) {
+      setStatus({
+        loading: false,
+        error: buildAssignmentSubmissionWordError({
+          wordCount: submissionWordCount,
+          minimumWords: minimumSubmissionWords,
+          level: selectedAssignmentLevel,
+          chapter: selectedAssignmentChapter,
+        }),
+        success: "",
+      });
+      return;
+    }
+
     if (form.submissionText.trim().length > dynamicMaxSubmissionCharacters) {
       setStatus({
         loading: false,
@@ -2660,6 +2687,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 autoCapitalize="sentences"
                 autoCorrect="off"
                 spellCheck={false}
+                data-minimum-words={minimumSubmissionWords}
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 200 }}
                 placeholder={
@@ -2671,7 +2699,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 }
                 disabled={isSelectedLocked || !hasSelectedAssignment}
               />
-              <WordProgress value={form.submissionText} minimumWords={MIN_SUBMISSION_WORDS} />
+              <WordProgress value={form.submissionText} minimumWords={minimumSubmissionWords} />
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
                 {GERMAN_SPECIAL_CHARACTERS.map((character) => (
@@ -2855,7 +2883,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 placeholder="Paste your corrected letter/text here."
                 disabled={resubmissionLimitReached}
               />
-              <WordProgress value={resubmissionText} minimumWords={MIN_SUBMISSION_WORDS} />
+              <WordProgress value={resubmissionText} minimumWords={DEFAULT_ASSIGNMENT_SUBMISSION_WORDS} />
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
               </span>
