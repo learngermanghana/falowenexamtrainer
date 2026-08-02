@@ -23,4 +23,6 @@ regression = regression.replace(
 );
 fs.writeFileSync(regressionPath, regression);
 
+await import("./patchA2Day25StandardNavigation.mjs");
+
 console.log("Removed the A2/B1 floating Continue and Submit mobile action bar.");
