@@ -61,6 +61,6 @@
     "build": "vite build",
     "test": "jest",
     "test:ci": "jest --runInBand",
-    "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs"
+    "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs && node ../scripts/patchA2Day25StandardNavigation.mjs"
   }
 }
