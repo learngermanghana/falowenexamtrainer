@@ -1,5 +1,5 @@
 const COMPLETED_TUTOR_STATUSES = new Set(["passed", "submitted", "resubmitted"]);
-const PINNED_ORIENTATION_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
+const ORIENTATION_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
 
 const isMilestoneEntry = (entry = {}) =>
   Boolean(entry?.isMilestone || entry?.completion || /course completed/i.test(String(entry?.topic || "")));
@@ -14,16 +14,18 @@ const isTutorMarkedEntry = (entry = {}) => {
 
 const getEntryLevel = (entry = {}) => {
   const explicit = String(entry?.level || entry?.courseLevel || entry?.course || "").trim().toUpperCase();
-  if (PINNED_ORIENTATION_LEVELS.has(explicit)) return explicit;
+  if (ORIENTATION_LEVELS.has(explicit)) return explicit;
   const assignmentToken = `${entry?.assignmentKey || ""} ${entry?.assignmentId || ""} ${entry?.assignment_id || ""}`.toUpperCase();
   return assignmentToken.match(/\b(A1|A2|B1|B2|C1)\b/)?.[1] || "";
 };
 
+// Kept for compatibility with older callers. Day 0 is now part of the normal
+// Week 1 course sequence and is no longer skipped by next-lesson progression.
 export const isPinnedCourseBookOrientationEntry = (entry = {}) => {
   const day = Number(entry?.displayDay ?? entry?.day);
   if (day !== 0) return false;
   const level = getEntryLevel(entry);
-  return !level || PINNED_ORIENTATION_LEVELS.has(level);
+  return !level || ORIENTATION_LEVELS.has(level);
 };
 
 export const isCourseBookEntryComplete = (entry = {}, practiceProgress = {}) => {
@@ -35,7 +37,6 @@ export const isCourseBookEntryComplete = (entry = {}, practiceProgress = {}) => 
 export const getNextCourseBookEntry = (entries = [], practiceProgress = {}) =>
   entries.find(
     (entry) =>
-      !isPinnedCourseBookOrientationEntry(entry) &&
       !isMilestoneEntry(entry) &&
       !isCourseBookEntryComplete(entry, practiceProgress)
   ) || null;
