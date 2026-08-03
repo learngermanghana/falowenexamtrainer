@@ -40,7 +40,7 @@ describe("Course Book Day 0 orientation video", () => {
       "src",
       "https://www.youtube-nocookie.com/embed/qPwxBYlu3CE"
     );
-    expect(document.querySelector("section > [data-course-book-orientation-video='true']")).toBeNull();
+    expect(document.querySelector('section[data-course-book-orientation-video="true"]')).toBeNull();
   });
 
   it("does not create duplicate panels when reapplied", () => {
