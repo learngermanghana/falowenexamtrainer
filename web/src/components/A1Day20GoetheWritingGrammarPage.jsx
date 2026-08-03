@@ -68,14 +68,15 @@ const formRowStyle = {
   borderBottom: "1px solid #e2e8f0",
 };
 
-const letterStyle = {
+const taskStyle = {
   margin: 0,
-  whiteSpace: "pre-line",
   lineHeight: 1.8,
   background: "#ffffff",
   border: "1px solid #e2e8f0",
   borderRadius: 12,
   padding: 14,
+  display: "grid",
+  gap: 12,
 };
 
 const FormRow = ({ label, value }) => (
@@ -212,13 +213,13 @@ const A1Day20GoetheWritingGrammarPage = () => (
     </section>
 
     <section style={sectionStyle} aria-labelledby="formal-informal-comparison-heading">
-      <span style={labelStyle}>Teil 2 samples</span>
+      <span style={labelStyle}>Teil 2 – Schreibaufgaben</span>
       <h2 id="formal-informal-comparison-heading" style={{ margin: 0 }}>
-        Formal and informal letters: see the difference
+        Formelle und informelle Schreibaufgaben
       </h2>
       <p style={paragraphStyle}>
-        The structure is similar, but the recipient, pronouns, greeting, tone, closing, and name are
-        different.
+        Üben Sie beide Aufgaben. Schreiben Sie zu jedem Punkt einen klaren Satz und verwenden Sie
+        die passende Anrede und den passenden Gruß.
       </p>
 
       <div style={{ overflowX: "auto" }} aria-label="Formal and informal letter comparison">
@@ -246,24 +247,54 @@ const A1Day20GoetheWritingGrammarPage = () => (
       </div>
 
       <div style={gridStyle}>
-        <article style={{ ...cardStyle, borderColor: "#fdba74", background: "#fff7ed" }}>
+        <article
+          style={{ ...cardStyle, borderColor: "#fdba74", background: "#fff7ed" }}
+          aria-label="Formelle Schreibaufgabe"
+        >
           <span style={{ ...labelStyle, background: "#ffedd5", color: "#9a3412" }}>
-            Formal sample
+            Formelle Aufgabe
           </span>
-          <h3 style={{ margin: 0 }}>E-mail to a language school</h3>
-          <p style={letterStyle}>
-            {`Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich mich für Ihren Deutschkurs interessiere. Wann beginnt der nächste Kurs? Wie viel kostet er? Gibt es Unterricht am Abend? Bitte senden Sie mir weitere Informationen.\n\nMit freundlichen Grüßen\nMia Mensah`}
-          </p>
+          <h3 style={{ margin: 0 }}>E-Mail an eine Sprachschule</h3>
+          <div style={taskStyle}>
+            <p style={paragraphStyle}>
+              Sie möchten einen Deutschkurs besuchen. Schreiben Sie eine E-Mail an eine
+              Sprachschule.
+            </p>
+            <strong>Schreiben Sie etwas zu:</strong>
+            <ul style={listStyle}>
+              <li>Wann beginnt der nächste Kurs?</li>
+              <li>Wie viel kostet der Kurs?</li>
+              <li>Gibt es einen Abendkurs?</li>
+            </ul>
+            <p style={paragraphStyle}>
+              Schreiben Sie circa 30 Wörter. Schreiben Sie eine Anrede und einen Gruß.
+            </p>
+          </div>
         </article>
 
-        <article style={{ ...cardStyle, borderColor: "#86efac", background: "#f0fdf4" }}>
+        <article
+          style={{ ...cardStyle, borderColor: "#86efac", background: "#f0fdf4" }}
+          aria-label="Informelle Schreibaufgabe"
+        >
           <span style={{ ...labelStyle, background: "#dcfce7", color: "#166534" }}>
-            Informal sample
+            Informelle Aufgabe
           </span>
-          <h3 style={{ margin: 0 }}>Invitation to a friend</h3>
-          <p style={letterStyle}>
-            {`Liebe Anna,\n\nwie geht es dir? Ich schreibe dir, weil ich am Samstag Geburtstag habe. Die Feier beginnt um 18 Uhr bei mir zu Hause. Kannst du kommen? Bitte bring etwas zu trinken mit.\n\nLiebe Grüße\nMia`}
-          </p>
+          <h3 style={{ margin: 0 }}>E-Mail an eine Freundin</h3>
+          <div style={taskStyle}>
+            <p style={paragraphStyle}>
+              Sie haben am Samstag Geburtstag und möchten Ihre Freundin Anna einladen. Schreiben
+              Sie eine E-Mail an Anna.
+            </p>
+            <strong>Schreiben Sie etwas zu:</strong>
+            <ul style={listStyle}>
+              <li>Warum schreiben Sie?</li>
+              <li>Wann und wo ist die Feier?</li>
+              <li>Was soll Anna mitbringen?</li>
+            </ul>
+            <p style={paragraphStyle}>
+              Schreiben Sie circa 30 Wörter. Schreiben Sie eine Anrede und einen Gruß.
+            </p>
+          </div>
         </article>
       </div>
 
