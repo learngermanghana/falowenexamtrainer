@@ -9,7 +9,7 @@ const LEVEL_ORIENTATION_CONFIG = {
       "This video explains how to start A1, use the Course Book and complete Day 0 before the first real lesson.",
   },
   A2: {
-    videoId: "ORX4KELTPEQ",
+    videoId: "kV6BHHfZfPs",
     title: "A2 orientation video",
     description:
       "This video explains how to use A2 Course Book, Falowen Radio, workbooks and submissions. Watch it before continuing to Day 1.",
