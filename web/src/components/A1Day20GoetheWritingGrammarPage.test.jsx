@@ -26,17 +26,28 @@ describe("A1 Day 20 Goethe writing grammar page", () => {
     expect(screen.getByText(/Teil 1 is a form, not a letter/i)).toBeInTheDocument();
   });
 
-  test("shows a completed form with exact personal and course details", () => {
+  test("shows a German exam-style form exercise with three numbered blanks", () => {
     render(<A1Day20GoetheWritingGrammarPage />);
 
-    const completedForm = screen.getByRole("article", { name: "Completed form sample" });
-    expect(completedForm).toHaveTextContent("Familienname");
-    expect(completedForm).toHaveTextContent("Mensah");
-    expect(completedForm).toHaveTextContent("Geburtsdatum");
-    expect(completedForm).toHaveTextContent("14.06.1998");
-    expect(completedForm).toHaveTextContent("kwame.mensah@example.com");
-    expect(completedForm).toHaveTextContent("Abendkurs");
-    expect(completedForm).toHaveTextContent("12.08.2026");
+    expect(
+      screen.getByRole("heading", {
+        name: "Formular ausfüllen: lesen, finden und übertragen",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesen Sie die Informationen\. Ergänzen Sie die Felder/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Kwame Mensah wurde am 14\. Juni 1998 geboren/i)).toBeInTheDocument();
+
+    const formExercise = screen.getByRole("article", { name: "Formularübung" });
+    expect(formExercise).toHaveTextContent("Familienname");
+    expect(formExercise).toHaveTextContent("1. ____________________");
+    expect(formExercise).toHaveTextContent("Geburtsdatum");
+    expect(formExercise).toHaveTextContent("2. ____________________");
+    expect(formExercise).toHaveTextContent("kwame.mensah@example.com");
+    expect(formExercise).toHaveTextContent("Abendkurs");
+    expect(formExercise).toHaveTextContent("Kursbeginn");
+    expect(formExercise).toHaveTextContent("3. ____________________");
   });
 
   test("shows complete formal and informal samples and their language differences", () => {
