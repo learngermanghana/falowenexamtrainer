@@ -5,41 +5,37 @@ const LEVEL_ORIENTATION_CONFIG = {
   A1: {
     videoId: "qPwxBYlu3CE",
     title: "A1 orientation video",
-    tutorialUrl: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
     description:
       "This video explains how to start A1, use the Course Book and complete Day 0 before the first real lesson.",
   },
   A2: {
     videoId: "ORX4KELTPEQ",
     title: "A2 orientation video",
-    tutorialUrl: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
     description:
-      "This video explains how to use A2 Course Book, Falowen Radio, workbooks and submissions. Watch it first, then open the Day 0 tutorial.",
+      "This video explains how to use A2 Course Book, Falowen Radio, workbooks and submissions. Watch it before continuing to Day 1.",
   },
   B1: {
     videoId: ["QMWj", "_N6ncwI"].join(""),
     title: "B1 orientation video",
-    tutorialUrl: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
     description:
       "This video explains how to continue with B1, use the Course Book, prepare speaking, write better answers and submit workbook tasks.",
   },
   B2: {
     videoId: "AH2dPdqjfTo",
     title: "B2 self-learning onboarding video",
-    tutorialUrl: "/campus/course/b2-day-0-self-learning-orientation-workbook",
     description:
       "This video explains how to use B2 self-learning, Falowen AI, Course Book routines and independent workbook practice.",
   },
   C1: {
     videoId: "",
     title: "C1 orientation tutorial",
-    tutorialUrl: "/campus/course/c1-day-0-progression-workbook",
     description:
-      "Open the C1 Day 0 progression tutorial first. Add a C1 orientation video later when it is ready.",
+      "Complete the C1 Day 0 progression tutorial before continuing. The orientation video will be added here when it is ready.",
   },
 };
 
-const CARD_ATTR = "data-course-book-orientation-video";
+const HOST_ATTR = "data-course-book-orientation-video";
+const PANEL_ATTR = "data-course-book-orientation-panel";
 
 const normalizeText = (value = "") =>
   String(value || "")
@@ -66,24 +62,32 @@ const readSelectedLevel = (hero) => {
   return text.match(/\b(A1|A2|B1|B2|C1)\b/)?.[1] || "";
 };
 
+const isDayZeroLessonCard = (article) => {
+  if (!article?.querySelectorAll) return false;
+  return [...article.querySelectorAll("div, span, p, strong")].some((element) =>
+    /^day\s*0(?:\s|$)/i.test(normalizeText(element.textContent))
+  );
+};
+
+const findDayZeroLessonCard = (root = document) =>
+  [...(root.querySelectorAll?.("article") || [])].find(isDayZeroLessonCard) || null;
+
 const setStyles = (element, styles) => Object.assign(element.style, styles);
 
 const getVideoUrl = (videoId = "") => (videoId ? `https://youtu.be/${videoId}` : "");
 const getEmbedUrl = (videoId = "") => (videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : "");
 
-const createButtonLink = ({ href, text, primary = false }) => {
+const createButtonLink = ({ href, text }) => {
   const link = document.createElement("a");
   link.href = href;
   link.textContent = text;
-  if (!href.startsWith("/")) {
-    link.target = "_blank";
-    link.rel = "noreferrer";
-  }
+  link.target = "_blank";
+  link.rel = "noreferrer";
   setStyles(link, {
-    background: primary ? "#2563eb" : "#ffffff",
-    border: primary ? "1px solid #2563eb" : "1px solid #bfdbfe",
+    background: "#ffffff",
+    border: "1px solid #bfdbfe",
     borderRadius: "999px",
-    color: primary ? "#ffffff" : "#1d4ed8",
+    color: "#1d4ed8",
     fontWeight: "900",
     padding: "10px 14px",
     textDecoration: "none",
@@ -91,15 +95,14 @@ const createButtonLink = ({ href, text, primary = false }) => {
   return link;
 };
 
-const createOrientationCard = (level, config) => {
+const createOrientationPanel = (level, config) => {
   const wrapper = document.createElement("section");
-  wrapper.setAttribute(CARD_ATTR, "true");
+  wrapper.setAttribute(PANEL_ATTR, "true");
   wrapper.setAttribute("data-course-book-orientation-level", level);
   setStyles(wrapper, {
     border: "1px solid #bfdbfe",
-    borderRadius: "18px",
+    borderRadius: "16px",
     background: "linear-gradient(135deg, #eff6ff, #ffffff)",
-    boxShadow: "0 16px 34px rgba(37, 99, 235, 0.12)",
     display: "grid",
     gap: "12px",
     padding: "14px",
@@ -109,7 +112,7 @@ const createOrientationCard = (level, config) => {
   setStyles(headingWrap, { display: "grid", gap: "4px" });
 
   const eyebrow = document.createElement("span");
-  eyebrow.textContent = `${level} orientation · start here`;
+  eyebrow.textContent = `${level} · Day 0`;
   setStyles(eyebrow, {
     color: "#1d4ed8",
     fontSize: "12px",
@@ -120,8 +123,8 @@ const createOrientationCard = (level, config) => {
 
   const heading = document.createElement("strong");
   heading.textContent = config.videoId
-    ? "Watch this before you open the tutorial"
-    : "Open the tutorial before you continue";
+    ? "Watch the Day 0 orientation video"
+    : "Complete Day 0 before continuing";
   setStyles(heading, { color: "#0f172a", fontSize: "18px" });
 
   const description = document.createElement("p");
@@ -142,7 +145,7 @@ const createOrientationCard = (level, config) => {
       position: "relative",
       width: "100%",
       paddingTop: "56.25%",
-      borderRadius: "16px",
+      borderRadius: "14px",
       overflow: "hidden",
       background: "#000000",
       border: "1px solid #93c5fd",
@@ -163,9 +166,14 @@ const createOrientationCard = (level, config) => {
     });
     videoShell.appendChild(frame);
     wrapper.appendChild(videoShell);
+
+    const actionRow = document.createElement("div");
+    setStyles(actionRow, { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" });
+    actionRow.appendChild(createButtonLink({ href: getVideoUrl(config.videoId), text: "Open video on YouTube" }));
+    wrapper.appendChild(actionRow);
   } else {
     const notice = document.createElement("div");
-    notice.textContent = `${level} orientation video will be added later. Use the Day 0 tutorial first.`;
+    notice.textContent = `${level} orientation video will be added later. Complete the Day 0 lesson first.`;
     setStyles(notice, {
       border: "1px solid #fde68a",
       borderRadius: "14px",
@@ -178,45 +186,52 @@ const createOrientationCard = (level, config) => {
     wrapper.appendChild(notice);
   }
 
-  const actionRow = document.createElement("div");
-  setStyles(actionRow, { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" });
-  actionRow.appendChild(createButtonLink({ href: config.tutorialUrl, text: "Open Day 0 tutorial", primary: true }));
-  if (config.videoId) actionRow.appendChild(createButtonLink({ href: getVideoUrl(config.videoId), text: "Open video on YouTube" }));
-
-  wrapper.appendChild(actionRow);
   return wrapper;
+};
+
+const clearOrientationHosts = (root, keepHost = null) => {
+  root.querySelectorAll?.(`[${HOST_ATTR}="true"]`).forEach((element) => {
+    if (element === keepHost) return;
+    if (element.tagName === "ARTICLE") element.removeAttribute(HOST_ATTR);
+    else element.remove();
+  });
+
+  root.querySelectorAll?.(`[${PANEL_ATTR}="true"]`).forEach((panel) => {
+    if (!keepHost || panel.closest("article") !== keepHost) panel.remove();
+  });
 };
 
 export const applyCourseBookOrientationVideo = (root = document) => {
   if (!root?.querySelector || typeof document === "undefined") return 0;
 
-  const existing = root.querySelector(`[${CARD_ATTR}="true"]`);
   if (normalizePath() !== "/campus/course") {
-    existing?.remove();
+    clearOrientationHosts(root);
     return 0;
   }
 
   const hero = findCourseBookHero(root);
-  if (!hero) {
-    existing?.remove();
-    return 0;
-  }
-
   const selectedLevel = readSelectedLevel(hero);
   const config = LEVEL_ORIENTATION_CONFIG[selectedLevel];
-  if (!config) {
-    existing?.remove();
+  const dayZeroCard = findDayZeroLessonCard(root);
+
+  if (!hero || !config || !dayZeroCard) {
+    clearOrientationHosts(root);
     return 0;
   }
 
-  if (existing?.getAttribute("data-course-book-orientation-level") !== selectedLevel) {
-    existing?.remove();
-  } else if (existing) {
-    if (existing.previousElementSibling !== hero) hero.insertAdjacentElement("afterend", existing);
-    return 1;
+  clearOrientationHosts(root, dayZeroCard);
+  if (dayZeroCard.getAttribute(HOST_ATTR) !== "true") {
+    dayZeroCard.setAttribute(HOST_ATTR, "true");
   }
 
-  hero.insertAdjacentElement("afterend", createOrientationCard(selectedLevel, config));
+  const existingPanel = dayZeroCard.querySelector(`[${PANEL_ATTR}="true"]`);
+  if (existingPanel?.getAttribute("data-course-book-orientation-level") === selectedLevel) return 1;
+  existingPanel?.remove();
+
+  const panel = createOrientationPanel(selectedLevel, config);
+  const firstContentBlock = dayZeroCard.firstElementChild;
+  if (firstContentBlock) firstContentBlock.insertAdjacentElement("afterend", panel);
+  else dayZeroCard.appendChild(panel);
   return 1;
 };
 
@@ -246,6 +261,7 @@ export default function A2CourseBookOrientationVideoInjector() {
       document.removeEventListener("change", schedule, true);
       document.removeEventListener("click", schedule, true);
       observer.disconnect();
+      clearOrientationHosts(document);
     };
   }, [location.pathname, location.search]);
 
@@ -256,5 +272,7 @@ export const __private__ = {
   LEVEL_ORIENTATION_CONFIG,
   findCourseBookHero,
   readSelectedLevel,
+  isDayZeroLessonCard,
+  findDayZeroLessonCard,
   applyCourseBookOrientationVideo,
 };
