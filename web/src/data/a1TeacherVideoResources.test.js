@@ -50,6 +50,40 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 
+  test("Day 3 Chapter 1.2 restores its teacher lecture in the chapter hub", () => {
+    expect(getA1TeacherVideoResources(3)).toEqual([
+      expect.objectContaining({
+        chapter: "1.2",
+        topic: "Personal Information, Articles, Adjectives and W-Questions",
+        url: "https://youtu.be/iZDv1rcYWsQ",
+      }),
+    ]);
+
+    const lesson = normalizeLesson(
+      {
+        day: 3,
+        chapter: "1.2",
+        lesen_hören: { chapter: "1.2" },
+      },
+      "A1"
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "1.2",
+        url: "https://youtu.be/iZDv1rcYWsQ",
+      })
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: "a1-day3-chapter-1-2-teacher-video",
+          url: "https://youtu.be/iZDv1rcYWsQ",
+        }),
+      ])
+    );
+  });
+
   test("Day 13 chapter 3.5 exposes the new recording as Teacher Video 2", () => {
     const configuredVideos = getA1TeacherVideoResources(13).filter(
       (video) => video.chapter === "3.5"
