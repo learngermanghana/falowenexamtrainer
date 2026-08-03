@@ -8,6 +8,7 @@ describe("Course Book Day 0 orientation video", () => {
         <h2>Course Book</h2>
         <select aria-label="Level">
           <option value="A1" selected>A1</option>
+          <option value="A2">A2</option>
         </select>
       </section>
       <section>
@@ -41,6 +42,21 @@ describe("Course Book Day 0 orientation video", () => {
       "https://www.youtube-nocookie.com/embed/qPwxBYlu3CE"
     );
     expect(document.querySelector('section[data-course-book-orientation-video="true"]')).toBeNull();
+  });
+
+  it("uses the approved A2 Day 0 orientation video", () => {
+    const levelSelect = document.querySelector('select[aria-label="Level"]');
+    levelSelect.value = "A2";
+
+    expect(applyCourseBookOrientationVideo(document)).toBe(1);
+
+    const panel = document.querySelector('[data-course-book-orientation-panel="true"]');
+    expect(panel).toHaveAttribute("data-course-book-orientation-level", "A2");
+    expect(panel.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/kV6BHHfZfPs"
+    );
+    expect(panel.querySelector('a[href="https://youtu.be/kV6BHHfZfPs"]')).not.toBeNull();
   });
 
   it("does not create duplicate panels when reapplied", () => {
