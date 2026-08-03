@@ -20,8 +20,12 @@ describe("course book next lesson progression", () => {
     { day: 3, assignmentKey: "A1-1.2", topic: "Introducing Yourself", isTutorMarked: true, status: "notStarted", isMilestone: false },
   ];
 
+  const orientationComplete = {
+    "A1-DAY-0-PRACTICE-ORIENTATION": { completed: true },
+  };
+
   it.each(["A1", "A2", "B1", "B2", "C1"])(
-    "recognizes the pinned %s Day 0 orientation entry",
+    "recognizes the %s Day 0 orientation entry",
     (level) => {
       expect(
         isPinnedCourseBookOrientationEntry({
@@ -33,18 +37,32 @@ describe("course book next lesson progression", () => {
     }
   );
 
-  it("starts the learning journey with Day 1 instead of the pinned Day 0 tutorial", () => {
+  it("starts the learning journey with Day 0", () => {
     const firstIncomplete = entries.map((entry) => ({ ...entry, status: "notStarted" }));
-    expect(getNextCourseBookEntry(firstIncomplete, {})).toMatchObject({ day: 1, assignmentKey: "A1-0.1" });
+    expect(getNextCourseBookEntry(firstIncomplete, {})).toMatchObject({
+      day: 0,
+      assignmentKey: "A1-DAY-0-PRACTICE-ORIENTATION",
+    });
+  });
+
+  it("continues to Day 1 after Day 0 is completed", () => {
+    const firstIncomplete = entries.map((entry) => ({ ...entry, status: "notStarted" }));
+    expect(getNextCourseBookEntry(firstIncomplete, orientationComplete)).toMatchObject({
+      day: 1,
+      assignmentKey: "A1-0.1",
+    });
   });
 
   it("stops at an incomplete self-study lesson", () => {
-    expect(getNextCourseBookEntry(entries, {})).toMatchObject({ assignmentKey: "A1-DAY-3-PRACTICE-1.1" });
+    expect(getNextCourseBookEntry(entries, orientationComplete)).toMatchObject({ assignmentKey: "A1-DAY-3-PRACTICE-1.1" });
     expect(isCourseBookEntryComplete(entries[2], {})).toBe(false);
   });
 
   it("unlocks the next assignment after self-study is marked complete", () => {
-    const practiceProgress = { "A1-DAY-3-PRACTICE-1.1": { completed: true } };
+    const practiceProgress = {
+      ...orientationComplete,
+      "A1-DAY-3-PRACTICE-1.1": { completed: true },
+    };
     expect(isCourseBookEntryComplete(entries[2], practiceProgress)).toBe(true);
     expect(getNextCourseBookEntry(entries, practiceProgress)).toMatchObject({ assignmentKey: "A1-1.2" });
   });

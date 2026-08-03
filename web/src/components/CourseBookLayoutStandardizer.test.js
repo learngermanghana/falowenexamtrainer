@@ -20,15 +20,18 @@ describe("Course Book layout standardizer", () => {
     expect(source).toContain('normalizeText(button.textContent) === "submit"');
   });
 
-  it("keeps Day 0 pinned and removes its duplicate weekly card from A1 through C1", () => {
+  it("keeps Day 0 inside Week 1 and places the orientation video in that lesson card", () => {
     const layout = read("CourseBookLayoutStandardizer.js");
+    const injector = read("A2CourseBookOrientationVideoInjector.js");
+    const courseTab = read("CourseTab.js");
     const progression = read("../utils/courseBookProgression.js");
 
-    expect(layout).toContain('new Set(["A1", "A2", "B1", "B2", "C1"])');
-    expect(layout).toContain("hidePinnedDayZeroLessonCards(document)");
-    expect(layout).toContain('data-course-book-orientation-video="true"');
-    expect(layout).toContain('data-falowen-pinned-day-zero-hidden');
-    expect(progression).toContain("!isPinnedCourseBookOrientationEntry(entry)");
+    expect(courseTab).toContain("Math.max(1, Math.ceil(numericDay / 5))");
+    expect(injector).toContain('const HOST_ATTR = "data-course-book-orientation-video"');
+    expect(injector).toContain('dayZeroCard.setAttribute(HOST_ATTR, "true")');
+    expect(injector).toContain('firstContentBlock.insertAdjacentElement("afterend", panel)');
+    expect(layout).toContain('article.closest(\'[data-course-book-orientation-video="true"]\')');
+    expect(progression).not.toContain("!isPinnedCourseBookOrientationEntry(entry)");
   });
 
   it("is mounted beside the existing shared A1 navigation service", () => {
