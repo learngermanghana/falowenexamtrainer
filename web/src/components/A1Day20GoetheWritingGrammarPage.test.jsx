@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import A1Day20GoetheWritingGrammarPage from "./A1Day20GoetheWritingGrammarPage";
 
 jest.mock("./LetterWritingIntroPage", () => ({
@@ -50,22 +50,29 @@ describe("A1 Day 20 Goethe writing grammar page", () => {
     expect(formExercise).toHaveTextContent("3. ____________________");
   });
 
-  test("shows complete formal and informal samples and their language differences", () => {
+  test("shows formal and informal writing questions instead of completed samples", () => {
     render(<A1Day20GoetheWritingGrammarPage />);
 
     expect(
-      screen.getByRole("heading", {
-        name: "Formal and informal letters: see the difference",
-      }),
+      screen.getByRole("heading", { name: "Formelle und informelle Schreibaufgaben" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getAllByText("Sehr geehrte Damen und Herren,", { exact: false }).length,
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText("Mit freundlichen Grüßen", { exact: false }).length,
-    ).toBeGreaterThan(0);
-    expect(screen.getAllByText("Liebe Anna,", { exact: false }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Liebe Grüße", { exact: false }).length).toBeGreaterThan(0);
+
+    const formalTask = screen.getByRole("article", { name: "Formelle Schreibaufgabe" });
+    expect(within(formalTask).getByRole("heading", { name: "E-Mail an eine Sprachschule" })).toBeInTheDocument();
+    expect(formalTask).toHaveTextContent("Wann beginnt der nächste Kurs?");
+    expect(formalTask).toHaveTextContent("Wie viel kostet der Kurs?");
+    expect(formalTask).toHaveTextContent("Gibt es einen Abendkurs?");
+    expect(formalTask).toHaveTextContent("Schreiben Sie circa 30 Wörter");
+    expect(formalTask).not.toHaveTextContent("ich schreibe Ihnen");
+
+    const informalTask = screen.getByRole("article", { name: "Informelle Schreibaufgabe" });
+    expect(within(informalTask).getByRole("heading", { name: "E-Mail an eine Freundin" })).toBeInTheDocument();
+    expect(informalTask).toHaveTextContent("Warum schreiben Sie?");
+    expect(informalTask).toHaveTextContent("Wann und wo ist die Feier?");
+    expect(informalTask).toHaveTextContent("Was soll Anna mitbringen?");
+    expect(informalTask).toHaveTextContent("Schreiben Sie circa 30 Wörter");
+    expect(informalTask).not.toHaveTextContent("wie geht es dir");
+
     expect(screen.getAllByText(/Sie, Ihnen, Ihr\/Ihre/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/du, dir, dich, dein\/deine/i).length).toBeGreaterThan(0);
   });
