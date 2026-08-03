@@ -160,47 +160,53 @@ const A1Day20GoetheWritingGrammarPage = () => (
     </section>
 
     <section style={sectionStyle} aria-labelledby="form-sample-heading">
-      <span style={labelStyle}>Teil 1 sample</span>
+      <span style={labelStyle}>Teil 1 – Beispiel</span>
       <h2 id="form-sample-heading" style={{ margin: 0 }}>
-        Form filling: read, find, and copy
+        Formular ausfüllen: lesen, finden und übertragen
       </h2>
+      <p style={paragraphStyle}>
+        Lesen Sie die Informationen. Ergänzen Sie die Felder <strong>1–3</strong>. So kann Teil 1
+        in der Goethe-A1-Prüfung aussehen.
+      </p>
       <div style={gridStyle}>
         <article style={cardStyle}>
-          <h3 style={{ margin: 0 }}>Information given</h3>
+          <h3 style={{ margin: 0 }}>Informationen</h3>
           <p style={paragraphStyle}>
-            Kwame Mensah was born on 14 June 1998. He lives at 24 Market Road in Accra. His telephone
-            number is 020 123 4567 and his e-mail address is kwame.mensah@example.com. He wants to
-            attend a German A1 evening course beginning on 12 August 2026.
+            Kwame Mensah wurde am 14. Juni 1998 geboren. Er wohnt in Accra. Seine Adresse ist
+            24 Market Road. Seine Telefonnummer lautet 020 123 4567 und seine E-Mail-Adresse ist
+            kwame.mensah@example.com. Er möchte ab dem 12. August 2026 einen Deutschkurs A1 am
+            Abend besuchen.
           </p>
         </article>
 
-        <article style={{ ...cardStyle, background: "#ffffff" }} aria-label="Completed form sample">
-          <h3 style={{ margin: 0 }}>Completed form</h3>
+        <article style={{ ...cardStyle, background: "#ffffff" }} aria-label="Formularübung">
+          <h3 style={{ margin: 0 }}>Formular</h3>
           <div>
-            <FormRow label="Familienname" value="Mensah" />
+            <FormRow label="Familienname" value="1. ____________________" />
             <FormRow label="Vorname" value="Kwame" />
-            <FormRow label="Geburtsdatum" value="14.06.1998" />
+            <FormRow label="Geburtsdatum" value="2. ____________________" />
             <FormRow label="Straße / Hausnummer" value="24 Market Road" />
             <FormRow label="Wohnort" value="Accra" />
             <FormRow label="Telefon" value="020 123 4567" />
             <FormRow label="E-Mail" value="kwame.mensah@example.com" />
             <FormRow label="Kurs" value="Deutsch A1" />
             <FormRow label="Kurszeit" value="Abendkurs" />
-            <FormRow label="Kursbeginn" value="12.08.2026" />
+            <FormRow label="Kursbeginn" value="3. ____________________" />
           </div>
         </article>
       </div>
 
       <div style={cardStyle}>
-        <h3 style={{ margin: 0 }}>Form-filling rules</h3>
+        <h3 style={{ margin: 0 }}>Tipps zum Ausfüllen</h3>
         <ul style={listStyle}>
           <li>
-            <strong>Familienname</strong> means surname; <strong>Vorname</strong> means first name.
+            <strong>Familienname</strong> bedeutet Nachname; <strong>Vorname</strong> ist der erste
+            Name.
           </li>
-          <li>Write dates clearly, for example: 14.06.1998.</li>
-          <li>Check every digit in telephone numbers and dates.</li>
-          <li>Copy the e-mail address exactly, including dots and the @ sign.</li>
-          <li>When boxes are provided, mark only the option supported by the information.</li>
+          <li>Schreiben Sie Daten deutlich, zum Beispiel: 14.06.1998.</li>
+          <li>Kontrollieren Sie jede Zahl in Telefonnummern und Daten.</li>
+          <li>Kopieren Sie die E-Mail-Adresse genau, einschließlich Punkt und @-Zeichen.</li>
+          <li>Tragen Sie nur Informationen ein, die im Text stehen.</li>
         </ul>
       </div>
     </section>
