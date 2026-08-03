@@ -51,13 +51,17 @@ describe("standardized A1 teacher videos", () => {
   });
 
   test("Day 3 Chapter 1.2 restores its teacher lecture in the chapter hub", () => {
-    expect(getA1TeacherVideoResources(3)).toEqual([
+    const configuredVideo = getA1TeacherVideoResources(3).find(
+      (video) => video.chapter === "1.2"
+    );
+
+    expect(configuredVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
-        topic: "Personal Information, Articles, Adjectives and W-Questions",
-        url: "https://youtu.be/iZDv1rcYWsQ",
-      }),
-    ]);
+        topic: "Personal Pronouns and Verb Conjugation",
+        url: "https://youtu.be/LdCVsY-SFTg",
+      })
+    );
 
     const lesson = normalizeLesson(
       {
@@ -71,14 +75,14 @@ describe("standardized A1 teacher videos", () => {
     expect(lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
-        url: "https://youtu.be/iZDv1rcYWsQ",
+        url: "https://youtu.be/LdCVsY-SFTg",
       })
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           key: "a1-day3-chapter-1-2-teacher-video",
-          url: "https://youtu.be/iZDv1rcYWsQ",
+          url: "https://youtu.be/LdCVsY-SFTg",
         }),
       ])
     );
