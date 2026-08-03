@@ -108,6 +108,30 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
         }),
       ]),
     }),
+    16: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day16-digitalisierung-alltag-ai-video",
+          chapter: "4.1",
+          title: "B2 Day 16 · Digitalisierung im Alltag · AI video",
+          description:
+            "AI video lesson for evaluating digital tools, opportunities, risks, data protection and dependence in everyday life.",
+          url: "https://youtu.be/ioHsbvDoLag",
+        }),
+      ]),
+    }),
+    17: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "b2-day17-mobilitaet-stadtleben-ai-video",
+          chapter: "4.2",
+          title: "B2 Day 17 · Mobilität und Stadtleben · AI video",
+          description:
+            "AI video lesson for comparing transport, urban planning and quality of life at B2 level.",
+          url: "https://youtu.be/i167ok5kIFg",
+        }),
+      ]),
+    }),
   }),
   C1: Object.freeze({
     10: Object.freeze({
