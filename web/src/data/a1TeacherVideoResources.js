@@ -3,6 +3,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [2, "0.2", "German Alphabet", "https://youtu.be/uhFgKp4WVEc"],
   [2, "1.1", "Personal Pronouns and Verb Conjugation", "https://youtu.be/AjsnO1hxDs4"],
   [3, "1.1", "Personal Information, Articles, Adjectives and W-Questions", "https://youtu.be/iZDv1rcYWsQ"],
+  [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/LdCVsY-SFTg"],
   [4, "2", "German Numbers", "https://youtu.be/lN7xxSbkPZ4"],
   [5, "1.3", "Introducing Yourself and Articles", "https://youtu.be/KuGq_0r0FCY"],
   [6, "2.3", "Family and Hobbies", "https://youtu.be/_WdlEcKXuVg"],
