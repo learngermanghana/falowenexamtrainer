@@ -36,6 +36,61 @@ updateFile("web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js", 
   return source.replace(marker, `${marker}\n${videoBlock}`);
 });
 
+updateFile("web/src/data/b2C1LessonMediaOverrides.js", (source) => {
+  const marker = "  C1: Object.freeze({\n";
+  const requestedUrls = [
+    "https://youtu.be/H4mPDTiMkwg",
+    "https://youtu.be/g-HaC_4ogaQ",
+    "https://youtu.be/ULtTH3LmWBo",
+  ];
+  const videoBlock = `    16: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day16-technologie-alltag-ai-video",
+          chapter: "4.1",
+          title: "C1 Day 16 · Technologie im Alltag · AI video",
+          description:
+            "AI video lesson for evaluating digital tools, permanent availability, digital overload and self-determined technology use at C1 level.",
+          url: "https://youtu.be/H4mPDTiMkwg",
+        }),
+      ]),
+    }),
+    17: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day17-umwelt-verantwortung-ai-video",
+          chapter: "4.2",
+          title: "C1 Day 17 · Umwelt und Verantwortung · AI video",
+          description:
+            "AI video lesson for discussing sustainability, climate responsibility and personal action in a differentiated way at C1 level.",
+          url: "https://youtu.be/g-HaC_4ogaQ",
+        }),
+      ]),
+    }),
+    18: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day18-gesellschaft-zusammenhalt-ai-video",
+          chapter: "4.3",
+          title: "C1 Day 18 · Gesellschaft und Zusammenhalt · AI video",
+          description:
+            "AI video lesson for analysing community, conflict, solidarity and social cohesion at C1 level.",
+          url: "https://youtu.be/ULtTH3LmWBo",
+        }),
+      ]),
+    }),
+`;
+
+  if (requestedUrls.every((url) => source.includes(url))) return source;
+  if (requestedUrls.some((url) => source.includes(url))) {
+    throw new Error("C1 Days 16–18 AI video mappings are only partially present.");
+  }
+  if (!source.includes(marker)) {
+    throw new Error("C1 lesson video override anchor was not found.");
+  }
+  return source.replace(marker, `${marker}${videoBlock}`);
+});
+
 updateFile("web/src/components/WritingCheatSheetTabs.js", (source) => {
   let updated = source;
   const badgeBefore = "        Watch before writing · Essay Ideas";
@@ -78,6 +133,27 @@ if (!c1Source.includes("https://youtu.be/51cNSMK5F0g?si=npQ1tReOKcrLhY-T")) {
 if (!b2C1MediaSource.includes('key: "b2-day11-gesellschaft-integration-falowen-radio"') || !b2C1MediaSource.includes('youtubeId: "AWEHnJd1o3M"')) {
   throw new Error("The B2 Day 11 chapter 3.1 Falowen Radio mapping is missing.");
 }
+[
+  {
+    key: 'key: "c1-day16-technologie-alltag-ai-video"',
+    chapter: 'chapter: "4.1"',
+    url: 'url: "https://youtu.be/H4mPDTiMkwg"',
+  },
+  {
+    key: 'key: "c1-day17-umwelt-verantwortung-ai-video"',
+    chapter: 'chapter: "4.2"',
+    url: 'url: "https://youtu.be/g-HaC_4ogaQ"',
+  },
+  {
+    key: 'key: "c1-day18-gesellschaft-zusammenhalt-ai-video"',
+    chapter: 'chapter: "4.3"',
+    url: 'url: "https://youtu.be/ULtTH3LmWBo"',
+  },
+].forEach((mapping) => {
+  if (!b2C1MediaSource.includes(mapping.key) || !b2C1MediaSource.includes(mapping.chapter) || !b2C1MediaSource.includes(mapping.url)) {
+    throw new Error(`Requested C1 AI video mapping is missing: ${mapping.key}`);
+  }
+});
 if (courseScheduleSource.includes('video: "https://youtu.be/AWEHnJd1o3M"') || courseScheduleSource.includes('youtube_link: "https://youtu.be/AWEHnJd1o3M"')) {
   throw new Error("B2 Day 11 Falowen Radio must not be injected into ordinary lesson video fields.");
 }
