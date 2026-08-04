@@ -3,6 +3,7 @@ import {
   LEGACY_C1_OPINION_ESSAY_TEMPLATES,
   migrateC1OpinionTemplateDraft,
   migrateGuidedWritingState,
+  usesSingleWritingAndAnalysisBox,
 } from "./GuidedWritingWorkspace";
 import b2 from "../data/writingQuestionBuilders/b2Day1PersoenlicheIdentitaet";
 import c1 from "../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
@@ -10,6 +11,12 @@ import c1 from "../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
 test("B2 and C1 guided routes use exactly five existing questions", () => {
   expect(b2.questions).toHaveLength(5);
   expect(c1.questions).toHaveLength(5);
+});
+
+test("B2 and C1 use one shared writing and analysis box", () => {
+  expect(usesSingleWritingAndAnalysisBox({ level: "B2" })).toBe(true);
+  expect(usesSingleWritingAndAnalysisBox({ level: "c1" })).toBe(true);
+  expect(usesSingleWritingAndAnalysisBox({ level: "B1" })).toBe(false);
 });
 
 test("old final-view drafts migrate to protected manual combined text", () => {

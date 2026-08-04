@@ -236,6 +236,14 @@ const getTemplateForMode = ({ formalMode, opinionMode, config }) => {
 
 const hasUnfilledPlaceholders = (text = "") => /\[[^\]]+\]/.test(String(text || ""));
 
+export const usesSingleWritingAndAnalysisBox = (config = {}) => {
+  const normalizedLevel = String(config.level || "").trim().toUpperCase();
+  return config.singleDraftMode === true
+    || config.oneBoxMode === true
+    || normalizedLevel === "B2"
+    || normalizedLevel === "C1";
+};
+
 export default function GuidedWritingWorkspace({
   config,
   storageKey,
@@ -271,7 +279,7 @@ export default function GuidedWritingWorkspace({
 
   const opinionMode = isOpinionWritingTask(config);
   const formalMode = isFormalWritingTask(config);
-  const forcedSingleBoxMode = config.singleDraftMode === true || config.oneBoxMode === true;
+  const forcedSingleBoxMode = usesSingleWritingAndAnalysisBox(config);
   const singleBoxMode = formalMode || opinionMode || forcedSingleBoxMode;
   const modeLabel = formalMode ? "Formal letter" : opinionMode ? "Opinion essay" : "Writing";
   const templateText = getTemplateForMode({ formalMode, opinionMode, config });
