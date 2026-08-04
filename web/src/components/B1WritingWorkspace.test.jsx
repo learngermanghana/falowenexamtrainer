@@ -14,11 +14,11 @@ jest.mock("./WritingPage", () => {
 });
 
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import B1WritingWorkspace from "./B1WritingWorkspace";
 
 describe("B1WritingWorkspace", () => {
-  test("shows planning, Schreiben, three fast templates and Mark My Letter in order", () => {
+  test("shows only the planning box and the shared writing-analysis box", () => {
     render(
       <B1WritingWorkspace
         writingContext={{
@@ -35,32 +35,14 @@ describe("B1WritingWorkspace", () => {
     );
 
     const planning = screen.getByLabelText("B1 planning points");
-    const draft = screen.getByLabelText("B1 writing draft");
     const marker = screen.getByTestId("mark-my-letter-ui");
 
     expect(screen.getByText("Schreiben Sie einen Meinungsbeitrag.")).toBeVisible();
     expect(planning).toBeVisible();
-    expect(draft).toBeVisible();
     expect(marker).toBeVisible();
-    expect(planning.compareDocumentPosition(draft) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(draft.compareDocumentPosition(marker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
-    expect(screen.getByRole("tab", { name: "Opinion / Forum" })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Formal letter" })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Informal letter" })).toBeVisible();
+    expect(planning.compareDocumentPosition(marker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByLabelText("B1 writing draft")).not.toBeInTheDocument();
+    expect(screen.getByText(/same text there/i)).toBeVisible();
     expect(screen.getByText("Nennen Sie Ihre Meinung.")).toBeVisible();
-  });
-
-  test("inserts the selected formal or informal structure into the Schreiben box", () => {
-    render(<B1WritingWorkspace writingContext={{ level: "B1", day: 2 }} />);
-
-    fireEvent.click(screen.getByRole("tab", { name: "Formal letter" }));
-    fireEvent.click(screen.getByRole("button", { name: /Insert Formal letter template into Schreiben/i }));
-    expect(screen.getByLabelText("B1 writing draft").value).toContain("Sehr geehrte Damen und Herren");
-
-    fireEvent.change(screen.getByLabelText("B1 writing draft"), { target: { value: "" } });
-    fireEvent.click(screen.getByRole("tab", { name: "Informal letter" }));
-    fireEvent.click(screen.getByRole("button", { name: /Insert Informal letter template into Schreiben/i }));
-    expect(screen.getByLabelText("B1 writing draft").value).toContain("Liebe/r [Name]");
   });
 });

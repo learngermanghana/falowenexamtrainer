@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { styles } from "../styles";
 
 export const A2_FORMAL_LETTER_TEMPLATE = `Sehr geehrte Damen und Herren,
@@ -74,12 +74,6 @@ const textareaStyle = {
   background: "#fff",
 };
 
-const draftTextareaStyle = {
-  ...textareaStyle,
-  minHeight: 310,
-  borderColor: "#93c5fd",
-};
-
 const pointsPlaceholder = `Write simple points first. English is okay here.
 
 1. Why am I writing?
@@ -95,50 +89,8 @@ Example:
 4. ask what is new with him
 5. say I look forward to his answer`;
 
-const replaceTemplateSafely = ({ draft, nextTemplate, setDraft }) => {
-  const current = String(draft || "").trim();
-  const knownTemplate = LETTER_TYPES.some((type) => current === type.template.trim());
-
-  if (current && !knownTemplate && current !== nextTemplate.trim()) {
-    const shouldReplace = window.confirm(
-      "This will replace your current A2 draft with the selected template. Continue?"
-    );
-    if (!shouldReplace) return false;
-  }
-
-  setDraft(nextTemplate);
-  return true;
-};
-
 export function A2WritingPlanner() {
   const [planningNotes, setPlanningNotes] = useState("");
-  const [letterType, setLetterType] = useState("informal");
-  const [draft, setDraft] = useState(A2_INFORMAL_LETTER_TEMPLATE);
-  const selectedType = useMemo(
-    () => LETTER_TYPES.find((type) => type.key === letterType) || LETTER_TYPES[0],
-    [letterType]
-  );
-
-  const chooseType = (type) => {
-    if (!replaceTemplateSafely({ draft, nextTemplate: type.template, setDraft })) return;
-    setLetterType(type.key);
-  };
-
-  const copyDraft = async () => {
-    try {
-      await navigator.clipboard.writeText(draft);
-    } catch {
-      const helper = document.createElement("textarea");
-      helper.value = draft;
-      helper.setAttribute("readonly", "true");
-      helper.style.position = "fixed";
-      helper.style.opacity = "0";
-      document.body.appendChild(helper);
-      helper.select();
-      document.execCommand("copy");
-      helper.remove();
-    }
-  };
 
   return (
     <div data-a2-writing-workspace="true" style={{ display: "grid", gap: 14 }}>
@@ -164,69 +116,10 @@ export function A2WritingPlanner() {
         />
       </section>
 
-      <section style={panelStyle}>
-        <div style={{ display: "grid", gap: 5 }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
-            Step 2
-          </span>
-          <strong>Choose and edit the correct letter template</strong>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
-            Replace every bracket such as [Name], [Grund] and [Information]. Keep the language simple and clear.
-          </p>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Choose A2 letter type"
-          style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}
-        >
-          {LETTER_TYPES.map((type) => {
-            const active = type.key === letterType;
-            return (
-              <button
-                key={type.key}
-                type="button"
-                onClick={() => chooseType(type)}
-                style={{
-                  ...(active ? styles.primaryButton : styles.secondaryButton),
-                  minHeight: 48,
-                  fontWeight: 850,
-                }}
-              >
-                {type.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ border: "1px solid #fed7aa", borderRadius: 12, padding: 12, background: "#fffbeb" }}>
-          <strong>{selectedType.label}</strong>
-          <p style={{ margin: "5px 0 0", color: "#92400e", lineHeight: 1.6 }}>{selectedType.useFor}</p>
-        </div>
-
-        <textarea
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder={selectedType.template}
-          aria-label="A2 German letter draft"
-          style={draftTextareaStyle}
-          inputMode="text"
-          autoCapitalize="sentences"
-          autoCorrect="on"
-        />
-
-        <button type="button" onClick={copyDraft} style={{ ...styles.secondaryButton, width: "fit-content" }}>
-          Copy my draft
-        </button>
-      </section>
-
       <section style={{ ...panelStyle, borderColor: "#86efac", background: "#f0fdf4" }}>
-        <span style={{ ...styles.badge, width: "fit-content", background: "#dcfce7", color: "#166534" }}>
-          Step 3
-        </span>
-        <strong>Use Mark My Letter below</strong>
+        <strong>Step 2 · Write and analyse below</strong>
         <p style={{ margin: 0, color: "#166534", lineHeight: 1.65 }}>
-          Copy your completed German draft into Mark My Letter. Review the score and corrections before you copy the final version to the Submit tab.
+          Write your German text directly in the analysis box below. The same box is used for writing and feedback, so you do not need to copy your draft.
         </p>
       </section>
     </div>
