@@ -75,7 +75,6 @@ const findDayZeroLessonCard = (root = document) =>
 const setStyles = (element, styles) => Object.assign(element.style, styles);
 
 const getVideoUrl = (videoId = "") => (videoId ? `https://youtu.be/${videoId}` : "");
-const getEmbedUrl = (videoId = "") => (videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : "");
 
 const createButtonLink = ({ href, text }) => {
   const link = document.createElement("a");
@@ -84,12 +83,16 @@ const createButtonLink = ({ href, text }) => {
   link.target = "_blank";
   link.rel = "noreferrer";
   setStyles(link, {
-    background: "#ffffff",
-    border: "1px solid #bfdbfe",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "fit-content",
+    background: "#2563eb",
+    border: "1px solid #1d4ed8",
     borderRadius: "999px",
-    color: "#1d4ed8",
+    color: "#ffffff",
     fontWeight: "900",
-    padding: "10px 14px",
+    padding: "10px 16px",
     textDecoration: "none",
   });
   return link;
@@ -140,36 +143,11 @@ const createOrientationPanel = (level, config) => {
   wrapper.appendChild(headingWrap);
 
   if (config.videoId) {
-    const videoShell = document.createElement("div");
-    setStyles(videoShell, {
-      position: "relative",
-      width: "100%",
-      paddingTop: "56.25%",
-      borderRadius: "14px",
-      overflow: "hidden",
-      background: "#000000",
-      border: "1px solid #93c5fd",
-    });
-
-    const frame = document.createElement("iframe");
-    frame.src = getEmbedUrl(config.videoId);
-    frame.title = config.title;
-    frame.loading = "lazy";
-    frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    frame.allowFullscreen = true;
-    setStyles(frame, {
-      position: "absolute",
-      inset: "0",
-      width: "100%",
-      height: "100%",
-      border: "0",
-    });
-    videoShell.appendChild(frame);
-    wrapper.appendChild(videoShell);
-
     const actionRow = document.createElement("div");
     setStyles(actionRow, { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" });
-    actionRow.appendChild(createButtonLink({ href: getVideoUrl(config.videoId), text: "Open video on YouTube" }));
+    actionRow.appendChild(
+      createButtonLink({ href: getVideoUrl(config.videoId), text: "Watch video" })
+    );
     wrapper.appendChild(actionRow);
   } else {
     const notice = document.createElement("div");
