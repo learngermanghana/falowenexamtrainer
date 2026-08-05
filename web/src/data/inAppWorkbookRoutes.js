@@ -1,4 +1,4 @@
-import routeConfig from "./inAppWorkbookRoutes.json";
+import routeConfig from "./inAppWorkbookRoutes.json" with { type: "json" };
 
 const GUARDED_LEVELS = new Set(["A1", "A2"]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
@@ -39,85 +39,60 @@ const B1_WORKBOOK_ROUTES = {
   "28": { "*": b1WorkbookLessonRoute(28) },
 };
 
-export const normalizeFalowenCourseRoute = (value = "") => {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
+const stripFalowenOrigin = (value = "") => {
+  const input = String(value || "").trim();
+  if (!input) return "";
   try {
-    const url = new URL(raw, "https://www.falowen.app");
-    if (!["falowen.app", "www.falowen.app"].includes(url.hostname)) return "";
-    if (!url.pathname.startsWith("/campus/course/")) return "";
-    return `${url.pathname}${url.search}`;
+    const parsed = new URL(input, "https://www.falowen.app");
+    if (/^(www\.)?falowen\.app$/i.test(parsed.hostname)) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
   } catch {
-    return "";
+    return input;
   }
+  return input;
 };
 
-const isA1LessonRoute = () => {
-  if (typeof window === "undefined") return false;
-  return /^\/campus\/course\/lesson\/A1\//i.test(window.location?.pathname || "");
+export const normalizeFalowenCourseRoute = (value = "") => {
+  const input = stripFalowenOrigin(value);
+  if (!input) return "";
+  if (!input.startsWith("/")) return input;
+  return input.replace(/\/{2,}/g, "/");
+};
+
+const configuredRoutes = routeConfig?.routes || routeConfig || {};
+
+const getConfiguredLevelRoutes = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (normalizedLevel === "B1") return B1_WORKBOOK_ROUTES;
+  return configuredRoutes?.[normalizedLevel] || {};
 };
 
 export const getConfiguredInAppWorkbookResourceRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const normalizedDay = String(Number(day));
-  const normalizedChapter = normalizeChapter(chapter);
-
-  if (normalizedLevel === "A1" && normalizedDay === "18" && normalizedChapter === "12.2") {
+  const dayKey = String(Number(day || 0));
+  const chapterKey = normalizeChapter(chapter);
+  const levelRoutes = getConfiguredLevelRoutes(normalizedLevel);
+  const dayRoutes = levelRoutes?.[dayKey] || {};
+  const configured = dayRoutes?.[chapterKey] || dayRoutes?.["*"] || "";
+  if (normalizedLevel === "A1" && Number(day) === 18 && chapterKey === "12.2") {
     return A1_DAY18_CHAPTER122_WORKBOOK_ROUTE;
   }
-
-  if (normalizedLevel === "B1" && B1_WORKBOOK_ROUTES[normalizedDay]) {
-    const dayRoutes = B1_WORKBOOK_ROUTES[normalizedDay];
-    return dayRoutes[normalizedChapter] || dayRoutes["*"] || "";
-  }
-
-  const config = routeConfig?.[normalizedLevel]?.[normalizedDay];
-  if (!config) return "";
-  return config[normalizedChapter] || config["*"] || "";
+  return normalizeFalowenCourseRoute(configured);
 };
 
-export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) => {
+export const getConfiguredInAppGrammarResourceRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const normalizedDay = String(Number(day));
-  const normalizedChapter = normalizeChapter(chapter);
-
-  if (
-    normalizedLevel === "A1"
-    && normalizedDay === "23"
-    && normalizedChapter === "14.2"
-    && isA1LessonRoute()
-  ) {
+  if (normalizedLevel === "A1" && Number(day) === 23 && normalizeChapter(chapter) === "14.2") {
     return A1_DAY23_CHAPTER142_GRAMMAR_ROUTE;
   }
-
-  // Course Book lesson cards should open the A1 lesson resource hub first.
-  // The workbook route remains available through the hub's Open workbook action.
-  if (normalizedLevel === "A1" && normalizedDay !== "0" && isA1LessonRoute()) {
-    return "";
-  }
-
-  return getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
+  return "";
 };
 
-export const resolveInAppWorkbookRoute = ({ level, day, chapter, fallback } = {}) => {
-  const normalizedLevel = normalizeLevel(level);
-  const internalFallback = normalizeFalowenCourseRoute(fallback);
-  if (internalFallback) return internalFallback;
-  const configured = getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
-  if (configured) return configured;
-  if (GUARDED_LEVELS.has(normalizedLevel)) return "";
-  return String(fallback || "").trim();
-};
-
-export const hasOnlyInAppWorkbookRoutesForLevel = (level) => {
-  const config = routeConfig?.[normalizeLevel(level)] || {};
-  return Object.values(config).every((dayConfig) =>
-    Object.values(dayConfig || {}).every((route) => Boolean(normalizeFalowenCourseRoute(route)))
-  );
-};
+export const isGuardedWorkbookLevel = (level) => GUARDED_LEVELS.has(normalizeLevel(level));
 
 export {
   A1_DAY18_CHAPTER122_WORKBOOK_ROUTE,
   A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
-  GUARDED_LEVELS,
+  B1_WORKBOOK_ROUTES,
 };
