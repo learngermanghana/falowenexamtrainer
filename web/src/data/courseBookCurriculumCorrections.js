@@ -1,4 +1,4 @@
-import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards";
+import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards.js";
 
 export const A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE =
   "/campus/course/a1-day-3-kapitel-1-2-grammar-notes";
@@ -40,173 +40,75 @@ const cardMatchesResource = (resource = {}, card = {}) => {
   );
 };
 
-const applyCardIdentity = (entry = {}, card = {}) => {
-  if (!entry || typeof entry !== "object" || !card) return entry;
+const applyCardToResource = (resource = {}, card = {}) => {
+  if (!resource || typeof resource !== "object") return resource;
+  if (!cardMatchesResource(resource, card)) return resource;
 
-  const tutorMarked = isTutorMarkedCard(card);
-  const patched = {
-    ...entry,
-    level: entry.level || "A1",
-    lessonId: card.lessonId,
-    courseBookId: card.lessonId,
-    chapter: card.chapter,
-    displayChapter: card.chapter,
-    displayDay: Number(card.displayDay),
-    displayLabel: card.displayLabel,
-    title: card.title,
-    topic: card.title,
-    lessonTitle: card.title,
-    assignmentTitle: card.title,
+  const assignment = isTutorMarkedCard(card);
+  return {
+    ...resource,
+    assignment,
+    progressionEligible: assignment,
     assignmentId: card.assignmentId,
     assignment_id: card.assignmentId,
-    resourceSection: card.resourceSection,
-    courseBookTaskSection: card.resourceSection,
-    assessmentType: card.assessmentType,
-    assignment: tutorMarked,
-    tutorMarked,
-    selfPractice: !tutorMarked,
-    submissionRequired: Boolean(card.submissionRequired),
-    progressionEligible: Boolean(card.progressionEligible),
+    assignmentKey: card.assignmentId,
+    chapter: card.chapter,
+    displayChapter: card.chapter,
+    ...(card.title ? { topic: card.title, title: card.title } : {}),
+    ...(hasOwn(card, "grammarPage") ? { grammarPage: card.grammarPage || "" } : {}),
+    ...(hasOwn(card, "workbookRoute") ? { workbookRoute: card.workbookRoute || "" } : {}),
+  };
+};
+
+const applyCardToEntry = (entry = {}, card = {}) => {
+  if (!entry || typeof entry !== "object") return entry;
+  const level = normalizeLevel(entry.level || entry.courseLevel || entry.course);
+  if (level && level !== "A1") return entry;
+  if (!cardMatchesResource(entry, card)) return entry;
+
+  const assignment = isTutorMarkedCard(card);
+  const corrected = {
+    ...entry,
+    assignment,
+    progressionEligible: assignment,
+    assignmentId: card.assignmentId,
+    assignment_id: card.assignmentId,
+    assignmentKey: card.assignmentId,
+    chapter: card.chapter,
+    displayChapter: card.chapter,
+    ...(card.title ? { topic: card.title, title: card.title } : {}),
+    ...(hasOwn(card, "grammarPage") ? { grammarPage: card.grammarPage || "" } : {}),
+    ...(hasOwn(card, "workbookRoute") ? { workbookRoute: card.workbookRoute || "" } : {}),
   };
 
-  ["grammarPage", "workbookRoute", "video"].forEach((field) => {
-    if (hasOwn(card, field)) patched[field] = card[field];
+  ["resources", "primaryResource", "lesen_hören", "schreiben_sprechen"].forEach((field) => {
+    if (!hasOwn(entry, field)) return;
+    const value = entry[field];
+    corrected[field] = Array.isArray(value)
+      ? value.map((resource) => applyCardToResource(resource, card))
+      : applyCardToResource(value, card);
   });
 
-  if (hasOwn(card, "grammarPage")) {
-    patched.grammarbook_link = card.grammarPage || null;
-    patched.grammar_link = card.grammarPage || null;
-  }
-  if (hasOwn(card, "workbookRoute")) {
-    patched.workbook_link = card.workbookRoute || null;
-  }
-
-  return patched;
+  return corrected;
 };
 
-const patchResourceCollection = (value, card) => {
-  if (!value) return value;
-  if (Array.isArray(value)) {
-    const matchingIndexes = value
-      .map((resource, index) => (cardMatchesResource(resource, card) ? index : -1))
-      .filter((index) => index >= 0);
-    if (!matchingIndexes.length && value.length === 1) return [applyCardIdentity(value[0], card)];
-    return value.map((resource, index) =>
-      matchingIndexes.includes(index) ? applyCardIdentity(resource, card) : resource
-    );
-  }
-  return cardMatchesResource(value, card) ? applyCardIdentity(value, card) : value;
-};
-
-export const getCourseBookCurriculumCorrection = ({
-  level,
-  displayDay,
-  chapter,
-  assignmentId,
-  title,
-} = {}) => {
-  if (normalizeLevel(level) !== "A1") return null;
-  return getA1CourseBookCard({ displayDay, chapter, assignmentId, title });
-};
-
-export const applyCourseBookCurriculumCorrection = (entry = {}, context = {}) => {
-  if (!entry || typeof entry !== "object") return entry;
-
-  const level = normalizeLevel(context.level || entry.level || entry.courseLevel || entry.course);
-  if (level !== "A1") return entry;
+export const applyCourseBookCurriculumCorrection = (entry = {}) => {
+  const level = normalizeLevel(entry.level || entry.courseLevel || entry.course);
+  if (level && level !== "A1") return entry;
 
   const card = getA1CourseBookCard({
-    displayDay: context.displayDay ?? entry.displayDay ?? entry.day,
-    chapter: context.chapter || entry.displayChapter || entry.chapter,
-    assignmentId:
-      context.assignmentId || entry.assignmentId || entry.assignment_id || entry.assignmentKey,
-    title: context.title || getEntryTitle(entry),
+    chapter: entry.displayChapter || entry.chapter,
+    assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey,
+    title: getEntryTitle(entry),
   });
 
-  return card ? applyCardIdentity(entry, card) : entry;
-};
-
-const createCatalogEntry = (card) => {
-  const tutorMarked = isTutorMarkedCard(card);
-  const resource = applyCardIdentity(
-    {
-      kind: card.resourceSection,
-      grammarPage: card.grammarPage || "",
-      workbookRoute: card.workbookRoute || "",
-      video: card.video || "",
-    },
-    card
-  );
-
-  return applyCardIdentity(
-    {
-      level: "A1",
-      day: Number(card.displayDay),
-      assignmentDay: Number(card.displayDay),
-      resources: [resource],
-      lesen_hören: card.resourceSection === "lesen_hören" ? [resource] : [],
-      schreiben_sprechen: card.resourceSection === "schreiben_sprechen" ? [resource] : [],
-      primaryResource: resource,
-      mode: card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
-      type: card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
-      assignmentType:
-        card.resourceSection === "lesen_hören" ? "Lesen & Hören" : "Schreiben & Sprechen",
-      assignment: tutorMarked,
-    },
-    card
-  );
+  return card ? applyCardToEntry(entry, card) : entry;
 };
 
 export const applyAssignmentCatalogCurriculumCorrections = (entries = []) => {
-  A1_COURSE_BOOK_CARDS.forEach((card) => {
-    const entry = entries.find((candidate) => {
-      const level = normalizeLevel(candidate.level || candidate.courseLevel || candidate.course);
-      if (level && level !== "A1") return false;
-
-      const candidateDay = Number(
-        candidate.displayDay ?? candidate.assignmentDay ?? candidate.day
-      );
-      const candidateChapter = normalizeChapter(
-        candidate.displayChapter || candidate.chapter
-      );
-      const candidateAssignmentId = normalizeAssignmentId(
-        candidate.assignment_id || candidate.assignmentId
-      );
-
-      return (
-        (candidateDay === Number(card.displayDay) && candidateChapter === card.chapter) ||
-        (candidateAssignmentId &&
-          candidateAssignmentId === normalizeAssignmentId(card.assignmentId) &&
-          (!Number.isFinite(candidateDay) || candidateDay === Number(card.displayDay))) ||
-        (candidateDay === Number(card.displayDay) &&
-          (card.legacyMatches || []).some(
-            (match) =>
-              candidateChapter === normalizeChapter(match.chapter) &&
-              (!match.title || normalizeTitle(getEntryTitle(candidate)) === normalizeTitle(match.title))
-          ))
-      );
-    });
-
-    if (!entry) {
-      entries.push(createCatalogEntry(card));
-      return;
-    }
-
-    Object.assign(entry, applyCardIdentity(entry, card));
-
-    if (Array.isArray(entry.resources)) {
-      entry.resources = patchResourceCollection(entry.resources, card);
-    }
-    if (entry.primaryResource && typeof entry.primaryResource === "object") {
-      entry.primaryResource = applyCardIdentity(entry.primaryResource, card);
-    }
-    if (entry.lesen_hören) {
-      entry.lesen_hören = patchResourceCollection(entry.lesen_hören, card);
-    }
-    if (entry.schreiben_sprechen) {
-      entry.schreiben_sprechen = patchResourceCollection(entry.schreiben_sprechen, card);
-    }
+  if (!Array.isArray(entries)) return entries;
+  entries.forEach((entry, index) => {
+    entries[index] = applyCourseBookCurriculumCorrection(entry);
   });
-
   return entries;
 };
