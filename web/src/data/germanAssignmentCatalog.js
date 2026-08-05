@@ -3,8 +3,8 @@ import {
   CURRICULUM_BY_LEVEL,
   getCurriculumEntriesForLevel,
   normalizeLevel,
-} from "./curriculumManifest.js";
-import { applyAssignmentCatalogCurriculumCorrections } from "./courseBookCurriculumCorrections.js";
+} from "./curriculumManifest";
+import { applyAssignmentCatalogCurriculumCorrections } from "./courseBookCurriculumCorrections";
 
 applyAssignmentCatalogCurriculumCorrections(CURRICULUM_BY_LEVEL.A1 || []);
 
@@ -99,6 +99,11 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mod
   const normalizedLevel = normalizeLevel(level);
   if (!normalizedLevel) return null;
 
+  // A1 Day 16 and Day 18 contain two tutor-marked child assignments on one parent day.
+  // The parent schedule uses chapters like 9_10 and 12.1_12.2. During schedule normalization
+  // that parent probes the first child with a generated level-prefixed id, which previously
+  // caused both children to inherit the first assignment identity. Unprefixed child lookups
+  // still resolve normally below, so A1-9/A1-10 and A1-12.1/A1-12.2 remain submittable.
   if (isLevelPrefixedChildLookupWithoutDay({ level: normalizedLevel, assignmentId, chapter, assignmentDay })) {
     return null;
   }

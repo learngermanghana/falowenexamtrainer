@@ -104,4 +104,3 @@ fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(data, null, 2)}\n`);
 console.log(`Synced ${classes.length} classes to ${path.relative(webRoot, outputPath)}`);
 
-await import("./generate-public-course-catalogue.mjs");

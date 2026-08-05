@@ -1,4 +1,4 @@
-import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards.js";
+import { A1_COURSE_BOOK_CARDS, getA1CourseBookCard } from "./a1CourseBookCards";
 
 export const A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE =
   "/campus/course/a1-day-3-kapitel-1-2-grammar-notes";
