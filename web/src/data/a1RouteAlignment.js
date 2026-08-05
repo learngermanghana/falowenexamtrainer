@@ -1,8 +1,8 @@
-import { getA1GrammarRoute } from "./a1GrammarRoutes";
+import { getA1GrammarRoute } from "./a1GrammarRoutes.js";
 import {
   getConfiguredInAppWorkbookResourceRoute,
   normalizeFalowenCourseRoute,
-} from "./inAppWorkbookRoutes";
+} from "./inAppWorkbookRoutes.js";
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
