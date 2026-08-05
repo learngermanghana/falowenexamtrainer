@@ -1,6 +1,6 @@
 import routeConfig from "./inAppWorkbookRoutes.json" with { type: "json" };
 
-const GUARDED_LEVELS = new Set(["A1", "A2"]);
+export const GUARDED_LEVELS = new Set(["A1", "A2"]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
 const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook";
