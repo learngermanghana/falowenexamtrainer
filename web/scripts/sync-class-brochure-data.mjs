@@ -49,10 +49,7 @@ function toClassEntry([className, details]) {
     ...(isSelfLearning && className ? { title: className } : {}),
   };
 
-  if (!entry.title && /Self-learning/i.test(className)) {
-    entry.title = className;
-  }
-
+  if (!entry.title && /Self-learning/i.test(className)) entry.title = className;
   return entry;
 }
 
@@ -89,27 +86,9 @@ const data = {
     selfLearningFormat: "Self-learning with AI assistant and tutor support by email",
     selfLearningLocation: "Online",
     scheduleBaseUrl: "https://admin.falowen.app/course-schedule/public",
-    tuitionGhsByLevel: {
-      A1: 2800,
-      A2: 3000,
-      B1: 3000,
-      B2: 3000,
-      C1: 3000,
-    },
-    totalSessionsByLevel: {
-      A1: 24,
-      A2: 28,
-      B1: 28,
-      B2: 28,
-      C1: 28,
-    },
-    sessionMinutesByLevel: {
-      A1: 60,
-      A2: 60,
-      B1: 90,
-      B2: 60,
-      C1: 60,
-    },
+    tuitionGhsByLevel: { A1: 2800, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
+    totalSessionsByLevel: { A1: 24, A2: 28, B1: 28, B2: 28, C1: 28 },
+    sessionMinutesByLevel: { A1: 60, A2: 60, B1: 90, B2: 60, C1: 60 },
     highlightsByLevel: {
       A1: ["Beginner German foundation", "Live class plus assignment support", "Falowen app access"],
       A2: ["Everyday German communication", "Speaking, writing, listening, and reading practice", "Falowen app support"],
@@ -124,3 +103,5 @@ const data = {
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(data, null, 2)}\n`);
 console.log(`Synced ${classes.length} classes to ${path.relative(webRoot, outputPath)}`);
+
+await import("./generate-public-course-catalogue.mjs");
