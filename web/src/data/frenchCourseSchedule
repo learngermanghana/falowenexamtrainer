@@ -1,1 +1,0 @@
-export { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule.js";
