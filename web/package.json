@@ -32,7 +32,7 @@
     "typescript": "4.9.5"
   },
   "scripts": {
-    "sync:classes": "node scripts/sync-class-brochure-data.mjs",
+    "sync:classes": "node scripts/sync-class-brochure-data.mjs && node scripts/generate-public-course-catalogue-safe.mjs",
     "sync:goethe-config-ui": "node scripts/patch-goethe-exam-config-ui.mjs",
     "sync:live-class-session-identity": "node scripts/patch-live-class-session-identity.mjs",
     "sync:speaking-audio": "node ../scripts/runSpeakingAudioReliabilityPatch.mjs",
@@ -62,6 +62,6 @@
     "test": "jest",
     "test:ci": "jest --runInBand",
     "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs",
-    "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue.mjs"
+    "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue-safe.mjs"
   }
 }
