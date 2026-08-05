@@ -3,8 +3,8 @@ import {
   CURRICULUM_BY_LEVEL,
   getCurriculumEntriesForLevel,
   normalizeLevel,
-} from "./curriculumManifest";
-import { applyAssignmentCatalogCurriculumCorrections } from "./courseBookCurriculumCorrections";
+} from "./curriculumManifest.js";
+import { applyAssignmentCatalogCurriculumCorrections } from "./courseBookCurriculumCorrections.js";
 
 applyAssignmentCatalogCurriculumCorrections(CURRICULUM_BY_LEVEL.A1 || []);
 
@@ -38,133 +38,47 @@ const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
   if (chapterToken) return `${normalizedLevel}-${chapterToken}`;
 
   const chapterFromId = explicitToken.match(/(\d+(?:\.\d+)?)/)?.[1] || "";
-  return normalizeChapter(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
+  return chapterFromId ? `${normalizedLevel}-${chapterFromId}` : "";
 };
 
-export { CURRICULUM_ENTRIES };
+const buildAssignmentDictionary = () => {
+  const dictionary = {};
 
-export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
-  Object.entries(CURRICULUM_BY_LEVEL).map(([level, entries]) => [
-    level,
-    Object.fromEntries(
-      entries.map((entry, index) => [
-        `${entry.assignment_id}::${entry.mode || "default"}::${entry.assignmentDay}::${index}`,
-        entry,
-      ])
-    ),
-  ])
-);
-
-export { getCurriculumEntriesForLevel };
-
-export const getCurriculumEntriesByDayForLevel = (level) => {
-  const entries = getCurriculumEntriesForLevel(level);
-  return entries.reduce((acc, entry) => {
-    const day = Number(entry.assignmentDay || 0);
-    if (!day) return acc;
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(entry);
-    return acc;
-  }, {});
-};
-
-const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
-  const entry = entryParam || {};
-  return String(entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "").trim();
-};
-
-const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
-  const entry = entryParam || {};
-  return String(entry.mode || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || entry.topic || "").trim();
-};
-
-export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
-export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
-
-const A1_MULTI_CHAPTER_CHILD_IDS = new Set(["A1-9", "A1-10", "A1-12.1", "A1-12.2"]);
-
-const isLevelPrefixedChildLookupWithoutDay = ({ level, assignmentId, chapter, assignmentDay }) => {
-  const normalizedLevel = normalizeLevel(level);
-  if (normalizedLevel !== "A1") return false;
-  if (assignmentDay) return false;
-
-  const explicitAssignmentId = String(assignmentId || "").trim().toUpperCase();
-  const chapterToken = normalizeChapter(chapter);
-  if (!A1_MULTI_CHAPTER_CHILD_IDS.has(explicitAssignmentId)) return false;
-
-  return explicitAssignmentId === `A1-${chapterToken}`;
-};
-
-export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mode, assignmentDay } = {}) => {
-  const normalizedLevel = normalizeLevel(level);
-  if (!normalizedLevel) return null;
-
-  // A1 Day 16 and Day 18 contain two tutor-marked child assignments on one parent day.
-  // The parent schedule uses chapters like 9_10 and 12.1_12.2. During schedule normalization
-  // that parent probes the first child with a generated level-prefixed id, which previously
-  // caused both children to inherit the first assignment identity. Unprefixed child lookups
-  // still resolve normally below, so A1-9/A1-10 and A1-12.1/A1-12.2 remain submittable.
-  if (isLevelPrefixedChildLookupWithoutDay({ level: normalizedLevel, assignmentId, chapter, assignmentDay })) {
-    return null;
-  }
-
-  const entries = CURRICULUM_BY_LEVEL[normalizedLevel] || [];
-  const explicitAssignmentId = String(assignmentId || "").trim().toUpperCase();
-  const exactAssignmentMatches = explicitAssignmentId
-    ? entries.filter(
-        (entry) =>
-          String(entry.assignment_id || entry.assignmentId || "").trim().toUpperCase() ===
-          explicitAssignmentId
-      )
-    : [];
-  const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter });
-  const chapterToken = normalizeChapter(chapter);
-  const modeToken = String(mode || "").trim();
-  const dayToken = Number(assignmentDay || 0);
-
-  const sourceEntries = exactAssignmentMatches.length ? exactAssignmentMatches : entries;
-  const matches = sourceEntries.filter((entry) => {
-    if (!exactAssignmentMatches.length && canonicalId && entry.assignment_id !== canonicalId) return false;
-    if (!exactAssignmentMatches.length && !canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
-    if (modeToken && entry.mode !== modeToken) return false;
-    if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
-    return true;
-  });
-
-  const prioritized = matches.sort((a, b) => {
-    if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
-    return Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
-  });
-
-  const entry = prioritized[0] || null;
-  return entry
-    ? {
-        ...entry,
-        assignment: entry.assignment === true,
-        canonicalAssignmentId: entry.assignment_id,
-      }
-    : null;
-};
-
-export const getAssignmentSequenceForLevel = (level, { includePractical = true } = {}) => {
-  const entries = getCurriculumEntriesForLevel(level)
-    .filter((entry) => includePractical || entry.progressionEligible === true)
-    .sort((a, b) => {
-      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
-      if (dayDiff !== 0) return dayDiff;
-      if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
-      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
+  CURRICULUM_ENTRIES.forEach((entry) => {
+    const level = normalizeLevel(entry.level);
+    const canonicalId = toCanonicalAssignmentId({
+      level,
+      assignmentId: entry.assignmentId || entry.id,
+      chapter: entry.chapter,
     });
+    if (!canonicalId) return;
 
-  if (includePractical) return entries;
-
-  const seen = new Set();
-  return entries.filter((entry) => {
-    if (seen.has(entry.assignment_id)) return false;
-    seen.add(entry.assignment_id);
-    return true;
+    dictionary[canonicalId] = {
+      ...entry,
+      assignmentId: canonicalId,
+      level,
+      chapter: normalizeChapter(entry.chapter),
+    };
   });
+
+  return Object.freeze(dictionary);
 };
 
-export const getValidProgressionIdentifiersForLevel = (level) =>
-  new Set(getAssignmentSequenceForLevel(level, { includePractical: false }).map((entry) => entry.assignment_id));
+export const GERMAN_ASSIGNMENT_DICTIONARY = buildAssignmentDictionary();
+
+export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter } = {}) => {
+  const canonicalId = toCanonicalAssignmentId({ level, assignmentId, chapter });
+  return canonicalId ? GERMAN_ASSIGNMENT_DICTIONARY[canonicalId] || null : null;
+};
+
+export const getGermanAssignmentsForLevel = (level) =>
+  getCurriculumEntriesForLevel(level).map((entry) => {
+    const canonicalId = toCanonicalAssignmentId({
+      level: entry.level,
+      assignmentId: entry.assignmentId || entry.id,
+      chapter: entry.chapter,
+    });
+    return canonicalId ? GERMAN_ASSIGNMENT_DICTIONARY[canonicalId] || entry : entry;
+  });
+
+export default GERMAN_ASSIGNMENT_DICTIONARY;
