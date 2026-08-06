@@ -25,6 +25,35 @@ const normalizeDay = (value) => {
   return Number.isFinite(number) && number >= 0 ? number : null;
 };
 
+const classifyPrintableLesson = (level, day) => {
+  if (level === "A1") {
+    if (day === 0) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Orientation and platform tutorial",
+      };
+    }
+
+    return {
+      printKind: "combined",
+      status: "ready-for-render-audit",
+    };
+  }
+
+  if (["B2", "C1"].includes(level)) {
+    return {
+      printKind: "combined",
+      status: "ready-for-render-audit",
+    };
+  }
+
+  return {
+    printKind: "review-required",
+    status: "needs-route-classification",
+  };
+};
+
 const lessonCandidates = [];
 const seenObjects = new WeakSet();
 
@@ -76,17 +105,12 @@ const lessons = [...byDay.values()]
     const route = lesson.sourceUrl.startsWith("/")
       ? lesson.sourceUrl
       : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
-    const printKind = ["B2", "C1"].includes(requestedLevel)
-      ? "combined"
-      : "review-required";
+    const classification = classifyPrintableLesson(requestedLevel, lesson.day);
 
     return {
       ...lesson,
       route,
-      printKind,
-      status: printKind === "review-required"
-        ? "needs-route-classification"
-        : "ready-for-render-audit",
+      ...classification,
     };
   });
 
@@ -105,16 +129,29 @@ for (let day = firstDay; day <= lastDay; day += 1) {
 const unresolvedLessons = lessons
   .filter((lesson) => lesson.printKind === "review-required")
   .map(({ day, chapter, title, route }) => ({ day, chapter, title, route }));
+const excludedLessons = lessons
+  .filter((lesson) => lesson.printKind === "excluded")
+  .map(({ day, chapter, title, route, exclusionReason }) => ({
+    day,
+    chapter,
+    title,
+    route,
+    exclusionReason,
+  }));
+const printableLessons = lessons.filter((lesson) => lesson.printKind !== "excluded");
 const curriculumComplete = missingDays.length === 0;
 const routesClassified = unresolvedLessons.length === 0;
 
 const manifest = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   level: requestedLevel,
   curriculumSource: "shared/curriculumCanonical.json",
   generatedAt: new Date().toISOString(),
   generator: "scripts/course-material-bundles/buildLevelManifest.mjs",
   lessonCount: lessons.length,
+  printableLessonCount: printableLessons.length,
+  excludedLessonCount: excludedLessons.length,
+  excludedLessons,
   firstDay,
   lastDay,
   missingDays,
@@ -122,7 +159,7 @@ const manifest = {
   unresolvedLessons,
   curriculumComplete,
   routesClassified,
-  readyForPdfGeneration: curriculumComplete && routesClassified,
+  readyForPdfGeneration: curriculumComplete && routesClassified && printableLessons.length > 0,
   lessons,
 };
 
@@ -131,5 +168,7 @@ fs.writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
 console.log(`Created ${outputPath}`);
 console.log(`${requestedLevel}: ${lessons.length} lessons, ${missingDays.length} missing day(s)`);
+console.log(`Printable lessons: ${printableLessons.length}`);
+console.log(`Excluded lessons: ${excludedLessons.length}`);
 console.log(`Unresolved printable routes: ${unresolvedLessons.length}`);
 console.log(`Ready for PDF generation: ${manifest.readyForPdfGeneration}`);
