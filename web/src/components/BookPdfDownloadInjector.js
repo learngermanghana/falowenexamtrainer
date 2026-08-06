@@ -11,10 +11,19 @@ export const getPrintableBookKind = (pathname = "", search = "") => {
     return /workbook\/?$/i.test(pathname) ? "combined" : "grammar";
   }
 
-  if (!COURSE_LESSON_PATTERN.test(pathname)) return null;
+  const lessonMatch = pathname.match(COURSE_LESSON_PATTERN);
+  if (!lessonMatch) return null;
+
+  const level = String(lessonMatch[1] || "").toUpperCase();
   const view = new URLSearchParams(search || "").get("view");
-  if (view === "workbook") return "combined";
+
   if (view === "grammar") return "grammar";
+  if (view === "workbook") return level === "B1" ? "workbook" : "combined";
+
+  // Canonical B2 and C1 self-learning links open the complete lesson without
+  // a view query parameter. Those pages contain both grammar and workbook work.
+  if ((level === "B2" || level === "C1") && !view) return "combined";
+
   return null;
 };
 
@@ -30,6 +39,12 @@ const humanizeBookTitle = (pathname = "") => {
 
 const stampStyle = {
   display: "none",
+};
+
+const getBookKindLabel = (bookKind) => {
+  if (bookKind === "combined") return "Grammar + workbook";
+  if (bookKind === "workbook") return "Workbook";
+  return "Grammar book";
 };
 
 export default function BookPdfDownloadInjector() {
@@ -53,7 +68,7 @@ export default function BookPdfDownloadInjector() {
       <style>{`@media print { .book-pdf-download-action { display: none !important; } }`}</style>
       <aside className="book-pdf-download-dock" aria-label="PDF download">
         <div>
-          <strong>{bookKind === "combined" ? "Grammar + workbook" : "Grammar book"}</strong>
+          <strong>{getBookKindLabel(bookKind)}</strong>
           <span>Save the complete lesson you are viewing.</span>
         </div>
         <button type="button" className="book-pdf-download-action" onClick={() => window.print()}>
