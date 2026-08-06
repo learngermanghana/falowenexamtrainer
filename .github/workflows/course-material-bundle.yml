@@ -13,15 +13,20 @@ on:
           - B1
           - B2
           - C1
+      build_pdf:
+        description: Render and merge the complete level PDF
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 jobs:
-  build-manifest:
-    name: Build ${{ inputs.level }} material manifest
+  build-bundle:
+    name: Build ${{ inputs.level }} course material bundle
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 90
 
     steps:
       - name: Check out repository
@@ -59,9 +64,13 @@ jobs:
             console.log(`Curriculum complete: ${manifest.curriculumComplete}`);
             console.log(`Routes classified: ${manifest.routesClassified}`);
             console.log(`Ready for PDF generation: ${manifest.readyForPdfGeneration}`);
+            if (process.env.BUILD_PDF === "true" && !manifest.readyForPdfGeneration) {
+              throw new Error(`${level} is not ready for consolidated PDF generation.`);
+            }
           '
         env:
           LEVEL: ${{ inputs.level }}
+          BUILD_PDF: ${{ inputs.build_pdf }}
 
       - name: Upload administration manifest
         uses: actions/upload-artifact@v4
@@ -70,3 +79,38 @@ jobs:
           path: artifacts/course-material-bundles/${{ inputs.level }}/Falowen-${{ inputs.level }}-Course-Materials-manifest.json
           if-no-files-found: error
           retention-days: 30
+
+      - name: Install PDF rendering dependencies
+        if: ${{ inputs.build_pdf }}
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1
+
+      - name: Install Chromium
+        if: ${{ inputs.build_pdf }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Render and merge course materials
+        if: ${{ inputs.build_pdf }}
+        run: node scripts/course-material-bundles/renderLevelBundle.mjs "${{ inputs.level }}"
+        env:
+          FALOWEN_PDF_BASE_URL: https://www.falowen.app
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+
+      - name: Upload consolidated level PDF
+        if: ${{ inputs.build_pdf }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-${{ inputs.level }}-course-materials-pdf
+          path: artifacts/course-material-bundles/${{ inputs.level }}/Falowen-${{ inputs.level }}-Course-Materials.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload render diagnostics on failure
+        if: ${{ failure() && inputs.build_pdf }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-${{ inputs.level }}-render-diagnostics
+          path: artifacts/course-material-bundles/${{ inputs.level }}/
+          if-no-files-found: warn
+          retention-days: 7
