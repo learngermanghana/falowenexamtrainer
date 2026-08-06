@@ -76,12 +76,17 @@ const lessons = [...byDay.values()]
     const route = lesson.sourceUrl.startsWith("/")
       ? lesson.sourceUrl
       : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
+    const printKind = ["B2", "C1"].includes(requestedLevel)
+      ? "combined"
+      : "review-required";
 
     return {
       ...lesson,
       route,
-      printKind: ["B2", "C1"].includes(requestedLevel) ? "combined" : "review-required",
-      status: "ready-for-render-audit",
+      printKind,
+      status: printKind === "review-required"
+        ? "needs-route-classification"
+        : "ready-for-render-audit",
     };
   });
 
@@ -97,8 +102,14 @@ for (let day = firstDay; day <= lastDay; day += 1) {
   if (!byDay.has(day)) missingDays.push(day);
 }
 
+const unresolvedLessons = lessons
+  .filter((lesson) => lesson.printKind === "review-required")
+  .map(({ day, chapter, title, route }) => ({ day, chapter, title, route }));
+const curriculumComplete = missingDays.length === 0;
+const routesClassified = unresolvedLessons.length === 0;
+
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   level: requestedLevel,
   curriculumSource: "shared/curriculumCanonical.json",
   generatedAt: new Date().toISOString(),
@@ -107,7 +118,11 @@ const manifest = {
   firstDay,
   lastDay,
   missingDays,
-  readyForPdfGeneration: missingDays.length === 0,
+  unresolvedLessonCount: unresolvedLessons.length,
+  unresolvedLessons,
+  curriculumComplete,
+  routesClassified,
+  readyForPdfGeneration: curriculumComplete && routesClassified,
   lessons,
 };
 
@@ -116,3 +131,5 @@ fs.writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
 console.log(`Created ${outputPath}`);
 console.log(`${requestedLevel}: ${lessons.length} lessons, ${missingDays.length} missing day(s)`);
+console.log(`Unresolved printable routes: ${unresolvedLessons.length}`);
+console.log(`Ready for PDF generation: ${manifest.readyForPdfGeneration}`);
