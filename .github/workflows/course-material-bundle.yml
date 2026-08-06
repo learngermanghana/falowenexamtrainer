@@ -27,6 +27,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Show checked-out revision
+        run: |
+          echo "Workflow ref: $GITHUB_REF"
+          echo "Commit SHA: $GITHUB_SHA"
+          git log -1 --oneline
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,15 +41,21 @@ jobs:
       - name: Build ordered level manifest
         run: node scripts/course-material-bundles/buildLevelManifest.mjs "${{ inputs.level }}"
 
-      - name: Show manifest summary
+      - name: Validate and show manifest summary
         run: |
           node -e '
             const fs = require("fs");
             const level = process.env.LEVEL;
             const file = `artifacts/course-material-bundles/${level}/Falowen-${level}-Course-Materials-manifest.json`;
             const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
+            if (manifest.schemaVersion !== 2) {
+              throw new Error(`Outdated manifest schema ${manifest.schemaVersion}; expected schemaVersion 2.`);
+            }
             console.log(`${manifest.level}: ${manifest.lessonCount} lessons`);
             console.log(`Missing days: ${manifest.missingDays.length ? manifest.missingDays.join(", ") : "none"}`);
+            console.log(`Unresolved printable routes: ${manifest.unresolvedLessonCount}`);
+            console.log(`Curriculum complete: ${manifest.curriculumComplete}`);
+            console.log(`Routes classified: ${manifest.routesClassified}`);
             console.log(`Ready for PDF generation: ${manifest.readyForPdfGeneration}`);
           '
         env:
