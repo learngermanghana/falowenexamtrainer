@@ -1,9 +1,10 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import BookPdfDownloadInjector, {
   getPrintableBookKind,
   isPrintableBookRoute,
+  needsInlineA1PdfAction,
   SCHOOL_PRINT_STAMP,
 } from "./BookPdfDownloadInjector";
 
@@ -42,6 +43,24 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(screen.queryByRole("complementary", { name: "PDF download" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Download PDF" })).not.toBeInTheDocument();
     expect(screen.getByText(SCHOOL_PRINT_STAMP)).toBeInTheDocument();
+  });
+
+  it("shows an inline print action on legacy A1 workbook routes", () => {
+    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+
+    render(
+      <MemoryRouter initialEntries={["/campus/course/a1-day-1-greetings-workbook"]}>
+        <BookPdfDownloadInjector />
+      </MemoryRouter>
+    );
+
+    expect(needsInlineA1PdfAction("/campus/course/a1-day-1-greetings-workbook")).toBe(true);
+    expect(needsInlineA1PdfAction("/campus/course/a2-day-1-greetings-workbook")).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Download or print PDF" }));
+    expect(printSpy).toHaveBeenCalledTimes(1);
+
+    printSpy.mockRestore();
   });
 
   it("exposes the school print stamp", () => {
