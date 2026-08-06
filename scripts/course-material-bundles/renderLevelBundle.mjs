@@ -13,6 +13,7 @@ const outputDir = path.join(repoRoot, "artifacts", "course-material-bundles", le
 const manifestPath = path.join(outputDir, `Falowen-${level}-Course-Materials-manifest.json`);
 const finalPdfPath = path.join(outputDir, `Falowen-${level}-Course-Materials.pdf`);
 const renderDir = path.join(outputDir, "rendered-lessons");
+const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
 
 if (!fs.existsSync(manifestPath)) throw new Error(`Manifest not found: ${manifestPath}`);
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
@@ -20,6 +21,16 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
+
+const diagnostics = {
+  level,
+  startedAt: new Date().toISOString(),
+  lessons: [],
+};
+
+const writeDiagnostics = () => {
+  fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
+};
 
 const storageStateFromEnv = () => {
   const encoded = String(process.env.FALOWEN_PDF_AUTH_STATE_B64 || "").trim();
@@ -30,13 +41,18 @@ const storageStateFromEnv = () => {
 };
 
 const waitForLesson = async (page) => {
-  await page.waitForLoadState("domcontentloaded");
-  await page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => {});
-  await page.waitForTimeout(1500);
+  await page.waitForLoadState("domcontentloaded", { timeout: 30000 });
+  await page.locator("body").waitFor({ state: "visible", timeout: 10000 });
+  await page.waitForFunction(
+    () => (document.body?.innerText || "").trim().length > 120,
+    undefined,
+    { timeout: 10000 },
+  ).catch(() => {});
+  await page.waitForTimeout(500);
 };
 
 const authenticateIfNeeded = async (page, targetUrl) => {
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForLesson(page);
 
   const emailInput = page.locator('input[type="email"]').first();
@@ -54,12 +70,9 @@ const authenticateIfNeeded = async (page, targetUrl) => {
   await passwordInput.fill(password);
   const submit = page.locator('button[type="submit"], input[type="submit"]').first();
   if (!(await submit.count())) throw new Error("Could not find the Falowen login submit button.");
-  await Promise.all([
-    page.waitForLoadState("domcontentloaded").catch(() => {}),
-    submit.click(),
-  ]);
-  await waitForLesson(page);
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await submit.click();
+  await page.waitForTimeout(1200);
+  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForLesson(page);
   if (/login|sign-in|signin/i.test(page.url())) throw new Error("Falowen PDF account login failed.");
 };
@@ -84,8 +97,8 @@ const clickTab = async (page, names) => {
   for (const name of names) {
     const button = page.getByRole("button", { name: new RegExp(name, "i") }).first();
     if (await button.count()) {
-      await button.click();
-      await page.waitForTimeout(900);
+      await button.click({ timeout: 10000 });
+      await page.waitForTimeout(350);
       return true;
     }
   }
@@ -94,7 +107,7 @@ const clickTab = async (page, names) => {
 
 const renderLessonTabs = async (page, lesson) => {
   const routeUrl = new URL(lesson.route, baseUrl).toString();
-  await page.goto(routeUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await page.goto(routeUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForLesson(page);
   if (/login|sign-in|signin/i.test(page.url())) throw new Error(`Authentication was lost while opening Day ${lesson.day}.`);
 
@@ -116,6 +129,7 @@ const renderLessonTabs = async (page, lesson) => {
       printBackground: true,
       preferCSSPageSize: true,
       margin: { top: "10mm", right: "10mm", bottom: "14mm", left: "10mm" },
+      timeout: 30000,
     });
     rendered.push({ tab: tab.key, file });
   }
@@ -135,7 +149,7 @@ const addCoverAndContents = async (output, printableLessons) => {
   page.drawText(`Printable lessons: ${manifest.printableLessonCount}`, { x: 54, y: 548, size: 11, font });
   page.drawText("Generated for administration", { x: 54, y: 110, size: 11, font, color: rgb(0.38, 0.43, 0.5) });
 
-  const toc = output.addPage([595.28, 841.89]);
+  let toc = output.addPage([595.28, 841.89]);
   toc.drawText("Contents", { x: 54, y: 780, size: 24, font: bold });
   let y = 744;
   for (const lesson of printableLessons) {
@@ -147,9 +161,9 @@ const addCoverAndContents = async (output, printableLessons) => {
     }
     y -= 4;
     if (y < 70) {
+      toc = output.addPage([595.28, 841.89]);
+      toc.drawText("Contents continued", { x: 54, y: 810, size: 18, font: bold });
       y = 780;
-      const next = output.addPage([595.28, 841.89]);
-      next.drawText("Contents continued", { x: 54, y: 810, size: 18, font: bold });
     }
   }
 };
@@ -179,26 +193,46 @@ const mergeBundle = async (renderedLessons) => {
   fs.writeFileSync(finalPdfPath, await output.save());
 };
 
-const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
+const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1800 },
   storageState: storageStateFromEnv(),
 });
 const page = await context.newPage();
+page.setDefaultTimeout(15000);
+page.setDefaultNavigationTimeout(45000);
 const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
 await authenticateIfNeeded(page, new URL(printableLessons[0].route, baseUrl).toString());
 
 const renderedLessons = new Map();
 try {
   for (const lesson of printableLessons) {
-    console.log(`Rendering ${level} Day ${lesson.day}: ${lesson.title}`);
-    renderedLessons.set(lesson.day, await renderLessonTabs(page, lesson));
+    const startedAt = Date.now();
+    console.log(`::group::Rendering ${level} Day ${lesson.day}: ${lesson.title}`);
+    try {
+      const rendered = await renderLessonTabs(page, lesson);
+      renderedLessons.set(lesson.day, rendered);
+      const durationSeconds = Math.round((Date.now() - startedAt) / 1000);
+      diagnostics.lessons.push({ day: lesson.day, title: lesson.title, status: "rendered", tabs: rendered.map((item) => item.tab), durationSeconds });
+      console.log(`Rendered ${rendered.length} section(s) in ${durationSeconds}s.`);
+    } catch (error) {
+      const durationSeconds = Math.round((Date.now() - startedAt) / 1000);
+      diagnostics.lessons.push({ day: lesson.day, title: lesson.title, status: "failed", durationSeconds, error: error instanceof Error ? error.message : String(error) });
+      writeDiagnostics();
+      throw error;
+    } finally {
+      console.log("::endgroup::");
+      writeDiagnostics();
+    }
   }
 } finally {
   await browser.close();
 }
 
 await mergeBundle(renderedLessons);
+diagnostics.completedAt = new Date().toISOString();
+diagnostics.pdfPath = finalPdfPath;
+writeDiagnostics();
 const stats = fs.statSync(finalPdfPath);
 console.log(`Created ${finalPdfPath}`);
 console.log(`PDF size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
