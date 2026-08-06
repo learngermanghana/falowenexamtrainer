@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import WorkbookStartGuide from "./WorkbookStartGuide";
 
 jest.mock("../data/courseSchedule", () => ({ courseSchedules: { A1: [], B1: [] } }));
@@ -63,5 +63,25 @@ describe("WorkbookStartGuide video cards", () => {
       "href",
       "https://youtu.be/_mmAtSzWbNo"
     );
+  });
+
+  test.each(["B2", "C1"])("keeps the %s PDF action inside supporting materials", (level) => {
+    const print = jest.spyOn(window, "print").mockImplementation(() => {});
+    render(
+      <WorkbookStartGuide
+        level={level}
+        day={12}
+        entry={{ day: 12, chapter: "12.1" }}
+      />
+    );
+
+    const supportingMaterials = screen.getByRole("heading", { name: "Supporting materials" })
+      .closest("section");
+    const download = screen.getByRole("button", { name: "Download / Print PDF" });
+
+    expect(supportingMaterials).toContainElement(download);
+    fireEvent.click(download);
+    expect(print).toHaveBeenCalledTimes(1);
+    print.mockRestore();
   });
 });

@@ -41,12 +41,6 @@ const stampStyle = {
   display: "none",
 };
 
-const getBookKindLabel = (bookKind) => {
-  if (bookKind === "combined") return "Grammar + workbook";
-  if (bookKind === "workbook") return "Workbook";
-  return "Grammar book";
-};
-
 export default function BookPdfDownloadInjector() {
   const location = useLocation();
   const bookKind = getPrintableBookKind(location.pathname, location.search);
@@ -66,16 +60,6 @@ export default function BookPdfDownloadInjector() {
   return (
     <>
       <style>{`@media print { .book-pdf-download-action { display: none !important; } }`}</style>
-      <aside className="book-pdf-download-dock" aria-label="PDF download">
-        <div>
-          <strong>{getBookKindLabel(bookKind)}</strong>
-          <span>Save the complete lesson you are viewing.</span>
-        </div>
-        <button type="button" className="book-pdf-download-action" onClick={() => window.print()}>
-          <span aria-hidden="true">↓</span>
-          Download PDF
-        </button>
-      </aside>
       <div className="book-print-stamp" style={stampStyle} aria-hidden="true">
         <strong>{SCHOOL_PRINT_STAMP}</strong>
         <span>{title}</span>

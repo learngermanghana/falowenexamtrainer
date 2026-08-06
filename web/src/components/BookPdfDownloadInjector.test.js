@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import BookPdfDownloadInjector, {
   getPrintableBookKind,
@@ -15,29 +15,33 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(isPrintableBookRoute("/campus/course/a2-day-9-urlaub-radio")).toBe(false);
   });
 
-  it.each(["A1", "A2", "B1", "B2", "C1"])(
-    "supports the merged %s lesson workbook route",
-    (level) => {
+  it.each([
+    ["A1", "combined", false],
+    ["A2", "combined", false],
+    ["B1", "workbook", false],
+    ["B2", "combined", true],
+    ["C1", "combined", true],
+  ])(
+    "supports the printable %s lesson workbook route",
+    (level, workbookKind, printsCompleteLesson) => {
       const pathname = `/campus/course/lesson/${level}/12`;
       expect(isPrintableBookRoute(pathname, "?view=workbook")).toBe(true);
-      expect(getPrintableBookKind(pathname, "?view=workbook")).toBe("combined");
+      expect(getPrintableBookKind(pathname, "?view=workbook")).toBe(workbookKind);
       expect(getPrintableBookKind(pathname, "?view=grammar")).toBe("grammar");
-      expect(isPrintableBookRoute(pathname)).toBe(false);
+      expect(isPrintableBookRoute(pathname)).toBe(printsCompleteLesson);
     }
   );
 
-  it("offers one combined download and prints the current lesson", () => {
-    const print = jest.spyOn(window, "print").mockImplementation(() => {});
+  it("keeps printable lesson metadata without covering Study Buddy with a floating download", () => {
     render(
       <MemoryRouter initialEntries={["/campus/course/lesson/C1/12?view=workbook"]}>
         <BookPdfDownloadInjector />
       </MemoryRouter>
     );
 
-    expect(screen.getByText("Grammar + workbook")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Download PDF" }));
-    expect(print).toHaveBeenCalledTimes(1);
-    print.mockRestore();
+    expect(screen.queryByRole("complementary", { name: "PDF download" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Download PDF" })).not.toBeInTheDocument();
+    expect(screen.getByText(SCHOOL_PRINT_STAMP)).toBeInTheDocument();
   });
 
   it("exposes the school print stamp", () => {
