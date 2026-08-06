@@ -48,10 +48,12 @@ jobs:
             const level = process.env.LEVEL;
             const file = `artifacts/course-material-bundles/${level}/Falowen-${level}-Course-Materials-manifest.json`;
             const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
-            if (manifest.schemaVersion !== 2) {
-              throw new Error(`Outdated manifest schema ${manifest.schemaVersion}; expected schemaVersion 2.`);
+            if (manifest.schemaVersion !== 3) {
+              throw new Error(`Outdated manifest schema ${manifest.schemaVersion}; expected schemaVersion 3.`);
             }
-            console.log(`${manifest.level}: ${manifest.lessonCount} lessons`);
+            console.log(`${manifest.level}: ${manifest.lessonCount} curriculum entries`);
+            console.log(`Printable lessons: ${manifest.printableLessonCount}`);
+            console.log(`Excluded lessons: ${manifest.excludedLessonCount}`);
             console.log(`Missing days: ${manifest.missingDays.length ? manifest.missingDays.join(", ") : "none"}`);
             console.log(`Unresolved printable routes: ${manifest.unresolvedLessonCount}`);
             console.log(`Curriculum complete: ${manifest.curriculumComplete}`);
