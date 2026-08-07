@@ -17,8 +17,17 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 6, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 7, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
+
+const firstLesson = plan.lessons?.[0];
+const firstTarget = firstLesson?.targets?.[0];
+if (
+  Number(firstLesson?.day) !== 1
+  || firstTarget?.url !== "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"
+) {
+  throw new Error("A1 render plan must begin with Day 1 Greetings / Chapter 0.1.");
+}
 
 const getBodyText = async (page) => {
   for (let attempt = 0; attempt < 4; attempt += 1) {
@@ -91,8 +100,19 @@ const injectPrintMode = async (page) => {
   ` });
 };
 
+const WORKBOOK_KINDS = new Set(["workbook", "practice", "combined"]);
+const getInternalRenderUrl = (target) => {
+  const url = new URL(target.url, baseUrl);
+  if (WORKBOOK_KINDS.has(target.kind)) {
+    // A1 workbook pages normally pass through Falowen Radio first. For an
+    // administration PDF we need the workbook itself, so mark Radio complete.
+    url.searchParams.set("radio", "done");
+  }
+  return url.toString();
+};
+
 const ensureInternalPage = async (page, target, day) => {
-  const url = new URL(target.url, baseUrl).toString();
+  const url = getInternalRenderUrl(target);
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForStablePage(page);
 
@@ -104,6 +124,7 @@ const ensureInternalPage = async (page, target, day) => {
   const expectedUrl = new URL(url);
   const text = await getBodyText(page);
   const fatalShell = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i.test(text);
+  const radioGate = /Falowen Radio/i.test(text) && /continue|workbook|complete/i.test(text);
   const isFalowenCoursePage = currentUrl.origin === expectedUrl.origin && currentUrl.pathname.startsWith("/campus/course/");
 
   if (!isFalowenCoursePage) {
@@ -111,6 +132,9 @@ const ensureInternalPage = async (page, target, day) => {
   }
   if (fatalShell) {
     throw new Error(`Day ${day} ${target.kind} rendered an error page: ${url}`);
+  }
+  if (WORKBOOK_KINDS.has(target.kind) && radioGate) {
+    throw new Error(`Day ${day} ${target.kind} stopped on Falowen Radio instead of workbook content: ${url}`);
   }
   if (!text) {
     throw new Error(`Day ${day} ${target.kind} rendered an empty page: ${url}`);
