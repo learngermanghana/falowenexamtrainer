@@ -56,7 +56,7 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           </span>
           <h3 style={{ margin: "8px 0 4px" }}>Stichpunkte / ideas</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            Note the points you must answer before writing the full text.
+            Note the points you must answer before writing the full text. English is okay in this planning box.
           </p>
         </div>
         {writingContext.taskTitle ? (
@@ -100,6 +100,9 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           hideTabList
           markLabel="Mark My Letter"
           submitLabel="Mark My Letter"
+          markDescription="Write your complete German letter in this box, then use the Mark My Letter button directly below it to check and improve your work."
+          draftLabel="Your complete German letter"
+          draftPlaceholder="Write your complete German letter here..."
           writingContext={writingContext}
         />
       </section>

@@ -454,6 +454,9 @@ const WritingPage = ({
   hideTabList = false,
   markLabel,
   submitLabel,
+  markDescription,
+  draftLabel,
+  draftPlaceholder,
   writingContext = {},
 }) => {
   const {
@@ -2291,9 +2294,9 @@ const WritingPage = ({
                 (isCourseMode ? "Analyse my text" : "Mark my letter")}
             </h3>
             <p style={styles.helperText}>
-              {isCourseMode
+              {markDescription || (isCourseMode
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
-                : "From Day 21, write one complete essay, get full feedback, and save one revised version."}
+                : "From Day 21, write one complete essay, get full feedback, and save one revised version.")}
             </p>
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2318,9 +2321,9 @@ const WritingPage = ({
             </div>
 
             <label style={styles.label}>
-              {isCourseMode
+              {draftLabel || (isCourseMode
                 ? "Your combined section"
-                : "Your complete letter or essay"}
+                : "Your complete letter or essay")}
             </label>
             <textarea
               ref={markDraftRef}
@@ -2330,9 +2333,9 @@ const WritingPage = ({
                 setTypedAnswer(e.target.value);
               }}
               placeholder={
-                isCourseMode
+                draftPlaceholder || (isCourseMode
                   ? "Combine what you wrote today and paste it here for level-based analysis..."
-                  : "Paste your finished letter or essay here for marking..."
+                  : "Paste your finished letter or essay here for marking...")
               }
               style={styles.textArea}
               rows={9}
