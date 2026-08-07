@@ -17,7 +17,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 4, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 5, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const getBodyText = async (page) => {
@@ -51,17 +51,29 @@ const loginOnce = async (page) => {
 
   await page.goto(`${baseUrl}/login/`, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForStablePage(page);
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
+
+  const loginForm = page.locator("form").filter({ hasText: /Email or student code/i }).first();
+  await loginForm.waitFor({ state: "visible", timeout: 15000 });
+  const emailInput = loginForm.locator('input[type="text"]').first();
+  const passwordInput = loginForm.locator('input[type="password"]').first();
   await emailInput.waitFor({ state: "visible", timeout: 15000 });
   await passwordInput.waitFor({ state: "visible", timeout: 15000 });
   await emailInput.fill(email);
   await passwordInput.fill(password);
-  const submit = page.locator('button[type="submit"], input[type="submit"]').first();
+  const submit = loginForm.getByRole("button", { name: /^Log in$/i }).first();
   await submit.click({ timeout: 10000 });
 
-  await page.waitForURL((url) => !url.pathname.startsWith("/login"), { timeout: 20000 }).catch(() => {});
+  await page.waitForFunction(
+    () => !document.body?.innerText?.includes("Returning Falowen student"),
+    undefined,
+    { timeout: 25000 },
+  ).catch(() => {});
   await waitForStablePage(page);
+
+  const authText = await getBodyText(page);
+  if (/Password mismatch|could not find an account|cannot log in right now|permission denied/i.test(authText)) {
+    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
+  }
 };
 
 const injectPrintMode = async (page) => {
