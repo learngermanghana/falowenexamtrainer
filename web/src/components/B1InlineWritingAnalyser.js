@@ -13,16 +13,21 @@ const resolveStudentName = ({ studentProfile, user }) =>
       "Student",
   ).trim();
 
-export default function B1InlineWritingAnalyser({ text = "", taskTitle = "B1 writing task" }) {
+export default function B1InlineWritingAnalyser({
+  text = "",
+  taskTitle = "Writing task",
+  level = "B1",
+}) {
   const { user, idToken, studentProfile } = useAuth();
   const [feedbackData, setFeedbackData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const resolvedLevel = String(level || "B1").toUpperCase() === "A2" ? "A2" : "B1";
 
   const analyseText = async () => {
     const draft = String(text || "").trim();
     if (!draft) {
-      setError("Write your text first, then click Analyse my text.");
+      setError("Write your German text first, then click Analyse my text.");
       return;
     }
 
@@ -31,7 +36,7 @@ export default function B1InlineWritingAnalyser({ text = "", taskTitle = "B1 wri
     try {
       const result = await markLetterWithAI({
         text: draft,
-        level: "B1",
+        level: resolvedLevel,
         studentName: resolveStudentName({ studentProfile, user }),
         program: studentProfile?.program,
         submissionContext: `course-task:${taskTitle}`,
@@ -66,7 +71,7 @@ export default function B1InlineWritingAnalyser({ text = "", taskTitle = "B1 wri
       {feedbackData ? (
         <WritingFeedbackCard
           feedback={feedbackData.feedback || "Analysis completed."}
-          level="B1"
+          level={resolvedLevel}
           draft={text}
           rubric={feedbackData.rubric || null}
           corrections={feedbackData.corrections || []}
