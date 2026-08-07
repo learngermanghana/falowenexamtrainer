@@ -51,30 +51,86 @@ const waitForLesson = async (page) => {
   await page.waitForTimeout(500);
 };
 
-const authenticateIfNeeded = async (page, targetUrl) => {
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForLesson(page);
+const isPublicLanding = async (page) => {
+  if (await page.locator(".falowen-public-home").count()) return true;
+  const bodyText = await page.locator("body").innerText().catch(() => "");
+  return /German and French learning in one place|Ready to start learning\?|Create your Falowen account or log in to continue your course/i.test(bodyText);
+};
 
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-  const needsLogin = /login|sign-in|signin/i.test(page.url()) || (await emailInput.count()) > 0;
-  if (!needsLogin) return;
+const hasRealLessonContent = async (page) => {
+  if (await isPublicLanding(page)) return false;
+  const markers = [
+    page.getByRole("button", { name: /(?:^|\b)(?:1\.\s*)?Learn(?:\b|$)/i }).first(),
+    page.getByRole("button", { name: /(?:^|\b)(?:2\.\s*)?Speak(?:\b|$)/i }).first(),
+    page.getByRole("button", { name: /(?:^|\b)(?:3\.\s*)?Write(?:\b|$)/i }).first(),
+    page.getByText(/Back to Course Book/i).first(),
+    page.getByText(/Course Book/i).first(),
+  ];
+  for (const marker of markers) {
+    if (await marker.count()) return true;
+  }
+  return false;
+};
 
+const requirePdfCredentials = () => {
   const email = String(process.env.FALOWEN_PDF_EMAIL || "").trim();
   const password = String(process.env.FALOWEN_PDF_PASSWORD || "");
   if (!email || !password) {
-    throw new Error("Falowen login is required. Add FALOWEN_PDF_EMAIL and FALOWEN_PDF_PASSWORD repository secrets, or FALOWEN_PDF_AUTH_STATE_B64.");
+    throw new Error("Falowen login is required. Add FALOWEN_PDF_EMAIL and FALOWEN_PDF_PASSWORD repository secrets, or provide a valid FALOWEN_PDF_AUTH_STATE_B64 session.");
   }
+  return { email, password };
+};
 
+const openLoginFromLanding = async (page) => {
+  const loginButton = page.getByRole("button", { name: /^(Log in|Login|Anmelden|Se connecter)$/i }).first();
+  const loginLink = page.getByRole("link", { name: /^(Log in|Login|Anmelden|Se connecter)$/i }).first();
+  if (await loginButton.count()) {
+    await loginButton.click({ timeout: 10000 });
+  } else if (await loginLink.count()) {
+    await loginLink.click({ timeout: 10000 });
+  } else {
+    throw new Error("Public Falowen landing page was shown, but its Log in action could not be found.");
+  }
+  await page.locator('input[type="email"]').first().waitFor({ state: "visible", timeout: 15000 });
+};
+
+const submitLoginForm = async (page) => {
+  const { email, password } = requirePdfCredentials();
+  const emailInput = page.locator('input[type="email"]').first();
+  const passwordInput = page.locator('input[type="password"]').first();
+  if (!(await emailInput.count()) || !(await passwordInput.count())) {
+    throw new Error("Falowen login form did not expose email and password fields.");
+  }
   await emailInput.fill(email);
   await passwordInput.fill(password);
   const submit = page.locator('button[type="submit"], input[type="submit"]').first();
   if (!(await submit.count())) throw new Error("Could not find the Falowen login submit button.");
-  await submit.click();
-  await page.waitForTimeout(1200);
+  await submit.click({ timeout: 10000 });
+  await page.waitForTimeout(1500);
+};
+
+const authenticateIfNeeded = async (page, targetUrl) => {
   await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForLesson(page);
-  if (/login|sign-in|signin/i.test(page.url())) throw new Error("Falowen PDF account login failed.");
+
+  if (await hasRealLessonContent(page)) return;
+
+  const emailInput = page.locator('input[type="email"]').first();
+  if (await isPublicLanding(page)) {
+    console.log("Public landing fallback detected. Opening Falowen login.");
+    await openLoginFromLanding(page);
+  } else if (!(await emailInput.count())) {
+    throw new Error(`The requested lesson did not render authenticated course content. Current page: ${page.url()}`);
+  }
+
+  await submitLoginForm(page);
+  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
+  await waitForLesson(page);
+
+  if (!(await hasRealLessonContent(page))) {
+    const bodyText = (await page.locator("body").innerText().catch(() => "")).slice(0, 500).replace(/\s+/g, " ");
+    throw new Error(`Falowen PDF login completed, but authenticated lesson content was not available at ${targetUrl}. Page preview: ${bodyText}`);
+  }
 };
 
 const injectPrintMode = async (page) => {
@@ -105,11 +161,17 @@ const clickTab = async (page, names) => {
   return false;
 };
 
+const assertLessonStillAuthenticated = async (page, lesson) => {
+  if (!(await hasRealLessonContent(page))) {
+    throw new Error(`Day ${lesson.day} did not render real authenticated course content. Refusing to create a PDF from the public landing page.`);
+  }
+};
+
 const renderLessonTabs = async (page, lesson) => {
   const routeUrl = new URL(lesson.route, baseUrl).toString();
   await page.goto(routeUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForLesson(page);
-  if (/login|sign-in|signin/i.test(page.url())) throw new Error(`Authentication was lost while opening Day ${lesson.day}.`);
+  await assertLessonStillAuthenticated(page, lesson);
 
   const tabSpecs = [
     { key: "learn", names: ["1. Learn", "Learn", "Grammar"] },
@@ -121,6 +183,7 @@ const renderLessonTabs = async (page, lesson) => {
   for (const tab of tabSpecs) {
     const clicked = await clickTab(page, tab.names);
     if (!clicked && tab.key !== "learn") continue;
+    await assertLessonStillAuthenticated(page, lesson);
     await injectPrintMode(page);
     const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${tab.key}.pdf`);
     await page.pdf({
