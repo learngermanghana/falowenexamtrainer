@@ -1,11 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  getWritingVideoResource,
-  getYouTubeEmbedUrl,
-} from "../data/writingVideoResources";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
-import WritingPage from "./WritingPage";
-import { WritingVideoSupportCard } from "./WritingCheatSheetTabs";
+import B1InlineWritingAnalyser from "./B1InlineWritingAnalyser";
 
 const textareaStyle = {
   width: "100%",
@@ -31,100 +26,78 @@ const cardStyle = {
 
 export default function B1WritingWorkspace({ writingContext = {} }) {
   const [pointsDraft, setPointsDraft] = useState("");
-  const markMyLetterRootRef = useRef(null);
+  const [germanDraft, setGermanDraft] = useState("");
+  const level = String(writingContext.level || writingContext.courseLevel || "B1").toUpperCase() === "A2" ? "A2" : "B1";
   const supportItems = writingContext.supportStructure?.length
     ? writingContext.supportStructure
     : writingContext.taskPoints || [];
-  const writingVideo = getWritingVideoResource(
-    writingContext.level || writingContext.courseLevel || "B1",
-    writingContext.day,
-  );
-  const writingVideoEmbed = getYouTubeEmbedUrl(writingVideo?.url);
 
   const planningPlaceholder = useMemo(() => {
     if (!supportItems.length) {
-      return "Write your Stichpunkte here before you start.\n1. ...\n2. ...\n3. ...";
+      return "Write your ideas in English or German first.\n1. Main point ...\n2. Reason ...\n3. Example ...";
     }
-    return supportItems.map((item, index) => `${index + 1}. ${item} → ...`).join("\n");
+    return supportItems.map((item, index) => `${index + 1}. ${item} → write your idea here`).join("\n");
   }, [supportItems]);
 
-  useEffect(() => {
-    const placeMarkButtonLast = () => {
-      const root = markMyLetterRootRef.current;
-      if (!root) return;
-      const button = Array.from(root.querySelectorAll("button")).find(
-        (item) => String(item.textContent || "").trim() === "Mark My Letter",
-      );
-      if (!button?.parentElement) return;
-      button.parentElement.appendChild(button);
-      button.setAttribute("data-b1-mark-my-letter-final-action", "true");
-    };
-
-    placeMarkButtonLast();
-    const timer = window.setTimeout(placeMarkButtonLast, 250);
-    return () => window.clearTimeout(timer);
-  }, [writingContext]);
-
   return (
-    <div data-b1-writing-workspace="restored" style={{ display: "grid", gap: 14 }}>
-      <section style={cardStyle} aria-label="B1 writing planning points">
+    <div data-a2-b1-writing-workspace="standard" style={{ display: "grid", gap: 14 }}>
+      <section style={cardStyle} aria-label={`${level} writing planning points`}>
         <div>
           <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
             Step 1 · Plan your points
           </span>
           <h3 style={{ margin: "8px 0 4px" }}>Stichpunkte / ideas</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            Note the points you must answer before writing the full text. English is okay in this planning box.
+            Write short ideas before you start the German text. English is okay in this planning box.
           </p>
         </div>
+
         {writingContext.taskTitle ? (
           <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#fff" }}>
             <strong>Writing task</strong>
             <p style={{ margin: "6px 0 0", lineHeight: 1.7 }}>{writingContext.taskTitle}</p>
           </div>
         ) : null}
+
         {supportItems.length ? (
           <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.7 }}>
             {supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
           </ul>
         ) : null}
+
         <textarea
-          aria-label="B1 planning points"
+          aria-label={`${level} planning points`}
           value={pointsDraft}
           onChange={(event) => setPointsDraft(event.target.value)}
           placeholder={planningPlaceholder}
-          style={{ ...textareaStyle, minHeight: 150 }}
+          style={{ ...textareaStyle, minHeight: 140 }}
         />
       </section>
 
-      {writingVideo?.url ? (
-        <WritingVideoSupportCard writingVideo={writingVideo} writingVideoEmbed={writingVideoEmbed} />
-      ) : null}
-
-      <section style={cardStyle} aria-label="B1 Mark My Letter">
+      <section style={cardStyle} aria-label={`${level} German writing`}>
         <div>
           <span style={{ ...styles.badge, width: "fit-content", background: "#fef3c7", color: "#92400e" }}>
-            Step 2 · Write, check and improve
+            Step 2 · Schreiben
           </span>
-          <h3 style={{ margin: "8px 0 4px" }}>Write your letter</h3>
+          <h3 style={{ margin: "8px 0 4px" }}>Write your German text</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            Write your completed Schreiben in the box below. When you finish, use Mark My Letter as the final action at the bottom of this box.
+            Turn your points into one complete German text. When you finish, analyse the same text below.
           </p>
         </div>
-        <div ref={markMyLetterRootRef} data-b1-mark-my-letter-area="true">
-          <WritingPage
-            mode="course"
-            initialTab="mark"
-            enabledTabs={["mark"]}
-            hideTabList
-            markLabel="Mark My Letter"
-            submitLabel="Mark My Letter"
-            markDescription="Write your complete German letter in this box, then use the Mark My Letter button at the bottom to check and improve your work."
-            draftLabel="Your complete German letter"
-            draftPlaceholder="Write your complete German letter here..."
-            writingContext={writingContext}
-          />
-        </div>
+
+        <textarea
+          aria-label={`${level} German writing draft`}
+          value={germanDraft}
+          onChange={(event) => setGermanDraft(event.target.value)}
+          placeholder={writingContext.draftPlaceholder || "Write your complete German text here..."}
+          style={{ ...textareaStyle, minHeight: 260 }}
+        />
+
+        <B1InlineWritingAnalyser
+          text={germanDraft}
+          level={level}
+          taskTitle={writingContext.taskTitle || `${level} writing task`}
+        />
       </section>
     </div>
   );
