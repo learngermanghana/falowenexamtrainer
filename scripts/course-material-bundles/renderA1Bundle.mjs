@@ -17,7 +17,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 7, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 8, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -111,6 +111,12 @@ const getInternalRenderUrl = (target) => {
   return url.toString();
 };
 
+const hasVisibleRadioGate = async (page) => {
+  const gate = page.locator('[data-a1-radio-first-workbook-route="true"]');
+  if (!(await gate.count())) return false;
+  return gate.first().isVisible().catch(() => false);
+};
+
 const ensureInternalPage = async (page, target, day) => {
   const url = getInternalRenderUrl(target);
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
@@ -124,7 +130,7 @@ const ensureInternalPage = async (page, target, day) => {
   const expectedUrl = new URL(url);
   const text = await getBodyText(page);
   const fatalShell = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i.test(text);
-  const radioGate = /Falowen Radio/i.test(text) && /continue|workbook|complete/i.test(text);
+  const radioGate = WORKBOOK_KINDS.has(target.kind) ? await hasVisibleRadioGate(page) : false;
   const isFalowenCoursePage = currentUrl.origin === expectedUrl.origin && currentUrl.pathname.startsWith("/campus/course/");
 
   if (!isFalowenCoursePage) {
@@ -133,8 +139,8 @@ const ensureInternalPage = async (page, target, day) => {
   if (fatalShell) {
     throw new Error(`Day ${day} ${target.kind} rendered an error page: ${url}`);
   }
-  if (WORKBOOK_KINDS.has(target.kind) && radioGate) {
-    throw new Error(`Day ${day} ${target.kind} stopped on Falowen Radio instead of workbook content: ${url}`);
+  if (radioGate) {
+    throw new Error(`Day ${day} ${target.kind} stopped on the visible Falowen Radio gate instead of workbook content: ${url}`);
   }
   if (!text) {
     throw new Error(`Day ${day} ${target.kind} rendered an empty page: ${url}`);
