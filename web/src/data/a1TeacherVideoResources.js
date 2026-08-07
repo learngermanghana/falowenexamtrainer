@@ -12,7 +12,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [9, "5", "German Cases", "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0"],
   [10, "6", "Objects and Colors", "https://youtu.be/sDL5z3lsITk"],
   [11, "7", "Understanding Time", "https://youtu.be/qrkQJc5kQJQ"],
-  [12, "8", "The 24-Hour Clock", "https://youtu.be/hLpPFOthVkU"],
+  [12, "8", "The 24-Hour Clock", "https://youtu.be/ckuH1McZqJk"],
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/eqSc_5p5uyQ", 1],
   [13, "3.5", "Revision: Numbers, Time and Prices", "https://youtu.be/zizS5WdOYs8", 2],
   [14, "3.6", "Modal Verbs", "https://youtu.be/GJw1aJehYHU"],
