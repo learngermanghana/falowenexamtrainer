@@ -21,7 +21,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 2, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 3, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -72,12 +72,14 @@ const credentials = () => {
 };
 
 const openLogin = async (page) => {
-  const action = page.getByRole("button", { name: /^(Log in|Login|Anmelden|Se connecter)$/i }).first();
-  const link = page.getByRole("link", { name: /^(Log in|Login|Anmelden|Se connecter)$/i }).first();
-  if (await action.count()) await action.click({ timeout: 10000 });
-  else if (await link.count()) await link.click({ timeout: 10000 });
-  else throw new Error("Public Falowen page was shown but the Log in action was not found.");
-  await page.locator('input[type="email"]').first().waitFor({ state: "visible", timeout: 15000 });
+  const loginUrl = `${baseUrl}/login/`;
+  console.log(`Opening Falowen login directly: ${loginUrl}`);
+  await page.goto(loginUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
+  await waitForPage(page);
+  const emailInput = page.locator('input[type="email"]').first();
+  const passwordInput = page.locator('input[type="password"]').first();
+  await emailInput.waitFor({ state: "visible", timeout: 15000 });
+  await passwordInput.waitFor({ state: "visible", timeout: 15000 });
 };
 
 const submitLogin = async (page) => {
@@ -90,7 +92,7 @@ const submitLogin = async (page) => {
   const submit = page.locator('button[type="submit"], input[type="submit"]').first();
   if (!(await submit.count())) throw new Error("Falowen login submit button was not found.");
   await submit.click({ timeout: 10000 });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(2500);
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
@@ -99,18 +101,17 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
   await waitForPage(page);
   if (await hasLessonContent(page, lesson)) return;
 
-  if (await isPublicLanding(page)) await openLogin(page);
-  else if (!(await page.locator('input[type="email"]').count())) {
-    const preview = (await getBodyText(page)).slice(0, 500);
-    throw new Error(`Day ${lesson.day} did not show course content or a login form. Preview: ${preview}`);
+  const loginFormAlreadyVisible = (await page.locator('input[type="email"]').count()) > 0;
+  if (!loginFormAlreadyVisible) {
+    await openLogin(page);
   }
 
   await submitLogin(page);
   await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForPage(page);
   if (!(await hasLessonContent(page, lesson))) {
-    const preview = (await getBodyText(page)).slice(0, 500);
-    throw new Error(`Login completed but Day ${lesson.day} still did not show the real lesson. Preview: ${preview}`);
+    const preview = (await getBodyText(page)).slice(0, 700);
+    throw new Error(`Login completed but Day ${lesson.day} still did not show the real lesson. Current URL: ${page.url()}. Preview: ${preview}`);
   }
 };
 
@@ -138,8 +139,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
 
 const renderA1Lesson = async (page, lesson) => {
   await ensureAuthenticatedLesson(page, lesson);
-  // A1 pages are full workbook/lesson pages. Do not look for B2/C1 Learn/Speak/Write tabs.
-  return [await saveCurrentPagePdf(page, lesson, "full")];
+  return [await saveCurrentPagePdf(page, lesson, "lesson")];
 };
 
 const clickTab = async (page, names) => {
@@ -154,68 +154,73 @@ const clickTab = async (page, names) => {
   return false;
 };
 
-const renderTabbedLesson = async (page, lesson) => {
+const renderGuidedLesson = async (page, lesson) => {
   await ensureAuthenticatedLesson(page, lesson);
-  const tabs = [
-    { key: "learn", names: ["1. Learn", "Learn"] },
+  const tabSpecs = [
+    { key: "learn", names: ["1. Learn", "Learn", "Grammar"] },
     { key: "speak", names: ["2. Speak", "Speak"] },
-    { key: "write", names: ["3. Write", "Write"] },
+    { key: "write", names: ["3. Write", "Write", "Workbook"] },
   ];
   const rendered = [];
-  for (const tab of tabs) {
-    if (!(await clickTab(page, tab.names))) continue;
+  for (const tab of tabSpecs) {
+    const clicked = await clickTab(page, tab.names);
+    if (!clicked && tab.key !== "learn") continue;
     rendered.push(await saveCurrentPagePdf(page, lesson, tab.key));
   }
-  if (!rendered.length) throw new Error(`No guided lesson tabs were rendered for Day ${lesson.day}.`);
+  if (!rendered.length) throw new Error(`No guided lesson sections were rendered for Day ${lesson.day}.`);
   return rendered;
-};
-
-const renderStandardLesson = async (page, lesson) => {
-  await ensureAuthenticatedLesson(page, lesson);
-  return [await saveCurrentPagePdf(page, lesson, "full")];
 };
 
 const renderLesson = async (page, lesson) => {
   if (level === "A1") return renderA1Lesson(page, lesson);
-  if (level === "B2" || level === "C1") return renderTabbedLesson(page, lesson);
-  return renderStandardLesson(page, lesson);
+  if (level === "B2" || level === "C1") return renderGuidedLesson(page, lesson);
+  await ensureAuthenticatedLesson(page, lesson);
+  return [await saveCurrentPagePdf(page, lesson, "lesson")];
 };
 
-const addCoverAndContents = async (output, lessons) => {
+const addCoverAndContents = async (output, printableLessons) => {
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
   cover.drawText("FALOWEN", { x: 54, y: 755, size: 28, font: bold, color: rgb(0.08, 0.25, 0.65) });
   cover.drawText(`${level} Course Materials`, { x: 54, y: 670, size: 30, font: bold });
-  cover.drawText(level === "A1" ? "Complete lesson and workbook materials" : "Course learning materials", { x: 54, y: 625, size: 15, font, color: rgb(0.28, 0.34, 0.43) });
+  cover.drawText(level === "A1" ? "Complete course book and workbook lessons" : "Course materials", { x: 54, y: 625, size: 15, font });
   cover.drawText(`Curriculum version: ${manifest.generatedAt.slice(0, 10)}`, { x: 54, y: 570, size: 11, font });
   cover.drawText(`Printable lessons: ${manifest.printableLessonCount}`, { x: 54, y: 548, size: 11, font });
 
   let toc = output.addPage([595.28, 841.89]);
   toc.drawText("Contents", { x: 54, y: 780, size: 24, font: bold });
   let y = 744;
-  for (const lesson of lessons) {
-    if (y < 80) {
-      toc = output.addPage([595.28, 841.89]);
-      toc.drawText("Contents continued", { x: 54, y: 800, size: 18, font: bold });
-      y = 765;
+  for (const lesson of printableLessons) {
+    const label = `Day ${lesson.day} · ${lesson.title}`;
+    const lines = label.length > 78 ? [label.slice(0, 78), label.slice(78)] : [label];
+    for (const line of lines) {
+      toc.drawText(line, { x: 58, y, size: 10.5, font });
+      y -= 16;
     }
-    toc.drawText(`Day ${lesson.day} · ${lesson.title}`.slice(0, 92), { x: 58, y, size: 10.5, font });
-    y -= 21;
+    y -= 4;
+    if (y < 70) {
+      toc = output.addPage([595.28, 841.89]);
+      toc.drawText("Contents continued", { x: 54, y: 810, size: 18, font: bold });
+      y = 780;
+    }
   }
 };
 
 const mergeBundle = async (renderedLessons) => {
   const output = await PDFDocument.create();
-  const lessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
-  await addCoverAndContents(output, lessons);
-  for (const lesson of lessons) {
-    for (const item of renderedLessons.get(lesson.day) || []) {
+  const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+  await addCoverAndContents(output, printableLessons);
+
+  for (const lesson of printableLessons) {
+    const files = renderedLessons.get(lesson.day) || [];
+    for (const item of files) {
       const source = await PDFDocument.load(fs.readFileSync(item.file));
       const pages = await output.copyPages(source, source.getPageIndices());
       pages.forEach((page) => output.addPage(page));
     }
   }
+
   const font = await output.embedFont(StandardFonts.Helvetica);
   const pages = output.getPages();
   pages.forEach((page, index) => {
@@ -223,6 +228,7 @@ const mergeBundle = async (renderedLessons) => {
     page.drawText("Falowen Learning Hub", { x: 36, y: 20, size: 8, font, color: rgb(0.45, 0.5, 0.58) });
     page.drawText(`${index + 1} / ${pages.length}`, { x: width - 70, y: 20, size: 8, font, color: rgb(0.45, 0.5, 0.58) });
   });
+
   fs.writeFileSync(finalPdfPath, await output.save());
 };
 
@@ -231,9 +237,9 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1800
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
-
 const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
 const renderedLessons = new Map();
+
 try {
   for (const lesson of printableLessons) {
     const startedAt = Date.now();
@@ -241,16 +247,26 @@ try {
     try {
       const rendered = await renderLesson(page, lesson);
       renderedLessons.set(lesson.day, rendered);
-      const durationSeconds = Math.round((Date.now() - startedAt) / 1000);
-      diagnostics.lessons.push({ day: lesson.day, title: lesson.title, status: "rendered", sections: rendered.map((item) => item.tab), durationSeconds });
-      console.log(`Rendered ${rendered.length} page source(s) in ${durationSeconds}s.`);
+      diagnostics.lessons.push({
+        day: lesson.day,
+        title: lesson.title,
+        status: "rendered",
+        sections: rendered.map((item) => item.tab),
+        durationSeconds: Math.round((Date.now() - startedAt) / 1000),
+      });
     } catch (error) {
-      diagnostics.lessons.push({ day: lesson.day, title: lesson.title, status: "failed", error: error instanceof Error ? error.message : String(error) });
+      diagnostics.lessons.push({
+        day: lesson.day,
+        title: lesson.title,
+        status: "failed",
+        durationSeconds: Math.round((Date.now() - startedAt) / 1000),
+        error: error instanceof Error ? error.message : String(error),
+      });
       writeDiagnostics();
       throw error;
     } finally {
-      console.log("::endgroup::");
       writeDiagnostics();
+      console.log("::endgroup::");
     }
   }
 } finally {
