@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import WritingPage from "./WritingPage";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import {
   STANDARD_WORKBOOK_TABS,
@@ -75,19 +76,6 @@ const writingPanelStyle = {
   border: "1px solid #bfdbfe",
   background: "#f8fbff",
   gap: 12,
-};
-
-const writingTextareaStyle = {
-  width: "100%",
-  minHeight: 260,
-  border: "1px solid #cbd5e1",
-  borderRadius: 14,
-  padding: 12,
-  fontSize: "clamp(1rem, 4vw, 1.05rem)",
-  lineHeight: 1.7,
-  resize: "vertical",
-  boxSizing: "border-box",
-  overflowWrap: "anywhere",
 };
 
 const templateTextStyle = {
@@ -209,7 +197,6 @@ const QuestionList = ({ questions }) => (
 const B1Day1TraumweltWorkbookPage = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [writingView, setWritingView] = useState("schreiben");
-  const [writingDraft, setWritingDraft] = useState("");
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -340,12 +327,28 @@ const B1Day1TraumweltWorkbookPage = () => {
           {writingView === "schreiben" && (
             <div style={writingPanelStyle}>
               <strong>Schreiben</strong>
-              <p style={mobileTextStyle}>Type your draft here first. When it is finished, copy it to the Submit tab.</p>
-              <textarea
-                value={writingDraft}
-                onChange={(event) => setWritingDraft(event.target.value)}
-                placeholder="Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ..."
-                style={writingTextareaStyle}
+              <p style={mobileTextStyle}>
+                Write your complete German letter below. When you finish, click <strong>Mark My Letter</strong> to get your score and corrections before submitting the final version.
+              </p>
+              <WritingPage
+                mode="course"
+                initialTab="mark"
+                enabledTabs={["mark"]}
+                hideTabList
+                markLabel="Mark My Letter"
+                submitLabel="Mark My Letter"
+                markDescription="Write your complete German letter in this box, then click Mark My Letter below it to check your work."
+                draftLabel="Your complete German letter"
+                draftPlaceholder={'Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...'}
+                writingContext={{
+                  level: "B1",
+                  courseLevel: "B1",
+                  day: 1,
+                  lessonId: "B1-day-1",
+                  workbookId: "B1-day-1",
+                  writingTaskId: "B1-day-1-teil-2-writing",
+                  taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
+                }}
               />
             </div>
           )}
