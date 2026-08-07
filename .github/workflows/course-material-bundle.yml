@@ -92,7 +92,7 @@ jobs:
         if: ${{ inputs.build_pdf }}
         run: |
           if [ "${{ inputs.level }}" = "A1" ]; then
-            node scripts/course-material-bundles/renderA1Bundle.mjs
+            node scripts/course-material-bundles/runA1BundleCleanPdf.mjs
           else
             node scripts/course-material-bundles/renderLevelBundleV2.mjs "${{ inputs.level }}"
           fi
