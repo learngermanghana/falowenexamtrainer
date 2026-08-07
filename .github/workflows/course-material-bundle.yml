@@ -90,7 +90,12 @@ jobs:
 
       - name: Render and merge course materials
         if: ${{ inputs.build_pdf }}
-        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs "${{ inputs.level }}"
+        run: |
+          if [ "${{ inputs.level }}" = "A1" ]; then
+            node scripts/course-material-bundles/renderA1Bundle.mjs
+          else
+            node scripts/course-material-bundles/renderLevelBundleV2.mjs "${{ inputs.level }}"
+          fi
         env:
           FALOWEN_PDF_BASE_URL: https://www.falowen.app
           FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
