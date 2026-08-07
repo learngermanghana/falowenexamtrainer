@@ -307,7 +307,7 @@ const A2StandardTabbedWorkbookPage = ({
           <CourseInlinePracticePanel
             type="writing"
             title="A2 writing workspace"
-            description="Plan your points in English, choose a formal or informal template, write your German draft and use Mark My Letter before submitting."
+            description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting."
             writingContext={{
               level: "A2",
               courseLevel: "A2",
@@ -358,30 +358,20 @@ const A2StandardTabbedWorkbookPage = ({
       {activeTab === "references" && (
         <WorkbookReferenceAnswers
           level="A2"
-          lesson={{ title: resolvedWorkbookId, level: "A2", day, workbookId: resolvedWorkbookId }}
+          lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }}
           workbookId={resolvedWorkbookId}
         />
       )}
 
       {activeTab === "submit" && (
         <div style={card}>
-          <h2 style={sectionTitle}>Submit Workbook</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Submit your required answers for A2 Day {day} here. Include your writing text and your reading/listening answer letters if required by your tutor.
-          </p>
-          <WorkbookSubmissionReminder />
-          <div className={`a2-day${day}-submission-page`} style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.a2-day${day}-submission-page > div > section:first-child { display: none !important; }
-            .a2-day${day}-submission-page select { display: none !important; }`}</style>
-            <ContextualAssignmentSubmissionPage
-              submissionContext={{
-                level: "A2",
-                day,
-                assignmentKey,
-                canonicalAssignmentKey: assignmentKey,
-              }}
-            />
-          </div>
+          <ContextualAssignmentSubmissionPage
+            level="A2"
+            day={day}
+            assignmentKey={assignmentKey}
+            canonicalAssignmentKey={assignmentKey}
+            workbookId={resolvedWorkbookId}
+          />
         </div>
       )}
     </div>
