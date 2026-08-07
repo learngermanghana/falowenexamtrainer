@@ -17,7 +17,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 5, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 6, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const getBodyText = async (page) => {
@@ -95,11 +95,27 @@ const ensureInternalPage = async (page, target, day) => {
   const url = new URL(target.url, baseUrl).toString();
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForStablePage(page);
+
   if (await isPublicOrLogin(page)) {
     throw new Error(`Day ${day} ${target.kind} route is not authenticated: ${url}`);
   }
+
+  const currentUrl = new URL(page.url());
+  const expectedUrl = new URL(url);
   const text = await getBodyText(page);
-  if (text.length < 350) throw new Error(`Day ${day} ${target.kind} route rendered too little content: ${url}`);
+  const fatalShell = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i.test(text);
+  const isFalowenCoursePage = currentUrl.origin === expectedUrl.origin && currentUrl.pathname.startsWith("/campus/course/");
+
+  if (!isFalowenCoursePage) {
+    throw new Error(`Day ${day} ${target.kind} left the expected Falowen course route: ${page.url()}`);
+  }
+  if (fatalShell) {
+    throw new Error(`Day ${day} ${target.kind} rendered an error page: ${url}`);
+  }
+  if (!text) {
+    throw new Error(`Day ${day} ${target.kind} rendered an empty page: ${url}`);
+  }
+
   return url;
 };
 
