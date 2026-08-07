@@ -1,0 +1,30 @@
+{
+  "level": "A1",
+  "source": "web/src/data/courseSchedule.js",
+  "lessons": [
+    {"day":1,"title":"Greetings and Asking About Well-being","targets":[{"kind":"grammar","url":"/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"},{"kind":"workbook","url":"/campus/course/a1-day-1-greetings-workbook"}]},
+    {"day":2,"title":"German Alphabet + Personal Pronouns and Verb Conjugation","targets":[{"kind":"grammar","url":"/campus/course/german-alphabet-grammar-notes-day-2"},{"kind":"workbook","url":"/campus/course/a1-day-2-german-alphabet-reviewing-workbook"},{"kind":"grammar","url":"/campus/course/singular-pronouns-verb-conjugation-day-2"},{"kind":"workbook","url":"/campus/course/a1-day-2-kapitel-1-1-workbook"}]},
+    {"day":3,"title":"Personal Pronouns and Verb Conjugation + Introducing Yourself","targets":[{"kind":"practice","url":"/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"},{"kind":"grammar","url":"/campus/course/a1-day-3-kapitel-1-2-grammar-notes"},{"kind":"workbook","url":"/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"}]},
+    {"day":4,"title":"Numbers","targets":[{"kind":"grammar","url":"/campus/course/german-numbers-1-10-with-pronunciation"},{"kind":"workbook","url":"/campus/course/a1-day-4-numbers-for-beginners-workbook"}]},
+    {"day":5,"title":"Introducing Yourself and Articles","targets":[{"kind":"grammar","url":"/campus/course/a1-day-3-kapitel-1-2-grammar-notes"},{"kind":"workbook","url":"/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"}]},
+    {"day":6,"title":"Family and Hobbies","targets":[{"kind":"workbook","url":"/campus/course/a1-day-6-family-and-hobbies-workbook"}]},
+    {"day":7,"title":"Asking About Prices","targets":[{"kind":"grammar","url":"/campus/course/a1-day-7-asking-about-prices-and-preferences"},{"kind":"workbook","url":"/campus/course/a1-chapter-3-asking-about-prices-workbook"}]},
+    {"day":8,"title":"Countries and Languages","targets":[{"kind":"grammar","url":"/campus/course/forming-basic-statements-german-a1-day-8"},{"kind":"workbook","url":"/campus/course/a1-day-8-countries-and-languages-workbook"}]},
+    {"day":9,"title":"German Cases","targets":[{"kind":"grammar","url":"/campus/course/a1-day-9-nominative-and-accusative-cases"},{"kind":"workbook","url":"/campus/course/a1-chapter-5-german-cases-workbook"}]},
+    {"day":10,"title":"Objects and Colors","targets":[{"kind":"grammar","url":"/campus/course/objects-and-colors-chapter-6"},{"kind":"workbook","url":"/campus/course/a1-day-10-objects-colors-possessive-articles-workbook"}]},
+    {"day":11,"title":"Understanding Time","targets":[{"kind":"grammar","url":"/campus/course/the-12-hour-clock-system-in-german-chapter-7"},{"kind":"workbook","url":"/campus/course/a1-day-11-understanding-time-workbook"}]},
+    {"day":12,"title":"24 Hour Clock","targets":[{"kind":"grammar","url":"/campus/course/a1-day-12-the-24-hour-clock-and-dates"},{"kind":"workbook","url":"/campus/course/a1-day-12-24-hour-clock-and-dates-workbook"}]},
+    {"day":13,"title":"Revision","targets":[{"kind":"workbook","url":"/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook"}]},
+    {"day":14,"title":"Modal Verbs","targets":[{"kind":"combined","url":"/campus/course/modal-verbs-day-14-3-6"}]},
+    {"day":15,"title":"Introduction to Speaking Exams","targets":[{"kind":"combined","url":"/campus/course/speaking-exams-intro-4-7"}]},
+    {"day":16,"title":"Food and Negation","targets":[{"kind":"grammar","url":"/campus/course/food-and-negation-day-16-9-10"},{"kind":"workbook","url":"/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook"},{"kind":"workbook","url":"/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook"}]},
+    {"day":17,"title":"Instructions","targets":[{"kind":"grammar","url":"/campus/course/directions-imperative-11"},{"kind":"workbook","url":"/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook"}]},
+    {"day":18,"title":"Two Case Prepositions","targets":[{"kind":"grammar","url":"/campus/course/two-case-prepositions-wechselpraepositionen-day-18"},{"kind":"external-pdf","url":"https://drive.google.com/file/d/1A0NkFl1AG68jHeqSytI3ygJ0k7H74AEX/view?usp=sharing"},{"kind":"grammar","url":"/campus/course/a1-12-2-dative-articles-mit-bei-zu"},{"kind":"external-pdf","url":"https://drive.google.com/file/d/1xojH7Tgb5LeJj3nzNSATUVppWnJgJLEF/view?usp=sharing"}]},
+    {"day":19,"title":"Goethe A1 Speaking Confidence Lab","targets":[{"kind":"combined","url":"/campus/course/verboten-erlaubt-5-9"}]},
+    {"day":20,"title":"Introduction to Letter Writing 12.3","targets":[{"kind":"combined","url":"/campus/course/letter-writing-intro-german-a1-day-12-3"}]},
+    {"day":21,"title":"Weather","targets":[{"kind":"grammar","url":"/campus/course/weather-perfekt-letter-13"},{"kind":"workbook","url":"/campus/course/a1-day-21-weather-workbook"}]},
+    {"day":22,"title":"Health","targets":[{"kind":"grammar","url":"/campus/course/health-and-body-parts-14-1"},{"kind":"workbook","url":"/campus/course/a1-day-22-health-and-body-parts-workbook"}]},
+    {"day":23,"title":"Dative and Accusative Verbs","targets":[{"kind":"grammar","url":"/campus/course/dative-and-accusative-verbs-14-2"}]},
+    {"day":24,"title":"Conjunctions","targets":[{"kind":"combined","url":"/campus/course/conjunctions-5-10"}]}
+  ]
+}
