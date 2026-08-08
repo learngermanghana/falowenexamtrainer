@@ -6,12 +6,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const replacements = [
   {
-    file: "web/src/components/A2Day2PersonenBeschreibenWorkbookPage.js",
-    before: 'hoerenAudioUrl="https://youtu.be/5ttnGcZWo-Q"',
-    after: 'hoerenAudioUrl="https://youtu.be/iB-yVVqI1DQ"',
-    label: "A2 Day 2 teacher lecture video",
-  },
-  {
     file: "web/src/data/a1TeacherVideoResources.js",
     before: '[11, "7", "Understanding Time", "https://youtu.be/qrkQJc5kQJQ"],',
     after: '[11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],',
