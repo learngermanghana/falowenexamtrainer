@@ -5,7 +5,7 @@ import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import WritingPage from "./WritingPage";
+import B1WritingWorkspace from "./B1WritingWorkspace";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import {
   STANDARD_WORKBOOK_TABS,
@@ -325,32 +325,23 @@ const B1Day1TraumweltWorkbookPage = () => {
           </div>
 
           {writingView === "schreiben" && (
-            <div style={writingPanelStyle}>
-              <strong>Schreiben</strong>
-              <p style={mobileTextStyle}>
-                Write your complete German letter below. When you finish, click <strong>Mark My Letter</strong> to get your score and corrections before submitting the final version.
-              </p>
-              <WritingPage
-                mode="course"
-                initialTab="mark"
-                enabledTabs={["mark"]}
-                hideTabList
-                markLabel="Mark My Letter"
-                submitLabel="Mark My Letter"
-                markDescription="Write your complete German letter in this box, then click Mark My Letter below it to check your work."
-                draftLabel="Your complete German letter"
-                draftPlaceholder={'Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...'}
-                writingContext={{
-                  level: "B1",
-                  courseLevel: "B1",
-                  day: 1,
-                  lessonId: "B1-day-1",
-                  workbookId: "B1-day-1",
-                  writingTaskId: "B1-day-1-teil-2-writing",
-                  taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
-                }}
-              />
-            </div>
+            <B1WritingWorkspace
+              writingContext={{
+                level: "B1",
+                courseLevel: "B1",
+                day: 1,
+                lessonId: "B1-day-1",
+                workbookId: "B1-day-1",
+                writingTaskId: "B1-day-1-teil-2-writing",
+                taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
+                taskPoints: [
+                  "Reagieren Sie auf Tanjas Meinung.",
+                  "Nennen Sie Vorteile oder Nachteile von Homeoffice.",
+                  "Begründen Sie Ihre eigene Meinung.",
+                ],
+                draftPlaceholder: "Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...",
+              }}
+            />
           )}
 
           {writingView === "cheatSheet" && (

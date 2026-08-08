@@ -1,23 +1,19 @@
-jest.mock("./WritingPage", () => {
+jest.mock("./B1InlineWritingAnalyser", () => {
   const React = require("react");
-  return function MockWritingPage(props) {
+  return function MockWritingAnalyser(props) {
     return React.createElement(
-      "div",
+      "button",
       {
-        "data-testid": "mark-my-letter-ui",
-        "data-initial-tab": props.initialTab,
-        "data-enabled-tabs": (props.enabledTabs || []).join(","),
-        "data-submit-label": props.submitLabel,
-        "data-draft-label": props.draftLabel,
-        "data-draft-placeholder": props.draftPlaceholder,
+        "data-testid": "analyse-text",
+        "data-text": props.text,
       },
-      "Mark My Letter UI",
+      "Analyse my text",
     );
   };
 });
 
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import B1WritingWorkspace from "./B1WritingWorkspace";
 
 describe("B1WritingWorkspace", () => {
@@ -38,18 +34,19 @@ describe("B1WritingWorkspace", () => {
     );
 
     const planning = screen.getByLabelText("B1 planning points");
-    const marker = screen.getByTestId("mark-my-letter-ui");
+    const germanDraft = screen.getByLabelText("B1 German writing draft");
+    const analyser = screen.getByTestId("analyse-text");
 
-    expect(screen.getByText("Schreiben Sie einen Meinungsbeitrag.")).toBeVisible();
     expect(planning).toBeVisible();
-    expect(marker).toBeVisible();
-    expect(marker).toHaveAttribute("data-submit-label", "Mark My Letter");
-    expect(marker).toHaveAttribute("data-draft-label", "Your complete German letter");
-    expect(marker).toHaveAttribute("data-draft-placeholder", "Write your complete German letter here...");
-    expect(planning.compareDocumentPosition(marker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.queryByLabelText("B1 writing draft")).not.toBeInTheDocument();
-    expect(screen.getByText(/same text there/i)).toBeVisible();
+    expect(germanDraft).toBeVisible();
+    expect(analyser).toBeVisible();
+    expect(planning.compareDocumentPosition(germanDraft) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(germanDraft.compareDocumentPosition(analyser) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.change(germanDraft, { target: { value: "Das ist mein Text." } });
+    expect(screen.getByTestId("analyse-text")).toHaveAttribute("data-text", "Das ist mein Text.");
+    expect(screen.getAllByRole("textbox")).toHaveLength(2);
+    expect(screen.queryByText(/Mark My Letter/i)).not.toBeInTheDocument();
     expect(screen.getByText(/English is okay in this planning box/i)).toBeVisible();
-    expect(screen.getByText("Nennen Sie Ihre Meinung.")).toBeVisible();
+    expect(screen.queryByText("Nennen Sie Ihre Meinung.")).not.toBeInTheDocument();
   });
 });

@@ -31,7 +31,7 @@ jest.mock("./B1WritingWorkspace", () => {
         "data-level": writingContext.level,
         "data-day": String(writingContext.day),
       },
-      "B1 planning, Schreiben and Mark My Letter workspace",
+      "B1 planning, Schreiben and Analyse my text workspace",
     );
   };
 });
@@ -75,7 +75,7 @@ test("unrelated workbook routes do not receive the Small Talk map", () => {
   expect(screen.queryByTestId("mind-map-centre")).not.toBeInTheDocument();
 });
 
-test("B1 Teil 2 restores the planning and Schreiben workspace before Mark My Letter", () => {
+test("B1 Teil 2 renders the shared two-box workspace without an outer practice card", () => {
   window.history.pushState(
     {},
     "",
@@ -96,10 +96,22 @@ test("B1 Teil 2 restores the planning and Schreiben workspace before Mark My Let
     />,
   );
 
-  expect(screen.getByText("Teil 2 writing workspace")).toBeVisible();
+  expect(screen.queryByText("Teil 2 writing workspace")).not.toBeInTheDocument();
   const workspace = screen.getByTestId("b1-writing-workspace");
   expect(workspace).toBeVisible();
   expect(workspace).toHaveAttribute("data-level", "B1");
   expect(workspace).toHaveAttribute("data-day", "1");
+  expect(screen.queryByTestId("writing-support-tabs")).not.toBeInTheDocument();
+});
+
+test("A2 Small Talk Schreiben uses the same shared workspace", () => {
+  window.history.pushState({}, "", "/campus/course/a2-day-2-small-talk-workbook");
+
+  render(<CourseInlinePracticePanel type="writing" />);
+
+  const workspace = screen.getByTestId("b1-writing-workspace");
+  expect(workspace).toHaveAttribute("data-level", "A2");
+  expect(workspace).toHaveAttribute("data-day", "2");
+  expect(screen.queryByTestId("mark-my-letter-ui")).not.toBeInTheDocument();
   expect(screen.queryByTestId("writing-support-tabs")).not.toBeInTheDocument();
 });

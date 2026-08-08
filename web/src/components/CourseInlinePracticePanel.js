@@ -165,6 +165,13 @@ const CourseInlinePracticePanel = ({
       ? `Topic locked: ${resolvedSpeakingContext.topic}. The chat can ask follow-up questions, but it should stay on this lesson topic.`
       : description || config.defaultDescription;
 
+  // A2/B1 workbooks already render their task and tabs around this component.
+  // Return the shared workspace directly so the writing area contains exactly
+  // its planning box and German-text box, without a third practice-panel card.
+  if (isA2B1Writing) {
+    return <B1WritingWorkspace writingContext={resolvedWritingContext} />;
+  }
+
   return (
     <Fragment>
       {speakingMindMap ? <SpeakingMindMap config={speakingMindMap} /> : null}
