@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { styles } from "../styles";
 import B1InlineWritingAnalyser from "./B1InlineWritingAnalyser";
 
@@ -28,58 +28,29 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
   const [pointsDraft, setPointsDraft] = useState("");
   const [germanDraft, setGermanDraft] = useState("");
   const level = String(writingContext.level || writingContext.courseLevel || "B1").toUpperCase() === "A2" ? "A2" : "B1";
-  const supportItems = writingContext.supportStructure?.length
-    ? writingContext.supportStructure
-    : writingContext.taskPoints || [];
-
-  const planningPlaceholder = useMemo(() => {
-    if (!supportItems.length) {
-      return "Write your ideas in English or German first.\n1. Main point ...\n2. Reason ...\n3. Example ...";
-    }
-    return supportItems.map((item, index) => `${index + 1}. ${item} → write your idea here`).join("\n");
-  }, [supportItems]);
 
   return (
     <div data-a2-b1-writing-workspace="standard" style={{ display: "grid", gap: 14 }}>
       <section style={cardStyle} aria-label={`${level} writing planning points`}>
         <div>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
-            Step 1 · Plan your points
-          </span>
-          <h3 style={{ margin: "8px 0 4px" }}>Stichpunkte / ideas</h3>
+          <h3 style={{ margin: 0 }}>Stichpunkte / ideas</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
             Write short ideas before you start the German text. English is okay in this planning box.
           </p>
         </div>
 
-        {writingContext.taskTitle ? (
-          <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#fff" }}>
-            <strong>Writing task</strong>
-            <p style={{ margin: "6px 0 0", lineHeight: 1.7 }}>{writingContext.taskTitle}</p>
-          </div>
-        ) : null}
-
-        {supportItems.length ? (
-          <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.7 }}>
-            {supportItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
-          </ul>
-        ) : null}
-
         <textarea
           aria-label={`${level} planning points`}
           value={pointsDraft}
           onChange={(event) => setPointsDraft(event.target.value)}
-          placeholder={planningPlaceholder}
+          placeholder="Write your short ideas in English or German here..."
           style={{ ...textareaStyle, minHeight: 140 }}
         />
       </section>
 
       <section style={cardStyle} aria-label={`${level} German writing`}>
         <div>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#fef3c7", color: "#92400e" }}>
-            Step 2 · Schreiben
-          </span>
-          <h3 style={{ margin: "8px 0 4px" }}>Write your German text</h3>
+          <h3 style={{ margin: 0 }}>Write your German text</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
             Turn your points into one complete German text. When you finish, analyse the same text below.
           </p>
