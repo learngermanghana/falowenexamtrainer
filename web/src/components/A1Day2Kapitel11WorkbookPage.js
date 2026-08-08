@@ -36,21 +36,21 @@ const questions = [
   {
     stem: "2. Woher kommt sie?",
     translation: "Where does she come from?",
-    options: ["A) Berlin", "B) Hamburg", "C) München", "D) Frankfurt"],
+    options: ["A) Italien", "B) Hamburg", "C) München", "D) Frankfurt"],
   },
   {
-    stem: "3. Welche Buchstaben sagt sie?",
-    translation: "Which letters does Anna say?",
+    stem: "3. Wo arbeitet Anna?",
+    translation: "Where does Anna work?",
     options: [
-      "A) A, B, C, D, E, F, G",
-      "B) H, I, J, K, L, M, N",
-      "C) O, P, Q, R, S, T, U",
-      "D) V, W, X, Y, Z, Ä, Ö, Ü",
+      "A) In einem Café",
+      "B) In einer Schule",
+      "C) In einem Büro",
+      "D) In einem Krankenhaus",
     ],
   },
   {
-    stem: "4. Woher kommt Annas Freund Max?",
-    translation: "Where does Anna's friend Max come from?",
+    stem: "4. Woher kommt Annas Freund Tom?",
+    translation: "Where does Anna's friend Tom come from?",
     options: ["A) Berlin", "B) Hamburg", "C) München", "D) Frankfurt"],
   },
 ];
