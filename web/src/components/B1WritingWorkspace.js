@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import B1InlineWritingAnalyser from "./B1InlineWritingAnalyser";
 
@@ -28,6 +28,14 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
   const [pointsDraft, setPointsDraft] = useState("");
   const [germanDraft, setGermanDraft] = useState("");
   const level = String(writingContext.level || writingContext.courseLevel || "B1").toUpperCase() === "A2" ? "A2" : "B1";
+  const supportItems = writingContext.supportStructure?.length
+    ? writingContext.supportStructure
+    : writingContext.taskPoints || [];
+
+  const planningPlaceholder = useMemo(() => {
+    if (!supportItems.length) return "Write your short ideas in English or German here...";
+    return supportItems.map((item, index) => `${index + 1}. ${item} → ...`).join("\n");
+  }, [supportItems]);
 
   return (
     <div data-a2-b1-writing-workspace="standard" style={{ display: "grid", gap: 14 }}>
@@ -39,11 +47,22 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           </p>
         </div>
 
+        {supportItems.length ? (
+          <div>
+            <strong>Points you must cover</strong>
+            <ul style={{ margin: "8px 0 0", paddingLeft: 22, lineHeight: 1.7 }}>
+              {supportItems.map((item, index) => (
+                <li key={`${item}-${index}`}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         <textarea
           aria-label={`${level} planning points`}
           value={pointsDraft}
           onChange={(event) => setPointsDraft(event.target.value)}
-          placeholder="Write your short ideas in English or German here..."
+          placeholder={planningPlaceholder}
           style={{ ...textareaStyle, minHeight: 140 }}
         />
       </section>
