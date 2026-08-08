@@ -15,6 +15,7 @@ import { applyA1Day16LessonResourceFixes } from "./a1Day16LessonResourceFixes";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import { hasTeacherLectureVideoResources } from "./teacherLectureVideoResources";
 import {
   applyB1LessonVideoOverrides,
   getB1LessonResourceOverride,
@@ -266,8 +267,9 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
 
 const shouldKeepTeacherVideo = ({ level, day, video }) => {
   if (!isTeacherVideo(video)) return true;
-  if (level === "B1") return false;
-  if (level === "A2") return Number(day) === 16;
+  if (["A2", "B1"].includes(level)) {
+    return hasTeacherLectureVideoResources(level, day);
+  }
   return true;
 };
 
