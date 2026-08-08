@@ -15,6 +15,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/70AgN5VKeqc",
       },
     ],
+    2: [
+      {
+        chapter: "1.2",
+        topic: "Personen beschreiben",
+        url: "https://youtu.be/iB-yVVqI1DQ",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
