@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useState } from "react";
+import C1_APPROVED_OPINION_ESSAY_TEMPLATE from "../data/c1ApprovedOpinionEssayTemplate";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
 import {
   getWritingVideoResource,
@@ -9,6 +10,36 @@ import {
   A2LetterTemplateCheatSheet,
   A2WritingPlanner,
 } from "./A2WritingWorkspaceSupport";
+
+const C1_TEMPLATE_LABELS = [
+  "Einleitung",
+  "Hauptargument / Kriterien",
+  "Beispiel",
+  "Einwand",
+  "Alternative",
+  "Schluss",
+];
+
+const syncC1OpinionTemplateSection = (sections = [], normalizedLevel = "") => {
+  if (normalizedLevel !== "C1") return sections;
+  const templateItems = C1_APPROVED_OPINION_ESSAY_TEMPLATE
+    .split(/\n\n+/)
+    .map((meaning, index) => ({
+      phrase: C1_TEMPLATE_LABELS[index] || `Abschnitt ${index + 1}`,
+      meaning,
+    }));
+
+  return sections.map((section) =>
+    section.id === "c1-opinion-essay-template"
+      ? {
+          ...section,
+          title: "C1 MEINUNGSBEITRAG / ERÖRTERUNG · Gleiche Vorlage wie im Schreibfeld",
+          layout: "template",
+          items: templateItems,
+        }
+      : section,
+  );
+};
 
 export const WritingVideoSupportCard = ({ writingVideo, writingVideoEmbed }) => {
   if (!writingVideo?.url) return null;
@@ -103,7 +134,10 @@ export default function WritingCheatSheetTabs({ level, day, children }) {
   const [writeView, setWriteView] = useState("task");
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const isA2 = normalizedLevel === "A2";
-  const writingCheatSheet = getWritingCheatSheet(level, day);
+  const writingCheatSheet = syncC1OpinionTemplateSection(
+    getWritingCheatSheet(level, day),
+    normalizedLevel,
+  );
   const writingVideo = getWritingVideoResource(level, day);
   const writingVideoEmbed = getYouTubeEmbedUrl(writingVideo?.url);
   const hasWritingVideo = Boolean(writingVideo?.url);
