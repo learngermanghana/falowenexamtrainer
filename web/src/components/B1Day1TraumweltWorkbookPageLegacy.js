@@ -301,7 +301,7 @@ const B1Day1TraumweltWorkbookPage = () => {
             submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
           >
             <p style={mobileTextStyle}>
-              Schreiben Sie Ihre Meinung zum Thema <strong>Traumberuf und persönliche Kontakte</strong>. Reagieren Sie auf Tanjas Meinung. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre eigene Meinung.
+              Schreiben Sie Ihre <strong>eigene Meinung</strong> zur Frage, ob persönlicher Kontakt im Traumberuf wichtiger ist als flexible Arbeit im Homeoffice. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre Meinung.
             </p>
           </WorkbookTaskCard>
 
@@ -313,7 +313,10 @@ const B1Day1TraumweltWorkbookPage = () => {
           />
 
           <div style={questionCardStyle}>
-            <strong>Meinung aus dem Online-Gästebuch</strong>
+            <strong>Beispielmeinung aus dem Online-Gästebuch</strong>
+            <p style={{ ...mobileTextStyle, color: "#475569" }}>
+              Lesen Sie Tanjas Meinung als Beispiel. Sie müssen nicht direkt darauf reagieren.
+            </p>
             <p style={mobileTextStyle}>
               Tanja: „Ich finde es wichtig, dass man im Traumberuf mit anderen Menschen in Kontakt steht. Aber heute arbeiten viele im Homeoffice, und oft haben sie wenig persönlichen Kontakt mit Kollegen. Meiner Meinung nach kann das den Beruf nicht so erfüllend machen wie bei direkter Zusammenarbeit im Büro.“
             </p>
@@ -335,9 +338,9 @@ const B1Day1TraumweltWorkbookPage = () => {
                 writingTaskId: "B1-day-1-teil-2-writing",
                 taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
                 taskPoints: [
-                  "Reagieren Sie auf Tanjas Meinung.",
-                  "Nennen Sie Vorteile oder Nachteile von Homeoffice.",
-                  "Begründen Sie Ihre eigene Meinung.",
+                  "Äußern Sie Ihre eigene Meinung zur Leitfrage.",
+                  "Sagen Sie, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist.",
+                  "Nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre Meinung.",
                 ],
                 draftPlaceholder: "Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...",
               }}
