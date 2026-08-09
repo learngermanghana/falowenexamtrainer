@@ -1,6 +1,6 @@
-export const C1_APPROVED_OPINION_ESSAY_TEMPLATE = `In der heutigen Zeit wird häufig über [Thema] diskutiert. Dieses Thema ist von großer gesellschaftlicher Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Im Folgenden werde ich zunächst erläutern, nach welchen Kriterien [Entscheidung oder Maßnahme] beurteilt werden sollte. Anschließend werde ich anhand eines konkreten Beispiels argumentieren, mögliche Einwände darstellen und schließlich eine Alternative erläutern.
+export const C1_APPROVED_OPINION_ESSAY_TEMPLATE = `In der heutigen Zeit wird häufig über [Thema] diskutiert. Dieses Thema ist von großer gesellschaftlicher Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft.
 
-Bei der Beurteilung von [Thema] sollten mehrere Kriterien berücksichtigt werden. Von besonderer Bedeutung ist zunächst ...
+Bei der Beurteilung von [Thema] sollten mehrere Kriterien berücksichtigt werden.
 
 Ein anschauliches Beispiel hierfür ist ... Daran zeigt sich, dass ...
 
