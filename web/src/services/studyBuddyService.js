@@ -7,6 +7,9 @@ const STUDY_BUDDY_MODE_LABELS = {
   speaking: "Speaking",
   writing: "Writing",
 };
+const STUDY_BUDDY_HISTORY_PREFIX = "studyBuddyConversationHistory";
+const STUDY_BUDDY_HISTORY_MAX_MESSAGES = 10;
+const STUDY_BUDDY_HISTORY_MAX_MESSAGE_CHARS = 1200;
 
 const getStoredStudyBuddyMode = () => DEFAULT_STUDY_BUDDY_MODE;
 
@@ -36,7 +39,71 @@ const getBrowserLessonContext = () => {
   };
 };
 
-const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
+const decodeTokenIdentity = (idToken) => {
+  if (!idToken || typeof idToken !== "string") return "session";
+  try {
+    const payloadPart = idToken.split(".")[1];
+    if (!payloadPart) return "session";
+    const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = JSON.parse(atob(padded));
+    return String(decoded?.user_id || decoded?.sub || decoded?.uid || "session");
+  } catch (error) {
+    return "session";
+  }
+};
+
+const sanitizeHistoryMessage = (entry) => {
+  const role = entry?.role === "assistant" ? "assistant" : entry?.role === "user" ? "user" : null;
+  const content = String(entry?.content || "").trim().slice(0, STUDY_BUDDY_HISTORY_MAX_MESSAGE_CHARS);
+  if (!role || !content) return null;
+  return { role, content };
+};
+
+const getConversationStorageKey = ({ idToken, level }) => {
+  const identity = decodeTokenIdentity(idToken);
+  const normalizedLevel = String(level || "unknown").trim().toUpperCase() || "UNKNOWN";
+  return `${STUDY_BUDDY_HISTORY_PREFIX}:${identity}:${normalizedLevel}`;
+};
+
+export const readStudyBuddyConversationHistory = ({ idToken, level }) => {
+  if (typeof window === "undefined" || !window.localStorage) return [];
+  try {
+    const raw = window.localStorage.getItem(getConversationStorageKey({ idToken, level }));
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(sanitizeHistoryMessage)
+      .filter(Boolean)
+      .slice(-STUDY_BUDDY_HISTORY_MAX_MESSAGES);
+  } catch (error) {
+    return [];
+  }
+};
+
+const writeStudyBuddyConversationHistory = ({ idToken, level, history }) => {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
+    const normalized = (Array.isArray(history) ? history : [])
+      .map(sanitizeHistoryMessage)
+      .filter(Boolean)
+      .slice(-STUDY_BUDDY_HISTORY_MAX_MESSAGES);
+    window.localStorage.setItem(getConversationStorageKey({ idToken, level }), JSON.stringify(normalized));
+  } catch (error) {
+    // Ignore storage errors (privacy mode, quota limits, etc.).
+  }
+};
+
+export const clearStudyBuddyConversationHistory = ({ idToken, level }) => {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
+    window.localStorage.removeItem(getConversationStorageKey({ idToken, level }));
+  } catch (error) {
+    // Ignore storage errors.
+  }
+};
+
+const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationHistory = [] }) => {
   const selectedMode = mode || getStoredStudyBuddyMode();
   const browserContext = getBrowserLessonContext();
   const context = {
@@ -59,12 +126,19 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
     writing: "Mode rule: Help the student plan, structure and improve writing. Give ideas, Redemittel and correction guidance. Do not write the full final answer for them.",
   };
 
+  const historyLines = (Array.isArray(conversationHistory) ? conversationHistory : [])
+    .map(sanitizeHistoryMessage)
+    .filter(Boolean)
+    .slice(-STUDY_BUDDY_HISTORY_MAX_MESSAGES)
+    .map((entry) => `${entry.role === "assistant" ? "STUDY BUDDY" : "STUDENT"}: ${entry.content}`);
+
   return [
     "You are Falowen Course Assistant inside the Course Book.",
     "Stay focused on the current lesson, level and task below.",
     "If the student asks something unrelated, briefly redirect them back to this lesson and give one useful lesson-based example.",
     "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
     "Keep the answer short and phone-friendly. Do not give many corrections at once; correct only the 1-2 most important mistakes per turn.",
+    "Use the recent conversation only to understand references and follow-up questions such as 'why?', 'what do you mean?', or 'give me another example'. If old conversation conflicts with the CURRENT LESSON CONTEXT, follow the current lesson context.",
     "Level rules: A1/A2 = simple English explanation + simple German examples. B1 = correct and help build longer connected sentences. B2 = improve argumentation, connectors and natural expression. C1 = upgrade to advanced, natural, precise German.",
     "For C1 useful replies, include exactly this compact pattern: a short natural response; 'Besser / C1-Version:' with one upgraded sentence; 'Nützlicher Ausdruck:' with one strong C1 phrase and English meaning; one deeper follow-up question. Do not only correct; upgrade.",
     "Current-info safety: if the student asks about current politics, current office holders, current government, current prices, latest news, or anything that may change, do not answer with certainty unless live/current data is provided. Say: 'Bei aktuellen Informationen kann ich mich irren. Bitte prüfe eine aktuelle Quelle.' Then continue language practice with a safe sentence frame.",
@@ -73,6 +147,7 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
     "CURRENT LESSON CONTEXT:",
     ...contextLines,
     "",
+    ...(historyLines.length ? ["RECENT CONVERSATION:", ...historyLines, ""] : []),
     "STUDENT MESSAGE:",
     message,
   ]
@@ -80,17 +155,33 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
     .join("\n");
 };
 
-export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) =>
-  callAI({
+export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) => {
+  const conversationHistory = readStudyBuddyConversationHistory({ idToken, level });
+  const response = await callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message: buildCourseFocusedMessage({ message, mode, lessonContext }),
+      message: buildCourseFocusedMessage({ message, mode, lessonContext, conversationHistory }),
       level,
       mode: mode || getStoredStudyBuddyMode(),
       lessonContext: lessonContext || null,
     },
     idToken,
   });
+
+  if (response?.reply) {
+    writeStudyBuddyConversationHistory({
+      idToken,
+      level,
+      history: [
+        ...conversationHistory,
+        { role: "user", content: message },
+        { role: "assistant", content: response.reply },
+      ],
+    });
+  }
+
+  return response;
+};
 
 const EVENT_LABELS = {
   quick_question: "Asked Study Buddy AI",
