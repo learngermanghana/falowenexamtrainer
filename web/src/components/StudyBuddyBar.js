@@ -7,9 +7,15 @@ import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
-import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
+import {
+  clearStudyBuddyConversationHistory,
+  logStudyBuddyUsage,
+  readStudyBuddyConversationHistory,
+  requestStudyBuddyReply,
+} from "../services/studyBuddyService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import "./StudyBuddyBar.css";
+import "./StudyBuddyChat.css";
 
 const PASS_MARK = 60;
 const ATTENDANCE_TARGET = 80;
@@ -45,6 +51,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const { idToken, user } = useAuth();
   const locale = i18n.language;
   const quickQuestionInputRef = useRef(null);
+  const chatEndRef = useRef(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(true);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
@@ -158,9 +165,11 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [questionInput, setQuestionInput] = useState("");
   const [quickReply, setQuickReply] = useState("");
   const [quickReplyError, setQuickReplyError] = useState("");
+  const [conversationHistory, setConversationHistory] = useState([]);
   const [isReplyLoading, setIsReplyLoading] = useState(false);
   const trimmedQuestion = questionInput.trim();
   const isSendDisabled = !trimmedQuestion || isReplyLoading;
+  const historyLevel = resolvedLevel || "B1";
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
@@ -187,6 +196,14 @@ const StudyBuddyBar = ({ studentProfile }) => {
     [trackStudyBuddyEvent]
   );
 
+  useEffect(() => {
+    setConversationHistory(readStudyBuddyConversationHistory({ idToken, level: historyLevel }));
+  }, [historyLevel, idToken]);
+
+  useEffect(() => {
+    if (!conversationHistory.length && !isReplyLoading) return;
+    window.setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 0);
+  }, [conversationHistory, isReplyLoading]);
 
   const examDaysLeft = useMemo(() => {
     const examDateMs = toDateMs(
@@ -440,6 +457,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
     async (question) => {
       const trimmed = question.trim();
       if (!trimmed) return;
+      const priorHistory = readStudyBuddyConversationHistory({ idToken, level: historyLevel });
+      setConversationHistory([...priorHistory, { role: "user", content: trimmed }]);
       setQuestionInput("");
       setIsReplyLoading(true);
       setQuickReply("");
@@ -457,11 +476,12 @@ const StudyBuddyBar = ({ studentProfile }) => {
         });
         const response = await requestStudyBuddyReply({
           message: trimmed,
-          level: resolvedLevel || "B1",
+          level: historyLevel,
           idToken,
         });
         setQuickReply(response?.reply || "");
         if (response?.reply) {
+          setConversationHistory(readStudyBuddyConversationHistory({ idToken, level: historyLevel }));
           trackStudyBuddyEvent("quick_question_reply", { questionLength: trimmed.length, replyLength: response.reply.length });
           triggerInteractionFeedback({ sound: "success" });
         } else {
@@ -476,8 +496,19 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setIsReplyLoading(false);
       }
     },
-    [className, idToken, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]
+    [className, historyLevel, idToken, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]
   );
+
+  const startNewConversation = useCallback(() => {
+    clearStudyBuddyConversationHistory({ idToken, level: historyLevel });
+    setConversationHistory([]);
+    setQuickReply("");
+    setQuickReplyError("");
+    setQuestionInput("");
+    trackStudyBuddyEvent("conversation_reset", { historyLevel });
+    triggerInteractionFeedback({ sound: "open" });
+    window.setTimeout(() => quickQuestionInputRef.current?.focus(), 0);
+  }, [historyLevel, idToken, trackStudyBuddyEvent]);
 
   const focusQuickQuestion = useCallback(() => {
     setIsCollapsed(false);
@@ -631,7 +662,44 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
         <div id={contentId} className="study-buddy-details" hidden={isCollapsed}>
           <div className="study-buddy-qa study-buddy-qa-priority">
-            <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
+            <div className="study-buddy-chat-heading">
+              <div>
+                <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
+                <p className="study-buddy-chat-subtitle">Ask a question, then continue with a follow-up.</p>
+              </div>
+              {conversationHistory.length ? (
+                <button className="study-buddy-new-chat" type="button" onClick={startNewConversation} disabled={isReplyLoading}>
+                  New conversation
+                </button>
+              ) : null}
+            </div>
+
+            {conversationHistory.length ? (
+              <div className="study-buddy-chat-history" aria-live="polite" aria-label="Study Buddy conversation">
+                {conversationHistory.map((entry, index) => (
+                  <div
+                    className={`study-buddy-chat-row study-buddy-chat-row--${entry.role}`}
+                    key={`${entry.role}-${index}-${entry.content.slice(0, 24)}`}
+                  >
+                    <div className="study-buddy-chat-speaker">{entry.role === "assistant" ? "Study Buddy" : "You"}</div>
+                    <div className="study-buddy-chat-bubble">{entry.content}</div>
+                  </div>
+                ))}
+                {isReplyLoading ? (
+                  <div className="study-buddy-chat-row study-buddy-chat-row--assistant">
+                    <div className="study-buddy-chat-speaker">Study Buddy</div>
+                    <div className="study-buddy-chat-bubble study-buddy-chat-typing">{t("studyBuddy.qa.loading")}</div>
+                  </div>
+                ) : null}
+                <div ref={chatEndRef} />
+              </div>
+            ) : (
+              <div className="study-buddy-chat-empty">
+                <strong>Start a conversation</strong>
+                <span>Study Buddy will remember the recent messages so you can ask follow-up questions.</span>
+              </div>
+            )}
+
             <form
               className="study-buddy-qa-form"
               onSubmit={(event) => {
@@ -644,7 +712,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
                 className="study-buddy-qa-input"
                 type="text"
                 value={questionInput}
-                placeholder={t("studyBuddy.qa.placeholder")}
+                placeholder={conversationHistory.length ? "Ask a follow-up question…" : t("studyBuddy.qa.placeholder")}
                 onChange={(event) => setQuestionInput(event.target.value)}
                 disabled={isReplyLoading}
               />
@@ -663,16 +731,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
             <div className="study-buddy-qa-meta">
               <p className="study-buddy-qa-helper">{t("studyBuddy.qa.helper")}</p>
             </div>
-            {isReplyLoading ? (
-              <p className="study-buddy-qa-response" aria-live="polite">
-                {t("studyBuddy.qa.loading")}
-              </p>
-            ) : quickReply ? (
-              <p className="study-buddy-qa-response" aria-live="polite">
-                {quickReply}
-              </p>
-            ) : quickReplyError ? (
-              <p className="study-buddy-qa-response" aria-live="polite">
+            {quickReplyError ? (
+              <p className="study-buddy-qa-response study-buddy-chat-error" aria-live="polite">
                 {quickReplyError}
               </p>
             ) : null}
