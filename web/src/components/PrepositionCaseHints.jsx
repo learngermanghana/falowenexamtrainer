@@ -92,7 +92,7 @@ const PrepositionCaseHints = ({
 
       {!hints.length ? (
         <p style={{ margin: 0, color: "#166534", fontWeight: 700 }}>
-          No active phrase to check. Keep writing.
+          No preposition-case issue detected. Other grammar may still need checking.
         </p>
       ) : null}
 
