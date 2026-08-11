@@ -2,6 +2,7 @@ import React from "react";
 import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
 import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
+import B2Day6To10SelfTutoringPage from "./B2Day6To10SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
 import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
@@ -105,27 +106,17 @@ export const SELF_LEARNING_LESSONS = {
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
 
-// B2 and C1 own their Radio-first journey inside the standout workbook pages.
-// Keep this frame deliberately transparent so no generic materials selector can
-// appear between Falowen Radio and Learn / Speak / Write / Finish.
 export const SelfLearningLessonFrame = ({ children }) => children;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
-  // Keep the lesson-owned AI video inside Learn. Only remove teacher lectures
-  // from the tab data so they cannot replace or duplicate the AI lesson.
   const pageLesson = removeTeacherLectureFromLesson(lesson);
   const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
 
   let page;
   if (day === 0) {
-    page = (
-      <SelfLearningEditableLessonPageV2
-        lesson={pageLesson}
-        falowenRadio={null}
-      />
-    );
+    page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
   } else if (normalizedLevel === "C1" && day >= 8 && day <= 10) {
     page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 25 && day <= 28) {
@@ -134,6 +125,8 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
     page = <B2Day21To24GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 17 && day <= 20) {
     page = <B2Day17To20GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  } else if (normalizedLevel === "B2" && day >= 6 && day <= 10) {
+    page = <B2Day6To10SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 7 && day <= 16) {
     page = <B2Day7To16GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   } else if (normalizedLevel === "B2" && day >= 1 && day <= 6) {
@@ -142,16 +135,7 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
     page = <StandardLessonWritingCoachPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   }
 
-  return (
-    <SelfLearningLessonFrame
-      level={normalizedLevel}
-      day={day}
-      lesson={lesson}
-      canonicalLesson={canonicalLesson}
-    >
-      {page}
-    </SelfLearningLessonFrame>
-  );
+  return <SelfLearningLessonFrame level={normalizedLevel} day={day} lesson={lesson} canonicalLesson={canonicalLesson}>{page}</SelfLearningLessonFrame>;
 };
 
 const componentRegistry = Object.fromEntries(
@@ -163,19 +147,14 @@ const componentRegistry = Object.fromEntries(
   ),
 );
 
-const B1RadioLessonComponent = ({ canonicalLesson }) => (
-  <B1TutorLessonPage canonicalLesson={canonicalLesson} />
-);
+const B1RadioLessonComponent = ({ canonicalLesson }) => <B1TutorLessonPage canonicalLesson={canonicalLesson} />;
 
-const hasB1Radio = (day) =>
-  Boolean(getLessonRadioResource("B1", day) || getB1Day5RadioResource("B1", day));
+const hasB1Radio = (day) => Boolean(getLessonRadioResource("B1", day) || getB1Day5RadioResource("B1", day));
 
 export const getSelfLearningLessonComponent = (level, day) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const dayNumber = Number(day || 0);
-  if (normalizedLevel === "B1" && dayNumber > 0 && hasB1Radio(dayNumber)) {
-    return B1RadioLessonComponent;
-  }
+  if (normalizedLevel === "B1" && dayNumber > 0 && hasB1Radio(dayNumber)) return B1RadioLessonComponent;
   return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null;
 };
 
