@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './index.css';
 import './goetheFreeChatMobile.css';
 import './i18n';
@@ -41,6 +41,8 @@ import { ToastProvider } from './context/ToastContext';
 
 const normalizedPublicPath = window.location.pathname.replace(/\/+$/, '') || '/';
 const isFalowenRadioSeoPage = normalizedPublicPath === '/falowen-radio';
+const A1_DAY0_TUTORIAL_ROUTE = '/campus/course/lesson/A1/0';
+const A1_DAY0_WORKBOOK_ROUTE = '/campus/course/a1-day-0-orientation-and-knowledge-test-workbook';
 const A1_SHORT_CHAPTER_LESSON_ROUTES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.shortLessonRoute,
 );
@@ -68,6 +70,7 @@ const AuthenticatedAppRoutes = () => (
           <A1SharedPracticeWorkbookNavigation />
           <RequestedLessonAiVideoHeader />
           <Routes>
+            <Route path={A1_DAY0_TUTORIAL_ROUTE} element={<Navigate to={A1_DAY0_WORKBOOK_ROUTE} replace />} />
             <Route
               path="/campus/course/lesson/A1/chapter/:chapter"
               element={<A1CanonicalChapterLessonRoute />}
@@ -125,3 +128,5 @@ root.render(
 );
 
 reportWebVitals();
+
+export { A1_DAY0_TUTORIAL_ROUTE, A1_DAY0_WORKBOOK_ROUTE };
