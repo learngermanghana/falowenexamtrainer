@@ -10,6 +10,51 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(num) ? num : fallback;
 };
 
+const hasScoreValue = (value) =>
+  value !== null && value !== undefined && String(value).trim() !== "";
+
+const ceilScore = (value, fallback = null) => {
+  const numeric = toNumber(value, null);
+  return numeric === null ? fallback : Math.ceil(numeric);
+};
+
+const resolveWritingPercent = (row = {}) => {
+  if (hasScoreValue(row.writingScorePercent)) {
+    return toNumber(row.writingScorePercent, null);
+  }
+
+  if (!hasScoreValue(row.writingScore)) return null;
+
+  const writingScore = toNumber(row.writingScore, null);
+  if (writingScore === null) return null;
+
+  const maxWritingScore = toNumber(row.maxWritingScore, null);
+  if (maxWritingScore !== null && maxWritingScore > 0) {
+    return (writingScore / maxWritingScore) * 100;
+  }
+
+  // A numeric 0 is a valid writing score, not a missing score.
+  if (writingScore === 0) return 0;
+
+  // Legacy rows may already store writingScore as a percentage.
+  if (writingScore >= 0 && writingScore <= 100) return writingScore;
+
+  return null;
+};
+
+const resolveFinalScore = (row = {}) => {
+  const objectiveScore = hasScoreValue(row.objectiveScore)
+    ? toNumber(row.objectiveScore, null)
+    : null;
+  const writingPercent = resolveWritingPercent(row);
+
+  if (objectiveScore !== null && writingPercent !== null) {
+    return Math.ceil((objectiveScore + writingPercent) / 2);
+  }
+
+  return ceilScore(row.finalScore ?? row.score, null);
+};
+
 const toDate = (value) => {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -155,6 +200,8 @@ const buildResults = (scores = []) => {
       const key = `${normalizedCode}::${canonicalAssignmentKey || normalizedAssignment}`;
       attemptsTracker[key] = (attemptsTracker[key] || 0) + 1;
       const attemptNumber = attemptsTracker[key];
+      const resolvedFinalScore = resolveFinalScore(row);
+
       return {
         assignment: normalizedAssignment,
         assignmentKey: canonicalAssignmentKey || normalizeString(row.assignmentKey || row.canonicalAssignmentKey) || "",
@@ -166,8 +213,8 @@ const buildResults = (scores = []) => {
         name: normalizeString(row.name || row.studentName) || "",
         level: (row.level || "").toUpperCase(),
         date: normalizeString(row.date || row.created_at || row.createdAt) || "",
-        score: toNumber(row.score ?? row.finalScore, null),
-        finalScore: toNumber(row.finalScore ?? row.score, null),
+        score: resolvedFinalScore,
+        finalScore: resolvedFinalScore,
         comments: normalizeString(row.comments || row.feedback || row.aiFeedback) || "",
         feedback: normalizeString(row.feedback || row.aiFeedback || row.comments) || "",
         link: normalizeString(row.link) || "",
