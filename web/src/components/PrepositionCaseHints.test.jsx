@@ -76,6 +76,9 @@ describe("PrepositionCaseHints", () => {
 
     expect(screen.getByText("0 current")).toBeInTheDocument();
     expect(screen.getByText("2 cleared")).toBeInTheDocument();
-    expect(screen.getByText(/No active phrase to check/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No preposition-case issue detected/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Other grammar may still need checking/)).toBeInTheDocument();
   });
 });

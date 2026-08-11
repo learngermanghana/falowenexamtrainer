@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   analyzePrepositionCaseCoach,
+} from "../lib/prepositionCaseCoachSupplement";
+import {
   isPrepositionCaseCoachLevel,
 } from "../lib/prepositionCaseCoach";
 
