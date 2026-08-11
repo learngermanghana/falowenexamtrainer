@@ -26,6 +26,31 @@ describe("configured teacher lecture lesson normalization", () => {
     );
   });
 
+  test("keeps the configured A2 Day 3 teacher lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 3,
+        chapter: "1.3",
+        topic: "A2 Day 3",
+      },
+      "A2",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        title: "Kapitel 1.3 · Teacher lecture video",
+        url: "https://youtu.be/Sc6TPEyyzA0",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          url: "https://youtu.be/Sc6TPEyyzA0",
+        }),
+      ]),
+    );
+  });
+
   test("still filters teacher-like resources on unconfigured A2 days", () => {
     const lesson = normalizeA2B1Lesson(
       {
