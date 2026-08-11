@@ -22,6 +22,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/iB-yVVqI1DQ",
       },
     ],
+    3: [
+      {
+        chapter: "1.3",
+        topic: "A2 Day 3",
+        url: "https://youtu.be/Sc6TPEyyzA0",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
