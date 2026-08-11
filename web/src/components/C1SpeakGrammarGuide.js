@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { enrichC1SpeakingBranches } from "../data/c1Day11To15SpeakingScaffolds";
 import { styles } from "../styles";
 
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -13,6 +14,9 @@ const NoteBox = ({ children, tone = "blue" }) => {
 export const getC1SpeakGrammarData = (lesson, branchesOverride = null) => {
   const grammar = lesson?.grammarLesson || {};
   const speakingBuilder = lesson?.speakingBuilder || {};
+  const rawBranches = Array.isArray(branchesOverride)
+    ? branchesOverride
+    : (Array.isArray(speakingBuilder.branches) ? speakingBuilder.branches : []);
   return {
     grammarTitle: grammar.title || lesson?.grammarFocus || "C1-Grammatik",
     grammarFocus: lesson?.grammarFocus || grammar.title || "",
@@ -21,7 +25,7 @@ export const getC1SpeakGrammarData = (lesson, branchesOverride = null) => {
     examples: Array.isArray(grammar.examples) ? grammar.examples : [],
     miniExercise: grammar.miniExercise || "",
     question: String(speakingBuilder.question || lesson?.speakingTopic || lesson?.topic || "").replace(/^Sprechen:\s*/i, ""),
-    branches: Array.isArray(branchesOverride) ? branchesOverride : (Array.isArray(speakingBuilder.branches) ? speakingBuilder.branches : []),
+    branches: enrichC1SpeakingBranches(lesson, rawBranches),
     plan: Array.isArray(speakingBuilder.plan) ? speakingBuilder.plan : [],
     starters: Array.isArray(speakingBuilder.starters) ? speakingBuilder.starters : [],
   };
@@ -45,7 +49,7 @@ export default function C1SpeakGrammarGuide({ lesson, branchesOverride = null, s
       <div style={{ ...panelStyle, background: "#fff" }}>
         <div><strong>Trainiere bis du ohne Hilfe sprechen kannst</strong><p style={{ margin: "5px 0 0", color: "#475569", lineHeight: 1.6 }}>1. Mit Hilfe: Ideen, Leitfragen, Beispiele und Satzanfänge. 2. Weniger Hilfe: nur Ideen und Leitfragen. 3. Prüfung: nur die Aufgabe.</p></div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {[['full','1. Mit Hilfe'],['keywords','2. Weniger Hilfe'],['exam','3. Prüfungsmodus']].map(([value,label]) => <button key={value} type="button" onClick={() => setSupport(value)} style={support === value ? styles.primaryButton : styles.secondaryButton}>{label}</button>)}
+          {[["full","1. Mit Hilfe"],["keywords","2. Weniger Hilfe"],["exam","3. Prüfungsmodus"]].map(([value,label]) => <button key={value} type="button" onClick={() => setSupport(value)} style={support === value ? styles.primaryButton : styles.secondaryButton}>{label}</button>)}
         </div>
       </div>
 
