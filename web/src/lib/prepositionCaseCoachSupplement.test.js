@@ -1,28 +1,39 @@
 import { analyzePrepositionCaseCoach } from "./prepositionCaseCoachSupplement";
 
 describe("Preposition Case Coach supplemental articleless rules", () => {
-  it("detects von öffentliche Verkehrsmittel", () => {
-    const issue = analyzePrepositionCaseCoach(
-      "Bei der Beurteilung von öffentliche Verkehrsmittel sollten mehrere Kriterien berücksichtigt werden.",
-      { level: "C1" },
-    )[0];
-
-    expect(issue).toMatchObject({
-      fullPhrase: "von öffentliche Verkehrsmittel",
-      fullCorrection: "von öffentlichen Verkehrsmitteln",
-      case: "dative",
-      expectedEnding: "en",
-      issueType: "articleless-case",
-      confidence: 1,
-    });
+  it("abstains when Verkehrsmittel number is ambiguous", () => {
+    expect(
+      analyzePrepositionCaseCoach(
+        "Bei der Beurteilung von öffentliche Verkehrsmittel sollten mehrere Kriterien berücksichtigt werden.",
+        { level: "C1" },
+      ),
+    ).toEqual([]);
   });
 
-  it("does not flag the corrected phrase", () => {
+  it("does not change valid singular Verkehrsmittel phrases to plural", () => {
+    expect(
+      analyzePrepositionCaseCoach("mit öffentlichem Verkehrsmittel", { level: "C1" }),
+    ).toEqual([]);
+    expect(
+      analyzePrepositionCaseCoach("ohne öffentliches Verkehrsmittel", { level: "C1" }),
+    ).toEqual([]);
+  });
+
+  it("keeps already-correct plural Verkehrsmittel phrases unchanged", () => {
     expect(
       analyzePrepositionCaseCoach(
         "Bei der Beurteilung von öffentlichen Verkehrsmitteln sollten mehrere Kriterien berücksichtigt werden.",
         { level: "C1" },
       ),
+    ).toEqual([]);
+  });
+
+  it("preserves lexical adjective stems such as teuer and sicher", () => {
+    expect(
+      analyzePrepositionCaseCoach("mit teuer Verkehrsmittel", { level: "C1" }),
+    ).toEqual([]);
+    expect(
+      analyzePrepositionCaseCoach("mit sicher Verkehrsmittel", { level: "C1" }),
     ).toEqual([]);
   });
 
