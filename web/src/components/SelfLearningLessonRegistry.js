@@ -3,16 +3,14 @@ import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2
 import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import B2Day6To10SelfTutoringPage from "./B2Day6To10SelfTutoringPage";
+import B2Day11To15SelfTutoringPage from "./B2Day11To15SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
 import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
 import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
-import {
-  removeTeacherLectureFromCanonicalLesson,
-  removeTeacherLectureFromLesson,
-} from "./selfLearning/TeacherLectureSupportingMaterials";
+import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../data/b2LessonContentAlignment";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
@@ -60,52 +58,14 @@ const c1FallbackLessons = [
 
 const b2FallbackLessons = Object.values(B2_LESSON_CONTENT_ALIGNMENT)
   .sort((left, right) => Number(left.day) - Number(right.day))
-  .map(({ day, chapter, title, lessonTopic }) =>
-    buildDefaultLesson({
-      level: "B2",
-      day,
-      chapter,
-      title,
-      topic: lessonTopic,
-    })
-  );
+  .map(({ day, chapter, title, lessonTopic }) => buildDefaultLesson({ level: "B2", day, chapter, title, topic: lessonTopic }));
 
 export const SELF_LEARNING_LESSONS = {
-  B2: [
-    b2Day0Orientation,
-    b2Day1PersoenlicheIdentitaet,
-    b2Day2AlltagUndZeitmanagement,
-    b2Day3ArbeitUndBeruf,
-    b2Day4BildungUndLernen,
-    b2Day5GesundheitUndWohlbefinden,
-    b2Day6MigrationUndIntegration,
-    b2Day7GesellschaftlicheVielfalt,
-    ...b2FallbackLessons,
-  ],
-  C1: [
-    c1Day0Orientation,
-    c1Day1ZieleUndLernweg,
-    c1Day2KulturUndIdentitaet,
-    c1Day3MedienUndInformationskompetenz,
-    c1Day4BeziehungenUndTeamarbeit,
-    c1Day5BeruflicheEntwicklung,
-    c1Day6GesundheitUndLebensstil,
-    c1Day7ReisenUndNachhaltigkeit,
-    c1Day8WohnenUndStadtentwicklung,
-    c1Day9KonsumUndWerbung,
-    c1Day10IntegrationUndGesellschaft,
-    c1Day11EngagementUndEhrenamt,
-    c1Day12FreizeitUndKultur,
-    c1Day13Mehrsprachigkeit,
-    c1Day14InnovationUndZukunft,
-    c1Day15BildungUndLebenslangesLernen,
-    c1Day16TechnologieImAlltag,
-    ...c1FallbackLessons,
-  ],
+  B2: [b2Day0Orientation,b2Day1PersoenlicheIdentitaet,b2Day2AlltagUndZeitmanagement,b2Day3ArbeitUndBeruf,b2Day4BildungUndLernen,b2Day5GesundheitUndWohlbefinden,b2Day6MigrationUndIntegration,b2Day7GesellschaftlicheVielfalt,...b2FallbackLessons],
+  C1: [c1Day0Orientation,c1Day1ZieleUndLernweg,c1Day2KulturUndIdentitaet,c1Day3MedienUndInformationskompetenz,c1Day4BeziehungenUndTeamarbeit,c1Day5BeruflicheEntwicklung,c1Day6GesundheitUndLebensstil,c1Day7ReisenUndNachhaltigkeit,c1Day8WohnenUndStadtentwicklung,c1Day9KonsumUndWerbung,c1Day10IntegrationUndGesellschaft,c1Day11EngagementUndEhrenamt,c1Day12FreizeitUndKultur,c1Day13Mehrsprachigkeit,c1Day14InnovationUndZukunft,c1Day15BildungUndLebenslangesLernen,c1Day16TechnologieImAlltag,...c1FallbackLessons],
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
-
 export const SelfLearningLessonFrame = ({ children }) => children;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
@@ -113,49 +73,22 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const day = Number(lesson?.day || 0);
   const pageLesson = removeTeacherLectureFromLesson(lesson);
   const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
-
   let page;
-  if (day === 0) {
-    page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
-  } else if (normalizedLevel === "C1" && day >= 8 && day <= 10) {
-    page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 25 && day <= 28) {
-    page = <B2Day25To28GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 21 && day <= 24) {
-    page = <B2Day21To24GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 17 && day <= 20) {
-    page = <B2Day17To20GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 6 && day <= 10) {
-    page = <B2Day6To10SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 7 && day <= 16) {
-    page = <B2Day7To16GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else if (normalizedLevel === "B2" && day >= 1 && day <= 6) {
-    page = <B2Day1To4GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  } else {
-    page = <StandardLessonWritingCoachPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  }
-
+  if (day === 0) page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
+  else if (normalizedLevel === "C1" && day >= 8 && day <= 10) page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 25 && day <= 28) page = <B2Day25To28GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 21 && day <= 24) page = <B2Day21To24GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 17 && day <= 20) page = <B2Day17To20GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 11 && day <= 15) page = <B2Day11To15SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 6 && day <= 10) page = <B2Day6To10SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 7 && day <= 16) page = <B2Day7To16GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 1 && day <= 6) page = <B2Day1To4GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else page = <StandardLessonWritingCoachPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   return <SelfLearningLessonFrame level={normalizedLevel} day={day} lesson={lesson} canonicalLesson={canonicalLesson}>{page}</SelfLearningLessonFrame>;
 };
 
-const componentRegistry = Object.fromEntries(
-  Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) =>
-    lessons.map((lesson) => [
-      lessonKey(level, lesson.day),
-      ({ canonicalLesson }) => renderSelfLearningPage({ level, lesson, canonicalLesson }),
-    ]),
-  ),
-);
-
+const componentRegistry = Object.fromEntries(Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) => lessons.map((lesson) => [lessonKey(level, lesson.day), ({ canonicalLesson }) => renderSelfLearningPage({ level, lesson, canonicalLesson })])));
 const B1RadioLessonComponent = ({ canonicalLesson }) => <B1TutorLessonPage canonicalLesson={canonicalLesson} />;
-
 const hasB1Radio = (day) => Boolean(getLessonRadioResource("B1", day) || getB1Day5RadioResource("B1", day));
-
-export const getSelfLearningLessonComponent = (level, day) => {
-  const normalizedLevel = String(level || "").toUpperCase();
-  const dayNumber = Number(day || 0);
-  if (normalizedLevel === "B1" && dayNumber > 0 && hasB1Radio(dayNumber)) return B1RadioLessonComponent;
-  return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null;
-};
-
+export const getSelfLearningLessonComponent = (level, day) => { const normalizedLevel = String(level || "").toUpperCase(); const dayNumber = Number(day || 0); if (normalizedLevel === "B1" && dayNumber > 0 && hasB1Radio(dayNumber)) return B1RadioLessonComponent; return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null; };
 export default getSelfLearningLessonComponent;
