@@ -45,17 +45,19 @@ builder = replaceOnce(
 fs.writeFileSync(lessonBuilderPath, builder);
 
 let guided = fs.readFileSync(guidedPagePath, "utf8");
-const standardDay18 = `  writingQuestion: "Verfassen Sie eine C1-Stellungnahme zum Thema gesellschaftlicher Zusammenhalt mit 220–280 Wörtern.",
-  writingIdeas: [
+const standardDay18 = `const day18Writing = {
+  question: "Verfassen Sie eine C1-Stellungnahme zum Thema gesellschaftlicher Zusammenhalt mit 220–280 Wörtern.",
+  points: [
     "Erklären Sie, welche Bedeutung gesellschaftlicher Zusammenhalt für eine demokratische Gesellschaft hat.",
     "Argumentieren Sie anhand eines konkreten Beispiels für eine Maßnahme, die gesellschaftlichen Zusammenhalt stärken kann.",
     "Nennen Sie Gründe oder Einwände, die gegen stärkere staatliche Maßnahmen sprechen könnten.",
     "Erläutern Sie eine Alternative oder einen ausgewogenen Lösungsweg zur Förderung des gesellschaftlichen Zusammenhalts.",
-  ],`;
+  ],
+};`;
 
 guided = replaceOnce(
   guided,
-  /  writingQuestion: "Sollte der Staat stärker in Maßnahmen für gesellschaftlichen Zusammenhalt investieren\? Verfassen Sie eine C1-Stellungnahme mit 220–280 Wörtern\.",\n  writingIdeas: \[[\s\S]*?\n  \],/,
+  /const day18Writing = \{[\s\S]*?\n\};/,
   standardDay18,
   "C1 Day 18 Goethe writing bullets",
 );
