@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 
 const itemsByDay = {
@@ -31,10 +31,10 @@ const itemsByDay = {
 export default function C1GrammarQuickCheck({ day, completed = false, onCompleteChange }) {
   const items = useMemo(() => itemsByDay[Number(day)] || [], [day]);
   const [answers, setAnswers] = useState({});
-  if (!items.length) return null;
   const correct = items.filter((item, index) => answers[index] === item[2]).length;
-  const done = correct === items.length;
-  if (done && !completed) onCompleteChange?.(true);
+  const done = items.length > 0 && correct === items.length;
+  useEffect(() => { if (done && !completed) onCompleteChange?.(true); }, [done, completed, onCompleteChange]);
+  if (!items.length) return null;
   return <section style={{ ...styles.card, display: "grid", gap: 14, border: "1px solid #c7d2fe", borderRadius: 18 }}>
     <div><span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>Learn by choosing</span><h2 style={{ marginBottom: 4 }}>Grammar knowledge check</h2><p style={{ margin: 0, color: "#475569" }}>Answer the real multiple-choice questions after reading the grammar notes.</p></div>
     {items.map(([question, options, answer], index) => <div key={question} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
