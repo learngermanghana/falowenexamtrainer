@@ -1,142 +1,8 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
-import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+import A2Day4WoWohinPrepositionLesson from "./A2Day4WoWohinPrepositionLesson";
 
-const paragraph = {
-  margin: 0,
-  lineHeight: 1.75,
-};
-
-const list = {
-  margin: 0,
-  paddingLeft: 22,
-  lineHeight: 1.75,
-};
-
-const grid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: 12,
-};
-
-const practiceCard = {
-  border: "1px solid #bfdbfe",
-  borderRadius: 12,
-  padding: 14,
-  background: "#f8fbff",
-  display: "grid",
-  gap: 8,
-};
-
-const heading = {
-  margin: 0,
-  color: "#1e3a8a",
-  fontSize: "1rem",
-};
-
-const chipRow = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-};
-
-const chip = {
-  border: "1px solid #93c5fd",
-  borderRadius: 999,
-  padding: "7px 11px",
-  background: "#eff6ff",
-  color: "#1e3a8a",
-  fontWeight: 800,
-};
-
-const speakingContent = (
-  <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Wo möchten wir uns treffen?" practiceOnly>
-      <p style={paragraph}>
-        In this chapter, we’ll engage in group exercises discussing these topics. Following this, your tutor will revise the questions and invite you to record an audio about yourself.
-      </p>
-    </WorkbookTaskCard>
-
-    <WorkbookTaskCard eyebrow="Zentrales Thema" title="Wo möchten wir uns treffen?" practiceOnly>
-      <div style={chipRow}>
-        {["Ort", "Aktivitäten", "Wetter und Jahreszeit", "Anreise", "Mit einer Gruppe oder allein"].map((item) => (
-          <span key={item} style={chip}>{item}</span>
-        ))}
-      </div>
-    </WorkbookTaskCard>
-
-    <div style={grid}>
-      <section style={practiceCard}>
-        <h3 style={heading}>1. Ort</h3>
-        <ul style={list}>
-          <li>Café</li>
-          <li>Restaurant</li>
-          <li>Park</li>
-          <li>Kino</li>
-          <li>Einkaufszentrum</li>
-          <li>Zuhause</li>
-          <li>Museum</li>
-          <li>Sportplatz</li>
-        </ul>
-      </section>
-
-      <section style={practiceCard}>
-        <h3 style={heading}>2. Aktivitäten</h3>
-        <ul style={list}>
-          <li>Kaffee trinken</li>
-          <li>Einen Spaziergang machen</li>
-          <li>Einen Film schauen</li>
-          <li>Essen gehen</li>
-          <li>Sport treiben</li>
-          <li>Spiele spielen</li>
-        </ul>
-      </section>
-
-      <section style={practiceCard}>
-        <h3 style={heading}>3. Wetter und Jahreszeit</h3>
-        <ul style={list}>
-          <li>Im Sommer</li>
-          <li>Im Winter</li>
-          <li>Bei sonnigem Wetter</li>
-          <li>Bei Regen</li>
-          <li>Im Frühling oder Herbst</li>
-        </ul>
-      </section>
-
-      <section style={practiceCard}>
-        <h3 style={heading}>4. Anreise</h3>
-        <ul style={list}>
-          <li>Zu Fuß</li>
-          <li>Mit dem Fahrrad</li>
-          <li>Mit dem Auto</li>
-          <li>Mit öffentlichen Verkehrsmitteln</li>
-          <li>Mit dem Taxi</li>
-        </ul>
-      </section>
-
-      <section style={practiceCard}>
-        <h3 style={heading}>5. Mit einer Gruppe oder allein</h3>
-        <ul style={list}>
-          <li>Mit Freunden</li>
-          <li>Mit der Familie</li>
-          <li>Nur zu zweit</li>
-          <li>Allein</li>
-        </ul>
-      </section>
-    </div>
-
-    <WorkbookTaskCard eyebrow="Deine Audioantwort" title="Wo und wie verbringst du am liebsten Zeit mit deinen Freunden?" practiceOnly>
-      <div style={chipRow}>
-        {["Treffpunkt", "Freizeit", "Freundschaft", "Aktivitäten"].map((item) => (
-          <span key={item} style={chip}>{item}</span>
-        ))}
-      </div>
-      <p style={paragraph}>
-        Sprich über den Treffpunkt, eure Aktivitäten, das Wetter oder die Jahreszeit, die Anreise und darüber, mit wem du deine Freizeit verbringst.
-      </p>
-    </WorkbookTaskCard>
-  </>
-);
+const speakingContent = <A2Day4WoWohinPrepositionLesson />;
 
 const readingText = `Pläne für die Freizeit
 
@@ -213,7 +79,7 @@ export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
       title="Wo möchten wir uns treffen?"
       chapter="2.4"
       workbookId="A2Day4WoMoechtenWirUnsTreffen"
-      topicPrompt="Wo und wie verbringst du am liebsten Zeit mit deinen Freunden?"
+      topicPrompt="Wo möchtest du dich mit deinen Freunden treffen? Wie kommst du dorthin?"
       sprechenContent={speakingContent}
       schreibenTask={`Schreiben Sie einen Brief an Herrn Felix Asadu und laden Sie ihn zu einem gemeinsamen Wochenende ein.
 
