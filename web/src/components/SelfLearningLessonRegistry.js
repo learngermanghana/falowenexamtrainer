@@ -4,8 +4,8 @@ import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import B2Day6To10SelfTutoringPage from "./B2Day6To10SelfTutoringPage";
 import B2Day11To15SelfTutoringPage from "./B2Day11To15SelfTutoringPage";
+import B2Day16To20SelfTutoringPage from "./B2Day16To20SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
-import B2Day17To20GuidedLessonPage from "./B2Day17To20GuidedLessonPage";
 import B2Day21To24GuidedLessonPage from "./B2Day21To24GuidedLessonPage";
 import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
@@ -78,7 +78,7 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   else if (normalizedLevel === "C1" && day >= 8 && day <= 10) page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 25 && day <= 28) page = <B2Day25To28GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 21 && day <= 24) page = <B2Day21To24GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  else if (normalizedLevel === "B2" && day >= 17 && day <= 20) page = <B2Day17To20GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 16 && day <= 20) page = <B2Day16To20SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 11 && day <= 15) page = <B2Day11To15SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 6 && day <= 10) page = <B2Day6To10SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 7 && day <= 16) page = <B2Day7To16GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
