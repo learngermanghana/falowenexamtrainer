@@ -6,8 +6,8 @@ import B2Day6To10SelfTutoringPage from "./B2Day6To10SelfTutoringPage";
 import B2Day11To15SelfTutoringPage from "./B2Day11To15SelfTutoringPage";
 import B2Day16To20SelfTutoringPage from "./B2Day16To20SelfTutoringPage";
 import B2Day21To25SelfTutoringPage from "./B2Day21To25SelfTutoringPage";
+import B2Day26To28SelfTutoringPage from "./B2Day26To28SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
-import B2Day25To28GuidedLessonPage from "./B2Day25To28GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
@@ -76,7 +76,7 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   let page;
   if (day === 0) page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
   else if (normalizedLevel === "C1" && day >= 8 && day <= 10) page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
-  else if (normalizedLevel === "B2" && day >= 26 && day <= 28) page = <B2Day25To28GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 26 && day <= 28) page = <B2Day26To28SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 21 && day <= 25) page = <B2Day21To25SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 16 && day <= 20) page = <B2Day16To20SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 11 && day <= 15) page = <B2Day11To15SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
