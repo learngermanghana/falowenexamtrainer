@@ -30,9 +30,11 @@ describe("C1KnowledgeChoicePractice", () => {
     window.scrollTo = jest.fn();
   });
 
-  test("limits the interactive Learn flow to C1 days 1 through 12", () => {
+  test("limits the interactive Learn flow to C1 days 1 through 15", () => {
     expect(getC1KnowledgeItems(lesson)).toHaveLength(2);
-    expect(getC1KnowledgeItems({ ...lesson, day: 13 })).toHaveLength(0);
+    expect(getC1KnowledgeItems({ ...lesson, day: 13 })).toHaveLength(2);
+    expect(getC1KnowledgeItems({ ...lesson, day: 15 })).toHaveLength(2);
+    expect(getC1KnowledgeItems({ ...lesson, day: 16 })).toHaveLength(0);
     expect(getC1KnowledgeItems({ ...lesson, level: "B2" })).toHaveLength(0);
   });
 
