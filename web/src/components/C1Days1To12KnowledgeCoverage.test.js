@@ -17,6 +17,7 @@ import day12 from "../data/selfLearningLessons/c1/day12FreizeitUndKultur";
 
 const lessons = [day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12];
 const earlyLessons = lessons.slice(0, 5);
+const middleLessons = lessons.slice(5, 10);
 const readComponent = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("C1 Day 1-12 Learn and Speak coverage", () => {
@@ -54,6 +55,26 @@ describe("C1 Day 1-12 Learn and Speak coverage", () => {
       expect(lesson.grammarLesson.miniExercise).toBeTruthy();
       expect(getC1KnowledgeItems(lesson).length).toBeGreaterThanOrEqual(4);
       expect(lesson.speakingTopic).toBeTruthy();
+      expect(lesson.writingTopic).toBeTruthy();
+      expect(lesson.writingBuilder.structure.length).toBeGreaterThanOrEqual(5);
+      expect(lesson.writingBuilder.usefulLines.length).toBeGreaterThanOrEqual(5);
+      expect(lesson.tasks.speaking).toBeTruthy();
+      expect(lesson.tasks.writing).toBeTruthy();
+    });
+  });
+
+  test("C1 Days 6-10 contain the same complete self-tutoring path", () => {
+    middleLessons.forEach((lesson) => {
+      expect(lesson.explanation.length).toBeGreaterThanOrEqual(2);
+      expect(lesson.grammarLesson.explanation.length).toBeGreaterThanOrEqual(2);
+      expect(lesson.grammarLesson.rules.length).toBeGreaterThanOrEqual(4);
+      expect(lesson.grammarLesson.examples.length).toBeGreaterThanOrEqual(4);
+      expect(lesson.grammarLesson.miniExercise).toBeTruthy();
+      expect(getC1KnowledgeItems(lesson).length).toBeGreaterThanOrEqual(4);
+      expect(lesson.speakingTopic).toBeTruthy();
+      expect(Array.isArray(lesson.speakingBuilder.branches)).toBe(true);
+      expect(lesson.speakingBuilder.branches.length).toBeGreaterThanOrEqual(6);
+      expect(lesson.speakingBuilder.branches.every((branch) => branch.title && Array.isArray(branch.keywords) && branch.keywords.length >= 4)).toBe(true);
       expect(lesson.writingTopic).toBeTruthy();
       expect(lesson.writingBuilder.structure.length).toBeGreaterThanOrEqual(5);
       expect(lesson.writingBuilder.usefulLines.length).toBeGreaterThanOrEqual(5);
