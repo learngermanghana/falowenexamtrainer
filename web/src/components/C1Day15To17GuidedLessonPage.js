@@ -29,7 +29,14 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
   const [entered, setEntered] = useState(() => !radio);
   const [active, setActive] = useState("learn");
   const storageKey = getStandardLessonStorageKey(lesson, "progress");
-  const [progress, setProgress] = useState(() => { try { return { learnDone: false, speakDone: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnDone: false, speakDone: false, completed: false }; } });
+  const [progress, setProgress] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      return { learnDone: false, quizDone: false, speakDone: false, completed: false, ...saved, quizDone: Boolean(saved.quizDone) };
+    } catch {
+      return { learnDone: false, quizDone: false, speakDone: false, completed: false };
+    }
+  });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
   if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
 
@@ -38,6 +45,7 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || lesson.resources?.workbook?.url || "";
   const branches = getC1Day16To20SpeakingScaffold(day);
   const complete = () => { setProgress((old) => ({ ...old, completed: true, completedAt: new Date().toISOString() })); showToast(`C1 Day ${day} completed.`, "success"); };
+  const quizCompleted = day <= 16 ? progress.quizDone : progress.learnDone;
 
   return <div style={{ ...styles.container, display: "grid", gap: 18 }}>
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
@@ -46,13 +54,13 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
 
     {active === "learn" ? <>
       <Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section>
-      {day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /> : <><C1Day15To17GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></>}
+      {day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /> : <><C1Day15To17GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></>}
     </> : null}
 
     {active === "speak" ? <Section title="Speaking builder"><C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches.length ? branches : null} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
 
     {active === "write" ? <Section title="Guided writing builder"><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}><p>Complete Learn, Speak and Write, then practise once more in Prüfungsmodus without the speaking idea bank.</p>{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={complete}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary C1 Day ${day}`}>{day === 15 && !progress.quizDone ? <NoteBox>Complete the new multiple-choice Learn questions. A legacy grammar checkbox is not counted as quiz completion.</NoteBox> : null}{quizCompleted ? <NoteBox><strong>Learn complete.</strong> The current Learn check is complete.</NoteBox> : null}<p>Practise the speaking task once more in Prüfungsmodus without the idea bank.</p>{progress.completed ? <NoteBox>Completed and saved on this device.</NoteBox> : null}<button style={styles.primaryButton} onClick={complete}>I have completed</button></Section> : null}
   </div>;
 }
