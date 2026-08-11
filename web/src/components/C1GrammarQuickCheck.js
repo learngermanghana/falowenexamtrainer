@@ -26,6 +26,36 @@ const itemsByDay = {
     ["Welche Bedingung ist sprachlich korrekt?", ["Digitale Gesundheit ist sinnvoll, sofern Datenschutz gewährleistet ist.", "Digitale Gesundheit ist sinnvoll, sofern Datenschutz ist gewährleistet.", "Sofern digitale Gesundheit, Datenschutz sinnvoll."], "Digitale Gesundheit ist sinnvoll, sofern Datenschutz gewährleistet ist."],
     ["Welche Aussage ist ausgewogen?", ["Digitale Angebote sollten ärztliche Betreuung ergänzen, aber nicht vollständig ersetzen.", "Apps sollten Ärzte vollständig ersetzen.", "Digitale Gesundheit hat keine Risiken."], "Digitale Angebote sollten ärztliche Betreuung ergänzen, aber nicht vollständig ersetzen."],
   ],
+  21: [
+    ["Welche Formulierung drückt Teilhabe korrekt aus?", ["an der Gesellschaft teilhaben", "in die Gesellschaft teilhaben", "die Gesellschaft teilhaben"], "an der Gesellschaft teilhaben"],
+    ["Welche Formulierung ist korrekt?", ["Der Erwerb guter Sprachkenntnisse erleichtert die Integration.", "Die Erwerb gute Sprachkenntnisse erleichtert Integration.", "Erwerben Sprachkenntnisse die Integration."], "Der Erwerb guter Sprachkenntnisse erleichtert die Integration."],
+    ["Welche Struktur beschreibt eine Voraussetzung?", ["sofern", "dennoch", "nachdem"], "sofern"],
+    ["Welche Aussage ist differenziert?", ["Teilhabe erfordert sowohl Eigeninitiative als auch institutionelle Unterstützung.", "Nur Zugewanderte sind verantwortlich.", "Nur der Staat ist verantwortlich."], "Teilhabe erfordert sowohl Eigeninitiative als auch institutionelle Unterstützung."],
+  ],
+  22: [
+    ["Welche Formulierung passt zu politischer Beteiligung?", ["an Wahlen teilnehmen", "in Wahlen teilnehmen", "auf Wahlen teilnehmen"], "an Wahlen teilnehmen"],
+    ["Welche indirekte Wiedergabe ist korrekt?", ["Laut der Studie sei politische Bildung besonders wichtig.", "Laut die Studie ist politische Bildung wichtig.", "Laut der Studie politische Bildung sei wichtig ist."], "Laut der Studie sei politische Bildung besonders wichtig."],
+    ["Welche Formulierung ist ausgewogen?", ["Eine Wahlpflicht könnte Beteiligung erhöhen, zugleich aber die Entscheidungsfreiheit einschränken.", "Wahlpflicht ist immer perfekt.", "Wahlen sind grundsätzlich unwichtig."], "Eine Wahlpflicht könnte Beteiligung erhöhen, zugleich aber die Entscheidungsfreiheit einschränken."],
+    ["Welcher Ausdruck passt zu einem politischen Gegenargument?", ["Dem ist entgegenzuhalten, dass ...", "Nachdem ist dagegen ...", "Damit obwohl ..."], "Dem ist entgegenzuhalten, dass ..."],
+  ],
+  23: [
+    ["Welche Formulierung ist idiomatisch?", ["die psychische Gesundheit fördern", "die mentale Gesundheit machen", "psychische Gesundheit steigen"], "die psychische Gesundheit fördern"],
+    ["Welche Formulierung ist korrekt?", ["kürzere Arbeitszeiten", "weniger Arbeitszeiten", "kleinere Arbeitszeit"], "kürzere Arbeitszeiten"],
+    ["Welche Aussage ist ausgewogen?", ["Homeoffice kann Flexibilität erhöhen, allerdings auch soziale Isolation verstärken.", "Homeoffice hat nur Vorteile.", "Homeoffice hat nur Nachteile."], "Homeoffice kann Flexibilität erhöhen, allerdings auch soziale Isolation verstärken."],
+    ["Welche Struktur drückt einen Zweck aus?", ["damit Beschäftigte sich erholen können", "indem Beschäftigte sich erholen können sollen", "obwohl Beschäftigte sich erholen"], "damit Beschäftigte sich erholen können"],
+  ],
+  24: [
+    ["Welche Formulierung ist korrekt?", ["die Nutzung öffentlicher Verkehrsmittel", "die Nutzung öffentliche Verkehrsmittel", "die Nutzung von öffentliche Verkehrsmittel"], "die Nutzung öffentlicher Verkehrsmittel"],
+    ["Welche Formulierung beschreibt Beschäftigung präzise?", ["die Schaffung neuer Arbeitsplätze", "die schaffen neue Arbeitsplätze", "das Arbeitsplätze schaffen neue"], "die Schaffung neuer Arbeitsplätze"],
+    ["Welche Aussage ist differenziert?", ["Öffentlicher Verkehr kann Emissionen senken, sofern emissionsarme Fahrzeuge eingesetzt werden.", "Jeder Bus ist emissionsfrei.", "Verkehr hat keine Umweltwirkung."], "Öffentlicher Verkehr kann Emissionen senken, sofern emissionsarme Fahrzeuge eingesetzt werden."],
+    ["Welche Formulierung ist korrekt?", ["zur Arbeit pendeln", "in die Arbeit pendeln", "an Arbeit pendeln"], "zur Arbeit pendeln"],
+  ],
+  25: [
+    ["Welche Formulierung gibt eine Quelle distanziert wieder?", ["Die Studie komme zu dem Ergebnis, dass ...", "Die Studie kommt immer sicher, dass ...", "Die Studie Ergebnis ist ..."], "Die Studie komme zu dem Ergebnis, dass ..."],
+    ["Welche Formulierung ist wissenschaftlich vorsichtig?", ["Die Ergebnisse deuten darauf hin, dass ...", "Die Ergebnisse beweisen immer, dass ...", "Die Ergebnisse sind sicher alles."], "Die Ergebnisse deuten darauf hin, dass ..."],
+    ["Welche Aussage ist ausgewogen?", ["Forschungsfreiheit ist wichtig, sollte jedoch bei erheblichen Risiken durch ethische Standards begrenzt werden.", "Forschung darf niemals begrenzt werden.", "Forschung sollte grundsätzlich verboten werden."], "Forschungsfreiheit ist wichtig, sollte jedoch bei erheblichen Risiken durch ethische Standards begrenzt werden."],
+    ["Welche Nominalisierung passt?", ["die Einschränkung der Forschung", "die einschränken der Forschung", "das eingeschränkt Forschung"], "die Einschränkung der Forschung"],
+  ],
 };
 
 export default function C1GrammarQuickCheck({ day, completed = false, onCompleteChange }) {
