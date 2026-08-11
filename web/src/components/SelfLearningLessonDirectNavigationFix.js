@@ -3,14 +3,20 @@ import { getA1CanonicalLessonForLegacyRoute } from "../data/a1CanonicalLessonCat
 
 const SELF_LEARNING_COURSE_DESTINATION = /^\/campus\/course\/(?:lesson\/(?:B2|C1)\/\d+|(?:b2|c1)-)/i;
 const A1_LEGACY_LESSON_DESTINATION = /^\/campus\/course\/lesson\/A1\/(\d+)\/?$/i;
+const A1_DAY0_WORKBOOK_ROUTE = "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook";
 
 const getA1PracticeCourseDestination = (url) => {
   const match = String(url?.pathname || "").match(A1_LEGACY_LESSON_DESTINATION);
   if (!match) return "";
 
+  const day = Number(match[1]);
   const chapter = url.searchParams.get("chapter") || "";
+  if (day === 0 && String(chapter).toLowerCase() === "tutorial") {
+    return A1_DAY0_WORKBOOK_ROUTE;
+  }
+
   const lesson = getA1CanonicalLessonForLegacyRoute({
-    day: Number(match[1]),
+    day,
     identity: chapter,
   });
   if (lesson?.kind !== "practice" || !lesson.destination) return "";
@@ -70,10 +76,6 @@ export default function SelfLearningLessonDirectNavigationFix() {
       const destination = getSelfLearningCourseDestination(anchor.href, window.location.origin);
       if (!destination) return;
 
-      // Use the same clean destination that succeeds in a fresh navigation.
-      // A1 practice-only cards resolve through the canonical lesson catalog so
-      // they open their owned practice page instead of getting stuck on the
-      // generic lesson route with stale React Router state.
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation?.();
