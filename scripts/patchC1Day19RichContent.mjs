@@ -6,6 +6,23 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pagePath = path.join(root, "web/src/components/C1Day18To20GuidedLessonPage.js");
 let source = fs.readFileSync(pagePath, "utf8");
 
+// The current guided page already owns the richer Day 18/19 learning journey
+// through C1SpeakGrammarGuide, the shared Day 16–20 speaking scaffold, and the
+// guided writing workspace. Older deployments used this script to inject that
+// content into a legacy page shape. Once the modern structure is present there
+// is nothing left to patch, so exit successfully instead of failing on stale
+// search/replace targets.
+const hasModernGuidedPage =
+  source.includes('import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";') &&
+  source.includes('getC1Day16To20SpeakingScaffold') &&
+  source.includes('const day18Writing = {') &&
+  source.includes('<C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches} />');
+
+if (hasModernGuidedPage) {
+  console.log("C1 Days 18 and 19 already use the modern guided prompt configuration; no legacy patch needed.");
+  process.exit(0);
+}
+
 const replaceRequired = (pattern, replacement, label) => {
   if (source.includes(replacement)) return;
   const next = source.replace(pattern, replacement);
