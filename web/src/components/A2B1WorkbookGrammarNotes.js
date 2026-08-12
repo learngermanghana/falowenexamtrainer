@@ -48,6 +48,7 @@ import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
 import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
 import { A2Days12To16ThinkingFirstGrammarGuide } from "./A2Days12To16ThinkingSupport";
 import { A2Days17To21ThinkingFirstGrammarGuide } from "./A2Days17To21ThinkingSupport";
+import { A2Days22To28ThinkingFirstGrammarGuide } from "./A2Days22To28ThinkingSupport";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
@@ -101,6 +102,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const showDays7To11Guide = normalizedLevel === "A2" && numericDay >= 7 && numericDay <= 11;
   const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
   const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
+  const showDays22To28Guide = normalizedLevel === "A2" && numericDay >= 22 && numericDay <= 28;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -109,6 +111,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays12To16Guide ? <A2Days12To16ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays17To21Guide ? <A2Days17To21ThinkingFirstGrammarGuide day={numericDay} /> : null}
+      {showDays22To28Guide ? <A2Days22To28ThinkingFirstGrammarGuide day={numericDay} /> : null}
       <GrammarNotes />
     </div>
   );
