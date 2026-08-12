@@ -46,6 +46,7 @@ import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeute
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
 import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
+import { A2Days12To16ThinkingFirstGrammarGuide } from "./A2Days12To16ThinkingSupport";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
@@ -97,12 +98,14 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
 
   const showDays2To6Guide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6;
   const showDays7To11Guide = normalizedLevel === "A2" && numericDay >= 7 && numericDay <= 11;
+  const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <A2B1GrammarVideoCard level={level} day={day} />
       {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
+      {showDays12To16Guide ? <A2Days12To16ThinkingFirstGrammarGuide day={numericDay} /> : null}
       <GrammarNotes />
     </div>
   );
