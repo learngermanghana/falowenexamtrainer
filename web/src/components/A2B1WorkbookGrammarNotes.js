@@ -45,56 +45,31 @@ import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19Vorstellungsg
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
+import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
   A2: {
-    1: A2StarterConjunctionsPage,
-    2: A2Day2Kapitel12GrammarNotesPage,
-    3: ComparingThingsAndPeopleGrammarPage,
-    4: WoTreffenUnsGrammarPage,
-    5: A2Day5FreizeitSeparableVerbsGrammarPage,
-    6: A2Day6TwoCasePrepositionsGrammarPage,
-    7: A2Day7RelativeClausesWohnungGrammarPage,
-    8: A2Day8ImperativeGrammarPage,
-    9: A2Day9PerfektGrammarPage,
-    10: A2Day10PraeteritumGrammarPage,
-    11: A2Day11ComparativeFormsGrammarPage,
-    12: A2Day12MeinTraumberufGrammarPage,
-    13: A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage,
-    14: A2Day14BerufUndKarriereUmZuGrammarPage,
-    15: A2Day15MeinLieblingssportSeitDativGrammarPage,
-    16: A2Day16WohlbefindenReflexiveVerbenGrammarPage,
-    17: A2Day17InDieApothekeModalverbenFragenGrammarPage,
-    18: A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage,
-    19: A2Day19EinkaufenOderDennGrammarPage,
-    20: A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage,
-    21: A2Day21EinWochenendePlanenWennObFallsGrammarPage,
-    22: A2Day22DieWochePlanungGrammarPage,
-    23: A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage,
-    24: A2Day24EinenUrlaubPlanenGrammarPage,
+    1: A2StarterConjunctionsPage, 2: A2Day2Kapitel12GrammarNotesPage, 3: ComparingThingsAndPeopleGrammarPage,
+    4: WoTreffenUnsGrammarPage, 5: A2Day5FreizeitSeparableVerbsGrammarPage, 6: A2Day6TwoCasePrepositionsGrammarPage,
+    7: A2Day7RelativeClausesWohnungGrammarPage, 8: A2Day8ImperativeGrammarPage, 9: A2Day9PerfektGrammarPage,
+    10: A2Day10PraeteritumGrammarPage, 11: A2Day11ComparativeFormsGrammarPage, 12: A2Day12MeinTraumberufGrammarPage,
+    13: A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage, 14: A2Day14BerufUndKarriereUmZuGrammarPage,
+    15: A2Day15MeinLieblingssportSeitDativGrammarPage, 16: A2Day16WohlbefindenReflexiveVerbenGrammarPage,
+    17: A2Day17InDieApothekeModalverbenFragenGrammarPage, 18: A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage,
+    19: A2Day19EinkaufenOderDennGrammarPage, 20: A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage,
+    21: A2Day21EinWochenendePlanenWennObFallsGrammarPage, 22: A2Day22DieWochePlanungGrammarPage,
+    23: A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage, 24: A2Day24EinenUrlaubPlanenGrammarPage,
     28: A2Day28UeberDieZukunftSprechenGrammarPage,
   },
   B1: {
-    1: B1Day1TraumweltGrammarNotesPage,
-    2: B1Day2FreundeFuersLebenGrammarNotesPage,
-    3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
-    4: B1Day4WohnungSuchenGrammarNotesPage,
-    5: B1Day5BesichtigungsterminGrammarNotesPage,
-    6: B1Day6StadtOderLandGrammarNotesPage,
-    7: B1Day7FastFoodHausmannskostGrammarNotesPage,
-    8: B1Day8AllesFuerDieGesundheitGrammarNotesPage,
-    9: B1Day9WorkLifeBalanceGrammarNotesPage,
-    10: B1Day10DigitaleAuszeitGrammarNotesPage,
-    11: B1Day11TeamspieleGrammarNotesPage,
-    12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
-    13: B1Day13EigeneFilmkritikGrammarNotesPage,
-    14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage,
-    15: B1Day15MedienHomeofficeGrammarNotesPage,
-    16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage,
-    18: B1Day18WegeZumWunschberufGrammarNotesPage,
-    19: B1Day19VorstellungsgespraechGrammarNotesPage,
-    21: B1Day21LebensformenHeuteGrammarNotesPage,
+    1: B1Day1TraumweltGrammarNotesPage, 2: B1Day2FreundeFuersLebenGrammarNotesPage, 3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
+    4: B1Day4WohnungSuchenGrammarNotesPage, 5: B1Day5BesichtigungsterminGrammarNotesPage, 6: B1Day6StadtOderLandGrammarNotesPage,
+    7: B1Day7FastFoodHausmannskostGrammarNotesPage, 8: B1Day8AllesFuerDieGesundheitGrammarNotesPage, 9: B1Day9WorkLifeBalanceGrammarNotesPage,
+    10: B1Day10DigitaleAuszeitGrammarNotesPage, 11: B1Day11TeamspieleGrammarNotesPage, 12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
+    13: B1Day13EigeneFilmkritikGrammarNotesPage, 14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage, 15: B1Day15MedienHomeofficeGrammarNotesPage,
+    16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage, 18: B1Day18WegeZumWunschberufGrammarNotesPage,
+    19: B1Day19VorstellungsgespraechGrammarNotesPage, 21: B1Day21LebensformenHeuteGrammarNotesPage,
   },
 };
 
@@ -103,9 +78,7 @@ export const getA2B1GrammarNotesComponent = (level, day) =>
 
 Object.entries(GRAMMAR_NOTES_BY_LEVEL_DAY).forEach(([level, notesByDay]) => {
   Object.keys(notesByDay).forEach((day) => {
-    if (!hasA2B1GrammarNotes(level, day)) {
-      throw new Error(`Grammar availability is missing ${level} Day ${day}.`);
-    }
+    if (!hasA2B1GrammarNotes(level, day)) throw new Error(`Grammar availability is missing ${level} Day ${day}.`);
   });
 });
 
@@ -117,19 +90,19 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
     return (
       <section style={{ display: "grid", gap: 10 }}>
         <h2 style={{ margin: 0 }}>Grammar Notes</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Grammar notes have not been added for this workbook day yet. Continue with Teil 1–4, Ref and Submit.
-        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>Grammar notes have not been added for this workbook day yet. Continue with Teil 1–4, Ref and Submit.</p>
       </section>
     );
   }
 
-  const showThinkingGuide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6;
+  const showDays2To6Guide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6;
+  const showDays7To11Guide = normalizedLevel === "A2" && numericDay >= 7 && numericDay <= 11;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <A2B1GrammarVideoCard level={level} day={day} />
-      {showThinkingGuide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
+      {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
+      {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
       <GrammarNotes />
     </div>
   );
