@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { getA2Days7To11SpeakingConfig } from "./A2Days7To11ThinkingSupport";
 import { getA2Days12To16SpeakingConfig } from "./A2Days12To16ThinkingSupport";
 import { getA2Days17To21SpeakingConfig } from "./A2Days17To21ThinkingSupport";
+import { getA2Days22To28SpeakingConfig } from "./A2Days22To28ThinkingSupport";
 import "./SpeakingMindMap.css";
 
 const emptyConfig = {
@@ -39,6 +40,11 @@ const withA2EnhancedHelp = (config) => {
 
   if (day >= 17 && day <= 21) {
     const enriched = getA2Days17To21SpeakingConfig(day);
+    return enriched ? { ...config, extraHelp: enriched.extraHelp } : config;
+  }
+
+  if (day >= 22 && day <= 28) {
+    const enriched = getA2Days22To28SpeakingConfig(day);
     return enriched ? { ...config, extraHelp: enriched.extraHelp } : config;
   }
 
