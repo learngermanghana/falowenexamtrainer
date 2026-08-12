@@ -17,17 +17,19 @@ const historicalPromptChecks = [
     day: 2,
     file: "A2Day2PersonenBeschreibenWorkbookPage.js",
     markers: [
-      "Schreibe einen Brief an Felix",
-      "Beschreibe deinen Chef oder deine Chefin: Aussehen, Persönlichkeit und Verhalten.",
-      "Was gefällt dir an deinem Chef oder deiner Chefin, und was könnte besser sein?",
+      "Brief an Felix: Mein Chef / Meine Chefin",
+      "Beschreibe das Aussehen deines Chefs / deiner Chefin.",
+      "Beschreibe Persönlichkeit und Verhalten bei der Arbeit.",
+      "Sage, was dir gefällt oder was besser sein könnte.",
     ],
   },
   {
     day: 3,
     file: "A2Day3ComparisonsWorkbookPage.js",
     markers: [
-      "Schreibe einen Brief an deinen Freund Felix. Beschreibe und vergleiche deine Mutter und deinen Vater.",
-      "Vergleiche beide mit so ... wie und dem Komparativ",
+      "Brief an Felix: Meine Mutter und mein Vater",
+      "Vergleiche ihr Aussehen mit",
+      "Vergleiche ihren Charakter.",
       "Frage Felix am Ende nach seinen Eltern.",
     ],
   },
@@ -35,29 +37,31 @@ const historicalPromptChecks = [
     day: 4,
     file: "A2Day4WoMoechtenWirUnsTreffenWorkbookPage.js",
     markers: [
-      "Schreiben Sie einen Brief an Herrn Felix Asadu und laden Sie ihn zu einem gemeinsamen Wochenende ein.",
-      "Fragen Sie, wann er Zeit hat und wo das Treffen stattfinden soll.",
-      "Fragen Sie, ob er etwas Bestimmtes für ein gemeinsames Abendessen oder eine Aktivität mitbringen kann.",
+      "Formeller Brief: Einladung zu einem gemeinsamen Wochenende",
+      "Schreiben Sie Herrn Felix Asadu einen kurzen Brief",
+      "Fragen Sie, wann er Zeit hat und wo Sie sich treffen können.",
+      "Fragen Sie, ob er etwas für das Essen oder die Aktivität mitbringen kann.",
     ],
   },
   {
     day: 5,
     file: "A2Day5FreizeitWorkbookPage.js",
     markers: [
-      "Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail:",
-      "Sagen Sie, dass Sie Zeit haben und etwas zusammen machen möchten.",
-      "Fragen Sie, ob er am Wochenende frei ist.",
-      "Fragen Sie, ob er einen Vorschlag für eine Aktivität hat.",
+      "E-Mail an Alex: Freizeit planen",
+      "Du möchtest mit deinem Freund Alex am Wochenende etwas unternehmen.",
+      "Frage, ob Alex am Wochenende frei ist.",
+      "Schlage selbst eine mögliche Aktivität vor.",
     ],
   },
   {
     day: 6,
     file: "A2Day6MoebelRaeumeWorkbookPage.js",
     markers: [
-      "Schreibe eine Nachricht an deine Freundin oder deinen Freund über dein Zimmer.",
+      "Nachricht an einen Freund: Meine Wohnung / mein Zimmer",
       "Beschreibe mindestens zwei Räume in deiner Wohnung.",
-      "Nenne mindestens fünf Möbel und sage, wo sie stehen (Wo? + Dativ).",
-      "Beschreibe zwei Veränderungen (Wohin? + Akkusativ)",
+      "Nenne mindestens fünf Möbel.",
+      "Wo? + Dativ",
+      "Wohin? + Akkusativ",
     ],
   },
   {
@@ -138,7 +142,7 @@ const replacedGenericSummaries = [
 ];
 
 describe("original A2 Teil 2 prompt identity", () => {
-  it.each(historicalPromptChecks)("keeps the historical Day $day writing task", ({ file, markers }) => {
+  it.each(historicalPromptChecks)("keeps the Day $day writing task clear and specific", ({ file, markers }) => {
     const source = read(file);
     markers.forEach((marker) => expect(source).toContain(marker));
   });
@@ -148,7 +152,7 @@ describe("original A2 Teil 2 prompt identity", () => {
   });
 
   it("keeps structured writing content on every restored shared workbook", () => {
-    [5, 6, 7, 8, 9, 18].forEach((day) => {
+    [2, 3, 4, 5, 6, 7, 8, 9, 18].forEach((day) => {
       const file = historicalPromptChecks.find((entry) => entry.day === day).file;
       const source = read(file);
       expect(source).toContain("schreibenContent={schreibenContent}");
