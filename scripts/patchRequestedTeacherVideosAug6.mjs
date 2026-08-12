@@ -11,6 +11,18 @@ const replacements = [
     after: '[11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],',
     label: "A1 Day 11 teacher lecture video",
   },
+  {
+    file: "web/src/data/lessonVideoDictionary.js",
+    before: 'url: "https://youtu.be/qPwxBYlu3CE",',
+    after: 'url: "https://youtu.be/PP38eObAMh8",',
+    label: "A1 Day 0 orientation dictionary video",
+  },
+  {
+    file: "web/src/components/Day0StudentWorkflowUpgrade.js",
+    before: 'id: "qPwxBYlu3CE",\n      url: "https://youtu.be/qPwxBYlu3CE",',
+    after: 'id: "PP38eObAMh8",\n      url: "https://youtu.be/PP38eObAMh8",',
+    label: "A1 Day 0 workflow orientation video",
+  },
 ];
 
 for (const { file, before, after, label } of replacements) {
@@ -43,4 +55,4 @@ if (!smallTalkSource.includes(teacherLectureMarker)) {
 }
 
 fs.writeFileSync(smallTalkPath, smallTalkSource, "utf8");
-console.log("Updated requested teacher lecture videos without changing A2 speaking structure.");
+console.log("Updated requested teacher lecture videos and A1 Day 0 orientation video without changing A2 speaking structure.");
