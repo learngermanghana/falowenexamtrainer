@@ -12,20 +12,41 @@ function patchFile(relativePath, transform) {
   fs.writeFileSync(filePath, updated, "utf8");
 }
 
-patchFile("web/src/components/A2LegacyStandardWorkbookNavigationImpl.js", (source) => {
+patchFile("web/src/components/A2B1WorkbookGuidance.js", (source) => {
   let updated = source;
   if (!updated.includes(componentImport)) {
-    const anchor = 'import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";';
-    if (!updated.includes(anchor)) throw new Error("A2 legacy grammar import anchor was not found.");
+    const anchor = 'import A2MiniLearningBlock from "./A2MiniLearningBlock";';
+    if (!updated.includes(anchor)) throw new Error("A2 shared guidance import anchor was not found.");
     updated = updated.replace(anchor, `${anchor}\n${componentImport}`);
   }
 
-  const oldGrammar = '<A2B1GrammarNotesTab level="A2" day={config.day} />';
-  const newGrammar = '<><A2Days26To28LearningUpgrade day={config.day} /><A2B1GrammarNotesTab level="A2" day={config.day} /></>';
-  if (!updated.includes(newGrammar)) {
-    if (!updated.includes(oldGrammar)) throw new Error("A2 legacy grammar panel anchor was not found.");
-    updated = updated.replace(oldGrammar, newGrammar);
+  const fallbackComponent = `const A2Days26To28FallbackLearning = ({ level = "" }) => {
+  const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
+  const workbookDay = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return resolveA2B1WorkbookDayFromLocation(
+      workbookLevel,
+      \`${"${window.location.pathname || \"\"}"}${"${window.location.search || \"\"}"}\`,
+    );
+  }, [workbookLevel]);
+
+  if (workbookLevel !== "A2" || workbookDay !== 26) return null;
+  return <A2Days26To28LearningUpgrade day={26} />;
+};`;
+
+  if (!updated.includes("const A2Days26To28FallbackLearning =")) {
+    const anchor = "const detectTabKey = (text = \"\") => {";
+    if (!updated.includes(anchor)) throw new Error("A2 shared guidance helper anchor was not found.");
+    updated = updated.replace(anchor, `${fallbackComponent}\n\n${anchor}`);
   }
+
+  const mount = "      <A2Days26To28FallbackLearning level={workbookLevel} />";
+  if (!updated.includes(mount)) {
+    const anchor = "      <A2Days11To15QuickLearning level={workbookLevel} />";
+    if (!updated.includes(anchor)) throw new Error("A2 shared guidance learning mount anchor was not found.");
+    updated = updated.replace(anchor, `${anchor}\n${mount}`);
+  }
+
   return updated;
 });
 
@@ -61,10 +82,11 @@ patchFile("web/src/components/A2Day28UeberDieZukunftSprechenWorkbookPage.js", (s
   return updated;
 });
 
-const legacy = fs.readFileSync(path.join(root, "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"), "utf8");
+const guidance = fs.readFileSync(path.join(root, "web/src/components/A2B1WorkbookGuidance.js"), "utf8");
 const day27 = fs.readFileSync(path.join(root, "web/src/components/A2Day27DigitaleKommunikationWorkbookPage.js"), "utf8");
 const day28 = fs.readFileSync(path.join(root, "web/src/components/A2Day28UeberDieZukunftSprechenWorkbookPage.js"), "utf8");
-if (!legacy.includes("<A2Days26To28LearningUpgrade day={config.day} />")) throw new Error("A2 Day 26 learning block is not wired into the legacy grammar panel.");
+if (!guidance.includes("<A2Days26To28LearningUpgrade day={26} />")) throw new Error("A2 Day 26 learning block is not wired into the shared fallback.");
+if (!guidance.includes("workbookDay !== 26")) throw new Error("A2 Day 26 shared fallback guard is missing.");
 if (!day27.includes("<A2Days26To28LearningUpgrade day={27} />")) throw new Error("A2 Day 27 learning block is missing.");
 if (!day28.includes("<A2Days26To28LearningUpgrade day={28} />")) throw new Error("A2 Day 28 learning block is missing.");
-console.log("Wired A2 Days 26-28 concise learning blocks into their workbook pages.");
+console.log("Wired A2 Days 26-28 concise learning blocks into active production workbook paths.");
