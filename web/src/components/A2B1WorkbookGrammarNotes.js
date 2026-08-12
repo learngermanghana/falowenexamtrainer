@@ -44,6 +44,7 @@ import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschber
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
+import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
@@ -100,7 +101,6 @@ const GRAMMAR_NOTES_BY_LEVEL_DAY = {
 export const getA2B1GrammarNotesComponent = (level, day) =>
   GRAMMAR_NOTES_BY_LEVEL_DAY[String(level || "").toUpperCase()]?.[Number(day)] || null;
 
-// Keep tab availability and the rendered registry aligned during development.
 Object.entries(GRAMMAR_NOTES_BY_LEVEL_DAY).forEach(([level, notesByDay]) => {
   Object.keys(notesByDay).forEach((day) => {
     if (!hasA2B1GrammarNotes(level, day)) {
@@ -110,6 +110,8 @@ Object.entries(GRAMMAR_NOTES_BY_LEVEL_DAY).forEach(([level, notesByDay]) => {
 });
 
 export const A2B1GrammarNotesTab = ({ level, day }) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  const numericDay = Number(day);
   const GrammarNotes = getA2B1GrammarNotesComponent(level, day);
   if (!GrammarNotes) {
     return (
@@ -122,9 +124,12 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
     );
   }
 
+  const showThinkingGuide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6;
+
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <A2B1GrammarVideoCard level={level} day={day} />
+      {showThinkingGuide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
       <GrammarNotes />
     </div>
   );
