@@ -1,3 +1,4 @@
+// A2 Day 1 Small Talk: bilingual thinking-first grammar note.
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
