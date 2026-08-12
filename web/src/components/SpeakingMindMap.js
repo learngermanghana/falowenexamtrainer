@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { getA2Days7To11SpeakingConfig } from "./A2Days7To11ThinkingSupport";
+import { getA2Days12To16SpeakingConfig } from "./A2Days12To16ThinkingSupport";
 import "./SpeakingMindMap.css";
 
 const emptyConfig = {
@@ -20,16 +21,26 @@ const positionSets = {
   7: [{ x: 18, y: 15 }, { x: 50, y: 8 }, { x: 82, y: 15 }, { x: 12, y: 52 }, { x: 88, y: 52 }, { x: 28, y: 87 }, { x: 72, y: 87 }],
 };
 
-const withA2Days7To11Help = (config) => {
+const withA2EnhancedHelp = (config) => {
   const level = String(config?.level || "").toUpperCase();
   const day = Number(config?.day || 0);
-  if (level !== "A2" || day < 7 || day > 11) return config;
-  const enriched = getA2Days7To11SpeakingConfig(day);
-  return enriched ? { ...config, extraHelp: enriched.extraHelp } : config;
+  if (level !== "A2") return config;
+
+  if (day >= 7 && day <= 11) {
+    const enriched = getA2Days7To11SpeakingConfig(day);
+    return enriched ? { ...config, extraHelp: enriched.extraHelp } : config;
+  }
+
+  if (day >= 12 && day <= 16) {
+    const enriched = getA2Days12To16SpeakingConfig(day);
+    return enriched ? { ...config, extraHelp: enriched.extraHelp } : config;
+  }
+
+  return config;
 };
 
 const normalizeConfig = (config) => {
-  const source = withA2Days7To11Help(config);
+  const source = withA2EnhancedHelp(config);
   const safe = source && typeof source === "object" ? source : {};
   const branches = Array.isArray(safe.branches)
     ? safe.branches.filter((branch) => branch && branch.id && (branch.label || branch.title)).map((branch) => ({
