@@ -1,48 +1,37 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
-import A2MiniLearningBlock from "./A2MiniLearningBlock";
+import SpeakingMindMap from "./SpeakingMindMap";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+import { getA2Days2To6SpeakingConfig } from "./A2Days2To6ThinkingSupport";
 
-const paragraph = { margin:0, lineHeight:1.7 };
-const list = { margin:0, paddingLeft:22, lineHeight:1.75 };
+const paragraph = { margin: 0, lineHeight: 1.7 };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <A2MiniLearningBlock
-    title="Eine Person mit ganzen Sätzen beschreiben"
-    rule="Benutze sein für Eigenschaften, haben für Körpermerkmale und tragen für Kleidung oder Accessoires. Baue deine Beschreibung Schritt für Schritt auf: Aussehen → Kleidung → Charakter."
-    examples={[
-      "Er ist mittelgroß und sportlich.",
-      "Er hat kurze schwarze Haare und braune Augen.",
-      "Er trägt eine Brille und oft ein blaues Hemd.",
-      "Er ist freundlich, ruhig und hilfsbereit."
-    ]}
-    questions={[
-      { stem:"Was passt? Er ___ kurze schwarze Haare.", options:["ist","hat","trägt"], answer:1, explanation:"Haare sind ein Körpermerkmal: Er hat ..." },
-      { stem:"Was passt? Sie ___ sehr freundlich und geduldig.", options:["ist","hat","trägt"], answer:0, explanation:"Eigenschaften stehen mit sein." },
-      { stem:"Was passt? Er ___ eine Brille.", options:["ist","hat","trägt"], answer:2, explanation:"Bei Kleidung und Accessoires ist trägt besonders natürlich." },
-      { stem:"Welche Reihenfolge ist für eine kurze Beschreibung klar?", options:["Charakter → Name → zufällige Wörter","Aussehen → Kleidung → Charakter","Nur Adjektive nennen"], answer:1, explanation:"Eine feste Reihenfolge hilft dir, flüssiger zu sprechen." }
-    ]}
-    outputPrompt="Beschreibe eine Person in 4–6 ganzen Sätzen."
-    starters={["Die Person ist ...", "Sie/Er hat ...", "Sie/Er trägt ...", "Vom Charakter her ist sie/er ..."]}
-  />
-
-  <WorkbookTaskCard eyebrow="Teil 1 · Sprechen" title="Jetzt beschreibst du selbst" practiceOnly>
-    <p style={paragraph}>Wähle eine Person aus deiner Familie, Arbeit oder deinem Freundeskreis. Sprich zuerst über das Aussehen und danach über den Charakter.</p>
-    <ul style={list}>
-      <li>Aussehen: groß, klein, mittelgroß, Haare, Augen</li>
-      <li>Kleidung/Merkmale: Brille, Bart, Kleid, Hemd</li>
-      <li>Charakter: freundlich, lustig, ruhig, hilfsbereit, geduldig</li>
-    </ul>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(2)} />
+  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Beschreibe eine echte Person in 4–6 Sätzen" practiceOnly>
+    <p style={paragraph}>Choose one person you really know. Build one connected description instead of listing adjectives.</p>
+    <ol style={list}>
+      <li>Say who the person is and how you know them.</li>
+      <li>Describe appearance and one clothing detail.</li>
+      <li>Describe the character with 2–3 useful adjectives.</li>
+      <li>Finish with your opinion and one reason with <strong>weil</strong>.</li>
+    </ol>
+    <p style={paragraph}><strong>Thinking route:</strong> Person → Aussehen → Kleidung → Charakter → Meinung + Grund.</p>
   </WorkbookTaskCard>
 </>;
 
-const writingContent = <WorkbookTaskCard eyebrow="Schreibaufgabe" title="Schreibe einen Brief an Felix">
-  <p style={paragraph}>Erzähle Felix von deinem Chef oder deiner Chefin.</p>
-  <ol style={list}>
-    <li>Warum schreibst du?</li>
-    <li>Beschreibe Aussehen, Persönlichkeit und Verhalten.</li>
-    <li>Was gefällt dir, und was könnte besser sein?</li>
-  </ol>
+const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Brief an Felix: Mein Chef / Meine Chefin">
+  <p style={paragraph}><strong>Aufgabe:</strong> Schreibe Felix einen kurzen Brief über deinen Chef oder deine Chefin.</p>
+  <p style={paragraph}>Bearbeite diese Punkte:</p>
+  <ul style={list}>
+    <li>Schreibe, warum du Felix schreibst.</li>
+    <li>Beschreibe das Aussehen deines Chefs / deiner Chefin.</li>
+    <li>Beschreibe Persönlichkeit und Verhalten bei der Arbeit.</li>
+    <li>Sage, was dir gefällt oder was besser sein könnte.</li>
+    <li>Frage Felix am Ende nach seinem Chef / seiner Chefin.</li>
+  </ul>
+  <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Grund → Beschreibung → Meinung → Frage → Viele Grüße.</p>
 </WorkbookTaskCard>;
 
 const readingText = `Ich arbeite seit einem Jahr in einem kleinen Büro in der Stadtmitte. Mein Chef, Herr Müller, ist etwa 45 Jahre alt. Er ist ein sehr organisierter und motivierter Mensch. Jeden Morgen kommt er pünktlich ins Büro und begrüßt alle freundlich. Herr Müller trägt meistens einen Anzug und eine Brille. Er hat kurze, braune Haare und ist immer gut gelaunt. Er ist sehr freundlich, aber auch sehr anspruchsvoll, wenn es um die Arbeit geht.
@@ -73,7 +62,7 @@ export default function A2Day2PersonenBeschreibenWorkbookPage() {
     topicPrompt="Personen beschreiben"
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
-    schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich schreibe dir, weil ...\n\nMein Chef / Meine Chefin ist ... Er/Sie hat ..."}
+    schreibenPlaceholder={"Lieber Felix,\n\nich schreibe dir, weil ...\n\nMein Chef / Meine Chefin ist ... Er/Sie hat ... Er/Sie ist ...\n\nIch finde ...\n\nWie ist dein Chef / deine Chefin?\n\nViele Grüße\n[Dein Name]"}
     lesenText={readingText}
     lesenQuestions={readingQuestions}
     hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die drei Hörverstehen-Fragen."
