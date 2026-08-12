@@ -1,160 +1,70 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
-const writingListStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+const list = { margin:0, paddingLeft:22, lineHeight:1.75 };
 
-const schreibenContent = (
-  <WorkbookTaskCard eyebrow="Schreibaufgabe" title="E-Mail an Alex">
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail:
-    </p>
-    <ol style={writingListStyle}>
-      <li>Sagen Sie, dass Sie Zeit haben und etwas zusammen machen möchten.</li>
-      <li>Fragen Sie, ob er am Wochenende frei ist.</li>
-      <li>Fragen Sie, ob er einen Vorschlag für eine Aktivität hat.</li>
-    </ol>
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      <strong>Optional:</strong> Schreiben Sie 5 Sätze über Ihre Freizeit mit Ideen aus Ihrer Brain Map.
-    </p>
-  </WorkbookTaskCard>
-);
+const speakingContent = <A2MiniLearningBlock
+  title="Über Freizeit in ganzen Sätzen sprechen"
+  rule="Sag zuerst, was du machst, dann wann oder mit wem, und gib am Ende einen einfachen Grund mit weil."
+  examples={[
+    "In meiner Freizeit spiele ich Fußball.",
+    "Am Wochenende treffe ich mich mit Freunden.",
+    "Ich interessiere mich für Musik.",
+    "Ich gehe gern spazieren, weil ich mich dabei entspannen kann."
+  ]}
+  questions={[
+    { stem:"Welcher Satz ist richtig?", options:["In meiner Freizeit ich spiele Fußball.","In meiner Freizeit spiele ich Fußball."], answer:1, explanation:"Wenn ein Zeitteil zuerst steht, kommt das Verb direkt danach." },
+    { stem:"Was passt? Ich interessiere mich ___ Musik.", options:["an","für","mit"], answer:1, explanation:"Die feste Verbindung lautet: sich für etwas interessieren." },
+    { stem:"Was passt? Am Wochenende ___ ich mich mit Freunden.", options:["treffe","treffen","trifft"], answer:0, explanation:"Mit ich heißt das Verb: ich treffe mich." },
+    { stem:"Welcher Satz gibt einen Grund richtig an?", options:["Ich gehe spazieren, weil ich möchte entspannen.","Ich gehe spazieren, weil ich mich entspannen möchte."], answer:1, explanation:"Bei weil steht das konjugierte Verb am Ende." }
+  ]}
+  outputPrompt="Sprich 4–6 Sätze über deine Freizeit. Sage was du machst, wann, mit wem und warum."
+  starters={["In meiner Freizeit ...", "Am Wochenende ...", "Ich mache das mit ...", "Ich mag das, weil ..."]}
+/>;
 
-const restaurantReadingText = `Im Restaurant
+const schreibenContent = <WorkbookTaskCard eyebrow="Schreibaufgabe" title="E-Mail an Alex">
+  <p style={{ margin:0, lineHeight:1.7 }}>Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail:</p>
+  <ol style={list}>
+    <li>Sagen Sie, dass Sie Zeit haben und etwas zusammen machen möchten.</li>
+    <li>Fragen Sie, ob er am Wochenende frei ist.</li>
+    <li>Fragen Sie, ob er einen Vorschlag für eine Aktivität hat.</li>
+  </ol>
+</WorkbookTaskCard>;
 
-Kellner: Guten Abend, haben Sie reserviert?
-Gast: Ja, einen Tisch für zwei auf den Namen Müller.
-Kellner: Bitte folgen Sie mir, ich bringe Sie zu Ihrem Tisch.
-Gast: Vielen Dank.
-Kellner: Darf ich Ihnen schon Getränke bringen?
-Gast: Die Speisekarte bitte zuerst.
-Kellner: Sehr gern.
-Gast: Wir bestellen eine Flasche Weißwein und einen Liter Wasser bitte.
-Kellner: Zum Essen haben Sie schon gewählt?
-Gast: Ja, wir bekommen als Vorspeise zwei Mal die Suppe. Ist das Gemüsesuppe?
-Kellner: Ja, Gemüsesuppe mit Karotten.
-Gast: Sehr gut. Und anschließend als Hauptspeise nehmen wir ein Mal die Nudeln, ein Mal eine Pizza und einen Salat.
-Kellner: Sehr gern. Möchten Sie Kartoffelsalat oder grünen Salat?
-Gast: Gern grünen Salat.
-Kellner: Ist alles in Ordnung?
-Gast: Die Suppe ist köstlich, aber leider kalt.
-Kellner: Entschuldigen Sie vielmals, ich bringe Ihnen sofort eine neue.
-Gast: Ja bitte.
+const restaurantReadingText = `Im Restaurant\n\nKellner: Guten Abend, haben Sie reserviert?\nGast: Ja, einen Tisch für zwei auf den Namen Müller.\nKellner: Darf ich Ihnen schon Getränke bringen?\nGast: Die Speisekarte bitte zuerst.\nGast: Wir bestellen eine Flasche Weißwein und Wasser. Als Vorspeise nehmen wir zweimal die Suppe. Als Hauptspeise nehmen wir Nudeln, eine Pizza und einen grünen Salat.\nKellner: Ist alles in Ordnung?\nGast: Die Suppe ist köstlich, aber leider kalt.\nKellner: Entschuldigen Sie, ich bringe sofort eine neue.\nGast: Außerdem haben Sie den grünen Salat vergessen.\nKellner: Das tut mir leid. Als Entschuldigung laden wir Sie zum Nachtisch ein.\nGast: Dann nehmen wir ein Tiramisu und einen Schokoladenkuchen.\nGast: Wir möchten gern bezahlen.\nKellner: Bar oder mit Karte?\nGast: Bar, bitte.`;
 
-Kellner: Sind Sie zufrieden? Wie sind die Nudeln? Schmeckt die Pizza?
-Gast: Ja, wunderbar. Allerdings haben Sie den grünen Salat vergessen.
-Kellner: Das tut mir furchtbar leid. Kommt sofort.
-Gast: Wir hätten gern Nachtisch. Bringen Sie uns nochmals die Speisekarte bitte?
-Kellner: Sehr gern, als Entschuldigung für die kalte Suppe und den vergessenen Salat laden wir Sie dazu gern ein.
-Gast: Ja, wunderbar. Wir hätten gern ein Tiramisu und einen Schokoladenkuchen.
-Kellner: Sehr gern.
-Gast: Wir möchten gern bezahlen.
-Kellner: Gern, bar oder mit Karte?
-Gast: Bar. Und bitte eine Rechnung.
-Kellner: Selbstverständlich. Kommt sofort.`;
+const lesenQuestions = [
+  { stem:"Welche Hauptspeisen bestellen die Gäste?", options:["a) Nudeln, Pizza und Salat","b) Schnitzel und Reis","c) Nur Suppe","d) Fisch und Kartoffeln"] },
+  { stem:"Was hat der Kellner vergessen?", options:["a) Wasser","b) Den grünen Salat","c) Die Pizza","d) Die Rechnung"] },
+  { stem:"Was ist mit der Suppe nicht in Ordnung?", options:["a) Sie ist kalt.","b) Sie ist zu teuer.","c) Sie ist zu salzig.","d) Sie fehlt."] },
+  { stem:"Welche Nachspeisen bestellen die Gäste?", options:["a) Eis und Kuchen","b) Tiramisu und Schokoladenkuchen","c) Obst","d) Keine"] },
+  { stem:"Wie bezahlt der Gast?", options:["a) Mit Karte","b) Bar","c) Per Überweisung","d) Mit Scheck"] }
+];
+
+const hoerenQuestions = [
+  { stem:"Was macht Anna abends gerne?", options:["a) Tee trinken und lesen","b) Fernsehen","c) Telefonieren"] },
+  { stem:"Welches Brettspiel spielt Anna oft?", options:["a) Schach","b) Mensch ärgere dich nicht","c) Uno"] },
+  { stem:"Was macht Anna jeden Morgen?", options:["a) Joggen","b) Yoga","c) Schwimmen"] },
+  { stem:"Wo war Anna letztes Wochenende mit Freunden?", options:["a) Am Strand","b) In den Bergen","c) Im Park"] },
+  { stem:"Welche Musik hört Anna zum Konzentrieren?", options:["a) Pop","b) Klassische Musik","c) Jazz"] }
+];
 
 export default function A2Day5FreizeitWorkbookPage() {
-  return (
-    <A2StandardTabbedWorkbookPage
-      day={5}
-      title="Was machst du in deiner Freizeit?"
-      chapter="2.5"
-      workbookId="A2Day5Freizeit"
-      topicPrompt="Welche Freizeitaktivitäten machst du gern und warum?"
-      schreibenTask="Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail."
-      schreibenContent={schreibenContent}
-      lesenText={restaurantReadingText}
-      lesenQuestions={[
-        {
-          stem: "Welche Speisen bestellen die Gäste?",
-          options: [
-            "a) Gemüseauflauf mit Salat",
-            "b) Rindfleisch mit Leberknödeln",
-            "c) Nudeln, Pizza und Salat",
-            "d) Schnitzel mit Salat und Kotelett mit Gemüse",
-          ],
-        },
-        {
-          stem: "Was hat der Kellner vergessen?",
-          options: [
-            "a) Den Weißwein",
-            "b) Den Nachtisch",
-            "c) Den grünen Salat",
-            "d) Die Speisekarte",
-          ],
-        },
-        {
-          stem: "Welche Nachspeisen bestellen die Gäste?",
-          options: [
-            "a) Schokoladencreme und Tiramisu",
-            "b) Schokoladeneis und Kuchen",
-            "c) Schokoladenkuchen und Tiramisu",
-            "d) Eis und Schokoladenkuchen",
-          ],
-        },
-        {
-          stem: "Was ist nicht in Ordnung bei den Speisen?",
-          options: [
-            "a) Der bestellte Salat ist der falsche.",
-            "b) Die Suppe ist kalt.",
-            "c) Das Kotelett ist zäh.",
-            "d) Das Schnitzel ist kalt.",
-          ],
-        },
-        {
-          stem: "Wie bezahlt der Gast?",
-          options: [
-            "a) Mit einem Scheck.",
-            "b) Gegen Rechnung.",
-            "c) In bar.",
-            "d) Mit Kreditkarte.",
-          ],
-        },
-      ]}
-      hoerenTask="Sieh dir das eingebettete Video über Anna und ihre Freizeit an. Wähle danach die richtige Antwort und submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/V8gcgVcUGQM"
-      hoerenQuestions={[
-        {
-          stem: "Was macht Anna abends gerne, wenn sie zu Hause ist?",
-          options: [
-            "a) Sie trinkt Tee und liest ein Buch.",
-            "b) Sie schaut Fernsehen.",
-            "c) Sie telefoniert mit ihren Freunden.",
-          ],
-        },
-        {
-          stem: "Welches Brettspiel spielt Anna oft mit ihrer Familie?",
-          options: [
-            "a) Schach",
-            "b) Mensch ärgere dich nicht",
-            "c) Uno",
-          ],
-        },
-        {
-          stem: "Was macht Anna jeden Morgen, um fit zu bleiben?",
-          options: [
-            "a) Sie geht joggen.",
-            "b) Sie macht Yoga.",
-            "c) Sie geht schwimmen.",
-          ],
-        },
-        {
-          stem: "Wo hat Anna am letzten Wochenende Zeit mit ihren Freunden verbracht?",
-          options: [
-            "a) Am Strand",
-            "b) In den Bergen",
-            "c) Im Park",
-          ],
-        },
-        {
-          stem: "Welche Musik hört Anna, wenn sie sich konzentrieren möchte?",
-          options: [
-            "a) Popmusik",
-            "b) Klassische Musik",
-            "c) Jazzmusik",
-          ],
-        },
-      ]}
-    />
-  );
+  return <A2StandardTabbedWorkbookPage
+    day={5}
+    title="Was machst du in deiner Freizeit?"
+    chapter="2.5"
+    workbookId="A2Day5Freizeit"
+    topicPrompt="Welche Freizeitaktivitäten machst du gern und warum?"
+    sprechenContent={speakingContent}
+    schreibenTask="Sie möchten mit Ihrem Freund Alex in Ihrer Freizeit etwas unternehmen. Schreiben Sie Alex eine E-Mail."
+    schreibenContent={schreibenContent}
+    lesenText={restaurantReadingText}
+    lesenQuestions={lesenQuestions}
+    hoerenTask="Sieh dir das eingebettete Video über Anna und ihre Freizeit an und beantworte danach die Fragen."
+    hoerenAudioUrl="https://youtu.be/V8gcgVcUGQM"
+    hoerenQuestions={hoerenQuestions}
+  />;
 }
