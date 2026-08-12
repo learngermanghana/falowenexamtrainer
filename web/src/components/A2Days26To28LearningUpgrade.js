@@ -1,6 +1,60 @@
 import React from "react";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
 
+const THINK_FIRST_BY_DAY = {
+  26: {
+    title: "Feelings with wenn: picture the situation first",
+    question: "What happens first, and how do you feel in that situation?",
+    steps: [
+      "Choose one real situation: Prüfung, gute Nachricht, Streit, zu viele Aufgaben.",
+      "Say the feeling: froh, nervös, enttäuscht, gestresst.",
+      "Connect situation and feeling with wenn; the conjugated verb goes to the end of the wenn-clause.",
+      "Then add what you do or what helps you.",
+    ],
+    example: "Idea: exam tomorrow → nervous → Wenn ich morgen eine Prüfung habe, bin ich nervös. Dann höre ich Musik, um mich zu beruhigen.",
+  },
+  27: {
+    title: "Opinions with dass: decide your message first",
+    question: "What do you think, believe or find important about digital communication?",
+    steps: [
+      "Choose one clear opinion: WhatsApp is practical / email is important / data should be safe.",
+      "Start with Ich finde / Ich glaube / Ich denke / Mir ist wichtig.",
+      "Add dass and move the conjugated verb to the end of the dass-clause.",
+      "Add one real example or reason so the sentence is useful in speaking.",
+    ],
+    example: "Idea: email important for work → opinion → Ich finde, dass E-Mails im Beruf wichtig sind, weil man Informationen klar schicken kann.",
+  },
+  28: {
+    title: "Futur I: choose the future plan before building the form",
+    question: "What will you do later, and who is doing it?",
+    steps: [
+      "Choose one concrete future action: lernen, reisen, arbeiten, umziehen.",
+      "Conjugate werden for the person: ich werde, du wirst, er/sie wird, wir werden.",
+      "Keep werden in position 2 and put the main infinitive at the end.",
+      "Add a time expression or reason to make the plan meaningful.",
+    ],
+    example: "Idea: next year + continue German → Nächstes Jahr werde ich Deutsch weiterlernen, weil ich B1 erreichen möchte.",
+  },
+};
+
+const ThinkingFirstCard = ({ day }) => {
+  const guide = THINK_FIRST_BY_DAY[Number(day)];
+  if (!guide) return null;
+  return (
+    <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 14, background: "#f8fbff", display: "grid", gap: 10 }}>
+      <strong style={{ color: "#1d4ed8" }}>Think first · Erst verstehen, dann anwenden</strong>
+      <h3 style={{ margin: 0 }}>{guide.title}</h3>
+      <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Ask yourself:</strong> {guide.question}</p>
+      <ol style={{ margin: 0, paddingLeft: 22, lineHeight: 1.8 }}>
+        {guide.steps.map((step) => <li key={step}>{step}</li>)}
+      </ol>
+      <div style={{ padding: 12, borderRadius: 10, background: "#fff", border: "1px solid #dbeafe", lineHeight: 1.7 }}>
+        <strong>Idea → decision → German sentence</strong><br />{guide.example}
+      </div>
+    </div>
+  );
+};
+
 export const A2_DAYS_26_TO_28_LEARNING = {
   26: {
     title: "Gefühle in Situationen ausdrücken",
@@ -62,8 +116,9 @@ export default function A2Days26To28LearningUpgrade({ day }) {
   const lesson = A2_DAYS_26_TO_28_LEARNING[Number(day)];
   if (!lesson) return null;
   return (
-    <section data-a2-days26-28-learning-upgrade={`day-${day}`} style={{ display: "grid", gap: 8 }}>
+    <section data-a2-days26-28-learning-upgrade={`day-${day}`} style={{ display: "grid", gap: 12 }}>
       <div style={{ color: "#1e3a8a", fontWeight: 800 }}>A2 Day {day} · Schnell lernen, dann anwenden</div>
+      <ThinkingFirstCard day={day} />
       <A2MiniLearningBlock {...lesson} />
     </section>
   );
