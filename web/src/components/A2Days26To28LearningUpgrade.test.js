@@ -22,10 +22,14 @@ describe("A2 Days 26-28 final learning upgrade", () => {
     },
   );
 
-  test("prebuild chain wires all three final A2 days", () => {
+  test("prebuild chain wires Day 26 through the enabled shared fallback and Days 27-28 directly", () => {
     const patch = fs.readFileSync(path.join(root, "../scripts/patchA2Days26To28LearningUpgrade.mjs"), "utf8");
     const mobilePatch = fs.readFileSync(path.join(root, "../scripts/patchA2B1MobileFloatingActions.mjs"), "utf8");
-    expect(patch).toContain("A2Days26To28LearningUpgrade");
+    expect(patch).toContain('patchFile("web/src/components/A2B1WorkbookGuidance.js"');
+    expect(patch).toContain("A2Days26To28FallbackLearning");
+    expect(patch).toContain("workbookDay !== 26");
+    expect(patch).toContain("<A2Days26To28LearningUpgrade day={26} />");
+    expect(patch).not.toContain('patchFile("web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"');
     expect(patch).toContain("day={27}");
     expect(patch).toContain("day={28}");
     expect(mobilePatch).toContain('patchA2Days26To28LearningUpgrade.mjs');
