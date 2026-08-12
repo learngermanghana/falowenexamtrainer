@@ -43,11 +43,15 @@ import B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage from "./B1Day16Pr
 import B1Day17WieLerntManAmBestenGrammarNotesPage from "./B1Day17WieLerntManAmBestenGrammarNotesPage";
 import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschberufGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
+import B1Day20BerufKennenGrammarNotesPage from "./B1Day20BerufKennenGrammarNotesPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
+import B1Day22BeziehungWichtigGrammarNotesPage from "./B1Day22BeziehungWichtigGrammarNotesPage";
+import B1Day23ErstesDateGrammarNotesPage from "./B1Day23ErstesDateGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import B1Days1To5LearningUpgrade from "./B1Days1To5LearningUpgrade";
 import B1Days6To11LearningUpgrade from "./B1Days6To11LearningUpgrade";
 import B1Days12To17LearningUpgrade from "./B1Days12To17LearningUpgrade";
+import B1Days18To23LearningUpgrade from "./B1Days18To23LearningUpgrade";
 import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
 import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
 import { A2Days12To16ThinkingFirstGrammarGuide } from "./A2Days12To16ThinkingSupport";
@@ -76,7 +80,8 @@ const GRAMMAR_NOTES_BY_LEVEL_DAY = {
     10: B1Day10DigitaleAuszeitGrammarNotesPage, 11: B1Day11TeamspieleGrammarNotesPage, 12: B1Day12AbenteuerInDerNaturGrammarNotesPage,
     13: B1Day13EigeneFilmkritikGrammarNotesPage, 14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage, 15: B1Day15MedienHomeofficeGrammarNotesPage,
     16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage, 17: B1Day17WieLerntManAmBestenGrammarNotesPage,
-    18: B1Day18WegeZumWunschberufGrammarNotesPage, 19: B1Day19VorstellungsgespraechGrammarNotesPage, 21: B1Day21LebensformenHeuteGrammarNotesPage,
+    18: B1Day18WegeZumWunschberufGrammarNotesPage, 19: B1Day19VorstellungsgespraechGrammarNotesPage, 20: B1Day20BerufKennenGrammarNotesPage,
+    21: B1Day21LebensformenHeuteGrammarNotesPage, 22: B1Day22BeziehungWichtigGrammarNotesPage, 23: B1Day23ErstesDateGrammarNotesPage,
   },
 };
 
@@ -110,6 +115,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const showB1Days1To5Upgrade = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 5;
   const showB1Days6To11Upgrade = normalizedLevel === "B1" && numericDay >= 6 && numericDay <= 11;
   const showB1Days12To17Upgrade = normalizedLevel === "B1" && numericDay >= 12 && numericDay <= 17;
+  const showB1Days18To23Upgrade = normalizedLevel === "B1" && numericDay >= 18 && numericDay <= 23;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -117,6 +123,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       {showB1Days1To5Upgrade ? <B1Days1To5LearningUpgrade day={numericDay} /> : null}
       {showB1Days6To11Upgrade ? <B1Days6To11LearningUpgrade day={numericDay} /> : null}
       {showB1Days12To17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null}
+      {showB1Days18To23Upgrade ? <B1Days18To23LearningUpgrade day={numericDay} /> : null}
       {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays12To16Guide ? <A2Days12To16ThinkingFirstGrammarGuide day={numericDay} /> : null}
