@@ -57,6 +57,27 @@ const GrammarNotes = ({ lesson, checked, onCheckedChange }) => {
   return <B2Day2To4GrammarNotes day={day} checked={checked} onCheckedChange={onCheckedChange} />;
 };
 
+const QuickGrammarPreview = ({ lesson }) => {
+  const grammar = lesson?.grammarLesson || {};
+  const explanation = Array.isArray(grammar.explanation) ? grammar.explanation.filter(Boolean).slice(0, 2) : [];
+  const rules = Array.isArray(grammar.rules) ? grammar.rules.filter(Boolean).slice(0, 3) : [];
+  const examples = Array.isArray(grammar.examples) ? grammar.examples.filter(Boolean).slice(0, 2) : [];
+  if (!explanation.length && !rules.length && !examples.length) return null;
+
+  return (
+    <section style={{ ...card, borderColor: "#bfdbfe", background: "#f8fbff" }} data-b2-quick-grammar-preview>
+      <div style={{ display: "grid", gap: 6 }}>
+        <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Quick grammar first</span>
+        <h2 style={{ margin: 0, fontSize: "1.2rem" }}>{grammar.title || lesson.grammarFocus || "Grammar focus"}</h2>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>Read the short idea first, answer the clickable questions, then continue to the deeper notes below.</p>
+      </div>
+      {explanation.map((item) => <p key={item} style={{ margin: 0, lineHeight: 1.7 }}>{item}</p>)}
+      {rules.length ? <div><strong>Remember:</strong><ul style={listStyle}>{rules.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
+      {examples.length ? <div><strong>Examples:</strong><ul style={listStyle}>{examples.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
+    </section>
+  );
+};
+
 const GermanyLifeMiniLesson = ({ lesson }) => {
   const lower = `${lesson?.title || ""} ${lesson?.topic || ""}`.toLowerCase();
   let intro = "Verbinde das Thema mit einer konkreten Alltagssituation in Deutschland und vergleiche sie mit eigenen Erfahrungen.";
@@ -130,7 +151,13 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
     <header style={{ borderRadius: 22, overflow: "hidden", color: "#fff", backgroundImage: `linear-gradient(135deg,rgba(2,6,23,.94),rgba(30,64,175,.72)),url(${lesson.heroImage || ""})`, backgroundSize: "cover", backgroundPosition: "center", padding: "clamp(22px,4vw,42px)", display: "grid", gap: 16, minHeight: 280, alignContent: "space-between" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>B2</span><span style={{ ...styles.badge, background: "rgba(255,255,255,.16)", color: "#fff" }}>Day {day}</span><span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Chapter {lesson.chapter}</span></div><div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.6rem)" }}>{lesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{lesson.topic}</p></div></header>
     <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>{tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}</div>
 
-    {active === "learn" ? <><Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the guided grammar notes.</NoteBox>}</Section><GrammarNotes lesson={lesson} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} /><B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(quizDone) => setProgress((old) => old.quizDone === quizDone ? old : ({ ...old, quizDone }))} /></> : null}
+    {active === "learn" ? <>
+      <Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the guided grammar notes.</NoteBox>}</Section>
+      <QuickGrammarPreview lesson={lesson} />
+      <B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(quizDone) => setProgress((old) => old.quizDone === quizDone ? old : ({ ...old, quizDone }))} />
+      <Section title="Deep grammar notes"><NoteBox>Now read the complete grammar explanation, examples and practice below. The quick check above is the first checkpoint; these notes deepen the same grammar.</NoteBox></Section>
+      <GrammarNotes lesson={lesson} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} />
+    </> : null}
 
     {active === "speak" ? <Section title="Speaking builder"><B2SpeakingSupportGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label style={fieldLabel}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
 
