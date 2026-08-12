@@ -24,5 +24,6 @@ regression = regression.replace(
 fs.writeFileSync(regressionPath, regression);
 
 await import("./patchA2Day25StandardNavigation.mjs");
+await import("./patchA2Days26To28LearningUpgrade.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar.");
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar and applied final A2 learning upgrades.");
