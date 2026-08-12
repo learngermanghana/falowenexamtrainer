@@ -1,0 +1,1 @@
+patchA2GrammarQuizSpeakingMindMap.mjs must run before patchA2SelfTutoringDesign.mjs. The combined entry point is runA2WorkbookSelfTutoringUpgrade.mjs.
