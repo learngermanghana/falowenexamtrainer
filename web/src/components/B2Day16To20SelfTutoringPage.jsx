@@ -3,6 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import B2Day14To16GrammarNotes from "./B2Day14To16GrammarNotes";
 import B2Day17To20GrammarNotes from "./B2Day17To20GrammarNotes";
 import B2KnowledgeChoicePractice from "./B2KnowledgeChoicePractice";
+import B2QuizFirstLearnPreview from "./B2QuizFirstLearnPreview";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -73,9 +74,10 @@ export default function B2Day16To20SelfTutoringPage({ lesson, canonicalLesson = 
     <div style={{position:"sticky",top:0,zIndex:5,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:8,padding:10,border:"1px solid #e2e8f0",borderRadius:18,background:"rgba(248,250,252,.94)"}}>{tabs.map((tab)=><button key={tab} type="button" onClick={()=>setActive(tab)} style={{...(active===tab?styles.primaryButton:styles.secondaryButton),borderRadius:999,minHeight:44}}>{labels[tab]}</button>)}</div>
 
     {active === "learn" ? <>
-      <Section title="AI video">{video?.url ? <div style={{display:"grid",gap:10}}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{margin:0,color:"#475569",lineHeight:1.6}}>{video.description}</p> : null}{videoEmbed ? <div style={{position:"relative",width:"100%",paddingTop:"56.25%",borderRadius:16,overflow:"hidden",background:"#0f172a"}}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}</Section>
-      <GrammarNotes day={day} checked={progress.learnNotesDone} onCheckedChange={(checked)=>setProgress((old)=>({...old,learnNotesDone:checked}))} />
+      <Section title="AI video">{video?.url ? <div style={{display:"grid",gap:10}}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{margin:0,color:"#475569",lineHeight:1.6}}>{video.description}</p> : null}{videoEmbed ? <div style={{position:"relative",width:"100%",paddingTop:"56.25%",borderRadius:16,overflow:"hidden",background:"#0f172a"}}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}} /></div> : null}</div> : <NoteBox tone="amber">Continue with the quick grammar preview and clickable check below.</NoteBox>}</Section>
+      <B2QuizFirstLearnPreview lesson={guidedLesson} />
       <B2KnowledgeChoicePractice lesson={guidedLesson} onCompleteChange={(quizDone)=>setProgress((old)=>old.quizDone===quizDone?old:{...old,quizDone})} />
+      <Section title="Deep grammar notes"><GrammarNotes day={day} checked={progress.learnNotesDone} onCheckedChange={(checked)=>setProgress((old)=>({...old,learnNotesDone:checked}))} /></Section>
     </> : null}
 
     {active === "speak" ? <Section title="Speaking builder"><B2SpeakingSupportGuide lesson={guidedLesson} /><EmbeddedSpeechPracticePanel /><label style={{display:"flex",gap:9,alignItems:"center",fontWeight:800}}><input type="checkbox" checked={progress.speakDone} onChange={(event)=>setProgress((old)=>({...old,speakDone:event.target.checked}))} />I completed a speaking practice.</label></Section> : null}
