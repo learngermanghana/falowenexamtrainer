@@ -27,9 +27,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "vite": "^7.2.7"
   },
-  "overrides": {
-    "typescript": "4.9.5"
-  },
+  "overrides": { "typescript": "4.9.5" },
   "scripts": {
     "sync:classes": "node scripts/sync-class-brochure-data.mjs && node scripts/generate-public-course-catalogue-safe.mjs",
     "sync:goethe-config-ui": "node scripts/patch-goethe-exam-config-ui.mjs",
@@ -60,7 +58,7 @@
     "build": "vite build",
     "test": "jest",
     "test:ci": "jest --runInBand",
-    "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs && node ../scripts/patchA2SelfTutoringDesign.mjs",
+    "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs && node ../scripts/patchA2SelfTutoringDesign.mjs && node ../scripts/patchA2Day1SpeakingCleanup.mjs",
     "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue-safe.mjs"
   }
 }
