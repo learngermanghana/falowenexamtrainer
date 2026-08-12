@@ -1,6 +1,7 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
+import SpeakingMindMap from "./SpeakingMindMap";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
 const paragraph = {
@@ -33,21 +34,6 @@ const topicTitle = {
   margin: 0,
   color: "#1e3a8a",
   fontSize: "1rem",
-};
-
-const chipRow = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-};
-
-const chip = {
-  border: "1px solid #93c5fd",
-  borderRadius: 999,
-  padding: "7px 11px",
-  background: "#eff6ff",
-  color: "#1e3a8a",
-  fontWeight: 800,
 };
 
 const smallTalkTopics = [
@@ -117,6 +103,97 @@ const endingExpressions = [
   "Ich wünsche dir einen schönen Tag! (I wish you a nice day!)",
   "Bis bald! (See you soon!)",
 ];
+
+const smallTalkIntroductionMap = {
+  level: "A2",
+  day: 1,
+  lessonId: "a2-day-1-small-talk-introduction",
+  title: "Deine Vorstellung",
+  centralQuestion: "Kannst du dich vorstellen? Erzähl uns etwas über dich!",
+  targetDurationSeconds: 60,
+  branches: [
+    {
+      id: "familie",
+      label: "Familie",
+      type: "topic",
+      keywords: ["Eltern", "Geschwister", "Kinder", "wohnen", "Familie"],
+      guidingQuestion: "Who is in your family? Wer gehört zu deiner Familie?",
+      sentenceStarter: "Ich habe ... / Meine Familie ...",
+      modelSentence: "Ich habe zwei Brüder und eine Schwester. Meine Familie wohnt in Accra.",
+    },
+    {
+      id: "sprachen",
+      label: "Sprachen",
+      type: "detail",
+      keywords: ["Deutsch", "Englisch", "Twi", "sprechen", "lernen"],
+      guidingQuestion: "Which languages do you speak or learn? Welche Sprachen sprichst oder lernst du?",
+      sentenceStarter: "Ich spreche ... / Ich lerne ...",
+      modelSentence: "Ich spreche Englisch und Twi. Außerdem lerne ich Deutsch.",
+    },
+    {
+      id: "beruf-studium",
+      label: "Beruf / Studium",
+      type: "example",
+      keywords: ["arbeiten", "studieren", "Beruf", "Universität", "Firma"],
+      guidingQuestion: "What do you do and where? Was machst du und wo?",
+      sentenceStarter: "Ich arbeite als ... / Ich studiere ...",
+      modelSentence: "Ich arbeite als Verkäufer und arbeite in Accra. / Ich studiere Informatik an der Universität.",
+    },
+    {
+      id: "hobbys",
+      label: "Hobbys",
+      type: "closing",
+      keywords: ["Fußball", "Musik", "lesen", "Freunde", "Wochenende", "gern"],
+      guidingQuestion: "What do you enjoy doing in your free time? Was machst du gern in deiner Freizeit?",
+      sentenceStarter: "In meiner Freizeit ... / Ich ... gern, weil ...",
+      modelSentence: "In meiner Freizeit spiele ich gern Fußball, weil es Spaß macht.",
+    },
+  ],
+  speakingRoute: ["familie", "sprachen", "beruf-studium", "hobbys"],
+  extraHelp: {
+    title: "Build your answer step by step",
+    instructions: [
+      "Start with one keyword. Do not try to create a long answer immediately.",
+      "Turn the keyword into one simple German sentence.",
+      "Add one extra detail: where, when, who or how often.",
+      "If possible, add a reason or example with weil, zum Beispiel or außerdem.",
+      "Connect the four branches into one short introduction.",
+    ],
+    phraseGroups: [
+      {
+        title: "The thinking pattern",
+        items: [
+          "Keyword → simple sentence → extra detail → reason/example",
+          "Fußball → Ich spiele gern Fußball. → Ich spiele am Wochenende Fußball. → Ich spiele am Wochenende Fußball, weil es Spaß macht.",
+        ],
+      },
+      {
+        title: "Useful connectors",
+        items: [
+          "und = and",
+          "aber = but",
+          "außerdem = in addition",
+          "weil = because",
+          "zum Beispiel = for example",
+        ],
+      },
+    ],
+    vocabulary: [
+      "die Familie",
+      "die Geschwister",
+      "sprechen",
+      "lernen",
+      "arbeiten als",
+      "studieren",
+      "in meiner Freizeit",
+      "gern",
+      "am Wochenende",
+      "weil",
+      "außerdem",
+    ],
+    modelAnswer: "Ich heiße Ama und komme aus Ghana. Ich habe zwei Brüder und eine Schwester. Meine Familie wohnt in Accra. Ich spreche Englisch und Twi, und ich lerne Deutsch. Ich arbeite als Verkäuferin. In meiner Freizeit höre ich gern Musik und spiele am Wochenende Fußball, weil es Spaß macht.",
+  },
+};
 
 const readingQuestions = [
   {
@@ -189,9 +266,17 @@ const listeningQuestions = [
 
 const speakingContent = (
   <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Zentrales Thema: Small Talk" practiceOnly>
+    <WorkbookTaskCard eyebrow="Group practice" title="Small Talk: learn how to build your own answer" practiceOnly>
       <p style={paragraph}>
-        In this chapter, we’ll engage in group exercises discussing these topics. Following this, your tutor will revise the questions and invite you to write a brief essay about yourself.
+        Don’t memorize one long text. Start with a topic, choose useful words, build one simple sentence and then add a detail. The brain map below shows you how to think before you speak.
+      </p>
+    </WorkbookTaskCard>
+
+    <SpeakingMindMap config={smallTalkIntroductionMap} />
+
+    <WorkbookTaskCard eyebrow="Useful Small Talk" title="Questions and phrases you can use after your introduction" practiceOnly>
+      <p style={paragraph}>
+        After you introduce yourself, use these short questions and answers to continue the conversation. German comes first, with English support in brackets.
       </p>
     </WorkbookTaskCard>
 
@@ -208,46 +293,18 @@ const speakingContent = (
 
     <div style={topicGrid}>
       <section style={topicCard}>
-        <h3 style={topicTitle}>Höfliche Ausdrücke</h3>
+        <h3 style={topicTitle}>Höfliche Ausdrücke · Polite expressions</h3>
         <ul style={list}>
           {politeExpressions.map((item) => <li key={item}>{item}</li>)}
         </ul>
       </section>
       <section style={topicCard}>
-        <h3 style={topicTitle}>Gespräch beenden</h3>
+        <h3 style={topicTitle}>Gespräch beenden · End the conversation</h3>
         <ul style={list}>
           {endingExpressions.map((item) => <li key={item}>{item}</li>)}
         </ul>
       </section>
     </div>
-
-    <WorkbookTaskCard eyebrow="Sprachliche Hilfen" title="So kannst du deinen Beitrag strukturieren" practiceOnly>
-      <div style={topicGrid}>
-        <section style={topicCard}>
-          <h3 style={topicTitle}>Einleitung</h3>
-          <p style={paragraph}>„Small Talk ist eine gute Möglichkeit, um neue Leute kennenzulernen.“</p>
-          <p style={paragraph}>„Ich finde, dass Small Talk wichtig im Alltag ist.“</p>
-        </section>
-        <section style={topicCard}>
-          <h3 style={topicTitle}>Hauptteil</h3>
-          <p style={paragraph}>„Ein gutes Thema für Small Talk ist die Arbeit, weil ...“</p>
-          <p style={paragraph}>„Man kann auch über das Wetter oder Hobbys sprechen, zum Beispiel ...“</p>
-          <p style={paragraph}>„Ein Vorteil von Small Talk ist, dass ...“</p>
-        </section>
-        <section style={topicCard}>
-          <h3 style={topicTitle}>Schluss</h3>
-          <p style={paragraph}>„Zusammenfassend kann man sagen, dass Small Talk einfach und nützlich ist.“</p>
-        </section>
-      </div>
-    </WorkbookTaskCard>
-
-    <WorkbookTaskCard eyebrow="Deine Vorstellung" title="Kannst du dich vorstellen? Erzähl uns etwas über dich!" practiceOnly>
-      <div style={chipRow}>
-        {["Familie", "Sprachen", "Beruf/Studium", "Hobbys"].map((item) => (
-          <span key={item} style={chip}>{item}</span>
-        ))}
-      </div>
-    </WorkbookTaskCard>
   </>
 );
 
