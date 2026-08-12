@@ -41,6 +41,20 @@ const patchListeningMedia = (root) => {
   root.querySelectorAll(`iframe[src*="${OLD_RECOMMENDED_VIDEO_ID}"]`).forEach((iframe) => iframe.remove());
 };
 
+const patchWritingPrompt = (root) => {
+  if (!root) return;
+  root.querySelectorAll("li").forEach((item) => {
+    if (item.textContent?.trim() === "Was erwarten Sie?") {
+      item.textContent = "Fragen Sie nach den Arbeitszeiten, den Aufgaben oder den Weiterbildungsmöglichkeiten.";
+    }
+  });
+};
+
+const patchDay13Workbook = (root) => {
+  patchListeningMedia(root);
+  patchWritingPrompt(root);
+};
+
 const A2Day13VorstellungsgespraechWorkbookPage = () => {
   const rootRef = useRef(null);
 
@@ -48,8 +62,8 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
     const root = rootRef.current;
     if (!root) return undefined;
 
-    patchListeningMedia(root);
-    const observer = new MutationObserver(() => patchListeningMedia(root));
+    patchDay13Workbook(root);
+    const observer = new MutationObserver(() => patchDay13Workbook(root));
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
@@ -66,4 +80,6 @@ export default A2Day13VorstellungsgespraechWorkbookPage;
 
 export const __TESTING__ = {
   patchListeningMedia,
+  patchWritingPrompt,
+  patchDay13Workbook,
 };
