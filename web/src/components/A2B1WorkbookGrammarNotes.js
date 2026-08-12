@@ -44,6 +44,7 @@ import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschber
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
+import B1Days1To5LearningUpgrade from "./B1Days1To5LearningUpgrade";
 import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
 import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
 import { A2Days12To16ThinkingFirstGrammarGuide } from "./A2Days12To16ThinkingSupport";
@@ -103,10 +104,12 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
   const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
   const showDays22To28Guide = normalizedLevel === "A2" && numericDay >= 22 && numericDay <= 28;
+  const showB1Days1To5Upgrade = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 5;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <A2B1GrammarVideoCard level={level} day={day} />
+      {showB1Days1To5Upgrade ? <B1Days1To5LearningUpgrade day={numericDay} /> : null}
       {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays12To16Guide ? <A2Days12To16ThinkingFirstGrammarGuide day={numericDay} /> : null}
