@@ -4,7 +4,7 @@ import path from "path";
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("B2 Days 1-5 quiz-first Learn flow", () => {
-  test("puts the clickable grammar check before the deep grammar notes", () => {
+  test("keeps the clickable grammar check before the deep grammar notes", () => {
     const source = read("B2Day1To4GuidedLessonPage.js");
     expect(source).toContain("QuickGrammarPreview");
     expect(source).toContain("B2KnowledgeChoicePractice");
