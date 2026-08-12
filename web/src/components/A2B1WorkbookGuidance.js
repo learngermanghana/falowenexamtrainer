@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import {
   STANDARD_WORKBOOK_TABS,
   WorkbookTabNav,
@@ -57,6 +58,121 @@ const UNIVERSAL_A2_WORKBOOK_TABS = [
   { key: "references", legacyKey: "ref", match: /\bref\b|reference|answers|antwort/i },
   { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
 ];
+
+const A2_DAYS_11_TO_15_LEARNING = {
+  11: {
+    title: "Verkehrsmittel klar vergleichen",
+    rule: "Für Unterschiede benutzt du den Komparativ + als. Für Gleichheit benutzt du genauso ... wie. Ergänze einen Grund mit weil.",
+    examples: [
+      "Der Zug ist schneller als der Bus.",
+      "Das Fahrrad ist günstiger als das Auto.",
+      "Der Bus ist genauso praktisch wie die Bahn.",
+      "Ich fahre gern mit dem Zug, weil er bequem ist.",
+    ],
+    questions: [
+      { stem: "Was passt? Der Zug ist ___ als der Bus.", options: ["schnell", "schneller", "am schnellsten"], answer: 1, explanation: "Zwei Verkehrsmittel werden verglichen: Komparativ + als." },
+      { stem: "Was passt bei Gleichheit? Das Fahrrad ist genauso umweltfreundlich ___ der Zug.", options: ["als", "wie", "denn"], answer: 1, explanation: "Gleichheit: genauso ... wie." },
+      { stem: "Welcher Satz ist richtig?", options: ["Das Auto ist teuer als der Bus.", "Das Auto ist teurer als der Bus.", "Das Auto ist teurer wie der Bus."], answer: 1, explanation: "Ungleichheit: Komparativ + als." },
+      { stem: "Wie gibst du einen Grund?", options: ["Ich fahre Bus, weil er günstig ist.", "Ich fahre Bus, weil ist er günstig.", "Ich fahre Bus, deshalb er günstig ist."], answer: 0, explanation: "Bei weil steht das konjugierte Verb am Ende." },
+    ],
+    outputPrompt: "Vergleiche zwei Verkehrsmittel in 4–5 Sätzen und sage, welches du bevorzugst.",
+    starters: ["Der/Die ... ist ... als ...", "... ist genauso ... wie ...", "Ich bevorzuge ..., weil ..."],
+  },
+  12: {
+    title: "Über deinen Traumberuf sprechen",
+    rule: "Für Wünsche und Pläne sind möchte und würde gern besonders nützlich. Nach möchte steht der zweite Infinitiv am Satzende.",
+    examples: [
+      "Ich möchte Ärztin werden.",
+      "Ich würde gern in einem Krankenhaus arbeiten.",
+      "Ich möchte Menschen helfen, weil mir Gesundheit wichtig ist.",
+      "Später möchte ich eine Weiterbildung machen.",
+    ],
+    questions: [
+      { stem: "Was passt? Ich ___ Ingenieur werden.", options: ["möchte", "bin", "habe"], answer: 0, explanation: "möchte + Infinitiv beschreibt einen Wunsch." },
+      { stem: "Welcher Satz ist richtig?", options: ["Ich möchte arbeiten in Berlin.", "Ich möchte in Berlin arbeiten.", "Ich in Berlin möchte arbeiten."], answer: 1, explanation: "Bei möchte steht der Infinitiv am Ende." },
+      { stem: "Welche Form klingt höflich für einen Wunsch?", options: ["Ich würde gern ...", "Ich muss gern ...", "Ich war gern ..."], answer: 0, explanation: "Ich würde gern ... ist eine sehr nützliche Wunschform." },
+      { stem: "Was passt? Ich möchte Lehrer werden, ___ ich gern mit Menschen arbeite.", options: ["weil", "als", "oder"], answer: 0, explanation: "weil gibt den Grund an." },
+    ],
+    outputPrompt: "Sprich 4–6 Sätze über deinen Traumberuf: Beruf, Arbeitsort, Aufgaben und Grund.",
+    starters: ["Mein Traumberuf ist ...", "Ich möchte ... werden.", "Ich würde gern ... arbeiten.", "Dieser Beruf gefällt mir, weil ..."],
+  },
+  13: {
+    title: "Modalverben im Präteritum im Vorstellungsgespräch",
+    rule: "Für frühere Fähigkeiten, Pflichten und Wünsche benutzt du oft konnte, musste und wollte. Der zweite Infinitiv steht am Satzende.",
+    examples: [
+      "In meinem letzten Job konnte ich viele Kunden beraten.",
+      "Ich musste oft selbstständig arbeiten.",
+      "Ich wollte neue Erfahrungen sammeln.",
+      "Ich konnte gut mit Computern arbeiten.",
+    ],
+    questions: [
+      { stem: "Präteritum von können: Ich ___ gut im Team arbeiten.", options: ["kann", "konnte", "könnte"], answer: 1, explanation: "Vergangenheit von können: konnte." },
+      { stem: "Präteritum von müssen: Ich ___ früh anfangen.", options: ["musste", "muss", "möchte"], answer: 0, explanation: "Vergangenheit von müssen: musste." },
+      { stem: "Welcher Satz ist richtig?", options: ["Ich konnte Kunden beraten gut.", "Ich konnte gut Kunden beraten.", "Ich konnte beraten gut Kunden."], answer: 1, explanation: "Der zweite Infinitiv steht am Satzende." },
+      { stem: "Was passt für ein früheres Ziel? Ich ___ mehr Verantwortung übernehmen.", options: ["wollte", "war", "hatte"], answer: 0, explanation: "wollte beschreibt einen Wunsch oder ein Ziel in der Vergangenheit." },
+    ],
+    outputPrompt: "Beantworte eine Interviewfrage in 5 Sätzen und nenne mindestens eine frühere Fähigkeit oder Aufgabe.",
+    starters: ["Ich habe ... gearbeitet.", "Dort konnte ich ...", "Ich musste ...", "Ich wollte ...", "Jetzt möchte ich ..."],
+  },
+  14: {
+    title: "Berufsziele mit um ... zu ausdrücken",
+    rule: "um ... zu zeigt ein Ziel. Das Subjekt bleibt in beiden Satzteilen gleich. Das Verb nach zu steht am Ende.",
+    examples: [
+      "Ich mache eine Weiterbildung, um meine Chancen zu verbessern.",
+      "Ich lerne Deutsch, um in Deutschland zu arbeiten.",
+      "Ich spare Geld, um einen Kurs zu machen.",
+      "Ich sammle Erfahrung, um später Teamleiter zu werden.",
+    ],
+    questions: [
+      { stem: "Was passt? Ich lerne Deutsch, ___ in Deutschland zu arbeiten.", options: ["um", "weil", "als"], answer: 0, explanation: "um ... zu beschreibt ein Ziel." },
+      { stem: "Welcher Satz ist richtig?", options: ["Ich mache einen Kurs, um bessere Chancen haben.", "Ich mache einen Kurs, um bessere Chancen zu haben.", "Ich mache einen Kurs, zu um bessere Chancen haben."], answer: 1, explanation: "um + ... + zu + Infinitiv." },
+      { stem: "Was drückt um ... zu aus?", options: ["ein Ziel", "eine Vergangenheit", "einen Vergleich"], answer: 0, explanation: "um ... zu beantwortet: Wozu? Mit welchem Ziel?" },
+      { stem: "Was passt? Ich arbeite viel, um Erfahrung ___.", options: ["sammeln", "zu sammeln", "gesammelt"], answer: 1, explanation: "Nach um steht zu + Infinitiv." },
+    ],
+    outputPrompt: "Nenne drei berufliche Ziele und erkläre jeweils mit um ... zu, warum du etwas tust.",
+    starters: ["Ich möchte ...", "Ich mache ..., um ... zu ...", "Ich lerne ..., um ... zu ..."],
+  },
+  15: {
+    title: "Seit + Dativ + Präsens",
+    rule: "seit zeigt, dass etwas in der Vergangenheit begonnen hat und bis heute dauert. Im Deutschen benutzt du dafür meistens Präsens: seit + Dativ.",
+    examples: [
+      "Ich spiele seit zwei Jahren Fußball.",
+      "Seit einem Monat gehe ich ins Fitnessstudio.",
+      "Ich trainiere seit meiner Schulzeit regelmäßig.",
+      "Wir spielen seit drei Wochen zusammen.",
+    ],
+    questions: [
+      { stem: "Was passt? Ich spiele ___ zwei Jahren Tennis.", options: ["seit", "vor", "für"], answer: 0, explanation: "Die Aktivität begann früher und dauert noch an: seit." },
+      { stem: "Welche Form ist richtig?", options: ["seit zwei Jahre", "seit zwei Jahren", "seit zwei Jahres"], answer: 1, explanation: "seit verlangt den Dativ: zwei Jahren." },
+      { stem: "Was passt? Seit ___ Monat trainiere ich regelmäßig.", options: ["ein", "einen", "einem"], answer: 2, explanation: "der Monat → Dativ: einem Monat." },
+      { stem: "Welcher Satz ist natürlich?", options: ["Ich habe seit zwei Jahren Fußball gespielt.", "Ich spiele seit zwei Jahren Fußball.", "Ich spielte seit zwei Jahren Fußball."], answer: 1, explanation: "Wenn es bis heute weitergeht, benutzt man meistens Präsens." },
+    ],
+    outputPrompt: "Sprich 4–5 Sätze über deinen Sport und sage, seit wann du ihn machst.",
+    starters: ["Mein Lieblingssport ist ...", "Ich spiele/mache ... seit ...", "Ich trainiere ...", "Ich mag den Sport, weil ..."],
+  },
+};
+
+const A2Days11To15QuickLearning = ({ level = "" }) => {
+  const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
+  const workbookDay = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return resolveA2B1WorkbookDayFromLocation(
+      workbookLevel,
+      `${window.location.pathname || ""}${window.location.search || ""}`,
+    );
+  }, [workbookLevel]);
+
+  if (workbookLevel !== "A2") return null;
+  const lesson = A2_DAYS_11_TO_15_LEARNING[workbookDay];
+  if (!lesson) return null;
+
+  return (
+    <section data-a2-days11-15-quick-learning="true" style={{ display: "grid", gap: 8 }}>
+      <div style={{ color: "#1e3a8a", fontWeight: 800 }}>A2 Day {workbookDay} · Schnell lernen, dann anwenden</div>
+      <A2MiniLearningBlock {...lesson} />
+    </section>
+  );
+};
 
 const detectTabKey = (text = "") => {
   const normalized = normalizeTabText(text);
@@ -257,6 +373,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   return (
     <>
       <UniversalA2WorkbookTabs level={workbookLevel} />
+      <A2Days11To15QuickLearning level={workbookLevel} />
       <details
         style={{
           ...styles.card,
