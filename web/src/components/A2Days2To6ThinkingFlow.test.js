@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 
+// Production deployment marker: Days 2-6 thinking flow is ready for main/Vercel.
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("A2 Days 2-6 thinking flow", () => {
