@@ -1,25 +1,38 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
-import A2MiniLearningBlock from "./A2MiniLearningBlock";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { WorkbookTaskCard } from "./StandardWorkbookComponents";
+import { getA2Days2To6SpeakingConfig } from "./A2Days2To6ThinkingSupport";
 
-const speakingContent = <A2MiniLearningBlock
-  title="Komparativ: zwei Dinge klar vergleichen"
-  rule="Bei einem Unterschied benutzt du Komparativ + als. Bei Gleichheit benutzt du so/genauso + Adjektiv + wie."
-  examples={[
-    "groß → größer: Anna ist größer als Maria.",
-    "schnell → schneller: Der Zug ist schneller als der Bus.",
-    "gut → besser: Dieses Buch ist besser als das andere.",
-    "gleich: Mein Bruder ist genauso groß wie ich."
-  ]}
-  questions={[
-    { stem:"Anna ist größer ___ Maria.", options:["als","wie"], answer:0, explanation:"Bei einem Unterschied benutzt du als." },
-    { stem:"Mein Handy ist genauso neu ___ dein Handy.", options:["als","wie"], answer:1, explanation:"Bei Gleichheit benutzt du wie." },
-    { stem:"Was ist der Komparativ von gut?", options:["guter","besser","am gut"], answer:1, explanation:"gut ist unregelmäßig: gut → besser." },
-    { stem:"Welcher Satz ist richtig?", options:["Ein Fahrrad ist umweltfreundlicher als ein Auto.","Ein Fahrrad ist umweltfreundlicher wie ein Auto."], answer:0, explanation:"Unterschied = Komparativ + als." }
-  ]}
-  outputPrompt="Vergleiche zwei Personen, Orte oder Dinge in 4 Sätzen. Benutze mindestens zweimal als und einmal wie."
-  starters={["... ist größer als ...", "... ist schneller als ...", "... ist genauso ... wie ...", "Ich finde ... besser als ..."]}
-/>;
+const paragraph = { margin: 0, lineHeight: 1.7 };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+
+const speakingContent = <>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(3)} />
+  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Vergleiche zwei Dinge oder Personen" practiceOnly>
+    <p style={paragraph}>Choose two clear things first. Then make one connected comparison instead of separate example sentences.</p>
+    <ol style={list}>
+      <li>Name the two things or people.</li>
+      <li>Say one similarity with <strong>genauso ... wie</strong>.</li>
+      <li>Say at least two differences with comparative + <strong>als</strong>.</li>
+      <li>Finish with your opinion and a reason.</li>
+    </ol>
+    <p style={paragraph}><strong>Thinking route:</strong> Auswahl → Gemeinsamkeit → Unterschiede → Preis/Qualität → Meinung + weil.</p>
+  </WorkbookTaskCard>
+</>;
+
+const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Brief an Felix: Meine Mutter und mein Vater">
+  <p style={paragraph}><strong>Aufgabe:</strong> Schreibe Felix einen kurzen Brief. Beschreibe und vergleiche deine Mutter und deinen Vater.</p>
+  <p style={paragraph}>Bearbeite diese Punkte:</p>
+  <ul style={list}>
+    <li>Stelle deine Mutter und deinen Vater kurz vor.</li>
+    <li>Vergleiche ihr Aussehen mit <strong>als</strong> oder <strong>genauso ... wie</strong>.</li>
+    <li>Vergleiche ihren Charakter.</li>
+    <li>Sage, was du an beiden besonders magst.</li>
+    <li>Frage Felix am Ende nach seinen Eltern.</li>
+  </ul>
+  <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Vorstellung → Vergleiche → Meinung → Frage → Viele Grüße.</p>
+</WorkbookTaskCard>;
 
 const readingText = `Anna ist 25 Jahre alt und wohnt in Berlin. Sie hat lange blonde Haare und arbeitet als Krankenschwester. In ihrer Freizeit liest sie gern und geht spazieren. Max ist 27 Jahre alt, trägt eine Brille und arbeitet als Mathematiklehrer. Er spielt gern Fußball und kocht. Anna ist jünger als Max. Max ist sportlicher als Anna, aber Anna liest häufiger als Max. Beide sind freundlich und hilfsbereit.`;
 
@@ -46,8 +59,8 @@ export default function A2Day3ComparisonsWorkbookPage() {
     workbookId="A2Day3DingeUndPersonenVergleichen"
     topicPrompt="Vergleiche zwei Personen, Dinge oder Orte."
     sprechenContent={speakingContent}
-    schreibenTask={`Schreibe einen Brief an deinen Freund Felix. Beschreibe und vergleiche deine Mutter und deinen Vater.\n\n1. Stelle beide kurz vor.\n2. Vergleiche Aussehen und Charakter mit als und wie.\n3. Sage, was du an beiden besonders magst, und frage Felix nach seinen Eltern.`}
-    schreibenPlaceholder={"Lieber Felix,\n\nmeine Mutter ist ... Mein Vater ist ...\n\nMeine Mutter ist ... als mein Vater. Mein Vater ist genauso ... wie ...\n\nViele Grüße\n[Dein Name]"}
+    schreibenContent={writingContent}
+    schreibenPlaceholder={"Lieber Felix,\n\nmeine Mutter ist ... und mein Vater ist ...\n\nMeine Mutter ist ... als mein Vater. Mein Vater ist genauso ... wie ...\n\nIch mag ... besonders, weil ...\n\nWie sind deine Eltern?\n\nViele Grüße\n[Dein Name]"}
     lesenText={readingText}
     lesenQuestions={readingQuestions}
     hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die fünf Hörverstehen-Fragen."
