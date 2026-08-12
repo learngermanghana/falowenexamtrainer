@@ -7,8 +7,9 @@ export default function A2StarterConjunctionsPage() {
   return <div style={{ ...styles.container, display:"grid", gap:16 }}>
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ ...styles.card, display:"grid", gap:8 }}>
-      <h1 style={{ ...styles.title, margin:0 }}>A2 Day 1 · weil, denn und deshalb</h1>
-      <p style={{ ...styles.subtitle, margin:0 }}>Ziel: kurze Gründe geben und die richtige Wortstellung sehen.</p>
+      <h1 style={{ ...styles.title, margin:0 }}>A2 Starter Grammar Note: weil, deshalb, denn</h1>
+      <p style={{ ...styles.subtitle, margin:0 }}>Topic: Small talk • Day 1 • Chapter 1.1</p>
+      <p style={{ margin:0, color:"#475569" }}>Ziel: kurze Gründe geben und die richtige Wortstellung sehen.</p>
     </header>
 
     <A2MiniLearningBlock
