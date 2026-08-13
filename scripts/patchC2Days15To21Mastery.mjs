@@ -4,3 +4,4 @@ add('import { C2_DAY_8_TO_14_LESSONS } from "../data/c2Day8To14Mastery";','impor
 add('  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS],','  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS],','C2 lesson registry');
 add('  else if (normalizedLevel === "C2" && day >= 8 && day <= 14) page = <C2Day8To14MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;','  else if (normalizedLevel === "C2" && day >= 8 && day <= 21) page = <C2Day8To14MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;','C2 renderer range');
 fs.writeFileSync(file,s,"utf8");console.log("Registered C2 Days 15-21 mastery lessons.");
+await import("./patchC2Days22To28Mastery.mjs");
