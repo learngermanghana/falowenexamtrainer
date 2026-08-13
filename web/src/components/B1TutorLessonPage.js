@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
+import B1TopicCollocationPractice from "./B1TopicCollocationPractice";
 import { styles } from "../styles";
 
 const toArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
@@ -242,6 +243,7 @@ export default function B1TutorLessonPage({ canonicalLesson }) {
         ) : null}
       </header>
 
+      <B1TopicCollocationPractice day={day} />
       <B1TutorResources canonicalLesson={canonicalLesson} />
 
       {canSubmit ? (
