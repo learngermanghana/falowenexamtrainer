@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -16,6 +16,16 @@ const tabs = [
   { key: "hoeren", label: "Teil 4 · Hören" },
   { key: "references", label: "5. Ref" },
 ];
+
+const ACTIVE_TAB_STORAGE_KEY = "falowen:a2-day24:active-tab";
+
+const getInitialActiveTab = () => {
+  if (typeof window === "undefined") return "sprechen";
+
+  const params = new URLSearchParams(window.location.search || "");
+  const requestedTab = params.get("workbookTab") || window.sessionStorage?.getItem(ACTIVE_TAB_STORAGE_KEY) || "";
+  return tabs.some((tab) => tab.key === requestedTab) ? requestedTab : "sprechen";
+};
 
 const card = {
   ...styles.card,
@@ -104,13 +114,24 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
     lesen: false,
     hoeren: false,
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.sessionStorage?.setItem(ACTIVE_TAB_STORAGE_KEY, activeTab);
+
+    const params = new URLSearchParams(window.location.search || "");
+    params.set("workbookTab", activeTab);
+    const nextSearch = params.toString();
+    const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}${window.location.hash || ""}`;
+    window.history?.replaceState?.(window.history.state, "", nextUrl);
+  }, [activeTab]);
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
