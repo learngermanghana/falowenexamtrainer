@@ -142,6 +142,47 @@ const GermanAlphabetGrammarNotesPage = () => {
           </li>
         </ul>
       </section>
+
+      <section style={{ ...sectionStyle, border: "1px solid #fde68a", background: "#fffbeb" }}>
+        <h2 style={{ margin: 0 }}>4. Important: An umlaut can change the word</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          An umlaut is not decoration. Changing <strong>a → ä</strong>, <strong>o → ö</strong>, or
+          <strong>u → ü</strong> changes the pronunciation, and it can also change the meaning or the
+          grammatical form of a word.
+        </p>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={letterCardStyle}>
+            <strong>schon ≠ schön</strong>
+            <span><strong>schon</strong> = already</span>
+            <span><strong>schön</strong> = beautiful / nice</span>
+            <span style={{ color: "#92400e" }}>Be careful: the umlaut changes the meaning.</span>
+          </div>
+          <div style={letterCardStyle}>
+            <strong>Bruder → Brüder</strong>
+            <span><strong>der Bruder</strong> = the brother</span>
+            <span><strong>die Brüder</strong> = the brothers</span>
+            <span style={{ color: "#475569" }}>Here the umlaut helps form the plural.</span>
+          </div>
+          <div style={letterCardStyle}>
+            <strong>Mutter → Mütter</strong>
+            <span><strong>die Mutter</strong> = the mother</span>
+            <span><strong>die Mütter</strong> = the mothers</span>
+            <span style={{ color: "#475569" }}>The umlaut can also appear when a word changes form.</span>
+          </div>
+        </div>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Typing tip:</strong> If your keyboard does not have umlauts, you can write
+          <strong> ae</strong> for ä, <strong>oe</strong> for ö, and <strong>ue</strong> for ü. For example,
+          <strong> schön → schoen</strong> and <strong> Brüder → Brueder</strong>.
+        </p>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Remember:</strong> Do not simply remove the two dots. Writing <strong>schon</strong>
+          when you mean <strong>schön</strong> produces a different German word.
+        </p>
+      </section>
     </main>
   );
 };
