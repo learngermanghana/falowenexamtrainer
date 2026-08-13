@@ -31,4 +31,11 @@ describe("C1 topic-matched collocations", () => {
     expect(quickCheck).toContain('import C1TopicCollocationPractice from "./C1TopicCollocationPractice"');
     expect(quickCheck).toContain("<C1TopicCollocationPractice day={day} />");
   });
+
+  test("end-of-course C1 lessons mount the block directly in Learn", () => {
+    const day26 = read("C1Day24To26GuidedLessonPage.js");
+    const days27To28 = read("C1Day27To28GuidedLessonPage.js");
+    expect(day26).toContain("<C1TopicCollocationPractice day={day} />");
+    expect(days27To28).toContain("<C1TopicCollocationPractice day={day} />");
+  });
 });
