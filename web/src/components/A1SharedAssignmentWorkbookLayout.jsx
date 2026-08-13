@@ -183,7 +183,13 @@ export default function A1SharedAssignmentWorkbookLayout({
   if (process.env.NODE_ENV !== "production") validateWorkbookSections(assignment, sectionElements);
 
   const renderedKeys = new Set(sectionElements.map((element) => element.props.sectionKey));
-  const availableSections = assignment.sections.filter(({ key }) => renderedKeys.has(key));
+  const isCombinedDay1 =
+    assignment.assignmentKey === "A1-0.1" &&
+    renderedKeys.has("teil-1") &&
+    renderedKeys.has("teil-2");
+  const availableSections = isCombinedDay1
+    ? [{ key: "teil-2", number: 2, label: "Reading + Questions" }]
+    : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
   const overviewTab = availableSections.length ? "overview" : "assignment";
@@ -205,11 +211,17 @@ export default function A1SharedAssignmentWorkbookLayout({
             {grammar}
           </div>
         ) : null}
-        {sectionElements.map((element) => (
-          <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
-            {element}
+        {isCombinedDay1 ? (
+          <div hidden={activeTab !== "teil-2"} data-workbook-combined-section="reading-questions">
+            {sectionElements}
           </div>
-        ))}
+        ) : (
+          sectionElements.map((element) => (
+            <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
+              {element}
+            </div>
+          ))
+        )}
         <div hidden={activeTab !== "submit"} data-workbook-submission={assignment.assignmentKey}>
           {renderSubmission?.(assignment)}
         </div>
