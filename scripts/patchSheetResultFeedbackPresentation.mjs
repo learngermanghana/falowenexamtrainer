@@ -115,3 +115,5 @@ console.log("Applied basic Sheet result feedback presentation.");
 
 // Keep submission-history status in sync with the same marked A1/A2/B1 results source.
 await import("./patchAssignmentMarkedStatusReconciliation.mjs");
+// Keep Mark My Letter feedback complete while preserving the compact default view.
+await import("./patchMarkMyLetterFullFeedback.mjs");
