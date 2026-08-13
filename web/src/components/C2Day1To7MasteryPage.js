@@ -1,9 +1,11 @@
 import React from "react";
 import {styles} from "../styles";
 import {getC2Day1To7Mastery} from "../data/c2Day1To7Mastery";
+import C2Day1GuidedWorkbookPage from "./C2Day1GuidedWorkbookPage";
 
 const C2Day1To7MasteryPage=({lesson})=>{
  const day=Number(lesson?.day||0);
+ if(day===1)return <C2Day1GuidedWorkbookPage lesson={lesson}/>;
  const d=lesson?.c2Mastery||getC2Day1To7Mastery(day);
  if(!d)return null;
  const card={...styles.card,display:"grid",gap:10};
