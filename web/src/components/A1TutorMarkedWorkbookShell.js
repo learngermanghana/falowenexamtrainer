@@ -90,19 +90,25 @@ const A1TutorMarkedWorkbookShell = ({
   const assignment = getA1Assignment(fallbackAssignmentKey);
   if (!assignment) throw new Error(`Unknown canonical A1 assignment: ${fallbackAssignmentKey}`);
 
+  const isFirstA1Workbook = assignment.assignmentKey === "A1-0.1";
   const { sectionMap, overviewNodes } = splitA1WorkbookContent(children);
   const sections = assignment.sections
     .filter(({ key }) => sectionMap.has(key))
-    .map(({ key }) => (
-      <WorkbookSection key={key} sectionKey={key}>{sectionMap.get(key)}</WorkbookSection>
+    .map(({ key, number }) => (
+      <WorkbookSection key={key} sectionKey={key}>
+        {isFirstA1Workbook ? (
+          <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, marginBottom: 12, background: "#eff6ff", lineHeight: 1.6 }}>
+            <strong>Teil {number}:</strong> Complete the questions on this page. Your final answers are sent from the <strong>Submit</strong> tab after you finish all Teil sections.
+          </div>
+        ) : null}
+        {sectionMap.get(key)}
+      </WorkbookSection>
     ));
 
   if (process.env.NODE_ENV !== "production") {
     const missing = assignment.sections.filter(({ key }) => !sectionMap.has(key)).map(({ key }) => key);
     if (missing.length) {
-      throw new Error(
-        `[A1 workbook ${assignment.assignmentKey}] could not find rendered content for ${missing.join(", ")}.`,
-      );
+      throw new Error(`[A1 workbook ${assignment.assignmentKey}] could not find rendered content for ${missing.join(", ")}.`);
     }
   }
 
@@ -114,6 +120,17 @@ const A1TutorMarkedWorkbookShell = ({
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       <A1TutorMarkedOverviewGuidance />
       {overviewNodes}
+    </div>
+  );
+
+  const grammar = (
+    <div style={{ display: "grid", gap: 12 }}>
+      {isFirstA1Workbook ? (
+        <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 12, background: "#fff1f2", color: "#991b1b", lineHeight: 1.65 }}>
+          <strong>Grammar only.</strong> Read and learn on this page. Then continue to <strong>Teil 1</strong>. Use <strong>Submit</strong> after you finish the workbook questions.
+        </div>
+      ) : null}
+      <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />
     </div>
   );
 
@@ -139,7 +156,7 @@ const A1TutorMarkedWorkbookShell = ({
 
       <A1SharedAssignmentWorkbookLayout
         assignmentKey={assignment.assignmentKey}
-        grammar={<A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />}
+        grammar={grammar}
         overview={overview}
         renderSubmission={(canonical) => (
           <A1CanonicalSubmissionPanel
