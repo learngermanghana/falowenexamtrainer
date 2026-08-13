@@ -96,9 +96,9 @@ const A1TutorMarkedWorkbookShell = ({
     .filter(({ key }) => sectionMap.has(key))
     .map(({ key, number }) => (
       <WorkbookSection key={key} sectionKey={key}>
-        {isFirstA1Workbook ? (
+        {isFirstA1Workbook && number === 1 ? (
           <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, marginBottom: 12, background: "#eff6ff", lineHeight: 1.6 }}>
-            <strong>Teil {number}:</strong> Complete the questions on this page. Your final answers are sent from the <strong>Submit</strong> tab after you finish all Teil sections.
+            <strong>Reading + Questions:</strong> Read the text first, then continue directly to the questions below on this same page. Do not submit here. When you finish the questions, open <strong>Submit</strong>.
           </div>
         ) : null}
         {sectionMap.get(key)}
@@ -112,13 +112,33 @@ const A1TutorMarkedWorkbookShell = ({
     }
   }
 
+  const firstWorkbookOverview = (
+    <div
+      data-a1-day1-combined-guidance="true"
+      style={{
+        ...styles.card,
+        margin: 0,
+        border: "1px solid #bfdbfe",
+        background: "#eff6ff",
+        display: "grid",
+        gap: 6,
+        lineHeight: 1.65,
+      }}
+    >
+      <strong>How to complete this assignment</strong>
+      <p style={{ margin: 0 }}>
+        Start here in <strong>Overview</strong>. First open <strong>Grammar</strong> and read the lesson. Then open <strong>Reading + Questions</strong>: read the short text and answer the questions on the same page. You do not type or submit answers there. When you are finished, open <strong>Submit</strong> to send your final answers.
+      </p>
+    </div>
+  );
+
   const overview = (
     <div style={{ display: "grid", gap: 12 }}>
       <p style={{ ...styles.card, margin: 0 }}>
         {assignmentIntro || `Complete every section, then submit ${assignment.assignmentKey}.`}
       </p>
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
-      <A1TutorMarkedOverviewGuidance />
+      {isFirstA1Workbook ? firstWorkbookOverview : <A1TutorMarkedOverviewGuidance />}
       {overviewNodes}
     </div>
   );
@@ -127,7 +147,7 @@ const A1TutorMarkedWorkbookShell = ({
     <div style={{ display: "grid", gap: 12 }}>
       {isFirstA1Workbook ? (
         <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 12, background: "#fff1f2", color: "#991b1b", lineHeight: 1.65 }}>
-          <strong>Grammar only.</strong> Read and learn on this page. Then continue to <strong>Teil 1</strong>. Use <strong>Submit</strong> after you finish the workbook questions.
+          <strong>Grammar only.</strong> Read and learn on this page. Your assignment is under <strong>Reading + Questions</strong>. Use <strong>Submit</strong> only after you finish the questions.
         </div>
       ) : null}
       <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />
