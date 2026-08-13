@@ -30,61 +30,20 @@ const questionBoxStyle = {
 };
 
 const questions = [
-  {
-    stem: "1. Wie begrüßt man jemanden um 7:00 Uhr morgens?",
-    translation: "How do you greet someone at 7:00 AM?",
-    options: ["A) Guten Abend", "B) Gute Nacht", "C) Guten Morgen", "D) Guten Tag"],
-  },
-  {
-    stem: "2. Wie begrüßt man jemanden um 14:00 Uhr?",
-    translation: "How do you greet someone at 2:00 PM?",
-    options: ["A) Guten Morgen", "B) Gute Nacht", "C) Guten Abend", "D) Guten Tag"],
-  },
-  {
-    stem: "3. Wie begrüßt man jemanden um 20:00 Uhr?",
-    translation: "How do you greet someone at 8:00 PM?",
-    options: ["A) Guten Morgen", "B) Guten Abend", "C) Guten Tag", "D) Gute Nacht"],
-  },
-  {
-    stem: "4. Wie verabschiedet man sich um 22:30 Uhr?",
-    translation: "How do you say goodbye at 10:30 PM?",
-    options: ["A) Guten Abend", "B) Gute Nacht", "C) Guten Morgen", "D) Guten Tag"],
-  },
-  {
-    stem: "5. Welche formelle Begrüßung verwendet man um 11:00 Uhr?",
-    translation: "What formal greeting is used at 11:00 AM?",
-    options: ["A) Hallo", "B) Guten Abend", "C) Guten Morgen", "D) Gute Nacht"],
-  },
-  {
-    stem: "6. Wie fragt man höflich \"Wie geht es Ihnen?\" auf Deutsch?",
-    translation: "How do you politely ask \"How are you?\" in German?",
-    options: ["A) Wie geht es dir?", "B) Wie geht's?", "C) Wie geht es Ihnen?", "D) Alles klar?"],
-  },
-  {
-    stem: "7. Was sagt man auf Deutsch, wenn man sich tagsüber verabschiedet?",
-    translation: "What do you say in German when saying goodbye during the day?",
-    options: ["A) Guten Morgen", "B) Auf Wiedersehen", "C) Gute Nacht", "D) Hallo"],
-  },
-  {
-    stem: "8. Was sagt man auf Deutsch, wenn man sich informell verabschiedet?",
-    translation: "What do you say in German when saying goodbye informally?",
-    options: ["A) Tschüss", "B) Guten Tag", "C) Guten Abend", "D) Auf Wiedersehen"],
-  },
-  {
-    stem: "9. Welche Begrüßung ist für den Abend geeignet?",
-    translation: "Which greeting is appropriate for the evening?",
-    options: ["A) Guten Morgen", "B) Guten Tag", "C) Guten Abend", "D) Gute Nacht"],
-  },
-  {
-    stem: "10. Welche Begrüßung benutzt man am Ende des Tages?",
-    translation: "Which greeting is used at the end of the day?",
-    options: ["A) Guten Tag", "B) Guten Morgen", "C) Guten Abend", "D) Gute Nacht"],
-  },
+  { stem: "1. Wie begrüßt man jemanden um 7:00 Uhr morgens?", translation: "How do you greet someone at 7:00 AM?", options: ["A) Guten Abend", "B) Gute Nacht", "C) Guten Morgen", "D) Guten Tag"] },
+  { stem: "2. Wie begrüßt man jemanden um 14:00 Uhr?", translation: "How do you greet someone at 2:00 PM?", options: ["A) Guten Morgen", "B) Gute Nacht", "C) Guten Abend", "D) Guten Tag"] },
+  { stem: "3. Wie begrüßt man jemanden um 20:00 Uhr?", translation: "How do you greet someone at 8:00 PM?", options: ["A) Guten Morgen", "B) Guten Abend", "C) Guten Tag", "D) Gute Nacht"] },
+  { stem: "4. Wie verabschiedet man sich um 22:30 Uhr?", translation: "How do you say goodbye at 10:30 PM?", options: ["A) Guten Abend", "B) Gute Nacht", "C) Guten Morgen", "D) Guten Tag"] },
+  { stem: "5. Welche formelle Begrüßung verwendet man um 11:00 Uhr?", translation: "What formal greeting is used at 11:00 AM?", options: ["A) Hallo", "B) Guten Abend", "C) Guten Morgen", "D) Gute Nacht"] },
+  { stem: "6. Wie fragt man höflich \"Wie geht es Ihnen?\" auf Deutsch?", translation: "How do you politely ask \"How are you?\" in German?", options: ["A) Wie geht es dir?", "B) Wie geht's?", "C) Wie geht es Ihnen?", "D) Alles klar?"] },
+  { stem: "7. Was sagt man auf Deutsch, wenn man sich tagsüber verabschiedet?", translation: "What do you say in German when saying goodbye during the day?", options: ["A) Guten Morgen", "B) Auf Wiedersehen", "C) Gute Nacht", "D) Hallo"] },
+  { stem: "8. Was sagt man auf Deutsch, wenn man sich informell verabschiedet?", translation: "What do you say in German when saying goodbye informally?", options: ["A) Tschüss", "B) Guten Tag", "C) Guten Abend", "D) Auf Wiedersehen"] },
+  { stem: "9. Welche Begrüßung ist für den Abend geeignet?", translation: "Which greeting is appropriate for the evening?", options: ["A) Guten Morgen", "B) Guten Tag", "C) Guten Abend", "D) Gute Nacht"] },
+  { stem: "10. Welche Begrüßung benutzt man am Ende des Tages?", translation: "Which greeting is used at the end of the day?", options: ["A) Guten Tag", "B) Guten Morgen", "C) Guten Abend", "D) Gute Nacht"] },
 ];
 
 const A1Day1GreetingsWorkbookPage = () => {
   const radio = getA1RadioResource(1);
-
   return (
     <RadioFirstWorkbookGate level="A1" day={1} resource={radio}>
       <A1TutorMarkedWorkbookShell
@@ -93,28 +52,15 @@ const A1Day1GreetingsWorkbookPage = () => {
         fallbackAssignmentKey="A1-0.1"
         title="A1 · Day 1 Workbook · Greetings"
         subtitle="Chapter 0.1 · Tutor-marked assignment"
-        assignmentIntro="Complete the assignment, then open Submit to send only your Teil 2 answers for A1-0.1."
+        assignmentIntro="First read Grammar. Then open Reading + Questions, read the short text and answer the multiple-choice questions on the same page. When you finish, open Submit to send your final answers."
         submitTitle="Submit A1 · Day 1 · Chapter 0.1"
       >
         <section style={sectionStyle}>
-          <img
-            src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70"
-            alt="Students greeting each other in a classroom"
-            loading="lazy"
-            style={imageStyle}
-          />
+          <img src="https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=70" alt="Students greeting each other in a classroom" loading="lazy" style={imageStyle} />
           <h2 style={{ margin: 0, fontSize: 18 }}>Teil 1 · Reading Text</h2>
-          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-            <strong>Instruction:</strong> Read the text and answer the questions below. Each has one correct answer.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-            <strong>Text:</strong> Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein
-            bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}>
-            <strong>Translation:</strong> Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired.
-            Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!
-          </p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Instruction:</strong> Read the text first. The multiple-choice questions are directly below on this same page.</p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Text:</strong> Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!</p>
+          <p style={{ margin: 0, lineHeight: 1.55, fontSize: 13 }}><strong>Translation:</strong> Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired. Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!</p>
         </section>
 
         <section style={sectionStyle}>
@@ -123,9 +69,7 @@ const A1Day1GreetingsWorkbookPage = () => {
             <div key={question.stem} style={questionBoxStyle}>
               <strong>{question.stem}</strong>
               <span style={{ color: "#4b5563", fontSize: 12 }}>Translation: {question.translation}</span>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
+              {question.options.map((option) => <span key={option}>{option}</span>)}
             </div>
           ))}
         </section>
