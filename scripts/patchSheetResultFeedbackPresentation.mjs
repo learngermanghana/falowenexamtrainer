@@ -116,3 +116,4 @@ console.log("Applied basic Sheet result feedback presentation.");
 await import("./patchAssignmentMarkedStatusReconciliation.mjs");
 await import("./patchMarkMyLetterFullFeedback.mjs");
 await import("./patchC2Days1To7Foundation.mjs");
+await import("./patchC2Days8To14Mastery.mjs");
