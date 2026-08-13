@@ -1,0 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+const file=path.join(root,"web/src/components/SelfLearningLessonRegistry.js");
+let s=fs.readFileSync(file,"utf8");
+const add=(before,after,label)=>{if(s.includes(after))return;if(!s.includes(before))throw new Error(`C2 Days 8-14 patch anchor missing: ${label}`);s=s.replace(before,after);};
+add('import C2Day1To7MasteryPage from "./C2Day1To7MasteryPage";','import C2Day1To7MasteryPage from "./C2Day1To7MasteryPage";\nimport C2Day8To14MasteryPage from "./C2Day8To14MasteryPage";','C2 page import');
+add('import { C2_DAY_1_TO_7_LESSONS } from "../data/c2Day1To7Mastery";','import { C2_DAY_1_TO_7_LESSONS } from "../data/c2Day1To7Mastery";\nimport { C2_DAY_8_TO_14_LESSONS } from "../data/c2Day8To14Mastery";','C2 data import');
+add('  C2: C2_DAY_1_TO_7_LESSONS,','  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS],','C2 lesson registry');
+add('  if (normalizedLevel === "C2" && day >= 1 && day <= 7) page = <C2Day1To7MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;','  if (normalizedLevel === "C2" && day >= 1 && day <= 7) page = <C2Day1To7MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;\n  else if (normalizedLevel === "C2" && day >= 8 && day <= 14) page = <C2Day8To14MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;','C2 renderer');
+fs.writeFileSync(file,s,"utf8");
+console.log("Registered C2 Days 8-14 mastery lessons.");
