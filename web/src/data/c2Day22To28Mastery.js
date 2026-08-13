@@ -1,0 +1,11 @@
+import d22 from "./c2Day22Mastery";
+import d23 from "./c2Day23Mastery";
+import d24 from "./c2Day24Mastery";
+import d25 from "./c2Day25Mastery";
+import d26 from "./c2Day26Mastery";
+import d27 from "./c2Day27Mastery";
+import d28 from "./c2Day28Mastery";
+export const C2_DAY_22_TO_28_MASTERY={22:d22,23:d23,24:d24,25:d25,26:d26,27:d27,28:d28};
+export const C2_DAY_22_TO_28_LESSONS=Object.entries(C2_DAY_22_TO_28_MASTERY).map(([day,m])=>({level:"C2",day:Number(day),chapter:m.chapter,title:m.title,topic:m.topic,grammarFocus:m.grammarFocus,objectives:m.objectives,c2Mastery:m}));
+export const getC2Day22To28Mastery=(day)=>C2_DAY_22_TO_28_MASTERY[Number(day||0)]||null;
+export default C2_DAY_22_TO_28_MASTERY;
