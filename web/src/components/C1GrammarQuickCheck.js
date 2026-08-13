@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import C1TopicCollocationPractice from "./C1TopicCollocationPractice";
 
 const itemsByDay = {
   17: [
@@ -64,8 +65,8 @@ export default function C1GrammarQuickCheck({ day, completed = false, onComplete
   const correct = items.filter((item, index) => answers[index] === item[2]).length;
   const done = items.length > 0 && correct === items.length;
   useEffect(() => { if (done && !completed) onCompleteChange?.(true); }, [done, completed, onCompleteChange]);
-  if (!items.length) return null;
-  return <section style={{ ...styles.card, display: "grid", gap: 14, border: "1px solid #c7d2fe", borderRadius: 18 }}>
+  if (!items.length) return <C1TopicCollocationPractice day={day} />;
+  return <><C1TopicCollocationPractice day={day} /><section style={{ ...styles.card, display: "grid", gap: 14, border: "1px solid #c7d2fe", borderRadius: 18 }}>
     <div><span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>Learn by choosing</span><h2 style={{ marginBottom: 4 }}>Grammar knowledge check</h2><p style={{ margin: 0, color: "#475569" }}>Answer the real multiple-choice questions after reading the grammar notes.</p></div>
     {items.map(([question, options, answer], index) => <div key={question} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
       <strong>{index + 1}. {question}</strong>
@@ -73,5 +74,5 @@ export default function C1GrammarQuickCheck({ day, completed = false, onComplete
       {answers[index] ? <div style={{ color: answers[index] === answer ? "#166534" : "#991b1b", fontWeight: 700 }}>{answers[index] === answer ? "Correct." : `Try again. Correct form: ${answer}`}</div> : null}
     </div>)}
     <strong>{correct}/{items.length} correct</strong>
-  </section>;
+  </section></>;
 }
