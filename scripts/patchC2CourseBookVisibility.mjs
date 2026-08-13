@@ -35,3 +35,4 @@ if (!source.includes("C2_COURSE_BOOK_SCHEDULE")) throw new Error("C2 Course Book
 
 fs.writeFileSync(file, source, "utf8");
 console.log("Exposed all 28 C2 mastery lessons in the Course Book for C2-level profiles.");
+await import("./patchB1Day2WritingCheatSheet.mjs");
