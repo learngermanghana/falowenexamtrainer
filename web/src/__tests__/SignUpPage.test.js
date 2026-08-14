@@ -110,7 +110,7 @@ describe("SignUpPage", () => {
 
     const signupPayload = mockSignup.mock.calls[0][2];
     expect(signupPayload.contractTermMonths).toBe(0);
-    expect(signupPayload.paymentIntentAmount).toBe(2800);
+    expect(signupPayload.paymentIntentAmount).toBe(3000);
     expect(window.open).not.toHaveBeenCalled();
   });
 });
