@@ -56,3 +56,4 @@ if (!day26.includes("C1SpeakingGuidanceCards")) throw new Error("C1 Day 26 rich 
 if (!day2728.includes("C1SpeakingGuidanceCards")) throw new Error("C1 Days 27-28 rich speaking guidance missing.");
 
 console.log("C1 Days 26-28 now show speaking idea examples, guidance questions and sentence starters.");
+await import("./patchC2Day1C1LearningMechanics.mjs");
