@@ -2142,7 +2142,7 @@ const lessonCatalog = Object.freeze([
     "sequence": 29,
     "day": 28,
     "chapter": "6.3",
-    "title": "Review und Transfer",
+    "title": "Demografischer Wandel und Generationengerechtigkeit",
     "assignmentId": "C1-6.3",
     "assignmentType": "Lesen & Hören",
     "submissionRequired": true,

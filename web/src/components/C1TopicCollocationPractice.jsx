@@ -164,11 +164,11 @@ export const C1_TOPIC_COLLOCATIONS = {
     ["schützen vor + Dat", "to protect from", "Sicherheitsmaßnahmen schützen persönliche Daten vor Missbrauch."],
     ["führen zu + Dat", "to lead to", "Digitalisierte Prozesse können zu kürzeren Bearbeitungszeiten führen."],
   ]},
-  28: { topic: "Review und Transfer", items: [
-    ["sich beziehen auf + Akk", "to refer to", "Ein gutes Argument bezieht sich direkt auf die Aufgabenstellung."],
-    ["abhängen von + Dat", "to depend on", "Die Qualität einer C1-Antwort hängt von Struktur und sprachlicher Präzision ab."],
-    ["beitragen zu + Dat", "to contribute to", "Passende Kollokationen tragen zu einem natürlichen Ausdruck bei."],
-    ["sich auswirken auf + Akk", "to affect", "Grammatische Fehler können sich auf die Verständlichkeit auswirken."],
+  28: { topic: "Demografischer Wandel und Generationengerechtigkeit", items: [
+    ["führen zu + Dat", "to lead to", "Eine alternde Bevölkerung kann zu einem höheren Pflegebedarf führen."],
+    ["abhängen von + Dat", "to depend on", "Die langfristige Finanzierung des Rentensystems hängt von mehreren demografischen und wirtschaftlichen Faktoren ab."],
+    ["beitragen zu + Dat", "to contribute to", "Gezielte Fachkräftezuwanderung kann zur Entlastung des Arbeitsmarktes beitragen."],
+    ["sich auswirken auf + Akk", "to affect", "Der demografische Wandel wirkt sich auf Renten, Pflege, Arbeitsmarkt und öffentliche Haushalte aus."],
   ]},
 };
 

@@ -58,21 +58,52 @@ describe("B1 workbook writing cheat sheet injector", () => {
         "/campus/course/lesson/B1/21",
         "?view=workbook"
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  test("does not activate on removed standalone B1 Day 21 workbook routes", () => {
+  test("supports standalone B1 Day 21 workbook routes when they are rendered", () => {
     expect(
       __TESTING__.isB1WorkbookRoute(
         "/campus/course/b1-day-21-lebensformen-heute-workbook",
         ""
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
   test("B1 cheat sheet content exists for workbook days", () => {
     expect(getWritingCheatSheet("B1", 1).length).toBeGreaterThan(0);
     expect(getWritingCheatSheet("B1", 1)[0].items.length).toBeGreaterThan(0);
+  });
+
+  test("adds an always-visible fallback cheat sheet and inserts all three template types", () => {
+    const root = buildWritingRoot();
+    const textarea = document.createElement("textarea");
+    root.querySelector("section").appendChild(textarea);
+
+    expect(__TESTING__.ensureWritingCheatSheet(root)).toEqual({ mounted: true, reason: "inserted" });
+    const card = root.querySelector(`[${__TESTING__.WRITING_CHEAT_SHEET_ATTRIBUTE}]`);
+    expect(card).toHaveTextContent("B1 Writing Cheat Sheet");
+
+    const buttons = Array.from(card.querySelectorAll("button"));
+    expect(buttons.map((button) => button.textContent)).toEqual([
+      "Insert Opinion Essay Template",
+      "Insert Formal Letter Template",
+      "Insert Informal Letter Template",
+    ]);
+    buttons.forEach((button) => button.click());
+    expect(textarea.value).toContain("Heutzutage ist das Thema");
+    expect(textarea.value).toContain("Sehr geehrte Damen und Herren");
+    expect(textarea.value).toContain("Liebe/r [Name]");
+  });
+
+  test("does not duplicate the React-owned B1 cheat sheet", () => {
+    const root = buildWritingRoot();
+    const owned = document.createElement("div");
+    owned.setAttribute("data-b1-writing-cheat-sheet", "always-visible");
+    root.querySelector("section").appendChild(owned);
+
+    expect(__TESTING__.ensureWritingCheatSheet(root)).toEqual({ mounted: true, reason: "react-owned" });
+    expect(root.querySelector(`[${__TESTING__.WRITING_CHEAT_SHEET_ATTRIBUTE}]`)).toBeNull();
   });
 
   test("injects the mapped B1 Day 1 writing video before the writing workspace", () => {

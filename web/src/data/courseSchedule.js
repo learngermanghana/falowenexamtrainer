@@ -695,7 +695,7 @@ const c1Schedule = [
   },
   {
     day: 28,
-    topic: "Review und Transfer",
+    topic: "Demografischer Wandel und Generationengerechtigkeit",
     chapter: "6.3",
     goal: "",
     instruction: "",

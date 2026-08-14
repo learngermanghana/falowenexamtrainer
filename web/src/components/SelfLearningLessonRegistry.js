@@ -9,10 +9,16 @@ import B2Day21To25SelfTutoringPage from "./B2Day21To25SelfTutoringPage";
 import B2Day26To28SelfTutoringPage from "./B2Day26To28SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
+import C2Day1To7MasteryPage from "./C2Day1To7MasteryPage";
+import C2Day8To14MasteryPage from "./C2Day8To14MasteryPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../data/b2LessonContentAlignment";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
+import { C2_DAY_1_TO_7_LESSONS } from "../data/c2Day1To7Mastery";
+import { C2_DAY_8_TO_14_LESSONS } from "../data/c2Day8To14Mastery";
+import { C2_DAY_15_TO_21_LESSONS } from "../data/c2Day15To21Mastery";
+import { C2_DAY_22_TO_28_LESSONS } from "../data/c2Day22To28Mastery";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
 import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
@@ -53,7 +59,7 @@ const c1FallbackLessons = [
   [25, "5.5", "Wissenschaft und Forschung", "Forschung, Fortschritt und gesellschaftlicher Nutzen"],
   [26, "6.1", "Nachhaltiger Konsum", "Kaufverhalten, Ressourcen und Verantwortung"],
   [27, "6.2", "Digitalisierung und Verwaltung", "Online-Services, Bürokratie und Zugang"],
-  [28, "6.3", "Review und Transfer", "C1-Themen wiederholen und auf neue Aufgaben übertragen"],
+  [28, "6.3", "Demografischer Wandel und Generationengerechtigkeit", "Demografischer Wandel, Generationengerechtigkeit, Rentensystem, Pflege und Fachkräftemangel"],
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "C1", day, chapter, title, topic }));
 
 const b2FallbackLessons = Object.values(B2_LESSON_CONTENT_ALIGNMENT)
@@ -63,6 +69,7 @@ const b2FallbackLessons = Object.values(B2_LESSON_CONTENT_ALIGNMENT)
 export const SELF_LEARNING_LESSONS = {
   B2: [b2Day0Orientation,b2Day1PersoenlicheIdentitaet,b2Day2AlltagUndZeitmanagement,b2Day3ArbeitUndBeruf,b2Day4BildungUndLernen,b2Day5GesundheitUndWohlbefinden,b2Day6MigrationUndIntegration,b2Day7GesellschaftlicheVielfalt,...b2FallbackLessons],
   C1: [c1Day0Orientation,c1Day1ZieleUndLernweg,c1Day2KulturUndIdentitaet,c1Day3MedienUndInformationskompetenz,c1Day4BeziehungenUndTeamarbeit,c1Day5BeruflicheEntwicklung,c1Day6GesundheitUndLebensstil,c1Day7ReisenUndNachhaltigkeit,c1Day8WohnenUndStadtentwicklung,c1Day9KonsumUndWerbung,c1Day10IntegrationUndGesellschaft,c1Day11EngagementUndEhrenamt,c1Day12FreizeitUndKultur,c1Day13Mehrsprachigkeit,c1Day14InnovationUndZukunft,c1Day15BildungUndLebenslangesLernen,c1Day16TechnologieImAlltag,...c1FallbackLessons],
+  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS,...C2_DAY_22_TO_28_LESSONS],
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
@@ -74,7 +81,9 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const pageLesson = removeTeacherLectureFromLesson(lesson);
   const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
   let page;
-  if (day === 0) page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
+  if (normalizedLevel === "C2" && day >= 1 && day <= 7) page = <C2Day1To7MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "C2" && day >= 8 && day <= 28) page = <C2Day8To14MasteryPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (day === 0) page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
   else if (normalizedLevel === "C1" && day >= 8 && day <= 10) page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 26 && day <= 28) page = <B2Day26To28SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 21 && day <= 25) page = <B2Day21To25SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;

@@ -5,22 +5,27 @@ import {
   getWritingVideoResource,
   getYouTubeEmbedUrl,
 } from "../data/writingVideoResources";
+import { getWritingCheatSheet } from "../data/writingCheatSheets";
 
 const WRITING_VIDEO_CARD_ATTRIBUTE = "data-b1-writing-video-support";
+const WRITING_CHEAT_SHEET_ATTRIBUTE = "data-b1-writing-cheat-sheet-fallback";
 const REACT_WRITING_VIDEO_SELECTOR = '[data-writing-video-support="true"]';
+const REACT_WRITING_CHEAT_SHEET_SELECTOR = '[data-b1-writing-cheat-sheet="always-visible"]';
 
 const isB1WorkbookRoute = (pathname = "", search = "") => {
   const path = String(pathname || "").replace(/\/+$/, "");
   const lessonMatch = path.match(/^\/campus\/course\/lesson\/B1\/(\d+)$/i);
   if (lessonMatch) {
     const lessonDay = Number(lessonMatch[1]);
-    return (lessonDay < 21 || lessonDay > 28) && new URLSearchParams(search || "").get("view") === "workbook";
+    return lessonDay >= 1
+      && lessonDay <= 28
+      && new URLSearchParams(search || "").get("view") === "workbook";
   }
   const standaloneMatch = path.match(/^\/campus\/course\/b1-day-(\d+)-.*-workbook$/i);
   if (!standaloneMatch) return false;
 
   const standaloneDay = Number(standaloneMatch[1]);
-  return standaloneDay < 21 || standaloneDay > 28;
+  return standaloneDay >= 1 && standaloneDay <= 28;
 };
 
 const getB1WorkbookDay = (pathname = "") => {
@@ -194,6 +199,108 @@ const ensureWritingVideoCard = (root, day) => {
   return { mounted: true, reason: "inserted", day, key: resource.key };
 };
 
+const templateButtonLabels = {
+  "b1-opinion-text-template": "Insert Opinion Essay Template",
+  "b1-formal-letter-template": "Insert Formal Letter Template",
+  "b1-informal-letter-template": "Insert Informal Letter Template",
+};
+
+const templateToText = (template) => template.items
+  .map((item) => `${item.phrase}:\n${item.meaning}`)
+  .join("\n\n");
+
+const insertTemplateIntoWritingBox = (section, template) => {
+  const textareas = Array.from(section.querySelectorAll("textarea"));
+  const textarea = textareas.at(-1);
+  if (!textarea) return false;
+
+  const templateText = templateToText(template);
+  const currentText = String(textarea.value || "").trimEnd();
+  const nextText = currentText ? `${currentText}\n\n${templateText}` : templateText;
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    window.HTMLTextAreaElement.prototype,
+    "value",
+  )?.set;
+  valueSetter?.call(textarea, nextText);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  textarea.focus();
+  return true;
+};
+
+const createWritingCheatSheetCard = (section) => {
+  const card = document.createElement("div");
+  card.setAttribute(WRITING_CHEAT_SHEET_ATTRIBUTE, "true");
+  Object.assign(card.style, {
+    display: "grid",
+    gap: "12px",
+    border: "1px solid #bfdbfe",
+    borderRadius: "16px",
+    padding: "14px",
+    background: "#eff6ff",
+  });
+
+  const heading = document.createElement("strong");
+  heading.textContent = "B1 Writing Cheat Sheet";
+  heading.style.color = "#1e3a8a";
+  card.appendChild(heading);
+
+  const description = document.createElement("p");
+  description.textContent = "Use these connectors while writing, or insert the template that matches your task into the German text box.";
+  Object.assign(description.style, { margin: "0", color: "#475569", lineHeight: "1.6" });
+  card.appendChild(description);
+
+  const sheets = getWritingCheatSheet("B1", 1);
+  const quickList = document.createElement("div");
+  quickList.textContent = sheets
+    .filter((item) => ["b1-connectors", "b1-message-phrases"].includes(item.id))
+    .flatMap((item) => item.items.map((entry) => entry.phrase))
+    .join(" · ");
+  Object.assign(quickList.style, { lineHeight: "1.7", color: "#1e3a8a" });
+  card.appendChild(quickList);
+
+  const controls = document.createElement("div");
+  Object.assign(controls.style, { display: "flex", flexWrap: "wrap", gap: "8px" });
+  sheets.filter((item) => templateButtonLabels[item.id]).forEach((template) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = templateButtonLabels[template.id];
+    Object.assign(button.style, {
+      border: "1px solid #93c5fd",
+      borderRadius: "999px",
+      padding: "9px 12px",
+      background: "#fff",
+      color: "#1d4ed8",
+      fontWeight: "800",
+      cursor: "pointer",
+    });
+    button.addEventListener("click", () => insertTemplateIntoWritingBox(section, template));
+    controls.appendChild(button);
+  });
+  card.appendChild(controls);
+  return card;
+};
+
+const ensureWritingCheatSheet = (root) => {
+  const existing = root.querySelector(`[${WRITING_CHEAT_SHEET_ATTRIBUTE}]`);
+  const writingSection = findWritingSection(root);
+  if (!writingSection) return { mounted: false, reason: "writing-section-not-mounted" };
+
+  if (writingSection.querySelector(REACT_WRITING_CHEAT_SHEET_SELECTOR)) {
+    existing?.remove();
+    return { mounted: true, reason: "react-owned" };
+  }
+  if (existing && writingSection.contains(existing)) {
+    return { mounted: true, reason: "already-mounted" };
+  }
+
+  existing?.remove();
+  const card = createWritingCheatSheetCard(writingSection);
+  const textBox = Array.from(writingSection.querySelectorAll("textarea")).at(-1);
+  if (textBox) textBox.parentElement?.insertBefore(card, textBox);
+  else writingSection.appendChild(card);
+  return { mounted: true, reason: "inserted" };
+};
+
 export default function B1WorkbookWritingCheatSheetInjector() {
   const location = useLocation();
 
@@ -204,6 +311,7 @@ export default function B1WorkbookWritingCheatSheetInjector() {
     const day = getB1WorkbookDay(location.pathname);
     let lastTabSnapshot = "";
     let lastVideoSnapshot = "";
+    let lastCheatSheetSnapshot = "";
 
     const reportTabs = (reason) => {
       const snapshot = readTabs(root);
@@ -229,6 +337,12 @@ export default function B1WorkbookWritingCheatSheetInjector() {
     const sync = (reason) => {
       reportTabs(reason);
       syncWritingVideo(reason);
+      const cheatSheetResult = ensureWritingCheatSheet(root);
+      const serialized = JSON.stringify(cheatSheetResult);
+      if (reason === "click" || serialized !== lastCheatSheetSnapshot) {
+        lastCheatSheetSnapshot = serialized;
+        courseDebug("b1Workbook:writingCheatSheet", { reason, ...cheatSheetResult });
+      }
     };
 
     const handleClick = (event) => {
@@ -263,6 +377,7 @@ export default function B1WorkbookWritingCheatSheetInjector() {
       observer.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
       root.querySelector(`[${WRITING_VIDEO_CARD_ATTRIBUTE}]`)?.remove();
+      root.querySelector(`[${WRITING_CHEAT_SHEET_ATTRIBUTE}]`)?.remove();
       courseDebug("b1Workbook:unmounted", { day });
     };
   }, [location.pathname, location.search]);
@@ -272,9 +387,12 @@ export default function B1WorkbookWritingCheatSheetInjector() {
 
 export const __TESTING__ = {
   WRITING_VIDEO_CARD_ATTRIBUTE,
+  WRITING_CHEAT_SHEET_ATTRIBUTE,
   REACT_WRITING_VIDEO_SELECTOR,
   createWritingVideoCard,
   ensureWritingVideoCard,
+  ensureWritingCheatSheet,
+  insertTemplateIntoWritingBox,
   findWritingInsertAnchor,
   findWritingSection,
   getB1WorkbookDay,
