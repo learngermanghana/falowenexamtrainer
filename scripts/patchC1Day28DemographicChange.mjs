@@ -16,6 +16,8 @@ const textTargets = [
   "functions/data/courseSchedule.js",
   "web/src/components/SelfLearningLessonRegistry.js",
   "web/public/classes/brochure.js",
+  "web/src/components/C1Day27To28GuidedLessonPage.js",
+  "web/src/components/C1Day27To28GrammarNotes.js",
 ];
 
 for (const relativePath of textTargets) {
@@ -31,6 +33,45 @@ for (const relativePath of textTargets) {
     );
 
   if (after !== before) fs.writeFileSync(filePath, after);
+}
+
+const guidedLessonPath = path.join(
+  repoRoot,
+  "web/src/components/C1Day27To28GuidedLessonPage.js",
+);
+
+if (fs.existsSync(guidedLessonPath)) {
+  const before = fs.readFileSync(guidedLessonPath, "utf8");
+  let after = before;
+  after = after.replace(
+    '28: { title: "Demografischer Wandel und Generationengerechtigkeit: C1 sicher abschließen", intro: "Dieses Schlusskapitel wiederholt zentrale C1-Strukturen und trainiert Selbstkorrektur. Lernende übertragen Grammatik auf neue Themen und verbessern den roten Faden ihrer Antworten.", points: ["Wiederhole Verknüpfungen, Wortstellung, Passiv und Nominalstil.", "Korrigiere deine Antwort systematisch nach Struktur, Präzision und Logik.", "Eine starke C1-Antwort bleibt komplex, aber klar und kontrolliert."], vocabulary: ["der rote Faden", "Selbstkorrektur", "folgend", "dennoch", "präzise formulieren"] },',
+    '28: { title: "Demografischer Wandel und Generationengerechtigkeit", intro: "Dieses C1-Kapitel untersucht die Folgen einer alternden Gesellschaft für Renten, Pflege, Arbeitsmarkt und öffentliche Finanzen. Ziel ist eine differenzierte Abwägung zwischen wirtschaftlicher Tragfähigkeit und fairer Verteilung zwischen den Generationen.", points: ["Erkläre Ursachen und Folgen des demografischen Wandels mit präzisen Ursache-Folge-Strukturen.", "Bewerte Maßnahmen wie Fachkräftezuwanderung, Familienförderung und ein höheres Renteneintrittsalter differenziert.", "Eine starke C1-Antwort berücksichtigt sowohl die Belastung jüngerer Generationen als auch die Lebens- und Arbeitsrealität älterer Menschen."], vocabulary: ["der demografische Wandel", "die Generationengerechtigkeit", "der Fachkräftemangel", "das Rentensystem", "der Pflegebedarf", "die Lebenserwartung"] },',
+  );
+  if (after !== before) fs.writeFileSync(guidedLessonPath, after);
+}
+
+const grammarPath = path.join(
+  repoRoot,
+  "web/src/components/C1Day27To28GrammarNotes.js",
+);
+
+if (fs.existsSync(grammarPath)) {
+  const before = fs.readFileSync(grammarPath, "utf8");
+  let after = before;
+  after = after
+    .replaceAll(
+      "Review: Verknüpfungen, Wortstellung und Selbstkorrektur auf C1",
+      "Ursache, Folge und Abwägung beim demografischen Wandel",
+    )
+    .replaceAll(
+      "C1-Themen übertragen, Fehler erkennen und Antworten verbessern",
+      "Demografische Entwicklungen präzise erklären und Generationengerechtigkeit differenziert bewerten",
+    )
+    .replaceAll(
+      "Am Ende des Kurses geht es darum, Strukturen flexibel zu übertragen. Du solltest Argumente klar verbinden, Wortstellung kontrollieren und deine Antwort selbstständig verbessern können.",
+      "Beim Thema demografischer Wandel musst du langfristige Ursachen und Folgen miteinander verknüpfen und politische Maßnahmen abwägen. Auf C1-Niveau helfen dir Nominalstil, Ursache-Folge-Strukturen und konzessive Formulierungen dabei, Renten, Pflege, Fachkräftemangel und Generationengerechtigkeit sachlich zu beurteilen.",
+    );
+  if (after !== before) fs.writeFileSync(grammarPath, after);
 }
 
 const collocationPath = path.join(
