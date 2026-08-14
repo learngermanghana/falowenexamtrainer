@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Student Reviews | Falowen</title>
+  <meta name="description" content="Read Google reviews from students who learned German with Falowen and Learn Language Education Academy in Ghana and online." />
+  <link rel="canonical" href="https://www.falowen.app/reviews/" />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#f8fafc;color:#0f172a;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit}.shell{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:18px 0 48px}.nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 0 18px}.brand{display:flex;align-items:center;gap:10px;font-weight:900;text-decoration:none;font-size:20px}.brand img{width:38px;height:38px;border-radius:10px}.navlinks{display:flex;gap:8px;flex-wrap:wrap}.navlinks a,.button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:12px;padding:9px 14px;border:1px solid #cbd5e1;background:#fff;text-decoration:none;font-weight:800}.hero{background:linear-gradient(135deg,#1d4ed8,#172554);color:#fff;border-radius:26px;padding:clamp(26px,6vw,58px);box-shadow:0 22px 50px rgba(30,64,175,.2)}.eyebrow{display:inline-block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#bfdbfe;margin-bottom:9px}.hero h1{margin:0;font-size:clamp(36px,7vw,64px);line-height:1;letter-spacing:-.04em}.hero p{max-width:760px;color:#dbeafe;line-height:1.7;font-size:17px;margin:16px 0 0}.rating{margin-top:22px;display:inline-grid;gap:4px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:14px 18px}.rating strong{font-size:28px}.rating span{color:#dbeafe;font-weight:800}.section{margin-top:20px;background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:22px}.sectionhead{display:flex;justify-content:space-between;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:16px}.section h2{margin:0;font-size:28px}.sectionhead p{margin:5px 0 0;color:#64748b}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{border:1px solid #e2e8f0;border-radius:18px;padding:18px;background:#f8fafc;display:grid;gap:10px}.stars{color:#d97706;letter-spacing:.08em;font-size:18px}.card p{margin:0;color:#334155;line-height:1.65;font-size:14px}.card footer{display:grid;gap:2px;margin-top:auto}.card footer strong{font-size:14px}.card footer span{font-size:12px;color:#64748b;font-weight:700}.empty{color:#64748b;font-style:italic}.cta{margin-top:20px;background:#0f172a;color:#fff;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}.cta h2{margin:0 0 6px}.cta p{margin:0;color:#cbd5e1}.cta .button{background:#fbbf24;border-color:#fbbf24;color:#111827}.note{margin:14px 2px 0;color:#64748b;font-size:13px;line-height:1.6}
+    @media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.shell{width:min(100% - 20px,1120px)}.nav{align-items:flex-start}.navlinks a:first-child{display:none}.hero{border-radius:20px;padding:26px 20px}.grid{grid-template-columns:1fr}.section{padding:18px}.cta{padding:20px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="nav" aria-label="Falowen">
+      <a class="brand" href="/"><img src="/logo192.png" alt="" /><span>Falowen</span></a>
+      <div class="navlinks"><a href="/classes/">Classes</a><a href="/">Home</a></div>
+    </nav>
+
+    <section class="hero">
+      <span class="eyebrow">Student Reviews</span>
+      <h1>What our learners say</h1>
+      <p>Feedback from students who have learned German with Falowen and Learn Language Education Academy through live classes, structured course materials, exam preparation and Falowen learning tools.</p>
+      <div class="rating" aria-label="4.6 out of 5 on Google from 107 reviews"><strong>4.6 ★</strong><span>107 Google reviews</span></div>
+    </section>
+
+    <section class="section">
+      <div class="sectionhead"><div><h2>Featured Google reviews</h2><p>Reviews included in our current Google Business Profile export.</p></div></div>
+      <div class="grid" id="reviews-grid"></div>
+      <p class="note">This page currently displays the 20 reviews contained in the latest exported review file available to Falowen. Some Google reviewers left a star rating without a written comment.</p>
+    </section>
+
+    <section class="cta">
+      <div><h2>Ready to start learning?</h2><p>Explore upcoming German classes and choose the level that fits you.</p></div>
+      <a class="button" href="/classes/">View classes</a>
+    </section>
+  </main>
+
+  <script>
+    const reviews = [
+      {name:"Cathy Summus",rating:5,date:"5 Aug 2026",text:""},
+      {name:"Reuben Lamptey",rating:5,date:"5 Jun 2026",text:"Great experience. The website and app are revolutionary and help you learn as well as prepare you for exams. Very supportive teacher. Thank you"},
+      {name:"Jeffrey Danso",rating:5,date:"29 Apr 2026",text:""},
+      {name:"FaithLord Diamenu",rating:3,date:"18 Apr 2026",text:""},
+      {name:"Bridgette Baah",rating:5,date:"28 Mar 2026",text:"Falowen has excellent learning tools that make studying really convenient. On the student website, you get access to grammar notes, workbooks, and recorded lectures, so it’s easy to catch up if you miss a class. There are also exam practice tools, including AI features that support self-study. The online classes are very effective, and the tutor is disciplined and committed. Overall, it’s been a 5-star experience for me, and I’d highly recommend it to anyone interested in learning German, whether in Ghana or abroad."},
+      {name:"Yaw Safo",rating:5,date:"16 Mar 2026",text:"My A1class was very interesting. Mr Felix really did a good job"},
+      {name:"Oheneyere Adofoa",rating:4,date:"6 Mar 2026",text:""},
+      {name:"ISAAC ADDOTEYE",rating:5,date:"21 Jan 2026",text:""},
+      {name:"Agyemang Dorothy",rating:5,date:"15 Dec 2025",text:"Every moment spent was great, lectures was understandable"},
+      {name:"Bismark Biney",rating:5,date:"15 Dec 2025",text:"Great lessons, top-notch AI-powered tools, conducive environment, flexible schedules, and highly interactive class, German skills improved. Big thanks to Mr. Felix for this amazing opportunity! Highly recommend to anyone looking to learn German, whether you're just starting out or looking to refine your skills."},
+      {name:"Charlotte Christodia",rating:5,date:"13 Dec 2025",text:"The A1 Deutsch class was very good. Mr Felix explained the lessons clearly and slowly. I learned basic German words and simple sentences. We practiced greetings, numbers, verbs, and simple questions. The class was interesting and easy to understand. Mr Felix is friendly and patient. I enjoyed the lessons and learned a lot. This class helped me to speak and understand basic German. I recommend this Learn Language Education Academy deutsch class to beginners. Your money will never go waste if you join this class."},
+      {name:"Afua Asamoah Larbi",rating:5,date:"14 Nov 2025",text:"Felix is an amazing teacher; always ready to help and push you beyond your limit. My transition from A1 to A2 was smooth. All thanks to his patience and innovation! The Falowen app was also very helpful."},
+      {name:"Selasi Kumah",rating:5,date:"11 Nov 2025",text:"I loved every bit of the German A1 course, the tools made available to us helped break everything down, making it very easy to understand. The tutor was also very patient with us and made sure we were following. This course has adequately prepared me for the German A1 exam. I definitely recommend Learn Language Academy to anyone interested in learning German."},
+      {name:"Rhodlyne Boakye",rating:5,date:"7 Nov 2025",text:"My experience with your tutelage has been a tremendous one. Your modernised teaching style is very impressive and it took me out of my comfort zone to actually speak Deutsch with courage. I’m glad to have enrolled for the B1 Deutsch Course at the Learn Language Education Academy and I must say Mr. Felix is an outstanding teacher. I recommend this institution to anyone out there who wants to speak and understand the German language with flare to enroll in this Nobel institution. Thank you so much for the opportunity. Regards."},
+      {name:"Mathias Ahorlu jnr.",rating:5,date:"23 Oct 2025",text:""},
+      {name:"Bernice Twumasi",rating:4,date:"14 Oct 2025",text:""},
+      {name:"Priscilla Akrong",rating:5,date:"14 Oct 2025",text:"I'm absolutely delighted with Learn Language Education Academy. The flexible and personalized approach suits my busy schedule perfectly. The teacher is fantastic, and I've made great progress. I highly recommend it to anyone wanting to learn the German language."},
+      {name:"Kelvin Akenteng",rating:5,date:"11 Oct 2025",text:"I am Kelvin Akenteng. I studied A1 Deutsch at Learn Language Education Academy and is a decision I never regretted. Learn Language Education Academy impacted me with all the basic knowledge an A1 student needs to explore in a German setting. I am able to introduce myself, construct polite statements and write a letter in Deutsch today and is all thanks to Learn Language Education Academy. I am very happy I took this step in Learning Deutsch at Learn Language Education Academy."},
+      {name:"De-Graft Donkor",rating:5,date:"11 Oct 2025",text:"It has really been a great experience. The fallowen app has been very helpful, the tutor has been amazing with the lecture hours and his insightfulness"},
+      {name:"Marian Conteh",rating:5,date:"10 Aug 2024",text:"Learn German is the right place to be if anyone want to study German language In Ghana. The tutor makes it very simple and enjoyable with ready available learning materials at our disposal to widened our horizon. With Learn German absenteeism is not an excuse. You can be anywhere in the world and participate in class either by logging with the meeting ID in to Zoom or replay the lecture recorded video or betterstill be in person. Keep it up Learn German"}
+    ];
+    const grid = document.getElementById("reviews-grid");
+    grid.innerHTML = reviews.map(review => `
+      <article class="card">
+        <div class="stars" aria-label="${review.rating} out of 5 stars">${"★★★★★".slice(0,review.rating)}${"☆☆☆☆☆".slice(0,5-review.rating)}</div>
+        ${review.text ? `<p>“${review.text}”</p>` : `<p class="empty">Star rating only — no written comment.</p>`}
+        <footer><strong>${review.name}</strong><span>${review.date} · Google Review</span></footer>
+      </article>`).join("");
+  </script>
+</body>
+</html>
