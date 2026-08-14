@@ -28,10 +28,10 @@ describe("TuitionStatusCard", () => {
   });
 
   it("shows paid state with full balance cleared", () => {
-    render(<TuitionStatusCard level="A1" paidAmount={2800} tuitionFee={2800} />);
+    render(<TuitionStatusCard level="A1" paidAmount={3000} tuitionFee={3000} />);
 
     expect(screen.getByText("Paid")).toBeInTheDocument();
-    expect(screen.getAllByText(formatMoney(2800))).toHaveLength(2);
+    expect(screen.getAllByText(formatMoney(3000))).toHaveLength(2);
     expect(screen.getByText(formatMoney(0))).toBeInTheDocument();
   });
 
