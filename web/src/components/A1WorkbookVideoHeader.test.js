@@ -189,6 +189,20 @@ describe("A1 workbook AI video header", () => {
     expect(document.querySelectorAll('[data-a1-workbook-video-header="true"]')).toHaveLength(1);
   });
 
+  test("falls back safely when the insertBefore reference is stale", () => {
+    const container = document.createElement("div");
+    const otherContainer = document.createElement("div");
+    const staleReference = document.createElement("span");
+    const node = document.createElement("section");
+
+    otherContainer.appendChild(staleReference);
+
+    expect(() =>
+      __private__.safeInsertBefore(container, node, staleReference),
+    ).not.toThrow();
+    expect(container.lastElementChild).toBe(node);
+  });
+
   test("allows the learner to collapse and reopen the video", () => {
     buildWorkbookDom();
     applyA1WorkbookVideoHeader({

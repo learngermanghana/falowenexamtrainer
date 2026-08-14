@@ -175,6 +175,16 @@ const nextNonVideoHeaderSibling = (element) => {
   return sibling;
 };
 
+const safeInsertBefore = (container, node, reference = null) => {
+  if (!container?.appendChild || !node) return false;
+  if (reference && reference.parentNode === container) {
+    container.insertBefore(node, reference);
+  } else {
+    container.appendChild(node);
+  }
+  return true;
+};
+
 export const findA1WorkbookVideoInsertionPoint = (root = document) => {
   const main = root?.querySelector?.("main.layout-main") || root?.querySelector?.("main");
   if (!main) return null;
@@ -344,13 +354,13 @@ export const applyA1WorkbookVideoHeader = ({
 
   if (existing?.getAttribute(HEADER_LESSON_ATTRIBUTE) === model.lessonId) {
     if (existing.parentElement !== insertion.container || existing.nextElementSibling !== insertion.reference) {
-      insertion.container.insertBefore(existing, insertion.reference);
+      safeInsertBefore(insertion.container, existing, insertion.reference);
     }
     return 1;
   }
 
   existing?.remove();
-  insertion.container.insertBefore(createVideoHeader(model), insertion.reference);
+  safeInsertBefore(insertion.container, createVideoHeader(model), insertion.reference);
   return 1;
 };
 
@@ -391,4 +401,5 @@ export const __private__ = {
   alignedA1Lessons,
   createVideoHeader,
   normalizePath,
+  safeInsertBefore,
 };
