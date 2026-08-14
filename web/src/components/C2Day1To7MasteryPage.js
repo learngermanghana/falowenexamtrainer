@@ -3,11 +3,13 @@ import {styles} from "../styles";
 import {getC2Day1To7Mastery} from "../data/c2Day1To7Mastery";
 import C2Day1GuidedWorkbookPage from "./C2Day1GuidedWorkbookPage";
 import C2Days2To5GuidedWorkbookPage from "./C2Days2To5GuidedWorkbookPage";
+import C2Days6To11GuidedWorkbookPage from "./C2Days6To11GuidedWorkbookPage";
 
 const C2Day1To7MasteryPage=({lesson})=>{
  const day=Number(lesson?.day||0);
  if(day===1)return <C2Day1GuidedWorkbookPage lesson={lesson}/>;
  if(day>=2&&day<=5)return <C2Days2To5GuidedWorkbookPage lesson={lesson}/>;
+ if(day>=6&&day<=7)return <C2Days6To11GuidedWorkbookPage lesson={lesson}/>;
  const d=lesson?.c2Mastery||getC2Day1To7Mastery(day);
  if(!d)return null;
  const card={...styles.card,display:"grid",gap:10};
