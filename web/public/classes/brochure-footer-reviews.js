@@ -1,5 +1,5 @@
 (function () {
-  const REVIEWS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5Nm-MLJkw3TeOht5ROELvFumVS9X8-ke_npLoOuF3W-zrF0v9xjk_Upzv4umQCocD5xtFaMRJQh6Z/pub?output=csv";
+  const REVIEWS_JSON_URL = "/reviews.json";
   const GOOGLE_MAPS_URL = "https://www.google.com/maps/place/Learn+Language+Education+Academy+(Former+%22Learn+German+Ghana%22)/data=!4m2!3m1!1s0x0:0xbd2e1fb7eabd20da?sa=X&ved=1t:2428&ictx=111";
 
   function injectStyles() {
@@ -31,55 +31,29 @@
     document.head.appendChild(style);
   }
 
-  function parseCsv(csv) {
-    const rows = [];
-    let row = [];
-    let value = "";
-    let inQuotes = false;
+  const STAR_RATINGS = {
+    ONE: 1,
+    TWO: 2,
+    THREE: 3,
+    FOUR: 4,
+    FIVE: 5,
+  };
 
-    for (let i = 0; i < csv.length; i += 1) {
-      const char = csv[i];
-      const next = csv[i + 1];
-
-      if (char === '"' && inQuotes && next === '"') {
-        value += '"';
-        i += 1;
-      } else if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === "," && !inQuotes) {
-        row.push(value.trim());
-        value = "";
-      } else if ((char === "\n" || char === "\r") && !inQuotes) {
-        if (char === "\r" && next === "\n") i += 1;
-        row.push(value.trim());
-        value = "";
-        if (row.some(Boolean)) rows.push(row);
-        row = [];
-      } else {
-        value += char;
-      }
-    }
-
-    row.push(value.trim());
-    if (row.some(Boolean)) rows.push(row);
-    return rows;
-  }
-
-  function normalizeReviews(rows) {
-    if (!rows.length) return [];
-    const headers = rows[0].map((header) => String(header || "").trim().toLowerCase());
-    const nameIndex = headers.indexOf("student_name");
-    const ratingIndex = headers.indexOf("rating");
-    const textIndex = headers.indexOf("review_text");
-
-    return rows
-      .slice(1)
-      .map((row) => ({
-        name: row[nameIndex] || "Student",
-        rating: Number(row[ratingIndex] || 5),
-        text: row[textIndex] || "",
+  function normalizeReviews(payload) {
+    const source = Array.isArray(payload?.reviews) ? payload.reviews : [];
+    return source
+      .map((review) => ({
+        name: String(review?.reviewer?.displayName || "Student").trim() || "Student",
+        rating: STAR_RATINGS[String(review?.starRating || "").toUpperCase()] || Number(review?.starRating) || 5,
+        text: String(review?.comment || "").replace(/\s+/g, " ").trim(),
+        createdAt: String(review?.createTime || ""),
       }))
       .filter((review) => review.text)
+      .sort((a, b) => {
+        const ratingDifference = b.rating - a.rating;
+        if (ratingDifference) return ratingDifference;
+        return String(b.createdAt).localeCompare(String(a.createdAt));
+      })
       .slice(0, 3);
   }
 
@@ -99,22 +73,25 @@
     card.className = "card student-reviews-card";
     card.innerHTML = `
       <h2>What students say</h2>
-      <p class="student-reviews-intro">A few comments from students who have learned with Learn Language Education Academy.</p>
+      <p class="student-reviews-intro">Recent Google reviews from students who have learned with Learn Language Education Academy.</p>
       <div class="student-review-grid" id="studentReviewGrid">
         <p class="student-review-empty">Loading student reviews…</p>
       </div>
     `;
     anchor.insertAdjacentElement("afterend", card);
 
-    fetch(REVIEWS_CSV_URL)
-      .then((response) => response.text())
-      .then((csv) => {
-        const reviews = normalizeReviews(parseCsv(csv));
+    fetch(REVIEWS_JSON_URL, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Review file returned ${response.status}`);
+        return response.json();
+      })
+      .then((payload) => {
+        const reviews = normalizeReviews(payload);
         const grid = document.getElementById("studentReviewGrid");
         if (!grid) return;
 
         if (!reviews.length) {
-          grid.innerHTML = '<p class="student-review-empty">Student reviews will appear here when the published review sheet has entries.</p>';
+          grid.innerHTML = '<p class="student-review-empty">Google reviews will appear here when the review export contains written comments.</p>';
           return;
         }
 
