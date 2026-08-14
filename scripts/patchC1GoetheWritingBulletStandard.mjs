@@ -63,4 +63,6 @@ guided = replaceOnce(
 );
 fs.writeFileSync(guidedPagePath, guided);
 
+await import("./patchC1WritingExplicitQuestion.mjs");
+
 console.log("Applied Goethe-style four-point writing structure to C1 opinion tasks and Day 18.");
