@@ -106,7 +106,7 @@ function publicClass(snapshot) {
     endDate,
     totalSessions: Number(data.generatedSessionCount || data.totalSessions || SESSIONS[level] || 24),
     sessionMinutes: Number(data.sessionMinutes || firstRuleDuration || MINUTES[level] || 60),
-    tuitionGhs: Number(data.tuitionGhs || TUITION[level] || 3000),
+    tuitionGhs: Number(level === "A1" ? TUITION.A1 : data.tuitionGhs || TUITION[level] || 3000),
     meetingDays: meetings,
     scheduleUrl: scheduleUrl(data, level, startDate, meetings),
     highlights: Array.isArray(data.highlights) && data.highlights.length ? data.highlights : HIGHLIGHTS[level] || [],
