@@ -23,3 +23,4 @@ if (!source.includes(newWorkspace)) {
 if (!source.includes('taskType="informal-letter"')) throw new Error("B1 Day 2 informal-letter cheat sheet was not installed.");
 fs.writeFileSync(file, source, "utf8");
 console.log("B1 Day 2 now shows the task-matched informal-letter cheat sheet.");
+await import("./patchC1Days26To28SpeakingGuidance.mjs");
