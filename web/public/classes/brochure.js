@@ -147,7 +147,7 @@ const COURSE_TITLES_BY_LEVEL = {
     25: "Wissenschaft und Forschung",
     26: "Nachhaltiger Konsum",
     27: "Digitalisierung und Verwaltung",
-    28: "Review und Transfer",
+    28: "Demografischer Wandel und Generationengerechtigkeit",
   },
 };
 
