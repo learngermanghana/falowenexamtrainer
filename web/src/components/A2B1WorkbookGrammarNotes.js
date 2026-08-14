@@ -23,6 +23,7 @@ import A2Day21EinWochenendePlanenWennObFallsGrammarPage from "./A2Day21EinWochen
 import A2Day22DieWochePlanungGrammarPage from "./A2Day22DieWochePlanungGrammarPage";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage";
 import A2Day24EinenUrlaubPlanenGrammarPage from "./A2Day24EinenUrlaubPlanenGrammarPage";
+import A2Day27DigitaleKommunikationGrammarPage from "./A2Day27DigitaleKommunikationGrammarPage";
 import A2Day28UeberDieZukunftSprechenGrammarPage from "./A2Day28UeberDieZukunftSprechenGrammarPage";
 import A2TopicCollocationPractice from "./A2TopicCollocationPractice";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -72,7 +73,7 @@ const GRAMMAR_NOTES_BY_LEVEL_DAY = {
     19: A2Day19EinkaufenOderDennGrammarPage, 20: A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage,
     21: A2Day21EinWochenendePlanenWennObFallsGrammarPage, 22: A2Day22DieWochePlanungGrammarPage,
     23: A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage, 24: A2Day24EinenUrlaubPlanenGrammarPage,
-    28: A2Day28UeberDieZukunftSprechenGrammarPage,
+    27: A2Day27DigitaleKommunikationGrammarPage, 28: A2Day28UeberDieZukunftSprechenGrammarPage,
   },
   B1: {
     1: B1Day1TraumweltGrammarNotesPage, 2: B1Day2FreundeFuersLebenGrammarNotesPage, 3: B1Day3ErfolgsgeschichtenGrammarNotesPage,
