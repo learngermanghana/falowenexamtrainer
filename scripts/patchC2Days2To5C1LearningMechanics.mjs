@@ -37,3 +37,4 @@ if (!source.includes("EmbeddedSpeechPracticePanel")) throw new Error("C2 Days 2-
 
 fs.writeFileSync(file, source, "utf8");
 console.log("C2 Days 2-5 now mirror the C1 learning mechanics with German-first C2 scaffolding.");
+await import("./patchC2Days6To11C1LearningMechanics.mjs");
