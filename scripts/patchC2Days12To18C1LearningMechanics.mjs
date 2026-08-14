@@ -5,3 +5,4 @@ if(!s.includes(imp)){const a='import C2Days6To11GuidedWorkbookPage from "./C2Day
 const route=' if(day>=12&&day<=18)return <C2Days12To18GuidedWorkbookPage lesson={lesson}/>;';
 if(!s.includes(route)){const a=' const day=Number(lesson?.day||0);';if(!s.includes(a))throw new Error("C2 Days 12-18 route anchor missing");s=s.replace(a,`${a}\n${route}`)}
 if(!s.includes("C2Days12To18GuidedWorkbookPage"))throw new Error("C2 Days 12-18 guided workbook missing");fs.writeFileSync(file,s,"utf8");console.log("C2 Days 12-18 now use the tabbed German-first guided workbook.");
+await import("./patchC2Days19To24C1LearningMechanics.mjs");
