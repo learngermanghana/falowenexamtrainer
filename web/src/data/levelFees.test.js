@@ -2,7 +2,7 @@ import { computeTuitionStatus, getNextLevel, paystackLinkForLevel } from "./leve
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
-    const summary = computeTuitionStatus({ level: "A1", paidAmount: 2800 });
+    const summary = computeTuitionStatus({ level: "A1", paidAmount: 3000 });
 
     expect(summary.balanceDue).toBe(0);
     expect(summary.statusLabel).toBe("Paid");
