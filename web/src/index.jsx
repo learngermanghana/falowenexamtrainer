@@ -34,6 +34,7 @@ import A1Day20Chapter123DirectWorkbookRoute, {
 import A1SpeakingExamIntroEntryRoute, {
   A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
 } from './components/A1SpeakingExamIntroEntryRoute';
+import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
 import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
@@ -43,6 +44,7 @@ const normalizedPublicPath = window.location.pathname.replace(/\/+$/, '') || '/'
 const isFalowenRadioSeoPage = normalizedPublicPath === '/falowen-radio';
 const A1_DAY0_TUTORIAL_ROUTE = '/campus/course/lesson/A1/0';
 const A1_DAY0_WORKBOOK_ROUTE = '/campus/course/a1-day-0-orientation-and-knowledge-test-workbook';
+const A2_DAY27_GRAMMAR_ROUTE = '/campus/course/a2-day-27-digitale-kommunikation-dass-grammar';
 const A1_SHORT_CHAPTER_LESSON_ROUTES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.shortLessonRoute,
 );
@@ -102,6 +104,10 @@ const AuthenticatedAppRoutes = () => (
               path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
               element={<A1ChapterResourceHubRoute level="A1" fallback={<App />} />}
             />
+            <Route
+              path={A2_DAY27_GRAMMAR_ROUTE}
+              element={<A2Day27DigitaleKommunikationGrammarPage />}
+            />
             <Route path="*" element={<App />} />
           </Routes>
         </A1ChapterSpecificLessonRouteBoundary>
@@ -129,4 +135,4 @@ root.render(
 
 reportWebVitals();
 
-export { A1_DAY0_TUTORIAL_ROUTE, A1_DAY0_WORKBOOK_ROUTE };
+export { A1_DAY0_TUTORIAL_ROUTE, A1_DAY0_WORKBOOK_ROUTE, A2_DAY27_GRAMMAR_ROUTE };
