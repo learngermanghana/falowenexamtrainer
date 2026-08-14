@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -17,6 +17,14 @@ export {
   isA1ChapterResourceHubRequest,
   resolveA1ChapterResourceHubEntry,
   shouldNormalizeA1ChapterResourceHubState,
+};
+
+const hasCompletedRadio = (search = "") => {
+  try {
+    return new URLSearchParams(String(search || "")).get("radio") === "done";
+  } catch (_error) {
+    return false;
+  }
 };
 
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
@@ -49,6 +57,15 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
         search: location.search,
       })
     : location.state;
+
+  // Once Falowen Radio is complete, do not render the legacy hub again. The
+  // normalized state already contains the direct workbook route with
+  // `radio=done`; navigating there avoids DOM injectors racing while React is
+  // replacing the hub tree and makes pasted completed-radio URLs deterministic.
+  const completedWorkbookRoute = routeState?.entry?.workbookRoute || routeState?.entry?.workbook_link || "";
+  if (hasCompletedRadio(location.search) && completedWorkbookRoute) {
+    return <Navigate to={completedWorkbookRoute} replace />;
+  }
 
   return (
     <CourseLessonPageLegacy
