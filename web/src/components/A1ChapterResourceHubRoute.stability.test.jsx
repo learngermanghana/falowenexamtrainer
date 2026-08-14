@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
+  buildA1ChapterResourceHubState,
+  isCrossOriginWorkbookRoute,
 } from "./A1ChapterResourceHubRoute";
 
 let mockMountCount = 0;
@@ -81,4 +83,22 @@ test("completed Day 15 Kapitel 4.7 radio URL redirects straight to the workbook"
   expect(await screen.findByTestId("location-probe")).toHaveTextContent(
     "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done",
   );
+});
+
+test("completed external workbook routes are recognized as cross-origin document navigations", () => {
+  const state = buildA1ChapterResourceHubState({
+    level: "A1",
+    day: 18,
+    search: "?radio=done&chapter=12.1&hub=1",
+  });
+  const route = state.entry?.workbookRoute || state.entry?.workbook_link || "";
+
+  expect(route).toMatch(/^https:\/\/drive\.google\.com\//);
+  expect(isCrossOriginWorkbookRoute(route, "https://www.falowen.app")).toBe(true);
+  expect(
+    isCrossOriginWorkbookRoute(
+      "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done",
+      "https://www.falowen.app",
+    ),
+  ).toBe(false);
 });
