@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
 
 export const A1_SPEAKING_EXAM_INTRO_ENTRY_PATH =
   "/campus/course/speaking-exams-intro-4-7";
@@ -15,11 +16,15 @@ export const buildA1SpeakingExamIntroHubDestination = (search = "") => {
   return `/campus/course/lesson/A1/15${query ? `?${query}` : ""}`;
 };
 
-export default function A1SpeakingExamIntroEntryRoute({ workbookElement = null }) {
+export default function A1SpeakingExamIntroEntryRoute() {
   const location = useLocation();
   const query = new URLSearchParams(location.search || "");
 
-  if (query.get("view") === "workbook") return workbookElement;
+  // This entry route already owns the workbook page. Rendering <App /> here
+  // creates descendant <Routes> beneath an exact parent route, which React
+  // Router warns cannot match deeper locations and can fall through to the
+  // homepage. Render the workbook directly instead.
+  if (query.get("view") === "workbook") return <SpeakingExamIntroPage />;
 
   return (
     <Navigate

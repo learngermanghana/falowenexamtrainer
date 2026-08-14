@@ -1,12 +1,19 @@
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { normalizeLesson } from "../data/lessonModel";
 import {
   resolveCanonicalA1LessonRouteEntry,
 } from "../utils/lessonRouteEntry";
-import {
+import A1SpeakingExamIntroEntryRoute, {
   A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
   A1_SPEAKING_EXAM_INTRO_HUB_PATH,
   buildA1SpeakingExamIntroHubDestination,
 } from "./A1SpeakingExamIntroEntryRoute";
+
+jest.mock("./SpeakingExamIntroPage", () => function SpeakingWorkbookProbe() {
+  return <div data-testid="speaking-workbook">Speaking workbook</div>;
+});
 
 describe("A1 speaking-exam self-learning entry flow", () => {
   test("opens the Kapitel 4.7 supporting-resource hub before the workbook", () => {
@@ -19,6 +26,20 @@ describe("A1 speaking-exam self-learning entry flow", () => {
     expect(buildA1SpeakingExamIntroHubDestination("")).toBe(
       A1_SPEAKING_EXAM_INTRO_HUB_PATH,
     );
+  });
+
+  test("renders the workbook directly for completed material URLs instead of nesting App routes", () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done&materials=done",
+        ]}
+      >
+        <A1SpeakingExamIntroEntryRoute />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook");
   });
 
   test("the supporting hub contains teacher and AI videos plus a separate workbook link", () => {
