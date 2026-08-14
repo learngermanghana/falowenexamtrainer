@@ -26,7 +26,7 @@ const renderChecklist = (studentProfile) =>
 
 describe("OnboardingChecklist payment gate", () => {
   it("keeps an unpaid student on the payment checkpoint", () => {
-    renderChecklist({ level: "A1", paymentStatus: "pending", balanceDue: 2800 });
+    renderChecklist({ level: "A1", paymentStatus: "pending", balanceDue: 3000 });
 
     expect(screen.getByTestId("payment-checkpoint")).toBeInTheDocument();
     expect(
@@ -44,7 +44,7 @@ describe("OnboardingChecklist payment gate", () => {
   });
 
   it("shows onboarding after an accepted partial payment", () => {
-    renderChecklist({ level: "A1", paymentStatus: "partial", balanceDue: 800 });
+    renderChecklist({ level: "A1", paymentStatus: "partial", balanceDue: 1000 });
 
     expect(screen.queryByTestId("payment-checkpoint")).not.toBeInTheDocument();
     expect(
