@@ -1,4 +1,5 @@
 import { getA1RadioResource } from "../data/a1RadioResources";
+import { buildA1ChapterResourceHubState } from "../utils/a1ChapterResourceHubState";
 import { resolveA1RadioFirstWorkbookRoute } from "./A1RadioFirstWorkbookRoutes";
 
 describe("A1 Day 15 Speaking Exams Introduction Falowen Radio", () => {
@@ -21,6 +22,19 @@ describe("A1 Day 15 Speaking Exams Introduction Falowen Radio", () => {
         chapter: "4.7",
         youtubeId: "HfNlBfUwGBo",
       }),
+    );
+  });
+
+  test("opens the actual workbook after the Kapitel 4.7 radio is complete", () => {
+    const state = buildA1ChapterResourceHubState({
+      level: "A1",
+      day: 15,
+      search: "?radio=done&chapter=4.7&hub=1",
+    });
+
+    expect(state.entry).toEqual(expect.objectContaining({ chapter: "4.7" }));
+    expect(state.entry.workbookRoute).toBe(
+      "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done",
     );
   });
 
