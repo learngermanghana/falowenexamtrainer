@@ -1,6 +1,6 @@
 import { courseSchedules } from "../data/courseSchedule";
 import { findCourseBookEntry } from "./courseBookEntries";
-import { addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
+import { addA1WorkbookHubBypass, addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
 
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeDay = (value = "") => String(value ?? "").trim();
@@ -34,10 +34,10 @@ export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}
   return resolvedChapter === requestedChapter ? entry : null;
 };
 
-const patchWorkbookRoute = (resource = null, search = "") => {
+const patchWorkbookRoute = (resource = null, search = "", directWorkbookRoute = "") => {
   if (!resource || typeof resource !== "object") return resource;
   const workbookRoute = addCompletedRadioToWorkbookRoute(
-    resource.workbookRoute || resource.workbook_link || "",
+    directWorkbookRoute || resource.workbookRoute || resource.workbook_link || "",
     search,
   );
   if (!workbookRoute) return resource;
@@ -50,24 +50,23 @@ const patchWorkbookRoute = (resource = null, search = "") => {
 
 const preserveCompletedRadioOnEntry = (entry = null, search = "") => {
   if (!entry) return entry;
-  const workbookRoute = addCompletedRadioToWorkbookRoute(
-    entry.workbookRoute || entry.workbook_link || "",
-    search,
-  );
+  const rawWorkbookRoute = entry.workbookRoute || entry.workbook_link || "";
+  const directWorkbookRoute = addA1WorkbookHubBypass({ lesson: entry, workbookRoute: rawWorkbookRoute });
+  const workbookRoute = addCompletedRadioToWorkbookRoute(directWorkbookRoute, search);
 
   return {
     ...entry,
     ...(workbookRoute ? { workbookRoute, workbook_link: workbookRoute } : {}),
     resources: Array.isArray(entry.resources)
-      ? entry.resources.map((resource) => patchWorkbookRoute(resource, search))
+      ? entry.resources.map((resource) => patchWorkbookRoute(resource, search, directWorkbookRoute))
       : entry.resources,
-    primaryResource: patchWorkbookRoute(entry.primaryResource, search),
+    primaryResource: patchWorkbookRoute(entry.primaryResource, search, directWorkbookRoute),
     lesen_hören: Array.isArray(entry.lesen_hören)
-      ? entry.lesen_hören.map((resource) => patchWorkbookRoute(resource, search))
-      : patchWorkbookRoute(entry.lesen_hören, search),
+      ? entry.lesen_hören.map((resource) => patchWorkbookRoute(resource, search, directWorkbookRoute))
+      : patchWorkbookRoute(entry.lesen_hören, search, directWorkbookRoute),
     schreiben_sprechen: Array.isArray(entry.schreiben_sprechen)
-      ? entry.schreiben_sprechen.map((resource) => patchWorkbookRoute(resource, search))
-      : patchWorkbookRoute(entry.schreiben_sprechen, search),
+      ? entry.schreiben_sprechen.map((resource) => patchWorkbookRoute(resource, search, directWorkbookRoute))
+      : patchWorkbookRoute(entry.schreiben_sprechen, search, directWorkbookRoute),
   };
 };
 
