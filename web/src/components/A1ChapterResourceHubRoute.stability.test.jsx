@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import A1ChapterResourceHubRoute, {
   A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from "./A1ChapterResourceHubRoute";
@@ -18,6 +18,11 @@ jest.mock("./CourseLessonPageLegacy", () => function StableLessonProbe() {
   }, []);
   return <div data-testid="stable-lesson">{location.pathname}{location.search}</div>;
 });
+
+function LocationProbe() {
+  const location = useLocation();
+  return <div data-testid="location-probe">{location.pathname}{location.search}</div>;
+}
 
 test("Day 7 chapter hub normalizes once and stays mounted without repeated fetching", async () => {
   mockMountCount = 0;
@@ -58,4 +63,22 @@ test("Day 7 chapter hub normalizes once and stays mounted without repeated fetch
   expect(mockUnmountCount).toBe(0);
   expect(fetchSpy).not.toHaveBeenCalled();
   global.fetch = originalFetch;
+});
+
+test("completed Day 15 Kapitel 4.7 radio URL redirects straight to the workbook", async () => {
+  render(
+    <MemoryRouter initialEntries={["/campus/course/lesson/A1/15?radio=done&chapter=4.7&hub=1"]}>
+      <Routes>
+        <Route
+          path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
+          element={<A1ChapterResourceHubRoute level="A1" />}
+        />
+        <Route path="*" element={<LocationProbe />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+
+  expect(await screen.findByTestId("location-probe")).toHaveTextContent(
+    "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done",
+  );
 });
