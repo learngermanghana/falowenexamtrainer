@@ -41,6 +41,7 @@ if (!testSource.includes(testMarker)) {
 fs.writeFileSync(targetPath, source);
 fs.writeFileSync(testPath, testSource);
 
+await import("./patchA1WorkbookVideoInsertBeforeSafety.mjs");
 await import("./patchA1Day13RevisionClarity.mjs");
 
 console.log("Applied A1 self-practice tutor-navigation safety patch.");
