@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
@@ -26,6 +26,38 @@ const hasCompletedRadio = (search = "") => {
     return false;
   }
 };
+
+export const isCrossOriginWorkbookRoute = (
+  route = "",
+  origin = typeof window !== "undefined" ? window.location.origin : "https://www.falowen.app",
+) => {
+  try {
+    const base = new URL(origin);
+    return new URL(String(route || ""), base).origin !== base.origin;
+  } catch (_error) {
+    return false;
+  }
+};
+
+function CompletedWorkbookNavigation({ route }) {
+  const isExternal = isCrossOriginWorkbookRoute(route);
+
+  useEffect(() => {
+    if (!isExternal || typeof window === "undefined") return;
+    window.location.replace(route);
+  }, [isExternal, route]);
+
+  if (isExternal) {
+    return (
+      <div style={{ padding: 24 }}>
+        <p>Opening workbook…</p>
+        <a href={route}>Continue to workbook</a>
+      </div>
+    );
+  }
+
+  return <Navigate to={route} replace />;
+}
 
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
   const location = useLocation();
@@ -58,13 +90,12 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
       })
     : location.state;
 
-  // Once Falowen Radio is complete, do not render the legacy hub again. The
-  // normalized state already contains the direct workbook route with
-  // `radio=done`; navigating there avoids DOM injectors racing while React is
-  // replacing the hub tree and makes pasted completed-radio URLs deterministic.
+  // Once Falowen Radio is complete, do not render the legacy hub again. Internal
+  // workbooks can use React Router, while cross-origin workbooks must use a real
+  // document navigation because history.replaceState cannot change origins.
   const completedWorkbookRoute = routeState?.entry?.workbookRoute || routeState?.entry?.workbook_link || "";
   if (hasCompletedRadio(location.search) && completedWorkbookRoute) {
-    return <Navigate to={completedWorkbookRoute} replace />;
+    return <CompletedWorkbookNavigation route={completedWorkbookRoute} />;
   }
 
   return (
