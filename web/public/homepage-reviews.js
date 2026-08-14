@@ -1,30 +1,49 @@
 (function () {
-  var featuredReviews = [
-    {
-      name: "Bridgette Baah",
-      rating: 5,
-      text: "Falowen has excellent learning tools that make studying really convenient. On the student website, you get access to grammar notes, workbooks, and recorded lectures, so it’s easy to catch up if you miss a class. There are also exam practice tools, including AI features that support self-study."
-    },
-    {
-      name: "Bismark Biney",
-      rating: 5,
-      text: "Great lessons, top-notch AI-powered tools, conducive environment, flexible schedules, and highly interactive class. German skills improved. Big thanks to Mr. Felix for this amazing opportunity!"
-    },
-    {
-      name: "Afua Asamoah Larbi",
-      rating: 5,
-      text: "Felix is an amazing teacher; always ready to help and push you beyond your limit. My transition from A1 to A2 was smooth. All thanks to his patience and innovation! The Falowen app was also very helpful."
-    }
-  ];
+  var STAR_VALUES = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function normalize(raw) {
+    return (raw && Array.isArray(raw.reviews) ? raw.reviews : []).map(function (review) {
+      return {
+        name: review && review.reviewer && review.reviewer.displayName ? review.reviewer.displayName : "Google reviewer",
+        rating: STAR_VALUES[review && review.starRating] || 0,
+        text: review && review.comment ? review.comment.trim() : "",
+        createdAt: review && review.createTime ? review.createTime : ""
+      };
+    }).filter(function (review) { return review.rating > 0; });
+  }
 
   function stars(count) {
     return "★★★★★".slice(0, count);
   }
 
-  function mountReviews() {
+  function summary(reviews) {
+    if (!reviews.length) return { average: "–", count: 0 };
+    var total = reviews.reduce(function (sum, review) { return sum + review.rating; }, 0);
+    return { average: (total / reviews.length).toFixed(1), count: reviews.length };
+  }
+
+  function selectFeatured(reviews) {
+    var writtenFiveStar = reviews.filter(function (review) { return review.rating === 5 && review.text; });
+    return writtenFiveStar.slice(0, 3);
+  }
+
+  function mountReviews(reviews) {
     if (document.getElementById("falowen-google-reviews")) return true;
     var shell = document.querySelector(".falowen-home-shell");
     if (!shell) return false;
+
+    var featuredReviews = selectFeatured(reviews);
+    if (!featuredReviews.length) return true;
+    var stats = summary(reviews);
 
     var section = document.createElement("section");
     section.id = "falowen-google-reviews";
@@ -38,17 +57,17 @@
           '<h2 id="falowen-google-reviews-title">Trusted by German learners in Ghana and abroad</h2>' +
           '<p>Real feedback from learners using Falowen and Learn Language Education Academy.</p>' +
         '</div>' +
-        '<div class="falowen-google-reviews__score" aria-label="4.6 out of 5 on Google from 107 reviews">' +
-          '<strong>4.6 <span aria-hidden="true">★</span></strong>' +
-          '<span>107 Google reviews</span>' +
+        '<div class="falowen-google-reviews__score" aria-label="' + stats.average + ' out of 5 from ' + stats.count + ' exported Google reviews">' +
+          '<strong>' + stats.average + ' <span aria-hidden="true">★</span></strong>' +
+          '<span>' + stats.count + ' exported Google reviews</span>' +
         '</div>' +
       '</div>' +
       '<div class="falowen-google-reviews__grid">' +
         featuredReviews.map(function (review) {
           return '<article class="falowen-google-review-card">' +
             '<div class="falowen-google-review-card__stars" aria-label="' + review.rating + ' out of 5 stars">' + stars(review.rating) + '</div>' +
-            '<p>“' + review.text + '”</p>' +
-            '<footer><strong>' + review.name + '</strong><span>Google Review</span></footer>' +
+            '<p>“' + escapeHtml(review.text) + '”</p>' +
+            '<footer><strong>' + escapeHtml(review.name) + '</strong><span>Google Review</span></footer>' +
           '</article>';
         }).join("") +
       '</div>' +
@@ -62,7 +81,7 @@
       '.falowen-google-reviews__eyebrow{display:inline-block;color:#1d4ed8;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}' +
       '.falowen-google-reviews h2{margin:0;font-size:clamp(24px,4vw,32px);letter-spacing:-.02em}' +
       '.falowen-google-reviews__header p{margin:7px 0 0;color:#475569;line-height:1.6}' +
-      '.falowen-google-reviews__score{min-width:160px;border:1px solid #fde68a;background:#fffbeb;border-radius:16px;padding:13px 16px;display:grid;gap:3px}' +
+      '.falowen-google-reviews__score{min-width:190px;border:1px solid #fde68a;background:#fffbeb;border-radius:16px;padding:13px 16px;display:grid;gap:3px}' +
       '.falowen-google-reviews__score strong{font-size:24px;color:#92400e}' +
       '.falowen-google-reviews__score span{font-size:13px;font-weight:800;color:#78350f}' +
       '.falowen-google-reviews__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}' +
@@ -82,13 +101,21 @@
     return true;
   }
 
-  if (!mountReviews()) {
+  function start(reviews) {
+    if (mountReviews(reviews)) return;
     var attempts = 0;
     var timer = window.setInterval(function () {
       attempts += 1;
-      if (mountReviews() || attempts > 40) window.clearInterval(timer);
+      if (mountReviews(reviews) || attempts > 40) window.clearInterval(timer);
     }, 250);
+    window.addEventListener("falowen:app-mounted", function () { mountReviews(reviews); });
   }
 
-  window.addEventListener("falowen:app-mounted", mountReviews);
+  fetch("/reviews.json", { cache: "no-store" })
+    .then(function (response) {
+      if (!response.ok) throw new Error("Reviews request failed");
+      return response.json();
+    })
+    .then(function (raw) { start(normalize(raw)); })
+    .catch(function (error) { console.error("Could not load Google reviews", error); });
 })();
