@@ -43,6 +43,34 @@ const SPEAKING_EXAMPLES_BY_DAY = {
     "Wohnung kontrollieren": "Beispiel: „Bei der Besichtigung würde ich besonders auf Fenster, Lärm und mögliche Mängel achten.“",
     "Höfliche Formulierungen": "Beispiel: „Wäre Samstag um 14 Uhr möglich?“ ist höflicher als eine direkte Forderung.",
   },
+  6: {
+    "Leben in der Stadt": "Beispiel: „Einerseits bietet das Leben in der Stadt viele Vorteile, weil Arbeitsplätze, Geschäfte und öffentliche Verkehrsmittel leicht erreichbar sind.“",
+    "Leben auf dem Land": "Beispiel: „Das Leben auf dem Land ist oft ruhiger und näher an der Natur, allerdings sind die Wege zur Arbeit oder zum Einkaufen manchmal länger.“",
+  },
+  7: {
+    "Fast Food": "Beispiel: „Einerseits ist Fast Food schnell und praktisch, andererseits enthält es oft viel Fett, Salz oder Zucker.“",
+    "Hausmannskost": "Beispiel: „Hausmannskost kann gesünder sein, weil man frische Zutaten verwenden und selbst entscheiden kann, wie das Essen zubereitet wird.“",
+  },
+  8: {
+    "Gesunde Ernährung": "Beispiel: „Eine ausgewogene Ernährung ist wichtig, weil Obst, Gemüse und ausreichend Wasser den Körper mit wichtigen Nährstoffen versorgen.“",
+    "Bewegung und Sport": "Beispiel: „Regelmäßige Bewegung stärkt den Körper und kann gleichzeitig helfen, Stress abzubauen.“",
+    "Mentale Gesundheit": "Beispiel: „Für meine mentale Gesundheit versuche ich genug zu schlafen und mir bewusst Zeit für Familie, Freunde und Hobbys zu nehmen.“",
+    "Gesundheitsvorsorge": "Beispiel: „Regelmäßige Kontrolluntersuchungen sind sinnvoll, weil gesundheitliche Probleme dadurch früh erkannt werden können.“",
+  },
+  9: {
+    "Definition und Bedeutung": "Beispiel: „Eine gute Work-Life-Balance bedeutet für mich, dass Arbeit wichtig ist, aber trotzdem genug Zeit für Familie, Freunde und Erholung bleibt.“",
+    "Herausforderungen und Probleme": "Beispiel: „Ein großes Problem sind Überstunden und ständige Erreichbarkeit, weil man dadurch nach der Arbeit schwer abschalten kann.“",
+    "Strategien für eine bessere Balance": "Beispiel: „Eine hilfreiche Strategie ist, klare Arbeitszeiten festzulegen und nach Feierabend berufliche Nachrichten nicht mehr zu beantworten.“",
+    "Vorteile einer guten Work-Life-Balance": "Beispiel: „Eine gute Balance kann Stress reduzieren und gleichzeitig Motivation, Gesundheit und Produktivität verbessern.“",
+    "Zukunft der Work-Life-Balance": "Beispiel: „Ich glaube, dass flexible Arbeitszeiten und die Vier-Tage-Woche in Zukunft eine größere Rolle spielen werden.“",
+  },
+  10: {
+    "Warum ist eine digitale Auszeit wichtig?": "Beispiel: „Eine digitale Auszeit kann Stress reduzieren, weil man nicht ständig Nachrichten und Benachrichtigungen kontrolliert.“",
+    "Selbstfürsorge im Alltag": "Beispiel: „Zur Selbstfürsorge gehört für mich, genug zu schlafen, mich zu bewegen und regelmäßig Zeit ohne Handy zu verbringen.“",
+    "Herausforderungen": "Beispiel: „Eine Schwierigkeit ist, dass viele Menschen ihr Smartphone für Arbeit, Studium und soziale Kontakte brauchen.“",
+    "Strategien für eine erfolgreiche Auszeit": "Beispiel: „Eine gute Strategie ist, jeden Abend eine feste handyfreie Stunde einzuplanen.“",
+    "Gesunder Umgang mit Technik": "Beispiel: „Ein gesunder Umgang mit Technik bedeutet nicht, ganz darauf zu verzichten, sondern Bildschirmzeit bewusst zu begrenzen.“",
+  },
 };
 
 const WRITING_SUPPORT_BY_DAY = {
@@ -160,7 +188,7 @@ const addSpeakingIdeaExamples = (root = document) => {
 
   let changed = 0;
   Object.entries(examples).forEach(([title, example]) => {
-    const heading = Array.from(speakingSection.querySelectorAll("strong")).find(
+    const heading = Array.from(speakingSection.querySelectorAll("strong, h3")).find(
       (node) => String(node.textContent || "").trim() === title,
     );
     if (!heading) return;
