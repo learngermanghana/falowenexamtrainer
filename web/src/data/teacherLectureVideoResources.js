@@ -44,7 +44,15 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
       },
     ],
   },
-  B1: {},
+  B1: {
+    2: [
+      {
+        chapter: "1.2",
+        topic: "Freunde fürs Leben",
+        url: "https://youtu.be/Br-ISFAAfoI",
+      },
+    ],
+  },
 };
 
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
