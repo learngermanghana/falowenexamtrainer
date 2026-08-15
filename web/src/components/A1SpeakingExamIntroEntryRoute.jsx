@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
+import { ExamProvider } from "../context/ExamContext";
 
 export const A1_SPEAKING_EXAM_INTRO_ENTRY_PATH =
   "/campus/course/speaking-exams-intro-4-7";
@@ -20,11 +21,17 @@ export default function A1SpeakingExamIntroEntryRoute() {
   const location = useLocation();
   const query = new URLSearchParams(location.search || "");
 
-  // This entry route already owns the workbook page. Rendering <App /> here
-  // creates descendant <Routes> beneath an exact parent route, which React
-  // Router warns cannot match deeper locations and can fall through to the
-  // homepage. Render the workbook directly instead.
-  if (query.get("view") === "workbook") return <SpeakingExamIntroPage />;
+  // This route is mounted outside App, so it also sits outside the provider
+  // normally installed by AppShell. Keep rendering the workbook directly to
+  // avoid nested Routes, but restore the exam context expected by shared
+  // campus navigation and workbook controls.
+  if (query.get("view") === "workbook") {
+    return (
+      <ExamProvider>
+        <SpeakingExamIntroPage />
+      </ExamProvider>
+    );
+  }
 
   return (
     <Navigate
