@@ -71,6 +71,41 @@ const SPEAKING_EXAMPLES_BY_DAY = {
     "Strategien für eine erfolgreiche Auszeit": "Beispiel: „Eine gute Strategie ist, jeden Abend eine feste handyfreie Stunde einzuplanen.“",
     "Gesunder Umgang mit Technik": "Beispiel: „Ein gesunder Umgang mit Technik bedeutet nicht, ganz darauf zu verzichten, sondern Bildschirmzeit bewusst zu begrenzen.“",
   },
+  11: {
+    "Warum sind Teamspiele wichtig?": "Beispiel: „Teamspiele sind wichtig, weil man lernt, klar zu kommunizieren, Verantwortung zu übernehmen und gemeinsam Lösungen zu finden.“",
+    "Beliebte Teamspiele": "Beispiel: „Fußball ist ein typisches Teamspiel, weil alle Spieler zusammenarbeiten müssen, um ein gemeinsames Ziel zu erreichen.“",
+    "Kooperative Aktivitäten im Alltag": "Beispiel: „Auch bei einem Schulprojekt ist Zusammenarbeit wichtig, weil jeder eine Aufgabe übernimmt und zum Ergebnis beiträgt.“",
+    "Herausforderungen": "Beispiel: „Ein Nachteil von Teamarbeit ist, dass unterschiedliche Meinungen zu Konflikten führen können.“",
+    "Strategien für erfolgreiches Teamwork": "Beispiel: „Gutes Teamwork gelingt besser, wenn alle einander zuhören, Aufgaben fair verteilen und Probleme ruhig besprechen.“",
+  },
+  12: {
+    "1. Natur": "Beispiel: „Mein schönstes Naturerlebnis war in den Bergen, weil die Landschaft ruhig war und die Aussicht mich beeindruckt hat.“",
+    "2. Abenteuer": "Beispiel: „Ich war mit Freunden wandern und wir haben eine Nacht im Zelt verbracht.“",
+    "3. Erlebnisse": "Beispiel: „Besonders schön war, dass wir draußen gekocht und am Abend den Sonnenuntergang gesehen haben.“",
+    "4. Herausforderungen": "Beispiel: „Eine Herausforderung war der starke Regen, aber wir sind ruhig geblieben und haben einen sicheren Platz gefunden.“",
+  },
+  13: {
+    "1. Handlung": "Beispiel: „Der Film handelt von einer Familie, die nach einem unerwarteten Ereignis ihr Leben neu organisieren muss.“",
+    "2. Schauspiel": "Beispiel: „Die Hauptdarstellerin spielt ihre Rolle sehr überzeugend, weil ihre Gefühle natürlich wirken.“",
+    "3. Atmosphäre": "Beispiel: „Die Musik und die dunklen Farben schaffen eine spannende und manchmal geheimnisvolle Atmosphäre.“",
+    "4. Regie und Produktion": "Beispiel: „Die Regie ist gelungen, weil die Geschichte klar erzählt wird und die Bilder gut zur Handlung passen.“",
+    "5. Empfehlung": "Beispiel: „Ich würde den Film empfehlen, weil die Geschichte spannend ist und gleichzeitig eine interessante Botschaft hat.“",
+  },
+  14: {
+    "1. Lernumgebung": "Beispiel: „Beim traditionellen Lernen sitzt man im Klassenzimmer, während digitales Lernen auch von zu Hause möglich ist.“",
+    "2. Methoden": "Beispiel: „Digitales Lernen bietet Videos und interaktive Übungen, während man traditionell oft mit Büchern und handschriftlichen Notizen arbeitet.“",
+    "3. Interaktion und Kommunikation": "Beispiel: „Im Klassenzimmer ist der direkte Kontakt einfacher, während digitale Kurse mehr technische Kommunikation brauchen.“",
+    "4. Flexibilität und Zeitmanagement": "Beispiel: „Ein großer Vorteil des digitalen Lernens ist, dass man häufig selbst entscheiden kann, wann und wo man lernt.“",
+    "5. Vor- und Nachteile": "Beispiel: „Einerseits ist digitales Lernen flexibel, andererseits können technische Probleme und fehlender persönlicher Kontakt Nachteile sein.“",
+    "6. Eigene Meinung": "Beispiel: „Ich glaube, dass eine Kombination aus traditionellem und digitalem Lernen am besten ist.“",
+  },
+  15: {
+    "1. Medien im Homeoffice": "Beispiel: „Im Homeoffice braucht man digitale Medien wie E-Mail und Videokonferenzen, um mit Kollegen in Kontakt zu bleiben.“",
+    "2. Vorteile des Homeoffice": "Beispiel: „Ein großer Vorteil des Homeoffice ist, dass man Zeit und Geld spart, weil der Arbeitsweg wegfällt.“",
+    "3. Nachteile des Homeoffice": "Beispiel: „Andererseits können soziale Kontakte fehlen und die Grenze zwischen Arbeit und Freizeit kann schwieriger werden.“",
+    "4. Medienkompetenz und digitale Tools": "Beispiel: „Wer im Homeoffice arbeitet, sollte digitale Programme sicher benutzen und auf Datenschutz achten können.“",
+    "5. Eigene Meinung": "Beispiel: „Meiner Meinung nach ist eine Mischung aus Homeoffice und Büro die beste Lösung.“",
+  },
 };
 
 const WRITING_SUPPORT_BY_DAY = {
@@ -243,6 +278,20 @@ const addWritingSupport = (root = document) => {
   return 1;
 };
 
+const normalizeDay13WritingSource = (root = document) => {
+  if (getB1Day() !== 13) return 0;
+  const writingSection = Array.from(root.querySelectorAll("section")).find((section) =>
+    /Teil 2\s*[·-]\s*Schreiben/i.test(String(section.textContent || "")),
+  );
+  if (!writingSection) return 0;
+  const paragraph = Array.from(writingSection.querySelectorAll("p")).find((node) =>
+    /Students are to write an essay expressing their opinion/i.test(String(node.textContent || "")),
+  );
+  if (!paragraph) return 0;
+  paragraph.textContent = "Schreiben Sie Ihre Meinung zur Frage: Sind spannende Filme besser als ruhige Filme? Begründen Sie Ihre Position, nennen Sie Vor- und Nachteile und geben Sie ein passendes Beispiel.";
+  return 1;
+};
+
 export const standardizeB1SpeakingStructures = (root = document) => {
   if (typeof window === "undefined" || !isB1WorkbookRoute()) return 0;
   const headings = Array.from(root.querySelectorAll("h2, h3, h4, strong")).filter(headingMatches);
@@ -278,6 +327,7 @@ export const standardizeB1SpeakingStructures = (root = document) => {
 
   changed += addSpeakingIdeaExamples(root);
   changed += addWritingSupport(root);
+  changed += normalizeDay13WritingSource(root);
   return changed;
 };
 
