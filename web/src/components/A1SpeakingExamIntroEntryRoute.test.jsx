@@ -10,9 +10,14 @@ import A1SpeakingExamIntroEntryRoute, {
   A1_SPEAKING_EXAM_INTRO_HUB_PATH,
   buildA1SpeakingExamIntroHubDestination,
 } from "./A1SpeakingExamIntroEntryRoute";
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ studentProfile: null, saveStudentProfile: jest.fn() }),
+}));
 
 jest.mock("./SpeakingExamIntroPage", () => function SpeakingWorkbookProbe() {
-  return <div data-testid="speaking-workbook">Speaking workbook</div>;
+  const { useExam } = require("../context/ExamContext");
+  const { level } = useExam();
+  return <div data-testid="speaking-workbook">Speaking workbook ({level})</div>;
 });
 
 describe("A1 speaking-exam self-learning entry flow", () => {
@@ -39,7 +44,7 @@ describe("A1 speaking-exam self-learning entry flow", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook");
+    expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook (A1)");
   });
 
   test("the supporting hub contains teacher and AI videos plus a separate workbook link", () => {
