@@ -31,6 +31,37 @@ const buildStandardList = (sourceList) => {
   return list;
 };
 
+const buildSpeakingTask = () => {
+  const box = document.createElement("div");
+  box.setAttribute("data-b1-argument-speaking-task", "true");
+  box.style.cssText = "border:1px solid #bfdbfe;border-radius:10px;padding:12px;background:#eff6ff;display:grid;gap:8px;line-height:1.65;";
+
+  const title = document.createElement("strong");
+  title.textContent = "Ihre Aufgabe: Vorteile, Nachteile und Meinung";
+  box.appendChild(title);
+
+  const intro = document.createElement("p");
+  intro.style.margin = "0";
+  intro.textContent = "Benutzen Sie das Thema dieser Lektion und sprechen Sie in diesen Schritten:";
+  box.appendChild(intro);
+
+  const list = document.createElement("ol");
+  list.style.cssText = "margin:0;padding-left:20px;line-height:1.75;";
+  [
+    "Nennen Sie einen Vorteil.",
+    "Geben Sie ein konkretes Beispiel.",
+    "Nennen Sie einen Nachteil.",
+    "Geben Sie ein konkretes Beispiel.",
+    "Sagen und begründen Sie Ihre eigene Meinung.",
+  ].forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    list.appendChild(item);
+  });
+  box.appendChild(list);
+  return box;
+};
+
 const findSpeakingSection = (heading) => {
   const section = heading.closest("section");
   if (!section) return null;
@@ -73,6 +104,12 @@ export const standardizeB1SpeakingStructures = (root = document) => {
     if (anchor && heading.previousElementSibling !== anchor) {
       anchor.insertAdjacentElement("afterend", heading);
       heading.insertAdjacentElement("afterend", list);
+      changed += 1;
+    }
+
+    if (!section.querySelector('[data-b1-argument-speaking-task="true"]')) {
+      const task = buildSpeakingTask();
+      heading.insertAdjacentElement("beforebegin", task);
       changed += 1;
     }
   });
