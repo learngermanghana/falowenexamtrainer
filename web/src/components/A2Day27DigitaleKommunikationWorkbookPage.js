@@ -4,7 +4,6 @@ import A2Days26To28LearningUpgrade from "./A2Days26To28LearningUpgrade";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
-import { styles } from "../styles";
 
 const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -60,13 +59,6 @@ const speakingContent = <>
     <strong>Model answer</strong>
     <p style={paragraph}>Ich benutze am meisten WhatsApp und E-Mail. WhatsApp nutze ich jeden Tag, weil es schnell und praktisch ist. Ich finde, dass E-Mails im Beruf sehr wichtig sind, weil man Informationen gut organisieren kann. Soziale Medien sind praktisch, aber sie können auch viel Zeit kosten. Zum Beispiel schalte ich beim Lernen meine Benachrichtigungen aus. Deshalb versuche ich, digitale Medien bewusst zu benutzen.</p>
   </div>
-
-  <a
-    href="/campus/course/a2-day-27-digitale-kommunikation-dass-grammar"
-    style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
-  >
-    Open Day 27 grammar notes · dass-Sätze
-  </a>
 </>;
 
 const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="E-Mail an den Kundenservice">
