@@ -121,7 +121,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
     fallbackAssignmentKey="A1-9"
     title="A1 · Day 16 Workbook · Negation and Food"
     subtitle="Chapter 9 · Tutor-marked assignment"
-    assignmentIntro="Complete all four parts below. Then open Submit and send your numbered answers and writing task to your tutor."
+    assignmentIntro="Complete all three parts below. Then open Submit and send your numbered answers and writing task to your tutor."
     submitTitle="Submit A1 · Day 16 · Chapter 9"
     submitDescription="This submission is locked to A1-9, so your Chapter 9 work is saved under the correct tutor-marked assignment."
   >
@@ -148,7 +148,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
         />
         <h2 style={{ margin: 0 }}>Teil 1 · Lesen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instructions:</strong> Read the text and choose the correct answer. Only one answer is correct.
+          <strong>Instructions:</strong> Read the text and choose the correct answer for questions 1–10. Only one answer is correct.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Text:</strong> Ich gehe oft in den Supermarkt, um Lebensmittel zu kaufen. Ich mag frisches Obst und Gemüse.
@@ -158,15 +158,11 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
           und Bohnen. Am Wochenende backen wir oft einen Kuchen. Wir alle mögen Schokolade im Kuchen. Mein Hund mag keinen
           Kuchen, aber er mag Kekse.
         </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Fragen zum Lesen</h2>
         <QuestionList questions={readingQuestions} />
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hörverstehen</h2>
+        <h2 style={{ margin: 0 }}>Teil 2 · Hörverstehen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Thema:</strong> Lebensmittel, mögen and negation. Listen to the material, then answer questions 1–5.
         </p>
@@ -179,7 +175,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 4 · Schreiben</h2>
+        <h2 style={{ margin: 0 }}>Teil 3 · Schreiben</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Schreiben Sie einen kurzen Text über Ihre Essgewohnheiten. Answer all three questions in complete sentences.
         </p>
