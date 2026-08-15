@@ -1,10 +1,10 @@
 const STANDARD_TITLE = "Suggested answer structure";
 const STANDARD_ITEMS = [
   ["Thema vorstellen", "„Heute möchte ich über [Thema] sprechen.“"],
-  ["Vorteile", "„Ein Vorteil ist, dass ...“ / „Außerdem ...“"],
-  ["Nachteile", "„Ein Nachteil ist, dass ...“ / „Andererseits ...“"],
+  ["Vorteile", "„Einerseits bietet dieses Thema viele Vorteile. Ein Beispiel dafür ist, dass ...“"],
+  ["Nachteile", "„Andererseits gibt es auch einige Nachteile. Ein Beispiel dafür ist, dass ...“"],
   ["Situation in deinem Land", "„In meinem Land ist die Situation so, dass ...“"],
-  ["Eigene Meinung", "„Meiner Meinung nach ...“ / „Ich bin der Meinung, dass ...“"],
+  ["Eigene Meinung", "„Meiner Meinung nach ...“ / „Ich bin der Meinung, dass ...“ / „Ich glaube, dass ...“"],
   ["Schluss", "„Zusammenfassend lässt sich sagen, dass ...“ / „Vielen Dank fürs Zuhören.“"],
 ];
 
