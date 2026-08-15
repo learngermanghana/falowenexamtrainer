@@ -72,7 +72,7 @@ const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultIma
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", lesenText, lesenQuestions = [], hoerenTask, hoerenAudioUrl, hoerenQuestions = [] }) => {
-  const [activeTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const assignmentKey = `A2-${chapter}`;
   const resolvedWorkbookId = workbookId || `A2Day${day}Workbook`;
