@@ -52,6 +52,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/Br-ISFAAfoI",
       },
     ],
+    3: [
+      {
+        chapter: "1.3",
+        topic: "Erfolgsgeschichten",
+        url: "https://youtu.be/qosa1oXKZE4",
+      },
+    ],
   },
 };
 
