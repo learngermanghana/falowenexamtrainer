@@ -112,7 +112,7 @@ export default function B1Day4WohnungSuchenWorkbookPage() {
             submissionNote="Prepare a 1–2 minute answer for class. Teil 1 is not submitted."
           >
             <p style={{ margin: 0 }}>
-              Vergleichen Sie beide Methoden, nennen Sie mindestens einen Vorteil und einen Nachteil und geben Sie ein konkretes Beispiel. Verwenden Sie mindestens zwei zweiteilige Konnektoren.
+              Vergleichen Sie beide Methoden. Nennen Sie einen Vorteil mit Beispiel, einen Nachteil mit Beispiel und sagen Sie am Ende Ihre eigene Meinung.
             </p>
           </WorkbookTaskCard>
           <p style={{ margin: 0, color: "#475569" }}>The cards below are supporting ideas, not separate questions.</p>
@@ -124,7 +124,18 @@ export default function B1Day4WohnungSuchenWorkbookPage() {
               </div>
             ))}
           </div>
-          <NoteBox tone="green">Beispiel: „Sowohl Online-Portale als auch persönliche Kontakte können hilfreich sein, aber persönliche Kontakte sind oft schneller.“</NoteBox>
+
+          <h3 style={sectionTitle}>Suggested answer structure</h3>
+          <ol style={listSpacing}>
+            <li><strong>Thema vorstellen:</strong> „Heute möchte ich über die Wohnungssuche sprechen.“</li>
+            <li><strong>Vorteile:</strong> „Einerseits bietet diese Methode viele Vorteile. Ein Beispiel dafür ist, dass ...“</li>
+            <li><strong>Nachteile:</strong> „Andererseits gibt es auch einige Nachteile. Ein Beispiel dafür ist, dass ...“</li>
+            <li><strong>Situation / Erfahrung:</strong> „In meinem Land / Aus meiner Erfahrung ist die Situation so, dass ...“</li>
+            <li><strong>Eigene Meinung:</strong> „Meiner Meinung nach ...“ / „Ich bin der Meinung, dass ...“ / „Ich glaube, dass ...“</li>
+            <li><strong>Schluss:</strong> „Zusammenfassend lässt sich sagen, dass ...“</li>
+          </ol>
+
+          <NoteBox tone="green">Beispiel: „Einerseits bieten Online-Portale eine große Auswahl. Andererseits gibt es dort oft sehr viele Bewerber. Ich glaube, dass persönliche Kontakte bei der Wohnungssuche besonders hilfreich sein können.“</NoteBox>
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </section>
@@ -135,9 +146,26 @@ export default function B1Day4WohnungSuchenWorkbookPage() {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Schreiben Sie Ihre Meinung: Wohnung suchen und persönliche Kontakte."
+            title="Sind persönliche Kontakte bei der Wohnungssuche hilfreicher als Online-Portale?"
             submissionNote="Write approximately 80 words and submit your final text through the Submit tab."
           >
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Schreiben Sie Ihre <strong>eigene Meinung</strong> zu der Frage, ob persönliche Kontakte bei der Wohnungssuche hilfreicher sind als Online-Portale. Begründen Sie Ihre Meinung und geben Sie ein konkretes Beispiel.
+            </p>
+          </WorkbookTaskCard>
+
+          <div style={questionCardStyle}>
+            <strong>Beispielmeinung aus dem Online-Gästebuch</strong>
+            <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>
+              Lesen Sie Marias Meinung als Beispiel. Sie müssen nicht direkt darauf reagieren.
+            </p>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              <strong>Maria:</strong> „Ich finde persönliche Kontakte bei der Wohnungssuche sehr hilfreich. Freunde oder Bekannte wissen manchmal von einer freien Wohnung, bevor sie online angeboten wird. Andererseits bieten Online-Portale eine größere Auswahl, aber dort bewerben sich oft sehr viele Menschen. Ich glaube, dass persönliche Kontakte besonders in großen Städten ein Vorteil sind.“
+            </p>
+          </div>
+
+          <div style={questionCardStyle}>
+            <strong>Schreiben Sie jetzt Ihre Meinung.</strong>
             <ol style={listSpacing}>
               <li>Führen Sie kurz in das Thema ein.</li>
               <li>Sagen Sie, ob persönliche Kontakte hilfreich sind.</li>
@@ -145,8 +173,9 @@ export default function B1Day4WohnungSuchenWorkbookPage() {
               <li>Nennen Sie einen Vorteil oder Nachteil von Online-Portalen.</li>
               <li>Geben Sie ein Beispiel und formulieren Sie einen Schluss.</li>
             </ol>
-          </WorkbookTaskCard>
-          <NoteBox tone="green">Verwenden Sie mindestens zwei zweiteilige Konnektoren.</NoteBox>
+          </div>
+
+          <NoteBox tone="green">Verwenden Sie möglichst: „Einerseits ...“, „Andererseits ...“, „Ein Beispiel dafür ist, dass ...“ und „Ich glaube, dass ...“.</NoteBox>
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
