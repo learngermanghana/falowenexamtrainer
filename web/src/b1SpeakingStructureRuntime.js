@@ -106,6 +106,41 @@ const SPEAKING_EXAMPLES_BY_DAY = {
     "4. Medienkompetenz und digitale Tools": "Beispiel: „Wer im Homeoffice arbeitet, sollte digitale Programme sicher benutzen und auf Datenschutz achten können.“",
     "5. Eigene Meinung": "Beispiel: „Meiner Meinung nach ist eine Mischung aus Homeoffice und Büro die beste Lösung.“",
   },
+  16: {
+    "1. Ursachen von Prüfungsangst": "Beispiel: „Prüfungsangst entsteht oft, wenn man sich nicht gut vorbereitet fühlt oder sehr hohe Erwartungen an sich selbst hat.“",
+    "2. Symptome von Prüfungsangst": "Beispiel: „Ein typisches Symptom ist, dass man nervös wird, sich schlecht konzentrieren kann oder sogar einen Blackout bekommt.“",
+    "3. Strategien zur Stressbewältigung": "Beispiel: „Mir hilft es, frühzeitig zu lernen, Pausen zu machen und vor der Prüfung ruhig zu atmen.“",
+    "4. Tipps für die Prüfung": "Beispiel: „Während der Prüfung sollte man die Aufgaben genau lesen und zuerst die Fragen beantworten, die man sicher lösen kann.“",
+    "5. Eigene Erfahrungen und Meinung": "Beispiel: „Ich glaube, dass etwas Nervosität normal ist, aber gute Vorbereitung kann die Prüfungsangst deutlich reduzieren.“",
+  },
+  17: {
+    "1. Lernmethoden": "Beispiel: „Ich lerne besonders gut, wenn ich Notizen mache und den Stoff später mit eigenen Worten wiederhole.“",
+    "2. Lernumgebung": "Beispiel: „Eine ruhige Lernumgebung hilft mir, weil ich mich dort besser konzentrieren und Ablenkungen vermeiden kann.“",
+    "3. Zeitmanagement": "Beispiel: „Ich plane feste Lernzeiten und kurze Pausen ein, damit ich über längere Zeit konzentriert bleiben kann.“",
+    "4. Motivation und Konzentration": "Beispiel: „Realistische Ziele motivieren mich, weil ich kleine Fortschritte schneller erkennen kann.“",
+    "5. Eigene Erfahrungen und Meinung": "Beispiel: „Meiner Meinung nach gibt es nicht nur eine richtige Lernmethode, weil jeder Mensch anders lernt.“",
+  },
+  18: {
+    "1. Traumberuf finden": "Beispiel: „Um meinen Wunschberuf zu finden, sollte ich zuerst meine Interessen und persönlichen Stärken kennen.“",
+    "2. Ausbildung und Qualifikation": "Beispiel: „Für manche Berufe braucht man ein Studium, während andere über eine Ausbildung oder Weiterbildung erreichbar sind.“",
+    "3. Bewerbungsprozess": "Beispiel: „Zu einer guten Bewerbung gehören ein klarer Lebenslauf und eine überzeugende Erklärung, warum man den Beruf machen möchte.“",
+    "4. Wichtige Fähigkeiten und Eigenschaften": "Beispiel: „Neben Fachwissen sind Teamfähigkeit und gute Kommunikation in vielen Berufen besonders wichtig.“",
+    "5. Karrierechancen und Zukunft": "Beispiel: „Weiterbildungen können neue Karrierechancen eröffnen und helfen, später mehr Verantwortung zu übernehmen.“",
+    "6. Eigene Erfahrungen und Meinung": "Beispiel: „Ich glaube, dass man seinen Wunschberuf leichter erreicht, wenn man ein klares Ziel hat und praktische Erfahrungen sammelt.“",
+  },
+  19: {
+    "Persönliche Informationen": "Beispiel: „Zu Beginn würde ich mich kurz und professionell vorstellen und nur die wichtigsten persönlichen Informationen nennen.“",
+    "Ausbildung und Qualifikationen": "Beispiel: „Danach würde ich meine Ausbildung, Sprachkenntnisse und andere Qualifikationen erklären, die für die Stelle wichtig sind.“",
+    "Berufserfahrung": "Beispiel: „Bei meiner Berufserfahrung würde ich nicht nur frühere Jobs nennen, sondern auch erklären, welche Aufgaben und Erfolge ich dort hatte.“",
+    "Stärken und Motivation": "Beispiel: „Eine meiner Stärken ist Teamfähigkeit, und ich möchte in diesem Unternehmen arbeiten, weil mich die Aufgaben interessieren.“",
+  },
+  20: {
+    "1️⃣ Beliebte Berufe (Popular Professions)": "Beispiel: „Mich interessiert der Beruf Lehrer, weil ich gern Wissen vermittle und mit Menschen arbeite.“",
+    "2️⃣ Ausbildung & Studium (Education & Studies)": "Beispiel: „Für viele Berufe braucht man entweder ein Studium oder eine Berufsausbildung, bevor man selbstständig arbeiten kann.“",
+    "3️⃣ Wichtige Qualifikationen (Important Qualifications)": "Beispiel: „Neben Fachwissen sind Kommunikationsfähigkeit, Teamarbeit und digitale Kompetenzen in vielen Berufen wichtig.“",
+    "4️⃣ Karriereweg (Career Path)": "Beispiel: „Ein typischer Karriereweg beginnt mit der Ausbildung und führt über Berufserfahrung und Weiterbildung zu mehr Verantwortung.“",
+    "5️⃣ Herausforderungen und Chancen (Challenges & Opportunities)": "Beispiel: „Eine lange Ausbildung kann schwierig sein, aber gute Qualifikationen verbessern später die Chancen auf dem Arbeitsmarkt.“",
+  },
 };
 
 const WRITING_SUPPORT_BY_DAY = {
@@ -132,6 +167,18 @@ const WRITING_SUPPORT_BY_DAY = {
     ],
     phrases: "Nützliche Sätze: „Leider kann ich an der Präsentation nicht teilnehmen.“ · „Der Grund dafür ist, dass ...“ · „Ich bitte um Ihr Verständnis.“ · „Mit freundlichen Grüßen“",
   },
+  20: {
+    title: "Schreibplan für Ihren Meinungsbeitrag",
+    steps: [
+      "Einleitung: Stellen Sie kurz das Thema Ausbildung und Qualifikationen vor.",
+      "Reaktion: Sagen Sie, ob Sie Felix zustimmen oder nicht.",
+      "Argument: Erklären Sie einen Vorteil einer guten Ausbildung oder Qualifikation.",
+      "Vergleich: Vergleichen Sie Ausbildung mit praktischer Berufserfahrung.",
+      "Beispiel: Nennen Sie ein Beispiel aus Ihrem Leben oder Ihrem Heimatland.",
+      "Schluss: Formulieren Sie Ihre eigene Meinung klar und fassen Sie sie kurz zusammen.",
+    ],
+    phrases: "Nützliche Sätze: „Ich stimme Felix zu, weil ...“ · „Einerseits ist eine gute Ausbildung wichtig, andererseits spielt praktische Erfahrung eine große Rolle.“ · „Ein Beispiel dafür ist, dass ...“ · „Zusammenfassend bin ich der Meinung, dass ...“",
+  },
 };
 
 const isB1WorkbookRoute = () => {
@@ -148,7 +195,7 @@ const getB1Day = () => {
 };
 
 const headingMatches = (element) =>
-  /^suggested answer structure$/i.test(String(element?.textContent || "").trim());
+  /^(suggested answer structure|nutze diese struktur)$/i.test(String(element?.textContent || "").trim());
 
 const buildStandardList = (sourceList) => {
   const list = document.createElement(sourceList?.tagName?.toLowerCase() === "ul" ? "ul" : "ol");
@@ -200,13 +247,13 @@ const findSpeakingSection = (heading) => {
   const section = heading.closest("section");
   if (!section) return null;
   const text = String(section.textContent || "");
-  return /Sprechen|Speaking|Question of the Day/i.test(text) ? section : null;
+  return /Sprechen|Speaking|Question of the Day|Beruf kennen/i.test(text) ? section : null;
 };
 
 const findTopAnchor = (section) => {
   const children = Array.from(section.children || []);
   const taskIndex = children.findIndex((child) =>
-    /Question of the Day|Speaking|Sprechen/i.test(String(child.textContent || "")) &&
+    /Question of the Day|Speaking|Sprechen|Beruf kennen/i.test(String(child.textContent || "")) &&
     child.querySelector?.("strong, h2, h3, p"),
   );
   if (taskIndex >= 0) return children[taskIndex];
@@ -217,7 +264,7 @@ const addSpeakingIdeaExamples = (root = document) => {
   const examples = SPEAKING_EXAMPLES_BY_DAY[getB1Day()];
   if (!examples) return 0;
   const speakingSection = Array.from(root.querySelectorAll("section")).find((section) =>
-    /Teil 1\s*[·-]\s*Sprechen/i.test(String(section.textContent || "")),
+    /Teil 1\s*[·-]\s*(Sprechen|Beruf kennen)/i.test(String(section.textContent || "")),
   );
   if (!speakingSection) return 0;
 
