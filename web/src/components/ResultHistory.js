@@ -277,6 +277,7 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const objectiveTotal = Number(item.objectiveTotal || 0);
   const objectiveCorrect = Number(item.objectiveCorrect || 0);
   const objectiveAllCorrect = objectiveTotal > 0 && objectiveCorrect === objectiveTotal && wrongObjectiveRows.length === 0;
+  const objectiveNeedsReview = wrongObjectiveRows.length;
 
   return (
     <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
@@ -346,6 +347,21 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         </div>
       ) : null}
 
+      {objectiveTotal > 0 ? (
+        <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
+          <div style={{ fontWeight: 800 }}>Reading & Listening summary</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <strong>{objectiveCorrect}/{objectiveTotal} correct</strong>
+            <span style={{ color: "#475569" }}>·</span>
+            <span style={{ color: objectiveNeedsReview ? "#b91c1c" : "#065f46", fontWeight: 700 }}>
+              {objectiveNeedsReview
+                ? `${objectiveNeedsReview} question${objectiveNeedsReview === 1 ? "" : "s"} need review`
+                : "No questions need review"}
+            </span>
+          </div>
+        </div>
+      ) : null}
+
       {objectiveAllCorrect ? (
         <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12 }}>
           <h4 style={{ ...styles.resultHeading, margin: 0 }}>Objective questions</h4>
@@ -363,27 +379,41 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
               These are the reading/listening or multiple-choice questions you answered incorrectly or left unanswered. Compare your answer with the correct answer and review that question in the exercise.
             </p>
           </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Question</th>
-                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Your answer</th>
-                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Correct answer</th>
-                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {wrongObjectiveRows.slice(0, 8).map((row, index) => (
-                  <tr key={`${row.partId}-${row.question}-${index}`}>
-                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5", fontWeight: 600 }}>{row.question}</td>
-                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.student}</td>
-                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.expected}</td>
-                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5", color: "#b91c1c", fontWeight: 700 }}>Incorrect</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div
+            style={{
+              display: "grid",
+              gap: 10,
+              padding: 10,
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            }}
+          >
+            {wrongObjectiveRows.slice(0, 8).map((row, index) => (
+              <div
+                key={`${row.partId}-${row.question}-${index}`}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #fed7aa",
+                  borderRadius: 10,
+                  padding: 10,
+                  display: "grid",
+                  gap: 8,
+                  minWidth: 0,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: 14 }}>{row.question}</strong>
+                  <span style={{ color: "#b91c1c", fontWeight: 700, fontSize: 12 }}>Incorrect</span>
+                </div>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <span style={{ ...styles.helperText, margin: 0 }}>Your answer</span>
+                  <strong style={{ overflowWrap: "anywhere" }}>{row.student}</strong>
+                </div>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <span style={{ ...styles.helperText, margin: 0 }}>Correct answer</span>
+                  <strong style={{ color: "#065f46", overflowWrap: "anywhere" }}>{row.expected}</strong>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ) : null}
