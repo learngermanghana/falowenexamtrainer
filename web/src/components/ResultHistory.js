@@ -132,13 +132,47 @@ const getScoreBreakdownRows = (item = {}) => {
   return rows;
 };
 
+const formatObjectiveAnswer = (value) => {
+  const cleaned = String(value ?? "").trim();
+  if (!cleaned || /^blank$/i.test(cleaned) || /^null$/i.test(cleaned) || /^undefined$/i.test(cleaned)) {
+    return "No answer";
+  }
+  return cleaned;
+};
+
+const formatObjectiveQuestion = (question, partId = "") => {
+  const questionText = String(question ?? "").trim();
+  const partText = String(partId ?? "").trim();
+  const combined = [partText, questionText].filter(Boolean).join(" ");
+
+  const teilTokens = combined.match(/teil\s*\d+(?:[._-]\d+)?/gi) || [];
+  const detailedTeil = teilTokens.find((token) => /[._-]\d+\s*$/i.test(token));
+  if (detailedTeil) {
+    const match = detailedTeil.match(/teil\s*(\d+)[._-](\d+)/i);
+    if (match) return `Teil ${match[1]} – Question ${match[2]}`;
+  }
+
+  const dottedQuestion = questionText.match(/^(\d+)[._-](\d+)$/);
+  const partMatch = partText.match(/teil\s*(\d+)/i);
+  if (dottedQuestion) return `Teil ${dottedQuestion[1]} – Question ${dottedQuestion[2]}`;
+  if (partMatch && /^\d+$/.test(questionText)) return `Teil ${partMatch[1]} – Question ${questionText}`;
+
+  const simpleTeil = combined.match(/teil\s*(\d+)/i);
+  if (simpleTeil && questionText) {
+    const trailingQuestion = questionText.match(/(?:[._-]|\s)(\d+)$/);
+    if (trailingQuestion) return `Teil ${simpleTeil[1]} – Question ${trailingQuestion[1]}`;
+  }
+
+  return questionText || partText || "Question";
+};
+
 const getWrongObjectiveRows = (item = {}) => {
   const wrongAnswers = normalizeArray(item.wrongAnswers);
   if (wrongAnswers.length) {
     return wrongAnswers.map((row, index) => ({
-      question: row.question || row.label || index + 1,
-      student: row.student || row.submitted || row.answer || "blank",
-      expected: row.expected || row.correctAnswer || row.correct || "—",
+      question: formatObjectiveQuestion(row.question || row.label || index + 1, row.partId || row.part || ""),
+      student: formatObjectiveAnswer(row.student || row.submitted || row.answer),
+      expected: formatObjectiveAnswer(row.expected || row.correctAnswer || row.correct || "—"),
       partId: row.partId || row.part || "",
     }));
   }
@@ -148,9 +182,9 @@ const getWrongObjectiveRows = (item = {}) => {
     .map(([question, detail]) => ({ question, ...detail }))
     .filter((row) => row && row.correct === false)
     .map((row) => ({
-      question: row.question,
-      student: row.student || row.submitted || "blank",
-      expected: row.expected || row.rawExpected || "—",
+      question: formatObjectiveQuestion(row.question, row.partId || ""),
+      student: formatObjectiveAnswer(row.student || row.submitted),
+      expected: formatObjectiveAnswer(row.expected || row.rawExpected || "—"),
       partId: row.partId || "",
     }));
 };
@@ -240,6 +274,9 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const correctionPoints = hasStructuredFeedback ? getCorrectionPoints(item) : [];
   const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/course?submitWork=1";
   const passed = item.numericScore >= PASS_MARK;
+  const objectiveTotal = Number(item.objectiveTotal || 0);
+  const objectiveCorrect = Number(item.objectiveCorrect || 0);
+  const objectiveAllCorrect = objectiveTotal > 0 && objectiveCorrect === objectiveTotal && wrongObjectiveRows.length === 0;
 
   return (
     <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
@@ -309,9 +346,23 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         </div>
       ) : null}
 
+      {objectiveAllCorrect ? (
+        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12 }}>
+          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Objective questions</h4>
+          <p style={{ ...styles.resultText, margin: "6px 0 0" }}>
+            Excellent — all reading/listening or multiple-choice answers were correct.
+          </p>
+        </div>
+      ) : null}
+
       {wrongObjectiveRows.length ? (
         <div style={{ border: "1px solid #fecaca", borderRadius: 12, background: "#fff7ed", overflow: "hidden" }}>
-          <div style={{ padding: 10, fontWeight: 800, color: "#7f1d1d" }}>Wrong objective answers</div>
+          <div style={{ padding: 10, display: "grid", gap: 4 }}>
+            <div style={{ fontWeight: 800, color: "#7f1d1d" }}>Questions to review</div>
+            <p style={{ ...styles.helperText, margin: 0, color: "#7c2d12" }}>
+              These are the reading/listening or multiple-choice questions you answered incorrectly or left unanswered. Compare your answer with the correct answer and review that question in the exercise.
+            </p>
+          </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
@@ -319,14 +370,16 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
                   <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Question</th>
                   <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Your answer</th>
                   <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Correct answer</th>
+                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Result</th>
                 </tr>
               </thead>
               <tbody>
                 {wrongObjectiveRows.slice(0, 8).map((row, index) => (
                   <tr key={`${row.partId}-${row.question}-${index}`}>
-                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.partId ? `${row.partId} ` : ""}{row.question}</td>
+                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5", fontWeight: 600 }}>{row.question}</td>
                     <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.student}</td>
                     <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.expected}</td>
+                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5", color: "#b91c1c", fontWeight: 700 }}>Incorrect</td>
                   </tr>
                 ))}
               </tbody>
