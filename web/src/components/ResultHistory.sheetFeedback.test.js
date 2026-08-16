@@ -35,4 +35,15 @@ describe("Sheet result feedback presentation", () => {
     expect(source).toContain("{hasStructuredFeedback ? (");
     expect(source).toContain('<TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />');
   });
+
+  test("objective feedback uses student-friendly review labels instead of raw admin wording", () => {
+    const source = fs.readFileSync(path.resolve(__dirname, "ResultHistory.js"), "utf8");
+
+    expect(source).toContain("Questions to review");
+    expect(source).toContain("No answer");
+    expect(source).toContain("Correct answer");
+    expect(source).toContain(">Incorrect</td>");
+    expect(source).toContain("Teil ${match[1]} – Question ${match[2]}");
+    expect(source).not.toContain(">Wrong objective answers<");
+  });
 });
