@@ -34,11 +34,8 @@ const A1_ASSIGNMENT_WORKBOOK_CASES = [
 ];
 
 describe("A1 workbook inline submission mounting", () => {
-  test("uses only Assignment and Submit tabs for A1", () => {
-    expect(getWorkbookNavigationTabs("A1")).toEqual([
-      { key: "assignment", label: "Assignment" },
-      { key: "submit", label: "Submit" },
-    ]);
+  test("does not add shared A2/B1 navigation tabs to A1 workbooks", () => {
+    expect(getWorkbookNavigationTabs("A1")).toEqual([]);
   });
 
   test("uses the exact canonical tutor-marked A1 assignment keys", () => {
