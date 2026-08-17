@@ -111,7 +111,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
       fallbackAssignmentKey="A1-0.2"
       title="A1 · Day 2 Workbook · German Alphabet + Reviewing"
       subtitle="Chapter 0.2 · Assignment for tutor marking"
-      assignmentIntro="Complete Teil 1, Teil 2 and Teil 3, then open Submit to send your final answers for A1-0.2."
+      assignmentIntro="Complete Teil 1 + Teil 2 and Teil 3, then open Submit to send your final answers for A1-0.2."
       submitTitle="Submit A1 · Day 2 · German Alphabet"
       submitDescription="This submission is locked to A1-0.2."
     >
@@ -122,9 +122,9 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
           loading="lazy"
           style={imageStyle}
         />
-        <h2 style={{ margin: 0 }}>Teil 1 · Reading and Writing</h2>
+        <h2 style={{ margin: 0 }}>Teil 1 + Teil 2 · Reading and Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instruction:</strong> Read the text carefully and answer the questions below. Each question has one correct answer.
+          <strong>Instruction:</strong> Read the text carefully and answer the questions directly below it. Each question has one correct answer.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Text:</strong> The German alphabet has 26 letters. There are also some additional letters like Ä, Ö, Ü, and ß,
@@ -134,10 +134,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
           (ball), C as in Computer (computer), D as in Deutschland (Germany). It is important to know the alphabet well in order to
           read and write correctly.
         </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Questions</h2>
+        <h3 style={{ margin: "8px 0 0" }}>Questions</h3>
         {questions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
             <strong>{question.stem}</strong>
