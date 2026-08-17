@@ -78,6 +78,7 @@ const replacements = [
 ];
 
 for (const [before, after] of replacements) {
+  if (source.includes(after)) continue;
   if (!source.includes(before)) throw new Error(`Anchor not found: ${before.slice(0, 80)}`);
   source = source.replace(before, after);
 }
