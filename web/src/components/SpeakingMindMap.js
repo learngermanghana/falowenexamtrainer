@@ -115,12 +115,14 @@ const ExtraHelpPanel = ({ help, selectedBranch }) => {
 const SpeakingMindMap = ({ config }) => {
   const safeConfig = useMemo(() => normalizeConfig(config), [config]);
   const firstBranchId = safeConfig.speakingRoute[0] || safeConfig.branches[0]?.id || "";
+  const level = String(safeConfig.level || "").toUpperCase();
+  const isA2 = level === "A2";
   const [selectedBranchId, setSelectedBranchId] = useState(firstBranchId);
-  const [helpOpen, setHelpOpen] = useState(false);
-  const focusModeEnabled = safeConfig.focusMode !== undefined ? Boolean(safeConfig.focusMode) : ["A2", "B1"].includes(String(safeConfig.level || "").toUpperCase());
+  const [helpOpen, setHelpOpen] = useState(isA2);
+  const focusModeEnabled = safeConfig.focusMode !== undefined ? Boolean(safeConfig.focusMode) : ["A2", "B1"].includes(level);
 
   useEffect(() => { setSelectedBranchId(firstBranchId); }, [firstBranchId]);
-  useEffect(() => { setHelpOpen(false); }, [safeConfig.lessonId, safeConfig.day, focusModeEnabled]);
+  useEffect(() => { setHelpOpen(isA2); }, [safeConfig.lessonId, safeConfig.day, focusModeEnabled, isA2]);
 
   const selectedBranch = safeConfig.branches.find((branch) => branch.id === selectedBranchId) || safeConfig.branches[0];
   const routeIndex = safeConfig.speakingRoute.indexOf(selectedBranch?.id);
@@ -172,7 +174,7 @@ const SpeakingMindMap = ({ config }) => {
         {selectedBranch.keywords.length ? <div className="speaking-mind-map__keywords">{selectedBranch.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div> : null}
       </article>
       <div className="speaking-mind-map__route"><strong>Route:</strong><span className="speaking-mind-map__route-copy">{safeConfig.speakingRoute.map((id) => safeConfig.branches.find((branch) => branch.id === id)?.label).filter(Boolean).join(" → ")}</span><div className="speaking-mind-map__route-buttons"><button type="button" style={styles.secondaryButton} onClick={() => selectRouteOffset(-1)} disabled={selectedRouteIndex === 0}>Previous</button><span>{selectedRouteIndex + 1}/{safeConfig.speakingRoute.length}</span><button type="button" style={styles.secondaryButton} onClick={() => selectRouteOffset(1)} disabled={selectedRouteIndex >= safeConfig.speakingRoute.length - 1}>Next</button></div></div>
-      {focusModeEnabled ? <div className="speaking-mind-map__help-toggle"><button type="button" className="speaking-mind-map__help-button" style={styles.secondaryButton} onClick={() => setHelpOpen((current) => !current)} aria-expanded={helpOpen}>{helpOpen ? "Hide extra speaking help" : "More speaking help"}</button><span>Phrase bank · vocabulary · model answer · detailed instructions</span></div> : null}
+      {focusModeEnabled ? <div className="speaking-mind-map__help-toggle"><button type="button" className="speaking-mind-map__help-button" style={styles.secondaryButton} onClick={() => setHelpOpen((current) => !current)} aria-expanded={helpOpen}>{helpOpen ? "Collapse speaking help" : "Expand speaking help"}</button><span>{isA2 ? "Speaking help is open by default so you do not miss it." : "Phrase bank · vocabulary · model answer · detailed instructions"}</span></div> : null}
       {focusModeEnabled && helpOpen ? <ExtraHelpPanel help={safeConfig.extraHelp} selectedBranch={selectedBranch} /> : null}
     </section>
   );
