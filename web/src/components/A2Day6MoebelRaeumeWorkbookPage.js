@@ -23,17 +23,20 @@ const speakingContent = <>
 </>;
 
 const schreibenContent = (
-  <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Nachricht an einen Freund: Meine Wohnung / mein Zimmer">
-    <p style={paragraph}><strong>Aufgabe:</strong> Schreibe einer Freundin oder einem Freund eine kurze Nachricht über deine Wohnung und dein Zimmer.</p>
-    <p style={paragraph}>Bearbeite diese Punkte:</p>
+  <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="E-Mail an eine Freundin / einen Freund: Mein Zimmer">
+    <p style={paragraph}>
+      <strong>Aufgabe:</strong> Sie sind vor Kurzem umgezogen und möchten einer Freundin oder einem Freund von Ihrem neuen Zimmer erzählen.
+      Schreiben Sie eine E-Mail.
+    </p>
+    <p style={paragraph}>Schreiben Sie etwas zu allen drei Punkten:</p>
     <ul style={list}>
-      <li>Beschreibe mindestens zwei Räume in deiner Wohnung.</li>
-      <li>Nenne mindestens fünf Möbel.</li>
-      <li>Sage, wo die Möbel stehen oder liegen: <strong>Wo? + Dativ</strong>.</li>
-      <li>Beschreibe zwei Veränderungen: Wohin stellst oder legst du etwas? <strong>Wohin? + Akkusativ</strong>.</li>
-      <li>Sage, welcher Platz dir am besten gefällt und warum.</li>
+      <li><strong>Warum schreiben Sie?</strong></li>
+      <li><strong>Beschreiben Sie Ihr Zimmer und die wichtigsten Möbel.</strong></li>
+      <li><strong>Was gefällt Ihnen an Ihrem Zimmer besonders und warum?</strong></li>
     </ul>
-    <p style={paragraph}><strong>Useful structure:</strong> Hallo/Liebe(r) ..., → Wohnung/Räume → Möbel + Position → Veränderungen → Lieblingsplatz → Viele Grüße.</p>
+    <p style={paragraph}>
+      Vergessen Sie nicht die Anrede und den Gruß am Schluss. Schreiben Sie einen zusammenhängenden Text.
+    </p>
   </WorkbookTaskCard>
 );
 
@@ -55,9 +58,9 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
       workbookId="A2Day6MoebelRaeume"
       topicPrompt="Beschreibe deine Wohnung, die Zimmer und wichtige Möbel."
       sprechenContent={speakingContent}
-      schreibenTask="Schreibe einer Freundin oder einem Freund eine kurze Nachricht über deine Wohnung und dein Zimmer."
+      schreibenTask="Sie sind vor Kurzem umgezogen. Schreiben Sie einer Freundin oder einem Freund eine E-Mail über Ihr neues Zimmer und bearbeiten Sie alle drei Punkte."
       schreibenContent={schreibenContent}
-      schreibenPlaceholder={"Hallo ... ,\n\nich möchte dir meine Wohnung beschreiben. Sie hat ...\n\nIn meinem ... gibt es ... Der/Die/Das ... steht/liegt ...\n\nIch möchte ... neben/auf/in ... stellen/legen.\n\nAm liebsten mag ich ..., weil ...\n\nViele Grüße\n[Dein Name]"}
+      schreibenPlaceholder={"Hallo ... ,\n\nich schreibe dir, weil ...\n\nMein neues Zimmer ...\n\nBesonders gefällt mir ..., weil ...\n\nViele Grüße\n[Dein Name]"}
       lesenText={newInTownReadingText}
       lesenQuestions={[
         { stem: "Warum bin ich in die Stadt gezogen?", options: ["a) Weil ich in einer Wohngemeinschaft wohne", "b) Weil ich studiere", "c) Weil ich gerne lese", "d) Weil ich manchmal in den Zoo gehe"] },
