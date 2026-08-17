@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Navigate, useLocation, useParams } from "react-router-dom";
+import React from "react";
+import { useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -18,46 +18,6 @@ export {
   resolveA1ChapterResourceHubEntry,
   shouldNormalizeA1ChapterResourceHubState,
 };
-
-const hasCompletedRadio = (search = "") => {
-  try {
-    return new URLSearchParams(String(search || "")).get("radio") === "done";
-  } catch (_error) {
-    return false;
-  }
-};
-
-export const isCrossOriginWorkbookRoute = (
-  route = "",
-  origin = typeof window !== "undefined" ? window.location.origin : "https://www.falowen.app",
-) => {
-  try {
-    const base = new URL(origin);
-    return new URL(String(route || ""), base).origin !== base.origin;
-  } catch (_error) {
-    return false;
-  }
-};
-
-function CompletedWorkbookNavigation({ route }) {
-  const isExternal = isCrossOriginWorkbookRoute(route);
-
-  useEffect(() => {
-    if (!isExternal || typeof window === "undefined") return;
-    window.location.replace(route);
-  }, [isExternal, route]);
-
-  if (isExternal) {
-    return (
-      <div style={{ padding: 24 }}>
-        <p>Opening workbook…</p>
-        <a href={route}>Continue to workbook</a>
-      </div>
-    );
-  }
-
-  return <Navigate to={route} replace />;
-}
 
 export default function A1ChapterResourceHubRoute({ fallback = null, level = "" }) {
   const location = useLocation();
@@ -90,14 +50,9 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
       })
     : location.state;
 
-  // Once Falowen Radio is complete, do not render the legacy hub again. Internal
-  // workbooks can use React Router, while cross-origin workbooks must use a real
-  // document navigation because history.replaceState cannot change origins.
-  const completedWorkbookRoute = routeState?.entry?.workbookRoute || routeState?.entry?.workbook_link || "";
-  if (hasCompletedRadio(location.search) && completedWorkbookRoute) {
-    return <CompletedWorkbookNavigation route={completedWorkbookRoute} />;
-  }
-
+  // `radio=done` records progress; it must not turn the resource hub into a
+  // workbook redirect. Learners still need this screen to choose the workbook,
+  // teacher lecture, or AI video in whichever order helps them most.
   return (
     <CourseLessonPageLegacy
       routeLevel={routeLevel}
