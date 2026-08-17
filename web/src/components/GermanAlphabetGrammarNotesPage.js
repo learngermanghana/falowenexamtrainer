@@ -142,6 +142,28 @@ const GermanAlphabetGrammarNotesPage = () => {
           </li>
         </ul>
       </section>
+
+      <section style={{ ...sectionStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+        <h2 style={{ margin: 0 }}>4. Why Umlauts Matter</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Umlauts are not just decorations. Writing <strong>ä, ö,</strong> and <strong>ü</strong> correctly can
+          change both the pronunciation and the meaning of a German word.
+        </p>
+        <div style={letterGridStyle}>
+          <div style={letterCardStyle}>
+            <strong>schon</strong>
+            <span>already</span>
+          </div>
+          <div style={letterCardStyle}>
+            <strong>schön</strong>
+            <span>beautiful</span>
+          </div>
+        </div>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          One small umlaut can therefore give a word a completely different meaning. Pay attention to
+          umlauts when reading, writing, and spelling in German.
+        </p>
+      </section>
     </main>
   );
 };
