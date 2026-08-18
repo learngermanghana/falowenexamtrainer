@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'functions/**'
+      - 'scripts/patchResubmissionReviewGate.mjs'
       - 'firebase.json'
       - '.firebaserc'
       - '.github/workflows/deploy-functions.yml'
@@ -43,15 +44,19 @@ jobs:
         working-directory: functions
         run: npm install --no-audit --no-fund
 
+      - name: Apply resubmission review gate
+        run: node scripts/patchResubmissionReviewGate.mjs
+
       - name: Validate committed functions source
         working-directory: functions
         run: |
           node --check index.js
           node --check index.entry.js
+          node --check resubmission.js
           node --check functionz/app.js
           node --check functionz/paymentAwareApp.js
           node --check functionz/paystackFeePolicy.js
-          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); console.log("Firebase api export discovered");'
+          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); console.log("Firebase api and resubmission callable exports discovered");'
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -66,13 +71,13 @@ jobs:
         with:
           project_id: '${{ env.FIREBASE_PROJECT_ID }}'
 
-      - name: Deploy exam trainer API
+      - name: Deploy exam trainer API and resubmission callable
         shell: bash
         run: |
           set +e
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
-            --only functions:falowenexamtrainer:api \
+            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission \
             --debug > firebase-deploy.log 2>&1
           status=$?
           tail -n 180 firebase-deploy.log || true
