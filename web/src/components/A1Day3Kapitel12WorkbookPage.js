@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+import LiveClassResponsePanel from "./LiveClassResponsePanel";
 
 const cardStyle = {
   ...styles.card,
@@ -32,6 +33,19 @@ const questionBoxStyle = {
   background: "#fff",
 };
 
+const classGrammarCheckpoints = [
+  {
+    id: "wir-kommen",
+    stem: "Wir ___ aus Italien.",
+    options: ["kommen", "kommt", "kommst"],
+  },
+  {
+    id: "ich-wohnen",
+    stem: "Ich ___ in Berlin.",
+    options: ["wohne", "wohnt", "wohnen"],
+  },
+];
+
 const listeningQuestions = [
   {
     stem: "1. Wie heißt die Sprecherin?",
@@ -56,6 +70,7 @@ const listeningQuestions = [
 ];
 
 const A1Day3Kapitel12WorkbookPage = () => {
+  const [classAnswers, setClassAnswers] = useState({});
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -99,6 +114,54 @@ const A1Day3Kapitel12WorkbookPage = () => {
           <li>Du ___ in Madrid.</li>
           <li>Sie ___ in Wien.</li>
         </ol>
+
+        <div style={{ ...questionBoxStyle, background: "#f8fbff", borderColor: "#bfdbfe" }}>
+          <strong>Class contribution · two grammar checkpoints</strong>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+            Choose your own answer first. These two practice choices are shared live with your class and are not graded.
+          </p>
+
+          {classGrammarCheckpoints.map((checkpoint) => (
+            <div key={checkpoint.id} style={{ ...questionBoxStyle, marginTop: 4 }}>
+              <strong>{checkpoint.stem}</strong>
+              <div style={{ display: "grid", gap: 8 }}>
+                {checkpoint.options.map((option) => {
+                  const selected = classAnswers[checkpoint.id] === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() =>
+                        setClassAnswers((current) => ({
+                          ...current,
+                          [checkpoint.id]: option,
+                        }))
+                      }
+                      style={{
+                        ...styles.secondaryButton,
+                        width: "100%",
+                        textAlign: "left",
+                        justifyContent: "flex-start",
+                        border: selected ? "2px solid #2563eb" : "1px solid #d1d5db",
+                        background: selected ? "#eff6ff" : "#fff",
+                      }}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <LiveClassResponsePanel
+                lessonId="a1-day-3-kapitel-1-2"
+                questionId={`grammar-${checkpoint.id}`}
+                questionLabel={checkpoint.stem}
+                selectedOption={classAnswers[checkpoint.id] || ""}
+                options={checkpoint.options}
+              />
+            </div>
+          ))}
+        </div>
       </section>
 
       <section style={sectionStyle}>
