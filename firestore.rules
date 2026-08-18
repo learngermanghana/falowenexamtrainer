@@ -125,6 +125,20 @@ service cloud.firestore {
       allow delete: if ownsResource();
     }
 
+    // Live, ungraded classroom multiple-choice responses.
+    // Signed-in users may read class responses. Students may only create/update
+    // their own response document; staff may manage them for classroom support.
+    match /classResponses/{responseId} {
+      allow read: if signedIn();
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow update: if (
+        ownsStudentResource() &&
+        ownsStudentIncoming() &&
+        ownershipFieldsUnchanged()
+      ) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
     // Canonical live-class records are readable by signed-in students.
     // Only admins and tutors can change scheduling and communication records.
     match /classes/{document=**} {
