@@ -9,6 +9,7 @@ const MANAGED_ATTRIBUTE = "data-a1-practice-nav-managed";
 const PREVIOUS_DISPLAY_ATTRIBUTE = "data-a1-practice-nav-previous-display";
 const LEGACY_NAV_HIDDEN_ATTRIBUTE = "data-a1-practice-legacy-nav-hidden";
 const LEGACY_NAV_DISPLAY_ATTRIBUTE = "data-a1-practice-legacy-nav-display";
+const GROUP_ATTRIBUTE = "data-a1-practice-section-group";
 const SHARED_VIEW_PARAM = "workbookTab";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
@@ -67,8 +68,36 @@ const makeSectionLabel = (headingText, index) => {
   return `Section ${index + 1}`;
 };
 
-export const findA1PracticeSections = (root) =>
-  topLevelPracticeSections(root)
+const groupedPracticeSections = (root) => {
+  if (!root?.querySelectorAll) return [];
+  const grouped = new Map();
+  Array.from(root.querySelectorAll(`[${GROUP_ATTRIBUTE}]`)).forEach((element) => {
+    const group = String(element.getAttribute(GROUP_ATTRIBUTE) || "").trim();
+    if (!/^\d+$/.test(group)) return;
+    if (!grouped.has(group)) grouped.set(group, []);
+    grouped.get(group).push(element);
+  });
+
+  return Array.from(grouped.entries())
+    .sort((left, right) => Number(left[0]) - Number(right[0]))
+    .map(([group, elements]) => {
+      const heading = firstSectionHeading(elements[0]);
+      const title = normalizeText(heading?.textContent) || `Teil ${group}`;
+      return {
+        key: `section-${group}`,
+        label: `Teil ${group}`,
+        title,
+        element: elements[0],
+        elements,
+      };
+    });
+};
+
+export const findA1PracticeSections = (root) => {
+  const grouped = groupedPracticeSections(root);
+  if (grouped.length) return grouped;
+
+  return topLevelPracticeSections(root)
     .map((element, index) => {
       const heading = firstSectionHeading(element);
       const title = normalizeText(heading?.textContent);
@@ -78,9 +107,11 @@ export const findA1PracticeSections = (root) =>
         label: makeSectionLabel(title, index),
         title,
         element,
+        elements: [element],
       };
     })
     .filter(Boolean);
+};
 
 const findPracticePageRoot = (main) => {
   if (!main) return null;
@@ -146,20 +177,25 @@ const restoreLegacyPracticeNavigation = (root = document) => {
 
 const requestedPracticeView = (search = "") => {
   const value = String(new URLSearchParams(search || "").get(SHARED_VIEW_PARAM) || "").trim().toLowerCase();
-  // Older links used "overview". The simplified navigator now opens the first
-  // real workbook section instead of showing a second, duplicated menu.
   if (value === "overview") return "section-1";
   return /^section-\d+$/.test(value) ? value : "";
 };
 
+const sectionElements = (section) => section?.elements || (section?.element ? [section.element] : []);
+
 const sameSectionList = (left = [], right = []) =>
   left.length === right.length &&
-  left.every(
-    (section, index) =>
-      section.key === right[index]?.key &&
-      section.title === right[index]?.title &&
-      section.element === right[index]?.element,
-  );
+  left.every((section, index) => {
+    const rightSection = right[index];
+    const leftElements = sectionElements(section);
+    const rightElements = sectionElements(rightSection);
+    return (
+      section.key === rightSection?.key &&
+      section.title === rightSection?.title &&
+      leftElements.length === rightElements.length &&
+      leftElements.every((element, elementIndex) => element === rightElements[elementIndex])
+    );
+  });
 
 const navButtonStyle = (selected) => ({
   ...styles.secondaryButton,
@@ -220,9 +256,6 @@ export default function A1SharedPracticeWorkbookNavigation() {
       }
 
       setNavMount((current) => (current === host ? current : host));
-      // Include DOM identity in the comparison. Route/search updates can replace
-      // workbook nodes while keeping identical headings; stale element refs were
-      // the reason a clicked Teil could remain hidden in production.
       setSections((current) => (sameSectionList(current, nextSections) ? current : nextSections));
     };
 
@@ -255,7 +288,6 @@ export default function A1SharedPracticeWorkbookNavigation() {
     (view) => {
       const next = new URLSearchParams(location.search || "");
       next.set(SHARED_VIEW_PARAM, view);
-      // Self-practice deliberately does not write assignmentKey/assignmentId.
       next.delete("assignmentKey");
       next.delete("assignmentId");
       const nextSearch = `?${next.toString()}`;
@@ -279,8 +311,10 @@ export default function A1SharedPracticeWorkbookNavigation() {
     }
 
     sections.forEach((section) => {
-      if (validView === section.key) showElement(section.element);
-      else hideElement(section.element);
+      sectionElements(section).forEach((element) => {
+        if (validView === section.key) showElement(element);
+        else hideElement(element);
+      });
     });
     hideLegacyPracticeNavigation(pageRootRef.current);
     syncLocation(validView);
