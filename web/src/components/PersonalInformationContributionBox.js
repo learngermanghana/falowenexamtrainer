@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { collection, db, isFirebaseConfigured, onSnapshot, query, where } from "../firebase";
 import { styles } from "../styles";
@@ -38,7 +38,11 @@ const memberFrom = (snapshot) => {
   };
 };
 
-export default function PersonalInformationContributionBox() {
+export default function PersonalInformationContributionBox({
+  autoSave = false,
+  showReference = true,
+  placeholder = "Example: Mein Vorname ist Ama. Ich komme aus Ghana. Ich bin 24 Jahre alt.",
+}) {
   const { user, studentProfile, saveStudentProfile } = useAuth();
   const [draft, setDraft] = useState("");
   const [isDirty, setIsDirty] = useState(false);
@@ -47,13 +51,23 @@ export default function PersonalInformationContributionBox() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [members, setMembers] = useState([]);
+  const draftRef = useRef("");
+  const lastSavedRef = useRef("");
 
   const level = useMemo(() => levelFrom(studentProfile), [studentProfile]);
   const className = useMemo(() => classNameFrom(studentProfile), [studentProfile]);
   const studentCode = useMemo(() => studentCodeFrom(studentProfile, user), [studentProfile, user]);
 
   useEffect(() => {
-    if (!isDirty) setDraft(String(studentProfile?.biography || ""));
+    draftRef.current = draft;
+  }, [draft]);
+
+  useEffect(() => {
+    if (!isDirty) {
+      const biography = String(studentProfile?.biography || "");
+      setDraft(biography);
+      lastSavedRef.current = biography.trim();
+    }
   }, [isDirty, studentProfile?.biography]);
 
   useEffect(() => {
@@ -95,64 +109,92 @@ export default function PersonalInformationContributionBox() {
     );
   }, [className, level]);
 
+  const saveBiography = useCallback(
+    async (biography, automatic = false) => {
+      const nextBiography = biography.trim();
+      if (!nextBiography) {
+        if (!automatic) {
+          setError("Write your introduction before saving.");
+          setStatus("");
+        }
+        return false;
+      }
+      if (!level || !className) {
+        setError("Your class details are missing. Please contact support.");
+        setStatus("");
+        return false;
+      }
+      if (nextBiography === lastSavedRef.current) {
+        if (draftRef.current.trim() === nextBiography) setIsDirty(false);
+        return true;
+      }
+
+      setIsSaving(true);
+      setError("");
+      setStatus(automatic ? "Saving to Class Members…" : "");
+      try {
+        await saveStudentProfile({ biography: nextBiography });
+        lastSavedRef.current = nextBiography;
+        if (draftRef.current.trim() === nextBiography) setIsDirty(false);
+        setStatus(automatic ? "✓ Saved automatically to Class Members." : `✓ Saved to Class Members for ${className}.`);
+        return true;
+      } catch (saveError) {
+        console.error("Failed to save class member introduction", saveError);
+        setError("Your introduction could not be saved. Please try again.");
+        setStatus("");
+        return false;
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [className, level, saveStudentProfile]
+  );
+
+  useEffect(() => {
+    if (!autoSave || !isDirty || !draft.trim() || !level || !className) return undefined;
+
+    const timer = window.setTimeout(() => {
+      saveBiography(draft, true);
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [autoSave, className, draft, isDirty, level, saveBiography]);
+
   const handleSave = async (event) => {
     event.preventDefault();
-    const biography = draft.trim();
-    if (!biography) {
-      setError("Write your introduction before saving.");
-      setStatus("");
-      return;
-    }
-    if (!level || !className) {
-      setError("Your class details are missing. Please contact support.");
-      setStatus("");
-      return;
-    }
-
-    setIsSaving(true);
-    setError("");
-    setStatus("");
-    try {
-      await saveStudentProfile({ biography });
-      setDraft(biography);
-      setIsDirty(false);
-      setStatus(`✓ Saved to Class Members for ${className}.`);
-    } catch (saveError) {
-      console.error("Failed to save class member introduction", saveError);
-      setError("Your introduction could not be saved. Please try again.");
-    } finally {
-      setIsSaving(false);
-    }
+    await saveBiography(draft, false);
   };
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <div
-        style={{
-          border: "1px solid #bfdbfe",
-          borderRadius: 14,
-          background: "#eff6ff",
-          padding: 14,
-          display: "grid",
-          gap: 10,
-        }}
-      >
-        <strong>English meaning and German sentence starters</strong>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Use the English meaning to understand each item, then write your answer in German.
-        </p>
-        <div style={{ display: "grid", gap: 9 }}>
-          {personalInformationTranslations.map((item, index) => (
-            <div key={item.german} style={{ display: "grid", gap: 3, lineHeight: 1.55 }}>
-              <div>
-                <strong>{index + 1}. {item.german}</strong> — {item.english}
+      {showReference ? (
+        <div
+          style={{
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "#eff6ff",
+            padding: 14,
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <strong>English meaning and German sentence starters</strong>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Use the English meaning to understand each item, then write your answer in German.
+          </p>
+          <div style={{ display: "grid", gap: 9 }}>
+            {personalInformationTranslations.map((item, index) => (
+              <div key={item.german} style={{ display: "grid", gap: 3, lineHeight: 1.55 }}>
+                <div>
+                  <strong>{index + 1}. {item.german}</strong> — {item.english}
+                </div>
+                <div><strong>German:</strong> {item.example}</div>
+                <div style={{ color: "#475569" }}><strong>English:</strong> {item.meaning}</div>
               </div>
-              <div><strong>German:</strong> {item.example}</div>
-              <div style={{ color: "#475569" }}><strong>English:</strong> {item.meaning}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
         <textarea
@@ -162,24 +204,30 @@ export default function PersonalInformationContributionBox() {
           onChange={(event) => {
             setDraft(event.target.value);
             setIsDirty(true);
-            setStatus("");
+            setStatus(autoSave ? "Changes will save automatically…" : "");
             setError("");
           }}
-          placeholder="Example: Mein Vorname ist Ama. Ich komme aus Ghana. Ich bin 24 Jahre alt."
+          placeholder={placeholder}
           autoCapitalize="sentences"
           autoCorrect="on"
           spellCheck
           inputMode="text"
-          rows={10}
-          disabled={isSaving}
+          rows={8}
+          disabled={!autoSave && isSaving}
         />
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ ...styles.helperText, margin: 0 }}>Class: {className || "Not assigned"}</span>
-          <button className="day5-writing-save-button" type="submit" style={styles.primaryButton} disabled={isSaving || !level || !className}>
-            {isSaving ? "Speichern…" : "Save to Class Members"}
-          </button>
+          {!autoSave ? (
+            <button className="day5-writing-save-button" type="submit" style={styles.primaryButton} disabled={isSaving || !level || !className}>
+              {isSaving ? "Speichern…" : "Save to Class Members"}
+            </button>
+          ) : (
+            <span style={{ ...styles.helperText, margin: 0 }}>{isSaving ? "Saving…" : "Auto-save on"}</span>
+          )}
         </div>
-        <p style={{ ...styles.helperText, margin: 0 }}>This updates your Class Members profile and is not submitted for grading.</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          This updates the same biography shown on the Class Members page and is not submitted for grading.
+        </p>
         {status ? <p role="status" style={{ margin: 0, color: "#166534", fontWeight: 700 }}>{status}</p> : null}
         {error ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{error}</p> : null}
       </form>
