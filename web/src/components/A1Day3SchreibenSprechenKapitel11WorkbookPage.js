@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy from "./A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy";
+import LiveClassResponsePanel from "./LiveClassResponsePanel";
 import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
 import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
 
@@ -15,6 +16,19 @@ export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
     url: "https://youtu.be/LdCVsY-SFTg",
   }),
 ]);
+
+const LIVE_CLASS_LESSON_ID = "A1-day-3-kapitel-1.1-w-words";
+const liveQuestions = [
+  { id: "1", stem: "1. ___ ist das?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "2", stem: "2. ___ ist Martin?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "3", stem: "3. ___ ist der Ball?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "4", stem: "4. ___ ist das?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "5", stem: "5. ___ spielt mit dem Ball?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "6", stem: "6. ___ heißt du?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "7", stem: "7. ___ wohnt deine Mutter?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "8", stem: "8. ___ ist dein Job?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "9", stem: "9. ___ heißt deine Mutter?", options: ["Was", "Wer", "Wie", "Wo"] },
+];
 
 const answerClues = [
   "Das ist ein Ball.",
@@ -91,32 +105,97 @@ const ensureBiographyMount = (root) => {
   return mount;
 };
 
+const ensureLiveResponseMounts = (root) => {
+  const mounts = {};
+  if (!root) return mounts;
+
+  liveQuestions.forEach((question) => {
+    const stem = Array.from(root.querySelectorAll("strong")).find(
+      (element) => element.textContent?.trim() === question.stem
+    );
+    const questionBox = stem?.parentElement;
+    if (!questionBox) return;
+
+    questionBox.dataset.liveClassQuestionId = question.id;
+    let mount = questionBox.querySelector(":scope > [data-live-class-response-mount]");
+    if (!mount) {
+      mount = document.createElement("div");
+      mount.dataset.liveClassResponseMount = question.id;
+      questionBox.appendChild(mount);
+    }
+    mounts[question.id] = mount;
+  });
+
+  return mounts;
+};
+
 const updateWorkbook = (root) => {
   removeExcludedSections(root);
   updateWWordExercise(root);
-  return ensureBiographyMount(root);
+  return {
+    biographyMount: ensureBiographyMount(root),
+    liveResponseMounts: ensureLiveResponseMounts(root),
+  };
+};
+
+const getClickedQuestionAnswer = (root, target) => {
+  const button = target?.closest?.("button");
+  if (!button || !root?.contains(button)) return null;
+
+  const questionBox = button.closest("[data-live-class-question-id]");
+  const questionId = questionBox?.dataset.liveClassQuestionId;
+  const question = liveQuestions.find((item) => item.id === questionId);
+  if (!question) return null;
+
+  const buttonText = button.textContent || "";
+  const option = question.options.find((item) => buttonText.includes(item));
+  if (!option) return null;
+
+  return { questionId, option };
 };
 
 export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
   const rootRef = useRef(null);
   const [biographyMount, setBiographyMount] = useState(null);
+  const [liveResponseMounts, setLiveResponseMounts] = useState({});
+  const [classSelections, setClassSelections] = useState({});
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
 
     const syncWorkbook = () => {
-      const mount = updateWorkbook(root);
-      if (mount) {
-        setBiographyMount((current) => (current === mount ? current : mount));
+      const next = updateWorkbook(root);
+      if (next.biographyMount) {
+        setBiographyMount((current) => (current === next.biographyMount ? current : next.biographyMount));
       }
+      setLiveResponseMounts((current) => {
+        const ids = Object.keys(next.liveResponseMounts);
+        const unchanged =
+          ids.length === Object.keys(current).length &&
+          ids.every((id) => current[id] === next.liveResponseMounts[id]);
+        return unchanged ? current : next.liveResponseMounts;
+      });
+    };
+
+    const handleClick = (event) => {
+      const response = getClickedQuestionAnswer(root, event.target);
+      if (!response) return;
+      setClassSelections((current) => ({
+        ...current,
+        [response.questionId]: response.option,
+      }));
     };
 
     syncWorkbook();
+    root.addEventListener("click", handleClick);
     const observer = new MutationObserver(syncWorkbook);
     observer.observe(root, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
+    return () => {
+      root.removeEventListener("click", handleClick);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -133,6 +212,22 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
       </div>
 
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
+
+      {liveQuestions.map((question) =>
+        liveResponseMounts[question.id]
+          ? createPortal(
+              <LiveClassResponsePanel
+                lessonId={LIVE_CLASS_LESSON_ID}
+                questionId={question.id}
+                questionLabel={question.stem}
+                options={question.options}
+                selectedOption={classSelections[question.id] || ""}
+              />,
+              liveResponseMounts[question.id],
+              `live-class-${question.id}`
+            )
+          : null
+      )}
 
       {biographyMount
         ? createPortal(
