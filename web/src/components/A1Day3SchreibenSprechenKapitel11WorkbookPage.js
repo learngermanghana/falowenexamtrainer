@@ -42,6 +42,17 @@ const answerClues = [
   "Sie heißt Anna.",
 ];
 
+const DAY3_SECTION_GROUPS = Object.freeze({
+  "Teil 1 · Reading / Writing": "1",
+  "Spelling Practice": "1",
+  "Basic Vocabulary for A1 German Class": "1",
+  "Explanation of W-Words and Their Usage": "2",
+  "Lückentext mit W-Wörtern": "2",
+  "Speaking Practice": "3",
+  "Introducing Yourself": "3",
+  "Key Things You Learned Today": "3",
+});
+
 const replaceText = (element, label, value) => {
   if (!element) return;
   const strong = document.createElement("strong");
@@ -58,9 +69,19 @@ const removeSectionByText = (root, selector, text) => {
 };
 
 const removeExcludedSections = (root) => {
-  removeSectionByText(root, "h1, h2, h3, h4", "Teil 1 · Reading / Writing");
   removeSectionByText(root, "p", "Class activity");
   removeSectionByText(root, "h1, h2, h3, h4, strong", "Save your class contribution");
+};
+
+const applyThreeTeilGroups = (root) => {
+  if (!root) return;
+  Array.from(root.querySelectorAll("section")).forEach((section) => {
+    const heading = Array.from(section.children || []).find((child) =>
+      /^H[1-4]$/.test(child.tagName || "")
+    );
+    const group = DAY3_SECTION_GROUPS[heading?.textContent?.trim() || ""];
+    if (group) section.dataset.a1PracticeSectionGroup = group;
+  });
 };
 
 const updateWWordExercise = (root) => {
@@ -131,6 +152,7 @@ const ensureLiveResponseMounts = (root) => {
 
 const updateWorkbook = (root) => {
   removeExcludedSections(root);
+  applyThreeTeilGroups(root);
   updateWWordExercise(root);
   return {
     biographyMount: ensureBiographyMount(root),
