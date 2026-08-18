@@ -36,6 +36,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/0ZddddnHvuI",
       },
     ],
+    6: [
+      {
+        chapter: "3.6",
+        topic: "Möbel und Räume kennenlernen",
+        url: "https://youtu.be/eBs5Xrpc_nQ",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
