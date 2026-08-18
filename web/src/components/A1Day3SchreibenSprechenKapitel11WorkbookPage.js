@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy from "./A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy";
+import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
 import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
 
 export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
@@ -44,6 +46,7 @@ const removeSectionByText = (root, selector, text) => {
 const removeExcludedSections = (root) => {
   removeSectionByText(root, "h1, h2, h3, h4", "Teil 1 · Reading / Writing");
   removeSectionByText(root, "p", "Class activity");
+  removeSectionByText(root, "h1, h2, h3, h4, strong", "Save your class contribution");
 };
 
 const updateWWordExercise = (root) => {
@@ -69,20 +72,48 @@ const updateWWordExercise = (root) => {
   );
 };
 
+const ensureBiographyMount = (root) => {
+  if (!root) return null;
+
+  const existing = root.querySelector("[data-a1-day3-class-biography]");
+  if (existing) return existing;
+
+  const marker = Array.from(root.querySelectorAll("strong")).find(
+    (element) => element.textContent?.trim() === "Next step: Save your biography"
+  );
+  const oldBox = marker?.parentElement;
+  const section = marker?.closest("section");
+  if (!oldBox || !section) return null;
+
+  const mount = document.createElement("div");
+  mount.dataset.a1Day3ClassBiography = "true";
+  section.replaceChild(mount, oldBox);
+  return mount;
+};
+
 const updateWorkbook = (root) => {
   removeExcludedSections(root);
   updateWWordExercise(root);
+  return ensureBiographyMount(root);
 };
 
 export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
   const rootRef = useRef(null);
+  const [biographyMount, setBiographyMount] = useState(null);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
 
-    updateWorkbook(root);
-    const observer = new MutationObserver(() => updateWorkbook(root));
+    const syncWorkbook = () => {
+      const mount = updateWorkbook(root);
+      if (mount) {
+        setBiographyMount((current) => (current === mount ? current : mount));
+      }
+    };
+
+    syncWorkbook();
+    const observer = new MutationObserver(syncWorkbook);
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
@@ -100,7 +131,36 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
           description="Watch the AI lesson, then continue with the Kapitel 1.1 self-learning practice book. No teacher lecture is currently configured for this page."
         />
       </div>
+
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
+
+      {biographyMount
+        ? createPortal(
+            <div
+              style={{
+                border: "1px solid #bfdbfe",
+                borderRadius: 14,
+                background: "#eff6ff",
+                padding: 14,
+                display: "grid",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "grid", gap: 5 }}>
+                <strong>Write your introduction</strong>
+                <p style={{ margin: 0, lineHeight: 1.7, color: "#475569" }}>
+                  Type your German introduction below. Your work saves automatically to the same biography used on the Class Members page, and classmates&apos; introductions appear here too.
+                </p>
+              </div>
+              <PersonalInformationContributionBox
+                autoSave
+                showReference={false}
+                placeholder="Hallo! Ich heiße Ama. Ich komme aus Ghana. Ich bin 25 Jahre alt und ich wohne in Accra."
+              />
+            </div>,
+            biographyMount
+          )
+        : null}
     </div>
   );
 }
