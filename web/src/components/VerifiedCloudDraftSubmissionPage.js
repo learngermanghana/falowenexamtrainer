@@ -6,7 +6,6 @@ import { styles } from "../styles";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
-import ExamReadinessBadge from "./ExamReadinessBadge";
 import { InfoBox } from "./ui";
 
 const DRAFT_COLLECTION = "submissionDrafts";
@@ -942,14 +941,6 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
           </div>
         </div>
       ) : null}
-
-      <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Certificate readiness</h3>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Keep this visible before every submission so you can spot missed or failed tasks early.
-        </p>
-        <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
-      </section>
 
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
