@@ -32,9 +32,13 @@ if (!source.includes("if (!A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET.has(assignmentKey)
 
 const testMarker = 'it("keeps A1 Day 19 self-practice outside the injected tutor navigation"';
 if (!testSource.includes(testMarker)) {
-  const testAnchor = '  it("builds Overview and separated Teil navigation for Day 0.2", () => {';
+  const testAnchors = [
+    '  it("builds Overview with the combined Teil 1 and separate Teil 3 for Day 0.2", () => {',
+    '  it("builds Overview and separated Teil navigation for Day 0.2", () => {',
+  ];
+  const testAnchor = testAnchors.find((candidate) => testSource.includes(candidate));
+  if (!testAnchor) throw new Error("Could not find A1 tutor navigation test anchor.");
   const regression = `  it("keeps A1 Day 19 self-practice outside the injected tutor navigation", () => {\n    expect(\n      resolveA1UnifiedTutorWorkbookMatch({\n        pathname: "/campus/course/verboten-erlaubt-5-9",\n        search: "?radio=done&materials=done&workbookTab=section-1",\n      }),\n    ).toBeNull();\n\n    expect(\n      resolveA1UnifiedTutorWorkbookMatch({\n        pathname: "/campus/course/lesson/A1/19",\n        search: "?chapter=5.9&view=workbook",\n      }),\n    ).toBeNull();\n  });\n\n${testAnchor}`;
-  if (!testSource.includes(testAnchor)) throw new Error("Could not find A1 tutor navigation test anchor.");
   testSource = testSource.replace(testAnchor, regression);
 }
 
