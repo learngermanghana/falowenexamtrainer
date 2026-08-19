@@ -21,7 +21,7 @@ jest.mock("./SpeakingExamIntroPage", () => function SpeakingWorkbookProbe() {
 });
 
 describe("A1 speaking-exam self-learning entry flow", () => {
-  test("opens the Kapitel 4.7 supporting-resource hub before the workbook", () => {
+  test("keeps the historical Day 15 dedicated entry path", () => {
     expect(A1_SPEAKING_EXAM_INTRO_ENTRY_PATH).toBe(
       "/campus/course/speaking-exams-intro-4-7",
     );
@@ -33,13 +33,23 @@ describe("A1 speaking-exam self-learning entry flow", () => {
     );
   });
 
-  test("renders the workbook directly for completed material URLs instead of nesting App routes", () => {
+  test("renders the dedicated workbook after the one-time Radio step", () => {
     render(
       <MemoryRouter
         initialEntries={[
           "/campus/course/speaking-exams-intro-4-7?view=workbook&radio=done&materials=done",
         ]}
       >
+        <A1SpeakingExamIntroEntryRoute />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("speaking-workbook")).toHaveTextContent("Speaking workbook (A1)");
+  });
+
+  test("does not redirect the dedicated page back into the generic lesson hub", () => {
+    render(
+      <MemoryRouter initialEntries={[A1_SPEAKING_EXAM_INTRO_ENTRY_PATH]}>
         <A1SpeakingExamIntroEntryRoute />
       </MemoryRouter>,
     );
