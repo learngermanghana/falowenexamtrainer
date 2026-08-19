@@ -117,23 +117,31 @@ export const resolveAssignmentStatus = ({
   passMark = PASS_MARK,
 }) => {
   const results = Array.isArray(resultRecords) ? resultRecords : resultRecords ? [resultRecords] : [];
+  const manualOverrides = results
+    .filter((row) => row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true)
+    .sort((a, b) => {
+      const aUpdatedAt = toIsoDate(a?.updatedAt || a?.manuallyEditedAt || a?.date || a?.createdAt) || "";
+      const bUpdatedAt = toIsoDate(b?.updatedAt || b?.manuallyEditedAt || b?.date || b?.createdAt) || "";
+      return new Date(bUpdatedAt || 0).getTime() - new Date(aUpdatedAt || 0).getTime();
+    });
+  const effectiveResults = manualOverrides.length ? [manualOverrides[0]] : results;
 
-  const hasExplicitPassed = results.some((row) => {
+  const hasExplicitPassed = effectiveResults.some((row) => {
     if (row?.passed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "passed";
   });
-  const hasExplicitFailed = results.some((row) => {
+  const hasExplicitFailed = effectiveResults.some((row) => {
     if (row?.failed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "failed";
   });
-  const hasExplicitSubmitted = results.some((row) => {
+  const hasExplicitSubmitted = effectiveResults.some((row) => {
     if (row?.submitted === true || row?.inProgress === true) return true;
     return ["submitted", "in_progress", "inprogress", "in-progress"].includes(
       String(row?.status || "").trim().toLowerCase()
     );
   });
 
-  const scored = results
+  const scored = effectiveResults
     .map((row) => ({
       score: toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade),
       identityRank: getResultIdentityRank(row),
