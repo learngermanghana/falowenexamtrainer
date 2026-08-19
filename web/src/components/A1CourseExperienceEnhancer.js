@@ -175,8 +175,9 @@ const ensureStyles = (root = document) => {
       display: inline-flex;
       font-size: 12px;
       font-weight: 900;
-      min-height: 30px;
-      padding: 5px 10px;
+      margin-top: 6px;
+      min-height: 26px;
+      padding: 4px 8px;
       white-space: nowrap;
     }
     [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
@@ -538,7 +539,14 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
 
   const cardsByDay = new Map();
   formattedCards.forEach((card) => {
-    const dayBadge = Array.from(card.querySelectorAll("span")).find((span) => /^Day\s+\d+(?:\s|$)/i.test(String(span.textContent || "").trim()));
+    const dayCandidates = Array.from(card.querySelectorAll("*"))
+      .filter((element) => /^Day\s+\d+(?:\s|$)/i.test(String(element.textContent || "").trim()))
+      .sort((left, right) => {
+        const childDifference = left.children.length - right.children.length;
+        if (childDifference) return childDifference;
+        return String(left.textContent || "").length - String(right.textContent || "").length;
+      });
+    const dayBadge = dayCandidates[0] || null;
     const day = String(dayBadge?.textContent || "").match(/^Day\s+(\d+)/i)?.[1] || "";
     if (!day) return;
     if (!cardsByDay.has(day)) cardsByDay.set(day, []);
@@ -569,7 +577,7 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
     if (!taskChip) {
       taskChip = root.createElement("span");
       taskChip.className = "a1-day-task-chip";
-      groupedEntry[taskIndex - 1].dayBadge?.insertAdjacentElement("afterend", taskChip);
+      groupedEntry[taskIndex - 1].dayBadge?.appendChild(taskChip);
       changed += 1;
     }
     if (taskChip.textContent !== taskLabel) {

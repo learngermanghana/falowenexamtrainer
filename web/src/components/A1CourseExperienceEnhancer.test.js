@@ -151,7 +151,7 @@ describe("A1CourseExperienceEnhancer", () => {
     document.body.innerHTML = `
       <select><option value="A1" selected>A1</option></select>
       <article>
-        <span>Day 2 0.2</span><h3>German Alphabet</h3>
+        <div class="day-badge"><strong>Day 2 0.2</strong></div><h3>German Alphabet</h3>
         <div><a href="/campus/course/lesson/A1/2?chapter=0.2">Open Lesson</a></div>
       </article>
       <article>
@@ -170,6 +170,7 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(cards[0].getAttribute("data-a1-day-task")).toBe("1");
     expect(cards[1].getAttribute("data-a1-day-task")).toBe("2");
     expect(cards[0].querySelector(".a1-day-task-chip").textContent).toBe("Task 1 of 2");
+    expect(cards[0].querySelector(".a1-day-task-chip").parentElement.tagName).toBe("STRONG");
     expect(cards[1].querySelector(".a1-day-task-chip").textContent).toBe("Task 2 of 2");
     expect(cards[2].hasAttribute("data-a1-day-task")).toBe(false);
   });
