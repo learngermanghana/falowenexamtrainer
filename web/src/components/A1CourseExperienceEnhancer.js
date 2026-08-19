@@ -288,11 +288,17 @@ const updateLessonMetadata = ({ root, container, title, routeInfo, sections, sub
   if (!container || !title || !routeInfo) return;
   container.setAttribute(HEADER_ATTRIBUTE, "true");
 
-  let metadata = container.querySelector(`:scope > [${META_ATTRIBUTE}]`);
+  // The selected header container can be an outer lesson card while the h1
+  // lives inside a nested header block. insertBefore requires its reference
+  // node to be a direct child, so always mount the metadata beside the title.
+  const titleContainer = title.parentElement;
+  if (!titleContainer) return;
+
+  let metadata = titleContainer.querySelector(`:scope > [${META_ATTRIBUTE}]`);
   if (!metadata) {
     metadata = root.createElement("div");
     metadata.setAttribute(META_ATTRIBUTE, "true");
-    container.insertBefore(metadata, title);
+    titleContainer.insertBefore(metadata, title);
   }
 
   const modeLabel = submitButton ? "Tutor-marked assignment" : sections.length ? "Practice lesson" : "Lesson";
