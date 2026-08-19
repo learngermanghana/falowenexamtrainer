@@ -9,6 +9,8 @@ const HEADER_ATTRIBUTE = "data-a1-lesson-header";
 const COURSE_CARD_ATTRIBUTE = "data-a1-course-card";
 const COURSE_ACTION_ATTRIBUTE = "data-a1-course-action";
 const COURSE_ACTIONS_ATTRIBUTE = "data-a1-course-actions";
+const COURSE_DAY_TASK_ATTRIBUTE = "data-a1-day-task";
+const COURSE_DAY_TASK_COUNT_ATTRIBUTE = "data-a1-day-task-count";
 
 const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") || "/";
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -156,6 +158,27 @@ const ensureStyles = (root = document) => {
       font-size: clamp(1.05rem, 2.8vw, 1.2rem) !important;
       line-height: 1.3 !important;
     }
+    [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="1"] {
+      border-left-color: #2563eb !important;
+      background: linear-gradient(90deg, rgba(239,246,255,.85), #ffffff 20%) !important;
+    }
+    [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="2"] {
+      border-left-color: #8b5cf6 !important;
+      background: linear-gradient(90deg, rgba(245,243,255,.9), #ffffff 20%) !important;
+    }
+    .a1-day-task-chip {
+      align-items: center;
+      background: #ede9fe;
+      border: 1px solid #c4b5fd;
+      border-radius: 999px;
+      color: #5b21b6;
+      display: inline-flex;
+      font-size: 12px;
+      font-weight: 900;
+      min-height: 30px;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
     [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
       align-items: center !important;
       display: flex !important;
@@ -233,14 +256,34 @@ const ensureStyles = (root = document) => {
     }
     @media (max-width: 640px) {
       [${NAV_ATTRIBUTE}="true"] { top: 4px; border-radius: 14px; }
-      [${COURSE_CARD_ATTRIBUTE}="true"] { padding: 14px !important; }
+      [${COURSE_CARD_ATTRIBUTE}="true"] {
+        align-items: stretch !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        padding: 14px !important;
+        width: 100% !important;
+      }
+      [${COURSE_CARD_ATTRIBUTE}="true"] > * {
+        min-width: 0 !important;
+        width: 100% !important;
+      }
       [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
         align-items: stretch !important;
         flex-direction: column !important;
         min-width: 0;
         width: 100%;
       }
-      [${COURSE_ACTION_ATTRIBUTE}="true"] { min-width: 0 !important; width: 100%; }
+      [${COURSE_ACTION_ATTRIBUTE}="true"] {
+        inset: auto !important;
+        margin: 0 !important;
+        min-width: 0 !important;
+        position: static !important;
+        transform: none !important;
+        width: 100% !important;
+      }
       [data-a1-coursebook="true"] { gap: 12px !important; }
       [data-a1-coursebook="true"] [data-a1-coursebook-hero-header="true"],
       [data-a1-coursebook="true"] [data-a1-coursebook-hero-actions="true"],
@@ -438,7 +481,12 @@ const clearA1CourseBookAttributes = (root = document, { resetLabels = false } = 
     }
   });
   root.querySelectorAll(`[${COURSE_ACTIONS_ATTRIBUTE}="true"]`).forEach((element) => element.removeAttribute(COURSE_ACTIONS_ATTRIBUTE));
-  root.querySelectorAll(`[${COURSE_CARD_ATTRIBUTE}="true"]`).forEach((element) => element.removeAttribute(COURSE_CARD_ATTRIBUTE));
+  root.querySelectorAll(`[${COURSE_CARD_ATTRIBUTE}="true"]`).forEach((element) => {
+    element.removeAttribute(COURSE_CARD_ATTRIBUTE);
+    element.removeAttribute(COURSE_DAY_TASK_ATTRIBUTE);
+    element.removeAttribute(COURSE_DAY_TASK_COUNT_ATTRIBUTE);
+  });
+  root.querySelectorAll(".a1-day-task-chip").forEach((element) => element.remove());
 };
 
 export const applyA1CourseBookFormatting = (root = document, pathname = window.location?.pathname) => {
@@ -450,6 +498,7 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
   }
 
   let changed = 0;
+  const formattedCards = [];
   Array.from(root.querySelectorAll("article a")).forEach((action) => {
     if (!isA1CourseLessonAction(action)) return;
     const card = action.closest("article");
@@ -457,6 +506,7 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
 
     if (card.getAttribute(COURSE_CARD_ATTRIBUTE) !== "true") changed += 1;
     card.setAttribute(COURSE_CARD_ATTRIBUTE, "true");
+    if (!formattedCards.includes(card)) formattedCards.push(card);
 
     if (action.getAttribute(COURSE_ACTION_ATTRIBUTE) !== "true") changed += 1;
     action.setAttribute(COURSE_ACTION_ATTRIBUTE, "true");
@@ -484,6 +534,48 @@ export const applyA1CourseBookFormatting = (root = document, pathname = window.l
       changed += 1;
     }
     action.setAttribute("aria-label", `${nextLabel}: ${card.querySelector("h3")?.textContent || "A1 lesson"}`);
+  });
+
+  const cardsByDay = new Map();
+  formattedCards.forEach((card) => {
+    const dayBadge = Array.from(card.querySelectorAll("span")).find((span) => /^Day\s+\d+(?:\s|$)/i.test(String(span.textContent || "").trim()));
+    const day = String(dayBadge?.textContent || "").match(/^Day\s+(\d+)/i)?.[1] || "";
+    if (!day) return;
+    if (!cardsByDay.has(day)) cardsByDay.set(day, []);
+    cardsByDay.get(day).push({ card, dayBadge });
+  });
+
+  formattedCards.forEach((card) => {
+    const existingChip = card.querySelector(".a1-day-task-chip");
+    const groupedEntry = Array.from(cardsByDay.values()).find((entries) => entries.length > 1 && entries.some((entry) => entry.card === card));
+    if (!groupedEntry) {
+      if (card.hasAttribute(COURSE_DAY_TASK_ATTRIBUTE)) {
+        card.removeAttribute(COURSE_DAY_TASK_ATTRIBUTE);
+        card.removeAttribute(COURSE_DAY_TASK_COUNT_ATTRIBUTE);
+        existingChip?.remove();
+        changed += 1;
+      }
+      return;
+    }
+
+    const taskIndex = groupedEntry.findIndex((entry) => entry.card === card) + 1;
+    const taskCount = groupedEntry.length;
+    const taskLabel = `Task ${taskIndex} of ${taskCount}`;
+    if (card.getAttribute(COURSE_DAY_TASK_ATTRIBUTE) !== String(taskIndex)) changed += 1;
+    card.setAttribute(COURSE_DAY_TASK_ATTRIBUTE, String(taskIndex));
+    card.setAttribute(COURSE_DAY_TASK_COUNT_ATTRIBUTE, String(taskCount));
+
+    let taskChip = existingChip;
+    if (!taskChip) {
+      taskChip = root.createElement("span");
+      taskChip.className = "a1-day-task-chip";
+      groupedEntry[taskIndex - 1].dayBadge?.insertAdjacentElement("afterend", taskChip);
+      changed += 1;
+    }
+    if (taskChip.textContent !== taskLabel) {
+      taskChip.textContent = taskLabel;
+      changed += 1;
+    }
   });
 
   return changed;
