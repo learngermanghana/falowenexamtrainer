@@ -160,18 +160,15 @@ const ensureStyles = (root = document) => {
     }
     [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="1"] {
       border-left-color: #2563eb !important;
-      background: linear-gradient(90deg, rgba(239,246,255,.85), #ffffff 20%) !important;
+      background: linear-gradient(90deg, rgba(239,246,255,.9), #ffffff 20%) !important;
     }
     [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="2"] {
-      border-left-color: #8b5cf6 !important;
-      background: linear-gradient(90deg, rgba(245,243,255,.9), #ffffff 20%) !important;
+      border-left-color: #f97316 !important;
+      background: linear-gradient(90deg, rgba(255,247,237,.95), #ffffff 20%) !important;
     }
     .a1-day-task-chip {
       align-items: center;
-      background: #ede9fe;
-      border: 1px solid #c4b5fd;
       border-radius: 999px;
-      color: #5b21b6;
       display: inline-flex;
       font-size: 12px;
       font-weight: 900;
@@ -179,6 +176,16 @@ const ensureStyles = (root = document) => {
       min-height: 26px;
       padding: 4px 8px;
       white-space: nowrap;
+    }
+    [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="1"] .a1-day-task-chip {
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+    [${COURSE_CARD_ATTRIBUTE}="true"][${COURSE_DAY_TASK_ATTRIBUTE}="2"] .a1-day-task-chip {
+      background: #ffedd5;
+      border: 1px solid #fdba74;
+      color: #9a3412;
     }
     [${COURSE_ACTIONS_ATTRIBUTE}="true"] {
       align-items: center !important;
