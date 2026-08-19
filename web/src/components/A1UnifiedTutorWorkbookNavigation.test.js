@@ -79,7 +79,7 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     ).toBeNull();
   });
 
-  it("builds Overview and separated Teil navigation for Day 0.2", () => {
+  it("builds Overview with the combined Teil 1 and separate Teil 3 for Day 0.2", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div id="alphabet-workbook">
@@ -87,8 +87,7 @@ describe("A1 unified tutor-marked workbook navigation", () => {
             <button aria-selected="true">Assignment</button>
             <button aria-selected="false">Submit</button>
           </div>
-          <section id="alphabet-teil1"><h2>Teil 1 · Reading and Writing</h2></section>
-          <section id="alphabet-teil2"><h2>Teil 2 · Questions</h2></section>
+          <section id="alphabet-teil1"><h2>Teil 1 · Reading and Questions</h2></section>
           <section id="alphabet-teil3"><h2>Teil 3 · Hören</h2></section>
         </div>
       </main>
@@ -100,7 +99,6 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     expect(state.pageManaged).toBe(false);
     expect(state.tabs).toEqual([
       expect.objectContaining({ key: "teil-1", number: 1 }),
-      expect.objectContaining({ key: "teil-2", number: 2 }),
       expect.objectContaining({ key: "teil-3", number: 3 }),
     ]);
   });
