@@ -111,7 +111,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
       fallbackAssignmentKey="A1-0.2"
       title="A1 · Day 2 Workbook · German Alphabet + Reviewing"
       subtitle="Chapter 0.2 · Assignment for tutor marking"
-      assignmentIntro="Complete Teil 1 + Teil 2 and Teil 3, then open Submit to send your final answers for A1-0.2."
+      assignmentIntro="Complete Teil 1 and Teil 3, then open Submit to send your final answers for A1-0.2. The reading text and its questions are combined in Teil 1."
       submitTitle="Submit A1 · Day 2 · German Alphabet"
       submitDescription="This submission is locked to A1-0.2."
     >
@@ -122,7 +122,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
           loading="lazy"
           style={imageStyle}
         />
-        <h2 style={{ margin: 0 }}>Teil 1 + Teil 2 · Reading and Questions</h2>
+        <h2 style={{ margin: 0 }}>Teil 1 · Reading and Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Instruction:</strong> Read the text carefully and answer the questions directly below it. Each question has one correct answer.
         </p>
