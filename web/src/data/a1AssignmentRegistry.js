@@ -15,7 +15,10 @@ export const A1_ASSIGNMENT_ORDER = Object.freeze([
   "A1-12.1", "A1-12.2", "A1-12.3", "A1-13", "A1-14.1",
 ]);
 
-const section = (number, label) => Object.freeze({ key: `teil-${number}`, number, label });\nconst recordSection = (definition, index) => Array.isArray(definition)\n  ? section(definition[0], definition[1])\n  : section(index + 1, definition);
+const section = (number, label) => Object.freeze({ key: `teil-${number}`, number, label });
+const recordSection = (definition, index) => Array.isArray(definition)
+  ? section(definition[0], definition[1])
+  : section(index + 1, definition);
 
 const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day1GreetingsWorkbookPage",
