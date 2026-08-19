@@ -1,5 +1,4 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
 import SpeakingExamIntroPage from "./SpeakingExamIntroPage";
 import { ExamProvider } from "../context/ExamContext";
 
@@ -18,26 +17,12 @@ export const buildA1SpeakingExamIntroHubDestination = (search = "") => {
 };
 
 export default function A1SpeakingExamIntroEntryRoute() {
-  const location = useLocation();
-  const query = new URLSearchParams(location.search || "");
-
-  // This route is mounted outside App, so it also sits outside the provider
-  // normally installed by AppShell. Keep rendering the workbook directly to
-  // avoid nested Routes, but restore the exam context expected by shared
-  // campus navigation and workbook controls.
-  if (query.get("view") === "workbook") {
-    return (
-      <ExamProvider>
-        <SpeakingExamIntroPage />
-      </ExamProvider>
-    );
-  }
-
+  // Day 15 was originally a stable dedicated page. Keep it outside the
+  // generic chapter hub and its DOM injectors. The route-scoped A1 Radio
+  // service owns the one-time Radio gate; this component owns only the page.
   return (
-    <Navigate
-      replace
-      state={null}
-      to={buildA1SpeakingExamIntroHubDestination(location.search)}
-    />
+    <ExamProvider>
+      <SpeakingExamIntroPage />
+    </ExamProvider>
   );
 }
