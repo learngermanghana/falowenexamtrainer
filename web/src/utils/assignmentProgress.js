@@ -118,7 +118,7 @@ export const resolveAssignmentStatus = ({
 }) => {
   const results = Array.isArray(resultRecords) ? resultRecords : resultRecords ? [resultRecords] : [];
   const manualOverrides = results
-    .filter((row) => row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true)
+    .filter((row) => row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true || row?.manuallyEdited === true)
     .sort((a, b) => {
       const aUpdatedAt = toIsoDate(a?.updatedAt || a?.manuallyEditedAt || a?.date || a?.createdAt) || "";
       const bUpdatedAt = toIsoDate(b?.updatedAt || b?.manuallyEditedAt || b?.date || b?.createdAt) || "";
@@ -127,10 +127,18 @@ export const resolveAssignmentStatus = ({
   const effectiveResults = manualOverrides.length ? [manualOverrides[0]] : results;
 
   const hasExplicitPassed = effectiveResults.some((row) => {
+    const correctedScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
+    if ((row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true || row?.manuallyEdited === true) && correctedScore !== null) {
+      return correctedScore >= passMark;
+    }
     if (row?.passed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "passed";
   });
   const hasExplicitFailed = effectiveResults.some((row) => {
+    const correctedScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
+    if ((row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true || row?.manuallyEdited === true) && correctedScore !== null) {
+      return correctedScore < passMark;
+    }
     if (row?.failed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "failed";
   });
