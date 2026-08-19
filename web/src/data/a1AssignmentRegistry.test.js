@@ -32,6 +32,13 @@ describe("canonical A1 assignment registry", () => {
     expect(assignment.submissionEnabled).toBe(true);
   });
 
+  test("preserves non-consecutive section numbers after workbook parts are merged", () => {
+    expect(A1_ASSIGNMENT_REGISTRY["A1-0.2"].sections).toEqual([
+      { key: "teil-1", number: 1, label: "Teil 1 · Reading and Questions" },
+      { key: "teil-3", number: 3, label: "Teil 3 · Hören" },
+    ]);
+  });
+
   test("gives dotted chapters the requested short, permanent aliases", () => {
     expect(A1_ASSIGNMENT_REGISTRY["A1-0.2"].shortLessonRoute).toBe(
       "/campus/course/lesson/A1/0.2",
