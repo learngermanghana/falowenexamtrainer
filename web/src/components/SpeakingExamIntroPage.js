@@ -286,6 +286,8 @@ const SpeakingExamIntroPage = () => {
             ["kaufen", "Können Sie bitte Brot kaufen?", "Can you please buy bread?"],
             ["aufmachen", "Können Sie bitte das Fenster aufmachen?", "Can you please open the window?"],
             ["anmachen", "Können Sie bitte das Licht anmachen?", "Can you please turn on the light?"],
+            ["zumachen", "Können Sie bitte das Fenster zumachen?", "Can you please close the window?"],
+            ["ausmachen", "Können Sie bitte das Licht ausmachen?", "Can you please turn off the light?"],
           ]}
         />
         <WarningCallout>
