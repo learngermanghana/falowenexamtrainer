@@ -61,6 +61,34 @@ describe("resolveAssignmentStatus", () => {
     expect(status.bestScore).toBe(74);
     expect(status.latestScore).toBe(74);
   });
+  test("manual correction to 40 overrides an earlier mistaken pass", () => {
+    const status = resolveAssignmentStatus({
+      assignmentId: "A1-1.2",
+      resultRecords: [
+        {
+          score: 100,
+          status: "passed",
+          passed: true,
+          updatedAt: "2026-08-19T08:23:00.000Z",
+        },
+        {
+          score: 40,
+          status: "failed",
+          passed: false,
+          failed: true,
+          scoreOverrideAuthoritative: true,
+          updatedAt: "2026-08-19T08:52:21.000Z",
+        },
+      ],
+    });
+
+    expect(status.status).toBe("failed");
+    expect(status.passed).toBe(false);
+    expect(status.failed).toBe(true);
+    expect(status.bestScore).toBe(40);
+    expect(status.latestScore).toBe(40);
+  });
+
   test("prefers explicit canonical assignment rows when picking latestScore", () => {
     const status = resolveAssignmentStatus({
       assignmentId: "A2-3.6",
