@@ -53,11 +53,18 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toBeNull();
   });
 
-  test("keeps Day 2 Falowen Radio on the canonical A1-1.1 workbook route", () => {
+  test("does not repeat Day 2 Falowen Radio after the resource hub opens the workbook", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
         "/campus/course/a1-day-2-kapitel-1-1-workbook",
         "?workbookTab=overview&assignmentKey=A1-1.1&level=A1",
+      ),
+    ).toBeNull();
+
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/2",
+        "?chapter=1.1&hub=1",
       ),
     ).toEqual({ day: 2, chapter: "1.1" });
   });
