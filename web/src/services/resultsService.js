@@ -218,6 +218,8 @@ const buildResults = (scores = []) => {
         result: normalizeString(row.result || row.status) || "",
         passed: row.passed === true,
         failed: row.failed === true,
+        manuallyEdited: row.manuallyEdited === true,
+        manuallyEditedAt: normalizeString(row.manuallyEditedAt) || "",
         manualScoreOverride: row.manualScoreOverride === true,
         scoreOverrideAuthoritative: row.scoreOverrideAuthoritative === true,
         score: resolvedFinalScore,
