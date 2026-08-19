@@ -147,6 +147,33 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(cards[1].textContent).toContain("Practice");
   });
 
+  it("labels multiple lessons on the same day as separate tasks", () => {
+    document.body.innerHTML = `
+      <select><option value="A1" selected>A1</option></select>
+      <article>
+        <span>Day 2 0.2</span><h3>German Alphabet</h3>
+        <div><a href="/campus/course/lesson/A1/2?chapter=0.2">Open Lesson</a></div>
+      </article>
+      <article>
+        <span>Day 2 1.1</span><h3>Personal Pronouns</h3>
+        <div><a href="/campus/course/lesson/A1/2?chapter=1.1">Open Lesson</a></div>
+      </article>
+      <article>
+        <span>Day 3</span><h3>Personal Information</h3>
+        <div><a href="/campus/course/lesson/A1/3?chapter=1.1">Open Lesson</a></div>
+      </article>
+    `;
+
+    applyA1CourseBookFormatting(document, "/campus/course");
+
+    const cards = Array.from(document.querySelectorAll("article"));
+    expect(cards[0].getAttribute("data-a1-day-task")).toBe("1");
+    expect(cards[1].getAttribute("data-a1-day-task")).toBe("2");
+    expect(cards[0].querySelector(".a1-day-task-chip").textContent).toBe("Task 1 of 2");
+    expect(cards[1].querySelector(".a1-day-task-chip").textContent).toBe("Task 2 of 2");
+    expect(cards[2].hasAttribute("data-a1-day-task")).toBe(false);
+  });
+
   it("removes A1-only action attributes and restores the generic label after changing level", () => {
     document.body.innerHTML = `
       <select>
@@ -185,5 +212,8 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(css).toContain('[data-a1-coursebook="true"] [data-a1-coursebook-tabs="true"]');
     expect(css).toContain("flex-direction: column !important");
     expect(css).toContain("min-height: 44px");
+    expect(css).toContain("position: static !important");
+    expect(css).toContain("width: 100% !important");
+    expect(css).toContain(".a1-day-task-chip");
   });
 });
