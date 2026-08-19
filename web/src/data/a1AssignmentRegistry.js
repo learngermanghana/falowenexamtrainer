@@ -15,7 +15,7 @@ export const A1_ASSIGNMENT_ORDER = Object.freeze([
   "A1-12.1", "A1-12.2", "A1-12.3", "A1-13", "A1-14.1",
 ]);
 
-const section = (number, label) => Object.freeze({ key: `teil-${number}`, number, label });
+const section = (number, label) => Object.freeze({ key: `teil-${number}`, number, label });\nconst recordSection = (definition, index) => Array.isArray(definition)\n  ? section(definition[0], definition[1])\n  : section(index + 1, definition);
 
 const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day1GreetingsWorkbookPage",
@@ -35,7 +35,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
 
 const records = [
   ["A1-0.1", 1, "0.1", "Greetings and Asking About Well-being", "/campus/course/a1-day-1-greetings-workbook", "A1Day1GreetingsWorkbookPage", ["Teil 1 · Reading Text", "Teil 2 · Multiple-Choice Questions"]],
-  ["A1-0.2", 2, "0.2", "German Alphabet", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", "A1Day3GermanAlphabetReviewingWorkbookPage", ["Teil 1 · Reading and Questions", "Teil 3 · Hören"]],
+  ["A1-0.2", 2, "0.2", "German Alphabet", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook", "A1Day3GermanAlphabetReviewingWorkbookPage", [[1, "Teil 1 · Reading and Questions"], [3, "Teil 3 · Hören"]]],
   ["A1-1.1", 2, "1.1", "Personal Pronouns and Basic Verb Conjugation", "/campus/course/a1-day-2-kapitel-1-1-workbook", "A1Day2Kapitel11WorkbookPage", ["Teil 1 · Hören", "Teil 2 · Schreiben"]],
   ["A1-1.2", 3, "1.2", "Present-Tense Verb Conjugation Practice", "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook", "A1Day3PronounsIntroducingYourselfWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Schreiben (Exercise)", "Teil 3 · Hören"]],
   ["A1-2", 4, "2", "Numbers", "/campus/course/a1-day-4-numbers-for-beginners-workbook", "A1Day4NumbersForBeginnersWorkbookPage", ["Teil 1: Reading / Writing", "Teil 2: Questions"]],
@@ -76,7 +76,7 @@ export const A1_ASSIGNMENT_REGISTRY = Object.freeze(Object.fromEntries(records.m
       ...routeParts,
       component,
       layoutMode: NATIVE_SHARED_LAYOUT_COMPONENTS.has(component) ? "native" : "bridge",
-      sections: Object.freeze(labels.map((label, index) => section(index + 1, label))),
+      sections: Object.freeze(labels.map(recordSection)),
       submissionEnabled: true,
     })];
   }
