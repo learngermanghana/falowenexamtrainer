@@ -216,5 +216,9 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(css).toContain("position: static !important");
     expect(css).toContain("width: 100% !important");
     expect(css).toContain(".a1-day-task-chip");
+    expect(css).toContain("background: #dbeafe");
+    expect(css).toContain("border-left-color: #f97316");
+    expect(css).toContain("background: #ffedd5");
+    expect(css).toContain("color: #9a3412");
   });
 });
