@@ -80,6 +80,31 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(document.body.textContent).toContain("Original questions");
   });
 
+  it("formats a nested Day 15 lesson heading without an insertBefore DOMException", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <article class="lesson-card">
+          <button>Back to Course Book</button>
+          <header><h1>Speaking Exams Introduction</h1></header>
+          <section><h2>Lesson resources</h2><p>Original lesson content</p></section>
+        </article>
+      </main>
+    `;
+
+    expect(() =>
+      applyA1LessonFormatting(document, {
+        pathname: "/campus/course/lesson/A1/15",
+        search: "?radio=done&chapter=4.7&hub=1",
+      })
+    ).not.toThrow();
+
+    const title = document.querySelector("h1");
+    const metadata = document.querySelector('[data-a1-lesson-meta="true"]');
+    expect(metadata.parentElement).toBe(title.parentElement);
+    expect(metadata.nextElementSibling).toBe(title);
+    expect(metadata.textContent).toContain("A1 · Day 15 · Kapitel 4.7");
+  });
+
   it("applies one shared action design to every A1 lesson card regardless of the current button label", () => {
     document.body.innerHTML = `
       <select>
