@@ -43,6 +43,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/eBs5Xrpc_nQ",
       },
     ],
+    8: [
+      {
+        chapter: "3.8",
+        topic: "Rezepte und Essen",
+        url: "https://youtu.be/diUTkWdqT_0",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
