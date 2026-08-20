@@ -57,15 +57,24 @@ if (!backend.includes("Your latest submission is still awaiting review.")) {
   throw new Error("Backend pending-review gate was not installed");
 }
 
-// The account-upgrade patch emits existing browser template-literal expressions
-// into source files. Seed them as literal strings while the patch runs in Node.
+// The account-upgrade patch writes browser-side template literals into source.
+// Seed placeholder strings so Node does not evaluate those expressions while
+// applying the patch during Vercel/Firebase builds.
 globalThis.studentProfile = { paymentStatus: '${studentProfile?.paymentStatus || ""}' };
 globalThis.window = { location: { origin: '${window.location.origin}' } };
+globalThis.nextLevel = '${nextLevel}';
+globalThis.queuedUpgradeLevel = '${queuedUpgradeLevel}';
+globalThis.idToken = '${idToken}';
+globalThis.path = '${path}';
 try {
   await import("./patchPaymentDrivenAccountUpgrade.mjs");
 } finally {
   delete globalThis.studentProfile;
   delete globalThis.window;
+  delete globalThis.nextLevel;
+  delete globalThis.queuedUpgradeLevel;
+  delete globalThis.idToken;
+  delete globalThis.path;
 }
 
 console.log("Resubmission gate aligned: latest attempt must be marked failed before another resubmission.");
