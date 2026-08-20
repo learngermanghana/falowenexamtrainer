@@ -57,13 +57,15 @@ if (!backend.includes("Your latest submission is still awaiting review.")) {
   throw new Error("Backend pending-review gate was not installed");
 }
 
-// The account-upgrade patch emits one existing template-literal expression into
-// TuitionStatusCard. Seed that expression as a literal during the patch run.
+// The account-upgrade patch emits existing browser template-literal expressions
+// into source files. Seed them as literal strings while the patch runs in Node.
 globalThis.studentProfile = { paymentStatus: '${studentProfile?.paymentStatus || ""}' };
+globalThis.window = { location: { origin: '${window.location.origin}' } };
 try {
   await import("./patchPaymentDrivenAccountUpgrade.mjs");
 } finally {
   delete globalThis.studentProfile;
+  delete globalThis.window;
 }
 
 console.log("Resubmission gate aligned: latest attempt must be marked failed before another resubmission.");
