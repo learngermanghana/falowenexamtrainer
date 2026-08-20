@@ -57,4 +57,6 @@ if (!backend.includes("Your latest submission is still awaiting review.")) {
   throw new Error("Backend pending-review gate was not installed");
 }
 
+await import("./patchPaymentDrivenAccountUpgrade.mjs");
+
 console.log("Resubmission gate aligned: latest attempt must be marked failed before another resubmission.");
