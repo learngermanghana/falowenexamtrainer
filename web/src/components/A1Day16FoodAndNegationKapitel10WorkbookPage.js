@@ -40,6 +40,19 @@ const questionBoxStyle = {
   background: "#fff",
 };
 
+const readingQuestions = [
+  "1. Der Autor geht jeden Tag einkaufen.",
+  "2. Der Autor kauft im Supermarkt Obst, Gemüse, Brot, Milch und Eier.",
+  "3. Der Autor macht oft eine Einkaufsliste, um Geld zu sparen.",
+  "4. Der Autor geht gerne auf den Wochenmarkt, weil die Atmosphäre schön ist und die Produkte frisch sind.",
+  "5. Letzten Samstag hat der Autor Tomaten, Gurken, Salat und Kartoffeln auf dem Markt gekauft.",
+  "6. Der Verkäufer fragt den Kunden, ob er noch etwas möchte.",
+  "7. Der Autor bereitet einen Tomatensalat mit Tomaten, Zwiebeln, Salz, Pfeffer und Olivenöl zu.",
+  "8. Der Autor kocht nicht gerne nach dem Einkaufen.",
+  "9. Der Autor findet, dass die Qualität der Produkte auf dem Wochenmarkt oft schlechter ist als im Supermarkt.",
+  "10. Der Tomatensalat dauert 20 Minuten, um ihn zuzubereiten.",
+];
+
 const listeningQuestions = [
   {
     stem: "1. Wie oft geht der Sprecher einkaufen?",
@@ -215,7 +228,7 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
               <strong>📝 Workbook Teil 1 (Lesen):</strong> Einkaufen und Kochen
             </p>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Instructions:</strong> Read the text below.
+              <strong>Instructions:</strong> Read the text below and choose the correct answer. One answer is correct.
             </p>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               Einkaufen ist wichtig. Ich mache oft eine Einkaufsliste und kaufe Obst, Gemüse, Brot, Milch und Eier im
@@ -225,6 +238,17 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
               einfaches Rezept ist Tomatensalat: Tomaten und Zwiebeln schneiden, mit Salz, Pfeffer und Olivenöl mischen.
               Dieser Salat ist schnell gemacht und sehr lecker.
             </p>
+          </section>
+
+          <section style={sectionStyle}>
+            <p style={{ margin: 0, fontWeight: 600 }}>A) True or False Questions</p>
+            {readingQuestions.map((question) => (
+              <div key={question} style={questionBoxStyle}>
+                <strong>{question}</strong>
+                <span>A) Wahr</span>
+                <span>B) Falsch</span>
+              </div>
+            ))}
           </section>
 
           <section style={sectionStyle}>
@@ -249,7 +273,7 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
             >
               Open Hören video on YouTube
             </a>
-            <p style={{ margin: "8px 0 0", fontWeight: 600 }}>Hören Fragen (Multiple Choice)</p>
+            <p style={{ margin: "8px 0 0", fontWeight: 600 }}>B) Hören Fragen (Multiple Choice)</p>
             {listeningQuestions.map((question) => (
               <div key={question.stem} style={questionBoxStyle}>
                 <strong>{question.stem}</strong>
