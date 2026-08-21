@@ -238,9 +238,6 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
               einfaches Rezept ist Tomatensalat: Tomaten und Zwiebeln schneiden, mit Salz, Pfeffer und Olivenöl mischen.
               Dieser Salat ist schnell gemacht und sehr lecker.
             </p>
-          </section>
-
-          <section style={sectionStyle}>
             <p style={{ margin: 0, fontWeight: 600 }}>A) True or False Questions</p>
             {readingQuestions.map((question) => (
               <div key={question} style={questionBoxStyle}>
