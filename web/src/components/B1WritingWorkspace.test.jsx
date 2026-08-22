@@ -34,6 +34,26 @@ describe("B1WritingWorkspace", () => {
     expect(screen.getByRole("button", { name: "Insert Informal Letter Template" })).toBeVisible();
   });
 
+  test("keeps B1 Day 4 opinion structure inside the writing cheat sheet", () => {
+    render(
+      <B1WritingWorkspace
+        writingContext={{
+          level: "B1",
+          day: 4,
+          taskTitle: "Sind persönliche Kontakte bei der Wohnungssuche hilfreicher als Online-Portale?",
+        }}
+      />,
+    );
+
+    const day4CheatSheet = screen.getByTestId("b1-day4-writing-cheat-sheet");
+    expect(day4CheatSheet).toBeVisible();
+    expect(within(day4CheatSheet).getByText("Day 4 · Wohnung suchen")).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/sowohl Online-Portale als auch persönliche Kontakte/)).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/Online-Portale bieten zwar viele Anzeigen/)).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/Use at least two different paired connectors/)).toBeVisible();
+    expect(screen.queryByTestId("b1-day5-writing-cheat-sheet")).not.toBeInTheDocument();
+  });
+
   test("keeps B1 Day 5 landlord-email guidance inside the writing cheat sheet", () => {
     render(
       <B1WritingWorkspace
@@ -52,10 +72,12 @@ describe("B1WritingWorkspace", () => {
     expect(within(day5CheatSheet).getAllByText(/Wäre Samstag um 14 Uhr möglich/).length).toBeGreaterThan(0);
     expect(within(day5CheatSheet).getAllByText(/Sie erreichen mich unter/).length).toBeGreaterThan(0);
     expect(within(day5CheatSheet).getByText("Final check")).toBeVisible();
+    expect(screen.queryByTestId("b1-day4-writing-cheat-sheet")).not.toBeInTheDocument();
   });
 
-  test("does not show Day 5-specific writing guidance on another B1 day", () => {
-    render(<B1WritingWorkspace writingContext={{ level: "B1", day: 4 }} />);
+  test("does not show Day 4 or Day 5-specific writing guidance on another B1 day", () => {
+    render(<B1WritingWorkspace writingContext={{ level: "B1", day: 3 }} />);
+    expect(screen.queryByTestId("b1-day4-writing-cheat-sheet")).not.toBeInTheDocument();
     expect(screen.queryByTestId("b1-day5-writing-cheat-sheet")).not.toBeInTheDocument();
   });
 
