@@ -13,7 +13,7 @@ jest.mock("./B1InlineWritingAnalyser", () => {
 });
 
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import B1WritingWorkspace from "./B1WritingWorkspace";
 
 describe("B1WritingWorkspace", () => {
@@ -32,6 +32,53 @@ describe("B1WritingWorkspace", () => {
     expect(screen.getByRole("button", { name: "Insert Opinion Essay Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Formal Letter Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Informal Letter Template" })).toBeVisible();
+  });
+
+  test("keeps B1 Day 4 opinion structure inside the writing cheat sheet", () => {
+    render(
+      <B1WritingWorkspace
+        writingContext={{
+          level: "B1",
+          day: 4,
+          taskTitle: "Sind persönliche Kontakte bei der Wohnungssuche hilfreicher als Online-Portale?",
+        }}
+      />,
+    );
+
+    const day4CheatSheet = screen.getByTestId("b1-day4-writing-cheat-sheet");
+    expect(day4CheatSheet).toBeVisible();
+    expect(within(day4CheatSheet).getByText("Day 4 · Wohnung suchen")).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/sowohl Online-Portale als auch persönliche Kontakte/)).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/Online-Portale bieten zwar viele Anzeigen/)).toBeVisible();
+    expect(within(day4CheatSheet).getByText(/Use at least two different paired connectors/)).toBeVisible();
+    expect(screen.queryByTestId("b1-day5-writing-cheat-sheet")).not.toBeInTheDocument();
+  });
+
+  test("keeps B1 Day 5 landlord-email guidance inside the writing cheat sheet", () => {
+    render(
+      <B1WritingWorkspace
+        writingContext={{
+          level: "B1",
+          day: 5,
+          taskTitle: "Schreiben Sie eine höfliche E-Mail an den Vermieter.",
+        }}
+      />,
+    );
+
+    const day5CheatSheet = screen.getByTestId("b1-day5-writing-cheat-sheet");
+    expect(day5CheatSheet).toBeVisible();
+    expect(within(day5CheatSheet).getByText("Day 5 · Der Besichtigungstermin")).toBeVisible();
+    expect(within(day5CheatSheet).getByText(/Anfrage wegen eines Besichtigungstermins/)).toBeVisible();
+    expect(within(day5CheatSheet).getAllByText(/Wäre Samstag um 14 Uhr möglich/).length).toBeGreaterThan(0);
+    expect(within(day5CheatSheet).getAllByText(/Sie erreichen mich unter/).length).toBeGreaterThan(0);
+    expect(within(day5CheatSheet).getByText("Final check")).toBeVisible();
+    expect(screen.queryByTestId("b1-day4-writing-cheat-sheet")).not.toBeInTheDocument();
+  });
+
+  test("does not show Day 4 or Day 5-specific writing guidance on another B1 day", () => {
+    render(<B1WritingWorkspace writingContext={{ level: "B1", day: 3 }} />);
+    expect(screen.queryByTestId("b1-day4-writing-cheat-sheet")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("b1-day5-writing-cheat-sheet")).not.toBeInTheDocument();
   });
 
   test("inserts a selected B1 template directly into the German text box", () => {

@@ -16,7 +16,6 @@ const cellStyle = {
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
     blue: { border: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a" },
-    green: { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" },
     amber: { border: "#fde68a", background: "#fffbeb", color: "#92400e" },
   };
   const selected = tones[tone] || tones.blue;
@@ -220,22 +219,7 @@ const B1Day4WohnungSuchenGrammarNotesPage = () => (
       </ExampleBox>
     </section>
 
-    <section style={card}>
-      <h2 style={sectionTitle}>So benutzt du die Grammatik in Teil 2 Schreiben</h2>
-      <p style={{ margin: 0, lineHeight: 1.75 }}>
-        Für den Meinungsbeitrag über persönliche Kontakte und Online-Portale kannst du diese Struktur verwenden:
-      </p>
-      <ol style={listStyle}>
-        <li><strong>Einleitung:</strong> Das Thema Wohnungssuche ist in vielen Städten besonders wichtig.</li>
-        <li><strong>Eigene Meinung:</strong> Meiner Meinung nach sollte man sowohl Online-Portale als auch persönliche Kontakte nutzen.</li>
-        <li><strong>Vorteil und Einschränkung:</strong> Online-Portale bieten zwar viele Anzeigen, aber die Konkurrenz ist häufig sehr groß.</li>
-        <li><strong>Zweiter Vorteil:</strong> Persönliche Empfehlungen sind nicht nur direkter, sondern oft auch vertrauenswürdiger.</li>
-        <li><strong>Schluss:</strong> Deshalb ist eine Kombination aus beiden Methoden am sinnvollsten.</li>
-      </ol>
-      <NoteBox tone="green">
-        <strong>B1-Ziel:</strong> Verwende in deinem Text mindestens zwei verschiedene zweiteilige Konnektoren. Achte darauf, dass deine Sätze logisch verbunden und nicht nur aufgezählt sind.
-      </NoteBox>
-    </section>
+    {/* Teil 2 writing structure lives in B1WritingWorkspace's Day 4 cheat sheet. */}
 
     <section style={card}>
       <h2 style={sectionTitle}>Häufige Fehler</h2>
