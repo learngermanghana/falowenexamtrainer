@@ -53,8 +53,11 @@ const readTabs = (root) => {
 };
 
 const findWritingSection = (root) => Array.from(root.querySelectorAll("section")).find((section) => {
-  const heading = String(section.querySelector("h2")?.textContent || "").toLowerCase();
-  return heading.includes("teil 2") && heading.includes("schreiben");
+  const heading = String(section.querySelector("h2")?.textContent || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+  return /^teil\s*2\b/.test(heading) && heading.includes("schreiben");
 }) || null;
 
 const findWritingInsertAnchor = (section) => {
