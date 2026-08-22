@@ -137,6 +137,41 @@ const B1_CLEANED_TASK_POINTS = {
     "Beschreiben Sie wichtige Erlebnisse sowie eine Schwierigkeit und wie Sie sie gelöst haben.",
     "Erklären Sie, warum das Erlebnis besonders war, und beenden Sie den Brief freundlich.",
   ],
+  13: [
+    "Sagen Sie, ob Sie spannende oder ruhige Filme lieber mögen.",
+    "Vergleichen Sie beide Filmarten und nennen Sie jeweils einen Vorteil oder Nachteil.",
+    "Begründen Sie Ihre Meinung mit einem konkreten Filmbeispiel.",
+  ],
+  14: [
+    "Bedanken Sie sich für das Angebot und sagen Sie höflich, dass Sie nicht teilnehmen können.",
+    "Erklären Sie den Grund für Ihre Absage.",
+    "Bitten Sie um Verständnis und beenden Sie die E-Mail mit einem passenden formellen Gruß.",
+  ],
+  15: [
+    "Erklären Sie, wie digitale Medien das Arbeiten im Homeoffice erleichtern können.",
+    "Nennen Sie mindestens ein Problem oder Risiko digitaler Medien im Homeoffice.",
+    "Schlagen Sie eine Lösung vor und formulieren Sie Ihre eigene Meinung.",
+  ],
+  16: [
+    "Sagen Sie, ob man Prüfungsangst mit guter Stressbewältigung reduzieren kann.",
+    "Nennen Sie mindestens zwei Strategien gegen Prüfungsangst.",
+    "Erklären Sie, warum diese Strategien helfen, und geben Sie ein Beispiel.",
+  ],
+  17: [
+    "Nennen Sie zwei Lernmethoden, die für Sie gut funktionieren.",
+    "Erklären Sie, warum Ziele, Pausen oder Wiederholung beim Lernen wichtig sind.",
+    "Sagen Sie, wie Sie persönlich am besten lernen, und begründen Sie Ihre Meinung.",
+  ],
+  18: [
+    "Nennen Sie verschiedene Wege zum Wunschberuf, zum Beispiel Ausbildung, Studium, Praktikum oder Weiterbildung.",
+    "Erklären Sie, warum unterschiedliche Menschen unterschiedliche Wege brauchen.",
+    "Sagen Sie, welchen Weg Sie sinnvoll finden, und begründen Sie Ihre Meinung.",
+  ],
+  19: [
+    "Sagen Sie, ob Vorstellungsgespräche schwierig oder stressig sind, und begründen Sie Ihre Meinung.",
+    "Erklären Sie, wie man sich auf ein Vorstellungsgespräch vorbereiten kann.",
+    "Nennen Sie, was für ein erfolgreiches Gespräch besonders wichtig ist.",
+  ],
 };
 
 export const resolveWritingSupportItems = (writingContext = {}, level = "B1") => {
