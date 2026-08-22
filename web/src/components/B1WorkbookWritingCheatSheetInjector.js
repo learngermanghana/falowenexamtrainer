@@ -57,6 +57,8 @@ const findWritingSection = (root) => Array.from(root.querySelectorAll("section")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+  // Match only the actual workbook assignment heading, never a Grammar section
+  // that merely mentions "Teil 2 Schreiben" in explanatory text.
   return /^teil\s*2\b/.test(heading) && heading.includes("schreiben");
 }) || null;
 
