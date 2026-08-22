@@ -219,6 +219,8 @@ const B1Day4WohnungSuchenGrammarNotesPage = () => (
       </ExampleBox>
     </section>
 
+    {/* Teil 2 writing structure lives in B1WritingWorkspace's Day 4 cheat sheet. */}
+
     <section style={card}>
       <h2 style={sectionTitle}>Häufige Fehler</h2>
       <div style={{ display: "grid", gap: 10 }}>
