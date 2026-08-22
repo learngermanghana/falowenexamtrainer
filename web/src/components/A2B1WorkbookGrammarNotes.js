@@ -116,6 +116,8 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
   const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
   const showDays22To28Guide = normalizedLevel === "A2" && numericDay >= 22 && numericDay <= 28;
+  // B1 Days 1–5 already have complete day-specific grammar pages. Rendering the
+  // old learning-upgrade block here repeated the same rules, examples and quiz.
   const showB1Days6To11Upgrade = normalizedLevel === "B1" && numericDay >= 6 && numericDay <= 11;
   const showB1Days12To17Upgrade = normalizedLevel === "B1" && numericDay >= 12 && numericDay <= 17;
   const showB1Days18To23Upgrade = normalizedLevel === "B1" && numericDay >= 18 && numericDay <= 23;
