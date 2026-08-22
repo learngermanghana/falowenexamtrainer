@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import B1Day1TraumweltWorkbookPageLegacy from "./B1Day1TraumweltWorkbookPageLegacy";
+import B1EarlyWritingPageCleanup from "./B1EarlyWritingPageCleanup";
 
 const DRIVE_FILE_ID = "1c62CXG6BHBtiGA9FGWLY5Ijj9J59Pa8d";
 const YOUTUBE_URL = "https://youtu.be/dZDgNxPWox8";
@@ -48,6 +49,7 @@ const B1Day1TraumweltWorkbookPage = () => {
   return (
     <div ref={rootRef}>
       <B1Day1TraumweltWorkbookPageLegacy />
+      <B1EarlyWritingPageCleanup />
     </div>
   );
 };
