@@ -33,12 +33,12 @@ const getTaskPoints = (section) => Array.from(
 );
 
 describe("B1EarlyWritingPageCleanup", () => {
-  test("recognizes B1 workbook days 1 to 12 only", () => {
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/6", "?view=workbook")).toBe(6);
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/12", "?view=workbook")).toBe(12);
-    expect(getEarlyB1WorkbookDay("/campus/course/b1-day-11-teamspiele-workbook", "")).toBe(11);
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/12", "?view=grammar")).toBeNull();
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/13", "?view=workbook")).toBeNull();
+  test("recognizes B1 workbook days 1 to 19 only", () => {
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/13", "?view=workbook")).toBe(13);
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/19", "?view=workbook")).toBe(19);
+    expect(getEarlyB1WorkbookDay("/campus/course/b1-day-19-vorstellungsgespraech-workbook", "")).toBe(19);
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/19", "?view=grammar")).toBeNull();
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/20", "?view=workbook")).toBeNull();
   });
 
   test("keeps Day 5 task and removes duplicated page guidance", () => {
@@ -108,45 +108,69 @@ describe("B1EarlyWritingPageCleanup", () => {
     expect(section.querySelector('[data-a2-b1-writing-workspace="standard"]')).not.toBeNull();
   });
 
-  test("reduces Day 11 to the question and three content points", () => {
+  test("reduces Day 13 to the film question and three writing points", () => {
     const section = buildWritingSection({
-      title: "Ist Teamkooperation in der heutigen Arbeitswelt wichtig? Schreiben Sie Ihre Meinung.",
-      extras: `
-        <img alt="team" />
-        <div><strong>Markus</strong><p>Teamkooperation ist entscheidend …</p></div>
-        <div><strong>Writing content points</strong><ul><li>Extra duplicate point</li></ul></div>
-      `,
-    });
-
-    cleanEarlyB1WritingSection(section, 11);
-
-    expect(getTaskPoints(section)).toEqual([
-      "Nennen Sie zwei Vorteile der Teamkooperation.",
-      "Erklären Sie eine Herausforderung und eine mögliche Lösung.",
-      "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
-    ]);
-    expect(section.textContent).not.toContain("Markus");
-    expect(section.textContent).not.toContain("Writing content points");
-  });
-
-  test("keeps Day 12 as a simple informal-letter task with three points", () => {
-    const section = buildWritingSection({
-      title: "Schreiben Sie einen informellen Brief an Ihren Freund Felix über ein spannendes Abenteuer.",
+      title: "Sind spannende Filme besser als ruhige Filme?",
       includeVideo: false,
       extras: `
-        <img alt="adventure" />
-        <div><strong>Aufgabe</strong><p>Sie haben kürzlich ein spannendes Abenteuer erlebt …</p></div>
+        <img alt="film" />
+        <div><strong>Opinion Assignment</strong><p>Students are to write an essay …</p></div>
       `,
     });
 
-    cleanEarlyB1WritingSection(section, 12);
+    cleanEarlyB1WritingSection(section, 13);
 
     expect(getTaskPoints(section)).toEqual([
-      "Begrüßen Sie Felix und erzählen Sie, welches Abenteuer Sie erlebt haben und wo es war.",
-      "Beschreiben Sie wichtige Erlebnisse sowie eine Schwierigkeit und wie Sie sie gelöst haben.",
-      "Erklären Sie, warum das Erlebnis besonders war, und beenden Sie den Brief freundlich.",
+      "Sagen Sie, ob Sie spannende oder ruhige Filme lieber mögen.",
+      "Vergleichen Sie beide Filmarten und nennen Sie jeweils einen Vorteil oder Nachteil.",
+      "Begründen Sie Ihre Meinung mit einem konkreten Filmbeispiel.",
     ]);
     expect(section.querySelector("img")).toBeNull();
-    expect(section.textContent).not.toContain("Sie haben kürzlich ein spannendes Abenteuer erlebt");
+    expect(section.textContent).not.toContain("Opinion Assignment");
+  });
+
+  test("turns Day 14 into a concise formal-email task", () => {
+    const section = buildWritingSection({
+      title: "Formelle E-Mail: Teilnahme an einem Weiterbildungsprogramm ablehnen",
+      includeVideo: false,
+      extras: '<div><strong>Aufgabe</strong><p>Ihr Arbeitgeber bietet Ihnen …</p></div>',
+    });
+
+    cleanEarlyB1WritingSection(section, 14);
+
+    expect(section.querySelector('section[aria-label="Your assignment · Writing"] > h3').textContent)
+      .toBe("Schreiben Sie eine formelle E-Mail an Ihren Chef.");
+    expect(getTaskPoints(section)).toEqual([
+      "Bedanken Sie sich für das Angebot und sagen Sie höflich, dass Sie nicht teilnehmen können.",
+      "Erklären Sie den Grund für Ihre Absage.",
+      "Bitten Sie um Verständnis und beenden Sie die E-Mail mit einem passenden formellen Gruß.",
+    ]);
+    expect(section.textContent).not.toContain("Ihr Arbeitgeber bietet Ihnen");
+  });
+
+  test("keeps the Day 19 writing video but removes Emma and duplicate structure", () => {
+    const section = buildWritingSection({
+      title: "Sind Vorstellungsgespräche schwierig? Schreiben Sie Ihre Meinung.",
+      includeVideo: false,
+      extras: `
+        <article data-b1-day19-writing-video="true">Day 19 writing video</article>
+        <div><strong>Emma</strong><p>Ein Vorstellungsgespräch kann stressig sein …</p></div>
+        <div><strong>Structure</strong><ol><li>Einleitung</li></ol></div>
+      `,
+    });
+
+    cleanEarlyB1WritingSection(section, 19);
+
+    expect(getTaskPoints(section)).toEqual([
+      "Sagen Sie, ob Vorstellungsgespräche schwierig oder stressig sind, und begründen Sie Ihre Meinung.",
+      "Erklären Sie, wie man sich auf ein Vorstellungsgespräch vorbereiten kann.",
+      "Nennen Sie, was für ein erfolgreiches Gespräch besonders wichtig ist.",
+    ]);
+    expect(section.textContent).not.toContain("Emma");
+    expect(section.textContent).not.toContain("Structure");
+    const video = section.querySelector('[data-b1-day19-writing-video="true"]');
+    const workspace = section.querySelector('[data-a2-b1-writing-workspace="standard"]');
+    expect(video).not.toBeNull();
+    expect(video.nextElementSibling).toBe(workspace);
   });
 });
