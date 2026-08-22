@@ -33,12 +33,12 @@ const getTaskPoints = (section) => Array.from(
 );
 
 describe("B1EarlyWritingPageCleanup", () => {
-  test("recognizes B1 workbook days 1 to 19 only", () => {
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/13", "?view=workbook")).toBe(13);
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/19", "?view=workbook")).toBe(19);
-    expect(getEarlyB1WorkbookDay("/campus/course/b1-day-19-vorstellungsgespraech-workbook", "")).toBe(19);
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/19", "?view=grammar")).toBeNull();
-    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/20", "?view=workbook")).toBeNull();
+  test("recognizes B1 workbook days 1 to 28 only", () => {
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/20", "?view=workbook")).toBe(20);
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/28", "?view=workbook")).toBe(28);
+    expect(getEarlyB1WorkbookDay("/campus/course/b1-day-28-klimafreundlich-leben-workbook", "")).toBe(28);
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/28", "?view=grammar")).toBeNull();
+    expect(getEarlyB1WorkbookDay("/campus/course/lesson/B1/29", "?view=workbook")).toBeNull();
   });
 
   test("keeps Day 5 task and removes duplicated page guidance", () => {
@@ -172,5 +172,94 @@ describe("B1EarlyWritingPageCleanup", () => {
     const workspace = section.querySelector('[data-a2-b1-writing-workspace="standard"]');
     expect(video).not.toBeNull();
     expect(video.nextElementSibling).toBe(workspace);
+  });
+
+  test("cleans Day 20 Felix source card and duplicate content points", () => {
+    const section = buildWritingSection({
+      title: "Sind Ausbildung und Qualifikationen wichtig für den Beruf?",
+      includeVideo: false,
+      extras: `
+        <img alt="career" />
+        <div><strong>Beitrag von Felix</strong><p>Eine gute Ausbildung hilft …</p></div>
+        <div><strong>Beantworten Sie diese Inhaltspunkte</strong><ul><li>Stimmen Sie Felix zu?</li></ul></div>
+      `,
+    });
+
+    cleanEarlyB1WritingSection(section, 20);
+
+    expect(getTaskPoints(section)).toEqual([
+      "Sagen Sie, ob Ausbildung und Qualifikationen für den Beruf wichtig sind.",
+      "Vergleichen Sie Ausbildung und praktische Erfahrung und erklären Sie, was für Sie wichtiger ist.",
+      "Geben Sie ein konkretes Beispiel und begründen Sie Ihre Meinung.",
+    ]);
+    expect(section.textContent).not.toContain("Beitrag von Felix");
+    expect(section.textContent).not.toContain("Beantworten Sie diese Inhaltspunkte");
+    expect(section.querySelector("img")).toBeNull();
+  });
+
+  test("preserves the Day 21 writing video while removing Mara source content", () => {
+    const section = buildWritingSection({
+      title: "Welche Lebensform ist heute am besten – Familie, Wohngemeinschaft oder Singleleben?",
+      includeVideo: false,
+      extras: `
+        <div><strong>Meinung von Mara</strong><p>Heute gibt es viele verschiedene Lebensformen …</p></div>
+        <article data-b1-day21-writing-video="true">Day 21 writing video</article>
+      `,
+    });
+
+    cleanEarlyB1WritingSection(section, 21);
+
+    expect(getTaskPoints(section)).toEqual([
+      "Vergleichen Sie Familie, Wohngemeinschaft und Singleleben und nennen Sie wichtige Vor- oder Nachteile.",
+      "Sagen Sie, welche Lebensform für Sie am besten passt.",
+      "Begründen Sie Ihre Meinung mit einem persönlichen Beispiel oder der Situation in Ihrem Heimatland.",
+    ]);
+    expect(section.textContent).not.toContain("Meinung von Mara");
+    const video = section.querySelector('[data-b1-day21-writing-video="true"]');
+    const workspace = section.querySelector('[data-a2-b1-writing-workspace="standard"]');
+    expect(video).not.toBeNull();
+    expect(video.nextElementSibling).toBe(workspace);
+  });
+
+  test("reduces Day 25 complaint letter to three required points", () => {
+    const section = buildWritingSection({
+      title: "Schreiben Sie einen formellen Beschwerdebrief an den Kundenservice.",
+      includeVideo: false,
+      extras: `
+        <img alt="complaint" />
+        <div><strong>Support structure</strong><ol><li>Anrede</li><li>Rücksendung</li></ol></div>
+      `,
+    });
+
+    cleanEarlyB1WritingSection(section, 25);
+
+    expect(getTaskPoints(section)).toEqual([
+      "Erklären Sie, wann Sie das Handy gekauft haben und was bei der Lieferung kaputt war.",
+      "Beschreiben Sie, wann und wie Sie das Handy zurückgeschickt haben.",
+      "Sagen Sie, welche Lösung Sie erwarten, und bitten Sie höflich um eine schnelle Antwort.",
+    ]);
+    expect(section.textContent).not.toContain("Support structure");
+    expect(section.querySelector("img")).toBeNull();
+  });
+
+  test("cleans Day 28 model opinion and keeps only three climate writing points", () => {
+    const section = buildWritingSection({
+      title: "Kann jeder Mensch klimafreundlich leben? Schreiben Sie Ihre Meinung.",
+      includeVideo: false,
+      extras: `
+        <img alt="climate" />
+        <div><strong>Meinungstext</strong><p>In der heutigen Zeit ist der Klimawandel ein großes Problem …</p></div>
+      `,
+    });
+
+    cleanEarlyB1WritingSection(section, 28);
+
+    expect(getTaskPoints(section)).toEqual([
+      "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
+      "Beschreiben Sie eine Schwierigkeit, zum Beispiel Geld, Wohnort oder Gewohnheiten.",
+      "Sagen Sie, ob jeder Mensch klimafreundlich leben kann, und begründen Sie Ihre Meinung.",
+    ]);
+    expect(section.textContent).not.toContain("Meinungstext");
+    expect(section.querySelector("img")).toBeNull();
   });
 });

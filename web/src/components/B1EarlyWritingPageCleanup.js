@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const CLEANUP_STYLE_ID = "b1-early-writing-page-cleanup-style";
-const WRITING_VIDEO_SELECTOR = '[data-b1-writing-video-support], [data-b1-day19-writing-video="true"]';
+const WRITING_VIDEO_SELECTOR = '[data-b1-writing-video-support], [data-b1-day19-writing-video="true"], [data-b1-day21-writing-video="true"]';
 
 const TASK_CONFIG = {
   1: {
@@ -141,6 +141,70 @@ const TASK_CONFIG = {
       "Nennen Sie, was für ein erfolgreiches Gespräch besonders wichtig ist.",
     ],
   },
+  20: {
+    points: [
+      "Sagen Sie, ob Ausbildung und Qualifikationen für den Beruf wichtig sind.",
+      "Vergleichen Sie Ausbildung und praktische Erfahrung und erklären Sie, was für Sie wichtiger ist.",
+      "Geben Sie ein konkretes Beispiel und begründen Sie Ihre Meinung.",
+    ],
+  },
+  21: {
+    points: [
+      "Vergleichen Sie Familie, Wohngemeinschaft und Singleleben und nennen Sie wichtige Vor- oder Nachteile.",
+      "Sagen Sie, welche Lebensform für Sie am besten passt.",
+      "Begründen Sie Ihre Meinung mit einem persönlichen Beispiel oder der Situation in Ihrem Heimatland.",
+    ],
+  },
+  22: {
+    points: [
+      "Nennen Sie einen Vorteil und einen Nachteil der Partnersuche im Internet.",
+      "Vergleichen Sie Online-Kontakt mit persönlichem Kennenlernen.",
+      "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
+    ],
+  },
+  23: {
+    points: [
+      "Sagen Sie, wie wichtig der erste Eindruck bei einem ersten Date sein kann.",
+      "Erklären Sie, warum ein erstes Date auch täuschen kann.",
+      "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
+    ],
+  },
+  24: {
+    points: [
+      "Erklären Sie, warum nachhaltiger Konsum wichtig sein kann.",
+      "Nennen Sie eine Schwierigkeit und konkrete Beispiele für nachhaltigen Konsum.",
+      "Begründen Sie Ihre eigene Meinung und formulieren Sie einen klaren Schluss.",
+    ],
+  },
+  25: {
+    points: [
+      "Erklären Sie, wann Sie das Handy gekauft haben und was bei der Lieferung kaputt war.",
+      "Beschreiben Sie, wann und wie Sie das Handy zurückgeschickt haben.",
+      "Sagen Sie, welche Lösung Sie erwarten, und bitten Sie höflich um eine schnelle Antwort.",
+    ],
+  },
+  26: {
+    title: "Schreiben Sie Max oder Lisa einen informellen Brief über Ihre Reise.",
+    points: [
+      "Erzählen Sie, wohin Sie gereist sind und wie Sie gereist sind.",
+      "Beschreiben Sie ein Reiseproblem, zum Beispiel eine Verspätung, ein geschlossenes Hotel oder verlorenes Gepäck.",
+      "Erklären Sie, wie Sie das Problem gelöst haben, und beenden Sie den Brief freundlich.",
+    ],
+  },
+  27: {
+    points: [
+      "Erklären Sie, warum umweltfreundliches Leben wichtig ist, und nennen Sie Beispiele aus dem Alltag.",
+      "Beschreiben Sie eine Schwierigkeit, die umweltfreundliches Verhalten erschweren kann.",
+      "Begründen Sie Ihre eigene Meinung und formulieren Sie einen klaren Schluss.",
+    ],
+  },
+  28: {
+    points: [
+      "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
+      "Beschreiben Sie eine Schwierigkeit, zum Beispiel Geld, Wohnort oder Gewohnheiten.",
+      "Sagen Sie, ob jeder Mensch klimafreundlich leben kann, und begründen Sie Ihre Meinung.",
+    ],
+  },
 };
 
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim();
@@ -151,13 +215,13 @@ export const getEarlyB1WorkbookDay = (pathname = "", search = "") => {
   if (dynamicMatch) {
     const day = Number(dynamicMatch[1]);
     const isWorkbook = new URLSearchParams(search || "").get("view") === "workbook";
-    return isWorkbook && day >= 1 && day <= 19 ? day : null;
+    return isWorkbook && day >= 1 && day <= 28 ? day : null;
   }
 
   const standaloneMatch = normalizedPath.match(/^\/campus\/course\/b1-day-(\d+)-.*-workbook$/i);
   if (!standaloneMatch) return null;
   const day = Number(standaloneMatch[1]);
-  return day >= 1 && day <= 19 ? day : null;
+  return day >= 1 && day <= 28 ? day : null;
 };
 
 export const findTeil2WritingSection = (root = document) =>
