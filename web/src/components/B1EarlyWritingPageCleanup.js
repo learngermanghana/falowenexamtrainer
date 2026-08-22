@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const CLEANUP_STYLE_ID = "b1-early-writing-page-cleanup-style";
+const WRITING_VIDEO_SELECTOR = '[data-b1-writing-video-support], [data-b1-day19-writing-video="true"]';
 
 const TASK_CONFIG = {
   1: {
@@ -90,6 +91,56 @@ const TASK_CONFIG = {
       "Erklären Sie, warum das Erlebnis besonders war, und beenden Sie den Brief freundlich.",
     ],
   },
+  13: {
+    points: [
+      "Sagen Sie, ob Sie spannende oder ruhige Filme lieber mögen.",
+      "Vergleichen Sie beide Filmarten und nennen Sie jeweils einen Vorteil oder Nachteil.",
+      "Begründen Sie Ihre Meinung mit einem konkreten Filmbeispiel.",
+    ],
+  },
+  14: {
+    title: "Schreiben Sie eine formelle E-Mail an Ihren Chef.",
+    points: [
+      "Bedanken Sie sich für das Angebot und sagen Sie höflich, dass Sie nicht teilnehmen können.",
+      "Erklären Sie den Grund für Ihre Absage.",
+      "Bitten Sie um Verständnis und beenden Sie die E-Mail mit einem passenden formellen Gruß.",
+    ],
+  },
+  15: {
+    points: [
+      "Erklären Sie, wie digitale Medien das Arbeiten im Homeoffice erleichtern können.",
+      "Nennen Sie mindestens ein Problem oder Risiko digitaler Medien im Homeoffice.",
+      "Schlagen Sie eine Lösung vor und formulieren Sie Ihre eigene Meinung.",
+    ],
+  },
+  16: {
+    points: [
+      "Sagen Sie, ob man Prüfungsangst mit guter Stressbewältigung reduzieren kann.",
+      "Nennen Sie mindestens zwei Strategien gegen Prüfungsangst.",
+      "Erklären Sie, warum diese Strategien helfen, und geben Sie ein Beispiel.",
+    ],
+  },
+  17: {
+    points: [
+      "Nennen Sie zwei Lernmethoden, die für Sie gut funktionieren.",
+      "Erklären Sie, warum Ziele, Pausen oder Wiederholung beim Lernen wichtig sind.",
+      "Sagen Sie, wie Sie persönlich am besten lernen, und begründen Sie Ihre Meinung.",
+    ],
+  },
+  18: {
+    points: [
+      "Nennen Sie verschiedene Wege zum Wunschberuf, zum Beispiel Ausbildung, Studium, Praktikum oder Weiterbildung.",
+      "Erklären Sie, warum unterschiedliche Menschen unterschiedliche Wege brauchen.",
+      "Sagen Sie, welchen Weg Sie sinnvoll finden, und begründen Sie Ihre Meinung.",
+    ],
+  },
+  19: {
+    points: [
+      "Sagen Sie, ob Vorstellungsgespräche schwierig oder stressig sind, und begründen Sie Ihre Meinung.",
+      "Erklären Sie, wie man sich auf ein Vorstellungsgespräch vorbereiten kann.",
+      "Nennen Sie, was für ein erfolgreiches Gespräch besonders wichtig ist.",
+    ],
+  },
 };
 
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim();
@@ -100,13 +151,13 @@ export const getEarlyB1WorkbookDay = (pathname = "", search = "") => {
   if (dynamicMatch) {
     const day = Number(dynamicMatch[1]);
     const isWorkbook = new URLSearchParams(search || "").get("view") === "workbook";
-    return isWorkbook && day >= 1 && day <= 12 ? day : null;
+    return isWorkbook && day >= 1 && day <= 19 ? day : null;
   }
 
   const standaloneMatch = normalizedPath.match(/^\/campus\/course\/b1-day-(\d+)-.*-workbook$/i);
   if (!standaloneMatch) return null;
   const day = Number(standaloneMatch[1]);
-  return day >= 1 && day <= 12 ? day : null;
+  return day >= 1 && day <= 19 ? day : null;
 };
 
 export const findTeil2WritingSection = (root = document) =>
@@ -150,13 +201,15 @@ const getDirectChild = (section, element) => {
   return current?.parentElement === section ? current : null;
 };
 
+const getWritingVideoChild = (section) =>
+  getDirectChild(section, section?.querySelector(WRITING_VIDEO_SELECTOR));
+
 const removeWritingScaffoldingBeforeWorkspace = (section, taskCard) => {
   const workspace = section?.querySelector('[data-a2-b1-writing-workspace="standard"]');
   const workspaceChild = getDirectChild(section, workspace);
   if (!section || !taskCard || !workspaceChild) return false;
 
-  const video = section.querySelector('[data-b1-writing-video-support]');
-  const videoChild = getDirectChild(section, video);
+  const videoChild = getWritingVideoChild(section);
   let changed = false;
   let current = taskCard.nextElementSibling;
 
@@ -173,9 +226,8 @@ const removeWritingScaffoldingBeforeWorkspace = (section, taskCard) => {
 };
 
 const keepWritingVideoBeforeWorkspace = (section) => {
-  const video = section?.querySelector('[data-b1-writing-video-support]');
   const workspace = section?.querySelector('[data-a2-b1-writing-workspace="standard"]');
-  const videoChild = getDirectChild(section, video);
+  const videoChild = getWritingVideoChild(section);
   const workspaceChild = getDirectChild(section, workspace);
   if (!videoChild || !workspaceChild || videoChild.nextElementSibling === workspaceChild) return false;
   section.insertBefore(videoChild, workspaceChild);
@@ -263,6 +315,7 @@ export default function B1EarlyWritingPageCleanup() {
 export const __TESTING__ = {
   TASK_CONFIG,
   CLEANUP_STYLE_ID,
+  WRITING_VIDEO_SELECTOR,
   findWritingTaskCard,
   replaceTaskBodyWithPoints,
   removeWritingScaffoldingBeforeWorkspace,
