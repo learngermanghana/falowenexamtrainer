@@ -4,19 +4,16 @@ import path from "path";
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("B1 Days 6-11 thinking and quiz-first grammar upgrade", () => {
-  test("central grammar tab renders the upgrade before deep grammar notes", () => {
+  test("central grammar tab does not stack the legacy upgrade over complete day-specific notes", () => {
     const source = read("A2B1WorkbookGrammarNotes.js");
-    expect(source).toContain('import B1Days6To11LearningUpgrade from "./B1Days6To11LearningUpgrade"');
-    expect(source).toContain('normalizedLevel === "B1" && numericDay >= 6 && numericDay <= 11');
-    expect(source.indexOf("<B1Days6To11LearningUpgrade day={numericDay} />")).toBeLessThan(
-      source.indexOf("<GrammarNotes />"),
-    );
-    expect(source.indexOf("<A2B1GrammarVideoCard level={level} day={day} />")).toBeLessThan(
-      source.indexOf("<B1Days6To11LearningUpgrade day={numericDay} />"),
-    );
+    expect(source).not.toContain('import B1Days6To11LearningUpgrade from "./B1Days6To11LearningUpgrade"');
+    expect(source).not.toContain('normalizedLevel === "B1" && numericDay >= 6 && numericDay <= 11');
+    expect(source).not.toContain("<B1Days6To11LearningUpgrade day={numericDay} />");
+    expect(source).toContain("<A2B1GrammarVideoCard level={level} day={day} />");
+    expect(source).toContain("<GrammarNotes />");
   });
 
-  test("all six days include thinking support, clickable questions and output practice", () => {
+  test("all six legacy upgrade days remain defined for any non-grammar reuse", () => {
     const source = read("B1Days6To11LearningUpgrade.jsx");
     [6, 7, 8, 9, 10, 11].forEach((day) => expect(source).toContain(`${day}: {`));
     expect(source).toContain("Think first · Erst verstehen, dann anwenden");
