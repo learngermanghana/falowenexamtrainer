@@ -13,7 +13,7 @@ jest.mock("./B1InlineWritingAnalyser", () => {
 });
 
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import B1WritingWorkspace from "./B1WritingWorkspace";
 
 describe("B1WritingWorkspace", () => {
@@ -32,6 +32,31 @@ describe("B1WritingWorkspace", () => {
     expect(screen.getByRole("button", { name: "Insert Opinion Essay Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Formal Letter Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Informal Letter Template" })).toBeVisible();
+  });
+
+  test("keeps B1 Day 5 landlord-email guidance inside the writing cheat sheet", () => {
+    render(
+      <B1WritingWorkspace
+        writingContext={{
+          level: "B1",
+          day: 5,
+          taskTitle: "Schreiben Sie eine höfliche E-Mail an den Vermieter.",
+        }}
+      />,
+    );
+
+    const day5CheatSheet = screen.getByTestId("b1-day5-writing-cheat-sheet");
+    expect(day5CheatSheet).toBeVisible();
+    expect(within(day5CheatSheet).getByText("Day 5 · Der Besichtigungstermin")).toBeVisible();
+    expect(within(day5CheatSheet).getByText(/Anfrage wegen eines Besichtigungstermins/)).toBeVisible();
+    expect(within(day5CheatSheet).getAllByText(/Wäre Samstag um 14 Uhr möglich/).length).toBeGreaterThan(0);
+    expect(within(day5CheatSheet).getAllByText(/Sie erreichen mich unter/).length).toBeGreaterThan(0);
+    expect(within(day5CheatSheet).getByText("Final check")).toBeVisible();
+  });
+
+  test("does not show Day 5-specific writing guidance on another B1 day", () => {
+    render(<B1WritingWorkspace writingContext={{ level: "B1", day: 4 }} />);
+    expect(screen.queryByTestId("b1-day5-writing-cheat-sheet")).not.toBeInTheDocument();
   });
 
   test("inserts a selected B1 template directly into the German text box", () => {
