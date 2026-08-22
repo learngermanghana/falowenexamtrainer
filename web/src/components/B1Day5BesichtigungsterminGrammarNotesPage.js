@@ -44,8 +44,8 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
         <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 5 · Kapitel 2.5 · Grammar Notes</span>
         <h1 style={{ ...styles.title, margin: 0 }}>Höfliche Terminvereinbarung: Konjunktiv II und indirekte Fragen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Grammatik zum Thema <strong>Der Besichtigungstermin</strong>: höflich nach einem Termin fragen, Informationen erfragen,
-          einen Vorschlag machen und eine formelle E-Mail an einen Vermieter schreiben.
+          Grammatik zum Thema <strong>Der Besichtigungstermin</strong>: höflich nach einem Termin fragen, Informationen erfragen
+          und einen Vorschlag machen.
         </p>
         <img
           src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80"
@@ -64,8 +64,8 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
           <em> wie</em>.
         </p>
         <NoteBox>
-          <strong>Merke:</strong> Direkte Fragen sind korrekt, aber indirekte Fragen und Konjunktiv-II-Formen wirken in einer
-          formellen E-Mail höflicher und professioneller.
+          <strong>Merke:</strong> Direkte Fragen sind korrekt, aber indirekte Fragen und Konjunktiv-II-Formen wirken in formellen
+          Situationen höflicher und professioneller.
         </NoteBox>
       </section>
 
@@ -142,7 +142,7 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
           Wäre auch ein Termin am frühen Abend denkbar?
         </ExampleBox>
         <NoteBox tone="green">
-          <strong>Sehr nützlicher E-Mail-Schluss:</strong> Ich würde mich über eine kurze Rückmeldung freuen.
+          <strong>Höfliche Formulierung:</strong> Ich würde mich über eine kurze Rückmeldung freuen.
         </NoteBox>
       </section>
 
@@ -178,49 +178,6 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
       </section>
 
       <section style={card}>
-        <h2 style={sectionTitle}>5. Nützliche Redemittel für eine Besichtigung</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-          <ExampleBox>
-            <strong>Interesse zeigen</strong><br />
-            Ich interessiere mich sehr für die Wohnung.<br />
-            Ihre Anzeige hat mein Interesse geweckt.<br />
-            Ich würde die Wohnung gern besichtigen.
-          </ExampleBox>
-          <ExampleBox>
-            <strong>Termin vorschlagen</strong><br />
-            Wäre Samstag um 14 Uhr möglich?<br />
-            Alternativ könnte ich am Montagabend kommen.<br />
-            Welcher Termin würde Ihnen passen?
-          </ExampleBox>
-          <ExampleBox>
-            <strong>Informationen erfragen</strong><br />
-            Sind Haustiere erlaubt?<br />
-            Wie hoch sind die Nebenkosten?<br />
-            Welche Unterlagen soll ich mitbringen?
-          </ExampleBox>
-          <ExampleBox>
-            <strong>Bestätigung erbitten</strong><br />
-            Bitte bestätigen Sie mir den Termin per E-Mail.<br />
-            Sie erreichen mich unter …<br />
-            Vielen Dank im Voraus.
-          </ExampleBox>
-        </div>
-      </section>
-
-      <section style={card}>
-        <h2 style={sectionTitle}>So benutzt du die Grammatik in Teil 2 Schreiben</h2>
-        <ol style={listStyle}>
-          <li><strong>Betreff:</strong> Anfrage wegen eines Besichtigungstermins</li>
-          <li><strong>Anrede:</strong> Sehr geehrte Frau … / Sehr geehrter Herr …</li>
-          <li><strong>Grund:</strong> Ich interessiere mich für Ihre Wohnung und würde sie gern besichtigen.</li>
-          <li><strong>Termin:</strong> Wäre Samstag, der 12. Juli, um 14 Uhr möglich?</li>
-          <li><strong>Bestätigung:</strong> Könnten Sie mir den Termin bitte per E-Mail bestätigen?</li>
-          <li><strong>Kontakt:</strong> Sie erreichen mich unter …</li>
-          <li><strong>Schluss:</strong> Mit freundlichen Grüßen</li>
-        </ol>
-      </section>
-
-      <section style={card}>
         <h2 style={sectionTitle}>Mini-Übung</h2>
         <ol style={listStyle}>
           <li>Formuliere höflich: „Geben Sie mir einen Termin.“</li>
@@ -234,17 +191,6 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
           frei ist. · Könnten Sie mir sagen, wann ich kommen kann? · Wäre Samstag um 15 Uhr möglich? · Ich würde mich über
           eine kurze Bestätigung freuen.
         </NoteBox>
-      </section>
-
-      <section style={card}>
-        <h2 style={sectionTitle}>Kontrollliste</h2>
-        <ul style={listStyle}>
-          <li>Habe ich eine höfliche Anrede und einen passenden Schluss verwendet?</li>
-          <li>Habe ich mindestens eine Konjunktiv-II-Form benutzt?</li>
-          <li>Steht das Verb in indirekten Fragen am Ende?</li>
-          <li>Habe ich einen konkreten Termin oder eine Alternative genannt?</li>
-          <li>Habe ich um eine Bestätigung gebeten und meine Kontaktdaten angegeben?</li>
-        </ul>
       </section>
     </div>
   );
