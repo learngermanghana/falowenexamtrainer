@@ -73,6 +73,20 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/qosa1oXKZE4",
       },
     ],
+    4: [
+      {
+        chapter: "2.4",
+        topic: "Wohnung suchen",
+        url: "https://youtu.be/FiC2obM4qHU",
+      },
+    ],
+    5: [
+      {
+        chapter: "2.5",
+        topic: "Der Besichtigungstermin",
+        url: "https://youtu.be/OJmM8BUTN3k",
+      },
+    ],
   },
 };
 
