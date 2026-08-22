@@ -31,6 +31,23 @@ const templateIds = [
   ["b1-informal-letter-template", "Insert Informal Letter Template"],
 ];
 
+const B1_DAY4_OPINION_STRUCTURE = [
+  ["Einleitung", "Das Thema Wohnungssuche ist in vielen Städten besonders wichtig."],
+  ["Eigene Meinung", "Meiner Meinung nach sollte man sowohl Online-Portale als auch persönliche Kontakte nutzen."],
+  ["Vorteil + Einschränkung", "Online-Portale bieten zwar viele Anzeigen, aber die Konkurrenz ist häufig sehr groß."],
+  ["Zweiter Vorteil", "Persönliche Empfehlungen sind nicht nur direkter, sondern oft auch vertrauenswürdiger."],
+  ["Schluss", "Deshalb ist eine Kombination aus beiden Methoden am sinnvollsten."],
+];
+
+const B1_DAY4_CONNECTORS = [
+  "sowohl … als auch",
+  "nicht nur … sondern auch",
+  "zwar … aber",
+  "einerseits … andererseits",
+  "entweder … oder",
+  "weder … noch",
+];
+
 const B1_DAY5_EMAIL_STRUCTURE = [
   ["Betreff", "Anfrage wegen eines Besichtigungstermins"],
   ["Anrede", "Sehr geehrte Frau … / Sehr geehrter Herr …"],
@@ -99,6 +116,42 @@ export const appendWritingTemplate = (currentText, template) => {
   return current ? `${current}\n\n${templateText}` : templateText;
 };
 
+const B1Day4WritingCheatSheet = () => (
+  <div
+    data-testid="b1-day4-writing-cheat-sheet"
+    data-b1-day4-writing-cheat-sheet="true"
+    style={{ border: "1px solid #93c5fd", borderRadius: 14, padding: 12, background: "#fff", display: "grid", gap: 12 }}
+  >
+    <div>
+      <strong style={{ color: "#1e3a8a" }}>Day 4 · Wohnung suchen</strong>
+      <p style={{ margin: "4px 0 0", color: "#475569", lineHeight: 1.6 }}>
+        Use this structure in Teil 2 Schreiben. The Grammar tab should contain the connector rules only.
+      </p>
+    </div>
+
+    <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
+      <strong>Meinungsbeitrag-Struktur</strong>
+      <ol style={{ margin: "7px 0 0", paddingLeft: 22, lineHeight: 1.7 }}>
+        {B1_DAY4_OPINION_STRUCTURE.map(([label, example]) => (
+          <li key={label}><strong>{label}:</strong> {example}</li>
+        ))}
+      </ol>
+    </div>
+
+    <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
+      <strong>Useful paired connectors</strong>
+      <p style={{ margin: "7px 0 0", lineHeight: 1.7 }}>{B1_DAY4_CONNECTORS.join(" · ")}</p>
+    </div>
+
+    <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 10, background: "#f0fdf4" }}>
+      <strong>Day 4 target</strong>
+      <p style={{ margin: "7px 0 0", lineHeight: 1.65 }}>
+        Use at least two different paired connectors and connect your ideas logically instead of only listing them.
+      </p>
+    </div>
+  </div>
+);
+
 const B1Day5WritingCheatSheet = () => (
   <div
     data-testid="b1-day5-writing-cheat-sheet"
@@ -161,6 +214,7 @@ const B1WritingSupport = ({ onInsertTemplate, day }) => {
           </p>
         </div>
 
+        {normalizedDay === 4 ? <B1Day4WritingCheatSheet /> : null}
         {normalizedDay === 5 ? <B1Day5WritingCheatSheet /> : null}
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
