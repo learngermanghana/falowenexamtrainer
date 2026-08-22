@@ -6,6 +6,7 @@ import GoetheFreeChatPage from "./GoetheFreeChatPage";
 import WritingPage from "./WritingPage";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import B1WritingWorkspace from "./B1WritingWorkspace";
+import B1EarlyWritingPageCleanup from "./B1EarlyWritingPageCleanup";
 
 const currentPath = () => {
   if (typeof window === "undefined") return "";
@@ -169,7 +170,12 @@ const CourseInlinePracticePanel = ({
   // Return the shared workspace directly so the writing area contains exactly
   // its planning box and German-text box, without a third practice-panel card.
   if (isA2B1Writing) {
-    return <B1WritingWorkspace writingContext={resolvedWritingContext} />;
+    return (
+      <Fragment>
+        <B1WritingWorkspace writingContext={resolvedWritingContext} />
+        <B1EarlyWritingPageCleanup />
+      </Fragment>
+    );
   }
 
   return (
