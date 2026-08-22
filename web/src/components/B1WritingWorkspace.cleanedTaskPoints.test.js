@@ -64,9 +64,91 @@ describe("resolveWritingSupportItems", () => {
     ]);
   });
 
-  test("keeps the original support structure outside the cleaned Day 6 to 19 range", () => {
+  test("Day 21 ignores stale Mara/source structure", () => {
+    const items = resolveWritingSupportItems({
+      day: 21,
+      supportStructure: [
+        "Einleitung zum Thema",
+        "Reaktion auf Maras Meinung",
+        "Eigene Meinung",
+      ],
+    }, "B1");
+
+    expect(items).toEqual([
+      "Vergleichen Sie Familie, Wohngemeinschaft und Singleleben und nennen Sie wichtige Vor- oder Nachteile.",
+      "Sagen Sie, welche Lebensform für Sie am besten passt.",
+      "Begründen Sie Ihre Meinung mit einem persönlichen Beispiel oder der Situation in Ihrem Heimatland.",
+    ]);
+    expect(items.join(" ")).not.toMatch(/Mara/i);
+  });
+
+  test("Day 23 ignores stale Sophie/source structure", () => {
+    const items = resolveWritingSupportItems({
+      day: 23,
+      supportStructure: [
+        "Reaktion auf Sophies Meinung",
+        "Argument für die Bedeutung des ersten Dates",
+      ],
+    }, "B1");
+
+    expect(items).toEqual([
+      "Sagen Sie, wie wichtig der erste Eindruck bei einem ersten Date sein kann.",
+      "Erklären Sie, warum ein erstes Date auch täuschen kann.",
+      "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
+    ]);
+    expect(items.join(" ")).not.toMatch(/Sophie/i);
+  });
+
+  test("Day 25 uses the same three complaint-letter points as the cleaned task card", () => {
+    const items = resolveWritingSupportItems({
+      day: 25,
+      supportStructure: [
+        "Anrede: Sehr geehrte Damen und Herren,",
+        "Bestellung und Schaden genau beschreiben.",
+        "Grußformel und Name.",
+      ],
+    }, "B1");
+
+    expect(items).toEqual([
+      "Erklären Sie, wann Sie das Handy gekauft haben und was bei der Lieferung kaputt war.",
+      "Beschreiben Sie, wann und wie Sie das Handy zurückgeschickt haben.",
+      "Sagen Sie, welche Lösung Sie erwarten, und bitten Sie höflich um eine schnelle Antwort.",
+    ]);
+  });
+
+  test("Day 27 ignores stale Ahmed/source structure", () => {
+    const items = resolveWritingSupportItems({
+      day: 27,
+      supportStructure: [
+        "Reaktion auf Ahmeds Meinung",
+        "Argumente und Beispiele",
+      ],
+    }, "B1");
+
+    expect(items).toEqual([
+      "Erklären Sie, warum umweltfreundliches Leben wichtig ist, und nennen Sie Beispiele aus dem Alltag.",
+      "Beschreiben Sie eine Schwierigkeit, die umweltfreundliches Verhalten erschweren kann.",
+      "Begründen Sie Ihre eigene Meinung und formulieren Sie einen klaren Schluss.",
+    ]);
+    expect(items.join(" ")).not.toMatch(/Ahmed/i);
+  });
+
+  test("Day 28 replaces the old model structure with the concise climate task", () => {
+    const items = resolveWritingSupportItems({
+      day: 28,
+      supportStructure: ["Einleitung", "Eigene Meinung", "Beispiele", "Schwierigkeiten", "Begründung", "Schluss"],
+    }, "B1");
+
+    expect(items).toEqual([
+      "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
+      "Beschreiben Sie eine Schwierigkeit, zum Beispiel Geld, Wohnort oder Gewohnheiten.",
+      "Sagen Sie, ob jeder Mensch klimafreundlich leben kann, und begründen Sie Ihre Meinung.",
+    ]);
+  });
+
+  test("keeps the original support structure outside the cleaned Day 6 to 28 range", () => {
     expect(resolveWritingSupportItems({
-      day: 20,
+      day: 29,
       supportStructure: ["Original structure"],
       taskPoints: ["Original task point"],
     }, "B1")).toEqual(["Original structure"]);
@@ -74,7 +156,7 @@ describe("resolveWritingSupportItems", () => {
 
   test("does not apply B1 cleanup points to A2 workbooks", () => {
     expect(resolveWritingSupportItems({
-      day: 15,
+      day: 21,
       supportStructure: ["A2 structure"],
     }, "A2")).toEqual(["A2 structure"]);
   });
