@@ -75,6 +75,26 @@ describe("B1 workbook writing cheat sheet injector", () => {
     expect(getWritingCheatSheet("B1", 1)[0].items.length).toBeGreaterThan(0);
   });
 
+  test("ignores Grammar sections that only mention Teil 2 Schreiben", () => {
+    const root = document.createElement("div");
+    root.innerHTML = `
+      <section data-a2-b1-legacy-grammar-panel="true">
+        <h2>Grammar Notes</h2>
+        <section>
+          <h2>So benutzt du die Grammatik in Teil 2 Schreiben</h2>
+          <p>This is grammar guidance, not the writing assignment.</p>
+        </section>
+      </section>
+    `;
+
+    expect(__TESTING__.findWritingSection(root)).toBeNull();
+    expect(__TESTING__.ensureWritingVideoCard(root, 4)).toEqual(expect.objectContaining({
+      mounted: false,
+      reason: "writing-section-not-mounted",
+    }));
+    expect(root.querySelector(`[${__TESTING__.WRITING_VIDEO_CARD_ATTRIBUTE}]`)).toBeNull();
+  });
+
   test("adds an always-visible fallback cheat sheet and inserts all three template types", () => {
     const root = buildWritingRoot();
     const textarea = document.createElement("textarea");
