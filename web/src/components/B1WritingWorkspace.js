@@ -101,6 +101,55 @@ const B1_DAY5_CHECKLIST = [
   "Um Bestätigung bitten und Kontaktdaten angeben.",
 ];
 
+const B1_CLEANED_TASK_POINTS = {
+  6: [
+    "Vergleichen Sie das Leben in der Stadt mit dem Leben auf dem Land und nennen Sie wichtige Vor- oder Nachteile.",
+    "Sagen Sie, wo Sie lieber leben würden.",
+    "Begründen Sie Ihre Meinung mit einem konkreten Beispiel.",
+  ],
+  7: [
+    "Sagen Sie, ob Fertiggerichte für eine gesunde Ernährung geeignet sind.",
+    "Nennen Sie einen Vorteil und einen Nachteil von Fertiggerichten.",
+    "Erklären Sie, wie Sie sich im Alltag möglichst gesund ernähren.",
+  ],
+  8: [
+    "Sagen Sie, wie wichtig regelmäßiger Sport für ein gesundes Leben ist.",
+    "Nennen Sie Vorteile von Bewegung und erklären Sie die Rolle der Ernährung.",
+    "Beschreiben Sie, was Sie persönlich für Ihre Gesundheit tun oder verbessern möchten.",
+  ],
+  9: [
+    "Erklären Sie einen Vorteil und einen Nachteil moderner Arbeitsmodelle für die Work-Life-Balance.",
+    "Beschreiben Sie, welche Rolle flexible Arbeitszeiten oder Homeoffice spielen.",
+    "Geben Sie ein Beispiel und formulieren Sie Ihre eigene Meinung.",
+  ],
+  10: [
+    "Nennen Sie zwei Vorteile einer digitalen Auszeit.",
+    "Erklären Sie eine Schwierigkeit und nennen Sie konkrete Strategien für weniger Bildschirmzeit.",
+    "Geben Sie ein persönliches Beispiel und formulieren Sie Ihre eigene Meinung.",
+  ],
+  11: [
+    "Nennen Sie zwei Vorteile der Teamkooperation.",
+    "Erklären Sie eine Herausforderung und eine mögliche Lösung.",
+    "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
+  ],
+  12: [
+    "Begrüßen Sie Felix und erzählen Sie, welches Abenteuer Sie erlebt haben und wo es war.",
+    "Beschreiben Sie wichtige Erlebnisse sowie eine Schwierigkeit und wie Sie sie gelöst haben.",
+    "Erklären Sie, warum das Erlebnis besonders war, und beenden Sie den Brief freundlich.",
+  ],
+};
+
+export const resolveWritingSupportItems = (writingContext = {}, level = "B1") => {
+  const normalizedLevel = String(level || "B1").toUpperCase();
+  const cleanedPoints = normalizedLevel === "B1"
+    ? B1_CLEANED_TASK_POINTS[Number(writingContext.day)]
+    : null;
+
+  if (cleanedPoints?.length) return cleanedPoints;
+  if (writingContext.supportStructure?.length) return writingContext.supportStructure;
+  return writingContext.taskPoints || [];
+};
+
 export const writingTemplateToText = (template) => {
   if (!template?.items?.length) return "";
   return template.items
@@ -252,9 +301,7 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
   const [pointsDraft, setPointsDraft] = useState("");
   const [germanDraft, setGermanDraft] = useState("");
   const level = String(writingContext.level || writingContext.courseLevel || "B1").toUpperCase() === "A2" ? "A2" : "B1";
-  const supportItems = writingContext.supportStructure?.length
-    ? writingContext.supportStructure
-    : writingContext.taskPoints || [];
+  const supportItems = resolveWritingSupportItems(writingContext, level);
 
   const planningPlaceholder = useMemo(() => {
     if (!supportItems.length) return "Write your short ideas in English or German here...";

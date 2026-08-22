@@ -34,6 +34,62 @@ const TASK_CONFIG = {
       "Begründen Sie Ihre Meinung und geben Sie ein konkretes Beispiel.",
     ],
   },
+  5: {
+    points: [
+      "Erklären Sie, dass Sie sich für die Wohnung interessieren.",
+      "Fragen Sie nach einem möglichen Besichtigungstermin oder schlagen Sie selbst einen Termin vor.",
+      "Bitten Sie um eine Bestätigung und erklären Sie, wie der Vermieter Sie erreichen kann.",
+    ],
+  },
+  6: {
+    points: [
+      "Vergleichen Sie das Leben in der Stadt mit dem Leben auf dem Land und nennen Sie wichtige Vor- oder Nachteile.",
+      "Sagen Sie, wo Sie lieber leben würden.",
+      "Begründen Sie Ihre Meinung mit einem konkreten Beispiel.",
+    ],
+  },
+  7: {
+    points: [
+      "Sagen Sie, ob Fertiggerichte für eine gesunde Ernährung geeignet sind.",
+      "Nennen Sie einen Vorteil und einen Nachteil von Fertiggerichten.",
+      "Erklären Sie, wie Sie sich im Alltag möglichst gesund ernähren.",
+    ],
+  },
+  8: {
+    points: [
+      "Sagen Sie, wie wichtig regelmäßiger Sport für ein gesundes Leben ist.",
+      "Nennen Sie Vorteile von Bewegung und erklären Sie die Rolle der Ernährung.",
+      "Beschreiben Sie, was Sie persönlich für Ihre Gesundheit tun oder verbessern möchten.",
+    ],
+  },
+  9: {
+    points: [
+      "Erklären Sie einen Vorteil und einen Nachteil moderner Arbeitsmodelle für die Work-Life-Balance.",
+      "Beschreiben Sie, welche Rolle flexible Arbeitszeiten oder Homeoffice spielen.",
+      "Geben Sie ein Beispiel und formulieren Sie Ihre eigene Meinung.",
+    ],
+  },
+  10: {
+    points: [
+      "Nennen Sie zwei Vorteile einer digitalen Auszeit.",
+      "Erklären Sie eine Schwierigkeit und nennen Sie konkrete Strategien für weniger Bildschirmzeit.",
+      "Geben Sie ein persönliches Beispiel und formulieren Sie Ihre eigene Meinung.",
+    ],
+  },
+  11: {
+    points: [
+      "Nennen Sie zwei Vorteile der Teamkooperation.",
+      "Erklären Sie eine Herausforderung und eine mögliche Lösung.",
+      "Geben Sie ein Beispiel und begründen Sie Ihre eigene Meinung.",
+    ],
+  },
+  12: {
+    points: [
+      "Begrüßen Sie Felix und erzählen Sie, welches Abenteuer Sie erlebt haben und wo es war.",
+      "Beschreiben Sie wichtige Erlebnisse sowie eine Schwierigkeit und wie Sie sie gelöst haben.",
+      "Erklären Sie, warum das Erlebnis besonders war, und beenden Sie den Brief freundlich.",
+    ],
+  },
 };
 
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim();
@@ -44,13 +100,13 @@ export const getEarlyB1WorkbookDay = (pathname = "", search = "") => {
   if (dynamicMatch) {
     const day = Number(dynamicMatch[1]);
     const isWorkbook = new URLSearchParams(search || "").get("view") === "workbook";
-    return isWorkbook && day >= 1 && day <= 5 ? day : null;
+    return isWorkbook && day >= 1 && day <= 12 ? day : null;
   }
 
   const standaloneMatch = normalizedPath.match(/^\/campus\/course\/b1-day-(\d+)-.*-workbook$/i);
   if (!standaloneMatch) return null;
   const day = Number(standaloneMatch[1]);
-  return day >= 1 && day <= 5 ? day : null;
+  return day >= 1 && day <= 12 ? day : null;
 };
 
 export const findTeil2WritingSection = (root = document) =>
@@ -86,53 +142,43 @@ const replaceTaskBodyWithPoints = (taskCard, points) => {
   return true;
 };
 
-const removeDirectChildContaining = (section, phrase) => {
-  const normalizedPhrase = normalizeText(phrase).toLowerCase();
-  const match = Array.from(section?.children || []).find((child) => {
-    if (child.tagName === "SECTION") return false;
-    return normalizeText(child.textContent).toLowerCase().includes(normalizedPhrase);
-  });
-  if (!match) return false;
-  match.remove();
-  return true;
+const getDirectChild = (section, element) => {
+  let current = element;
+  while (current && current.parentElement && current.parentElement !== section) {
+    current = current.parentElement;
+  }
+  return current?.parentElement === section ? current : null;
 };
 
-const removeDay1WritingExtras = (section) => {
-  Array.from(section.children).forEach((child) => {
-    if (child.tagName === "IMG") child.remove();
-  });
-  removeDirectChildContaining(section, "Beispielmeinung aus dem Online-Gästebuch");
+const removeWritingScaffoldingBeforeWorkspace = (section, taskCard) => {
+  const workspace = section?.querySelector('[data-a2-b1-writing-workspace="standard"]');
+  const workspaceChild = getDirectChild(section, workspace);
+  if (!section || !taskCard || !workspaceChild) return false;
 
-  const localTabs = Array.from(section.children).find((child) => {
-    const labels = Array.from(child.querySelectorAll(":scope > button"), (button) => normalizeText(button.textContent).toLowerCase());
-    return labels.includes("schreiben") && labels.includes("cheat sheet");
-  });
-  localTabs?.remove();
-  removeDirectChildContaining(section, "Cheat sheet · Writing support template");
-};
+  const video = section.querySelector('[data-b1-writing-video-support]');
+  const videoChild = getDirectChild(section, video);
+  let changed = false;
+  let current = taskCard.nextElementSibling;
 
-const removeDay2WritingExtras = (section) => {
-  Array.from(section.children).forEach((child) => {
-    if (child.tagName === "IMG") child.remove();
-  });
-};
+  while (current && current !== workspaceChild) {
+    const next = current.nextElementSibling;
+    if (current !== videoChild) {
+      current.remove();
+      changed = true;
+    }
+    current = next;
+  }
 
-const removeDay4WritingExtras = (section) => {
-  removeDirectChildContaining(section, "Beispielmeinung aus dem Online-Gästebuch");
-  removeDirectChildContaining(section, "Schreiben Sie jetzt Ihre Meinung.");
-  removeDirectChildContaining(section, "Verwenden Sie möglichst:");
-};
-
-const removeDay5WritingExtras = (section) => {
-  removeDirectChildContaining(section, "Empfohlene E-Mail-Struktur");
-  removeDirectChildContaining(section, "Verwenden Sie mindestens zwei höfliche Strukturen");
+  return changed;
 };
 
 const keepWritingVideoBeforeWorkspace = (section) => {
   const video = section?.querySelector('[data-b1-writing-video-support]');
   const workspace = section?.querySelector('[data-a2-b1-writing-workspace="standard"]');
-  if (!video || !workspace || video.nextElementSibling === workspace) return false;
-  section.insertBefore(video, workspace);
+  const videoChild = getDirectChild(section, video);
+  const workspaceChild = getDirectChild(section, workspace);
+  if (!videoChild || !workspaceChild || videoChild.nextElementSibling === workspaceChild) return false;
+  section.insertBefore(videoChild, workspaceChild);
   return true;
 };
 
@@ -153,13 +199,7 @@ export const cleanEarlyB1WritingSection = (section, day) => {
     changed = replaceTaskBodyWithPoints(taskCard, config.points) || changed;
   }
 
-  const beforeCount = section.childElementCount;
-  if (day === 1) removeDay1WritingExtras(section);
-  if (day === 2) removeDay2WritingExtras(section);
-  if (day === 4) removeDay4WritingExtras(section);
-  if (day === 5) removeDay5WritingExtras(section);
-  changed = section.childElementCount !== beforeCount || changed;
-
+  changed = removeWritingScaffoldingBeforeWorkspace(section, taskCard) || changed;
   changed = keepWritingVideoBeforeWorkspace(section) || changed;
   return changed;
 };
@@ -225,5 +265,6 @@ export const __TESTING__ = {
   CLEANUP_STYLE_ID,
   findWritingTaskCard,
   replaceTaskBodyWithPoints,
+  removeWritingScaffoldingBeforeWorkspace,
   keepWritingVideoBeforeWorkspace,
 };
