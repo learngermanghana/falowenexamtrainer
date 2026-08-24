@@ -15,10 +15,7 @@ if (!guidanceSource.includes(contextualImport)) {
   if (!guidanceSource.includes(assignmentImport)) {
     throw new Error("Could not find AssignmentSubmissionPage import in A2 workbook guidance.");
   }
-  guidanceSource = guidanceSource.replace(
-    assignmentImport,
-    `${assignmentImport}\n${contextualImport}`,
-  );
+  guidanceSource = guidanceSource.replace(assignmentImport, `${assignmentImport}\n${contextualImport}`);
 }
 
 const assignmentsImport = 'import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";';
@@ -32,20 +29,12 @@ if (!guidanceSource.includes(assignmentsImport)) {
 
 const fallbackSubmissionMarker = "export const resolveA2FallbackSubmissionContext";
 if (!guidanceSource.includes(fallbackSubmissionMarker)) {
-  const universalTabsBlock = `const UNIVERSAL_A2_WORKBOOK_TABS = [
-  { key: "grammar", legacyKey: "grammar", match: /\\bgrammar\\b|grammatik/i },
-  { key: "sprechen", legacyKey: "teil1", match: /\\bteil\\s*1\\b|sprechen|speak/i },
-  { key: "schreiben", legacyKey: "teil2", match: /\\bteil\\s*2\\b|schreiben|write/i },
-  { key: "lesen", legacyKey: "teil3", match: /\\bteil\\s*3\\b|lesen|read/i },
-  { key: "hoeren", legacyKey: "teil4", match: /\\bteil\\s*4\\b|h[oö]ren|hoeren|listen/i },
-  { key: "references", legacyKey: "ref", match: /\\bref\\b|reference|answers|antwort/i },
-  { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
-];`;
-  if (!guidanceSource.includes(universalTabsBlock)) {
-    throw new Error("Could not find universal A2 fallback tabs block.");
+  const learningAnchor = `];\n\nconst A2_DAYS_11_TO_15_LEARNING = {`;
+  if (!guidanceSource.includes(learningAnchor)) {
+    throw new Error("Could not find the universal A2 fallback tabs boundary.");
   }
 
-  const fallbackSubmissionBlock = `${universalTabsBlock}
+  const resolverBlock = `];
 
 const A2_FALLBACK_SUBMISSION_CONFIG_BY_DAY = {
   24: { fallbackChapter: "9.24", workbookId: "A2Day24EinenUrlaubPlanen" },
@@ -70,46 +59,26 @@ export const resolveA2FallbackSubmissionContext = (day) => {
     canonicalAssignmentKey: assignmentKey,
     workbookId: config.workbookId,
   };
-};`;
+};
 
-  guidanceSource = guidanceSource.replace(universalTabsBlock, fallbackSubmissionBlock);
+const A2_DAYS_11_TO_15_LEARNING = {`;
+
+  guidanceSource = guidanceSource.replace(learningAnchor, resolverBlock);
 }
 
-const workbookDayBlock = `  const workbookDay = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return resolveA2B1WorkbookDayFromLocation(
-      workbookLevel,
-      \`${"${window.location.pathname || \"\"}"}${"${window.location.search || \"\"}"}\`,
-    );
-  }, [workbookLevel]);`;
-const submissionContextBlock = `${workbookDayBlock}
-  const routeLockedSubmissionContext = useMemo(
+// Older versions of this patch introduced a memoized variable that a later runtime
+// safety patch intentionally removed from the JSX. Remove it here as well so repeated
+// pretest runs converge on one stable representation instead of re-wrapping Submit.
+const obsoleteRouteLockedMemo = `  const routeLockedSubmissionContext = useMemo(
     () => resolveA2FallbackSubmissionContext(workbookDay),
     [workbookDay],
-  );`;
-if (!guidanceSource.includes("const routeLockedSubmissionContext = useMemo(")) {
-  if (!guidanceSource.includes(workbookDayBlock)) {
-    throw new Error("Could not find workbook day resolver in universal A2 tabs.");
-  }
-  guidanceSource = guidanceSource.replace(workbookDayBlock, submissionContextBlock);
+  );\n`;
+if (guidanceSource.includes(obsoleteRouteLockedMemo)) {
+  guidanceSource = guidanceSource.replace(obsoleteRouteLockedMemo, "");
 }
 
-const unsafeFallbackTabs = `  const fallbackTabs = useMemo(
-    () =>
-      workbookDay === 25
-        ? STANDARD_WORKBOOK_TABS.map((tab) =>
-            tab.key === "hoeren" ? { ...tab, description: "Lesen" } : tab,
-          )
-        : STANDARD_WORKBOOK_TABS,
-    [workbookDay],
-  );`;
 const tabDescriptionOverrideDeclaration = '  const tabDescriptionOverrides = workbookDay === 25 ? { hoeren: "Lesen" } : null;';
-if (guidanceSource.includes(unsafeFallbackTabs)) {
-  guidanceSource = guidanceSource.replace(
-    unsafeFallbackTabs,
-    guidanceSource.includes(tabDescriptionOverrideDeclaration) ? "" : tabDescriptionOverrideDeclaration,
-  );
-} else if (!guidanceSource.includes(tabDescriptionOverrideDeclaration)) {
+if (!guidanceSource.includes(tabDescriptionOverrideDeclaration)) {
   const submitRefAnchor = "  const submitRef = useRef(null);";
   if (!guidanceSource.includes(submitRefAnchor)) {
     throw new Error("Could not find universal A2 submit ref for Day 25 label override.");
@@ -120,33 +89,46 @@ if (guidanceSource.includes(unsafeFallbackTabs)) {
   );
 }
 
-const fallbackNavWithMappedTabs = `        tabs={fallbackTabs}
-        ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-const safeFallbackNav = `        tabs={STANDARD_WORKBOOK_TABS}
+const navWithoutOverrides = `        tabs={STANDARD_WORKBOOK_TABS}
+        ariaLabel={workbookDay ? \`A2 Day \${workbookDay} workbook sections\` : "A2 workbook sections"}`;
+const navWithOverrides = `        tabs={STANDARD_WORKBOOK_TABS}
         tabDescriptionOverrides={tabDescriptionOverrides}
-        ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-if (guidanceSource.includes(fallbackNavWithMappedTabs)) {
-  guidanceSource = guidanceSource.replace(fallbackNavWithMappedTabs, safeFallbackNav);
-} else if (!guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
-  const standardFallbackNav = `        tabs={STANDARD_WORKBOOK_TABS}
-        ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-  if (!guidanceSource.includes(standardFallbackNav)) {
+        ariaLabel={workbookDay ? \`A2 Day \${workbookDay} workbook sections\` : "A2 workbook sections"}`;
+if (!guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
+  if (!guidanceSource.includes(navWithoutOverrides)) {
     throw new Error("Could not find universal A2 WorkbookTabNav props.");
   }
-  guidanceSource = guidanceSource.replace(standardFallbackNav, safeFallbackNav);
+  guidanceSource = guidanceSource.replace(navWithoutOverrides, navWithOverrides);
 }
 
-const genericSubmission = "          <AssignmentSubmissionPage />";
-const lockedSubmission = `          {routeLockedSubmissionContext ? (
+const unsafeRouteLockedSubmission = `          {routeLockedSubmissionContext ? (
             <ContextualAssignmentSubmissionPage submissionContext={routeLockedSubmissionContext} />
           ) : (
             <AssignmentSubmissionPage />
           )}`;
-if (!guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
-  if (!guidanceSource.includes(genericSubmission)) {
-    throw new Error("Could not find generic fallback assignment submission mount.");
+const safeSubmission = `          {resolveA2FallbackSubmissionContext(workbookDay) ? (
+            <ContextualAssignmentSubmissionPage submissionContext={resolveA2FallbackSubmissionContext(workbookDay)} />
+          ) : (
+            <AssignmentSubmissionPage />
+          )}`;
+
+if (!guidanceSource.includes(safeSubmission)) {
+  if (guidanceSource.includes(unsafeRouteLockedSubmission)) {
+    guidanceSource = guidanceSource.replace(unsafeRouteLockedSubmission, safeSubmission);
+  } else {
+    const genericFallbackMount = `          <AssignmentSubmissionPage />
+        </div>
+      ) : null}
+    </section>`;
+    const lockedFallbackMount = `${safeSubmission}
+        </div>
+      ) : null}
+    </section>`;
+    if (!guidanceSource.includes(genericFallbackMount)) {
+      throw new Error("Could not find the generic universal A2 fallback submission mount.");
+    }
+    guidanceSource = guidanceSource.replace(genericFallbackMount, lockedFallbackMount);
   }
-  guidanceSource = guidanceSource.replace(genericSubmission, lockedSubmission);
 }
 
 const workbookTabPropsAnchor = `  tabs = STANDARD_WORKBOOK_TABS,
@@ -193,11 +175,11 @@ const overrideDeclarationCount = guidanceSource.split(tabDescriptionOverrideDecl
 if (overrideDeclarationCount !== 1) {
   throw new Error(`Expected exactly one Day 25 label override declaration, found ${overrideDeclarationCount}.`);
 }
-if (!guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
-  throw new Error("Days 24-26 fallback submissions are not route-locked.");
+if (!guidanceSource.includes(safeSubmission)) {
+  throw new Error("Days 24-26 fallback submissions are not route-locked with the runtime-safe resolver.");
 }
-if (guidanceSource.includes("STANDARD_WORKBOOK_TABS.map((tab) =>")) {
-  throw new Error("Day 25 fallback still breaks Grammar integration by mapping STANDARD_WORKBOOK_TABS before WorkbookTabNav.");
+if (guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
+  throw new Error("Obsolete routeLockedSubmissionContext JSX remains in A2 workbook guidance.");
 }
 if (!guidanceSource.includes("tabs={STANDARD_WORKBOOK_TABS}") || !guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
   throw new Error("Day 25 fallback no longer preserves STANDARD_WORKBOOK_TABS identity through Grammar integration.");
@@ -208,4 +190,4 @@ if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
 
 fs.writeFileSync(guidancePath, guidanceSource, "utf8");
 fs.writeFileSync(standardComponentsPath, standardSource, "utf8");
-console.log("Patched A2 fallback tabs to preserve route-locked submission context and Grammar integration.");
+console.log("Patched A2 fallback tabs idempotently with route-locked submission context and Grammar integration.");
