@@ -39,7 +39,7 @@ const cases = [
     role: "button",
     teil2: /Teil 2 · Schreiben/i,
     teil3: /Teil 3 · Lesen/i,
-    cleanupTab: /Submit/i,
+    cleanupTab: /Teil 4 · Lesen/i,
   },
   {
     day: 26,
