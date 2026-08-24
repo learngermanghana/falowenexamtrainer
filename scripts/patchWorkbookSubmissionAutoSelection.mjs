@@ -101,12 +101,13 @@ replaceOnce(
   "workbook assignment lock",
 );
 
-replaceOnce(
-  `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
+if (!source.includes('data-workbook-submission-context="locked"')) {
+  replaceOnce(
+    `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           <div
             style={{
               display: "grid",`,
-  `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
+    `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           {isWorkbookSubmissionContext ? (
             <div
               data-workbook-submission-context="locked"
@@ -141,8 +142,9 @@ replaceOnce(
             data-manual-submission-selectors="true"
             style={{
               display: isWorkbookSubmissionContext ? "none" : "grid",`,
-  "read-only workbook assignment summary",
-);
+    "read-only workbook assignment summary",
+  );
+}
 
 const requiredMarkers = [
   'from "../utils/workbookSubmissionContext"',
