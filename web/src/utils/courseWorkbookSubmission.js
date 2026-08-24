@@ -44,13 +44,7 @@ export const buildLegacyAssignmentLockId = ({ studentScopeKey, level, chapterKey
 
 export const getWorkbookNavigationTabs = (level) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
-
-  if (normalizedLevel === "A1") {
-    return [
-      { key: "assignment", label: "Assignment" },
-      { key: "submit", label: "Submit" },
-    ];
-  }
+  if (normalizedLevel === "A1") return [];
 
   if (["A2", "B1"].includes(normalizedLevel)) {
     return [
