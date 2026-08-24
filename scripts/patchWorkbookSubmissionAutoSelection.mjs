@@ -124,7 +124,11 @@ replaceOnce(
               </span>
               <strong style={{ color: "#0f172a" }}>
                 {requestedAssignmentMatch?.label ||
-                  [workbookSubmissionContext.level, workbookSubmissionContext.day ? `Day ${workbookSubmissionContext.day}` : "", workbookSubmissionContext.chapter ? `Chapter ${workbookSubmissionContext.chapter}` : ""]
+                  [
+                    workbookSubmissionContext.level,
+                    workbookSubmissionContext.day ? "Day " + workbookSubmissionContext.day : "",
+                    workbookSubmissionContext.chapter ? "Chapter " + workbookSubmissionContext.chapter : "",
+                  ]
                     .filter(Boolean)
                     .join(" · ")}
               </strong>
