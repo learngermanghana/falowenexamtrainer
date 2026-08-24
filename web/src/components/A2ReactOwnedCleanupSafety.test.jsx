@@ -70,7 +70,10 @@ const cases = [
   },
 ];
 
-const getControl = (role, name) => screen.getByRole(role, { name });
+// Day 25's native controls are deliberately hidden when the shared fallback navigation
+// owns the live UI. This test mocks that fallback, so include hidden controls while
+// exercising the native React state transitions that cleanup must preserve.
+const getControl = (role, name) => screen.getByRole(role, { name, hidden: true });
 
 describe("A2 Days 24-28 React-owned cleanup safety", () => {
   test.each(cases)(
