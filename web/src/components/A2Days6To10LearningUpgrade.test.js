@@ -4,7 +4,7 @@ import path from "path";
 const read = (file) => fs.readFileSync(path.join(__dirname, file), "utf8");
 
 describe("A2 Days 6-10 learning upgrade", () => {
-  test("Days 6-9 use guided clickable learning blocks", () => {
+  test("Days 6-9 keep guided clickable learning block content", () => {
     const guide = read("A2Days6To9LearningGuide.jsx");
     expect(guide).toContain("Wo? oder Wohin? bei Möbeln und Räumen");
     expect(guide).toContain("Relativsätze: die Wohnung genauer beschreiben");
@@ -15,10 +15,16 @@ describe("A2 Days 6-10 learning upgrade", () => {
     expect(guide).toContain("explanation:");
   });
 
-  test("standard workbook exposes the guide on Days 6-9", () => {
+  test("standard workbook exposes the speaking mini-guide only on Days 6-8", () => {
     const page = read("A2StandardTabbedWorkbookPage.js");
     expect(page).toContain("A2Days6To9LearningGuide");
-    expect(page).toContain("Number(day) >= 6 && Number(day) <= 9");
+    expect(page).toContain("Number(day) >= 6 && Number(day) <= 8");
+    expect(page).not.toContain("Number(day) >= 6 && Number(day) <= 9");
+  });
+
+  test("Day 9 Perfekt remains available in the Grammar tab", () => {
+    const grammar = read("A2B1WorkbookGrammarNotes.js");
+    expect(grammar).toContain("9: A2Day9PerfektGrammarPage");
   });
 
   test("Day 10 keeps a concise Präteritum lesson with clickable checks", () => {
