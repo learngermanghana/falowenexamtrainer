@@ -254,12 +254,13 @@ describe("shared A2 workbook regression", () => {
     expect(document.querySelectorAll('[role="note"]')).toHaveLength(0);
   });
 
-  it("leaves Days 27 and 28 on their native working standard navigation", () => {
+  it("leaves Days 27 and 28 on their shared working standard navigation", () => {
     [day27, day28].forEach((source) => {
-      expect(source).toContain("STANDARD_WORKBOOK_TABS");
-      expect(source).toContain("WorkbookTabNav");
-      expect(source).toContain('activeTab === "submit"');
+      expect(source).toContain("A2StandardTabbedWorkbookPage");
     });
+    expect(standardShell).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
+    expect(standardShell).toContain("WorkbookTabNav");
+    expect(standardShell).toContain('activeTab === "submit"');
   });
 
   it("shows Day 27 Goethe Hören without separate workbook questions or listening submission", () => {
