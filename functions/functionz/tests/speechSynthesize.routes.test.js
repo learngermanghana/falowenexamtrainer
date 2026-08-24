@@ -70,7 +70,6 @@ beforeEach(() => {
 
 describe("POST /speech/synthesize", () => {
   it("requires authentication", async () => {
-    mockVerifyIdToken.mockResolvedValueOnce(null);
     const res = await postJson("/speech/synthesize", { text: "Hallo", level: "A2" });
     expect(res.status).toBe(401);
   });
