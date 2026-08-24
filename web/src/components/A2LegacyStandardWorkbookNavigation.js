@@ -12,6 +12,7 @@ import {
 
 const A2_DAY20_PATH = "/campus/course/a2-day-20-typische-reklamationssituationen-workbook";
 const A2_DAY22_PATH = "/campus/course/a2-day-22-die-woche-planung-workbook";
+const A2_DAY23_PATH = "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook";
 const DAY22_SELF_CHECK_NOTE =
   "Watch the Goethe past-paper video and check your answers there. Teil 4 is self-check practice and is not submitted. The school evaluates only Teil 2 · Schreiben and Teil 3 · Lesen for this workbook.";
 const DAY22_READING_QUESTION_STEMS = [
@@ -31,7 +32,7 @@ A2_LEGACY_STANDARD_NAV_BY_PATH[A2_DAY20_PATH] = {
 
 export const A2_DAYS_22_TO_26_PATHS = new Set([
   A2_DAY22_PATH,
-  "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
+  A2_DAY23_PATH,
   "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
   "/campus/course/a2-day-25-tagesablauf-workbook",
   "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
@@ -150,10 +151,12 @@ export const safelyCleanA2Day22Presentation = (root = document) => {
 export default function A2LegacyStandardWorkbookNavigation() {
   const location = useLocation();
   const normalizedPath = normalizePath(location.pathname);
-  const isSupportedRoute = A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath);
+  const isNativeDay23 = normalizedPath === A2_DAY23_PATH;
+  const isSupportedRoute = A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath) && !isNativeDay23;
   const shouldCleanPresentation =
-    A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath) ||
-    A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath);
+    !isNativeDay23 &&
+    (A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath) ||
+      A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath));
 
   useEffect(() => {
     if (!isSupportedRoute) return undefined;

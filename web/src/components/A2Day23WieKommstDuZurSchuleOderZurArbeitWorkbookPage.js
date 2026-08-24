@@ -2,19 +2,17 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
+import {
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
-
-const tabs = [
-  { key: "teil1", label: "Teil 1 · Group Practice" },
-  { key: "teil2", label: "Teil 2 · Schreiben" },
-  { key: "teil3", label: "Teil 3 · Lesen" },
-  { key: "teil4", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
 
 const cardStyle = {
   ...styles.card,
@@ -44,13 +42,6 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const tabButtonStyle = (active) => ({
-  ...styles.secondaryButton,
-  borderColor: active ? "#2563eb" : "#d1d5db",
-  background: active ? "#eff6ff" : "#fff",
-  color: active ? "#1d4ed8" : "#111827",
-});
-
 const lesenQuestions = [
   {
     question: "Wohin fuhr Matthias?",
@@ -75,7 +66,7 @@ const lesenQuestions = [
 ];
 
 const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("teil1");
+  const [activeTab, setActiveTab] = useState("grammar");
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -85,21 +76,26 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 23 Workbook · Wie kommst du zur Schule / zur Arbeit?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 9.23</p>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete each Teil and submit your final answers in the submission area (not on this page).
+          Use Grammar first when needed, then complete Teil 1–4 and submit your final answers through the Submit tab.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <button key={tab.key} style={tabButtonStyle(tab.key === activeTab)} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <WorkbookTabNav
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          tabs={A2_B1_WORKBOOK_TABS_WITH_GRAMMAR}
+          ariaLabel="A2 Day 23 workbook sections"
+        />
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance level="A2" />
 
-      {activeTab === "teil1" && (
+      {activeTab === "grammar" && (
+        <div style={cardStyle}>
+          <A2B1GrammarNotesTab level="A2" day={23} />
+        </div>
+      )}
+
+      {activeTab === "sprechen" && (
         <div style={cardStyle}>
           <img
             src="https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=1600&q=80"
@@ -220,7 +216,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      {activeTab === "teil2" && (
+      {activeTab === "schreiben" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -240,11 +236,11 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
           <CourseInlinePracticePanel
             type="writing"
           />
-        <WorkbookSubmissionReminder />
+          <WorkbookSubmissionReminder />
         </div>
       )}
 
-      {activeTab === "teil3" && (
+      {activeTab === "lesen" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 3 (Lesen) · Exercise</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -268,11 +264,11 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
               </div>
             ))}
           </div>
-        <WorkbookSubmissionReminder />
+          <WorkbookSubmissionReminder />
         </div>
       )}
 
-      {activeTab === "teil4" && (
+      {activeTab === "hoeren" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -292,21 +288,33 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      <div style={{ ...cardStyle, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
-        <h2 style={{ ...sectionTitle, color: "#1e3a8a" }}>Final submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7, color: "#1e3a8a" }}>
-          Submit your final answers in the submission area. Do not submit answers directly on this workbook page.
-        </p>
-        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer">
-          Go to submission area
-        </a>
-      <WorkbookSubmissionReminder />
-      </div>
-
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day23WieKommstDuZurSchuleOderZurArbeit", level: "A2", workbookId: "A2Day23WieKommstDuZurSchuleOderZurArbeit" }} workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit" />
+        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day23WieKommstDuZurSchuleOderZurArbeit", level: "A2", day: 23, chapter: "9.23", workbookId: "A2Day23WieKommstDuZurSchuleOderZurArbeit" }} workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit" />
       )}
 
+      {activeTab === "submit" && (
+        <section style={{ ...cardStyle, border: "2px solid #2563eb" }}>
+          <div>
+            <p style={{ margin: 0, color: "#1d4ed8", fontSize: 13, fontWeight: 900 }}>
+              Tutor-marked assignment
+            </p>
+            <h2 style={{ margin: "4px 0" }}>Submit A2 · Day 23 · Kapitel 9.23</h2>
+            <p style={{ margin: 0, color: "#475569" }}>
+              Submit your final Schreiben and Lesen answers here. Teil 4 · Hören is Goethe self-check practice.
+            </p>
+          </div>
+          <ContextualAssignmentSubmissionPage
+            submissionContext={{
+              level: "A2",
+              day: 23,
+              chapter: "9.23",
+              assignmentKey: "A2-9.23",
+              canonicalAssignmentKey: "A2-9.23",
+              workbookId: "A2Day23WieKommstDuZurSchuleOderZurArbeit",
+            }}
+          />
+        </section>
+      )}
     </div>
   );
 };
