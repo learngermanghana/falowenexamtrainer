@@ -89,16 +89,39 @@ if (!guidanceSource.includes(tabDescriptionOverrideDeclaration)) {
   );
 }
 
-const navWithoutOverrides = `        tabs={STANDARD_WORKBOOK_TABS}
-        ariaLabel={workbookDay ? \`A2 Day \${workbookDay} workbook sections\` : "A2 workbook sections"}`;
-const navWithOverrides = `        tabs={STANDARD_WORKBOOK_TABS}
-        tabDescriptionOverrides={tabDescriptionOverrides}
-        ariaLabel={workbookDay ? \`A2 Day \${workbookDay} workbook sections\` : "A2 workbook sections"}`;
-if (!guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
-  if (!guidanceSource.includes(navWithoutOverrides)) {
-    throw new Error("Could not find universal A2 WorkbookTabNav props.");
+// patchA2ReactOwnedDomCleanupSafety may run immediately before this script and add a
+// Day-25-only mapped `fallbackTabs` array. That copy breaks the identity check used to
+// integrate Grammar. Collapse it back to STANDARD_WORKBOOK_TABS and let WorkbookTabNav
+// apply only a display-label override. Do this every run so the patch chain is idempotent.
+const mappedFallbackTabs = `  const fallbackTabs = useMemo(
+    () =>
+      workbookDay === 25
+        ? STANDARD_WORKBOOK_TABS.map((tab) =>
+            tab.key === "hoeren" ? { ...tab, description: "Lesen" } : tab,
+          )
+        : STANDARD_WORKBOOK_TABS,
+    [workbookDay],
+  );`;
+if (guidanceSource.includes(mappedFallbackTabs)) {
+  guidanceSource = guidanceSource.replace(mappedFallbackTabs, "");
+}
+
+const mappedTabsProp = "        tabs={fallbackTabs}";
+const standardTabsProp = "        tabs={STANDARD_WORKBOOK_TABS}";
+const overrideProp = "        tabDescriptionOverrides={tabDescriptionOverrides}";
+if (guidanceSource.includes(mappedTabsProp)) {
+  guidanceSource = guidanceSource.replace(
+    mappedTabsProp,
+    `${standardTabsProp}\n${overrideProp}`,
+  );
+} else if (!guidanceSource.includes(overrideProp)) {
+  if (!guidanceSource.includes(standardTabsProp)) {
+    throw new Error("Could not find universal A2 WorkbookTabNav tabs prop.");
   }
-  guidanceSource = guidanceSource.replace(navWithoutOverrides, navWithOverrides);
+  guidanceSource = guidanceSource.replace(
+    standardTabsProp,
+    `${standardTabsProp}\n${overrideProp}`,
+  );
 }
 
 const unsafeRouteLockedSubmission = `          {routeLockedSubmissionContext ? (
@@ -181,7 +204,10 @@ if (!guidanceSource.includes(safeSubmission)) {
 if (guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
   throw new Error("Obsolete routeLockedSubmissionContext JSX remains in A2 workbook guidance.");
 }
-if (!guidanceSource.includes("tabs={STANDARD_WORKBOOK_TABS}") || !guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
+if (guidanceSource.includes("const fallbackTabs = useMemo(") || guidanceSource.includes("tabs={fallbackTabs}")) {
+  throw new Error("Day 25 fallback still maps STANDARD_WORKBOOK_TABS before Grammar integration.");
+}
+if (!guidanceSource.includes(standardTabsProp) || !guidanceSource.includes(overrideProp)) {
   throw new Error("Day 25 fallback no longer preserves STANDARD_WORKBOOK_TABS identity through Grammar integration.");
 }
 if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
