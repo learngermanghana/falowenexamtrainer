@@ -36,18 +36,28 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
 
   it("only shows Grammar when that workbook day has grammar notes", () => {
     [
-      ["A2 Day 25 workbook sections", "A2"],
-      ["A2 Day 26 workbook sections", "A2"],
-      ["A2 Day 27 workbook sections", "A2"],
-      ["B1 Day 17 workbook sections", "B1"],
-      ["B1 Day 20 workbook sections", "B1"],
-    ].forEach(([ariaLabel]) => {
+      "A2 Day 25 workbook sections",
+      "A2 Day 26 workbook sections",
+      "A2 Day 27 workbook sections",
+    ].forEach((ariaLabel) => {
       const resolved = getWorkbookTabsWithLegacyGrammar({
         tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
         ariaLabel,
       });
 
       expect(resolved.tabs.map((tab) => tab.key)).not.toContain("grammar");
+    });
+
+    [
+      "B1 Day 17 workbook sections",
+      "B1 Day 20 workbook sections",
+    ].forEach((ariaLabel) => {
+      const resolved = getWorkbookTabsWithLegacyGrammar({
+        tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+        ariaLabel,
+      });
+
+      expect(resolved.tabs[0].key).toBe("grammar");
     });
 
     expect(getWorkbookTabsWithLegacyGrammar({
@@ -84,9 +94,10 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
   it("explains that Personen beschreiben Teil 1 prepares the Teil 2 letter", () => {
     const source = read("A2Day2PersonenBeschreibenWorkbookPage.js");
 
-    expect(source).toContain('eyebrow="Teil 1 · Practice and class discussion"');
-    expect(source).toContain("Teil 1 is for speaking practice and class discussion.");
-    expect(source).toContain("Then use the ideas and vocabulary from this discussion in Teil 2 to write the letter about your boss.");
+    expect(source).toContain('eyebrow="Now speak · Jetzt sprechen"');
+    expect(source).toContain("Teil 1 is speaking practice.");
+    expect(source).toContain("Use the same description route, ideas and vocabulary in Teil 2 when you write the letter about your boss.");
+    expect(source).toContain('title="Brief an Felix: Mein Chef / Meine Chefin"');
     expect(source).not.toContain("invite you to write a brief essay about yourself");
     expect(source).not.toContain("In this chapter, we’ll engage in group exercises discussing these topics");
   });
