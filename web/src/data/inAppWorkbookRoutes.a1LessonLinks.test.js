@@ -76,7 +76,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   );
 
   it("keeps the Day 1 teacher, AI, grammar and workbook resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(1, "0.1")).toContain("https://youtu.be/CqFbBQG9M3U");
+    expect(getTeacherVideoUrls(1, "0.1")).toContain("https://youtu.be/jXUJ3VTBlcE");
     expect(getAiVideoUrls(1, "0.1")).toContain("https://youtu.be/5WIMkENgdGE");
     expect(getA1GrammarRoute({ day: 1, chapter: "0.1" })).toBe(
       "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
@@ -180,7 +180,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(workbookSource).toContain("Teil 2 · Schreiben");
     expect(workbookSource).toContain("1. Wie heißt sie?");
     expect(workbookSource).toContain("C) Anna");
-    expect(workbookSource).toContain("A) A, B, C, D, E, F, G");
+    expect(workbookSource).toContain("Write your text with these five points:");
     expect(workbookSource).not.toContain("Teil 3 ·");
   });
 
