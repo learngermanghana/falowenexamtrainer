@@ -50,6 +50,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/diUTkWdqT_0",
       },
     ],
+    9: [
+      {
+        chapter: "4.9",
+        topic: "Urlaub",
+        url: "https://youtu.be/iKKyQRbuc-8",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
