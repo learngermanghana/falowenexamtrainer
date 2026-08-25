@@ -76,6 +76,13 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const assignmentKey = `A2-${chapter}`;
   const resolvedWorkbookId = workbookId || `A2Day${day}Workbook`;
+  const submissionContext = {
+    level: "A2",
+    day,
+    assignmentKey,
+    canonicalAssignmentKey: assignmentKey,
+    workbookId: resolvedWorkbookId,
+  };
   const writingTaskTitle = schreibenTask || `${title} · Teil 2 writing task`;
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
@@ -114,7 +121,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     {activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor."}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
 
     {activeTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
-    {activeTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage level="A2" day={day} assignmentKey={assignmentKey} canonicalAssignmentKey={assignmentKey} workbookId={resolvedWorkbookId} /></div>}
+    {activeTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
   </div>;
 };
 
