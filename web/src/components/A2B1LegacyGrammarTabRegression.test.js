@@ -91,15 +91,28 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(source).not.toContain("In this chapter, we’ll engage in group exercises discussing these topics");
   });
 
-  it("keeps the forced A2 fallback on the same Grammar-first shared tab contract", () => {
-    const guidance = read("A2B1WorkbookGuidance.js");
+  it("moves A2 Day 10 onto the same standard isolated tab contract as Days 1-9", () => {
+    const day9 = read("A2Day9UrlaubWorkbookPage.js");
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
+    const standard = read("A2StandardTabbedWorkbookPage.js");
 
-    expect(guidance).toContain('{ key: "grammar", legacyKey: "grammar"');
-    expect(guidance).toContain('useState("sprechen")');
-    expect(guidance).toContain('`A2 Day ${workbookDay} workbook sections`');
-    expect(guidance).toContain("Grammar, Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit");
-    expect(day10).toContain("<A2B1WorkbookGuidance />");
+    expect(day9).toContain("A2StandardTabbedWorkbookPage");
+    expect(day10).toContain("A2StandardTabbedWorkbookPage");
+    expect(day10).toContain("showWorkbookGuidance={false}");
+    expect(standard).toContain('activeTab === "grammar"');
+    expect(standard).toContain('activeTab === "sprechen"');
+    expect(standard).toContain("showWorkbookGuidance ? <A2B1WorkbookGuidance /> : null");
+  });
+
+  it("keeps Day 10 grammar content separate from Teil 1 speaking content", () => {
+    const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
+    const grammar = read("A2Day10PraeteritumGrammarPage.js");
+
+    expect(day10).toContain('eyebrow="Teil 1 · Practice and class discussion"');
+    expect(grammar).toContain("Präteritum und Perfekt: Was ist der Unterschied?");
+    expect(grammar).toContain("Regelmäßige Verben: Stamm + -te");
+    expect(grammar).toContain("Die wichtigsten Formen: sein und haben");
+    expect(grammar).not.toContain("Teil 1 · Practice and class discussion");
   });
 
   it("does not double-integrate grammar on newer A2/B1 workbook pages", () => {
