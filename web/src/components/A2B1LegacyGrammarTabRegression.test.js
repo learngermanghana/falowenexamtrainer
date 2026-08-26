@@ -113,6 +113,26 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(day11).not.toContain('useState("sprechen")');
   });
 
+  it("keeps A2 Days 12-16 speaking content off the Grammar tab", () => {
+    const day12 = read("A2Day12MeinTraumberufWorkbookPageLegacy.js");
+    const day13 = read("A2Day13VorstellungsgespraechWorkbookPageLegacy.js");
+    const day14 = read("A2Day14BerufUndKarriereWorkbookPage.js");
+    const day15 = read("A2Day15MeinLieblingssportWorkbookPageLegacy.js");
+    const day16 = read("A2Day16WohlbefindenUndEntspannungWorkbookPage.js");
+
+    [day12, day13].forEach((source) => {
+      expect(source).toContain('{ key: "grammar", label: "Grammar" }');
+      expect(source).toContain('activeTab === "grammar"');
+      expect(source).not.toContain("<A2B1WorkbookGuidance");
+    });
+    [day14, day15].forEach((source) => {
+      expect(source).toContain("WorkbookTabNav");
+      expect(source).not.toContain("<A2B1WorkbookGuidance");
+    });
+    expect(day16).toContain("A2StandardTabbedWorkbookPage");
+    expect(day16).toContain("showWorkbookGuidance={false}");
+  });
+
   it("keeps Day 10 grammar content separate from Teil 1 speaking content", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
     const grammar = read("A2Day10PraeteritumGrammarPage.js");
