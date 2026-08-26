@@ -133,6 +133,45 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(day16).toContain("showWorkbookGuidance={false}");
   });
 
+  it("keeps A2 Days 17-28 speaking content off the Grammar tab", () => {
+    const standardDays = [
+      "A2Day18DieBankAnrufenWorkbookPage.js",
+      "A2Day19EinkaufenWoUndWieWorkbookPage.js",
+      "A2Day21EinWochenendePlanenWorkbookPage.js",
+      "A2Day27DigitaleKommunikationWorkbookPage.js",
+    ];
+    const nativeGrammarDays = [
+      "A2Day20TypischeReklamationssituationenWorkbookPage.js",
+      "A2Day22DieWochePlanungWorkbookPage.js",
+      "A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js",
+      "A2Day24EinenUrlaubPlanenWorkbookPage.js",
+      "A2Day25TagesablaufWorkbookPage.js",
+      "A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js",
+    ];
+    const sharedNavDays = [
+      "A2Day17InDieApothekeGehenWorkbookPage.js",
+      "A2Day28UeberDieZukunftSprechenWorkbookPage.js",
+    ];
+
+    standardDays.forEach((name) => {
+      const source = read(name);
+      expect(source).toContain("A2StandardTabbedWorkbookPage");
+      expect(source).toContain("showWorkbookGuidance={false}");
+    });
+    nativeGrammarDays.forEach((name) => {
+      const source = read(name);
+      expect(source).toContain('{ key: "grammar", label: "Grammar" }');
+      expect(source).toContain('activeTab === "grammar"');
+      expect(source).not.toContain("<A2B1WorkbookGuidance");
+    });
+    sharedNavDays.forEach((name) => {
+      const source = read(name);
+      expect(source).toContain("WorkbookTabNav");
+      expect(source).not.toContain("<A2B1WorkbookGuidance");
+    });
+    expect(read("A2LegacyStandardWorkbookNavigationImpl.js")).toContain('return "grammar"');
+  });
+
   it("keeps Day 10 grammar content separate from Teil 1 speaking content", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
     const grammar = read("A2Day10PraeteritumGrammarPage.js");
