@@ -114,4 +114,5 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
     hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
     hoerenQuestions={listeningQuestions}
   />;
-}
+}      showWorkbookGuidance={false}
+
