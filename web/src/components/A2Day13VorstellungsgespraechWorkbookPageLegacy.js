@@ -5,12 +5,14 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 
 const tabs = [
+  { key: "grammar", label: "Grammar" },
   { key: "sprechen", label: "Teil 1" },
   { key: "schreiben", label: "Teil 2" },
   { key: "lesen", label: "Teil 3" },
@@ -213,7 +215,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
         </p>
       </div>
 
-      <A2B1WorkbookGuidance level="A2" />
+      {activeTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={13} /></div>}
 
       {activeTab === "sprechen" && (
         <div style={card}>
