@@ -6,7 +6,7 @@ import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import {
@@ -178,8 +178,6 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
           />
         </div>
       </div>
-
-      <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
         <div style={card}>
