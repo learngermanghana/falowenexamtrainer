@@ -241,6 +241,7 @@ export default function A2Day19EinkaufenWoUndWieWorkbookPage() {
       hoerenTask="Hören Sie den Text ‚Online Shopping und Konsumverhalten‘ und wählen Sie jeweils die richtige Antwort."
       hoerenAudioUrl="https://drive.google.com/file/d/1OsT5j6Y7a-rMdB0HlRJJ98gTgSvxm_LB/view?usp=sharing"
       hoerenQuestions={hoerenQuestions}
+      showWorkbookGuidance={false}
     />
   );
 }
