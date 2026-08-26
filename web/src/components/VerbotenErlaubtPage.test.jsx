@@ -29,7 +29,7 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(5);
   });
 
-  test("teaches the direct erlaubt and verboten sentence logic without a conjugation table", () => {
+  test("teaches both rule patterns and the full dürfen conjugation", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: "Erlaubt oder verboten?" })).toBeVisible();
@@ -37,7 +37,12 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(screen.getByText(/Man darf hier nicht rauchen/)).toBeVisible();
     expect(screen.getByText("Das Fotografieren ist erlaubt.")).toBeVisible();
     expect(screen.getByText("= Man darf hier fotografieren.")).toBeVisible();
-    expect(screen.queryByText("Show all forms")).not.toBeInTheDocument();
+    expect(screen.getByText("Dürfen is a modal verb")).toBeVisible();
+    expect(screen.getByText("darfst")).toBeVisible();
+    expect(screen.getByText("dürft")).toBeVisible();
+    expect(screen.getByText("Wir dürfen hier Deutsch lernen.")).toBeVisible();
+    expect(screen.getByText("Sie dürfen hier parken.")).toBeVisible();
+    expect(screen.getByText(/Both mean the same thing/)).toBeVisible();
   });
 
   test("exam mode hides translations, badges and instant explanations", () => {
