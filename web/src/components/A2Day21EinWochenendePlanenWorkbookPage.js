@@ -244,6 +244,7 @@ export default function A2Day21EinWochenendePlanenWorkbookPage() {
       hoerenTask="This is a Goethe-standard Hören test. The answers are provided in the YouTube video, so check and mark your own listening results. The school officially evaluates Lesen and Schreiben for this workbook."
       hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"
       hoerenQuestions={[]}
+      showWorkbookGuidance={false}
     />
   );
 }
