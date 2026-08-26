@@ -6,7 +6,7 @@ import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import {
@@ -164,8 +164,6 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           ariaLabel="A2 Day 14 workbook sections"
         />
       </div>
-
-      <A2B1WorkbookGuidance level="A2" />
 
       {activeTab === "sprechen" && (
         <div style={card}>
