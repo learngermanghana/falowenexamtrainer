@@ -47,6 +47,7 @@ export default function A2Day18DieBankAnrufenWorkbookPage() {
         { stem: "Welches Konto ist kostenlos?", options: ["A) Basiskonto", "B) Konto mit zusätzlichen Dienstleistungen", "C) Premium-Konto", "D) Geschäftskonto"] },
         { stem: "Was können Sie tun, um Zeit zu sparen?", options: ["A) Die Formulare in der Bankfiliale ausfüllen", "B) Die Formulare vor dem Termin online ausfüllen", "C) Einen Termin absagen"] },
       ]}
+      showWorkbookGuidance={false}
     />
   );
 }
