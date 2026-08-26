@@ -4,12 +4,14 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 
 const tabs = [
+  { key: "grammar", label: "Grammar" },
   { key: "sprechen", label: "Teil 1" },
   { key: "schreiben", label: "Teil 2" },
   { key: "lesen", label: "Teil 3" },
@@ -262,7 +264,7 @@ const A2Day20WorkbookContent = () => {
         </p>
       </div>
 
-      <A2B1WorkbookGuidance />
+      {activeTab === "grammar" && <section style={sectionStyle}><A2B1GrammarNotesTab level="A2" day={20} /></section>}
 
       {activeTab === "sprechen" && (
         <section style={sectionStyle}>
