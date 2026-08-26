@@ -33,29 +33,31 @@ const replaceRange = (source, start, end, replacement, label) => {
 };
 
 let page = read(paths.page);
-page = replaceOnce(
+if (!page.includes("data-combined-rule-question")) {
+  page = replaceOnce(
   page,
   `{knowledgeQuestions.map((question, index) => {\n          const selected = answers[index];`,
   `{knowledgeQuestions.map((question, index) => {\n          const rule = knowledgeRules[index];\n          const selected = answers[index];`,
   "combined rule lookup",
-);
-page = replaceOnce(
+  );
+  page = replaceOnce(
   page,
   `              <strong style={{ color: palette.ink }}>{index + 1}. {question.prompt}</strong>`,
   `              <div\n                data-combined-rule-question={index + 1}\n                style={{\n                  background: examMode ? "#f8fafc" : palette.indigoSoft,\n                  border: "1px solid #c7d2fe",\n                  borderRadius: 13,\n                  display: "grid",\n                  gap: 5,\n                  padding: 11,\n                }}\n              >\n                <span style={{ color: palette.indigo, fontSize: 11, fontWeight: 900, letterSpacing: ".06em", textTransform: "uppercase" }}>Rule {index + 1}</span>\n                <strong style={{ color: palette.ink, lineHeight: 1.5 }}>{rule?.german}</strong>\n                {!examMode && rule?.english ? <span style={{ color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>{rule.english}</span> : null}\n              </div>\n              <strong style={{ color: palette.ink }}>{question.prompt}</strong>`,
   "combined rule card",
-);
-page = replaceRange(
+  );
+  page = replaceRange(
   page,
   `        <div style={{ border: "1px solid #c7d2fe", borderRadius: 18, background: "linear-gradient(135deg,#eef2ff,#f8fafc)", padding: 16, display: "grid", gap: 12 }}>`,
   `        </div>\n        {!examMode ? (`,
   `        <Callout>\n          <strong>One card, one decision</strong>\n          <span>Read each rule and answer its matching question immediately below it. You no longer need to scroll between two repeated lists.</span>\n        </Callout>\n        {!examMode ? (`,
   "separate rules list",
-);
-page = page.replace(
-  `: "Read the short rules. Green ✓ means allowed. Red ✕ means forbidden. Then answer the questions below."}`,
-  `: "Read one short rule and answer its matching question on the same card. Green ✓ means allowed. Red ✕ means forbidden."}`,
-);
+  );
+  page = page.replace(
+    `: "Read the short rules. Green ✓ means allowed. Red ✕ means forbidden. Then answer the questions below."}`,
+    `: "Read one short rule and answer its matching question on the same card. Green ✓ means allowed. Red ✕ means forbidden."}`,
+  );
+}
 write(paths.page, page);
 
 let panel = read(paths.panel);
