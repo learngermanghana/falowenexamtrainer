@@ -104,6 +104,15 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(standard).toContain("showWorkbookGuidance ? <A2B1WorkbookGuidance /> : null");
   });
 
+  it("moves A2 Day 11 onto isolated standard tabs", () => {
+    const day11 = read("A2Day11UnterwegsVerkehrsmittelWorkbookPage.js");
+
+    expect(day11).toContain("A2StandardTabbedWorkbookPage");
+    expect(day11).toContain("showWorkbookGuidance={false}");
+    expect(day11).toContain('eyebrow="Teil 1 · Practice and class discussion"');
+    expect(day11).not.toContain('useState("sprechen")');
+  });
+
   it("keeps Day 10 grammar content separate from Teil 1 speaking content", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
     const grammar = read("A2Day10PraeteritumGrammarPage.js");
