@@ -4,11 +4,13 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
+  { key: "grammar", label: "Grammar" },
   { key: "teil1", label: "Teil 1 · Group Practice" },
   { key: "teil2", label: "Teil 2 · Schreiben" },
   { key: "teil3", label: "Teil 3 · Lesen" },
@@ -97,7 +99,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       </div>
 
-      <A2B1WorkbookGuidance />
+      {activeTab === "grammar" && <div style={cardStyle}><A2B1GrammarNotesTab level="A2" day={23} /></div>}
 
       {activeTab === "teil1" && (
         <div style={cardStyle}>
