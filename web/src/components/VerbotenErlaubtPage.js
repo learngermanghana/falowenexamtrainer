@@ -83,32 +83,7 @@ const BulletList = ({ items }) => (
   </ul>
 );
 
-const RuleStatusBadge = ({ status }) => {
-  const allowed = status === "erlaubt";
-  return (
-    <span
-      aria-label={allowed ? "Erlaubt" : "Verboten"}
-      style={{
-        alignItems: "center",
-        background: allowed ? palette.greenSoft : palette.roseSoft,
-        border: `1px solid ${allowed ? "#86efac" : "#fda4af"}`,
-        borderRadius: 999,
-        color: allowed ? "#166534" : "#9f1239",
-        display: "inline-flex",
-        fontSize: 13,
-        fontWeight: 900,
-        gap: 6,
-        padding: "6px 10px",
-        width: "fit-content",
-      }}
-    >
-      <span aria-hidden="true">{allowed ? "✓" : "✕"}</span>
-      {allowed ? "Erlaubt" : "Verboten"}
-    </span>
-  );
-};
-
-const ExamExampleCard = ({ number, keyword, tone = "blue", icon, iconLabel, children }) => {
+const ExamExampleCard = ({ number, theme, keyword, tone = "blue", icon, iconLabel, children }) => {
   const tones = {
     blue: { background: "#f8fbff", border: "#bfdbfe", number: "#2563eb" },
     green: { background: "#f7fef9", border: "#bbf7d0", number: palette.green },
@@ -127,9 +102,10 @@ const ExamExampleCard = ({ number, keyword, tone = "blue", icon, iconLabel, chil
     >
       <div style={{ alignItems: "center", display: "flex", gap: 10 }}>
         <span style={{ background: selected.number, borderRadius: 10, color: "#fff", display: "grid", fontWeight: 900, height: 32, placeItems: "center", width: 32 }}>{number}</span>
-        <div style={{ display: "grid", gap: 2 }}>
-          <span style={{ color: palette.muted, fontSize: 11, fontWeight: 900, letterSpacing: ".06em", textTransform: "uppercase" }}>Karte</span>
-          <strong style={{ color: palette.ink, fontSize: 17 }}>{keyword}</strong>
+        <div style={{ display: "grid", gap: 3 }}>
+          {theme ? <span style={{ color: palette.muted, fontSize: 11, fontWeight: 900, letterSpacing: ".06em", textTransform: "uppercase" }}>THEMA: {theme}</span> : null}
+          <span style={{ color: palette.indigo, fontSize: 11, fontWeight: 900, letterSpacing: ".06em", textTransform: "uppercase" }}>KEYWORD</span>
+          <strong style={{ color: palette.ink, fontSize: 19 }}>{keyword}</strong>
         </div>
         {icon ? (
           <span
@@ -173,22 +149,6 @@ const RevealButton = ({ expanded, onClick, showLabel }) => (
   </button>
 );
 
-const conjugationRows = [
-  ["ich darf", "I may / I am allowed to"],
-  ["du darfst", "you may / you are allowed to (informal singular)"],
-  ["er / sie / es darf", "he / she / it may or is allowed to"],
-  ["wir dürfen", "we may / we are allowed to"],
-  ["ihr dürft", "you all may / you are allowed to (informal plural)"],
-  ["sie / Sie dürfen", "they may / you may (formal)"],
-];
-
-const essentialForms = [
-  ["ich darf", "Ich darf hier sitzen."],
-  ["du darfst", "Du darfst Wasser trinken."],
-  ["Sie dürfen", "Sie dürfen hier warten."],
-  ["darf nicht", "Man darf hier nicht rauchen."],
-];
-
 const speakingKeywords = [
   ["Name?", "Name"],
   ["Alter?", "Age"],
@@ -209,33 +169,19 @@ const introTemplates = [
   ["Hobby?", "Mein Hobby ist …", "My hobby is …"],
 ];
 
-const knowledgeRules = [
-  { status: "erlaubt", german: "Im Unterricht darfst du Wasser trinken.", english: "You may drink water in class." },
-  { status: "verboten", german: "Im Kursraum darfst du nicht essen.", english: "You may not eat in the classroom." },
-  { status: "erlaubt", german: "In der Pause darfst du dein Handy benutzen.", english: "You may use your phone during the break." },
-  { status: "verboten", german: "Im Unterricht darfst du nicht telefonieren.", english: "You may not make phone calls in class." },
-  { status: "erlaubt", german: "Im Computerraum darfst du Deutsch üben.", english: "You may practise German in the computer room." },
-  { status: "verboten", german: "Im Computerraum darfst du keine Computerspiele spielen.", english: "You may not play computer games in the computer room." },
-  { status: "verboten", german: "Im Gebäude darfst du nicht rauchen.", english: "You may not smoke in the building." },
-  { status: "erlaubt", german: "Vor dem Gebäude darfst du dein Fahrrad abstellen.", english: "You may park your bicycle in front of the building." },
-];
-
 const knowledgeQuestions = [
-  { prompt: "Darf Ama im Unterricht Wasser trinken?", answer: "erlaubt", explanation: "Ja. Ama darf im Unterricht Wasser trinken." },
-  { prompt: "Darf Kojo im Kursraum essen?", answer: "verboten", explanation: "Nein. Kojo darf im Kursraum nicht essen." },
-  { prompt: "Darf Esi ihr Handy in der Pause benutzen?", answer: "erlaubt", explanation: "Ja. Esi darf ihr Handy in der Pause benutzen." },
-  { prompt: "Darf Yaw im Unterricht telefonieren?", answer: "verboten", explanation: "Nein. Yaw darf im Unterricht nicht telefonieren." },
-  { prompt: "Darf Abena im Computerraum Deutsch üben?", answer: "erlaubt", explanation: "Ja. Abena darf im Computerraum Deutsch üben." },
-  { prompt: "Darf Kofi im Computerraum Computerspiele spielen?", answer: "verboten", explanation: "Nein. Kofi darf im Computerraum keine Computerspiele spielen." },
-  { prompt: "Darf man im Gebäude rauchen?", answer: "verboten", explanation: "Nein. Man darf im Gebäude nicht rauchen." },
-  { prompt: "Darf man vor dem Gebäude ein Fahrrad abstellen?", answer: "erlaubt", explanation: "Ja. Man darf dort ein Fahrrad abstellen." },
+  { icon: "💧", iconLabel: "water is allowed", sign: "✓", rule: "Im Unterricht darfst du Wasser trinken.", english: "You may drink water in class.", prompt: "Darf Ama im Unterricht Wasser trinken?", answer: "erlaubt", explanation: "Ja. Ama darf im Unterricht Wasser trinken." },
+  { icon: "🍔", iconLabel: "food is forbidden", sign: "✕", rule: "Im Kursraum darfst du nicht essen.", english: "You may not eat in the classroom.", prompt: "Darf Kojo im Kursraum essen?", answer: "verboten", explanation: "Nein. Kojo darf im Kursraum nicht essen." },
+  { icon: "📱", iconLabel: "mobile phones are allowed during the break", sign: "✓", rule: "In der Pause darfst du dein Handy benutzen.", english: "You may use your phone during the break.", prompt: "Darf Esi ihr Handy in der Pause benutzen?", answer: "erlaubt", explanation: "Ja. Esi darf ihr Handy in der Pause benutzen." },
+  { icon: "📞", iconLabel: "phone calls are forbidden in class", sign: "✕", rule: "Im Unterricht darfst du nicht telefonieren.", english: "You may not make phone calls in class.", prompt: "Darf Yaw im Unterricht telefonieren?", answer: "verboten", explanation: "Nein. Yaw darf im Unterricht nicht telefonieren." },
+  { icon: "🖥️", iconLabel: "German practice is allowed in the computer room", sign: "✓", rule: "Im Computerraum darfst du Deutsch üben.", english: "You may practise German in the computer room.", prompt: "Darf Abena im Computerraum Deutsch üben?", answer: "erlaubt", explanation: "Ja. Abena darf im Computerraum Deutsch üben." },
 ];
 
 const teil2Examples = [
-  { keyword: "Wasser", pattern: "Was + Verb + Sie + …?", question: "Was trinken Sie im Unterricht?", answer: "Ich trinke im Unterricht Wasser." },
-  { keyword: "Pause", pattern: "Wann + Verb + Sie + …?", question: "Wann benutzen Sie Ihr Handy?", answer: "Ich benutze mein Handy in der Pause." },
-  { keyword: "Computerraum", pattern: "Wo + Verb + Sie + …?", question: "Wo lernen Sie Deutsch?", answer: "Ich lerne Deutsch im Computerraum." },
-  { keyword: "Fahrrad", pattern: "Haben Sie + …?", question: "Haben Sie ein Fahrrad?", answer: "Ja, ich habe ein Fahrrad." },
+  { theme: "Getränke", keyword: "Wasser", pattern: "Was + Verb + Sie + …?", question: "Was trinken Sie im Unterricht?", answer: "Ich trinke im Unterricht Wasser." },
+  { theme: "Freizeit", keyword: "Pause", pattern: "Wann + Verb + Sie + …?", question: "Wann benutzen Sie Ihr Handy?", answer: "Ich benutze mein Handy in der Pause." },
+  { theme: "Deutsch lernen", keyword: "Computerraum", pattern: "Wo + Verb + Sie + …?", question: "Wo lernen Sie Deutsch?", answer: "Ich lerne Deutsch im Computerraum." },
+  { theme: "Verkehr", keyword: "Fahrrad", pattern: "Haben Sie + …?", question: "Haben Sie ein Fahrrad?", answer: "Ja, ich habe ein Fahrrad." },
 ];
 
 const teil3Examples = [
@@ -329,6 +275,7 @@ const KnowledgeCheck = ({ examMode }) => {
           return (
             <article
               key={question.prompt}
+              data-combined-rule-question
               style={{
                 border: `1px solid ${showScore && selected ? (correct ? "#86efac" : "#fda4af") : palette.border}`,
                 borderRadius: 16,
@@ -338,7 +285,17 @@ const KnowledgeCheck = ({ examMode }) => {
                 background: showScore && selected ? (correct ? palette.greenSoft : palette.roseSoft) : "#fff",
               }}
             >
-              <strong style={{ color: palette.ink }}>{index + 1}. {question.prompt}</strong>
+              <div style={{ display: "grid", gridTemplateColumns: "70px 1fr", gap: 12, alignItems: "center" }}>
+                <div role="img" aria-label={question.iconLabel} style={{ position: "relative", background: "#f8fafc", border: `1px solid ${palette.border}`, borderRadius: 14, display: "grid", fontSize: 36, height: 70, placeItems: "center" }}>
+                  {question.icon}
+                  <span aria-hidden="true" style={{ position: "absolute", right: 4, top: 2, color: question.answer === "erlaubt" ? palette.green : palette.rose, fontSize: 25, fontWeight: 900 }}>{question.sign}</span>
+                </div>
+                <div style={{ display: "grid", gap: 4 }}>
+                  {!examMode ? <strong style={{ color: palette.ink }}>{index + 1}. {question.rule}</strong> : <strong style={{ color: palette.ink }}>Bild {index + 1}</strong>}
+                  {!examMode ? <span style={{ color: palette.muted, fontSize: 13 }}>{question.english}</span> : null}
+                </div>
+              </div>
+              <strong style={{ color: palette.indigo }}>{question.prompt}</strong>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 9 }}>
                 {["erlaubt", "verboten"].map((choice) => (
                   <button
@@ -390,9 +347,9 @@ const KnowledgeCheck = ({ examMode }) => {
       </div>
 
       {showScore ? (
-        <Callout tone={score >= 7 ? "green" : "amber"}>
+        <Callout tone={score >= 4 ? "green" : "amber"}>
           <strong>{score}/{knowledgeQuestions.length} correct</strong>
-          <span>{score >= 7 ? "Excellent. You understand what is erlaubt and verboten." : "Read the short rules again and repeat the questions."}</span>
+          <span>{score >= 4 ? "Excellent. You understand what is erlaubt and verboten." : "Read the short rules again and repeat the questions."}</span>
         </Callout>
       ) : null}
     </div>
@@ -402,7 +359,7 @@ const KnowledgeCheck = ({ examMode }) => {
 const Teil2PracticeCard = ({ example, index }) => {
   const [revealed, setRevealed] = useState(false);
   return (
-    <ExamExampleCard number={index + 1} keyword={example.keyword}>
+    <ExamExampleCard number={index + 1} theme={example.theme} keyword={example.keyword}>
       <div style={{ background: "#fff", border: `1px solid ${palette.border}`, borderRadius: 12, display: "grid", gap: 5, padding: 11 }}>
         <span style={{ color: palette.indigo, fontSize: 12, fontWeight: 900 }}>PATTERN</span>
         <strong style={{ color: palette.ink }}>{example.pattern}</strong>
@@ -495,69 +452,26 @@ const VerbotenErlaubtPage = () => {
         </div>
       </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12 }}>
-        {[
-          ["1", "Learn four forms", "Use darf and darf nicht"],
-          ["2", "Read short rules", "See green ✓ and red ✕ signs"],
-          ["3", "Try Exam Mode", "Answer eight questions in 60 seconds"],
-          ["4", "Practise Teil 1", "Introduce yourself"],
-          ["5", "Practise Teil 2–3", "Try first, then reveal the models"],
-        ].map(([number, title, text]) => (
-          <div key={number} style={{ ...card, gridTemplateColumns: "42px 1fr", alignItems: "start", padding: 16 }}>
-            <span style={{ width: 42, height: 42, display: "grid", placeItems: "center", borderRadius: 14, background: palette.indigo, color: "#fff", fontWeight: 900 }}>{number}</span>
-            <div style={{ display: "grid", gap: 4 }}><strong style={{ color: palette.ink }}>{title}</strong><span style={{ color: palette.muted, fontSize: 14, lineHeight: 1.5 }}>{text}</span></div>
-          </div>
-        ))}
-      </div>
-
-      <Section eyebrow="Grammar meaning" title="Four forms you need first" description="Start with these four useful A1 patterns. Open the full table only when you want to review every form.">
-        <Callout>
-          <strong>Sentence formula</strong>
-          <span><strong>Subject + dürfen + other information + infinitive.</strong></span>
-          <span>Ich <strong>darf</strong> hier sitzen.</span>
-          <span>Ich <strong>darf</strong> hier <strong>nicht rauchen</strong>.</span>
-        </Callout>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
-          {essentialForms.map(([form, example]) => (
-            <div key={form} style={{ background: "#fff", border: "1px solid #c7d2fe", borderRadius: 14, display: "grid", gap: 5, padding: 13 }}>
-              <strong style={{ color: palette.indigo, fontSize: 18 }}>{form}</strong>
-              <span style={{ color: palette.ink, lineHeight: 1.5 }}>{example}</span>
-            </div>
-          ))}
-        </div>
+      <Section eyebrow="Grammar meaning" title="Erlaubt oder verboten?" description="Learn the two ways an exam rule can be written. They have the same meaning.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-          <Callout tone="green"><strong>✓ erlaubt = allowed</strong><span>Du darfst das machen.</span></Callout>
-          <Callout tone="amber"><strong>✕ verboten = not allowed</strong><span>Du darfst das nicht machen.</span></Callout>
+          <Callout tone="green"><strong>✓ ERLAUBT</strong><span><strong>Das Fotografieren ist erlaubt.</strong></span><span>= Man darf hier fotografieren.</span></Callout>
+          <Callout tone="amber"><strong>✕ VERBOTEN</strong><span><strong>Rauchen ist verboten.</strong></span><span>= Man darf hier nicht rauchen.</span></Callout>
         </div>
-        <details style={{ border: `1px solid ${palette.border}`, borderRadius: 16, overflow: "hidden" }}>
-          <summary style={{ background: palette.indigoSoft, color: "#312e81", cursor: "pointer", fontWeight: 900, padding: 14 }}>
-            Show all forms
-          </summary>
-          <div style={{ overflowX: "auto", padding: 12 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
-              <thead><tr style={{ background: "#f8fafc" }}><th style={{ padding: 13, textAlign: "left", color: "#312e81" }}>German</th><th style={{ padding: 13, textAlign: "left", color: "#312e81" }}>English meaning</th></tr></thead>
-              <tbody>
-                {conjugationRows.map(([german, english], index) => (
-                  <tr key={german} style={{ borderTop: `1px solid ${palette.border}`, background: index % 2 ? "#fbfdff" : "#fff" }}><td style={{ padding: 13 }}><strong style={{ color: palette.indigo }}>{german}</strong></td><td style={{ padding: 13, color: palette.muted }}>{english}</td></tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
+        <Callout><strong>The logic</strong><span><strong>erlaubt</strong> → man darf + Infinitiv</span><span><strong>verboten</strong> → man darf nicht + Infinitiv</span></Callout>
       </Section>
 
       <Section
         eyebrow="Reading and knowledge check"
         title="Was ist erlaubt? Was ist verboten?"
         description={examMode
-          ? "Exam Mode is active. Read only the German situations and answer before the timer ends."
+          ? "Exam Mode is active. Use only the pictures and signs, then answer before the timer ends."
           : "Read the short rules. Green ✓ means allowed. Red ✕ means forbidden. Then answer the questions below."}
       >
         <div style={{ alignItems: "center", background: examMode ? "#0f172a" : palette.blueSoft, border: `1px solid ${examMode ? "#334155" : "#bfdbfe"}`, borderRadius: 16, display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", padding: 14 }}>
           <div style={{ display: "grid", gap: 3 }}>
             <strong style={{ color: examMode ? "#fff" : "#1e3a8a" }}>{examMode ? "Exam Mode active" : "Ready for the exam challenge?"}</strong>
             <span style={{ color: examMode ? "#cbd5e1" : "#475569", fontSize: 13 }}>
-              {examMode ? "Translations, answer badges and instant explanations are hidden." : "You will have 60 seconds for eight questions."}
+              {examMode ? "Translations and instant explanations are hidden." : "You will have 60 seconds for five questions."}
             </span>
           </div>
           <button
@@ -570,39 +484,7 @@ const VerbotenErlaubtPage = () => {
           </button>
         </div>
 
-        <div style={{ border: "1px solid #c7d2fe", borderRadius: 18, background: "linear-gradient(135deg,#eef2ff,#f8fafc)", padding: 16, display: "grid", gap: 12 }}>
-          <div>
-            <strong style={{ color: "#312e81", fontSize: 18 }}>Hausordnung im Falowen Lernzentrum</strong>
-            {!examMode ? <p style={{ margin: "5px 0 0", color: palette.muted }}>Simple rules at the Falowen Learning Centre</p> : null}
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
-            {knowledgeRules.map((rule, index) => {
-              const allowed = rule.status === "erlaubt";
-              return (
-                <article
-                  key={rule.german}
-                  style={{
-                    background: "rgba(255,255,255,.94)",
-                    border: `1px solid ${examMode ? palette.border : (allowed ? "#bbf7d0" : "#fecdd3")}`,
-                    borderRadius: 15,
-                    display: "grid",
-                    gap: 10,
-                    padding: 13,
-                  }}
-                >
-                  <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", gap: 10 }}>
-                    <span style={{ width: 32, height: 32, borderRadius: 10, display: "grid", placeItems: "center", background: "#4338ca", color: "#fff", fontWeight: 900 }}>{index + 1}</span>
-                    {!examMode ? <RuleStatusBadge status={rule.status} /> : null}
-                  </div>
-                  <div style={{ display: "grid", gap: 4 }}>
-                    <strong style={{ color: palette.ink, lineHeight: 1.5 }}>{rule.german}</strong>
-                    {!examMode ? <span style={{ color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>{rule.english}</span> : null}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
+        {!examMode ? <Callout tone="amber"><strong>Important for the exam</strong><span>Here you can see an English translation while learning. In the real exam there is no translation. The rule is usually shown as a picture or sign.</span></Callout> : null}
         {!examMode ? (
           <Callout>
             <strong>Exam pattern</strong>
