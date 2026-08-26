@@ -12,10 +12,12 @@ const renderPage = () => render(
 );
 
 describe("VerbotenErlaubtPage A1 exam practice", () => {
-  test("combines every short rule with its matching question and exam choices", () => {
+  test("combines five picture rules with matching questions and exam choices", () => {
     renderPage();
 
-    expect(document.querySelectorAll("[data-combined-rule-question]")).toHaveLength(8);
+    expect(document.querySelectorAll("[data-combined-rule-question]")).toHaveLength(5);
+    expect(screen.getByRole("img", { name: "water is allowed" })).toBeVisible();
+    expect(screen.getByRole("img", { name: "food is forbidden" })).toBeVisible();
     expect(screen.getByText("Im Kursraum darfst du nicht essen.")).toBeVisible();
     expect(screen.getByText("Darf Kojo im Kursraum essen?")).toBeVisible();
     expect(screen.getByText("Im Unterricht darfst du nicht telefonieren.")).toBeVisible();
@@ -23,30 +25,30 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(screen.getByText("Im Computerraum darfst du Deutsch üben.")).toBeVisible();
     expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
     expect(screen.queryAllByLabelText("Verboten")).toHaveLength(0);
-    expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(8);
-    expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(8);
+    expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(5);
+    expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(5);
   });
 
-  test("keeps only four essential grammar forms visible and collapses the full table", () => {
+  test("teaches the direct erlaubt and verboten sentence logic without a conjugation table", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Four forms you need first" })).toBeVisible();
-    expect(screen.getByText("Ich darf hier sitzen.")).toBeVisible();
-    expect(screen.getByText("Du darfst Wasser trinken.")).toBeVisible();
-    expect(screen.getByText("Sie dürfen hier warten.")).toBeVisible();
-    expect(screen.getByText("Man darf hier nicht rauchen.")).toBeVisible();
-
-    const summary = screen.getByText("Show all forms");
-    expect(summary.closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByRole("heading", { name: "Erlaubt oder verboten?" })).toBeVisible();
+    expect(screen.getByText("Rauchen ist verboten.")).toBeVisible();
+    expect(screen.getByText(/Man darf hier nicht rauchen/)).toBeVisible();
+    expect(screen.getByText("Das Fotografieren ist erlaubt.")).toBeVisible();
+    expect(screen.getByText("= Man darf hier fotografieren.")).toBeVisible();
+    expect(screen.queryByText("Show all forms")).not.toBeInTheDocument();
   });
 
   test("exam mode hides translations, badges and instant explanations", () => {
     renderPage();
 
     expect(screen.getByText("You may drink water in class.")).toBeVisible();
+    expect(screen.getByText(/In the real exam there is no translation/)).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Start Exam Mode" }));
 
     expect(screen.queryByText("You may drink water in class.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Im Unterricht darfst du Wasser trinken.")).not.toBeInTheDocument();
     expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
     expect(screen.getByLabelText("Exam mode timer")).toHaveTextContent("01:00");
 
@@ -62,6 +64,8 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: "Ask first, then reveal the model" })).toBeVisible();
+    expect(screen.getByText("THEMA: Getränke")).toBeVisible();
+    expect(screen.getAllByText("KEYWORD")).toHaveLength(4);
     expect(screen.queryByText("Was trinken Sie im Unterricht?")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getAllByRole("button", { name: "Show model question and answer" })[0]);
