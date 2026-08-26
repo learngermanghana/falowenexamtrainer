@@ -208,6 +208,7 @@ export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
       hoerenTask="Hören Sie den Text über gesunde Ernährung, Bewegung, Fitness und regelmäßige Arztbesuche. Wählen Sie jeweils die richtige Antwort."
       hoerenAudioUrl="https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing"
       hoerenQuestions={hoerenQuestions}
+      showWorkbookGuidance={false}
     />
   );
 }
