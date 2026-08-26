@@ -169,6 +169,15 @@ const introTemplates = [
   ["Hobby?", "Mein Hobby ist …", "My hobby is …"],
 ];
 
+const duerfenConjugation = [
+  ["ich", "darf", "Ich darf hier sitzen."],
+  ["du", "darfst", "Du darfst hier warten."],
+  ["er / sie / es", "darf", "Er darf hier fotografieren."],
+  ["wir", "dürfen", "Wir dürfen hier Deutsch lernen."],
+  ["ihr", "dürft", "Ihr dürft hier Wasser trinken."],
+  ["sie / Sie", "dürfen", "Sie dürfen hier parken."],
+];
+
 const knowledgeQuestions = [
   { icon: "💧", iconLabel: "water is allowed", sign: "✓", rule: "Im Unterricht darfst du Wasser trinken.", english: "You may drink water in class.", prompt: "Darf Ama im Unterricht Wasser trinken?", answer: "erlaubt", explanation: "Ja. Ama darf im Unterricht Wasser trinken." },
   { icon: "🍔", iconLabel: "food is forbidden", sign: "✕", rule: "Im Kursraum darfst du nicht essen.", english: "You may not eat in the classroom.", prompt: "Darf Kojo im Kursraum essen?", answer: "verboten", explanation: "Nein. Kojo darf im Kursraum nicht essen." },
@@ -453,11 +462,37 @@ const VerbotenErlaubtPage = () => {
       </header>
 
       <Section eyebrow="Grammar meaning" title="Erlaubt oder verboten?" description="Learn the two ways an exam rule can be written. They have the same meaning.">
+        <Callout>
+          <strong>Dürfen is a modal verb</strong>
+          <span><strong>dürfen</strong> works like <strong>können, müssen</strong> and <strong>möchten</strong>. The modal verb is in position 2. The second verb is an infinitive at the end.</span>
+          <span><strong>Subject + dürfen + information + infinitive</strong></span>
+          <span>Man <strong>darf</strong> hier <strong>fotografieren</strong>.</span>
+        </Callout>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
           <Callout tone="green"><strong>✓ ERLAUBT</strong><span><strong>Das Fotografieren ist erlaubt.</strong></span><span>= Man darf hier fotografieren.</span></Callout>
           <Callout tone="amber"><strong>✕ VERBOTEN</strong><span><strong>Rauchen ist verboten.</strong></span><span>= Man darf hier nicht rauchen.</span></Callout>
         </div>
-        <Callout><strong>The logic</strong><span><strong>erlaubt</strong> → man darf + Infinitiv</span><span><strong>verboten</strong> → man darf nicht + Infinitiv</span></Callout>
+        <Callout tone="green"><strong>Both forms are correct</strong><span>You can say <strong>Rauchen ist verboten</strong> or <strong>Man darf hier nicht rauchen</strong>. Both mean the same thing.</span></Callout>
+        <div style={{ border: `1px solid ${palette.border}`, borderRadius: 16, overflowX: "auto" }}>
+          <table style={{ borderCollapse: "collapse", minWidth: 560, width: "100%" }}>
+            <thead>
+              <tr style={{ background: palette.indigoSoft }}>
+                <th style={{ color: "#312e81", padding: 12, textAlign: "left" }}>Subject</th>
+                <th style={{ color: "#312e81", padding: 12, textAlign: "left" }}>dürfen</th>
+                <th style={{ color: "#312e81", padding: 12, textAlign: "left" }}>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {duerfenConjugation.map(([subject, form, example]) => (
+                <tr key={subject} style={{ borderTop: `1px solid ${palette.border}` }}>
+                  <td style={{ padding: 12, fontWeight: 800 }}>{subject}</td>
+                  <td style={{ color: palette.indigo, padding: 12, fontWeight: 900 }}>{form}</td>
+                  <td style={{ color: palette.ink, padding: 12 }}>{example}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Section>
 
       <Section
