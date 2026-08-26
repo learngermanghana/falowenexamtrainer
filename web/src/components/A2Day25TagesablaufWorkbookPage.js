@@ -5,11 +5,13 @@ import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const tabs = [
+  { key: "grammar", label: "Grammar" },
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen1", label: "Teil 3 · Lesen" },
@@ -164,6 +166,8 @@ export default function A2Day25TagesablaufWorkbookPage() {
         </div>
         <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
       </div>
+
+      {activeTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={25} /></div>}
 
       {activeTab === "sprechen" && (
         <div style={card}>
