@@ -65,6 +65,7 @@ const normalizeText = (value = "") =>
 
 export const getA2LegacyWorkbookTabKey = (value = "") => {
   const text = normalizeText(value);
+  if (/\bgrammar\b|grammatik/.test(text)) return "grammar";
   if (/teil\s*1\b|sprechen|speak/.test(text)) return "teil1";
   if (/teil\s*2\b|schreiben|write/.test(text)) return "teil2";
   if (/teil\s*3\b/.test(text)) return "teil3";
