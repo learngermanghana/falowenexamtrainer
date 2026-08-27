@@ -197,17 +197,26 @@ const A1Day20GoetheWritingGrammarPage = () => (
         </article>
       </div>
 
+      <div style={{ ...cardStyle, borderColor: "#86efac", background: "#f0fdf4" }}>
+        <h3 style={{ margin: 0 }}>Answers for reference</h3>
+        <ol style={listStyle}>
+          <li><strong>Mensah</strong></li>
+          <li><strong>14.06.1998</strong></li>
+          <li><strong>12.08.2026</strong></li>
+        </ol>
+      </div>
+
       <div style={cardStyle}>
-        <h3 style={{ margin: 0 }}>Tipps zum Ausfüllen</h3>
+        <h3 style={{ margin: 0 }}>Tips for completing the form</h3>
         <ul style={listStyle}>
           <li>
-            <strong>Familienname</strong> bedeutet Nachname; <strong>Vorname</strong> ist der erste
-            Name.
+            <strong>Familienname</strong> means surname / last name; <strong>Vorname</strong> means
+            first name.
           </li>
-          <li>Schreiben Sie Daten deutlich, zum Beispiel: 14.06.1998.</li>
-          <li>Kontrollieren Sie jede Zahl in Telefonnummern und Daten.</li>
-          <li>Kopieren Sie die E-Mail-Adresse genau, einschließlich Punkt und @-Zeichen.</li>
-          <li>Tragen Sie nur Informationen ein, die im Text stehen.</li>
+          <li>Write dates clearly, for example: 14.06.1998.</li>
+          <li>Check every digit in telephone numbers and dates.</li>
+          <li>Copy the e-mail address exactly, including the full stop and @ sign.</li>
+          <li>Enter only information that is given in the text.</li>
         </ul>
       </div>
     </section>
