@@ -2,6 +2,7 @@ import { courseSchedules } from "../data/courseSchedule";
 import { findCourseBookEntry } from "./courseBookEntries";
 import { addA1WorkbookHubBypass, addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
 
+const FALOWEN_ORIGIN = "https://www.falowen.app";
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeDay = (value = "") => String(value ?? "").trim();
 const normalizeChapter = (value = "") => String(value || "").trim();
@@ -37,6 +38,24 @@ export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}
 const getScheduleLessonIdentity = (entry = {}) =>
   String(entry.id || entry.lessonId || entry.courseBookId || entry.assignmentId || entry.assignment_id || "").trim();
 
+const addDay20WorkbookView = (lesson = {}, workbookRoute = "") => {
+  if (!workbookRoute) return workbookRoute;
+  const isDay20Chapter123 =
+    Number(lesson.displayDay ?? lesson.day) === 20 &&
+    normalizeChapter(lesson.displayChapter || lesson.chapter) === "12.3";
+  if (!isDay20Chapter123) return workbookRoute;
+
+  try {
+    const parsed = new URL(workbookRoute, FALOWEN_ORIGIN);
+    if (parsed.origin !== FALOWEN_ORIGIN) return workbookRoute;
+    parsed.searchParams.set("view", "workbook");
+    const query = parsed.searchParams.toString();
+    return `${parsed.pathname}${query ? `?${query}` : ""}${parsed.hash || ""}`;
+  } catch (_error) {
+    return workbookRoute;
+  }
+};
+
 const patchWorkbookRoute = (resource = null, search = "", directWorkbookRoute = "") => {
   if (!resource || typeof resource !== "object") return resource;
   const workbookRoute = addCompletedRadioToWorkbookRoute(
@@ -58,10 +77,13 @@ const preserveCompletedRadioOnEntry = (entry = null, search = "") => {
     ...entry,
     id: getScheduleLessonIdentity(entry),
   };
-  const directWorkbookRoute = addA1WorkbookHubBypass({
-    lesson: scheduleLesson,
-    workbookRoute: rawWorkbookRoute,
-  });
+  const directWorkbookRoute = addDay20WorkbookView(
+    scheduleLesson,
+    addA1WorkbookHubBypass({
+      lesson: scheduleLesson,
+      workbookRoute: rawWorkbookRoute,
+    }),
+  );
   const workbookRoute = addCompletedRadioToWorkbookRoute(directWorkbookRoute, search);
 
   return {
