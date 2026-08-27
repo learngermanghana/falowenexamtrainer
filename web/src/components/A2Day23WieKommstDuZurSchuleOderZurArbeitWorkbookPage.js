@@ -77,7 +77,7 @@ const lesenQuestions = [
 ];
 
 const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("teil1");
+  const [activeTab, setActiveTab] = useState("grammar");
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -87,21 +87,20 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 23 Workbook · Wie kommst du zur Schule / zur Arbeit?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 9.23</p>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete each Teil and submit your final answers in the submission area (not on this page).
+          Complete each Teil. Submit only Teil 2 · Schreiben and Teil 3 · Lesen. Teil 4 · Hören is self-check only.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <button key={tab.key} style={tabButtonStyle(tab.key === activeTab)} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <WorkbookTabNav
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          tabs={tabs}
+          ariaLabel="A2 Day 23 workbook sections"
+        />
       </div>
 
       {activeTab === "grammar" && <div style={cardStyle}><A2B1GrammarNotesTab level="A2" day={23} /></div>}
 
-      {activeTab === "teil1" && (
+      {activeTab === "sprechen" && (
         <div style={cardStyle}>
           <img
             src="https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=1600&q=80"
@@ -222,7 +221,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      {activeTab === "teil2" && (
+      {activeTab === "schreiben" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -246,7 +245,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      {activeTab === "teil3" && (
+      {activeTab === "lesen" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 3 (Lesen) · Exercise</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -274,7 +273,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      {activeTab === "teil4" && (
+      {activeTab === "hoeren" && (
         <div style={cardStyle}>
           <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -294,16 +293,22 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         </div>
       )}
 
-      <div style={{ ...cardStyle, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
-        <h2 style={{ ...sectionTitle, color: "#1e3a8a" }}>Final submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7, color: "#1e3a8a" }}>
-          Submit your final answers in the submission area. Do not submit answers directly on this workbook page.
-        </p>
-        <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer">
-          Go to submission area
-        </a>
-      <WorkbookSubmissionReminder />
-      </div>
+      {(activeTab === "schreiben" || activeTab === "lesen") && (
+        <div
+          data-a2-day23-native-guidance="true"
+          style={{ ...cardStyle, border: "1px solid #bfdbfe", background: "#eff6ff" }}
+        >
+          <h2 style={{ ...sectionTitle, color: "#1e3a8a" }}>Final submission</h2>
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#1e3a8a" }}>
+            Submit only Schreiben and Lesen in the submission area; do not send Hören through Submit because it is
+            self-check only. Do not submit answers directly on this workbook page.
+          </p>
+          <a href="/campus/course?submitWork=1" target="_blank" rel="noreferrer">
+            Go to submission area
+          </a>
+          <WorkbookSubmissionReminder />
+        </div>
+      )}
 
       {activeTab === "references" && (
         <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day23WieKommstDuZurSchuleOderZurArbeit", level: "A2", workbookId: "A2Day23WieKommstDuZurSchuleOderZurArbeit" }} workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit" />
