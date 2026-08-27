@@ -8,6 +8,14 @@ const regressionPath = path.join(root, "web/src/components/A2SharedWorkbookRegre
 
 let day25 = fs.readFileSync(day25Path, "utf8");
 
+const usesNativeGrammarTabs =
+  day25.includes('{ key: "grammar", label: "Grammar" }') &&
+  day25.includes('activeTab === "grammar"');
+
+if (usesNativeGrammarTabs) {
+  console.log("A2 Day 25 already owns isolated native Grammar and workbook tabs; legacy shared-navigation patch skipped.");
+} else {
+
 const reminderOnlyImport =
   'import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";';
 const sharedNavigationImport =
@@ -114,3 +122,4 @@ if (!regression.includes(regressionMarker)) {
 
 fs.writeFileSync(regressionPath, regression, "utf8");
 console.log("Updated A2 Day 25 with shared navigation, safe submission flow and quick learning.");
+}
