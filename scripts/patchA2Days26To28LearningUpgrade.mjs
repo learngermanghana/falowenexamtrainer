@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const componentImport = 'import A2Days26To28LearningUpgrade from "./A2Days26To28LearningUpgrade";';
+let day28UsesIsolatedTabs = false;
 
 function patchFile(relativePath, transform) {
   const filePath = path.join(root, relativePath);
@@ -57,6 +58,11 @@ patchFile("web/src/components/A2Day27DigitaleKommunikationWorkbookPage.js", (sou
 });
 
 patchFile("web/src/components/A2Day28UeberDieZukunftSprechenWorkbookPage.js", (source) => {
+  if (source.includes("WorkbookTabNav") && !source.includes("<A2B1WorkbookGuidance")) {
+    day28UsesIsolatedTabs = true;
+    return source;
+  }
+
   let updated = source;
   if (!updated.includes(componentImport)) {
     const anchor = 'import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";';
@@ -77,5 +83,5 @@ const day27 = fs.readFileSync(path.join(root, "web/src/components/A2Day27Digital
 const day28 = fs.readFileSync(path.join(root, "web/src/components/A2Day28UeberDieZukunftSprechenWorkbookPage.js"), "utf8");
 if (!legacy.includes("<A2Days26To28LearningUpgrade day={config.day} />")) throw new Error("A2 Day 26 learning block is not wired into the legacy grammar panel.");
 if (!day27.includes("<A2Days26To28LearningUpgrade day={27} />")) throw new Error("A2 Day 27 learning block is missing.");
-if (!day28.includes("<A2Days26To28LearningUpgrade day={28} />")) throw new Error("A2 Day 28 learning block is missing.");
+if (!day28UsesIsolatedTabs && !day28.includes("<A2Days26To28LearningUpgrade day={28} />")) throw new Error("A2 Day 28 learning block is missing.");
 console.log("Wired A2 Days 26-28 concise learning blocks into their workbook pages.");
