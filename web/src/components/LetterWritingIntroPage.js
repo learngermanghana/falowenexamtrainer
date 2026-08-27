@@ -118,24 +118,38 @@ const BulletList = ({ items, ordered = false }) => {
 const WeilExplanation = ({ pronoun = "Ihnen" }) => (
   <div style={{ display: "grid", gap: 10 }}>
     <p style={{ margin: 0, lineHeight: 1.75 }}>
-      After <strong>weil</strong>, move the conjugated verb or modal verb to the end of the clause.
+      After <strong>weil</strong>, the conjugated verb goes to the end. The exact pattern depends on
+      whether the sentence has a modal verb or only one normal verb.
     </p>
+
     <div style={exampleStyle}>
-      <strong>Example 1</strong>
+      <strong>Rule 1: Statement with a modal verb</strong>
       <br />
-      Ich kann nicht kommen.
+      <strong>Main statement:</strong> subject + modal verb + ... + infinitive.
       <br />
-      Ich schreibe {pronoun}, weil ich nicht kommen <strong>kann</strong>.
+      <strong>After weil:</strong> weil + subject + ... + infinitive + modal verb.
+      <br />
+      <br />
+      Ich <strong>kann</strong> nicht <strong>kommen</strong>.
+      <br />
+      Ich schreibe {pronoun}, weil ich nicht <strong>kommen kann</strong>.
     </div>
+
     <div style={exampleStyle}>
-      <strong>Example 2</strong>
+      <strong>Rule 2: Normal statement without a modal verb</strong>
       <br />
-      Ich komme nicht.
+      <strong>Main statement:</strong> subject + conjugated verb + ...
+      <br />
+      <strong>After weil:</strong> weil + subject + ... + conjugated verb at the end.
+      <br />
+      <br />
+      Ich <strong>komme</strong> nicht.
       <br />
       Ich schreibe {pronoun}, weil ich nicht <strong>komme</strong>.
     </div>
+
     <div style={blueBannerStyle}>
-      <strong>Useful pattern:</strong>{" "}
+      <strong>Useful modal-verb pattern with möchte:</strong>{" "}
       Ich schreibe {pronoun}, weil ich den Termin absagen <strong>möchte</strong>.
     </div>
   </div>
@@ -427,6 +441,10 @@ const WorkbookQuestions = () => (
             "du, dir, dich, dein/deine",
             "Hallo, Liebe, or Lieber",
             "Liebe Grüße or Viele Grüße",
+            "Geburtstag = birthday; gratulieren = to congratulate.",
+            "Use möchte to form the reason for writing: Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.",
+            "Feier = party / celebration. Ask: Gibt es eine Feier?",
+            "Use Kann ich ...? to ask if you may come: Kann ich mit meiner Familie kommen?",
           ]}
         />
       </InfoBox>
@@ -467,6 +485,13 @@ const WorkbookQuestions = () => (
             "Sie, Ihnen, Ihr/Ihre",
             "Sehr geehrte Damen und Herren,",
             "Mit freundlichen Grüßen + full name",
+            "sich für einen Deutschkurs anmelden = to register for a German course.",
+            "Use möchte: Ich möchte mich für einen Deutschkurs anmelden.",
+            "For your introduction: Ich schreibe Ihnen, weil ich mich für einen Deutschkurs anmelden möchte.",
+            "Make a polite request: Könnten Sie mir bitte Informationen über die Deutschkurse geben?",
+            "Ask about dates: Wann beginnt der nächste Kurs? / Welche Kurstermine gibt es?",
+            "Ask the price: Wie viel kostet der Kurs?",
+            "Ask about payment: Kann ich mit Kreditkarte bezahlen?",
           ]}
         />
       </InfoBox>
