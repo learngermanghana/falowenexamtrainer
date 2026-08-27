@@ -12,11 +12,14 @@ export const carryCompletedRadioQuery = (route = "", fallback = "") => {
 
   try {
     const fallbackUrl = new URL(String(fallback || ""), FALOWEN_ORIGIN);
-    if (fallbackUrl.searchParams.get("radio") !== "done") return route;
+    const preserveCompletedRadio = fallbackUrl.searchParams.get("radio") === "done";
+    const preserveWorkbookView = fallbackUrl.searchParams.get("view") === "workbook";
+    if (!preserveCompletedRadio && !preserveWorkbookView) return route;
 
     const routeUrl = new URL(route, FALOWEN_ORIGIN);
     if (routeUrl.origin !== FALOWEN_ORIGIN) return route;
-    routeUrl.searchParams.set("radio", "done");
+    if (preserveCompletedRadio) routeUrl.searchParams.set("radio", "done");
+    if (preserveWorkbookView) routeUrl.searchParams.set("view", "workbook");
     const query = routeUrl.searchParams.toString();
     return `${routeUrl.pathname}${query ? `?${query}` : ""}${routeUrl.hash || ""}`;
   } catch (_error) {
