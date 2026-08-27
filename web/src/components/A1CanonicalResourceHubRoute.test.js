@@ -112,6 +112,22 @@ describe("A1 canonical resource hub handoff", () => {
     );
   });
 
+  test("preserves the Day 20 workbook-only view through strict route normalization", () => {
+    const state = buildA1ChapterResourceHubState({
+      level: "A1",
+      day: "20",
+      search: "?chapter=12.3&hub=1&radio=done",
+    });
+    const lesson = normalizeLesson(state.entry, "A1");
+
+    expect(state.entry.workbookRoute).toBe(
+      `${A1_DAY20_CHAPTER123_WORKBOOK_ROUTE}?view=workbook&radio=done`,
+    );
+    expect(lesson.resources.workbook?.url).toBe(
+      `${A1_DAY20_CHAPTER123_WORKBOOK_ROUTE}?radio=done&view=workbook`,
+    );
+  });
+
   test("keeps Day 20 Kapitel 12.3 grammar notes on the lesson resource hub", () => {
     const entry = resolveA1ChapterResourceHubEntry({ day: 20, chapter: "12.3" });
     const lesson = normalizeLesson(entry, "A1");
