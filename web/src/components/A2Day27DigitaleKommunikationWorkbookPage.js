@@ -113,6 +113,6 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
     hoerenTask="Sieh dir den Beitrag zur digitalen Kommunikation an und beantworte danach die vier Fragen."
     hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
     hoerenQuestions={listeningQuestions}
+    showWorkbookGuidance={false}
   />;
-}      showWorkbookGuidance={false}
-
+}
