@@ -71,12 +71,30 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(screen.getByRole("heading", { name: "Ask first, then reveal the model" })).toBeVisible();
     expect(screen.getByText("THEMA: Getränke")).toBeVisible();
     expect(screen.getAllByText("KEYWORD")).toHaveLength(4);
-    expect(screen.queryByText("Was trinken Sie im Unterricht?")).not.toBeInTheDocument();
+    expect(screen.queryByText("Trinken Sie im Unterricht Wasser?")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getAllByRole("button", { name: "Show model question and answer" })[0]);
 
-    expect(screen.getByText("Was trinken Sie im Unterricht?")).toBeVisible();
-    expect(screen.getByText("Ich trinke im Unterricht Wasser.")).toBeVisible();
+    expect(screen.getByText("Trinken Sie im Unterricht Wasser?")).toBeVisible();
+    expect(screen.getByText("Ja, ich trinke im Unterricht Wasser.")).toBeVisible();
+  });
+
+  test("Teil 2 uses every keyword in both the model question and answer", () => {
+    renderPage();
+
+    screen.getAllByRole("button", { name: "Show model question and answer" }).forEach((button) => {
+      fireEvent.click(button);
+    });
+
+    [
+      ["Trinken Sie im Unterricht Wasser?", "Ja, ich trinke im Unterricht Wasser."],
+      ["Wann ist Ihre Pause?", "Meine Pause ist um zwölf Uhr."],
+      ["Lernen Sie Deutsch im Computerraum?", "Ja, ich lerne Deutsch im Computerraum."],
+      ["Haben Sie ein Fahrrad?", "Ja, ich habe ein Fahrrad."],
+    ].forEach(([question, answer]) => {
+      expect(screen.getByText(question)).toBeVisible();
+      expect(screen.getByText(answer)).toBeVisible();
+    });
   });
 
   test("Teil 3 uses picture cards and reveals the request after the attempt", () => {

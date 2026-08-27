@@ -187,9 +187,9 @@ const knowledgeQuestions = [
 ];
 
 const teil2Examples = [
-  { theme: "Getränke", keyword: "Wasser", pattern: "Was + Verb + Sie + …?", question: "Was trinken Sie im Unterricht?", answer: "Ich trinke im Unterricht Wasser." },
-  { theme: "Freizeit", keyword: "Pause", pattern: "Wann + Verb + Sie + …?", question: "Wann benutzen Sie Ihr Handy?", answer: "Ich benutze mein Handy in der Pause." },
-  { theme: "Deutsch lernen", keyword: "Computerraum", pattern: "Wo + Verb + Sie + …?", question: "Wo lernen Sie Deutsch?", answer: "Ich lerne Deutsch im Computerraum." },
+  { theme: "Getränke", keyword: "Wasser", pattern: "Verb + Sie + KEYWORD + …?", question: "Trinken Sie im Unterricht Wasser?", answer: "Ja, ich trinke im Unterricht Wasser." },
+  { theme: "Freizeit", keyword: "Pause", pattern: "Wann + sein + …?", question: "Wann ist Ihre Pause?", answer: "Meine Pause ist um zwölf Uhr." },
+  { theme: "Deutsch lernen", keyword: "Computerraum", pattern: "Verb + Sie + … + KEYWORD?", question: "Lernen Sie Deutsch im Computerraum?", answer: "Ja, ich lerne Deutsch im Computerraum." },
   { theme: "Verkehr", keyword: "Fahrrad", pattern: "Haben Sie + …?", question: "Haben Sie ein Fahrrad?", answer: "Ja, ich habe ein Fahrrad." },
 ];
 
