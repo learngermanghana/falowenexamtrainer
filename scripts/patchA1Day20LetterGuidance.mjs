@@ -7,6 +7,13 @@ const pagePath = path.join(root, "web/src/components/LetterWritingIntroPage.js")
 
 let source = fs.readFileSync(pagePath, "utf8");
 
+const directWorkbookImport = 'import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage";';
+if (!source.includes(directWorkbookImport)) {
+  const importAnchor = 'import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";';
+  if (!source.includes(importAnchor)) throw new Error("Could not find Day 20 workbook import anchor.");
+  source = source.replace(importAnchor, `${importAnchor}\n${directWorkbookImport}`);
+}
+
 const bodyRulesComponent = String.raw`const A1BodyRules = () => (
   <div style={{ display: "grid", gap: 10 }}>
     <p style={{ margin: 0, lineHeight: 1.75 }}>
@@ -112,5 +119,13 @@ source = source.replace(
   "          Schreiben Sie höchstens fünf kurze Sätze im Hauptteil. Schreiben Sie außerdem eine\n          passende Anrede, einen formellen Gruß und Ihren vollständigen Namen.",
 );
 
+const legacyWorkbookReturn = '  return mode === "grammar" ? <LetterWritingGrammarNotesPage /> : <WorkbookPage />;';
+const canonicalWorkbookReturn = '  return mode === "grammar" ? <LetterWritingGrammarNotesPage /> : <A1Day20LetterWritingWorkbookPage />;';
+if (source.includes(legacyWorkbookReturn)) {
+  source = source.replace(legacyWorkbookReturn, canonicalWorkbookReturn);
+} else if (!source.includes(canonicalWorkbookReturn)) {
+  throw new Error("Could not find Day 20 workbook render anchor.");
+}
+
 fs.writeFileSync(pagePath, source);
-console.log("A1 Day 20 letter guidance is aligned with the learners' current grammar.");
+console.log("A1 Day 20 letter guidance is aligned with the learners' current grammar and canonical workbook.");
