@@ -70,6 +70,7 @@ const looksLikeHtml = (raw = "") => /^\s*<!doctype html|^\s*<html/i.test(String(
 const isNetworkFailure = (error) =>
   error instanceof TypeError ||
   /networkerror|failed to fetch|load failed|network request failed/i.test(String(error?.message || ""));
+const isRetryableServerStatus = (status) => Number(status) >= 500 && Number(status) <= 599;
 
 export async function callAI({ path, payload, idToken, timeoutMs = 20000 }) {
   const candidates = buildApiCandidates(path);
@@ -98,7 +99,15 @@ export async function callAI({ path, payload, idToken, timeoutMs = 20000 }) {
       if (response.ok && data !== null) return data;
       if (response.ok && !raw) return {};
 
-      if (hasFallback && (response.status === 404 || response.status === 405 || looksLikeHtml(raw))) {
+      if (
+        hasFallback &&
+        (
+          response.status === 404 ||
+          response.status === 405 ||
+          isRetryableServerStatus(response.status) ||
+          looksLikeHtml(raw)
+        )
+      ) {
         lastError = new Error(responseMessage({ response, raw, data }));
         continue;
       }
