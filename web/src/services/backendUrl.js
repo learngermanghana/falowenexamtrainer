@@ -3,12 +3,13 @@ const getProductionBackendUrl = () => {
   return `${window.location.origin}/api`;
 };
 
+// Production API traffic must stay on the same Falowen origin. Older Vercel
+// environment values can point at a stale backend and surface as Axios
+// "Network Error" even while /api is healthy.
 const DEFAULT_BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production"
-    ? // Vercel exposes the Express backend through /api/*.
-      getProductionBackendUrl()
-    : "http://localhost:5000");
+  process.env.NODE_ENV === "production"
+    ? getProductionBackendUrl()
+    : process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
 const DEFAULT_SPEAKING_API_URL =
   process.env.REACT_APP_SPEAKING_API_URL || DEFAULT_BACKEND_URL;
