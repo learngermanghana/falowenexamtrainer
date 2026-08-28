@@ -122,12 +122,13 @@ const InformalLetterSection = () => (
         items={[
           "Sagen Sie, warum Sie schreiben.",
           "Gratulieren Sie zum Geburtstag.",
-          "Fragen Sie, ob es eine Feier gibt und ob Sie mit Ihrer Familie kommen können.",
+          "Fragen Sie: Gibt es eine Feier?",
+          "Fragen Sie: Kann Ihre Familie mitkommen?",
         ]}
       />
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie ungefähr 35–50 Wörter. Schreiben Sie eine passende Anrede, einen Gruß und
-        Ihren Namen.
+        Schreiben Sie höchstens fünf kurze Sätze im Hauptteil. Schreiben Sie außerdem eine passende
+        Anrede, einen Gruß und Ihren Namen.
       </p>
     </InfoBox>
     <InfoBox title="Use">
@@ -136,6 +137,10 @@ const InformalLetterSection = () => (
           "du, dir, dich, dein/deine",
           "Hallo, Liebe, or Lieber",
           "Liebe Grüße or Viele Grüße",
+          "Geburtstag = birthday; gratulieren = to congratulate.",
+          "Use möchte for the reason: Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.",
+          "Feier = party / celebration. Ask: Gibt es eine Feier?",
+          "Use Kann ...? for a yes/no question: Kann meine Familie mitkommen?",
         ]}
       />
     </InfoBox>
@@ -163,13 +168,14 @@ const FormalLetterSection = () => (
         ordered
         items={[
           "Sagen Sie, warum Sie schreiben.",
-          "Bitten Sie um Informationen über die Deutschkurse.",
-          "Fragen Sie nach Kursterminen, Preisen und Zahlungsmöglichkeiten.",
+          "Fragen Sie: Wann beginnt der Kurs?",
+          "Fragen Sie: Wie viel kostet der Kurs?",
+          "Fragen Sie: Kann ich online bezahlen?",
         ]}
       />
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie ungefähr 35–50 Wörter. Schreiben Sie eine passende Anrede, einen formellen
-        Gruß und Ihren vollständigen Namen.
+        Schreiben Sie höchstens fünf kurze Sätze im Hauptteil. Schreiben Sie außerdem eine passende
+        Anrede, einen formellen Gruß und Ihren vollständigen Namen.
       </p>
     </InfoBox>
     <InfoBox title="Use">
@@ -178,6 +184,12 @@ const FormalLetterSection = () => (
           "Sie, Ihnen, Ihr/Ihre",
           "Sehr geehrte Damen und Herren,",
           "Mit freundlichen Grüßen + full name",
+          "sich für einen Deutschkurs anmelden = to register for a German course.",
+          "Use möchte: Ich möchte mich für einen Deutschkurs anmelden.",
+          "For your introduction: Ich schreibe Ihnen, weil ich Deutsch lernen möchte.",
+          "Ask about dates: Wann beginnt der Kurs?",
+          "Ask the price: Wie viel kostet der Kurs?",
+          "Ask about payment: Kann ich online bezahlen?",
         ]}
       />
     </InfoBox>
