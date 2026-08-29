@@ -52,6 +52,19 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(screen.getByText(SCHOOL_PRINT_STAMP)).toBeInTheDocument();
   });
 
+  it("hides Study Buddy from printed workbooks and PDFs", () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={["/campus/course/speaking-exams-intro-4-7"]}>
+        <BookPdfDownloadInjector />
+      </MemoryRouter>
+    );
+
+    const printRules = container.querySelector("style")?.textContent || "";
+    expect(printRules).toContain(".study-buddy-bar");
+    expect(printRules).toContain(".study-buddy-reopen");
+    expect(printRules).toContain("display: none !important");
+  });
+
   it("shows an inline print action on legacy A1 workbook routes", () => {
     const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
 
