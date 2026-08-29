@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 const componentSource = fs.readFileSync(path.join(__dirname, "StudyBuddyBar.js"), "utf8");
+const barCssSource = fs.readFileSync(path.join(__dirname, "StudyBuddyBar.css"), "utf8");
 const chatCssSource = fs.readFileSync(path.join(__dirname, "StudyBuddyChat.css"), "utf8");
 
 describe("Study Buddy chat interface", () => {
@@ -21,6 +22,13 @@ describe("Study Buddy chat interface", () => {
   test("opens directly into the full chat instead of the input-only compact state", () => {
     expect(componentSource).toContain("setIsCollapsed(false);\n          setIsDismissed(false);");
     expect(componentSource).toContain("setIsCollapsed(true);\n                setIsDismissed(true);");
+  });
+
+  test("keeps Study Buddy below modal overlay layers", () => {
+    expect(barCssSource).toContain("z-index: 40;");
+    expect(barCssSource).toContain("z-index: 41;");
+    expect(barCssSource).not.toContain("2147482000");
+    expect(barCssSource).not.toContain("2147482001");
   });
 
   test("styles user and assistant messages separately", () => {
