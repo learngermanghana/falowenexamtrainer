@@ -1,0 +1,42 @@
+name: Study Buddy A1-C1 safety
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/StudyBuddyBar.js"
+      - "web/src/components/StudyBuddyBar.css"
+      - "web/src/services/studyBuddyService.js"
+      - "web/src/utils/studyBuddyRouteContext.js"
+      - "web/src/utils/studyBuddyRouteContext.test.js"
+      - "scripts/patchStudyBuddyGlobalOverlay.mjs"
+      - ".github/workflows/study-buddy-level-safety.yml"
+  workflow_dispatch:
+
+jobs:
+  level-context:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Verify A1-C1 route families remain independent
+        run: npx jest --runInBand src/utils/studyBuddyRouteContext.test.js
+
+      - name: Verify Study Buddy production patch is idempotent
+        run: |
+          node ../scripts/patchStudyBuddyGlobalOverlay.mjs
+          node ../scripts/patchStudyBuddyGlobalOverlay.mjs
+          git diff --exit-code -- src/components/StudyBuddyBar.js src/components/StudyBuddyBar.css src/__tests__/StudyBuddyBar.test.js
