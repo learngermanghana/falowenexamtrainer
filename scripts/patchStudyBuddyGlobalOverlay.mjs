@@ -18,12 +18,36 @@ if (!source.includes(portalImport)) {
   source = source.replace(reactImport, `${reactImport}\n${portalImport}`);
 }
 
+// Study Buddy is mounted once by App. It may read route metadata, but it must
+// never rewrite or wrap the distinct A1/A2/B1/B2/C1 lesson structures.
+const routerImportOld = 'import { useNavigate } from "react-router-dom";';
+const routerImportNew = 'import { useLocation, useNavigate } from "react-router-dom";';
+if (source.includes(routerImportOld)) {
+  source = source.replace(routerImportOld, routerImportNew);
+} else if (!source.includes(routerImportNew)) {
+  throw new Error("Study Buddy router import anchor missing");
+}
+
+const routeContextImport = 'import { resolveStudyBuddyRouteContext } from "../utils/studyBuddyRouteContext";';
+if (!source.includes(routeContextImport)) {
+  const importAnchor = 'import { toDateMs } from "../lib/dateUtils";';
+  if (!source.includes(importAnchor)) throw new Error("Study Buddy route context import anchor missing");
+  source = source.replace(importAnchor, `${importAnchor}\n${routeContextImport}`);
+}
+
 const helperMarker = "const renderStudyBuddyOverlay =";
 if (!source.includes(helperMarker)) {
   const anchor = "const StudyBuddyBar = ({ studentProfile }) => {";
   if (!source.includes(anchor)) throw new Error("Study Buddy component anchor missing");
   const helper = `const renderStudyBuddyOverlay = (node) => {\n  if (typeof document === \"undefined\" || !document.body) return node;\n  return createPortal(node, document.body);\n};\n\n`;
   source = source.replace(anchor, `${helper}${anchor}`);
+}
+
+const navigateAnchor = "  const navigate = useNavigate();";
+const locationAnchor = "  const location = useLocation();";
+if (!source.includes(locationAnchor)) {
+  if (!source.includes(navigateAnchor)) throw new Error("Study Buddy navigate anchor missing");
+  source = source.replace(navigateAnchor, `${navigateAnchor}\n${locationAnchor}`);
 }
 
 // Keep the launcher available everywhere without forcing the chat panel open.
@@ -35,6 +59,43 @@ if (source.includes(dismissedStateWrong)) {
   source = source.replace(dismissedStateWrong, dismissedStateCorrect);
 } else if (!source.includes(dismissedStateCorrect)) {
   throw new Error("Study Buddy dismissed-state anchor missing");
+}
+
+// Resolve context from the route instead of assuming that all levels share one
+// workbook shape. Profile level is only a fallback for legacy pages whose URL
+// does not carry a level (for example the dedicated A1 speaking page).
+const lessonContextMarker = "  const lessonContext = useMemo(";
+if (!source.includes(lessonContextMarker)) {
+  const levelEndAnchor = `  }, [levelKey]);\n  const [latestResult, setLatestResult] = useState(null);`;
+  const levelContextBlock = `  }, [levelKey]);\n  const lessonContext = useMemo(\n    () =>\n      resolveStudyBuddyRouteContext({\n        pathname: location.pathname,\n        search: location.search,\n        profileLevel: resolvedLevel,\n      }),\n    [location.pathname, location.search, resolvedLevel]\n  );\n  const [latestResult, setLatestResult] = useState(null);`;
+  if (!source.includes(levelEndAnchor)) throw new Error("Study Buddy level context anchor missing");
+  source = source.replace(levelEndAnchor, levelContextBlock);
+}
+
+const historyLevelOld = '  const historyLevel = resolvedLevel || "B1";';
+const historyLevelNew = '  const historyLevel = lessonContext.level || resolvedLevel || "B1";';
+if (source.includes(historyLevelOld)) {
+  source = source.replace(historyLevelOld, historyLevelNew);
+} else if (!source.includes(historyLevelNew)) {
+  throw new Error("Study Buddy history-level anchor missing");
+}
+
+const requestContextOld = `        const response = await requestStudyBuddyReply({\n          message: trimmed,\n          level: historyLevel,\n          idToken,\n        });`;
+const requestContextNew = `        const response = await requestStudyBuddyReply({\n          message: trimmed,\n          level: historyLevel,\n          idToken,\n          lessonContext,\n        });`;
+if (source.includes(requestContextOld)) {
+  source = source.replace(requestContextOld, requestContextNew);
+} else if (!source.includes(requestContextNew)) {
+  throw new Error("Study Buddy request context anchor missing");
+}
+
+// The lesson context changes with navigation. Include it in the callback
+// dependency list so a B1 conversation cannot accidentally keep A2 metadata.
+const submitDependencyOld = "    [className, historyLevel, idToken, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]";
+const submitDependencyNew = "    [className, historyLevel, idToken, lessonContext, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]";
+if (source.includes(submitDependencyOld)) {
+  source = source.replace(submitDependencyOld, submitDependencyNew);
+} else if (!source.includes(submitDependencyNew)) {
+  throw new Error("Study Buddy request dependency anchor missing");
 }
 
 // Opening the launcher must go straight to the full chat. The compact desktop
@@ -97,4 +158,4 @@ if (!testSource.includes(regressionMarker)) {
 fs.writeFileSync(sourcePath, source, "utf8");
 fs.writeFileSync(cssPath, css, "utf8");
 fs.writeFileSync(testPath, testSource, "utf8");
-console.log("Study Buddy stays as a protected launcher, opens the full chat, and remains below modal overlays.");
+console.log("Study Buddy stays global and level-aware without rewriting A1-A2-B1-B2-C1 lesson structures.");
