@@ -13,9 +13,14 @@ describe("Study Buddy chat interface", () => {
     expect(componentSource).toContain("Ask a follow-up question");
   });
 
-  test("starts visible in a body-level overlay so workbook layouts cannot hide it", () => {
-    expect(componentSource).toContain("useState(false)");
+  test("starts as a body-level launcher so workbook layouts cannot hide it", () => {
+    expect(componentSource).toContain("const [isDismissed, setIsDismissed] = useState(true);");
     expect(componentSource).toContain("createPortal(node, document.body)");
+  });
+
+  test("opens directly into the full chat instead of the input-only compact state", () => {
+    expect(componentSource).toContain("setIsCollapsed(false);\n          setIsDismissed(false);");
+    expect(componentSource).toContain("setIsCollapsed(true);\n                setIsDismissed(true);");
   });
 
   test("styles user and assistant messages separately", () => {
