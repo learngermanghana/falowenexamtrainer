@@ -2,7 +2,7 @@
   position: fixed;
   left: 50%;
   bottom: max(18px, env(safe-area-inset-bottom));
-  z-index: 900;
+  z-index: 2147482000;
   width: min(760px, calc(100vw - 28px));
   transform: translateX(-50%);
   pointer-events: none;
@@ -356,7 +356,7 @@
   position: fixed;
   right: max(16px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 901;
+  z-index: 2147482001;
   border: 1px solid rgba(147, 197, 253, 0.5);
   border-radius: 999px;
   background: #1d4ed8;

@@ -9,6 +9,13 @@ import BookPdfDownloadInjector, {
 } from "./BookPdfDownloadInjector";
 
 describe("BookPdfDownloadInjector helpers", () => {
+  it("treats the dedicated A1 Day 15 workbook as printable", () => {
+    const pathname = "/campus/course/speaking-exams-intro-4-7";
+
+    expect(getPrintableBookKind(pathname)).toBe("combined");
+    expect(needsInlineA1PdfAction(pathname)).toBe(true);
+  });
+
   it("targets grammar notes and workbook pages only", () => {
     expect(isPrintableBookRoute("/campus/course/a2-day-9-urlaub-workbook")).toBe(true);
     expect(isPrintableBookRoute("/campus/course/a2-day-9-perfekt-grammar-notes")).toBe(true);
