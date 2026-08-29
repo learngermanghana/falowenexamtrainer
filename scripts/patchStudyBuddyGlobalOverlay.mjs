@@ -80,8 +80,10 @@ if (!source.includes("return renderStudyBuddyOverlay(\n    <section")) {
   source = source.replace(expandedOld, expandedNew);
 }
 
-css = css.replace(/z-index:\s*900;/g, "z-index: 2147482000;");
-css = css.replace(/z-index:\s*901;/g, "z-index: 2147482001;");
+// Portaling solves workbook clipping without putting Study Buddy above dialogs.
+// Keep it below the app's modal layers (50+), including focus and submit overlays.
+css = css.replace(/z-index:\s*(?:900|2147482000);/g, "z-index: 40;");
+css = css.replace(/z-index:\s*(?:901|2147482001);/g, "z-index: 41;");
 
 const regressionMarker = 'it("renders the Study Buddy launcher in document.body so learning-page layouts cannot clip it"';
 if (!testSource.includes(regressionMarker)) {
@@ -95,4 +97,4 @@ if (!testSource.includes(regressionMarker)) {
 fs.writeFileSync(sourcePath, source, "utf8");
 fs.writeFileSync(cssPath, css, "utf8");
 fs.writeFileSync(testPath, testSource, "utf8");
-console.log("Study Buddy now stays as a protected launcher until opened, then opens the full chat.");
+console.log("Study Buddy stays as a protected launcher, opens the full chat, and remains below modal overlays.");
