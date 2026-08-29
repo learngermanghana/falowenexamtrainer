@@ -9,36 +9,43 @@ describe("StudyBuddyBar", () => {
     localStorage.clear();
   });
 
-  it("updates aria-expanded when toggling collapse", async () => {
+  it("opens the full Study Buddy from the launcher and closes back to the launcher", async () => {
     const user = userEvent.setup();
     render(<StudyBuddyBar studentProfile={{}} />);
 
-    const toggle = screen.getByRole("button", { name: /show details/i });
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    const launcher = screen.getByRole("button", { name: /open study buddy/i });
+    expect(launcher).toBeInTheDocument();
 
-    await user.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await user.click(launcher);
 
-    await user.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    const closeButtons = screen.getAllByRole("button", { name: /^hide details$/i });
+    expect(closeButtons[0]).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(/start a conversation/i)).toBeInTheDocument();
+
+    await user.click(closeButtons[0]);
+
+    expect(screen.getByRole("button", { name: /open study buddy/i })).toBeInTheDocument();
   });
 
-  it("shows mobile close button only when expanded", async () => {
+  it("mobile close returns to the launcher", async () => {
     const user = userEvent.setup();
     render(<StudyBuddyBar studentProfile={{}} />);
 
-    expect(screen.queryByRole("button", { name: /^hide details$/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /open study buddy/i }));
 
-    await user.click(screen.getByRole("button", { name: /show details/i }));
+    const closeButtons = screen.getAllByRole("button", { name: /^hide details$/i });
+    expect(closeButtons).toHaveLength(2);
 
-    expect(screen.getAllByRole("button", { name: /^hide details$/i })).toHaveLength(2);
+    await user.click(closeButtons[1]);
+
+    expect(screen.getByRole("button", { name: /open study buddy/i })).toBeInTheDocument();
   });
 
   it("toggles the progress details disclosure", async () => {
     const user = userEvent.setup();
     render(<StudyBuddyBar studentProfile={{ latestScore: 72, attendanceRate: 85 }} />);
 
-    await user.click(screen.getByRole("button", { name: /show details/i }));
+    await user.click(screen.getByRole("button", { name: /open study buddy/i }));
 
     const progressToggle = screen.getByRole("button", { name: /show progress details/i });
     expect(progressToggle).toHaveAttribute("aria-expanded", "false");
@@ -50,5 +57,4 @@ describe("StudyBuddyBar", () => {
     expect(screen.getByText(/attendance/i)).toBeInTheDocument();
     expect(screen.getByText(/weekly plan/i)).toBeInTheDocument();
   });
-
 });
