@@ -38,5 +38,10 @@ jobs:
       - name: Verify Study Buddy production patch is idempotent
         run: |
           node ../scripts/patchStudyBuddyGlobalOverlay.mjs
+          cp src/components/StudyBuddyBar.js /tmp/StudyBuddyBar.first.js
+          cp src/components/StudyBuddyBar.css /tmp/StudyBuddyBar.first.css
+          cp src/__tests__/StudyBuddyBar.test.js /tmp/StudyBuddyBar.first.test.js
           node ../scripts/patchStudyBuddyGlobalOverlay.mjs
-          git diff --exit-code -- src/components/StudyBuddyBar.js src/components/StudyBuddyBar.css src/__tests__/StudyBuddyBar.test.js
+          cmp src/components/StudyBuddyBar.js /tmp/StudyBuddyBar.first.js
+          cmp src/components/StudyBuddyBar.css /tmp/StudyBuddyBar.first.css
+          cmp src/__tests__/StudyBuddyBar.test.js /tmp/StudyBuddyBar.first.test.js
