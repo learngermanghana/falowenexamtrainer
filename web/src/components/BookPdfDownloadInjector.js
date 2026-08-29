@@ -5,9 +5,14 @@ export const SCHOOL_PRINT_STAMP = "learn Language Education Academy";
 
 const BOOK_ROUTE_PATTERN = /(?:grammar-notes|workbook\/?$)/i;
 const A1_WORKBOOK_ROUTE_PATTERN = /^\/campus\/course\/a1-[^/]*-workbook\/?$/i;
+const A1_DAY15_WORKBOOK_PATH = "/campus/course/speaking-exams-intro-4-7";
 const COURSE_LESSON_PATTERN = /^\/campus\/course\/lesson\/(A1|A2|B1|B2|C1)\/\d+\/?$/i;
 
 export const getPrintableBookKind = (pathname = "", search = "") => {
+  if ((pathname.replace(/\/+$/, "") || "/") === A1_DAY15_WORKBOOK_PATH) {
+    return "combined";
+  }
+
   if (BOOK_ROUTE_PATTERN.test(pathname)) {
     return /workbook\/?$/i.test(pathname) ? "combined" : "grammar";
   }
@@ -32,7 +37,8 @@ export const isPrintableBookRoute = (pathname = "", search = "") =>
   Boolean(getPrintableBookKind(pathname, search));
 
 export const needsInlineA1PdfAction = (pathname = "") =>
-  A1_WORKBOOK_ROUTE_PATTERN.test(pathname);
+  A1_WORKBOOK_ROUTE_PATTERN.test(pathname) ||
+  (pathname.replace(/\/+$/, "") || "/") === A1_DAY15_WORKBOOK_PATH;
 
 const humanizeBookTitle = (pathname = "") => {
   const slug = pathname.split("/").filter(Boolean).pop() || "course-book";

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -45,6 +46,11 @@ const readStoredPlanState = (storageKey) => {
   }
 };
 
+const renderStudyBuddyOverlay = (node) => {
+  if (typeof document === "undefined" || !document.body) return node;
+  return createPortal(node, document.body);
+};
+
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -53,7 +59,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const quickQuestionInputRef = useRef(null);
   const chatEndRef = useRef(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isDismissed, setIsDismissed] = useState(true);
+  // Keep the compact bar visible on workbook entry. Starting in the dismissed
+  // state made Study Buddy look unavailable until students noticed the small
+  // reopen control in the corner.
+  const [isDismissed, setIsDismissed] = useState(false);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
@@ -582,7 +591,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   }, [isHighContrast]);
 
   if (isDismissed) {
-    return (
+    return renderStudyBuddyOverlay(
       <button
         className={`study-buddy-reopen${isHighContrast ? " is-high-contrast" : ""}`}
         type="button"
@@ -597,7 +606,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     );
   }
 
-  return (
+  return renderStudyBuddyOverlay(
     <section
       className={`study-buddy-bar${isCollapsed ? " is-collapsed" : ""}${
         isHighContrast ? " is-high-contrast" : ""
