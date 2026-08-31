@@ -773,7 +773,17 @@ app.post("/attendance/checkin", async (req, res) => {
       const checkinSnap = await tx.get(checkinRef);
       if (checkinSnap.exists) return { duplicate: true };
       const attendance = session.attendance || {};
-      if (attendance[studentCode]) return { duplicate: true };
+      const existingAttendance = attendance[studentCode];
+const existingAttendanceStatus = String(
+  existingAttendance?.status || existingAttendance?.attendance || ""
+).toLowerCase();
+const alreadyPresent =
+  existingAttendance === true ||
+  existingAttendance?.present === true ||
+  existingAttendance?.attended === true ||
+  existingAttendanceStatus === "present" ||
+  existingAttendanceStatus === "late";
+if (alreadyPresent) return { duplicate: true };
       tx.set(checkinRef, {
         studentCode,
         studentUid: authedUser.uid,
