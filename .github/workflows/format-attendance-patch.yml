@@ -17,36 +17,18 @@ jobs:
         with:
           ref: fix/attendance-false-duplicate-checkin
       - name: Format attendance block
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
           path = Path("functions/functionz/app.js")
           text = path.read_text(encoding="utf-8")
-          old = '''      const existingAttendance = attendance[studentCode];
-const existingAttendanceStatus = String(
-  existingAttendance?.status || existingAttendance?.attendance || ""
-).toLowerCase();
-const alreadyPresent =
-  existingAttendance === true ||
-  existingAttendance?.present === true ||
-  existingAttendance?.attended === true ||
-  existingAttendanceStatus === "present" ||
-  existingAttendanceStatus === "late";
-if (alreadyPresent) return { duplicate: true };'''
-          new = '''      const existingAttendance = attendance[studentCode];
-      const existingAttendanceStatus = String(
-        existingAttendance?.status || existingAttendance?.attendance || ""
-      ).toLowerCase();
-      const alreadyPresent =
-        existingAttendance === true ||
-        existingAttendance?.present === true ||
-        existingAttendance?.attended === true ||
-        existingAttendanceStatus === "present" ||
-        existingAttendanceStatus === "late";
-      if (alreadyPresent) return { duplicate: true };'''
+          old = "      const existingAttendance = attendance[studentCode];\nconst existingAttendanceStatus = String(\n  existingAttendance?.status || existingAttendance?.attendance || \"\"\n).toLowerCase();\nconst alreadyPresent =\n  existingAttendance === true ||\n  existingAttendance?.present === true ||\n  existingAttendance?.attended === true ||\n  existingAttendanceStatus === \"present\" ||\n  existingAttendanceStatus === \"late\";\nif (alreadyPresent) return { duplicate: true };"
+          new = "      const existingAttendance = attendance[studentCode];\n      const existingAttendanceStatus = String(\n        existingAttendance?.status || existingAttendance?.attendance || \"\"\n      ).toLowerCase();\n      const alreadyPresent =\n        existingAttendance === true ||\n        existingAttendance?.present === true ||\n        existingAttendance?.attended === true ||\n        existingAttendanceStatus === \"present\" ||\n        existingAttendanceStatus === \"late\";\n      if (alreadyPresent) return { duplicate: true };"
           if old not in text:
-            raise SystemExit("Expected unformatted attendance block was not found.")
+              raise SystemExit("Expected unformatted attendance block was not found.")
           path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
       - name: Validate and commit
         run: |
           node --check functions/functionz/app.js
@@ -55,5 +37,3 @@ if (alreadyPresent) return { duplicate: true };'''
           git add functions/functionz/app.js
           git commit -m "Format attendance duplicate check [attendance-format]"
           git push origin HEAD:fix/attendance-false-duplicate-checkin
-
-# Temporary workflow used only to keep the final attendance fix diff clean.
