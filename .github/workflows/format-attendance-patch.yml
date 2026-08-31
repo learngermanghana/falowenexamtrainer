@@ -55,3 +55,5 @@ if (alreadyPresent) return { duplicate: true };'''
           git add functions/functionz/app.js
           git commit -m "Format attendance duplicate check [attendance-format]"
           git push origin HEAD:fix/attendance-false-duplicate-checkin
+
+# Temporary workflow used only to keep the final attendance fix diff clean.
