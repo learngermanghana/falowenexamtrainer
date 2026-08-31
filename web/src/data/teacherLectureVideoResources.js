@@ -94,6 +94,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/OJmM8BUTN3k",
       },
     ],
+    6: [
+      {
+        chapter: "2.6",
+        topic: "Leben in der Stadt oder auf dem Land?",
+        url: "https://youtu.be/7e6yi6_OM2c",
+      },
+    ],
   },
 };
 
