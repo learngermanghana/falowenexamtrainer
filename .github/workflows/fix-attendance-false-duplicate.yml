@@ -20,8 +20,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: functions/package-lock.json
 
       - name: Patch duplicate attendance detection
         shell: python
@@ -48,9 +46,9 @@ jobs:
 
           path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-      - name: Install Functions dependencies
+      - name: Install Functions dependencies without changing lockfile
         working-directory: functions
-        run: npm ci
+        run: npm install --package-lock=false --no-audit --no-fund
 
       - name: Run attendance regression tests
         working-directory: functions
