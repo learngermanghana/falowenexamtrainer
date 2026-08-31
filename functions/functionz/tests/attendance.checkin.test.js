@@ -1,11 +1,11 @@
 const http = require("http");
 
 let mockDb;
-const verifyIdToken = jest.fn(async () => ({ uid: "uid-1", email: "student@example.com" }));
+const mockVerifyIdToken = jest.fn(async () => ({ uid: "uid-1", email: "student@example.com" }));
 
 jest.mock("firebase-admin", () => ({
   apps: [{}],
-  auth: () => ({ verifyIdToken }),
+  auth: () => ({ verifyIdToken: mockVerifyIdToken }),
   firestore: () => mockDb,
   credential: { cert: jest.fn() },
   initializeApp: jest.fn(),
@@ -114,6 +114,23 @@ describe("attendance check-in", () => {
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ duplicate: true });
     expect(mockDb.writes).toHaveLength(0);
+  });
+
+  it("does not treat an absent attendance placeholder as an existing check-in", async () => {
+    mockDb = createDb({
+      session: {
+        opened: true,
+        attendance: {
+          "STU-1": { status: "absent", present: false },
+        },
+      },
+    });
+
+    const res = await request({ className: "A1", sessionId: "s1", source: "falowen_student_app" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ ok: true, duplicate: false, status: "present" });
+    expect(mockDb.writes).toHaveLength(2);
   });
 
   it("saves successful Falowen button check-ins with the app source", async () => {
