@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import A2Day13VorstellungsgespraechWorkbookPageLegacy from "./A2Day13VorstellungsgespraechWorkbookPageLegacy";
+import A2LegacyStandardWorkbookNavBridge from "./A2LegacyStandardWorkbookNavBridge";
 
 const DRIVE_FILE_ID = "1iT-0eKLWmEn_ZNdhQ8qiEWh0Dhn-ql4p";
 const OLD_RECOMMENDED_VIDEO_ID = "urKBrX5VAYU";
@@ -70,9 +71,17 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
   }, []);
 
   return (
-    <div ref={rootRef}>
-      <A2Day13VorstellungsgespraechWorkbookPageLegacy />
-    </div>
+    <>
+      <A2LegacyStandardWorkbookNavBridge
+        legacyRootRef={rootRef}
+        day={13}
+        chapter="5.13"
+        workbookId="A2Day13Vorstellungsgespraech"
+      />
+      <div ref={rootRef}>
+        <A2Day13VorstellungsgespraechWorkbookPageLegacy />
+      </div>
+    </>
   );
 };
 
