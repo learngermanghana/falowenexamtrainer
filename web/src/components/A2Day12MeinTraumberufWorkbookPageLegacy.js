@@ -1,23 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
+import {
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "grammar", label: "Grammar" },
-  { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
-  { key: "schreiben", label: "Teil 2 · Schreiben" },
-  { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "references", label: "5. Ref" },
-];
+const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
 const card = {
   ...styles.card,
@@ -133,22 +131,6 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -165,9 +147,15 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+
+  const submissionContext = {
+    level: "A2",
+    day: 12,
+    assignmentKey: "A2-5.12",
+    canonicalAssignmentKey: "A2-5.12",
+    workbookId: "A2Day12MeinTraumberuf",
+  };
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -176,20 +164,17 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 12 Workbook · Mein Traumberuf</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          Select Grammar, Teil 1–4, Ref or Submit below.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}>
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 12 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
       {activeTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={12} /></div>}
@@ -336,9 +321,7 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -368,9 +351,7 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this
             page.
           </p>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -491,9 +472,18 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
       )}
 
       {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="A2" lesson={{ title: "A2Day12MeinTraumberuf", level: "A2", workbookId: "A2Day12MeinTraumberuf" }} workbookId="A2Day12MeinTraumberuf" />
+        <WorkbookReferenceAnswers
+          level="A2"
+          lesson={{ title: "A2Day12MeinTraumberuf", level: "A2", day: 12, workbookId: "A2Day12MeinTraumberuf" }}
+          workbookId="A2Day12MeinTraumberuf"
+        />
       )}
 
+      {activeTab === "submit" && (
+        <div style={card}>
+          <ContextualAssignmentSubmissionPage submissionContext={submissionContext} />
+        </div>
+      )}
     </div>
   );
 };
