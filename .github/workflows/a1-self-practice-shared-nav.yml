@@ -15,6 +15,7 @@ on:
       - "web/src/components/A1Day5PersonalInformationSingleReference.test.js"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.jsx"
       - "web/src/components/A1SharedPracticeWorkbookNavigation.test.jsx"
+      - "web/src/components/A1SelfPracticeDivWorkbookTabs.regression.test.jsx"
       - "web/src/index.jsx"
       - "scripts/patchA1SelfLearningDestinationOwnership.mjs"
       - ".github/workflows/a1-self-practice-shared-nav.yml"
@@ -43,7 +44,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1SharedPracticeWorkbookNavigation.test.jsx src/components/A1SelfPracticeDivWorkbookTabs.regression.test.jsx
       - name: Test Day 5 completed workbook opener
         working-directory: web
         env:
