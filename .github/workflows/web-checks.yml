@@ -142,6 +142,12 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/CourseLessonInlineSubmission.test.js
 
+      - name: Test Question of the Day writing templates
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/QuestionOfDayWritingTemplateInjector.test.js
+
       - name: Test workbook route matching
         working-directory: web
         env:
