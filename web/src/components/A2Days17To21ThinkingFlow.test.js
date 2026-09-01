@@ -31,6 +31,20 @@ describe("A2 Days 17-21 thinking flow", () => {
     expect(source).toContain("day >= 17 && day <= 21");
   });
 
+  test("Days 17 and 18 do not repeat the speaking question below the mind map", () => {
+    const day17 = read("A2Day17InDieApothekeGehenWorkbookPage.js");
+    const day18 = read("A2Day18DieBankAnrufenWorkbookPage.js");
+    const standardShell = read("A2StandardTabbedWorkbookPage.js");
+
+    expect((day17.match(/<SpeakingMindMap /g) || [])).toHaveLength(1);
+    expect(day17).toContain("The mind map contains the complete task");
+    expect(day17).not.toContain("Beispiel für die Brain Map-Struktur");
+    expect(day17).not.toContain("Sprechen wie bei einer Mini-Präsentation");
+    expect(day17).not.toContain("Modellantwort (ca. 30–45 Sekunden)");
+    expect(standardShell).toContain("showSpeakingTaskCard = true");
+    expect(day18).toContain("showSpeakingTaskCard={false}");
+  });
+
   test.each([
     ["A2Day17InDieApothekeGehenWorkbookPage.js", "Beschreiben Sie kurz, warum Sie das Medikament benötigen.", "Fragen Sie nach der richtigen Dosierung oder möglichen Nebenwirkungen."],
     ["A2Day18DieBankAnrufenWorkbookPage.js", "fragen, ob Ihre Karte entsperrt werden kann.", "fragen, wie lange der Vorgang dauern wird."],
