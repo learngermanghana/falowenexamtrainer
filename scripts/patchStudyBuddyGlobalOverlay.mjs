@@ -26,10 +26,10 @@ if (!source.includes(helperMarker)) {
   source = source.replace(anchor, `${helper}${anchor}`);
 }
 
-// Study Buddy is a persistent campus control. It should begin visible on every
-// learning/workbook route instead of starting in a dismissed state.
-const dismissedStateOld = "  const [isDismissed, setIsDismissed] = useState(true);";
-const dismissedStateNew = "  const [isDismissed, setIsDismissed] = useState(false);";
+// Study Buddy is available on every learning/workbook route, but the page must
+// start with only the bottom-right launcher visible so it cannot cover content.
+const dismissedStateOld = "  const [isDismissed, setIsDismissed] = useState(false);";
+const dismissedStateNew = "  const [isDismissed, setIsDismissed] = useState(true);";
 if (source.includes(dismissedStateOld)) {
   source = source.replace(dismissedStateOld, dismissedStateNew);
 } else if (!source.includes(dismissedStateNew)) {
@@ -53,16 +53,16 @@ if (!source.includes("return renderStudyBuddyOverlay(\n    <section")) {
 css = css.replace(/z-index:\s*900;/g, "z-index: 2147482000;");
 css = css.replace(/z-index:\s*901;/g, "z-index: 2147482001;");
 
-const regressionMarker = 'it("renders the visible Study Buddy in document.body so learning-page layouts cannot clip it"';
+const regressionMarker = 'it("renders the Study Buddy launcher in document.body so learning-page layouts cannot clip it"';
 if (!testSource.includes(regressionMarker)) {
   const endAnchor = "\n});";
   const index = testSource.lastIndexOf(endAnchor);
   if (index < 0) throw new Error("Study Buddy test suite end anchor missing");
-  const regression = `\n  it("renders the visible Study Buddy in document.body so learning-page layouts cannot clip it", () => {\n    const pageShell = document.createElement("div");\n    pageShell.style.overflow = "hidden";\n    pageShell.style.transform = "translateZ(0)";\n    document.body.appendChild(pageShell);\n\n    render(<StudyBuddyBar studentProfile={{}} />, { container: pageShell });\n\n    const buddy = document.body.querySelector(".study-buddy-bar");\n    expect(buddy).toBeTruthy();\n    expect(buddy.parentElement).toBe(document.body);\n  });\n`;
+  const regression = `\n  it("renders the Study Buddy launcher in document.body so learning-page layouts cannot clip it", () => {\n    const pageShell = document.createElement("div");\n    pageShell.style.overflow = "hidden";\n    pageShell.style.transform = "translateZ(0)";\n    document.body.appendChild(pageShell);\n\n    render(<StudyBuddyBar studentProfile={{}} />, { container: pageShell });\n\n    const launcher = document.body.querySelector(".study-buddy-reopen");\n    expect(launcher).toBeTruthy();\n    expect(launcher.parentElement).toBe(document.body);\n    expect(document.body.querySelector(".study-buddy-bar")).toBeNull();\n  });\n`;
   testSource = `${testSource.slice(0, index)}${regression}${testSource.slice(index)}`;
 }
 
 fs.writeFileSync(sourcePath, source, "utf8");
 fs.writeFileSync(cssPath, css, "utf8");
 fs.writeFileSync(testPath, testSource, "utf8");
-console.log("Study Buddy now starts visible and renders as a protected global overlay across learning pages.");
+console.log("Study Buddy now starts as a bottom-right launcher and renders as a protected global overlay.");
