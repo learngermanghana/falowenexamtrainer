@@ -37,6 +37,20 @@ describe("A2 Days 12-16 thinking flow", () => {
     expect(source).toContain("patchWritingPrompt");
   });
 
+  test("Day 13 keeps the speaking task in one mind map instead of repeating it below", () => {
+    const page = read("A2Day13VorstellungsgespraechWorkbookPageLegacy.js");
+    const mindMaps = fs.readFileSync(path.resolve(__dirname, "../data/speakingMindMaps/a2/index.js"), "utf8");
+
+    expect(page).toContain("The mind map contains the complete");
+    expect(page).toContain("<SpeakingMindMap config={getA2SpeakingMindMap(13)} />");
+    expect(page).not.toContain("Zentrales Thema: „Mein Beruf und ich“");
+    expect(page).not.toContain("<h3 style={sectionTitle}>Hauptfrage</h3>");
+    expect(page).not.toContain("Sprechen wie bei einer Mini-Präsentation");
+    ["Vorstellung", "Ausbildung", "Berufserfahrung", "Fähigkeiten", "Motivation"].forEach((branchLabel) => {
+      expect(mindMaps).toContain(`\"${branchLabel}\"`);
+    });
+  });
+
   test.each([
     ["A2Day12MeinTraumberufWorkbookPageLegacy.js", "Fragen, ob es noch offene Stellen in der Firma gibt.", "Ihre Fähigkeiten und Fertigkeiten beschreiben"],
     ["A2Day14BerufUndKarriereWorkbookPage.js", "Bedanken Sie sich für den Vorschlag.", "Fragen Sie nach weiteren Details: Inhalt, Termine und Kosten."],
