@@ -28,6 +28,7 @@ export default function A2Day18DieBankAnrufenWorkbookPage() {
       chapter="7.18"
       workbookId="A2Day18DieBankAnrufen"
       topicPrompt="Sie rufen bei einer Bank an. Warum rufen Sie an? Welche Informationen brauchen Sie? Welche höflichen Fragen stellen Sie?"
+      showSpeakingTaskCard={false}
       schreibenTask="Sie sind jetzt in Ghana und Ihre Karte wurde gesperrt. Schreiben Sie einen Brief an Ihre Bank in Ghana."
       schreibenContent={schreibenContent}
       lesenText="Sie vergleichen verschiedene Banken. Die Deutsche Bank bietet Kontoeröffnung, Beratung und Online-Banking an und ist Montag bis Freitag von 9 bis 17 Uhr geöffnet. Die Sparkasse ist zentral gelegen, berät neue Kunden und öffnet Montag bis Freitag von 8 bis 18 Uhr. Die Volksbank hat Filialen in den Vororten. Die ING-DiBa bietet Online-Kontoeröffnung und telefonische Beratung, aber keine persönlichen Filialen."
