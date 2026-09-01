@@ -59,10 +59,9 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const quickQuestionInputRef = useRef(null);
   const chatEndRef = useRef(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  // Keep the compact bar visible on workbook entry. Starting in the dismissed
-  // state made Study Buddy look unavailable until students noticed the small
-  // reopen control in the corner.
-  const [isDismissed, setIsDismissed] = useState(false);
+  // Keep workbook content unobstructed until the student deliberately opens
+  // Study Buddy from the fixed launcher in the bottom-right corner.
+  const [isDismissed, setIsDismissed] = useState(true);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
