@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import A2Day12MeinTraumberufWorkbookPageLegacy from "./A2Day12MeinTraumberufWorkbookPageLegacy";
+import A2LegacyStandardWorkbookNavBridge from "./A2LegacyStandardWorkbookNavBridge";
 
 const DRIVE_FILE_ID = "1XqRF0mQZs6UFpPHjEaX7fp7XRS652onL";
 const OLD_RECOMMENDED_VIDEO_ID = "w81bsmssGXQ";
@@ -56,9 +57,17 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
   }, []);
 
   return (
-    <div ref={rootRef}>
-      <A2Day12MeinTraumberufWorkbookPageLegacy />
-    </div>
+    <>
+      <A2LegacyStandardWorkbookNavBridge
+        legacyRootRef={rootRef}
+        day={12}
+        chapter="5.12"
+        workbookId="A2Day12MeinTraumberuf"
+      />
+      <div ref={rootRef}>
+        <A2Day12MeinTraumberufWorkbookPageLegacy />
+      </div>
+    </>
   );
 };
 
