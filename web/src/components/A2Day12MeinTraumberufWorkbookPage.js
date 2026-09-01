@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import A2Day12MeinTraumberufWorkbookPageLegacy from "./A2Day12MeinTraumberufWorkbookPageLegacy";
 
+// Navigation is rendered directly inside the workbook component, matching the working A2 Day 1 structure.
 const DRIVE_FILE_ID = "1XqRF0mQZs6UFpPHjEaX7fp7XRS652onL";
 const OLD_RECOMMENDED_VIDEO_ID = "w81bsmssGXQ";
 const YOUTUBE_URL = "https://youtu.be/VGzHSjn3O-A";
