@@ -5,6 +5,8 @@ import { buildAttendanceSummary, fetchAttendanceRecords } from "../services/atte
 import { isFirebaseConfigured } from "../firebase";
 import { jsPDF } from "jspdf";
 
+const PENDING_PREVIEW_LIMIT = 5;
+
 const getRecordSessionTitle = (record = {}, fallbackLabel = "") =>
   String(
     record.sessionLabel ||
@@ -42,6 +44,85 @@ const styles = {
     gap: 6,
   },
   listHeading: { margin: 0, fontSize: 14, color: "#111827" },
+  details: {
+    border: "1px solid #dbe3ef",
+    borderRadius: 16,
+    padding: 12,
+    background: "#f8fafc",
+  },
+  detailsSummary: {
+    cursor: "pointer",
+    fontWeight: 800,
+    color: "#111827",
+    lineHeight: 1.4,
+  },
+  detailsGrid: {
+    display: "grid",
+    gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
+    marginTop: 12,
+    alignItems: "start",
+  },
+  attendanceGroup: {
+    display: "grid",
+    gap: 10,
+    border: "1px solid #e5e7eb",
+    borderRadius: 14,
+    padding: 12,
+    background: "#ffffff",
+  },
+  attendanceGroupHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  attendanceCount: {
+    minWidth: 28,
+    borderRadius: 999,
+    padding: "3px 8px",
+    textAlign: "center",
+    fontSize: 12,
+    fontWeight: 800,
+  },
+  attendanceList: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    display: "grid",
+    gap: 8,
+  },
+  attendanceItem: {
+    display: "grid",
+    gap: 4,
+    border: "1px solid #e5e7eb",
+    borderRadius: 11,
+    padding: "10px 11px",
+    background: "#ffffff",
+  },
+  attendanceTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: 750,
+    lineHeight: 1.45,
+    overflowWrap: "anywhere",
+  },
+  attendanceMeta: {
+    color: "#6b7280",
+    fontSize: 12,
+    lineHeight: 1.4,
+  },
+  showMoreButton: {
+    width: "100%",
+    border: "1px solid #cbd5e1",
+    borderRadius: 10,
+    padding: "9px 10px",
+    background: "#ffffff",
+    color: "#1d4ed8",
+    fontSize: 13,
+    fontWeight: 800,
+    cursor: "pointer",
+  },
   error: {
     background: "#fef2f2",
     border: "1px solid #fecaca",
@@ -120,6 +201,58 @@ const StatCard = ({ label, value, helper }) => (
   </div>
 );
 
+const ATTENDANCE_GROUP_TONES = {
+  present: { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" },
+  absent: { border: "#fecaca", background: "#fef2f2", color: "#991b1b" },
+  pending: { border: "#fde68a", background: "#fffbeb", color: "#92400e" },
+};
+
+const AttendanceRecordGroup = ({
+  title,
+  records,
+  tone = "pending",
+  emptyMessage,
+  getMeta,
+  action,
+  totalCount = records.length,
+}) => {
+  const colors = ATTENDANCE_GROUP_TONES[tone] || ATTENDANCE_GROUP_TONES.pending;
+
+  return (
+    <section style={{ ...styles.attendanceGroup, borderColor: colors.border }}>
+      <div style={styles.attendanceGroupHeader}>
+        <h3 style={{ ...styles.listHeading, color: colors.color }}>{title}</h3>
+        <span
+          style={{
+            ...styles.attendanceCount,
+            border: `1px solid ${colors.border}`,
+            background: colors.background,
+            color: colors.color,
+          }}
+          aria-label={`${totalCount} records`}
+        >
+          {totalCount}
+        </span>
+      </div>
+
+      {records.length ? (
+        <ul style={styles.attendanceList}>
+          {records.map((record) => (
+            <li key={record.id} style={{ ...styles.attendanceItem, borderColor: colors.border }}>
+              <span style={styles.attendanceTitle}>{getRecordSessionTitle(record, "Class session")}</span>
+              <span style={{ ...styles.attendanceMeta, color: colors.color }}>{getMeta(record)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p style={styles.helper}>{emptyMessage}</p>
+      )}
+
+      {action || null}
+    </section>
+  );
+};
+
 const AttendanceSummaryCard = ({ summary }) => {
   const tone = statusTone(summary.statusLevel);
   const percentLabel = summary.attendanceRate === null ? "—" : `${summary.attendanceRate}%`;
@@ -174,6 +307,7 @@ const AttendanceTab = () => {
   const { t } = useTranslation();
   const { user, studentProfile } = useAuth();
   const [state, setState] = useState({ loading: true, records: [], error: "" });
+  const [showAllPending, setShowAllPending] = useState(false);
 
   const studentCode = useMemo(
     () => studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "",
@@ -241,6 +375,9 @@ const AttendanceTab = () => {
   const presentRecords = useMemo(() => attendanceSummary.markedRecords.filter((record) => record.present === true), [attendanceSummary.markedRecords]);
   const absentRecords = useMemo(() => attendanceSummary.markedRecords.filter((record) => record.present === false), [attendanceSummary.markedRecords]);
   const pendingRecords = useMemo(() => levelRecords.filter((record) => !record.marked || record.present === null), [levelRecords]);
+  const visiblePendingRecords = showAllPending
+    ? pendingRecords
+    : pendingRecords.slice(0, PENDING_PREVIEW_LIMIT);
 
   const attendanceAlerts = useMemo(() => {
     const alerts = [];
@@ -402,47 +539,47 @@ const AttendanceTab = () => {
       ) : null}
 
       {!state.loading && !state.error ? (
-        <details style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }} open={attendanceSummary.attendanceRate !== null && attendanceSummary.attendanceRate < 80}>
-          <summary style={{ cursor: "pointer", fontWeight: 800 }}>Expand attendance details</summary>
-          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", marginTop: 12 }}>
-            <div>
-              <h3 style={styles.listHeading}>{t("attendanceTab.present", { count: presentRecords.length })}</h3>
-              {presentRecords.length ? (
-                <ul style={styles.list}>
-                  {presentRecords.map((record) => (
-                    <li key={record.id}>{getRecordSessionTitle(record, t("attendanceTab.fallback.session"))} · {formatDate(record.date) || record.status}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={styles.helper}>{t("attendanceTab.empty.present")}</p>
-              )}
-            </div>
+        <details style={styles.details} open={attendanceSummary.attendanceRate !== null && attendanceSummary.attendanceRate < 80}>
+          <summary style={styles.detailsSummary}>Attendance details</summary>
+          <div style={styles.detailsGrid}>
+            <AttendanceRecordGroup
+              title="Present"
+              records={presentRecords}
+              tone="present"
+              emptyMessage={t("attendanceTab.empty.present")}
+              getMeta={(record) => formatDate(record.date) || record.status || "Present"}
+            />
 
-            <div>
-              <h3 style={styles.listHeading}>Absent / missed ({absentRecords.length})</h3>
-              {absentRecords.length ? (
-                <ul style={styles.list}>
-                  {absentRecords.map((record) => (
-                    <li key={record.id}>{getRecordSessionTitle(record, t("attendanceTab.fallback.session"))} · {formatDate(record.date) || record.status}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={styles.helper}>No confirmed absence. Keep it up.</p>
-              )}
-            </div>
+            <AttendanceRecordGroup
+              title="Absent / missed"
+              records={absentRecords}
+              tone="absent"
+              emptyMessage="No confirmed absence. Keep it up."
+              getMeta={(record) => formatDate(record.date) || record.status || "Absent"}
+            />
 
-            <div>
-              <h3 style={styles.listHeading}>Pending ({pendingRecords.length})</h3>
-              {pendingRecords.length ? (
-                <ul style={styles.list}>
-                  {pendingRecords.map((record) => (
-                    <li key={record.id}>{getRecordSessionTitle(record, t("attendanceTab.fallback.session"))} · waiting for teacher</li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={styles.helper}>No pending attendance marks.</p>
-              )}
-            </div>
+            <AttendanceRecordGroup
+              title="Pending"
+              records={visiblePendingRecords}
+              totalCount={pendingRecords.length}
+              tone="pending"
+              emptyMessage="No pending attendance marks."
+              getMeta={() => "Waiting for teacher confirmation"}
+              action={
+                pendingRecords.length > PENDING_PREVIEW_LIMIT ? (
+                  <button
+                    type="button"
+                    style={styles.showMoreButton}
+                    onClick={() => setShowAllPending((current) => !current)}
+                    aria-expanded={showAllPending}
+                  >
+                    {showAllPending
+                      ? "Show fewer pending records"
+                      : `Show all ${pendingRecords.length} pending records`}
+                  </button>
+                ) : null
+              }
+            />
           </div>
         </details>
       ) : null}
