@@ -43,8 +43,6 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
-
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -175,142 +173,12 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Prepare one clear 30–45 second introduction for the Amazon interview. The mind map contains the complete
+            task: open each branch, practise the sentence, and connect the five parts into one answer.
+          </p>
           <SpeakingMindMap config={getA2SpeakingMindMap(13)} />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we&apos;ll engage in group exercises on <strong>„Mein Beruf und ich“</strong>.
-          </p>
-
-          <h3 style={sectionTitle}>Zentrales Thema: „Mein Beruf und ich“</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Wer bist du?</strong>
-              <ul style={listSpacing}>
-                <li>Name – „Ich heiße ...“</li>
-                <li>Wohnort – „Ich wohne in ...“</li>
-                <li>Alter – „Ich bin ... Jahre alt.“</li>
-                <li>Interessen – „Ich interessiere mich für ...“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Welche Ausbildung hast du?</strong>
-              <ul style={listSpacing}>
-                <li>Schulabschluss – „Ich habe meinen Abschluss in ... gemacht.“</li>
-                <li>Studium oder Ausbildung – „Ich habe eine Ausbildung als ... gemacht.“</li>
-                <li>Zusätzliche Kurse – „Ich habe einen Kurs in ... gemacht.“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Welche Berufserfahrung hast du?</strong>
-              <ul style={listSpacing}>
-                <li>Praktikum – „Ich habe ein Praktikum bei ... gemacht.“</li>
-                <li>Berufserfahrung – „Ich habe ... Jahre als ... gearbeitet.“</li>
-                <li>Arbeitsstil – „Ich arbeite gern im Team/allein.“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Welche Fähigkeiten und Qualifikationen hast du?</strong>
-              <ul style={listSpacing}>
-                <li>Sprachen – „Ich spreche ...“</li>
-                <li>Technische Fähigkeiten – „Ich kann mit ... arbeiten.“</li>
-                <li>Soziale Fähigkeiten – „Ich bin teamfähig und kommunikativ.“</li>
-                <li>Andere Fähigkeiten – „Ich bin kreativ und organisiert.“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Warum möchtest du diesen Job?</strong>
-              <ul style={listSpacing}>
-                <li>Motivation – „Ich interessiere mich für ...“</li>
-                <li>Berufsziel – „Ich möchte in der Zukunft ...“</li>
-                <li>Karrierechancen – „Dieser Beruf hat gute Chancen für mich.“</li>
-                <li>Neue Erfahrungen – „Ich möchte neue Dinge lernen.“</li>
-              </ul>
-            </li>
-          </ol>
-
-          <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
-            <strong>Beispielantwort (Example Answer)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Ich heiße Maria und bin 25 Jahre alt. Ich habe eine Ausbildung als Bürokauffrau gemacht. Ich habe ein
-              Praktikum in einem Unternehmen gemacht und arbeite gern im Team. Ich kann gut mit Computern arbeiten und
-              spreche Englisch und Deutsch. Ich interessiere mich für Verwaltung und möchte in einem Büro arbeiten.“
-            </p>
-          </div>
-
-          <h3 style={sectionTitle}>Hauptfrage</h3>
-          <div style={{ ...questionCardStyle, background: "#eff6ff" }}>
-            <strong>Sie befinden sich in einem Vorstellungsgespräch bei Amazon. Bitte stellen Sie sich vor.</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>Gehen Sie in Ihrer Antwort auf diese Punkte ein:</p>
-            <ul style={listSpacing}>
-              <li><strong>Wer sind Sie?</strong> Nennen Sie zum Beispiel Ihren Namen, Ihren Wohnort und Ihre Interessen.</li>
-              <li><strong>Welche Ausbildung bringen Sie mit?</strong></li>
-              <li><strong>Welche Berufserfahrung haben Sie?</strong></li>
-              <li><strong>Welche Fähigkeiten und Qualifikationen besitzen Sie?</strong></li>
-              <li><strong>Warum interessieren Sie sich für diese Position bei Amazon?</strong></li>
-            </ul>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>Sprechen Sie in vollständigen Sätzen.</p>
-          </div>
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Schlüsselwörter: Name · Ausbildung · Berufserfahrung · Fähigkeiten · Motivation · Qualifikationen · Interessen · Berufsziel
-          </p>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-            So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
-          </p>
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Schnelle Struktur für 30–45 Sekunden</strong>
-            <ol style={listSpacing}>
-              <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
-              <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
-              <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
-              <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
-            </ol>
-          </div>
-          <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
-                <li>„Ich möchte kurz etwas über … sagen.“</li>
-                <li>„Mein Thema ist …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter / Connectors</strong>
-              <ul style={listSpacing}>
-                <li><strong>und</strong> · „Ich fahre Bus und ich gehe zu Fuß.“</li>
-                <li><strong>oder</strong> · „Ich nehme den Zug oder den Bus.“</li>
-                <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
-                <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich finde … gut, weil …“</li>
-                <li>„Für mich ist … wichtig.“</li>
-                <li>„Meiner Meinung nach ist … praktisch.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zum Schluss kann ich sagen: …“</li>
-                <li>„Deshalb finde ich … gut.“</li>
-                <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
-              </ul>
-            </div>
-          </div>
-
           <SpeakingPracticeTimerCard />
-
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über ein Vorstellungsgespräch. Zuerst begrüße ich die Person freundlich und stelle mich kurz vor. Dann erkläre ich meine Erfahrung, weil das für die Stelle wichtig ist. Außerdem sage ich, warum ich in der Firma arbeiten möchte. Zum Beispiel kann ich sagen: Ich bin zuverlässig und arbeite gern im Team. Zum Schluss bedanke ich mich für das Gespräch und frage nach dem nächsten Schritt.“
-            </p>
-          </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
