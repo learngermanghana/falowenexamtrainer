@@ -49,12 +49,6 @@ const imageStyle = {
   objectFit: "cover",
 };
 
-const phraseGridStyle = {
-  display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-};
-
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -188,45 +182,11 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Prepare one clear 30–45 second answer about your favourite sport. The mind map contains the complete task:
+            open each branch, practise the sentence, and connect the five parts into one answer.
+          </p>
           <SpeakingMindMap config={getA2SpeakingMindMap(15)} />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we discuss sport, training, health benefits and favourite activities.
-          </p>
-
-          <h3 style={sectionTitle}>Zentrales Thema: „Mein Lieblingssport“</h3>
-          <ol style={listSpacing}>
-            <li><strong>Sportart:</strong> Fußball, Basketball, Schwimmen, Tennis, Laufen, Radfahren.</li>
-            <li><strong>Training:</strong> Wie oft trainierst du? Trainierst du allein oder mit Freunden?</li>
-            <li><strong>Gesundheit:</strong> Warum ist der Sport gut für deine Fitness?</li>
-            <li><strong>Meinung:</strong> Warum magst du diesen Sport?</li>
-          </ol>
-
-          <div style={questionCardStyle}>
-            <strong>Frage zur Diskussion</strong>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>Was ist Ihr Lieblingssport und warum?</p>
-            <p style={{ margin: 0 }}><strong>Vier Schlüsselwörter:</strong> Fußball · Fitness · gesund · Freunde</p>
-          </div>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-          </p>
-          <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
-                <li>„Mein Thema ist …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter</strong>
-              <ul style={listSpacing}>
-                <li><strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong></li>
-              </ul>
-            </div>
-          </div>
-
           <SpeakingPracticeTimerCard />
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
