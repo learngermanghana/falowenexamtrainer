@@ -59,10 +59,9 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const quickQuestionInputRef = useRef(null);
   const chatEndRef = useRef(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  // Keep the compact bar visible on workbook entry. Starting in the dismissed
-  // state made Study Buddy look unavailable until students noticed the small
-  // reopen control in the corner.
-  const [isDismissed, setIsDismissed] = useState(false);
+  // Keep the lightweight launcher available on every workbook page without
+  // forcing the chat panel open over lesson content.
+  const [isDismissed, setIsDismissed] = useState(true);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
@@ -596,7 +595,9 @@ const StudyBuddyBar = ({ studentProfile }) => {
         className={`study-buddy-reopen${isHighContrast ? " is-high-contrast" : ""}`}
         type="button"
         onClick={() => {
+          setIsCollapsed(false);
           setIsDismissed(false);
+          playOpenFeedback();
           trackStudyBuddyEvent("reopen");
         }}
         aria-label={t("studyBuddy.actions.reopenAria")}
@@ -624,9 +625,16 @@ const StudyBuddyBar = ({ studentProfile }) => {
               className="study-buddy-toggle"
               type="button"
               onClick={() => {
-                const nextCollapsed = !isCollapsed;
-                setIsCollapsed(nextCollapsed);
-                trackStudyBuddyEvent(nextCollapsed ? "collapse" : "expand");
+                if (isCollapsed) {
+                  setIsCollapsed(false);
+                  playOpenFeedback();
+                  trackStudyBuddyEvent("expand");
+                  return;
+                }
+                setIsCollapsed(true);
+                setIsDismissed(true);
+                triggerInteractionFeedback({ sound: "close" });
+                trackStudyBuddyEvent("collapse");
               }}
               aria-expanded={!isCollapsed}
               aria-controls={contentId}
@@ -857,6 +865,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
             className="study-buddy-mobile-close"
             onClick={() => {
               setIsCollapsed(true);
+              setIsDismissed(true);
+              triggerInteractionFeedback({ sound: "close" });
               trackStudyBuddyEvent("collapse", { source: "mobile_close" });
             }}
             aria-label={t("studyBuddy.actions.collapse")}

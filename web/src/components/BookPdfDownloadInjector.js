@@ -88,7 +88,13 @@ export default function BookPdfDownloadInjector() {
 
   return (
     <>
-      <style>{`@media print { .book-pdf-download-action { display: none !important; } }`}</style>
+      <style>{`@media print {
+        .book-pdf-download-action,
+        .study-buddy-bar,
+        .study-buddy-reopen {
+          display: none !important;
+        }
+      }`}</style>
       {showInlineA1Action ? (
         <div className="book-pdf-download-action" style={inlineActionStyle}>
           <button
