@@ -154,6 +154,54 @@ const bankAnrufenExtraHelp = {
     "Guten Tag, mein Name ist Ama Mensah. Ich rufe an, weil ich meine Bankkarte verloren habe. Könnten Sie die Karte bitte sofort sperren? Außerdem möchte ich wissen, ob ich am Schalter Geld abheben kann. Wie hoch ist mein Tageslimit? Könnten Sie mir die Informationen bitte per E-Mail schicken? Vielen Dank für Ihre Hilfe. Auf Wiederhören.",
 };
 
+const vorstellungsgespraechBranches = [
+  branch(
+    "vorstellung",
+    "Vorstellung",
+    "topic",
+    ["Name", "Wohnort", "Interessen"],
+    "Wer sind Sie?",
+    "Guten Tag, mein Name ist ...",
+    "Guten Tag, mein Name ist Ama Mensah. Ich wohne in Accra und interessiere mich für Kundenservice.",
+  ),
+  branch(
+    "ausbildung",
+    "Ausbildung",
+    "detail",
+    ["Abschluss", "Ausbildung", "Kurse"],
+    "Welche Ausbildung bringen Sie mit?",
+    "Ich habe eine Ausbildung als ... gemacht.",
+    "Ich habe eine Ausbildung als Bürokauffrau gemacht und zusätzlich einen Computerkurs besucht.",
+  ),
+  branch(
+    "berufserfahrung",
+    "Berufserfahrung",
+    "example",
+    ["Praktikum", "Aufgaben", "Arbeitsstil"],
+    "Welche Berufserfahrung haben Sie?",
+    "Ich habe bereits als ... gearbeitet.",
+    "Ich habe bereits im Verkauf gearbeitet und dort Bestellungen organisiert sowie Kunden beraten.",
+  ),
+  branch(
+    "faehigkeiten",
+    "Fähigkeiten",
+    "opinion",
+    ["Sprachen", "Teamarbeit", "Organisation"],
+    "Welche Fähigkeiten und Qualifikationen besitzen Sie?",
+    "Ich bin ... und kann gut ...",
+    "Ich bin zuverlässig und freundlich, spreche Deutsch und Englisch und arbeite gern im Team.",
+  ),
+  branch(
+    "motivation",
+    "Motivation",
+    "closing",
+    ["Interesse", "Berufsziel", "Amazon"],
+    "Warum interessieren Sie sich für diese Position bei Amazon?",
+    "Ich interessiere mich für diese Stelle, weil ...",
+    "Ich interessiere mich für diese Stelle, weil ich gern mit Menschen arbeite und mich beruflich weiterentwickeln möchte.",
+  ),
+];
+
 const topics = [
   [1, "a2-day-1-small-talk", "Small Talk", "Wie führst du ein kurzes freundliches Gespräch?", ["Begrüßung", "Kennenlernen", "Arbeit oder Studium", "Freizeit", "Gespräch beenden"], earlyA2LessonBranchesByDay[1]],
   [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"], personenBeschreibenBranches],
@@ -167,7 +215,7 @@ const topics = [
   [10, "a2-day-10-tourismus-feste", "Tourismus und traditionelle Feste", "Welches Fest oder welchen Ort empfiehlst du?", ["Ort", "Fest", "Essen", "Aktivitäten", "Tipp"]],
   [11, "a2-day-11-verkehrsmittel", "Verkehrsmittel vergleichen", "Welches Verkehrsmittel benutzt du und warum?", ["Verkehrsmittel", "Preis", "Zeit", "Komfort", "Meinung"]],
   [12, "a2-day-12-traumberuf", "Mein Traumberuf", "Was ist dein Traumberuf und warum?", ["Beruf", "Aufgaben", "Ort", "Stärken", "Ziel"]],
-  [13, "a2-day-13-vorstellungsgespraech", "Ein Vorstellungsgespräch", "Wie stellst du dich in einem Vorstellungsgespräch vor?", ["Begrüßung", "Erfahrung", "Stärken", "Fragen", "Abschluss"]],
+  [13, "a2-day-13-vorstellungsgespraech", "Ein Vorstellungsgespräch", "Sie sind bei Amazon im Vorstellungsgespräch. Wie stellen Sie sich vor?", ["Vorstellung", "Ausbildung", "Berufserfahrung", "Fähigkeiten", "Motivation"], vorstellungsgespraechBranches],
   [14, "a2-day-14-beruf-karriere", "Beruf und Karriere", "Was ist dir im Beruf wichtig?", ["Arbeit", "Team", "Arbeitszeit", "Gehalt", "Zukunft"]],
   [15, "a2-day-15-lieblingssport", "Mein Lieblingssport", "Welchen Sport magst du und warum?", ["Sportart", "Ort", "Personen", "Training", "Gefühl"]],
   [16, "a2-day-16-wohlbefinden", "Wohlbefinden und Entspannung", "Was machst du für dein Wohlbefinden?", ["Stress", "Entspannung", "Schlaf", "Bewegung", "Tipp"]],
