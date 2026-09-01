@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -10,25 +10,12 @@ import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import {
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+  WorkbookTabNav,
+} from "./StandardWorkbookComponents";
 
-const tabs = [
-  { key: "grammar", label: "Grammar" },
-  { key: "sprechen", label: "Teil 1" },
-  { key: "schreiben", label: "Teil 2" },
-  { key: "lesen", label: "Teil 3" },
-  { key: "hoeren", label: "Teil 4" },
-  { key: "references", label: "Ref" },
-  { key: "submit", label: "Submit" },
-];
-
-const tabDescriptions = {
-  sprechen: "Sprechen · Group Practice",
-  schreiben: "Schreiben · Assignment",
-  lesen: "Lesen · Reading questions",
-  hoeren: "Hören · Listening questions",
-  references: "Reference answers",
-  submit: "Submit final answers",
-};
+const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
 const card = {
   ...styles.card,
@@ -63,19 +50,6 @@ const videoPreviewStyle = {
   minHeight: 315,
   border: 0,
   borderRadius: 10,
-};
-
-const workbookTabBarStyle = {
-  position: "sticky",
-  top: 0,
-  zIndex: 20,
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-  padding: "10px 0",
-  background: "rgba(255,255,255,0.96)",
-  backdropFilter: "blur(10px)",
-  borderBottom: "1px solid #e5e7eb",
 };
 
 const lesenQuestions = [
@@ -152,26 +126,6 @@ const hoerenQuestions = [
   },
 ];
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-        fontWeight: active ? 800 : 700,
-        minWidth: 88,
-        boxShadow: active ? "0 0 0 2px rgba(37,99,235,0.16)" : "none",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -188,8 +142,6 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
     hoeren: false,
   });
 
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
-
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
@@ -199,20 +151,17 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 13 Workbook · Ein Vorstellungsgespräch</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          Select Grammar, Teil 1–4, Ref or Submit below.
         </p>
 
-        <div style={workbookTabBarStyle} aria-label="Workbook parts navigation">
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
+        <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}>
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            ariaLabel="A2 Day 13 workbook sections"
+          />
         </div>
-
-        <p style={{ margin: 0, color: "#4b5563", fontWeight: 700 }}>
-          {activeIndex + 1}. {tabDescriptions[activeTab] || "Workbook section"}
-        </p>
       </div>
 
       {activeTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={13} /></div>}
@@ -301,8 +250,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             <p style={{ margin: 0, lineHeight: 1.7 }}>Sprechen Sie in vollständigen Sätzen.</p>
           </div>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Schlüsselwörter: Name · Ausbildung · Berufserfahrung · Fähigkeiten · Motivation · Qualifikationen · Interessen ·
-            Berufsziel
+            Schlüsselwörter: Name · Ausbildung · Berufserfahrung · Fähigkeiten · Motivation · Qualifikationen · Interessen · Berufsziel
           </p>
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
@@ -384,8 +332,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             <strong>Thema: Bewerbung um eine Stelle im CityMall Einkaufszentrum</strong>
           </p>
           <p style={{ margin: 0 }}>
-            Sie möchten sich bei CityMall Einkaufszentrum um eine Stelle als Verkäufer/in oder
-            Kundenservice-Mitarbeiter/in bewerben. Schreiben Sie einen formellen Brief.
+            Sie möchten sich bei CityMall Einkaufszentrum um eine Stelle als Verkäufer/in oder Kundenservice-Mitarbeiter/in bewerben. Schreiben Sie einen formellen Brief.
           </p>
           <p style={{ margin: 0 }}>Punkte, die Sie beachten sollen:</p>
           <ol style={listSpacing}>
@@ -412,32 +359,18 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
           <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the Submit
-            tab to send your answers.
+            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the Submit tab to send your answers.
           </p>
 
           <h3 style={sectionTitle}>Kinderbetreuung in Deutschland (A2-Niveau)</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In Deutschland gibt es viele Möglichkeiten für kleine Kinder. Wenn Vater und Mutter arbeiten, können sie ihr
-            Kind in eine Kinderkrippe bringen. Eine Kinderkrippe ist für Kinder bis 3 Jahre. Es gibt nur wenige Plätze.
-            Man muss das Kind früh anmelden. Ab 3 Jahren können Kinder in den Kindergarten gehen. Dort können sie spielen,
-            singen, malen und basteln. Im Sommer gehen viele Erzieherinnen mit den Kindern nach draußen. Viele Kindergärten
-            helfen auch mit der Sprache. Die Kinder hören Geschichten und machen Sprachspiele. Ein Kindergarten ist eine
-            gute Vorbereitung für die Schule. Aber es gibt nicht überall genug Plätze. Man muss das Kind rechtzeitig
-            anmelden. Einige Kindergärten sind vormittags offen (z. B. 7–13 Uhr). Andere Kindergärten sind den ganzen Tag
-            offen (z. B. 7–17 Uhr). Diese heißen Kitas. In einer Kita bekommt das Kind auch Mittagessen. Die Eltern müssen
-            für den Kindergarten Geld bezahlen. Der Preis ist in jedem Bundesland anders. Wer wenig Geld hat, zahlt
-            weniger. Wer mehr verdient, zahlt mehr. Private Kindergärten sind teurer als staatliche. In einigen privaten
-            Kitas spricht man zwei Sprachen, zum Beispiel Deutsch und Spanisch. Vor der Schule machen viele Kinder einen
-            Sprachtest. Wenn ein Kind noch nicht gut Deutsch spricht, bekommt es Hilfe beim Deutschlernen.
+            In Deutschland gibt es viele Möglichkeiten für kleine Kinder. Wenn Vater und Mutter arbeiten, können sie ihr Kind in eine Kinderkrippe bringen. Eine Kinderkrippe ist für Kinder bis 3 Jahre. Es gibt nur wenige Plätze. Man muss das Kind früh anmelden. Ab 3 Jahren können Kinder in den Kindergarten gehen. Dort können sie spielen, singen, malen und basteln. Im Sommer gehen viele Erzieherinnen mit den Kindern nach draußen. Viele Kindergärten helfen auch mit der Sprache. Die Kinder hören Geschichten und machen Sprachspiele. Ein Kindergarten ist eine gute Vorbereitung für die Schule. Aber es gibt nicht überall genug Plätze. Man muss das Kind rechtzeitig anmelden. Einige Kindergärten sind vormittags offen (z. B. 7–13 Uhr). Andere Kindergärten sind den ganzen Tag offen (z. B. 7–17 Uhr). Diese heißen Kitas. In einer Kita bekommt das Kind auch Mittagessen. Die Eltern müssen für den Kindergarten Geld bezahlen. Der Preis ist in jedem Bundesland anders. Wer wenig Geld hat, zahlt weniger. Wer mehr verdient, zahlt mehr. Private Kindergärten sind teurer als staatliche. In einigen privaten Kitas spricht man zwei Sprachen, zum Beispiel Deutsch und Spanisch. Vor der Schule machen viele Kinder einen Sprachtest. Wenn ein Kind noch nicht gut Deutsch spricht, bekommt es Hilfe beim Deutschlernen.
           </p>
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {lesenQuestions.map((question, index) => (
             <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                {index + 1}. {question.stem}
-              </strong>
+              <strong>{index + 1}. {question.stem}</strong>
               {question.options.map((option) => (
                 <span key={option}>{option}</span>
               ))}
@@ -478,9 +411,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (
             <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                {index + 1}. {question.stem}
-              </strong>
+              <strong>{index + 1}. {question.stem}</strong>
               {question.options.map((option) => (
                 <span key={option}>{option}</span>
               ))}
@@ -495,7 +426,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
       {activeTab === "references" && (
         <WorkbookReferenceAnswers
           level="A2"
-          lesson={{ title: "A2Day13Vorstellungsgespraech", level: "A2", workbookId: "A2Day13Vorstellungsgespraech" }}
+          lesson={{ title: "A2Day13Vorstellungsgespraech", level: "A2", day: 13, workbookId: "A2Day13Vorstellungsgespraech" }}
           workbookId="A2Day13Vorstellungsgespraech"
         />
       )}
