@@ -82,6 +82,14 @@ const ensureNavHost = (root) => {
   return host;
 };
 
+const setLegacyBodyVisible = (root, visible) => {
+  const container = root?.firstElementChild;
+  if (!container) return;
+  Array.from(container.children).slice(1).forEach((child) => {
+    child.style.display = visible ? "" : "none";
+  });
+};
+
 export default function A2LegacyStandardWorkbookNavBridge({
   legacyRootRef,
   day,
@@ -109,7 +117,7 @@ export default function A2LegacyStandardWorkbookNavBridge({
 
     const sync = () => {
       const host = ensureNavHost(root);
-      if (host && host !== navHost) setNavHost(host);
+      setNavHost((current) => current || host);
       hideLegacyNavigation(root);
       setLegacyHasSubmit(Boolean(findLegacyButton(root, "submit")));
     };
@@ -123,13 +131,13 @@ export default function A2LegacyStandardWorkbookNavBridge({
       const host = root.querySelector("[data-a2-standard-nav-host]");
       if (host) host.remove();
     };
-  }, [legacyRootRef, navHost]);
+  }, [legacyRootRef]);
 
   useEffect(() => {
     const root = legacyRootRef?.current;
     if (!root) return;
     const usingFallbackSubmit = activeTab === "submit" && !legacyHasSubmit;
-    root.style.display = usingFallbackSubmit ? "none" : "block";
+    setLegacyBodyVisible(root, !usingFallbackSubmit);
   }, [activeTab, legacyHasSubmit, legacyRootRef]);
 
   const changeTab = (nextTab) => {
