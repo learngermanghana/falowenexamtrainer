@@ -85,6 +85,80 @@ const recordTime = (record = {}) => {
   return 0;
 };
 
+const getCourseDayNumber = (record = {}) => {
+  for (const value of [record.dayNumber, record.courseDay, record.lessonDay, record.assignmentDay]) {
+    if (value === null || value === undefined || value === "") continue;
+    const parsed = Number(value);
+    if (Number.isInteger(parsed) && parsed >= 0) return parsed;
+  }
+
+  const label = [
+    record.sessionLabel,
+    record.title,
+    record.topic,
+    record.chapter,
+    record.note,
+  ]
+    .map(normalizeValue)
+    .filter(Boolean)
+    .join(" ");
+  const match = label.match(/\b(?:day|tag|jour)\s*[:#-]?\s*0*(\d{1,3})\b/i);
+  return match ? Number(match[1]) : null;
+};
+
+const attendanceStatusRank = (record = {}) => {
+  if (record.present === true) return 3;
+  if (record.present === false && record.marked !== false) return 2;
+  return 1;
+};
+
+const mergeCourseDayRecords = (current = {}, candidate = {}) => {
+  const currentRank = attendanceStatusRank(current);
+  const candidateRank = attendanceStatusRank(candidate);
+  const candidateWins =
+    candidateRank > currentRank ||
+    (candidateRank === currentRank && recordTime(candidate) > recordTime(current));
+  const winner = candidateWins ? candidate : current;
+  const fallback = candidateWins ? current : candidate;
+
+  return {
+    ...fallback,
+    ...winner,
+    id: winner.id || fallback.id,
+    sessionLabel: normalizeValue(winner.sessionLabel) || fallback.sessionLabel || "",
+    title: normalizeValue(winner.title) || fallback.title || "",
+    topic: normalizeValue(winner.topic) || fallback.topic || "",
+    date: winner.date || fallback.date || "",
+    sessionDate: winner.sessionDate || fallback.sessionDate || "",
+  };
+};
+
+export const reconcileAttendanceRecords = (records = []) => {
+  const reconciled = [];
+  const courseDayIndexes = new Map();
+
+  records.forEach((record) => {
+    const dayNumber = getCourseDayNumber(record);
+    if (dayNumber === null) {
+      reconciled.push(record);
+      return;
+    }
+
+    const level = normalizeValue(record.level).toUpperCase() || "ANY";
+    const key = `${level}:DAY:${dayNumber}`;
+    const existingIndex = courseDayIndexes.get(key);
+    if (existingIndex === undefined) {
+      courseDayIndexes.set(key, reconciled.length);
+      reconciled.push(record);
+      return;
+    }
+
+    reconciled[existingIndex] = mergeCourseDayRecords(reconciled[existingIndex], record);
+  });
+
+  return reconciled;
+};
+
 const mergeAttendanceResults = (results = []) => {
   const recordsByKey = new Map();
   const idIndex = new Map();
@@ -103,7 +177,8 @@ const mergeAttendanceResults = (results = []) => {
     });
   });
 
-  const records = Array.from(recordsByKey.values()).sort((left, right) => recordTime(left) - recordTime(right));
+  const records = reconcileAttendanceRecords(Array.from(recordsByKey.values()))
+    .sort((left, right) => recordTime(left) - recordTime(right));
   const presentRecords = records.filter((record) => record.present === true);
 
   return {
