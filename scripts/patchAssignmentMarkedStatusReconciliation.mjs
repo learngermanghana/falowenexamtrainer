@@ -12,11 +12,19 @@ const ensureReplace = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-ensureReplace(
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport { fetchStudentResultsHistory } from "../services/resultsApi";\nimport { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";',
-  "results service import anchor",
-);
+const interactionImport = 'import { triggerInteractionFeedback } from "../services/interactionFeedback";';
+const resultsApiImport = 'import { fetchStudentResultsHistory } from "../services/resultsApi";';
+const resultsSheetImport = 'import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";';
+
+if (!source.includes(resultsApiImport)) {
+  if (!source.includes(interactionImport)) throw new Error("Could not find results service import anchor.");
+  source = source.replace(interactionImport, `${interactionImport}\n${resultsApiImport}`);
+}
+if (!source.includes(resultsSheetImport)) {
+  const anchor = source.includes(resultsApiImport) ? resultsApiImport : interactionImport;
+  if (!source.includes(anchor)) throw new Error("Could not find results sheet import anchor.");
+  source = source.replace(anchor, `${anchor}\n${resultsSheetImport}`);
+}
 
 ensureReplace(
   '  const { user, studentProfile } = useAuth();',
@@ -65,6 +73,13 @@ ensureReplace(
   'Status: {resolveSubmissionHistoryStatus(entry)}',
   "submission history status label",
 );
+
+if ((source.match(/from "\.\.\/services\/resultsApi";/g) || []).length !== 1) {
+  throw new Error("Expected exactly one resultsApi import after reconciliation patch.");
+}
+if ((source.match(/from "\.\.\/services\/resultsSheetService";/g) || []).length !== 1) {
+  throw new Error("Expected exactly one resultsSheetService import after reconciliation patch.");
+}
 
 fs.writeFileSync(targetPath, source, "utf8");
 console.log("Assignment submission history now reconciles A1/A2/B1 statuses with marked results.");

@@ -20,10 +20,25 @@ const STRONG_ADJECTIVE_ENDINGS = {
   genitive: { masculine: "en", feminine: "er", neuter: "en", plural: "er" },
 };
 
-// Keep only nouns whose number can be inferred safely from the written form.
-// Verkehrsmittel is deliberately excluded because singular and plural are
-// identical outside dative plural, so forcing one number would change meaning.
-const ARTICLELESS_NOUNS = new Map();
+// Keep only nouns whose number can be inferred safely enough for articleless
+// writing feedback. "Verkehrsmittel" is treated as plural here because the
+// coach uses it for the common public-transport phrase and must produce the
+// dative plural form "Verkehrsmitteln" after prepositions such as "von".
+const ARTICLELESS_NOUNS = new Map([
+  [
+    "verkehrsmittel",
+    {
+      number: "plural",
+      display: "Verkehrsmittel",
+      forms: {
+        nominative: "Verkehrsmittel",
+        accusative: "Verkehrsmittel",
+        dative: "Verkehrsmitteln",
+        genitive: "Verkehrsmittel",
+      },
+    },
+  ],
+]);
 
 const onlyWhitespaceBetween = (text, left, right) =>
   /^\s+$/u.test(text.slice(left.end, right.start));

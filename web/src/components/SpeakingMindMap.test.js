@@ -48,24 +48,24 @@ test("moves through the configured speaking route", async () => {
   expect(screen.getByText(/2\s*\/\s*5/)).toBeInTheDocument();
 });
 
-test("starts A2 focus mode collapsed and opens extra speaking help", async () => {
+test("starts A2 focus mode with speaking help open and allows it to collapse", async () => {
   const { container } = render(<SpeakingMindMap config={config} />);
   const root = container.querySelector("[data-speaking-mind-map]");
 
   expect(root).toHaveAttribute("data-focus-mode", "true");
-  expect(root).toHaveAttribute("data-help-open", "false");
-  expect(
-    screen.getByRole("button", { name: "More speaking help" }),
-  ).toHaveAttribute("aria-expanded", "false");
-
-  await userEvent.click(
-    screen.getByRole("button", { name: "More speaking help" }),
-  );
-
   expect(root).toHaveAttribute("data-help-open", "true");
   expect(
-    screen.getByRole("button", { name: "Hide extra speaking help" }),
+    screen.getByRole("button", { name: "Collapse speaking help" }),
   ).toHaveAttribute("aria-expanded", "true");
+
+  await userEvent.click(
+    screen.getByRole("button", { name: "Collapse speaking help" }),
+  );
+
+  expect(root).toHaveAttribute("data-help-open", "false");
+  expect(
+    screen.getByRole("button", { name: "Expand speaking help" }),
+  ).toHaveAttribute("aria-expanded", "false");
 });
 
 test("allows focus mode to be disabled for advanced layouts", () => {
@@ -80,7 +80,7 @@ test("allows focus mode to be disabled for advanced layouts", () => {
     container.querySelector("[data-speaking-mind-map]"),
   ).toHaveAttribute("data-focus-mode", "false");
   expect(
-    screen.queryByRole("button", { name: "More speaking help" }),
+    screen.queryByRole("button", { name: "Expand speaking help" }),
   ).not.toBeInTheDocument();
 });
 

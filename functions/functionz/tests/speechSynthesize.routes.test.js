@@ -1,13 +1,13 @@
 const http = require("http");
 
 let mockDb;
-const verifyIdToken = jest.fn(async () => ({ uid: "uid-tts", email: "student@example.com" }));
-const speechCreate = jest.fn();
+const mockVerifyIdToken = jest.fn(async () => ({ uid: "uid-tts", email: "student@example.com" }));
+const mockSpeechCreate = jest.fn();
 const auditAdd = jest.fn(async () => ({}));
 
 jest.mock("firebase-admin", () => ({
   apps: [{}],
-  auth: () => ({ verifyIdToken }),
+  auth: () => ({ verifyIdToken: mockVerifyIdToken }),
   firestore: () => mockDb,
   credential: { cert: jest.fn() },
   initializeApp: jest.fn(),
@@ -15,7 +15,7 @@ jest.mock("firebase-admin", () => ({
 
 jest.mock("../openaiClient", () => ({
   createChatCompletion: jest.fn(),
-  getOpenAIClient: jest.fn(() => ({ audio: { speech: { create: speechCreate } } })),
+  getOpenAIClient: jest.fn(() => ({ audio: { speech: { create: mockSpeechCreate } } })),
 }));
 
 const admin = require("firebase-admin");
@@ -65,12 +65,11 @@ beforeEach(() => {
   process.env.OPENAI_API_KEY = "test-key";
   delete process.env.OPENAI_TTS_MODEL;
   delete process.env.OPENAI_TTS_VOICE;
-  speechCreate.mockResolvedValue({ arrayBuffer: async () => Buffer.from("mp3-bytes") });
+  mockSpeechCreate.mockResolvedValue({ arrayBuffer: async () => Buffer.from("mp3-bytes") });
 });
 
 describe("POST /speech/synthesize", () => {
   it("requires authentication", async () => {
-    verifyIdToken.mockResolvedValueOnce(null);
     const res = await postJson("/speech/synthesize", { text: "Hallo", level: "A2" });
     expect(res.status).toBe(401);
   });
@@ -86,7 +85,7 @@ describe("POST /speech/synthesize", () => {
     mockDb = makeDb({ currentTts: 30 });
     const res = await postJson("/speech/synthesize", { text: "Hallo", level: "A2" }, { Authorization: "Bearer token" });
     expect(res.status).toBe(429);
-    expect(speechCreate).not.toHaveBeenCalled();
+    expect(mockSpeechCreate).not.toHaveBeenCalled();
   });
 
   it("calls OpenAI speech with expected options and returns audio/mpeg", async () => {
@@ -98,18 +97,18 @@ describe("POST /speech/synthesize", () => {
     expect(res.headers["content-type"]).toContain("audio/mpeg");
     expect(res.headers["cache-control"]).toBe("private, max-age=3600");
     expect(res.buffer.toString()).toBe("mp3-bytes");
-    expect(speechCreate).toHaveBeenCalledWith(expect.objectContaining({ model: "tts-model", voice: "voice-name", input: text, response_format: "mp3", speed: 0.94, instructions: expect.stringContaining("Standard German") }));
+    expect(mockSpeechCreate).toHaveBeenCalledWith(expect.objectContaining({ model: "tts-model", voice: "voice-name", input: text, response_format: "mp3", speed: 0.94, instructions: expect.stringContaining("Standard German") }));
   });
 
   it("uses supported level speed and safe logs without full input", async () => {
     const secretText = `Hallo ${"secret ".repeat(20)}`;
     await postJson("/speech/synthesize", { text: secretText, level: "C1" }, { Authorization: "Bearer token" });
-    expect(speechCreate).toHaveBeenCalledWith(expect.objectContaining({ speed: 1.03 }));
+    expect(mockSpeechCreate).toHaveBeenCalledWith(expect.objectContaining({ speed: 1.03 }));
     expect(JSON.stringify(auditAdd.mock.calls)).not.toContain(secretText);
   });
 
   it("returns a safe structured error when OpenAI speech fails", async () => {
-    speechCreate.mockRejectedValueOnce(new Error("provider exploded with details"));
+    mockSpeechCreate.mockRejectedValueOnce(new Error("provider exploded with details"));
     const res = await postJson("/speech/synthesize", { text: "Hallo", level: "B2" }, { Authorization: "Bearer token" });
     expect(res.status).toBe(502);
     expect(res.body).toEqual({ error: "Speech generation failed", code: "speech_generation_failed" });

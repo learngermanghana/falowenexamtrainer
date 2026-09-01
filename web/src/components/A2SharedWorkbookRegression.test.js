@@ -227,7 +227,7 @@ describe("shared A2 workbook regression", () => {
     expect(document.body.textContent).toContain("Teil 4 is self-check practice and is not submitted");
   });
 
-  it("labels Day 25 Teil 4 as Lesen and removes legacy reminder noise", () => {
+  it("labels Day 25 Teil 4 as Lesen and safely hides React-owned reminder noise", () => {
     document.body.innerHTML = `
       <main class="layout-main">
         <div data-a2-standard-legacy-nav-root="day-25">
@@ -251,15 +251,21 @@ describe("shared A2 workbook regression", () => {
     ).toBe(true);
     expect(document.querySelector("#day25-teil4 span:nth-child(2)").textContent).toBe("Lesen");
     expect(document.body.textContent).toContain("This workbook has no Hören assignment");
-    expect(document.querySelectorAll('[role="note"]')).toHaveLength(0);
+    const day25Reminder = document.querySelector('[role="note"]');
+    expect(day25Reminder).not.toBeNull();
+    expect(day25Reminder).toHaveAttribute("data-a2-react-owned-hidden", "true");
+    expect(day25Reminder).not.toBeVisible();
   });
 
-  it("leaves Days 27 and 28 on their native working standard navigation", () => {
-    [day27, day28].forEach((source) => {
-      expect(source).toContain("STANDARD_WORKBOOK_TABS");
-      expect(source).toContain("WorkbookTabNav");
-      expect(source).toContain('activeTab === "submit"');
-    });
+  it("keeps Day 27 on the shared shell and Day 28 on native standard navigation", () => {
+    expect(day27).toContain("A2StandardTabbedWorkbookPage");
+    expect(standardShell).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
+    expect(standardShell).toContain("WorkbookTabNav");
+    expect(standardShell).toContain('activeTab === "submit"');
+
+    expect(day28).toContain("STANDARD_WORKBOOK_TABS");
+    expect(day28).toContain("WorkbookTabNav");
+    expect(day28).toContain('activeTab === "submit"');
   });
 
   it("shows Day 27 Goethe Hören without separate workbook questions or listening submission", () => {

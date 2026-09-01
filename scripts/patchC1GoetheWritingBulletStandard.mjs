@@ -36,13 +36,20 @@ const standardBuilder = `const buildC1OpinionWriting = (title, topicContext) => 
   ],
 });`;
 
-builder = replaceOnce(
-  builder,
-  /const buildC1OpinionWriting = \(title, topicContext\) => \(\{[\s\S]*?\n\}\);\n\nconst buildB2OpinionWriting/,
-  `${standardBuilder}\n\nconst buildB2OpinionWriting`,
-  "shared C1 Goethe writing structure",
-);
-fs.writeFileSync(lessonBuilderPath, builder);
+const hasExplicitC1OpinionBuilder =
+  builder.includes("const buildC1OpinionQuestion =") &&
+  builder.includes("const buildC1OpinionStructure =") &&
+  builder.includes("structure: buildC1OpinionStructure(title, topicContext),");
+
+if (!hasExplicitC1OpinionBuilder) {
+  builder = replaceOnce(
+    builder,
+    /const buildC1OpinionWriting = \(title, topicContext\) => \(\{[\s\S]*?\n\}\);\n\nconst buildB2OpinionWriting/,
+    `${standardBuilder}\n\nconst buildB2OpinionWriting`,
+    "shared C1 Goethe writing structure",
+  );
+  fs.writeFileSync(lessonBuilderPath, builder);
+}
 
 let guided = fs.readFileSync(guidedPagePath, "utf8");
 const standardDay18 = `const day18Writing = {

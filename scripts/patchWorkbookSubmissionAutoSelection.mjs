@@ -14,11 +14,17 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-replaceOnce(
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
-  `import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport {\n  findWorkbookContextAssignment,\n  resolveWorkbookSubmissionContext,\n} from "../utils/workbookSubmissionContext";`,
-  "workbook submission context import",
-);
+const interactionImport = 'import { triggerInteractionFeedback } from "../services/interactionFeedback";';
+const workbookContextImport = `import {
+  findWorkbookContextAssignment,
+  resolveWorkbookSubmissionContext,
+} from "../utils/workbookSubmissionContext";`;
+if (!source.includes('from "../utils/workbookSubmissionContext";')) {
+  if (!source.includes(interactionImport)) {
+    throw new Error("Could not patch workbook submission context import: source anchor was not found.");
+  }
+  source = source.replace(interactionImport, `${interactionImport}\n${workbookContextImport}`);
+}
 
 replaceOnce(
   `  const requestedSubmitLevel = useMemo(
@@ -95,12 +101,13 @@ replaceOnce(
   "workbook assignment lock",
 );
 
-replaceOnce(
-  `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
+if (!source.includes('data-workbook-submission-context="locked"')) {
+  replaceOnce(
+    `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           <div
             style={{
               display: "grid",`,
-  `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
+    `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           {isWorkbookSubmissionContext ? (
             <div
               data-workbook-submission-context="locked"
@@ -118,7 +125,11 @@ replaceOnce(
               </span>
               <strong style={{ color: "#0f172a" }}>
                 {requestedAssignmentMatch?.label ||
-                  [workbookSubmissionContext.level, workbookSubmissionContext.day ? \`Day \${workbookSubmissionContext.day}\` : "", workbookSubmissionContext.chapter ? \`Chapter \${workbookSubmissionContext.chapter}\` : ""]
+                  [
+                    workbookSubmissionContext.level,
+                    workbookSubmissionContext.day ? "Day " + workbookSubmissionContext.day : "",
+                    workbookSubmissionContext.chapter ? "Chapter " + workbookSubmissionContext.chapter : "",
+                  ]
                     .filter(Boolean)
                     .join(" · ")}
               </strong>
@@ -131,8 +142,9 @@ replaceOnce(
             data-manual-submission-selectors="true"
             style={{
               display: isWorkbookSubmissionContext ? "none" : "grid",`,
-  "read-only workbook assignment summary",
-);
+    "read-only workbook assignment summary",
+  );
+}
 
 const requiredMarkers = [
   'from "../utils/workbookSubmissionContext"',

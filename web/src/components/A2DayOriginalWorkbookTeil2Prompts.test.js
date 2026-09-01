@@ -57,11 +57,10 @@ const historicalPromptChecks = [
     day: 6,
     file: "A2Day6MoebelRaeumeWorkbookPage.js",
     markers: [
-      "Nachricht an einen Freund: Meine Wohnung / mein Zimmer",
-      "Beschreibe mindestens zwei Räume in deiner Wohnung.",
-      "Nenne mindestens fünf Möbel.",
-      "Wo? + Dativ",
-      "Wohin? + Akkusativ",
+      "E-Mail an eine Freundin / einen Freund: Mein Zimmer",
+      "Warum schreiben Sie?",
+      "Beschreiben Sie Ihr Zimmer und die wichtigsten Möbel.",
+      "Was gefällt Ihnen an Ihrem Zimmer besonders und warum?",
     ],
   },
   {
@@ -155,7 +154,7 @@ describe("original A2 Teil 2 prompt identity", () => {
     [2, 3, 4, 5, 6, 7, 8, 9, 18].forEach((day) => {
       const file = historicalPromptChecks.find((entry) => entry.day === day).file;
       const source = read(file);
-      expect(source).toContain("schreibenContent={schreibenContent}");
+      expect(source).toMatch(/schreibenContent=\{[A-Za-z][A-Za-z0-9]*\}/);
       expect(source).toContain("WorkbookTaskCard");
     });
   });

@@ -18,6 +18,7 @@ const speakingContent = <>
       <li>Finish with your opinion and one reason with <strong>weil</strong>.</li>
     </ol>
     <p style={paragraph}><strong>Thinking route:</strong> Person → Aussehen → Kleidung → Charakter → Meinung + Grund.</p>
+    <p style={paragraph}>Teil 1 is speaking practice. Use the same description route, ideas and vocabulary in Teil 2 when you write the letter about your boss.</p>
   </WorkbookTaskCard>
 </>;
 
