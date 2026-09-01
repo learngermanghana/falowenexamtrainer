@@ -155,11 +155,13 @@ const SpeakingRoom = () => {
   const aiPayload = useMemo(() => {
     if (!selectedPrompt) return "Choose a topic to send to the AI.";
 
-    const keyword = selectedPrompt.keywordSubtopic
-      ? ` (Keyword: ${selectedPrompt.keywordSubtopic})`
-      : "";
+    const keywordLine = selectedPrompt.keywordSubtopic ? `\nKeyword/Subtopic: ${selectedPrompt.keywordSubtopic}` : "";
+    const keywordInstruction =
+      selectedPrompt.level === "A1" && selectedPrompt.teilLabel === "Teil 2" && selectedPrompt.keywordSubtopic
+        ? "\nInstruction: Build your question from the Keyword/Subtopic (NOT from the Topic title)."
+        : "";
 
-    return `Level: ${selectedPrompt.level}\nPart: ${selectedPrompt.teilLabel}\nTopic: ${selectedPrompt.topicPrompt}${keyword}`;
+    return `Level: ${selectedPrompt.level}\nPart: ${selectedPrompt.teilLabel}\nTopic: ${selectedPrompt.topicPrompt}${keywordLine}${keywordInstruction}`;
   }, [selectedPrompt]);
 
   const copyToClipboard = async () => {
@@ -167,7 +169,7 @@ const SpeakingRoom = () => {
 
     try {
       await navigator.clipboard.writeText(aiPayload);
-      alert("Topic copied. Paste it into your AI chat.");
+      alert("Topic + keyword copied. Paste it into your AI chat.");
     } catch (error) {
       console.error("Clipboard copy failed", error);
     }
@@ -337,7 +339,10 @@ const SpeakingRoom = () => {
                 <div style={{ display: "grid", gap: 4 }}>
                   <span style={styles.levelPill}>{prompt.level}</span>
                   <strong>{prompt.teilLabel}</strong>
-                  <span style={{ ...styles.helperText, fontWeight: 600 }}>{prompt.topicPrompt}</span>
+                  <span style={{ ...styles.helperText, fontWeight: 600 }}>
+                    Topic: {prompt.topicPrompt}
+                    {prompt.keywordSubtopic ? ` · Keyword: ${prompt.keywordSubtopic}` : ""}
+                  </span>
                   {prompt.keywordSubtopic ? (
                     <span style={{ ...styles.helperText, color: "#4f46e5" }}>
                       Keyword: {prompt.keywordSubtopic}
@@ -348,7 +353,10 @@ const SpeakingRoom = () => {
                   <span style={{ ...styles.helperText, margin: 0 }}>AI prompt</span>
                   <div style={{ ...styles.card, padding: 10, margin: 0 }}>
                     <p style={{ ...styles.helperText, margin: 0 }}>
-                      {`Level ${prompt.level}, ${prompt.teilLabel}. Topic: ${prompt.topicPrompt}${prompt.keywordSubtopic ? ` (${prompt.keywordSubtopic})` : ""}.`}
+                      {`Level ${prompt.level}, ${prompt.teilLabel}. Topic: ${prompt.topicPrompt}.${prompt.keywordSubtopic ? ` Keyword/Subtopic: ${prompt.keywordSubtopic}.` : ""}`}
+                      {prompt.level === "A1" && prompt.teilLabel === "Teil 2" && prompt.keywordSubtopic
+                        ? " Form your question from the keyword, not the topic title."
+                        : ""}
                     </p>
                   </div>
                 </div>
@@ -361,12 +369,17 @@ const SpeakingRoom = () => {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <div>
               <p style={{ ...styles.helperText, margin: 0 }}>Selected topic</p>
-              <h3 style={{ margin: "4px 0" }}>{selectedPrompt?.topicPrompt || "Please choose a topic"}</h3>
+              <h3 style={{ margin: "4px 0" }}>
+                {selectedPrompt
+                  ? `${selectedPrompt.topicPrompt}${selectedPrompt.keywordSubtopic ? ` · ${selectedPrompt.keywordSubtopic}` : ""}`
+                  : "Please choose a topic"}
+              </h3>
               <p style={{ ...styles.helperText, margin: 0 }}>
                 Copy the details and start your AI chat for the chosen part.
               </p>
               <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
-                <li>👉 Read the keywords aloud once so you know what should appear.</li>
+                <li>👉 Read the keyword aloud once so you know what should appear.</li>
+                <li>👉 For A1 Teil 2, make the question from the keyword/subtopic (not only from the topic title).</li>
                 <li>👉 Then start recording and speak freely without staring at the text.</li>
                 <li>👉 Save the topic with the button on the right to copy it into the AI quickly.</li>
               </ul>
