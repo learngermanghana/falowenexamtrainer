@@ -2,6 +2,7 @@ import {
   fetchAttendanceRecords,
   filterAttendanceRecordsForReporting,
   formatAttendanceRecord,
+  reconcileAttendanceRecords,
 } from "./attendanceService";
 import { collection, doc, getDoc, getDocs } from "../firebase";
 
@@ -156,6 +157,83 @@ describe("filterAttendanceRecordsForReporting", () => {
   });
 });
 
+describe("reconcileAttendanceRecords", () => {
+  it("keeps one present record when the same course day is also pending", () => {
+    const records = reconcileAttendanceRecords([
+      {
+        id: "assignment-a1-3",
+        title: "Day 3 - Pronouns",
+        marked: false,
+        present: null,
+        status: "Pending",
+      },
+      {
+        id: "2026-08-18",
+        sessionLabel: "Day 3: Personal Information and Articles",
+        date: "2026-08-18",
+        marked: true,
+        present: true,
+        status: "Present",
+      },
+    ]);
+
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({
+      id: "2026-08-18",
+      present: true,
+      marked: true,
+      status: "Present",
+    });
+  });
+
+  it("lets a present mark override an absent mark for the same course day", () => {
+    const records = reconcileAttendanceRecords([
+      {
+        id: "old-day-8",
+        title: "Day 8 - Countries and Languages",
+        marked: true,
+        present: false,
+        status: "Absent",
+      },
+      {
+        id: "checkin-day-8",
+        title: "Day 8: Countries and Languages",
+        marked: true,
+        present: true,
+        status: "Present",
+      },
+    ]);
+
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({
+      id: "checkin-day-8",
+      present: true,
+      status: "Present",
+    });
+  });
+
+  it("does not merge different course days held on the same calendar date", () => {
+    const records = reconcileAttendanceRecords([
+      {
+        id: "day-3",
+        title: "Day 3: Personal Information",
+        date: "2026-08-18",
+        marked: true,
+        present: true,
+      },
+      {
+        id: "day-4",
+        title: "Day 4: Numbers and Addresses",
+        date: "2026-08-18",
+        marked: true,
+        present: true,
+      },
+    ]);
+
+    expect(records).toHaveLength(2);
+  });
+});
+
 describe("fetchAttendanceRecords", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -238,5 +316,45 @@ describe("fetchAttendanceRecords", () => {
     expect(result.records.map((record) => record.id)).toEqual(["2026-06-20"]);
     expect(result.sessions).toBe(1);
     expect(result.excludedSessions).toBe(1);
+  });
+
+  it("does not return the same course day as both present and pending", async () => {
+    getDocs.mockImplementation(async (ref) => {
+      if (ref?.segments?.[1] === "classes") return { docs: [] };
+      return {
+        docs: [
+          {
+            id: "assignment-a1-3",
+            data: () => ({
+              title: "Day 3 - Pronouns",
+            }),
+          },
+          {
+            id: "2026-08-18",
+            data: () => ({
+              date: "2026-08-18",
+              sessionLabel: "Day 3: Personal Information and Articles",
+              attendance: { Student001: true },
+            }),
+          },
+        ],
+      };
+    });
+    getDoc.mockResolvedValue({ exists: () => false });
+
+    const result = await fetchAttendanceRecords({
+      className: "Unknown Test Class",
+      studentCode: "Student001",
+      now: "2026-09-01T23:59:59Z",
+    });
+
+    expect(result.records).toHaveLength(1);
+    expect(result.records[0]).toMatchObject({
+      id: "2026-08-18",
+      marked: true,
+      present: true,
+      status: "Present",
+    });
+    expect(result.sessions).toBe(1);
   });
 });
