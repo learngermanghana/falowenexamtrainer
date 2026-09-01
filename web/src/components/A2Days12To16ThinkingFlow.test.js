@@ -52,6 +52,17 @@ describe("A2 Days 12-16 thinking flow", () => {
   });
 
   test.each([
+    ["A2Day14BerufUndKarriereWorkbookPage.js", "A2-Mindmap: „Mein Beruf und meine Zukunft“"],
+    ["A2Day15MeinLieblingssportWorkbookPageLegacy.js", "Zentrales Thema: „Mein Lieblingssport“"],
+  ])("%s keeps its complete speaking task in one mind map", (file, removedDuplicateHeading) => {
+    const page = read(file);
+    expect((page.match(/<SpeakingMindMap /g) || [])).toHaveLength(1);
+    expect(page).toContain("The mind map contains the complete task");
+    expect(page).not.toContain(removedDuplicateHeading);
+    expect(page).not.toContain("Sprechen wie bei einer Mini-Präsentation");
+  });
+
+  test.each([
     ["A2Day12MeinTraumberufWorkbookPageLegacy.js", "Fragen, ob es noch offene Stellen in der Firma gibt.", "Ihre Fähigkeiten und Fertigkeiten beschreiben"],
     ["A2Day14BerufUndKarriereWorkbookPage.js", "Bedanken Sie sich für den Vorschlag.", "Fragen Sie nach weiteren Details: Inhalt, Termine und Kosten."],
     ["A2Day15MeinLieblingssportWorkbookPageLegacy.js", "Fragen, ob es noch freie Plätze im Sportkurs gibt.", "Nach Trainingszeiten und Kosten fragen."],
