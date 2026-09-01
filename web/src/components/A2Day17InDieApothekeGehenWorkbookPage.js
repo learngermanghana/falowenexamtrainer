@@ -49,12 +49,6 @@ const imageStyle = {
   objectFit: "cover",
 };
 
-const phraseGridStyle = {
-  display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-};
-
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -194,61 +188,12 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Prepare one short pharmacy dialogue. The mind map contains the complete task: open each branch, practise the
+            sentence, and connect the five parts from your health problem to a polite ending.
+          </p>
           <SpeakingMindMap config={getA2SpeakingMindMap(17)} />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we practise speaking about going to the pharmacy, symptoms, medicine, prescriptions and polite questions.
-          </p>
-
-          <h3 style={sectionTitle}>Ziel (Objective)</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Erstelle eine Brain Map zu: Berufe in der Apotheke, Symptome, Medikamente, Dialog in der Apotheke, Rezepte und Regeln.
-          </p>
-
-          <h3 style={sectionTitle}>Beispiel für die Brain Map-Struktur</h3>
-          <ul style={listSpacing}>
-            <li><strong>Berufe:</strong> Apotheker/in, PTA, PKA, Beratung, Rezeptprüfung, Bestellungen.</li>
-            <li><strong>Symptome:</strong> Kopfschmerzen, Halsschmerzen, Fieber, Husten, Schnupfen, Bauchschmerzen.</li>
-            <li><strong>Medikamente:</strong> Tabletten, Hustensaft, Nasenspray, Salbe, Tropfen, rezeptfrei, rezeptpflichtig.</li>
-            <li><strong>Dialog:</strong> „Was fehlt Ihnen?“, „Wie oft soll ich das Medikament nehmen?“, „Gute Besserung!“</li>
-            <li><strong>Regeln:</strong> Rezept, Dosierung, Nebenwirkungen, Packungsbeilage, Apotheken-Notdienst.</li>
-          </ul>
-
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Leitfrage: <strong>Was kaufst du in der Apotheke und wann gehst du dorthin?</strong>
-          </p>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-          </p>
-          <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
-                <li>„Ich möchte kurz etwas über … sagen.“</li>
-                <li>„Mein Thema ist …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter / Connectors</strong>
-              <ul style={listSpacing}>
-                <li><strong>und</strong> · „Ich habe Husten und Halsschmerzen.“</li>
-                <li><strong>oder</strong> · „Ich kaufe Tabletten oder Hustensaft.“</li>
-                <li><strong>weil</strong> · „Ich gehe in die Apotheke, weil ich krank bin.“</li>
-                <li><strong>deshalb</strong> · „Ich habe Fieber, deshalb brauche ich Hilfe.“</li>
-              </ul>
-            </div>
-          </div>
-
           <SpeakingPracticeTimerCard />
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über einen Besuch in der Apotheke. Zuerst erkläre ich mein Problem, zum Beispiel: Ich habe Kopfschmerzen oder Husten. Dann frage ich nach einem Medikament, weil ich schnell Hilfe brauche. Außerdem sage ich, ob ich Allergien habe. Zum Schluss bedanke ich mich und lese die Packungsbeilage zu Hause.“
-            </p>
-          </div>
-
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
