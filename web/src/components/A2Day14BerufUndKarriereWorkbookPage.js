@@ -50,12 +50,6 @@ const imageStyle = {
   objectFit: "cover",
 };
 
-const phraseGridStyle = {
-  display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-};
-
 const lesenQuestions = [
   {
     stem: "Was lernt man in den ersten Tagen am neuen Arbeitsplatz kennen?",
@@ -174,67 +168,11 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-          <WorkbookTaskCard
-            eyebrow="Question of the Day · Speaking"
-            title="Was ist dein Beruf, wie bist du zu diesem Job gekommen und was möchtest du in Zukunft machen?"
-            practiceOnly
-            submissionNote="Teil 1 is group practice only and has no assignment submission."
-          >
-            <p style={{ margin: 0 }}>
-              Prepare a short answer about your job, your path into the job and your future career plans.
-            </p>
-          </WorkbookTaskCard>
-
-          <SpeakingMindMap config={getA2SpeakingMindMap(14)} />
-
-          <h3 style={sectionTitle}>A2-Mindmap: „Mein Beruf und meine Zukunft“</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Was ist dein Beruf?</strong>
-              <ul style={listSpacing}>
-                <li>Beruf: „Ich bin ...“</li>
-                <li>Arbeitsplatz: „Ich arbeite in ...“</li>
-                <li>Tätigkeiten: „Ich mache ...“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Wie bist du zu diesem Job gekommen?</strong>
-              <ul style={listSpacing}>
-                <li>Ausbildung oder Studium: „Ich habe eine Ausbildung/ein Studium als ... gemacht.“</li>
-                <li>Bewerbung: „Ich habe mich bei ... beworben.“</li>
-                <li>Erfahrung: „Ich habe ein Praktikum bei ... gemacht.“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Was möchtest du in Zukunft machen?</strong>
-              <ul style={listSpacing}>
-                <li>Karrierepläne: „Ich möchte ... werden.“</li>
-                <li>Weiterbildung: „Ich möchte eine Weiterbildung machen.“</li>
-                <li>Ziele: „In 5 Jahren möchte ich ...“</li>
-              </ul>
-            </li>
-          </ol>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+            Prepare one clear 30–45 second career story. The mind map contains the complete task: open each branch,
+            practise the sentence, and connect the five parts into one answer.
           </p>
-          <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
-                <li>„Mein Thema ist …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter</strong>
-              <ul style={listSpacing}>
-                <li><strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong></li>
-              </ul>
-            </div>
-          </div>
-
+          <SpeakingMindMap config={getA2SpeakingMindMap(14)} />
           <SpeakingPracticeTimerCard />
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
