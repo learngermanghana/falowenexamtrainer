@@ -5,11 +5,17 @@ export const SCHOOL_PRINT_STAMP = "learn Language Education Academy";
 
 const BOOK_ROUTE_PATTERN = /(?:grammar-notes|workbook\/?$)/i;
 const A1_WORKBOOK_ROUTE_PATTERN = /^\/campus\/course\/a1-[^/]*-workbook\/?$/i;
-const A1_DAY15_WORKBOOK_PATH = "/campus/course/speaking-exams-intro-4-7";
+const A1_SPECIAL_WORKBOOK_PATHS = new Set([
+  "/campus/course/speaking-exams-intro-4-7",
+  "/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
+  "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
+  "/campus/course/letter-writing-intro-german-a1-day-12-3",
+]);
 const COURSE_LESSON_PATTERN = /^\/campus\/course\/lesson\/(A1|A2|B1|B2|C1)\/\d+\/?$/i;
 
 export const getPrintableBookKind = (pathname = "", search = "") => {
-  if ((pathname.replace(/\/+$/, "") || "/") === A1_DAY15_WORKBOOK_PATH) {
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  if (A1_SPECIAL_WORKBOOK_PATHS.has(normalizedPath)) {
     return "combined";
   }
 
@@ -36,9 +42,10 @@ export const getPrintableBookKind = (pathname = "", search = "") => {
 export const isPrintableBookRoute = (pathname = "", search = "") =>
   Boolean(getPrintableBookKind(pathname, search));
 
-export const needsInlineA1PdfAction = (pathname = "") =>
-  A1_WORKBOOK_ROUTE_PATTERN.test(pathname) ||
-  (pathname.replace(/\/+$/, "") || "/") === A1_DAY15_WORKBOOK_PATH;
+export const needsInlineA1PdfAction = (pathname = "") => {
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  return A1_WORKBOOK_ROUTE_PATTERN.test(pathname) || A1_SPECIAL_WORKBOOK_PATHS.has(normalizedPath);
+};
 
 const humanizeBookTitle = (pathname = "") => {
   const slug = pathname.split("/").filter(Boolean).pop() || "course-book";
