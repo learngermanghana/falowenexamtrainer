@@ -357,4 +357,32 @@ describe("fetchAttendanceRecords", () => {
     });
     expect(result.sessions).toBe(1);
   });
+
+  it("preserves Present by assignment and its evidence", () => {
+    const { record } = formatAttendanceRecord(
+      "session-day-4",
+      {
+        students: {
+          Student001: {
+            present: true,
+            status: "present_by_assignment",
+            source: "assignment_submission",
+            method: "Assignment",
+            assignmentId: "A1-day-4",
+          },
+        },
+      },
+      "Student001"
+    );
+
+    expect(record).toMatchObject({
+      present: true,
+      presentByAssignment: true,
+      status: "Present by assignment",
+      attendanceSource: "assignment_submission",
+      attendanceMethod: "Assignment",
+      assignmentId: "A1-day-4",
+    });
+  });
+
 });
