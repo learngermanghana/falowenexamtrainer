@@ -5,7 +5,6 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import SpeakingMindMap from "./SpeakingMindMap";
-import A2Days6To9LearningGuide from "./A2Days6To9LearningGuide";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import { styles } from "../styles";
@@ -100,7 +99,6 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     {activeTab === "sprechen" && <div style={card}>
       <HeroImage type="sprechen" alt="Students speaking together during German class" />
       <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-      {Number(day) >= 6 && Number(day) <= 8 ? <A2Days6To9LearningGuide day={day} /> : null}
       {sprechenContent ? sprechenContent : <><SpeakingMindMap config={getA2SpeakingMindMap(day)} />{showSpeakingTaskCard ? <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly><p style={{ margin: 0 }}>Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.</p><ul style={listSpacing}><li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li><li>Speak clearly for 30–60 seconds.</li><li>This part is practice only; submit required final answers in the Submit tab.</li></ul></WorkbookTaskCard> : null}</>}
       <SpeakingPracticeTimerCard />
       <CourseInlinePracticePanel type="speaking" />
