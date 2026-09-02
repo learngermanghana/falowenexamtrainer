@@ -8,18 +8,12 @@ const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const sprechenContent = (
   <>
-    <SpeakingMindMap config={getA2SpeakingMindMap(11)} />
-    <WorkbookTaskCard eyebrow="Teil 1 · Practice and class discussion" title="Unterwegs: Verkehrsmittel vergleichen" practiceOnly>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>Vergleiche zwei oder drei Verkehrsmittel. Sprich über <strong>Preis, Geschwindigkeit, Komfort, Sicherheit und Umwelt</strong>.</p>
-      <ul style={listStyle}>
-        <li>Welches Verkehrsmittel benutzt du am häufigsten?</li>
-        <li>Was sind die Vorteile und Nachteile von Auto, Bus, Zug oder Fahrrad?</li>
-        <li>Welches Verkehrsmittel passt zu kurzen und welches zu langen Reisen?</li>
-        <li>Welches Verkehrsmittel findest du am besten und warum?</li>
-      </ul>
-      <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Modell:</strong> Ich fahre oft mit dem Bus, weil er günstig ist. Das Auto ist bequemer, aber es ist teurer und im Stau oft langsamer. Für kurze Wege ist das Fahrrad am besten, weil es gesund und umweltfreundlich ist.</p>
-      <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
+    <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
+      </p>
     </WorkbookTaskCard>
+    <SpeakingMindMap config={getA2SpeakingMindMap(11)} />
   </>
 );
 
