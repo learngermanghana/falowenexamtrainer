@@ -16,6 +16,17 @@ describe("BookPdfDownloadInjector helpers", () => {
     expect(needsInlineA1PdfAction(pathname)).toBe(true);
   });
 
+  it.each([
+    "/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
+    "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
+    "/campus/course/letter-writing-intro-german-a1-day-12-3",
+  ])("shows the PDF action on special A1 workbook route %s", (pathname) => {
+    expect(getPrintableBookKind(pathname, "?view=workbook")).toBe("combined");
+    expect(isPrintableBookRoute(pathname, "?view=workbook")).toBe(true);
+    expect(needsInlineA1PdfAction(pathname)).toBe(true);
+    expect(needsInlineA1PdfAction(`${pathname}/`)).toBe(true);
+  });
+
   it("targets grammar notes and workbook pages only", () => {
     expect(isPrintableBookRoute("/campus/course/a2-day-9-urlaub-workbook")).toBe(true);
     expect(isPrintableBookRoute("/campus/course/a2-day-9-perfekt-grammar-notes")).toBe(true);
