@@ -68,12 +68,12 @@ export const WritingVideoSupportCard = ({ writingVideo, writingVideoEmbed }) => 
           fontWeight: 800,
         }}
       >
-        Watch before writing · Essay Ideas
+        {writingVideo.badge || "Watch before writing · Essay Ideas"}
       </span>
 
       <div style={{ display: "grid", gap: 6 }}>
         <h3 style={{ margin: 0, color: "#1e3a8a" }}>
-          Get ideas for this exact essay
+          {writingVideo.heading || "Get ideas for this exact essay"}
         </h3>
         <strong style={{ color: "#0f172a" }}>
           {writingVideo.title || "Writing explanation video"}
