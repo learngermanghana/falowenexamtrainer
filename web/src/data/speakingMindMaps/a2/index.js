@@ -300,7 +300,7 @@ const apothekeBranches = [
 
 const topics = [
   [1, "a2-day-1-small-talk", "Small Talk", "Wie führst du ein kurzes freundliches Gespräch?", ["Begrüßung", "Kennenlernen", "Arbeit oder Studium", "Freizeit", "Gespräch beenden"], earlyA2LessonBranchesByDay[1]],
-  [2, "a2-day-2-personen-beschreiben", "Personen beschreiben", "Wie beschreibst du eine Person einfach und klar?", ["Aussehen", "Charakter", "Kleidung", "Beziehung", "Meinung"], personenBeschreibenBranches],
+  [2, "a2-day-2-personen-beschreiben", "Deine Beschreibung", "Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?", ["Aussehen", "Charakter", "Kleidung", "Besondere Merkmale"], personenBeschreibenBranches],
   [3, "a2-day-3-vergleichen", "Dinge und Personen vergleichen", "Was vergleichst du und was ist anders oder gleich?", ["Auswahl", "Gemeinsamkeiten", "Unterschiede", "Preis und Qualität", "Meinung"], earlyA2LessonBranchesByDay[3]],
   [4, "a2-day-4-treffen", "Wo möchten wir uns treffen?", "Wo und wann möchtest du dich treffen?", ["Aktivität", "Treffpunkt", "Zeit", "Anreise", "Bestätigung"], earlyA2LessonBranchesByDay[4]],
   [5, "a2-day-5-freizeit", "Freizeit", "Was machst du gern in deiner Freizeit?", ["Hobby", "Zeit und Häufigkeit", "Ort", "Mit wem?", "Grund und Gefühl"], earlyA2LessonBranchesByDay[5]],
