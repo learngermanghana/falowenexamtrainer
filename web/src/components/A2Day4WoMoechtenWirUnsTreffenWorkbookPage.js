@@ -8,18 +8,12 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(4)} />
-  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Plane ein Treffen von Anfang bis Ende" practiceOnly>
-    <p style={paragraph}>Create one realistic plan. Do not only name a place; connect the activity, place, time, transport and confirmation.</p>
-    <ol style={list}>
-      <li>Suggest an activity.</li>
-      <li>Choose a clear meeting place.</li>
-      <li>Say the day and time.</li>
-      <li>Explain how you will get there.</li>
-      <li>Confirm the plan or give one alternative.</li>
-    </ol>
-    <p style={paragraph}><strong>Thinking route:</strong> Was? → Wo? → Wann? → Wie komme ich hin? → Bestätigung / Alternative.</p>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
+    </p>
   </WorkbookTaskCard>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(4)} />
 </>;
 
 const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Formeller Brief: Einladung zu einem gemeinsamen Wochenende">
