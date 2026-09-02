@@ -10,7 +10,7 @@ const requiredMarkers = {
     'hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"',
   ],
   "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js": [
-    'url: "https://youtu.be/51cNSMK5F0g?si=npQ1tReOKcrLhY-T"',
+    'url: "https://youtu.be/F67RRmGNK1c"',
   ],
   "web/src/data/b2C1LessonMediaOverrides.js": [
     'key: "b2-day11-gesellschaft-integration-falowen-radio"',
