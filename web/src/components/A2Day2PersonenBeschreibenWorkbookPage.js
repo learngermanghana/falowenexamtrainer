@@ -8,17 +8,12 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(2)} />
-  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Beschreibe eine echte Person in 4–6 Sätzen" practiceOnly>
-    <p style={paragraph}>Choose one person you really know. Build one connected description instead of listing adjectives.</p>
-    <ol style={list}>
-      <li>Say who the person is and how you know them.</li>
-      <li>Describe appearance and one clothing detail.</li>
-      <li>Describe the character with 2–3 useful adjectives.</li>
-      <li>Finish with your opinion and one reason with <strong>weil</strong>.</li>
-    </ol>
-    <p style={paragraph}><strong>Thinking route:</strong> Person → Aussehen → Kleidung → Charakter → Meinung + Grund.</p>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
+    </p>
   </WorkbookTaskCard>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(2)} />
 </>;
 
 const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Brief an Felix: Mein Chef / Meine Chefin">
