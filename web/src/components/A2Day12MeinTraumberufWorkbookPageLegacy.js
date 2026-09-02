@@ -43,8 +43,6 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
-
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -188,138 +186,11 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Prepare one clear answer about your dream job. Open each mind-map branch, practise the sentence, and connect the parts.
+          </p>
           <SpeakingMindMap config={getA2SpeakingMindMap(12)} />
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we&apos;ll engage in group exercises discussing <strong>„Mein Traumberuf“</strong>.
-          </p>
-
-          <h3 style={sectionTitle}>Instructions · Zentrales Thema: „Mein Traumberuf“</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Was ist dein Traumberuf?</strong>
-              <ul style={listSpacing}>
-                <li>Interessen und Hobbys – Was macht dir Spaß? (interests and hobbies — what is fun for you?)</li>
-                <li>Gehalt – Ist der Beruf gut bezahlt? (salary — is the job well paid?)</li>
-                <li>Möglichkeiten – Gibt es viele Jobs? (opportunities — are there many jobs?)</li>
-                <li>
-                  Beispiele für Traumberufe: Arzt, Lehrer, Musiker, Ingenieur, Koch, Designer, Pilot, Polizist (example dream jobs: doctor, teacher, musician, engineer, cook/chef, designer, pilot, police officer).
-                </li>
-              </ul>
-            </li>
-            <li>
-              <strong>Wo möchtest du arbeiten?</strong>
-              <ul style={listSpacing}>
-                <li>Im Büro – Computerarbeit, Meetings (in an office — computer work, meetings)</li>
-                <li>Zu Hause – Flexibel, kein Arbeitsweg (at home — flexible, no commute)</li>
-                <li>Draußen – Viel Bewegung, frische Luft (outside — lots of movement, fresh air)</li>
-                <li>Reisen – Neue Länder sehen, viele Menschen treffen (traveling — seeing new countries, meeting many people)</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Arbeitest du lieber allein oder im Team?</strong>
-              <ul style={listSpacing}>
-                <li>Allein arbeiten – Mehr Konzentration, eigene Entscheidungen (working alone — more concentration, own decisions)</li>
-                <li>Im Team arbeiten – Zusammenarbeit, Ideen teilen, Unterstützung (working in a team — cooperation, sharing ideas, support)</li>
-                <li>
-                  Beispiele für Berufe: Allein (Schriftsteller, Fotograf, Künstler) · Im Team (Arzt, Lehrer,
-                  Bauarbeiter, Verkäufer) (examples of jobs: alone — writer, photographer, artist; in a team — doctor, teacher, construction worker, salesperson)
-                </li>
-              </ul>
-            </li>
-            <li>
-              <strong>Welche Fähigkeiten braucht man?</strong>
-              <ul style={listSpacing}>
-                <li>
-                  Soft Skills: Kommunikation, Teamarbeit, Kreativität, Zeitmanagement, Geduld und Ausdauer (soft skills: communication, teamwork, creativity, time management, patience, and perseverance).
-                </li>
-                <li>Hard Skills: Computerkenntnisse, Mathematik, handwerkliches Geschick, Sprachen (hard skills: computer skills, mathematics, practical/craft skills, languages).</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Warum interessiert dich dieser Beruf?</strong>
-              <ul style={listSpacing}>
-                <li>Leidenschaft – „Ich liebe Musik, deshalb möchte ich Musiker werden.“ (passion — “I love music, so I want to become a musician.”)</li>
-                <li>Zukunftspläne – „Ich möchte Menschen helfen, deshalb werde ich Arzt.“ (future plans — “I want to help people, so I will become a doctor.”)</li>
-                <li>Neue Erfahrungen – „Ich möchte reisen und neue Kulturen kennenlernen.“ (new experiences — “I want to travel and get to know new cultures.”)</li>
-              </ul>
-            </li>
-          </ol>
-
-          <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
-            <strong>Beispielantwort (Example Answer)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Mein Traumberuf ist Lehrer. Ich liebe Sprachen und möchte Schülern helfen. Ich arbeite gern im Team
-              mit Kollegen. Ich brauche gute Kommunikationsfähigkeiten und Geduld. Ich möchte in einer Schule
-              arbeiten, weil ich gern mit Menschen bin.“
-            </p>
-          </div>
-
-          <h3 style={sectionTitle}>Discussion Questions: Thema Beruf (A2)</h3>
-          <p style={{ margin: 0 }}>
-            Was möchtest du machen, wo möchtest du arbeiten, und arbeitest du lieber allein oder im Team?
-          </p>
-          <p style={{ margin: 0, color: "#4b5563" }}>Stichwörter: Traumberuf · Arbeitsplatz · Teamarbeit · Interesse</p>
-
-          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
-            So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
-          </p>
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Schnelle Struktur für 30–45 Sekunden</strong>
-            <ol style={listSpacing}>
-              <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
-              <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
-              <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
-              <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
-            </ol>
-          </div>
-          <div style={phraseGridStyle}>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Einleitungen</strong>
-              <ul style={listSpacing}>
-                <li>„Heute spreche ich über …“</li>
-                <li>„Ich möchte kurz etwas über … sagen.“</li>
-                <li>„Mein Thema ist …“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Verbindungswörter / Connectors</strong>
-              <ul style={listSpacing}>
-                <li><strong>und</strong> · „Ich fahre Bus und ich gehe zu Fuß.“</li>
-                <li><strong>oder</strong> · „Ich nehme den Zug oder den Bus.“</li>
-                <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
-                <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Eigene Meinung ausdrücken</strong>
-              <ul style={listSpacing}>
-                <li>„Ich finde … gut, weil …“</li>
-                <li>„Für mich ist … wichtig.“</li>
-                <li>„Meiner Meinung nach ist … praktisch.“</li>
-              </ul>
-            </div>
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Gute Schlüsse</strong>
-              <ul style={listSpacing}>
-                <li>„Zum Schluss kann ich sagen: …“</li>
-                <li>„Deshalb finde ich … gut.“</li>
-                <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
-              </ul>
-            </div>
-          </div>
-
           <SpeakingPracticeTimerCard />
-
-          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
-            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute spreche ich über meinen Traumberuf. Ich möchte gern im Büro arbeiten, weil ich gern organisiere und mit Menschen spreche. Der Beruf soll interessant sein und gute Arbeitszeiten haben. Außerdem möchte ich Deutsch im Beruf benutzen, deshalb übe ich jeden Tag. Zum Beispiel kann ich später E-Mails schreiben und Kunden helfen. Zum Schluss finde ich: Ein guter Beruf passt zu meinen Stärken und macht mir Freude.“
-            </p>
-          </div>
-
-          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
           <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
