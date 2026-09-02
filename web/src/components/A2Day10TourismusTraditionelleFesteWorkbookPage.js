@@ -5,55 +5,15 @@ import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
-const gridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 };
-const helpCardStyle = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#f8fafc", display: "grid", gap: 8 };
 
 const sprechenContent = (
   <>
-    <SpeakingMindMap config={getA2SpeakingMindMap(10)} />
-
-    <WorkbookTaskCard eyebrow="Teil 1 · Practice and class discussion" title="Tourismus und traditionelle Feste" practiceOnly>
+    <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Wähle lieber ein konkretes Fest oder einen konkreten Reiseort. Sprich dann in einer klaren Reihenfolge:
-        <strong> Ort → Fest/Tradition → Aktivitäten → Vorteil/Nachteil → eigene Meinung.</strong>
+        Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
       </p>
-      <div style={gridStyle}>
-        <div style={helpCardStyle}>
-          <strong>Tourismus</strong>
-          <ul style={listStyle}>
-            <li>Neue Kulturen und Menschen kennenlernen</li>
-            <li>Sehenswürdigkeiten besuchen</li>
-            <li>Sprache üben und neue Erfahrungen sammeln</li>
-            <li>Problem: hohe Kosten, Lärm oder zu viele Besucher</li>
-          </ul>
-        </div>
-        <div style={helpCardStyle}>
-          <strong>Traditionelle Feste</strong>
-          <ul style={listStyle}>
-            <li>Oktoberfest, Weihnachten, Karneval, Ostern, Silvester</li>
-            <li>Musik, Essen, Kleidung und lokale Traditionen</li>
-            <li>Feste bringen Familien und Besucher zusammen</li>
-            <li>Traditionen zeigen und bewahren Kultur</li>
-          </ul>
-        </div>
-      </div>
-      <p style={{ margin: 0 }}><strong>Fragen zur Diskussion:</strong></p>
-      <ul style={listStyle}>
-        <li>Welches Fest gibt es in deinem Heimatland?</li>
-        <li>Warum ist dieses Fest besonders?</li>
-        <li>Welche Orte besuchen Touristen in deinem Land gern?</li>
-        <li>Welche Vorteile und Probleme kann Tourismus bringen?</li>
-        <li>Welches Fest möchtest du einmal besuchen? Warum?</li>
-      </ul>
-      <div style={{ ...helpCardStyle, background: "#fff7ed" }}>
-        <strong>Mini-Präsentation</strong>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          „Heute spreche ich über Homowo in Ghana. Das Fest ist besonders, weil es eine wichtige Tradition ist.
-          Es gibt Musik, traditionelle Kleidung und lokales Essen. Viele Besucher können dort viel über die Kultur lernen.
-          Manchmal sind die Straßen sehr voll. Trotzdem empfehle ich das Fest, weil die Atmosphäre sehr interessant ist.“
-        </p>
-      </div>
     </WorkbookTaskCard>
+    <SpeakingMindMap config={getA2SpeakingMindMap(10)} />
   </>
 );
 
