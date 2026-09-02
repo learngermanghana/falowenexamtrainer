@@ -8,13 +8,6 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
   //   ],
   // },
   A2: {
-    1: [
-      {
-        chapter: "1.1",
-        topic: "A2 Day 1",
-        url: "https://youtu.be/70AgN5VKeqc",
-      },
-    ],
     2: [
       {
         chapter: "1.2",
