@@ -203,6 +203,7 @@ const StatCard = ({ label, value, helper }) => (
 
 const ATTENDANCE_GROUP_TONES = {
   present: { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" },
+  assignment: { border: "#bfdbfe", background: "#eff6ff", color: "#1d4ed8" },
   absent: { border: "#fecaca", background: "#fef2f2", color: "#991b1b" },
   pending: { border: "#fde68a", background: "#fffbeb", color: "#92400e" },
 };
@@ -372,7 +373,14 @@ const AttendanceTab = () => {
   }, [level, state.records]);
 
   const attendanceSummary = useMemo(() => buildAttendanceSummary(levelRecords), [levelRecords]);
-  const presentRecords = useMemo(() => attendanceSummary.markedRecords.filter((record) => record.present === true), [attendanceSummary.markedRecords]);
+  const assignmentAttendanceRecords = useMemo(
+    () => attendanceSummary.markedRecords.filter((record) => record.presentByAssignment === true),
+    [attendanceSummary.markedRecords]
+  );
+  const presentRecords = useMemo(
+    () => attendanceSummary.markedRecords.filter((record) => record.present === true && record.presentByAssignment !== true),
+    [attendanceSummary.markedRecords]
+  );
   const absentRecords = useMemo(() => attendanceSummary.markedRecords.filter((record) => record.present === false), [attendanceSummary.markedRecords]);
   const pendingRecords = useMemo(() => levelRecords.filter((record) => !record.marked || record.present === null), [levelRecords]);
   const visiblePendingRecords = showAllPending
@@ -538,6 +546,16 @@ const AttendanceTab = () => {
         </div>
       ) : null}
 
+      {!state.loading && !state.error && assignmentAttendanceRecords.length ? (
+        <div style={{ ...styles.alert, borderColor: "#bfdbfe", background: "#eff6ff", color: "#1e40af" }}>
+          <strong>Present by assignment</strong>
+          <div style={{ marginTop: 4 }}>
+            You missed the live check-in, but your matching assignment was submitted within 24 hours.
+            This session counts toward your attendance.
+          </div>
+        </div>
+      ) : null}
+
       {!state.loading && !state.error ? (
         <details style={styles.details} open={attendanceSummary.attendanceRate !== null && attendanceSummary.attendanceRate < 80}>
           <summary style={styles.detailsSummary}>Attendance details</summary>
@@ -548,6 +566,17 @@ const AttendanceTab = () => {
               tone="present"
               emptyMessage={t("attendanceTab.empty.present")}
               getMeta={(record) => formatDate(record.date) || record.status || "Present"}
+            />
+
+            <AttendanceRecordGroup
+              title="Present by assignment"
+              records={assignmentAttendanceRecords}
+              tone="assignment"
+              emptyMessage="No attendance has been credited from an assignment."
+              getMeta={(record) => {
+                const date = formatDate(record.date);
+                return `${date ? `${date} · ` : ""}Assignment submitted within 24 hours`;
+              }}
             />
 
             <AttendanceRecordGroup
