@@ -59,7 +59,7 @@ export default function A2Day3ComparisonsWorkbookPage() {
     lesenText={readingText}
     lesenQuestions={readingQuestions}
     hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die fünf Hörverstehen-Fragen."
-    hoerenAudioUrl="https://youtu.be/Ml50uHYxBx8"
+    hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"
     hoerenQuestions={listeningQuestions}
   />;
 }
