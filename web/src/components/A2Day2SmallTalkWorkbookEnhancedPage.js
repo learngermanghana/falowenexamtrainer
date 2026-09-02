@@ -266,45 +266,12 @@ const listeningQuestions = [
 
 const speakingContent = (
   <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Small Talk: learn how to build your own answer" practiceOnly>
+    <WorkbookTaskCard eyebrow="Group practice" title="Stell dich vor und führe ein kurzes Gespräch" practiceOnly>
       <p style={paragraph}>
-        Don’t memorize one long text. Start with a topic, choose useful words, build one simple sentence and then add a detail. The brain map below shows you how to think before you speak.
+        Prepare one connected introduction. Open each mind-map branch, practise the sentence, and combine the four parts into one answer.
       </p>
     </WorkbookTaskCard>
-
     <SpeakingMindMap config={smallTalkIntroductionMap} />
-
-    <WorkbookTaskCard eyebrow="Useful Small Talk" title="Questions and phrases you can use after your introduction" practiceOnly>
-      <p style={paragraph}>
-        After you introduce yourself, use these short questions and answers to continue the conversation. German comes first, with English support in brackets.
-      </p>
-    </WorkbookTaskCard>
-
-    <div style={topicGrid}>
-      {smallTalkTopics.map((topic) => (
-        <section key={topic.title} style={topicCard}>
-          <h3 style={topicTitle}>{topic.title}</h3>
-          <ul style={list}>
-            {topic.items.map((item) => <li key={item}>{item}</li>)}
-          </ul>
-        </section>
-      ))}
-    </div>
-
-    <div style={topicGrid}>
-      <section style={topicCard}>
-        <h3 style={topicTitle}>Höfliche Ausdrücke · Polite expressions</h3>
-        <ul style={list}>
-          {politeExpressions.map((item) => <li key={item}>{item}</li>)}
-        </ul>
-      </section>
-      <section style={topicCard}>
-        <h3 style={topicTitle}>Gespräch beenden · End the conversation</h3>
-        <ul style={list}>
-          {endingExpressions.map((item) => <li key={item}>{item}</li>)}
-        </ul>
-      </section>
-    </div>
   </>
 );
 
