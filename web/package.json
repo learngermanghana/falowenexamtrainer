@@ -39,7 +39,7 @@
     "sync:course-goethe-free-chat": "node ../scripts/patchCourseGoetheFreeChatMounts.mjs",
     "sync:a1-self-learning-destinations": "node ../scripts/patchA1SelfLearningDestinationOwnership.mjs",
     "sync:sheet-result-feedback": "node ../scripts/patchSheetResultFeedbackPresentation.mjs",
-    "sync:course-media": "node ../scripts/patchRequestedCourseMedia.mjs && node ../scripts/patchA1Day10PossessivePatterns.mjs && node ../scripts/patchA2StandardSpeakingMindMap.mjs && node ../scripts/patchA2Day2PersonDescriptionPrompt.mjs && node ../scripts/patchRequestedTeacherVideosAug6.mjs",
+    "sync:course-media": "node ../scripts/auditCourseMediaAndSpeaking.mjs",
     "sync:b2-days-9-12": "node ../scripts/patchB2Days9To12ContentUpgrade.mjs",
     "sync:c1-opinion-template": "node ../scripts/patchC1OpinionEssayTemplate.mjs && node ../scripts/patchC1GoetheEssayTemplate.mjs && node ../scripts/patchC1Day18GrammarNotes.mjs && node ../scripts/patchC1GoetheWritingBulletStandard.mjs && node ../scripts/patchC1Day19RichContent.mjs && node ../scripts/patchC1Day19TemplateAndSpeakingCleanup.mjs && node ../scripts/patchC1Day28DemographicChange.mjs",
     "sync:a2-legacy-portal-safety": "node ../scripts/patchA2LegacyPortalSafety.mjs",
