@@ -8,17 +8,12 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(3)} />
-  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Vergleiche zwei Dinge oder Personen" practiceOnly>
-    <p style={paragraph}>Choose two clear things first. Then make one connected comparison instead of separate example sentences.</p>
-    <ol style={list}>
-      <li>Name the two things or people.</li>
-      <li>Say one similarity with <strong>genauso ... wie</strong>.</li>
-      <li>Say at least two differences with comparative + <strong>als</strong>.</li>
-      <li>Finish with your opinion and a reason.</li>
-    </ol>
-    <p style={paragraph}><strong>Thinking route:</strong> Auswahl → Gemeinsamkeit → Unterschiede → Preis/Qualität → Meinung + weil.</p>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
+    </p>
   </WorkbookTaskCard>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(3)} />
 </>;
 
 const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Brief an Felix: Meine Mutter und mein Vater">
