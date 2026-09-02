@@ -21,7 +21,7 @@ const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
   title: "A1 Orientation AI video",
   description:
     "Watch this A1 orientation video first, then continue with the Day 0 guide and workbook.",
-  url: "https://youtu.be/qPwxBYlu3CE",
+  url: "https://youtu.be/PP38eObAMh8",
 };
 
 const A2_DAY0_ORIENTATION_VIDEO_RESOURCE = {
@@ -117,6 +117,18 @@ export const LESSON_VIDEO_DICTIONARY = {
           description:
             "AI video lesson for nominative and accusative cases in A1 German.",
           url: "https://youtu.be/0W1ZMXnaDxI",
+        },
+      ],
+    },
+    10: {
+      videoResources: [
+        {
+          key: "a1-day10-possessive-articles-ai-video",
+          chapter: "6",
+          title: "A1 Day 10 · Possessive Articles · AI video",
+          description:
+            "AI video lesson for mein, dein, sein, ihr, unser, euer and possessive endings in nominative and accusative sentences.",
+          url: "https://youtu.be/7h0XURhtGFg",
         },
       ],
     },
