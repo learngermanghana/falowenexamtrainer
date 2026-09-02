@@ -53,6 +53,7 @@ export default function A2Day9UrlaubWorkbookPage() {
       chapter="4.9"
       workbookId="A2Day9Urlaub"
       topicPrompt="Sprich über deinen letzten Urlaub oder deinen Traumurlaub."
+      showSpeakingTaskCard={false}
       schreibenTask="Sie planen einen Urlaub und möchten eine Unterkunft reservieren. Schreiben Sie eine E-Mail an ein Hotel."
       schreibenContent={schreibenContent}
       lesenText={cultureFreeTimeReadingText}
