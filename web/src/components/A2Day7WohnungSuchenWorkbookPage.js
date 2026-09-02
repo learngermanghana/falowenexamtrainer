@@ -50,6 +50,7 @@ export default function A2Day7WohnungSuchenWorkbookPage() {
       chapter="3.7"
       workbookId="A2Day7WohnungSuchen"
       topicPrompt="Beschreibe, welche Wohnung du suchst und warum sie zu dir passt."
+      showSpeakingTaskCard={false}
       schreibenTask="Sie möchten eine Wohnung in einer bestimmten Stadt mieten. Schreiben Sie eine E-Mail an den Vermieter."
       schreibenContent={schreibenContent}
       lesenText={apartmentSearchReadingText}
