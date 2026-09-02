@@ -8,18 +8,12 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(6)} />
-  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Beschreibe einen Raum so, dass man ihn sich vorstellen kann" practiceOnly>
-    <p style={paragraph}>Create a picture in your head first. Then turn the picture into connected German sentences.</p>
-    <ol style={list}>
-      <li>Name the room and say how it is: groß, klein, hell, gemütlich.</li>
-      <li>Name 3–5 pieces of furniture.</li>
-      <li>Say where important objects are with <strong>Wo? + Dativ</strong>.</li>
-      <li>If you change something, say where you move it with <strong>Wohin? + Akkusativ</strong>.</li>
-      <li>Finish with your favourite place and one reason.</li>
-    </ol>
-    <p style={paragraph}><strong>Thinking route:</strong> Raum → Möbel → Wo? → Veränderung/Wohin? → Lieblingsplatz + weil.</p>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the sentence, and connect the parts into one clear room description.
+    </p>
   </WorkbookTaskCard>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(6)} />
 </>;
 
 const schreibenContent = (
