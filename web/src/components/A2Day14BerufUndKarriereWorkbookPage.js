@@ -7,15 +7,16 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import {
-  STANDARD_WORKBOOK_TABS,
+  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   WorkbookTabNav,
   WorkbookTaskCard,
 } from "./StandardWorkbookComponents";
 
-const DAY14_WORKBOOK_TABS = STANDARD_WORKBOOK_TABS.filter((tab) => tab.key !== "hoeren");
+const DAY14_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.filter((tab) => tab.key !== "hoeren");
 
 const card = {
   ...styles.card,
@@ -148,16 +149,36 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 14 Workbook · Beruf und Karriere</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–3, Ref or Submit below. This 5.14 workbook has no Teil 4 Hören assignment.
+          Select Grammar, Teil 1–3, Ref or Submit below. This 5.14 workbook has no Teil 4 Hören assignment.
         </p>
 
-        <WorkbookTabNav
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          tabs={DAY14_WORKBOOK_TABS}
-          ariaLabel="A2 Day 14 workbook sections"
-        />
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            padding: 10,
+            margin: "0 -4px",
+            border: "1px solid #bfdbfe",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.98)",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <WorkbookTabNav
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            tabs={DAY14_WORKBOOK_TABS}
+            ariaLabel="A2 Day 14 workbook sections"
+          />
+        </div>
       </div>
+
+      {activeTab === "grammar" && (
+        <div style={card}>
+          <A2B1GrammarNotesTab level="A2" day={14} />
+        </div>
+      )}
 
       {activeTab === "sprechen" && (
         <div style={card}>
