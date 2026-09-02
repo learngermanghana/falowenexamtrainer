@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -13,6 +13,45 @@ const formulaStyle = {
   fontWeight: 600,
 };
 
+const practiceQuestions = [
+  {
+    prompt: "Ich mache einen Computerkurs, um ...",
+    options: [
+      "meine Computerkenntnisse zu verbessern.",
+      "zu meine Computerkenntnisse verbessern.",
+      "meine Computerkenntnisse verbessern zu.",
+    ],
+    correctIndex: 0,
+  },
+  {
+    prompt: "Wir schreiben viele Bewerbungen, um ...",
+    options: [
+      "eine gute Stelle zu finden.",
+      "zu eine gute Stelle finden.",
+      "eine gute Stelle finden zu.",
+    ],
+    correctIndex: 0,
+  },
+  {
+    prompt: "Ich arbeite im Team, um ...",
+    options: [
+      "gemeinsam Lösungen zu finden.",
+      "zu gemeinsam Lösungen finden.",
+      "gemeinsam Lösungen finden zu.",
+    ],
+    correctIndex: 0,
+  },
+  {
+    prompt: "Ich lese Fachartikel, um ...",
+    options: [
+      "mehr über meinen Beruf zu lernen.",
+      "zu mehr über meinen Beruf lernen.",
+      "mehr über meinen Beruf lernen zu.",
+    ],
+    correctIndex: 0,
+  },
+];
+
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -20,8 +59,95 @@ const SectionCard = ({ title, children }) => (
   </section>
 );
 
-const A2Day14BerufUndKarriereUmZuGrammarPage = () => {
+const MiniPractice = () => {
+  const [answers, setAnswers] = useState({});
 
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Click the correct ending. Remember: <strong>um + ... + zu + Infinitiv</strong>.
+      </p>
+
+      {practiceQuestions.map((question, questionIndex) => {
+        const selectedIndex = answers[questionIndex];
+        const hasAnswered = Number.isInteger(selectedIndex);
+        const isCorrect = hasAnswered && selectedIndex === question.correctIndex;
+
+        return (
+          <div
+            key={question.prompt}
+            style={{
+              border: "1px solid rgba(148,163,184,0.4)",
+              borderRadius: 12,
+              padding: 12,
+              display: "grid",
+              gap: 10,
+              background: "#fff",
+            }}
+          >
+            <strong>{questionIndex + 1}. {question.prompt}</strong>
+            <div style={{ display: "grid", gap: 8 }} role="group" aria-label={`Question ${questionIndex + 1}`}>
+              {question.options.map((option, optionIndex) => {
+                const selected = selectedIndex === optionIndex;
+                const optionIsCorrect = optionIndex === question.correctIndex;
+                const showCorrect = hasAnswered && optionIsCorrect;
+                const showWrong = selected && !optionIsCorrect;
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setAnswers((current) => ({ ...current, [questionIndex]: optionIndex }))}
+                    aria-pressed={selected}
+                    style={{
+                      ...styles.secondaryButton,
+                      width: "100%",
+                      textAlign: "left",
+                      justifyContent: "flex-start",
+                      padding: "11px 13px",
+                      borderRadius: 10,
+                      border: showCorrect
+                        ? "2px solid #16a34a"
+                        : showWrong
+                          ? "2px solid #dc2626"
+                          : "1px solid #cbd5e1",
+                      background: showCorrect
+                        ? "#f0fdf4"
+                        : showWrong
+                          ? "#fef2f2"
+                          : "#f8fafc",
+                      color: "#0f172a",
+                      fontWeight: selected || showCorrect ? 700 : 600,
+                    }}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+
+            {hasAnswered ? (
+              <p
+                role="status"
+                style={{
+                  margin: 0,
+                  fontWeight: 700,
+                  color: isCorrect ? "#166534" : "#b91c1c",
+                }}
+              >
+                {isCorrect
+                  ? `Correct: ${question.prompt} ${question.options[question.correctIndex]}`
+                  : "Not quite. Choose the ending with zu directly before the infinitive."}
+              </p>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const A2Day14BerufUndKarriereUmZuGrammarPage = () => {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
@@ -88,16 +214,8 @@ const A2Day14BerufUndKarriereUmZuGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="5) Mini practice">
-            <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8 }}>
-              <li>Ich mache einen Computerkurs, um ...</li>
-              <li>Wir schreiben viele Bewerbungen, um ...</li>
-              <li>Ich arbeite im Team, um ...</li>
-              <li>Ich lese Fachartikel, um ...</li>
-            </ol>
-            <p style={{ margin: 0 }}>
-              Write one full sentence for each prompt with <strong>um ... zu</strong>.
-            </p>
+          <SectionCard title="5) Mini practice · Choose the correct answer">
+            <MiniPractice />
           </SectionCard>
         </div>
       </div>
