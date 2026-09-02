@@ -241,50 +241,50 @@ function shuffleArray(items) {
   return copy;
 }
 
-const PracticeBlock = () => {
-  const [q1, setQ1] = useState("");
-  const [q2, setQ2] = useState("");
+const possessivePracticeQuestions = [
+  { stem: "1) Das ist ___ Tisch.", options: ["mein", "meine", "meinen"], answer: "mein", pattern: "ein Tisch", result: "mein Tisch" },
+  { stem: "2) Ich suche ___ Tisch.", options: ["mein", "meine", "meinen"], answer: "meinen", pattern: "einen Tisch", result: "meinen Tisch" },
+  { stem: "3) Das ist ___ Tasche.", options: ["mein", "meine", "meinen"], answer: "meine", pattern: "eine Tasche", result: "meine Tasche" },
+  { stem: "4) Er liest ___ Buch.", options: ["sein", "seine", "seinen"], answer: "sein", pattern: "ein Buch", result: "sein Buch" },
+  { stem: "5) Das sind ___ Bücher.", options: ["unser", "unsere", "unseren"], answer: "unsere", pattern: "die Bücher", result: "unsere Bücher" },
+];
 
-  const Option = ({ name, value, checked, onChange }) => (
-    <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-      <input type="radio" name={name} value={value} checked={checked} onChange={onChange} />
-      {value}
-    </label>
-  );
+const PracticeBlock = () => {
+  const [answers, setAnswers] = useState({});
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <p style={{ margin: 0 }}>Choose the correct possessive word. Use the article pattern to help you.</p>
-
-      <div style={{ display: "grid", gap: 6 }}>
-        <strong>1) Das ist ___ Tisch.</strong>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {["mein", "meine", "meinen"].map((option) => (
-            <Option key={option} name="q1" value={option} checked={q1 === option} onChange={(event) => setQ1(event.target.value)} />
-          ))}
-        </div>
-        {q1 ? (
-          <p style={{ margin: 0 }}>
-            {q1 === "mein" ? "✅ Correct" : "❌ Try again"} — The pattern is <strong>ein Tisch</strong>, so you say{" "}
-            <strong>mein Tisch</strong>.
-          </p>
-        ) : null}
-      </div>
-
-      <div style={{ display: "grid", gap: 6 }}>
-        <strong>2) Ich suche ___ Tisch.</strong>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {["mein", "meine", "meinen"].map((option) => (
-            <Option key={option} name="q2" value={option} checked={q2 === option} onChange={(event) => setQ2(event.target.value)} />
-          ))}
-        </div>
-        {q2 ? (
-          <p style={{ margin: 0 }}>
-            {q2 === "meinen" ? "✅ Correct" : "❌ Try again"} — The pattern is <strong>einen Tisch</strong>, so you say{" "}
-            <strong>meinen Tisch</strong>.
-          </p>
-        ) : null}
-      </div>
+      {possessivePracticeQuestions.map((question, index) => {
+        const selected = answers[index] || "";
+        return (
+          <div key={question.stem} style={{ display: "grid", gap: 6 }}>
+            <strong>{question.stem}</strong>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {question.options.map((option) => (
+                <label key={option} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <input
+                    type="radio"
+                    name={`possessive-q-${index + 1}`}
+                    value={option}
+                    checked={selected === option}
+                    onChange={(event) =>
+                      setAnswers((current) => ({ ...current, [index]: event.target.value }))
+                    }
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+            {selected ? (
+              <p style={{ margin: 0 }}>
+                {selected === question.answer ? "✅ Correct" : "❌ Try again"} — The pattern is{" "}
+                <strong>{question.pattern}</strong>, so you say <strong>{question.result}</strong>.
+              </p>
+            ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 };
