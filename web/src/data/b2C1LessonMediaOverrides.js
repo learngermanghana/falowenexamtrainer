@@ -134,6 +134,42 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
     }),
   }),
   C1: Object.freeze({
+    16: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day16-technologie-alltag-ai-video",
+          chapter: "4.1",
+          title: "C1 Day 16 · Technologie im Alltag · AI video",
+          description:
+            "AI video lesson for evaluating digital tools, permanent availability, digital overload and self-determined technology use at C1 level.",
+          url: "https://youtu.be/H4mPDTiMkwg",
+        }),
+      ]),
+    }),
+    17: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day17-umwelt-verantwortung-ai-video",
+          chapter: "4.2",
+          title: "C1 Day 17 · Umwelt und Verantwortung · AI video",
+          description:
+            "AI video lesson for discussing sustainability, climate responsibility and personal action in a differentiated way at C1 level.",
+          url: "https://youtu.be/g-HaC_4ogaQ",
+        }),
+      ]),
+    }),
+    18: Object.freeze({
+      videoResources: Object.freeze([
+        Object.freeze({
+          key: "c1-day18-gesellschaft-zusammenhalt-ai-video",
+          chapter: "4.3",
+          title: "C1 Day 18 · Gesellschaft und Zusammenhalt · AI video",
+          description:
+            "AI video lesson for analysing community, conflict, solidarity and social cohesion at C1 level.",
+          url: "https://youtu.be/ULtTH3LmWBo",
+        }),
+      ]),
+    }),
     10: Object.freeze({
       videoResources: Object.freeze([
         Object.freeze({
