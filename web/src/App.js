@@ -5,6 +5,7 @@ import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
+import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import LandingPage from "./components/LandingPage";
@@ -659,6 +660,7 @@ const AppShell = ({
 
       <main className="layout-main" style={{ minWidth: 0 }}>
         {!isOnboarding ? <AutoWorkbookStartGuide /> : null}
+        {!isOnboarding ? <BookPdfDownloadInjector /> : null}
         <Routes>
           <Route
             path="/onboarding"
