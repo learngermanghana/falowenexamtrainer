@@ -8,17 +8,12 @@ const paragraph = { margin: 0, lineHeight: 1.7 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const speakingContent = <>
-  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(5)} />
-  <WorkbookTaskCard eyebrow="Now speak · Jetzt sprechen" title="Erzähl über deine Freizeit in 4–6 Sätzen" practiceOnly>
-    <p style={paragraph}>Start with one real hobby and develop it. Do not only list activities.</p>
-    <ol style={list}>
-      <li>Say what you like doing.</li>
-      <li>Add when and how often you do it.</li>
-      <li>Say where and with whom you do it.</li>
-      <li>Finish with a reason or feeling using <strong>weil</strong>.</li>
-    </ol>
-    <p style={paragraph}><strong>Thinking route:</strong> Hobby → Wann/wie oft? → Wo? → Mit wem? → Warum/Gefühl.</p>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the sentence, and connect the parts into one clear answer.
+    </p>
   </WorkbookTaskCard>
+  <SpeakingMindMap config={getA2Days2To6SpeakingConfig(5)} />
 </>;
 
 const schreibenContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="E-Mail an Alex: Freizeit planen">
