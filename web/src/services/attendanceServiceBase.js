@@ -323,6 +323,10 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
     (entryIsObject && studentEntry.late === true) ||
     data.late === true ||
     /\b(late|tardy)\b/.test(normalizedStatus);
+  const isPresentByAssignment =
+    normalizedStatus === "present_by_assignment" ||
+    normalizedStatus === "present by assignment" ||
+    (entryIsObject && normalizeLower(studentEntry.source) === "assignment_submission");
   const hasExplicitPresentFlag =
     entryIsObject && ("present" in studentEntry || "attended" in studentEntry);
   const explicitPresentValue = hasExplicitPresentFlag
@@ -343,7 +347,7 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
     : statusImpliesAbsent
     ? false
     : toBoolean(studentEntry);
-  const status = isPending ? "Pending" : isLate ? "Late" : present ? "Present" : "Absent";
+  const status = isPending ? "Pending" : isPresentByAssignment ? "Present by assignment" : isLate ? "Late" : present ? "Present" : "Absent";
   const rawDuration = data.hours ?? data.durationHours ?? data.duration ?? data.length;
   const sessionHours = parseDurationToHours(rawDuration);
   const resolvedHours = sessionHours || getDefaultSessionHours(level);
@@ -370,6 +374,11 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
     hours: resolvedHours,
     creditedHours: present ? resolvedHours : 0,
     note: (entryIsObject && studentEntry.note) || data.note || "",
+    attendanceSource: (entryIsObject && studentEntry.source) || data.source || "",
+    attendanceMethod: (entryIsObject && studentEntry.method) || data.method || "",
+    assignmentId: (entryIsObject && studentEntry.assignmentId) || "",
+    assignmentSubmittedAt: (entryIsObject && studentEntry.assignmentSubmittedAt) || null,
+    presentByAssignment: isPresentByAssignment,
     startTime: data.startTime || "",
     endTime: data.endTime || "",
     startsAt: data.startsAt || data.startAt || data.startDateTime || data.openFrom || null,
