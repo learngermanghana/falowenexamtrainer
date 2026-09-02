@@ -34,6 +34,7 @@ export default function A2Day8RezepteUndEssenWorkbookPage() {
       chapter="3.8"
       workbookId="A2Day8RezepteUndEssen"
       topicPrompt="Erkläre ein einfaches Rezept und sprich über Essen und Zutaten."
+      showSpeakingTaskCard={false}
       schreibenTask="Sie möchten einen Tisch in einem Restaurant reservieren. Schreiben Sie eine E-Mail an das Restaurant."
       schreibenContent={schreibenContent}
       lesenText={germanKitchenReadingText}
