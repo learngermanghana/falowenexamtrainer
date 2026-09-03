@@ -115,9 +115,10 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
   const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
   const showDays22To28Guide = normalizedLevel === "A2" && numericDay >= 22 && numericDay <= 28;
-  // B1 Days 1–11 already have complete day-specific grammar pages. The central
+  // B1 Days 1–16 already have complete day-specific grammar pages. The central
   // Grammar tab must not stack legacy learning-upgrade blocks on top of them.
-  const showB1Days12To17Upgrade = normalizedLevel === "B1" && numericDay >= 12 && numericDay <= 17;
+  // Keep Day 17 unchanged until its range is reviewed separately.
+  const showB1Day17Upgrade = normalizedLevel === "B1" && numericDay === 17;
   const showB1Days18To23Upgrade = normalizedLevel === "B1" && numericDay >= 18 && numericDay <= 23;
 
   return (
@@ -125,7 +126,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       <A2B1GrammarVideoCard level={level} day={day} />
       {showB1ArgumentTraining ? <B1ArgumentSpeakingTraining /> : null}
       {showA2Collocations ? <A2TopicCollocationPractice day={numericDay} /> : null}
-      {showB1Days12To17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null}
+      {showB1Day17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null}
       {showB1Days18To23Upgrade ? <B1Days18To23LearningUpgrade day={numericDay} /> : null}
       {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
