@@ -41,6 +41,14 @@ const imageStyle = {
   borderRadius: 12,
 };
 
+const listeningVideoStyle = {
+  width: "100%",
+  aspectRatio: "16 / 9",
+  minHeight: 260,
+  border: 0,
+  borderRadius: 12,
+};
+
 const essayText = [
   "Deutschland liegt in Europa. Es hat neun Nachbarländer. Diese sind: Dänemark, Polen, Tschechien, Österreich, die Schweiz, Frankreich, Luxemburg, Belgien und die Niederlande.",
   "In Deutschland spricht man Deutsch. In Polen spricht man Polnisch. In Frankreich spricht man Französisch. In den Niederlanden spricht man Niederländisch. In Österreich und der Schweiz spricht man Deutsch. In der Schweiz spricht man auch Französisch und Italienisch.",
@@ -153,13 +161,14 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
 
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>Teil 3 · Germany&apos;s Neighbors (Hören)</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Listen to the audio below and choose one correct answer.</p>
-        <p style={{ margin: 0 }}>
-          Audio Link:{" "}
-          <a href="https://drive.google.com/file/d/1qyrzaHyuB0mLOxRCidmvyj15P8LzeEft/view?usp=sharing" target="_blank" rel="noreferrer">
-            Open Hören audio
-          </a>
-        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>Listen to the video below and choose one correct answer.</p>
+        <iframe
+          title="A1 Day 8 Hören: Annas Reisepläne"
+          src="https://www.youtube.com/embed/nqTYvpXFGfQ"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          style={listeningVideoStyle}
+        />
 
         <div style={questionCardStyle}>
           <strong>Fragen:</strong>
@@ -200,7 +209,15 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
                 <li>d) London</li>
               </ul>
             </li>
-            <li>Wohin möchte Anna nächstes Jahr?</li>
+            <li>
+              Wohin möchte Anna nächstes Jahr?
+              <ul style={listStyle}>
+                <li>a) Nach Spanien</li>
+                <li>b) Nach Deutschland</li>
+                <li>c) Nach Italien</li>
+                <li>d) Nach Frankreich</li>
+              </ul>
+            </li>
           </ol>
         </div>
       </section>
