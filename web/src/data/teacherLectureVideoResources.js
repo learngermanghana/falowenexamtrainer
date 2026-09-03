@@ -50,6 +50,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/iKKyQRbuc-8",
       },
     ],
+    14: [
+      {
+        chapter: "5.14",
+        topic: "Beruf und Karriere",
+        tutor_lecture_video: "https://youtu.be/hGK64aXtARk",
+      },
+    ],
     16: [
       {
         chapter: "6.16",
@@ -100,6 +107,23 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const clean = (value = "") => String(value || "").trim();
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const teacherLectureUrl = (entry = {}) =>
+  clean(
+    entry.url ||
+      entry.href ||
+      entry.youtube_link ||
+      entry.video ||
+      entry.tutor_lecture_video ||
+      entry.tutorLectureVideo ||
+      entry.tutor_lecture_video_url ||
+      entry.tutorLectureVideoUrl ||
+      entry.tutor_lecture_url ||
+      entry.tutorLectureUrl ||
+      entry.teacher_video ||
+      entry.teacherVideo ||
+      entry.teacher_lecture_url ||
+      entry.teacherLectureUrl,
+  );
 
 export const getTeacherLectureVideoResources = (level, day) => {
   const normalizedLevel = normalizeLevel(level);
@@ -108,7 +132,7 @@ export const getTeacherLectureVideoResources = (level, day) => {
 
   return entries
     .map((entry, index) => {
-      const url = clean(entry.url || entry.href || entry.youtube_link || entry.video);
+      const url = teacherLectureUrl(entry);
       if (!url) return null;
       const chapter = clean(entry.chapter);
       const topic = clean(entry.topic || entry.title) || `${normalizedLevel} Day ${dayNumber}`;
