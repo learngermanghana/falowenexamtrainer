@@ -1,6 +1,9 @@
 import { normalizeA2B1Lesson } from "./lessonModel";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
-import { getTeacherLectureVideoResources } from "./teacherLectureVideoResources";
+import {
+  getTeacherLectureVideoResources,
+  TEACHER_LECTURE_VIDEO_RESOURCES,
+} from "./teacherLectureVideoResources";
 
 describe("teacher lecture media regressions", () => {
   test("renders the A2 Day 14 tutor lecture alongside the AI video", () => {
@@ -32,19 +35,6 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
-  test("accepts a configured tutor-only legacy media key", () => {
-    const resources = getTeacherLectureVideoResources("A2", 14);
-
-    expect(resources).toHaveLength(1);
-    expect(resources[0]).toEqual(
-      expect.objectContaining({
-        chapter: "5.14",
-        title: "Kapitel 5.14 · Teacher lecture video",
-        url: "https://youtu.be/hGK64aXtARk",
-      }),
-    );
-  });
-
   test("registers the B1 Day 8 Kapitel 3.8 tutor lecture", () => {
     const lesson = normalizeA2B1Lesson(
       {
@@ -62,10 +52,36 @@ describe("teacher lecture media regressions", () => {
         url: "https://youtu.be/GuQcUitfvQA",
       }),
     );
-    expect(lesson.resources.videos).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ url: "https://youtu.be/GuQcUitfvQA" }),
-      ]),
+  });
+
+  test("keeps ready-made Day 1 to 28 slots for A2 through C1", () => {
+    ["A2", "B1", "B2", "C1"].forEach((level) => {
+      expect(Object.keys(TEACHER_LECTURE_VIDEO_RESOURCES[level]).map(Number)).toEqual(
+        Array.from({ length: 28 }, (_, index) => index + 1),
+      );
+    });
+
+    expect(TEACHER_LECTURE_VIDEO_RESOURCES.A2[28][0].chapter).toBe("10.28");
+    expect(TEACHER_LECTURE_VIDEO_RESOURCES.B1[28][0].chapter).toBe("10.28");
+    expect(TEACHER_LECTURE_VIDEO_RESOURCES.B2[6][0].chapter).toBe("2.1");
+    expect(TEACHER_LECTURE_VIDEO_RESOURCES.C1[28][0].chapter).toBe("6.3");
+  });
+
+  test("does not render empty prepared B2 and C1 teacher slots", () => {
+    expect(getTeacherLectureVideoResources("B2", 1)).toEqual([]);
+    expect(getTeacherLectureVideoResources("C1", 28)).toEqual([]);
+  });
+
+  test("accepts a configured tutor-only legacy media key", () => {
+    const resources = getTeacherLectureVideoResources("A2", 14);
+
+    expect(resources).toHaveLength(1);
+    expect(resources[0]).toEqual(
+      expect.objectContaining({
+        chapter: "5.14",
+        title: "Kapitel 5.14 · Teacher lecture video",
+        url: "https://youtu.be/hGK64aXtARk",
+      }),
     );
   });
 

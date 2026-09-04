@@ -139,60 +139,79 @@ In the Course Book UI, this appears as **AI Grammar Explainer** with a **Watch A
 ### 2. Teacher lecture video / tutor lecture video
 Use this only for real teacher/tutor lecture recordings.
 
-A1 teacher videos are managed here:
+#### A1
+A1 remains separate because some A1 days can have more than one teacher video for the same day/chapter:
 
 ```
 web/src/data/a1TeacherVideoResources.js
 ```
 
-A1 already has teacher lecture videos configured by day and chapter. Example format:
+Example:
 
 ```js
 [2, "0.2", "German Alphabet", "https://youtu.be/VIDEO_ID"]
 ```
 
-For future A2 or B1 teacher lecture videos, use this simple config file:
+#### A2, B1, B2 and C1
+All teacher lectures for A2 through C1 now use one registry:
 
 ```
 web/src/data/teacherLectureVideoResources.js
 ```
 
-Add new A2/B1 teacher lecture videos like this:
+The file already contains **Day 1–28 for A2, B1, B2 and C1**. The chapter values are already filled in. In normal use, do not rebuild the dictionary and do not change the chapter. Find the level and day, then paste the YouTube link into `tutor_lecture_video`.
+
+Blank slot:
 
 ```js
-const TEACHER_LECTURE_VIDEO_ENTRIES = {
-  A2: {
-    16: [
-      {
-        chapter: "6.16",
-        topic: "Wohlbefinden und Entspannung",
-        url: "https://youtu.be/VIDEO_ID",
-      },
-    ],
-  },
-  B1: {
-    8: [
-      {
-        chapter: "3.8",
-        topic: "Alles für die Gesundheit",
-        url: "https://youtu.be/VIDEO_ID",
-      },
-    ],
-  },
-};
+8: [{ chapter: "3.8", tutor_lecture_video: "" }],
 ```
+
+After adding the teacher lecture:
+
+```js
+8: [{ chapter: "3.8", tutor_lecture_video: "https://youtu.be/VIDEO_ID" }],
+```
+
+Current B1 Day 8 / Chapter 3.8 example:
+
+```js
+B1: {
+  8: [{
+    chapter: "3.8",
+    topic: "B1 Day 8",
+    tutor_lecture_video: "https://youtu.be/GuQcUitfvQA",
+  }],
+},
+```
+
+Current A2 Day 14 / Chapter 5.14 example:
+
+```js
+A2: {
+  14: [{
+    chapter: "5.14",
+    topic: "Beruf und Karriere",
+    tutor_lecture_video: "https://youtu.be/hGK64aXtARk",
+  }],
+},
+```
+
+`topic` is optional. The only field you normally need to edit is `tutor_lecture_video`.
 
 Rules:
 
-- A1 teacher lecture videos show when an A1 teacher video link exists.
-- A2 teacher lecture videos show only when that day is added to `teacherLectureVideoResources.js`.
-- B1 teacher lecture videos show only when that day is added to `teacherLectureVideoResources.js`.
-- If no teacher lecture video exists for an A2/B1 day, the app does not show an empty teacher video card.
+- Empty `tutor_lecture_video: ""` slots are ignored and do **not** create empty cards for students.
+- Adding a teacher lecture does **not** replace the AI video; both can appear for the same lesson.
+- A2, B1, B2 and C1 all use `teacherLectureVideoResources.js` for new teacher lectures.
+- A1 continues to use `a1TeacherVideoResources.js`.
+- Do not put teacher lecture links in `ai_grammar_video`.
+- Do not change the prepared day/chapter mapping unless the curriculum itself changes.
 
-In the Course Book UI, this appears as **Teacher Lecture** with a **Watch teacher video** button.
+In the Course Book UI, a configured tutor recording appears as **Teacher Lecture** with a **Watch teacher video** button.
 
 ### 3. Falowen Radio
-Use this for the radio/listening intro shown with the `?radio=done` flow and A2/B1 radio lessons.
+Use this for the radio/listening intro shown with the `?radio=done` flow and course radio lessons.
 
 Main files:
 
@@ -242,7 +261,7 @@ The logic is:
 
 1. `lessonModel.js` normalizes the lesson and collects media resources.
 2. `lessonVideoDictionary.js` separates AI grammar videos from teacher lecture videos.
-3. `teacherLectureVideoResources.js` controls which A2/B1 teacher videos are allowed to show.
+3. `teacherLectureVideoResources.js` provides the A2, B1, B2 and C1 teacher-video registry.
 4. `a1TeacherVideoResources.js` provides the A1 teacher lecture videos.
 5. `lessonRadioDictionary.js` and `additionalA2RadioEntries.js` provide Falowen Radio.
 6. `CourseLessonPageLegacy.js` renders the cards in the Lesson resources box.
@@ -250,7 +269,7 @@ The logic is:
 ### Quick checklist when adding media
 - Add AI videos to `lessonVideoDictionary.js` using `ai_grammar_video` or a resource titled `AI grammar video`.
 - Add A1 teacher videos to `a1TeacherVideoResources.js`.
-- Add A2/B1 teacher videos to `teacherLectureVideoResources.js`.
+- Add A2/B1/B2/C1 teacher videos by pasting the URL into the prepared day slot in `teacherLectureVideoResources.js`.
 - Add Falowen Radio videos to `lessonRadioDictionary.js` or `additionalA2RadioEntries.js`.
 - Do not put a teacher lecture link in `ai_grammar_video`.
 - Do not put a Falowen Radio link in the AI video or teacher lecture files.
