@@ -101,6 +101,13 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
         url: "https://youtu.be/7e6yi6_OM2c",
       },
     ],
+    8: [
+      {
+        chapter: "3.8",
+        topic: "B1 Day 8",
+        tutor_lecture_video: "https://youtu.be/GuQcUitfvQA",
+      },
+    ],
   },
 };
 
