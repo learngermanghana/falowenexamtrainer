@@ -45,6 +45,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("registers the B1 Day 8 Kapitel 3.8 tutor lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 8,
+        chapter: "3.8",
+        topic: "B1 Day 8",
+      },
+      "B1",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "3.8",
+        title: "Kapitel 3.8 · Teacher lecture video",
+        url: "https://youtu.be/GuQcUitfvQA",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/GuQcUitfvQA" }),
+      ]),
+    );
+  });
+
   test("preserves case-sensitive paths and query values for generic video URLs", () => {
     const urls = [
       "https://example.com/Video.mp4?Token=AbC",
