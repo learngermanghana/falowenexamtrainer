@@ -192,6 +192,7 @@ export default function B1StandardWorkbookPage({ config }) {
   const reading = config.reading || {};
   const listening = config.listening || { status: "planned" };
   const embedUrl = getYouTubeEmbedUrl(listening);
+  const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -379,11 +380,16 @@ export default function B1StandardWorkbookPage({ config }) {
 
       {activeTab === "hoeren" && (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 4 · Hören (Self-check)</h2>
+          <h2 style={sectionTitle}>Teil 4 · Hören ({listeningRequiresSubmission ? "Assignment" : "Self-check"})</h2>
           <WorkbookTaskCard
-            eyebrow="Your assignment · Listening"
+            eyebrow={listeningRequiresSubmission ? "Your assignment · Listening" : "Listening · Self-check"}
             title={listening.title || "Listening task will be added here."}
-            submissionNote={listening.submissionNote || "Self-check this part. Submit only if your teacher asks for it."}
+            submissionNote={
+              listening.submissionNote ||
+              (listeningRequiresSubmission
+                ? "Submit your listening answers through the Submit tab."
+                : "Self-check this part. Submit only if your teacher asks for it.")
+            }
           >
             <p style={{ margin: 0 }}>
               {listening.instructions || "Listen carefully and complete the questions."}
@@ -395,7 +401,11 @@ export default function B1StandardWorkbookPage({ config }) {
           {listening.status === "planned" ? (
             <PlaceholderCard
               title="Listening content skeleton"
-              text="Add the listening media, questions and self-check instructions here when the material is ready."
+              text={
+                listeningRequiresSubmission
+                  ? "Add the listening media, questions and submission instructions here when the material is ready."
+                  : "Add the listening media, questions and self-check instructions here when the material is ready."
+              }
             />
           ) : embedUrl ? (
             <>
@@ -429,11 +439,19 @@ export default function B1StandardWorkbookPage({ config }) {
           <h2 style={sectionTitle}>Submit workbook answers</h2>
           <WorkbookTaskCard
             eyebrow="Final step"
-            title={config.submitTitle || "Submit Teil 2 and Teil 3."}
-            submissionNote={config.submitNote || "Teil 1 is group practice. Teil 4 may be self-check depending on the lesson."}
+            title={config.submitTitle || (listeningRequiresSubmission ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3.")}
+            submissionNote={
+              config.submitNote ||
+              (listeningRequiresSubmission
+                ? "Teil 1 is group practice. Teil 4 is a listening assignment and must be submitted."
+                : "Teil 1 is group practice. Teil 4 may be self-check depending on the lesson.")
+            }
           >
             <p style={{ margin: 0 }}>
-              {config.submitInstructions || "Paste your final writing text and reading answers into the form below."}
+              {config.submitInstructions ||
+                (listeningRequiresSubmission
+                  ? "Paste your final writing text, reading answers and listening answers into the form below."
+                  : "Paste your final writing text and reading answers into the form below.")}
             </p>
           </WorkbookTaskCard>
           <div className="b1-standard-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
