@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { resolveA2B1WorkbookDayFromLocation } from "./A2B1WorkbookGuidance";
 import A2StarterConjunctionsPage from "./A2StarterConjunctionsPage";
-import { getA2B1GrammarNotesComponent } from "./A2B1WorkbookGrammarNotes";
+import { getA2B1GrammarNotesComponent } from "./A2B1WorkbookGrammarNotesContent";
 import {
   A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   STANDARD_WORKBOOK_TABS,
