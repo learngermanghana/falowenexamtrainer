@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { LESSON_VIDEO_DICTIONARY } from "../data/lessonVideoDictionary";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { toDateMs } from "../lib/dateUtils";
 import { useToast } from "../context/ToastContext";
 import SetupCheckpoint from "./SetupCheckpoint";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
@@ -55,13 +56,18 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
     const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
     return ["paid", "partial"].includes(paymentStatus) || hasClearedBalance(balanceDue);
   }, [studentProfile?.balance, studentProfile?.balanceDue, studentProfile?.paymentStatus]);
+  const activeTrial = useMemo(() => {
+    const trialEndsAtMs = toDateMs(studentProfile?.trialEndsAt);
+    return Number.isFinite(trialEndsAtMs) && trialEndsAtMs > Date.now();
+  }, [studentProfile?.trialEndsAt]);
+  const accessConfirmed = paymentConfirmed || activeTrial;
 
   useEffect(() => {
-    if (!paymentConfirmed) return;
+    if (!accessConfirmed) return;
     const context = getPublicFunnelContext();
     if (!context.sessionId && !context.source && !context.video) return;
     trackPublicFunnelEvent("onboarding_view", { level, onboardingVideo: videoId });
-  }, [level, paymentConfirmed, videoId]);
+  }, [accessConfirmed, level, videoId]);
 
   const openDashboard = async ({ skippedVideo = false } = {}) => {
     setSaving(true);
@@ -88,7 +94,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
     }
   };
 
-  if (!paymentConfirmed) {
+  if (!accessConfirmed) {
     return <SetupCheckpoint />;
   }
 
@@ -139,7 +145,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             fontWeight: 700,
           }}
         >
-          Video not playing? Do not worry. Paid students can continue to the dashboard and watch the video later.
+          Video not playing? Do not worry. Students with a confirmed payment or an active free trial can continue to the dashboard and watch the video later.
         </div>
 
         <section className="onboarding-steps" aria-labelledby="easy-steps-title">
