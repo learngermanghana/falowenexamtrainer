@@ -6,13 +6,17 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
+import { toDateMs } from "../lib/dateUtils";
+
+const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
 const SetupCheckpoint = () => {
-  const { studentProfile, refreshUser, logout } = useAuth();
+  const { studentProfile, refreshUser, saveStudentProfile, logout } = useAuth();
   const { i18n } = useTranslation();
   const locale = i18n.language;
   const [status, setStatus] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [startingTrial, setStartingTrial] = useState(false);
   const paymentsEnabled = isPaymentsEnabled();
 
   const paidAmount = useMemo(() => {
@@ -44,6 +48,38 @@ const SetupCheckpoint = () => {
     return intended;
   }, [paidAmount, studentProfile?.paymentIntentAmount]);
 
+  const trialState = useMemo(() => {
+    const endsAtMs = toDateMs(studentProfile?.trialEndsAt);
+    const startedAtMs = toDateMs(studentProfile?.trialStartedAt);
+    const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
+    const wasUsed =
+      Number.isFinite(startedAtMs) ||
+      Number.isFinite(endsAtMs) ||
+      Number.isFinite(usedAtMs);
+    const active = Number.isFinite(endsAtMs) && endsAtMs > Date.now();
+    return { active, endsAtMs, wasUsed };
+  }, [studentProfile?.trialEndsAt, studentProfile?.trialStartedAt, studentProfile?.trialUsedAt]);
+
+  const handleStartTrial = async () => {
+    if (trialState.wasUsed || startingTrial) return;
+    setStartingTrial(true);
+    setStatus("");
+    try {
+      const startedAt = new Date();
+      const endsAt = new Date(startedAt.getTime() + TRIAL_DURATION_MS);
+      await saveStudentProfile({
+        trialStartedAt: startedAt.toISOString(),
+        trialEndsAt: endsAt.toISOString(),
+        trialUsedAt: startedAt.toISOString(),
+      });
+      setStatus("Your 7-day free trial is active. Opening your Falowen campus...");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not start your free trial.";
+      setStatus(message);
+      setStartingTrial(false);
+    }
+  };
+
   const handleRefreshStatus = async () => {
     setRefreshing(true);
     setStatus("");
@@ -58,6 +94,14 @@ const SetupCheckpoint = () => {
     }
   };
 
+  const trialEndLabel = Number.isFinite(trialState.endsAtMs)
+    ? new Intl.DateTimeFormat(locale || "en", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(new Date(trialState.endsAtMs))
+    : "";
+
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, width: "100%", maxWidth: 920, display: "grid", gap: 12 }}>
@@ -65,7 +109,7 @@ const SetupCheckpoint = () => {
           <div>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Finish setting up your account</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You're signed in with limited access until your tuition payment is confirmed.
+              You're signed in with limited access until your tuition payment is confirmed or you start your one-time 7-day free trial.
               Pay at least {formatCurrency(2000, { locale })} to unlock 1-month access, or clear the full balance to unlock 6 months.
             </p>
           </div>
@@ -114,6 +158,43 @@ const SetupCheckpoint = () => {
                 : "Payments are available on the web app. Sign in on the website to complete your tuition."
             }
           />
+
+          <div
+            style={{
+              ...styles.card,
+              margin: 0,
+              borderColor: trialState.wasUsed ? "#e2e8f0" : "#93c5fd",
+              background: trialState.wasUsed ? "#f8fafc" : "#eff6ff",
+              display: "grid",
+              gap: 10,
+              alignContent: "start",
+            }}
+          >
+            <div>
+              <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
+                7-day free trial
+              </span>
+              <h3 style={{ margin: "10px 0 4px" }}>
+                {trialState.wasUsed ? "Your free trial has already been used" : "Try Falowen before you pay"}
+              </h3>
+              <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+                {trialState.wasUsed
+                  ? `The one-time trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has ended"}. Complete your tuition payment to continue learning.`
+                  : "Get full student access for 7 days. Starting a trial does not record a payment, reduce your tuition balance, or start your paid contract. Payment is required when the trial ends."}
+              </p>
+            </div>
+
+            {!trialState.wasUsed ? (
+              <button
+                type="button"
+                style={styles.primaryButton}
+                onClick={handleStartTrial}
+                disabled={startingTrial}
+              >
+                {startingTrial ? "Starting your trial..." : "Start 7-day free trial"}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
