@@ -38,24 +38,6 @@ const lazyLevelPages = () => ({
   },
 });
 
-const reportEntryModules = () => ({
-  name: 'falowen-entry-module-report',
-  generateBundle(_options, bundle) {
-    Object.values(bundle).forEach((output) => {
-      if (output.type !== 'chunk' || !output.isEntry) return;
-      const largest = Object.entries(output.modules)
-        .map(([id, details]) => ({
-          id: id.replace(/\\/g, '/').replace(process.cwd().replace(/\\/g, '/'), ''),
-          size: details.renderedLength || 0,
-        }))
-        .sort((a, b) => b.size - a.size)
-        .slice(0, 30);
-      console.log(`FALOWEN_ENTRY_PROFILE ${output.fileName}`);
-      largest.forEach(({ id, size }) => console.log(`FALOWEN_ENTRY_MODULE ${size} ${id}`));
-    });
-  },
-});
-
 const splitVendorChunk = (id) => {
   const normalizedId = id.replace(/\\/g, '/');
   if (!normalizedId.includes('/node_modules/')) return undefined;
@@ -96,7 +78,6 @@ export default defineConfig(({ mode }) => ({
     react({
       include: /\.[jt]sx?$/,
     }),
-    reportEntryModules(),
   ],
   esbuild: {
     loader: 'jsx',
