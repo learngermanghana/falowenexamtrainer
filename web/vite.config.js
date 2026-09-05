@@ -8,29 +8,31 @@ const getClientEnv = (mode) => {
   );
 };
 
-const lazyCourseRoutes = () => ({
-  name: 'falowen-lazy-course-routes',
+const lazyLevelPages = () => ({
+  name: 'falowen-lazy-level-pages',
   enforce: 'pre',
   transform(code, id) {
     const normalizedId = id.replace(/\\/g, '/');
-    if (!normalizedId.endsWith('/src/App.js')) return null;
+    if (!normalizedId.includes('/src/') || normalizedId.includes('/node_modules/')) return null;
 
-    const routeImportPattern = /^import\s+([A-Za-z0-9_]+(?:Page|Course))\s+from\s+["'](\.\/components\/(?:A1|A2|B1|B2|C1|C2)[^"']+)["'];\s*$/gm;
+    const routeImportPattern = /^import\s+([A-Za-z0-9_]+(?:Page|Course))\s+from\s+["']([^"']+)["'];\s*$/gm;
     let converted = 0;
-    const transformed = code.replace(routeImportPattern, (_match, componentName, sourcePath) => {
+    const transformed = code.replace(routeImportPattern, (match, componentName, sourcePath) => {
+      const sourceFile = sourcePath.split('/').pop() || '';
+      if (!/^(A1|A2|B1|B2|C1|C2)/i.test(sourceFile)) return match;
+
       converted += 1;
-      return `const ${componentName} = createLazyRoute(() => import("${sourcePath}"), "${componentName}");`;
+      return `const ${componentName} = __falowenCreateLazyRoute(() => import("${sourcePath}"), "${componentName}");`;
     });
 
     if (!converted) return null;
 
-    const helper = `\nconst createLazyRoute = (loader, displayName) => {\n  const LazyComponent = React.lazy(loader);\n  const LazyRoute = (props) => React.createElement(\n    React.Suspense,\n    { fallback: React.createElement("div", { style: { padding: 16 } }, "Loading lesson…") },\n    React.createElement(LazyComponent, props),\n  );\n  LazyRoute.displayName = displayName;\n  return LazyRoute;\n};\n`;
+    const helper = `const __falowenCreateLazyRoute = (loader, displayName) => {\n  const LazyComponent = React.lazy(loader);\n  const LazyRoute = (props) => React.createElement(\n    React.Suspense,\n    { fallback: React.createElement("div", { style: { padding: 16 } }, "Loading lesson…") },\n    React.createElement(LazyComponent, props),\n  );\n  LazyRoute.displayName = displayName;\n  return LazyRoute;\n};\n`;
+    const hasReactDefaultImport = /^import\s+React(?:\s*,|\s+from)/m.test(transformed);
+    const reactImport = hasReactDefaultImport ? '' : 'import React from "react";\n';
 
     return {
-      code: transformed.replace(
-        /^(import\s+React[^;]+;)/m,
-        `$1${helper}`,
-      ),
+      code: `${reactImport}${helper}${transformed}`,
       map: null,
     };
   },
@@ -72,7 +74,7 @@ const splitVendorChunk = (id) => {
 
 export default defineConfig(({ mode }) => ({
   plugins: [
-    lazyCourseRoutes(),
+    lazyLevelPages(),
     react({
       include: /\.[jt]sx?$/,
     }),
