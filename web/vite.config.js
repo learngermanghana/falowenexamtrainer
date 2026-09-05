@@ -8,104 +8,71 @@ const getClientEnv = (mode) => {
   );
 };
 
-const sanitizeChunkName = (value) =>
-  String(value || '')
-    .replace(/^@/, '')
-    .replace(/[^a-zA-Z0-9_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
+const lazyCourseRoutes = () => ({
+  name: 'falowen-lazy-course-routes',
+  enforce: 'pre',
+  transform(code, id) {
+    const normalizedId = id.replace(/\\/g, '/');
+    if (!normalizedId.endsWith('/src/App.js')) return null;
 
-const packageChunkName = (id) => {
-  const marker = '/node_modules/';
-  const markerIndex = id.lastIndexOf(marker);
-  if (markerIndex < 0) return undefined;
+    const routeImportPattern = /^import\s+([A-Za-z0-9_]+(?:Page|Course))\s+from\s+["'](\.\/components\/(?:A1|A2|B1|B2|C1|C2)[^"']+)["'];\s*$/gm;
+    let converted = 0;
+    const transformed = code.replace(routeImportPattern, (_match, componentName, sourcePath) => {
+      converted += 1;
+      return `const ${componentName} = createLazyRoute(() => import("${sourcePath}"), "${componentName}");`;
+    });
 
-  const packagePath = id.slice(markerIndex + marker.length);
-  const parts = packagePath.split('/').filter(Boolean);
-  if (!parts.length) return undefined;
-  const packageName = parts[0].startsWith('@') && parts[1]
-    ? `${parts[0]}-${parts[1]}`
-    : parts[0];
-  return `vendor-${sanitizeChunkName(packageName)}`;
-};
+    if (!converted) return null;
 
-const levelDayChunk = (id) => {
-  const componentMarker = '/src/components/';
-  const markerIndex = id.indexOf(componentMarker);
-  if (markerIndex < 0) return undefined;
+    const helper = `\nconst createLazyRoute = (loader, displayName) => {\n  const LazyComponent = React.lazy(loader);\n  const LazyRoute = (props) => React.createElement(\n    React.Suspense,\n    { fallback: React.createElement("div", { style: { padding: 16 } }, "Loading lesson…") },\n    React.createElement(LazyComponent, props),\n  );\n  LazyRoute.displayName = displayName;\n  return LazyRoute;\n};\n`;
 
-  const relative = id.slice(markerIndex + componentMarker.length);
-  const fileName = relative.split('/').pop() || '';
-  const levelMatch = fileName.match(/^(A1|A2|B1|B2|C1|C2)(?:Day)?(\d{1,2})?/i);
-  if (!levelMatch) return undefined;
+    return {
+      code: transformed.replace(
+        /^(import\s+React[^;]+;)/m,
+        `$1${helper}`,
+      ),
+      map: null,
+    };
+  },
+});
 
-  const level = levelMatch[1].toLowerCase();
-  const day = Number(levelMatch[2]);
-  if (!Number.isFinite(day) || day < 1 || day > 31) return `course-${level}-shared`;
-
-  const rangeStart = Math.floor((day - 1) / 7) * 7 + 1;
-  const rangeEnd = Math.min(rangeStart + 6, 31);
-  return `course-${level}-days-${rangeStart}-${rangeEnd}`;
-};
-
-const genericComponentChunk = (id) => {
-  if (!id.includes('/src/components/')) return undefined;
-  if (id.includes('/src/components/selfLearning/')) return 'feature-self-learning';
-
-  const fileName = id.split('/').pop() || '';
-  if (/Exam|Goethe|Readiness/i.test(fileName)) return 'feature-exams';
-  if (/Speaking|Speech|Pronunciation|Recorder/i.test(fileName)) return 'feature-speaking';
-  if (/Writing|Letter|Essay/i.test(fileName)) return 'feature-writing';
-  if (/Workbook|Course|Lesson|Campus/i.test(fileName)) return 'feature-learning-shell';
-
-  const first = fileName.charAt(0).toLowerCase();
-  if (first >= 'a' && first <= 'f') return 'components-a-f';
-  if (first >= 'g' && first <= 'l') return 'components-g-l';
-  if (first >= 'm' && first <= 'r') return 'components-m-r';
-  return 'components-s-z';
-};
-
-const splitAppChunk = (id) => {
+const splitVendorChunk = (id) => {
   const normalizedId = id.replace(/\\/g, '/');
+  if (!normalizedId.includes('/node_modules/')) return undefined;
 
-  if (normalizedId.includes('/node_modules/')) {
-    if (normalizedId.includes('/firebase/') || normalizedId.includes('/@firebase/')) return 'vendor-firebase';
-    if (
-      normalizedId.includes('/react/') ||
-      normalizedId.includes('/react-dom/') ||
-      normalizedId.includes('/react-router/') ||
-      normalizedId.includes('/react-router-dom/') ||
-      normalizedId.includes('/scheduler/')
-    ) return 'vendor-react';
-    if (normalizedId.includes('/i18next/') || normalizedId.includes('/react-i18next/')) return 'vendor-i18n';
-    if (normalizedId.includes('/jspdf/')) return 'vendor-pdf';
-    if (normalizedId.includes('/axios/')) return 'vendor-network';
-    return packageChunkName(normalizedId);
-  }
-
-  // Keep this module owned by its dynamic import so opening Grammar creates a real lazy chunk.
-  if (normalizedId.endsWith('/src/components/A2B1WorkbookGrammarNotesContent.js')) return undefined;
-
-  const courseChunk = levelDayChunk(normalizedId);
-  if (courseChunk) return courseChunk;
-
-  const componentChunk = genericComponentChunk(normalizedId);
-  if (componentChunk) return componentChunk;
-
-  if (normalizedId.includes('/src/data/')) {
-    const dataFile = normalizedId.split('/').pop() || '';
-    const level = dataFile.match(/^(a1|a2|b1|b2|c1|c2)/i)?.[1]?.toLowerCase();
-    return level ? `data-${level}` : 'data-core';
-  }
-  if (normalizedId.includes('/src/services/')) return 'app-services';
-  if (normalizedId.includes('/src/context/')) return 'app-context';
-  if (normalizedId.includes('/src/lib/') || normalizedId.includes('/src/utils/')) return 'app-utils';
-
-  return undefined;
+  if (normalizedId.includes('/firebase/') || normalizedId.includes('/@firebase/')) return 'vendor-firebase';
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/react-dom/') ||
+    normalizedId.includes('/react-router/') ||
+    normalizedId.includes('/react-router-dom/') ||
+    normalizedId.includes('/scheduler/')
+  ) return 'vendor-react';
+  if (normalizedId.includes('/i18next/') || normalizedId.includes('/react-i18next/')) return 'vendor-i18n';
+  if (normalizedId.includes('/jspdf/')) return 'vendor-pdf';
+  if (normalizedId.includes('/axios/')) return 'vendor-network';
+  if (normalizedId.includes('/html2canvas/')) return 'vendor-html-canvas';
+  if (
+    normalizedId.includes('/canvg/') ||
+    normalizedId.includes('/svg-pathdata/') ||
+    normalizedId.includes('/rgbcolor/') ||
+    normalizedId.includes('/stackblur-canvas/') ||
+    normalizedId.includes('/raf/')
+  ) return 'vendor-canvas-support';
+  if (normalizedId.includes('/re2js/')) return 'vendor-regex';
+  if (
+    normalizedId.includes('/pako/') ||
+    normalizedId.includes('/fflate/') ||
+    normalizedId.includes('/fast-png/') ||
+    normalizedId.includes('/iobuffer/')
+  ) return 'vendor-codecs';
+  if (normalizedId.includes('/core-js/') || normalizedId.includes('/dompurify/')) return 'vendor-runtime';
+  return 'vendor-misc';
 };
 
 export default defineConfig(({ mode }) => ({
   plugins: [
+    lazyCourseRoutes(),
     react({
       include: /\.[jt]sx?$/,
     }),
@@ -126,7 +93,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: splitAppChunk,
+        manualChunks: splitVendorChunk,
       },
     },
   },
