@@ -80,6 +80,10 @@ const SetupCheckpoint = () => {
     }
   };
 
+  const handlePayTuition = () => {
+    document.getElementById("tuition-payment")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const handleRefreshStatus = async () => {
     setRefreshing(true);
     setStatus("");
@@ -109,13 +113,64 @@ const SetupCheckpoint = () => {
           <div>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Finish setting up your account</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You're signed in with limited access until your tuition payment is confirmed or you start your one-time 7-day free trial.
-              Pay at least {formatCurrency(2000, { locale })} to unlock 1-month access, or clear the full balance to unlock 6 months.
+              Choose a 7-day free trial or complete your tuition payment to continue into Falowen.
             </p>
           </div>
           <button style={styles.secondaryButton} onClick={logout}>
             Logout
           </button>
+        </div>
+
+        <div
+          style={{
+            ...styles.card,
+            margin: 0,
+            borderColor: trialState.wasUsed ? "#e2e8f0" : "#93c5fd",
+            background: trialState.wasUsed ? "#f8fafc" : "#eff6ff",
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <div>
+            <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
+              Choose how you want to continue
+            </span>
+            <h3 style={{ margin: "10px 0 4px" }}>
+              {trialState.wasUsed ? "Continue with tuition payment" : "Start free or pay now"}
+            </h3>
+            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+              {trialState.wasUsed
+                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Your progress is saved. Complete your tuition payment to continue.`
+                : "Start your one-time 7-day free trial for full student access, or pay your tuition now. Starting the trial does not count as a payment or reduce your tuition balance."}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 10,
+            }}
+          >
+            {!trialState.wasUsed ? (
+              <button
+                type="button"
+                style={{ ...styles.primaryButton, width: "100%" }}
+                onClick={handleStartTrial}
+                disabled={startingTrial}
+              >
+                {startingTrial ? "Starting your trial..." : "Start 7-day free trial"}
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, width: "100%" }}
+              onClick={handlePayTuition}
+            >
+              Pay tuition
+            </button>
+          </div>
         </div>
 
         <div
@@ -138,13 +193,7 @@ const SetupCheckpoint = () => {
           </p>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          }}
-        >
+        <div id="tuition-payment" style={{ scrollMarginTop: 16 }}>
           <TuitionStatusCard
             level={studentProfile?.level}
             paidAmount={paidAmount}
@@ -158,43 +207,6 @@ const SetupCheckpoint = () => {
                 : "Payments are available on the web app. Sign in on the website to complete your tuition."
             }
           />
-
-          <div
-            style={{
-              ...styles.card,
-              margin: 0,
-              borderColor: trialState.wasUsed ? "#e2e8f0" : "#93c5fd",
-              background: trialState.wasUsed ? "#f8fafc" : "#eff6ff",
-              display: "grid",
-              gap: 10,
-              alignContent: "start",
-            }}
-          >
-            <div>
-              <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
-                7-day free trial
-              </span>
-              <h3 style={{ margin: "10px 0 4px" }}>
-                {trialState.wasUsed ? "Your free trial has already been used" : "Try Falowen before you pay"}
-              </h3>
-              <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-                {trialState.wasUsed
-                  ? `The one-time trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has ended"}. Complete your tuition payment to continue learning.`
-                  : "Get full student access for 7 days. Starting a trial does not record a payment, reduce your tuition balance, or start your paid contract. Payment is required when the trial ends."}
-              </p>
-            </div>
-
-            {!trialState.wasUsed ? (
-              <button
-                type="button"
-                style={styles.primaryButton}
-                onClick={handleStartTrial}
-                disabled={startingTrial}
-              >
-                {startingTrial ? "Starting your trial..." : "Start 7-day free trial"}
-              </button>
-            ) : null}
-          </div>
         </div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -210,7 +222,7 @@ const SetupCheckpoint = () => {
         <div style={{ ...styles.card, margin: 0, background: "#fef3c7", border: "1px solid #f59e0b" }}>
           <h3 style={{ margin: "0 0 4px" }}>Limited access active</h3>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            While you finish payment, live classes and community features stay locked. Account & Billing remains available
+            Until you start the free trial or complete payment, live classes and community features stay locked. Account & Billing remains available
             so you can return to your student code and payment link anytime.
           </p>
           {!checkpoints.paymentReady && (
