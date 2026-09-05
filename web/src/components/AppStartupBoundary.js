@@ -29,7 +29,6 @@ class AppStartupBoundary extends React.Component {
         role="alert"
         style={{
           minHeight: "100vh",
-          minHeight: "100dvh",
           display: "grid",
           placeItems: "center",
           padding: 24,

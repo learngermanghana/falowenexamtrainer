@@ -1,12 +1,7 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 import { styles } from "../styles";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
-
-const LazyA2B1GrammarNotesTab = lazy(() =>
-  import("./A2B1WorkbookGrammarNotes").then((module) => ({
-    default: module.A2B1GrammarNotesTab,
-  })),
-);
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 
 export const A2_B1_WORKBOOK_TABS = [
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
@@ -201,12 +196,10 @@ export const WorkbookTabNav = ({
             border: "2px solid #2563eb",
           }}
         >
-          <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
-            <LazyA2B1GrammarNotesTab
-              level={legacyGrammarContext.level}
-              day={legacyGrammarContext.day}
-            />
-          </Suspense>
+          <A2B1GrammarNotesTab
+            level={legacyGrammarContext.level}
+            day={legacyGrammarContext.day}
+          />
         </section>
       ) : null}
     </>
