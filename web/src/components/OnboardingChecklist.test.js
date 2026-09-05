@@ -51,4 +51,34 @@ describe("OnboardingChecklist payment gate", () => {
       screen.getByRole("heading", { name: /watch this before your dashboard opens/i })
     ).toBeInTheDocument();
   });
+
+  it("shows onboarding while a free trial is active without changing payment status", () => {
+    renderChecklist({
+      level: "A1",
+      paymentStatus: "pending",
+      balanceDue: 3000,
+      trialStartedAt: "2099-01-01T00:00:00.000Z",
+      trialEndsAt: "2099-01-08T00:00:00.000Z",
+    });
+
+    expect(screen.queryByTestId("payment-checkpoint")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /watch this before your dashboard opens/i })
+    ).toBeInTheDocument();
+  });
+
+  it("returns an unpaid student to the payment checkpoint after trial expiry", () => {
+    renderChecklist({
+      level: "A1",
+      paymentStatus: "pending",
+      balanceDue: 3000,
+      trialStartedAt: "2020-01-01T00:00:00.000Z",
+      trialEndsAt: "2020-01-08T00:00:00.000Z",
+    });
+
+    expect(screen.getByTestId("payment-checkpoint")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /watch this before your dashboard opens/i })
+    ).not.toBeInTheDocument();
+  });
 });
