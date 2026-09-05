@@ -32,7 +32,7 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
   const [progress, setProgress] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
-      return { learnDone: false, quizDone: false, speakDone: false, completed: false, ...saved, quizDone: Boolean(saved.quizDone) };
+      return { learnDone: false, speakDone: false, completed: false, ...saved, quizDone: Boolean(saved.quizDone) };
     } catch {
       return { learnDone: false, quizDone: false, speakDone: false, completed: false };
     }
