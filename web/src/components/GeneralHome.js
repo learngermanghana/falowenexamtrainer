@@ -9,6 +9,7 @@ import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
+import TrialCountdownBanner from "./TrialCountdownBanner";
 import { fetchAnnouncements } from "../services/announcementService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
@@ -303,6 +304,11 @@ const GeneralHome = ({
     navigate("/campus/account");
   }, [navigate, playOpenFeedback]);
 
+  const openBilling = useCallback(() => {
+    playOpenFeedback();
+    navigate("/campus/account?tab=billing");
+  }, [navigate, playOpenFeedback]);
+
   const openExamsRoom = useCallback(() => {
     playOpenFeedback();
     onSelectArea("exams");
@@ -443,6 +449,8 @@ const GeneralHome = ({
         onContinueLearning={openCampus}
         onOpenAccount={openAccount}
       />
+
+      <TrialCountdownBanner studentProfile={studentProfile} onCompletePayment={openBilling} />
 
       {paymentAlert ? (
         <section
