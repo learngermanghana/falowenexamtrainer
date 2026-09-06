@@ -1,12 +1,14 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 
-const C1_DAY1_WORKBOOK_ROUTE = "/campus/course/lesson/C1/1?view=workbook";
+const C1_DAY1_SELF_LEARNING_COMPONENT = getSelfLearningLessonComponent("C1", 1);
 
-const C1Day1WillkommenSelbstlernstartWorkbookPage = () => (
-  <Navigate to={C1_DAY1_WORKBOOK_ROUTE} replace />
-);
+const C1Day1WillkommenSelbstlernstartWorkbookPage = () => {
+  if (!C1_DAY1_SELF_LEARNING_COMPONENT) return null;
+  const SelfLearningLesson = C1_DAY1_SELF_LEARNING_COMPONENT;
+  return <SelfLearningLesson canonicalLesson={null} />;
+};
 
 export default C1Day1WillkommenSelbstlernstartWorkbookPage;
 
-export const __TESTING__ = { C1_DAY1_WORKBOOK_ROUTE };
+export const __TESTING__ = { level: "C1", day: 1 };
