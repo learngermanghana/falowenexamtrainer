@@ -10,8 +10,6 @@ import { __TESTING__ as c1Day16 } from "./C1Day16TechnologieImAlltagWorkbookPage
 import { getWorkbookTabsForLevel } from "./StandardWorkbookComponents";
 
 const legacyRoutes = [
-  ["B2", 1, b2Day1.B2_DAY1_WORKBOOK_ROUTE],
-  ["C1", 1, c1Day1.C1_DAY1_WORKBOOK_ROUTE],
   ["C1", 10, c1Day10.C1_DAY10_WORKBOOK_ROUTE],
   ["C1", 11, c1Day11.C1_DAY11_WORKBOOK_ROUTE],
   ["C1", 12, c1Day12.C1_DAY12_WORKBOOK_ROUTE],
@@ -22,6 +20,11 @@ const legacyRoutes = [
 ];
 
 describe("B2/C1 legacy workbook routes", () => {
+  test("Day 1 legacy workbooks hand off directly to the self-learning component after the radio gate", () => {
+    expect(b2Day1).toEqual({ level: "B2", day: 1 });
+    expect(c1Day1).toEqual({ level: "C1", day: 1 });
+  });
+
   test.each(legacyRoutes)("%s Day %s uses the canonical self-learning lesson", (level, day, route) => {
     const url = new URL(route, "https://www.falowen.app");
 
@@ -32,8 +35,9 @@ describe("B2/C1 legacy workbook routes", () => {
   });
 
   test.each(["B2", "C1"])("%s shared workbook tabs do not expose Hören", (level) => {
-    const tabKeys = getWorkbookTabsForLevel(level).map((tab) => String(tab.key).toLowerCase());
-    const tabLabels = getWorkbookTabsForLevel(level).map((tab) => String(tab.label).toLowerCase());
+    const tabs = getWorkbookTabsForLevel(level);
+    const tabKeys = tabs.map((tab) => String(tab.key).toLowerCase());
+    const tabLabels = tabs.map((tab) => String(tab.label).toLowerCase());
 
     expect(tabKeys).not.toContain("hoeren");
     expect(tabKeys).not.toContain("hören");
