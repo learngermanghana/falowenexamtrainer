@@ -13,6 +13,7 @@ export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
 const A2_B1_SECTION_OVERRIDES = Object.freeze({
   A2: Object.freeze({
     14: Object.freeze({ listening: false }),
+    25: Object.freeze({ listening: false }),
   }),
   B1: Object.freeze({}),
 });
