@@ -22,6 +22,16 @@ describe("A2/B1 workbook section profiles", () => {
     expect(tabs).toEqual(expect.arrayContaining(["sprechen", "schreiben", "lesen", "references", "submit"]));
   });
 
+  test("A2 Day 25 explicitly has no listening section", () => {
+    const profile = getA2B1WorkbookSectionProfile("A2", 25);
+    const tabs = tabKeysFor("A2 Day 25 workbook sections");
+
+    expect(profile.listening).toBe(false);
+    expect(profile.grammar).toBe(false);
+    expect(tabs).not.toContain("grammar");
+    expect(tabs).not.toContain("hoeren");
+  });
+
   test("ordinary A2 lessons keep listening by default", () => {
     const profile = getA2B1WorkbookSectionProfile("A2", 13);
     const tabs = tabKeysFor("A2 Day 13 workbook sections");
