@@ -87,8 +87,8 @@ replaceOnce(
 );
 
 replaceOnce(
-  `            ? \`Saved automatically at \${autosaveStatus.savedAt.toLocaleTimeString([], {\n                hour: "2-digit",\n                minute: "2-digit",\n              })}\`\n            : "Your draft is saved automatically while you type."}`,
-  `            ? \`Saved automatically at \${autosaveStatus.savedAt.toLocaleTimeString([], {\n                hour: "2-digit",\n                minute: "2-digit",\n              })}\`\n            : autosaveStatus.state === "local" && autosaveStatus.savedAt\n              ? \`Saved on this device at \${autosaveStatus.savedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · cloud sync pending\`\n              : "Your draft is saved automatically while you type."}`,
+  `              {autosaveStatus.state === "saving" ? (\n                <span style={styles.helperText}>Autosaving…</span>\n              ) : autosaveStatus.state === "saved" ? (\n                <span style={styles.helperText}>Autosaved {formatDate(autosaveStatus.savedAt)}</span>\n              ) : null}`,
+  `              {autosaveStatus.state === "saving" ? (\n                <span style={styles.helperText}>Autosaving…</span>\n              ) : autosaveStatus.state === "saved" ? (\n                <span style={styles.helperText}>Autosaved {formatDate(autosaveStatus.savedAt)}</span>\n              ) : autosaveStatus.state === "local" && autosaveStatus.savedAt ? (\n                <span style={styles.helperText}>\n                  Saved on this device {formatDate(autosaveStatus.savedAt)} · cloud sync pending\n                </span>\n              ) : null}`,
   "local autosave status copy",
 );
 
