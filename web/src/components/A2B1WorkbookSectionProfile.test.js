@@ -4,11 +4,13 @@ import {
 } from "./StandardWorkbookComponents";
 import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 
-const tabKeysFor = (ariaLabel) =>
+const tabsFor = (ariaLabel) =>
   getWorkbookTabsWithLegacyGrammar({
     tabs: STANDARD_WORKBOOK_TABS,
     ariaLabel,
-  }).tabs.map((tab) => tab.key);
+  }).tabs;
+
+const tabKeysFor = (ariaLabel) => tabsFor(ariaLabel).map((tab) => tab.key);
 
 describe("A2/B1 workbook section profiles", () => {
   test("A2 Day 14 explicitly omits listening while keeping its grammar section", () => {
@@ -22,14 +24,16 @@ describe("A2/B1 workbook section profiles", () => {
     expect(tabs).toEqual(expect.arrayContaining(["sprechen", "schreiben", "lesen", "references", "submit"]));
   });
 
-  test("A2 Day 25 explicitly has no listening section", () => {
+  test("A2 Day 25 has no listening skill and renders Teil 4 as reading", () => {
     const profile = getA2B1WorkbookSectionProfile("A2", 25);
-    const tabs = tabKeysFor("A2 Day 25 workbook sections");
+    const tabs = tabsFor("A2 Day 25 workbook sections");
+    const part4 = tabs.find((tab) => tab.key === "hoeren");
 
     expect(profile.listening).toBe(false);
+    expect(profile.part4).toBe("reading");
     expect(profile.grammar).toBe(false);
-    expect(tabs).not.toContain("grammar");
-    expect(tabs).not.toContain("hoeren");
+    expect(tabs.map((tab) => tab.key)).not.toContain("grammar");
+    expect(part4).toMatchObject({ label: "Teil 4", description: "Lesen" });
   });
 
   test("ordinary A2 lessons keep listening by default", () => {
@@ -37,6 +41,7 @@ describe("A2/B1 workbook section profiles", () => {
     const tabs = tabKeysFor("A2 Day 13 workbook sections");
 
     expect(profile.listening).toBe(true);
+    expect(profile.part4).toBe("listening");
     expect(tabs).toContain("hoeren");
   });
 
@@ -45,6 +50,7 @@ describe("A2/B1 workbook section profiles", () => {
     const tabs = tabKeysFor("B1 Day 1 workbook sections");
 
     expect(profile.listening).toBe(true);
+    expect(profile.part4).toBe("listening");
     expect(tabs).toContain("hoeren");
   });
 
