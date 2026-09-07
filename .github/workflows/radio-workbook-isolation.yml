@@ -1,0 +1,41 @@
+name: Radio workbook isolation
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/RadioFirstWorkbookGate.js"
+      - "web/src/components/A2Day15MeinLieblingssportWorkbookPage.js"
+      - "web/src/components/A2Day15MeinLieblingssportWorkbookPageLegacy.js"
+      - "web/src/components/RadioWorkbookIsolation.test.js"
+      - ".github/workflows/radio-workbook-isolation.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "web/src/components/RadioFirstWorkbookGate.js"
+      - "web/src/components/A2Day15MeinLieblingssportWorkbookPage.js"
+      - "web/src/components/A2Day15MeinLieblingssportWorkbookPageLegacy.js"
+      - "web/src/components/RadioWorkbookIsolation.test.js"
+      - ".github/workflows/radio-workbook-isolation.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test Radio isolation and A2 Day 15 tab ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/RadioWorkbookIsolation.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
