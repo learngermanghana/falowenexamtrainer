@@ -131,5 +131,10 @@ requiredMarkers.forEach((marker) => {
 
 fs.writeFileSync(targetPath, source, "utf8");
 console.log("Workbook submissions now auto-select assignments and use canonical one-box TEIL templates.");
-await import("./patchStructuredResubmission.mjs");
+
+if (!source.includes("const previousResubmissionSeed = useMemo(")) {
+  await import("./patchStructuredResubmission.mjs");
+} else {
+  console.log("Structured resubmission lifecycle is already applied.");
+}
 await import("./patchLocalSubmissionDraftResilience.mjs");
