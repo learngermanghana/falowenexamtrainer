@@ -1,7 +1,10 @@
 import React from "react";
 import { styles } from "../styles";
-import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
+import {
+  filterA2B1WorkbookTabsByProfile,
+  getA2B1WorkbookSectionProfile,
+} from "./a2B1WorkbookSectionProfile";
 
 export const A2_B1_WORKBOOK_TABS = [
   { key: "sprechen", label: "Teil 1", description: "Sprechen" },
@@ -35,15 +38,21 @@ export const getA2B1WorkbookContextFromAriaLabel = (ariaLabel = "") => {
 
 export const getWorkbookTabsWithLegacyGrammar = ({ tabs = STANDARD_WORKBOOK_TABS, ariaLabel = "" } = {}) => {
   const context = getA2B1WorkbookContextFromAriaLabel(ariaLabel);
-  const grammarAvailable = Boolean(context && hasA2B1GrammarNotes(context.level, context.day));
+  const sectionProfile = context
+    ? getA2B1WorkbookSectionProfile(context.level, context.day)
+    : null;
+  const grammarAvailable = Boolean(sectionProfile?.grammar);
   const integratesLegacyGrammar = tabs === STANDARD_WORKBOOK_TABS && grammarAvailable;
-  const availableTabs = context && !grammarAvailable
-    ? tabs.filter((tab) => tab.key !== "grammar")
-    : tabs;
+  const candidateTabs = integratesLegacyGrammar ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR : tabs;
+  const availableTabs = sectionProfile
+    ? filterA2B1WorkbookTabsByProfile(candidateTabs, sectionProfile)
+    : candidateTabs;
+
   return {
     context,
+    sectionProfile,
     integratesLegacyGrammar,
-    tabs: integratesLegacyGrammar ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR : availableTabs,
+    tabs: availableTabs,
   };
 };
 

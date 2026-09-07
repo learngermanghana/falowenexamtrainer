@@ -11,12 +11,10 @@ import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import {
-  A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+  STANDARD_WORKBOOK_TABS,
   WorkbookTabNav,
   WorkbookTaskCard,
 } from "./StandardWorkbookComponents";
-
-const DAY14_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.filter((tab) => tab.key !== "hoeren");
 
 const card = {
   ...styles.card,
@@ -122,15 +120,6 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-const NoTeilFourNotice = () => (
-  <div style={{ ...card, border: "2px solid #facc15", background: "#fffbeb" }}>
-    <h2 style={sectionTitle}>No Teil 4 for this workbook</h2>
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      This A2 Day 14 / 5.14 workbook has no Teil 4 Hören assignment. Please skip Teil 4 and submit only the required Teil 2 Schreiben and Teil 3 Lesen work.
-    </p>
-  </div>
-);
-
 const A2Day14BerufUndKarriereWorkbookPage = () => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
@@ -168,8 +157,9 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           <WorkbookTabNav
             activeTab={activeTab}
             onChange={setActiveTab}
-            tabs={DAY14_WORKBOOK_TABS}
+            tabs={STANDARD_WORKBOOK_TABS}
             ariaLabel="A2 Day 14 workbook sections"
+            renderLegacyGrammarPanel={false}
           />
         </div>
       </div>
@@ -259,8 +249,6 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
-
-      {activeTab === "hoeren" && <NoTeilFourNotice />}
 
       {activeTab === "references" && (
         <WorkbookReferenceAnswers
