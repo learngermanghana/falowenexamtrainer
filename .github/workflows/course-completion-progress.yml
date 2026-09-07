@@ -1,0 +1,44 @@
+name: Course completion progress
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/courseCompletionJourney.js"
+      - "web/src/data/courseCompletionJourney.test.js"
+      - "web/src/hooks/useCourseCompletionProgress.js"
+      - "web/src/components/CourseCompletionProgressCard.jsx"
+      - "web/src/components/HomeMetrics.js"
+      - "web/src/components/CourseTab.js"
+      - "web/src/components/GuidedWritingWorkspace.js"
+      - "web/src/components/CourseCompletionProgressRegression.test.js"
+      - "scripts/patchCanonicalCourseCompletionProgress.mjs"
+      - "web/package.json"
+      - ".github/workflows/course-completion-progress.yml"
+
+jobs:
+  completion-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Apply completion normalization twice
+        run: |
+          node scripts/patchCanonicalCourseCompletionProgress.mjs
+          node scripts/patchCanonicalCourseCompletionProgress.mjs
+      - name: Test completion engine and wiring
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/courseCompletionJourney.test.js src/components/CourseCompletionProgressRegression.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
