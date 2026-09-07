@@ -6,6 +6,9 @@ on:
       - "web/src/components/A1SharedAssignmentWorkbookBridge.jsx"
       - "web/src/components/A1SharedAssignmentWorkbookBridge.delayedJourney.test.jsx"
       - "web/src/components/A1SharedAssignmentWorkbookLayout.jsx"
+      - "web/src/components/A1TutorMarkedWorkbookShell.js"
+      - "web/src/components/A1WorkbookMediaPanel.jsx"
+      - "web/src/components/A1WorkbookModernization.test.jsx"
       - "web/src/data/a1AssignmentRegistry.js"
       - "web/src/data/a1AssignmentRegistry.test.js"
       - ".github/workflows/a1-shared-workbook-navigation.yml"
@@ -30,6 +33,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/a1AssignmentRegistry.test.js
+      - name: Test A1 workbook modernization
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookModernization.test.jsx
       - name: Test delayed materials to workbook navigation handoff
         working-directory: web
         env:
