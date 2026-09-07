@@ -3,6 +3,7 @@ import {
   buildCourseCompletionProgress,
   readSelfLearningProgressByDay,
 } from "../data/courseCompletionJourney";
+import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
 import { useLessonProgress } from "./useLessonProgress";
 
 export const COURSE_COMPLETION_PROGRESS_EVENT = "falowen:course-completion-progress";
@@ -34,6 +35,23 @@ export const useCourseCompletionProgress = ({ studentProfile, user, level } = {}
       }),
     [lessonProgress.progressByAssignmentId, normalizedLevel, revision],
   );
+
+  useEffect(() => {
+    if (lessonProgress.loading || !user?.uid || !progress?.total) return undefined;
+
+    const timer = setTimeout(() => {
+      persistCourseCompletionSnapshot({
+        progress,
+        level: normalizedLevel,
+        user,
+        studentProfile,
+      }).catch((error) => {
+        console.warn("Could not sync canonical course completion snapshot", error);
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [lessonProgress.loading, normalizedLevel, progress, studentProfile, user]);
 
   return {
     progress,
