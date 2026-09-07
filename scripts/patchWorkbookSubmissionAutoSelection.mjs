@@ -131,3 +131,4 @@ requiredMarkers.forEach((marker) => {
 
 fs.writeFileSync(targetPath, source, "utf8");
 console.log("Workbook submissions now auto-select assignments and use canonical one-box TEIL templates.");
+await import("./patchStructuredResubmission.mjs");
