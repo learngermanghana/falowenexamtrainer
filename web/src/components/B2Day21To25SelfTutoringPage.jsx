@@ -11,13 +11,12 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { useToast } from "../context/ToastContext";
 import { getStandardLessonStorageKey, getStandardWritingCloudField, getStandardWritingConfig } from "../data/standardLessonJourney";
 import { getB2Days21To25Tutoring } from "../data/b2Days21To25SelfTutoring";
 import { styles } from "../styles";
 
-const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
 const NoteBox = ({ children, tone = "blue" }) => { const tones = { blue:["#bfdbfe","#eff6ff","#1e3a8a"], green:["#bbf7d0","#f0fdf4","#14532d"], amber:["#fde68a","#fffbeb","#92400e"] }; const [border,background,color] = tones[tone] || tones.blue; return <div style={{ border:`1px solid ${border}`, borderRadius:14, padding:12, background, color, lineHeight:1.65 }}>{children}</div>; };
@@ -81,7 +80,7 @@ export default function B2Day21To25SelfTutoringPage({ lesson, canonicalLesson = 
       <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}><span style={{ ...styles.badge, background:"rgba(255,255,255,.16)", color:"#fff" }}>B2</span><span style={{ ...styles.badge, background:"rgba(255,255,255,.16)", color:"#fff" }}>Day {day}</span><span style={{ ...styles.badge, background:"rgba(37,99,235,.9)", color:"#fff" }}>Chapter {guidedLesson.chapter}</span></div>
       <div><h1 style={{ margin:0, fontSize:"clamp(2rem,5vw,3.4rem)" }}>{guidedLesson.title}</h1><p style={{ margin:"10px 0 0", color:"#e2e8f0" }}>{guidedLesson.topic}</p></div>
     </header>
-    <div style={{ position:"sticky", top:0, zIndex:5, display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))", gap:8, padding:10, border:"1px solid #e2e8f0", borderRadius:18, background:"rgba(248,250,252,.94)" }}>{tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active===tab ? styles.primaryButton : styles.secondaryButton), borderRadius:999, minHeight:44 }}>{labels[tab]}</button>)}</div>
+    <AdvancedSelfLearningTabNav level="B2" day={day} activeTab={active} onChange={setActive} />
 
     {active === "learn" ? <>
       <Section title="AI video">{video?.url ? <div style={{ display:"grid", gap:10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin:0, color:"#475569", lineHeight:1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position:"relative", width:"100%", paddingTop:"56.25%", borderRadius:16, overflow:"hidden", background:"#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position:"absolute", inset:0, width:"100%", height:"100%", border:0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar preview and clickable check below.</NoteBox>}</Section>
