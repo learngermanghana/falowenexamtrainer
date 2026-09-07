@@ -12,6 +12,7 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { useToast } from "../context/ToastContext";
 import {
   getStandardLessonStorageKey,
@@ -20,8 +21,6 @@ import {
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
 
-const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 
 const NoteBox = ({ children, tone = "blue" }) => {
@@ -130,7 +129,7 @@ export default function B2Day6To10SelfTutoringPage({ lesson, canonicalLesson = n
   return <div style={{ ...styles.container, display: "grid", gap: 18 }}>
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ borderRadius: 22, color: "#fff", background: "linear-gradient(135deg,#020617,#1e40af)", padding: "clamp(22px,4vw,42px)", display: "grid", gap: 12 }}><div><strong>B2 · Day {day}</strong></div><h1 style={{ margin: 0 }}>{guidedLesson.title}</h1><p style={{ margin: 0, color: "#e2e8f0" }}>{guidedLesson.topic}</p></header>
-    <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>{tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}</div>
+    <AdvancedSelfLearningTabNav level="B2" day={day} activeTab={active} onChange={setActive} />
     {active === "learn" ? <>
       <Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">Continue with the quick grammar preview and interactive check below.</NoteBox>}</Section>
       <B2QuizFirstLearnPreview lesson={guidedLesson} />
