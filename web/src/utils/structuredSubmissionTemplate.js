@@ -119,6 +119,137 @@ export const parseStructuredSubmissionText = (text = "", profile = null) => {
   };
 };
 
+const readStructuredSectionValue = (value) => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value).trim();
+  }
+  if (typeof value !== "object" || Array.isArray(value)) return "";
+  return String(
+    value.text ?? value.answer ?? value.submissionText ?? value.workContent ?? value.value ?? ""
+  ).trim();
+};
+
+export const normalizeStructuredSubmissionSections = (sections = null, profile = null) => {
+  if (!sections || typeof sections !== "object" || Array.isArray(sections)) return {};
+  const byPart = {};
+  Object.entries(sections).forEach(([key, value]) => {
+    const partId = normalizePartId(key);
+    if (!partId || Object.prototype.hasOwnProperty.call(byPart, partId)) return;
+    byPart[partId] = readStructuredSectionValue(value);
+  });
+
+  if (!profile?.parts?.length) return byPart;
+  return profile.parts.reduce((result, part) => {
+    result[part.partId] = String(byPart[part.partId] || "").trim();
+    return result;
+  }, {});
+};
+
+export const buildStructuredSubmissionTextFromSections = (profile = null, sections = {}) => {
+  if (!profile?.parts?.length) return "";
+  const normalized = normalizeStructuredSubmissionSections(sections, profile);
+  return profile.parts
+    .map((part) => {
+      const answer = String(normalized[part.partId] || "").trim();
+      return answer ? `${part.heading}\n${answer}` : part.heading;
+    })
+    .join("\n\n")
+    .trim();
+};
+
+const inspectHistoricalHeadingShape = (text = "", profile = null) => {
+  if (!profile?.parts?.length) return { exact: false, partIds: [] };
+  const source = String(text || "").replace(/\r\n/g, "\n");
+  const lines = source.split("\n");
+  const partIds = [];
+  let firstHeadingLine = -1;
+
+  lines.forEach((line, index) => {
+    const match = line.match(headingRegex);
+    if (!match?.[1]) return;
+    if (firstHeadingLine < 0) firstHeadingLine = index;
+    partIds.push(`teil${Number(match[1])}`);
+  });
+
+  const expected = profile.parts.map((part) => part.partId);
+  const prefixIsEmpty = firstHeadingLine >= 0 && lines.slice(0, firstHeadingLine).every((line) => !String(line).trim());
+  const exactOrder = partIds.length === expected.length && partIds.every((partId, index) => partId === expected[index]);
+  const noDuplicates = new Set(partIds).size === partIds.length;
+  return { exact: prefixIsEmpty && exactOrder && noDuplicates, partIds };
+};
+
+export const resolveStructuredResubmissionSeed = ({
+  profile = null,
+  structuredSections = null,
+  submissionText = "",
+} = {}) => {
+  const fallbackText = String(submissionText || "").trim();
+  if (!profile?.parts?.length) {
+    return { mode: "legacy", confident: false, text: fallbackText, sections: null, parsed: null };
+  }
+
+  const normalizedStoredSections = normalizeStructuredSubmissionSections(structuredSections, profile);
+  const hasStoredStructure = profile.parts.every(
+    (part) => String(normalizedStoredSections[part.partId] || "").trim().length > 0,
+  );
+  if (hasStoredStructure) {
+    const text = buildStructuredSubmissionTextFromSections(profile, normalizedStoredSections);
+    return {
+      mode: "structured",
+      confident: true,
+      source: "structuredSections",
+      text,
+      sections: normalizedStoredSections,
+      parsed: parseStructuredSubmissionText(text, profile),
+    };
+  }
+
+  const headingShape = inspectHistoricalHeadingShape(fallbackText, profile);
+  const parsed = parseStructuredSubmissionText(fallbackText, profile);
+  if (headingShape.exact && parsed.complete) {
+    const text = buildStructuredSubmissionTextFromSections(profile, parsed.sections);
+    return {
+      mode: "structured",
+      confident: true,
+      source: "historicalHeadings",
+      text,
+      sections: parsed.sections,
+      parsed: parseStructuredSubmissionText(text, profile),
+    };
+  }
+
+  return { mode: "legacy", confident: false, source: "legacy", text: fallbackText, sections: null, parsed: null };
+};
+
+const normalizeSectionForDiff = (value = "") =>
+  String(value || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .join("\n")
+    .trim();
+
+export const compareStructuredSubmissionSections = (previousSections = {}, currentSections = {}, sectionOrder = []) => {
+  const order = Array.isArray(sectionOrder) ? sectionOrder.map(normalizePartId).filter(Boolean) : [];
+  const changedParts = [];
+  const unchangedParts = [];
+
+  order.forEach((partId) => {
+    const previous = normalizeSectionForDiff(previousSections?.[partId]);
+    const current = normalizeSectionForDiff(currentSections?.[partId]);
+    if (previous === current) unchangedParts.push(partId);
+    else changedParts.push(partId);
+  });
+
+  return {
+    changedParts,
+    unchangedParts,
+    changedCount: changedParts.length,
+    hasChanges: changedParts.length > 0,
+  };
+};
+
 export const getStructuredAnswerText = (parsed = null) => {
   if (!parsed?.sectionOrder?.length) return "";
   return parsed.sectionOrder
