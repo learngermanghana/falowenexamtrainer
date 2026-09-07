@@ -6,7 +6,8 @@ import A1Day21WeatherResources from "./A1Day21WeatherResources";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
-import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
+import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
 import { styles } from "../styles";
 
 export { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
@@ -73,6 +74,21 @@ export const splitA1WorkbookContent = (children) => {
   return { sectionMap, overviewNodes };
 };
 
+const metaBadgeStyle = (emphasis = false) => ({
+  alignItems: "center",
+  background: emphasis ? "#1d4ed8" : "#eff6ff",
+  border: `1px solid ${emphasis ? "#1d4ed8" : "#bfdbfe"}`,
+  borderRadius: 999,
+  color: emphasis ? "#ffffff" : "#1e3a8a",
+  display: "inline-flex",
+  fontSize: 12,
+  fontWeight: 900,
+  gap: 4,
+  lineHeight: 1,
+  minHeight: 28,
+  padding: "7px 10px",
+});
+
 const A1TutorMarkedWorkbookShell = ({
   fallbackAssignmentKey,
   title,
@@ -90,6 +106,10 @@ const A1TutorMarkedWorkbookShell = ({
   const assignment = getA1Assignment(fallbackAssignmentKey);
   if (!assignment) throw new Error(`Unknown canonical A1 assignment: ${fallbackAssignmentKey}`);
 
+  const assignmentIndex = A1_ASSIGNMENT_ORDER.indexOf(assignment.assignmentKey);
+  const assignmentNumber = assignmentIndex >= 0 ? assignmentIndex + 1 : 1;
+  const assignmentTotal = A1_ASSIGNMENT_ORDER.length;
+  const assignmentProgress = Math.round((assignmentNumber / assignmentTotal) * 100);
   const isFirstA1Workbook = assignment.assignmentKey === "A1-0.1";
   const { sectionMap, overviewNodes } = splitA1WorkbookContent(children);
   const sections = assignment.sections
@@ -155,15 +175,61 @@ const A1TutorMarkedWorkbookShell = ({
   );
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <AppBackButton
-          label={backLabel}
-          fallbackPath={backFallbackPath}
-          onBack={backTo ? () => navigate(backTo, { replace: true }) : undefined}
-        />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>{title}</h1>
-        {subtitle ? <p style={{ ...styles.subtitle, margin: 0 }}>{subtitle}</p> : null}
+    <div
+      data-a1-tutor-marked-workbook={assignment.assignmentKey}
+      style={{ ...styles.container, display: "grid", gap: 16 }}
+    >
+      <header
+        data-a1-modern-workbook-header="true"
+        style={{
+          ...styles.card,
+          display: "grid",
+          gap: 14,
+          border: "1px solid #bfdbfe",
+          background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 70%)",
+          boxShadow: "0 14px 30px rgba(15, 23, 42, 0.08)",
+        }}
+      >
+        <div style={{ display: "flex", gap: 8, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
+          <AppBackButton
+            label={backLabel}
+            fallbackPath={backFallbackPath}
+            onBack={backTo ? () => navigate(backTo, { replace: true }) : undefined}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={metaBadgeStyle(true)}>A1</span>
+          <span style={metaBadgeStyle()}>Day {assignment.day}</span>
+          <span style={metaBadgeStyle()}>Kapitel {assignment.chapter}</span>
+          <span style={metaBadgeStyle()}>Assignment {assignment.assignmentKey}</span>
+        </div>
+
+        <div style={{ display: "grid", gap: 6 }}>
+          <h1 style={{ ...styles.title, margin: 0 }}>{title || assignment.title}</h1>
+          {title && title !== assignment.title ? (
+            <p style={{ margin: 0, color: "#334155", fontWeight: 800 }}>{assignment.title}</p>
+          ) : null}
+          {subtitle ? <p style={{ ...styles.subtitle, margin: 0 }}>{subtitle}</p> : null}
+        </div>
+
+        <div data-a1-assignment-progress="true" style={{ display: "grid", gap: 7 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 13, fontWeight: 800 }}>
+            <span>Assignment {assignmentNumber} of {assignmentTotal}</span>
+            <span>{assignmentProgress}% of tutor-marked A1 workbooks</span>
+          </div>
+          <div
+            role="progressbar"
+            aria-label="A1 assignment progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={assignmentProgress}
+            style={{ height: 8, width: "100%", background: "#dbeafe", borderRadius: 999, overflow: "hidden" }}
+          >
+            <div style={{ width: `${assignmentProgress}%`, height: "100%", background: "#2563eb", borderRadius: 999 }} />
+          </div>
+        </div>
+
         {headerActions ? (
           <div
             data-a1-workbook-header-actions="true"
@@ -173,6 +239,8 @@ const A1TutorMarkedWorkbookShell = ({
           </div>
         ) : null}
       </header>
+
+      <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />
 
       <A1SharedAssignmentWorkbookLayout
         assignmentKey={assignment.assignmentKey}

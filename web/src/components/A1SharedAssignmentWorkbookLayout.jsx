@@ -101,14 +101,17 @@ const tabButtonStyle = (selected, submit = false) => ({
   background: selected ? (submit ? "#166534" : "#2563eb") : submit ? "#ecfdf5" : "#ffffff",
   borderColor: submit ? "#86efac" : selected ? "#2563eb" : "#93c5fd",
   color: selected ? "#ffffff" : submit ? "#166534" : "#1d4ed8",
-  flex: "1 1 120px",
+  flex: "1 1 112px",
   fontWeight: 900,
-  minHeight: 46,
-  padding: "10px 14px",
+  lineHeight: 1.2,
+  minHeight: 50,
+  minWidth: 0,
+  padding: "10px 12px",
+  whiteSpace: "normal",
 });
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
-  const tabs = sections.length
+export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false } = {}) =>
+  sections.length
     ? [
       { key: "overview", label: "Overview" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
@@ -121,34 +124,64 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
       { key: "submit", label: "Submit", submit: true },
     ];
 
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
+  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
+  const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
+  const progressPercent = tabs.length ? Math.round(((activeIndex + 1) / tabs.length) * 100) : 0;
+
   return (
-    <nav
-      data-workbook-navigation="shared"
-      data-workbook-navigation-behavior="static"
-      role="tablist"
-      aria-label={`${assignment.assignmentKey} workbook sections`}
-      style={{
-        ...styles.card,
-        border: "2px solid #2563eb",
-        background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 74%)",
-        display: "flex",
-        gap: 8,
-        flexWrap: "wrap",
-      }}
-    >
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          type="button"
-          role="tab"
-          aria-selected={activeTab === tab.key}
-          onClick={() => onSelect(tab.key)}
-          style={tabButtonStyle(activeTab === tab.key, tab.submit)}
+    <div data-a1-workbook-navigation-shell="true" style={{ display: "grid", gap: 8 }}>
+      <nav
+        data-workbook-navigation="shared"
+        data-workbook-navigation-behavior="static"
+        role="tablist"
+        aria-label={`${assignment.assignmentKey} workbook sections`}
+        style={{
+          ...styles.card,
+          border: "2px solid #2563eb",
+          background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 74%)",
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          padding: 12,
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            onClick={() => onSelect(tab.key)}
+            style={tabButtonStyle(activeTab === tab.key, tab.submit)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      <div
+        data-a1-workbook-section-progress="true"
+        style={{ ...styles.card, padding: "10px 12px", display: "grid", gap: 7 }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 13, fontWeight: 800 }}>
+          <span>Section {activeIndex + 1} of {tabs.length}</span>
+          <span>{progressPercent}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="A1 workbook section progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progressPercent}
+          style={{ height: 7, width: "100%", background: "#dbeafe", borderRadius: 999, overflow: "hidden" }}
         >
-          {tab.label}
-        </button>
-      ))}
-    </nav>
+          <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb", borderRadius: 999, transition: "width 180ms ease" }} />
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -157,6 +190,7 @@ export const A1AssignmentNeighborLinks = ({ assignmentKey }) => {
   return (
     <nav
       aria-label="Previous and next A1 assignments"
+      data-a1-assignment-neighbors="true"
       style={{ ...styles.card, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}
     >
       {neighbors.previous ? (

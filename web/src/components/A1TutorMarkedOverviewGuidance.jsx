@@ -2,7 +2,7 @@ import React from "react";
 import { styles } from "../styles";
 
 export const A1_TUTOR_MARKED_OVERVIEW_GUIDANCE =
-  "First open Grammar. Next complete the Teil sections in order. Use Submit only after you finish the questions.";
+  "First open Grammar. Next complete Teil 1 and the other Teil sections in order. Use Submit only after you finish the questions.";
 
 export default function A1TutorMarkedOverviewGuidance() {
   return (
