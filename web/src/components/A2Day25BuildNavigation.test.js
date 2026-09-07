@@ -4,7 +4,7 @@ import path from "path";
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 describe("A2 Day 25 build-time workbook navigation", () => {
-  test("prestart and prebuild patch the shared navigation after legacy portal routing is resolved", () => {
+  test("build hooks apply the Day 25 patch after shared fallback safety", () => {
     const packageJson = JSON.parse(read("../../package.json"));
     const patchSource = read("../../../scripts/patchA2Day25BuildNavigation.mjs");
 
@@ -15,9 +15,13 @@ describe("A2 Day 25 build-time workbook navigation", () => {
     for (const hook of ["prestart", "prebuild", "pretest", "pretest:ci"]) {
       const script = packageJson.scripts[hook];
       expect(script).toContain("sync:a2-legacy-portal-safety");
+      expect(script).toContain("sync:a2-fallback-workbook-safety");
       expect(script).toContain("sync:a2-day25-build-navigation");
       expect(script.indexOf("sync:a2-day25-build-navigation")).toBeGreaterThan(
         script.indexOf("sync:a2-legacy-portal-safety"),
+      );
+      expect(script.indexOf("sync:a2-day25-build-navigation")).toBeGreaterThan(
+        script.indexOf("sync:a2-fallback-workbook-safety"),
       );
     }
 
