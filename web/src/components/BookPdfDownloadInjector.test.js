@@ -2,6 +2,7 @@ import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import BookPdfDownloadInjector, {
+  getA2B1WorkbookExperienceContext,
   getPrintableBookKind,
   isPrintableBookRoute,
   needsInlineA1PdfAction,
@@ -50,6 +51,51 @@ describe("BookPdfDownloadInjector helpers", () => {
       expect(isPrintableBookRoute(pathname)).toBe(printsCompleteLesson);
     }
   );
+
+  it("resolves A2 Day 14 from the registered legacy workbook path", () => {
+    expect(getA2B1WorkbookExperienceContext("/campus/course/a2-day-14-beruf-und-karriere-workbook")).toMatchObject({
+      level: "A2",
+      day: 14,
+      chapter: "5.14",
+    });
+  });
+
+  it("resolves canonical B1 workbook routes from the course schedule", () => {
+    expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=workbook")).toMatchObject({
+      level: "B1",
+      day: 8,
+    });
+    expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=grammar")).toBeNull();
+  });
+
+  it("shows teacher-first media, AI revision, PDF and navigation for A2 Day 14", () => {
+    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+
+    render(
+      <MemoryRouter initialEntries={["/campus/course/a2-day-14-beruf-und-karriere-workbook"]}>
+        <BookPdfDownloadInjector />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByLabelText("A2 workbook tools")).toBeInTheDocument();
+    expect(screen.getByLabelText("Teacher lecture")).toBeInTheDocument();
+    expect(screen.getByLabelText("AI explanation")).toBeInTheDocument();
+    expect(screen.getByTitle("Kapitel 5.14 · Teacher lecture video")).toHaveAttribute(
+      "src",
+      expect.stringContaining("hGK64aXtARk")
+    );
+    expect(screen.getByTitle("AI grammar video")).toHaveAttribute(
+      "src",
+      expect.stringContaining("qWy7yMgwmvQ")
+    );
+    expect(screen.getByRole("progressbar", { name: "Course progress" })).toHaveAttribute("aria-valuenow", "50");
+    expect(screen.getByRole("button", { name: "← Previous lesson" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Next lesson →" })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Download or print workbook PDF" }));
+    expect(printSpy).toHaveBeenCalledTimes(1);
+    printSpy.mockRestore();
+  });
 
   it("keeps printable lesson metadata without covering Study Buddy with a floating download", () => {
     render(
