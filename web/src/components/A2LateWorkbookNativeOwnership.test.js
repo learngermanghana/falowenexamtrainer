@@ -4,9 +4,9 @@ import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
-describe("A2 Days 23-28 native workbook ownership", () => {
+describe("A2 Days 22-28 native workbook ownership", () => {
   test("late A2 submission rules live in the section profile", () => {
-    [23, 24, 26, 27, 28].forEach((day) => {
+    [22, 23, 24, 26, 27, 28].forEach((day) => {
       const profile = getA2B1WorkbookSectionProfile("A2", day);
       expect(profile.part4).toBe("listening");
       expect(profile.part4Submission).toBe("self-check");
@@ -18,15 +18,31 @@ describe("A2 Days 23-28 native workbook ownership", () => {
     expect(day25.part4Submission).toBe("submit");
   });
 
-  test("generated guidance does not run fallback navigation for Days 23-28", () => {
+  test("generated guidance does not run fallback navigation for Days 22-28", () => {
     const guidance = read("A2B1WorkbookGuidance.js");
 
     expect(guidance).toContain("const usesNativeLateWorkbook =");
-    expect(guidance).toContain("[23, 24, 25, 26, 27, 28].includes(Number(workbookDay))");
+    expect(guidance).toContain("[22, 23, 24, 25, 26, 27, 28].includes(Number(workbookDay))");
     expect(guidance).toContain("usesNativeLateWorkbook || !showFallbackTabs");
   });
 
-  test("global workbook enhancements mount the Days 24-26 native submission panel", () => {
+  test("Day 22 owns shared React navigation and route-locked submission", () => {
+    const day22 = read("A2Day22DieWochePlanungWorkbookPage.js");
+
+    expect(day22).toContain('data-a2-day22-native-workbook="true"');
+    expect(day22).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
+    expect(day22).toContain("<WorkbookTabNav");
+    expect(day22).toContain('ariaLabel="A2 Day 22 workbook sections"');
+    expect(day22).toContain("<ContextualAssignmentSubmissionPage");
+    expect(day22).toContain('assignmentKey: "A2-8.22"');
+    expect(day22).toContain("Teil 4 · Hören · Goethe Self-Check");
+    expect(day22).toContain("Aufgabe 1 · Gülcan schreibt Sonja, dass ...");
+    expect(day22).not.toContain("function TabButton(");
+    expect(day22).not.toContain("Go to Submission Area");
+    expect(day22).not.toContain("<h2 style={{ margin: 0 }}>Final Submission</h2>");
+  });
+
+  test("global workbook enhancements keep the Days 24-26 native submission panel", () => {
     const inlineEnhancements = read("WorkbookInlineEnhancements.jsx");
 
     expect(inlineEnhancements).toContain(
@@ -37,11 +53,14 @@ describe("A2 Days 23-28 native workbook ownership", () => {
     );
   });
 
-  test("legacy observers retain Day 22 but stand down for Days 23-28", () => {
+  test("legacy observers stand down for every Day 22-28 workbook", () => {
     const legacyWrapper = read("A2LegacyStandardWorkbookNavigation.js");
 
-    expect(legacyWrapper).toContain("A2_DAY22_PATH,");
+    expect(legacyWrapper).toContain(
+      "export const A2_LEGACY_STANDARD_NAV_PATHS = new Set([\n  A2_DAY20_PATH,\n]);",
+    );
     expect(legacyWrapper).toContain("const usesNativeLateWorkbook =");
+    expect(legacyWrapper).toContain("(?:22|23|24|25|26|27|28)");
     expect(legacyWrapper).toContain("!usesNativeLateWorkbook &&");
     expect(legacyWrapper).not.toContain("...A2_DAYS_22_TO_26_PATHS");
   });

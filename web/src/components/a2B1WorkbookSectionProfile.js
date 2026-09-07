@@ -15,6 +15,7 @@ export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
 const A2_B1_SECTION_OVERRIDES = Object.freeze({
   A2: Object.freeze({
     14: Object.freeze({ listening: false, part4: null, part4Submission: "none" }),
+    22: Object.freeze({ part4Submission: "self-check" }),
     23: Object.freeze({ part4Submission: "self-check" }),
     24: Object.freeze({ part4Submission: "self-check" }),
     25: Object.freeze({ listening: false, part4: "reading", part4Submission: "submit" }),
