@@ -27,9 +27,11 @@ const nativeOwnershipBlock = `${workbookDayBlock}
   const usesNativeLateWorkbook =
     workbookLevel === "A2" && [23, 24, 25, 26, 27, 28].includes(Number(workbookDay));`;
 if (!guidance.includes("const usesNativeLateWorkbook =")) {
-  const firstIndex = guidance.indexOf(workbookDayBlock);
-  if (firstIndex < 0) throw new Error("Could not find Universal A2 workbook day resolver.");
-  guidance = `${guidance.slice(0, firstIndex)}${nativeOwnershipBlock}${guidance.slice(firstIndex + workbookDayBlock.length)}`;
+  const universalComponentIndex = guidance.indexOf("const UniversalA2WorkbookTabs =");
+  if (universalComponentIndex < 0) throw new Error("Could not find UniversalA2WorkbookTabs.");
+  const workbookDayIndex = guidance.indexOf(workbookDayBlock, universalComponentIndex);
+  if (workbookDayIndex < 0) throw new Error("Could not find Universal A2 workbook day resolver.");
+  guidance = `${guidance.slice(0, workbookDayIndex)}${nativeOwnershipBlock}${guidance.slice(workbookDayIndex + workbookDayBlock.length)}`;
 }
 
 const workbookLevelGuard = `    if (workbookLevel !== "A2") {
@@ -43,8 +45,10 @@ const nativeWorkbookGuard = `${workbookLevelGuard}
       return undefined;
     }`;
 if (!guidance.includes("if (usesNativeLateWorkbook)")) {
-  if (!guidance.includes(workbookLevelGuard)) throw new Error("Could not find Universal A2 workbook fallback guard.");
-  guidance = guidance.replace(workbookLevelGuard, nativeWorkbookGuard);
+  const universalComponentIndex = guidance.indexOf("const UniversalA2WorkbookTabs =");
+  const guardIndex = guidance.indexOf(workbookLevelGuard, universalComponentIndex);
+  if (guardIndex < 0) throw new Error("Could not find Universal A2 workbook fallback guard.");
+  guidance = `${guidance.slice(0, guardIndex)}${nativeWorkbookGuard}${guidance.slice(guardIndex + workbookLevelGuard.length)}`;
 }
 guidance = guidance.replace(
   "  }, [workbookLevel]);\n\n  if (workbookLevel !== \"A2\" || !showFallbackTabs) return null;",
