@@ -75,6 +75,38 @@ export const resolveA2FallbackSubmissionContext = (day) => {
   guidanceSource = guidanceSource.replace(universalTabsBlock, fallbackSubmissionBlock);
 }
 
+// Day 25 is the one forced shared-fallback lesson whose Part 4 is Lesen rather
+// than Hören. Define its visible tab set and proxy-click targets here, in the
+// same build-time patch that owns the Days 24-26 fallback, so prebuild/pretest
+// runs remain deterministic and idempotent.
+const day25TabsMarker = "const A2_DAY25_WORKBOOK_TABS = [";
+if (!guidanceSource.includes(day25TabsMarker)) {
+  const day25TabsAnchor = "const A2_FALLBACK_SUBMISSION_CONFIG_BY_DAY = {";
+  if (!guidanceSource.includes(day25TabsAnchor)) {
+    throw new Error("Could not find A2 fallback config anchor for Day 25 navigation.");
+  }
+  const day25TabsBlock = `const A2_DAY25_WORKBOOK_TABS = [
+  { key: "sprechen", label: "Teil 1", description: "Sprechen" },
+  { key: "schreiben", label: "Teil 2", description: "Schreiben" },
+  { key: "lesen", label: "Teil 3", description: "Lesen" },
+  { key: "lesen2", label: "Teil 4", description: "Lesen" },
+  { key: "references", label: "Ref", description: "Notes" },
+  { key: "submit", label: "Submit", description: "Send work" },
+];
+
+const A2_DAY25_NAVIGATION_TARGETS = [
+  { key: "sprechen", legacyKey: "teil1", match: /\\bteil\\s*1\\b|sprechen|speak/i },
+  { key: "schreiben", legacyKey: "teil2", match: /\\bteil\\s*2\\b|schreiben|write/i },
+  { key: "lesen", legacyKey: "teil3", match: /\\bteil\\s*3\\b|first reading|reading 1|lesen 1/i },
+  { key: "lesen2", legacyKey: "teil4", match: /\\bteil\\s*4\\b|second reading|reading 2|lesen 2/i },
+  { key: "references", legacyKey: "ref", match: /\\bref\\b|reference|answers|antwort/i },
+  { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
+];
+
+`;
+  guidanceSource = guidanceSource.replace(day25TabsAnchor, `${day25TabsBlock}${day25TabsAnchor}`);
+}
+
 const workbookDayBlock = `  const workbookDay = useMemo(() => {
     if (typeof window === "undefined") return null;
     return resolveA2B1WorkbookDayFromLocation(
@@ -120,20 +152,37 @@ if (guidanceSource.includes(unsafeFallbackTabs)) {
   );
 }
 
+const legacyHandleLookup =
+  '    const tab = UNIVERSAL_A2_WORKBOOK_TABS.find((item) => item.key === tabKey);';
+const day25HandleLookup = `    const navigationTargets = workbookDay === 25
+      ? A2_DAY25_NAVIGATION_TARGETS
+      : UNIVERSAL_A2_WORKBOOK_TABS;
+    const tab = navigationTargets.find((item) => item.key === tabKey);`;
+if (guidanceSource.includes(legacyHandleLookup)) {
+  guidanceSource = guidanceSource.replace(legacyHandleLookup, day25HandleLookup);
+} else if (!guidanceSource.includes("const navigationTargets = workbookDay === 25")) {
+  throw new Error("Could not route Day 25 shared tabs to the second reading target.");
+}
+
 const fallbackNavWithMappedTabs = `        tabs={fallbackTabs}
         ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-const safeFallbackNav = `        tabs={STANDARD_WORKBOOK_TABS}
+const standardFallbackNav = `        tabs={STANDARD_WORKBOOK_TABS}
+        ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
+const standardFallbackNavWithOverrides = `        tabs={STANDARD_WORKBOOK_TABS}
         tabDescriptionOverrides={tabDescriptionOverrides}
         ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-if (guidanceSource.includes(fallbackNavWithMappedTabs)) {
-  guidanceSource = guidanceSource.replace(fallbackNavWithMappedTabs, safeFallbackNav);
-} else if (!guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
-  const standardFallbackNav = `        tabs={STANDARD_WORKBOOK_TABS}
+const day25FallbackNav = `        tabs={workbookDay === 25 ? A2_DAY25_WORKBOOK_TABS : STANDARD_WORKBOOK_TABS}
+        tabDescriptionOverrides={tabDescriptionOverrides}
         ariaLabel={workbookDay ? \`A2 Day ${"${workbookDay}"} workbook sections\` : "A2 workbook sections"}`;
-  if (!guidanceSource.includes(standardFallbackNav)) {
-    throw new Error("Could not find universal A2 WorkbookTabNav props.");
-  }
-  guidanceSource = guidanceSource.replace(standardFallbackNav, safeFallbackNav);
+
+if (guidanceSource.includes(fallbackNavWithMappedTabs)) {
+  guidanceSource = guidanceSource.replace(fallbackNavWithMappedTabs, day25FallbackNav);
+} else if (guidanceSource.includes(standardFallbackNavWithOverrides)) {
+  guidanceSource = guidanceSource.replace(standardFallbackNavWithOverrides, day25FallbackNav);
+} else if (guidanceSource.includes(standardFallbackNav)) {
+  guidanceSource = guidanceSource.replace(standardFallbackNav, day25FallbackNav);
+} else if (!guidanceSource.includes(day25FallbackNav)) {
+  throw new Error("Could not apply the Day 25 tab set to the shared A2 fallback navigation.");
 }
 
 const genericSubmission = "          <AssignmentSubmissionPage />";
@@ -203,10 +252,19 @@ if (
   throw new Error("Days 24-26 fallback submissions are not route-locked.");
 }
 if (guidanceSource.includes("STANDARD_WORKBOOK_TABS.map((tab) =>")) {
-  throw new Error("Day 25 fallback still breaks Grammar integration by mapping STANDARD_WORKBOOK_TABS before WorkbookTabNav.");
+  throw new Error("Day 25 fallback still maps STANDARD_WORKBOOK_TABS before WorkbookTabNav.");
 }
-if (!guidanceSource.includes("tabs={STANDARD_WORKBOOK_TABS}") || !guidanceSource.includes("tabDescriptionOverrides={tabDescriptionOverrides}")) {
-  throw new Error("Day 25 fallback no longer preserves STANDARD_WORKBOOK_TABS identity through Grammar integration.");
+if (!guidanceSource.includes(day25TabsMarker)) {
+  throw new Error("Day 25 shared workbook tabs were not generated.");
+}
+if (!guidanceSource.includes('{ key: "lesen2", label: "Teil 4", description: "Lesen" }')) {
+  throw new Error("Day 25 Teil 4 is not exposed as the second reading tab.");
+}
+if (!guidanceSource.includes("const navigationTargets = workbookDay === 25")) {
+  throw new Error("Day 25 shared navigation does not use its dedicated click targets.");
+}
+if (!guidanceSource.includes(day25FallbackNav)) {
+  throw new Error("Day 25 custom tabs are not mounted by the shared fallback navigation.");
 }
 if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
   throw new Error("WorkbookTabNav cannot safely apply post-integration label overrides.");
@@ -214,4 +272,4 @@ if (!standardSource.includes("const displayTabs = tabDescriptionOverrides")) {
 
 fs.writeFileSync(guidancePath, guidanceSource, "utf8");
 fs.writeFileSync(standardComponentsPath, standardSource, "utf8");
-console.log("Patched A2 fallback tabs to preserve route-locked submission context and Grammar integration.");
+console.log("Patched A2 fallback submissions, Grammar integration and Day 25 reading-only navigation.");
