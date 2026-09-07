@@ -1,0 +1,43 @@
+name: Workbook page chrome
+
+on:
+  pull_request:
+    paths:
+      - "web/src/App.js"
+      - "web/src/components/BookPdfDownloadInjector.js"
+      - "web/src/components/RouteScopedAppServices.js"
+      - "web/src/components/UniversalWorkbookLessonNavigator.js"
+      - "web/src/components/WorkbookPageChromeOwnership.test.js"
+      - ".github/workflows/workbook-page-chrome.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "web/src/App.js"
+      - "web/src/components/BookPdfDownloadInjector.js"
+      - "web/src/components/RouteScopedAppServices.js"
+      - "web/src/components/UniversalWorkbookLessonNavigator.js"
+      - "web/src/components/WorkbookPageChromeOwnership.test.js"
+      - ".github/workflows/workbook-page-chrome.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test single workbook chrome ownership
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/WorkbookPageChromeOwnership.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
