@@ -142,7 +142,10 @@ const lockedSubmission = `          {routeLockedSubmissionContext ? (
           ) : (
             <AssignmentSubmissionPage />
           )}`;
-if (!guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
+const hasRouteLockedSubmission =
+  guidanceSource.includes("submissionContext={routeLockedSubmissionContext}") ||
+  guidanceSource.includes("submissionContext={resolveA2FallbackSubmissionContext(workbookDay)}");
+if (!hasRouteLockedSubmission) {
   if (!guidanceSource.includes(genericSubmission)) {
     throw new Error("Could not find generic fallback assignment submission mount.");
   }
@@ -193,7 +196,10 @@ const overrideDeclarationCount = guidanceSource.split(tabDescriptionOverrideDecl
 if (overrideDeclarationCount !== 1) {
   throw new Error(`Expected exactly one Day 25 label override declaration, found ${overrideDeclarationCount}.`);
 }
-if (!guidanceSource.includes("submissionContext={routeLockedSubmissionContext}")) {
+if (
+  !guidanceSource.includes("submissionContext={routeLockedSubmissionContext}") &&
+  !guidanceSource.includes("submissionContext={resolveA2FallbackSubmissionContext(workbookDay)}")
+) {
   throw new Error("Days 24-26 fallback submissions are not route-locked.");
 }
 if (guidanceSource.includes("STANDARD_WORKBOOK_TABS.map((tab) =>")) {
