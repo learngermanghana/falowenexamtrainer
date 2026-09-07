@@ -96,14 +96,13 @@ describe("A2 late native submission safety", () => {
     expect(panel.textContent).not.toMatch(/Teil 4 · Hören/i);
   });
 
-  test("Days 24 and 26 identify Hören as self-check only", () => {
-    [24, 26].forEach((day) => {
-      document.body.innerHTML = "";
-      const routeCase = nativeSubmissionCases.find((item) => item.day === day);
-      renderNativeSubmission(routeCase);
-      const panel = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
-      expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
-    });
+  test.each([24, 26])("Day %i identifies Hören as self-check only", (day) => {
+    const routeCase = nativeSubmissionCases.find((item) => item.day === day);
+    renderNativeSubmission(routeCase);
+
+    const panel = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
+    expect(panel).toBeTruthy();
+    expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
   });
 
   test("only Days 24-26 receive route-locked shared submission contexts", () => {
