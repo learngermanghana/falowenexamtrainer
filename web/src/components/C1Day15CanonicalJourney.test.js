@@ -8,6 +8,10 @@ const guidedPageSource = readFileSync(
   path.join(process.cwd(), "src/components/C1Day15To17GuidedLessonPage.js"),
   "utf8",
 );
+const sharedWorkbookSource = readFileSync(
+  path.join(process.cwd(), "src/components/StandardWorkbookComponents.js"),
+  "utf8",
+);
 const legacyWorkbookSource = readFileSync(
   path.join(
     process.cwd(),
@@ -35,15 +39,19 @@ describe("C1 Day 15 canonical lesson journey", () => {
     );
   });
 
-  test("uses the C1 Learn, Speak, Write, Finish and Ref structure", () => {
+  test("uses the shared C1 Learn, Speak, Write, Finish and Ref structure", () => {
     expect(guidedPageSource).toContain(
-      'const tabs = ["learn", "speak", "write", "finish", "references"]',
+      'import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents"',
     );
-    expect(guidedPageSource).toContain('learn: "1. Learn"');
-    expect(guidedPageSource).toContain('speak: "2. Speak"');
-    expect(guidedPageSource).toContain('write: "3. Write"');
-    expect(guidedPageSource).toContain('finish: "4. Finish"');
-    expect(guidedPageSource).toContain('references: "5. Ref"');
+    expect(guidedPageSource).toContain(
+      '<AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />',
+    );
+    expect(sharedWorkbookSource).toContain("export const B2_C1_WORKBOOK_TABS = [");
+    expect(sharedWorkbookSource).toContain('{ key: "learn", label: "Learn", description: "Input" }');
+    expect(sharedWorkbookSource).toContain('{ key: "speak", label: "Speak", description: "Practice" }');
+    expect(sharedWorkbookSource).toContain('{ key: "write", label: "Write", description: "Practice" }');
+    expect(sharedWorkbookSource).toContain('{ key: "finish", label: "Finish", description: "Complete" }');
+    expect(sharedWorkbookSource).toContain('{ key: "references", label: "Ref", description: "Notes" }');
     expect(guidedPageSource).toContain("<EmbeddedSpeechPracticePanel />");
 
     expect(legacyWorkbookSource).not.toContain("RouteSpeakingMindMap");
