@@ -8,6 +8,15 @@ import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { STANDARD_WORKBOOK_TABS, WorkbookTabNav } from "./StandardWorkbookComponents";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 
+const A2_DAY25_WORKBOOK_TABS = [
+  { key: "sprechen", label: "Teil 1", description: "Sprechen" },
+  { key: "schreiben", label: "Teil 2", description: "Schreiben" },
+  { key: "lesen", label: "Teil 3", description: "Lesen" },
+  { key: "lesen2", label: "Teil 4", description: "Lesen" },
+  { key: "references", label: "Ref", description: "Notes" },
+  { key: "submit", label: "Submit", description: "Send work" },
+];
+
 export const A2_LEGACY_STANDARD_NAV_BY_PATH = {
   "/campus/course/a2-day-21-ein-wochenende-planen-workbook": {
     day: 21,
@@ -51,6 +60,7 @@ const STANDARD_TO_LEGACY_KEY = {
   sprechen: "teil1",
   schreiben: "teil2",
   lesen: "teil3",
+  lesen2: "teil4",
   hoeren: "teil4",
 };
 
@@ -280,12 +290,13 @@ export default function A2LegacyStandardWorkbookNavigation() {
 
   if (!config) return null;
 
+  const navigationTabs = config.day === 25 ? A2_DAY25_WORKBOOK_TABS : STANDARD_WORKBOOK_TABS;
   const navigation = navRoot
     ? createPortal(
         <WorkbookTabNav
           activeTab={activeTab}
           onChange={selectTab}
-          tabs={STANDARD_WORKBOOK_TABS}
+          tabs={navigationTabs}
           ariaLabel={`A2 Day ${config.day} workbook sections`}
           renderLegacyGrammarPanel={false}
         />,

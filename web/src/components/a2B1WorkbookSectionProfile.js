@@ -6,6 +6,7 @@ export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
   writing: true,
   reading: true,
   listening: true,
+  part4: "listening",
   references: true,
   submit: true,
 });
@@ -13,6 +14,7 @@ export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
 const A2_B1_SECTION_OVERRIDES = Object.freeze({
   A2: Object.freeze({
     14: Object.freeze({ listening: false }),
+    25: Object.freeze({ listening: false, part4: "reading" }),
   }),
   B1: Object.freeze({}),
 });
@@ -39,10 +41,16 @@ export const getA2B1WorkbookSectionProfile = (level, day) => {
 };
 
 export const filterA2B1WorkbookTabsByProfile = (tabs = [], profile = {}) =>
-  tabs.filter((tab) => {
+  tabs.reduce((visibleTabs, tab) => {
+    if (tab?.key === "hoeren" && profile.part4 === "reading" && profile.reading !== false) {
+      visibleTabs.push({ ...tab, description: "Lesen" });
+      return visibleTabs;
+    }
+
     const section = TAB_TO_SECTION[tab?.key];
-    return !section || profile[section] !== false;
-  });
+    if (!section || profile[section] !== false) visibleTabs.push(tab);
+    return visibleTabs;
+  }, []);
 
 export const __TESTING__ = {
   overrides: A2_B1_SECTION_OVERRIDES,
