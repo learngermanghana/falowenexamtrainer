@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import { resolveStrictInAppWorkbookRoute } from "../data/strictInAppWorkbookRoutes";
 import { styles } from "../styles";
+import { getA2B1WorkbookExperienceContext } from "./BookPdfDownloadInjector";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"];
 const HOST_ID = "falowen-universal-workbook-navigation";
@@ -162,6 +163,9 @@ export const resolveWorkbookNavigation = ({ pathname = "", search = "", schedule
   };
 };
 
+export const shouldUseUniversalWorkbookNavigator = ({ pathname = "", search = "" } = {}) =>
+  !getA2B1WorkbookExperienceContext(pathname, search);
+
 const lessonLabel = (lesson) => {
   if (!lesson) return "";
   const parts = [`${lesson.level} · Day ${lesson.day}`];
@@ -245,10 +249,12 @@ const NavigationCard = ({ navigation }) => (
 export default function UniversalWorkbookLessonNavigator() {
   const location = useLocation();
   const [portalHost, setPortalHost] = useState(null);
-  const navigation = useMemo(
-    () => resolveWorkbookNavigation({ pathname: location.pathname, search: location.search }),
-    [location.pathname, location.search]
-  );
+  const navigation = useMemo(() => {
+    if (!shouldUseUniversalWorkbookNavigator({ pathname: location.pathname, search: location.search })) {
+      return null;
+    }
+    return resolveWorkbookNavigation({ pathname: location.pathname, search: location.search });
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (!navigation || typeof document === "undefined") {
