@@ -9,7 +9,17 @@ const repoRoot = path.resolve(__dirname, "..");
 const lessonBuilderPath = path.join(repoRoot, "web", "src", "data", "selfLearningLessons", "buildSelfLearningLesson.js");
 const guidedPagePath = path.join(repoRoot, "web", "src", "components", "C1Day18To20GuidedLessonPage.js");
 
-const replaceOnce = (source, pattern, replacement, label) => {
+const replaceSection = (source, startMarker, endMarker, replacement, label) => {
+  if (source.includes(replacement)) return source;
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error(`Could not patch ${label}`);
+  }
+  return `${source.slice(0, start)}${replacement}\n\n${source.slice(end)}`;
+};
+
+const replaceBlock = (source, pattern, replacement, label) => {
   if (source.includes(replacement)) return source;
   const next = source.replace(pattern, replacement);
   if (next === source) throw new Error(`Could not patch ${label}`);
@@ -36,10 +46,11 @@ const standardBuilder = `const buildC1OpinionWriting = (title, topicContext) => 
   ],
 });`;
 
-builder = replaceOnce(
+builder = replaceSection(
   builder,
-  /const buildC1OpinionWriting = \(title, topicContext\) => \(\{[\s\S]*?\n\}\);\n\nconst buildB2OpinionWriting/,
-  `${standardBuilder}\n\nconst buildB2OpinionWriting`,
+  "const buildC1OpinionWriting =",
+  "const buildB2OpinionWriting =",
+  standardBuilder,
   "shared C1 Goethe writing structure",
 );
 fs.writeFileSync(lessonBuilderPath, builder);
@@ -55,7 +66,7 @@ const standardDay18 = `const day18Writing = {
   ],
 };`;
 
-guided = replaceOnce(
+guided = replaceBlock(
   guided,
   /const day18Writing = \{[\s\S]*?\n\};/,
   standardDay18,
