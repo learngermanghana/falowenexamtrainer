@@ -144,11 +144,9 @@ describe("A2 legacy portal safety", () => {
     });
     expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
     expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
-
-    const guidance = document.querySelector('[data-a2-day23-native-guidance="true"]');
-    expect(guidance).toBeTruthy();
-    expect(guidance.textContent).toMatch(/Teil 4 · Hören: self-check only/i);
-    expect(guidance.textContent).toMatch(/do not send Hören through Submit/i);
+    expect(
+      screen.getByText(/Submit only Teil 2 · Schreiben and Teil 3 · Lesen\. Teil 4 · Hören is self-check only/i),
+    ).toBeInTheDocument();
 
     expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
     expect(screen.getByRole("heading", { name: /Teil 2 \(Schreiben\)/i })).toBeVisible();
@@ -170,7 +168,7 @@ describe("A2 legacy portal safety", () => {
   });
 
   test.each(DAY24_TO_26)(
-    "Day $day uses in-page shared tabs and opens Teil 2 and Teil 3 without a portal collision",
+    "Day $day keeps native tabs and route-owned submission without the legacy fallback",
     async ({ day, path }) => {
       const url = `${path}?radio=done`;
       window.history.pushState({}, "", url);
@@ -186,19 +184,21 @@ describe("A2 legacy portal safety", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("navigation", { name: `A2 Day ${day} workbook sections` })).toBeVisible();
+        expect(document.querySelector("[data-native-workbook-tabs]")).toBeVisible();
       });
-
-      await waitFor(() => {
-        expect(document.querySelector("[data-native-workbook-tabs]")).not.toBeVisible();
-      });
+      expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
       expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
 
-      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
+      expect(() => fireEvent.click(screen.getByRole("button", { name: "Teil 2 · Schreiben" }))).not.toThrow();
       expect(screen.getByRole("heading", { name: "Native Teil 2 Schreiben content" })).toBeVisible();
 
-      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
+      expect(() => fireEvent.click(screen.getByRole("button", { name: "Teil 3 · Lesen" }))).not.toThrow();
       expect(screen.getByRole("heading", { name: "Native Teil 3 Lesen content" })).toBeVisible();
+
+      const submission = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
+      expect(submission).toBeTruthy();
+      expect(submission.textContent).toMatch(new RegExp(`Submit workbook · Day ${day}`, "i"));
+      expect(submission.textContent).toMatch(/Submit Teil 2 · Schreiben and Teil 3 · Lesen/i);
     },
   );
 
