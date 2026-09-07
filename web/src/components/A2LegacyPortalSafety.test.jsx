@@ -5,7 +5,7 @@ import A2LegacyStandardWorkbookNavigation from "./A2LegacyStandardWorkbookNaviga
 import A2LegacyStandardWorkbookNavigationImpl, {
   insertA2LegacyPortalMountBefore,
 } from "./A2LegacyStandardWorkbookNavigationImpl";
-import { A2B1WorkbookGuidance } from "./A2B1WorkbookGuidance";
+import A2LateWorkbookSubmissionPanel from "./A2LateWorkbookSubmissionPanel";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage";
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
@@ -52,13 +52,13 @@ const NativeWorkbookTabs = ({ replaceable = false }) => {
         <button type="button" onClick={() => setActiveTab("teil1")}>Teil 1 · Group Practice</button>
         <button type="button" onClick={() => setActiveTab("teil2")}>Teil 2 · Schreiben</button>
         <button type="button" onClick={() => setActiveTab("teil3")}>Teil 3 · Lesen</button>
-        <button type="button" onClick={() => setActiveTab("teil4")}>Teil 4 · Hören</button>
+        <button type="button" onClick={() => setActiveTab("teil4")}>Teil 4</button>
         <button type="button" onClick={() => setActiveTab("references")}>5. Ref</button>
       </div>
       {activeTab === "teil1" ? <h2>Native Teil 1 content</h2> : null}
       {activeTab === "teil2" ? <h2>Native Teil 2 Schreiben content</h2> : null}
       {activeTab === "teil3" ? <h2>Native Teil 3 Lesen content</h2> : null}
-      {activeTab === "teil4" ? <h2>Native Teil 4 Hören content</h2> : null}
+      {activeTab === "teil4" ? <h2>Native Teil 4 content</h2> : null}
       {activeTab === "references" ? <h2>Native references content</h2> : null}
     </>
   );
@@ -178,7 +178,7 @@ describe("A2 legacy portal safety", () => {
           <A2LegacyStandardWorkbookNavigation />
           <main className="layout-main">
             <NativeWorkbookTabs />
-            <A2B1WorkbookGuidance level="A2" />
+            <A2LateWorkbookSubmissionPanel pathname={path} />
           </main>
         </MemoryRouter>,
       );
@@ -197,7 +197,7 @@ describe("A2 legacy portal safety", () => {
 
       const submission = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
       expect(submission).toBeTruthy();
-      expect(submission.textContent).toMatch(new RegExp(`Submit workbook · Day ${day}`, "i"));
+      expect(submission.textContent).toMatch(new RegExp(`Submit Workbook · Day ${day}`, "i"));
       expect(submission.textContent).toMatch(/Submit Teil 2 · Schreiben and Teil 3 · Lesen/i);
     },
   );
