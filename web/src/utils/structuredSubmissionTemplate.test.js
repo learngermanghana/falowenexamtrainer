@@ -60,7 +60,7 @@ describe("structured submission templates", () => {
   test("reports deleted headings and unanswered required Teile before submission", () => {
     const profile = getStructuredSubmissionProfile({ level: "A2", day: 15, assignmentKey: "A2-6.15" });
     const parsed = parseStructuredSubmissionText(
-      "TEIL 2\nHallo.\n\nTEIL 3\n\nSome text without the Teil 4 heading",
+      "TEIL 2\nHallo.\n\nTEIL 3\n",
       profile,
     );
 
