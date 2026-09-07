@@ -135,6 +135,9 @@ export const WorkbookTabNav = ({
   } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
   const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
   const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");
+  const sectionProgress = effectiveTabs.length
+    ? Math.round(((activeIndex + 1) / effectiveTabs.length) * 100)
+    : 0;
 
   return (
     <>
@@ -180,9 +183,24 @@ export const WorkbookTabNav = ({
           ))}
         </div>
 
-        <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
-          Tab {activeIndex + 1} of {effectiveTabs.length} · Select {tabNames}.
-        </p>
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
+              Section {activeIndex + 1} of {effectiveTabs.length} · Select {tabNames}.
+            </p>
+            <span style={{ color: "#475569", fontWeight: 800, fontSize: 12 }}>{sectionProgress}% through sections</span>
+          </div>
+          <div
+            role="progressbar"
+            aria-label="Workbook section progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={sectionProgress}
+            style={{ width: "100%", height: 7, borderRadius: 999, background: "#bfdbfe", overflow: "hidden" }}
+          >
+            <div style={{ width: `${sectionProgress}%`, height: "100%", borderRadius: 999, background: "#2563eb" }} />
+          </div>
+        </div>
       </nav>
 
       {integratesLegacyGrammar && renderLegacyGrammarPanel && activeTab === "grammar" && legacyGrammarContext ? (
