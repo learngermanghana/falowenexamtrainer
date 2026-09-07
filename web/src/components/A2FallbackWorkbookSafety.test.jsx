@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import {
@@ -19,7 +19,7 @@ jest.mock("./A2B1WorkbookGrammarNotes", () => ({
   A2B1GrammarNotesTab: ({ level, day }) => <div>{level} Day {day} grammar notes</div>,
 }));
 
-const fallbackCases = [
+const nativeSubmissionCases = [
   {
     day: 24,
     path: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
@@ -54,7 +54,7 @@ const expectedContext = ({ day, fallbackChapter, workbookId }) => {
   };
 };
 
-const renderFallback = async ({ day, path }) => {
+const renderNativeSubmission = ({ path }) => {
   const location = `${path}?radio=done`;
   window.history.pushState({}, "", location);
 
@@ -63,40 +63,51 @@ const renderFallback = async ({ day, path }) => {
       <A2B1WorkbookGuidance level="A2" />
     </MemoryRouter>,
   );
-
-  return screen.findByRole("tablist", {
-    name: `A2 Day ${day} workbook sections`,
-  });
 };
 
-describe("A2 universal fallback safety", () => {
-  test.each(fallbackCases)(
-    "Day $day Submit stays locked to the workbook assignment",
-    async (routeCase) => {
-      const tablist = await renderFallback(routeCase);
+describe("A2 late native submission safety", () => {
+  test.each(nativeSubmissionCases)(
+    "Day $day stays locked to the workbook assignment without universal fallback tabs",
+    (routeCase) => {
+      renderNativeSubmission(routeCase);
 
-      fireEvent.click(within(tablist).getByRole("tab", { name: "Submit" }));
+      expect(
+        screen.queryByRole("tablist", { name: `A2 Day ${routeCase.day} workbook sections` }),
+      ).not.toBeInTheDocument();
+      expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
 
-      const contextualSubmission = await screen.findByTestId("contextual-submission");
+      const panel = document.querySelector(`[data-a2-late-native-submission="${routeCase.day}"]`);
+      expect(panel).toBeTruthy();
+      expect(panel.textContent).toMatch(new RegExp(`Submit workbook · Day ${routeCase.day}`, "i"));
+
+      const contextualSubmission = screen.getByTestId("contextual-submission");
       expect(screen.queryByTestId("generic-submission")).not.toBeInTheDocument();
       expect(JSON.parse(contextualSubmission.textContent)).toEqual(expectedContext(routeCase));
     },
   );
 
-  test("Day 25 hides unavailable Grammar while relabeling Teil 4 as Lesen", async () => {
-    const day25 = fallbackCases.find(({ day }) => day === 25);
-    const tablist = await renderFallback(day25);
+  test("Day 25 identifies Part 4 as submitted Lesen rather than Hören", () => {
+    const day25 = nativeSubmissionCases.find(({ day }) => day === 25);
+    renderNativeSubmission(day25);
 
-    await waitFor(() => {
-      expect(within(tablist).getAllByRole("tab")).toHaveLength(6);
-    });
-
-    expect(within(tablist).queryByRole("tab", { name: "Grammar" })).not.toBeInTheDocument();
-    expect(within(tablist).getByRole("tab", { name: "Teil 4" })).toHaveTextContent(/Lesen/i);
+    const panel = document.querySelector('[data-a2-late-native-submission="25"]');
+    expect(panel).toBeTruthy();
+    expect(panel.textContent).toMatch(/Teil 4 · Lesen is part of the submitted workbook/i);
+    expect(panel.textContent).not.toMatch(/Teil 4 · Hören/i);
   });
 
-  test("only the bypassed Days 24-26 receive fallback submission locks", () => {
-    fallbackCases.forEach((routeCase) => {
+  test("Days 24 and 26 identify Hören as self-check only", () => {
+    [24, 26].forEach((day) => {
+      document.body.innerHTML = "";
+      const routeCase = nativeSubmissionCases.find((item) => item.day === day);
+      renderNativeSubmission(routeCase);
+      const panel = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
+      expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
+    });
+  });
+
+  test("only Days 24-26 receive route-locked shared submission contexts", () => {
+    nativeSubmissionCases.forEach((routeCase) => {
       expect(resolveA2FallbackSubmissionContext(routeCase.day)).toEqual(expectedContext(routeCase));
     });
     expect(resolveA2FallbackSubmissionContext(23)).toBeNull();
