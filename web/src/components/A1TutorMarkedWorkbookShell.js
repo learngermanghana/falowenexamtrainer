@@ -174,17 +174,11 @@ const A1TutorMarkedWorkbookShell = ({
     </div>
   );
 
-  const handlePrint = () => {
-    if (typeof window !== "undefined" && typeof window.print === "function") window.print();
-  };
-
   return (
     <div
       data-a1-tutor-marked-workbook={assignment.assignmentKey}
       style={{ ...styles.container, display: "grid", gap: 16 }}
     >
-      <style>{`@media print { [data-a1-workbook-screen-controls="true"] { display: none !important; } [data-a1-workbook-media="true"] { break-inside: avoid; } }`}</style>
-
       <header
         data-a1-modern-workbook-header="true"
         style={{
@@ -196,29 +190,12 @@ const A1TutorMarkedWorkbookShell = ({
           boxShadow: "0 14px 30px rgba(15, 23, 42, 0.08)",
         }}
       >
-        <div
-          data-a1-workbook-screen-controls="true"
-          style={{ display: "flex", gap: 8, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}
-        >
+        <div style={{ display: "flex", gap: 8, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
           <AppBackButton
             label={backLabel}
             fallbackPath={backFallbackPath}
             onBack={backTo ? () => navigate(backTo, { replace: true }) : undefined}
           />
-          <button
-            type="button"
-            onClick={handlePrint}
-            style={{
-              ...styles.secondaryButton,
-              borderColor: "#93c5fd",
-              color: "#1d4ed8",
-              fontWeight: 900,
-              minHeight: 42,
-              padding: "9px 13px",
-            }}
-          >
-            Download / Print PDF
-          </button>
         </div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
@@ -256,7 +233,6 @@ const A1TutorMarkedWorkbookShell = ({
         {headerActions ? (
           <div
             data-a1-workbook-header-actions="true"
-            data-a1-workbook-screen-controls="true"
             style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}
           >
             {headerActions}
