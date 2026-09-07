@@ -2,22 +2,14 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
-import {
-  A2B1WorkbookGuidance,
-  resolveA2FallbackSubmissionContext,
-} from "./A2B1WorkbookGuidance";
-
-jest.mock("./AssignmentSubmissionPage", () => () => (
-  <div data-testid="generic-submission">Generic submission</div>
-));
+import { resolveA2FallbackSubmissionContext } from "./A2B1WorkbookGuidance";
+import A2LateWorkbookSubmissionPanel, {
+  resolveA2LateWorkbookSubmissionContext,
+} from "./A2LateWorkbookSubmissionPanel";
 
 jest.mock("./ContextualAssignmentSubmissionPage", () => ({ submissionContext }) => (
   <pre data-testid="contextual-submission">{JSON.stringify(submissionContext)}</pre>
 ));
-
-jest.mock("./A2B1WorkbookGrammarNotes", () => ({
-  A2B1GrammarNotesTab: ({ level, day }) => <div>{level} Day {day} grammar notes</div>,
-}));
 
 const nativeSubmissionCases = [
   {
@@ -60,29 +52,24 @@ const renderNativeSubmission = ({ path }) => {
 
   render(
     <MemoryRouter initialEntries={[location]}>
-      <A2B1WorkbookGuidance level="A2" />
+      <A2LateWorkbookSubmissionPanel pathname={path} />
     </MemoryRouter>,
   );
 };
 
 describe("A2 late native submission safety", () => {
   test.each(nativeSubmissionCases)(
-    "Day $day stays locked to the workbook assignment without universal fallback tabs",
+    "Day $day stays locked to the workbook assignment in the production panel",
     (routeCase) => {
       renderNativeSubmission(routeCase);
 
-      expect(
-        screen.queryByRole("tablist", { name: `A2 Day ${routeCase.day} workbook sections` }),
-      ).not.toBeInTheDocument();
-      expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
-
       const panel = document.querySelector(`[data-a2-late-native-submission="${routeCase.day}"]`);
       expect(panel).toBeTruthy();
-      expect(panel.textContent).toMatch(new RegExp(`Submit workbook · Day ${routeCase.day}`, "i"));
+      expect(panel.textContent).toMatch(new RegExp(`Submit Workbook · Day ${routeCase.day}`, "i"));
 
       const contextualSubmission = screen.getByTestId("contextual-submission");
-      expect(screen.queryByTestId("generic-submission")).not.toBeInTheDocument();
       expect(JSON.parse(contextualSubmission.textContent)).toEqual(expectedContext(routeCase));
+      expect(resolveA2LateWorkbookSubmissionContext(routeCase.path)).toEqual(expectedContext(routeCase));
     },
   );
 
@@ -105,11 +92,13 @@ describe("A2 late native submission safety", () => {
     expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
   });
 
-  test("only Days 24-26 receive route-locked shared submission contexts", () => {
+  test("legacy fallback context stays in parity while only Days 24-26 are supported", () => {
     nativeSubmissionCases.forEach((routeCase) => {
       expect(resolveA2FallbackSubmissionContext(routeCase.day)).toEqual(expectedContext(routeCase));
+      expect(resolveA2LateWorkbookSubmissionContext(routeCase.path)).toEqual(expectedContext(routeCase));
     });
     expect(resolveA2FallbackSubmissionContext(23)).toBeNull();
     expect(resolveA2FallbackSubmissionContext(27)).toBeNull();
+    expect(resolveA2LateWorkbookSubmissionContext("/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook")).toBeNull();
   });
 });
