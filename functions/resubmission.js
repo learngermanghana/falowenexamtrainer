@@ -41,6 +41,54 @@ const compact = (value) => normalize(value).replace(/[^a-z0-9]+/g, "");
 const normalizeTitle = (value) => normalize(value).replace(/\s+/g, " ");
 const unique = (values = []) => [...new Set(values.map((value) => cleanText(value, 400)).filter(Boolean))];
 
+const normalizePartId = (value = "") => {
+  const match = String(value || "").toLowerCase().match(/(?:teil|part)[-_ ]?([1-4])/);
+  if (match?.[1]) return `teil${Number(match[1])}`;
+  if (/^[1-4]$/.test(String(value || "").trim())) return `teil${Number(value)}`;
+  return "";
+};
+
+const sanitizePartList = (value = []) => {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map(normalizePartId).filter(Boolean))].slice(0, 4);
+};
+
+const readStructuredSectionText = (value) => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return cleanText(value, 12000);
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "";
+  return cleanText(
+    value.text ?? value.answer ?? value.submissionText ?? value.workContent ?? value.value ?? "",
+    12000
+  );
+};
+
+const sanitizeStructuredSections = (value = null) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const sections = {};
+  Object.entries(value).forEach(([key, sectionValue]) => {
+    const partId = normalizePartId(key);
+    if (!partId || Object.prototype.hasOwnProperty.call(sections, partId)) return;
+    sections[partId] = readStructuredSectionText(sectionValue);
+  });
+  return sections;
+};
+
+const normalizeSectionForDiff = (value = "") =>
+  String(value || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .join("\n")
+    .trim();
+
+const compareStructuredSections = (previousSections = {}, currentSections = {}, sectionOrder = []) =>
+  sanitizePartList(sectionOrder).filter(
+    (partId) => normalizeSectionForDiff(previousSections?.[partId]) !== normalizeSectionForDiff(currentSections?.[partId])
+  );
+
 const toFiniteNumber = (value) => {
   if (value === null || value === undefined || cleanText(value) === "") return null;
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
@@ -225,6 +273,11 @@ const validatePayload = (data = {}) => {
   const previousScore = toFiniteNumber(data.previousScore);
   const day = toFiniteNumber(data.day);
   const level = cleanText(data.level, 20).toUpperCase();
+  const structuredSections = sanitizeStructuredSections(data.structuredSections || data.submissionSections);
+  const submissionSectionOrder = sanitizePartList(data.submissionSectionOrder || data.requiredSubmissionParts);
+  const requiredSubmissionParts = sanitizePartList(data.requiredSubmissionParts || data.submissionSectionOrder);
+  const previousStructuredSections = sanitizeStructuredSections(data.previousStructuredSections);
+  const hasStructuredPayload = Object.keys(structuredSections).length > 0 && submissionSectionOrder.length > 0;
 
   if (!canonicalAssignmentKey || !selectedAssignmentId) {
     throw new HttpsError("invalid-argument", "Assignment details are missing. Please reopen the assignment and try again.");
@@ -236,7 +289,45 @@ const validatePayload = (data = {}) => {
       "Corrected text appears to include page instructions. Submit only the corrected answer text."
     );
   }
-  if (correctedText.length < 80) throw new HttpsError("invalid-argument", "Corrected text is too short.");
+
+  let changedSubmissionParts = [];
+  if (hasStructuredPayload) {
+    const requiredParts = requiredSubmissionParts.length ? requiredSubmissionParts : submissionSectionOrder;
+    const missingParts = requiredParts.filter((partId) => !cleanText(structuredSections[partId], 12000));
+    if (missingParts.length) {
+      throw new HttpsError(
+        "invalid-argument",
+        `Every required Teil must contain an answer: ${missingParts.join(", ")}.`
+      );
+    }
+    if (correctedText.length < 20) {
+      throw new HttpsError("invalid-argument", "Corrected structured answers are too short.");
+    }
+
+    const previousHasAllParts = requiredParts.every(
+      (partId) => cleanText(previousStructuredSections[partId], 12000).length > 0
+    );
+    if (previousHasAllParts) {
+      changedSubmissionParts = compareStructuredSections(
+        previousStructuredSections,
+        structuredSections,
+        submissionSectionOrder
+      );
+      if (!changedSubmissionParts.length) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Your answers are unchanged. Correct at least one Teil before resubmitting."
+        );
+      }
+    } else {
+      changedSubmissionParts = sanitizePartList(data.changedSubmissionParts).filter((partId) =>
+        submissionSectionOrder.includes(partId)
+      );
+    }
+  } else if (correctedText.length < 80) {
+    throw new HttpsError("invalid-argument", "Corrected text is too short.");
+  }
+
   if (improvementSummary.length < 25) {
     throw new HttpsError("invalid-argument", "Please explain what you improved in this resubmission.");
   }
@@ -259,6 +350,17 @@ const validatePayload = (data = {}) => {
     chapter: cleanText(data.chapter, 80),
     chapterKey: cleanText(data.chapterKey, 160),
     className: cleanText(data.className, 200),
+    structured: hasStructuredPayload
+      ? {
+          submissionStructureVersion: Math.max(1, Number(data.submissionStructureVersion || 1) || 1),
+          structuredSections,
+          submissionSectionOrder,
+          requiredSubmissionParts: requiredSubmissionParts.length ? requiredSubmissionParts : submissionSectionOrder,
+          previousStructuredSections,
+          changedSubmissionParts,
+          resubmissionStructureSource: cleanText(data.resubmissionStructureSource, 80) || "structured",
+        }
+      : null,
   };
 };
 
@@ -439,6 +541,17 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
           data.previousSubmissionText || getSubmissionText(latestAttempt),
           12000
         ),
+        ...(validated.structured
+          ? {
+              submissionStructureVersion: validated.structured.submissionStructureVersion,
+              structuredSections: validated.structured.structuredSections,
+              submissionSectionOrder: validated.structured.submissionSectionOrder,
+              requiredSubmissionParts: validated.structured.requiredSubmissionParts,
+              previousStructuredSections: validated.structured.previousStructuredSections,
+              changedSubmissionParts: validated.structured.changedSubmissionParts,
+              resubmissionStructureSource: validated.structured.resubmissionStructureSource,
+            }
+          : {}),
         previousScore: validated.previousScore,
         originalSubmittedAt: earliestSubmissionMillis
           ? Timestamp.fromMillis(earliestSubmissionMillis)
@@ -505,9 +618,13 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
 exports._testing = {
   assignmentMatches,
   buildCooldownError,
+  compareStructuredSections,
   getReviewedScore,
   isAttemptDocument,
+  sanitizePartList,
+  sanitizeStructuredSections,
   submissionMillis,
   toFiniteNumber,
   toMillis,
+  validatePayload,
 };
