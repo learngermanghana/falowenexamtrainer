@@ -10,13 +10,12 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { useToast } from "../context/ToastContext";
 import { getC1Day21To25SpeakingScaffold } from "../data/c1Day21To25SpeakingScaffolds";
 import { getStandardLessonStorageKey, getStandardWritingCloudField, getStandardWritingConfig } from "../data/standardLessonJourney";
 import { styles } from "../styles";
 
-const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
 const NoteBox = ({ children, tone = "blue" }) => { const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#86efac", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] }; const [border, background, color] = tones[tone] || tones.blue; return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 12, background, color, lineHeight: 1.65 }}>{children}</div>; };
@@ -62,7 +61,7 @@ export default function C1Day21To25SelfTutoringPage({ lesson, canonicalLesson = 
   return <div style={{ ...styles.container, display: "grid", gap: 18 }}>
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ ...card, background: "linear-gradient(135deg,#0f172a,#1e3a8a)", color: "#fff" }}><span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day {day}</span><h1 style={{ margin: 0 }}>{effectiveLesson.title}</h1><p style={{ margin: 0, color: "#e2e8f0" }}>{effectiveLesson.topic}</p></header>
-    <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>{tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}</div>
+    <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
 
     {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 lesson video"} src={videoEmbed} allowFullScreen style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} /> : <NoteBox tone="amber">Continue with the grammar lesson below.</NoteBox>}</Section><GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone }))} /></> : null}
 

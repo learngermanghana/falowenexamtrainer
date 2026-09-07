@@ -14,11 +14,13 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-replaceOnce(
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
-  `import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport {\n  findWorkbookContextAssignment,\n  resolveWorkbookSubmissionContext,\n} from "../utils/workbookSubmissionContext";`,
-  "workbook submission context import",
-);
+if (!source.includes('from "../utils/workbookSubmissionContext"')) {
+  replaceOnce(
+    'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
+    `import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport {\n  findWorkbookContextAssignment,\n  resolveWorkbookSubmissionContext,\n} from "../utils/workbookSubmissionContext";`,
+    "workbook submission context import",
+  );
+}
 
 replaceOnce(
   `  const requestedSubmitLevel = useMemo(

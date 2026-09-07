@@ -9,6 +9,7 @@ import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
 import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
@@ -20,8 +21,6 @@ import {
 import { getAdvancedWritingPhase } from "../data/advancedWritingProgression";
 import { styles } from "../styles";
 
-const tabs = ["learn", "speak", "write", "finish", "references"];
-const labels = { learn: "1. Learn", speak: "2. Speak", write: "3. Write", finish: "4. Finish", references: "5. Ref" };
 const card = {
   ...styles.card,
   display: "grid",
@@ -166,9 +165,7 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
         <div><h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.6rem)" }}>{lesson.title}</h1><p style={{ margin: "10px 0 0", color: "#e2e8f0" }}>{lesson.topic}</p></div>
       </header>
 
-      <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.94)" }}>
-        {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}
-      </div>
+      <AdvancedSelfLearningTabNav level="C1" day={lesson.day} activeTab={active} onChange={setActive} />
 
       {active === "learn" ? <>
         <Section title="AI video">

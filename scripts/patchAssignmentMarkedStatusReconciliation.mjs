@@ -12,11 +12,13 @@ const ensureReplace = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-ensureReplace(
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
-  'import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport { fetchStudentResultsHistory } from "../services/resultsApi";\nimport { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";',
-  "results service import anchor",
-);
+if (!source.includes('from "../services/resultsApi"')) {
+  ensureReplace(
+    'import { triggerInteractionFeedback } from "../services/interactionFeedback";',
+    'import { triggerInteractionFeedback } from "../services/interactionFeedback";\nimport { fetchStudentResultsHistory } from "../services/resultsApi";\nimport { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";',
+    "results service import anchor",
+  );
+}
 
 ensureReplace(
   '  const { user, studentProfile } = useAuth();',

@@ -19,8 +19,9 @@ export const A2_B1_WORKBOOK_TABS_WITH_GRAMMAR = [
 
 export const B2_C1_WORKBOOK_TABS = [
   { key: "learn", label: "Learn", description: "Input" },
+  { key: "speak", label: "Speak", description: "Practice" },
   { key: "write", label: "Write", description: "Practice" },
-  { key: "finish", label: "Finish", description: "Task" },
+  { key: "finish", label: "Finish", description: "Complete" },
   { key: "references", label: "Ref", description: "Notes" },
 ];
 
@@ -223,6 +224,21 @@ export const WorkbookTabNav = ({
     </>
   );
 };
+
+export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) => (
+  <div
+    data-advanced-self-learning-navigation
+    style={{ position: "sticky", top: 0, zIndex: 35 }}
+  >
+    <WorkbookTabNav
+      activeTab={activeTab}
+      onChange={onChange}
+      tabs={B2_C1_WORKBOOK_TABS}
+      ariaLabel={`${String(level || "").toUpperCase()} Day ${day} self-learning sections`}
+      renderLegacyGrammarPanel={false}
+    />
+  </div>
+);
 
 export const WorkbookTaskCard = ({
   eyebrow = "Your task",
