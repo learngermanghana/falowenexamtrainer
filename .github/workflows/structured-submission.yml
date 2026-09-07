@@ -1,0 +1,46 @@
+name: Structured one-box submissions
+
+on:
+  pull_request:
+    paths:
+      - "web/src/utils/structuredSubmissionTemplate.js"
+      - "web/src/utils/structuredSubmissionTemplate.test.js"
+      - "web/src/components/StructuredSubmissionLifecycle.test.js"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - ".github/workflows/structured-submission.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/utils/structuredSubmissionTemplate.js"
+      - "web/src/utils/structuredSubmissionTemplate.test.js"
+      - "web/src/components/StructuredSubmissionLifecycle.test.js"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - ".github/workflows/structured-submission.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Apply structured submission lifecycle twice
+        run: |
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+      - name: Test profiles, parsing and page integration
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand src/utils/structuredSubmissionTemplate.test.js src/components/StructuredSubmissionLifecycle.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
