@@ -24,8 +24,17 @@ describe("A2 Days 23-28 native workbook ownership", () => {
     expect(guidance).toContain("const usesNativeLateWorkbook =");
     expect(guidance).toContain("[23, 24, 25, 26, 27, 28].includes(Number(workbookDay))");
     expect(guidance).toContain("usesNativeLateWorkbook || !showFallbackTabs");
-    expect(guidance).toContain("data-a2-late-native-submission");
-    expect(guidance).toContain("<ContextualAssignmentSubmissionPage submissionContext={submissionContext} />");
+  });
+
+  test("global workbook enhancements mount the Days 24-26 native submission panel", () => {
+    const inlineEnhancements = read("WorkbookInlineEnhancements.jsx");
+
+    expect(inlineEnhancements).toContain(
+      'import A2LateWorkbookSubmissionPanel from "./A2LateWorkbookSubmissionPanel";',
+    );
+    expect(inlineEnhancements).toContain(
+      "<A2LateWorkbookSubmissionPanel pathname={activePathname} />",
+    );
   });
 
   test("legacy observers retain Day 22 but stand down for Days 23-28", () => {
