@@ -13,6 +13,7 @@ on:
       - "web/src/components/A2LegacyPortalSafety.test.jsx"
       - "web/src/components/A2ReactOwnedCleanupSafety.test.jsx"
       - "web/src/components/A2FallbackWorkbookSafety.test.jsx"
+      - "web/src/components/A2Day25BuildNavigation.test.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
       - ".github/workflows/a2-day23-portal-safety.yml"
 
@@ -41,7 +42,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx src/components/A2FallbackWorkbookSafety.test.jsx src/components/A2SharedWorkbookRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A2LegacyPortalSafety.test.jsx src/components/A2ReactOwnedCleanupSafety.test.jsx src/components/A2FallbackWorkbookSafety.test.jsx src/components/A2Day25BuildNavigation.test.js src/components/A2SharedWorkbookRegression.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
