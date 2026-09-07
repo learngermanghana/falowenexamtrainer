@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - "scripts/patchA2LegacyPortalSafety.mjs"
+      - "scripts/patchA2Day23NativeNavigationSafety.mjs"
       - "scripts/patchA2ReactOwnedDomCleanupSafety.mjs"
       - "scripts/patchA2FallbackWorkbookSafety.mjs"
+      - "scripts/patchA2SharedRegressionSafety.mjs"
       - "web/package.json"
       - "web/src/components/a2GoetheListeningOnlyCleanup.js"
       - "web/src/components/A2LegacyStandardWorkbookNavigationImpl.js"
@@ -30,11 +32,15 @@ jobs:
       - name: Apply A2 DOM and fallback safety patches twice
         run: |
           node scripts/patchA2LegacyPortalSafety.mjs
+          node scripts/patchA2Day23NativeNavigationSafety.mjs
           node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
           node scripts/patchA2FallbackWorkbookSafety.mjs
+          node scripts/patchA2SharedRegressionSafety.mjs
           node scripts/patchA2LegacyPortalSafety.mjs
+          node scripts/patchA2Day23NativeNavigationSafety.mjs
           node scripts/patchA2ReactOwnedDomCleanupSafety.mjs
           node scripts/patchA2FallbackWorkbookSafety.mjs
+          node scripts/patchA2SharedRegressionSafety.mjs
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
