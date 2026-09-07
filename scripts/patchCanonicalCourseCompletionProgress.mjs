@@ -196,3 +196,4 @@ fs.writeFileSync(homePath, home, "utf8");
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
 fs.writeFileSync(writingPath, writing, "utf8");
 console.log("Canonical A1-C1 course completion is wired into Home, Course Book and self-learning writing progress.");
+await import("./patchCourseCompletionSnapshotPersistence.mjs");
