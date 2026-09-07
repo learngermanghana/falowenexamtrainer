@@ -23,7 +23,6 @@ import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetIn
 import B1WorkbookSubmissionContextSync from "./B1WorkbookSubmissionContextSync";
 import ExamQuestionCheatSheetInjector from "./ExamQuestionCheatSheetInjector";
 import AutoGrammarStartGuide from "./AutoGrammarStartGuide";
-import BookPdfDownloadInjector from "./BookPdfDownloadInjector";
 import A1CourseExperienceEnhancer from "./A1CourseExperienceEnhancer";
 import A1WorkbookSectionTabs from "./A1WorkbookSectionTabs";
 import A1UnifiedTutorWorkbookNavigation from "./A1UnifiedTutorWorkbookNavigation";
@@ -241,7 +240,6 @@ export default function RouteScopedAppServices() {
       <B1WorkbookWritingCheatSheetInjector />
       <ExamQuestionCheatSheetInjector />
       <AutoGrammarStartGuide />
-      <BookPdfDownloadInjector />
       {isA1DynamicLesson ? <A1ChapterSpecificLessonStateReset /> : null}
       {shouldEnhanceA1Experience ? <A1CourseExperienceEnhancer /> : null}
       {shouldMountA1WorkbookSectionServices ? <A1WorkbookSectionTabs /> : null}
