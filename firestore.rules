@@ -104,6 +104,15 @@ service cloud.firestore {
       allow delete: if isStaff();
     }
 
+    // Shared, canonical A1-C1 course progress snapshot.
+    // Students own their own snapshot; staff can read it for Admin/email/reporting.
+    match /courseCompletionSnapshots/{snapshotId} {
+      allow create: if ownsStudentIncoming() || isStaff();
+      allow read: if ownsStudentResource() || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow delete: if ownsStudentResource() || isStaff();
+    }
+
     match /writingReferences/{docId} {
       allow create: if ownsIncoming();
       allow read: if ownsResource() || isStaff();
