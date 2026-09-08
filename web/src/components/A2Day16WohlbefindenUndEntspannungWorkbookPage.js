@@ -1,5 +1,7 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
+import SpeakingMindMap from "./SpeakingMindMap";
+import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 
 const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 const sectionStyle = { display: "grid", gap: 12 };
@@ -14,6 +16,8 @@ const boxStyle = {
 
 const sprechenContent = (
   <div style={sectionStyle}>
+    <SpeakingMindMap config={getA2SpeakingMindMap(16)} />
+
     <p style={{ margin: 0, lineHeight: 1.7 }}>
       In this chapter, we&apos;ll engage in group exercises discussing these topics.
     </p>
