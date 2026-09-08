@@ -51,9 +51,9 @@ replaceOnce(
 );
 
 replaceOnce(
-  `    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
-  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
-  "inline word minimum submit validation",
+  `    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {\n      setStatus({\n        loading: false,\n        error: \`Please add a fuller response (${"${MIN_SUBMISSION_CHARACTERS}"}+ characters) before submitting.\`,\n        success: "",\n      });\n      return;\n    }\n\n    const submissionWordCount = countWords(form.submissionText);\n    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
+  `    const submissionWordCount = countWords(form.submissionText);\n    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }\n\n    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {\n      setStatus({\n        loading: false,\n        error: \`Please add a fuller response (${"${MIN_SUBMISSION_CHARACTERS}"}+ characters) before submitting.\`,\n        success: "",\n      });\n      return;\n    }`,
+  "inline word minimum before character validation",
 );
 
 replaceOnce(
@@ -81,6 +81,12 @@ const requiredMarkers = [
 requiredMarkers.forEach((marker) => {
   if (!source.includes(marker)) throw new Error(`Submission word feedback marker missing: ${marker}`);
 });
+
+const wordValidationIndex = source.indexOf("minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords");
+const characterValidationIndex = source.indexOf("form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS");
+if (wordValidationIndex < 0 || characterValidationIndex < 0 || wordValidationIndex > characterValidationIndex) {
+  throw new Error("Submission word minimum validation must run before the generic character guard.");
+}
 
 fs.writeFileSync(targetPath, source, "utf8");
 console.log("Assignment submissions now use task-aware word targets with inline missing-word feedback.");
