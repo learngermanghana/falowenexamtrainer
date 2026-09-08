@@ -65,7 +65,7 @@ test("Day 7 chapter hub normalizes once and stays mounted without repeated fetch
   global.fetch = originalFetch;
 });
 
-test("completed Day 15 Kapitel 4.7 radio URL keeps the resource choices visible", async () => {
+test("completed Day 15 Kapitel 4.7 radio URL redirects to the Course Book", async () => {
   render(
     <MemoryRouter initialEntries={["/campus/course/lesson/A1/15?radio=done&chapter=4.7&hub=1"]}>
       <Routes>
@@ -78,8 +78,8 @@ test("completed Day 15 Kapitel 4.7 radio URL keeps the resource choices visible"
     </MemoryRouter>,
   );
 
-  expect(await screen.findByTestId("stable-lesson")).toHaveTextContent(
-    "/campus/course/lesson/A1/15?radio=done&chapter=4.7&hub=1",
+  expect(await screen.findByTestId("location-probe")).toHaveTextContent(
+    "/campus/course/speaking-exams-intro-4-7?radio=done",
   );
-  expect(screen.queryByTestId("location-probe")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("stable-lesson")).not.toBeInTheDocument();
 });
