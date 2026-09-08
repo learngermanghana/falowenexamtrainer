@@ -40,7 +40,7 @@ describe("AssignmentSubmissionPage word feedback", () => {
       "minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords",
     );
     const characterGuardIndex = source.indexOf(
-      "form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS",
+      "submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS",
     );
 
     expect(wordValidationIndex).toBeGreaterThanOrEqual(0);
