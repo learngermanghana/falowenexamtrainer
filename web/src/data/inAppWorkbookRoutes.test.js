@@ -27,7 +27,7 @@ describe("in-app workbook routes", () => {
     });
   });
 
-  test("A1 lesson pages keep the configured workbook resource without redirecting", () => {
+  test("A1 lesson pages keep the Radio-first entry point before Radio is complete", () => {
     window.history.replaceState({}, "", "/campus/course/lesson/A1/10?chapter=6");
 
     const expectedRoute = "/campus/course/a1-day-10-objects-colors-possessive-articles-workbook";
@@ -40,5 +40,29 @@ describe("in-app workbook routes", () => {
       chapter: "6",
       fallback: "https://drive.google.com/file/d/legacy-workbook/view",
     })).toBe(expectedRoute);
+  });
+
+  test("A1 lesson pages continue directly to the Course Book after Radio is complete", () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/campus/course/lesson/A1/10?chapter=6&hub=1&radio=done",
+    );
+
+    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 10, chapter: "6" })).toBe(
+      "/campus/course/a1-day-10-objects-colors-possessive-articles-workbook?radio=done",
+    );
+  });
+
+  test("A1 Course Book redirect preserves existing workbook query parameters", () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/campus/course/lesson/A1/18?chapter=12.2&hub=1&radio=done",
+    );
+
+    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 18, chapter: "12.2" })).toBe(
+      "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook&radio=done",
+    );
   });
 });
