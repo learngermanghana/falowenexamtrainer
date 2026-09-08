@@ -51,10 +51,31 @@ replaceOnce(
 );
 
 replaceOnce(
-  `    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {\n      setStatus({\n        loading: false,\n        error: \`Please add a fuller response (${"${MIN_SUBMISSION_CHARACTERS}"}+ characters) before submitting.\`,\n        success: "",\n      });\n      return;\n    }\n\n    const submissionWordCount = countWords(form.submissionText);\n    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
-  `    const submissionWordCount = countWords(form.submissionText);\n    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }\n\n    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {\n      setStatus({\n        loading: false,\n        error: \`Please add a fuller response (${"${MIN_SUBMISSION_CHARACTERS}"}+ characters) before submitting.\`,\n        success: "",\n      });\n      return;\n    }`,
-  "inline word minimum before character validation",
+  `    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
+  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
+  "inline word minimum submit validation",
 );
+
+const structuredWordDeclaration = "    const submissionWordCount = countWords(submissionAnswerText);";
+const plainWordDeclaration = "    const submissionWordCount = countWords(form.submissionText);";
+const wordDeclaration = source.includes(structuredWordDeclaration) ? structuredWordDeclaration : plainWordDeclaration;
+const structuredCharacterGuard = "    if (submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {";
+const plainCharacterGuard = "    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {";
+const characterGuard = source.includes(structuredCharacterGuard) ? structuredCharacterGuard : plainCharacterGuard;
+const dynamicLengthGuard = "    if (form.submissionText.trim().length > dynamicMaxSubmissionCharacters) {";
+
+const wordBlockStart = source.indexOf(wordDeclaration);
+const characterBlockStart = source.indexOf(characterGuard);
+const dynamicGuardStart = source.indexOf(dynamicLengthGuard);
+if (wordBlockStart < 0 || characterBlockStart < 0 || dynamicGuardStart < 0) {
+  throw new Error("Could not locate submission word/character validation blocks.");
+}
+
+if (characterBlockStart < wordBlockStart) {
+  const characterBlock = source.slice(characterBlockStart, wordBlockStart).trimEnd();
+  const wordBlock = source.slice(wordBlockStart, dynamicGuardStart).trimEnd();
+  source = `${source.slice(0, characterBlockStart)}${wordBlock}\n\n${characterBlock}\n\n${source.slice(dynamicGuardStart)}`;
+}
 
 replaceOnce(
   `              <textarea\n                ref={submissionTextRef}\n                value={form.submissionText}`,
@@ -83,7 +104,11 @@ requiredMarkers.forEach((marker) => {
 });
 
 const wordValidationIndex = source.indexOf("minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords");
-const characterValidationIndex = source.indexOf("form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS");
+const structuredCharacterValidationIndex = source.indexOf("submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS");
+const plainCharacterValidationIndex = source.indexOf("form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS");
+const characterValidationIndex = structuredCharacterValidationIndex >= 0
+  ? structuredCharacterValidationIndex
+  : plainCharacterValidationIndex;
 if (wordValidationIndex < 0 || characterValidationIndex < 0 || wordValidationIndex > characterValidationIndex) {
   throw new Error("Submission word minimum validation must run before the generic character guard.");
 }
