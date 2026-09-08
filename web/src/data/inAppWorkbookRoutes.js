@@ -57,6 +57,21 @@ const isA1LessonRoute = () => {
   return /^\/campus\/course\/lesson\/A1\//i.test(window.location?.pathname || "");
 };
 
+const hasCompletedRadio = () => {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location?.search || "");
+  return params.get("radio") === "done";
+};
+
+const addCompletedRadioToRoute = (route = "") => {
+  const raw = String(route || "").trim();
+  if (!raw) return "";
+  const [path, query = ""] = raw.split("?");
+  const params = new URLSearchParams(query);
+  params.set("radio", "done");
+  return `${path}?${params.toString()}`;
+};
+
 export const getConfiguredInAppWorkbookResourceRoute = ({ level, day, chapter } = {}) => {
   const normalizedLevel = normalizeLevel(level);
   const normalizedDay = String(Number(day));
@@ -90,10 +105,16 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
     return A1_DAY23_CHAPTER142_GRAMMAR_ROUTE;
   }
 
-  // Course Book lesson cards should open the A1 lesson resource hub first.
-  // The workbook route remains available through the hub's Open workbook action.
+  // Keep the legacy lesson route as the Radio entry point. Once Radio is complete,
+  // skip the old resource hub and continue straight into the configured Course Book.
   if (normalizedLevel === "A1" && normalizedDay !== "0" && isA1LessonRoute()) {
-    return "";
+    if (!hasCompletedRadio()) return "";
+    const workbookRoute = getConfiguredInAppWorkbookResourceRoute({
+      level: normalizedLevel,
+      day,
+      chapter,
+    });
+    return addCompletedRadioToRoute(workbookRoute);
   }
 
   return getConfiguredInAppWorkbookResourceRoute({ level: normalizedLevel, day, chapter });
