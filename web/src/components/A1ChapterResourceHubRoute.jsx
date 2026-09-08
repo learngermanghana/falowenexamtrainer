@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import {
   buildA1ChapterResourceHubState,
   getRequestedA1Chapter,
@@ -32,6 +32,27 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
 
   if (!isResourceHubRequest) return fallback;
 
+  // Always rebuild the authoritative hub state from the URL. Besides avoiding
+  // stale state from another chapter, this applies the same canonical workbook
+  // routing rules used by the resource hub and preserves radio=done on the
+  // final workbook destination.
+  const resolvedRouteState = buildA1ChapterResourceHubState({
+    level: routeLevel,
+    day: params.day,
+    search: location.search,
+  });
+  const query = new URLSearchParams(location.search);
+  const completedRadio = query.get("radio") === "done";
+  const completedWorkbookRoute =
+    resolvedRouteState?.entry?.workbookRoute || resolvedRouteState?.entry?.workbook_link || "";
+
+  // A canonical A1 link with hub=1 is intercepted by this outer route before
+  // CourseLessonPage can run. Once Radio is complete, redirect here so the
+  // learner goes straight to the Course Book instead of seeing the legacy hub.
+  if (completedRadio && completedWorkbookRoute) {
+    return <Navigate to={completedWorkbookRoute} replace />;
+  }
+
   // The outer route contains a literal /A1/ segment, so CourseLessonPageLegacy
   // cannot read a `level` URL param. Build the route identity in memory instead
   // of replacing the current history entry; Firefox can throw
@@ -43,16 +64,9 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
     search: location.search,
     state: location.state,
   })
-    ? buildA1ChapterResourceHubState({
-        level: routeLevel,
-        day: params.day,
-        search: location.search,
-      })
+    ? resolvedRouteState
     : location.state;
 
-  // `radio=done` records progress; it must not turn the resource hub into a
-  // workbook redirect. Learners still need this screen to choose the workbook,
-  // teacher lecture, or AI video in whichever order helps them most.
   return (
     <CourseLessonPageLegacy
       routeLevel={routeLevel}
