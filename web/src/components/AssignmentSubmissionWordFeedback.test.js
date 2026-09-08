@@ -15,6 +15,12 @@ describe("AssignmentSubmissionPage word feedback", () => {
     expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter: "0.1" })).toBe(0);
   });
 
+  test("retains word targets for earlier A1 chapters with real writing tasks", () => {
+    ["3", "4", "9", "11"].forEach((chapter) => {
+      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
+    });
+  });
+
   test("keeps live writing feedback concise and actionable", () => {
     expect(buildAssignmentSubmissionWordProgressText({ wordCount: 15, minimumWords: 20 }))
       .toBe("15 / 20 words · Add 5 more words.");
@@ -27,5 +33,18 @@ describe("AssignmentSubmissionPage word feedback", () => {
     expect(source).toContain('data-submission-word-error="true"');
     expect(source).toContain("minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords");
     expect(source).toContain('textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });');
+  });
+
+  test("runs exact word feedback before the generic 20-character guard", () => {
+    const wordValidationIndex = source.indexOf(
+      "minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords",
+    );
+    const characterGuardIndex = source.indexOf(
+      "form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS",
+    );
+
+    expect(wordValidationIndex).toBeGreaterThanOrEqual(0);
+    expect(characterGuardIndex).toBeGreaterThanOrEqual(0);
+    expect(wordValidationIndex).toBeLessThan(characterGuardIndex);
   });
 });
