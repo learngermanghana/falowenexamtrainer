@@ -1,0 +1,43 @@
+name: Submission word feedback
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/components/AssignmentSubmissionWordFeedback.test.js"
+      - "web/src/components/SubmissionMinimumWordGuard.js"
+      - "web/src/components/SubmissionMinimumWordGuard.test.js"
+      - "web/src/utils/assignmentSubmissionWordMinimum.js"
+      - "web/src/utils/assignmentSubmissionWordMinimum.test.js"
+      - "web/src/utils/submissionWordMinimums.js"
+      - "web/src/utils/submissionWordMinimums.test.js"
+      - "scripts/patchSubmissionWordFeedback.mjs"
+      - "web/package.json"
+      - ".github/workflows/submission-word-feedback.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test task-aware submission word feedback
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/utils/assignmentSubmissionWordMinimum.test.js src/utils/submissionWordMinimums.test.js src/components/SubmissionMinimumWordGuard.test.js src/components/AssignmentSubmissionWordFeedback.test.js
