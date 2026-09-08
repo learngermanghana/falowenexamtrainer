@@ -174,6 +174,7 @@ const applyMobileFieldEnhancements = (form, { showPasswords = false } = {}) => {
     autocapitalize: "words",
     enterkeyhint: "next",
   });
+  if (locationInput) locationInput.removeAttribute("placeholder");
 
   const emergencyInput = form.querySelector('[autocomplete="tel-national"]');
   setAttributes(emergencyInput, {
