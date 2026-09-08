@@ -53,6 +53,7 @@ on:
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.js"
       - "web/src/components/A1ChapterSpecificLessonRouteBoundary.test.js"
       - "web/src/components/A1ChapterResourceHubRoute.jsx"
+      - "web/src/components/A1ChapterResourceHubRoute.test.jsx"
       - "web/src/components/CourseLessonDirectOpen.test.jsx"
       - "web/src/components/A1CourseBookLetterPracticePanel.js"
       - "web/src/components/A1CourseBookLetterPracticePanel.test.js"
@@ -128,7 +129,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/inAppWorkbookRoutes.a1LessonLinks.test.js src/components/A1ChapterResourceHubRoute.test.jsx
       - name: Test A1 teacher videos
         working-directory: web
         env:
