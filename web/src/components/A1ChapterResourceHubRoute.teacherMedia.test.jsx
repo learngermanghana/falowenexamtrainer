@@ -18,8 +18,8 @@ const renderHub = (url) =>
     </MemoryRouter>,
   );
 
-test("shows both the A1 teacher lecture and AI video in the chapter hub", async () => {
-  renderHub("/campus/course/lesson/A1/1?chapter=0.1&hub=1&radio=done");
+test("shows both the A1 teacher lecture and AI video in the chapter hub before Radio is complete", async () => {
+  renderHub("/campus/course/lesson/A1/1?chapter=0.1&hub=1");
 
   expect(await screen.findByText("A1")).toBeVisible();
   expect(screen.getByText((_, element) => element?.textContent === "🎬 Kapitel 0.1 teacher lecture video")).toBeVisible();
