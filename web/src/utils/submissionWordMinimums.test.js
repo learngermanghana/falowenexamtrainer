@@ -11,7 +11,7 @@ describe("level-based submission word minimums", () => {
     document.body.innerHTML = "";
   });
 
-  test("uses 20 words for the canonical A1 workbook submission", () => {
+  test("uses 20 words for the canonical A1 workbook submission when no assignment-specific target is declared", () => {
     document.body.innerHTML = `
       <div data-a1-built-in-submission>
         <form>
@@ -81,5 +81,19 @@ describe("level-based submission word minimums", () => {
     const textarea = document.querySelector("textarea");
     expect(applySubmissionWordMinimum(textarea)).toBe(40);
     expect(textarea.getAttribute("data-minimum-words")).toBe("40");
+  });
+
+  test("respects an explicit zero target for objective assignments", () => {
+    document.body.innerHTML = `
+      <form>
+        <select><option selected value="A1">A1</option></select>
+        <textarea data-minimum-words="0"></textarea>
+      </form>
+    `;
+
+    const textarea = document.querySelector("textarea");
+    expect(applySubmissionWordMinimum(textarea)).toBeNull();
+    expect(textarea.getAttribute("data-minimum-words")).toBe("0");
+    expect(textarea).not.toHaveAttribute("data-falowen-level-word-minimum");
   });
 });
