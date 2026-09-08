@@ -6,9 +6,21 @@ import {
 } from "./assignmentSubmissionWordMinimum";
 
 describe("assignment submission word minimum", () => {
-  test("does not require filler words for A1 objective assignments", () => {
-    ["0.1", "0.2", "1.1", "1.2", "12.2"].forEach((chapter) => {
+  test("does not require filler words for genuinely objective A1 assignments", () => {
+    ["0.1", "0.2", "5", "7", "8", "12.1", "12.2"].forEach((chapter) => {
       expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(0);
+    });
+  });
+
+  test("retains the 20-word target for A1 chapters with writing sections", () => {
+    ["1.1", "1.2", "2", "3", "4", "6", "9", "10", "11"].forEach((chapter) => {
+      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
+    });
+  });
+
+  test("protects the explicit A1 writing chapters called out by the assignment registry", () => {
+    ["3", "4", "9", "11"].forEach((chapter) => {
+      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
     });
   });
 
