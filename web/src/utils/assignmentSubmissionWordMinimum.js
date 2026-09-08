@@ -1,6 +1,25 @@
 export const DEFAULT_ASSIGNMENT_SUBMISSION_WORDS = 20;
+export const NO_ASSIGNMENT_SUBMISSION_WORD_MINIMUM = 0;
 export const A1_LETTER_ASSIGNMENT_MINIMUM_WORDS = 50;
 export const A1_FIFTY_WORD_CHAPTERS = Object.freeze(["12.3", "13", "14.1"]);
+export const A1_OBJECTIVE_ASSIGNMENT_CHAPTERS = Object.freeze([
+  "0.1",
+  "0.2",
+  "1.1",
+  "1.2",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12.1",
+  "12.2",
+]);
 
 const normalizeLevel = (level = "") => String(level).trim().toUpperCase();
 const normalizeChapter = (chapter = "") => String(chapter).trim();
@@ -8,22 +27,38 @@ const normalizeChapter = (chapter = "") => String(chapter).trim();
 const isA1FiftyWordAssignment = ({ level = "", chapter = "" } = {}) =>
   normalizeLevel(level) === "A1" && A1_FIFTY_WORD_CHAPTERS.includes(normalizeChapter(chapter));
 
-export const getAssignmentSubmissionWordMinimum = ({ level = "", chapter = "" } = {}) =>
-  isA1FiftyWordAssignment({ level, chapter })
-    ? A1_LETTER_ASSIGNMENT_MINIMUM_WORDS
-    : DEFAULT_ASSIGNMENT_SUBMISSION_WORDS;
+const isA1ObjectiveAssignment = ({ level = "", chapter = "" } = {}) =>
+  normalizeLevel(level) === "A1" && A1_OBJECTIVE_ASSIGNMENT_CHAPTERS.includes(normalizeChapter(chapter));
+
+export const getAssignmentSubmissionWordMinimum = ({ level = "", chapter = "" } = {}) => {
+  if (isA1FiftyWordAssignment({ level, chapter })) return A1_LETTER_ASSIGNMENT_MINIMUM_WORDS;
+  if (isA1ObjectiveAssignment({ level, chapter })) return NO_ASSIGNMENT_SUBMISSION_WORD_MINIMUM;
+  return DEFAULT_ASSIGNMENT_SUBMISSION_WORDS;
+};
+
+export const buildAssignmentSubmissionWordProgressText = ({ wordCount, minimumWords } = {}) => {
+  const current = Math.max(0, Number(wordCount) || 0);
+  const target = Math.max(0, Number(minimumWords) || 0);
+  if (!target) return "";
+
+  const remaining = Math.max(0, target - current);
+  if (!remaining) return `${current} / ${target} words · Ready to submit.`;
+  return `${current} / ${target} words · Add ${remaining} more word${remaining === 1 ? "" : "s"}.`;
+};
 
 export const buildAssignmentSubmissionWordError = ({ wordCount, minimumWords, level, chapter } = {}) => {
   const current = Math.max(0, Number(wordCount) || 0);
-  const target = Math.max(1, Number(minimumWords) || DEFAULT_ASSIGNMENT_SUBMISSION_WORDS);
+  const target = Math.max(0, Number(minimumWords) || 0);
+  if (!target) return "";
 
+  const remaining = Math.max(0, target - current);
   const normalizedChapter = normalizeChapter(chapter);
   if (isA1FiftyWordAssignment({ level, chapter })) {
     const requirement = normalizedChapter === "12.3"
       ? "both letters"
       : "the letter-writing task and answers";
-    return `A1 ${normalizedChapter} requires ${requirement}. Please submit at least ${target} words in total. You currently have ${current} word${current === 1 ? "" : "s"}; add ${Math.max(0, target - current)} more.`;
+    return `Your answer has ${current} word${current === 1 ? "" : "s"}. You need at least ${target} words for ${requirement}. Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
   }
 
-  return `Please submit at least ${target} words. You currently have ${current}.`;
+  return `Your answer has ${current} word${current === 1 ? "" : "s"}. You need at least ${target} words. Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
 };

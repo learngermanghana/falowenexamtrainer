@@ -109,6 +109,33 @@ describe("SubmissionMinimumWordGuard", () => {
     expect(__TESTING__.isGuardedTextarea(textarea)).toBe(false);
   });
 
+  test("honours an explicit zero target for objective assignments", () => {
+    document.body.innerHTML = `
+      <form>
+        <textarea data-minimum-words="0"></textarea>
+        <button type="submit" data-a1-final-submit-button>Submit assignment</button>
+      </form>
+    `;
+    const textarea = document.querySelector("textarea");
+    const button = document.querySelector("button");
+    expect(resolveMinimumSubmissionWords({ textarea, control: button })).toBe(0);
+    expect(__TESTING__.isGuardedTextarea(textarea)).toBe(false);
+  });
+
+  test("leaves inline-managed assignment feedback to the React form", () => {
+    document.body.innerHTML = `
+      <form>
+        <textarea data-minimum-words="20" data-submission-word-feedback="inline"></textarea>
+        <button type="submit" data-a1-final-submit-button>Submit assignment</button>
+      </form>
+    `;
+    const textarea = document.querySelector("textarea");
+    const button = document.querySelector("button");
+    expect(__TESTING__.usesInlineWordFeedback(textarea)).toBe(true);
+    expect(resolveMinimumSubmissionWords({ textarea, control: button })).toBeNull();
+    expect(__TESTING__.isGuardedTextarea(textarea)).toBe(false);
+  });
+
   test("shows ready status and allows canonical A1 submission at 20 words", () => {
     document.body.innerHTML = `
       <form data-minimum-words="20">

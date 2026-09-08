@@ -6,9 +6,16 @@ export const A1_MINIMUM_SUBMISSION_WORDS = 20;
 const PANEL_ATTRIBUTE = "data-submission-minimum-word-panel";
 const PANEL_ID = "submission-minimum-word-panel";
 const HIDDEN_PROGRESS_ATTRIBUTE = "data-submission-word-progress-hidden";
+const INLINE_WORD_FEEDBACK_ATTRIBUTE = "data-submission-word-feedback";
 const EXPLICIT_TARGET_ATTRIBUTES = ["data-minimum-words", "data-min-words", "data-word-target"];
 
 const normalizeLabel = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+
+const toNonNegativeInteger = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+};
 
 const toPositiveInteger = (value) => {
   const parsed = Number(value);
@@ -88,6 +95,9 @@ const findResubmissionControlForTextarea = (textarea) => {
   return null;
 };
 
+const usesInlineWordFeedback = (textarea) =>
+  textarea?.getAttribute?.(INLINE_WORD_FEEDBACK_ATTRIBUTE) === "inline";
+
 const readExplicitMinimumWords = (textarea, control) => {
   const form = textarea?.closest?.("form");
   const explicitContainer = textarea?.closest?.(
@@ -97,8 +107,8 @@ const readExplicitMinimumWords = (textarea, control) => {
 
   for (const candidate of candidates) {
     for (const attribute of EXPLICIT_TARGET_ATTRIBUTES) {
-      const target = toPositiveInteger(candidate.getAttribute?.(attribute));
-      if (target) return target;
+      const target = toNonNegativeInteger(candidate.getAttribute?.(attribute));
+      if (target !== null) return target;
     }
   }
   return null;
@@ -125,14 +135,15 @@ const isCanonicalA1Submission = (textarea, control) => Boolean(
 );
 
 export const resolveMinimumSubmissionWords = ({ textarea, control = null } = {}) => {
-  if (!textarea) return null;
-  return readExplicitMinimumWords(textarea, control)
-    || readRenderedMinimumWords(textarea)
+  if (!textarea || usesInlineWordFeedback(textarea)) return null;
+  const explicitTarget = readExplicitMinimumWords(textarea, control);
+  if (explicitTarget !== null) return explicitTarget;
+  return readRenderedMinimumWords(textarea)
     || (isCanonicalA1Submission(textarea, control) ? A1_MINIMUM_SUBMISSION_WORDS : null);
 };
 
 const resolveTextareaContext = (textarea) => {
-  if (!(textarea instanceof HTMLTextAreaElement)) return null;
+  if (!(textarea instanceof HTMLTextAreaElement) || usesInlineWordFeedback(textarea)) return null;
   const form = textarea.closest("form");
   const finalControl = findFinalAssignmentSubmitControl(form);
   if (finalControl && findSubmissionTextarea(form) === textarea) {
@@ -311,7 +322,7 @@ export default function SubmissionMinimumWordGuard() {
       const submitter = event.submitter || findFinalAssignmentSubmitControl(form);
       if (submitter && !isFinalAssignmentSubmitControl(submitter)) return;
       const textarea = findSubmissionTextarea(form);
-      if (!textarea) return;
+      if (!textarea || usesInlineWordFeedback(textarea)) return;
       const minimumWords = resolveMinimumSubmissionWords({ textarea, control: submitter });
       if (!minimumWords) return;
       activeTextarea = textarea;
@@ -322,7 +333,7 @@ export default function SubmissionMinimumWordGuard() {
       const button = event.target?.closest?.("button");
       if (!isResubmissionControl(button)) return;
       const textarea = findResubmissionTextarea(button);
-      if (!textarea) return;
+      if (!textarea || usesInlineWordFeedback(textarea)) return;
       const minimumWords = resolveMinimumSubmissionWords({ textarea, control: button });
       if (!minimumWords) return;
       activeTextarea = textarea;
@@ -365,4 +376,5 @@ export const __TESTING__ = {
   isGuardedTextarea,
   isResubmissionControl,
   resolveTextareaContext,
+  usesInlineWordFeedback,
 };
