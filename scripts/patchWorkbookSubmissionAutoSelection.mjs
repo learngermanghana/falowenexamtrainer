@@ -60,6 +60,14 @@ replaceOnce(
   "structured submission profile",
 );
 
+// Draft hydration runs after the template effect. Never let an absent/empty legacy
+// cloud or local draft erase the canonical TEIL headings that were just generated.
+replaceOnce(
+  `        submissionText: draft?.submissionText || "",`,
+  `        submissionText:\n          String(draft?.submissionText || "").trim() ||\n          buildStructuredSubmissionTemplate(selectedSubmissionProfile) ||\n          "",`,
+  "structured template draft hydration fallback",
+);
+
 replaceOnce(
   `      submissionText: form.submissionText.trim(),\n      answer: form.submissionText.trim(),\n      workContent: form.submissionText.trim(),`,
   `      submissionText: form.submissionText.trim(),\n      answer: form.submissionText.trim(),\n      workContent: form.submissionText.trim(),\n      ...(parsedStructuredSubmission\n        ? {\n            submissionStructureVersion: selectedSubmissionProfile?.version || 1,\n            structuredSections: parsedStructuredSubmission.sections,\n            submissionSectionOrder: parsedStructuredSubmission.sectionOrder,\n            requiredSubmissionParts: selectedSubmissionProfile.parts.map((part) => part.partId),\n          }\n        : {}),`,
@@ -117,6 +125,7 @@ const requiredMarkers = [
   "const isWorkbookSubmissionContext = workbookSubmissionContext.locked;",
   "const selectedSubmissionProfile = useMemo(",
   "parseStructuredSubmissionText(form.submissionText, selectedSubmissionProfile)",
+  "buildStructuredSubmissionTemplate(selectedSubmissionProfile) ||",
   "structuredSections: parsedStructuredSubmission.sections",
   "requiredSubmissionParts: selectedSubmissionProfile.parts.map",
   "Please answer every required section before submitting",

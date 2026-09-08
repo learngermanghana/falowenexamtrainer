@@ -1,0 +1,57 @@
+name: Structured submission production order
+
+on:
+  pull_request:
+    paths:
+      - "scripts/patchA2B1MobileFloatingActions.mjs"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/utils/structuredSubmissionTemplate.js"
+      - "web/src/utils/structuredSubmissionA1FiveRegression.test.js"
+      - ".github/workflows/structured-submission-production-order.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/patchA2B1MobileFloatingActions.mjs"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/utils/structuredSubmissionTemplate.js"
+      - "web/src/utils/structuredSubmissionA1FiveRegression.test.js"
+      - ".github/workflows/structured-submission-production-order.yml"
+
+jobs:
+  production-order:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Run the complete production prebuild lifecycle
+        working-directory: web
+        run: npm run prebuild
+      - name: Assert structured submit page survived every lifecycle patch
+        run: |
+          grep -F 'from "../utils/structuredSubmissionTemplate"' web/src/components/AssignmentSubmissionPage.js
+          grep -F 'data-structured-submission-template="true"' web/src/components/AssignmentSubmissionPage.js
+          grep -F 'structuredSections: parsedStructuredSubmission.sections' web/src/components/AssignmentSubmissionPage.js
+          grep -F 'Please answer every required section before submitting' web/src/components/AssignmentSubmissionPage.js
+      - name: Test A1-5 and structured submission lifecycle
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand
+          src/utils/structuredSubmissionA1FiveRegression.test.js
+          src/utils/structuredSubmissionTemplate.test.js
+          src/components/StructuredSubmissionLifecycle.test.js
+          src/components/StructuredResubmissionLifecycle.test.js
+      - name: Build exactly what production will serve
+        working-directory: web
+        run: npx vite build
