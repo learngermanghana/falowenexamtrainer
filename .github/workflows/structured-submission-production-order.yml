@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/patchA2B1MobileFloatingActions.mjs"
       - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "web/package.json"
       - "web/src/components/AssignmentSubmissionPage.js"
       - "web/src/utils/structuredSubmissionTemplate.js"
       - "web/src/utils/structuredSubmissionA1FiveRegression.test.js"
@@ -15,6 +16,7 @@ on:
     paths:
       - "scripts/patchA2B1MobileFloatingActions.mjs"
       - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "web/package.json"
       - "web/src/components/AssignmentSubmissionPage.js"
       - "web/src/utils/structuredSubmissionTemplate.js"
       - "web/src/utils/structuredSubmissionA1FiveRegression.test.js"
