@@ -42,10 +42,17 @@ export const resolveSubmissionLevelForElement = (element, root = null) => {
 export const applySubmissionWordMinimum = (textarea, root = null) => {
   if (!textarea?.matches?.("textarea")) return null;
 
-  const existingTarget = Number(textarea.getAttribute(MINIMUM_ATTRIBUTE));
+  const rawExistingTarget = textarea.getAttribute(MINIMUM_ATTRIBUTE);
+  const existingTarget = Number(rawExistingTarget);
   const isManaged = textarea.getAttribute(MANAGED_ATTRIBUTE) === "true";
-  if (Number.isInteger(existingTarget) && existingTarget > 0 && !isManaged) {
-    return existingTarget;
+  const hasExplicitTarget = rawExistingTarget !== null && rawExistingTarget !== "";
+  if (
+    hasExplicitTarget
+    && Number.isInteger(existingTarget)
+    && existingTarget >= 0
+    && !isManaged
+  ) {
+    return existingTarget || null;
   }
 
   const level = resolveSubmissionLevelForElement(textarea, root);
