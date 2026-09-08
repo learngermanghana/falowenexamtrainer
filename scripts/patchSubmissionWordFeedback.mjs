@@ -70,10 +70,10 @@ replaceOnce(
 
 const requiredMarkers = [
   "buildAssignmentSubmissionWordProgressText,",
+  "buildAssignmentSubmissionWordProgressText({",
   'data-submission-word-feedback="inline"',
   'data-submission-word-error="true"',
   "minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords",
-  "Add ${remaining} more word",
   "setWordMinimumError(wordError);",
   'textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });',
 ];
