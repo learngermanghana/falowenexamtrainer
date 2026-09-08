@@ -16,5 +16,7 @@ describe("structured one-box submission lifecycle", () => {
     expect(page).toContain("Please answer every required section before submitting");
     expect(page).toContain('data-structured-submission-template="true"');
     expect(page).toContain("One answer box, already organised for this assignment");
+    expect(page).toContain("String(draft?.submissionText || \"\").trim() ||");
+    expect(page).toContain("buildStructuredSubmissionTemplate(selectedSubmissionProfile) ||");
   });
 });
