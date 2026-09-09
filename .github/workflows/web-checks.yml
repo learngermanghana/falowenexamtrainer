@@ -74,7 +74,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js
+        run: npm run test:ci -- --runTestsByPath src/services/attendanceService.test.js src/utils/courseAttendanceProgress.test.js
 
       - name: Test authoritative live class session selection
         working-directory: web

@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { PillBadge, PrimaryActionBar, SectionHeader, StatCard } from "./ui";
 import { detectLevelKey } from "../lib/day0Workbook";
+import { formatCourseAttendanceProgress } from "../utils/courseAttendanceProgress";
 
 const labelOf = (entry) => {
   if (!entry) return "";
@@ -145,6 +146,10 @@ const HomeMetrics = ({ studentProfile }) => {
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const levelKey = detectLevelKey(studentProfile);
+  const attendanceProgress = useMemo(
+    () => formatCourseAttendanceProgress({ attended: attendance.sessions, level: levelKey }),
+    [attendance.sessions, levelKey]
+  );
   const shouldShowHomeMetrics = ["A1", "A2", "B1"].includes(levelKey);
   const isMountedRef = useRef(true);
   const lastRefreshAtRef = useRef(0);
@@ -446,7 +451,15 @@ const HomeMetrics = ({ studentProfile }) => {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
         <StatCard
           label={t("homeMetrics.attendance.label")}
-          value={t("homeMetrics.attendance.sessions", { count: attendance.sessions })}
+          value={
+            attendanceProgress.expectedSessions > 0
+              ? t("homeMetrics.attendance.progress", {
+                  attended: attendanceProgress.attendedSessions,
+                  total: attendanceProgress.expectedSessions,
+                  defaultValue: "{{attended}}/{{total}} sessions",
+                })
+              : t("homeMetrics.attendance.sessions", { count: attendanceProgress.attendedSessions })
+          }
           helper={t("homeMetrics.attendance.hours", { count: attendance.hours })}
           tone="info"
         />
