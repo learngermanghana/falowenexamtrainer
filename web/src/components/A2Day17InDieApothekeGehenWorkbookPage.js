@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -136,13 +137,22 @@ const QuestionList = ({ questions }) => (
 );
 
 const A2Day17InDieApothekeGehenWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const location = useLocation();
+  const radioCompleted = useMemo(
+    () => new URLSearchParams(location.search || "").get("radio") === "done",
+    [location.search],
+  );
+  const [activeTab, setActiveTab] = useState(() => (radioCompleted ? "grammar" : "sprechen"));
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
     lesen: false,
     hoeren: false,
   });
+
+  useEffect(() => {
+    if (radioCompleted) setActiveTab("grammar");
+  }, [radioCompleted]);
 
   const setPreparedFor = (tabKey) => (event) =>
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -154,7 +164,9 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 17 Workbook · In die Apotheke gehen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.
+          {radioCompleted
+            ? "Falowen Radio complete — start with the Grammar notes, then continue with Teil 1–4, Ref or Submit."
+            : "Select Grammar, Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook."}
         </p>
 
         <div
