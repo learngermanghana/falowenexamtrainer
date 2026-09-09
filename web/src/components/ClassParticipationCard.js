@@ -22,6 +22,11 @@ const latestDetail = (record = {}) => {
   return `${responseLabel} · ${correct} correct · ${needsReview} to review`;
 };
 
+const latestQuestion = (record = {}) => {
+  const rows = Array.isArray(record.questionResponses) ? record.questionResponses : [];
+  return rows[rows.length - 1] || null;
+};
+
 const statStyle = {
   border: "1px solid #e2e8f0",
   borderRadius: 14,
@@ -141,28 +146,48 @@ const ClassParticipationCard = () => {
 
       {summary.latest.length > 0 ? (
         <div style={{ display: "grid", borderTop: "1px solid #e2e8f0" }}>
-          {summary.latest.map((record) => (
-            <div
-              key={record.id || `${record.sessionDate}-${record.assignmentId}`}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: 12,
-                padding: "10px 2px",
-                borderBottom: "1px solid #f1f5f9",
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ minWidth: 0, flex: "1 1 220px" }}>
-                <strong style={{ display: "block" }}>{formatLessonLabel(record)}</strong>
-                <span style={{ ...styles.helperText, fontSize: 12 }}>{record.sessionDate || "Class lesson"}</span>
+          {summary.latest.map((record) => {
+            const question = latestQuestion(record);
+            return (
+              <div
+                key={record.id || `${record.sessionDate}-${record.assignmentId}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1fr) auto",
+                  gap: 12,
+                  padding: "10px 2px",
+                  borderBottom: "1px solid #f1f5f9",
+                  alignItems: "start",
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: "block" }}>{formatLessonLabel(record)}</strong>
+                  <span style={{ ...styles.helperText, fontSize: 12 }}>{record.sessionDate || "Class lesson"}</span>
+                  {question ? (
+                    <div
+                      style={{
+                        marginTop: 7,
+                        borderRadius: 10,
+                        background: "#f8fafc",
+                        padding: "8px 10px",
+                        display: "grid",
+                        gap: 4,
+                      }}
+                    >
+                      <span style={{ ...styles.helperText, fontSize: 11, fontWeight: 700 }}>Your latest class question</span>
+                      <span style={{ fontSize: 13, lineHeight: 1.35 }}>{question.question}</span>
+                      <strong style={{ fontSize: 12, color: question.result === "correct" ? "#166534" : "#92400e" }}>
+                        {question.result === "correct" ? "Correct" : "Needs review"}
+                      </strong>
+                    </div>
+                  ) : null}
+                </div>
+                <span style={{ ...styles.helperText, fontSize: 12, fontWeight: 700, textAlign: "right" }}>
+                  {latestDetail(record)}
+                </span>
               </div>
-              <span style={{ ...styles.helperText, fontSize: 12, fontWeight: 700 }}>
-                {latestDetail(record)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
 
