@@ -81,7 +81,7 @@ describe("A1 shared navigation after a delayed self-learning journey", () => {
     const teil1Tab = await screen.findByRole("tab", { name: /Teil 1/i });
     const teil2Tab = screen.getByRole("tab", { name: /Teil 2/i });
     expect(screen.getByRole("tab", { name: "Overview" })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Submit" })).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toBeVisible();
 
     expect(screen.getByRole("navigation", { name: /Previous and next A1 assignments/i })).toBeVisible();
     expect(screen.getByRole("link", { name: /A1-9/i })).toHaveAttribute(
