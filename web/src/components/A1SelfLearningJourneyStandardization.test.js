@@ -3,6 +3,7 @@ import {
 } from "../data/a1CanonicalLessonCatalog";
 import { getA1CourseBookCard } from "../data/a1CourseBookCards";
 import {
+  buildA1SelfLearningDestinationHref,
   getA1SelfLearningJourneyResources,
   getA1SelfLearningPracticeForLocation,
 } from "./A1CoursePracticeAutoMount";
@@ -74,6 +75,17 @@ describe("A1 self-learning journey standardization", () => {
         expect(resource === null || typeof resource === "object").toBe(true);
       });
     });
+  });
+
+  test("legacy self-learning routes continue straight to the practice book after Radio", () => {
+    const practice = practices.find((item) => item.destination);
+    const href = buildA1SelfLearningDestinationHref(
+      practice.destination,
+      "?radio=done&materials=done&chapter=1.3",
+    );
+
+    expect(href).toBe(`${practice.destination}?radio=done&chapter=1.3`);
+    expect(href).not.toContain("materials=");
   });
 
   test("Day 19 stays self-learning and keeps both configured lesson videos", () => {
