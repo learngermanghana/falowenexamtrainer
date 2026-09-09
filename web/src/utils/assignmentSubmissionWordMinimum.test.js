@@ -1,5 +1,6 @@
 import {
   A1_LETTER_ASSIGNMENT_MINIMUM_WORDS,
+  A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS,
   buildAssignmentSubmissionWordError,
   buildAssignmentSubmissionWordProgressText,
   getAssignmentSubmissionWordMinimum,
@@ -12,16 +13,15 @@ describe("assignment submission word minimum", () => {
     });
   });
 
-  test("retains the 20-word target for A1 chapters with writing sections", () => {
+  test("uses a 10-word minimum for standard A1 writing assignments", () => {
     ["1.1", "1.2", "2", "3", "4", "6", "9", "10", "11"].forEach((chapter) => {
-      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
+      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(10);
     });
   });
 
-  test("protects the explicit A1 writing chapters called out by the assignment registry", () => {
-    ["3", "4", "9", "11"].forEach((chapter) => {
-      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
-    });
+  test("uses the A1 10-word fallback for uncategorized A1 submit tasks", () => {
+    expect(A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS).toBe(10);
+    expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter: "unknown" })).toBe(10);
   });
 
   test("requires 50 words for the A1 letter-writing assignments", () => {
@@ -30,24 +30,28 @@ describe("assignment submission word minimum", () => {
     expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter: "14.1" })).toBe(50);
     expect(getAssignmentSubmissionWordMinimum({ level: "A2", chapter: "12.3" })).toBe(20);
     expect(getAssignmentSubmissionWordMinimum({ level: "A2", chapter: "13" })).toBe(20);
-    expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter: "unknown" })).toBe(20);
+  });
+
+  test("keeps the default 20-word minimum for higher levels", () => {
+    expect(getAssignmentSubmissionWordMinimum({ level: "A2", chapter: "3" })).toBe(20);
+    expect(getAssignmentSubmissionWordMinimum({ level: "B1", chapter: "3" })).toBe(20);
   });
 
   test("shows live missing-word and ready feedback", () => {
-    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 15, minimumWords: 20 }))
-      .toBe("15 / 20 words · Add 5 more words.");
-    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 20, minimumWords: 20 }))
-      .toBe("20 / 20 words · Ready to submit.");
+    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 7, minimumWords: 10 }))
+      .toBe("7 / 10 words · Add 3 more words.");
+    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 10, minimumWords: 10 }))
+      .toBe("10 / 10 words · Ready to submit.");
     expect(buildAssignmentSubmissionWordProgressText({ wordCount: 5, minimumWords: 0 })).toBe("");
   });
 
   test("explains exactly how many words are missing for a normal writing task", () => {
     expect(buildAssignmentSubmissionWordError({
-      level: "A2",
-      chapter: "13",
-      wordCount: 15,
-      minimumWords: 20,
-    })).toBe("Your answer has 15 words. You need at least 20 words. Add 5 more words before submitting.");
+      level: "A1",
+      chapter: "3",
+      wordCount: 7,
+      minimumWords: 10,
+    })).toBe("Your answer has 7 words. You need at least 10 words. Add 3 more words before submitting.");
   });
 
   test("explains that both 12.3 letters are required", () => {

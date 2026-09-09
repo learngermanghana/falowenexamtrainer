@@ -1,5 +1,6 @@
 export const DEFAULT_ASSIGNMENT_SUBMISSION_WORDS = 20;
 export const NO_ASSIGNMENT_SUBMISSION_WORD_MINIMUM = 0;
+export const A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS = 10;
 export const A1_LETTER_ASSIGNMENT_MINIMUM_WORDS = 50;
 export const A1_FIFTY_WORD_CHAPTERS = Object.freeze(["12.3", "13", "14.1"]);
 export const A1_STANDARD_WRITING_CHAPTERS = Object.freeze([
@@ -37,8 +38,9 @@ const isA1ObjectiveAssignment = ({ level = "", chapter = "" } = {}) =>
 
 export const getAssignmentSubmissionWordMinimum = ({ level = "", chapter = "" } = {}) => {
   if (isA1FiftyWordAssignment({ level, chapter })) return A1_LETTER_ASSIGNMENT_MINIMUM_WORDS;
-  if (isA1StandardWritingAssignment({ level, chapter })) return DEFAULT_ASSIGNMENT_SUBMISSION_WORDS;
   if (isA1ObjectiveAssignment({ level, chapter })) return NO_ASSIGNMENT_SUBMISSION_WORD_MINIMUM;
+  if (isA1StandardWritingAssignment({ level, chapter })) return A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS;
+  if (normalizeLevel(level) === "A1") return A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS;
   return DEFAULT_ASSIGNMENT_SUBMISSION_WORDS;
 };
 
