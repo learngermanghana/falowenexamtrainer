@@ -16,6 +16,18 @@ const toIso = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 };
 
+const safeQuestionResponses = (value) => (Array.isArray(value) ? value : [])
+  .filter((response) => response?.result === "correct" || response?.result === "needs_review")
+  .slice(-20)
+  .map((response) => ({
+    questionId: clean(response.questionId).slice(0, 160),
+    question: clean(response.question).slice(0, 700),
+    result: response.result,
+    questionContext: clean(response.questionContext).slice(0, 120),
+    recordedAt: clean(response.recordedAt).slice(0, 80),
+  }))
+  .filter((response) => response.question);
+
 async function getAuthenticatedStudent(req) {
   const authHeader = clean(req.headers?.authorization);
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
@@ -43,6 +55,7 @@ const studentSafeRecord = (snapshot) => {
     correct: count(data.correct),
     needsReview: count(data.needsReview),
     skipped: count(data.skipped),
+    questionResponses: safeQuestionResponses(data.questionResponses),
     updatedAt: toIso(data.updatedAt),
   };
 };
@@ -93,5 +106,6 @@ async function classParticipationMeHandler(req, res) {
 
 module.exports = {
   classParticipationMeHandler,
+  safeQuestionResponses,
   studentSafeRecord,
 };
