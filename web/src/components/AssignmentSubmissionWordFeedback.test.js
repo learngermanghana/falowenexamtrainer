@@ -15,17 +15,17 @@ describe("AssignmentSubmissionPage word feedback", () => {
     expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter: "0.1" })).toBe(0);
   });
 
-  test("retains word targets for earlier A1 chapters with real writing tasks", () => {
+  test("uses the reduced 10-word target for earlier A1 chapters with writing tasks", () => {
     ["3", "4", "9", "11"].forEach((chapter) => {
-      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(20);
+      expect(getAssignmentSubmissionWordMinimum({ level: "A1", chapter })).toBe(10);
     });
   });
 
-  test("keeps live writing feedback concise and actionable", () => {
-    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 15, minimumWords: 20 }))
-      .toBe("15 / 20 words · Add 5 more words.");
-    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 22, minimumWords: 20 }))
-      .toBe("22 / 20 words · Ready to submit.");
+  test("keeps live A1 writing feedback concise and actionable", () => {
+    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 7, minimumWords: 10 }))
+      .toBe("7 / 10 words · Add 3 more words.");
+    expect(buildAssignmentSubmissionWordProgressText({ wordCount: 12, minimumWords: 10 }))
+      .toBe("12 / 10 words · Ready to submit.");
   });
 
   test("lets the React form own validation instead of the floating global guard", () => {
