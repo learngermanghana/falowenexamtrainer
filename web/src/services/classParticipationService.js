@@ -1,15 +1,5 @@
-import {
-  auth,
-  db,
-  collection,
-  getDocs,
-  limit,
-  query,
-  where,
-} from "../firebase";
-
-const RECORD_COLLECTION = "classParticipationRecords";
-const DEFAULT_LIMIT = 60;
+import { auth } from "../firebase";
+import { getBackendUrl } from "./backendUrl";
 
 const clean = (value) => String(value ?? "").trim();
 const count = (value) => {
@@ -26,7 +16,10 @@ const recordDate = (record = {}) => {
 };
 
 export const normalizeParticipationRecord = (record = {}) => ({
-  ...record,
+  id: clean(record.id),
+  sessionId: clean(record.sessionId),
+  classId: clean(record.classId),
+  course: clean(record.course),
   sessionDate: clean(record.sessionDate),
   lessonDay: clean(record.lessonDay),
   lessonTitle: clean(record.lessonTitle),
@@ -35,60 +28,42 @@ export const normalizeParticipationRecord = (record = {}) => ({
   correct: count(record.correct),
   needsReview: count(record.needsReview),
   skipped: count(record.skipped),
+  updatedAt: clean(record.updatedAt),
 });
-
-const readQuery = async (field, value, maxRecords) => {
-  if (!db || !clean(value)) return [];
-  const snapshot = await getDocs(
-    query(
-      collection(db, RECORD_COLLECTION),
-      where(field, "==", value),
-      limit(maxRecords)
-    )
-  );
-  return snapshot.docs.map((document) =>
-    normalizeParticipationRecord({ id: document.id, ...document.data() })
-  );
-};
 
 /**
  * Load only the authenticated learner's participation records.
  *
- * Firestore rules mirror these two query constraints: a learner may read a
- * record only when its studentUid matches their Firebase uid or its normalized
- * email matches the email in their Firebase auth token. Classmate records are
- * never queried or returned to this client.
+ * The browser never queries the shared Firestore collection directly. The
+ * Falowen API verifies the Firebase ID token, looks up rows by that token's uid
+ * and email, and returns a student-safe shape with no classmate information or
+ * presenter absence state.
  */
-export async function fetchMyClassParticipation({
-  user = auth?.currentUser,
-  maxRecords = DEFAULT_LIMIT,
-} = {}) {
-  if (!user?.uid || !db) return [];
+export async function fetchMyClassParticipation({ user = auth?.currentUser } = {}) {
+  if (!user?.uid) return [];
 
-  const safeLimit = Math.max(1, Math.min(Number(maxRecords) || DEFAULT_LIMIT, 100));
-  const lookups = [readQuery("studentUid", user.uid, safeLimit)];
-  const email = clean(user.email).toLowerCase();
-  if (email) lookups.push(readQuery("studentEmailNormalized", email, safeLimit));
-
-  const settled = await Promise.allSettled(lookups);
-  const successful = settled.filter((entry) => entry.status === "fulfilled");
-  if (!successful.length) {
-    const firstError = settled.find((entry) => entry.status === "rejected")?.reason;
-    throw firstError || new Error("Could not load class participation.");
+  const token = await user.getIdToken();
+  const response = await fetch(`${getBackendUrl()}/class-participation/me`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data?.ok === false) {
+    throw new Error(data?.error || `Could not load Class Participation (${response.status}).`);
   }
 
-  const unique = new Map();
-  successful.forEach((entry) => {
-    entry.value.forEach((record) => unique.set(record.id, record));
-  });
-
-  return [...unique.values()].sort((a, b) => {
-    const dateCompare = String(b.sessionDate || "").localeCompare(String(a.sessionDate || ""));
-    if (dateCompare !== 0) return dateCompare;
-    return String(b.lessonDay || b.assignmentId || "").localeCompare(
-      String(a.lessonDay || a.assignmentId || "")
-    );
-  });
+  return (Array.isArray(data?.participation) ? data.participation : [])
+    .map(normalizeParticipationRecord)
+    .sort((a, b) => {
+      const dateCompare = String(b.sessionDate || "").localeCompare(String(a.sessionDate || ""));
+      if (dateCompare !== 0) return dateCompare;
+      return String(b.lessonDay || b.assignmentId || "").localeCompare(
+        String(a.lessonDay || a.assignmentId || "")
+      );
+    });
 }
 
 export function summarizeClassParticipation(records = [], now = new Date()) {
