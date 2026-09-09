@@ -1,12 +1,12 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SelfLearningJourneyGate, {
   buildCompletedMaterialsSearch,
   hasCompletedSelfLearningMaterials,
 } from "./SelfLearningJourneyGate";
 
-const renderJourney = ({ entry = "/campus/course/lesson/B2/1", radio = null, teacherVideo = null, aiVideo = null, grammarBook = null } = {}) =>
+const renderJourney = ({ entry = "/campus/course/lesson/B2/1", radio = null } = {}) =>
   render(
     <MemoryRouter initialEntries={[entry]}>
       <SelfLearningJourneyGate
@@ -14,9 +14,9 @@ const renderJourney = ({ entry = "/campus/course/lesson/B2/1", radio = null, tea
         day={1}
         title="Test self-learning lesson"
         radio={radio}
-        teacherVideo={teacherVideo}
-        aiVideo={aiVideo}
-        grammarBook={grammarBook}
+        teacherVideo={{ url: "https://youtu.be/teacher" }}
+        aiVideo={{ url: "https://youtu.be/ai" }}
+        grammarBook={{ url: "/campus/course/test-grammar" }}
       >
         <div>Self-learning content is open</div>
       </SelfLearningJourneyGate>
@@ -24,7 +24,7 @@ const renderJourney = ({ entry = "/campus/course/lesson/B2/1", radio = null, tea
   );
 
 describe("SelfLearningJourneyGate", () => {
-  test("uses radio first and does not expose the material selector before radio completion", () => {
+  test("uses Falowen Radio as the only gate before self-learning content", () => {
     renderJourney({
       radio: {
         key: "test-radio",
@@ -32,14 +32,15 @@ describe("SelfLearningJourneyGate", () => {
         youtubeId: "testVideoId",
         instruction: "Listen first.",
       },
-      aiVideo: { url: "https://youtu.be/ai-video" },
     });
 
-    expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /Falowen Radio/i })).toBeInTheDocument();
+    expect(screen.queryByText("Self-learning content is open")).not.toBeInTheDocument();
     expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /watch teacher video/i })).not.toBeInTheDocument();
   });
 
-  test("shows teacher, AI, grammar and workbook choices after radio completion", () => {
+  test("opens the self-learning content immediately when Radio is already complete", () => {
     renderJourney({
       entry: "/campus/course/lesson/B2/1?radio=done",
       radio: {
@@ -47,35 +48,21 @@ describe("SelfLearningJourneyGate", () => {
         title: "Test Falowen Radio",
         youtubeId: "testVideoId",
       },
-      teacherVideo: { url: "https://youtu.be/teacher", description: "Teacher explanation" },
-      aiVideo: { url: "https://youtu.be/ai", description: "AI explanation" },
-      grammarBook: { url: "/campus/course/test-grammar" },
     });
 
-    expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /watch teacher video/i })).toHaveAttribute("href", "https://youtu.be/teacher");
-    expect(screen.getByRole("link", { name: /watch ai video/i })).toHaveAttribute("href", "https://youtu.be/ai");
-    expect(screen.getByRole("link", { name: /open grammar book/i })).toHaveAttribute("href", "/campus/course/test-grammar");
-    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
-    expect(screen.getByText(/not submitted for tutor marking/i)).toBeInTheDocument();
+    expect(screen.getByText("Self-learning content is open")).toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /open self-learning workbook/i })).not.toBeInTheDocument();
   });
 
-  test("does not create an empty teacher card when no teacher lecture is configured", () => {
-    renderJourney({ aiVideo: { url: "https://youtu.be/ai" } });
-
-    expect(screen.queryByRole("link", { name: /watch teacher video/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /watch ai video/i })).toBeInTheDocument();
-  });
-
-  test("opens the self-learning content from the workbook choice", () => {
-    renderJourney({ aiVideo: { url: "https://youtu.be/ai" } });
-
-    fireEvent.click(screen.getByRole("button", { name: /open self-learning workbook/i }));
+  test("lessons without Radio open the self-learning content directly", () => {
+    renderJourney();
 
     expect(screen.getByText("Self-learning content is open")).toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
   });
 
-  test("renders the A1 materials step when auto-mounted outside the parent Router", () => {
+  test("opens A1 workbook content directly after Radio when auto-mounted outside the parent Router", () => {
     window.history.replaceState(
       {},
       "",
@@ -92,19 +79,18 @@ describe("SelfLearningJourneyGate", () => {
           title: "Introducing Yourself and Articles · Kapitel 1.3",
           youtubeId: "4yGJ9-Fz19A",
         }}
-        aiVideo={{ url: "https://youtu.be/a1-test-video" }}
       >
         <div>Day 5 workbook content</div>
       </SelfLearningJourneyGate>,
     );
 
-    expect(screen.getByText(/choose your learning material/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
+    expect(screen.getByText("Day 5 workbook content")).toBeInTheDocument();
+    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
 
     window.history.replaceState({}, "", "/");
   });
 
-  test("preserves existing query parameters when materials are completed", () => {
+  test("keeps legacy materials query helpers compatible with old bookmarked URLs", () => {
     expect(buildCompletedMaterialsSearch("?radio=done&chapter=3.1")).toBe("?radio=done&chapter=3.1&materials=done");
     expect(hasCompletedSelfLearningMaterials("?radio=done&materials=done")).toBe(true);
   });

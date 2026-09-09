@@ -14,6 +14,38 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
+const applySharedA2Day17Guard = () => {
+  replaceOnce(
+    `    const pathname = normalizeA1CoursePracticePath(location.pathname);
+    const practice = getA1SelfLearningPracticeForLocation(location);`,
+    `    const pathname = normalizeA1CoursePracticePath(location.pathname);
+    const routeSearch = new URLSearchParams(location.search || "");
+    const sharedA2Day17 =
+      pathname === "/campus/course/modal-verbs-day-14-3-6"
+      && String(routeSearch.get("level") || "").toUpperCase() === "A2"
+      && Number(routeSearch.get("day")) === 17;
+    const practice = sharedA2Day17 ? null : getA1SelfLearningPracticeForLocation(location);`,
+    "shared A2 Day 17 ownership guard",
+  );
+};
+
+// The current self-learning implementation owns the canonical practice page
+// directly after Falowen Radio and embeds the shared workbook media panel there.
+// When those anchors are present, the historical destination-overlay patch has
+// already been superseded. Keep only the cross-level ownership guard and do not
+// restore the old materials-selector flow.
+const hasDirectPracticeBookFlow =
+  source.includes("buildA1SelfLearningDestinationHref")
+  && source.includes("falowen-a1-practice-media-mount")
+  && source.includes("data-a1-self-learning-workbook-media");
+
+if (hasDirectPracticeBookFlow) {
+  applySharedA2Day17Guard();
+  fs.writeFileSync(sourcePath, source, "utf8");
+  console.log("A1 direct practice-book ownership preserved; shared A2 Day 17 is excluded.");
+  process.exit(0);
+}
+
 replaceOnce(
   `const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.kind === "practice",

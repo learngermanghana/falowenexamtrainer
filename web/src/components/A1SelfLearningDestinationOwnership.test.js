@@ -47,17 +47,29 @@ describe("A1 self-learning destination ownership", () => {
     )).toEqual({ day: 6, chapter: "2.3" });
   });
 
-  test("destination pages use a fixed materials overlay while native Day 14 owns its selector", () => {
+  test("completed Radio stays on the canonical practice book and embeds workbook media", () => {
     const source = fs.readFileSync(
       path.resolve(__dirname, "A1CoursePracticeAutoMount.js"),
       "utf8",
     );
 
-    expect(source).toContain("A1_NATIVE_DESTINATION_MATERIAL_PATHS");
-    expect(source).toContain('"/campus/course/modal-verbs-day-14-3-6"');
-    expect(source).toContain('mount.setAttribute("data-a1-self-learning-destination-overlay", "true")');
-    expect(source).toContain('document.body.appendChild(mount)');
-    expect(source).toContain('document.body.style.overflow = "hidden"');
-    expect(source).toContain("materialsCompleted || (journeyResources?.radio && !radioCompleted)");
+    expect(source).toContain("buildA1SelfLearningDestinationHref(practice.destination, location.search)");
+    expect(source).toContain('mediaMount.id = "falowen-a1-practice-media-mount"');
+    expect(source).toContain('mediaMount.setAttribute("data-a1-self-learning-workbook-media", "true")');
+    expect(source).toContain("<A1WorkbookMediaPanel");
+    expect(source).not.toContain("const materialsCompleted = hasCompletedSelfLearningMaterials(location.search)");
+  });
+
+  test("shared A2 Day 17 context cannot receive A1 Day 14 media", () => {
+    const source = fs.readFileSync(
+      path.resolve(__dirname, "A1CoursePracticeAutoMount.js"),
+      "utf8",
+    );
+
+    expect(source).toContain("const sharedA2Day17 =");
+    expect(source).toContain('pathname === "/campus/course/modal-verbs-day-14-3-6"');
+    expect(source).toContain('String(routeSearch.get("level") || "").toUpperCase() === "A2"');
+    expect(source).toContain('Number(routeSearch.get("day")) === 17');
+    expect(source).toContain("const practice = sharedA2Day17 ? null : getA1SelfLearningPracticeForLocation(location)");
   });
 });

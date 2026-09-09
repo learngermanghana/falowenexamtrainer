@@ -42,6 +42,17 @@ const dedupeByUrl = (resources = []) => {
   });
 };
 
+const normalizeProvidedResource = (resource, kind) => {
+  if (!resource) return null;
+  const normalized = typeof resource === "string" ? { url: resource } : resource;
+  if (!clean(normalized?.url)) return null;
+  return {
+    ...normalized,
+    kind,
+    label: kind === "teacher" ? "Teacher lecture" : "AI revision",
+  };
+};
+
 export const getYouTubeVideoId = (url = "") => {
   const value = clean(url);
   if (!value) return "";
@@ -89,11 +100,17 @@ export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
   return dedupeByUrl([...teacherResources, ...aiResources]);
 };
 
-const A1WorkbookMediaPanel = ({ day, chapter }) => {
-  const resources = useMemo(
-    () => getA1WorkbookMediaResources({ day, chapter }),
-    [day, chapter],
-  );
+const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = null }) => {
+  const resources = useMemo(() => {
+    const explicitResources = [
+      normalizeProvidedResource(teacherVideo, "teacher"),
+      normalizeProvidedResource(aiVideo, "ai"),
+    ].filter(Boolean);
+    return dedupeByUrl([
+      ...explicitResources,
+      ...getA1WorkbookMediaResources({ day, chapter }),
+    ]);
+  }, [aiVideo, chapter, day, teacherVideo]);
 
   if (!resources.length) return null;
 

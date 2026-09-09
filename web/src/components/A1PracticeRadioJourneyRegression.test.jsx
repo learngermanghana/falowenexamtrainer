@@ -43,7 +43,7 @@ describe("A1 practice radio journey regressions", () => {
     ).toBeNull();
   });
 
-  test("auto-mounted A1 journey can render materials outside the app Router after radio completion", () => {
+  test("auto-mounted A1 journey opens workbook content immediately after radio completion", () => {
     window.history.replaceState(
       {},
       "",
@@ -66,7 +66,8 @@ describe("A1 practice radio journey regressions", () => {
       </SelfLearningJourneyGate>,
     );
 
-    expect(screen.getByRole("heading", { name: /choose your learning material/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /open self-learning workbook/i })).toBeInTheDocument();
+    expect(screen.getByText("Day 5 workbook content")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /choose your learning material/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /open self-learning workbook/i })).not.toBeInTheDocument();
   });
 });
