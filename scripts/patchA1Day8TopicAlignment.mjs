@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NEW_TOPIC = "Countries, Languages & Travel";
+const NEW_GOAL = "Talk about countries, languages, cities and travel using wo, woher and wohin; use nach/in for destinations; recognize sein and haben in the Präteritum; and review irregular verbs plus man vs Mann.";
+const NEW_GRAMMAR_TOPIC = "wo, woher, wohin; nach vs in; sein/haben in Präteritum; irregular verbs; man vs Mann";
 
 const replaceOnce = (relativePath, before, after, label) => {
   const targetPath = path.join(root, relativePath);
@@ -18,26 +20,32 @@ const replaceOnce = (relativePath, before, after, label) => {
   fs.writeFileSync(targetPath, source, "utf8");
 };
 
-replaceOnce(
+const oldScheduleEntry = `    {\n      day: 8,\n      topic: "Countries and Languages",\n      chapter: "4",\n      goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann",\n      instruction: "Watch the video, review grammar, and complete your workbook.",\n      grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",`;
+const newScheduleEntry = `    {\n      day: 8,\n      topic: "${NEW_TOPIC}",\n      chapter: "4",\n      goal: "${NEW_GOAL}",\n      instruction: "Watch the video, review grammar, and complete your workbook.",\n      grammar_topic: "${NEW_GRAMMAR_TOPIC}",`;
+
+[
   "web/src/data/courseSchedule.js",
-  `    {\n      day: 8,\n      topic: "Countries and Languages",\n      chapter: "4",\n      goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann",\n      instruction: "Watch the video, review grammar, and complete your workbook.",\n      grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",`,
-  `    {\n      day: 8,\n      topic: "${NEW_TOPIC}",\n      chapter: "4",\n      goal: "Talk about countries, languages, cities and travel using wo, woher and wohin; use nach/in for destinations; recognize sein and haben in the Präteritum; and review irregular verbs plus man vs Mann.",\n      instruction: "Watch the video, review grammar, and complete your workbook.",\n      grammar_topic: "wo, woher, wohin; nach vs in; sein/haben in Präteritum; irregular verbs; man vs Mann",`,
-  "course schedule metadata",
-);
+  "functions/data/courseSchedule.js",
+].forEach((relativePath) => {
+  replaceOnce(relativePath, oldScheduleEntry, newScheduleEntry, "course schedule metadata");
+});
+
+const oldCatalogTitle = `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "Countries and Languages",`;
+const newCatalogTitle = `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "${NEW_TOPIC}",`;
 
 replaceOnce(
   "shared/curriculumCanonical.json",
-  `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "Countries and Languages",`,
-  `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "${NEW_TOPIC}",`,
+  oldCatalogTitle,
+  newCatalogTitle,
   "canonical curriculum title",
 );
 
-replaceOnce(
+[
   "web/src/data/lessonCatalog.js",
-  `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "Countries and Languages",`,
-  `    "id": "A1-4",\n    "level": "A1",\n    "sequence": 11,\n    "day": 8,\n    "chapter": "4",\n    "title": "${NEW_TOPIC}",`,
-  "generated lesson catalog title",
-);
+  "functions/data/lessonCatalog.js",
+].forEach((relativePath) => {
+  replaceOnce(relativePath, oldCatalogTitle, newCatalogTitle, "generated lesson catalog title");
+});
 
 replaceOnce(
   "web/src/data/a1AssignmentRegistry.js",
@@ -69,9 +77,12 @@ replaceOnce(
 
 const verificationTargets = [
   ["web/src/data/courseSchedule.js", `topic: "${NEW_TOPIC}"`],
-  ["web/src/data/courseSchedule.js", 'grammar_topic: "wo, woher, wohin; nach vs in; sein/haben in Präteritum; irregular verbs; man vs Mann"'],
+  ["web/src/data/courseSchedule.js", `grammar_topic: "${NEW_GRAMMAR_TOPIC}"`],
+  ["functions/data/courseSchedule.js", `topic: "${NEW_TOPIC}"`],
+  ["functions/data/courseSchedule.js", `grammar_topic: "${NEW_GRAMMAR_TOPIC}"`],
   ["shared/curriculumCanonical.json", `"title": "${NEW_TOPIC}"`],
   ["web/src/data/lessonCatalog.js", `"title": "${NEW_TOPIC}"`],
+  ["functions/data/lessonCatalog.js", `"title": "${NEW_TOPIC}"`],
   ["web/src/data/a1AssignmentRegistry.js", `"A1-4", 8, "4", "${NEW_TOPIC}"`],
   ["web/src/components/FormingBasicStatementsPage.js", `A1 Grammar – Day 8: ${NEW_TOPIC}`],
   ["web/src/components/A1Day8CountriesAndLanguagesWorkbookPage.js", `A1 · Day 8 Workbook · ${NEW_TOPIC}`],
@@ -84,9 +95,14 @@ verificationTargets.forEach(([relativePath, marker]) => {
   }
 });
 
-const scheduleSource = fs.readFileSync(path.join(root, "web/src/data/courseSchedule.js"), "utf8");
-if (scheduleSource.includes('goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann"')) {
-  throw new Error("A1 Day 8 still contains the stale schon mal / noch nie goal.");
-}
+[
+  "web/src/data/courseSchedule.js",
+  "functions/data/courseSchedule.js",
+].forEach((relativePath) => {
+  const scheduleSource = fs.readFileSync(path.join(root, relativePath), "utf8");
+  if (scheduleSource.includes('goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann"')) {
+    throw new Error(`A1 Day 8 still contains the stale schon mal / noch nie goal in ${relativePath}.`);
+  }
+});
 
-console.log(`A1 Day 8 topic aligned to: ${NEW_TOPIC}. Existing lesson/workbook URLs are preserved.`);
+console.log(`A1 Day 8 topic aligned to: ${NEW_TOPIC}. Web and Functions projections are synchronized; existing lesson/workbook URLs are preserved.`);
