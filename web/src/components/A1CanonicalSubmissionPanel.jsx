@@ -10,6 +10,60 @@ const AUTO_RESOLVE_MAX_ATTEMPTS = 80;
 const buildSubmitClassName = (assignmentKey = "A1-assignment") =>
   `a1-canonical-submit-${String(assignmentKey).toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
 
+const missingRequiredNumbers = (answers, total) =>
+  Array.from({ length: total }, (_, index) => index + 1).filter((number) => !answers.has(number));
+
+export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", text = "" } = {}) => {
+  if (String(assignmentKey).trim().toUpperCase() !== "A1-0.2") {
+    return { ok: true, message: "" };
+  }
+
+  const answersBySection = {
+    "teil-1": new Set(),
+    "teil-2": new Set(),
+  };
+  let currentSection = "";
+
+  String(text || "")
+    .split(/\r?\n/)
+    .forEach((rawLine) => {
+      const line = rawLine.trim();
+      if (!line) return;
+
+      const headingMatch = line.match(/^(?:teil|part)\s*([12])\b/i);
+      if (headingMatch) {
+        currentSection = `teil-${headingMatch[1]}`;
+        return;
+      }
+
+      if (!currentSection) return;
+      const answerMatch = line.match(/^\s*(\d{1,2})\s*(?:[\).:\-]\s*|\s+)(\S.*)$/);
+      if (!answerMatch) return;
+
+      const answerNumber = Number(answerMatch[1]);
+      if (Number.isInteger(answerNumber)) answersBySection[currentSection].add(answerNumber);
+    });
+
+  const missingTeil1 = missingRequiredNumbers(answersBySection["teil-1"], 7);
+  const missingTeil2 = missingRequiredNumbers(answersBySection["teil-2"], 5);
+  if (!missingTeil1.length && !missingTeil2.length) {
+    return { ok: true, message: "" };
+  }
+
+  const missing = [];
+  if (missingTeil1.length) {
+    missing.push(`Teil 1 answers ${missingTeil1.join(", ")}`);
+  }
+  if (missingTeil2.length) {
+    missing.push(`Teil 2 · Hören answers ${missingTeil2.join(", ")}`);
+  }
+
+  return {
+    ok: false,
+    message: `Complete both required parts before submitting A1-0.2. Use a "Teil 1" heading with answers 1–7 and a "Teil 2 · Hören" heading with answers 1–5. Missing: ${missing.join("; ")}.`,
+  };
+};
+
 export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, submitDescription }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,6 +71,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   const autoResolveInFlightRef = useRef(false);
   const lastContextNavigationRef = useRef("");
   const [autoResolveMessage, setAutoResolveMessage] = useState("");
+  const [submissionGuardMessage, setSubmissionGuardMessage] = useState("");
   const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
   const requestedTab = searchParams.get("workbookTab");
   const assignmentKey = assignment.assignmentKey;
@@ -30,6 +85,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     autoResolveInFlightRef.current = false;
     lastContextNavigationRef.current = "";
     setAutoResolveMessage("");
+    setSubmissionGuardMessage("");
   }, [assignmentKey]);
 
   useEffect(() => {
@@ -76,6 +132,21 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
   const handleSubmissionCapture = async (event) => {
     const root = submitRootRef.current;
+    const visibleSubmissionText = root?.querySelector("textarea")?.value || "";
+    const completeness = validateA1CanonicalSubmissionCompleteness({
+      assignmentKey,
+      text: visibleSubmissionText,
+    });
+    setSubmissionGuardMessage("");
+
+    if (!completeness.ok) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.nativeEvent?.stopImmediatePropagation?.();
+      setSubmissionGuardMessage(completeness.message);
+      return;
+    }
+
     const cloudDraftRoot = root?.querySelector('[data-cloud-draft-persistence="react-owned"]');
     const hasCloudConflict = cloudDraftRoot?.getAttribute("data-draft-conflict") === "true";
     if (!hasCloudConflict) return;
@@ -187,6 +258,12 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
             opacity: 1 !important;
           }
         `}</style>
+
+        {submissionGuardMessage ? (
+          <p role="alert" style={{ background: "#fff1f2", border: "1px solid #fecaca", borderRadius: 10, color: "#991b1b", fontWeight: 800, margin: "0 0 10px", padding: "10px 12px", lineHeight: 1.55 }}>
+            {submissionGuardMessage}
+          </p>
+        ) : null}
 
         {autoResolveMessage ? (
           <p role="status" aria-live="polite" style={{ background: "#eff6ff", border: "1px solid #93c5fd", borderRadius: 10, color: "#1e3a8a", fontWeight: 700, margin: "0 0 10px", padding: "10px 12px" }}>
