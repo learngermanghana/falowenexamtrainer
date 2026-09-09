@@ -49,7 +49,7 @@ describe("A1 Day 20 letter-writing workbook", () => {
     const overviewTab = screen.getByRole("tab", { name: "Overview" });
     const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Informal letter/i });
     const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · Formal letter/i });
-    const submitTab = screen.getByRole("tab", { name: "Submit" });
+    const submitTab = screen.getByRole("tab", { name: "Submit Assignment" });
 
     expect(grammarTab).toHaveAttribute("aria-selected", "true");
     expect(overviewTab).toHaveAttribute("aria-selected", "false");

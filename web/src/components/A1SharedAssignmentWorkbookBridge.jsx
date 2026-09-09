@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
@@ -7,6 +7,7 @@ import {
   A1AssignmentNeighborLinks,
   A1SharedWorkbookTabBar,
   A1WorkbookSectionAction,
+  moveA1WorkbookViewportTo,
   useA1WorkbookTabState,
 } from "./A1SharedAssignmentWorkbookLayout";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
@@ -125,6 +126,12 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
   );
   const hasGrammar = Boolean(getA1GrammarNotesComponent(assignment.assignmentKey));
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
+  const pendingViewportTabRef = useRef("");
+
+  const openTabFromSectionAction = useCallback((key) => {
+    pendingViewportTabRef.current = key;
+    openTab(key);
+  }, [openTab]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -260,6 +267,15 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     }
   }, [activeTab, hasGrammar, mountState.grammarHost, mountState.overviewGuidanceHost, mountState.sections, mountState.submissionHost]);
 
+  useEffect(() => {
+    if (!pendingViewportTabRef.current || pendingViewportTabRef.current !== activeTab) return;
+    pendingViewportTabRef.current = "";
+    const target = activeTab === "submit"
+      ? mountState.submissionHost
+      : mountState.sections.find(({ key }) => key === activeTab)?.element;
+    moveA1WorkbookViewportTo(target?.isConnected === false ? null : target);
+  }, [activeTab, mountState.sections, mountState.submissionHost]);
+
   const navHost = mountState.navHost?.isConnected ? mountState.navHost : null;
   const overviewGuidanceHost = mountState.overviewGuidanceHost?.isConnected ? mountState.overviewGuidanceHost : null;
   const grammarHost = mountState.grammarHost?.isConnected ? mountState.grammarHost : null;
@@ -297,7 +313,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         <A1WorkbookSectionAction
           sections={availableSections}
           sectionKey={key}
-          onSelect={openTab}
+          onSelect={openTabFromSectionAction}
         />,
         host,
         `${assignment.assignmentKey}-${key}-action`,
