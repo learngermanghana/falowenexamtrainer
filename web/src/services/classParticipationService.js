@@ -7,6 +7,17 @@ const count = (value) => {
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : 0;
 };
 
+const normalizeQuestionResponses = (value) => (Array.isArray(value) ? value : [])
+  .filter((response) => response?.result === "correct" || response?.result === "needs_review")
+  .map((response) => ({
+    questionId: clean(response.questionId),
+    question: clean(response.question),
+    result: response.result,
+    questionContext: clean(response.questionContext),
+    recordedAt: clean(response.recordedAt),
+  }))
+  .filter((response) => response.question);
+
 const recordDate = (record = {}) => {
   const raw = clean(record.sessionDate);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
@@ -28,6 +39,7 @@ export const normalizeParticipationRecord = (record = {}) => ({
   correct: count(record.correct),
   needsReview: count(record.needsReview),
   skipped: count(record.skipped),
+  questionResponses: normalizeQuestionResponses(record.questionResponses),
   updatedAt: clean(record.updatedAt),
 });
 
