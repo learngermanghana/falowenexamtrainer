@@ -6,6 +6,20 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const sourcePath = path.join(repositoryRoot, "web/src/components/A1CoursePracticeAutoMount.js");
 let source = fs.readFileSync(sourcePath, "utf8");
 
+// The current self-learning implementation owns the canonical practice page
+// directly after Falowen Radio and embeds the shared workbook media panel there.
+// When those anchors are present, the historical destination-overlay patch has
+// already been superseded and must not restore the old materials-selector flow.
+const hasDirectPracticeBookFlow =
+  source.includes("buildA1SelfLearningDestinationHref")
+  && source.includes("falowen-a1-practice-media-mount")
+  && source.includes("data-a1-self-learning-workbook-media");
+
+if (hasDirectPracticeBookFlow) {
+  console.log("A1 self-learning direct practice-book ownership already applied.");
+  process.exit(0);
+}
+
 const replaceOnce = (before, after, label) => {
   if (source.includes(after)) return;
   if (!source.includes(before)) {
