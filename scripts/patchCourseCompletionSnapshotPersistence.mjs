@@ -35,3 +35,5 @@ fs.writeFileSync(targetPath, source, "utf8");
 console.log("Canonical Course Book completion now persists a shared Firestore snapshot.");
 await import("./patchClassParticipationCard.mjs");
 await import("./patchSimplifiedHomeClassAccess.mjs");
+await import("./patchCourseBookProgressHomeNextClass.mjs");
+await import("./patchHomeParticipationMetric.mjs");
