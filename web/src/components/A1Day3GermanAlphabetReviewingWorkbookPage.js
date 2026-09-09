@@ -111,9 +111,9 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
       fallbackAssignmentKey="A1-0.2"
       title="A1 · Day 2 Workbook · German Alphabet + Reviewing"
       subtitle="Chapter 0.2 · Assignment for tutor marking"
-      assignmentIntro="Complete Teil 1 and Teil 3, then open Submit to send your final answers for A1-0.2. The reading text and its questions are combined in Teil 1."
+      assignmentIntro="Complete both required parts before submitting: Teil 1 has 7 reading/alphabet answers and Teil 2 has 5 Hören answers. Submit the assignment only once, after both parts are complete."
       submitTitle="Submit A1 · Day 2 · German Alphabet"
-      submitDescription="This submission is locked to A1-0.2."
+      submitDescription="Required format: write a Teil 1 heading with answers 1–7, then a Teil 2 · Hören heading with answers 1–5. Falowen will block an incomplete submission."
     >
       <section style={sectionStyle}>
         <img
@@ -145,13 +145,13 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+        <h2 style={{ margin: 0 }}>Teil 2 · Hören</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Instruction:</strong> Watch and listen to the embedded YouTube Hören video. Write the missing letters to complete
           each word, then return and submit your answers.
         </p>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören with the YouTube video below, then return to submit answers.
+          Complete all five Hören answers with the YouTube video below, then include them under <strong>Teil 2 · Hören</strong> in your final submission.
         </p>
         <iframe
           title="A1 Day 2 German Alphabet Hören video"
@@ -192,7 +192,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
 
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ margin: 0, fontWeight: 600 }}>
-          Finished the workbook? Open the Submit tab and paste your final answers there.
+          Finished both Teile? Open the Submit Assignment tab and include Teil 1 answers 1–7 and Teil 2 · Hören answers 1–5.
         </p>
       </div>
     </A1TutorMarkedWorkbookShell>
