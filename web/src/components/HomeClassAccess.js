@@ -17,7 +17,7 @@ const HomeClassAccess = ({ className = "", program = "german" }) => {
     return {
       identity: normalizedClassName,
       summary: cached || null,
-      status: normalizedClassName ? (cached ? "ready" : "loading") : "idle",
+      status: normalizedClassName ? "loading" : "idle",
     };
   });
 
@@ -31,7 +31,9 @@ const HomeClassAccess = ({ className = "", program = "german" }) => {
     setResolution({
       identity: normalizedClassName,
       summary: cached || null,
-      status: cached ? "ready" : "loading",
+      // Cached data is display context only. It must never prove that the
+      // class has no custom Zoom profile; wait for canonical resolution.
+      status: "loading",
     });
 
     return subscribeCanonicalLiveClass({
@@ -45,10 +47,11 @@ const HomeClassAccess = ({ className = "", program = "german" }) => {
       },
       onError: (error) => {
         console.warn("Compact class access could not refresh live class data", error);
-        setResolution((current) => {
-          if (current.identity === normalizedClassName && current.summary) return current;
-          return { identity: normalizedClassName, summary: null, status: "error" };
-        });
+        setResolution((current) => ({
+          identity: normalizedClassName,
+          summary: current.identity === normalizedClassName ? current.summary : null,
+          status: "error",
+        }));
       },
     });
   }, [cacheIdentity, normalizedClassName]);
@@ -65,11 +68,11 @@ const HomeClassAccess = ({ className = "", program = "german" }) => {
   const canonicalLookupCompleted = currentResolution.status === "ready";
   const noCanonicalClass = currentResolution.status === "unavailable";
   const allowLegacyFallback = (canonicalLookupCompleted && !hasCanonicalZoomProfile) || noCanonicalClass;
-  const zoom = canonicalZoom?.url
+  const zoom = canonicalLookupCompleted && (canonicalZoom?.url || canonicalZoom?.meetingId || canonicalZoom?.passcode)
     ? canonicalZoom
     : allowLegacyFallback
       ? fallbackZoom
-      : canonicalZoom;
+      : {};
 
   const zoomUrl = clean(zoom?.url);
   const meetingId = clean(zoom?.meetingId);

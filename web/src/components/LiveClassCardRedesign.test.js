@@ -166,14 +166,18 @@ describe("live class card UI protection", () => {
     expect(source("./ClassCalendarCard.js").trim()).toBe('export { default } from "./ClassCalendarCardV2";');
   });
 
-  test("compact Home Zoom access never exposes the legacy room before canonical resolution", () => {
+  test("compact Home Zoom access keeps cached summaries pending until canonical resolution", () => {
     const compactAccess = source("./HomeClassAccess.js");
-    expect(compactAccess).toContain('status: normalizedClassName ? (cached ? "ready" : "loading") : "idle"');
+    expect(compactAccess).toContain('status: normalizedClassName ? "loading" : "idle"');
+    expect(compactAccess).toContain('status: "loading"');
     expect(compactAccess).toContain('resolution.identity === normalizedClassName');
     expect(compactAccess).toContain('summary: null, status: "unavailable"');
+    expect(compactAccess).toContain('status: "error"');
     expect(compactAccess).toContain('hasCanonicalZoomProfile');
     expect(compactAccess).toContain('allowLegacyFallback = (canonicalLookupCompleted && !hasCanonicalZoomProfile) || noCanonicalClass');
+    expect(compactAccess).toContain('canonicalLookupCompleted && (canonicalZoom?.url || canonicalZoom?.meetingId || canonicalZoom?.passcode)');
     expect(compactAccess).toContain('Checking the correct Zoom room…');
+    expect(compactAccess).not.toContain('cached ? "ready" : "loading"');
   });
 
   test("simplified Home patch removes announcement reads and rotation after removing Updates UI", () => {
