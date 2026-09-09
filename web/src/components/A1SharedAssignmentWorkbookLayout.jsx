@@ -1,4 +1,4 @@
-import React, { Children, isValidElement, useCallback, useEffect, useMemo } from "react";
+import React, { Children, isValidElement, useCallback, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getA1Assignment, getA1AssignmentNeighbors } from "../data/a1AssignmentRegistry";
 import { styles } from "../styles";
@@ -94,6 +94,14 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   }, [allowedTabs, assignment, location.hash, location.pathname, location.search, location.state, navigate]);
 
   return { activeTab, allowedTabs, fallbackTab, openTab };
+};
+
+export const moveA1WorkbookViewportTo = (element) => {
+  if (!element) return;
+  const focusTarget = element.querySelector?.("h1, h2, h3, h4, h5, h6") || element;
+  if (!focusTarget.hasAttribute?.("tabindex")) focusTarget.setAttribute?.("tabindex", "-1");
+  focusTarget.focus?.({ preventScroll: true });
+  element.scrollIntoView?.({ behavior: "smooth", block: "start" });
 };
 
 const tabButtonStyle = (selected, submit = false) => ({
@@ -273,9 +281,23 @@ export default function A1SharedAssignmentWorkbookLayout({
   const hasGrammar = Boolean(grammar);
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
   const overviewTab = availableSections.length ? "overview" : "assignment";
+  const layoutRef = useRef(null);
+  const pendingViewportTabRef = useRef("");
+
+  const openTabFromSectionAction = useCallback((key) => {
+    pendingViewportTabRef.current = key;
+    openTab(key);
+  }, [openTab]);
+
+  useEffect(() => {
+    if (!pendingViewportTabRef.current || pendingViewportTabRef.current !== activeTab) return;
+    pendingViewportTabRef.current = "";
+    const target = layoutRef.current?.querySelector?.(`[data-workbook-panel="${activeTab}"]`);
+    moveA1WorkbookViewportTo(target);
+  }, [activeTab]);
 
   return (
-    <div data-a1-shared-workbook={assignmentKey} style={{ display: "grid", gap: 16 }}>
+    <div ref={layoutRef} data-a1-shared-workbook={assignmentKey} style={{ display: "grid", gap: 16 }}>
       <A1SharedWorkbookTabBar
         assignment={assignment}
         sections={availableSections}
@@ -285,34 +307,42 @@ export default function A1SharedAssignmentWorkbookLayout({
       />
 
       <div data-workbook-content>
-        <div hidden={activeTab !== overviewTab}>{overview}</div>
+        <div data-workbook-panel={overviewTab} hidden={activeTab !== overviewTab}>{overview}</div>
         {hasGrammar ? (
-          <div hidden={activeTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
+          <div data-workbook-panel="grammar" hidden={activeTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
             {grammar}
           </div>
         ) : null}
         {isCombinedDay1 ? (
-          <div hidden={activeTab !== "teil-2"} data-workbook-combined-section="reading-questions">
+          <div data-workbook-panel="teil-2" hidden={activeTab !== "teil-2"} data-workbook-combined-section="reading-questions">
             {sectionElements}
             <A1WorkbookSectionAction
               sections={availableSections}
               sectionKey="teil-2"
-              onSelect={openTab}
+              onSelect={openTabFromSectionAction}
             />
           </div>
         ) : (
           sectionElements.map((element) => (
-            <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
+            <div
+              key={element.props.sectionKey}
+              data-workbook-panel={element.props.sectionKey}
+              hidden={activeTab !== element.props.sectionKey}
+            >
               {element}
               <A1WorkbookSectionAction
                 sections={availableSections}
                 sectionKey={element.props.sectionKey}
-                onSelect={openTab}
+                onSelect={openTabFromSectionAction}
               />
             </div>
           ))
         )}
-        <div hidden={activeTab !== "submit"} data-workbook-submission={assignment.assignmentKey}>
+        <div
+          data-workbook-panel="submit"
+          hidden={activeTab !== "submit"}
+          data-workbook-submission={assignment.assignmentKey}
+        >
           {renderSubmission?.(assignment)}
         </div>
       </div>
