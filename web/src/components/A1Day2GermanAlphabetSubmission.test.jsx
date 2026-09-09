@@ -29,6 +29,15 @@ describe("A1-0.2 German Alphabet submission completeness", () => {
     expect(result).toEqual({ ok: true, message: "" });
   });
 
+  it("parses answer 1 when it follows the Teil heading on the same line", () => {
+    const result = validateA1CanonicalSubmissionCompleteness({
+      assignmentKey: "A1-0.2",
+      text: `Teil 1: 1. C - 26\n2. A - Ä, Ö, Ü, ß\n3. A - Eszett\n4. A - K\n5. A - A-Umlaut\n6. A - Ä, Ö, Ü, ß\n7. B - 4\n\nTeil 2 · Hören: 1. Wasser\n2. Käufe\n3. Brief\n4. Schule\n5. Tisch`,
+    });
+
+    expect(result).toEqual({ ok: true, message: "" });
+  });
+
   it("does not apply the A1-0.2 structure to other A1 assignments", () => {
     expect(
       validateA1CanonicalSubmissionCompleteness({ assignmentKey: "A1-1.1", text: "short answer" }),
