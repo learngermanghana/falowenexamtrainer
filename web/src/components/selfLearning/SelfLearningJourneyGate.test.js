@@ -34,7 +34,7 @@ describe("SelfLearningJourneyGate", () => {
       },
     });
 
-    expect(screen.getByRole("heading", { name: /Falowen Radio/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /Falowen Radio/i })).toBeInTheDocument();
     expect(screen.queryByText("Self-learning content is open")).not.toBeInTheDocument();
     expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /watch teacher video/i })).not.toBeInTheDocument();
