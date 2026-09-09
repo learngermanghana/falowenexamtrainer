@@ -6,6 +6,7 @@ import A1WorkbookGrammarNotes, { getA1GrammarNotesComponent } from "./A1Workbook
 import {
   A1AssignmentNeighborLinks,
   A1SharedWorkbookTabBar,
+  A1WorkbookSectionAction,
   useA1WorkbookTabState,
 } from "./A1SharedAssignmentWorkbookLayout";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
@@ -14,6 +15,7 @@ const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";
 const OVERVIEW_GUIDANCE_HOST_ATTRIBUTE = "data-a1-canonical-bridge-overview-guidance";
 const GRAMMAR_HOST_ATTRIBUTE = "data-a1-canonical-bridge-grammar";
 const SUBMISSION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-submission";
+const SECTION_ACTION_HOST_ATTRIBUTE = "data-a1-canonical-bridge-section-action";
 const FOOTER_HOST_ATTRIBUTE = "data-a1-canonical-bridge-footer";
 const ORIGINAL_DISPLAY_ATTRIBUTE = "data-a1-canonical-original-display";
 const ORIGINAL_ARIA_ATTRIBUTE = "data-a1-canonical-original-aria-hidden";
@@ -53,7 +55,7 @@ const findSectionRoot = (pageRoot, heading) => {
 const findExistingBridgeHosts = (pageRoot) =>
   Array.from(
     pageRoot?.querySelectorAll?.(
-      `[${NAV_HOST_ATTRIBUTE}="true"], [${OVERVIEW_GUIDANCE_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
+      `[${NAV_HOST_ATTRIBUTE}="true"], [${OVERVIEW_GUIDANCE_HOST_ATTRIBUTE}="true"], [${GRAMMAR_HOST_ATTRIBUTE}="true"], [${SUBMISSION_HOST_ATTRIBUTE}="true"], [${SECTION_ACTION_HOST_ATTRIBUTE}="true"], [${FOOTER_HOST_ATTRIBUTE}="true"]`,
     ) || [],
   );
 
@@ -114,6 +116,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     grammarHost: null,
     submissionHost: null,
     footerHost: null,
+    sectionActionHosts: [],
     sections: [],
   });
   const availableSections = useMemo(
@@ -130,7 +133,6 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     let frame = null;
     let attempts = 0;
     let observer = null;
-    let installedRoot = null;
     let installedSections = [];
     let createdHosts = [];
 
@@ -189,13 +191,27 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       const footerHost = document.createElement("div");
       footerHost.setAttribute(FOOTER_HOST_ATTRIBUTE, "true");
       footerHost.setAttribute("data-assignment-key", assignment.assignmentKey);
+      const sectionActionHosts = sections.map(({ key, element }) => {
+        const host = document.createElement("div");
+        host.setAttribute(SECTION_ACTION_HOST_ATTRIBUTE, "true");
+        host.setAttribute("data-assignment-key", assignment.assignmentKey);
+        host.setAttribute("data-section-key", key);
+        element.appendChild(host);
+        return { key, host };
+      });
 
       pageRoot.prepend(navHost, overviewGuidanceHost, grammarHost, submissionHost);
       pageRoot.appendChild(footerHost);
       installed = true;
       observer?.disconnect();
-      installedRoot = pageRoot;
-      createdHosts = [navHost, overviewGuidanceHost, grammarHost, submissionHost, footerHost];
+      createdHosts = [
+        navHost,
+        overviewGuidanceHost,
+        grammarHost,
+        submissionHost,
+        footerHost,
+        ...sectionActionHosts.map(({ host }) => host),
+      ];
       installedSections = sections;
 
       Array.from(pageRoot.querySelectorAll('[role="tablist"]')).forEach((tabList) => {
@@ -205,7 +221,15 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       Array.from(pageRoot.querySelectorAll('[data-a1-teil-navigation="true"], [aria-label="A1 Day 21 workbook navigation"]'))
         .forEach((element) => setElementVisible(element, false));
 
-      setMountState({ navHost, overviewGuidanceHost, grammarHost, submissionHost, footerHost, sections });
+      setMountState({
+        navHost,
+        overviewGuidanceHost,
+        grammarHost,
+        submissionHost,
+        footerHost,
+        sectionActionHosts,
+        sections,
+      });
     };
 
     observer = new MutationObserver(scheduleInstall);
@@ -218,7 +242,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       if (frame !== null) window.cancelAnimationFrame(frame);
       installedSections.forEach(({ element }) => restoreElement(element));
       createdHosts.forEach((host) => {
-        if (installedRoot && host.parentNode === installedRoot) installedRoot.removeChild(host);
+        if (host.parentNode) host.parentNode.removeChild(host);
       });
     };
   }, [assignment.assignmentKey]);
@@ -241,6 +265,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
   const grammarHost = mountState.grammarHost?.isConnected ? mountState.grammarHost : null;
   const submissionHost = mountState.submissionHost?.isConnected ? mountState.submissionHost : null;
   const footerHost = mountState.footerHost?.isConnected ? mountState.footerHost : null;
+  const sectionActionHosts = mountState.sectionActionHosts.filter(({ host }) => host?.isConnected);
 
   if (!navHost) return null;
 
@@ -268,6 +293,15 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         <A1CanonicalSubmissionPanel assignment={assignment} />,
         submissionHost,
       ) : null}
+      {sectionActionHosts.map(({ key, host }) => createPortal(
+        <A1WorkbookSectionAction
+          sections={availableSections}
+          sectionKey={key}
+          onSelect={openTab}
+        />,
+        host,
+        `${assignment.assignmentKey}-${key}-action`,
+      ))}
       {footerHost ? createPortal(
         <A1AssignmentNeighborLinks assignmentKey={assignment.assignmentKey} />,
         footerHost,

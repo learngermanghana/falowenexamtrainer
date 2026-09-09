@@ -116,13 +116,59 @@ export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false 
       { key: "overview", label: "Overview" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...sections,
-      { key: "submit", label: "Submit", submit: true },
+      { key: "submit", label: "Submit Assignment", submit: true },
     ]
     : [
       { key: "assignment", label: "Assignment" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
-      { key: "submit", label: "Submit", submit: true },
+      { key: "submit", label: "Submit Assignment", submit: true },
     ];
+
+export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect }) => {
+  const sectionIndex = sections.findIndex((section) => section.key === sectionKey);
+  if (sectionIndex < 0) return null;
+
+  const isFinalSection = sectionIndex === sections.length - 1;
+  const nextSection = !isFinalSection ? sections[sectionIndex + 1] : null;
+  const targetKey = isFinalSection ? "submit" : nextSection?.key;
+  if (!targetKey) return null;
+
+  const nextLabel = nextSection?.label || (nextSection?.number ? `Teil ${nextSection.number}` : "the next Teil");
+  const buttonLabel = isFinalSection ? "Submit Complete Assignment" : `Continue to ${nextLabel}`;
+
+  return (
+    <div
+      data-a1-section-action={sectionKey}
+      data-a1-final-section={isFinalSection ? "true" : "false"}
+      style={{
+        ...styles.card,
+        border: `1px solid ${isFinalSection ? "#86efac" : "#bfdbfe"}`,
+        background: isFinalSection ? "#f0fdf4" : "#eff6ff",
+        display: "grid",
+        gap: 10,
+        marginTop: 16,
+      }}
+    >
+      <p style={{ margin: 0, color: isFinalSection ? "#166534" : "#1e3a8a", lineHeight: 1.65, fontWeight: 700 }}>
+        {isFinalSection
+          ? "This is the final required Teil. Make sure all of your answers are ready, then open the submission form for the complete assignment."
+          : "Finished this Teil? Continue to the next required Teil before submitting the assignment."}
+      </p>
+      <button
+        type="button"
+        onClick={() => onSelect?.(targetKey)}
+        style={{
+          ...(isFinalSection ? styles.primaryButton : styles.secondaryButton),
+          justifySelf: "start",
+          minHeight: 46,
+          whiteSpace: "normal",
+        }}
+      >
+        {buttonLabel}
+      </button>
+    </div>
+  );
+};
 
 export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
   const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
@@ -248,11 +294,21 @@ export default function A1SharedAssignmentWorkbookLayout({
         {isCombinedDay1 ? (
           <div hidden={activeTab !== "teil-2"} data-workbook-combined-section="reading-questions">
             {sectionElements}
+            <A1WorkbookSectionAction
+              sections={availableSections}
+              sectionKey="teil-2"
+              onSelect={openTab}
+            />
           </div>
         ) : (
           sectionElements.map((element) => (
             <div key={element.props.sectionKey} hidden={activeTab !== element.props.sectionKey}>
               {element}
+              <A1WorkbookSectionAction
+                sections={availableSections}
+                sectionKey={element.props.sectionKey}
+                onSelect={openTab}
+              />
             </div>
           ))
         )}
