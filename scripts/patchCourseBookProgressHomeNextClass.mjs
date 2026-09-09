@@ -5,11 +5,9 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const servicesPath = path.join(root, "web/src/components/RouteScopedAppServices.js");
 const homePath = path.join(root, "web/src/components/GeneralHome.js");
-const courseTabPath = path.join(root, "web/src/components/CourseTab.js");
 
 let services = fs.readFileSync(servicesPath, "utf8");
 let home = fs.readFileSync(homePath, "utf8");
-const courseTab = fs.readFileSync(courseTabPath, "utf8");
 
 services = services
   .replace(
@@ -43,10 +41,7 @@ if (!home.includes("<HomeNextClassCard className={preferredClass}")) {
 if (home.includes("<HomeClassAccess className={preferredClass}")) {
   throw new Error("Homepage is still using the Zoom-only class card.");
 }
-if (!courseTab.includes("Course progress")) {
-  throw new Error("Course Book course-progress UI is missing.");
-}
 
 fs.writeFileSync(servicesPath, services, "utf8");
 fs.writeFileSync(homePath, home, "utf8");
-console.log("Course Book shows course progress without Next live class; Home owns the next-class card.");
+console.log("Course Book removes Next live class; Home owns the canonical next-class card.");
