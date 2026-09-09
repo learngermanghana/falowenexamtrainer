@@ -42,11 +42,13 @@ replaceOnce(
   "Home metrics participation refresh",
 );
 
-replaceOnce(
-  '        setLeaderboard(scoreResponse?.leaderboard || null);\n        setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");',
-  '        setLeaderboard(null);\n        setLeaderboardGeneratedAt("");',
-  "remove Home leaderboard presentation",
-);
+const leaderboardSource = '        setLeaderboard(scoreResponse?.leaderboard || null);\n        setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");';
+const leaderboardDisabled = '        setLeaderboard(null);\n        setLeaderboardGeneratedAt("");';
+if (source.includes(leaderboardSource)) {
+  source = source.replace(leaderboardSource, leaderboardDisabled);
+} else if (!source.includes(leaderboardDisabled)) {
+  throw new Error("Could not disable the Home leaderboard panel: source anchor was not found.");
+}
 
 replaceOnce(
   '      setRefreshError(attendanceResult.status === "rejected" ? t("homeMetrics.refreshError") : "");',
