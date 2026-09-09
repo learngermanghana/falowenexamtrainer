@@ -26,8 +26,8 @@ const renderAlphabetWorkbook = () => {
           <h2>Teil 1 · Reading and Questions</h2>
           <p>Alphabet reading practice</p>
         </WorkbookSection>
-        <WorkbookSection sectionKey="teil-3">
-          <h2>Teil 3 · Hören</h2>
+        <WorkbookSection sectionKey="teil-2">
+          <h2>Teil 2 · Hören</h2>
           <p>Alphabet listening practice</p>
         </WorkbookSection>
       </A1TutorMarkedWorkbookShell>
@@ -78,17 +78,17 @@ describe("A1 workbook modernization", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "Teil 1 · Reading and Questions" }));
     expect(screen.getByText("Finished this Teil? Continue to the next required Teil before submitting the assignment.")).toBeVisible();
-    const continueCta = screen.getByRole("button", { name: "Continue to Teil 3 · Hören" });
+    const continueCta = screen.getByRole("button", { name: "Continue to Teil 2 · Hören" });
     expect(continueCta).toBeVisible();
     expect(screen.queryByRole("button", { name: "Submit Complete Assignment" })).not.toBeInTheDocument();
 
-    const teil3Panel = document.querySelector('[data-workbook-panel="teil-3"]');
-    teil3Panel.scrollIntoView = jest.fn();
+    const teil2Panel = document.querySelector('[data-workbook-panel="teil-2"]');
+    teil2Panel.scrollIntoView = jest.fn();
     fireEvent.click(continueCta);
 
-    expect(screen.getByRole("tab", { name: "Teil 3 · Hören" })).toHaveAttribute("aria-selected", "true");
-    expect(teil3Panel.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
-    expect(document.activeElement).toBe(teil3Panel.querySelector("h2"));
+    expect(screen.getByRole("tab", { name: "Teil 2 · Hören" })).toHaveAttribute("aria-selected", "true");
+    expect(teil2Panel.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
+    expect(document.activeElement).toBe(teil2Panel.querySelector("h2"));
     expect(screen.getByText(/This is the final required Teil/)).toBeVisible();
 
     const submitPanel = document.querySelector('[data-workbook-panel="submit"]');
