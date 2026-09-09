@@ -15,6 +15,14 @@ describe("Class Participation integration", () => {
     expect(route).not.toContain("studentName:");
   });
 
+  test("student API returns only learning-result question evidence", () => {
+    const route = read("functions/functionz/routes/classParticipation.js");
+    expect(route).toContain("safeQuestionResponses");
+    expect(route).toContain('response?.result === "correct" || response?.result === "needs_review"');
+    expect(route).toContain("questionResponses: safeQuestionResponses(data.questionResponses)");
+    expect(route).not.toContain('result === "presenter_absent"');
+  });
+
   test("Vercel API exposes only the authenticated student participation endpoint", () => {
     const api = read("api/index.js");
     expect(api).toContain('classParticipationMeHandler');
@@ -30,8 +38,11 @@ describe("Class Participation integration", () => {
     expect(patch).toContain('<ClassParticipationCard />');
     expect(hook).toContain('await import("./patchClassParticipationCard.mjs")');
     expect(card).toContain("Class Participation");
+    expect(card).toContain("Your latest class question");
+    expect(card).toContain("Needs review");
     expect(card).toContain("does not change your course grade or official attendance");
     expect(service).toContain('Authorization: `Bearer ${token}`');
+    expect(service).toContain("questionResponses");
     expect(service).not.toContain("presenterAbsent");
   });
 });
