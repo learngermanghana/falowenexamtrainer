@@ -27,13 +27,17 @@ export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", 
   String(text || "")
     .split(/\r?\n/)
     .forEach((rawLine) => {
-      const line = rawLine.trim();
+      let line = rawLine.trim();
       if (!line) return;
 
       const headingMatch = line.match(/^(?:teil|part)\s*([12])\b/i);
       if (headingMatch) {
         currentSection = `teil-${headingMatch[1]}`;
-        return;
+        line = line
+          .slice(headingMatch[0].length)
+          .replace(/^[^0-9]*/, "")
+          .trim();
+        if (!line) return;
       }
 
       if (!currentSection) return;
