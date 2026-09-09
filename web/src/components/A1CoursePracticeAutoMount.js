@@ -278,6 +278,17 @@ const A1CoursePracticeAutoMount = () => {
 
     if (practice && Number(practice.day) === 19) prepareDay19Page(container);
 
+    // Canonical A1 destinations already have a route-level Falowen Radio
+    // portal. Do not create a second overlay while that entrance is active.
+    if (
+      practice
+      && currentIsDestination
+      && journeyResources?.radio
+      && !radioCompleted
+    ) {
+      return undefined;
+    }
+
     // Legacy self-learning links now converge on the canonical practice book.
     // Once Radio is completed (or when a lesson has no Radio), go straight to
     // the practice destination instead of exposing a materials selector.
