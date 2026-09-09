@@ -1,12 +1,18 @@
 import { courseSchedules } from "../data/courseSchedule";
 
+const isExpectedAttendanceSession = (entry) => {
+  if (!entry || entry.completion) return false;
+  const day = Number(entry.day);
+  return Number.isInteger(day) && day > 0;
+};
+
 export const getExpectedCourseSessionCount = (level = "") => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const schedule = courseSchedules?.[normalizedLevel] || [];
   const expectedDays = new Set(
     schedule
-      .map((entry) => Number(entry?.day))
-      .filter((day) => Number.isInteger(day) && day > 0),
+      .filter(isExpectedAttendanceSession)
+      .map((entry) => Number(entry.day)),
   );
 
   return expectedDays.size;
