@@ -12,42 +12,101 @@ const clean = (value) => String(value ?? "").trim();
 const HomeClassAccess = ({ className = "", program = "german" }) => {
   const normalizedClassName = clean(className);
   const cacheIdentity = useMemo(() => ({ className: normalizedClassName }), [normalizedClassName]);
-  const [summary, setSummary] = useState(() =>
-    normalizedClassName ? loadLiveClassSummaryCache(cacheIdentity) : null
-  );
+  const [resolution, setResolution] = useState(() => {
+    const cached = normalizedClassName ? loadLiveClassSummaryCache(cacheIdentity) : null;
+    return {
+      identity: normalizedClassName,
+      summary: cached || null,
+      status: normalizedClassName ? (cached ? "ready" : "loading") : "idle",
+    };
+  });
 
   useEffect(() => {
-    if (!normalizedClassName) return undefined;
+    if (!normalizedClassName) {
+      setResolution({ identity: "", summary: null, status: "idle" });
+      return undefined;
+    }
 
     const cached = loadLiveClassSummaryCache(cacheIdentity);
-    if (cached) setSummary(cached);
+    setResolution({
+      identity: normalizedClassName,
+      summary: cached || null,
+      status: cached ? "ready" : "loading",
+    });
 
     return subscribeCanonicalLiveClass({
       className: normalizedClassName,
       onChange: (nextSummary) => {
-        setSummary(nextSummary);
+        setResolution({ identity: normalizedClassName, summary: nextSummary, status: "ready" });
         saveLiveClassSummaryCache(cacheIdentity, nextSummary);
       },
-      onUnavailable: () => {},
+      onUnavailable: () => {
+        setResolution({ identity: normalizedClassName, summary: null, status: "unavailable" });
+      },
       onError: (error) => {
         console.warn("Compact class access could not refresh live class data", error);
+        setResolution((current) => {
+          if (current.identity === normalizedClassName && current.summary) return current;
+          return { identity: normalizedClassName, summary: null, status: "error" };
+        });
       },
     });
   }, [cacheIdentity, normalizedClassName]);
 
+  if (!normalizedClassName) return null;
+
+  const currentResolution = resolution.identity === normalizedClassName
+    ? resolution
+    : { identity: normalizedClassName, summary: null, status: "loading" };
+  const summary = currentResolution.summary;
   const fallbackZoom = String(program || "").toLowerCase() === "french" ? {} : ZOOM_DETAILS;
   const canonicalZoom = summary?.zoom || {};
+  const hasCanonicalZoomProfile = Boolean(clean(summary?.klass?.zoomProfileId));
+  const canonicalLookupCompleted = currentResolution.status === "ready";
+  const noCanonicalClass = currentResolution.status === "unavailable";
+  const allowLegacyFallback = (canonicalLookupCompleted && !hasCanonicalZoomProfile) || noCanonicalClass;
   const zoom = canonicalZoom?.url
     ? canonicalZoom
-    : summary?.klass?.zoomProfileId
-      ? canonicalZoom
-      : fallbackZoom;
+    : allowLegacyFallback
+      ? fallbackZoom
+      : canonicalZoom;
 
   const zoomUrl = clean(zoom?.url);
   const meetingId = clean(zoom?.meetingId);
   const passcode = clean(zoom?.passcode);
+  const hasZoomDetails = Boolean(zoomUrl || meetingId || passcode);
 
-  if (!zoomUrl && !meetingId && !passcode) return null;
+  if (!hasZoomDetails && currentResolution.status === "loading") {
+    return (
+      <section
+        aria-label="Live class Zoom access"
+        style={{ ...styles.card, padding: 14, border: "1px solid #bfdbfe", background: "#f8fbff" }}
+      >
+        <span style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Live class</span>
+        <strong style={{ display: "block", marginTop: 3 }}>{normalizedClassName}</strong>
+        <span style={{ ...styles.helperText, display: "block", marginTop: 3, fontSize: 12 }}>
+          Checking the correct Zoom room…
+        </span>
+      </section>
+    );
+  }
+
+  if (!hasZoomDetails && (currentResolution.status === "error" || hasCanonicalZoomProfile)) {
+    return (
+      <section
+        aria-label="Live class Zoom access"
+        style={{ ...styles.card, padding: 14, border: "1px solid #bfdbfe", background: "#f8fbff" }}
+      >
+        <span style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Live class</span>
+        <strong style={{ display: "block", marginTop: 3 }}>{normalizedClassName}</strong>
+        <span style={{ ...styles.helperText, display: "block", marginTop: 3, fontSize: 12 }}>
+          Zoom details are temporarily unavailable. Please try again shortly.
+        </span>
+      </section>
+    );
+  }
+
+  if (!hasZoomDetails) return null;
 
   return (
     <section

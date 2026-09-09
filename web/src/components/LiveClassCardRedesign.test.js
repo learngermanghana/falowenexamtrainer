@@ -165,4 +165,23 @@ describe("live class card UI protection", () => {
   test("existing ClassCalendarCard imports automatically receive the redesigned version", () => {
     expect(source("./ClassCalendarCard.js").trim()).toBe('export { default } from "./ClassCalendarCardV2";');
   });
+
+  test("compact Home Zoom access never exposes the legacy room before canonical resolution", () => {
+    const compactAccess = source("./HomeClassAccess.js");
+    expect(compactAccess).toContain('status: normalizedClassName ? (cached ? "ready" : "loading") : "idle"');
+    expect(compactAccess).toContain('resolution.identity === normalizedClassName');
+    expect(compactAccess).toContain('summary: null, status: "unavailable"');
+    expect(compactAccess).toContain('hasCanonicalZoomProfile');
+    expect(compactAccess).toContain('allowLegacyFallback = (canonicalLookupCompleted && !hasCanonicalZoomProfile) || noCanonicalClass');
+    expect(compactAccess).toContain('Checking the correct Zoom room…');
+  });
+
+  test("simplified Home patch removes announcement reads and rotation after removing Updates UI", () => {
+    const patch = source("../../../scripts/patchSimplifiedHomeClassAccess.mjs");
+    expect(patch).toContain('announcementImport');
+    expect(patch).toContain('announcementEffectsStart');
+    expect(patch).toContain('source.includes("fetchAnnouncements(")');
+    expect(patch).toContain('source.includes("announcementStatus")');
+    expect(patch).toContain('unused announcement loading are removed');
+  });
 });
