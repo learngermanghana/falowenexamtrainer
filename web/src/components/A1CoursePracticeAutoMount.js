@@ -7,9 +7,8 @@ import {
   shouldAutoMountA1WritingPractice,
 } from "../utils/a1CoursePracticeRoutes";
 import A1SimpleMarkMyLetterPanel from "./A1SimpleMarkMyLetterPanel";
-import SelfLearningJourneyGate, {
-  hasCompletedSelfLearningMaterials,
-} from "./selfLearning/SelfLearningJourneyGate";
+import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
+import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
 import { isTeacherLectureResource } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import {
@@ -25,9 +24,6 @@ const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
 const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.kind === "practice",
 );
-const A1_NATIVE_DESTINATION_MATERIAL_PATHS = new Set([
-  "/campus/course/modal-verbs-day-14-3-6",
-]);
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
@@ -229,15 +225,15 @@ const A1PracticeLearningContent = ({ onEnter }) => {
   return null;
 };
 
-const mergeJourneyStateIntoDestination = (destination, nextLocation) => {
+export const buildA1SelfLearningDestinationHref = (destination, search = "") => {
   const parsed = new URL(destination, "https://www.falowen.app");
-  const params = new URLSearchParams(nextLocation?.search || "");
+  const params = new URLSearchParams(search || "");
+  params.delete("materials");
   params.forEach((value, key) => parsed.searchParams.set(key, value));
-  parsed.searchParams.set("materials", "done");
   return `${parsed.pathname}${parsed.search}${parsed.hash}`;
 };
 
-const A1SelfLearningJourney = ({ practice, onEnter, onOpenWorkbook }) => {
+const A1SelfLearningJourney = ({ practice, onEnter }) => {
   const resources = getA1SelfLearningJourneyResources(practice);
   return (
     <SelfLearningJourneyGate
@@ -245,10 +241,6 @@ const A1SelfLearningJourney = ({ practice, onEnter, onOpenWorkbook }) => {
       day={practice.day}
       title={`${practice.title} · Kapitel ${practice.chapter}`}
       radio={resources.radio}
-      teacherVideo={resources.teacherVideo}
-      aiVideo={resources.aiVideo}
-      grammarBook={resources.grammarBook}
-      onOpenWorkbook={onOpenWorkbook}
     >
       <A1PracticeLearningContent onEnter={onEnter} />
     </SelfLearningJourneyGate>
@@ -268,6 +260,7 @@ const A1CoursePracticeAutoMount = () => {
     if (!practice && !isWritingPage && !isLetterGrammarPage) return undefined;
 
     document.getElementById("falowen-a1-practice-mount")?.remove();
+    document.getElementById("falowen-a1-practice-media-mount")?.remove();
 
     if (isLetterGrammarPage && !practice) {
       prepareLetterGrammarPage();
@@ -282,21 +275,53 @@ const A1CoursePracticeAutoMount = () => {
       : getPageContainer();
     const journeyResources = practice ? getA1SelfLearningJourneyResources(practice) : null;
     const radioCompleted = hasCompletedRadioFromSearch(location.search);
-    const materialsCompleted = hasCompletedSelfLearningMaterials(location.search);
-
-    if (practice && currentIsDestination) {
-      if (A1_NATIVE_DESTINATION_MATERIAL_PATHS.has(pathname)) return undefined;
-      if (Number(practice.day) === 19) prepareDay19Page(container);
-
-      // The fixed destination overlay owns the materials step. Radio-first
-      // destinations wait for the route-level radio gate, while routes without
-      // radio open their supporting materials immediately.
-      if (materialsCompleted || (journeyResources?.radio && !radioCompleted)) {
-        return undefined;
-      }
-    }
 
     if (practice && Number(practice.day) === 19) prepareDay19Page(container);
+
+    // Legacy self-learning links now converge on the canonical practice book.
+    // Once Radio is completed (or when a lesson has no Radio), go straight to
+    // the practice destination instead of exposing a materials selector.
+    if (
+      practice
+      && !currentIsDestination
+      && (radioCompleted || !journeyResources?.radio)
+    ) {
+      window.location.assign(
+        buildA1SelfLearningDestinationHref(practice.destination, location.search),
+      );
+      return undefined;
+    }
+
+    // On the canonical practice page, Radio remains the only entrance gate.
+    // After it is completed, the native practice book stays visible and the
+    // same media panel used by tutor-marked workbooks is embedded below its
+    // header with both configured videos.
+    if (
+      practice
+      && currentIsDestination
+      && (radioCompleted || !journeyResources?.radio)
+    ) {
+      const mediaMount = document.createElement("div");
+      mediaMount.id = "falowen-a1-practice-media-mount";
+      mediaMount.setAttribute("data-a1-self-learning-workbook-media", "true");
+      mediaMount.style.margin = "16px 0";
+      insertPracticeMount(container, mediaMount);
+
+      const mediaRoot = createRoot(mediaMount);
+      mediaRoot.render(
+        <A1WorkbookMediaPanel
+          day={practice.day}
+          chapter={practice.chapter}
+          teacherVideo={journeyResources?.teacherVideo}
+          aiVideo={journeyResources?.aiVideo}
+        />,
+      );
+
+      return () => {
+        mediaRoot.unmount();
+        mediaMount.remove();
+      };
+    }
 
     const mount = document.createElement("div");
     mount.id = "falowen-a1-practice-mount";
@@ -327,13 +352,6 @@ const A1CoursePracticeAutoMount = () => {
       else insertWritingMount(container, mount);
       restoreContent = practice ? hideSelfLearningContent(container, mount) : () => {};
     }
-    const openWorkbook = practice && !currentIsDestination
-      ? (nextLocation) => {
-          const href = mergeJourneyStateIntoDestination(practice.destination, nextLocation);
-          window.location.assign(href);
-          return true;
-        }
-      : null;
 
     const root = createRoot(mount);
     root.render(
@@ -341,7 +359,6 @@ const A1CoursePracticeAutoMount = () => {
         <A1SelfLearningJourney
           practice={practice}
           onEnter={restoreContent}
-          onOpenWorkbook={openWorkbook}
         />
       ) : (
         <A1SimpleMarkMyLetterPanel />
