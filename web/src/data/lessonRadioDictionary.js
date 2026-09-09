@@ -56,7 +56,7 @@ export const LESSON_RADIO_DICTIONARY = {
       youtubeId: "kp7KvFmaRuo",
       duration: "",
       instruction:
-        "Höre einfach zu und stimme dich auf das Thema Apotheke ein. Danach gehst du weiter zu Teil 1.",
+        "Höre einfach zu und stimme dich auf das Thema Apotheke ein. Danach gehst du weiter zur Grammatik.",
     },
     26: {
       key: "a2-day26-gefuehle-beschreiben-falowen-radio",
