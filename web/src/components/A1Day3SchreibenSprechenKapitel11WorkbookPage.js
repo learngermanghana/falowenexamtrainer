@@ -4,6 +4,7 @@ import A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy from "./A1Day3Schreibe
 import LiveClassResponsePanel from "./LiveClassResponsePanel";
 import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
 import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
+import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 
 export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
   Object.freeze({
@@ -16,6 +17,9 @@ export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
     url: "https://youtu.be/LdCVsY-SFTg",
   }),
 ]);
+
+export const A1_DAY3_KAPITEL11_TEACHER_VIDEO =
+  getA1TeacherVideoResources(3).find((resource) => String(resource.chapter) === "1.1") || null;
 
 const LIVE_CLASS_LESSON_ID = "A1-day-3-kapitel-1.1-w-words";
 const liveQuestions = [
@@ -206,8 +210,9 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
         style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}
       >
         <SelfLearningSupportingMaterials
+          teacherVideo={A1_DAY3_KAPITEL11_TEACHER_VIDEO}
           aiVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
-          description="Watch the AI lesson, then continue with the Kapitel 1.1 self-learning practice book. No teacher lecture is currently configured for this page."
+          description="Watch the teacher lecture and AI lesson, then continue with the Kapitel 1.1 self-learning practice book."
         />
       </div>
 
