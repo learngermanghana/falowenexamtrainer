@@ -40,9 +40,12 @@ test("Day 3 Kapitel 1.2 self-practice has its own route and legacy identity", ()
   );
 });
 
-test("Day 3 Kapitel 1.1 Radio does not leak into Kapitel 1.2 self-practice", () => {
+test("Day 3 Kapitel 1.1 and 1.2 each use their own Falowen Radio episode", () => {
   expect(getA1RadioResource(3, "1.1")).toEqual(
     expect.objectContaining({ chapter: "1.1", youtubeId: "y9LhKQkjsqM" }),
   );
-  expect(getA1RadioResource(3, "1.2")).toBeNull();
+  expect(getA1RadioResource(3, "1.2")).toEqual(
+    expect.objectContaining({ chapter: "1.2", youtubeId: "XrSTHS60LI4" }),
+  );
+  expect(getA1RadioResource(3, "1.2")?.youtubeId).not.toBe(getA1RadioResource(3, "1.1")?.youtubeId);
 });
