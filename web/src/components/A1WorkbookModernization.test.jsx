@@ -76,7 +76,18 @@ describe("A1 workbook modernization", () => {
     expect(screen.getByText("Grammar notes")).toBeVisible();
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "40");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Submit" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 1 · Reading and Questions" }));
+    expect(screen.getByText("Finished this Teil? Continue to the next required Teil before submitting the assignment.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Continue to Teil 3 · Hören" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Submit Complete Assignment" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 3 · Hören" }));
+    expect(screen.getByText(/This is the final required Teil/)).toBeVisible();
+    const finalSubmitCta = screen.getByRole("button", { name: "Submit Complete Assignment" });
+    expect(finalSubmitCta).toBeVisible();
+    fireEvent.click(finalSubmitCta);
+
+    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("canonical-a1-submit")).toHaveTextContent("Submit A1-0.2");
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "100");
 
