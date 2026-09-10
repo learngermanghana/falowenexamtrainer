@@ -734,56 +734,25 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         <h2 style={sectionTitle}>Teil 4 · Forming Yes-or-No Questions</h2>
 
         <div style={infoBoxStyle}>
-          <strong>Basic structure</strong>
-          <div style={chipStyle}>Conjugated verb + subject + rest of the sentence?</div>
+          <strong>Rule for a yes-or-no question</strong>
+          <div style={chipStyle}>Verb + Subject + other information?</div>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            A <strong>Ja/Nein-Frage</strong> can normally be answered with <strong>ja</strong> or <strong>nein</strong>.
-            The conjugated verb starts the question.
+            Put the <strong>conjugated verb first</strong>, the <strong>subject second</strong>, and any other information
+            after the subject.
           </p>
-        </div>
-
-        <div style={questionCardStyle}>
-          <strong>See the positions</strong>
-          <PositionLegend />
-
-          <div style={{ display: "grid", gap: 10 }}>
-            <div>
-              <div style={{ marginBottom: 6, fontWeight: 600 }}>Statement</div>
-              <SentencePattern
-                parts={[
-                  { type: "subject", text: "Du" },
-                  { type: "verb", text: "lernst" },
-                  { type: "rest", text: "Deutsch." },
-                ]}
-              />
-            </div>
-
-            <div>
-              <div style={{ marginBottom: 6, fontWeight: 600 }}>Yes-or-no question</div>
-              <SentencePattern
-                parts={[
-                  { type: "verb", text: "Lernst" },
-                  { type: "subject", text: "du" },
-                  { type: "rest", text: "Deutsch?" },
-                ]}
-              />
-            </div>
+          <SentencePattern
+            parts={[
+              { type: "verb", text: "Lernst" },
+              { type: "subject", text: "du" },
+              { type: "rest", text: "Deutsch?" },
+            ]}
+          />
+          <div style={{ color: "#374151", lineHeight: 1.7 }}>
+            <strong>Lernst</strong> = verb · <strong>du</strong> = subject · <strong>Deutsch</strong> = other information
           </div>
-
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            The verb <strong>lernst</strong> moves from position two in the statement to position one in the question.
+            So: <strong>Verb + Subject + other information</strong> → <strong>Lernst du Deutsch?</strong>
           </p>
-        </div>
-
-        <div style={questionCardStyle}>
-          <strong>How to form a yes-or-no question</strong>
-          <ol style={listStyle}>
-            <li>Find the conjugated verb.</li>
-            <li>Move the conjugated verb to the beginning.</li>
-            <li>Put the subject directly after the verb.</li>
-            <li>Keep the remaining information after the subject.</li>
-            <li>Add a question mark.</li>
-          </ol>
         </div>
 
         <div style={questionCardStyle}>
