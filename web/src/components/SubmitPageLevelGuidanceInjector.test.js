@@ -35,7 +35,7 @@ describe("SubmitPageLevelGuidanceInjector completion checklist", () => {
     ]);
   });
 
-  test("shows and gates the checklist inside the inline A1 workbook submit tab", () => {
+  test("shows and gates the checklist inside the inline A1 workbook submit tab without the old auto-change note", () => {
     document.body.innerHTML = `
       <div data-a1-built-in-submission data-assignment-key="A1-1.1">
         <form>
@@ -60,6 +60,8 @@ describe("SubmitPageLevelGuidanceInjector completion checklist", () => {
     expect(card.previousElementSibling).toBe(document.querySelector("textarea").closest("label"));
     expect(card).toHaveTextContent("Teil 1 · Hören");
     expect(card).toHaveTextContent("Teil 2 · Schreiben");
+    expect(card).not.toHaveTextContent("The checklist changes automatically when you select a different A1 assignment.");
+    expect(card).not.toHaveTextContent("Note:");
     expect(submitButton).toBeDisabled();
 
     checks.forEach((check) => {

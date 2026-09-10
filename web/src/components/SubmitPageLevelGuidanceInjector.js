@@ -19,7 +19,6 @@ const LEVEL_COPY = {
         kind: "answer",
       },
     ],
-    note: "The checklist changes automatically when you select a different A1 assignment.",
   },
   A2: {
     title: "A2 final answers",
@@ -188,12 +187,9 @@ const guidanceHtml = (copy, level, assignment, checklist) => `
     </div>
     <span style="font-size:12px;color:#64748b;">The Submit button unlocks only after every required item is checked.</span>
   </div>
-  <div style="border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:12px;padding:10px;line-height:1.6;font-size:14px;">
-    <strong>Note:</strong> ${escapeHtml(copy.note)}
-  </div>
+  ${copy.note ? `<div style="border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:12px;padding:10px;line-height:1.6;font-size:14px;"><strong>Note:</strong> ${escapeHtml(copy.note)}</div>` : ""}
   <div style="font-size:12px;color:#64748b;">Detected assignment: <strong>${escapeHtml(assignment || "Select an assignment")}</strong> · Level: <strong>${escapeHtml(level || "A1")}</strong></div>
 `;
-
 
 const findEditorContainer = (form) => {
   const textarea = form?.querySelector?.("textarea");
