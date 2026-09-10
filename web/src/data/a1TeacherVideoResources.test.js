@@ -1,6 +1,7 @@
 import {
   A1_TEACHER_VIDEO_RESOURCES,
   getA1TeacherVideoResources,
+  getCanonicalA1TeacherVideoResource,
   hasTeacherVideoForEveryConfiguredA1Chapter,
 } from "./a1TeacherVideoResources";
 import { normalizeLesson } from "./lessonModel";
@@ -50,16 +51,14 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 
-  test("Day 3 Chapter 1.2 restores its teacher lecture in the chapter hub", () => {
-    const configuredVideo = getA1TeacherVideoResources(3).find(
-      (video) => video.chapter === "1.2"
-    );
+  test("Day 3 Chapter 1.2 uses the latest canonical teacher lecture", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(3, "1.2");
 
     expect(configuredVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
         topic: "Personal Pronouns and Verb Conjugation",
-        url: "https://youtu.be/LdCVsY-SFTg",
+        url: "https://youtu.be/9CTJ-2nsY8U",
       })
     );
 
@@ -75,23 +74,21 @@ describe("standardized A1 teacher videos", () => {
     expect(lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
-        url: "https://youtu.be/LdCVsY-SFTg",
+        url: "https://youtu.be/9CTJ-2nsY8U",
       })
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           key: "a1-day3-chapter-1-2-teacher-video",
-          url: "https://youtu.be/LdCVsY-SFTg",
+          url: "https://youtu.be/9CTJ-2nsY8U",
         }),
       ])
     );
   });
 
   test("Day 13 chapter 3.5 exposes the new recording as Teacher Video 2", () => {
-    const configuredVideos = getA1TeacherVideoResources(13).filter(
-      (video) => video.chapter === "3.5"
-    );
+    const configuredVideos = getA1TeacherVideoResources(13, "3.5");
 
     expect(configuredVideos.map((video) => video.url)).toEqual([
       "https://youtu.be/eqSc_5p5uyQ",
@@ -123,7 +120,7 @@ describe("standardized A1 teacher videos", () => {
     expect(new Set(teacherVideos.map((video) => video.key)).size).toBe(2);
   });
 
-  test("does not replace an existing curated teacher video for the same chapter", () => {
+  test("canonical teacher video replaces a stale curated teacher video for the same chapter", () => {
     const lesson = normalizeLesson(
       {
         day: 16,
@@ -148,11 +145,23 @@ describe("standardized A1 teacher videos", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/custom-teacher-video",
+      "https://youtu.be/yYIjI6P-qmw",
+    ]);
+    expect(teacherVideos.map((video) => video.url)).not.toContain(
+      "https://youtu.be/custom-teacher-video"
+    );
+  });
+
+  test("chapter lookup returns only the canonical resources for that chapter", () => {
+    expect(getA1TeacherVideoResources(2, "0.2").map((video) => video.chapter)).toEqual([
+      "0.2",
+    ]);
+    expect(getA1TeacherVideoResources(2, "1.1").map((video) => video.chapter)).toEqual([
+      "1.1",
     ]);
   });
 
-  test("returns all teacher resources for a multi-chapter A1 day", () => {
+  test("returns all teacher resources for a multi-chapter A1 day when chapter is omitted", () => {
     expect(getA1TeacherVideoResources(2).map((video) => video.chapter)).toEqual([
       "0.2",
       "1.1",
