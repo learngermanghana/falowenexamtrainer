@@ -50,20 +50,22 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 
-  test("Day 3 Chapter 1.2 restores its teacher lecture in the chapter hub", () => {
-    const configuredVideo = getA1TeacherVideoResources(3).find(
-      (video) => video.chapter === "1.2"
+  test("Day 3 chapters 1.1 and 1.2 use the requested teacher lectures", () => {
+    const configuredVideos = getA1TeacherVideoResources(3);
+    expect(configuredVideos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          chapter: "1.1",
+          url: "https://youtu.be/Ygbpt6yC_f4",
+        }),
+        expect.objectContaining({
+          chapter: "1.2",
+          url: "https://youtu.be/9CTJ-2nsY8U",
+        }),
+      ])
     );
 
-    expect(configuredVideo).toEqual(
-      expect.objectContaining({
-        chapter: "1.2",
-        topic: "Personal Pronouns and Verb Conjugation",
-        url: "https://youtu.be/LdCVsY-SFTg",
-      })
-    );
-
-    const lesson = normalizeLesson(
+    const chapter12Lesson = normalizeLesson(
       {
         day: 3,
         chapter: "1.2",
@@ -72,17 +74,17 @@ describe("standardized A1 teacher videos", () => {
       "A1"
     );
 
-    expect(lesson.resources.teacherVideo).toEqual(
+    expect(chapter12Lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         chapter: "1.2",
-        url: "https://youtu.be/LdCVsY-SFTg",
+        url: "https://youtu.be/9CTJ-2nsY8U",
       })
     );
-    expect(lesson.resources.videos).toEqual(
+    expect(chapter12Lesson.resources.videos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           key: "a1-day3-chapter-1-2-teacher-video",
-          url: "https://youtu.be/LdCVsY-SFTg",
+          url: "https://youtu.be/9CTJ-2nsY8U",
         }),
       ])
     );
