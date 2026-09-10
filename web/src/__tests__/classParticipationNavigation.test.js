@@ -18,13 +18,20 @@ describe("Class Participation navigation", () => {
     expect(source).not.toContain("participationSummary.correct} correct");
   });
 
-  test("Account exposes participation as a deep view without consuming a tab slot", () => {
+  test("Account exposes participation as a Router-synchronized deep view without consuming a tab slot", () => {
     const source = fs.readFileSync(accountSettingsPath, "utf8");
 
+    expect(source).toContain('import { useLocation, useNavigate } from "react-router-dom";');
+    expect(source).toContain("const location = useLocation();");
+    expect(source).toContain("const navigate = useNavigate();");
+    expect(source).toContain('new URLSearchParams(location.search).get("tab")');
     expect(source).toContain('activeTab === "participation"');
     expect(source).toContain("View class participation");
     expect(source).toContain("Back to Student Data");
     expect(source).toContain('params.set("tab", tabKey)');
+    expect(source).toContain("navigate(nextUrl, { replace: true })");
+    expect(source).not.toContain("window.history.replaceState");
+    expect(source).not.toContain("setActiveTab(tabKey)");
     expect(source).not.toContain('{ key: "participation", label:');
     expect(source).not.toContain('{activeTab === "studentData" ? <ClassParticipationCard /> : null}');
   });

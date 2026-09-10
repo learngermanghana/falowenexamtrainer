@@ -23,6 +23,14 @@ describe("Class Participation integration", () => {
     expect(route).not.toContain('result === "presenter_absent"');
   });
 
+  test("student participation history is paginated deterministically before totals are calculated", () => {
+    const route = read("functions/functionz/routes/classParticipation.js");
+    expect(route).toContain("const PAGE_SIZE = 100");
+    expect(route).toContain(".orderBy(admin.firestore.FieldPath.documentId())");
+    expect(route).toContain("if (cursor) query = query.startAfter(cursor)");
+    expect(route).toContain("if (snapshot.docs.length < PAGE_SIZE) break");
+  });
+
   test("Vercel API exposes only the authenticated student participation endpoint", () => {
     const api = read("api/index.js");
     expect(api).toContain('classParticipationMeHandler');
@@ -38,7 +46,8 @@ describe("Class Participation integration", () => {
     expect(patch).toContain('<ClassParticipationCard />');
     expect(hook).toContain('await import("./patchClassParticipationCard.mjs")');
     expect(card).toContain("Class Participation");
-    expect(card).toContain("Your latest class question");
+    expect(card).toContain("QuestionHistory");
+    expect(card).toContain("Review {questions.length} recorded question");
     expect(card).toContain("Needs review");
     expect(card).toContain("does not change your course grade or official attendance");
     expect(service).toContain('Authorization: `Bearer ${token}`');
