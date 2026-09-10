@@ -77,7 +77,7 @@ export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
   const numericDay = Number(day || 0);
   if (!numericDay) return [];
 
-  const exactTeacherResources = getA1TeacherVideoResources(numericDay)
+  const exactTeacherResources = getA1TeacherVideoResources(numericDay, chapter)
     .filter((resource) => chapterMatches(resource, chapter, numericDay));
   const lessonResources = getLessonVideoResources("A1", numericDay, {}) || [];
   const fallbackTeacherResources = exactTeacherResources.length
@@ -102,14 +102,30 @@ export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
 
 const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = null }) => {
   const resources = useMemo(() => {
-    const explicitResources = [
-      normalizeProvidedResource(teacherVideo, "teacher"),
-      normalizeProvidedResource(aiVideo, "ai"),
-    ].filter(Boolean);
+    const canonicalResources = getA1WorkbookMediaResources({ day, chapter });
+    const canonicalTeacherResources = canonicalResources.filter(
+      (resource) => resource.kind === "teacher"
+    );
+    const canonicalOtherResources = canonicalResources.filter(
+      (resource) => resource.kind !== "teacher"
+    );
+    const explicitTeacher = normalizeProvidedResource(teacherVideo, "teacher");
+    const explicitAi = normalizeProvidedResource(aiVideo, "ai");
+
+    // A1 teacher lectures have one authoritative source: a1TeacherVideoResources.
+    // Page-specific or schedule-level teacher links are only fallbacks when the
+    // canonical registry has no entry. This prevents old URLs from resurfacing
+    // after a newer teacher lecture has been saved to the registry.
+    const fallbackTeacherResources = canonicalTeacherResources.length
+      ? []
+      : [explicitTeacher].filter(Boolean);
+
     return dedupeByUrl([
-      ...explicitResources,
-      ...getA1WorkbookMediaResources({ day, chapter }),
-    ]);
+      ...canonicalTeacherResources,
+      ...fallbackTeacherResources,
+      explicitAi,
+      ...canonicalOtherResources,
+    ].filter(Boolean));
   }, [aiVideo, chapter, day, teacherVideo]);
 
   if (!resources.length) return null;
