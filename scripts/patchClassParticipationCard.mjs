@@ -49,11 +49,11 @@ const activeTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
     if (tabKey === "studentData") params.delete("tab");
     else params.set("tab", tabKey);
     const nextSearch = params.toString();
-    window.history.replaceState(
-      window.history.state,
-      "",
-      \`${window.location.pathname}\${nextSearch ? \`?\${nextSearch}\` : ""}\${window.location.hash || ""}\`
-    );
+    const nextUrl =
+      window.location.pathname +
+      (nextSearch ? "?" + nextSearch : "") +
+      (window.location.hash || "");
+    window.history.replaceState(window.history.state, "", nextUrl);
   };`;
 replaceAccountOnce(activeTabBefore, activeTabAfter, "Account participation deep-link state");
 
