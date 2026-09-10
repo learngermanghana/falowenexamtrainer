@@ -28,6 +28,12 @@ const replaceAccountOnce = (before, after, label) => {
 };
 
 replaceAccountOnce(
+  'import { useTranslation } from "react-i18next";',
+  'import { useTranslation } from "react-i18next";\nimport { useLocation, useNavigate } from "react-router-dom";',
+  "Account Router location import",
+);
+
+replaceAccountOnce(
   'import NotificationSettingsCard from "./NotificationSettingsCard";',
   'import NotificationSettingsCard from "./NotificationSettingsCard";\nimport ClassParticipationCard from "./ClassParticipationCard";',
   "Account Class Participation import",
@@ -36,7 +42,7 @@ replaceAccountOnce(
 const activeTabBefore = `  const [activeTab, setActiveTab] = useState(() =>
     new URLSearchParams(window.location.search).get("tab") === "billing" ? "billing" : "studentData"
   );`;
-const activeTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
+const previousActiveTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
     const requestedTab = new URLSearchParams(window.location.search).get("tab");
     return ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
       ? requestedTab
@@ -55,7 +61,30 @@ const activeTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
       (window.location.hash || "");
     window.history.replaceState(window.history.state, "", nextUrl);
   };`;
-replaceAccountOnce(activeTabBefore, activeTabAfter, "Account participation deep-link state");
+const activeTabAfter = `  const location = useLocation();
+  const navigate = useNavigate();
+  const requestedTab = new URLSearchParams(location.search).get("tab");
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
+    ? requestedTab
+    : "studentData";
+
+  const selectAccountTab = (tabKey) => {
+    const params = new URLSearchParams(location.search);
+    if (tabKey === "studentData") params.delete("tab");
+    else params.set("tab", tabKey);
+    const nextSearch = params.toString();
+    const nextUrl =
+      location.pathname +
+      (nextSearch ? "?" + nextSearch : "") +
+      (location.hash || "");
+    navigate(nextUrl, { replace: true });
+  };`;
+
+if (account.includes(previousActiveTabAfter)) {
+  account = account.replace(previousActiveTabAfter, activeTabAfter);
+} else {
+  replaceAccountOnce(activeTabBefore, activeTabAfter, "Account participation deep-link state");
+}
 
 replaceAccountOnce(
   '            onClick={() => setActiveTab(tab.key)}',
@@ -101,8 +130,10 @@ replaceAccountOnce(
 );
 
 const requiredMarkers = [
+  'import { useLocation, useNavigate } from "react-router-dom";',
   'import ClassParticipationCard from "./ClassParticipationCard";',
-  'requestedTab',
+  'new URLSearchParams(location.search)',
+  'navigate(nextUrl, { replace: true })',
   '"participation"',
   'View class participation',
   'activeTab === "participation"',
@@ -120,7 +151,10 @@ if (account.includes('{activeTab === "studentData" ? <ClassParticipationCard /> 
 if (account.includes('{ key: "participation", label:')) {
   throw new Error("Class Participation must not consume an Account tab slot.");
 }
+if (account.includes("window.history.replaceState") || account.includes("setActiveTab(tabKey)")) {
+  throw new Error("Account tab state must be derived from React Router location changes.");
+}
 
 fs.writeFileSync(homePath, home, "utf8");
 fs.writeFileSync(accountPath, account, "utf8");
-console.log("Class Participation now has a dedicated Account view without adding permanent navigation space.");
+console.log("Class Participation now follows the Account query-string state through React Router.");
