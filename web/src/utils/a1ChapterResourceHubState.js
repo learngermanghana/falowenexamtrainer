@@ -39,7 +39,7 @@ export const resolveA1ChapterResourceHubEntry = ({ day = "", chapter = "" } = {}
 const getScheduleLessonIdentity = (entry = {}) =>
   String(entry.id || entry.lessonId || entry.courseBookId || entry.assignmentId || entry.assignment_id || "").trim();
 
-const addDay20WorkbookView = (lesson = {}, workbookRoute = "") => {
+export const addDay20WorkbookView = (lesson = {}, workbookRoute = "") => {
   if (!workbookRoute) return workbookRoute;
   const isDay20Chapter123 =
     Number(lesson.displayDay ?? lesson.day) === 20 &&
