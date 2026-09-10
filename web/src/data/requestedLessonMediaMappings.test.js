@@ -293,4 +293,72 @@ describe("requested lesson media mappings", () => {
     expect(b2Day11.resources.aiVideo.url).not.toContain("AWEHnJd1o3M");
     expect(b2Day11.resources.falowenRadio.youtubeId).not.toBe("TC85wRlhtCc");
   });
+
+  test("maps B2 Days 21 to 26 to the requested Falowen Radio videos and chapters", () => {
+    const requested = [
+      {
+        day: 21,
+        chapter: "5.1",
+        title: "Migration und neue Lebenswege",
+        key: "b2-day21-migration-neue-lebenswege-falowen-radio",
+        youtubeId: "vt2uLA4KZg0",
+      },
+      {
+        day: 22,
+        chapter: "5.2",
+        title: "Demokratie und Mitbestimmung",
+        key: "b2-day22-demokratie-mitbestimmung-falowen-radio",
+        youtubeId: "L43S-6dJffA",
+      },
+      {
+        day: 23,
+        chapter: "5.3",
+        title: "Work-Life-Balance",
+        key: "b2-day23-work-life-balance-falowen-radio",
+        youtubeId: "gGwzFPdmtSw",
+      },
+      {
+        day: 24,
+        chapter: "5.4",
+        title: "Wissenschaft und Forschung im Alltag",
+        key: "b2-day24-wissenschaft-forschung-alltag-falowen-radio",
+        youtubeId: "VLnzMBbXvCo",
+      },
+      {
+        day: 25,
+        chapter: "5.5",
+        title: "Nachhaltiger Konsum",
+        key: "b2-day25-nachhaltiger-konsum-falowen-radio",
+        youtubeId: "beZAKl9xudc",
+      },
+      {
+        day: 26,
+        chapter: "6.1",
+        title: "Behörden, Termine und formelle Kommunikation",
+        key: "b2-day26-behoerden-termine-formelle-kommunikation-falowen-radio",
+        youtubeId: "iudqbeWrwKQ",
+      },
+    ];
+
+    requested.forEach(({ day, chapter, title, key, youtubeId }) => {
+      expect(B2_C1_LESSON_RADIO_OVERRIDES.B2[day]).toEqual(
+        expect.objectContaining({
+          key,
+          title: `${title} ${chapter}`,
+          youtubeId,
+        }),
+      );
+
+      const lesson = normalizeB2C1Lesson(
+        { level: "B2", day, chapter, title },
+        "B2",
+      );
+
+      expect(lesson.chapter).toBe(chapter);
+      expect(lesson.resources.falowenRadio).toEqual(
+        expect.objectContaining({ key, youtubeId }),
+      );
+      expect(lesson.resources.aiVideo?.url || "").not.toContain(youtubeId);
+    });
+  });
 });
