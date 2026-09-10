@@ -1,6 +1,7 @@
 const admin = require("firebase-admin");
 
 const RECORD_COLLECTION = "classParticipationRecords";
+const PAGE_SIZE = 100;
 
 const clean = (value) => String(value ?? "").trim();
 const lower = (value) => clean(value).toLowerCase();
@@ -62,12 +63,27 @@ const studentSafeRecord = (snapshot) => {
 
 async function loadRows(db, field, value) {
   if (!clean(value)) return [];
-  const snapshot = await db
-    .collection(RECORD_COLLECTION)
-    .where(field, "==", value)
-    .limit(100)
-    .get();
-  return snapshot.docs.map(studentSafeRecord);
+
+  const rows = [];
+  let cursor = null;
+
+  while (true) {
+    let query = db
+      .collection(RECORD_COLLECTION)
+      .where(field, "==", value)
+      .orderBy(admin.firestore.FieldPath.documentId())
+      .limit(PAGE_SIZE);
+
+    if (cursor) query = query.startAfter(cursor);
+
+    const snapshot = await query.get();
+    rows.push(...snapshot.docs.map(studentSafeRecord));
+
+    if (snapshot.docs.length < PAGE_SIZE) break;
+    cursor = snapshot.docs[snapshot.docs.length - 1];
+  }
+
+  return rows;
 }
 
 async function classParticipationMeHandler(req, res) {
