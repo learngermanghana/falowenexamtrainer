@@ -845,7 +845,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     <div
       data-a1-coursebook={isA1CourseBook ? "true" : undefined}
       data-a2-b1-coursebook={usesSharedA2B1Design ? "true" : undefined}
-      className={usesSharedA2B1Design ? "a2-b1-course-book" : undefined}
+      className={usesSharedA2B1Design ? "course-book a2-b1-course-book" : "course-book"}
       style={{ display: "grid", gap: 14, paddingBottom: 80 }}
     >
       {activeSubTab === "classMembers" ? (
