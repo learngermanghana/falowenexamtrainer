@@ -43,6 +43,7 @@ describe('A1 direct Radio destinations', () => {
     [3, '1.1', '/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook'],
     [3, '1.2', '/campus/course/a1-day-3-pronouns-introducing-yourself-workbook'],
     [18, '12.2', '/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook'],
+    [20, '12.3', '/campus/course/letter-writing-intro-german-a1-day-12-3?view=workbook'],
   ])('opens Day %s chapter %s workbook without another hub visit', (day, chapter, expected) => {
     const href = buildCompletedRadioHref({pathname: `/campus/course/lesson/A1/${day}`, search: `?chapter=${chapter}&hub=1`});
     expect(href).toBe(`${expected}${expected.includes('?') ? '&' : '?'}radio=done`);
