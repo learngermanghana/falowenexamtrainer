@@ -2,8 +2,8 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [1, "0.1", "Greetings and Asking About Well-being", "https://youtu.be/jXUJ3VTBlcE"],
   [2, "0.2", "German Alphabet", "https://youtu.be/uhFgKp4WVEc"],
   [2, "1.1", "Personal Pronouns and Verb Conjugation", "https://youtu.be/AjsnO1hxDs4"],
-  [3, "1.1", "Personal Information, Articles, Adjectives and W-Questions", "https://youtu.be/iZDv1rcYWsQ"],
-  [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/LdCVsY-SFTg"],
+  [3, "1.1", "Personal Information, Articles, Adjectives and W-Questions", "https://youtu.be/Ygbpt6yC_f4"],
+  [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/9CTJ-2nsY8U"],
   [4, "2", "German Numbers", "https://youtu.be/lN7xxSbkPZ4"],
   [5, "1.3", "Introducing Yourself and Articles", "https://youtu.be/KuGq_0r0FCY"],
   [6, "2.3", "Family and Hobbies", "https://youtu.be/_WdlEcKXuVg"],
@@ -29,6 +29,8 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [24, "5.10", "Conjunctions", "https://youtu.be/XpcC3uvBcwo", 2],
 ];
 
+const normalizeChapter = (value = "") => String(value || "").trim().toLowerCase();
+
 export const A1_TEACHER_VIDEO_RESOURCES = Object.freeze(
   A1_TEACHER_VIDEO_ENTRIES.map(([day, chapter, topic, url, requestedVideoNumber]) => {
     const videoNumber = Number(requestedVideoNumber) || 1;
@@ -51,8 +53,21 @@ export const A1_TEACHER_VIDEO_RESOURCES = Object.freeze(
   })
 );
 
-export const getA1TeacherVideoResources = (day) =>
-  A1_TEACHER_VIDEO_RESOURCES.filter((resource) => Number(resource.day) === Number(day));
+export const getA1TeacherVideoResources = (day, chapter = "") => {
+  const resourcesForDay = A1_TEACHER_VIDEO_RESOURCES.filter(
+    (resource) => Number(resource.day) === Number(day)
+  );
+  const normalizedChapter = normalizeChapter(chapter);
+  if (!normalizedChapter) return resourcesForDay;
+  return resourcesForDay.filter(
+    (resource) => normalizeChapter(resource.chapter) === normalizedChapter
+  );
+};
+
+export const getCanonicalA1TeacherVideoResource = (day, chapter, videoNumber = 1) =>
+  getA1TeacherVideoResources(day, chapter).find(
+    (resource) => Number(resource.videoNumber) === Number(videoNumber)
+  ) || null;
 
 export const hasTeacherVideoForEveryConfiguredA1Chapter = () =>
   A1_TEACHER_VIDEO_RESOURCES.every(
