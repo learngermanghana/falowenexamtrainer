@@ -10,8 +10,12 @@ on:
       - "web/src/components/HomeMetrics.js"
       - "web/src/components/CourseTab.js"
       - "web/src/components/GuidedWritingWorkspace.js"
+      - "web/src/components/ClassParticipationCard.js"
       - "web/src/components/CourseCompletionProgressRegression.test.js"
+      - "web/src/__tests__/classParticipationNavigation.test.js"
       - "scripts/patchCanonicalCourseCompletionProgress.mjs"
+      - "scripts/patchClassParticipationCard.mjs"
+      - "scripts/patchHomeParticipationMetric.mjs"
       - "web/package.json"
       - ".github/workflows/course-completion-progress.yml"
 
@@ -34,11 +38,11 @@ jobs:
         run: |
           node scripts/patchCanonicalCourseCompletionProgress.mjs
           node scripts/patchCanonicalCourseCompletionProgress.mjs
-      - name: Test completion engine and wiring
+      - name: Test completion engine and participation wiring
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/courseCompletionJourney.test.js src/components/CourseCompletionProgressRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/courseCompletionJourney.test.js src/components/CourseCompletionProgressRegression.test.js src/__tests__/classParticipationNavigation.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
