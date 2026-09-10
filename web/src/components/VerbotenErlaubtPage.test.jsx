@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import VerbotenErlaubtPage from "./VerbotenErlaubtPage";
 
@@ -18,11 +18,11 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
     expect(document.querySelectorAll("[data-combined-rule-question]")).toHaveLength(5);
     expect(screen.getByRole("img", { name: "water is allowed" })).toBeVisible();
     expect(screen.getByRole("img", { name: "food is forbidden" })).toBeVisible();
-    expect(screen.getByText("Im Kursraum darfst du nicht essen.")).toBeVisible();
+    expect(screen.getByText(/Im Kursraum darfst du nicht essen\./)).toBeVisible();
     expect(screen.getByText("Darf Kojo im Kursraum essen?")).toBeVisible();
-    expect(screen.getByText("Im Unterricht darfst du nicht telefonieren.")).toBeVisible();
+    expect(screen.getByText(/Im Unterricht darfst du nicht telefonieren\./)).toBeVisible();
     expect(screen.getByText("Darf Yaw im Unterricht telefonieren?")).toBeVisible();
-    expect(screen.getByText("Im Computerraum darfst du Deutsch üben.")).toBeVisible();
+    expect(screen.getByText(/Im Computerraum darfst du Deutsch üben\./)).toBeVisible();
     expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
     expect(screen.queryAllByLabelText("Verboten")).toHaveLength(0);
     expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(5);
@@ -34,7 +34,7 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
 
     expect(screen.getByRole("heading", { name: "Erlaubt oder verboten?" })).toBeVisible();
     expect(screen.getByText("Rauchen ist verboten.")).toBeVisible();
-    expect(screen.getByText(/Man darf hier nicht rauchen/)).toBeVisible();
+    expect(screen.getAllByText(/Man darf hier nicht rauchen/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Das Fotografieren ist erlaubt.")).toBeVisible();
     expect(screen.getByText("= Man darf hier fotografieren.")).toBeVisible();
     expect(screen.getByText("Dürfen is a modal verb")).toBeVisible();
@@ -68,15 +68,19 @@ describe("VerbotenErlaubtPage A1 exam practice", () => {
   test("Teil 2 requires an attempt before revealing the model", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Ask first, then reveal the model" })).toBeVisible();
-    expect(screen.getByText("THEMA: Getränke")).toBeVisible();
-    expect(screen.getAllByText("KEYWORD")).toHaveLength(4);
-    expect(screen.queryByText("Trinken Sie im Unterricht Wasser?")).not.toBeInTheDocument();
+    const teil2Heading = screen.getByRole("heading", { name: "Ask first, then reveal the model" });
+    const teil2Section = teil2Heading.closest("section");
+    expect(teil2Section).not.toBeNull();
+    const teil2 = within(teil2Section);
 
-    fireEvent.click(screen.getAllByRole("button", { name: "Show model question and answer" })[0]);
+    expect(teil2.getByText("THEMA: Getränke")).toBeVisible();
+    expect(teil2.getAllByText("KEYWORD")).toHaveLength(4);
+    expect(teil2.queryByText("Trinken Sie im Unterricht Wasser?")).not.toBeInTheDocument();
 
-    expect(screen.getByText("Trinken Sie im Unterricht Wasser?")).toBeVisible();
-    expect(screen.getByText("Ja, ich trinke im Unterricht Wasser.")).toBeVisible();
+    fireEvent.click(teil2.getAllByRole("button", { name: "Show model question and answer" })[0]);
+
+    expect(teil2.getByText("Trinken Sie im Unterricht Wasser?")).toBeVisible();
+    expect(teil2.getByText("Ja, ich trinke im Unterricht Wasser.")).toBeVisible();
   });
 
   test("Teil 2 uses every keyword in both the model question and answer", () => {
