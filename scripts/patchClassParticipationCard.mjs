@@ -8,11 +8,18 @@ const accountPath = path.join(root, "web/src/components/AccountSettings.js");
 let home = fs.readFileSync(homePath, "utf8");
 let account = fs.readFileSync(accountPath, "utf8");
 
-// Remove the previous Home injection if this patch has already run in the
-// current worktree. Class Participation belongs under Account now.
+// Class Participation should not become another permanent Home or Campus nav
+// destination. Home owns the short summary, while Account can deep-link into a
+// dedicated participation view.
 home = home
   .replace('\nimport ClassParticipationCard from "./ClassParticipationCard";', "")
   .replace("\n\n      <ClassParticipationCard />", "");
+
+// Remove the previous Student Data injection when this patch is re-run in an
+// already-patched worktree, then rebuild the intended dedicated view.
+account = account
+  .replace('\nimport ClassParticipationCard from "./ClassParticipationCard";', "")
+  .replace('\n\n      {activeTab === "studentData" ? <ClassParticipationCard /> : null}', "");
 
 const replaceAccountOnce = (before, after, label) => {
   if (account.includes(after)) return;
@@ -26,22 +33,94 @@ replaceAccountOnce(
   "Account Class Participation import",
 );
 
+const activeTabBefore = `  const [activeTab, setActiveTab] = useState(() =>
+    new URLSearchParams(window.location.search).get("tab") === "billing" ? "billing" : "studentData"
+  );`;
+const activeTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    return ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
+      ? requestedTab
+      : "studentData";
+  });
+
+  const selectAccountTab = (tabKey) => {
+    setActiveTab(tabKey);
+    const params = new URLSearchParams(window.location.search);
+    if (tabKey === "studentData") params.delete("tab");
+    else params.set("tab", tabKey);
+    const nextSearch = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      \`${window.location.pathname}\${nextSearch ? \`?\${nextSearch}\` : ""}\${window.location.hash || ""}\`
+    );
+  };`;
+replaceAccountOnce(activeTabBefore, activeTabAfter, "Account participation deep-link state");
+
 replaceAccountOnce(
-  '      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}',
-  '      {activeTab === "studentData" ? <ClassParticipationCard /> : null}\n\n      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}',
-  "Account Class Participation card",
+  '            onClick={() => setActiveTab(tab.key)}',
+  '            onClick={() => selectAccountTab(tab.key)}',
+  "Account tab URL state",
 );
 
+const studentDataFooterBefore = `        <p style={{ ...styles.helperText, margin: 0 }}>
+          Biography editing has moved to the Class Members tab so it is easier to find.
+        </p>
+      </section>`;
+const studentDataFooterAfter = `        <p style={{ ...styles.helperText, margin: 0 }}>
+          Biography editing has moved to the Class Members tab so it is easier to find.
+        </p>
+
+        <div style={{ ...styles.card, margin: "14px 0 0", background: "#f8fafc", border: "1px solid #c7d2fe" }}>
+          <h3 style={{ margin: "0 0 4px" }}>Class Participation</h3>
+          <p style={{ ...styles.helperText, margin: "0 0 10px" }}>
+            Review your teacher-recorded class responses, correct answers and areas that need revision.
+          </p>
+          <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>
+            View class participation
+          </button>
+        </div>
+      </section>`;
+replaceAccountOnce(studentDataFooterBefore, studentDataFooterAfter, "Student Data participation entry point");
+
+replaceAccountOnce(
+  '      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}',
+  `      {activeTab === "participation" ? (
+        <section style={{ display: "grid", gap: 12 }} aria-label="Class Participation details">
+          <div>
+            <button type="button" style={styles.backTextLink} onClick={() => selectAccountTab("studentData")}>
+              <span aria-hidden="true">←</span> Back to Student Data
+            </button>
+          </div>
+          <ClassParticipationCard />
+        </section>
+      ) : null}
+
+      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}`,
+  "Dedicated Account Class Participation view",
+);
+
+const requiredMarkers = [
+  'import ClassParticipationCard from "./ClassParticipationCard";',
+  'requestedTab',
+  '"participation"',
+  'View class participation',
+  'activeTab === "participation"',
+  'Back to Student Data',
+];
+requiredMarkers.forEach((marker) => {
+  if (!account.includes(marker)) throw new Error(`Class Participation Account marker missing: ${marker}`);
+});
 if (home.includes("<ClassParticipationCard />")) {
-  throw new Error("Class Participation is still mounted on the Falowen homepage.");
+  throw new Error("Class Participation detail card is still mounted on the Falowen homepage.");
 }
-if (!account.includes('import ClassParticipationCard from "./ClassParticipationCard";')) {
-  throw new Error("Class Participation import is missing from Account.");
+if (account.includes('{activeTab === "studentData" ? <ClassParticipationCard /> : null}')) {
+  throw new Error("Class Participation detail card is still embedded directly in Student Data.");
 }
-if (!account.includes('{activeTab === "studentData" ? <ClassParticipationCard /> : null}')) {
-  throw new Error("Class Participation is missing from the Account Student Data tab.");
+if (account.includes('{ key: "participation", label:')) {
+  throw new Error("Class Participation must not consume an Account tab slot.");
 }
 
 fs.writeFileSync(homePath, home, "utf8");
 fs.writeFileSync(accountPath, account, "utf8");
-console.log("Student Class Participation moved from Falowen Home to Account > Student Data.");
+console.log("Class Participation now has a dedicated Account view without adding permanent navigation space.");
