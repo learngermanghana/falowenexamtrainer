@@ -1,4 +1,5 @@
 import { courseSchedules } from "../data/courseSchedule";
+import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 import { findCourseBookEntry } from "./courseBookEntries";
 import { addA1WorkbookHubBypass, addCompletedRadioToWorkbookRoute } from "./lessonRouteEntry";
 
@@ -72,7 +73,13 @@ const patchWorkbookRoute = (resource = null, search = "", directWorkbookRoute = 
 
 const preserveCompletedRadioOnEntry = (entry = null, search = "") => {
   if (!entry) return entry;
-  const rawWorkbookRoute = entry.workbookRoute || entry.workbook_link || "";
+  // Schedules can be initialized before Radio completes. Resolve the destination
+  // from lesson identity instead of reusing that browser-dependent snapshot.
+  const rawWorkbookRoute = getConfiguredInAppWorkbookResourceRoute({
+    level: "A1",
+    day: entry.displayDay ?? entry.day,
+    chapter: entry.displayChapter || entry.chapter,
+  }) || entry.workbookRoute || entry.workbook_link || "";
   const scheduleLesson = {
     ...entry,
     id: getScheduleLessonIdentity(entry),

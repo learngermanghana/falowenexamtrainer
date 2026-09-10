@@ -1,3 +1,4 @@
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
   getTeacherLectureVideoResources,
   hasTeacherLectureVideoResources,
@@ -488,7 +489,9 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);
 
-  const configuredTeacherVideos = getTeacherLectureVideoResources(normalizedLevel, dayKey);
+  const configuredTeacherVideos = normalizedLevel === "A1"
+    ? getA1TeacherVideoResources(dayKey)
+    : getTeacherLectureVideoResources(normalizedLevel, dayKey);
   const explicitResources = entries.flatMap((resource) =>
     normalizeVideoResources(resource),
   );
@@ -503,8 +506,12 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const allResources = uniqueVideoResources(
     configuredTeacherVideos,
     fallbackGenericLessonVideos,
-    explicitResources,
-    dictionaryResources,
+    explicitResources.filter((resource) => !configuredTeacherVideos.some(
+      (teacher) => isTeacherVideoResource(resource) && String(teacher.chapter || "") === String(resource.chapter || ""),
+    )),
+    dictionaryResources.filter((resource) => !configuredTeacherVideos.some(
+      (teacher) => isTeacherVideoResource(resource) && String(teacher.chapter || "") === String(resource.chapter || ""),
+    )),
   );
   const visibleResources = showTeacherVideos
     ? allResources
