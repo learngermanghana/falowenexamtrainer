@@ -503,15 +503,15 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const fallbackGenericLessonVideos = dictionaryHasTeacherVideo
     ? genericLessonVideos.filter((resource) => !isTeacherVideoResource(resource))
     : genericLessonVideos;
+  const isSupersededTeacherResource = (resource) =>
+    isTeacherVideoResource(resource) && configuredTeacherVideos.some(
+      (teacher) => String(teacher.chapter || "") === String(resource.chapter || ""),
+    );
   const allResources = uniqueVideoResources(
     configuredTeacherVideos,
-    fallbackGenericLessonVideos,
-    explicitResources.filter((resource) => !configuredTeacherVideos.some(
-      (teacher) => isTeacherVideoResource(resource) && String(teacher.chapter || "") === String(resource.chapter || ""),
-    )),
-    dictionaryResources.filter((resource) => !configuredTeacherVideos.some(
-      (teacher) => isTeacherVideoResource(resource) && String(teacher.chapter || "") === String(resource.chapter || ""),
-    )),
+    fallbackGenericLessonVideos.filter((resource) => !isSupersededTeacherResource(resource)),
+    explicitResources.filter((resource) => !isSupersededTeacherResource(resource)),
+    dictionaryResources.filter((resource) => !isSupersededTeacherResource(resource)),
   );
   const visibleResources = showTeacherVideos
     ? allResources
