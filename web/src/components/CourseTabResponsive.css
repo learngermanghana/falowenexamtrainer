@@ -46,6 +46,47 @@
   white-space: nowrap;
 }
 
+.course-book .course-book-section-summary {
+  flex-wrap: wrap;
+  min-height: 48px;
+  padding: 12px 0;
+  border-top: 2px solid #bfdbfe;
+}
+
+.course-book .course-book-section-summary h3 {
+  font-size: 17px !important;
+  line-height: 1.4;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.course-book-section-days {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.course-book-section-intro {
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  background: #eff6ff;
+  color: #334155;
+  padding: 16px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.course-book-section-intro h4 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: #1e3a8a;
+}
+
+.course-book-section-intro p {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
 @media (max-width: 680px) {
   .a2-b1-course-book {
     padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important;
