@@ -42,6 +42,18 @@ const COURSE_BOOK_FILTERS = [
   { key: "selfLearning", label: "Self-learning" },
 ];
 
+// Presentation sections within A1; these are not enrollment or assessment levels.
+const A1_COURSE_BOOK_SECTIONS = [
+  { key: "orientation", title: "Orientation", days: "Day 0", firstDay: 0, lastDay: 0 },
+  { key: "a1-1", title: "A1.1 – Foundations", days: "Days 1–12", firstDay: 1, lastDay: 12 },
+  { key: "a1-2", title: "A1.2 – Application and Readiness", days: "Days 13–24", firstDay: 13, lastDay: 24 },
+];
+
+const getA1CourseBookSection = (entry) => {
+  const day = Number(entry.displayDay ?? entry.day);
+  return A1_COURSE_BOOK_SECTIONS.find(({ firstDay, lastDay }) => day >= firstDay && day <= lastDay);
+};
+
 const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
@@ -771,8 +783,21 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     [decoratedSchedule, searchTerm, activeFilter, nextLesson]
   );
 
-  const groupedLessons = useMemo(() => groupLessonsByWeek(visibleLessons), [visibleLessons]);
-  const weekEntries = Object.entries(groupedLessons);
+  const groupedLessons = useMemo(() => {
+    if (!isA1CourseBook) return groupLessonsByWeek(visibleLessons);
+    return visibleLessons.reduce((groups, entry) => {
+      const section = getA1CourseBookSection(entry);
+      const key = section?.key || "Course completion";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(entry);
+      return groups;
+    }, {});
+  }, [isA1CourseBook, visibleLessons]);
+  const weekEntries = Object.entries(groupedLessons).map(([label, lessons]) => [
+    label,
+    lessons,
+    isA1CourseBook ? A1_COURSE_BOOK_SECTIONS.find(({ key }) => key === label) : null,
+  ]);
 
   const persistPracticeProgress = async (entry, nextValue) => {
     const assignmentKey = entry?.assignmentKey;
@@ -1065,20 +1090,35 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
           {weekEntries.length ? (
             <div style={{ display: "grid", gap: 14 }}>
-              {weekEntries.map(([weekLabel, lessons]) => (
+              {weekEntries.map(([weekLabel, lessons, section]) => (
                 <details
                   key={weekLabel}
                   className="course-book-week"
+                  data-a1-course-section={section?.key}
                   open={!usesSharedA2B1Design || !lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress))}
                   style={courseBookStyles.weekSection}
                 >
-                  <summary className="course-book-week-summary" style={courseBookStyles.weekHeader}>
-                    <h3 style={courseBookStyles.weekTitle}>{weekLabel}</h3>
+                  <summary className={`course-book-week-summary${section ? " course-book-section-summary" : ""}`} style={courseBookStyles.weekHeader}>
+                    <h3 style={courseBookStyles.weekTitle}>{section?.title || weekLabel}</h3>
                     <div style={courseBookStyles.weekLine} />
+                    {section ? <span className="course-book-section-days">{section.days}</span> : null}
                     {usesSharedA2B1Design && lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress)) ? (
                       <span className="course-book-week-complete">Completed · tap to review</span>
                     ) : null}
                   </summary>
+                  {section?.key === "a1-2" && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === 13) ? (
+                    <div className="course-book-section-intro">
+                      <h4>Welcome to A1.2</h4>
+                      <p>
+                        Day 13 begins the second half of your A1 course with revision of numbers, time and prices.
+                        Build on the foundations from Days 1–12, combine your vocabulary and grammar, and practise
+                        communicating more independently as you prepare for the A1 exam and future A2 study.
+                      </p>
+                      <p>
+                        After the final Conjunctions lesson on Day 24, continue in the Exam Room for focused exam preparation.
+                      </p>
+                    </div>
+                  ) : null}
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
