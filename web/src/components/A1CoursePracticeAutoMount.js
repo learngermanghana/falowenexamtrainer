@@ -11,6 +11,7 @@ import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
 import SelfLearningJourneyGate from "./selfLearning/SelfLearningJourneyGate";
 import { isTeacherLectureResource } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { getA1RadioResource } from "../data/a1RadioResources";
+import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResources";
 import {
   A1_CANONICAL_LESSON_CATALOG,
   getA1CanonicalLessonForLegacyRoute,
@@ -19,8 +20,6 @@ import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
 
 const A1_DAY_19_AI_VIDEO_URL = "https://youtu.be/gprnEZtMUPM";
-const A1_DAY_19_TEACHER_VIDEO_URL = "https://youtu.be/ZfXw4fRQ0Tg";
-const A1_DAY_12_TEACHER_VIDEO_URL = "https://youtu.be/qj7IsPqBnfE";
 const A1_SELF_LEARNING_PRACTICES = A1_CANONICAL_LESSON_CATALOG.filter(
   (lesson) => lesson.kind === "practice",
 );
@@ -116,14 +115,9 @@ const scopeA1PracticeLesson = (practice) => {
 export const getA1SelfLearningJourneyResources = (practice) => {
   const normalized = normalizeLesson(scopeA1PracticeLesson(practice), "A1");
   const videos = normalized?.resources?.videos || [];
-  const teacherVideo = videos.find(isTeacherLectureResource)
-    || (Number(practice.day) === 19
-      ? {
-          url: A1_DAY_19_TEACHER_VIDEO_URL,
-          title: "Goethe A1 Speaking Confidence Lab · Teacher lecture",
-          description: "Recorded teacher explanation for the Day 19 speaking lesson.",
-        }
-      : null);
+  const teacherVideo = getCanonicalA1TeacherVideoResource(practice.day, practice.chapter)
+    || videos.find(isTeacherLectureResource)
+    || null;
   const aiVideo = videos.find((video) => !isTeacherLectureResource(video))
     || (Number(practice.day) === 19
       ? {
@@ -160,8 +154,11 @@ const prepareLetterGrammarPage = () => {
     const label = String(link.textContent || "").trim();
     return href.includes("youtu.be/") && /video öffnen/i.test(label);
   });
+  const canonicalTeacherVideo = getCanonicalA1TeacherVideoResource(20, "12.3");
 
-  if (teacherVideoLink) teacherVideoLink.setAttribute("href", A1_DAY_12_TEACHER_VIDEO_URL);
+  if (teacherVideoLink && canonicalTeacherVideo?.url) {
+    teacherVideoLink.setAttribute("href", canonicalTeacherVideo.url);
+  }
 };
 
 const insertPracticeMount = (container, mount) => {
