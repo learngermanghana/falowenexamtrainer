@@ -56,16 +56,46 @@ replaceOnce(
   "Home metrics participation result",
 );
 
+const compactParticipationCard = `        <StatCard
+          label="Class participation"
+          value={
+            participationSummary.classesRecorded > 0
+              ? participationSummary.participated + "/" + participationSummary.classesRecorded + " classes"
+              : "No class responses yet"
+          }
+          helper={
+            participationSummary.classesRecorded > 0
+              ? participationSummary.responses + " responses · " + participationSummary.needsReview + " to review"
+              : "Teacher-recorded responses will appear here."
+          }
+          tone={participationSummary.needsReview > 0 ? "warning" : "success"}
+          footer={
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, padding: "7px 10px", justifySelf: "start" }}
+              onClick={() => navigate("/campus/account?tab=participation")}
+            >
+              View participation →
+            </button>
+          }
+        />
+`;
+
+// Avoid duplicating the current compact injection if a local patch chain is run twice.
+source = source.replace(compactParticipationCard, "");
 replaceOnce(
   '        <StatCard\n          label={t("homeMetrics.nextRecommendation.label")}',
-  '        <StatCard\n          label="Class participation"\n          value={\n            participationSummary.classesRecorded > 0\n              ? `${participationSummary.participated}/${participationSummary.classesRecorded} classes`\n              : "No class responses yet"\n          }\n          helper={\n            participationSummary.classesRecorded > 0\n              ? `${participationSummary.responses} responses · ${participationSummary.correct} correct · ${participationSummary.needsReview} to review`\n              : "Teacher-recorded class responses will appear here."\n          }\n          tone="success"\n        />\n        <StatCard\n          label={t("homeMetrics.nextRecommendation.label")}',
-  "Home metrics participation card",
+  `${compactParticipationCard}        <StatCard\n          label={t("homeMetrics.nextRecommendation.label")}`,
+  "compact Home participation card",
 );
 
 const requiredMarkers = [
   'fetchMyClassParticipation, summarizeClassParticipation',
   'label="Class participation"',
   'participationSummary.responses',
+  'participationSummary.needsReview',
+  '/campus/account?tab=participation',
+  'View participation →',
   'setLeaderboard(null);',
 ];
 requiredMarkers.forEach((marker) => {
@@ -74,6 +104,9 @@ requiredMarkers.forEach((marker) => {
 if (source.includes('setLeaderboard(scoreResponse?.leaderboard || null)')) {
   throw new Error("Home still enables the leaderboard panel.");
 }
+if (source.includes('participationSummary.correct} correct')) {
+  throw new Error("Home Class Participation is still showing detail that belongs in the dedicated view.");
+}
 
 fs.writeFileSync(targetPath, source, "utf8");
-console.log("Home metrics now include Class Participation and no longer expose the leaderboard panel.");
+console.log("Home now shows a compact Class Participation summary with a dedicated-details link.");
