@@ -56,31 +56,16 @@ replaceOnce(
   "Home metrics participation result",
 );
 
-const legacyParticipationCard = `        <StatCard
-          label="Class participation"
-          value={
-            participationSummary.classesRecorded > 0
-              ? \`${participationSummary.participated}/${participationSummary.classesRecorded} classes\`
-              : "No class responses yet"
-          }
-          helper={
-            participationSummary.classesRecorded > 0
-              ? \`${participationSummary.responses} responses · ${participationSummary.correct} correct · ${participationSummary.needsReview} to review\`
-              : "Teacher-recorded class responses will appear here."
-          }
-          tone="success"
-        />
-`;
 const compactParticipationCard = `        <StatCard
           label="Class participation"
           value={
             participationSummary.classesRecorded > 0
-              ? \`${participationSummary.participated}/${participationSummary.classesRecorded} classes\`
+              ? participationSummary.participated + "/" + participationSummary.classesRecorded + " classes"
               : "No class responses yet"
           }
           helper={
             participationSummary.classesRecorded > 0
-              ? \`${participationSummary.responses} responses · ${participationSummary.needsReview} to review\`
+              ? participationSummary.responses + " responses · " + participationSummary.needsReview + " to review"
               : "Teacher-recorded responses will appear here."
           }
           tone={participationSummary.needsReview > 0 ? "warning" : "success"}
@@ -96,8 +81,8 @@ const compactParticipationCard = `        <StatCard
         />
 `;
 
-// Remove either previous injection before placing the current compact version.
-source = source.replace(legacyParticipationCard, "").replace(compactParticipationCard, "");
+// Avoid duplicating the current compact injection if a local patch chain is run twice.
+source = source.replace(compactParticipationCard, "");
 replaceOnce(
   '        <StatCard\n          label={t("homeMetrics.nextRecommendation.label")}',
   `${compactParticipationCard}        <StatCard\n          label={t("homeMetrics.nextRecommendation.label")}`,
