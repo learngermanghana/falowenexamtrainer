@@ -265,6 +265,19 @@ const addMissingA1TeacherVideos = ({ level, day, videos = [], groups = [] }) => 
   return mergeVideos(primaryTeacherVideos, videos, supplementalTeacherVideos);
 };
 
+const enforceCanonicalA1TeacherVideos = ({ level, day, videos = [] }) => {
+  if (level !== "A1") return videos;
+  const canonicalTeacherVideos = getA1TeacherVideoResources(day);
+  if (!canonicalTeacherVideos.length) return videos;
+
+  // The A1 teacher registry is authoritative. Any teacher lecture copied into
+  // courseSchedule, a page component, or another video dictionary is stale as
+  // soon as the registry is updated, so remove it and re-add the current
+  // canonical entries. Non-teacher/AI videos remain untouched.
+  const nonTeacherVideos = videos.filter((video) => !isTeacherVideo(video));
+  return mergeVideos(canonicalTeacherVideos, nonTeacherVideos);
+};
+
 const shouldKeepTeacherVideo = ({ level, day, video }) => {
   if (!isTeacherVideo(video)) return true;
   if (["A2", "B1"].includes(level)) {
@@ -320,8 +333,13 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
     videos: preferredConfiguredVideos,
     groups,
   });
+  const authoritativeVideos = enforceCanonicalA1TeacherVideos({
+    level,
+    day,
+    videos: allVideos,
+  });
   const chapterScopedVideos = scopeLessonVideosToSelectedChapters(
-    removeHiddenTeacherVideos(level, day, allVideos),
+    removeHiddenTeacherVideos(level, day, authoritativeVideos),
     groups,
   );
   const videos = applyLessonHubVideoPolicy({ level, rawLesson, videos: chapterScopedVideos });
