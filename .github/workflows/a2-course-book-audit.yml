@@ -1,0 +1,41 @@
+name: A2 Course Book audit
+
+on:
+  pull_request:
+    paths:
+      - "shared/curriculumCanonical.json"
+      - "web/src/data/a2CurriculumAlignment.js"
+      - "web/src/data/a2Day*CourseBookAudit.test.js"
+      - "web/src/data/a2GrammarRoutes.js"
+      - "web/src/data/additionalA2RadioEntries.js"
+      - "web/src/data/curriculumManifest.js"
+      - "web/src/data/courseSchedule.js"
+      - "web/src/data/inAppWorkbookRoutes.json"
+      - "web/src/data/inAppWorkbookRoutes.js"
+      - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2StarterConjunctionsPage.js"
+      - "web/src/components/A2Day1RadioRegression.test.js"
+      - "web/src/components/A2SharedWorkbookRegression.test.js"
+      - ".github/workflows/a2-course-book-audit.yml"
+
+jobs:
+  a2-course-book:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test A2 Course Book audit regressions
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/data/a2Day1CourseBookAudit.test.js src/components/A2Day1RadioRegression.test.js src/components/A2SharedWorkbookRegression.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build
