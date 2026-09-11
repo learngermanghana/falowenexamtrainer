@@ -47,3 +47,4 @@ jobs:
           npx jest --runInBand
           src/data/b1Days1To6CourseBookAudit.test.js
           src/data/b1Days7To12CourseBookAudit.test.js
+          src/data/b1Days17To22CourseBookAudit.test.js
