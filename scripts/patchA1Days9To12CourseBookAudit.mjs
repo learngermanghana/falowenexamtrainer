@@ -42,7 +42,7 @@ replaceOnce(
 replaceOnce(
   "web/src/components/A1Day11UnderstandingTimeWorkbookPage.js",
   'submitDescription="This submission box is locked to A1-7, so students can send their final Chapter 7 answers from this workbook."',
-  'submitDescription="Complete both required Teile, then send your final Chapter 7 answers here once."',
+  'submitDescription="Submit your completed Chapter 7 answers here when both Teile are finished."',
   "Day 11 learner-facing submit description",
 );
 
