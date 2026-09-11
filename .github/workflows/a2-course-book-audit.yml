@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "shared/curriculumCanonical.json"
+      - "scripts/applyA1RouteAlignment.js"
       - "web/src/data/a2CurriculumAlignment.js"
       - "web/src/data/a2Day*CourseBookAudit.test.js"
       - "web/src/data/a2Days*CourseBookAudit.test.js"
@@ -14,6 +15,7 @@ on:
       - "web/src/data/inAppWorkbookRoutes.json"
       - "web/src/data/inAppWorkbookRoutes.js"
       - "web/src/components/A2Day*Workbook*.js"
+      - "web/src/components/A2StandardTabbedWorkbookPage.js"
       - "web/src/components/A2StarterConjunctionsPage.js"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
@@ -32,11 +34,13 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Regenerate curriculum manifest
+        run: npm run sync:curriculum
       - name: Test A2 Course Book audit regressions
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/a2Day1CourseBookAudit.test.js src/data/a2Days1To6CourseBookAudit.test.js src/components/A2Day1RadioRegression.test.js src/components/A2SharedWorkbookRegression.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/a2Day1CourseBookAudit.test.js src/data/a2Days1To12CourseBookAudit.test.js src/components/A2Day1RadioRegression.test.js src/components/A2SharedWorkbookRegression.test.js
       - name: Build web app
         working-directory: web
         run: npm run build
