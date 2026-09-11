@@ -195,14 +195,15 @@ const Teil3Content = () => (
         <li>Was schlagen Sie vor?</li>
       </ul>
       <p style={{ marginBottom: 6 }}>
-        <strong>Introduction tip (canceling an exam appointment):</strong>{" "}
-        Always use this reason when canceling an exam appointment: Ich schreibe Ihnen, weil ich den Termin absagen möchte.
+        <strong>Introduction tip:</strong>{" "}
+        This is an informal email to Bina. A clear opening is: <strong>Ich schreibe dir, weil ich leider nicht zu deiner Hochzeit kommen kann.</strong>
       </p>
       <p style={{ marginBottom: 6 }}>
-        <strong>Request tip (English):</strong> Use this request: Könnten wir einen anderen Termin vereinbaren?
+        <strong>Suggestion tip:</strong>{" "}
+        End with a simple suggestion, for example: <strong>Vielleicht können wir uns nächste Woche treffen.</strong>
       </p>
       <p style={{ marginBottom: 0 }}>
-        <strong>Body tip:</strong> Schreiben Sie im Hauptteil über das Wetter (z. B. starker Regen, Sturm oder Schnee) als Grund.
+        <strong>Weather tip:</strong> Give one concrete weather reason in the main part, for example <strong>starker Regen</strong>, <strong>ein Sturm</strong> or <strong>viel Schnee</strong>.
       </p>
     </div>
     <A1CourseBookLetterPracticePanel

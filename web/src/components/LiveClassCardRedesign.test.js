@@ -186,6 +186,6 @@ describe("live class card UI protection", () => {
     expect(patch).toContain('announcementEffectsStart');
     expect(patch).toContain('source.includes("fetchAnnouncements(")');
     expect(patch).toContain('source.includes("announcementStatus")');
-    expect(patch).toContain('unused announcement loading are removed');
+    expect(patch).toContain('long calendar and unused announcements are removed');
   });
 });

@@ -1,938 +1,337 @@
 import React, { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
-
 import { styles } from "../styles";
 
-/** =========================
- *  Helpers
- *  ========================= */
-const normalizeAnswer = (value) => String(value || "").trim().toLowerCase();
-
-const getChoiceButtonStyle = ({ selected, checked, isCorrectChoice, isWrongChoice }) => {
-  if (checked && isCorrectChoice) {
-    return {
-      ...styles.secondaryButton,
-      width: "fit-content",
-      borderColor: "#15803d",
-      background: "#dcfce7",
-      color: "#166534",
-      fontWeight: 700,
-    };
-  }
-
-  if (checked && isWrongChoice) {
-    return {
-      ...styles.secondaryButton,
-      width: "fit-content",
-      borderColor: "#dc2626",
-      background: "#fee2e2",
-      color: "#991b1b",
-      fontWeight: 700,
-    };
-  }
-
-  return {
-    ...styles.secondaryButton,
-    width: "fit-content",
-    borderColor: selected ? "#111827" : undefined,
-    background: selected ? "#f3f4f6" : undefined,
-    fontWeight: selected ? 700 : 500,
-  };
+const card = {
+  ...styles.card,
+  display: "grid",
+  gap: 12,
+  border: "1px solid #e2e8f0",
+  borderRadius: 18,
 };
 
-const getSelectStyle = ({ checked, isCorrect, isWrong }) => {
-  if (checked && isCorrect) {
-    return {
-      padding: "8px 10px",
-      borderRadius: 10,
-      border: "1px solid #15803d",
-      background: "#dcfce7",
-      color: "#166534",
-      fontWeight: 700,
-    };
-  }
-
-  if (checked && isWrong) {
-    return {
-      padding: "8px 10px",
-      borderRadius: 10,
-      border: "1px solid #dc2626",
-      background: "#fee2e2",
-      color: "#991b1b",
-      fontWeight: 700,
-    };
-  }
-
-  return {
-    padding: "8px 10px",
-    borderRadius: 10,
-    border: "1px solid #e5e7eb",
-    background: "#fff",
-  };
-};
-
-/** =========================
- *  Reusable UI bits
- *  ========================= */
-const Section = ({ title, children }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }} aria-label={title}>
-    <h2 style={{ margin: 0 }}>{title}</h2>
+const Section = ({ title, eyebrow, children }) => (
+  <section style={card}>
+    <div style={{ display: "grid", gap: 4 }}>
+      {eyebrow ? (
+        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#475569" }}>
+          {eyebrow}
+        </span>
+      ) : null}
+      <h2 style={{ margin: 0 }}>{title}</h2>
+    </div>
     {children}
   </section>
 );
 
-const BulletList = ({ items }) => (
-  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-    {items.map((item, index) => (
-      <li key={`${item}-${index}`}>{item}</li>
-    ))}
-  </ul>
-);
-
-const TopicImageBreak = ({ src, alt, title, subtitle }) => (
-  <div style={{ ...styles.card, padding: 0, overflow: "hidden" }} aria-label={title || "Topic image"}>
-    <img
-      src={src}
-      alt={alt}
-      style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
-      loading="lazy"
-    />
-    {(title || subtitle) && (
-      <div style={{ padding: 12, display: "grid", gap: 4 }}>
-        {title && <div style={{ fontWeight: 900 }}>{title}</div>}
-        {subtitle && <div style={{ opacity: 0.85 }}>{subtitle}</div>}
-      </div>
-    )}
-  </div>
-);
-
-/** =========================
- *  Visual scene card
- *  ========================= */
-const SceneCard = ({ label, emojiLine1, emojiLine2, helper }) => (
-  <div
-    style={{
-      border: "1px solid #dbe4f0",
-      borderRadius: 14,
-      background: "#f8fafc",
-      padding: 14,
-      display: "grid",
-      gap: 8,
-    }}
-  >
-    <div style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>{label}</div>
-    <div
-      style={{
-        minHeight: 86,
-        borderRadius: 12,
-        background: "#ffffff",
-        border: "1px solid #e5e7eb",
-        display: "grid",
-        alignItems: "center",
-        justifyItems: "center",
-        padding: 12,
-        textAlign: "center",
-      }}
-    >
-      <div style={{ fontSize: 32, lineHeight: 1.25 }}>{emojiLine1}</div>
-      {emojiLine2 ? <div style={{ fontSize: 32, lineHeight: 1.25 }}>{emojiLine2}</div> : null}
-    </div>
-    {helper ? <div style={{ fontSize: 13, opacity: 0.75 }}>{helper}</div> : null}
-  </div>
-);
-
-/** =========================
- *  Free-to-use images
- *  ========================= */
-const IMG_NOTEBOOK =
-  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
-const IMG_DIRECTIONS =
-  "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
-const IMG_SIGNPOST =
-  "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
-
-const PREPOSITION_OPTIONS = ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"];
-
-const PREPOSITIONS = [
-  "an = on / at (attached contact, side, edge)",
-  "auf = on top of",
-  "hinter = behind",
-  "in = in / into",
-  "neben = next to / beside",
-  "über = above / over",
-  "unter = under / below",
-  "vor = in front of / before",
-  "zwischen = between",
-];
-
-const examplePairs = [
-  ["in", "Ich gehe in die Schule.", "I go into the school.", "Ich bin in der Schule.", "I am in the school."],
-  ["auf", "Er legt das Buch auf den Tisch.", "He puts the book onto the table.", "Das Buch liegt auf dem Tisch.", "The book is lying on the table."],
-  ["an", "Sie hängt das Bild an die Wand.", "She hangs the picture onto the wall.", "Das Bild hängt an der Wand.", "The picture is hanging on the wall."],
-  ["unter", "Der Hund läuft unter den Tisch.", "The dog runs under the table.", "Der Hund liegt unter dem Tisch.", "The dog is lying under the table."],
-  ["zwischen", "Ich stelle den Stuhl zwischen die Tische.", "I put the chair between the tables.", "Der Stuhl steht zwischen den Tischen.", "The chair is standing between the tables."],
-];
-
-const visualGame = [
+const pairRows = [
   {
-    label: "Cat on the table",
-    emojiLine1: "🐱  ON TOP  🟫",
-    emojiLine2: "Tisch / table",
-    helper: "The cat is on top of the table.",
-    sentence: "Die Katze ist ______ dem Tisch.",
-    answer: "auf",
+    preposition: "in",
+    wohin: "Ich gehe in die Schule.",
+    wo: "Ich bin in der Schule.",
+    note: "die Schule → Akkusativ: die / Dativ: der",
   },
   {
-    label: "Cat under the table",
-    emojiLine1: "🟫 Tisch / table",
-    emojiLine2: "⬇️  🐱",
-    helper: "The cat is under the table.",
-    sentence: "Die Katze ist ______ dem Tisch.",
-    answer: "unter",
+    preposition: "auf",
+    wohin: "Ich lege das Buch auf den Tisch.",
+    wo: "Das Buch liegt auf dem Tisch.",
+    note: "der Tisch → Akkusativ: den / Dativ: dem",
   },
   {
-    label: "School between two places",
-    emojiLine1: "🏦  ←  🏫  →  📚",
-    emojiLine2: "Bank   Schule   Bibliothek",
-    helper: "The school is between the bank and the library.",
-    sentence: "Die Schule ist ______ der Bank und der Bibliothek.",
-    answer: "zwischen",
+    preposition: "an",
+    wohin: "Ich hänge das Bild an die Wand.",
+    wo: "Das Bild hängt an der Wand.",
+    note: "die Wand → Akkusativ: die / Dativ: der",
   },
   {
-    label: "Put the bag onto the table",
-    emojiLine1: "🎒  ➡️  🟫",
-    emojiLine2: "onto the table",
-    helper: "I put the bag onto the table. This shows movement: Wohin?",
-    sentence: "Ich lege die Tasche ______ den Tisch.",
-    answer: "auf",
+    preposition: "unter",
+    wohin: "Der Hund läuft unter den Tisch.",
+    wo: "Der Hund liegt unter dem Tisch.",
+    note: "der Tisch → Akkusativ: den / Dativ: dem",
   },
   {
-    label: "Boy in front of the tree",
-    emojiLine1: "👦  FRONT  🌳",
-    emojiLine2: "in front of the tree",
-    helper: "The boy is in front of the tree.",
-    sentence: "Der Junge steht ______ dem Baum.",
-    answer: "vor",
-  },
-  {
-    label: "Car behind the house",
-    emojiLine1: "🏠  HOUSE",
-    emojiLine2: "⬇️ behind the house: 🚗",
-    helper: "The car is behind the house.",
-    sentence: "Das Auto steht ______ dem Haus.",
-    answer: "hinter",
-  },
-  {
-    label: "Lamp attached to the door",
-    emojiLine1: "🚪  +  💡",
-    emojiLine2: "attached to the door",
-    helper: "The lamp is attached to the door.",
-    sentence: "Die Lampe hängt ______ der Tür.",
-    answer: "an",
-  },
-  {
-    label: "Dog next to the sofa",
-    emojiLine1: "🐶  ↔️  🛋",
-    emojiLine2: "next to the sofa",
-    helper: "The dog is sitting next to the sofa.",
-    sentence: "Der Hund sitzt ______ dem Sofa.",
-    answer: "neben",
-  },
-  {
-    label: "Box in the room",
-    emojiLine1: "🏠  📦  🏠",
-    emojiLine2: "inside the room",
-    helper: "The box is in the room.",
-    sentence: "Die Kiste ist ______ dem Zimmer.",
-    answer: "in",
+    preposition: "zwischen",
+    wohin: "Ich stelle den Stuhl zwischen die Tische.",
+    wo: "Der Stuhl steht zwischen den Tischen.",
+    note: "Plural: Akkusativ die / Dativ den (+n when needed)",
   },
 ];
 
-const practiceQuiz = [
-  { sentence: "Ich gehe in ___ Park.", choices: ["dem", "den", "der"], answer: "den" },
-  { sentence: "Ich bin in ___ Park.", choices: ["den", "dem", "der"], answer: "dem" },
-  { sentence: "Er stellt den Laptop auf ___ Tisch.", choices: ["den", "dem", "des"], answer: "den" },
-  { sentence: "Der Laptop steht auf ___ Tisch.", choices: ["dem", "den", "der"], answer: "dem" },
-  { sentence: "Wir setzen uns neben ___ Lehrer.", choices: ["dem", "den", "der"], answer: "den" },
-  { sentence: "Wir sitzen neben ___ Lehrer.", choices: ["den", "dem", "des"], answer: "dem" },
-  { sentence: "Sie hängt das Bild an ___ Wand.", choices: ["der", "die", "den"], answer: "die" },
+const quiz = [
+  {
+    prompt: "Ich gehe in ___ Park.",
+    options: ["den", "dem", "der"],
+    answer: "den",
+    explanation: "Wohin? There is movement to a destination, so use Akkusativ: der Park → den Park.",
+  },
+  {
+    prompt: "Ich bin in ___ Park.",
+    options: ["den", "dem", "der"],
+    answer: "dem",
+    explanation: "Wo? This is a location, so use Dativ: der Park → dem Park.",
+  },
+  {
+    prompt: "Sie hängt das Bild an ___ Wand.",
+    options: ["die", "der", "dem"],
+    answer: "die",
+    explanation: "Wohin? The picture is being moved onto the wall: die Wand stays die in Akkusativ.",
+  },
+  {
+    prompt: "Das Bild hängt an ___ Wand.",
+    options: ["die", "der", "dem"],
+    answer: "der",
+    explanation: "Wo? The picture is already there: die Wand → der Wand in Dativ.",
+  },
+  {
+    prompt: "Wir setzen uns neben ___ Lehrer.",
+    options: ["den", "dem", "der"],
+    answer: "den",
+    explanation: "Wohin? setzen shows a change of position: der Lehrer → den Lehrer.",
+  },
+  {
+    prompt: "Wir sitzen neben ___ Lehrer.",
+    options: ["den", "dem", "der"],
+    answer: "dem",
+    explanation: "Wo? sitzen describes position: der Lehrer → dem Lehrer.",
+  },
 ];
 
-const anAufQuiz = [
-  {
-    sentence: "Das Bild hängt ___ der Wand.",
-    choices: ["an", "auf"],
-    answer: "an",
-    tip: "A picture is attached to a wall.",
-  },
-  {
-    sentence: "Das Buch liegt ___ dem Tisch.",
-    choices: ["an", "auf"],
-    answer: "auf",
-    tip: "A book rests on top of a table.",
-  },
-  {
-    sentence: "Die Jacke hängt ___ der Tür.",
-    choices: ["an", "auf"],
-    answer: "an",
-    tip: "The jacket hangs on the side of the door.",
-  },
-  {
-    sentence: "Die Tasche steht ___ dem Boden.",
-    choices: ["an", "auf"],
-    answer: "auf",
-    tip: "The bag stands on top of the floor.",
-  },
+const articles = [
+  ["Akkusativ", "den", "die", "das", "die"],
+  ["Dativ", "dem", "der", "dem", "den (+n)"],
 ];
 
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-};
+const TwoCasePrepositionsPageLegacy = () => {
+  const location = useLocation();
+  const [answers, setAnswers] = useState({});
+  const [showScore, setShowScore] = useState(false);
+  const workbookHref = `${location.pathname}?view=workbook`;
 
-const thStyle = {
-  border: "1px solid #e5e7eb",
-  padding: "8px 10px",
-  textAlign: "left",
-  background: "#f8fafc",
-};
-
-const tdStyle = {
-  border: "1px solid #e5e7eb",
-  padding: "8px 10px",
-};
-
-const TwoCasePrepositionsPage = () => {
-
-  const [choices, setChoices] = useState(() => visualGame.map(() => ""));
-  const [checked, setChecked] = useState(false);
-
-  const [practiceChoices, setPracticeChoices] = useState(() => practiceQuiz.map(() => ""));
-  const [practiceChecked, setPracticeChecked] = useState(false);
-
-  const [anAufChoices, setAnAufChoices] = useState(() => anAufQuiz.map(() => ""));
-  const [anAufChecked, setAnAufChecked] = useState(false);
-
-  const score = useMemo(() => {
-    if (!checked) return null;
-    let s = 0;
-    visualGame.forEach((q, i) => {
-      if (normalizeAnswer(choices[i]) === normalizeAnswer(q.answer)) s += 1;
-    });
-    return s;
-  }, [checked, choices]);
-
-  const practiceScore = useMemo(() => {
-    if (!practiceChecked) return null;
-    let s = 0;
-    practiceQuiz.forEach((q, i) => {
-      if (normalizeAnswer(practiceChoices[i]) === normalizeAnswer(q.answer)) s += 1;
-    });
-    return s;
-  }, [practiceChecked, practiceChoices]);
-
-  const anAufScore = useMemo(() => {
-    if (!anAufChecked) return null;
-    let s = 0;
-    anAufQuiz.forEach((q, i) => {
-      if (normalizeAnswer(anAufChoices[i]) === normalizeAnswer(q.answer)) s += 1;
-    });
-    return s;
-  }, [anAufChecked, anAufChoices]);
-
-  const onChangeChoice = (index, value) => {
-    setChoices((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-    setChecked(false);
-  };
-
-  const onChangePracticeChoice = (index, value) => {
-    setPracticeChoices((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-    setPracticeChecked(false);
-  };
-
-  const onChangeAnAufChoice = (index, value) => {
-    setAnAufChoices((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-    setAnAufChecked(false);
-  };
-
-  const resetGame = () => {
-    setChoices(visualGame.map(() => ""));
-    setChecked(false);
-  };
-
-  const resetPractice = () => {
-    setPracticeChoices(practiceQuiz.map(() => ""));
-    setPracticeChecked(false);
-  };
-
-  const resetAnAuf = () => {
-    setAnAufChoices(anAufQuiz.map(() => ""));
-    setAnAufChecked(false);
-  };
-
-  const answeredVisual = choices.filter(Boolean).length;
-  const answeredPractice = practiceChoices.filter(Boolean).length;
-  const answeredAnAuf = anAufChoices.filter(Boolean).length;
+  const score = useMemo(
+    () => quiz.reduce((total, question, index) => total + (answers[index] === question.answer ? 1 : 0), 0),
+    [answers],
+  );
+  const allAnswered = Object.keys(answers).length === quiz.length;
 
   return (
-    <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
+    <main style={{ ...styles.container, display: "grid", gap: 16, maxWidth: 1080 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+        <a href={workbookHref} style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
+          Open Chapter 12.1 workbook
+        </a>
+      </div>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          Day 18: Wechselpräpositionen (Two-Case Prepositions)
-        </h1>
-
-        <p style={{ margin: 0 }}>
-          Some German prepositions can take <em>two cases</em>. Use <strong>Accusative</strong> for movement
-          (<strong>Wohin?</strong>) and <strong>Dative</strong> for position (<strong>Wo?</strong>).
+      <header style={{ ...card, padding: "clamp(20px, 4vw, 34px)", background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
+        <span style={{ width: "fit-content", borderRadius: 999, padding: "6px 10px", background: "#e0e7ff", color: "#3730a3", fontWeight: 800, fontSize: 12 }}>
+          A1.2 · Day 18 · Chapter 12.1
+        </span>
+        <h1 style={{ ...styles.title, margin: 0 }}>Wechselpräpositionen: Wo? or Wohin?</h1>
+        <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 820 }}>
+          The same preposition can use either Akkusativ or Dativ. The key is not memorising two random forms: first decide whether the sentence describes a destination or a position.
         </p>
       </header>
 
-      <TopicImageBreak
-        src={IMG_NOTEBOOK}
-        alt="Notebook on a desk"
-        title="Lesson Notes"
-        subtitle="Learn the rule first, then practise with examples and quizzes."
-      />
-
-      <Section title="0) Start Here: How two-case prepositions work">
-        <p style={{ margin: 0 }}>
-          Some German prepositions can take <strong>two cases</strong>. These are called{" "}
-          <strong>Wechselpräpositionen</strong>.
+      <Section eyebrow="Connect to what you know" title="Before you start">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          You already know places, articles and direction language from earlier A1 lessons. Today you combine those skills. Ask one question first:
         </p>
-
-        <p style={{ margin: 0 }}>
-          The case depends on the meaning of the sentence, not only on the preposition.
-        </p>
-
-        <BulletList
-          items={[
-            "Wohin? (movement to a place) → Akkusativ",
-            "Wo? (position in a place) → Dativ",
-            "The same preposition can change meaning: Ich gehe in die Schule. / Ich bin in der Schule.",
-          ]}
-        />
-
-        <p style={{ margin: 0 }}>
-          So always check the verb and ask: <strong>Wohin?</strong> or <strong>Wo?</strong>
-        </p>
-      </Section>
-
-      <TopicImageBreak
-        src={IMG_DIRECTIONS}
-        alt="A sign with arrows showing different directions"
-        title="Movement vs Position"
-        subtitle="Wohin? → Akkusativ • Wo? → Dativ"
-      />
-
-      <Section title="1) The 9 Wechselpräpositionen">
-        <BulletList items={PREPOSITIONS} />
-      </Section>
-
-      <Section title="2) The Golden Rule">
-        <p style={{ margin: 0 }}>
-          🔵 <strong>ACCUSATIVE</strong> → movement / direction / change of place
-        </p>
-        <p style={{ margin: 0 }}>
-          🟢 <strong>DATIVE</strong> → position / location / no change of place
-        </p>
-        <p style={{ margin: 0, fontSize: 14, opacity: 0.9 }}>
-          Tipp: <strong>legen, stellen, setzen</strong> usually answer <strong>Wohin?</strong> → Akkusativ.
-          <strong> liegen, stehen, sitzen</strong> usually answer <strong>Wo?</strong> → Dativ.
-        </p>
-      </Section>
-
-      <Section title="3) Helpful verb pairs">
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ ...tableStyle, minWidth: 420 }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Akkusativ (Wohin?)</th>
-                <th style={thStyle}>Dativ (Wo?)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["legen", "to lay / put something down", "liegen", "to lie / be lying"],
-                ["stellen", "to place / stand something upright", "stehen", "to stand / be standing"],
-                ["setzen", "to set / seat / put into a sitting position", "sitzen", "to sit / be seated"],
-                ["hängen", "to hang / put up", "hängen", "to hang / be hanging"],
-              ].map(([a, aEnglish, b, bEnglish], index) => (
-                <tr key={`${a}-${b}-${index}`}>
-                  <td style={tdStyle}><strong>{a}</strong><br /><span style={{ opacity: 0.78 }}>{aEnglish}</span></td>
-                  <td style={tdStyle}><strong>{b}</strong><br /><span style={{ opacity: 0.78 }}>{bEnglish}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p style={{ margin: 0, fontSize: 14, opacity: 0.9 }}>
-          <strong>About hängen:</strong> this verb appears in <strong>both columns</strong>.
-        </p>
-        <BulletList
-          items={[
-            "Akkusativ (Wohin?): Ich hänge das Bild an die Wand. → I hang/put the picture onto the wall (movement, change of place).",
-            "Dativ (Wo?): Das Bild hängt an der Wand. → The picture is hanging on the wall (position, no movement).",
-          ]}
-        />
-      </Section>
-
-      <Section title="4) Article Overview">
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ ...tableStyle, minWidth: 520 }}>
-            <caption style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>
-              Articles for Akkusativ vs Dativ (quick reference)
-            </caption>
-            <thead>
-              <tr>
-                {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
-                  <th key={header} scope="col" style={thStyle}>
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Accusative (def.)", "den", "die", "das", "die"],
-                ["Accusative (indef.)", "einen", "eine", "ein", "—"],
-                ["Dative (def.)", "dem", "der", "dem", "den (+n)"],
-                ["Dative (indef.)", "einem", "einer", "einem", "—"],
-              ].map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell, idx) =>
-                    idx === 0 ? (
-                      <th key={`${row[0]}-${cell}`} scope="row" style={{ ...tdStyle, textAlign: "left" }}>
-                        {cell}
-                      </th>
-                    ) : (
-                      <td key={`${row[0]}-${cell}`} style={tdStyle}>
-                        {cell}
-                      </td>
-                    )
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
-      <Section title="5) Important Difference: an vs auf">
-        <p style={{ margin: 0 }}>
-          Students often confuse <strong>an</strong> and <strong>auf</strong> because both can mean{" "}
-          <strong>on</strong> in English. But German uses them differently.
-        </p>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ ...tableStyle, minWidth: 520 }}>
-            <thead>
-              <tr>
-                {["Preposition", "Main idea", "Typical image", "Example"].map((header) => (
-                  <th key={header} style={thStyle}>
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ ...tdStyle, fontWeight: 700 }}>an</td>
-                <td style={tdStyle}>on / at a side, edge, vertical surface, or attached to it</td>
-                <td style={tdStyle}>something touches the side of something</td>
-                <td style={tdStyle}>
-                  Das Bild hängt <strong>an der Wand</strong>.
-                </td>
-              </tr>
-              <tr>
-                <td style={{ ...tdStyle, fontWeight: 700 }}>auf</td>
-                <td style={tdStyle}>on top of a horizontal surface</td>
-                <td style={tdStyle}>something rests on the top of something</td>
-                <td style={tdStyle}>
-                  Das Buch liegt <strong>auf dem Tisch</strong>.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <BulletList
-          items={[
-            "an = attached to the side / wall / door / window / edge",
-            "auf = resting on top of a table / chair / floor / bed / shelf",
-            "Think: an = side contact, auf = top contact",
-          ]}
-        />
-
-        <div
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 12,
-            background: "#f9fafb",
-            display: "grid",
-            gap: 8,
-          }}
-        >
-          <strong>Quick memory tip 💡</strong>
-          <div>
-            <strong>an</strong> → attached to a vertical surface
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+          <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14 }}>
+            <strong>Wohin? → Akkusativ</strong>
+            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>A person or object moves to a destination or changes position.</p>
           </div>
-          <div>
-            <strong>auf</strong> → on top of a flat surface
+          <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14 }}>
+            <strong>Wo? → Dativ</strong>
+            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>A person or object is already in a place. There is no change of position.</p>
           </div>
         </div>
       </Section>
 
-      <Section title="6) Example Pairs">
-        <div style={{ display: "grid", gap: 10 }}>
-          {examplePairs.map(([preposition, movement, movementEnglish, position, positionEnglish], index) => (
-            <div
-              key={`${preposition}-${index}`}
-              style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 5 }}
-            >
-              <strong>🔹 {preposition}</strong>
-              <p style={{ margin: "8px 0 0" }}>
-                {movement} <span style={{ opacity: 0.8 }}>(Wohin? · Akkusativ)</span>
-              </p>
-              <p style={{ margin: 0, color: "#475569", fontSize: 14 }}>→ {movementEnglish}</p>
-              <p style={{ margin: "6px 0 0" }}>
-                {position} <span style={{ opacity: 0.8 }}>(Wo? · Dativ)</span>
-              </p>
-              <p style={{ margin: 0, color: "#475569", fontSize: 14 }}>→ {positionEnglish}</p>
+      <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
+        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
+          <li>recognise the nine common two-case prepositions;</li>
+          <li>choose Akkusativ after <strong>Wohin?</strong> and Dativ after <strong>Wo?</strong>;</li>
+          <li>use common movement/position verb pairs such as <strong>legen/liegen</strong>, <strong>stellen/stehen</strong> and <strong>setzen/sitzen</strong>.</li>
+        </ol>
+      </Section>
+
+      <Section eyebrow="Core vocabulary" title="The nine Wechselpräpositionen">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
+          {[
+            ["an", "at / on a side or edge"],
+            ["auf", "on top of"],
+            ["hinter", "behind"],
+            ["in", "in / into"],
+            ["neben", "next to"],
+            ["über", "above / over"],
+            ["unter", "under"],
+            ["vor", "in front of"],
+            ["zwischen", "between"],
+          ].map(([word, meaning]) => (
+            <div key={word} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, background: "#fff" }}>
+              <strong style={{ fontSize: 19 }}>{word}</strong>
+              <div style={{ marginTop: 4, color: "#64748b" }}>{meaning}</div>
             </div>
           ))}
         </div>
       </Section>
 
-      <Section title="7) Mini Practice: an oder auf?">
-        <p style={{ margin: 0 }}>
-          Choose <strong>an</strong> or <strong>auf</strong>. This helps you see the difference clearly.
+      <Section eyebrow="Main rule" title="Movement is not enough — think destination vs position">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          A sentence can contain a verb of movement and still answer <strong>Wo?</strong>. What matters is whether the prepositional phrase gives a destination. For A1, the clearest shortcut is to compare these common verb pairs:
         </p>
-        <p style={{ margin: 0, opacity: 0.85 }}>
-          Answered: {answeredAnAuf}/{anAufQuiz.length}
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+            <thead>
+              <tr style={{ background: "#f8fafc" }}>
+                {[
+                  "Wohin? + Akkusativ",
+                  "Meaning",
+                  "Wo? + Dativ",
+                  "Meaning",
+                ].map((heading) => (
+                  <th key={heading} style={{ border: "1px solid #e2e8f0", textAlign: "left", padding: 10 }}>{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["legen", "put something down", "liegen", "be lying"],
+                ["stellen", "put/place upright", "stehen", "be standing"],
+                ["setzen", "put/seat", "sitzen", "be sitting"],
+                ["hängen", "hang something up", "hängen", "be hanging"],
+              ].map((row) => (
+                <tr key={row.join("-")}>
+                  {row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}>{cell}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section eyebrow="Article check" title="The article forms you need today">
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+            <thead>
+              <tr style={{ background: "#f8fafc" }}>
+                {["Case", "der", "die", "das", "Plural"].map((heading) => (
+                  <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {articles.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>{cell}</strong></td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
+          Useful short forms: <strong>im = in dem</strong>, <strong>ins = in das</strong>, <strong>am = an dem</strong>, <strong>ans = an das</strong>.
         </p>
+      </Section>
 
-        <div style={{ display: "grid", gap: 10, marginTop: 8 }}>
-          {anAufQuiz.map((q, i) => {
-            const selected = normalizeAnswer(anAufChoices[i]);
-            const correct = normalizeAnswer(q.answer);
-            const isCorrect = anAufChecked && selected === correct;
-            const isWrong = anAufChecked && selected && selected !== correct;
+      <Section eyebrow="Model sentences" title="See the same preposition in both cases">
+        <div style={{ display: "grid", gap: 12 }}>
+          {pairRows.map((pair) => (
+            <article key={pair.preposition} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
+              <strong style={{ fontSize: 18 }}>{pair.preposition}</strong>
+              <div><strong>Wohin?</strong> {pair.wohin}</div>
+              <div><strong>Wo?</strong> {pair.wo}</div>
+              <span style={{ color: "#64748b", fontSize: 14 }}>{pair.note}</span>
+            </article>
+          ))}
+        </div>
+      </Section>
 
+      <Section eyebrow="Common confusion" title="an or auf?">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          English often uses “on” for both. In German, <strong>an</strong> is common for contact with a side, wall, door, window or edge, while <strong>auf</strong> is common for something resting on top of a surface.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
+            <strong>an</strong>
+            <p style={{ margin: "5px 0 0" }}>Das Bild hängt <strong>an der Wand</strong>.</p>
+          </div>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
+            <strong>auf</strong>
+            <p style={{ margin: "5px 0 0" }}>Das Buch liegt <strong>auf dem Tisch</strong>.</p>
+          </div>
+        </div>
+      </Section>
+
+      <Section eyebrow="Guided practice" title="Choose the correct article">
+        <div style={{ display: "grid", gap: 12 }}>
+          {quiz.map((question, index) => {
+            const selected = answers[index];
+            const correct = selected === question.answer;
             return (
-              <div
-                key={`${q.sentence}-${i}`}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <div style={{ fontWeight: 600 }}>
-                  {i + 1}. {q.sentence}
-                </div>
-
+              <article key={question.prompt} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, display: "grid", gap: 9 }}>
+                <strong>{index + 1}. {question.prompt}</strong>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {q.choices.map((option) => {
-                    const normalizedOption = normalizeAnswer(option);
-                    const isCorrectChoice = anAufChecked && normalizedOption === correct;
-                    const isWrongChoice =
-                      anAufChecked && normalizedOption === selected && normalizedOption !== correct;
-
-                    return (
-                      <button
-                        key={`${q.sentence}-${option}`}
-                        type="button"
-                        onClick={() => onChangeAnAufChoice(i, option)}
-                        style={getChoiceButtonStyle({
-                          selected: anAufChoices[i] === option,
-                          checked: anAufChecked,
-                          isCorrectChoice,
-                          isWrongChoice,
-                        })}
-                        aria-label={`Choose ${option} for: ${q.sentence}`}
-                      >
-                        {option}
-                      </button>
-                    );
-                  })}
-
-                  {isCorrect && <span style={{ fontWeight: 700, color: "#166534" }}>✅ richtig</span>}
-                  {isWrong && <span style={{ fontWeight: 700, color: "#991b1b" }}>❌ falsch — richtig: {q.answer}</span>}
-                </div>
-
-                {anAufChecked && (
-                  <div style={{ fontSize: 14, opacity: 0.85 }}>
-                    <strong>Why?</strong> {q.tip}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, width: "fit-content" }}
-            onClick={() => setAnAufChecked(true)}
-          >
-            Check answers
-          </button>
-
-          <button
-            type="button"
-            style={{ ...styles.secondaryButton, width: "fit-content" }}
-            onClick={resetAnAuf}
-          >
-            Reset
-          </button>
-
-          {anAufChecked && (
-            <div style={{ marginLeft: "auto", fontWeight: 800 }}>
-              Score: {anAufScore}/{anAufQuiz.length}
-            </div>
-          )}
-        </div>
-      </Section>
-
-      <TopicImageBreak
-        src={IMG_NOTEBOOK}
-        alt="Notebook on a desk"
-        title="Quick Overview"
-        subtitle="Articles and short forms"
-      />
-
-      <Section title="8) Short Forms (Important!)">
-        <BulletList items={["im = in dem", "ins = in das", "am = an dem", "ans = an das"]} />
-      </Section>
-
-      <TopicImageBreak
-        src={IMG_SIGNPOST}
-        alt="A street sign with arrows pointing in different directions"
-        title="Practice Time"
-        subtitle="Choose the correct articles and prepositions."
-      />
-
-      <Section title="9) Quick Check: Choose the correct article (7 questions)">
-        <p style={{ margin: 0 }}>Pick one answer for each sentence.</p>
-        <p style={{ margin: 0, opacity: 0.85 }}>
-          Answered: {answeredPractice}/{practiceQuiz.length}
-        </p>
-
-        <div style={{ display: "grid", gap: 10, marginTop: 8 }}>
-          {practiceQuiz.map((q, i) => {
-            const selected = normalizeAnswer(practiceChoices[i]);
-            const correct = normalizeAnswer(q.answer);
-            const isCorrect = practiceChecked && selected === correct;
-            const isWrong = practiceChecked && selected && selected !== correct;
-
-            return (
-              <div
-                key={`${q.sentence}-${i}`}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <div style={{ fontWeight: 600 }}>
-                  {i + 1}. {q.sentence}
-                </div>
-
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {q.choices.map((option) => {
-                    const normalizedOption = normalizeAnswer(option);
-                    const isCorrectChoice = practiceChecked && normalizedOption === correct;
-                    const isWrongChoice =
-                      practiceChecked && normalizedOption === selected && normalizedOption !== correct;
-
-                    return (
-                      <button
-                        key={`${q.sentence}-${option}`}
-                        type="button"
-                        onClick={() => onChangePracticeChoice(i, option)}
-                        style={getChoiceButtonStyle({
-                          selected: practiceChoices[i] === option,
-                          checked: practiceChecked,
-                          isCorrectChoice,
-                          isWrongChoice,
-                        })}
-                        aria-label={`Choose ${option} for: ${q.sentence}`}
-                      >
-                        {option}
-                      </button>
-                    );
-                  })}
-
-                  {isCorrect && <span style={{ fontWeight: 700, color: "#166534" }}>✅ richtig</span>}
-                  {isWrong && (
-                    <span style={{ fontWeight: 700, color: "#991b1b" }}>❌ falsch — richtig: {q.answer}</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, width: "fit-content" }}
-            onClick={() => setPracticeChecked(true)}
-          >
-            Check answers
-          </button>
-
-          <button
-            type="button"
-            style={{ ...styles.secondaryButton, width: "fit-content" }}
-            onClick={resetPractice}
-          >
-            Reset
-          </button>
-
-          {practiceChecked && (
-            <div style={{ marginLeft: "auto", fontWeight: 800 }}>
-              Score: {practiceScore}/{practiceQuiz.length}
-            </div>
-          )}
-        </div>
-      </Section>
-
-      <TopicImageBreak
-        src={IMG_DIRECTIONS}
-        alt="A sign with arrows showing different directions"
-        title="Visual Game"
-        subtitle="Use the scene and choose the correct preposition."
-      />
-
-      <Section title="10) Visual Position Game (Interactive)">
-        <p style={{ margin: 0 }}>
-          Choose the correct preposition: <strong>{PREPOSITION_OPTIONS.join(" – ")}</strong>
-        </p>
-        <p style={{ margin: 0, color: "#475569" }}>
-          Match the picture, the English clue and the German sentence. Each card has one clear answer.
-        </p>
-        <p style={{ margin: 0, opacity: 0.85 }}>
-          Answered: {answeredVisual} of {visualGame.length}
-        </p>
-
-        <div style={{ display: "grid", gap: 12, marginTop: 8 }}>
-          {visualGame.map((q, i) => {
-            const selected = normalizeAnswer(choices[i]);
-            const correct = normalizeAnswer(q.answer);
-            const isCorrect = checked && selected === correct;
-            const isWrong = checked && selected && selected !== correct;
-
-            return (
-              <div
-                key={`${q.sentence}-${i}`}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  display: "grid",
-                  gap: 10,
-                }}
-              >
-                <SceneCard
-                  label={q.label}
-                  emojiLine1={q.emojiLine1}
-                  emojiLine2={q.emojiLine2}
-                  helper={q.helper}
-                />
-
-                <div style={{ display: "grid", gap: 8 }}>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 600 }}>{i + 1}.</span>
-                    <span>{q.sentence}</span>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                    <label style={{ fontWeight: 600 }} htmlFor={`prep-${i}`}>
-                      Antwort:
-                    </label>
-
-                    <select
-                      id={`prep-${i}`}
-                      value={choices[i]}
-                      onChange={(e) => onChangeChoice(i, e.target.value)}
-                      style={getSelectStyle({ checked, isCorrect, isWrong })}
-                      aria-label={`Choose preposition for question ${i + 1}`}
+                  {question.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setAnswers((old) => ({ ...old, [index]: option }));
+                        setShowScore(false);
+                      }}
+                      style={selected === option ? styles.primaryButton : styles.secondaryButton}
                     >
-                      <option value="">— wählen —</option>
-                      {PREPOSITION_OPTIONS.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-
-                    {isCorrect && <span style={{ fontWeight: 700, color: "#166534" }}>✅ richtig</span>}
-                    {isWrong && <span style={{ fontWeight: 700, color: "#991b1b" }}>❌ falsch — richtig: {q.answer}</span>}
-                  </div>
-
-                  {checked && !choices[i] && <span style={{ opacity: 0.8 }}>Bitte wähle eine Antwort.</span>}
+                      {option}
+                    </button>
+                  ))}
                 </div>
-              </div>
+                {selected ? (
+                  <div style={{ color: correct ? "#166534" : "#9f1239", lineHeight: 1.55 }}>
+                    <strong>{correct ? "Correct." : `Correct answer: ${question.answer}.`}</strong> {question.explanation}
+                  </div>
+                ) : null}
+              </article>
             );
           })}
         </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, width: "fit-content" }}
-            onClick={() => setChecked(true)}
-          >
-            Check answers
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <button type="button" disabled={!allAnswered} onClick={() => setShowScore(true)} style={{ ...styles.primaryButton, opacity: allAnswered ? 1 : 0.55 }}>
+            Show my score
           </button>
-
-          <button
-            type="button"
-            style={{ ...styles.secondaryButton, width: "fit-content" }}
-            onClick={resetGame}
-          >
-            Reset
+          <button type="button" onClick={() => { setAnswers({}); setShowScore(false); }} style={styles.secondaryButton}>
+            Restart practice
           </button>
-
-          {checked && (
-            <div style={{ marginLeft: "auto", fontWeight: 800 }}>
-              Score: {score}/{visualGame.length}
-            </div>
-          )}
         </div>
-
-        <details style={{ marginTop: 10 }}>
-          <summary style={{ cursor: "pointer", fontWeight: 700 }}>Antworten anzeigen (Teacher)</summary>
-          <ol style={{ margin: "10px 0 0", paddingLeft: 20, display: "grid", gap: 6 }}>
-            {visualGame.map((q, i) => (
-              <li key={`${q.answer}-${i}`}>{q.answer}</li>
-            ))}
-          </ol>
-        </details>
+        {showScore ? (
+          <div style={{ border: "1px solid #cbd5e1", background: "#f8fafc", borderRadius: 12, padding: 12 }}>
+            <strong>{score}/{quiz.length} correct.</strong> {score >= 5 ? "You are ready for the workbook." : "Review Wo/Wohin and repeat the practice before continuing."}
+          </div>
+        ) : null}
       </Section>
+
+      <Section eyebrow="Prepare for the tutor-marked work" title="What the workbook will test">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Chapter 12.1 is the grammar focus, but the existing tutor-marked workbook also checks reading and listening and recycles language from earlier A1 lessons. That is intentional revision. Use this page to learn the new grammar, then complete the workbook without expecting every question to be only about Wechselpräpositionen.
+        </p>
+        <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", padding: 12, borderRadius: 10, lineHeight: 1.65 }}>
+          <strong>Important:</strong> the tutor-marked assignment itself has not been changed, so your saved answers and grading setup remain compatible.
+        </div>
+      </Section>
+
+      <section style={{ ...card, background: "#172554", color: "#fff" }}>
+        <h2 style={{ margin: 0 }}>Ready for Chapter 12.1?</h2>
+        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.65 }}>
+          Before opening the workbook, make sure you can explain the difference between <strong>Wo?</strong> and <strong>Wohin?</strong> in one sentence and form at least two example pairs yourself.
+        </p>
+        <a href={workbookHref} style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none", background: "#fff", color: "#172554", borderColor: "#fff" }}>
+          Continue to the tutor-marked workbook
+        </a>
+      </section>
     </main>
   );
 };
 
-export default TwoCasePrepositionsPage;
+export default TwoCasePrepositionsPageLegacy;

@@ -6,6 +6,8 @@ import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
 import { courseDebug } from "../lib/courseDebug";
 import { styles } from "../styles";
+import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
+import { addDay20WorkbookView } from "../utils/a1ChapterResourceHubState";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
@@ -32,8 +34,26 @@ export const buildCompletedRadioSearch = (search = "") => {
   return query ? `?${query}` : "";
 };
 
-export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" } = {}) =>
-  `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" } = {}) => {
+  const match = pathname.match(/^\/campus\/course\/lesson\/A1\/(\d+)\/?$/i);
+  if (match) {
+    const params = new URLSearchParams(search);
+    const day = Number(match[1]);
+    const chapter = params.get("chapter") || "";
+    const configuredWorkbook = getConfiguredInAppWorkbookResourceRoute({
+      level: "A1", day, chapter,
+    });
+    const workbook = addDay20WorkbookView({ level: "A1", day, chapter }, configuredWorkbook);
+    if (workbook) {
+      const destination = new URL(workbook, "https://www.falowen.app");
+      params.delete("hub");
+      params.delete("chapter");
+      destination.searchParams.forEach((value, key) => params.set(key, value));
+      return `${destination.pathname}${buildCompletedRadioSearch(params.toString())}${destination.hash || hash || ""}`;
+    }
+  }
+  return `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+};
 
 export const openCompletedWorkbook = (locationLike, windowRef) => {
   const href = buildCompletedRadioHref(locationLike);

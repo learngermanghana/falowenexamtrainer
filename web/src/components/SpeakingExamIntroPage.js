@@ -1,326 +1,190 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
-
 import { styles } from "../styles";
 
-const Section = ({ title, children }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <h2 style={{ margin: 0 }}>{title}</h2>
+const card = {
+  ...styles.card,
+  display: "grid",
+  gap: 12,
+  border: "1px solid #e2e8f0",
+  borderRadius: 18,
+};
+
+const Section = ({ eyebrow, title, children }) => (
+  <section style={card}>
+    <div style={{ display: "grid", gap: 4 }}>
+      {eyebrow ? (
+        <span style={{ color: "#475569", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.6 }}>
+          {eyebrow}
+        </span>
+      ) : null}
+      <h2 style={{ margin: 0 }}>{title}</h2>
+    </div>
     {children}
   </section>
 );
 
-const BulletList = ({ items }) => (
-  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-    {items.map((item) => (
-      <li key={item}>{item}</li>
-    ))}
-  </ul>
-);
+const examParts = [
+  ["Teil 1", "Sich vorstellen", "Introduce yourself and answer simple personal questions."],
+  ["Teil 2", "Um Informationen bitten und Informationen geben", "Ask and answer a simple question using a topic card."],
+  ["Teil 3", "Bitten formulieren und darauf reagieren", "Make a polite request from a picture/card and react to another person’s request."],
+];
 
-const Table = ({ headers, rows }) => (
-  <div style={{ overflowX: "auto" }}>
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr>
-          {headers.map((header) => (
-            <th
-              key={header}
-              style={{
-                textAlign: "left",
-                padding: "8px 10px",
-                borderBottom: "2px solid #e6e8ef",
-                background: "#f7f8fb",
-              }}
-            >
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={row.join("-")}>
-            {row.map((cell) => (
-              <td key={cell} style={{ padding: "8px 10px", borderBottom: "1px solid #e6e8ef" }}>
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+const requestExamples = [
+  ["help", "Können Sie mir bitte helfen?"],
+  ["repeat", "Können Sie das bitte wiederholen?"],
+  ["speak slowly", "Können Sie bitte langsamer sprechen?"],
+  ["give something", "Können Sie mir bitte das Formular geben?"],
+  ["wait", "Können Sie bitte warten?"],
+];
 
-const Callout = ({ children }) => (
-  <div
-    style={{
-      background: "#f0f9ff",
-      borderLeft: "4px solid #38bdf8",
-      borderRadius: 10,
-      padding: "10px 12px",
-      fontSize: 14,
-      display: "grid",
-      gap: 6,
-    }}
-  >
-    {children}
-  </div>
-);
-
-const WarningCallout = ({ children }) => (
-  <div
-    style={{
-      background: "#fff7ed",
-      borderLeft: "4px solid #fb923c",
-      borderRadius: 10,
-      padding: "10px 12px",
-      fontSize: 14,
-      display: "grid",
-      gap: 6,
-    }}
-  >
-    {children}
-  </div>
-);
-
-const ExampleCard = ({ title, items }) => (
-  <div
-    style={{
-      border: "1px solid #e5e7eb",
-      borderRadius: 12,
-      padding: 12,
-      background: "#f8fafc",
-      display: "grid",
-      gap: 8,
-    }}
-  >
-    <strong>{title}</strong>
-    <BulletList items={items} />
-  </div>
-);
-
-const SpeakingExamIntroPage = () => {
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <img
-          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
-          alt="Students practicing German speaking exam tasks together"
-          style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 12 }}
-        />
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 15: Introduction to Speaking Exams</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Making formal requests with Sie-Imperativ and <strong>können</strong> (Goethe A1 – Sprechen Teil 3).
-        </p>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Designed for Goethe A1 candidates · Focus: <strong>Höfliche Bitten</strong> (polite requests)
-        </p>
-      </div>
-
-      <Section title="Workbook Focus: Making Formal Requests in German">
-        <p style={{ margin: 0 }}>
-          You will learn two safe structures for Teil 3: the Sie-Imperativ and “Können Sie bitte…?”. Use them to ask
-          politely in formal situations.
-        </p>
-        <Callout>
-          <strong>Quick rule to remember</strong>
-          <BulletList
-            items={[
-              "Formal requests always use Sie + bitte.",
-              "Können Sie bitte + infinitive is the safest for Teil 3.",
-              "The main verb goes to the end with können.",
-            ]}
-          />
-        </Callout>
-      </Section>
-
-      <Section title="Section 1 – What is the Sie-Imperativ? (Formal Imperative)">
-        <h3 style={{ margin: 0 }}>1.1 Definition</h3>
-        <p style={{ margin: 0 }}>
-          The Sie-Imperativ is used when you speak formally to one person or several people (Sie).
-        </p>
-        <BulletList
-          items={[
-            "Use it in formal situations: office, school, hospital, customer service, police, official settings.",
-            "It keeps your request polite and professional.",
-          ]}
-        />
-        <h3 style={{ margin: "12px 0 0" }}>1.2 Form of the Sie-Imperativ</h3>
-        <Callout>
-          <strong>Basic rule:</strong> Verb + Sie + bitte
-        </Callout>
-        <Table
-          headers={["Infinitiv", "Sie-Imperativ", "English translation"]}
-          rows={[
-            ["kommen", "Kommen Sie bitte.", "Please come."],
-            ["warten", "Warten Sie bitte.", "Please wait."],
-            ["hören", "Hören Sie bitte zu.", "Please listen."],
-            ["schreiben", "Schreiben Sie bitte.", "Please write."],
-            ["erklären", "Erklären Sie bitte.", "Please explain."],
-          ]}
-        />
-      </Section>
-
-      <Section title="Section 2 – Using “können” for Polite Requests">
-        <p style={{ margin: 0 }}>
-          In Goethe Sprechen Teil 3, you usually need to make polite requests. The safest structure is below.
-        </p>
-        <Callout>
-          <strong>Key structure:</strong> Können Sie bitte + Infinitiv …?
-        </Callout>
-        <BulletList
-          items={[
-            "Können Sie mir bitte helfen? (Can you please help me?)",
-            "Können Sie das bitte wiederholen? (Can you please repeat that?)",
-            "Können Sie mir bitte sagen, wo der Bahnhof ist? (Can you please tell me where the train station is?)",
-            "Können Sie bitte langsamer sprechen? (Can you please speak more slowly?)",
-            "Können Sie mir bitte das Formular geben? (Can you please give me the form?)",
-          ]}
-        />
-      </Section>
-
-      <Section title="Section 3 – Comparison: Imperativ vs. Können">
-        <Table
-          headers={["Situation", "Sie-Imperativ", "Mit können (more polite)"]}
-          rows={[
-            ["Ask for help", "Helfen Sie mir bitte.", "Können Sie mir bitte helfen?"],
-            ["Ask to wait", "Warten Sie bitte.", "Können Sie bitte warten?"],
-            ["Ask to explain", "Erklären Sie das bitte.", "Können Sie das bitte erklären?"],
-            ["Ask to repeat", "Wiederholen Sie das bitte.", "Können Sie das bitte wiederholen?"],
-          ]}
-        />
-        <WarningCallout>
-          <strong>Exam Tip (Very Important)</strong>
-          <p style={{ margin: 0 }}>
-            For Goethe Teil 3, prefer “Können Sie bitte…?” — it sounds more polite and natural.
-          </p>
-        </WarningCallout>
-      </Section>
-
-      <Section title="Section 5 – Goethe A1 Sprechen Teil 3 Practice">
-        <p style={{ margin: 0 }}>Write a polite request for each situation, then compare with the model answer.</p>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-          <ExampleCard
-            title="Situation 1 – At the Bahnhof"
-            items={["Write your request.", "Model: Können Sie mir bitte helfen? Ich suche den Bahnhof."]}
-          />
-          <ExampleCard
-            title="Situation 2 – In the Office"
-            items={["Write your request.", "Model: Können Sie mir bitte das Formular geben?"]}
-          />
-          <ExampleCard
-            title="Situation 3 – In a Shop"
-            items={["Write your request.", "Model: Können Sie mir bitte einen Rabatt geben?"]}
-          />
-          <ExampleCard
-            title="Situation 4 – Speaking too fast"
-            items={["Write your request.", "Model: Können Sie bitte langsamer sprechen?"]}
-          />
-        </div>
-      </Section>
-
-      <Section title="Section 6 – Real Exam Practice (Teil 3: Bitten formulieren)">
-        <h3 style={{ margin: 0 }}>6.1 Open the official practice page</h3>
-        <p style={{ margin: 0 }}>
-          Go to the official Goethe A1 speaking practice page:{" "}
-          <a href="https://bfu.goethe.de/a1_sd1/sprechen.php" target="_blank" rel="noreferrer">
-            https://bfu.goethe.de/a1_sd1/sprechen.php
-          </a>
-          .
-        </p>
-        <h3 style={{ margin: "12px 0 0" }}>6.2 What you see on the page</h3>
-        <BulletList
-          items={[
-            "Speaking exam time: 15 minutes",
-            "There are 3 parts (3 Teile)",
-            "You speak in a group",
-          ]}
-        />
-        <h3 style={{ margin: "12px 0 0" }}>6.3 Go to Teil 3 and what it means</h3>
-        <BulletList
-          items={[
-            "Teil 3 – „Bitte formulieren und darauf reagieren.”",
-            "Bitte formulieren → make a polite request based on a picture.",
-            "Darauf reagieren → respond politely (accept or refuse).",
-            "Time for Teil 3: about 5 minutes.",
-          ]}
-        />
-        <h3 style={{ margin: "12px 0 0" }}>6.4 Your task with the pictures</h3>
-        <p style={{ margin: 0 }}>For each picture, make one formal request using Sie.</p>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-          <Callout>
-            <strong>Option A (Recommended – very polite)</strong>
-            <BulletList
-              items={[
-                "Können Sie mir bitte helfen? (Can you please help me?)",
-                "Können Sie bitte warten? (Can you please wait?)",
-                "Können Sie bitte die Flasche öffnen? (Can you please open the bottle?)",
-              ]}
-            />
-          </Callout>
-          <Callout>
-            <strong>Option B (Formal command – Sie-Imperativ)</strong>
-            <BulletList
-              items={[
-                "Helfen Sie mir bitte. (Please help me.)",
-                "Warten Sie bitte. (Please wait.)",
-                "Öffnen Sie bitte die Flasche. (Please open the bottle.)",
-              ]}
-            />
-          </Callout>
-        </div>
-        <h3 style={{ margin: "12px 0 0" }}>6.5 Teil 3 verb trainer (answer with können)</h3>
-        <p style={{ margin: 0 }}>
-          In Teil 3, you can safely answer most cards with <strong>“Können Sie bitte …?”</strong> and these high-frequency
-          verbs:
-        </p>
-        <Table
-          headers={["Verb", "Teil 3 polite request with können", "English translation"]}
-          rows={[
-            ["bringen", "Können Sie mir bitte Wasser bringen?", "Can you please bring me water?"],
-            ["nehmen", "Können Sie bitte meinen Koffer nehmen?", "Can you please take my suitcase?"],
-            ["kaufen", "Können Sie bitte Brot kaufen?", "Can you please buy bread?"],
-            ["aufmachen", "Können Sie bitte das Fenster aufmachen?", "Can you please open the window?"],
-            ["anmachen", "Können Sie bitte das Licht anmachen?", "Can you please turn on the light?"],
-            ["zumachen", "Können Sie bitte das Fenster zumachen?", "Can you please close the window?"],
-            ["ausmachen", "Können Sie bitte das Licht ausmachen?", "Can you please turn off the light?"],
-          ]}
-        />
-        <WarningCallout>
-          <strong>Teil 3 note: how to pass</strong>
-          <BulletList
-            items={[
-              "Use one complete polite sentence for every picture: Können Sie bitte + Verb am Ende?",
-              "Speak clearly and keep eye contact with your partner/examiner.",
-              "After your request, react politely to your partner (Ja, gern / Tut mir leid...).",
-              "If you are nervous, use the same safe pattern with a new noun. Correct structure is more important than fancy vocabulary.",
-            ]}
-          />
-        </WarningCallout>
-        <h3 style={{ margin: "12px 0 0" }}>6.6 Reacting to your partner’s request</h3>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-          <ExampleCard title="Positive reaction (accept)" items={["Ja, gern.", "Ja, natürlich.", "Kein Problem."]} />
-          <ExampleCard
-            title="Negative reaction (refuse politely)"
-            items={["Tut mir leid, das geht leider nicht.", "Leider kann ich nicht.", "Es tut mir leid, ich habe keine Zeit."]}
-          />
-        </div>
-        <h3 style={{ margin: "12px 0 0" }}>6.7 Final checklist for students</h3>
-        <BulletList
-          items={[
-            "Did I use Sie?",
-            "Did I say bitte?",
-            "If I used können, did I put the main verb at the end?",
-            "Did I react politely to my partner?",
-          ]}
-        />
-      </Section>
+const SpeakingExamIntroPage = () => (
+  <main style={{ ...styles.container, display: "grid", gap: 16, maxWidth: 1080 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+      <span style={{ borderRadius: 999, padding: "6px 10px", background: "#e0e7ff", color: "#3730a3", fontWeight: 800, fontSize: 12 }}>
+        A1.2 · Day 15 · Chapter 4.7
+      </span>
     </div>
-  );
-};
+
+    <header style={{ ...card, padding: "clamp(20px, 4vw, 34px)", background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
+      <h1 style={{ ...styles.title, margin: 0 }}>Introduction to the Goethe A1 Speaking Exam</h1>
+      <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 850 }}>
+        First understand the complete speaking exam. Then practise today’s main skill in detail: <strong>Teil 3</strong>, where you make a polite request and react to a request.
+      </p>
+    </header>
+
+    <Section eyebrow="Big picture" title="The three speaking parts">
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
+          <thead>
+            <tr style={{ background: "#f8fafc" }}>
+              {['Part', 'What it is called', 'What you do'].map((heading) => (
+                <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {examParts.map((row) => (
+              <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`} style={{ border: "1px solid #e2e8f0", padding: 10 }}>{index === 0 ? <strong>{cell}</strong> : cell}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", borderRadius: 10, padding: 12, lineHeight: 1.65 }}>
+        <strong>Today’s focus:</strong> Teil 3. You are not expected to master every speaking part in one lesson; this page gives you the map first, then trains one part properly.
+      </div>
+    </Section>
+
+    <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
+      <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
+        <li>name the three parts of the Goethe A1 speaking exam;</li>
+        <li>make a polite formal request using <strong>Können Sie bitte ...?</strong> or the Sie-imperative;</li>
+        <li>accept or refuse a simple request politely.</li>
+      </ol>
+    </Section>
+
+    <Section eyebrow="Teil 3 core" title="The safest request pattern">
+      <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14, display: "grid", gap: 8 }}>
+        <strong style={{ fontSize: 20 }}>Können Sie bitte + Infinitiv ...?</strong>
+        <span>The conjugated verb <strong>können</strong> is in position 1, <strong>Sie</strong> follows it, and the main verb goes to the end.</span>
+      </div>
+      <div style={{ display: "grid", gap: 8 }}>
+        {requestExamples.map(([situation, sentence]) => (
+          <div key={situation} style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: 8 }}>
+            <strong>{sentence}</strong> <span style={{ color: "#64748b" }}>({situation})</span>
+          </div>
+        ))}
+      </div>
+    </Section>
+
+    <Section eyebrow="Alternative" title="Sie-Imperativ">
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        You can also use the formal imperative: <strong>Verb + Sie + bitte</strong>. It is correct and useful, but <strong>Können Sie bitte ...?</strong> is often the easiest polite structure for beginners.
+      </p>
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+          <thead>
+            <tr style={{ background: "#f8fafc" }}>
+              {['Infinitive', 'Sie-Imperativ', 'Question with können'].map((heading) => (
+                <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["warten", "Warten Sie bitte.", "Können Sie bitte warten?"],
+              ["helfen", "Helfen Sie mir bitte.", "Können Sie mir bitte helfen?"],
+              ["wiederholen", "Wiederholen Sie das bitte.", "Können Sie das bitte wiederholen?"],
+              ["sprechen", "Sprechen Sie bitte langsamer.", "Können Sie bitte langsamer sprechen?"],
+            ].map((row) => (
+              <tr key={row[0]}>{row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}>{cell}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Section>
+
+    <Section eyebrow="Reacting" title="Accept or refuse politely">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 12 }}>
+        <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
+          <strong>Accept</strong>
+          <span>Ja, natürlich.</span>
+          <span>Ja, gern.</span>
+          <span>Natürlich, hier bitte.</span>
+        </div>
+        <div style={{ border: "1px solid #fecdd3", background: "#fff1f2", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
+          <strong>Refuse</strong>
+          <span>Tut mir leid, das geht leider nicht.</span>
+          <span>Leider kann ich nicht.</span>
+          <span>Entschuldigung, das ist leider nicht möglich.</span>
+        </div>
+      </div>
+    </Section>
+
+    <Section eyebrow="Guided practice" title="Build a request from the situation">
+      <div style={{ display: "grid", gap: 12 }}>
+        {[
+          ["You do not understand the speaker.", "Können Sie das bitte wiederholen?"],
+          ["The other person is speaking too fast.", "Können Sie bitte langsamer sprechen?"],
+          ["You need the form on the table.", "Können Sie mir bitte das Formular geben?"],
+          ["You need help at the station.", "Können Sie mir bitte helfen?"],
+        ].map(([situation, model], index) => (
+          <details key={situation} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14 }}>
+            <summary style={{ cursor: "pointer", fontWeight: 800 }}>{index + 1}. {situation}</summary>
+            <p style={{ margin: "10px 0 0" }}><strong>Model:</strong> {model}</p>
+          </details>
+        ))}
+      </div>
+    </Section>
+
+    <Section eyebrow="Mini exam" title="Do this without looking at the models">
+      <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
+        <li>Make one request for <strong>Wasser</strong>.</li>
+        <li>Make one request for <strong>Hilfe</strong>.</li>
+        <li>Ask somebody to <strong>wait</strong>.</li>
+        <li>React positively to one request.</li>
+        <li>React negatively but politely to one request.</li>
+      </ol>
+    </Section>
+
+    <Section eyebrow="Official practice" title="Continue with Goethe material">
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        After practising the structures above, use the official Goethe A1 speaking practice and focus on Teil 3 picture prompts.
+      </p>
+      <a href="https://bfu.goethe.de/a1_sd1/sprechen.php" target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
+        Open official Goethe A1 speaking practice
+      </a>
+    </Section>
+
+    <Section eyebrow="Self-check" title="You are ready when you can do these three things">
+      <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, lineHeight: 1.65 }}>
+        <li>Explain what happens in Teil 1, Teil 2 and Teil 3.</li>
+        <li>Make a request with <strong>Können Sie bitte ...?</strong> without copying a model.</li>
+        <li>Respond naturally with a short acceptance or refusal.</li>
+      </ul>
+    </Section>
+  </main>
+);
 
 export default SpeakingExamIntroPage;

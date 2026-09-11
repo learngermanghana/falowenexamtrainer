@@ -1,3 +1,4 @@
+import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
   getTeacherLectureVideoResources,
   hasTeacherLectureVideoResources,
@@ -488,7 +489,9 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);
 
-  const configuredTeacherVideos = getTeacherLectureVideoResources(normalizedLevel, dayKey);
+  const configuredTeacherVideos = normalizedLevel === "A1"
+    ? getA1TeacherVideoResources(dayKey)
+    : getTeacherLectureVideoResources(normalizedLevel, dayKey);
   const explicitResources = entries.flatMap((resource) =>
     normalizeVideoResources(resource),
   );
@@ -500,11 +503,15 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const fallbackGenericLessonVideos = dictionaryHasTeacherVideo
     ? genericLessonVideos.filter((resource) => !isTeacherVideoResource(resource))
     : genericLessonVideos;
+  const isSupersededTeacherResource = (resource) =>
+    isTeacherVideoResource(resource) && configuredTeacherVideos.some(
+      (teacher) => String(teacher.chapter || "") === String(resource.chapter || ""),
+    );
   const allResources = uniqueVideoResources(
     configuredTeacherVideos,
-    fallbackGenericLessonVideos,
-    explicitResources,
-    dictionaryResources,
+    fallbackGenericLessonVideos.filter((resource) => !isSupersededTeacherResource(resource)),
+    explicitResources.filter((resource) => !isSupersededTeacherResource(resource)),
+    dictionaryResources.filter((resource) => !isSupersededTeacherResource(resource)),
   );
   const visibleResources = showTeacherVideos
     ? allResources

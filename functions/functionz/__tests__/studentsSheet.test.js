@@ -3,24 +3,26 @@ const mockAppend = jest.fn();
 const mockValuesGet = jest.fn();
 const mockSpreadsheetsGet = jest.fn();
 
-jest.mock('googleapis', () => ({
-  google: {
-    auth: {
-      JWT: jest.fn(() => ({})),
-    },
-    sheets: jest.fn(() => ({
-      spreadsheets: {
-        values: {
-          get: mockValuesGet,
-          batchUpdate: mockBatchUpdate,
-          append: mockAppend,
-        },
-        get: mockSpreadsheetsGet,
-        batchUpdate: jest.fn(),
+const installGoogleApisMock = () => {
+  jest.doMock('googleapis', () => ({
+    google: {
+      auth: {
+        JWT: jest.fn(() => ({})),
       },
-    })),
-  },
-}), { virtual: true });
+      sheets: jest.fn(() => ({
+        spreadsheets: {
+          values: {
+            get: mockValuesGet,
+            batchUpdate: mockBatchUpdate,
+            append: mockAppend,
+          },
+          get: mockSpreadsheetsGet,
+          batchUpdate: jest.fn(),
+        },
+      })),
+    },
+  }));
+};
 
 describe('upsertStudentToSheet paid field sync', () => {
   beforeEach(() => {
@@ -29,6 +31,7 @@ describe('upsertStudentToSheet paid field sync', () => {
     mockAppend.mockReset();
     mockValuesGet.mockReset();
     mockSpreadsheetsGet.mockReset();
+    installGoogleApisMock();
 
     process.env.STUDENTS_SHEET_ID = 'sheet-123';
     process.env.STUDENTS_SHEET_TAB = 'students';

@@ -38,7 +38,7 @@ describe("WritingCheatSheetTabs writing videos", () => {
 
   test("does not show a writing video for an unmapped assignment", () => {
     render(
-      <WritingCheatSheetTabs level="B2" day={7}>
+      <WritingCheatSheetTabs level="B2" day={8}>
         <WritingQuestion />
         <WritingEditor />
       </WritingCheatSheetTabs>,

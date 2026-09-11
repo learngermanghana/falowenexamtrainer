@@ -1,24 +1,24 @@
 import fs from "fs";
 import path from "path";
-import React from "react";
-import { render, screen } from "@testing-library/react";
 import A1Day21WeatherResources, {
   buildA1Day21WeatherResourceModels,
 } from "./A1Day21WeatherResources";
-import A1GrammarVideoCard from "./A1GrammarVideoCard";
-import { buildA1AssignmentVideoModel } from "./A1WorkbookVideoHeader";
+import {
+  getA1WorkbookMediaResources,
+  getYouTubeVideoId,
+} from "./A1WorkbookMediaPanel";
 
-const shellSource = fs.readFileSync(
-  path.resolve(__dirname, "A1TutorMarkedWorkbookShell.js"),
-  "utf8",
-);
 const grammarSource = fs.readFileSync(
   path.resolve(__dirname, "A1WorkbookGrammarNotes.js"),
   "utf8",
 );
+const workbookSource = fs.readFileSync(
+  path.resolve(__dirname, "A1Day21WeatherWorkbookPage.js"),
+  "utf8",
+);
 
 describe("A1 Day 21 Weather resources", () => {
-  test("keeps the teacher lecture and corrected Chapter 13 AI video", () => {
+  test("keeps the teacher lecture and corrected Chapter 13 AI video models", () => {
     const resources = buildA1Day21WeatherResourceModels();
 
     expect(resources.teacher).toEqual(
@@ -37,45 +37,24 @@ describe("A1 Day 21 Weather resources", () => {
     );
   });
 
-  test("renders both videos after the Falowen Radio step", () => {
-    render(<A1Day21WeatherResources />);
-
-    expect(
-      screen.getByRole("region", { name: "A1 Day 21 lesson resources" }),
-    ).toBeInTheDocument();
-    expect(screen.getByTitle("Weather · Teacher lecture")).toHaveAttribute(
-      "src",
-      "https://www.youtube-nocookie.com/embed/ijEY8XVrsZs",
-    );
-    expect(screen.getByTitle("A1 Day 21 · Weather · AI video")).toHaveAttribute(
-      "src",
-      "https://www.youtube-nocookie.com/embed/fRYM7ojc0Yo",
-    );
+  test("disables the legacy Day 21 duplicate block", () => {
+    expect(A1Day21WeatherResources()).toBeNull();
   });
 
-  test("builds an embeddable AI video for the A1-13 Grammar tab", () => {
-    const video = buildA1AssignmentVideoModel("A1-13");
+  test("renders Day 21 teacher and AI media once through the shared top panel model", () => {
+    const resources = getA1WorkbookMediaResources({ day: 21, chapter: "13" });
+    const videoIds = resources.map((resource) => getYouTubeVideoId(resource.url)).filter(Boolean);
 
-    expect(video).toEqual(
-      expect.objectContaining({
-        sourceUrl: "https://youtu.be/fRYM7ojc0Yo",
-        youtubeId: "fRYM7ojc0Yo",
-        embedUrl: "https://www.youtube-nocookie.com/embed/fRYM7ojc0Yo",
-      }),
-    );
-
-    render(<A1GrammarVideoCard assignmentKey="A1-13" />);
-    expect(screen.getByTitle("Weather · AI grammar video")).toHaveAttribute(
-      "src",
-      "https://www.youtube-nocookie.com/embed/fRYM7ojc0Yo",
-    );
+    expect(resources).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: "teacher", url: "https://youtu.be/ijEY8XVrsZs" }),
+      expect.objectContaining({ kind: "ai", url: "https://youtu.be/fRYM7ojc0Yo" }),
+    ]));
+    expect(new Set(videoIds).size).toBe(videoIds.length);
   });
 
-  test("mounts the resources in the Day 21 Overview and Grammar views", () => {
-    expect(shellSource).toContain(
-      'assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null',
-    );
-    expect(grammarSource).toContain('normalizedAssignmentKey === "A1-13"');
-    expect(grammarSource).toContain("<A1Day21WeatherResources />");
+  test("keeps the improved Day 21 grammar lesson and fixed A1-13 assignment", () => {
+    expect(grammarSource).toContain('"A1-13": WeatherPerfektLetterPage');
+    expect(workbookSource).toContain('const DAY21_ASSIGNMENT_KEY = "A1-13"');
+    expect(workbookSource).toContain('fallbackAssignmentKey={DAY21_ASSIGNMENT_KEY}');
   });
 });

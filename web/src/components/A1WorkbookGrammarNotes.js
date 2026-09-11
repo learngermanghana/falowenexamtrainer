@@ -17,7 +17,6 @@ import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./HealthBodyPartsPage";
 import A1Day21WeatherResources from "./A1Day21WeatherResources";
-import A1GrammarVideoCard from "./A1GrammarVideoCard";
 
 const A1Day20GoetheWritingGrammarPage = lazy(() =>
   import("./A1Day20GoetheWritingGrammarPage"),
@@ -63,11 +62,7 @@ const A1WorkbookGrammarNotes = ({ assignmentKey }) => {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      {normalizedAssignmentKey === "A1-13" ? (
-        <A1Day21WeatherResources />
-      ) : (
-        <A1GrammarVideoCard assignmentKey={normalizedAssignmentKey} />
-      )}
+      {normalizedAssignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
         <GrammarNotes />
       </Suspense>
