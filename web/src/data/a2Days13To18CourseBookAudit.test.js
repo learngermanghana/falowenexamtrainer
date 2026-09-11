@@ -1,10 +1,28 @@
 import fs from "fs";
 import path from "path";
+import { getA2GrammarRoute } from "./a2GrammarRoutes";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
 
+const batchChapters = Object.freeze({
+  13: "5.13",
+  14: "5.14",
+  15: "6.15",
+  16: "6.16",
+  17: "6.17",
+  18: "7.18",
+});
+
 describe("A2 Course Book continuation audit · Days 13–18", () => {
+  test("keeps every Day 13–18 grammar destination inside Falowen", () => {
+    Object.entries(batchChapters).forEach(([dayKey, chapter]) => {
+      const route = getA2GrammarRoute({ day: Number(dayKey), chapter });
+      expect(route).toMatch(/^\/campus\/course\//);
+      expect(route).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
+    });
+  });
+
   test("keeps Day 13 focused on Vorstellungsgespräch content", () => {
     const wrapper = readComponent("A2Day13VorstellungsgespraechWorkbookPage.js");
 
