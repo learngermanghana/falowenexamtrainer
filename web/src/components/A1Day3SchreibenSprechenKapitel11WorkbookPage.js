@@ -4,6 +4,7 @@ import A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy from "./A1Day3Schreibe
 import LiveClassResponsePanel from "./LiveClassResponsePanel";
 import PersonalInformationContributionBox from "./PersonalInformationContributionBox";
 import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupportingMaterials";
+import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResources";
 
 export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
   Object.freeze({
@@ -16,6 +17,8 @@ export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
     url: "https://youtu.be/LdCVsY-SFTg",
   }),
 ]);
+
+export const A1_DAY3_KAPITEL_11_TEACHER_VIDEO = getCanonicalA1TeacherVideoResource(3, "1.1");
 
 const LIVE_CLASS_LESSON_ID = "A1-day-3-kapitel-1.1-w-words";
 const liveQuestions = [
@@ -42,6 +45,31 @@ const answerClues = [
   "Sie heißt Anna.",
 ];
 
+const focusCardStyle = {
+  border: "1px solid #bfdbfe",
+  background: "#f8fbff",
+  borderRadius: 14,
+  padding: 14,
+  display: "grid",
+  gap: 12,
+};
+
+const miniGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+  gap: 10,
+};
+
+const miniCardStyle = {
+  border: "1px solid #dbeafe",
+  background: "#fff",
+  borderRadius: 10,
+  padding: 11,
+  display: "grid",
+  gap: 5,
+  lineHeight: 1.55,
+};
+
 const replaceText = (element, label, value) => {
   if (!element) return;
   const strong = document.createElement("strong");
@@ -58,7 +86,11 @@ const removeSectionByText = (root, selector, text) => {
 };
 
 const removeExcludedSections = (root) => {
+  // These blocks repeat Day 1/Day 2 content and distract from the canonical
+  // Day 3 · Kapitel 1.1 focus: personal information, articles, adjectives and W-questions.
   removeSectionByText(root, "h1, h2, h3, h4", "Teil 1 · Reading / Writing");
+  removeSectionByText(root, "h1, h2, h3, h4", "Spelling Practice");
+  removeSectionByText(root, "h1, h2, h3, h4", "Basic Vocabulary for A1 German Class");
   removeSectionByText(root, "p", "Class activity");
   removeSectionByText(root, "h1, h2, h3, h4, strong", "Save your class contribution");
 };
@@ -83,6 +115,29 @@ const updateWWordExercise = (root) => {
   );
   boxes.slice(0, answerClues.length).forEach((element, index) =>
     replaceText(element, "Antwort:", answerClues[index])
+  );
+};
+
+const updateLessonSummary = (root) => {
+  const heading = Array.from(root?.querySelectorAll("h1, h2, h3, h4") || []).find(
+    (element) => element.textContent?.trim() === "Key Things You Learned Today"
+  );
+  const section = heading?.closest("section") || heading?.parentElement;
+  const summaryBox = section?.querySelector("div");
+  if (!summaryBox) return;
+
+  const items = [
+    "✔ Asking for personal information with Was, Wer, Wie and Wo",
+    "✔ Using der, die and das with common nouns",
+    "✔ Describing people and things with simple adjectives",
+    "✔ Introducing yourself with name, origin, residence and occupation",
+  ];
+  summaryBox.replaceChildren(
+    ...items.map((text) => {
+      const span = document.createElement("span");
+      span.textContent = text;
+      return span;
+    })
   );
 };
 
@@ -132,6 +187,7 @@ const ensureLiveResponseMounts = (root) => {
 const updateWorkbook = (root) => {
   removeExcludedSections(root);
   updateWWordExercise(root);
+  updateLessonSummary(root);
   return {
     biographyMount: ensureBiographyMount(root),
     liveResponseMounts: ensureLiveResponseMounts(root),
@@ -206,9 +262,43 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
         style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}
       >
         <SelfLearningSupportingMaterials
+          teacherVideo={A1_DAY3_KAPITEL_11_TEACHER_VIDEO}
           aiVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
-          description="Watch the AI lesson, then continue with the Kapitel 1.1 self-learning practice book. No teacher lecture is currently configured for this page."
+          description="Watch the teacher lecture and AI lesson, then use the Kapitel 1.1 practice book for personal information, articles, adjectives and W-questions."
         />
+
+        <section style={{ ...focusCardStyle, marginTop: 12 }} data-a1-day3-kapitel11-core-notes="true">
+          <div>
+            <h2 style={{ margin: 0 }}>Kapitel 1.1 core language</h2>
+            <p style={{ margin: "6px 0 0", lineHeight: 1.6, color: "#475569" }}>
+              Use these patterns before the W-question, speaking and introduction exercises below.
+            </p>
+          </div>
+          <div style={miniGridStyle}>
+            <div style={miniCardStyle}>
+              <strong>Personal information</strong>
+              <span>Wie heißt du? – Ich heiße Ama.</span>
+              <span>Woher kommst du? – Ich komme aus Ghana.</span>
+              <span>Wo wohnst du? – Ich wohne in Accra.</span>
+            </div>
+            <div style={miniCardStyle}>
+              <strong>Articles: der · die · das</strong>
+              <span><strong>der</strong> Mann · <strong>die</strong> Frau · <strong>das</strong> Kind</span>
+              <span>Learn each new noun together with its article.</span>
+            </div>
+            <div style={miniCardStyle}>
+              <strong>Simple adjectives</strong>
+              <span>Der Ball ist <strong>klein</strong>.</span>
+              <span>Die Frau ist <strong>freundlich</strong>.</span>
+              <span>Das Haus ist <strong>groß</strong>.</span>
+            </div>
+            <div style={miniCardStyle}>
+              <strong>W-questions</strong>
+              <span><strong>Was</strong> = what · <strong>Wer</strong> = who</span>
+              <span><strong>Wie</strong> = how / what … called · <strong>Wo</strong> = where</span>
+            </div>
+          </div>
+        </section>
       </div>
 
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
