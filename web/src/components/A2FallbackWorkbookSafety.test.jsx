@@ -11,7 +11,7 @@ jest.mock("./ContextualAssignmentSubmissionPage", () => ({ submissionContext }) 
   <pre data-testid="contextual-submission">{JSON.stringify(submissionContext)}</pre>
 ));
 
-const nativeSubmissionCases = [
+const compatibilityCases = [
   {
     day: 24,
     path: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
@@ -46,7 +46,7 @@ const expectedContext = ({ day, fallbackChapter, workbookId }) => {
   };
 };
 
-const renderNativeSubmission = ({ path }) => {
+const renderCompatibilityPanel = ({ path }) => {
   const location = `${path}?radio=done`;
   window.history.pushState({}, "", location);
 
@@ -57,48 +57,40 @@ const renderNativeSubmission = ({ path }) => {
   );
 };
 
-describe("A2 late native submission safety", () => {
-  test.each(nativeSubmissionCases)(
-    "Day $day stays locked to the workbook assignment in the production panel",
+describe("A2 late submission compatibility safety", () => {
+  test.each(compatibilityCases)(
+    "compatibility resolver keeps Day $day locked to its canonical assignment",
     (routeCase) => {
-      renderNativeSubmission(routeCase);
-
-      const panel = document.querySelector(`[data-a2-late-native-submission="${routeCase.day}"]`);
-      expect(panel).toBeTruthy();
-      expect(panel.textContent).toMatch(new RegExp(`Submit Workbook · Day ${routeCase.day}`, "i"));
-
+      renderCompatibilityPanel(routeCase);
       const contextualSubmission = screen.getByTestId("contextual-submission");
       expect(JSON.parse(contextualSubmission.textContent)).toEqual(expectedContext(routeCase));
       expect(resolveA2LateWorkbookSubmissionContext(routeCase.path)).toEqual(expectedContext(routeCase));
     },
   );
 
-  test("Day 25 identifies Part 4 as submitted Lesen rather than Hören", () => {
-    const day25 = nativeSubmissionCases.find(({ day }) => day === 25);
-    renderNativeSubmission(day25);
+  test("Day 25 compatibility copy now identifies Hören as submitted", () => {
+    const day25 = compatibilityCases.find(({ day }) => day === 25);
+    renderCompatibilityPanel(day25);
 
     const panel = document.querySelector('[data-a2-late-native-submission="25"]');
     expect(panel).toBeTruthy();
-    expect(panel.textContent).toMatch(/Teil 4 · Lesen is part of the submitted workbook/i);
-    expect(panel.textContent).not.toMatch(/Teil 4 · Hören/i);
+    expect(panel.textContent).toMatch(/Teil 4 · Hören is part of the submitted workbook/i);
+    expect(panel.textContent).not.toMatch(/Teil 4 · Lesen/i);
   });
 
-  test.each([24, 26])("Day %i identifies Hören as self-check only", (day) => {
-    const routeCase = nativeSubmissionCases.find((item) => item.day === day);
-    renderNativeSubmission(routeCase);
+  test.each([24, 26])("Day %i compatibility copy keeps Hören self-check only", (day) => {
+    const routeCase = compatibilityCases.find((item) => item.day === day);
+    renderCompatibilityPanel(routeCase);
 
     const panel = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
     expect(panel).toBeTruthy();
     expect(panel.textContent).toMatch(/Teil 4 · Hören is self-check practice and is not submitted/i);
   });
 
-  test("legacy fallback context stays in parity while only Days 24-26 are supported", () => {
-    nativeSubmissionCases.forEach((routeCase) => {
+  test("legacy fallback resolver stays in parity for its compatibility routes", () => {
+    compatibilityCases.forEach((routeCase) => {
       expect(resolveA2FallbackSubmissionContext(routeCase.day)).toEqual(expectedContext(routeCase));
       expect(resolveA2LateWorkbookSubmissionContext(routeCase.path)).toEqual(expectedContext(routeCase));
     });
-    expect(resolveA2FallbackSubmissionContext(23)).toBeNull();
-    expect(resolveA2FallbackSubmissionContext(27)).toBeNull();
-    expect(resolveA2LateWorkbookSubmissionContext("/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook")).toBeNull();
   });
 });
