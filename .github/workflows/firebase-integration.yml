@@ -22,10 +22,17 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Install dependencies
+      - name: Install root test dependencies
         # The root package-lock predates the current backend devDependencies.
         # Install from package.json without mutating or trusting that stale lock in CI.
         run: npm install --package-lock=false --no-audit --no-fund
+
+      - name: Install Functions dependencies
+        # Backend route tests live under functions/functionz and resolve runtime
+        # dependencies (firebase-admin, firebase-functions, googleapis, etc.) from
+        # functions/node_modules. The Functions lockfile also predates package.json,
+        # so use package.json without rewriting the checked-in lockfile here.
+        run: npm install --prefix functions --package-lock=false --no-audit --no-fund
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
