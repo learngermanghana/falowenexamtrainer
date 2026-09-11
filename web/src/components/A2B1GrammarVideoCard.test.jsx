@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import A2B1GrammarVideoCard, {
   A2_B1_GRAMMAR_VIDEO_ATTRIBUTE,
@@ -10,9 +10,10 @@ import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("A2/B1 tutor grammar AI videos", () => {
-  test("embeds the configured A2 AI video above the grammar notes", () => {
+  test("embeds the configured A2 AI video above the grammar notes", async () => {
     renderWithRouter(<A2B1GrammarNotesTab level="A2" day={1} />);
 
+    await screen.findByTitle(/A2 Day 1.*AI grammar video/i);
     const card = document.querySelector(`[${A2_B1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`);
     expect(card).toBeVisible();
     expect(card).toBe(card.parentElement.firstElementChild);
@@ -52,10 +53,12 @@ describe("A2/B1 tutor grammar AI videos", () => {
     expect(model.videoResource.title).toMatch(/AI video/i);
   });
 
-  test("does not add a video-only grammar section when grammar notes are unavailable", () => {
-    renderWithRouter(<A2B1GrammarNotesTab level="B1" day={17} />);
+  test("does not add a video-only grammar card when a B1 deep-grammar page is unavailable", async () => {
+    renderWithRouter(<A2B1GrammarNotesTab level="B1" day={24} />);
 
-    expect(document.querySelector(`[${A2_B1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)).toBeNull();
-    expect(screen.getByText(/Grammar notes have not been added/i)).toBeVisible();
+    await waitFor(() => {
+      expect(document.querySelector(`[${A2_B1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)).toBeNull();
+    });
+    expect(await screen.findByText(/separate deep-grammar page has not been added/i)).toBeVisible();
   });
 });
