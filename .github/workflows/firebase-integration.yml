@@ -16,6 +16,12 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Use Java 21 for Firebase emulators
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: Install dependencies
         # The root package-lock predates the current backend devDependencies.
         # Install from package.json without mutating or trusting that stale lock in CI.
