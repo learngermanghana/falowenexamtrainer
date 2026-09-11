@@ -32,12 +32,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            web/package-lock.json
-
-      - name: Install curriculum tooling
-        run: npm ci
+          cache-dependency-path: web/package-lock.json
 
       - name: Regenerate curriculum routes
         run: npm run sync:curriculum
