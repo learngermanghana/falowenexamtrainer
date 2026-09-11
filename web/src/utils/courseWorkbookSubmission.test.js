@@ -39,8 +39,8 @@ describe("course workbook submission identities", () => {
 });
 
 describe("course workbook tabs", () => {
-  test("uses Assignment and Submit for A1", () => {
-    expect(getWorkbookNavigationTabs("A1").map((tab) => tab.label)).toEqual(["Assignment", "Submit"]);
+  test("does not add the retired generic Assignment and Submit tabs for A1", () => {
+    expect(getWorkbookNavigationTabs("A1")).toEqual([]);
   });
 
   test("uses Teil 1 to 4, Ref and Submit for A2 and B1", () => {
