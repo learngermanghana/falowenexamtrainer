@@ -87,15 +87,8 @@ function patchDay23() {
 
   source = replaceOnce(
     source,
-    "Today’s main goal is to choose the correct object case from the verb. Learn common dative verbs, compare them with accusative verbs and use the right pronoun. Adjective declension is kept below as an optional extra so the case choice stays clear.",
-    "Today’s main goal is to choose the correct object case from the verb. Learn common dative verbs, compare them with accusative verbs and use the right pronoun. Then build on that case knowledge with a second grammar focus: common adjective endings with ein/eine.",
-    "Day 23 introduction",
-  );
-
-  source = replaceOnce(
-    source,
-    "          <li>choose the correct object pronoun, for example <strong>mich</strong> vs <strong>mir</strong>.</li>\n",
-    "          <li>choose the correct object pronoun, for example <strong>mich</strong> vs <strong>mir</strong>.</li>\n          <li>use common adjective endings with <strong>ein/eine</strong> in Nominativ, Akkusativ and Dativ.</li>\n",
+    "          <li>use common object pronouns such as <strong>mich/mir</strong>, <strong>dich/dir</strong> and <strong>Sie/Ihnen</strong>.</li>\n",
+    "          <li>use common object pronouns such as <strong>mich/mir</strong>, <strong>dich/dir</strong> and <strong>Sie/Ihnen</strong>.</li>\n          <li>use common adjective endings with <strong>ein/eine</strong> in Nominativ, Akkusativ and Dativ.</li>\n",
     "Day 23 learning targets",
   );
 
