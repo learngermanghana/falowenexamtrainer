@@ -76,7 +76,7 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
     });
   });
 
-  test("the third cleanup batch does not take ownership of Days 13-16 or Day 23", () => {
+  test("the third cleanup batch does not take ownership of Days 13-16", () => {
     const raw = [
       {
         id: "B1-5.16",
@@ -84,13 +84,6 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
         displayDay: 16,
         grammarNotesPage: "https://drive.google.com/day16-grammar",
         workbookPage: "https://drive.google.com/day16-workbook",
-      },
-      {
-        id: "B1-7.23",
-        level: "B1",
-        displayDay: 23,
-        grammarNotesPage: "https://drive.google.com/day23-grammar",
-        workbookPage: "https://drive.google.com/day23-workbook",
       },
     ];
     expect(alignB1CurriculumEntries(raw)).toEqual(raw);

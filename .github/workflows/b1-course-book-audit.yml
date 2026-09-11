@@ -48,3 +48,4 @@ jobs:
           src/data/b1Days1To6CourseBookAudit.test.js
           src/data/b1Days7To12CourseBookAudit.test.js
           src/data/b1Days17To22CourseBookAudit.test.js
+          src/data/b1Days23To28CourseBookAudit.test.js
