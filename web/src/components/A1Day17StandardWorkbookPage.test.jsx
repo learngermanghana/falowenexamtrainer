@@ -33,7 +33,7 @@ describe("A1 Day 17 native standard workbook", () => {
     expect(screen.getByRole("tab", { name: /Teil 1/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 2/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 3/i })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Submit" })).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toBeVisible();
   });
 
   test("opens each original section through the native tabs", () => {
