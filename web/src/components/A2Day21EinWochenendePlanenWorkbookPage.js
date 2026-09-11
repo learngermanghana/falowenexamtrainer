@@ -30,6 +30,29 @@ const lesenQuestions = [
   },
 ];
 
+const schreibenContent = (
+  <div style={{ display: "grid", gap: 10 }}>
+    <p style={{ margin: 0, lineHeight: 1.7 }}>
+      Schreiben Sie einen Brief an einen Freund oder eine Freundin, in dem Sie ihn oder sie zu
+      einem gemeinsamen Wochenende einladen.
+    </p>
+    <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+      <li>
+        Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind (z. B.
+        was Sie vorhaben und worauf Sie sich freuen).
+      </li>
+      <li>
+        Laden Sie die Person ein, mit Ihnen zu kommen, und nennen Sie wichtige Details (Datum,
+        Ort, Treffpunkt, Dauer).
+      </li>
+      <li>
+        Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann (Kleidung,
+        Essen, Ausrüstung, Aktivitäten).
+      </li>
+    </ol>
+  </div>
+);
+
 export default function A2Day21EinWochenendePlanenWorkbookPage() {
   return (
     <A2StandardTabbedWorkbookPage
@@ -38,8 +61,9 @@ export default function A2Day21EinWochenendePlanenWorkbookPage() {
       chapter="8.21"
       workbookId="A2Day21EinWochenendePlanen"
       topicPrompt="Plane ein Wochenende. Sage, was du am Samstag und Sonntag machen möchtest, mit wem du unterwegs bist und was du bei gutem oder schlechtem Wetter machst."
-      schreibenTask="Schreiben Sie einem Freund oder einer Freundin und laden Sie die Person zu einem gemeinsamen Wochenende ein. Beschreiben Sie Ihre Pläne, nennen Sie Datum und Treffpunkt und erklären Sie, was die Person mitbringen sollte."
-      schreibenPlaceholder="Liebe/r ...,\n\nhast du am Wochenende Zeit? Ich möchte ..."
+      schreibenTask="Einladung zu einem gemeinsamen Wochenende"
+      schreibenContent={schreibenContent}
+      schreibenPlaceholder="Liebe/r ...,\n\nich möchte dich zu einem gemeinsamen Wochenende einladen ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
       hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie auf Aktivitäten, Zeiten, Treffpunkte und mögliche Änderungen bei schlechtem Wetter."
