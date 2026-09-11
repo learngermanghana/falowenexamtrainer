@@ -80,13 +80,13 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 4 Workbook · Numbers
+          A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2 · Tutor-marked assignment</p>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete both workbook Teile below. Use the Grammar notes for the full 0–10,000 number-building patterns and address expressions, then submit your final answers once.
+          Complete both workbook Teile below. Use the Grammar notes for the full 0–10,000 number-building patterns and for using numbers in phone numbers and addresses, then submit your final answers once.
         </p>
       </div>
 
