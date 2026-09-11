@@ -1,11 +1,11 @@
 const http = require("http");
 
 let mockDb;
-const verifyIdToken = jest.fn(async () => ({ uid: "uid-1", email: "student@example.com" }));
+const mockVerifyIdToken = jest.fn(async () => ({ uid: "uid-1", email: "student@example.com" }));
 
 jest.mock("firebase-admin", () => ({
   apps: [{}],
-  auth: () => ({ verifyIdToken }),
+  auth: () => ({ verifyIdToken: mockVerifyIdToken }),
   firestore: () => mockDb,
   credential: { cert: jest.fn() },
   initializeApp: jest.fn(),
