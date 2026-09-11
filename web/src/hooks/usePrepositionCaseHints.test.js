@@ -45,7 +45,7 @@ describe("usePrepositionCaseHints", () => {
     });
   });
 
-  it("detects articleless dative plural public transport phrases", () => {
+  it("does not guess the number of articleless nouns with identical singular and plural forms", () => {
     const { result } = renderHook(() =>
       usePrepositionCaseHints({
         text: "Bei der Beurteilung von öffentliche Verkehrsmittel sollten mehrere Kriterien berücksichtigt werden.",
@@ -55,13 +55,8 @@ describe("usePrepositionCaseHints", () => {
     );
 
     runDebounce();
-    expect(result.current.hints).toHaveLength(1);
-    expect(result.current.hints[0]).toMatchObject({
-      fullPhrase: "von öffentliche Verkehrsmittel",
-      fullCorrection: "von öffentlichen Verkehrsmitteln",
-      case: "dative",
-      issueType: "articleless-case",
-    });
+    expect(result.current.hints).toEqual([]);
+    expect(result.current.summary.checked).toBe(0);
   });
 
   it("returns no hints or progress for unsupported levels by default", () => {
