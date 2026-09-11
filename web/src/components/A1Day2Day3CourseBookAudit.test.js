@@ -5,7 +5,7 @@ import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResour
 const readComponent = (filename) =>
   fs.readFileSync(path.join(__dirname, filename), "utf8");
 
-describe("A1 Course Book Day 2 through Day 7 audit guardrails", () => {
+describe("A1 Course Book Day 2 through Day 8 audit guardrails", () => {
   test("Day 3 Kapitel 1.1 uses the canonical teacher lecture and teaches its declared focus", () => {
     const source = readComponent("A1Day3SchreibenSprechenKapitel11WorkbookPage.js");
     const teacher = getCanonicalA1TeacherVideoResource(3, "1.1");
@@ -60,5 +60,18 @@ describe("A1 Course Book Day 2 through Day 7 audit guardrails", () => {
     expect(workbook).not.toContain("Ich mag Bücher lesen.");
     expect(workbook).not.toContain("Sie genießt Malen.");
     expect(grammar).toContain("Plural short answer:</strong> Sie kosten 10 Euro.");
+  });
+
+  test("Day 8 title and grammar focus match the countries/languages/travel lesson", () => {
+    const workbook = readComponent("A1Day8CountriesAndLanguagesWorkbookPage.js");
+    const grammar = readComponent("FormingBasicStatementsPage.js");
+    const schedule = fs.readFileSync(path.join(__dirname, "../data/courseSchedule.js"), "utf8");
+
+    expect(workbook).toContain("Countries, Languages & Travel");
+    expect(grammar).toContain("A1 Grammar – Day 8: Countries, Languages & Travel");
+    expect(grammar).toContain("woher");
+    expect(grammar).toContain("wohin");
+    expect(schedule).toContain('topic: "Countries, Languages & Travel"');
+    expect(schedule).not.toContain('goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann"');
   });
 });
