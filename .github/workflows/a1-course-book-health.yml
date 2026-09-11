@@ -1,0 +1,52 @@
+name: A1 Course Book health
+
+on:
+  pull_request:
+    paths:
+      - "shared/curriculumCanonical.json"
+      - "web/src/App.js"
+      - "web/src/data/**"
+      - "web/src/components/A1*"
+      - "web/src/utils/a1*"
+      - "web/src/utils/courseWorkbookSubmission*"
+      - "scripts/auditA1CourseBook.js"
+      - "scripts/applyA1RouteAlignment.js"
+      - "scripts/patchA1*.mjs"
+      - ".github/workflows/a1-course-book-health.yml"
+
+jobs:
+  verify-a1-course-book:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Audit canonical A1 curriculum
+        run: node scripts/auditA1CourseBook.js
+
+      - name: Run A1 Course Book health regressions
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/data/a1CourseBookHealth.test.js
+          src/data/a1RouteAlignment.test.js
+          src/data/a1AssignmentRegistry.test.js
+          src/data/a1TeacherVideoResources.test.js
+          src/components/A1RadioFirstWorkbookRoutes.test.jsx
+          src/components/A1WorkbookSectionTabs.test.js
+          src/components/A1Day17StandardWorkbookPage.test.jsx
+          src/utils/courseWorkbookSubmission.test.js
+
+      - name: Build production web app
+        working-directory: web
+        run: npm run build
