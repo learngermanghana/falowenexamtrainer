@@ -1,8 +1,9 @@
 import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
+import { getB1Days23To28LessonMetadata } from "./b1Days23To28LessonMetadata";
 
 const FIRST_B1_CLEANUP_DAYS = new Set([
   ...Array.from({ length: 12 }, (_, index) => index + 1),
-  ...Array.from({ length: 6 }, (_, index) => index + 17),
+  ...Array.from({ length: 12 }, (_, index) => index + 17),
 ]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const firstPresent = (...values) =>
@@ -30,6 +31,8 @@ export const alignB1CurriculumEntry = (entry = {}, parentContext = {}) => {
   const override = getB1LessonResourceOverride(day);
   if (!override) return entry;
 
+  const lessonMetadata = getB1Days23To28LessonMetadata(day);
+  const isTopLevel = parentContext.day === undefined || parentContext.day === null;
   const aligned = { ...entry };
   const grammarRoute = String(override.grammarBook || "").trim();
   const workbookRoute = String(override.workbook || "").trim();
@@ -39,7 +42,10 @@ export const alignB1CurriculumEntry = (entry = {}, parentContext = {}) => {
     aligned.grammarPage = grammarRoute;
     aligned.grammarbook_link = grammarRoute;
     aligned.grammar_link = grammarRoute;
-  } else if (Object.prototype.hasOwnProperty.call(override, "grammarBook")) {
+  } else if (
+    Object.prototype.hasOwnProperty.call(override, "grammarBook") ||
+    lessonMetadata?.workbookOnly
+  ) {
     aligned.grammarNotesPage = null;
     aligned.grammarPage = null;
     aligned.grammarbook_link = null;
@@ -49,6 +55,13 @@ export const alignB1CurriculumEntry = (entry = {}, parentContext = {}) => {
     aligned.workbookPage = workbookRoute;
     aligned.workbookRoute = workbookRoute;
     aligned.workbook_link = workbookRoute;
+  }
+
+  if (isTopLevel && lessonMetadata) {
+    aligned.topic = lessonMetadata.title;
+    aligned.goal = lessonMetadata.goal;
+    aligned.instruction = lessonMetadata.instruction;
+    if (!aligned.chapter) aligned.chapter = lessonMetadata.chapter;
   }
 
   const context = { level: "B1", day };
