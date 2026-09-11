@@ -41,6 +41,9 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Run B1 Days 1-6 audit
+      - name: Run B1 Course Book audits
         working-directory: web
-        run: npx jest --runInBand src/data/b1Days1To6CourseBookAudit.test.js
+        run: >-
+          npx jest --runInBand
+          src/data/b1Days1To6CourseBookAudit.test.js
+          src/data/b1Days7To12CourseBookAudit.test.js

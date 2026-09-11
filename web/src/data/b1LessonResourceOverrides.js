@@ -70,6 +70,15 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     goal: "Über digitale Gewohnheiten und Digital-Detox-Strategien sprechen.",
     instruction: "Lies zuerst die Grammatiknotizen. Bearbeite Teil 1 bis Teil 4; Teil 4 ist Selbstkontrolle. Sende nur Schreiben und Lesen.",
   }),
+  11: Object.freeze({
+    chapter: "4.11",
+    title: "Teamspiele und kooperative Aktivitäten",
+    grammarBook: route(11, "grammar"),
+    workbook: route(11, "workbook"),
+    grammarTopic: "Reziproke Ausdrücke für Teamarbeit: einander, miteinander, füreinander, voneinander, aufeinander und gegeneinander",
+    goal: "Über Teamspiele, Zusammenarbeit, Konflikte und kooperative Aktivitäten sprechen und gegenseitige Handlungen klar ausdrücken.",
+    instruction: "Lies zuerst die in-app Grammatiknotizen zu reziproken Ausdrücken. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Teil 1 ist Gruppenpraxis; sende Schreiben, Lesen und Hören über den Submit-Tab.",
+  }),
   12: Object.freeze({
     chapter: "4.12",
     title: "Abenteuer in der Natur",

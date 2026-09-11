@@ -38,13 +38,13 @@ describe("B1 Course Book cleanup · Days 1-6", () => {
     });
   });
 
-  test("the first cleanup batch is deliberately scoped and does not rewrite Day 7 yet", () => {
+  test("expanded B1 cleanup remains deliberately scoped and does not rewrite Day 13 yet", () => {
     const raw = [{
-      id: "B1-3.7",
+      id: "B1-4.13",
       level: "B1",
-      displayDay: 7,
-      grammarNotesPage: "https://drive.google.com/day7-grammar",
-      workbookPage: "https://drive.google.com/day7-workbook",
+      displayDay: 13,
+      grammarNotesPage: "https://drive.google.com/day13-grammar",
+      workbookPage: "https://drive.google.com/day13-workbook",
     }];
     expect(alignB1CurriculumEntries(raw)).toEqual(raw);
   });
