@@ -11,24 +11,15 @@ const route = "/campus/course/modal-verbs-day-14-3-6";
 const workbookRoute = `${route}?radio=done&materials=done`;
 
 describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
-  test("shows the saved teacher lecture and AI lesson in the native materials step", () => {
+  test("opens the workbook directly after Falowen Radio and keeps the canonical lesson resources", () => {
     const { container } = render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
 
-    expect(container.querySelector('[data-self-learning-materials-selector="true"]')).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Choose your learning material/i })).toBeVisible();
-    expect(screen.getByRole("link", { name: /Watch teacher video/i })).toHaveAttribute(
-      "href",
-      "https://youtu.be/GJw1aJehYHU",
-    );
-    expect(screen.getByRole("link", { name: /Watch AI video/i })).toHaveAttribute(
-      "href",
-      "https://youtu.be/Wkj1-TnNUxY",
-    );
-    expect(container.querySelector("iframe")).not.toBeInTheDocument();
+    expect(container.querySelector('[data-self-learning-materials-selector="true"]')).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Modal Verbs with Separable Verbs/i })).toBeVisible();
 
     expect(getA1TeacherVideoResources(14)).toEqual([
       expect.objectContaining({
@@ -97,7 +88,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     );
 
     expect(container.querySelector('[data-self-learning-materials-selector="true"]')).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /A2 • 6\.17 In die Apotheke gehen/i })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /A2 Day 17 · In die Apotheke gehen/i })).toBeVisible();
     expect(screen.queryByRole("heading", { name: /A1 · Day 14 Workbook/i })).not.toBeInTheDocument();
   });
 
