@@ -1,0 +1,42 @@
+name: A1 all chapters audit
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/a1*.js"
+      - "web/src/data/a1*.json"
+      - "web/src/components/A1*"
+      - "web/src/components/RadioFirstWorkbookGate.js"
+      - "web/src/data/inAppWorkbookRoutes.*"
+      - "scripts/applyA1RouteAlignment.js"
+      - "shared/curriculumCanonical.json"
+      - ".github/workflows/a1-all-chapters-audit.yml"
+  push:
+    branches:
+      - "audit/a1-*"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Regenerate curriculum routes
+        run: npm run sync:curriculum
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Run A1 all-chapter audits
+        working-directory: web
+        run: >-
+          npx jest --runInBand
+          src/data/a1AllChaptersAudit.test.js
+          src/data/a1CourseBookHealth.test.js
+          src/data/a1RouteAlignment.test.js
+          src/data/a1AssignmentRegistry.test.js
+          src/data/a1TeacherVideoResources.test.js
+          src/components/A1RadioFirstWorkbookRoutes.test.jsx
