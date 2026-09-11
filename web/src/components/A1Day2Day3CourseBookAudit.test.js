@@ -5,7 +5,7 @@ import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResour
 const readComponent = (filename) =>
   fs.readFileSync(path.join(__dirname, filename), "utf8");
 
-describe("A1 Course Book Day 2 through Day 8 audit guardrails", () => {
+describe("A1 Course Book Day 2 through Day 12 audit guardrails", () => {
   test("Day 3 Kapitel 1.1 uses the canonical teacher lecture and teaches its declared focus", () => {
     const source = readComponent("A1Day3SchreibenSprechenKapitel11WorkbookPage.js");
     const teacher = getCanonicalA1TeacherVideoResource(3, "1.1");
@@ -73,5 +73,38 @@ describe("A1 Course Book Day 2 through Day 8 audit guardrails", () => {
     expect(grammar).toContain("wohin");
     expect(schedule).toContain('topic: "Countries, Languages & Travel"');
     expect(schedule).not.toContain('goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann"');
+  });
+
+  test("Day 9 labels the definite-article case practice accurately", () => {
+    const source = readComponent("A1Chapter5GermanCasesWorkbookPage.js");
+
+    expect(source).toContain("German Cases: Nominative and Accusative");
+    expect(source).toContain("practises definite articles in the nominative and accusative");
+    expect(source).not.toContain("Definite & Indefinite Articles");
+  });
+
+  test("Day 10 keeps the canonical identity while explaining the apartment-context assignment", () => {
+    const source = readComponent("A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js");
+
+    expect(source).toContain('title="A1 · Day 10 Workbook · Objects and Colors"');
+    expect(source).toContain("applies object vocabulary through rooms, furniture and apartment descriptions");
+    expect(source).not.toContain('title="A1 · Day 10 Workbook · Objects, Colors and Possessive Articles"');
+  });
+
+  test("Day 11 uses learner-facing submission wording", () => {
+    const source = readComponent("A1Day11UnderstandingTimeWorkbookPage.js");
+
+    expect(source).toContain("Complete both required Teile, then send your final Chapter 7 answers here once.");
+    expect(source).not.toContain("This submission box is locked to A1-7");
+  });
+
+  test("Day 12 has three assessed Teile and a non-blocking vocabulary reminder", () => {
+    const source = readComponent("A1Day12TwentyFourHourClockAndDatesWorkbookPage.js");
+    const registry = fs.readFileSync(path.join(__dirname, "../data/a1AssignmentRegistry.js"), "utf8");
+
+    expect(source).toContain("The assignment has three assessed parts");
+    expect(source).toContain("<h2 style={sectionTitle}>Vocabulary reminder</h2>");
+    expect(source).not.toContain("Teil 4: Vocabulary reminder");
+    expect(registry).not.toContain('"Teil 4: Vocabulary reminder"');
   });
 });
