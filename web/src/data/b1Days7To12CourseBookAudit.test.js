@@ -62,13 +62,13 @@ describe("B1 Course Book cleanup · Days 7-12", () => {
     });
   });
 
-  test("the second cleanup batch stops at Day 12", () => {
+  test("complete B1 cleanup leaves non-B1 curriculum entries unchanged", () => {
     const raw = [{
-      id: "B1-4.13",
-      level: "B1",
+      id: "A2-5.13",
+      level: "A2",
       displayDay: 13,
-      grammarNotesPage: "https://drive.google.com/day13-grammar",
-      workbookPage: "https://drive.google.com/day13-workbook",
+      grammarNotesPage: "https://drive.google.com/a2-grammar",
+      workbookPage: "https://drive.google.com/a2-workbook",
     }];
     expect(alignB1CurriculumEntries(raw)).toEqual(raw);
   });

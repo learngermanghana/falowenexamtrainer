@@ -1,10 +1,9 @@
 import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
 import { getB1Days23To28LessonMetadata } from "./b1Days23To28LessonMetadata";
 
-const FIRST_B1_CLEANUP_DAYS = new Set([
-  ...Array.from({ length: 12 }, (_, index) => index + 1),
-  ...Array.from({ length: 12 }, (_, index) => index + 17),
-]);
+const FIRST_B1_CLEANUP_DAYS = new Set(
+  Array.from({ length: 28 }, (_, index) => index + 1),
+);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const firstPresent = (...values) =>
   values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");

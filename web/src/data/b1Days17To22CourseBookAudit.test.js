@@ -76,16 +76,14 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
     });
   });
 
-  test("the third cleanup batch does not take ownership of Days 13-16", () => {
-    const raw = [
-      {
-        id: "B1-5.16",
-        level: "B1",
-        displayDay: 16,
-        grammarNotesPage: "https://drive.google.com/day16-grammar",
-        workbookPage: "https://drive.google.com/day16-workbook",
-      },
-    ];
+  test("complete B1 cleanup leaves entries without a usable day untouched", () => {
+    const raw = [{
+      id: "B1-unknown",
+      level: "B1",
+      displayDay: "",
+      grammarNotesPage: "https://drive.google.com/unknown-grammar",
+      workbookPage: "https://drive.google.com/unknown-workbook",
+    }];
     expect(alignB1CurriculumEntries(raw)).toEqual(raw);
   });
 
