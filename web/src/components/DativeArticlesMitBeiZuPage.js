@@ -213,9 +213,9 @@ export const DativeArticlesMitBeiZuGrammarNotes = () => {
         <p style={{ margin: 0, color: "#475569" }}><strong>mit</strong> has no similar contraction: mit dem Bus, mit der Bahn, mit den Freunden.</p>
       </Section>
 
-      <Section eyebrow="Workbook bridge" title="Practise the grammar in the same situations you will read about">
+      <Section eyebrow="Workbook bridge" title="Practise the grammar in familiar situations">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The fixed tutor-marked workbook includes doctor, train, office and everyday-life situations. Before you open it, connect those situations to today’s grammar:
+          You will meet doctor, train, office and everyday-life situations in the workbook. Before you open it, connect those situations to today’s grammar:
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
@@ -300,12 +300,12 @@ export const DativeArticlesMitBeiZuGrammarNotes = () => {
         ) : null}
       </Section>
 
-      <Section eyebrow="Prepare for the tutor-marked work" title="What the workbook will test">
+      <Section eyebrow="Workbook preparation" title="Apply the grammar while you read and listen">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The workbook is already connected to Falowen Admin and also checks reading, listening and earlier A1 knowledge. The grammar notes above prepare you for the new Chapter 12.2 language, while the workbook deliberately revises older skills too.
+          The workbook combines today’s grammar with reading, listening and familiar A1 language. When you see <strong>mit</strong>, <strong>bei</strong> or <strong>zu</strong>, check the dative article carefully and use the surrounding context to understand the rest.
         </p>
         <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", padding: 12, borderRadius: 10, lineHeight: 1.65 }}>
-          <strong>Important:</strong> the tutor-marked assignment and its saved answer mapping have not been changed.
+          <strong>Tip:</strong> Say the phrase aloud before answering: <strong>mit dem</strong>, <strong>bei der</strong>, <strong>zum</strong>, <strong>zur</strong>, <strong>zu den</strong>.
         </div>
       </Section>
 
