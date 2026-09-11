@@ -149,7 +149,7 @@ const HealthOverview = () => (
   <section style={sectionStyle} data-a1-day22-health-overview="true">
     <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Complete Teil 1, write the Teil 2 E-Mail, check it with Mark My Letter, finish Teil 3 vocabulary, then open Submit.
+      Complete Teil 1, write the Teil 2 E-Mail, check it with Mark My Letter, finish Teil 3 vocabulary, then open Submit Assignment.
     </p>
   </section>
 );
@@ -203,7 +203,7 @@ const Teil2Content = () => (
 
         <div style={infoBoxStyle}>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Schreiben Sie eine E-Mail an Felix. Sie hat Sie zum Geburtstag eingeladen, aber Sie können nicht teilnehmen.
+            Schreiben Sie eine E-Mail an Felix. Er hat Sie zum Geburtstag eingeladen, aber Sie können nicht teilnehmen.
           </p>
 
           <p style={{ margin: 0 }}><strong>Punkte:</strong></p>
@@ -226,7 +226,7 @@ const Teil2Content = () => (
 
         <A1CourseBookLetterPracticePanel
           title="Mark My Health Letter"
-          description="Write or paste your E-Mail to Felix here. Falowen will mark it and explain the corrections before you copy the improved version to Submit."
+          description="Write or paste your E-Mail to Felix here. Falowen will mark it and explain the corrections before you copy the improved version to Submit Assignment."
           taskId="A1-14.1-teil-2-health-letter"
           taskTitle="Health reason email to Felix"
           taskContext="email to Felix declining a birthday invitation with a health reason and asking for another appointment"
@@ -265,9 +265,9 @@ const A1Day22HealthBodyPartsWorkbookPage = () => (
     fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
     title="A1 · Day 22 Workbook · Health and Body Parts"
     subtitle="Kapitel 14.1 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit and send your final answers to your tutor."
+    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit Assignment and send your final answers to your tutor."
     submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
-    submitDescription="This submission is locked to A1-14.1. Submit your reading answers, final writing task and vocabulary answers for tutor marking."
+    submitDescription="Submit your reading answers, final writing task and vocabulary answers together for tutor marking."
   >
     <HealthOverview />
     <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>
