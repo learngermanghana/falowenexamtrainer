@@ -142,7 +142,7 @@ describe("A1 full Course Book consolidation", () => {
 
     const day3Practice = componentSource("A1Day3SchreibenSprechenKapitel11WorkbookPage.js");
     expect(day3Practice).toContain("getCanonicalA1TeacherVideoResource");
-    expect(day3Practice).toContain("teacherVideoUrl");
+    expect(day3Practice).toContain("teacherVideo={A1_DAY3_KAPITEL_11_TEACHER_VIDEO}");
   });
 
   test("all A1 workbook pages keep the global PDF download injector", () => {
