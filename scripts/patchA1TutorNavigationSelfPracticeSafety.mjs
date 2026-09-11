@@ -47,6 +47,7 @@ fs.writeFileSync(testPath, testSource);
 
 await import("./patchA1WorkbookVideoInsertBeforeSafety.mjs");
 await import("./patchStudyBuddyGlobalOverlay.mjs");
+await import("./patchA1Day3AuditObserverSafety.mjs");
 await import("./patchA1Day5CourseBookAudit.mjs");
 await import("./patchA1Day13RevisionClarity.mjs");
 
