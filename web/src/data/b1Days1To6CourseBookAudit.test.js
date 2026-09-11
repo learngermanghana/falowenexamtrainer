@@ -70,11 +70,11 @@ describe("B1 Course Book cleanup · Days 1-6", () => {
 
   test("CourseLessonPage owns the native Day 4-6 B1 grammar/workbook views", () => {
     const courseLessonPage = componentSource("CourseLessonPage.js");
-    expect(courseLessonPage).toContain("B1Day4WohnungSuchenGrammarPage");
+    expect(courseLessonPage).toContain("B1Day4WohnungSuchenGrammarNotesPage");
     expect(courseLessonPage).toContain("B1Day4WohnungSuchenWorkbookPage");
-    expect(courseLessonPage).toContain("B1Day5BesichtigungsterminGrammarPage");
+    expect(courseLessonPage).toContain("B1Day5BesichtigungsterminGrammarNotesPage");
     expect(courseLessonPage).toContain("B1Day5BesichtigungsterminWorkbookPage");
-    expect(courseLessonPage).toContain("B1Day6StadtOderLandGrammarPage");
-    expect(courseLessonPage).toContain("B1Day6StadtOderLandWorkbookPageV2");
+    expect(courseLessonPage).toContain("B1Day6StadtOderLandGrammarNotesPage");
+    expect(courseLessonPage).toContain("B1Day6StadtOderLandWorkbookPage");
   });
 });
