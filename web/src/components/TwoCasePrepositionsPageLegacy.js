@@ -186,12 +186,7 @@ const TwoCasePrepositionsPageLegacy = () => {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
             <thead>
               <tr style={{ background: "#f8fafc" }}>
-                {[
-                  "Wohin? + Akkusativ",
-                  "Meaning",
-                  "Wo? + Dativ",
-                  "Meaning",
-                ].map((heading) => (
+                {["Wohin? + Akkusativ", "Meaning", "Wo? + Dativ", "Meaning"].map((heading) => (
                   <th key={heading} style={{ border: "1px solid #e2e8f0", textAlign: "left", padding: 10 }}>{heading}</th>
                 ))}
               </tr>
@@ -312,12 +307,12 @@ const TwoCasePrepositionsPageLegacy = () => {
         ) : null}
       </Section>
 
-      <Section eyebrow="Prepare for the tutor-marked work" title="What the workbook will test">
+      <Section eyebrow="Workbook preparation" title="Use the grammar across different tasks">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Chapter 12.1 is the grammar focus, but the existing tutor-marked workbook also checks reading and listening and recycles language from earlier A1 lessons. That is intentional revision. Use this page to learn the new grammar, then complete the workbook without expecting every question to be only about Wechselpräpositionen.
+          The workbook combines this grammar with reading, listening and familiar A1 language. When you see a place phrase, first ask <strong>Wo?</strong> or <strong>Wohin?</strong>, then choose the case and article.
         </p>
         <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", padding: 12, borderRadius: 10, lineHeight: 1.65 }}>
-          <strong>Important:</strong> the tutor-marked assignment itself has not been changed, so your saved answers and grading setup remain compatible.
+          <strong>Tip:</strong> Focus on meaning first. Then check whether the sentence describes a location or a destination before choosing Dativ or Akkusativ.
         </div>
       </Section>
 
