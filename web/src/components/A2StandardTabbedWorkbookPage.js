@@ -51,6 +51,11 @@ const extractGoogleDriveFileId = (url = "") => {
   return idMatch ? idMatch[1] : "";
 };
 
+const normalizeLearnerTaskCopy = (value = "") =>
+  String(value || "")
+    .replace(/Submitte deine Antwortbuchstaben im Submit-Tab\.?/gi, "Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein.")
+    .replace(/Submitte deine Antwortbuchstaben im Submit-Bereich\.?/gi, "Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein.");
+
 const mediaFrameWrapper = { position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 12, overflow: "hidden", background: "#000" };
 const mediaFrame = { position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 };
 
@@ -84,6 +89,9 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   };
   const writingTaskTitle = schreibenTask || `${title} · Teil 2 writing task`;
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const listeningTask = normalizeLearnerTaskCopy(
+    hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor.",
+  );
 
   return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
     <div style={card}>
@@ -116,7 +124,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
     {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><p style={{ margin: 0 }}>Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.</p><p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{lesenText || "Read a short A2 text about the lesson topic. Identify the main idea, important details and the correct answer letters."}</p><QuestionList questions={lesenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-    {activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor."}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
+    {activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
 
     {activeTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
     {activeTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
