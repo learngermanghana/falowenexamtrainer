@@ -41,7 +41,6 @@ on:
       - 'scripts/patchGoetheCoachAudioFeedback.mjs'
       - 'scripts/patchCourseGoetheFreeChatMounts.mjs'
       - 'scripts/patchLockedA1Teil3Speaking.mjs'
-      - 'scripts/patchRequestedCourseMedia.mjs'
       - 'scripts/runSpeakingAudioReliabilityPatch.mjs'
       - 'scripts/checkSpeakingAudioReliabilityPatch.mjs'
       - 'tests/speaking-audio-reliability.test.mjs'
@@ -78,7 +77,6 @@ jobs:
             node --check scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
             node --check scripts/patchCourseGoetheFreeChatMounts.mjs || status=$?
             node --check scripts/patchLockedA1Teil3Speaking.mjs || status=$?
-            node --check scripts/patchRequestedCourseMedia.mjs || status=$?
             node --check scripts/runSpeakingAudioReliabilityPatch.mjs || status=$?
             node --check scripts/checkSpeakingAudioReliabilityPatch.mjs || status=$?
             echo '== apply patches =='
@@ -86,7 +84,6 @@ jobs:
             node scripts/patchCustomSpeakingReplyStyle.mjs || status=$?
             node scripts/patchGoetheCoachAudioFeedback.mjs || status=$?
             node scripts/patchCourseGoetheFreeChatMounts.mjs || status=$?
-            node scripts/patchRequestedCourseMedia.mjs || status=$?
             echo '== backend syntax =='
             node --check functions/functionz/app.js || status=$?
             node --check functions/functionz/speakingAudioReliability.js || status=$?
@@ -160,5 +157,4 @@ jobs:
           node scripts/patchCustomSpeakingReplyStyle.mjs
           node scripts/patchGoetheCoachAudioFeedback.mjs
           node scripts/patchCourseGoetheFreeChatMounts.mjs
-          node scripts/patchRequestedCourseMedia.mjs
           node scripts/checkSpeakingAudioReliabilityPatch.mjs
