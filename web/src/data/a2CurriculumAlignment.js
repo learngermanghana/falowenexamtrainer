@@ -42,6 +42,48 @@ export const A2_EARLY_COURSE_ALIGNMENT = Object.freeze({
     workbookRoute: "/campus/course/a2-day-6-moebel-und-raeume-workbook",
     assignmentId: "A2-3.6",
   }),
+  7: Object.freeze({
+    chapter: "3.7",
+    video: "https://youtu.be/ScU6w8VQgNg",
+    grammarPage: "/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes",
+    workbookRoute: "/campus/course/a2-day-7-eine-wohnung-suchen-workbook",
+    assignmentId: "A2-3.7",
+  }),
+  8: Object.freeze({
+    chapter: "3.8",
+    video: "https://youtu.be/hxkk6dZSjNM",
+    grammarPage: "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
+    workbookRoute: "/campus/course/a2-day-8-rezepte-und-essen-workbook",
+    assignmentId: "A2-3.8",
+  }),
+  9: Object.freeze({
+    chapter: "4.9",
+    video: "https://youtu.be/NxoQH-BY9Js",
+    grammarPage: "/campus/course/perfekt-urlaub-4-9-grammar-notes",
+    workbookRoute: "/campus/course/a2-day-9-urlaub-workbook",
+    assignmentId: "A2-4.9",
+  }),
+  10: Object.freeze({
+    chapter: "4.10",
+    video: "https://youtu.be/yOfTCQDn_JM",
+    grammarPage: "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
+    workbookRoute: "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
+    assignmentId: "A2-4.10",
+  }),
+  11: Object.freeze({
+    chapter: "4.11",
+    video: "https://youtu.be/RkvfRiPCZI4",
+    grammarPage: "/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes",
+    workbookRoute: "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
+    assignmentId: "A2-4.11",
+  }),
+  12: Object.freeze({
+    chapter: "5.12",
+    video: "https://youtu.be/w81bsmssGXQ",
+    grammarPage: "/campus/course/mein-traumberuf-5-12-grammar-notes",
+    workbookRoute: "/campus/course/a2-day-12-mein-traumberuf-workbook",
+    assignmentId: "A2-5.12",
+  }),
 });
 
 const getA2EarlyCourseAlignment = (entry = {}) => {
