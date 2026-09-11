@@ -119,10 +119,12 @@ describe("A1 Course Book health", () => {
     expect(getWorkbookNavigationTabs("A1")).toEqual([]);
   });
 
-  test("keeps tutor-marked workbook source free of known internal/admin-only copy", () => {
+  test("keeps tutor-marked workbook source free of known internal or stale learner copy", () => {
     Object.values(A1_ASSIGNMENT_REGISTRY).forEach((assignment) => {
       const source = readAssignmentComponentSource(assignment.component);
       expect(source).not.toMatch(/locked\s+to\s+A1-[\w.-]+/i);
+      expect(source).not.toMatch(/tutor-marked assignment\s*[·:-]\s*A1-[\w.-]+/i);
+      expect(source).not.toMatch(/\bUse the Assignment tab\b/i);
       expect(source).not.toMatch(/internal\s+assignment/i);
       expect(source).not.toMatch(/official\s+position/i);
     });
