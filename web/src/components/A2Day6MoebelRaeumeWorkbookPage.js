@@ -63,7 +63,7 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
         { stem: "Was ist in der WG verboten?", options: ["a) Schuhe", "b) Fahrräder", "c) Bücher", "d) Haustiere"] },
         { stem: "Wo möchte ich später arbeiten?", options: ["a) In der U-Bahn", "b) An der Universität", "c) Im Zoo", "d) In der Mensa"] },
       ]}
-      hoerenTask="Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung und submitte deine Antwortbuchstaben im Submit-Tab."
+      hoerenTask="Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung. Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein."
       hoerenAudioUrl="https://youtu.be/WuA8Xabn-Uw"
       hoerenQuestions={[
         { stem: "Welche Wohnung ist 70 Quadratmeter groß?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },

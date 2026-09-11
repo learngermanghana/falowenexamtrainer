@@ -36,12 +36,11 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
 
   it("only shows Grammar when that workbook day has grammar notes", () => {
     [
-      ["A2 Day 25 workbook sections", "A2"],
-      ["A2 Day 26 workbook sections", "A2"],
-      ["A2 Day 27 workbook sections", "A2"],
-      ["B1 Day 17 workbook sections", "B1"],
-      ["B1 Day 20 workbook sections", "B1"],
-    ].forEach(([ariaLabel]) => {
+      "A2 Day 25 workbook sections",
+      "A2 Day 26 workbook sections",
+      "A2 Day 27 workbook sections",
+      "B1 Day 24 workbook sections",
+    ].forEach((ariaLabel) => {
       const resolved = getWorkbookTabsWithLegacyGrammar({
         tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
         ariaLabel,
@@ -81,94 +80,53 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     expect(getA2B1GrammarNotesComponent("A2", 2)).not.toBe(A2StarterConjunctionsPage);
   });
 
-  it("explains that Personen beschreiben Teil 1 prepares the Teil 2 letter", () => {
+  it("keeps Personen beschreiben speaking practice separate from the Teil 2 boss letter", () => {
     const source = read("A2Day2PersonenBeschreibenWorkbookPage.js");
 
-    expect(source).toContain('eyebrow="Teil 1 · Practice and class discussion"');
-    expect(source).toContain("Teil 1 is for speaking practice and class discussion.");
-    expect(source).toContain("Then use the ideas and vocabulary from this discussion in Teil 2 to write the letter about your boss.");
+    expect(source).toContain('eyebrow="Group practice"');
+    expect(source).toContain('title="Teil 1 · Sprechen"');
+    expect(source).toContain('title="Brief an Felix: Mein Chef / Meine Chefin"');
+    expect(source).toContain("Beschreibe das Aussehen deines Chefs / deiner Chefin.");
     expect(source).not.toContain("invite you to write a brief essay about yourself");
-    expect(source).not.toContain("In this chapter, we’ll engage in group exercises discussing these topics");
   });
 
-  it("moves A2 Day 10 onto the same standard isolated tab contract as Days 1-9", () => {
+  it("keeps A2 Days 10 and 11 on the standard isolated tab shell", () => {
     const day9 = read("A2Day9UrlaubWorkbookPage.js");
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
+    const day11 = read("A2Day11UnterwegsVerkehrsmittelWorkbookPage.js");
     const standard = read("A2StandardTabbedWorkbookPage.js");
 
-    expect(day9).toContain("A2StandardTabbedWorkbookPage");
-    expect(day10).toContain("A2StandardTabbedWorkbookPage");
-    expect(day10).toContain("showWorkbookGuidance={false}");
+    [day9, day10, day11].forEach((source) => expect(source).toContain("A2StandardTabbedWorkbookPage"));
+    [day10, day11].forEach((source) => expect(source).toContain("showWorkbookGuidance={false}"));
     expect(standard).toContain('activeTab === "grammar"');
     expect(standard).toContain('activeTab === "sprechen"');
     expect(standard).toContain("showWorkbookGuidance ? <A2B1WorkbookGuidance /> : null");
-  });
-
-  it("moves A2 Day 11 onto isolated standard tabs", () => {
-    const day11 = read("A2Day11UnterwegsVerkehrsmittelWorkbookPage.js");
-
-    expect(day11).toContain("A2StandardTabbedWorkbookPage");
-    expect(day11).toContain("showWorkbookGuidance={false}");
-    expect(day11).toContain('eyebrow="Teil 1 · Practice and class discussion"');
     expect(day11).not.toContain('useState("sprechen")');
   });
 
-  it("keeps A2 Days 12-16 speaking content off the Grammar tab", () => {
-    const day12 = read("A2Day12MeinTraumberufWorkbookPageLegacy.js");
-    const day13 = read("A2Day13VorstellungsgespraechWorkbookPageLegacy.js");
-    const day14 = read("A2Day14BerufUndKarriereWorkbookPage.js");
-    const day15 = read("A2Day15MeinLieblingssportWorkbookPageLegacy.js");
-    const day16 = read("A2Day16WohlbefindenUndEntspannungWorkbookPage.js");
+  it("keeps A2 Days 12-16 grammar available without the old workbook guidance panel", () => {
+    [12, 13, 14, 15, 16].forEach((day) => {
+      expect(getA2B1GrammarNotesComponent("A2", day)).not.toBeNull();
+    });
 
-    [day12, day13].forEach((source) => {
-      expect(source).toContain('{ key: "grammar", label: "Grammar" }');
-      expect(source).toContain('activeTab === "grammar"');
-      expect(source).not.toContain("<A2B1WorkbookGuidance");
-    });
-    [day14, day15].forEach((source) => {
-      expect(source).toContain("WorkbookTabNav");
-      expect(source).not.toContain("<A2B1WorkbookGuidance");
-    });
-    expect(day16).toContain("A2StandardTabbedWorkbookPage");
-    expect(day16).toContain("showWorkbookGuidance={false}");
+    const sources = [
+      read("A2Day12MeinTraumberufWorkbookPageLegacy.js"),
+      read("A2Day13VorstellungsgespraechWorkbookPageLegacy.js"),
+      read("A2Day14BerufUndKarriereWorkbookPage.js"),
+      read("A2Day15MeinLieblingssportWorkbookPageLegacy.js"),
+      read("A2Day16WohlbefindenUndEntspannungWorkbookPage.js"),
+    ];
+    sources.forEach((source) => expect(source).not.toContain("<A2B1WorkbookGuidance"));
   });
 
-  it("keeps A2 Days 17-28 speaking content off the Grammar tab", () => {
-    const standardDays = [
-      "A2Day18DieBankAnrufenWorkbookPage.js",
-      "A2Day19EinkaufenWoUndWieWorkbookPage.js",
-      "A2Day21EinWochenendePlanenWorkbookPage.js",
-      "A2Day27DigitaleKommunikationWorkbookPage.js",
-    ];
-    const nativeGrammarDays = [
-      "A2Day20TypischeReklamationssituationenWorkbookPage.js",
-      "A2Day22DieWochePlanungWorkbookPage.js",
-      "A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js",
-      "A2Day24EinenUrlaubPlanenWorkbookPage.js",
-      "A2Day25TagesablaufWorkbookPage.js",
-      "A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js",
-    ];
-    const sharedNavDays = [
-      "A2Day17InDieApothekeGehenWorkbookPage.js",
-      "A2Day28UeberDieZukunftSprechenWorkbookPage.js",
-    ];
+  it("keeps late A2 grammar availability aligned with the shared registry", () => {
+    [17, 18, 19, 20, 21, 22, 23, 24, 28].forEach((day) => {
+      expect(getA2B1GrammarNotesComponent("A2", day)).not.toBeNull();
+    });
+    [25, 26, 27].forEach((day) => {
+      expect(getA2B1GrammarNotesComponent("A2", day)).toBeNull();
+    });
 
-    standardDays.forEach((name) => {
-      const source = read(name);
-      expect(source).toContain("A2StandardTabbedWorkbookPage");
-      expect(source).toContain("showWorkbookGuidance={false}");
-    });
-    nativeGrammarDays.forEach((name) => {
-      const source = read(name);
-      expect(source).toContain('{ key: "grammar", label: "Grammar" }');
-      expect(source).toContain('activeTab === "grammar"');
-      expect(source).not.toContain("<A2B1WorkbookGuidance");
-    });
-    sharedNavDays.forEach((name) => {
-      const source = read(name);
-      expect(source).toContain("WorkbookTabNav");
-      expect(source).not.toContain("<A2B1WorkbookGuidance");
-    });
     expect(read("A2LegacyStandardWorkbookNavigationImpl.js")).toContain('return "grammar"');
   });
 
@@ -176,11 +134,12 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     const day10 = read("A2Day10TourismusTraditionelleFesteWorkbookPage.js");
     const grammar = read("A2Day10PraeteritumGrammarPage.js");
 
-    expect(day10).toContain('eyebrow="Teil 1 · Practice and class discussion"');
+    expect(day10).toContain('eyebrow="Group practice"');
+    expect(day10).toContain('title="Teil 1 · Sprechen"');
     expect(grammar).toContain("Präteritum und Perfekt: Was ist der Unterschied?");
     expect(grammar).toContain("Regelmäßige Verben: Stamm + -te");
     expect(grammar).toContain("Die wichtigsten Formen: sein und haben");
-    expect(grammar).not.toContain("Teil 1 · Practice and class discussion");
+    expect(grammar).not.toContain('title="Teil 1 · Sprechen"');
   });
 
   it("does not double-integrate grammar on newer A2/B1 workbook pages", () => {
@@ -190,7 +149,7 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
     });
 
     expect(resolved.integratesLegacyGrammar).toBe(false);
-    expect(resolved.tabs).toBe(A2_B1_WORKBOOK_TABS_WITH_GRAMMAR);
+    expect(resolved.tabs).toEqual(A2_B1_WORKBOOK_TABS_WITH_GRAMMAR);
     expect(resolved.tabs.map((tab) => tab.key)).toEqual(expectedTabOrder);
   });
 

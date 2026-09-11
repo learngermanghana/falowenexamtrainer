@@ -37,9 +37,17 @@ jest.mock("./B1WritingWorkspace", () => {
 });
 
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const originalPath = `${window.location.pathname}${window.location.search}`;
+
+const renderWithRouter = (ui) =>
+  render(
+    <MemoryRouter initialEntries={[`${window.location.pathname}${window.location.search}`]}>
+      {ui}
+    </MemoryRouter>,
+  );
 
 afterEach(() => {
   window.history.pushState({}, "", originalPath || "/");
@@ -48,7 +56,7 @@ afterEach(() => {
 test("historical A2 Small Talk workbook route renders the Day 1 speaking mind map", () => {
   window.history.pushState({}, "", "/campus/course/a2-day-2-small-talk-workbook");
 
-  render(
+  renderWithRouter(
     <CourseInlinePracticePanel
       type="speaking"
       defaultOpen={false}
@@ -59,13 +67,14 @@ test("historical A2 Small Talk workbook route renders the Day 1 speaking mind ma
     "Wie führst du ein kurzes freundliches Gespräch?",
   );
   expect(screen.getByRole("button", { name: /Begrüßung/i })).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "More speaking help" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Collapse speaking help" })).toBeInTheDocument();
+  expect(screen.getByRole("article", { name: "Extra speaking help" })).toBeVisible();
 });
 
 test("unrelated workbook routes do not receive the Small Talk map", () => {
   window.history.pushState({}, "", "/campus/course/a1-day-4-numbers-workbook");
 
-  render(
+  renderWithRouter(
     <CourseInlinePracticePanel
       type="speaking"
       defaultOpen={false}
@@ -82,7 +91,7 @@ test("B1 Teil 2 renders the shared two-box workspace without an outer practice c
     "/campus/course/lesson/B1/1?view=workbook&assignmentKey=B1-1.1&radio=done",
   );
 
-  render(
+  renderWithRouter(
     <CourseInlinePracticePanel
       type="writing"
       writingContext={{
@@ -107,7 +116,7 @@ test("B1 Teil 2 renders the shared two-box workspace without an outer practice c
 test("A2 Small Talk Schreiben uses the same shared workspace", () => {
   window.history.pushState({}, "", "/campus/course/a2-day-2-small-talk-workbook");
 
-  render(<CourseInlinePracticePanel type="writing" />);
+  renderWithRouter(<CourseInlinePracticePanel type="writing" />);
 
   const workspace = screen.getByTestId("b1-writing-workspace");
   expect(workspace).toHaveAttribute("data-level", "A2");

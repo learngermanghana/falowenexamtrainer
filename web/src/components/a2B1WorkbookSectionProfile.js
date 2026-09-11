@@ -18,7 +18,6 @@ const A2_B1_SECTION_OVERRIDES = Object.freeze({
     22: Object.freeze({ part4Submission: "self-check" }),
     23: Object.freeze({ part4Submission: "self-check" }),
     24: Object.freeze({ part4Submission: "self-check" }),
-    25: Object.freeze({ listening: false, part4: "reading", part4Submission: "submit" }),
     26: Object.freeze({ part4Submission: "self-check" }),
     27: Object.freeze({ part4Submission: "self-check" }),
     28: Object.freeze({ part4Submission: "self-check" }),

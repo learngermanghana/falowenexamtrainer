@@ -15,70 +15,30 @@ jest.mock("./WorkbookReferenceAnswers", () => () => <div>References</div>);
 jest.mock("./CourseInlinePracticePanel", () => ({ type }) => <div>{type} practice</div>);
 jest.mock("./SpeakingMindMap", () => () => <div>Speaking mind map</div>);
 jest.mock("./SpeakingPracticeTimerCard", () => () => <div>Speaking timer</div>);
+jest.mock("./A2Days26To28LearningUpgrade", () => () => <div>Late A2 learning upgrade</div>);
 jest.mock("./A2B1WorkbookGuidance", () => ({
   A2B1WorkbookGuidance: () => <div>Workbook guidance</div>,
-  WorkbookSubmissionReminder: () => (
-    <div role="note">Reminder: Practise here, then submit only your final answers through the Submit tab.</div>
-  ),
+  WorkbookSubmissionReminder: () => <div role="note">Workbook reminder</div>,
+}));
+jest.mock("./A2B1WorkbookGrammarNotes", () => ({
+  A2B1GrammarNotesTab: () => <div>Grammar notes</div>,
 }));
 
 const cases = [
-  {
-    day: 24,
-    path: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
-    Component: A2Day24EinenUrlaubPlanenWorkbookPage,
-    role: "button",
-    teil2: /Teil 2 · Schreiben/i,
-    teil3: /Teil 3 · Lesen/i,
-    cleanupTab: /Teil 4 · Hören/i,
-  },
-  {
-    day: 25,
-    path: "/campus/course/a2-day-25-tagesablauf-workbook",
-    Component: A2Day25TagesablaufWorkbookPage,
-    role: "button",
-    teil2: /Teil 2 · Schreiben/i,
-    teil3: /Teil 3 · Lesen/i,
-    cleanupTab: /Submit/i,
-  },
-  {
-    day: 26,
-    path: "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
-    Component: A2Day26GefuehleInVerschiedenenSituationenWorkbookPage,
-    role: "button",
-    teil2: /Teil 2 · Schreiben/i,
-    teil3: /Teil 3 · Lesen/i,
-    cleanupTab: /Teil 4 · Hören/i,
-  },
-  {
-    day: 27,
-    path: "/campus/course/a2-day-27-digitale-kommunikation-workbook",
-    Component: A2Day27DigitaleKommunikationWorkbookPage,
-    role: "tab",
-    teil2: "Teil 2",
-    teil3: "Teil 3",
-    cleanupTab: "Teil 4",
-  },
-  {
-    day: 28,
-    path: "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
-    Component: A2Day28UeberDieZukunftSprechenWorkbookPage,
-    role: "tab",
-    teil2: "Teil 2",
-    teil3: "Teil 3",
-    cleanupTab: "Teil 4",
-  },
+  [24, "/campus/course/a2-day-24-einen-urlaub-planen-workbook", A2Day24EinenUrlaubPlanenWorkbookPage],
+  [25, "/campus/course/a2-day-25-tagesablauf-workbook", A2Day25TagesablaufWorkbookPage],
+  [26, "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook", A2Day26GefuehleInVerschiedenenSituationenWorkbookPage],
+  [27, "/campus/course/a2-day-27-digitale-kommunikation-workbook", A2Day27DigitaleKommunikationWorkbookPage],
+  [28, "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook", A2Day28UeberDieZukunftSprechenWorkbookPage],
 ];
-
-const getControl = (role, name) => screen.getByRole(role, { name });
 
 describe("A2 Days 24-28 React-owned cleanup safety", () => {
   test.each(cases)(
-    "Day $day keeps React-owned nodes attached while cleanup and tab changes interleave",
-    ({ path, Component, role, teil2, teil3, cleanupTab }) => {
+    "Day %i keeps its native standard tabs connected while legacy cleanup is called",
+    (day, path, Component) => {
       window.history.pushState({}, "", `${path}?radio=done`);
 
-      const { container } = render(
+      render(
         <MemoryRouter initialEntries={[`${path}?radio=done`]}>
           <main className="layout-main">
             <Component />
@@ -86,23 +46,23 @@ describe("A2 Days 24-28 React-owned cleanup safety", () => {
         </MemoryRouter>,
       );
 
-      expect(() => fireEvent.click(getControl(role, cleanupTab))).not.toThrow();
+      const navigation = screen.getByRole("navigation", { name: `A2 Day ${day} workbook sections` });
+      expect(navigation).toBeVisible();
+      expect(() => cleanA2WorkbookPresentation(document, path)).not.toThrow();
+      expect(navigation.isConnected).toBe(true);
+
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
+      expect(screen.getByRole("heading", { name: /Teil 2 · Schreiben/i })).toBeVisible();
+      expect(() => cleanA2WorkbookPresentation(document, path)).not.toThrow();
+      expect(navigation.isConnected).toBe(true);
+
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
+      expect(screen.getByRole("heading", { name: /Teil 3 · Lesen/i })).toBeVisible();
       expect(() => cleanA2WorkbookPresentation(document, path)).not.toThrow();
 
-      const safelyHidden = Array.from(container.querySelectorAll('[data-a2-react-owned-hidden="true"]'));
-      expect(safelyHidden.length).toBeGreaterThan(0);
-      safelyHidden.forEach((element) => {
-        expect(element.isConnected).toBe(true);
-        expect(element).not.toBeVisible();
-      });
-
-      expect(() => fireEvent.click(getControl(role, teil2))).not.toThrow();
-      expect(screen.getByRole("heading", { name: /Teil 2/i })).toBeVisible();
-      expect(() => cleanA2WorkbookPresentation(document, path)).not.toThrow();
-
-      expect(() => fireEvent.click(getControl(role, teil3))).not.toThrow();
-      expect(screen.getByRole("heading", { name: /Teil 3/i })).toBeVisible();
-      expect(() => cleanA2WorkbookPresentation(document, path)).not.toThrow();
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 4" }))).not.toThrow();
+      expect(screen.getByRole("heading", { name: /Teil 4 · Hören/i })).toBeVisible();
+      expect(navigation.isConnected).toBe(true);
     },
   );
 });

@@ -124,7 +124,7 @@ const DativeAdjectiveDeclensionPage = () => {
       <header style={{ ...card, padding: "clamp(20px, 4vw, 34px)", background: "linear-gradient(135deg, #f8fafc, #eef2ff)" }}>
         <h1 style={{ ...styles.title, margin: 0 }}>Dative and Accusative Verbs</h1>
         <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 850 }}>
-          Some German verbs normally take an accusative object; others normally take a dative object. Today the goal is to recognise a small group of useful verbs and choose the correct article or pronoun after them.
+          Learn which common verbs take Dativ or Akkusativ, then choose the correct article or personal pronoun. Adjective declension is taught later at A2, so this A1 lesson stays focused on the case forms you need now.
         </p>
       </header>
 
@@ -137,7 +137,7 @@ const DativeAdjectiveDeclensionPage = () => {
       <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
           <li>recognise common verbs that take Dativ or Akkusativ;</li>
-          <li>choose the correct article after those verbs;</li>
+          <li>choose the correct definite or indefinite article after those verbs;</li>
           <li>use common object pronouns such as <strong>mich/mir</strong>, <strong>dich/dir</strong> and <strong>Sie/Ihnen</strong>.</li>
         </ol>
       </Section>
@@ -193,6 +193,83 @@ const DativeAdjectiveDeclensionPage = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      </Section>
+
+      <Section eyebrow="Article review" title="See the Akkusativ and Dativ articles clearly">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          First identify the case. Then choose the article. Pay special attention to masculine nouns: <strong>den/einen</strong> in Akkusativ and <strong>dem/einem</strong> in Dativ.
+        </p>
+        <div style={{ display: "grid", gap: 14 }}>
+          <div style={{ overflowX: "auto" }}>
+            <strong style={{ display: "block", marginBottom: 8 }}>Definite articles: der / die / das</strong>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+              <thead>
+                <tr style={{ background: "#f8fafc" }}>
+                  {['Case', 'Masculine', 'Feminine', 'Neuter', 'Plural'].map((heading) => (
+                    <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>Akkusativ</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>den</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}>die</td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}>das</td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}>die</td>
+                </tr>
+                <tr style={{ background: "#f0fdf4" }}>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>Dativ</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>dem</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>der</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>dem</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>den</strong> (+ noun often -n)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ overflowX: "auto" }}>
+            <strong style={{ display: "block", marginBottom: 8 }}>Indefinite articles: ein / eine</strong>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+              <thead>
+                <tr style={{ background: "#f8fafc" }}>
+                  {['Case', 'Masculine', 'Feminine', 'Neuter'].map((heading) => (
+                    <th key={heading} style={{ border: "1px solid #e2e8f0", padding: 10, textAlign: "left" }}>{heading}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>Akkusativ</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>einen</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}>eine</td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}>ein</td>
+                </tr>
+                <tr style={{ background: "#f0fdf4" }}>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>Dativ</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>einem</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>einer</strong></td>
+                  <td style={{ border: "1px solid #e2e8f0", padding: 10 }}><strong>einem</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10 }}>
+          <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
+            <strong>Akkusativ</strong><br />
+            Ich sehe <strong>den Mann</strong>.<br />
+            Ich sehe <strong>eine Frau</strong>.<br />
+            Ich sehe <strong>das Kind</strong>.
+          </div>
+          <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
+            <strong>Dativ</strong><br />
+            Ich helfe <strong>dem Mann</strong>.<br />
+            Ich helfe <strong>einer Frau</strong>.<br />
+            Ich helfe <strong>dem Kind</strong>.
+          </div>
         </div>
       </Section>
 
@@ -271,23 +348,9 @@ const DativeAdjectiveDeclensionPage = () => {
         </div>
         {showScore ? (
           <div style={{ border: "1px solid #cbd5e1", background: "#f8fafc", borderRadius: 12, padding: 12 }}>
-            <strong>{score}/{quiz.length} correct.</strong> {score >= 7 ? "Strong work. You can move to the final A1.2 revision." : "Review the verb lists and pronoun table, then try again."}
+            <strong>{score}/{quiz.length} correct.</strong> {score >= 7 ? "Strong work. You can move to the final A1.2 revision." : "Review the verb lists and article/pronoun tables, then try again."}
           </div>
         ) : null}
-      </Section>
-
-      <Section eyebrow="Optional extra" title="Adjective endings are not the main goal today">
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800 }}>Open optional adjective reminder</summary>
-          <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.65 }}>
-            <p style={{ margin: 0 }}>
-              If you already feel comfortable with the cases, you can notice adjective endings too: <strong>ein großer Hund</strong>, <strong>einen großen Hund</strong>, <strong>mit einem großen Hund</strong>.
-            </p>
-            <p style={{ margin: 0 }}>
-              You do not need to master the full adjective-declension system to complete the core Day 23 objective. First make the case choice correctly.
-            </p>
-          </div>
-        </details>
       </Section>
 
       <Section eyebrow="Self-check" title="Can you explain these three contrasts?">

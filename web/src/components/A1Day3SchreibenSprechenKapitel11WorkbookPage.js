@@ -281,11 +281,38 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
               <span>Woher kommst du? – Ich komme aus Ghana.</span>
               <span>Wo wohnst du? – Ich wohne in Accra.</span>
             </div>
-            <div style={miniCardStyle}>
-              <strong>Articles: der · die · das</strong>
-              <span><strong>der</strong> Mann · <strong>die</strong> Frau · <strong>das</strong> Kind</span>
-              <span>Learn each new noun together with its article.</span>
+
+            <div style={{ ...miniCardStyle, gridColumn: "1 / -1", gap: 10 }}>
+              <div>
+                <strong>Articles: der · die · das</strong>
+                <p style={{ margin: "5px 0 0" }}>
+                  An article comes before a noun. In German, every noun has a grammatical gender, so learn the noun and its article together.
+                </p>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
+                <div style={{ border: "1px solid #dbeafe", borderRadius: 9, padding: 9, background: "#eff6ff" }}>
+                  <strong>der · masculine</strong><br />
+                  der Mann<br />der Tisch<br />der Stift
+                </div>
+                <div style={{ border: "1px solid #fbcfe8", borderRadius: 9, padding: 9, background: "#fdf2f8" }}>
+                  <strong>die · feminine</strong><br />
+                  die Frau<br />die Schule<br />die Tasche
+                </div>
+                <div style={{ border: "1px solid #ddd6fe", borderRadius: 9, padding: 9, background: "#f5f3ff" }}>
+                  <strong>das · neuter</strong><br />
+                  das Kind<br />das Buch<br />das Auto
+                </div>
+                <div style={{ border: "1px solid #bbf7d0", borderRadius: 9, padding: 9, background: "#f0fdf4" }}>
+                  <strong>die · plural</strong><br />
+                  die Bücher<br />die Autos<br />die Taschen
+                </div>
+              </div>
+              <div style={{ borderLeft: "4px solid #2563eb", paddingLeft: 10 }}>
+                <strong>When you mean “a / an”:</strong> <strong>ein</strong> Mann · <strong>eine</strong> Frau · <strong>ein</strong> Kind.
+              </div>
+              <span><strong>Best habit:</strong> do not learn only “Tisch”. Learn <strong>der Tisch</strong>. Do not learn only “Tasche”. Learn <strong>die Tasche</strong>.</span>
             </div>
+
             <div style={miniCardStyle}>
               <strong>Simple adjectives</strong>
               <span>Der Ball ist <strong>klein</strong>.</span>

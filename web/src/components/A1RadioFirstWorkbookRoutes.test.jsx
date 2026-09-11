@@ -44,13 +44,29 @@ describe("A1 route-scoped Falowen Radio", () => {
     );
   });
 
-  test.each([2, 3])("does not open Day %i radio for another chapter", (day) => {
+  test("does not open Day 2 radio for Kapitel 1.2", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
-        `/campus/course/lesson/A1/${day}`,
+        "/campus/course/lesson/A1/2",
         "?chapter=1.2",
       ),
     ).toBeNull();
+  });
+
+  test("opens Day 3 Kapitel 1.2 radio before the configured workbook", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/3",
+        "?chapter=1.2&hub=1",
+      ),
+    ).toEqual({ day: 3, chapter: "1.2" });
+    expect(getA1RadioResource(3, "1.2")).toEqual(
+      expect.objectContaining({
+        key: "a1-day3-chapter-1-2-falowen-radio",
+        chapter: "1.2",
+        youtubeId: "XrSTHS60LI4",
+      }),
+    );
   });
 
   test("does not repeat Day 2 Falowen Radio after the resource hub opens the workbook", () => {

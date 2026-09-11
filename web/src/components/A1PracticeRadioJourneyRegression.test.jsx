@@ -34,13 +34,13 @@ describe("A1 practice radio journey regressions", () => {
     );
   });
 
-  test("Day 3 Kapitel 1.2 assignment-style legacy route is not mistaken for the self-practice route", () => {
+  test("Day 3 Kapitel 1.2 legacy lesson route now enters the same chapter-specific Radio journey", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
         "/campus/course/lesson/A1/3",
         "?chapter=1.2&hub=1",
       ),
-    ).toBeNull();
+    ).toEqual({ day: 3, chapter: "1.2" });
   });
 
   test("auto-mounted A1 journey opens workbook content immediately after radio completion", () => {

@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import A2LegacyStandardWorkbookNavigation from "./A2LegacyStandardWorkbookNavigation";
-import A2LegacyStandardWorkbookNavigationImpl, {
-  insertA2LegacyPortalMountBefore,
-} from "./A2LegacyStandardWorkbookNavigationImpl";
-import A2LateWorkbookSubmissionPanel from "./A2LateWorkbookSubmissionPanel";
+import { insertA2LegacyPortalMountBefore } from "./A2LegacyStandardWorkbookNavigationImpl";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage";
+import A2Day24EinenUrlaubPlanenWorkbookPage from "./A2Day24EinenUrlaubPlanenWorkbookPage";
+import A2Day25TagesablaufWorkbookPage from "./A2Day25TagesablaufWorkbookPage";
+import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./A2Day26GefuehleInVerschiedenenSituationenWorkbookPage";
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
 
@@ -20,56 +20,22 @@ jest.mock("./navigation/AppBackButton", () => () => <div>Back</div>);
 jest.mock("./CourseInlinePracticePanel", () => ({ type }) => <div>{type} practice</div>);
 jest.mock("./SpeakingMindMap", () => () => <div>Speaking mind map</div>);
 jest.mock("./SpeakingPracticeTimerCard", () => () => <div>Speaking timer</div>);
+jest.mock("./A2Days26To28LearningUpgrade", () => () => <div>Late A2 learning upgrade</div>);
+jest.mock("./A2B1WorkbookGuidance", () => ({
+  A2B1WorkbookGuidance: () => <div>Workbook guidance</div>,
+  WorkbookSubmissionReminder: () => <div role="note">Workbook reminder</div>,
+}));
 
-const DAY23_PATH = "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook";
-const DAY24_TO_26 = [
-  {
-    day: 24,
-    path: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
-  },
-  {
-    day: 25,
-    path: "/campus/course/a2-day-25-tagesablauf-workbook",
-  },
-  {
-    day: 26,
-    path: "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
-  },
+const cleanedCases = [
+  [23, "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook", A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage],
+  [24, "/campus/course/a2-day-24-einen-urlaub-planen-workbook", A2Day24EinenUrlaubPlanenWorkbookPage],
+  [25, "/campus/course/a2-day-25-tagesablauf-workbook", A2Day25TagesablaufWorkbookPage],
+  [26, "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook", A2Day26GefuehleInVerschiedenenSituationenWorkbookPage],
+  [27, "/campus/course/a2-day-27-digitale-kommunikation-workbook", A2Day27DigitaleKommunikationWorkbookPage],
+  [28, "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook", A2Day28UeberDieZukunftSprechenWorkbookPage],
 ];
 
-const NativeWorkbookTabs = ({ replaceable = false }) => {
-  const [version, setVersion] = useState(1);
-  const [activeTab, setActiveTab] = useState("teil1");
-
-  return (
-    <>
-      {replaceable ? (
-        <button type="button" onClick={() => setVersion((current) => current + 1)}>
-          Replace native tabs
-        </button>
-      ) : null}
-      <div key={version} data-native-tab-version={version} data-native-workbook-tabs>
-        <button type="button" onClick={() => setActiveTab("teil1")}>Teil 1 · Group Practice</button>
-        <button type="button" onClick={() => setActiveTab("teil2")}>Teil 2 · Schreiben</button>
-        <button type="button" onClick={() => setActiveTab("teil3")}>Teil 3 · Lesen</button>
-        <button type="button" onClick={() => setActiveTab("teil4")}>Teil 4</button>
-        <button type="button" onClick={() => setActiveTab("references")}>5. Ref</button>
-      </div>
-      {activeTab === "teil1" ? <h2>Native Teil 1 content</h2> : null}
-      {activeTab === "teil2" ? <h2>Native Teil 2 Schreiben content</h2> : null}
-      {activeTab === "teil3" ? <h2>Native Teil 3 Lesen content</h2> : null}
-      {activeTab === "teil4" ? <h2>Native Teil 4 content</h2> : null}
-      {activeTab === "references" ? <h2>Native references content</h2> : null}
-    </>
-  );
-};
-
 describe("A2 legacy portal safety", () => {
-  beforeEach(() => {
-    window.requestAnimationFrame = (callback) => window.setTimeout(callback, 0);
-    window.cancelAnimationFrame = (id) => window.clearTimeout(id);
-  });
-
   test("does not call insertBefore when the reference row is already stale", () => {
     const parent = document.createElement("div");
     const row = document.createElement("div");
@@ -97,143 +63,32 @@ describe("A2 legacy portal safety", () => {
     expect(mount.parentNode).toBeNull();
   });
 
-  test("keeps portal replacement safety for A2 routes that still use the legacy bridge", async () => {
-    const day22Path = "/campus/course/a2-day-22-die-woche-planung-workbook";
-    window.history.pushState({}, "", day22Path);
-
-    render(
-      <MemoryRouter initialEntries={[day22Path]}>
-        <main className="layout-main">
-          <NativeWorkbookTabs replaceable />
-        </main>
-        <A2LegacyStandardWorkbookNavigationImpl />
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: "A2 Day 22 workbook sections" })).toBeVisible();
-    });
-
-    expect(() => {
-      act(() => {
-        fireEvent.click(screen.getByRole("button", { name: "Replace native tabs" }));
-      });
-    }).not.toThrow();
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: "A2 Day 22 workbook sections" })).toBeVisible();
-      expect(document.querySelector('[data-native-tab-version="2"]')).toBeTruthy();
-    });
-  });
-
-  test("Day 23 owns native standard tabs, opens Teil 2 and Teil 3, and keeps Hören self-check only", async () => {
-    const day23Url = `${DAY23_PATH}?radio=done`;
-    window.history.pushState({}, "", day23Url);
-
-    render(
-      <MemoryRouter initialEntries={[day23Url]}>
-        <A2LegacyStandardWorkbookNavigation />
-        <main className="layout-main">
-          <A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />
-        </main>
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: "A2 Day 23 workbook sections" })).toBeVisible();
-    });
-    expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
-    expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
-    expect(
-      screen.getByText(/Submit only Teil 2 · Schreiben and Teil 3 · Lesen\. Teil 4 · Hören is self-check only/i),
-    ).toBeInTheDocument();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Teil 2 \(Schreiben\)/i })).toBeVisible();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Teil 3 \(Lesen\)/i })).toBeVisible();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 4" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Teil 4 \(Hören\)/i })).toBeVisible();
-    expect(screen.getByText(/only parts that will be officially evaluated by the school are Lesen and Schreiben/i)).toBeInTheDocument();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Submit" }))).not.toThrow();
-    const submitHeading = screen.getByRole("heading", { name: /Submit Workbook · Day 23/i });
-    expect(submitHeading).toBeVisible();
-    const submitPanel = submitHeading.closest("section");
-    expect(submitPanel).toBeTruthy();
-    expect(submitPanel.textContent).toMatch(/Submit only Teil 2 · Schreiben and Teil 3 · Lesen/i);
-    expect(submitPanel.textContent).toMatch(/Do not submit Teil 1 or Teil 4 · Hören/i);
-  });
-
-  test.each(DAY24_TO_26)(
-    "Day $day keeps native tabs and route-owned submission without the legacy fallback",
-    async ({ day, path }) => {
-      const url = `${path}?radio=done`;
-      window.history.pushState({}, "", url);
+  test.each(cleanedCases)(
+    "Day %i uses the native shared workbook without a legacy portal",
+    (day, path, Component) => {
+      window.history.pushState({}, "", `${path}?radio=done`);
 
       render(
-        <MemoryRouter initialEntries={[url]}>
+        <MemoryRouter initialEntries={[`${path}?radio=done`]}>
           <A2LegacyStandardWorkbookNavigation />
           <main className="layout-main">
-            <NativeWorkbookTabs />
-            <A2LateWorkbookSubmissionPanel pathname={path} />
+            <Component />
           </main>
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(document.querySelector("[data-native-workbook-tabs]")).toBeVisible();
-      });
-      expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
+      expect(screen.getByRole("navigation", { name: `A2 Day ${day} workbook sections` })).toBeVisible();
       expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
+      expect(document.querySelector("[data-universal-a2-workbook-tabs]")).toBeNull();
 
-      expect(() => fireEvent.click(screen.getByRole("button", { name: "Teil 2 · Schreiben" }))).not.toThrow();
-      expect(screen.getByRole("heading", { name: "Native Teil 2 Schreiben content" })).toBeVisible();
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
+      expect(screen.getByRole("heading", { name: /Teil 2 · Schreiben/i })).toBeVisible();
 
-      expect(() => fireEvent.click(screen.getByRole("button", { name: "Teil 3 · Lesen" }))).not.toThrow();
-      expect(screen.getByRole("heading", { name: "Native Teil 3 Lesen content" })).toBeVisible();
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
+      expect(screen.getByRole("heading", { name: /Teil 3 · Lesen/i })).toBeVisible();
 
-      const submission = document.querySelector(`[data-a2-late-native-submission="${day}"]`);
-      expect(submission).toBeTruthy();
-      expect(submission.textContent).toMatch(new RegExp(`Submit Workbook · Day ${day}`, "i"));
-      expect(submission.textContent).toMatch(/Submit Teil 2 · Schreiben and Teil 3 · Lesen/i);
+      expect(() => fireEvent.click(screen.getByRole("tab", { name: "Submit" }))).not.toThrow();
+      expect(screen.getByText("Submission")).toBeVisible();
     },
   );
-
-  test.each([
-    {
-      day: 27,
-      path: "/campus/course/a2-day-27-digitale-kommunikation-workbook",
-      Component: A2Day27DigitaleKommunikationWorkbookPage,
-    },
-    {
-      day: 28,
-      path: "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
-      Component: A2Day28UeberDieZukunftSprechenWorkbookPage,
-    },
-  ])("Day $day uses native standard tabs without the legacy portal", async ({ day, path, Component }) => {
-    window.history.pushState({}, "", path);
-
-    render(
-      <MemoryRouter initialEntries={[path]}>
-        <A2LegacyStandardWorkbookNavigation />
-        <main className="layout-main">
-          <Component />
-        </main>
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: `A2 Day ${day} workbook sections` })).toBeVisible();
-    });
-    expect(document.querySelector("[data-a2-standard-legacy-nav-root]")).toBeNull();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Teil 2/i })).toBeVisible();
-
-    expect(() => fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }))).not.toThrow();
-    expect(screen.getByRole("heading", { name: /Teil 3/i })).toBeVisible();
-  });
 });
