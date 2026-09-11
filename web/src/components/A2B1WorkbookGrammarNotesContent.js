@@ -120,7 +120,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <A2B1GrammarVideoCard level={level} day={day} />
+      {GrammarNotes ? <A2B1GrammarVideoCard level={level} day={day} /> : null}
       {showB1ArgumentTraining ? <B1ArgumentSpeakingTraining /> : null}
       {showA2Collocations ? <A2TopicCollocationPractice day={numericDay} /> : null}
       {showB1Days12To17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null}
