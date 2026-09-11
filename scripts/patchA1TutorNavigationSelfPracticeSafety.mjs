@@ -50,6 +50,7 @@ await import("./patchStudyBuddyGlobalOverlay.mjs");
 await import("./patchA1Day3AuditObserverSafety.mjs");
 await import("./patchA1Day5CourseBookAudit.mjs");
 await import("./patchA1Day7CourseBookAudit.mjs");
+await import("./patchA1Day8TopicAlignment.mjs");
 await import("./patchA1Day13RevisionClarity.mjs");
 
 console.log("Applied A1 self-practice tutor-navigation safety patch.");
