@@ -7,11 +7,19 @@ import SelfLearningSupportingMaterials from "./selfLearning/SelfLearningSupporti
 
 export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
   Object.freeze({
+    key: "teacher-lecture-video",
+    label: "Teacher lecture video",
+    title: "Personal Information, Articles, Adjectives and W-Questions · Teacher lecture",
+    description: "Teacher explanation for Day 3 · Kapitel 1.1.",
+    youtubeId: "Ygbpt6yC_f4",
+    url: "https://youtu.be/Ygbpt6yC_f4",
+  }),
+  Object.freeze({
     key: "ai-lesson-video",
     label: "AI lesson video",
     title: "Kapitel 1.1 AI lesson",
     description:
-      "Review the Kapitel 1.1 language and speaking practice before continuing with the workbook activities.",
+      "Review personal information, articles, adjectives and W-questions before continuing with the workbook activities.",
     youtubeId: "LdCVsY-SFTg",
     url: "https://youtu.be/LdCVsY-SFTg",
   }),
@@ -58,9 +66,23 @@ const removeSectionByText = (root, selector, text) => {
 };
 
 const removeExcludedSections = (root) => {
-  removeSectionByText(root, "h1, h2, h3, h4", "Teil 1 · Reading / Writing");
+  [
+    "Teil 1 · Reading / Writing",
+    "Spelling Practice",
+    "Basic Vocabulary for A1 German Class",
+    "Speaking Practice",
+    "Introducing Yourself",
+    "Key Things You Learned Today",
+  ].forEach((heading) => removeSectionByText(root, "h1, h2, h3, h4", heading));
   removeSectionByText(root, "p", "Class activity");
   removeSectionByText(root, "h1, h2, h3, h4, strong", "Save your class contribution");
+};
+
+const updateLegacyHeading = (root) => {
+  const title = root?.querySelector("h1");
+  if (title) title.textContent = "A1 · Day 3 · Kapitel 1.1 · Personal Information, Articles, Adjectives and W-Questions";
+  const subtitle = title?.parentElement?.querySelector("p");
+  if (subtitle) subtitle.textContent = "Practise the language you need to ask for and give basic personal information.";
 };
 
 const updateWWordExercise = (root) => {
@@ -131,6 +153,7 @@ const ensureLiveResponseMounts = (root) => {
 
 const updateWorkbook = (root) => {
   removeExcludedSections(root);
+  updateLegacyHeading(root);
   updateWWordExercise(root);
   return {
     biographyMount: ensureBiographyMount(root),
@@ -152,6 +175,15 @@ const getClickedQuestionAnswer = (root, target) => {
   if (!option) return null;
 
   return { questionId, option };
+};
+
+const focusCardStyle = {
+  border: "1px solid #dbeafe",
+  background: "#f8fbff",
+  borderRadius: 14,
+  padding: 16,
+  display: "grid",
+  gap: 12,
 };
 
 export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
@@ -203,12 +235,26 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
       <div
         data-a1-workbook-owned-media="true"
         data-radio-first-workbook-gate="true"
-        style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}
+        style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0", display: "grid", gap: 14 }}
       >
         <SelfLearningSupportingMaterials
-          aiVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
-          description="Watch the AI lesson, then continue with the Kapitel 1.1 self-learning practice book. No teacher lecture is currently configured for this page."
+          teacherVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
+          aiVideo={A1_DAY3_PRACTICE_VIDEOS[1]}
+          description="Use the current Day 3 teacher lecture and AI lesson, then practise personal information, articles, adjectives and W-questions."
         />
+
+        <section style={focusCardStyle} data-a1-day3-kapitel-11-focus="true">
+          <h2 style={{ margin: 0 }}>Kapitel 1.1 focus</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Use <strong>W-questions</strong> to ask for personal information, and use the correct article when naming people, places and everyday objects.
+          </p>
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            <div><strong>W-questions</strong><br />Wie heißt du? · Wo wohnst du? · Woher kommst du? · Was ist das?</div>
+            <div><strong>Articles</strong><br />der Mann · die Frau · das Kind · ein Ball · eine Stadt</div>
+            <div><strong>Simple adjectives</strong><br />Der Ball ist klein. · Die Stadt ist groß. · Das Buch ist neu.</div>
+            <div><strong>Personal information</strong><br />Name · Wohnort · Herkunft · Beruf</div>
+          </div>
+        </section>
       </div>
 
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
@@ -242,15 +288,15 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
               }}
             >
               <div style={{ display: "grid", gap: 5 }}>
-                <strong>Write your introduction</strong>
+                <strong>Write your personal information</strong>
                 <p style={{ margin: 0, lineHeight: 1.7, color: "#475569" }}>
-                  Type your German introduction below. Your work saves automatically to the same biography used on the Class Members page, and classmates&apos; introductions appear here too.
+                  Use the W-question patterns from this lesson to give your name, origin, home city and occupation in German.
                 </p>
               </div>
               <PersonalInformationContributionBox
                 autoSave
                 showReference={false}
-                placeholder="Hallo! Ich heiße Ama. Ich komme aus Ghana. Ich bin 25 Jahre alt und ich wohne in Accra."
+                placeholder="Ich heiße Ama. Ich komme aus Ghana. Ich wohne in Accra. Ich bin Lehrerin."
               />
             </div>,
             biographyMount
