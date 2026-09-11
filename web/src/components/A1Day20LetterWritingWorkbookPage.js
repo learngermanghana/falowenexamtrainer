@@ -59,7 +59,7 @@ const BulletList = ({ items, ordered = false }) => {
 const InformalLetterPractice = () => (
   <A1CourseBookLetterPracticePanel
     title="Mark My Informal Letter"
-    description="Write or paste your birthday letter here. Falowen will mark it and explain the corrections before you copy the improved version to Submit."
+    description="Write or paste your birthday letter here. Falowen will mark it and explain the corrections before you copy the improved version to Submit Assignment."
     taskId="A1-12.3-teil-1-informal-letter"
     taskTitle="Informal birthday letter to a friend"
     taskContext="informal birthday note to a friend using du, dir and an informal closing"
@@ -74,7 +74,7 @@ const InformalLetterPractice = () => (
 const FormalLetterPractice = () => (
   <A1CourseBookLetterPracticePanel
     title="Mark My Formal Letter"
-    description="Write or paste your enquiry to the language school here. Improve it with the feedback before copying the final version to Submit."
+    description="Write or paste your enquiry to the language school here. Improve it with the feedback before copying the final version to Submit Assignment."
     taskId="A1-12.3-teil-2-formal-letter"
     taskTitle="Formal enquiry to a language school"
     taskContext="formal email to a language school using Sie, Ihnen, a formal greeting and a formal closing"
@@ -91,11 +91,11 @@ const WorkbookOverview = () => (
     style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}
     data-a1-day20-chapter123-workbook-overview="true"
   >
-    <span style={eyebrowStyle}>Tutor-marked assignment · A1-12.3</span>
+    <span style={eyebrowStyle}>Tutor-marked assignment · Kapitel 12.3</span>
     <h2 style={{ margin: 0 }}>How this workbook is organised</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
       Use the shared navigation: <strong>Overview</strong>, <strong>Teil 1</strong>,{" "}
-      <strong>Teil 2</strong>, and <strong>Submit</strong>. Open each Teil, write the letter,
+      <strong>Teil 2</strong>, and <strong>Submit Assignment</strong>. Open each Teil, write the letter,
       use <strong>Mark My Letter</strong> below the task, and improve it before final submission.
     </p>
   </section>
@@ -203,9 +203,9 @@ export default function A1Day20LetterWritingWorkbookPage() {
       fallbackAssignmentKey="A1-12.3"
       title="A1 · Day 20 Workbook · Letter Writing"
       subtitle="Kapitel 12.3 · Tutor-marked Schreiben assignment"
-      assignmentIntro="Use Overview, complete Teil 1 and Teil 2, check both drafts with Mark My Letter, then open Submit and send both final letters to your tutor."
+      assignmentIntro="Use Overview, complete Teil 1 and Teil 2, check both drafts with Mark My Letter, then open Submit Assignment and send both final letters to your tutor."
       submitTitle="Submit A1 · Day 20 · Kapitel 12.3"
-      submitDescription="This submission is locked to A1-12.3. Submit both the informal and formal letter for tutor marking."
+      submitDescription="Submit both the informal and formal letter together for tutor marking."
       backLabel="Back to lesson"
       backTo={A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE}
     >

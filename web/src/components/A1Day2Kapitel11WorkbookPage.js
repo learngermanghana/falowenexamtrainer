@@ -62,7 +62,7 @@ const A1Day2Kapitel11WorkbookPage = () => (
     subtitle="Personal Pronouns and Verb Conjugation · Tutor-marked assignment"
     assignmentIntro="Complete Teil 1 and Teil 2 only. Then open Submit and send all final answers for tutor marking."
     submitTitle="Submit A1 · Day 2 · Kapitel 1.1"
-    submitDescription="This submission is locked to A1-1.1. Submit the four listening answers and your Teil 2 writing text."
+    submitDescription="Submit the four listening answers and your Teil 2 writing text together for tutor marking."
   >
     <div style={{ display: "grid", gap: 16 }} data-a1-day2-chapter11-workbook="true">
       <section style={card}>

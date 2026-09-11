@@ -121,15 +121,15 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
     fallbackAssignmentKey="A1-9"
     title="A1 · Day 16 Workbook · Negation and Food"
     subtitle="Chapter 9 · Tutor-marked assignment"
-    assignmentIntro="Complete all three parts below. Then open Submit and send your numbered answers and writing task to your tutor."
+    assignmentIntro="Complete all three parts below. Then open Submit Assignment and send your numbered answers and writing task to your tutor."
     submitTitle="Submit A1 · Day 16 · Chapter 9"
-    submitDescription="This submission is locked to A1-9, so your Chapter 9 work is saved under the correct tutor-marked assignment."
+    submitDescription="Submit your Chapter 9 reading, listening and writing answers together for tutor marking."
   >
     <div data-a1-day16-chapter9-workbook-content="true" style={{ display: "grid", gap: 16 }}>
       <section style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}>
-        <strong style={{ color: "#1d4ed8" }}>Tutor-marked assignment · A1-9</strong>
+        <strong style={{ color: "#1d4ed8" }}>Tutor-marked assignment · Chapter 9</strong>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Use the Assignment tab to complete the workbook. When you finish, open the Submit tab and send your final answers.
+          Complete Teil 1, Teil 2 and Teil 3 below. When you finish, open Submit Assignment and send your final answers.
         </p>
         <a
           href="/campus/course/food-and-negation-day-16-9-10"
