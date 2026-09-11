@@ -171,7 +171,7 @@ const WeatherPerfektLetterPage = () => {
 
       <Section eyebrow="Writing bridge" title="Use the weather in an informal email">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          For the tutor-marked task, you write to Bina and explain why you cannot attend her wedding. Keep the message simple: reason for writing → weather reason → suggestion.
+          In the writing task, you write to Bina and explain why you cannot attend her wedding. Keep the message simple: reason for writing → weather reason → suggestion.
         </p>
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, lineHeight: 1.75 }}>
           <strong>Liebe Bina,</strong><br /><br />
@@ -179,7 +179,7 @@ const WeatherPerfektLetterPage = () => {
           <strong>Liebe Grüße<br />Anna</strong>
         </div>
         <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", borderRadius: 10, padding: 12, lineHeight: 1.65 }}>
-          The tutor-marked assignment <strong>A1-13</strong> is unchanged. This lesson only prepares you to understand and complete it more confidently.
+          <strong>Writing tip:</strong> Keep the email short and clear. Give one specific weather reason, use <strong>weil</strong> correctly, and finish with a simple suggestion.
         </div>
       </Section>
 
