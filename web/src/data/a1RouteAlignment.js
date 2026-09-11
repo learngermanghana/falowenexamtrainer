@@ -62,11 +62,13 @@ export const alignA1CurriculumEntry = (entry = {}, parentContext = {}) => {
   const context = { level: "A1", day, chapter };
 
   const grammarFallback = firstPresent(
+    entry.grammarNotesPage,
     entry.grammarPage,
     entry.grammarbook_link,
     entry.grammar_link,
   );
   const workbookFallback = firstPresent(
+    entry.workbookPage,
     entry.workbookRoute,
     entry.workbook_link,
   );
@@ -82,19 +84,26 @@ export const alignA1CurriculumEntry = (entry = {}, parentContext = {}) => {
   });
 
   const aligned = { ...entry };
-  const hadGrammarField = ["grammarPage", "grammarbook_link", "grammar_link"].some((field) =>
-    hasOwn(entry, field),
-  );
-  const hadWorkbookField = ["workbookRoute", "workbook_link"].some((field) =>
-    hasOwn(entry, field),
-  );
+  const hadGrammarField = [
+    "grammarNotesPage",
+    "grammarPage",
+    "grammarbook_link",
+    "grammar_link",
+  ].some((field) => hasOwn(entry, field));
+  const hadWorkbookField = [
+    "workbookPage",
+    "workbookRoute",
+    "workbook_link",
+  ].some((field) => hasOwn(entry, field));
 
   if (grammarRoute || hadGrammarField) {
+    aligned.grammarNotesPage = grammarRoute || "";
     aligned.grammarPage = grammarRoute || "";
     aligned.grammarbook_link = grammarRoute || null;
     aligned.grammar_link = grammarRoute || null;
   }
   if (workbookRoute || hadWorkbookField) {
+    aligned.workbookPage = workbookRoute || "";
     aligned.workbookRoute = workbookRoute || "";
     aligned.workbook_link = workbookRoute || null;
   }
