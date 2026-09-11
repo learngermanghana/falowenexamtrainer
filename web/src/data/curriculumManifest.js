@@ -10,10 +10,11 @@ import {
 } from "./lessonCatalog.js";
 import { alignA1CurriculumEntries } from "./a1RouteAlignment.js";
 import { alignA2CurriculumEntries } from "./a2CurriculumAlignment.js";
+import { alignB1CurriculumEntries } from "./b1CurriculumAlignment.js";
 import { alignB2CurriculumEntries } from "./b2LessonContentAlignment.js";
 
 const alignRuntimeCurriculumEntries = (entries = []) =>
-  alignB2CurriculumEntries(alignA2CurriculumEntries(alignA1CurriculumEntries(entries)));
+  alignB2CurriculumEntries(alignB1CurriculumEntries(alignA2CurriculumEntries(alignA1CurriculumEntries(entries))));
 
 const CANONICAL_CURRICULUM = lessonCatalog;
 const CURRICULUM_ENTRIES = alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES);
