@@ -1,6 +1,9 @@
 import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
 
-const FIRST_B1_CLEANUP_DAYS = new Set(Array.from({ length: 12 }, (_, index) => index + 1));
+const FIRST_B1_CLEANUP_DAYS = new Set([
+  ...Array.from({ length: 12 }, (_, index) => index + 1),
+  ...Array.from({ length: 6 }, (_, index) => index + 17),
+]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const firstPresent = (...values) =>
   values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
@@ -36,6 +39,11 @@ export const alignB1CurriculumEntry = (entry = {}, parentContext = {}) => {
     aligned.grammarPage = grammarRoute;
     aligned.grammarbook_link = grammarRoute;
     aligned.grammar_link = grammarRoute;
+  } else if (Object.prototype.hasOwnProperty.call(override, "grammarBook")) {
+    aligned.grammarNotesPage = null;
+    aligned.grammarPage = null;
+    aligned.grammarbook_link = null;
+    aligned.grammar_link = null;
   }
   if (workbookRoute) {
     aligned.workbookPage = workbookRoute;
