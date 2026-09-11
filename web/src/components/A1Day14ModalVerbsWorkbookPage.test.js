@@ -24,7 +24,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(getA1TeacherVideoResources(14)).toEqual([
       expect.objectContaining({
         chapter: "3.6",
-        url: "https://youtu.be/GJw1aJehYHU",
+        url: "https://youtu.be/0zps4OYwShg",
       }),
     ]);
 
