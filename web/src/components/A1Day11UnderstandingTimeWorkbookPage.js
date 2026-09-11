@@ -99,7 +99,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       title="A1 · Day 11 Workbook · Understanding Time"
       subtitle="Chapter 7 · Tutor-marked assignment"
       submitTitle="Submit A1 · Day 11 · Chapter 7"
-      submitDescription="This submission box is locked to A1-7, so students can send their final Chapter 7 answers from this workbook."
+      submitDescription="Submit your completed Chapter 7 answers here when both Teile are finished."
     >
       <div style={card}>
         <img
