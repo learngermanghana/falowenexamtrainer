@@ -8,6 +8,7 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
 import {
@@ -190,6 +191,12 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           />
         </div>
       </div>
+
+      {activeTab === "grammar" && (
+        <div style={card}>
+          <A2B1GrammarNotesTab level="A2" day={17} />
+        </div>
+      )}
 
       {activeTab === "sprechen" && (
         <div style={card}>
