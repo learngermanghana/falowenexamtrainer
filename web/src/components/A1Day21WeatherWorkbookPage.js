@@ -240,7 +240,7 @@ const A1Day21WeatherWorkbookPage = () => (
     subtitle="Kapitel 13 · Tutor-marked Lesen & Schreiben assignment"
     assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit and send your final answers to your tutor."
     submitTitle="Submit A1 · Day 21 · Kapitel 13"
-    submitDescription="This submission is locked to A1-13. Submit your reading answers and final writing task for tutor marking."
+    submitDescription="Submit your reading answers and final writing task for tutor marking."
   >
     <WeatherOverview />
     <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>
