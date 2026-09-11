@@ -1,6 +1,6 @@
 import { getB1LessonResourceOverride } from "./b1LessonResourceOverrides";
 
-const FIRST_B1_CLEANUP_DAYS = new Set([1, 2, 3, 4, 5, 6]);
+const FIRST_B1_CLEANUP_DAYS = new Set(Array.from({ length: 12 }, (_, index) => index + 1));
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const firstPresent = (...values) =>
   values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
