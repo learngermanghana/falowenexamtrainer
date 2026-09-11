@@ -80,13 +80,13 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 4 Workbook · Numbers and Addresses
+          A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses
         </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2</p>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2 · Tutor-marked assignment</p>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete the assignment below, then open the Submit tab above to send your answers immediately.
+          Complete both workbook Teile below. Use the Grammar notes for the full 0–10,000 number-building patterns and for using numbers in phone numbers and addresses, then submit your final answers once.
         </p>
       </div>
 
@@ -133,8 +133,7 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
         <h2 style={sectionTitle}>Teil 2: Questions</h2>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Teil 1: Zahlen erkennen und benennen</strong>, <strong>Teil 2: Zahlen in Kontext</strong>, and
-          <strong> Teil 3: Größere Zahlen</strong> are combined below.
+          The questions progress from <strong>basic number recognition</strong> to <strong>numbers in context</strong> and then <strong>larger numbers</strong>. They all belong to this one Teil 2 section.
         </p>
 
         {teil2Questions.map((question) => (
@@ -156,10 +155,10 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
       >
         <h2 style={sectionTitle}>Final Submission</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          After completing the workbook tasks, use the Submit tab above. The correct A1 Day 4 assignment is selected automatically.
+          After completing both Teile, use the Submit Assignment tab. The correct A1 Day 4 assignment is selected automatically.
         </p>
         <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8" }}>
-          Choose Submit above when you are ready.
+          Submit the assignment once when both Teile are complete.
         </p>
       </div>
     </div>

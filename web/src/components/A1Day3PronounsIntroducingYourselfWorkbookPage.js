@@ -65,8 +65,8 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
       day={3}
       chapter="1.2"
       fallbackAssignmentKey="A1-1.2"
-      title="A1 · Day 3 Workbook · Pronouns and Identity Expressions in German"
-      subtitle="Chapter 1.2 · Tutor-marked assignment"
+      title="A1 · Day 3 Workbook · Present-Tense Verb Conjugation Practice"
+      subtitle="Chapter 1.2 · Subject pronouns, heißen, kommen and wohnen · Tutor-marked assignment"
       submitTitle="Submit A1 · Day 3 · Chapter 1.2"
     >
       <section style={sectionStyle}>
@@ -84,7 +84,7 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
           Mein Freund Peter kommt aus Deutschland und wohnt in Berlin. Er heißt Peter.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Exercise: Complete the Sentences</strong> (Use the verbs <em>heiBen</em>, <em>wohnen</em> and <em>kommen</em>.
+          <strong>Exercise: Complete the Sentences</strong> (Use the verbs <em>heißen</em>, <em>wohnen</em> and <em>kommen</em>.
           Please conjugate the verb to match the pronoun.)
         </p>
         <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
