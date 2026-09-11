@@ -225,7 +225,7 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => (
       </section>
 
       <section style={card}>
-        <h2 style={sectionTitle}>Teil 4: Vocabulary reminder</h2>
+        <h2 style={sectionTitle}>Vocabulary reminder</h2>
         <p style={paragraph}>
           Time: Mitternacht, null Uhr, vierzehn Uhr, sechzehn Uhr, morgens, nachmittags, abends.
         </p>
