@@ -1,0 +1,51 @@
+name: B1 Course Book audit
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/B1Day*.js"
+      - "web/src/components/CourseLessonPage.js"
+      - "web/src/data/b1*.js"
+      - "web/src/data/curriculumManifest.js"
+      - "scripts/applyA1RouteAlignment.js"
+      - "shared/curriculumCanonical.json"
+      - ".github/workflows/b1-course-book-audit.yml"
+  push:
+    branches:
+      - "audit/b1-*"
+    paths:
+      - "web/src/components/B1Day*.js"
+      - "web/src/components/CourseLessonPage.js"
+      - "web/src/data/b1*.js"
+      - "web/src/data/curriculumManifest.js"
+      - "scripts/applyA1RouteAlignment.js"
+      - "shared/curriculumCanonical.json"
+      - ".github/workflows/b1-course-book-audit.yml"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install curriculum tooling
+        run: npm ci
+
+      - name: Regenerate curriculum routes
+        run: npm run sync:curriculum
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Run B1 Days 1-6 audit
+        working-directory: web
+        run: npx jest --runInBand src/data/b1Days1To6CourseBookAudit.test.js
