@@ -147,10 +147,14 @@ function patchSpeakingIntroPage() {
   }
 
   if (!source.includes("<A1Teil3SpeakingPracticePanel />")) {
-    const closing = "      </Section>\n    </div>\n  );";
+    const containerClosings = ["\n  </main>\n);", "\n    </div>\n  );"];
+    const closing = containerClosings.find((candidate) => source.lastIndexOf(candidate) >= 0);
+    if (!closing) throw new Error("Speaking intro page container anchor missing.");
+
     const index = source.lastIndexOf(closing);
-    if (index < 0) throw new Error("Speaking intro final section anchor missing.");
-    const replacement = "      </Section>\n\n      <A1Teil3SpeakingPracticePanel />\n    </div>\n  );";
+    const replacement = closing.startsWith("\n  </main>")
+      ? "\n\n    <A1Teil3SpeakingPracticePanel />\n  </main>\n);"
+      : "\n\n      <A1Teil3SpeakingPracticePanel />\n    </div>\n  );";
     source = `${source.slice(0, index)}${replacement}${source.slice(index + closing.length)}`;
   }
 
