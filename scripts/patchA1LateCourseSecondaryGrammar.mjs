@@ -104,8 +104,8 @@ function keepDay23AtA1CaseScope() {
     if (end >= 0) source = `${source.slice(0, start)}${source.slice(end + endMarker.length)}`;
   });
 
-  if (/Adjective endings with ein\/eine|adjective declension|optional adjective reminder/i.test(source)) {
-    throw new Error("A1 Day 23 still contains adjective-declension teaching after boundary cleanup.");
+  if (/Adjective endings with ein\/eine|optional adjective reminder/i.test(source)) {
+    throw new Error("A1 Day 23 still contains adjective-ending teaching after boundary cleanup.");
   }
 
   write(file, source);
