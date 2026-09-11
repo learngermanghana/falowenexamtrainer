@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "web/src/components/B1Day*.js"
+      - "web/src/components/B1Days12To17LearningUpgrade*.js"
+      - "web/src/components/B1Days12To17LearningUpgrade*.jsx"
+      - "web/src/components/A2B1WorkbookGrammarNotes*.js"
       - "web/src/components/CourseLessonPage.js"
       - "web/src/data/b1*.js"
       - "web/src/data/curriculumManifest.js"
@@ -15,6 +18,9 @@ on:
       - "audit/b1-*"
     paths:
       - "web/src/components/B1Day*.js"
+      - "web/src/components/B1Days12To17LearningUpgrade*.js"
+      - "web/src/components/B1Days12To17LearningUpgrade*.jsx"
+      - "web/src/components/A2B1WorkbookGrammarNotes*.js"
       - "web/src/components/CourseLessonPage.js"
       - "web/src/data/b1*.js"
       - "web/src/data/curriculumManifest.js"
@@ -47,5 +53,7 @@ jobs:
           npx jest --runInBand
           src/data/b1Days1To6CourseBookAudit.test.js
           src/data/b1Days7To12CourseBookAudit.test.js
+          src/data/b1Days13To16CourseBookAudit.test.js
           src/data/b1Days17To22CourseBookAudit.test.js
           src/data/b1Days23To28CourseBookAudit.test.js
+          src/components/B1Days12To17LearningUpgrade.test.js
