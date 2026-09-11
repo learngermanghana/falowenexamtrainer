@@ -32,10 +32,10 @@ describe("canonical A1 assignment registry", () => {
     expect(assignment.submissionEnabled).toBe(true);
   });
 
-  test("preserves non-consecutive section numbers after workbook parts are merged", () => {
+  test("keeps A1-0.2 sections consecutive after the Hören rename", () => {
     expect(A1_ASSIGNMENT_REGISTRY["A1-0.2"].sections).toEqual([
       { key: "teil-1", number: 1, label: "Teil 1 · Reading and Questions" },
-      { key: "teil-3", number: 3, label: "Teil 3 · Hören" },
+      { key: "teil-2", number: 2, label: "Teil 2 · Hören" },
     ]);
   });
 
