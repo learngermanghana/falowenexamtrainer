@@ -5,7 +5,7 @@ import { getCanonicalA1TeacherVideoResource } from "../data/a1TeacherVideoResour
 const readComponent = (filename) =>
   fs.readFileSync(path.join(__dirname, filename), "utf8");
 
-describe("A1 Course Book Day 2 through Day 5 audit guardrails", () => {
+describe("A1 Course Book Day 2 through Day 7 audit guardrails", () => {
   test("Day 3 Kapitel 1.1 uses the canonical teacher lecture and teaches its declared focus", () => {
     const source = readComponent("A1Day3SchreibenSprechenKapitel11WorkbookPage.js");
     const teacher = getCanonicalA1TeacherVideoResource(3, "1.1");
@@ -48,5 +48,17 @@ describe("A1 Course Book Day 2 through Day 5 audit guardrails", () => {
     expect(source).toContain("Self-Introduction Practice with Articles");
     expect(source).toContain('"heiße, ich, Anna (Statement)"');
     expect(source).not.toContain('"heisse, ich, Anna (Statement)"');
+  });
+
+  test("Day 7 explains its review sections and models gern naturally", () => {
+    const workbook = readComponent("A1Chapter3AskingAboutPricesWorkbookPage.js");
+    const grammar = readComponent("A1Day7PricesPreferencesGrammarPage.js");
+
+    expect(workbook).toContain("Teil 2 and Teil 3 deliberately review family and hobbies");
+    expect(workbook).toContain("Ich lese gern Bücher.");
+    expect(workbook).toContain("Sie malt gern.");
+    expect(workbook).not.toContain("Ich mag Bücher lesen.");
+    expect(workbook).not.toContain("Sie genießt Malen.");
+    expect(grammar).toContain("Plural short answer:</strong> Sie kosten 10 Euro.");
   });
 });
