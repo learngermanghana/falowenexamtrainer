@@ -238,12 +238,12 @@ const A1Day16FoodAndNegationGrammarPage = () => {
         ) : null}
       </Section>
 
-      <Section eyebrow="Workbook language preview" title="Some reading forms are recognition-only today">
+      <Section eyebrow="Workbook preparation" title="Use familiar A1 language while you read">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The existing Day 16 tutor-marked workbooks also recycle language from other A1 lessons and may contain forms such as <strong>weil</strong>, a past-time phrase like <strong>letzten Samstag</strong>, or a comparison such as <strong>frischer als</strong>. You do not need to make adjective comparison a new grammar target here; use the context to understand the text and focus your own production on food and negation.
+          In the workbook you may meet familiar forms such as <strong>weil</strong>, a past-time phrase like <strong>letzten Samstag</strong>, or a comparison such as <strong>frischer als</strong>. Use the context to understand these sentences, then keep your own speaking and writing focused on food and negation.
         </p>
         <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", borderRadius: 10, padding: 12, lineHeight: 1.65 }}>
-          <strong>Tutor-marked assignments A1-9 and A1-10 are unchanged.</strong> Their questions, answer mapping and submission behaviour remain exactly as before.
+          <strong>Reading tip:</strong> You do not need to practise every familiar grammar form again today. Read for meaning first and return to <strong>nein</strong>, <strong>nicht</strong> and <strong>kein</strong> when you produce your own sentences.
         </div>
       </Section>
 
