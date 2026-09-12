@@ -22,6 +22,17 @@ const latestDetail = (record = {}) => {
   return `${responseLabel} · ${correct} correct · ${needsReview} to review`;
 };
 
+const nextClassGoal = (record = {}) => {
+  if (Number(record.turns || 0) <= 0) {
+    return "Answer at least one question or attempt one class activity.";
+  }
+  const reviewConcept = String(record.reviewConcepts?.[0] || record.focusConcept || "").trim();
+  if (reviewConcept) return `Contribute at least once, especially when ${reviewConcept} comes up.`;
+  return "Contribute at least once again in your next class.";
+};
+
+const recordElementId = (record = {}) => `participation-session-${encodeURIComponent(record.sessionId || record.id || record.assignmentId || "record")}`;
+
 const statStyle = {
   border: "1px solid #e2e8f0",
   borderRadius: 14,
@@ -61,12 +72,12 @@ const Stat = ({ label, value }) => (
   </div>
 );
 
-const QuestionHistory = ({ record }) => {
+const QuestionHistory = ({ record, open = false }) => {
   const questions = Array.isArray(record.questionResponses) ? record.questionResponses : [];
   if (questions.length === 0) return null;
 
   return (
-    <details style={{ marginTop: 8 }}>
+    <details style={{ marginTop: 8 }} open={open || undefined}>
       <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#1d4ed8" }}>
         Review {questions.length} recorded question{questions.length === 1 ? "" : "s"}
       </summary>
@@ -86,6 +97,9 @@ const QuestionHistory = ({ record }) => {
               }}
             >
               <span style={{ fontSize: 13, lineHeight: 1.4 }}>{question.question}</span>
+              {question.conceptLabel ? (
+                <span style={{ ...styles.helperText, fontSize: 12 }}>Topic: {question.conceptLabel}</span>
+              ) : null}
               {question.questionContext ? (
                 <span style={{ ...styles.helperText, fontSize: 12 }}>{question.questionContext}</span>
               ) : null}
@@ -100,11 +114,53 @@ const QuestionHistory = ({ record }) => {
   );
 };
 
+const ParticipationRecap = ({ record, highlighted = false }) => {
+  const strongConcepts = Array.isArray(record.strongConcepts) ? record.strongConcepts : [];
+  const reviewConcepts = Array.isArray(record.reviewConcepts) ? record.reviewConcepts : [];
+  const reviewRecommendation = String(record.reviewRecommendation || "").trim();
+
+  return (
+    <div
+      style={{
+        marginTop: 4,
+        padding: "10px 12px",
+        borderRadius: 12,
+        border: highlighted ? "1px solid #818cf8" : "1px solid #e2e8f0",
+        background: highlighted ? "#eef2ff" : "#f8fafc",
+        display: "grid",
+        gap: 5,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <strong style={{ fontSize: 13 }}>Class recap</strong>
+        {highlighted ? <PillBadge tone="info">From your email</PillBadge> : null}
+      </div>
+      <span style={{ ...styles.helperText, fontSize: 12 }}>
+        Attempted: {Number(record.turns || 0)} · Correct: {Number(record.correct || 0)} · Needs review: {Number(record.needsReview || 0)}
+      </span>
+      {strongConcepts.length > 0 ? (
+        <span style={{ fontSize: 12 }}><strong>Strong topics:</strong> {strongConcepts.join(" · ")}</span>
+      ) : null}
+      {reviewRecommendation || reviewConcepts.length > 0 ? (
+        <span style={{ fontSize: 12 }}>
+          <strong>Review next:</strong> {reviewRecommendation.replace(/^Review(?: recommended| next)?:\s*/i, "") || reviewConcepts.join(" · ")}
+        </span>
+      ) : null}
+      <span style={{ fontSize: 12 }}><strong>Next class goal:</strong> {nextClassGoal(record)}</span>
+    </div>
+  );
+};
+
 const ClassParticipationCard = () => {
   const { user } = useAuth();
   const [records, setRecords] = useState([]);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+
+  const requestedSessionId = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return String(new URLSearchParams(window.location.search).get("sessionId") || "").trim();
+  }, []);
 
   const refresh = useCallback(async () => {
     if (!user?.uid) {
@@ -147,6 +203,24 @@ const ClassParticipationCard = () => {
 
   const weekly = useMemo(() => summarizeClassParticipation(records), [records]);
   const overall = useMemo(() => buildOverallSummary(records), [records]);
+  const displayedRecords = useMemo(() => {
+    if (!requestedSessionId) return records;
+    return [...records].sort((left, right) => {
+      const leftMatch = left.sessionId === requestedSessionId ? 1 : 0;
+      const rightMatch = right.sessionId === requestedSessionId ? 1 : 0;
+      return rightMatch - leftMatch;
+    });
+  }, [records, requestedSessionId]);
+
+  useEffect(() => {
+    if (status !== "success" || !requestedSessionId) return;
+    const selected = records.find((record) => record.sessionId === requestedSessionId);
+    if (!selected) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById(recordElementId(selected))?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [records, requestedSessionId, status]);
 
   return (
     <section
@@ -180,6 +254,12 @@ const ClassParticipationCard = () => {
       {status === "success" && records.length === 0 ? (
         <p style={{ ...styles.helperText, margin: 0 }}>
           Your participation will appear here after your teacher records a classroom response.
+        </p>
+      ) : null}
+
+      {status === "success" && requestedSessionId && records.length > 0 && !records.some((record) => record.sessionId === requestedSessionId) ? (
+        <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>
+          That class recap is not available yet. Your other participation records are shown below.
         </p>
       ) : null}
 
@@ -233,28 +313,37 @@ const ClassParticipationCard = () => {
               <span style={{ ...styles.helperText, fontSize: 12 }}>{records.length} recorded class{records.length === 1 ? "" : "es"}</span>
             </div>
             <div style={{ display: "grid" }}>
-              {records.map((record) => (
-                <article
-                  key={record.id || `${record.sessionDate}-${record.assignmentId}`}
-                  style={{
-                    display: "grid",
-                    gap: 6,
-                    padding: "12px 2px",
-                    borderBottom: "1px solid #f1f5f9",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 12, flexWrap: "wrap" }}>
-                    <div style={{ minWidth: 0, flex: "1 1 220px" }}>
-                      <strong style={{ display: "block" }}>{formatLessonLabel(record)}</strong>
-                      <span style={{ ...styles.helperText, fontSize: 12 }}>{record.sessionDate || "Class lesson"}</span>
+              {displayedRecords.map((record) => {
+                const highlighted = Boolean(requestedSessionId && record.sessionId === requestedSessionId);
+                return (
+                  <article
+                    id={recordElementId(record)}
+                    key={record.id || `${record.sessionDate}-${record.assignmentId}`}
+                    style={{
+                      display: "grid",
+                      gap: 6,
+                      padding: highlighted ? "14px 12px" : "12px 2px",
+                      margin: highlighted ? "4px 0" : 0,
+                      border: highlighted ? "2px solid #818cf8" : "none",
+                      borderBottom: highlighted ? "2px solid #818cf8" : "1px solid #f1f5f9",
+                      borderRadius: highlighted ? 14 : 0,
+                      background: highlighted ? "#f8faff" : "transparent",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 12, flexWrap: "wrap" }}>
+                      <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+                        <strong style={{ display: "block" }}>{formatLessonLabel(record)}</strong>
+                        <span style={{ ...styles.helperText, fontSize: 12 }}>{record.sessionDate || "Class lesson"}</span>
+                      </div>
+                      <span style={{ ...styles.helperText, fontSize: 12, fontWeight: 700 }}>
+                        {latestDetail(record)}
+                      </span>
                     </div>
-                    <span style={{ ...styles.helperText, fontSize: 12, fontWeight: 700 }}>
-                      {latestDetail(record)}
-                    </span>
-                  </div>
-                  <QuestionHistory record={record} />
-                </article>
-              ))}
+                    <ParticipationRecap record={record} highlighted={highlighted} />
+                    <QuestionHistory record={record} open={highlighted} />
+                  </article>
+                );
+              })}
             </div>
           </div>
         </>
@@ -273,4 +362,6 @@ export const __private__ = {
   buildOverallSummary,
   formatLessonLabel,
   latestDetail,
+  nextClassGoal,
+  recordElementId,
 };
