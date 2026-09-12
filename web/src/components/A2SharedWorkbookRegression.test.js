@@ -107,7 +107,7 @@ describe("shared A2 workbook regression", () => {
     expect(day25).toContain("Annas Tagesablauf");
     expect(day25).toContain("m7nP2qE9gNg");
     expect(day25).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
-    expect(day25).not.toContain("There is no Hören assignment in this workbook");
+    expect(day25).not.toContain(["There is no", "Hören assignment in this workbook"].join(" "));
   });
 
   it("keeps Day 26 focused on feelings", () => {
