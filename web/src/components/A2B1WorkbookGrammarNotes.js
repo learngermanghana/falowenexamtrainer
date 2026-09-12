@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from "react";
+import { A2SecondStageGrammarUpgrade } from "./A2SecondStageLearningUpgrade";
 
 const LazyA2B1GrammarNotesContent = lazy(() =>
   import("./A2B1WorkbookGrammarNotesContent").then((module) => ({
@@ -7,7 +8,10 @@ const LazyA2B1GrammarNotesContent = lazy(() =>
 );
 
 export const A2B1GrammarNotesTab = ({ level, day }) => (
-  <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
-    <LazyA2B1GrammarNotesContent level={level} day={day} />
-  </Suspense>
+  <>
+    <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
+      <LazyA2B1GrammarNotesContent level={level} day={day} />
+    </Suspense>
+    {String(level || "").toUpperCase() === "A2" ? <A2SecondStageGrammarUpgrade day={day} /> : null}
+  </>
 );
