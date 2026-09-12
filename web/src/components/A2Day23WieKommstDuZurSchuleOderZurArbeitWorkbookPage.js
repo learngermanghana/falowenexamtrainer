@@ -32,20 +32,28 @@ const lesenQuestions = [
 
 export default function A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage() {
   return (
-    <A2StandardTabbedWorkbookPage
-      day={23}
-      title="Wie kommst du zur Schule / zur Arbeit?"
-      chapter="9.23"
-      workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit"
-      topicPrompt="Beschreibe deinen Weg zur Schule oder zur Arbeit. Sage, welche Verkehrsmittel du benutzt, wie lange der Weg dauert und warum du diese Möglichkeit wählst."
-      schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihren Weg zur Schule oder zur Arbeit. Beschreiben Sie Ihre Verkehrsmittel, die Dauer des Weges und einen Vor- oder Nachteil. Fragen Sie auch, wie die andere Person zur Schule oder zur Arbeit kommt."
-      schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinem Arbeitsweg erzählen. Normalerweise ..."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
-      hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie auf Verkehrsmittel, Wege, Dauer und Gründe für die Wahl des Verkehrsmittels."
-      hoerenAudioUrl="https://youtu.be/LtARwiCljLY"
-      hoerenQuestions={[]}
-      showWorkbookGuidance={false}
-    />
+    <div data-a2-day23-native-guidance="true">
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 16px" }}>
+        <p style={{ margin: "0 0 8px", color: "#475569", fontSize: 14 }}>
+          Teil 4 · Hören is self-check practice; do not send Hören through Submit.
+        </p>
+      </div>
+      <A2StandardTabbedWorkbookPage
+        ariaLabel="A2 Day 23 workbook sections"
+        day={23}
+        title="Wie kommst du zur Schule / zur Arbeit?"
+        chapter="9.23"
+        workbookId="A2Day23WieKommstDuZurSchuleOderZurArbeit"
+        topicPrompt="Beschreibe deinen Weg zur Schule oder zur Arbeit. Sage, welche Verkehrsmittel du benutzt, wie lange der Weg dauert und warum du diese Möglichkeit wählst."
+        schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihren Weg zur Schule oder zur Arbeit. Beschreiben Sie Ihre Verkehrsmittel, die Dauer des Weges und einen Vor- oder Nachteil. Fragen Sie auch, wie die andere Person zur Schule oder zur Arbeit kommt."
+        schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinem Arbeitsweg erzählen. Normalerweise ..."
+        lesenText={lesenText}
+        lesenQuestions={lesenQuestions}
+        hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie auf Verkehrsmittel, Wege, Dauer und Gründe für die Wahl des Verkehrsmittels."
+        hoerenAudioUrl="https://youtu.be/LtARwiCljLY"
+        hoerenQuestions={[]}
+        showWorkbookGuidance={false}
+      />
+    </div>
   );
 }
