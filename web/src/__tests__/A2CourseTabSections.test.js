@@ -65,7 +65,10 @@ test("keeps Day 15 on its existing A2 identity and chapter route", () => {
   const second = sectionByTitle("A2.2 – Independent Communication");
   const day15 = within(second)
     .getAllByRole("article")
-    .find((card) => within(card).queryByText("Day 15"));
+    .find((card) => {
+      const href = within(card).getByRole("link", { name: "Open Lesson" }).getAttribute("href") || "";
+      return href.includes("/campus/course/lesson/A2/15");
+    });
 
   expect(day15).toBeTruthy();
   const lessonLink = within(day15).getByRole("link", { name: "Open Lesson" });
