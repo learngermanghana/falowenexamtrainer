@@ -29,7 +29,8 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(wrapper).toContain("patchReadingContent");
     expect(wrapper).toContain("Tipps für ein erfolgreiches Vorstellungsgespräch");
     expect(wrapper).toContain("Fragen Sie nach den Arbeitszeiten, den Aufgaben oder den Weiterbildungsmöglichkeiten.");
-    expect(wrapper).not.toContain("Kinderbetreuung in Deutschland");
+    expect(wrapper).toContain("readingHeading.textContent = DAY13_READING_TITLE");
+    expect(wrapper).toContain("if (readingText?.tagName === \"P\") readingText.textContent = DAY13_READING_TEXT");
   });
 
   test("keeps Day 14 grammar and submission locked to 5.14", () => {

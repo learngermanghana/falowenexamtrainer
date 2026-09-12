@@ -61,6 +61,10 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="9.23"');
     expect(source).toContain("Mein Arbeitsweg");
+    expect(source).toContain('ariaLabel="A2 Day 23 workbook sections"');
+    expect(source).toContain('data-a2-day23-native-guidance="true"');
+    expect(source).toContain('hoerenAudioUrl="https://youtu.be/LtARwiCljLY"');
+    expect(source).toContain('hoerenQuestions={[]}');
     expect(source).not.toMatch(/key:\s*"teil[1-4]"/i);
   });
 

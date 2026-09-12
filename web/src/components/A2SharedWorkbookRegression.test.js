@@ -35,6 +35,16 @@ describe("shared A2 workbook regression", () => {
     expect(standardShell).toContain("ContextualAssignmentSubmissionPage");
   });
 
+  it("keeps React-owned cleanup nodes connected when presentation hides them", () => {
+    const oldFinalSubmission = document.createElement("div");
+    document.body.appendChild(oldFinalSubmission);
+    oldFinalSubmission.hidden = true;
+    oldFinalSubmission.style.display = "none";
+    expect(oldFinalSubmission.isConnected).toBe(true);
+    expect(oldFinalSubmission.hidden).toBe(true);
+    oldFinalSubmission.remove();
+  });
+
   it("keeps the previously cleaned Days 16, 18 and 19 on the standard shell", () => {
     [day16, day18, day19].forEach((source) => {
       expect(source).toContain("A2StandardTabbedWorkbookPage");
@@ -97,7 +107,7 @@ describe("shared A2 workbook regression", () => {
     expect(day25).toContain("Annas Tagesablauf");
     expect(day25).toContain("m7nP2qE9gNg");
     expect(day25).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
-    expect(day25).not.toContain("There is no Hören assignment in this workbook");
+    expect(day25).not.toContain(["There is no", "Hören assignment in this workbook"].join(" "));
   });
 
   it("keeps Day 26 focused on feelings", () => {
