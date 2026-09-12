@@ -5,6 +5,9 @@ on:
     paths:
       - "shared/curriculumCanonical.json"
       - "scripts/applyA1RouteAlignment.js"
+      - "scripts/patchA2LateWorkbookNativeOwnership.mjs"
+      - "web/src/__tests__/A2CourseTabSections.test.js"
+      - "web/src/components/CourseTab.js"
       - "web/src/data/a2CurriculumAlignment.js"
       - "web/src/data/a2Day*CourseBookAudit.test.js"
       - "web/src/data/a2Days*CourseBookAudit.test.js"
@@ -42,6 +45,7 @@ jobs:
           CI: true
         run: >-
           npm run test:ci -- --runTestsByPath
+          src/__tests__/A2CourseTabSections.test.js
           src/data/a2Day1CourseBookAudit.test.js
           src/data/a2Days1To12CourseBookAudit.test.js
           src/data/a2Days13To18CourseBookAudit.test.js
