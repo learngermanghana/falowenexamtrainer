@@ -15,11 +15,15 @@ describe("Class Participation integration", () => {
     expect(route).not.toContain("studentName:");
   });
 
-  test("student API returns only learning-result question evidence", () => {
+  test("student API returns only learning-result question evidence and recap guidance", () => {
     const route = read("functions/functionz/routes/classParticipation.js");
     expect(route).toContain("safeQuestionResponses");
     expect(route).toContain('response?.result === "correct" || response?.result === "needs_review"');
-    expect(route).toContain("questionResponses: safeQuestionResponses(data.questionResponses)");
+    expect(route).toContain("const questionResponses = safeQuestionResponses(data.questionResponses)");
+    expect(route).toContain("conceptLabel: clean(response.conceptLabel)");
+    expect(route).toContain("reviewConcepts");
+    expect(route).toContain("focusConcept");
+    expect(route).toContain("reviewRecommendation");
     expect(route).not.toContain('result === "presenter_absent"');
   });
 
