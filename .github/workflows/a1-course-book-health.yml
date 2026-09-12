@@ -13,6 +13,20 @@ on:
       - "scripts/applyA1RouteAlignment.js"
       - "scripts/patchA1*.mjs"
       - ".github/workflows/a1-course-book-health.yml"
+  push:
+    branches:
+      - "audit/a1-*"
+    paths:
+      - "shared/curriculumCanonical.json"
+      - "web/src/App.js"
+      - "web/src/data/**"
+      - "web/src/components/A1*"
+      - "web/src/utils/a1*"
+      - "web/src/utils/courseWorkbookSubmission*"
+      - "scripts/auditA1CourseBook.js"
+      - "scripts/applyA1RouteAlignment.js"
+      - "scripts/patchA1*.mjs"
+      - ".github/workflows/a1-course-book-health.yml"
 
 jobs:
   verify-a1-course-book:
@@ -32,12 +46,13 @@ jobs:
       - name: Audit canonical A1 curriculum
         run: node scripts/auditA1CourseBook.js
 
-      - name: Run A1 Course Book health regressions
+      - name: Run focused A1 Course Book regressions
         working-directory: web
         env:
           CI: true
         run: >-
-          npm run test:ci -- --runTestsByPath
+          npx jest --runInBand --runTestsByPath
+          src/data/a1FullCourseBookAudit.test.js
           src/data/a1CourseBookHealth.test.js
           src/data/a1RouteAlignment.test.js
           src/data/a1AssignmentRegistry.test.js
@@ -47,6 +62,6 @@ jobs:
           src/components/A1Day17StandardWorkbookPage.test.jsx
           src/utils/courseWorkbookSubmission.test.js
 
-      - name: Build production web app
+      - name: Build production web app without mutation hooks
         working-directory: web
-        run: npm run build
+        run: npx vite build
