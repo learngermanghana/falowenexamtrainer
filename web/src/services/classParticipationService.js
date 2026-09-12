@@ -7,11 +7,18 @@ const count = (value) => {
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : 0;
 };
 
+const normalizeConceptList = (value) => [...new Set(
+  (Array.isArray(value) ? value : [])
+    .map(clean)
+    .filter(Boolean)
+)].slice(0, 6);
+
 const normalizeQuestionResponses = (value) => (Array.isArray(value) ? value : [])
   .filter((response) => response?.result === "correct" || response?.result === "needs_review")
   .map((response) => ({
     questionId: clean(response.questionId),
     question: clean(response.question),
+    conceptLabel: clean(response.conceptLabel),
     result: response.result,
     questionContext: clean(response.questionContext),
     recordedAt: clean(response.recordedAt),
@@ -26,22 +33,47 @@ const recordDate = (record = {}) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-export const normalizeParticipationRecord = (record = {}) => ({
-  id: clean(record.id),
-  sessionId: clean(record.sessionId),
-  classId: clean(record.classId),
-  course: clean(record.course),
-  sessionDate: clean(record.sessionDate),
-  lessonDay: clean(record.lessonDay),
-  lessonTitle: clean(record.lessonTitle),
-  assignmentId: clean(record.assignmentId),
-  turns: count(record.turns),
-  correct: count(record.correct),
-  needsReview: count(record.needsReview),
-  skipped: count(record.skipped),
-  questionResponses: normalizeQuestionResponses(record.questionResponses),
-  updatedAt: clean(record.updatedAt),
-});
+export const normalizeParticipationRecord = (record = {}) => {
+  const questionResponses = normalizeQuestionResponses(record.questionResponses);
+  const reviewConcepts = normalizeConceptList(
+    Array.isArray(record.reviewConcepts)
+      ? record.reviewConcepts
+      : questionResponses
+        .filter((response) => response.result === "needs_review")
+        .map((response) => response.conceptLabel)
+  );
+  const strongConcepts = normalizeConceptList(
+    questionResponses
+      .filter((response) => response.result === "correct")
+      .map((response) => response.conceptLabel)
+      .filter((concept) => !reviewConcepts.includes(concept))
+  );
+
+  return {
+    id: clean(record.id),
+    sessionId: clean(record.sessionId),
+    classId: clean(record.classId),
+    className: clean(record.className),
+    course: clean(record.course),
+    sessionDate: clean(record.sessionDate),
+    lessonDay: clean(record.lessonDay),
+    lessonTitle: clean(record.lessonTitle),
+    assignmentId: clean(record.assignmentId),
+    turns: count(record.turns),
+    correct: count(record.correct),
+    needsReview: count(record.needsReview),
+    skipped: count(record.skipped),
+    questionResponses,
+    strongConcepts,
+    reviewConcepts,
+    focusConcept: clean(record.focusConcept || reviewConcepts[0]),
+    reviewRecommendation: clean(
+      record.reviewRecommendation
+      || (reviewConcepts.length ? `Review next: ${reviewConcepts.join(" · ")}` : "")
+    ),
+    updatedAt: clean(record.updatedAt),
+  };
+};
 
 /**
  * Load only the authenticated learner's participation records.
