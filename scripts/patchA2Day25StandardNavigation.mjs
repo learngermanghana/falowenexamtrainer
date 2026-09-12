@@ -8,11 +8,19 @@ const regressionPath = path.join(root, "web/src/components/A2SharedWorkbookRegre
 
 let day25 = fs.readFileSync(day25Path, "utf8");
 
+const usesCleanStandardWorkbook =
+  day25.includes('import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";') &&
+  day25.includes("<A2StandardTabbedWorkbookPage") &&
+  day25.includes("day={25}") &&
+  day25.includes('chapter="9.25"');
+
 const usesNativeGrammarTabs =
   day25.includes('{ key: "grammar", label: "Grammar" }') &&
   day25.includes('activeTab === "grammar"');
 
-if (usesNativeGrammarTabs) {
+if (usesCleanStandardWorkbook) {
+  console.log("A2 Day 25 already uses the cleaned standard workbook shell; legacy shared-navigation patch skipped.");
+} else if (usesNativeGrammarTabs) {
   console.log("A2 Day 25 already owns isolated native Grammar and workbook tabs; legacy shared-navigation patch skipped.");
 } else {
 
