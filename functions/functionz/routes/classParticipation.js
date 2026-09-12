@@ -17,12 +17,19 @@ const toIso = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 };
 
+const safeConceptList = (value) => [...new Set(
+  (Array.isArray(value) ? value : [])
+    .map((concept) => clean(concept).slice(0, 160))
+    .filter(Boolean)
+)].slice(0, 6);
+
 const safeQuestionResponses = (value) => (Array.isArray(value) ? value : [])
   .filter((response) => response?.result === "correct" || response?.result === "needs_review")
   .slice(-20)
   .map((response) => ({
     questionId: clean(response.questionId).slice(0, 160),
     question: clean(response.question).slice(0, 700),
+    conceptLabel: clean(response.conceptLabel).slice(0, 160),
     result: response.result,
     questionContext: clean(response.questionContext).slice(0, 120),
     recordedAt: clean(response.recordedAt).slice(0, 80),
@@ -43,10 +50,25 @@ async function getAuthenticatedStudent(req) {
 
 const studentSafeRecord = (snapshot) => {
   const data = snapshot.data() || {};
+  const questionResponses = safeQuestionResponses(data.questionResponses);
+  const derivedReviewConcepts = questionResponses
+    .filter((response) => response.result === "needs_review")
+    .map((response) => response.conceptLabel);
+  const reviewConcepts = safeConceptList([
+    ...(Array.isArray(data.reviewConcepts) ? data.reviewConcepts : []),
+    ...derivedReviewConcepts,
+  ]);
+  const focusConcept = clean(data.focusConcept || reviewConcepts[0]).slice(0, 160);
+  const reviewRecommendation = clean(
+    data.reviewRecommendation
+      || (reviewConcepts.length ? `Review next: ${reviewConcepts.join(" · ")}` : "")
+  ).slice(0, 700);
+
   return {
     id: snapshot.id,
     sessionId: clean(data.sessionId),
     classId: clean(data.classId),
+    className: clean(data.className),
     course: clean(data.course),
     assignmentId: clean(data.assignmentId),
     lessonDay: clean(data.lessonDay),
@@ -56,7 +78,10 @@ const studentSafeRecord = (snapshot) => {
     correct: count(data.correct),
     needsReview: count(data.needsReview),
     skipped: count(data.skipped),
-    questionResponses: safeQuestionResponses(data.questionResponses),
+    questionResponses,
+    reviewConcepts,
+    focusConcept,
+    reviewRecommendation,
     updatedAt: toIso(data.updatedAt),
   };
 };
