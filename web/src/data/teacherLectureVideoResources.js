@@ -49,7 +49,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     8: [{ chapter: "3.8", topic: "B1 Day 8", tutor_lecture_video: "https://youtu.be/GuQcUitfvQA" }],
     9: [{ chapter: "3.9", tutor_lecture_video: "" }],
     10: [{ chapter: "4.10", tutor_lecture_video: "" }],
-    11: [{ chapter: "4.11", tutor_lecture_video: "" }],
+    11: [{ chapter: "4.11", topic: "Teamspiele und kooperative Aktivitäten", tutor_lecture_video: "https://youtu.be/UL-gk2klvWQ" }],
     12: [{ chapter: "4.12", tutor_lecture_video: "" }],
     13: [{ chapter: "4.13", tutor_lecture_video: "" }],
     14: [{ chapter: "5.14", tutor_lecture_video: "" }],
