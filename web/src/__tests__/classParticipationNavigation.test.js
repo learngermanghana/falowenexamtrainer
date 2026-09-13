@@ -5,6 +5,7 @@ const projectRoot = process.cwd();
 const homeMetricsPath = path.join(projectRoot, "src/components/HomeMetrics.js");
 const accountSettingsPath = path.join(projectRoot, "src/components/AccountSettings.js");
 const participationCardPath = path.join(projectRoot, "src/components/ClassParticipationCard.js");
+const participationServicePath = path.join(projectRoot, "src/services/classParticipationService.js");
 
 describe("Class Participation navigation", () => {
   test("Home keeps participation compact and links to the dedicated view", () => {
@@ -36,7 +37,7 @@ describe("Class Participation navigation", () => {
     expect(source).not.toContain('{activeTab === "studentData" ? <ClassParticipationCard /> : null}');
   });
 
-  test("the detailed participation view contains weekly, overall and question-level data", () => {
+  test("the detailed participation view supports canonical and legacy recap links", () => {
     const source = fs.readFileSync(participationCardPath, "utf8");
 
     expect(source).toContain("This week");
@@ -44,6 +45,25 @@ describe("Class Participation navigation", () => {
     expect(source).toContain("Class history");
     expect(source).toContain("Accuracy");
     expect(source).toContain("QuestionHistory");
+    expect(source).toContain('params.get("classSessionId")');
+    expect(source).toContain('params.get("sessionId")');
+    expect(source).toContain("record.classSessionId === requestedClassSessionId");
+    expect(source).toContain("record.sessionId === requestedSessionId");
+    expect(source).toContain("<strong>Lesson:</strong>");
+    expect(source).toContain("<strong>Recorded:</strong>");
     expect(source).toContain("It does not change your course grade or official attendance.");
+  });
+
+  test("participation metrics use canonical deduplicated records", () => {
+    const source = fs.readFileSync(participationServicePath, "utf8");
+
+    expect(source).toContain("classSessionId: clean(record.classSessionId)");
+    expect(source).toContain("revision: revisionNumber(record.revision)");
+    expect(source).toContain("markedDate: clean(record.markedDate)");
+    expect(source).toContain("export const deduplicateParticipationRecords");
+    expect(source).toContain("candidate.revision > current.revision");
+    expect(source).toContain("timestampValue(candidate.updatedAt)");
+    expect(source).toContain("candidate.sessionDate");
+    expect(source).toContain("const canonicalRecords = deduplicateParticipationRecords(records)");
   });
 });
