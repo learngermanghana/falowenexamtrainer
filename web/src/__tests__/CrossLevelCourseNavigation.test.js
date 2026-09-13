@@ -54,4 +54,15 @@ describe("A1-C1 Day 0 and Course Book navigation consistency", () => {
     expect(courseTab).toContain("getCourseBookPresentationSection(entry, normalizedSelectedCourseLevel)");
     expect(courseTab).toContain("data-course-section-intro={section.key}");
   });
+
+  it("shows one concise weekly goal card without turning the Course Book into another long checklist", () => {
+    expect(courseTab).toContain("COURSE_BOOK_WEEK_GOAL_LIMIT = 3");
+    expect(courseTab).toContain("getCourseBookWeekNumber");
+    expect(courseTab).toContain("getCourseBookWeekOutcomeItems");
+    expect(courseTab).toContain('className="course-book-week-goal"');
+    expect(courseTab).toContain("data-course-week-goal");
+    expect(courseTab).toContain("Week {weekNumber} goal");
+    expect(courseTab).toContain("By the end of this week:");
+    expect(courseTab).toContain("weekOutcomeItems.join(\" • \")");
+  });
 });
