@@ -22,7 +22,6 @@
     "typescript": "4.9.5",
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
-    "@vitejs/plugin-react": "^5.1.1",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "vite": "^7.2.7"
@@ -39,7 +38,7 @@
     "sync:course-goethe-free-chat": "node ../scripts/patchCourseGoetheFreeChatMounts.mjs",
     "sync:a1-self-learning-destinations": "node ../scripts/patchA1SelfLearningDestinationOwnership.mjs",
     "sync:sheet-result-feedback": "node ../scripts/patchSheetResultFeedbackPresentation.mjs",
-    "sync:course-completion-progress": "node ../scripts/patchCanonicalCourseCompletionProgress.mjs",
+    "sync:course-completion-progress": "node ../scripts/patchCanonicalCourseCompletionProgress.mjs && node ../scripts/patchHomeCourseBookFocus.mjs",
     "sync:course-media": "node ../scripts/auditCourseMediaAndSpeaking.mjs",
     "sync:b2-days-9-12": "node ../scripts/patchB2Days9To12ContentUpgrade.mjs",
     "sync:c1-opinion-template": "node ../scripts/patchC1OpinionEssayTemplate.mjs && node ../scripts/patchC1GoetheEssayTemplate.mjs && node ../scripts/patchC1Day18GrammarNotes.mjs && node ../scripts/patchC1GoetheWritingBulletStandard.mjs && node ../scripts/patchC1Day19RichContent.mjs && node ../scripts/patchC1Day19TemplateAndSpeakingCleanup.mjs && node ../scripts/patchC1Day28DemographicChange.mjs",
