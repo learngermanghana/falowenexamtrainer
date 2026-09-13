@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import {
@@ -11,6 +12,21 @@ const formatLessonLabel = (record = {}) => {
   const day = String(record.lessonDay || record.assignmentId || "Lesson").trim();
   const title = String(record.lessonTitle || "").trim();
   return title && !day.toLowerCase().includes(title.toLowerCase()) ? `${day} · ${title}` : day;
+};
+
+const formatParticipationDate = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const [year, month, day] = raw.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (Number.isNaN(parsed.getTime())) return raw;
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(parsed);
 };
 
 const latestDetail = (record = {}) => {
@@ -31,7 +47,14 @@ const nextClassGoal = (record = {}) => {
   return "Contribute at least once again in your next class.";
 };
 
-const recordElementId = (record = {}) => `participation-session-${encodeURIComponent(record.sessionId || record.id || record.assignmentId || "record")}`;
+const recordElementId = (record = {}) => `participation-session-${encodeURIComponent(
+  record.classSessionId || record.sessionId || record.id || record.assignmentId || "record"
+)}`;
+
+const recordMatchesRequest = (record = {}, requestedClassSessionId = "", requestedSessionId = "") => Boolean(
+  (requestedClassSessionId && record.classSessionId === requestedClassSessionId)
+  || (requestedSessionId && record.sessionId === requestedSessionId)
+);
 
 const statStyle = {
   border: "1px solid #e2e8f0",
@@ -153,14 +176,18 @@ const ParticipationRecap = ({ record, highlighted = false }) => {
 
 const ClassParticipationCard = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [records, setRecords] = useState([]);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
-  const requestedSessionId = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return String(new URLSearchParams(window.location.search).get("sessionId") || "").trim();
-  }, []);
+  const { requestedClassSessionId, requestedSessionId } = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return {
+      requestedClassSessionId: String(params.get("classSessionId") || "").trim(),
+      requestedSessionId: String(params.get("sessionId") || "").trim(),
+    };
+  }, [location.search]);
 
   const refresh = useCallback(async () => {
     if (!user?.uid) {
@@ -203,24 +230,31 @@ const ClassParticipationCard = () => {
 
   const weekly = useMemo(() => summarizeClassParticipation(records), [records]);
   const overall = useMemo(() => buildOverallSummary(records), [records]);
+  const hasRequestedRecap = Boolean(requestedClassSessionId || requestedSessionId);
   const displayedRecords = useMemo(() => {
-    if (!requestedSessionId) return records;
+    if (!hasRequestedRecap) return records;
     return [...records].sort((left, right) => {
-      const leftMatch = left.sessionId === requestedSessionId ? 1 : 0;
-      const rightMatch = right.sessionId === requestedSessionId ? 1 : 0;
+      const leftMatch = recordMatchesRequest(left, requestedClassSessionId, requestedSessionId) ? 1 : 0;
+      const rightMatch = recordMatchesRequest(right, requestedClassSessionId, requestedSessionId) ? 1 : 0;
       return rightMatch - leftMatch;
     });
-  }, [records, requestedSessionId]);
+  }, [hasRequestedRecap, records, requestedClassSessionId, requestedSessionId]);
 
   useEffect(() => {
-    if (status !== "success" || !requestedSessionId) return;
-    const selected = records.find((record) => record.sessionId === requestedSessionId);
+    if (status !== "success" || !hasRequestedRecap) return;
+    const selected = records.find((record) => (
+      recordMatchesRequest(record, requestedClassSessionId, requestedSessionId)
+    ));
     if (!selected) return;
     const timer = window.setTimeout(() => {
       document.getElementById(recordElementId(selected))?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 120);
     return () => window.clearTimeout(timer);
-  }, [records, requestedSessionId, status]);
+  }, [hasRequestedRecap, records, requestedClassSessionId, requestedSessionId, status]);
+
+  const requestedRecapMissing = hasRequestedRecap && !records.some((record) => (
+    recordMatchesRequest(record, requestedClassSessionId, requestedSessionId)
+  ));
 
   return (
     <section
@@ -257,7 +291,7 @@ const ClassParticipationCard = () => {
         </p>
       ) : null}
 
-      {status === "success" && requestedSessionId && records.length > 0 && !records.some((record) => record.sessionId === requestedSessionId) ? (
+      {status === "success" && records.length > 0 && requestedRecapMissing ? (
         <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>
           That class recap is not available yet. Your other participation records are shown below.
         </p>
@@ -314,11 +348,15 @@ const ClassParticipationCard = () => {
             </div>
             <div style={{ display: "grid" }}>
               {displayedRecords.map((record) => {
-                const highlighted = Boolean(requestedSessionId && record.sessionId === requestedSessionId);
+                const highlighted = recordMatchesRequest(
+                  record,
+                  requestedClassSessionId,
+                  requestedSessionId
+                );
                 return (
                   <article
                     id={recordElementId(record)}
-                    key={record.id || `${record.sessionDate}-${record.assignmentId}`}
+                    key={record.classSessionId || record.sessionId || record.id || `${record.sessionDate}-${record.assignmentId}`}
                     style={{
                       display: "grid",
                       gap: 6,
@@ -331,9 +369,16 @@ const ClassParticipationCard = () => {
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 12, flexWrap: "wrap" }}>
-                      <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+                      <div style={{ minWidth: 0, flex: "1 1 220px", display: "grid", gap: 2 }}>
                         <strong style={{ display: "block" }}>{formatLessonLabel(record)}</strong>
-                        <span style={{ ...styles.helperText, fontSize: 12 }}>{record.sessionDate || "Class lesson"}</span>
+                        <span style={{ ...styles.helperText, fontSize: 12 }}>
+                          <strong>Lesson:</strong> {formatParticipationDate(record.sessionDate) || "Class lesson"}
+                        </span>
+                        {record.markedDate ? (
+                          <span style={{ ...styles.helperText, fontSize: 12 }}>
+                            <strong>Recorded:</strong> {formatParticipationDate(record.markedDate)}
+                          </span>
+                        ) : null}
                       </div>
                       <span style={{ ...styles.helperText, fontSize: 12, fontWeight: 700 }}>
                         {latestDetail(record)}
@@ -361,7 +406,9 @@ export default ClassParticipationCard;
 export const __private__ = {
   buildOverallSummary,
   formatLessonLabel,
+  formatParticipationDate,
   latestDetail,
   nextClassGoal,
   recordElementId,
+  recordMatchesRequest,
 };
