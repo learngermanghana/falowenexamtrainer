@@ -19,7 +19,8 @@ describe("A1-C1 Day 0 and Course Book navigation consistency", () => {
     expect(day0Sources.A1).toContain("A1 Day 0: How to use Falowen");
     expect(day0Sources.A2).toContain("A2 Day 0: How to use Falowen");
     expect(day0Sources.B1).toContain("B1 Day 0: How to use Falowen");
-    expect(day0Sources.B2).toContain('level: "B2"');
+    expect(day0Sources.B2).toContain("B2 Day 0: How to use Falowen");
+    expect(day0Sources.B2).toContain('data-b2-day0-orientation="true"');
     expect(day0Sources.B2).toContain("B2 self-learning");
     expect(day0Sources.C1).toContain("C1 Day 0");
   });
