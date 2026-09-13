@@ -20,12 +20,18 @@ paymentAwareApp.get("/paystack/webhook", sendPaymentPolicyHealth);
 require.cache[require.resolve("./functionz/app")].exports = paymentAwareApp;
 
 const exportedFunctions = require("./index.notifications");
+const classPushLifecycleFunctions = require("./classPushLifecycle");
 const lessonProgressFunctions = require("./lessonProgress");
 const { submitAssignmentResubmission } = require("./resubmission");
 const { submitHistoricalAssignmentResubmission } = require("./historicalResubmission");
 const { publicClassesCatalog } = require("./publicClassesCatalog");
 
 Object.entries(lessonProgressFunctions).forEach(([name, fn]) => {
+  if (name.startsWith("_")) return;
+  exportedFunctions[name] = fn;
+});
+
+Object.entries(classPushLifecycleFunctions).forEach(([name, fn]) => {
   if (name.startsWith("_")) return;
   exportedFunctions[name] = fn;
 });
