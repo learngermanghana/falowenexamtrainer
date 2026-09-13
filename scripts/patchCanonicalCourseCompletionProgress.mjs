@@ -66,7 +66,9 @@ if (guideStart === -1 || guideEnd === -1) {
 
 const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey }) => {
   const className = studentProfile?.className || "Not assigned yet";
-  const courseName = levelKey ? \`${"${levelKey}"} ${"${selfLearningLevels.has(levelKey) ? \\\"Self-learning\\\" : \\\"Course\\\"}"}\` : "Course not selected";
+  const courseName = levelKey
+    ? levelKey + " " + (selfLearningLevels.has(levelKey) ? "Self-learning" : "Course")
+    : "Course not selected";
 
   return (
     <section
