@@ -6,7 +6,8 @@ const REGION = "europe-west1";
 const TIME_ZONE = "Africa/Accra";
 const APP_ORIGIN = process.env.FRONTEND_URL || "https://www.falowen.app";
 const REMINDER_KINDS = ["tomorrow", "one-hour", "fifteen-minutes", "checkin-open"];
-const TERMINAL_STATUSES = new Set(["cancelled", "canceled", "completed", "finished", "ended", "deleted"]);
+const INACTIVE_STATUSES = new Set(["cancelled", "canceled", "completed", "finished", "ended", "deleted"]);
+const CANCELLED_STATUSES = new Set(["cancelled", "canceled", "deleted"]);
 
 const getAdmin = () => {
   if (!admin.apps.length) admin.initializeApp();
@@ -36,16 +37,7 @@ const combineDateAndTime = (dateValue, timeValue) => {
 };
 
 const getSessionStartMs = (session = {}) => {
-  const direct = [
-    session.startAt,
-    session.startsAt,
-    session.startDateTime,
-    session.scheduledAt,
-    session.dateTime,
-    session.sessionStart,
-    session.start,
-  ];
-  for (const value of direct) {
+  for (const value of [session.startAt, session.startsAt, session.startDateTime, session.scheduledAt, session.dateTime, session.sessionStart, session.start]) {
     const parsed = toMillis(value);
     if (parsed) return parsed;
   }
@@ -53,8 +45,7 @@ const getSessionStartMs = (session = {}) => {
 };
 
 const getSessionEndMs = (session = {}) => {
-  const direct = [session.endAt, session.endsAt, session.endDateTime, session.sessionEnd, session.end];
-  for (const value of direct) {
+  for (const value of [session.endAt, session.endsAt, session.endDateTime, session.sessionEnd, session.end]) {
     const parsed = toMillis(value);
     if (parsed) return parsed;
   }
@@ -67,7 +58,7 @@ const getSessionEndMs = (session = {}) => {
 
 const getSessionStatus = (session = {}) => normalize(session.status || session.state || session.sessionStatus || "scheduled");
 const isSessionActive = (session = {}, nowMs = Date.now()) => {
-  if (TERMINAL_STATUSES.has(getSessionStatus(session))) return false;
+  if (INACTIVE_STATUSES.has(getSessionStatus(session))) return false;
   if (session.cancelled === true || session.canceled === true || session.isCancelled === true) return false;
   const endMs = getSessionEndMs(session);
   return !endMs || endMs > nowMs;
@@ -77,7 +68,6 @@ const getClassName = (session = {}) => String(session.className || session.class
 const getLevel = (session = {}) => String(session.level || session.courseLevel || "").trim().toUpperCase();
 const getSessionLabel = (session = {}) => String(session.sessionLabel || session.lessonTitle || session.title || session.topic || "Class").trim();
 const isCheckinOpen = (session = {}) => Boolean(session.checkinOpen || session.checkInOpen || session.attendanceOpen || session.checkin?.open || session.attendance?.open);
-const getExplicitCheckinUrl = (session = {}) => String(session.checkinUrl || session.checkInUrl || session.attendanceUrl || session.checkin?.url || "").trim();
 
 const classRoute = (session = {}) => {
   const className = getClassName(session);
@@ -85,9 +75,8 @@ const classRoute = (session = {}) => {
 };
 
 const checkinRoute = (session = {}) => {
-  const explicit = getExplicitCheckinUrl(session);
-  if (explicit) return explicit;
-  return classRoute(session);
+  const explicit = String(session.checkinRoute || session.checkInRoute || session.attendanceRoute || "").trim();
+  return explicit.startsWith("/") ? explicit : classRoute(session);
 };
 
 const absoluteLink = (route = "/") => {
@@ -115,13 +104,11 @@ const findClassTargets = async (session = {}) => {
   if (!className) return [];
   const variants = [...new Set([className, className.toLowerCase(), className.toUpperCase()])];
   const level = getLevel(session);
-  const snapshots = await Promise.all(
-    variants.map((variant) => {
-      let query = db().collection("students").where("className", "==", variant);
-      if (level) query = query.where("level", "==", level);
-      return query.get();
-    })
-  );
+  const snapshots = await Promise.all(variants.map((variant) => {
+    let query = db().collection("students").where("className", "==", variant);
+    if (level) query = query.where("level", "==", level);
+    return query.get();
+  }));
   const targets = new Map();
   snapshots.forEach((snapshot) => snapshot.forEach((docSnap) => targets.set(docSnap.id, { id: docSnap.id, data: docSnap.data() || {} })));
   return [...targets.values()];
@@ -130,18 +117,7 @@ const findClassTargets = async (session = {}) => {
 const toFcmData = (data = {}) => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value == null ? "" : String(value)]));
 
 const sendToStudent = async ({ target, notificationId, title, body, type, route, data = {} }) => {
-  const payloadData = toFcmData({
-    ...data,
-    notificationId,
-    type,
-    category: "class",
-    route,
-    url: absoluteLink(route),
-    title,
-    body,
-    timestamp: Date.now(),
-  });
-
+  const payloadData = toFcmData({ ...data, notificationId, type, category: "class", route, url: absoluteLink(route), title, body, timestamp: Date.now() });
   await db().collection("students").doc(target.id).collection("notifications").doc(notificationId).set({
     type: "Class",
     title,
@@ -157,7 +133,7 @@ const sendToStudent = async ({ target, notificationId, title, body, type, route,
   }, { merge: true });
 
   const tokens = tokensFromStudent(target.data);
-  if (!tokens.length) return { tokens: 0, success: 0 };
+  if (!tokens.length) return { success: 0 };
   const response = await getAdmin().messaging().sendEachForMulticast({
     tokens,
     notification: { title, body },
@@ -173,7 +149,7 @@ const sendToStudent = async ({ target, notificationId, title, body, type, route,
       fcmOptions: { link: absoluteLink(route) },
     },
   });
-  return { tokens: tokens.length, success: response.successCount || 0 };
+  return { success: response.successCount || 0 };
 };
 
 const startKey = (session = {}) => String(getSessionStartMs(session) || "unscheduled");
@@ -190,12 +166,7 @@ const claimEvent = async (eventId, payload = {}) => {
       const claimedAt = toMillis(snap.data()?.claimedAt);
       if (claimedAt && Date.now() - claimedAt < 10 * 60_000) return false;
     }
-    transaction.set(ref, {
-      ...payload,
-      state: "processing",
-      claimedAt: getAdmin().firestore.FieldValue.serverTimestamp(),
-      updatedAt: getAdmin().firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
+    transaction.set(ref, { ...payload, state: "processing", claimedAt: getAdmin().firestore.FieldValue.serverTimestamp(), updatedAt: getAdmin().firestore.FieldValue.serverTimestamp() }, { merge: true });
     return true;
   });
 };
@@ -211,12 +182,26 @@ const buildReminder = (kind, session = {}) => {
   const label = getSessionLabel(session);
   const className = getClassName(session);
   const route = kind === "checkin-open" ? checkinRoute(session) : classRoute(session);
-  const base = { route, className, level: getLevel(session), sessionLabel: label };
-  if (kind === "tomorrow") return { ...base, type: "class_tomorrow", title: "Class tomorrow", body: `${label}${className ? ` · ${className}` : ""}. Open Falowen to see the class details.` };
-  if (kind === "one-hour") return { ...base, type: "class_one_hour", title: "Class starts in 1 hour", body: `${label}${className ? ` · ${className}` : ""}. Get ready for class.` };
-  if (kind === "fifteen-minutes") return { ...base, type: "class_fifteen_minutes", title: "Class starts in 15 minutes", body: `${label}${className ? ` · ${className}` : ""}. Open the class details now.` };
-  if (kind === "checkin-open") return { ...base, type: "class_checkin_open", title: "Check-in is open", body: `${label}${className ? ` · ${className}` : ""}. Open the attendance link now.` };
+  const suffix = className ? ` · ${className}` : "";
+  if (kind === "tomorrow") return { route, type: "class_tomorrow", title: "Class tomorrow", body: `${label}${suffix}. Open Falowen to see the class details.` };
+  if (kind === "one-hour") return { route, type: "class_one_hour", title: "Class starts in 1 hour", body: `${label}${suffix}. Get ready for class.` };
+  if (kind === "fifteen-minutes") return { route, type: "class_fifteen_minutes", title: "Class starts in 15 minutes", body: `${label}${suffix}. Open the class details now.` };
+  if (kind === "checkin-open") return { route, type: "class_checkin_open", title: "Check-in is open", body: `${label}${suffix}. Open attendance now.` };
   return null;
+};
+
+const deleteOldReminderNotifications = async ({ sessionId, session, oldSession }) => {
+  const targets = await findClassTargets(session || oldSession || {});
+  const versions = [session, oldSession].filter(Boolean);
+  const refs = [];
+  targets.forEach((target) => versions.forEach((candidate) => REMINDER_KINDS.forEach((kind) => refs.push(
+    db().collection("students").doc(target.id).collection("notifications").doc(notificationIdFor(sessionId, kind, candidate))
+  ))));
+  for (let index = 0; index < refs.length; index += 400) {
+    const batch = db().batch();
+    refs.slice(index, index + 400).forEach((ref) => batch.delete(ref));
+    await batch.commit();
+  }
 };
 
 const sendClassLifecycleNotification = async ({ sessionId, session, kind }) => {
@@ -226,7 +211,6 @@ const sendClassLifecycleNotification = async ({ sessionId, session, kind }) => {
   const eventId = eventIdFor(sessionId, kind, session);
   const claimed = await claimEvent(eventId, { sessionId, kind, className: getClassName(session), startMs: getSessionStartMs(session) });
   if (!claimed) return { deduped: true };
-
   try {
     const targets = await findClassTargets(session);
     const notificationId = notificationIdFor(sessionId, kind, session);
@@ -239,14 +223,7 @@ const sendClassLifecycleNotification = async ({ sessionId, session, kind }) => {
         body: reminder.body,
         type: reminder.type,
         route: reminder.route,
-        data: {
-          sessionId,
-          className: reminder.className,
-          level: reminder.level,
-          sessionLabel: reminder.sessionLabel,
-          reminderKind: kind,
-          sessionStartMs: getSessionStartMs(session) || "",
-        },
+        data: { sessionId, className: getClassName(session), level: getLevel(session), sessionLabel: getSessionLabel(session), reminderKind: kind, sessionStartMs: getSessionStartMs(session) || "" },
       });
       pushes += result.success;
     }
@@ -258,61 +235,30 @@ const sendClassLifecycleNotification = async ({ sessionId, session, kind }) => {
   }
 };
 
-const markOldReminderNotificationsSuperseded = async ({ sessionId, session, oldSession }) => {
-  const targets = await findClassTargets(session || oldSession || {});
-  const sessions = [session, oldSession].filter(Boolean);
-  const refs = [];
-  targets.forEach((target) => {
-    sessions.forEach((candidate) => {
-      REMINDER_KINDS.forEach((kind) => refs.push(
-        db().collection("students").doc(target.id).collection("notifications").doc(notificationIdFor(sessionId, kind, candidate))
-      ));
-    });
-  });
-  for (let i = 0; i < refs.length; i += 400) {
-    const batch = db().batch();
-    refs.slice(i, i + 400).forEach((ref) => batch.set(ref, {
-      status: "superseded",
-      lifecycleState: "superseded",
-      expired: true,
-      updatedAt: getAdmin().firestore.FieldValue.serverTimestamp(),
-    }, { merge: true }));
-    await batch.commit();
-  }
-};
-
-const sendImmediateClassChange = async ({ sessionId, session, kind, oldSession }) => {
-  await markOldReminderNotificationsSuperseded({ sessionId, session, oldSession });
-  const className = getClassName(session || oldSession || {});
-  const label = getSessionLabel(session || oldSession || {});
-  const route = classRoute(session || oldSession || {});
-  const isCancelled = kind === "cancelled";
-  const title = isCancelled ? "Class cancelled" : "Class rescheduled";
-  const body = isCancelled
-    ? `${label}${className ? ` · ${className}` : ""} has been cancelled. Previous reminders are no longer active.`
+const sendImmediateClassChange = async ({ sessionId, session, oldSession, kind }) => {
+  await deleteOldReminderNotifications({ sessionId, session, oldSession });
+  const current = session || oldSession || {};
+  const className = getClassName(current);
+  const label = getSessionLabel(current);
+  const route = classRoute(current);
+  const cancelled = kind === "cancelled";
+  const title = cancelled ? "Class cancelled" : "Class rescheduled";
+  const body = cancelled
+    ? `${label}${className ? ` · ${className}` : ""} has been cancelled. Previous reminders were removed.`
     : `${label}${className ? ` · ${className}` : ""} has a new date or time. Open the updated class details.`;
-  const eventId = safeId(`${sessionId}-${startKey(session || oldSession)}-${kind}`);
-  const claimed = await claimEvent(eventId, { sessionId, kind, className });
-  if (!claimed) return;
-  const targets = await findClassTargets(session || oldSession || {});
-  const notificationId = safeId(`class-${sessionId}-${startKey(session || oldSession)}-${kind}`);
+  const eventId = safeId(`${sessionId}-${startKey(current)}-${kind}`);
+  if (!await claimEvent(eventId, { sessionId, kind, className })) return;
+  const targets = await findClassTargets(current);
   let pushes = 0;
   for (const target of targets) {
     const result = await sendToStudent({
       target,
-      notificationId,
+      notificationId: safeId(`class-${sessionId}-${startKey(current)}-${kind}`),
       title,
       body,
-      type: isCancelled ? "class_cancelled" : "class_rescheduled",
+      type: cancelled ? "class_cancelled" : "class_rescheduled",
       route,
-      data: {
-        sessionId,
-        className,
-        level: getLevel(session || oldSession || {}),
-        sessionLabel: label,
-        previousStartMs: getSessionStartMs(oldSession || {}) || "",
-        sessionStartMs: getSessionStartMs(session || {}) || "",
-      },
+      data: { sessionId, className, level: getLevel(current), sessionLabel: label, previousStartMs: getSessionStartMs(oldSession || {}) || "", sessionStartMs: getSessionStartMs(session || {}) || "" },
     });
     pushes += result.success;
   }
@@ -339,8 +285,7 @@ const runClassReminderScan = async () => {
   for (const docSnap of snapshot.docs) {
     const session = docSnap.data() || {};
     const startMs = getSessionStartMs(session);
-    if (!startMs || startMs < nowMs - 3 * 60 * 60_000 || startMs > nowMs + 25 * 60 * 60_000) continue;
-    if (!isSessionActive(session, nowMs)) continue;
+    if (!startMs || startMs < nowMs - 3 * 60 * 60_000 || startMs > nowMs + 25 * 60 * 60_000 || !isSessionActive(session, nowMs)) continue;
     considered += 1;
     for (const kind of reminderKindDue({ session, nowMs })) {
       const result = await sendClassLifecycleNotification({ sessionId: docSnap.id, session, kind });
@@ -355,12 +300,14 @@ const didStartChange = (before = {}, after = {}) => {
   const right = getSessionStartMs(after);
   return Boolean(left && right && Math.abs(left - right) >= 60_000);
 };
-const becameCancelled = (before = {}, after = {}) => isSessionActive(before) && !isSessionActive(after) && (
-  TERMINAL_STATUSES.has(getSessionStatus(after)) || after.cancelled === true || after.canceled === true || after.isCancelled === true
-);
+const becameCancelled = (before = {}, after = {}) => {
+  const afterStatus = getSessionStatus(after);
+  const explicitlyCancelled = CANCELLED_STATUSES.has(afterStatus) || after.cancelled === true || after.canceled === true || after.isCancelled === true;
+  return isSessionActive(before) && explicitlyCancelled;
+};
 const becameCheckinOpen = (before = {}, after = {}) => !isCheckinOpen(before) && isCheckinOpen(after) && isSessionActive(after);
 
-const buildExports = () => ({
+module.exports = {
   sendClassPushLifecycleReminders: onSchedule({ region: REGION, schedule: "every 5 minutes", timeZone: TIME_ZONE }, async () => {
     await runClassReminderScan();
   }),
@@ -380,18 +327,5 @@ const buildExports = () => ({
     }
     return null;
   }),
-});
-
-module.exports = {
-  ...buildExports(),
-  _classPushLifecycle: {
-    classRoute,
-    checkinRoute,
-    getSessionStartMs,
-    isSessionActive,
-    reminderKindDue,
-    didStartChange,
-    becameCancelled,
-    becameCheckinOpen,
-  },
+  _classPushLifecycle: { classRoute, checkinRoute, getSessionStartMs, isSessionActive, reminderKindDue, didStartChange, becameCancelled, becameCheckinOpen },
 };
