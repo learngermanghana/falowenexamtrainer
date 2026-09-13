@@ -52,11 +52,13 @@ jobs:
         run: |
           node --check index.js
           node --check index.entry.js
+          node --check index.notifications.js
+          node --check classPushLifecycle.js
           node --check resubmission.js
           node --check functionz/app.js
           node --check functionz/paymentAwareApp.js
           node --check functionz/paystackFeePolicy.js
-          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); console.log("Firebase api and resubmission callable exports discovered");'
+          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); if (!exported.sendClassPushLifecycleReminders) throw new Error("Class push reminder scheduler export was not discovered"); if (!exported.onClassSessionPushLifecycleUpdated) throw new Error("Class push lifecycle Firestore trigger export was not discovered"); console.log("Firebase API, resubmission and class push lifecycle exports discovered");'
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -71,13 +73,13 @@ jobs:
         with:
           project_id: '${{ env.FIREBASE_PROJECT_ID }}'
 
-      - name: Deploy exam trainer API and resubmission callable
+      - name: Deploy exam trainer API and notification lifecycle
         shell: bash
         run: |
           set +e
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
-            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission \
+            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission,functions:falowenexamtrainer:sendClassPushLifecycleReminders,functions:falowenexamtrainer:onClassSessionPushLifecycleUpdated \
             --debug > firebase-deploy.log 2>&1
           status=$?
           tail -n 180 firebase-deploy.log || true
