@@ -9,12 +9,25 @@ const count = (value) => {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : 0;
 };
+const revisionNumber = (value) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+};
 
 const toIso = (value) => {
   if (!value) return null;
   if (typeof value.toDate === "function") return value.toDate().toISOString();
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+};
+
+const toDateOnly = (value) => {
+  if (!value) return "";
+  if (typeof value.toDate === "function") return value.toDate().toISOString().slice(0, 10);
+  const raw = clean(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString().slice(0, 10);
 };
 
 const safeConceptList = (value) => [...new Set(
@@ -66,14 +79,17 @@ const studentSafeRecord = (snapshot) => {
 
   return {
     id: snapshot.id,
+    classSessionId: clean(data.classSessionId),
     sessionId: clean(data.sessionId),
+    revision: revisionNumber(data.revision),
     classId: clean(data.classId),
     className: clean(data.className),
     course: clean(data.course),
     assignmentId: clean(data.assignmentId),
     lessonDay: clean(data.lessonDay),
     lessonTitle: clean(data.lessonTitle),
-    sessionDate: clean(data.sessionDate),
+    sessionDate: toDateOnly(data.sessionDate),
+    markedDate: toDateOnly(data.markedDate),
     turns: count(data.turns),
     correct: count(data.correct),
     needsReview: count(data.needsReview),
