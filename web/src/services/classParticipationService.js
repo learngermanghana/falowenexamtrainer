@@ -6,6 +6,10 @@ const count = (value) => {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : 0;
 };
+const revisionNumber = (value) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+};
 
 const normalizeConceptList = (value) => [...new Set(
   (Array.isArray(value) ? value : [])
@@ -33,6 +37,11 @@ const recordDate = (record = {}) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+const timestampValue = (value) => {
+  const parsed = Date.parse(clean(value));
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 export const normalizeParticipationRecord = (record = {}) => {
   const questionResponses = normalizeQuestionResponses(record.questionResponses);
   const reviewConcepts = normalizeConceptList(
@@ -51,11 +60,14 @@ export const normalizeParticipationRecord = (record = {}) => {
 
   return {
     id: clean(record.id),
+    classSessionId: clean(record.classSessionId),
     sessionId: clean(record.sessionId),
+    revision: revisionNumber(record.revision),
     classId: clean(record.classId),
     className: clean(record.className),
     course: clean(record.course),
     sessionDate: clean(record.sessionDate),
+    markedDate: clean(record.markedDate),
     lessonDay: clean(record.lessonDay),
     lessonTitle: clean(record.lessonTitle),
     assignmentId: clean(record.assignmentId),
@@ -73,6 +85,44 @@ export const normalizeParticipationRecord = (record = {}) => {
     ),
     updatedAt: clean(record.updatedAt),
   };
+};
+
+const canonicalIdentityKey = (record = {}, index = 0) => {
+  const classSessionId = clean(record.classSessionId);
+  if (classSessionId) return `classSession:${classSessionId}`;
+  const sessionId = clean(record.sessionId);
+  if (sessionId) return `session:${sessionId}`;
+  const id = clean(record.id);
+  return id ? `record:${id}` : `anonymous:${index}`;
+};
+
+const isNewerParticipationRecord = (candidate, current) => {
+  if (candidate.revision !== current.revision) return candidate.revision > current.revision;
+
+  const updatedCompare = timestampValue(candidate.updatedAt) - timestampValue(current.updatedAt);
+  if (updatedCompare !== 0) return updatedCompare > 0;
+
+  const sessionCompare = clean(candidate.sessionDate).localeCompare(clean(current.sessionDate));
+  return sessionCompare > 0;
+};
+
+export const deduplicateParticipationRecords = (records = []) => {
+  const selected = new Map();
+
+  (Array.isArray(records) ? records : []).forEach((rawRecord, index) => {
+    const record = normalizeParticipationRecord(rawRecord);
+    const key = canonicalIdentityKey(record, index);
+    const current = selected.get(key);
+    if (!current || isNewerParticipationRecord(record, current)) selected.set(key, record);
+  });
+
+  return [...selected.values()].sort((a, b) => {
+    const dateCompare = clean(b.sessionDate).localeCompare(clean(a.sessionDate));
+    if (dateCompare !== 0) return dateCompare;
+    const updatedCompare = timestampValue(b.updatedAt) - timestampValue(a.updatedAt);
+    if (updatedCompare !== 0) return updatedCompare;
+    return clean(b.lessonDay || b.assignmentId).localeCompare(clean(a.lessonDay || a.assignmentId));
+  });
 };
 
 /**
@@ -99,25 +149,20 @@ export async function fetchMyClassParticipation({ user = auth?.currentUser } = {
     throw new Error(data?.error || `Could not load Class Participation (${response.status}).`);
   }
 
-  return (Array.isArray(data?.participation) ? data.participation : [])
-    .map(normalizeParticipationRecord)
-    .sort((a, b) => {
-      const dateCompare = String(b.sessionDate || "").localeCompare(String(a.sessionDate || ""));
-      if (dateCompare !== 0) return dateCompare;
-      return String(b.lessonDay || b.assignmentId || "").localeCompare(
-        String(a.lessonDay || a.assignmentId || "")
-      );
-    });
+  return deduplicateParticipationRecords(
+    Array.isArray(data?.participation) ? data.participation : []
+  );
 }
 
 export function summarizeClassParticipation(records = [], now = new Date()) {
+  const canonicalRecords = deduplicateParticipationRecords(records);
   const current = now instanceof Date ? now : new Date(now);
   const today = new Date(current.getFullYear(), current.getMonth(), current.getDate());
   const mondayOffset = (today.getDay() + 6) % 7;
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - mondayOffset);
 
-  const weekRecords = records.filter((record) => {
+  const weekRecords = canonicalRecords.filter((record) => {
     const date = recordDate(record);
     return date && date >= weekStart && date <= today;
   });
@@ -128,6 +173,6 @@ export function summarizeClassParticipation(records = [], now = new Date()) {
     responses: weekRecords.reduce((sum, record) => sum + count(record.turns), 0),
     correct: weekRecords.reduce((sum, record) => sum + count(record.correct), 0),
     needsReview: weekRecords.reduce((sum, record) => sum + count(record.needsReview), 0),
-    latest: records.slice(0, 3),
+    latest: canonicalRecords.slice(0, 3),
   };
 }
