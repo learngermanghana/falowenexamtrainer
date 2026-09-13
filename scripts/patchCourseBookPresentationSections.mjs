@@ -80,7 +80,7 @@ const getCourseBookWeekOutcomeItems = (entries = []) => {
       topics.push(title);
     });
     if (topics.length) {
-      outcomes.push(`use the main language from ${topics.join(", ")} in your own speaking and writing`);
+      outcomes.push("use the main language from " + topics.join(", ") + " in your own speaking and writing");
     }
   }
 
@@ -95,7 +95,7 @@ const getCourseBookWeekDayRange = (entries = []) => {
   if (!days.length) return "";
   const first = days[0];
   const last = days[days.length - 1];
-  return first === last ? `Day ${first}` : `Days ${first}–${last}`;
+  return first === last ? "Day " + first : "Days " + first + "–" + last;
 };`;
 
 if (!source.includes("COURSE_BOOK_PRESENTATION_SECTIONS")) {
