@@ -27,6 +27,17 @@ describe("Class Participation integration", () => {
     expect(route).not.toContain('result === "presenter_absent"');
   });
 
+  test("student API exposes canonical recap identity without conflating lesson and marking dates", () => {
+    const route = read("functions/functionz/routes/classParticipation.js");
+    expect(route).toContain("classSessionId: clean(data.classSessionId)");
+    expect(route).toContain("sessionId: clean(data.sessionId)");
+    expect(route).toContain("revision: revisionNumber(data.revision)");
+    expect(route).toContain("sessionDate: toDateOnly(data.sessionDate)");
+    expect(route).toContain("markedDate: toDateOnly(data.markedDate)");
+    expect(route).toContain("updatedAt: toIso(data.updatedAt)");
+    expect(route).not.toContain("sessionDate: toDateOnly(data.markedDate)");
+  });
+
   test("student participation history is paginated deterministically before totals are calculated", () => {
     const route = read("functions/functionz/routes/classParticipation.js");
     expect(route).toContain("const PAGE_SIZE = 100");
@@ -41,7 +52,7 @@ describe("Class Participation integration", () => {
     expect(api).toContain('req.url === "/class-participation/me"');
   });
 
-  test("student dashboard card is wired through the normal build patch", () => {
+  test("student dashboard uses canonical recap identity before participation metrics are calculated", () => {
     const patch = read("scripts/patchClassParticipationCard.mjs");
     const hook = read("scripts/patchCourseCompletionSnapshotPersistence.mjs");
     const card = read("web/src/components/ClassParticipationCard.js");
@@ -51,11 +62,19 @@ describe("Class Participation integration", () => {
     expect(hook).toContain('await import("./patchClassParticipationCard.mjs")');
     expect(card).toContain("Class Participation");
     expect(card).toContain("QuestionHistory");
-    expect(card).toContain("Review {questions.length} recorded question");
-    expect(card).toContain("Needs review");
+    expect(card).toContain("requestedClassSessionId");
+    expect(card).toContain('params.get("classSessionId")');
+    expect(card).toContain('params.get("sessionId")');
+    expect(card).toContain("record.classSessionId === requestedClassSessionId");
+    expect(card).toContain("record.sessionId === requestedSessionId");
+    expect(card).toContain("<strong>Lesson:</strong>");
+    expect(card).toContain("<strong>Recorded:</strong>");
     expect(card).toContain("does not change your course grade or official attendance");
     expect(service).toContain('Authorization: `Bearer ${token}`');
-    expect(service).toContain("questionResponses");
+    expect(service).toContain("classSessionId");
+    expect(service).toContain("markedDate");
+    expect(service).toContain("deduplicateParticipationRecords");
+    expect(service).toContain("candidate.revision > current.revision");
     expect(service).not.toContain("presenterAbsent");
   });
 });
