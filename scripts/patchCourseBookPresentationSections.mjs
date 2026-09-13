@@ -167,15 +167,13 @@ if (!source.includes("data-course-week-goal")) {
   if (!source.includes(lessonMapMarker)) throw new Error("Missing lesson map for weekly goals");
   source = source.replace(lessonMapMarker, lessonMapReplacement);
 
-  const returnMarker = `                    return (
-                      <article className="course-book-lesson-card"`;
-  const returnReplacement = `                    return (
-                      <React.Fragment key={\`week-lesson-\${entry.assignmentKey || entry.day}-\${entry.occurrence || 1}\`}>
+  const articleMarker = "                      <article className=\"course-book-lesson-card\" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>";
+  const goalPanel = `${articleMarker}
                         {beginsVisibleWeek && weekOutcomeItems.length ? (
                           <section
                             className="course-book-week-goal"
-                            data-course-week-goal={\`\${normalizedSelectedCourseLevel}-week-\${weekNumber}\`}
-                            style={{ margin: "0 0 10px", border: "1px solid #dbeafe", borderRadius: 14, background: "#f8fbff", padding: "11px 13px" }}
+                            data-course-week-goal={normalizedSelectedCourseLevel + "-week-" + weekNumber}
+                            style={{ margin: "0 0 12px", border: "1px solid #dbeafe", borderRadius: 12, background: "#f8fbff", padding: "10px 12px" }}
                           >
                             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
                               <strong style={{ color: "#1d4ed8", fontSize: 14 }}>Week {weekNumber} goal</strong>
@@ -185,19 +183,10 @@ if (!source.includes("data-course-week-goal")) {
                               <strong>By the end of this week:</strong> {weekOutcomeItems.join(" • ")}.
                             </p>
                           </section>
-                        ) : null}
-                        <article className="course-book-lesson-card"`;
-  if (!source.includes(returnMarker)) throw new Error("Missing lesson article return for weekly goals");
-  source = source.replace(returnMarker, returnReplacement);
+                        ) : null}`;
 
-  const lessonReturnStart = source.indexOf("                      <React.Fragment key={", source.indexOf("data-course-week-goal"));
-  const closeMarker = "                      </article>\n                    );";
-  const closeIndex = source.indexOf(closeMarker, lessonReturnStart);
-  if (lessonReturnStart < 0 || closeIndex < 0) throw new Error("Missing lesson article close for weekly goals");
-  source =
-    source.slice(0, closeIndex) +
-    "                        </article>\n                      </React.Fragment>\n                    );" +
-    source.slice(closeIndex + closeMarker.length);
+  if (!source.includes(articleMarker)) throw new Error("Missing lesson article for weekly goals");
+  source = source.replace(articleMarker, goalPanel);
 }
 
 for (const label of ["B1.1 – Independent Everyday Communication", "B2.1 – Independent Communication and Analysis", "C1.1 – Advanced Expression and Analysis"]) {
