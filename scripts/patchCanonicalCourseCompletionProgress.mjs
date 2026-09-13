@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const homePath = path.join(root, "web/src/components/HomeMetrics.js");
+const generalHomePath = path.join(root, "web/src/components/GeneralHome.js");
 const courseTabPath = path.join(root, "web/src/components/CourseTab.js");
 const writingPath = path.join(root, "web/src/components/GuidedWritingWorkspace.js");
 
 let home = fs.readFileSync(homePath, "utf8");
+let generalHome = fs.readFileSync(generalHomePath, "utf8");
 let courseTab = fs.readFileSync(courseTabPath, "utf8");
 let writing = fs.readFileSync(writingPath, "utf8");
 
@@ -17,38 +19,104 @@ const replaceOnce = (source, from, to, label) => {
   return source.replace(from, to);
 };
 
-// Dashboard: render the same canonical completion result used by the Course Book.
-home = replaceOnce(
-  home,
-  'import { detectLevelKey } from "../lib/day0Workbook";',
-  'import { detectLevelKey } from "../lib/day0Workbook";\nimport CourseCompletionProgressCard from "./CourseCompletionProgressCard";\nimport useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";',
-  "HomeMetrics course-completion imports",
-);
-
+// Home owns operational metrics only. Course progress belongs in Course Book.
+// These cleanup replacements also make repeated local prestart/pretest runs safe
+// when an older version of this patch has already modified the working tree.
 const homeLevelAnchor = '  const shouldShowHomeMetrics = ["A1", "A2", "B1"].includes(levelKey);';
 const homeProgressHook = `${homeLevelAnchor}\n  const {\n    progress: courseCompletion,\n    loading: courseCompletionLoading,\n    error: courseCompletionError,\n  } = useCourseCompletionProgress({ studentProfile, user, level: levelKey });`;
-home = replaceOnce(home, homeLevelAnchor, homeProgressHook, "HomeMetrics completion hook");
 
 const legacyCompleter = `  const isCourseCompleter = useMemo(() => {
     const targetIdentifier = completionIdentifiersByLevel[levelKey];
     if (!targetIdentifier || !assignmentStats?.lastAssignment) return false;
     return extractIdentifiers(assignmentStats.lastAssignment).includes(targetIdentifier);
   }, [assignmentStats?.lastAssignment, levelKey]);`;
-home = replaceOnce(
-  home,
-  legacyCompleter,
-  '  const isCourseCompleter = Boolean(courseCompletion?.courseWorkCompleted);',
-  "HomeMetrics canonical course-completer state",
-);
 
 const homeSectionAnchor = '    <section style={{ ...styles.card, display: "grid", gap: 12 }}>';
 const homeCardMarkup = `${homeSectionAnchor}\n      <CourseCompletionProgressCard\n        progress={courseCompletion}\n        loading={courseCompletionLoading}\n        error={courseCompletionError}\n        onContinue={courseCompletion?.next?.route ? () => navigate(courseCompletion.next.route) : undefined}\n      />`;
-home = replaceOnce(home, homeSectionAnchor, homeCardMarkup, "HomeMetrics completion card");
 
 home = home.replace(
-  "Home metrics are currently available for A1, A2, and B1. B2 and C1 students should start with Day 0 above.",
-  "Score, attendance and leaderboard metrics are available for tutor-marked A1–B1 courses. Course completion above is available across A1–C1.",
+  '\nimport CourseCompletionProgressCard from "./CourseCompletionProgressCard";\nimport useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";',
+  "",
 );
+home = home.replace(homeProgressHook, homeLevelAnchor);
+home = home.replace('  const isCourseCompleter = Boolean(courseCompletion?.courseWorkCompleted);', legacyCompleter);
+home = home.replace(homeCardMarkup, homeSectionAnchor);
+home = home.replace(
+  "Score, attendance and leaderboard metrics are available for tutor-marked A1–B1 courses. Course completion above is available across A1–C1.",
+  "Home metrics are currently available for A1, A2, and B1. Course progress is available in Course Book.",
+);
+
+[
+  'CourseCompletionProgressCard from "./CourseCompletionProgressCard"',
+  'useCourseCompletionProgress from "../hooks/useCourseCompletionProgress"',
+  "<CourseCompletionProgressCard",
+  "progress: courseCompletion",
+].forEach((marker) => {
+  if (home.includes(marker)) throw new Error(`HomeMetrics must not own course progress: ${marker}`);
+});
+
+// Keep access and navigation help visible on Home without duplicating learning actions.
+const guideStartMarker = "const CompactCourseGuide = (";
+const guideEndMarker = "\n\nconst AnnouncementSection =";
+const guideStart = generalHome.indexOf(guideStartMarker);
+const guideEnd = generalHome.indexOf(guideEndMarker, guideStart);
+if (guideStart === -1 || guideEnd === -1) {
+  throw new Error("Could not locate the Home course guide block.");
+}
+
+const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey }) => {
+  const className = studentProfile?.className || "Not assigned yet";
+  const courseName = levelKey ? \`${"${levelKey}"} ${"${selfLearningLevels.has(levelKey) ? \\\"Self-learning\\\" : \\\"Course\\\"}"}\` : "Course not selected";
+
+  return (
+    <section
+      data-home-course-access-guide="open"
+      style={{ ...styles.card, display: "grid", gap: 14, border: "1px solid #bfdbfe", background: "#f8fafc" }}
+    >
+      <SectionHeader
+        eyebrow="Course access"
+        title="Course access and navigation"
+        subtitle="Your course, class and access details are shown here. Use the guide below whenever you need help finding a Campus area."
+      />
+
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Course</p>
+          <strong>{courseName}</strong>
+        </div>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Assigned class</p>
+          <strong>{className}</strong>
+        </div>
+        <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Access</p>
+          <strong>{formatContractStatus(studentProfile)}</strong>
+        </div>
+      </div>
+
+      <p style={{ ...styles.helperText, margin: 0 }}>
+        Study flow: Course Book → Learn → Speak → Write → Finish. Your Course Book keeps your learning progress and next step together.
+      </p>
+
+      <div style={{ borderTop: "1px solid #dbe3ee", paddingTop: 12 }}>
+        <NavigationGuide />
+      </div>
+    </section>
+  );
+};`;
+
+generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
+
+[
+  "Expand course guide, access and navigation help",
+  "Open Day 0 Orientation",
+  "Continue Course Book",
+].forEach((marker) => {
+  if (generalHome.includes(marker)) throw new Error(`Home course guide still contains retired UI: ${marker}`);
+});
+if (!generalHome.includes('data-home-course-access-guide="open"') || !generalHome.includes("Course access and navigation")) {
+  throw new Error("Home course access/navigation guide is not permanently open.");
+}
 
 // Course Book: replace page-count progress with the canonical completion engine.
 courseTab = replaceOnce(
@@ -169,15 +237,6 @@ const writingCompletionEffect = `  useEffect(() => {
 ${nextWritingEffect}`;
 writing = replaceOnce(writing, nextWritingEffect, writingCompletionEffect, "GuidedWriting self-learning write completion");
 
-const requiredHomeMarkers = [
-  "useCourseCompletionProgress",
-  "<CourseCompletionProgressCard",
-  "Boolean(courseCompletion?.courseWorkCompleted)",
-];
-requiredHomeMarkers.forEach((marker) => {
-  if (!home.includes(marker)) throw new Error(`HomeMetrics missing course completion marker: ${marker}`);
-});
-
 const requiredCourseMarkers = [
   "buildCourseCompletionProgress",
   "findCourseBookEntryForRequirement",
@@ -193,7 +252,8 @@ if (!writing.includes("getSelfLearningProgressStorageKey") || !writing.includes(
 }
 
 fs.writeFileSync(homePath, home, "utf8");
+fs.writeFileSync(generalHomePath, generalHome, "utf8");
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
 fs.writeFileSync(writingPath, writing, "utf8");
-console.log("Canonical A1-C1 course completion is wired into Home, Course Book and self-learning writing progress.");
+console.log("Canonical A1-C1 course completion stays in Course Book; Home keeps an always-open access/navigation guide without course-progress duplication.");
 await import("./patchCourseCompletionSnapshotPersistence.mjs");
