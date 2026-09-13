@@ -55,14 +55,27 @@ describe("A1-C1 Day 0 and Course Book navigation consistency", () => {
     expect(courseTab).toContain("data-course-section-intro={section.key}");
   });
 
-  it("shows one concise weekly goal card without turning the Course Book into another long checklist", () => {
+  it("shows compact purpose-based weekly outcomes instead of repeating lesson content", () => {
     expect(courseTab).toContain("COURSE_BOOK_WEEK_GOAL_LIMIT = 3");
+    expect(courseTab).toContain("COURSE_BOOK_WEEK_PURPOSES");
     expect(courseTab).toContain("getCourseBookWeekNumber");
-    expect(courseTab).toContain("getCourseBookWeekOutcomeItems");
+    expect(courseTab).toContain("getCourseBookWeekPurposeItems");
     expect(courseTab).toContain('className="course-book-week-goal"');
     expect(courseTab).toContain("data-course-week-goal");
-    expect(courseTab).toContain("Week {weekNumber} goal");
-    expect(courseTab).toContain("By the end of this week:");
-    expect(courseTab).toContain("weekOutcomeItems.join(\" • \")");
+    expect(courseTab).toContain("Week {weekNumber} outcome");
+    expect(courseTab).toContain("By the end of this week, you should be able to:");
+    expect(courseTab).toContain('weekOutcomeItems.join(" • ")');
+    expect(courseTab).not.toContain("getCourseBookWeekOutcomeItems");
+    expect(courseTab).not.toContain("cleanCourseBookWeekOutcome");
+  });
+
+  it("keeps explicit capability outcomes for every German level from A1 to C1", () => {
+    [
+      "greet people, introduce yourself and exchange basic personal information",
+      "show that you can work independently with the core skills needed to move toward B1",
+      "present a balanced viewpoint and respond to another perspective",
+      "analyse a social or everyday issue from more than one perspective",
+      "synthesise ideas, evaluate competing positions and address counterarguments",
+    ].forEach((outcome) => expect(courseTab).toContain(outcome));
   });
 });
