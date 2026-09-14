@@ -88,7 +88,27 @@ const badgeStyle = (status, compact) => {
   return { ...styles.badge, ...palette, whiteSpace: "nowrap" };
 };
 
-const buttonRowStyle = { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" };
+const buttonRowStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
+  gap: 8,
+  alignItems: "stretch",
+};
+
+const actionBaseStyle = {
+  minHeight: 44,
+  width: "100%",
+  borderRadius: 12,
+  padding: "10px 14px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 6,
+  fontWeight: 800,
+  lineHeight: 1.2,
+  textAlign: "center",
+  whiteSpace: "normal",
+};
 
 export default function NextLiveClassCard({
   summary,
@@ -119,6 +139,7 @@ export default function NextLiveClassCard({
   const className = summary?.klass?.name || summary?.klass?.className || session.className || "Your class";
   const textColor = compact ? "#ffffff" : "#0f172a";
   const mutedColor = compact ? "#dbeafe" : "#475569";
+  const joinOpenLabel = liveClassJoinOpensAt(session, locale).replace(/^Join opens at\s*/i, "");
 
   return (
     <section data-next-live-class-card="true" style={compact ? compactCardStyle : cardStyle}>
@@ -154,20 +175,65 @@ export default function NextLiveClassCard({
         ) : null}
       </div>
 
-      <div style={buttonRowStyle}>
-        <a href={lessonLink} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content", padding: compact ? "8px 10px" : undefined }}>
-          Open lesson
+      <div style={buttonRowStyle} aria-label="Class actions">
+        <a
+          href={lessonLink}
+          style={{
+            ...styles.primaryButton,
+            ...actionBaseStyle,
+            textDecoration: "none",
+            padding: compact ? "9px 10px" : actionBaseStyle.padding,
+          }}
+        >
+          <span>Open lesson</span>
+          <span aria-hidden="true">→</span>
         </a>
-        <a href={fullCalendarLink} style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content", padding: compact ? "8px 10px" : undefined, color: compact ? "#ffffff" : undefined, borderColor: compact ? "rgba(255,255,255,0.5)" : undefined }}>
-          View timetable
+        <a
+          href={fullCalendarLink}
+          style={{
+            ...styles.secondaryButton,
+            ...actionBaseStyle,
+            textDecoration: "none",
+            padding: compact ? "9px 10px" : actionBaseStyle.padding,
+            color: compact ? "#ffffff" : undefined,
+            borderColor: compact ? "rgba(255,255,255,0.5)" : undefined,
+          }}
+        >
+          View full timetable
         </a>
         {joinEnabled ? (
-          <a href={zoom.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content", background: "#16a34a", padding: compact ? "8px 10px" : undefined }}>
-            Join class
+          <a
+            href={zoom.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              ...styles.primaryButton,
+              ...actionBaseStyle,
+              textDecoration: "none",
+              background: "#16a34a",
+              padding: compact ? "9px 10px" : actionBaseStyle.padding,
+            }}
+          >
+            Join live class
           </a>
         ) : (
-          <button type="button" disabled style={{ ...styles.secondaryButton, width: "fit-content", opacity: 0.7, cursor: "not-allowed", padding: compact ? "8px 10px" : undefined }}>
-            {zoom?.url ? liveClassJoinOpensAt(session, locale) : "Join link pending"}
+          <button
+            type="button"
+            disabled
+            style={{
+              ...styles.secondaryButton,
+              ...actionBaseStyle,
+              opacity: 0.72,
+              cursor: "not-allowed",
+              padding: compact ? "9px 10px" : actionBaseStyle.padding,
+              color: compact ? "#ffffff" : undefined,
+              borderColor: compact ? "rgba(255,255,255,0.45)" : undefined,
+              background: compact ? "rgba(255,255,255,0.08)" : undefined,
+            }}
+          >
+            {zoom?.url && joinOpenLabel && joinOpenLabel !== "Join unavailable"
+              ? `Join class · Opens ${joinOpenLabel}`
+              : "Join class · Link pending"}
           </button>
         )}
       </div>
