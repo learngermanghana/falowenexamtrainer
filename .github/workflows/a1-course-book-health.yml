@@ -57,6 +57,7 @@ jobs:
           src/data/a1RouteAlignment.test.js
           src/data/a1AssignmentRegistry.test.js
           src/data/a1TeacherVideoResources.test.js
+          src/components/A1WorkbookMediaPanel.regression.test.jsx
           src/components/A1RadioFirstWorkbookRoutes.test.jsx
           src/components/A1WorkbookSectionTabs.test.js
           src/components/A1Day17StandardWorkbookPage.test.jsx
