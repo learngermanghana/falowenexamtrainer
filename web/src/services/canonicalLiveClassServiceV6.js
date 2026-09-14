@@ -7,24 +7,14 @@ export {
 } from "./canonicalLiveClassServiceV5";
 
 const OFFICIAL_CURRICULUM_SOURCE = "coursedictionarydaygroups";
-const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
 const text = (value) => String(value || "").trim();
 const normalized = (value) => text(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
-const toMillis = (value) => {
-  if (!value) return 0;
-  if (typeof value?.toMillis === "function") return value.toMillis();
-  if (typeof value?.toDate === "function") return value.toDate().getTime();
-  if (typeof value?.seconds === "number") return value.seconds * 1000;
-  const date = value instanceof Date ? value : new Date(value);
-  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
-};
 const integer = (value) => {
   if (value === null || value === undefined || text(value) === "") return null;
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
 };
-const sessionStatus = (session = {}) => text(session.status || session.sessionStatus || "scheduled").toLowerCase();
 const curriculumIds = (session = {}) => {
   const values = [session.assignmentIds, session.chapterIds, session.curriculumIds]
     .find((candidate) => Array.isArray(candidate) && candidate.length)
@@ -68,7 +58,6 @@ function buildA1DayGroups() {
 }
 
 const A1_DAY_GROUPS = buildA1DayGroups();
-const A1_GROUP_BY_DAY = new Map(A1_DAY_GROUPS.map((group) => [group.day, group]));
 const A1_DAY_BY_ASSIGNMENT = new Map();
 A1_DAY_GROUPS.forEach((group) => group.assignmentIds.forEach((id) => A1_DAY_BY_ASSIGNMENT.set(id.toUpperCase(), group.day)));
 
@@ -93,57 +82,24 @@ function startingA1Day(orderedActive = []) {
   return known !== null ? known : 1;
 }
 
-function repairLegacyA1Session(session = {}, targetDay) {
-  if (isOfficialSession(session)) return session;
-  const group = A1_GROUP_BY_DAY.get(targetDay);
-  if (!group) return session;
-  const currentDay = knownA1Day(session);
-  if (currentDay === targetDay) return { ...session, curriculumDay: targetDay };
-
-  const assignmentIds = group.assignmentIds;
-  const topic = `Day ${targetDay}: ${group.titles.join(" + ")}`;
-  return {
-    ...session,
-    topic,
-    title: topic,
-    assignmentIds,
-    chapterIds: assignmentIds,
-    curriculumIds: assignmentIds,
-    assignment_id: assignmentIds[0] || null,
-    curriculumDay: targetDay,
-    chronologyRepaired: true,
-    chronologyPreviousDay: currentDay,
-  };
-}
-
+// A timetable position is not a curriculum identity: postponed lessons and
+// partial snapshots may arrive in any order. Preserve the admin's session.
 export function repairA1LiveClassChronology(summary = {}) {
-  if (!isA1Summary(summary) || !Array.isArray(summary.sessions) || !summary.sessions.length) return summary;
-
-  const ordered = [...summary.sessions]
-    .sort((left, right) => toMillis(left.startsAt) - toMillis(right.startsAt));
-  const active = ordered.filter((session) => !INACTIVE_STATUSES.has(sessionStatus(session)) && session.superseded !== true);
-  const firstDay = startingA1Day(active);
-  const targetDayById = new Map();
-  active.forEach((session, index) => targetDayById.set(text(session.id), firstDay + index));
-
-  const repairedById = new Map();
-  const sessions = ordered.map((session) => {
-    const targetDay = targetDayById.get(text(session.id));
-    const repaired = targetDay === undefined ? session : repairLegacyA1Session(session, targetDay);
-    repairedById.set(text(session.id), repaired);
-    return repaired;
-  });
-  const resolve = (session) => session ? (repairedById.get(text(session.id)) || session) : session;
-
+  if (!isA1Summary(summary) || !Array.isArray(summary.sessions)) return summary;
+  const enrich = (session) => {
+    if (!session || isOfficialSession(session)) return session;
+    const day = knownA1Day(session);
+    return day === null || integer(session.curriculumDay) !== null
+      ? session
+      : { ...session, curriculumDay: day };
+  };
   return {
     ...summary,
-    sessions,
-    nextSession: resolve(summary.nextSession),
-    latestCompletedSession: resolve(summary.latestCompletedSession),
-    cancelledSessions: Array.isArray(summary.cancelledSessions)
-      ? summary.cancelledSessions.map(resolve)
-      : summary.cancelledSessions,
-    chronologyRepairedSessionCount: sessions.filter((session) => session.chronologyRepaired).length,
+    sessions: summary.sessions.map(enrich),
+    nextSession: enrich(summary.nextSession),
+    latestCompletedSession: enrich(summary.latestCompletedSession),
+    cancelledSessions: summary.cancelledSessions?.map(enrich),
+    chronologyRepairedSessionCount: 0,
   };
 }
 

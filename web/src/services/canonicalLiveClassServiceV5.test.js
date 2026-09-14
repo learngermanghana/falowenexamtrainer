@@ -63,7 +63,7 @@ describe("canonical live class V5 class-record selection", () => {
     expect(klass.curriculumMappedSessionCount).toBe(25);
   });
 
-  test("replaces a stale student class ID with the repaired same-name record", async () => {
+  test("preserves the explicit attendance class ID despite a repaired same-name record", async () => {
     getDoc.mockResolvedValue(classSnapshot(staleBonnClass.id, staleBonnClass));
     getDocs.mockResolvedValue(querySnapshot(staleBonnClass, repairedBonnClass));
 
@@ -72,8 +72,8 @@ describe("canonical live class V5 class-record selection", () => {
       className: "A1 Bonn Klasse",
     });
 
-    expect(klass.id).toBe("a1-bonn-official");
-    expect(klass.sessionRepairStatus).toBe("complete");
+    expect(klass.id).toBe(staleBonnClass.id);
+    expect(klass.sessionRepairStatus).toBeUndefined();
   });
 
   test("does not move a student to a different same-name cohort", async () => {

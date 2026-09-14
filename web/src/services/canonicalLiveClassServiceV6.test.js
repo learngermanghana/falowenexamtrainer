@@ -17,7 +17,7 @@ const session = (id, day, assignmentId, curriculumDay) => ({
   topic: `Day ${curriculumDay}: stale`,
 });
 
-test("legacy A1 timetable advances the next session by chronological day instead of stale curriculum metadata", () => {
+test("legacy A1 timetable preserves the admin lesson even when its date position differs", () => {
   const sessions = [
     session("d0", 2, "A1-Tutorial", 0),
     session("d1", 3, "A1-0.1", 1),
@@ -28,7 +28,7 @@ test("legacy A1 timetable advances the next session by chronological day instead
     session("d6", 8, "A1-2.3", 6),
     session("d7", 9, "A1-3", 7),
     session("d8", 14, "A1-4", 8),
-    // This future row still carries stale Day 7 / A1-1.2 data in Firestore.
+    // A delayed lesson retains the identity stored by the admin.
     session("next", 15, "A1-1.2", 7),
   ];
 
@@ -38,10 +38,10 @@ test("legacy A1 timetable advances the next session by chronological day instead
     nextSession: sessions[9],
   });
 
-  expect(repaired.nextSession.curriculumDay).toBe(9);
-  expect(repaired.nextSession.assignmentIds).toContain("A1-5");
-  expect(repaired.nextSession.topic).toMatch(/^Day 9:/);
-  expect(repaired.nextSession.chronologyRepaired).toBe(true);
+  expect(repaired.nextSession.curriculumDay).toBe(7);
+  expect(repaired.nextSession.assignmentIds).toEqual(["A1-1.2"]);
+  expect(repaired.nextSession.topic).toMatch(/^Day 7:/);
+  expect(repaired.nextSession.chronologyRepaired).not.toBe(true);
 });
 
 test("official repaired A1 sessions keep their explicit curriculum identity", () => {
@@ -60,4 +60,18 @@ test("official repaired A1 sessions keep their explicit curriculum identity", ()
   expect(repaired.nextSession.assignmentIds).toEqual(["A1-4"]);
   expect(repaired.nextSession.curriculumDay).toBe(8);
   expect(repaired.nextSession.chronologyRepaired).not.toBe(true);
+});
+
+test("Dortmund Day 14 survives rescheduling, partial snapshots and date reordering", () => {
+  const modal = { ...session("modal", 14, "A1-3.6", 14),
+    topic: "Day 14: Modal Verbs", previousStartsAt: at(7) };
+  const laterLesson = session("prepositions", 8, "A1-12.1", 18);
+  for (const sessions of [[modal], [modal, laterLesson], [laterLesson, modal]]) {
+    const result = repairA1LiveClassChronology({
+      klass: { id: "xTq2ZiYSmtVlpr3I5Zon", name: "A1 Dortmund Klasse" },
+      sessions, nextSession: modal,
+    });
+    expect(result.nextSession).toEqual(modal);
+    expect(result.sessions.find(item => item.id === "modal")).toEqual(modal);
+  }
 });
