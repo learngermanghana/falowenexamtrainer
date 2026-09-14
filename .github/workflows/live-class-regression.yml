@@ -3,7 +3,9 @@ name: Live class regression checks
 on:
   pull_request:
     paths:
+      - "scripts/runCompactStudentNavigationPatch.mjs"
       - "web/src/components/CourseBookNextClassIndicator.js"
+      - "web/src/components/CourseBookNavigationSafety.test.js"
       - "web/src/components/FullClassCalendarPage.js"
       - "web/src/components/NextLiveClassCard.js"
       - "web/src/components/LiveClassCardRedesign.test.js"
@@ -36,5 +38,6 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/components/LiveClassCardRedesign.test.js
+          src/components/CourseBookNavigationSafety.test.js
           src/utils/homeLiveClassConsistency.test.js
           src/components/FullClassCalendarIdentity.test.js
