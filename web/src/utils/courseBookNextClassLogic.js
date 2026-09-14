@@ -107,10 +107,15 @@ const sessionDateTimeFromGhanaFields = (session = {}, timeField, fallbackField) 
   return buildGhanaDateTime(dateKey, time);
 };
 
+// Canonical Firestore timestamps are the authority after a class is moved.
+// The separate date/startTime fields are retained only as a legacy fallback;
+// they can legitimately lag behind a reschedule and must not override startsAt.
 const sessionStart = (session = {}) =>
-  sessionDateTimeFromGhanaFields(session, "startTime", "startsAt") || asDate(session.startsAt || session.startDateTime);
+  asDate(session.startsAt || session.startDateTime)
+  || sessionDateTimeFromGhanaFields(session, "startTime", "startsAt");
 const sessionEnd = (session = {}) =>
-  sessionDateTimeFromGhanaFields(session, "endTime", "endsAt") || asDate(session.endsAt || session.endDateTime);
+  asDate(session.endsAt || session.endDateTime)
+  || sessionDateTimeFromGhanaFields(session, "endTime", "endsAt");
 
 export const findCurrentOrNextSession = (sessions = [], now = new Date()) => {
   const nowMs = now.getTime();
