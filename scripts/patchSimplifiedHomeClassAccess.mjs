@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const targetPath = path.join(root, "web/src/components/GeneralHome.js");
 let source = fs.readFileSync(targetPath, "utf8");
+const hasPinnedClassCalendar = (source.match(/initialClassId=\{preferredClassId\}/g) || []).length === 2;
+
+if (hasPinnedClassCalendar) {
+  console.log("Falowen Home keeps both class-ID-pinned calendar mounts.");
+} else {
 
 const hasNextClassHome = source.includes('import HomeNextClassCard from "./HomeNextClassCard";') ||
   source.includes("<HomeNextClassCard className={preferredClass}");
@@ -103,3 +108,4 @@ if (
 
 fs.writeFileSync(targetPath, source, "utf8");
 console.log("Falowen Home keeps compact class access/Next Class; long calendar and unused announcements are removed.");
+}
