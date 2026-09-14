@@ -292,6 +292,12 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) 
     : !canonicalSummary?.klass?.zoomProfileId
       ? ZOOM_DETAILS
       : canonicalSummary?.zoom || {};
+  const resolvedClassId = canonicalSummary?.klass?.id || canonicalSummary?.klass?.classId || initialClassId;
+  const resolvedClassName = canonicalSummary?.klass?.name || canonicalSummary?.klass?.className || selectedClass;
+  const fullCalendarParams = new URLSearchParams();
+  if (resolvedClassId) fullCalendarParams.set("classId", resolvedClassId);
+  const fullCalendarQuery = fullCalendarParams.toString();
+  const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(resolvedClassName || "class")}${fullCalendarQuery ? `?${fullCalendarQuery}` : ""}`;
 
   const handleClassChange = (event) => {
     const value = event.target.value;
@@ -329,7 +335,7 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) 
               zoom={zoom}
               now={now}
               locale={locale}
-              fullCalendarLink="#full-session-timetable"
+              fullCalendarLink={fullCalendarLink}
               updating={canonicalStatus === "loading" || canonicalStatus === "cached"}
             />
           ) : <section style={infoCardStyle}><strong>No upcoming class</strong><span style={styles.helperText}>Check the timetable below for completed or cancelled sessions.</span></section>}

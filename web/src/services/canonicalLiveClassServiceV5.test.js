@@ -9,8 +9,8 @@ jest.mock("../firebase", () => ({
   where: jest.fn((...parts) => parts),
 }));
 
-import { getDoc, getDocs } from "../firebase";
-import { __private__ } from "./canonicalLiveClassServiceV5";
+import { getDoc, getDocs, onSnapshot } from "../firebase";
+import { __private__, subscribeCanonicalLiveClass } from "./canonicalLiveClassServiceV5";
 
 const classSnapshot = (id, data) => ({
   id,
@@ -20,6 +20,10 @@ const classSnapshot = (id, data) => ({
 
 const querySnapshot = (...classes) => ({
   docs: classes.map(({ id, ...data }) => classSnapshot(id, data)),
+});
+
+const sessionSnapshot = (...sessions) => ({
+  docs: sessions.map(({ id, ...data }) => ({ id, data: () => data })),
 });
 
 const staleBonnClass = {
@@ -92,6 +96,55 @@ describe("canonical live class V5 class-record selection", () => {
     });
 
     expect(klass.id).toBe(staleBonnClass.id);
+  });
+
+  test("keeps the assigned same-name class and emits a reschedule through its existing listener", async () => {
+    const assignedClass = { ...staleBonnClass, endDate: "2100-01-01" };
+    getDoc.mockResolvedValue(classSnapshot(assignedClass.id, assignedClass));
+    getDocs.mockResolvedValue(querySnapshot(repairedBonnClass));
+    const listeners = [];
+    onSnapshot.mockImplementation((target, onNext) => {
+      listeners.push({ target, onNext });
+      return jest.fn();
+    });
+    const onChange = jest.fn();
+
+    subscribeCanonicalLiveClass({
+      classId: assignedClass.id,
+      className: assignedClass.name,
+      onChange,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(getDocs).not.toHaveBeenCalled();
+    const sessionListener = listeners.find(({ target }) => Array.isArray(target));
+    expect(sessionListener).toBeDefined();
+
+    const original = {
+      id: "assigned-session",
+      classId: assignedClass.id,
+      classRecordId: assignedClass.id,
+      className: assignedClass.name,
+      topic: "Day 12: Admin lesson",
+      startsAt: new Date("2099-08-20T18:00:00.000Z"),
+      endsAt: new Date("2099-08-20T19:00:00.000Z"),
+      status: "scheduled",
+    };
+    sessionListener.onNext(sessionSnapshot(original));
+    const rescheduled = {
+      ...original,
+      startsAt: new Date("2099-08-22T18:00:00.000Z"),
+      endsAt: new Date("2099-08-22T19:00:00.000Z"),
+      previousStartsAt: original.startsAt,
+    };
+    sessionListener.onNext(sessionSnapshot(rescheduled));
+
+    const latest = onChange.mock.calls.at(-1)[0];
+    expect(latest.klass.id).toBe(assignedClass.id);
+    expect(latest.nextSession.id).toBe("assigned-session");
+    expect(latest.nextSession.topic).toBe("Day 12: Admin lesson");
+    expect(latest.nextSession.startsAt).toEqual(rescheduled.startsAt);
+    expect(latest.nextSession.previousStartsAt).toEqual(original.startsAt);
   });
 
   test("keeps an exact class record when no repaired duplicate exists", async () => {

@@ -274,6 +274,9 @@ const GeneralHome = ({
     triggerInteractionFeedback({ sound: "open" });
   }, []);
   const preferredClass = studentProfile?.className;
+  const preferredClassId = String(
+    studentProfile?.classId || studentProfile?.classRecordId || studentProfile?.assignedClassId || ""
+  ).trim();
   const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
@@ -434,7 +437,7 @@ const GeneralHome = ({
             title="Check your Zoom and calendar here"
             subtitle="Use this during onboarding only. After setup, it will move into the dashboard under Live class access & calendar."
           />
-          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} program={studentProfile?.program} />
+          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
         </section>
       </div>
     );
@@ -486,7 +489,7 @@ const GeneralHome = ({
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
 
-      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} program={studentProfile?.program} />
+      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
 
       <AnnouncementSection
         announcements={announcements}
