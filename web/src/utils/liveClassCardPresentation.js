@@ -114,7 +114,10 @@ export const liveClassSessionStatus = (session = {}, now = new Date()) => {
   const start = asLiveClassDate(session.startsAt)?.getTime() || 0;
   const end = asLiveClassDate(session.endsAt)?.getTime() || 0;
   const current = now.getTime();
-  if (stored === "completed") return "Completed";
+  // A reschedule can leave the old completion flag behind. Completion is only
+  // authoritative when the current session window has actually ended (or when
+  // no timing metadata exists at all). Future/current Admin timestamps win.
+  if (stored === "completed" && ((!start && !end) || (end && end < current))) return "Completed";
   if (end && end < current) return "Awaiting completion";
   if (stored === "live" || (start && current >= start && (!end || current <= end))) return "Live now";
   if (start) {
