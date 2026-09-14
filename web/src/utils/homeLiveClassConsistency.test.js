@@ -35,4 +35,30 @@ describe("homepage live-class consistency", () => {
     expect(liveClassLessonNumber(session)).toBe(4);
     expect(liveClassLessonLink(summary, session)).toBe("/campus/course/lesson/A1/4?chapter=2");
   });
+
+  test.each([null, undefined, ""])(
+    "falls back to assignment identity when curriculumIndex is missing (%p)",
+    (curriculumIndex) => {
+      const summary = {
+        klass: { name: "A2 Köln Klasse", level: "A2" },
+      };
+      const session = {
+        curriculumIndex,
+        assignmentIds: ["A2-7.20"],
+        topic: "Typische Reklamationssituationen",
+      };
+
+      expect(liveClassLessonNumber(session)).toBe(20);
+      expect(liveClassLessonLink(summary, session)).toBe("/campus/course/lesson/A2/20?chapter=7.20");
+    },
+  );
+
+  test("does not coerce a missing A1 curriculum day into Day 0", () => {
+    expect(liveClassLessonNumber({
+      curriculumDay: null,
+      curriculumIndex: null,
+      assignmentIds: ["A1-7"],
+      topic: "Prices and preferences",
+    })).toBe(7);
+  });
 });
