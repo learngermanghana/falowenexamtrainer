@@ -216,10 +216,17 @@ const CourseBookNextClassIndicator = () => {
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
   const isCourseBook = location.pathname.replace(/\/+$/, "") === COURSE_BOOK_PATH;
   const cacheIdentity = useMemo(() => ({ classId, className }), [classId, className]);
+  const cacheIdentityKey = useMemo(() => `${classId}::${className}`, [classId, className]);
 
   const [portalTarget, setPortalTarget] = useState(null);
   const [canonicalStatus, setCanonicalStatus] = useState("idle");
-  const [canonicalSummary, setCanonicalSummary] = useState(() => loadLiveClassSummaryCache(cacheIdentity));
+  const [canonicalResolution, setCanonicalResolution] = useState(() => ({
+    identity: cacheIdentityKey,
+    summary: loadLiveClassSummaryCache(cacheIdentity),
+  }));
+  const canonicalSummary = canonicalResolution.identity === cacheIdentityKey
+    ? canonicalResolution.summary
+    : null;
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -295,28 +302,44 @@ const CourseBookNextClassIndicator = () => {
 
   useEffect(() => {
     if (!isCourseBook || isSelfLearning || (!className && !classId)) {
+      setCanonicalResolution({ identity: cacheIdentityKey, summary: null });
       setCanonicalStatus("unavailable");
       return undefined;
     }
 
+    const identity = cacheIdentityKey;
     const cached = loadLiveClassSummaryCache(cacheIdentity);
-    if (cached) setCanonicalSummary(cached);
+    setCanonicalResolution({ identity, summary: cached || null });
     setCanonicalStatus("loading");
-    return subscribeCanonicalLiveClass({
+
+    let active = true;
+    const unsubscribe = subscribeCanonicalLiveClass({
       classId,
       className,
       onChange: (summary) => {
-        setCanonicalSummary(summary);
+        if (!active) return;
+        setCanonicalResolution({ identity, summary });
         saveLiveClassSummaryCache(cacheIdentity, summary);
         setCanonicalStatus("ready");
       },
-      onUnavailable: () => setCanonicalStatus(cached ? "cached" : "unavailable"),
+      onUnavailable: () => {
+        if (!active) return;
+        if (!cached) setCanonicalResolution({ identity, summary: null });
+        setCanonicalStatus(cached ? "cached" : "unavailable");
+      },
       onError: (error) => {
+        if (!active) return;
         console.warn("Course Book next-class indicator could not load the live schedule", error);
+        if (!cached) setCanonicalResolution({ identity, summary: null });
         setCanonicalStatus(cached ? "cached" : "unavailable");
       },
     });
-  }, [cacheIdentity, classId, className, isCourseBook, isSelfLearning]);
+
+    return () => {
+      active = false;
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, [cacheIdentity, cacheIdentityKey, classId, className, isCourseBook, isSelfLearning]);
 
   const nextSession = useMemo(() => {
     if (isSelfLearning) return null;
