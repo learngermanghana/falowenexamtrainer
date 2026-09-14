@@ -2,6 +2,7 @@ import {
   A1_MINIMUM_WORDS,
   buildA1WordStatus,
   countA1SubmissionWords,
+  installA1SubmissionConsistencyRuntime,
   showA1SubmitError,
   syncA1SubmissionForm,
   validateA1SubmissionForm,
@@ -10,13 +11,13 @@ import {
 const makeWords = (count) =>
   Array.from({ length: count }, (_, index) => `wort${index + 1}`).join(" ");
 
-const renderA1Form = ({ wordCount = 13, confirmed = true, teilChecked = true } = {}) => {
+const renderA1Form = ({ wordCount = 13, confirmed = true, teilChecked = true, draftConflict = false } = {}) => {
   document.body.innerHTML = `
     <div
       data-cloud-draft-persistence="react-owned"
       data-final-submission-state="idle"
       data-final-submission-error=""
-      data-draft-conflict="false"
+      data-draft-conflict="${draftConflict ? "true" : "false"}"
     >
       <form style="display:grid;gap:12px;">
         <div data-test-meta>Assignment details</div>
@@ -149,5 +150,41 @@ describe("A1 submission consistency runtime", () => {
     expect(validateA1SubmissionForm(form)).toBe(
       "Please check ‘I checked that this is the correct assignment.’ before submitting.",
     );
+  });
+
+  test("lets the canonical panel own draft-conflict recovery", () => {
+    const { form } = renderA1Form({
+      wordCount: 20,
+      confirmed: true,
+      teilChecked: true,
+      draftConflict: true,
+    });
+
+    syncA1SubmissionForm(form);
+
+    expect(validateA1SubmissionForm(form)).toBe("");
+  });
+
+  test("refreshes counter feedback after an umlaut quick-key click without an input event", () => {
+    const { form, textarea } = renderA1Form({ wordCount: 13 });
+    const quickKey = document.querySelector("#quick-keys button");
+    const cleanup = installA1SubmissionConsistencyRuntime();
+
+    const beforeLength = textarea.value.length;
+    quickKey.addEventListener("click", () => {
+      textarea.value = `${textarea.value}ä`;
+    });
+
+    quickKey.click();
+
+    expect(textarea.value.length).toBe(beforeLength + 1);
+    expect(document.getElementById("inline-counter").textContent).toContain(
+      `${beforeLength + 1} / 2,500 characters`,
+    );
+    expect(form.querySelector('[data-a1-mobile-word-status="true"]').textContent).toBe(
+      "13 / 20 words · 7 more words required",
+    );
+
+    cleanup();
   });
 });
