@@ -31,15 +31,19 @@ export default function A1Day14ModalVerbsWorkbookPage() {
   const resources = getA1SelfLearningJourneyResources(day14Practice);
 
   return (
-    <SelfLearningMaterialsSelector
-      level="A1"
-      day={14}
-      title="Modal Verbs · Kapitel 3.6"
-      teacherVideo={resources.teacherVideo}
-      aiVideo={resources.aiVideo}
-      grammarBook={resources.grammarBook}
-    >
-      <A1Day14ModalVerbsWorkbookCorePage />
-    </SelfLearningMaterialsSelector>
+    // Day 14 owns its lesson explanation and teacher lecture. This marker also
+    // tells the global A1 workbook video header not to re-inject the retired AI video.
+    <div data-a1-grammar-video="true" data-a1-day14-ai-video="suppressed">
+      <SelfLearningMaterialsSelector
+        level="A1"
+        day={14}
+        title="Modal Verbs · Kapitel 3.6"
+        teacherVideo={resources.teacherVideo}
+        aiVideo={resources.aiVideo}
+        grammarBook={resources.grammarBook}
+      >
+        <A1Day14ModalVerbsWorkbookCorePage />
+      </SelfLearningMaterialsSelector>
+    </div>
   );
 }
