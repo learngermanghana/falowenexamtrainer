@@ -29,5 +29,20 @@ replacements.forEach(([before, after]) => {
   source = source.replaceAll(before, after);
 });
 
+// Keep the student-facing destination name explicit on desktop and mobile.
+source = source.replaceAll('key: "learn", label: "Learn"', 'key: "learn", label: "Course Book"');
+
+// Course Book lives inside Campus, but the Falowen logo should not be the only way back.
+const heroActionsAnchor = '              <div data-a1-coursebook-hero-actions="true" className="course-book-hero-actions" style={courseBookStyles.heroActions}>';
+if (!source.includes('className="course-book-back-to-campus"')) {
+  if (!source.includes(heroActionsAnchor)) {
+    throw new Error("Compact navigation patch anchor missing: Course Book Back to Campus action");
+  }
+  source = source.replace(
+    heroActionsAnchor,
+    `${heroActionsAnchor}\n                <button\n                  type="button"\n                  className="course-book-back-to-campus"\n                  style={{ ...styles.secondaryButton, minHeight: 44, background: "#ffffff", fontWeight: 800 }}\n                  onClick={() => navigate("/")}\n                >\n                  ← Back to Campus\n                </button>`,
+  );
+}
+
 fs.writeFileSync(patchPath, source, "utf8");
 await import(`${pathToFileURL(patchPath).href}?compact-navigation-fixed=1`);
