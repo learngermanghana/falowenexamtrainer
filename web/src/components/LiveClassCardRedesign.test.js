@@ -135,7 +135,7 @@ describe("live class card UI protection", () => {
     const card = source("./NextLiveClassCard.js");
     expect(card).toContain("NEXT LIVE CLASS");
     expect(card).toContain("Open lesson");
-    expect(card).toContain("View timetable");
+    expect(card).toContain("View full timetable");
     expect(card).toContain("Join class");
     expect(card).toContain("liveClassJoinOpensAt");
     expect(card).toContain("After this");

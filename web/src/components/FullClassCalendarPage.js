@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import { classCatalog } from "../data/classCatalog";
@@ -82,6 +82,7 @@ const statusBadgeStyle = (status) => {
 
 const FullClassCalendarPage = () => {
   const { className: encodedClassName = "" } = useParams();
+  const [searchParams] = useSearchParams();
   const className = useMemo(() => {
     try {
       return decodeURIComponent(encodedClassName);
@@ -89,48 +90,51 @@ const FullClassCalendarPage = () => {
       return encodedClassName;
     }
   }, [encodedClassName]);
+  const classId = String(searchParams.get("classId") || "").trim();
+  const classIdentity = classId || className;
 
   const [now, setNow] = useState(() => new Date());
   const [resolution, setResolution] = useState(() => ({
-    identity: className,
+    identity: classIdentity,
     summary: null,
-    status: className ? "loading" : "idle",
+    status: classIdentity ? "loading" : "idle",
   }));
 
   useEffect(() => {
-    if (!className) {
+    if (!classIdentity) {
       setResolution({ identity: "", summary: null, status: "idle" });
       return undefined;
     }
 
-    setResolution({ identity: className, summary: null, status: "loading" });
+    setResolution({ identity: classIdentity, summary: null, status: "loading" });
     return subscribeCanonicalLiveClass({
+      classId,
       className,
       onChange: (summary) => {
-        setResolution({ identity: className, summary, status: "ready" });
+        setResolution({ identity: classIdentity, summary, status: "ready" });
       },
       onUnavailable: () => {
-        setResolution({ identity: className, summary: null, status: "unavailable" });
+        setResolution({ identity: classIdentity, summary: null, status: "unavailable" });
       },
       onError: (error) => {
         console.warn("Full class timetable could not refresh canonical class data", error);
         setResolution((current) => ({
-          identity: className,
-          summary: current.identity === className ? current.summary : null,
+          identity: classIdentity,
+          summary: current.identity === classIdentity ? current.summary : null,
           status: "error",
         }));
       },
     });
-  }, [className]);
+  }, [classId, classIdentity, className]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60000);
     return () => window.clearInterval(timer);
   }, []);
 
-  const currentResolution = resolution.identity === className
+  const currentResolution = resolution.identity === classIdentity
     ? resolution
-    : { identity: className, summary: null, status: "loading" };
+    : { identity: classIdentity, summary: null, status: "loading" };
   const summary = currentResolution.summary;
   const canonicalSessions = useMemo(
     () => [...(summary?.sessions || [])]

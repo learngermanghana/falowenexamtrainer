@@ -1,0 +1,40 @@
+name: Live class regression checks
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/CourseBookNextClassIndicator.js"
+      - "web/src/components/FullClassCalendarPage.js"
+      - "web/src/components/NextLiveClassCard.js"
+      - "web/src/components/LiveClassCardRedesign.test.js"
+      - "web/src/components/FullClassCalendarIdentity.test.js"
+      - "web/src/utils/liveClassCardPresentation.js"
+      - "web/src/utils/homeLiveClassConsistency.test.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-class-regression:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Run focused live-class Jest suites
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/components/LiveClassCardRedesign.test.js
+          src/utils/homeLiveClassConsistency.test.js
+          src/components/FullClassCalendarIdentity.test.js

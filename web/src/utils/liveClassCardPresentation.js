@@ -27,10 +27,15 @@ export const liveClassTopic = (session = {}, fallback = "Live class") =>
 const curriculumLevel = (session = {}) =>
   liveClassCurriculumIds(session).join(" ").match(/\b(A1|A2|B1|B2|C1|C2)\b/i)?.[1]?.toUpperCase() || "";
 
+const optionalNonNegativeInteger = (value) => {
+  if (value === null || value === undefined || String(value).trim() === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+};
+
 const a1CurriculumDay = (session = {}) => {
   if (curriculumLevel(session) !== "A1") return null;
-  const day = Number(session.curriculumDay);
-  return Number.isInteger(day) && day >= 0 ? day : null;
+  return optionalNonNegativeInteger(session.curriculumDay);
 };
 
 export const liveClassLessonNumber = (session = {}) => {
@@ -44,9 +49,10 @@ export const liveClassLessonNumber = (session = {}) => {
   // The repaired class timetable stores the official lesson position in
   // curriculumIndex. Prefer that over assignment IDs such as A1-2, because
   // the trailing number is a chapter/assignment identity, not necessarily
-  // the class day number.
-  const curriculumIndex = Number(session.curriculumIndex);
-  if (Number.isInteger(curriculumIndex) && curriculumIndex >= 0) return curriculumIndex + 1;
+  // the class day number. Missing legacy indices must stay missing: coercing
+  // null or "" with Number() would incorrectly turn them into lesson 1.
+  const curriculumIndex = optionalNonNegativeInteger(session.curriculumIndex);
+  if (curriculumIndex !== null) return curriculumIndex + 1;
 
   const assignment = liveClassCurriculumIds(session)[0] || "";
   const assignmentNumber = assignment.match(/(?:^|[.-])(\d+)(?:[A-Z])?$/i)?.[1];
