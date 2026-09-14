@@ -1,5 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import A1Day14ModalVerbsWorkbookPage from "./A1Day14ModalVerbsWorkbookPage";
 import A1WorkbookMediaPanel, {
   getA1WorkbookMediaResources,
   shouldSuppressA1WorkbookAiVideo,
@@ -38,6 +40,18 @@ describe("A1 workbook media regression policy", () => {
 
     expect(screen.getAllByText(/Teacher lecture/i).length).toBeGreaterThan(0);
     expect(screen.queryByText(/AI revision/i)).not.toBeInTheDocument();
+    expect(container.innerHTML).not.toContain("Wkj1-TnNUxY");
+  });
+
+  test("Day 14 page blocks the global A1 AI-video header from re-injecting the retired video", () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={["/campus/course/modal-verbs-day-14-3-6?radio=done"]}>
+        <A1Day14ModalVerbsWorkbookPage />
+      </MemoryRouter>,
+    );
+
+    expect(container.querySelector('[data-a1-grammar-video="true"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-a1-day14-ai-video="suppressed"]')).toBeInTheDocument();
     expect(container.innerHTML).not.toContain("Wkj1-TnNUxY");
   });
 });
