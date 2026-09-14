@@ -255,10 +255,8 @@ export const validateA1SubmissionForm = (form) => {
     return "Please check ‘I checked that this is the correct assignment.’ before submitting.";
   }
 
-  const root = form.closest(A1_ROOT_SELECTOR);
-  if (root?.getAttribute("data-draft-conflict") === "true") {
-    return "Resolve the newer cloud draft before submitting.";
-  }
+  // Draft conflicts are intentionally not rejected here. A1CanonicalSubmissionPanel's
+  // capture handler owns the automatic "Keep this device version" recovery and resubmit flow.
   return "";
 };
 
@@ -334,6 +332,19 @@ const installA1SubmissionConsistencyRuntime = () => {
     scheduleSync();
   };
 
+  const handleClick = (event) => {
+    const button = event.target?.closest?.("button");
+    const form = button?.closest?.("form");
+    if (!button || !isCanonicalA1Form(form)) return;
+
+    const quickKeys = findQuickKeys(form);
+    if (!quickKeys?.contains(button)) return;
+
+    // VerifiedCloudDraftSubmissionPage inserts umlauts through React state and does not emit
+    // an input/change event. Queue the shared counter refresh after that click has rendered.
+    scheduleSync();
+  };
+
   const handleSubmit = (event) => {
     const form = event.target;
     if (!isCanonicalA1Form(form)) return;
@@ -353,6 +364,7 @@ const installA1SubmissionConsistencyRuntime = () => {
 
   document.addEventListener("input", handleInput, true);
   document.addEventListener("change", handleChange, true);
+  document.addEventListener("click", handleClick);
   document.addEventListener("submit", handleSubmit, true);
   window.addEventListener("resize", scheduleSync);
 
@@ -381,6 +393,7 @@ const installA1SubmissionConsistencyRuntime = () => {
     observer?.disconnect();
     document.removeEventListener("input", handleInput, true);
     document.removeEventListener("change", handleChange, true);
+    document.removeEventListener("click", handleClick);
     document.removeEventListener("submit", handleSubmit, true);
     window.removeEventListener("resize", scheduleSync);
   };
