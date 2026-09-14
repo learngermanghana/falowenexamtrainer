@@ -12,6 +12,9 @@ const resourceLooksLikeTeacher = (resource = {}) =>
 const resourceLooksLikeAi = (resource = {}) =>
   /\bai\b|ai[-_ ]?grammar|ai[-_ ]?video/i.test(`${resource.key || ""} ${resource.title || ""}`);
 
+export const shouldSuppressA1WorkbookAiVideo = (day, chapter = "") =>
+  Number(day) === 14 && normalizeChapter(chapter) === "3.6";
+
 const chaptersForDay = (day) =>
   Object.values(A1_ASSIGNMENT_REGISTRY)
     .filter((assignment) => Number(assignment.day) === Number(day))
@@ -91,17 +94,21 @@ export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
     label: "Teacher lecture",
   }));
 
+  const suppressAiVideo = shouldSuppressA1WorkbookAiVideo(numericDay, chapter);
   const teacherUrls = new Set(teacherResources.map((resource) => clean(resource.url)));
-  const aiResources = lessonResources
-    .filter((resource) => resourceLooksLikeAi(resource) && chapterMatches(resource, chapter, numericDay))
-    .filter((resource) => !teacherUrls.has(clean(resource?.url)))
-    .map((resource) => ({ ...resource, kind: "ai", label: "AI revision" }));
+  const aiResources = suppressAiVideo
+    ? []
+    : lessonResources
+      .filter((resource) => resourceLooksLikeAi(resource) && chapterMatches(resource, chapter, numericDay))
+      .filter((resource) => !teacherUrls.has(clean(resource?.url)))
+      .map((resource) => ({ ...resource, kind: "ai", label: "AI revision" }));
 
   return dedupeByUrl([...teacherResources, ...aiResources]);
 };
 
 const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = null }) => {
   const resources = useMemo(() => {
+    const suppressAiVideo = shouldSuppressA1WorkbookAiVideo(day, chapter);
     const canonicalResources = getA1WorkbookMediaResources({ day, chapter });
     const canonicalTeacherResources = canonicalResources.filter(
       (resource) => resource.kind === "teacher"
@@ -110,7 +117,7 @@ const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = nul
       (resource) => resource.kind !== "teacher"
     );
     const explicitTeacher = normalizeProvidedResource(teacherVideo, "teacher");
-    const explicitAi = normalizeProvidedResource(aiVideo, "ai");
+    const explicitAi = suppressAiVideo ? null : normalizeProvidedResource(aiVideo, "ai");
 
     // A1 teacher lectures have one authoritative source: a1TeacherVideoResources.
     // Page-specific or schedule-level teacher links are only fallbacks when the

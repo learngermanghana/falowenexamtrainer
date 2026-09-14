@@ -87,19 +87,18 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
-  test("Day 13 chapter 3.5 exposes the new recording as Teacher Video 2", () => {
+  test("Day 13 chapter 3.5 exposes only the latest teacher lecture", () => {
     const configuredVideos = getA1TeacherVideoResources(13, "3.5");
 
-    expect(configuredVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/eqSc_5p5uyQ",
-      "https://youtu.be/zizS5WdOYs8",
-    ]);
-    expect(configuredVideos.map((video) => video.videoNumber)).toEqual([1, 2]);
-    expect(configuredVideos[0].title).toContain("Teacher video 1");
-    expect(configuredVideos[1]).toMatchObject({
-      key: "a1-day13-chapter-3-5-teacher-video-2",
-      title: "Revision: Numbers, Time and Prices · Teacher video 2",
+    expect(configuredVideos).toHaveLength(1);
+    expect(configuredVideos[0]).toMatchObject({
+      key: "a1-day13-chapter-3-5-teacher-video",
+      title: "Revision: Numbers, Time and Prices · Teacher lecture",
+      url: "https://youtu.be/zizS5WdOYs8",
     });
+    expect(configuredVideos.map((video) => video.url)).not.toContain(
+      "https://youtu.be/eqSc_5p5uyQ",
+    );
 
     const lesson = normalizeLesson(
       {
@@ -114,10 +113,8 @@ describe("standardized A1 teacher videos", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/eqSc_5p5uyQ",
       "https://youtu.be/zizS5WdOYs8",
     ]);
-    expect(new Set(teacherVideos.map((video) => video.key)).size).toBe(2);
   });
 
   test("canonical teacher video replaces a stale curated teacher video for the same chapter", () => {
