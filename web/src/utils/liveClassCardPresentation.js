@@ -1,6 +1,6 @@
 export const GHANA_TIMEZONE = "Africa/Accra";
 
-const CACHE_PREFIX = "falowen:live-class-summary:v3:";
+const CACHE_PREFIX = "falowen:live-class-summary:v4:";
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
 const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
@@ -41,12 +41,17 @@ export const liveClassLessonNumber = (session = {}) => {
   const explicit = topic.match(/\b(?:day|lesson|session)\s*(\d+)\b/i)?.[1];
   if (explicit !== undefined) return Number(explicit);
 
+  // The repaired class timetable stores the official lesson position in
+  // curriculumIndex. Prefer that over assignment IDs such as A1-2, because
+  // the trailing number is a chapter/assignment identity, not necessarily
+  // the class day number.
+  const curriculumIndex = Number(session.curriculumIndex);
+  if (Number.isInteger(curriculumIndex) && curriculumIndex >= 0) return curriculumIndex + 1;
+
   const assignment = liveClassCurriculumIds(session)[0] || "";
   const assignmentNumber = assignment.match(/(?:^|[.-])(\d+)(?:[A-Z])?$/i)?.[1];
   if (assignmentNumber !== undefined) return Number(assignmentNumber);
 
-  const curriculumIndex = Number(session.curriculumIndex);
-  if (Number.isInteger(curriculumIndex) && curriculumIndex >= 0) return curriculumIndex + 1;
   return null;
 };
 
