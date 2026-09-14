@@ -1,5 +1,6 @@
 import "./historyApiSafetyRuntime";
 import "./a1WorkbookMobileSubmit.css";
+import "./a1SubmissionConsistencyRuntime";
 import "./submissionWordMinimumsRuntime";
 import "./submissionExperienceRuntime";
 import "./studentSubmissionMessagesRuntime";
