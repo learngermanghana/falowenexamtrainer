@@ -331,9 +331,14 @@ const CourseBookNextClassIndicator = () => {
   if (!isCourseBook || !portalTarget) return null;
 
   const locale = i18n.language || "en";
-  const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(className)}`;
+  const resolvedClassName = canonicalSummary?.klass?.name || canonicalSummary?.klass?.className || className;
+  const resolvedClassId = canonicalSummary?.klass?.id || canonicalSummary?.klass?.classId || classId;
+  const fullCalendarParams = new URLSearchParams();
+  if (resolvedClassId) fullCalendarParams.set("classId", resolvedClassId);
+  const fullCalendarQuery = fullCalendarParams.toString();
+  const fullCalendarLink = `/campus/course/full-class-calendar/${encodeURIComponent(resolvedClassName)}${fullCalendarQuery ? `?${fullCalendarQuery}` : ""}`;
   const displaySummary = canonicalSummary || {
-    klass: { name: className || "Your class", levelId: level },
+    klass: { id: classId || undefined, name: className || "Your class", levelId: level },
     sessions: nextSession ? [nextSession] : [],
   };
   const standalone = portalTarget.getAttribute?.(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE) === "true";
