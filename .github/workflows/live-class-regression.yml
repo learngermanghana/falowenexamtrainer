@@ -10,6 +10,9 @@ on:
       - "web/src/components/NextLiveClassCard.js"
       - "web/src/components/LiveClassCardRedesign.test.js"
       - "web/src/components/FullClassCalendarIdentity.test.js"
+      - "web/src/services/canonicalLiveClassService.js"
+      - "web/src/services/canonicalLiveClassServiceV6.js"
+      - "web/src/services/canonicalLiveClassServiceV6.test.js"
       - "web/src/utils/liveClassCardPresentation.js"
       - "web/src/utils/homeLiveClassConsistency.test.js"
   workflow_dispatch:
@@ -41,3 +44,4 @@ jobs:
           src/components/CourseBookNavigationSafety.test.js
           src/utils/homeLiveClassConsistency.test.js
           src/components/FullClassCalendarIdentity.test.js
+          src/services/canonicalLiveClassServiceV6.test.js
