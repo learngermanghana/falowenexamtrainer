@@ -96,7 +96,7 @@ const getMobileStatus = (quickKeys) => {
 const updateMobileStatus = (quickKeys, message, ready) => {
   const status = getMobileStatus(quickKeys);
   if (!status) return null;
-  status.textContent = message;
+  if (status.textContent !== message) status.textContent = message;
   status.hidden = !isMobileViewport();
   status.dataset.wordTargetReached = ready ? "true" : "false";
   status.style.background = ready ? "#ecfdf5" : "#fffbeb";
@@ -154,7 +154,7 @@ export const showA1SubmitError = (form, message, { focus = true } = {}) => {
   if (!error) return null;
   const nextMessage = normalize(message);
   const changed = error.textContent !== nextMessage || error.hidden;
-  error.textContent = nextMessage;
+  if (error.textContent !== nextMessage) error.textContent = nextMessage;
   error.hidden = !nextMessage;
   const submit = form.querySelector("[data-a1-final-submit-button]");
   if (nextMessage) submit?.setAttribute("aria-describedby", error.id);
@@ -165,8 +165,8 @@ export const showA1SubmitError = (form, message, { focus = true } = {}) => {
 export const clearA1SubmitError = (form) => {
   const error = getSubmitError(form, false);
   if (!error) return;
-  error.hidden = true;
-  error.textContent = "";
+  if (!error.hidden) error.hidden = true;
+  if (error.textContent) error.textContent = "";
   form.querySelector("[data-a1-final-submit-button]")?.removeAttribute("aria-describedby");
 };
 
@@ -247,8 +247,7 @@ export const validateA1SubmissionForm = (form) => {
   const textarea = form.querySelector("textarea");
   const wordCount = countA1SubmissionWords(textarea?.value || "");
   if (wordCount < A1_MINIMUM_WORDS) {
-    const remaining = A1_MINIMUM_WORDS - wordCount;
-    return `${buildA1WordStatus(wordCount)}. Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
+    return `${buildA1WordStatus(wordCount)}.`;
   }
 
   const confirmation = findAssignmentConfirmation(form)?.querySelector('input[type="checkbox"]');
