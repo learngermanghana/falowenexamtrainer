@@ -134,22 +134,14 @@ async function findPreferredCanonicalClass({ classId, className, slug } = {}) {
     }
   }
 
-  const resolvedClassName = normalize(className || directClass?.name || directClass?.className);
-  const exactNameCandidates = await findClassesByExactName(resolvedClassName).catch(() => []);
-
-  if (directClass) {
-    if (hasCompleteOfficialRepair(directClass)) {
-      return base.__private__.applyOfficialSessionRequirement(directClass);
-    }
-    const sameCohortCandidates = exactNameCandidates.filter((candidate) =>
-      sameClassCohort(candidate, directClass)
-    );
-    const repairedSameCohort = chooseAuthoritativeClass(sameCohortCandidates, resolvedClassName);
-    if (hasCompleteOfficialRepair(repairedSameCohort)) {
-      return base.__private__.applyOfficialSessionRequirement(repairedSameCohort);
-    }
-    return base.__private__.applyOfficialSessionRequirement(directClass);
+  // An explicit record ID is shared with attendance. A duplicate's repair
+  // metadata must never silently transfer the student to another record.
+  if (directClassId) {
+    return directClass ? base.__private__.applyOfficialSessionRequirement(directClass) : null;
   }
+
+  const resolvedClassName = normalize(className);
+  const exactNameCandidates = await findClassesByExactName(resolvedClassName).catch(() => []);
 
   const authoritative = chooseAuthoritativeClass(exactNameCandidates, resolvedClassName);
   if (authoritative) {

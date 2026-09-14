@@ -1,6 +1,6 @@
 export const GHANA_TIMEZONE = "Africa/Accra";
 
-const CACHE_PREFIX = "falowen:live-class-summary:v4:";
+const CACHE_PREFIX = "falowen:live-class-summary:v5:";
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
 const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
@@ -114,10 +114,9 @@ export const liveClassSessionStatus = (session = {}, now = new Date()) => {
   const start = asLiveClassDate(session.startsAt)?.getTime() || 0;
   const end = asLiveClassDate(session.endsAt)?.getTime() || 0;
   const current = now.getTime();
-  if (stored === "completed" && end && end < current) return "Completed";
-  if (stored === "completed" && !start && !end) return "Completed";
+  if (stored === "completed") return "Completed";
+  if (end && end < current) return "Awaiting completion";
   if (stored === "live" || (start && current >= start && (!end || current <= end))) return "Live now";
-  if (end && end < current) return "Completed";
   if (start) {
     const ghanaDate = new Intl.DateTimeFormat("en-CA", {
       timeZone: GHANA_TIMEZONE,
