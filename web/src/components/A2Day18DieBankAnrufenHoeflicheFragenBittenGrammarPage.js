@@ -3,32 +3,26 @@ import AppBackButton from "./navigation/AppBackButton";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import { styles } from "../styles";
 
+const box = { ...styles.card, display: "grid", gap: 12 };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+
 export default function A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage() {
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h1 style={{ ...styles.title, margin: 0 }}>A2 Day 18 · Die Bank anrufen</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: höfliche Fragen und Bitten mit könnten, würde und bitte.</p>
-      </header>
-      <A2MiniLearningBlock
-        title="Höflich am Telefon sprechen"
-        rule="Für höfliche Bitten sind Könnten Sie bitte ...? und Ich würde gern ... besonders nützlich. Bei Könnten Sie ... steht der Infinitiv am Satzende."
-        examples={[
-          "Könnten Sie bitte meine Karte sperren?",
-          "Könnten Sie mir den Kontostand nennen?",
-          "Ich würde gern ein Konto eröffnen.",
-          "Könnten Sie das bitte wiederholen?"
-        ]}
-        questions={[
-          { stem: "Welche Bitte ist höflich?", options: ["Sperren Sie Karte!", "Könnten Sie bitte meine Karte sperren?", "Du sperrst meine Karte."], answer: 1, explanation: "Könnten Sie bitte ...? ist höflich und passend am Telefon." },
-          { stem: "Was passt? Ich ___ gern ein Konto eröffnen.", options: ["würde", "war", "muss"], answer: 0, explanation: "Ich würde gern ... drückt einen höflichen Wunsch aus." },
-          { stem: "Welcher Satz ist richtig?", options: ["Könnten Sie nennen mir den Kontostand?", "Könnten Sie mir den Kontostand nennen?", "Sie könnten mir nennen den Kontostand?"], answer: 1, explanation: "Bei könnten steht der Infinitiv am Ende." },
-          { stem: "Was sagst du, wenn du etwas nicht verstanden hast?", options: ["Könnten Sie das bitte wiederholen?", "Sie wiederholen jetzt.", "Was du gesagt?"], answer: 0, explanation: "Diese Form ist höflich und natürlich." }
-        ]}
-        outputPrompt="Führe ein kurzes Banktelefonat in 5 Sätzen: begrüßen, Grund nennen, Bitte stellen, Rückfrage stellen, höflich beenden."
-        starters={["Guten Tag, mein Name ist ...", "Ich rufe an, weil ...", "Könnten Sie bitte ...?", "Ich würde gern ...", "Vielen Dank für Ihre Hilfe."]}
-      />
-    </div>
-  );
+  return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+    <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+    <header style={box}><h1 style={{ ...styles.title, margin: 0 }}>A2 Day 18 · Die Bank anrufen</h1><p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: höfliche Fragen und Bitten mit können, möchten, hätte gern und würde gern.</p></header>
+    <section style={box}><h2 style={{ margin: 0 }}>1. Höflich sprechen statt direkt fordern</h2><p style={{ margin: 0, lineHeight: 1.75 }}>Bei einer Bank sprichst du meistens mit einer unbekannten Person. Deshalb benutzt du <strong>Sie</strong> und höfliche Formen. Statt „Geben Sie mir einen Termin!“ sagst du besser: <strong>„Könnten Sie mir bitte einen Termin geben?“</strong></p><ul style={list}><li><strong>Ich möchte ...</strong>: „Ich möchte ein Konto eröffnen.“</li><li><strong>Ich hätte gern ...</strong>: „Ich hätte gern einen Termin.“</li><li><strong>Ich würde gern ...</strong>: „Ich würde gern mit einer Beraterin sprechen.“</li><li><strong>Könnten Sie bitte ...?</strong>: „Könnten Sie meine Karte bitte sperren?“</li></ul></section>
+    <section style={box}><h2 style={{ margin: 0 }}>2. Satzbau bei Fragen</h2><p style={{ margin: 0, lineHeight: 1.75 }}><strong>Ja/Nein-Frage:</strong> Verb + Subjekt: „Können Sie mir helfen?“ Mit <strong>könnten</strong> klingt die Frage höflicher.</p><p style={{ margin: 0, lineHeight: 1.75 }}><strong>W-Frage:</strong> Fragewort + Verb + Subjekt: „Welche Unterlagen brauche ich?“ – „Wann kann ich kommen?“ – „Wie lange dauert die Bearbeitung?“</p><p style={{ margin: 0, lineHeight: 1.75 }}><strong>Modalverb:</strong> Das zweite Verb steht am Ende im Infinitiv: „Könnten Sie die Karte <strong>sperren</strong>?“ / „Ich möchte ein Konto <strong>eröffnen</strong>.“</p></section>
+    <section style={box}><h2 style={{ margin: 0 }}>3. Ein Bankgespräch aufbauen</h2><ol style={list}><li><strong>Begrüßung:</strong> „Guten Tag, mein Name ist Ama Mensah.“</li><li><strong>Anliegen:</strong> „Ich rufe an, weil ich meine Bankkarte verloren habe.“</li><li><strong>Bitte:</strong> „Könnten Sie die Karte bitte sperren?“</li><li><strong>Information:</strong> „Wie bekomme ich eine neue Karte?“</li><li><strong>Abschluss:</strong> „Vielen Dank für Ihre Hilfe. Auf Wiederhören.“</li></ol></section>
+    <section style={box}><h2 style={{ margin: 0 }}>4. Häufige Fehler</h2><ul style={list}><li>Falsch: „Ich möchte eröffnen ein Konto.“ → <strong>„Ich möchte ein Konto eröffnen.“</strong></li><li>Zu direkt: „Sperren Sie meine Karte!“ → <strong>„Könnten Sie meine Karte bitte sperren?“</strong></li><li>Im formellen Gespräch: <strong>Sie / Ihnen / Ihre</strong>, nicht du / dir / deine.</li></ul></section>
+    <A2MiniLearningBlock title="Knowledge Test · Höfliche Bankgespräche" rule="Merke: höflicher Wunsch = möchte / hätte gern / würde gern. Höfliche Bitte = Könnten Sie bitte ...? Bei Modalverben steht der Infinitiv am Satzende." examples={["Ich möchte ein Konto eröffnen.", "Ich hätte gern einen Termin.", "Könnten Sie mir bitte helfen?", "Wie lange dauert die Bearbeitung?"]} questions={[
+      { stem: "Welche Bitte klingt am höflichsten?", options: ["Geben Sie mir einen Termin!", "Könnten Sie mir bitte einen Termin geben?", "Du gibst mir einen Termin."], answer: 1, explanation: "Könnten Sie ...? ist eine höfliche formelle Bitte." },
+      { stem: "Ergänze: Ich ___ gern mit einem Berater sprechen.", options: ["würde", "werde", "bin"], answer: 0, explanation: "Ich würde gern ... drückt einen höflichen Wunsch aus." },
+      { stem: "Welcher Satz hat den richtigen Satzbau?", options: ["Ich möchte eröffnen ein Konto.", "Ich möchte ein Konto eröffnen.", "Ich eröffnen möchte ein Konto."], answer: 1, explanation: "Bei möchte steht der Infinitiv am Ende." },
+      { stem: "Welche W-Frage ist richtig?", options: ["Welche Unterlagen ich brauche?", "Welche Unterlagen brauche ich?", "Welche brauche ich Unterlagen?"], answer: 1, explanation: "W-Frage: Fragewort + Verb + Subjekt." },
+      { stem: "Du hast deine Karte verloren. Was sagst du?", options: ["Könnten Sie meine Karte bitte sperren?", "Meine Karte Sie sperren.", "Sperren Karte!"], answer: 0, explanation: "Das ist höflich und grammatisch korrekt." },
+      { stem: "Welche Form passt in einem formellen Bankgespräch?", options: ["Kannst du mir helfen?", "Könnten Sie mir helfen?", "Hilfst du mir?"], answer: 1, explanation: "Bei unbekannten Bankmitarbeitenden benutzt du normalerweise Sie." },
+      { stem: "Könnten Sie mir die Gebühren ___?", options: ["erklären", "erklärt", "erklärst"], answer: 0, explanation: "Nach dem Modalverb steht der Infinitiv am Ende." },
+      { stem: "Welche Reihenfolge ist sinnvoll?", options: ["Bitte → Name → Abschluss → Grund", "Begrüßung → Anliegen → Bitte/Frage → Abschluss", "Abschluss → Frage → Begrüßung"], answer: 1, explanation: "So bleibt das Gespräch klar und höflich." }
+    ]} outputPrompt="Spiele einen kurzen Bankanruf. Begrüße die Person, nenne dein Anliegen, stelle zwei höfliche Fragen und beende das Gespräch höflich." starters={["Guten Tag, mein Name ist ...", "Ich rufe an, weil ...", "Könnten Sie mir bitte ...?", "Ich möchte wissen, ...", "Vielen Dank für Ihre Hilfe."]} />
+  </div>;
 }
