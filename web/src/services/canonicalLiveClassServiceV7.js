@@ -61,25 +61,36 @@ export function alignedLiveClassNow(summary = {}, localNow = new Date()) {
 export function subscribeCanonicalLiveClass(options = {}) {
   const classId = text(options.classId);
   if (!classId || typeof fetch !== "function") return base.subscribeCanonicalLiveClass(options);
+
   let stopped = false;
   let timer = null;
   let controller = null;
-  let fallbackStop = null;
   let apiReady = false;
+  let latestApiSummary = null;
+  let authenticatedExtras = {};
 
-  const stopFallback = () => {
-    if (typeof fallbackStop === "function") fallbackStop();
-    fallbackStop = null;
+  const emitApi = () => {
+    if (!stopped && latestApiSummary) {
+      options.onChange?.({ ...latestApiSummary, ...authenticatedExtras });
+    }
   };
-  const startFallback = () => {
-    if (stopped || fallbackStop) return;
-    fallbackStop = base.subscribeCanonicalLiveClass({
-      ...options,
-      onChange: (summary) => { if (!stopped && !apiReady) options.onChange?.(summary); },
-      onUnavailable: () => { if (!stopped && !apiReady) options.onUnavailable?.(); },
-      onError: (error) => { if (!stopped && !apiReady) options.onError?.(error); },
-    });
-  };
+
+  const fallbackStop = base.subscribeCanonicalLiveClass({
+    ...options,
+    onChange: (summary) => {
+      if (stopped) return;
+      authenticatedExtras = summary?.zoom ? { zoom: summary.zoom } : {};
+      if (apiReady) emitApi();
+      else options.onChange?.(summary);
+    },
+    onUnavailable: () => {
+      if (!stopped && !apiReady) options.onUnavailable?.();
+    },
+    onError: (error) => {
+      if (!stopped && !apiReady) options.onError?.(error);
+    },
+  });
+
   const refresh = async () => {
     controller?.abort();
     controller = new AbortController();
@@ -87,22 +98,22 @@ export function subscribeCanonicalLiveClass(options = {}) {
       const summary = await fetchAdminLiveClassSummary(classId, { signal: controller.signal });
       if (stopped) return;
       apiReady = true;
-      stopFallback();
-      options.onChange?.(summary);
+      latestApiSummary = summary;
+      emitApi();
     } catch (error) {
       if (stopped || error?.name === "AbortError") return;
-      if (!apiReady) startFallback();
-      else options.onError?.(error);
+      if (apiReady) options.onError?.(error);
     } finally {
       if (!stopped) timer = window.setTimeout(refresh, REFRESH_MS);
     }
   };
+
   refresh();
   return () => {
     stopped = true;
     controller?.abort();
     if (timer) window.clearTimeout(timer);
-    stopFallback();
+    if (typeof fallbackStop === "function") fallbackStop();
   };
 }
 
