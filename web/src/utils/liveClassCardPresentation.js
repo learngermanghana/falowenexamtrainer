@@ -1,6 +1,6 @@
 export const GHANA_TIMEZONE = "Africa/Accra";
 
-const CACHE_PREFIX = "falowen:live-class-summary:v5:";
+const CACHE_PREFIX = "falowen:live-class-summary:v6:";
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
 const INACTIVE_STATUSES = new Set(["cancelled", "superseded", "deleted"]);
 
@@ -33,14 +33,13 @@ const optionalNonNegativeInteger = (value) => {
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
 };
 
-const a1CurriculumDay = (session = {}) => {
-  if (curriculumLevel(session) !== "A1") return null;
+const explicitCurriculumDay = (session = {}) => {
   return optionalNonNegativeInteger(session.curriculumDay);
 };
 
 export const liveClassLessonNumber = (session = {}) => {
-  const directA1Day = a1CurriculumDay(session);
-  if (directA1Day !== null) return directA1Day;
+  const directDay = explicitCurriculumDay(session);
+  if (directDay !== null) return directDay;
 
   const topic = liveClassTopic(session, "");
   const explicit = topic.match(/\b(?:day|lesson|session)\s*(\d+)\b/i)?.[1];
