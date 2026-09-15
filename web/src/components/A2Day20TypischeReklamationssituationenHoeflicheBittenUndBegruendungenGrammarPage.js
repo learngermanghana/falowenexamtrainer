@@ -2,33 +2,5 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import { styles } from "../styles";
-
-export default function A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage() {
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h1 style={{ ...styles.title, margin: 0 }}>A2 Day 20 · Typische Reklamationssituationen</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: höflich reklamieren, begründen und eine Lösung verlangen.</p>
-      </header>
-      <A2MiniLearningBlock
-        title="Problem + Grund + höfliche Lösung"
-        rule="Eine gute Reklamation hat drei Schritte: Problem nennen, mit weil oder denn begründen, dann höflich um eine Lösung bitten."
-        examples={[
-          "Die Jacke ist kaputt.",
-          "Ich möchte sie umtauschen, weil der Reißverschluss nicht funktioniert.",
-          "Könnten Sie mir bitte eine neue Jacke geben?",
-          "Ich hätte gern mein Geld zurück."
-        ]}
-        questions={[
-          { stem: "Was ist eine höfliche Bitte?", options: ["Geben Sie Geld!", "Könnten Sie mir bitte mein Geld zurückgeben?", "Du gibst mir Geld."], answer: 1, explanation: "Könnten Sie bitte ...? ist höflich." },
-          { stem: "Was passt? Ich möchte die Schuhe umtauschen, ___ sie zu klein sind.", options: ["weil", "oder", "als"], answer: 0, explanation: "weil nennt den Grund; das Verb steht am Ende." },
-          { stem: "Welcher Satz mit denn ist richtig?", options: ["Ich reklamiere, denn die Ware ist kaputt.", "Ich reklamiere, denn die Ware kaputt ist.", "Ich reklamiere, denn ist die Ware kaputt."], answer: 0, explanation: "Nach denn bleibt normale Hauptsatz-Wortstellung." },
-          { stem: "Was passt als Lösung?", options: ["Ich hätte gern einen Umtausch.", "Ich bin Umtausch.", "Ich umtausche gern."], answer: 0, explanation: "Ich hätte gern ... ist eine höfliche Wunschform." }
-        ]}
-        outputPrompt="Formuliere eine Reklamation in 5 Sätzen: Produkt nennen, Problem erklären, Grund geben, höfliche Lösung verlangen und danken."
-        starters={["Ich habe ... gekauft.", "Leider ...", "Ich möchte ..., weil ...", "Könnten Sie bitte ...?", "Vielen Dank."]}
-      />
-    </div>
-  );
-}
+const box={...styles.card,display:"grid",gap:12}; const list={margin:0,paddingLeft:22,lineHeight:1.75};
+export default function A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage(){return <div style={{...styles.container,display:"grid",gap:16}}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course"/><header style={box}><h1 style={{...styles.title,margin:0}}>A2 Day 20 · Typische Reklamationssituationen</h1><p style={{...styles.subtitle,margin:0}}>Grammatik: höflich reklamieren und Gründe mit weil und denn erklären.</p></header><section style={box}><h2 style={{margin:0}}>1. Eine Reklamation braucht drei Teile</h2><ol style={list}><li><strong>Problem:</strong> „Leider funktioniert der Wasserkocher nicht.“</li><li><strong>Grund/Detail:</strong> „Ich reklamiere ihn, weil er sich nicht einschalten lässt.“</li><li><strong>Lösung:</strong> „Könnten Sie das Gerät bitte umtauschen?“</li></ol><p style={{margin:0,lineHeight:1.75}}>Nenne möglichst Produkt, Kaufzeitpunkt, Problem und gewünschte Lösung. So klingt die Reklamation klar und höflich.</p></section><section style={box}><h2 style={{margin:0}}>2. weil oder denn?</h2><p style={{margin:0,lineHeight:1.75}}><strong>weil</strong> leitet einen Nebensatz ein. Das Verb steht <strong>am Ende</strong>: „Ich komme zurück, weil das Gerät kaputt <strong>ist</strong>.“</p><p style={{margin:0,lineHeight:1.75}}><strong>denn</strong> verbindet zwei Hauptsätze. Die normale Wortstellung bleibt: „Ich komme zurück, denn das Gerät <strong>ist</strong> kaputt.“</p><p style={{margin:0,lineHeight:1.75}}>Vergleich: „Ich möchte einen Umtausch, <strong>weil</strong> die Jacke zu klein <strong>ist</strong>.“ / „Ich möchte einen Umtausch, <strong>denn</strong> die Jacke <strong>ist</strong> zu klein.“</p></section><section style={box}><h2 style={{margin:0}}>3. Höfliche Lösungen verlangen</h2><ul style={list}><li>„Könnten Sie das Produkt bitte umtauschen?“</li><li>„Ich hätte gern mein Geld zurück.“</li><li>„Wäre eine Reparatur möglich?“</li><li>„Könnten Sie mir bitte eine Ersatzware geben?“</li></ul></section><section style={box}><h2 style={{margin:0}}>4. Häufige Fehler</h2><ul style={list}><li>Falsch: „weil das Gerät ist kaputt“ → <strong>„weil das Gerät kaputt ist“</strong>.</li><li>Falsch: „denn das Gerät kaputt ist“ → <strong>„denn das Gerät ist kaputt“</strong>.</li><li>Zu direkt: „Geben Sie mir sofort Geld!“ → <strong>„Ich hätte gern mein Geld zurück.“</strong></li></ul></section><A2MiniLearningBlock title="Knowledge Test · Reklamieren" rule="weil = Verb am Ende; denn = normale Hauptsatzstellung. Formuliere die gewünschte Lösung höflich." examples={["Ich reklamiere die Jacke, weil sie beschädigt ist.","Ich komme zurück, denn die Kaffeemaschine funktioniert nicht.","Könnten Sie das bitte umtauschen?","Ich hätte gern mein Geld zurück."]} questions={[{stem:"Was passt? Ich reklamiere die Jacke, ___ sie beschädigt ist.",options:["weil","denn","oder"],answer:0,explanation:"Nach weil steht das Verb am Ende."},{stem:"Was passt? Ich komme zurück, ___ das Gerät ist kaputt.",options:["weil","denn","dass"],answer:1,explanation:"denn behält die normale Hauptsatzstellung."},{stem:"Welcher weil-Satz ist richtig?",options:["weil die Hose ist zu klein","weil die Hose zu klein ist","weil ist die Hose zu klein"],answer:1,explanation:"Im weil-Satz steht das Verb am Ende."},{stem:"Welcher denn-Satz ist richtig?",options:["denn das Gerät kaputt ist","denn ist das Gerät kaputt","denn das Gerät ist kaputt"],answer:2,explanation:"Nach denn bleibt Subjekt + Verb."},{stem:"Welche Forderung ist höflich?",options:["Geld zurück!","Könnten Sie mir bitte das Geld erstatten?","Du gibst Geld."],answer:1,explanation:"Könnten Sie bitte ...? ist eine höfliche Bitte."},{stem:"Was gehört zu einer guten Reklamation?",options:["Nur der Preis","Problem und gewünschte Lösung","Nur dein Name"],answer:1,explanation:"Problem plus Lösung macht die Reklamation klar."},{stem:"Was bedeutet umtauschen?",options:["Ein Produkt gegen ein anderes austauschen","Mehr kaufen","Den Laden schließen"],answer:0,explanation:"Beim Umtausch bekommst du ein anderes Produkt."},{stem:"Welche Reihenfolge ist sinnvoll?",options:["Lösung → nichts erklären","Produkt/Kauf → Problem → Grund → Lösung","Gruß → Ende"],answer:1,explanation:"Diese Struktur ist klar und praktisch."}]} outputPrompt="Reklamiere ein Produkt in 5–6 Sätzen. Nenne Kauf, Problem, einen Grund mit weil oder denn und eine höfliche Lösung." starters={["Ich habe ... gekauft.","Leider ...","Ich reklamiere das Produkt, weil ...","Das ist problematisch, denn ...","Könnten Sie bitte ...?"]}/></div>}
