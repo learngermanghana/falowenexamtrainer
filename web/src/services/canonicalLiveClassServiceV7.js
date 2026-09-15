@@ -2,6 +2,7 @@ import * as base from "./canonicalLiveClassServiceV6";
 
 const API_URL = process.env.REACT_APP_PUBLIC_LIVE_CLASS_API_URL || "https://admin.falowen.app/api/public-live-class";
 const REFRESH_MS = 20000;
+const EXPECTED_SESSION_COUNTS = Object.freeze({ A1: 25, A2: 28, B1: 28 });
 const text = (value) => String(value || "").trim();
 const asDate = (value) => {
   if (!value) return null;
@@ -19,11 +20,33 @@ const normalizeSession = (session = {}) => ({
   rescheduledAt: asDate(session.rescheduledAt),
 });
 
+const summaryLevel = (payload = {}) => {
+  const source = [payload?.klass?.levelId, payload?.klass?.level, payload?.klass?.name, payload?.klass?.className]
+    .map(text)
+    .join(" ")
+    .toUpperCase();
+  return source.match(/\b(A1|A2|B1)\b/)?.[1] || "";
+};
+
 export const publicLiveClassApiUrl = (classId) => {
   const url = new URL(API_URL);
   url.searchParams.set("classId", text(classId));
   return url.toString();
 };
+
+export function assertCompleteAdminLiveClassSummary(payload = {}) {
+  const sessions = Array.isArray(payload.sessions) ? payload.sessions : [];
+  const level = summaryLevel(payload);
+  const expected = EXPECTED_SESSION_COUNTS[level] || 0;
+  if (expected && sessions.length < expected) {
+    const error = new Error(`Admin live-class API returned an incomplete ${level} timetable (${sessions.length}/${expected} sessions)`);
+    error.code = "incomplete-admin-live-class-summary";
+    error.expectedSessions = expected;
+    error.receivedSessions = sessions.length;
+    throw error;
+  }
+  return payload;
+}
 
 export async function fetchAdminLiveClassSummary(classId, options = {}) {
   const receivedAtMs = Date.now();
@@ -35,6 +58,7 @@ export async function fetchAdminLiveClassSummary(classId, options = {}) {
   });
   const payload = await response.json();
   if (!response.ok || !payload?.ok) throw new Error(payload?.error || `Admin live-class API returned ${response.status}`);
+  assertCompleteAdminLiveClassSummary(payload);
   const sessions = (payload.sessions || []).map(normalizeSession);
   const byId = new Map(sessions.map((session) => [session.id, session]));
   const linked = (session) => session ? (byId.get(session.id) || normalizeSession(session)) : null;
@@ -103,6 +127,7 @@ export function subscribeCanonicalLiveClass(options = {}) {
     } catch (error) {
       if (stopped || error?.name === "AbortError") return;
       if (apiReady) options.onError?.(error);
+      else console.warn("Admin live-class API unavailable or incomplete; keeping authenticated timetable fallback", error);
     } finally {
       if (!stopped) timer = window.setTimeout(refresh, REFRESH_MS);
     }
@@ -121,4 +146,4 @@ export const buildCanonicalLiveClassSummary = base.buildCanonicalLiveClassSummar
 export const findCanonicalClass = base.findCanonicalClass;
 export const normalizeCurriculumIds = base.normalizeCurriculumIds;
 export const repairA1LiveClassChronology = base.repairA1LiveClassChronology;
-export const __private__ = base.__private__;
+export const __private__ = { ...base.__private__, EXPECTED_SESSION_COUNTS, summaryLevel };
