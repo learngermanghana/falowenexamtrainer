@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { alignedLiveClassNow } from "../services/canonicalLiveClassService";
 import {
   GHANA_TIMEZONE,
   asLiveClassDate,
@@ -122,15 +123,16 @@ export default function NextLiveClassCard({
 }) {
   if (!session) return null;
 
+  const effectiveNow = alignedLiveClassNow(summary, now);
   const level = liveClassLevel(summary, session);
   const lessonLabel = liveClassLessonLabel(session, level);
   const title = liveClassCleanTitle(session);
   const assignment = liveClassAssignmentLabel(session);
-  const status = liveClassSessionStatus(session, now);
+  const status = liveClassSessionStatus(session, effectiveNow);
   const rescheduled = isRescheduledLiveClass(session);
-  const joinEnabled = canJoinLiveClass(session, now) && Boolean(zoom?.url);
+  const joinEnabled = canJoinLiveClass(session, effectiveNow) && Boolean(zoom?.url);
   const lessonLink = liveClassLessonLink(summary, session);
-  const afterThis = upcomingLiveClassSessions(summary, session, now, 2);
+  const afterThis = upcomingLiveClassSessions(summary, session, effectiveNow, 2);
   const deviceTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const ghanaRange = formatRange(session, locale, GHANA_TIMEZONE);
   const deviceRange = formatRange(session, locale, deviceTimeZone);
@@ -166,7 +168,7 @@ export default function NextLiveClassCard({
 
       <div style={{ borderRadius: 12, padding: compact ? "9px 10px" : "11px 12px", background: compact ? "rgba(15,23,42,0.18)" : "rgba(255,255,255,0.75)", display: "grid", gap: 4 }}>
         <strong style={{ color: textColor, fontSize: compact ? 13 : 15 }}>{formatDate(session.startsAt, locale)} · {ghanaRange} Ghana time</strong>
-        <span style={{ color: compact ? "#fef3c7" : "#1d4ed8", fontSize: compact ? 12 : 14, fontWeight: 900 }}>{countdown(session, now)}</span>
+        <span style={{ color: compact ? "#fef3c7" : "#1d4ed8", fontSize: compact ? 12 : 14, fontWeight: 900 }}>{countdown(session, effectiveNow)}</span>
         {showDeviceTime ? <span style={{ color: mutedColor, fontSize: 12 }}>Your device: {deviceRange} ({deviceTimeZone})</span> : null}
         {rescheduled && previousStart ? (
           <span style={{ color: compact ? "#fed7aa" : "#9a3412", fontSize: 12 }}>
