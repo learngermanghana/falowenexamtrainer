@@ -7,10 +7,10 @@ const webAlignmentPath = path.join(repoRoot, 'web/src/data/b2LessonContentAlignm
 const functionsAlignmentPath = path.join(repoRoot, 'functions/data/b2LessonContentAlignment.js');
 const checkerPath = path.join(repoRoot, 'scripts/checkCurriculumManifestSync.js');
 
-const lessonTopicAnchor = '    lessonTopic: "Transport, Urlaub und nachhaltige Entscheidungen",\n';
+const lessonTopicAnchor = '    lessonTopic: "Abfall vermeiden, Alltagshandeln und konkrete Umweltmaßnahmen",\n';
 const nestedMetadata = [
   '    futureMetadata: Object.freeze({',
-  '      tags: Object.freeze(["mobility", "comparison"]),',
+  '      tags: Object.freeze(["environment", "argumentation"]),',
   '      rubric: Object.freeze({',
   '        focus: "structure",',
   '        weights: Object.freeze([1, 2, 3]),',
@@ -21,7 +21,7 @@ const nestedMetadata = [
 
 const injectNestedMetadata = (source, label) => {
   if (!source.includes(lessonTopicAnchor)) {
-    throw new Error(`${label}: Day 8 lessonTopic anchor was not found.`);
+    throw new Error(`${label}: Day 1 lessonTopic anchor was not found.`);
   }
   if (source.includes('futureMetadata: Object.freeze({')) {
     throw new Error(`${label}: structural-parity fixture already exists.`);
