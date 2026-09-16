@@ -1,16 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
+import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { styles } from "../styles";
 import { getC2Day1To7Mastery } from "../data/c2Day1To7Mastery";
-
-const TABS = ["learn", "speak", "write", "finish", "references"];
-const LABELS = {
-  learn: "1. Learn",
-  speak: "2. Speak",
-  write: "3. Write",
-  finish: "4. Finish",
-  references: "5. Ref",
-};
 
 const card = {
   ...styles.card,
@@ -51,6 +44,77 @@ const ProgressCard = ({ label, done, detail }) => (
   </div>
 );
 
+const OpinionBox = ({ children }) => (
+  <blockquote
+    style={{
+      margin: 0,
+      padding: "18px 20px",
+      border: "1px solid #cbd5e1",
+      borderRadius: 14,
+      background: "#fff",
+      boxShadow: "0 8px 20px rgba(15,23,42,.07)",
+      fontSize: "1.03rem",
+      fontStyle: "italic",
+      lineHeight: 1.7,
+    }}
+  >
+    {children}
+  </blockquote>
+);
+
+const UmformungCard = ({ number, source, cue, value, onChange, solution }) => (
+  <article style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#f8fbff", display: "grid", gap: 10 }}>
+    <div style={{ display: "grid", gap: 5 }}>
+      <strong>{number}. Ausgangssatz</strong>
+      <span style={{ lineHeight: 1.65 }}>{source}</span>
+    </div>
+    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <span style={{ color: "#475569", fontWeight: 700 }}>Vorgegebenes Wort – nicht verändern:</span>
+      <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e3a8a" }}>{cue}</span>
+    </div>
+    <textarea
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={`Formulieren Sie den Satz mit „${cue}“ neu.`}
+      style={{ minHeight: 96, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.65 }}
+    />
+    <details>
+      <summary style={{ cursor: "pointer", fontWeight: 800 }}>Musterlösung anzeigen</summary>
+      <p style={{ marginBottom: 0, lineHeight: 1.7 }}>{solution}</p>
+    </details>
+  </article>
+);
+
+const SPEAK_QUOTES = [
+  "„Verbraucher tragen die größte Verantwortung für nachhaltigen Konsum.“",
+  "„Ohne strengere gesetzliche Vorgaben werden Unternehmen ihr Verhalten kaum ändern.“",
+  "„Reparieren und Wiederverwenden sind langfristig wichtiger als Recycling.“",
+];
+
+const WRITE_OPINIONS = [
+  "„Hersteller sollten verpflichtet werden, Produkte so zu bauen, dass sie länger halten und leichter repariert werden können.“",
+  "„Nicht Unternehmen, sondern Verbraucher entscheiden mit ihrem Kaufverhalten, ob die Wegwerfgesellschaft bestehen bleibt.“",
+  "„Recycling allein reicht nicht aus; entscheidend sind Wiederverwendung und Reparatur.“",
+];
+
+const UMFORMUNGEN = [
+  {
+    source: "Die Regierung möchte durch finanzielle Anreize Reparaturen fördern.",
+    cue: "zur",
+    solution: "Die Regierung schafft finanzielle Anreize zur Förderung von Reparaturen.",
+  },
+  {
+    source: "Viele Verbraucher waren skeptisch, ob sich Reparaturen finanziell lohnen.",
+    cue: "Zweifel",
+    solution: "Viele Verbraucher hatten Zweifel daran, ob sich Reparaturen finanziell lohnen.",
+  },
+  {
+    source: "Die Unternehmen erkannten, dass langlebige Produkte stärker nachgefragt werden.",
+    cue: "klar",
+    solution: "Den Unternehmen wurde klar, dass langlebige Produkte stärker nachgefragt werden.",
+  },
+];
+
 export default function C2Day1GuidedWorkbookPage({ lesson }) {
   const mastery = lesson?.c2Mastery || getC2Day1To7Mastery(1);
   const storageKey = "falowen:c2:day1:guided-workbook";
@@ -72,6 +136,7 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
   const [speakPlan, setSpeakPlan] = useState("");
   const [writingPlan, setWritingPlan] = useState("");
   const [writingDraft, setWritingDraft] = useState("");
+  const [reformulations, setReformulations] = useState({ 0: "", 1: "", 2: "" });
 
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(storageKey, JSON.stringify(progress));
@@ -101,13 +166,7 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
         </div>
       </header>
 
-      <nav style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(108px,1fr))", gap: 8, padding: 10, border: "1px solid #e2e8f0", borderRadius: 18, background: "rgba(248,250,252,.96)" }}>
-        {TABS.map((tab) => (
-          <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>
-            {LABELS[tab]}
-          </button>
-        ))}
-      </nav>
+      <AdvancedSelfLearningTabNav level="C2" day={1} activeTab={active} onChange={setActive} />
 
       {active === "learn" ? <>
         <Section title="Think first · Meaning before sophisticated German">
@@ -146,59 +205,123 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
         </Section>
       </> : null}
 
-      {active === "speak" ? <>
-        <Section title="Speak · Build the thought before the sentence">
-          <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 13, background: "#eff6ff", lineHeight: 1.7 }}>
-            <strong>Question:</strong> Passt du deine Sprache an unterschiedliche Menschen oder Situationen an? Ist das soziale Kompetenz oder Konformität?
+      {active === "speak" ? <Section title="Speaking builder">
+        <div style={{ display: "grid", gap: 12 }}>
+          <div>
+            <strong style={{ display: "block", marginBottom: 6 }}>Thema 1: Kreislaufwirtschaft und Wegwerfgesellschaft</strong>
+            <p style={{ margin: 0, lineHeight: 1.75 }}>
+              Sie sind Teilnehmer oder Teilnehmerin an einem Seminar zum Thema nachhaltiger Konsum und halten dort einen fünfminütigen Vortrag zum Thema „Kreislaufwirtschaft und Wegwerfgesellschaft“. Im Anschluss beantworten Sie Fragen dazu.
+            </p>
           </div>
-          <div style={{ display: "grid", gap: 10 }}>
-            <ThinkingStep number="1" title="Choose your position" question="Mostly social competence, mostly conformity, or both depending on context?" />
-            <ThinkingStep number="2" title="Choose two reasons" question="For example: belonging, respect, professional expectations, authenticity, pressure to fit in." />
-            <ThinkingStep number="3" title="Add one contrast" question="Show where adaptation is useful and where it becomes problematic." example="Während sprachliche Anpassung Rücksicht ausdrücken kann, wird sie problematisch, wenn ..." />
-            <ThinkingStep number="4" title="Upgrade selectively" question="Use two Day 1 collocations naturally. Do not force all four into the answer." />
+          <p style={{ margin: 0, lineHeight: 1.75 }}>
+            Wägen Sie unterschiedliche Standpunkte ab. Sie können sich an folgenden Zitaten orientieren. Geben Sie auch Beispiele.
+          </p>
+          <div style={{ display: "grid", gap: 10, padding: "clamp(14px,3vw,24px)", borderRadius: 16, background: "#f1f5f9" }}>
+            {SPEAK_QUOTES.map((quote) => <OpinionBox key={quote}>{quote}</OpinionBox>)}
           </div>
-          <textarea value={speakPlan} onChange={(e) => setSpeakPlan(e.target.value)} placeholder="Plan: position → reason 1 → example → contrast → conclusion" style={{ minHeight: 170, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.7 }} />
-          <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} />I gave a 2–3 minute answer using a controlled register.</label>
-        </Section>
-      </> : null}
+          <div style={{ lineHeight: 1.7 }}>
+            <strong>Achten Sie darauf, dass Sie</strong>
+            <ul style={{ marginBottom: 0 }}>
+              <li>Ihren Vortrag gut strukturieren,</li>
+              <li>anspruchsvolle Sprache (Wörter, Strukturen) einsetzen,</li>
+              <li>Ihre persönliche Einstellung zum Thema klar machen.</li>
+            </ul>
+          </div>
+          <label style={{ display: "grid", gap: 7 }}>
+            <strong>Vortragsplan</strong>
+            <textarea
+              value={speakPlan}
+              onChange={(event) => setSpeakPlan(event.target.value)}
+              placeholder="Einleitung → Standpunkt 1 → Standpunkt 2 → Beispiel → eigene Position → Schluss"
+              style={{ minHeight: 150, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.7 }}
+            />
+          </label>
+          <EmbeddedSpeechPracticePanel />
+          <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}>
+            <input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />
+            I completed the five-minute C2 presentation practice.
+          </label>
+        </div>
+      </Section> : null}
 
       {active === "write" ? <>
-        <Section title="Write · From idea to C2 formulation">
-          <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 13, background: "#eff6ff", lineHeight: 1.7 }}>
-            <strong>Task:</strong> Schreiben Sie einen argumentativen Beitrag darüber, ob sprachliche Anpassung eher soziale Kompetenz, Konformität oder eine notwendige Form gesellschaftlicher Kommunikation darstellt.
+        <Section title="Schreiben · Aufgabe 2">
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <strong style={{ display: "block", marginBottom: 6 }}>Thema 1: Kreislaufwirtschaft und Wegwerfgesellschaft</strong>
+              <p style={{ margin: 0, lineHeight: 1.75 }}>
+                Sie haben im Fernsehen eine Diskussionsrunde zum Thema „Kreislaufwirtschaft und Wegwerfgesellschaft“ verfolgt. Nach der Sendung wurden die Zuschauer aufgefordert, ihre Meinung abzugeben. Sie schreiben eine ausführliche E-Mail (circa 350 Wörter) an die Redaktion, in der Sie sich auf die drei folgenden Diskussionsbeiträge beziehen und Ihre Meinung dazu äußern.
+              </p>
+            </div>
+            <div style={{ display: "grid", gap: 12, padding: "clamp(14px,3vw,24px)", borderRadius: 16, background: "#f1f5f9" }}>
+              {WRITE_OPINIONS.map((opinion) => <OpinionBox key={opinion}>{opinion}</OpinionBox>)}
+            </div>
+            <label style={{ display: "grid", gap: 7 }}>
+              <strong>Planung</strong>
+              <textarea
+                value={writingPlan}
+                onChange={(event) => setWritingPlan(event.target.value)}
+                placeholder="Beitrag 1 → Beitrag 2 → Beitrag 3 → eigene Position → Beispiele → Schluss"
+                style={{ minHeight: 140, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.7 }}
+              />
+            </label>
+            <label style={{ display: "grid", gap: 7 }}>
+              <strong>Ihre E-Mail an die Redaktion</strong>
+              <textarea
+                value={writingDraft}
+                onChange={(event) => setWritingDraft(event.target.value)}
+                placeholder="Schreiben Sie hier Ihren vollständigen C2-Text..."
+                style={{ minHeight: 380, border: "1px solid #94a3b8", borderRadius: 12, padding: 14, font: "inherit", lineHeight: 1.75 }}
+              />
+            </label>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", color: "#475569", fontWeight: 700 }}>
+              <span>{wordCount} Wörter</span>
+              <span>Ziel: circa 350 Wörter</span>
+            </div>
           </div>
-          <div style={{ display: "grid", gap: 10 }}>
-            <ThinkingStep number="1" title="Answer the question in one simple sentence" question="Do not start with C2 vocabulary. First make your actual position clear." />
-            <ThinkingStep number="2" title="Build the logic" question="Position → criterion → example → counterargument → evaluation." />
-            <ThinkingStep number="3" title="Choose the register" question="This is an argumentative academic text, so emotional everyday wording should be reformulated." />
-            <ThinkingStep number="4" title="Upgrade the language" question="Replace only vague words with precise expressions and natural collocations." example="Leute reden anders → Menschen passen ihren Sprachgebrauch an, um Zugehörigkeit zu signalisieren." />
-            <ThinkingStep number="5" title="Check control" question="Can you defend every complex phrase? If a simpler sentence is more precise, keep the simpler sentence." />
+        </Section>
+
+        <Section title="Schreiben · Aufgabe 1 · Umformung">
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#475569" }}>
+            Formulieren Sie die markierte Aussage neu. Verwenden Sie das vorgegebene Wort unverändert und erhalten Sie die Bedeutung.
+          </p>
+          <div style={{ display: "grid", gap: 12 }}>
+            {UMFORMUNGEN.map((item, index) => (
+              <UmformungCard
+                key={`${item.cue}-${index}`}
+                number={index + 1}
+                source={item.source}
+                cue={item.cue}
+                value={reformulations[index] || ""}
+                onChange={(value) => setReformulations((old) => ({ ...old, [index]: value }))}
+                solution={item.solution}
+              />
+            ))}
           </div>
-          <label style={{ display: "grid", gap: 7 }}><strong>Planning box</strong><textarea value={writingPlan} onChange={(e) => setWritingPlan(e.target.value)} placeholder="Position / Kriterien / Beispiel / Gegenargument / Bewertung" style={{ minHeight: 150, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.7 }} /></label>
-          <label style={{ display: "grid", gap: 7 }}><strong>Final German text</strong><textarea value={writingDraft} onChange={(e) => setWritingDraft(e.target.value)} placeholder="Write your C2 argument here..." style={{ minHeight: 320, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit", lineHeight: 1.7 }} /></label>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", color: "#475569" }}><span>{wordCount} words</span><span>Target: about 180–220 words</span></div>
-          <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={progress.writeDone} onChange={(e) => setProgress((old) => ({ ...old, writeDone: e.target.checked }))} />I revised the text for precision, register, nuance and natural collocations.</label>
+          <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}>
+            <input type="checkbox" checked={progress.writeDone} onChange={(event) => setProgress((old) => ({ ...old, writeDone: event.target.checked }))} />
+            I completed the 350-word writing task and the three Umformungen.
+          </label>
         </Section>
       </> : null}
 
       {active === "finish" ? <Section title="Finish C2 Day 1">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           <ProgressCard label="Learn" done={progress.learnDone} detail="Register and nuance understood" />
-          <ProgressCard label="Speak" done={progress.speakDone} detail="Spoken argument completed" />
-          <ProgressCard label="Write" done={progress.writeDone} detail={`${wordCount} words · revision completed`} />
+          <ProgressCard label="Speak" done={progress.speakDone} detail="Five-minute Goethe-style presentation completed" />
+          <ProgressCard label="Write" done={progress.writeDone} detail={`${wordCount} words · essay and Umformung practice completed`} />
         </div>
         <label style={{ display: "grid", gap: 7 }}><strong>Confidence</strong><select value={progress.confidence} onChange={(e) => setProgress((old) => ({ ...old, confidence: e.target.value }))} style={styles.select}><option value="">Select confidence</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
-        <label style={{ display: "grid", gap: 7 }}><strong>Reflection</strong><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} placeholder="Which register decisions were difficult today?" style={{ minHeight: 110, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit" }} /></label>
+        <label style={{ display: "grid", gap: 7 }}><strong>Reflection</strong><textarea value={progress.reflection} onChange={(e) => setProgress((old) => ({ ...old, reflection: e.target.value }))} placeholder="What was difficult in the Vortrag, essay or Umformung today?" style={{ minHeight: 110, border: "1px solid #cbd5e1", borderRadius: 12, padding: 12, font: "inherit" }} /></label>
         <div style={{ border: `1px solid ${finishReady ? "#86efac" : "#fde68a"}`, borderRadius: 14, padding: 13, background: finishReady ? "#f0fdf4" : "#fffbeb" }}>
           {finishReady ? "Day 1 requirements complete." : "Complete Learn, Speak, Write and choose your confidence level before treating Day 1 as complete."}
         </div>
       </Section> : null}
 
       {active === "references" ? <>
-        <Section title="Reformulation reference">
-          <p><strong>Starting version:</strong> {mastery.reformulation[0]}</p>
-          <p><strong>C2 model:</strong> {mastery.reformulation[1]}</p>
-          <p style={{ color: "#475569", lineHeight: 1.7 }}>The model is not better because it is longer. It is better because it names the communicative action precisely: adapting language in order to signal social belonging.</p>
+        <Section title="Umformung reference">
+          <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Rule:</strong> Preserve the meaning, use the supplied word exactly as given, and make every grammatical change required by the new structure.</p>
+          <p><strong>Example:</strong> Die Regierung möchte durch finanzielle Anreize Reparaturen fördern. → Die Regierung schafft finanzielle Anreize <strong>zur Förderung</strong> von Reparaturen.</p>
         </Section>
         <Section title="C2 challenge">
           <p style={{ margin: 0, lineHeight: 1.7 }}>{mastery.challenge}</p>
