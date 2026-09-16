@@ -14,36 +14,36 @@ export default function A2StarterConjunctionsPage() {
 
       <header style={card}>
         <h1 style={{ ...styles.title, margin: 0 }}>A2 Day 1 · Small Talk 1.1</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: <strong>Gründe und Folgen</strong> mit <strong>weil</strong>, <strong>denn</strong> und <strong>deshalb</strong>.</p>
+        <p style={{ ...styles.subtitle, margin: 0 }}>Grammar: <strong>giving reasons and showing results</strong> with <strong>weil</strong>, <strong>denn</strong> and <strong>deshalb</strong>.</p>
         <p style={paragraph}>
-          <strong>Lernziel:</strong> Du sollst nicht nur drei Wörter auswendig lernen. Du sollst verstehen, ob du einen
-          <strong> Grund</strong> oder eine <strong>Folge</strong> ausdrücken möchtest und danach die richtige Wortstellung bilden.
+          <strong>Learning goal:</strong> Do not just memorise three connector words. First decide whether you want to give a
+          <strong> reason</strong> (Grund) or show a <strong>result</strong> (Folge). Then use the correct German word order.
         </p>
       </header>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>1. Zuerst die Bedeutung verstehen: Grund oder Folge?</h2>
+        <h2 style={{ margin: 0 }}>1. First understand the meaning: reason or result?</h2>
         <p style={paragraph}>
-          Im Small Talk erklärst du oft <strong>warum</strong> etwas so ist. Dafür brauchst du <strong>weil</strong> oder
-          <strong> denn</strong>. Wenn du dagegen sagst, <strong>was als Ergebnis passiert</strong>, benutzt du <strong>deshalb</strong>.
+          In small talk, you often explain <strong>why</strong> something is true. For this, German commonly uses <strong>weil</strong>
+          or <strong>denn</strong>. If you want to show <strong>what happens as a result</strong>, use <strong>deshalb</strong>.
         </p>
         <ul style={list}>
-          <li><strong>Grund:</strong> Ich bin heute müde. Warum? → Ich habe schlecht geschlafen.</li>
-          <li><strong>Mit weil:</strong> Ich bin heute müde, <strong>weil ich schlecht geschlafen habe</strong>.</li>
-          <li><strong>Mit denn:</strong> Ich bin heute müde, <strong>denn ich habe schlecht geschlafen</strong>.</li>
-          <li><strong>Folge:</strong> Ich habe schlecht geschlafen. <strong>Deshalb bin ich heute müde</strong>.</li>
+          <li><strong>Reason (Grund):</strong> Ich bin heute müde. Warum? → Ich habe schlecht geschlafen.</li>
+          <li><strong>With weil:</strong> Ich bin heute müde, <strong>weil ich schlecht geschlafen habe</strong>.</li>
+          <li><strong>With denn:</strong> Ich bin heute müde, <strong>denn ich habe schlecht geschlafen</strong>.</li>
+          <li><strong>Result (Folge):</strong> Ich habe schlecht geschlafen. <strong>Deshalb bin ich heute müde</strong>.</li>
         </ul>
         <p style={paragraph}>
-          Die Information kann ähnlich sein, aber die Blickrichtung ist anders: <strong>weil/denn erklären den Grund;</strong>
-          <strong> deshalb nennt die Folge.</strong>
+          The information can be very similar, but the direction changes: <strong>weil/denn introduce the reason;</strong>
+          <strong> deshalb introduces the result.</strong>
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>2. „weil“: Der konjugierte Verbteil geht ans Ende</h2>
+        <h2 style={{ margin: 0 }}>2. weil: the conjugated verb goes to the end</h2>
         <p style={paragraph}>
-          <strong>weil</strong> leitet einen Nebensatz ein. In einem Nebensatz steht das konjugierte Verb am Ende. Zwischen Hauptsatz
-          und weil-Satz steht normalerweise ein Komma.
+          <strong>weil</strong> introduces a subordinate clause (Nebensatz). In this clause, the conjugated verb moves to the end.
+          There is normally a comma before the <strong>weil</strong> clause.
         </p>
         <ul style={list}>
           <li>Ich lerne Deutsch, <strong>weil ich in Deutschland arbeiten möchte</strong>.</li>
@@ -51,20 +51,20 @@ export default function A2StarterConjunctionsPage() {
           <li>Ich bin entspannt, <strong>weil ich heute frei habe</strong>.</li>
         </ul>
         <p style={paragraph}>
-          <strong>Mit Modalverb:</strong> „möchte“ steht am Ende: … weil ich in Deutschland arbeiten <strong>möchte</strong>.
-          <br /><strong>Mit Perfekt:</strong> das Hilfsverb steht am Ende: … weil ich schlecht geschlafen <strong>habe</strong>.
+          <strong>With a modal verb:</strong> the modal verb comes at the end: … weil ich in Deutschland arbeiten <strong>möchte</strong>.
+          <br /><strong>With Perfekt:</strong> the conjugated auxiliary comes at the end: … weil ich schlecht geschlafen <strong>habe</strong>.
         </p>
         <p style={paragraph}>
-          Du kannst den weil-Satz auch zuerst stellen: <strong>Weil ich morgen früh arbeite, gehe ich heute früh ins Bett.</strong>
-          Nach dem Nebensatz beginnt der Hauptsatz direkt mit dem Verb: <strong>gehe ich</strong>.
+          The <strong>weil</strong> clause can also come first: <strong>Weil ich morgen früh arbeite, gehe ich heute früh ins Bett.</strong>
+          When the subordinate clause comes first, the main clause begins immediately with the verb: <strong>gehe ich</strong>.
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>3. „denn“: Der zweite Satz bleibt ein normaler Hauptsatz</h2>
+        <h2 style={{ margin: 0 }}>3. denn: normal main-clause word order stays</h2>
         <p style={paragraph}>
-          <strong>denn</strong> bedeutet ebenfalls „because“, aber es verändert die Wortstellung nicht. Nach <strong>denn</strong>
-          steht wieder ein normaler Hauptsatz: Subjekt + konjugiertes Verb + weitere Informationen.
+          <strong>denn</strong> also means <strong>because</strong>, but it does not send the verb to the end. After <strong>denn</strong>,
+          you keep normal main-clause word order: subject + conjugated verb + the rest of the sentence.
         </p>
         <ul style={list}>
           <li>Ich lerne Deutsch, <strong>denn ich möchte in Deutschland arbeiten</strong>.</li>
@@ -72,16 +72,17 @@ export default function A2StarterConjunctionsPage() {
           <li>Ich gehe heute früh nach Hause, <strong>denn ich bin müde</strong>.</li>
         </ul>
         <p style={paragraph}>
-          Vergleiche: <strong>weil ich müde bin</strong> ↔ <strong>denn ich bin müde</strong>. Die Bedeutung ist ähnlich, aber die
-          Grammatik ist verschieden.
+          Compare: <strong>weil ich müde bin</strong> ↔ <strong>denn ich bin müde</strong>. The meaning is similar, but the German
+          word order is different.
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>4. „deshalb“: Die Folge kommt zuerst, dann sofort das Verb</h2>
+        <h2 style={{ margin: 0 }}>4. deshalb: show the result, then put the verb in position 2</h2>
         <p style={paragraph}>
-          <strong>deshalb</strong> ist keine Konjunktion wie <strong>weil</strong> oder <strong>denn</strong>. Es ist ein Konjunktionaladverb.
-          Wenn <strong>deshalb</strong> an Position 1 steht, muss das konjugierte Verb direkt danach an Position 2 kommen.
+          <strong>deshalb</strong> means <strong>therefore / that is why</strong>. It is not used like <strong>weil</strong> or
+          <strong>denn</strong>. When <strong>deshalb</strong> is in position 1, the conjugated verb must come immediately after it
+          in position 2.
         </p>
         <ul style={list}>
           <li>Ich bin müde. <strong>Deshalb gehe ich</strong> früh schlafen.</li>
@@ -89,30 +90,30 @@ export default function A2StarterConjunctionsPage() {
           <li>Ich habe morgen Unterricht. <strong>Deshalb stehe ich</strong> früh auf.</li>
         </ul>
         <p style={paragraph}>
-          <strong>Falsch:</strong> Deshalb ich gehe früh schlafen. <br />
-          <strong>Richtig:</strong> Deshalb <strong>gehe ich</strong> früh schlafen.
+          <strong>Wrong:</strong> Deshalb ich gehe früh schlafen. <br />
+          <strong>Correct:</strong> Deshalb <strong>gehe ich</strong> früh schlafen.
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>5. Derselbe Inhalt mit drei verschiedenen Strukturen</h2>
-        <p style={paragraph}>Grundidee: <strong>Ich bin krank. Ich bleibe zu Hause.</strong></p>
+        <h2 style={{ margin: 0 }}>5. The same idea with three different structures</h2>
+        <p style={paragraph}>Basic idea: <strong>Ich bin krank. Ich bleibe zu Hause.</strong></p>
         <ul style={list}>
           <li><strong>weil:</strong> Ich bleibe zu Hause, <strong>weil ich krank bin</strong>.</li>
           <li><strong>denn:</strong> Ich bleibe zu Hause, <strong>denn ich bin krank</strong>.</li>
           <li><strong>deshalb:</strong> Ich bin krank. <strong>Deshalb bleibe ich zu Hause</strong>.</li>
         </ul>
         <p style={paragraph}>
-          Merkhilfe: <strong>weil = Verb am Ende</strong> · <strong>denn = normale Wortstellung</strong> ·
-          <strong> deshalb = deshalb + Verb + Subjekt</strong>.
+          Memory rule: <strong>weil = verb at the end</strong> · <strong>denn = normal word order</strong> ·
+          <strong> deshalb = deshalb + verb + subject</strong>.
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>6. So benutzt du die Grammatik im echten Small Talk</h2>
+        <h2 style={{ margin: 0 }}>6. How to use this grammar in real small talk</h2>
         <p style={paragraph}>
-          Eine natürliche Antwort besteht oft aus einer Information, einem Grund und einer Rückfrage. Dadurch klingt das Gespräch
-          nicht wie ein Fragebogen.
+          A natural answer often contains a short piece of information, a reason and a follow-up question. This helps the conversation
+          continue instead of sounding like a list of short answers.
         </p>
         <p style={paragraph}>
           <strong>A:</strong> Wie geht es dir heute?<br />
@@ -122,40 +123,40 @@ export default function A2StarterConjunctionsPage() {
           <strong>A:</strong> Nein. Ich habe heute keine Termine. <strong>Deshalb kann ich mich ausruhen</strong>.
         </p>
         <p style={paragraph}>
-          Achte darauf: Die Grammatik ist hier kein isoliertes Thema. Sie hilft dir, <strong>eine Antwort zu verlängern und ein Gespräch weiterzuführen</strong>.
+          The goal is not grammar in isolation. These structures help you <strong>extend an answer, explain yourself and keep a conversation going</strong>.
         </p>
       </section>
 
       <section style={card}>
-        <h2 style={{ margin: 0 }}>7. Häufige Fehler</h2>
+        <h2 style={{ margin: 0 }}>7. Common mistakes</h2>
         <ul style={list}>
-          <li><strong>Falsch:</strong> weil ich bin müde. → <strong>Richtig:</strong> weil ich müde <strong>bin</strong>.</li>
-          <li><strong>Falsch:</strong> denn ich müde bin. → <strong>Richtig:</strong> denn ich <strong>bin</strong> müde.</li>
-          <li><strong>Falsch:</strong> Deshalb ich bleibe zu Hause. → <strong>Richtig:</strong> Deshalb <strong>bleibe ich</strong> zu Hause.</li>
-          <li><strong>Falsch:</strong> Ich lerne Deutsch weil ich in Deutschland arbeiten möchte. → Besser mit Komma: Ich lerne Deutsch, <strong>weil</strong> ...</li>
-          <li><strong>Bedeutungsfehler:</strong> „deshalb“ beantwortet nicht direkt „Warum?“. Es zeigt die <strong>Folge</strong>.</li>
+          <li><strong>Wrong:</strong> weil ich bin müde. → <strong>Correct:</strong> weil ich müde <strong>bin</strong>.</li>
+          <li><strong>Wrong:</strong> denn ich müde bin. → <strong>Correct:</strong> denn ich <strong>bin</strong> müde.</li>
+          <li><strong>Wrong:</strong> Deshalb ich bleibe zu Hause. → <strong>Correct:</strong> Deshalb <strong>bleibe ich</strong> zu Hause.</li>
+          <li><strong>Wrong:</strong> Ich lerne Deutsch weil ich in Deutschland arbeiten möchte. → Add the comma: Ich lerne Deutsch, <strong>weil</strong> ...</li>
+          <li><strong>Meaning mistake:</strong> <strong>deshalb</strong> does not directly answer “Why?”. It shows the <strong>result</strong>.</li>
         </ul>
       </section>
 
       <A2MiniLearningBlock
         title="Knowledge Test · weil, denn, deshalb"
-        rule="Entscheide zuerst zwischen Grund und Folge. Prüfe danach die Wortstellung."
+        rule="First decide: reason or result? Then check the German word order."
         examples={[
-          "Grund + weil → Verb am Ende",
-          "Grund + denn → normale Hauptsatz-Wortstellung",
-          "Folge + deshalb → deshalb + Verb + Subjekt",
+          "Reason + weil → verb at the end",
+          "Reason + denn → normal main-clause word order",
+          "Result + deshalb → deshalb + verb + subject",
         ]}
         questions={[
-          { stem: "Welcher Satz mit weil ist richtig?", options: ["Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.", "Ich lerne Deutsch, weil ich möchte in Deutschland arbeiten."], answer: 0, explanation: "Im weil-Satz steht das konjugierte Verb am Ende: arbeiten möchte." },
-          { stem: "Welcher Satz mit denn ist richtig?", options: ["Ich bin müde, denn ich habe schlecht geschlafen.", "Ich bin müde, denn ich schlecht geschlafen habe."], answer: 0, explanation: "Nach denn bleibt die normale Hauptsatz-Wortstellung." },
-          { stem: "Es regnet. ___ bleibe ich zu Hause.", options: ["Weil", "Deshalb", "Denn"], answer: 1, explanation: "Regen ist der Grund; zu Hause bleiben ist die Folge. Deshalb zeigt die Folge." },
-          { stem: "Welche Wortstellung ist nach deshalb richtig?", options: ["Deshalb ich gehe früh.", "Deshalb gehe ich früh.", "Deshalb ich früh gehe."], answer: 1, explanation: "Deshalb steht auf Position 1, das Verb kommt direkt danach auf Position 2." },
-          { stem: "Welche Form bedeutet: I stay home because I am sick?", options: ["Ich bleibe zu Hause, weil ich krank bin.", "Ich bin krank. Deshalb bleibe ich zu Hause.", "Beide sind sinnvoll, aber A nennt den Grund direkt mit because."], answer: 2, explanation: "A entspricht direkt because; B beschreibt dieselbe Logik als Grund plus Folge." },
-          { stem: "Wo steht das Verb bei: weil ich gestern lange gearbeitet ___?", options: ["habe", "bin", "hat"], answer: 0, explanation: "Im Perfekt steht das konjugierte Hilfsverb im weil-Satz am Ende: gearbeitet habe." },
-          { stem: "Welche Antwort klingt im Small Talk natürlicher?", options: ["Gut.", "Gut, weil ich heute frei habe. Und dir?"], answer: 1, explanation: "Eine kleine Information plus Grund und Rückfrage hält das Gespräch am Laufen." },
-          { stem: "Welche Aussage ist richtig?", options: ["weil und denn haben immer dieselbe Wortstellung.", "deshalb zeigt meistens eine Folge.", "nach denn steht das Verb am Satzende."], answer: 1, explanation: "Deshalb verbindet einen Grund mit seiner Folge; die anderen Aussagen sind grammatisch falsch." },
+          { stem: "Which sentence with weil has the correct word order?", options: ["Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.", "Ich lerne Deutsch, weil ich möchte in Deutschland arbeiten."], answer: 0, explanation: "In a weil-clause, the conjugated verb goes to the end: arbeiten möchte." },
+          { stem: "Which sentence with denn has the correct word order?", options: ["Ich bin müde, denn ich habe schlecht geschlafen.", "Ich bin müde, denn ich schlecht geschlafen habe."], answer: 0, explanation: "After denn, normal main-clause word order stays: ich habe schlecht geschlafen." },
+          { stem: "Es regnet. ___ bleibe ich zu Hause.", options: ["Weil", "Deshalb", "Denn"], answer: 1, explanation: "The rain is the reason; staying home is the result. Deshalb introduces the result." },
+          { stem: "Which word order is correct after deshalb?", options: ["Deshalb ich gehe früh.", "Deshalb gehe ich früh.", "Deshalb ich früh gehe."], answer: 1, explanation: "Deshalb is in position 1, so the conjugated verb comes immediately after it in position 2." },
+          { stem: "Which sentence directly means: I stay home because I am sick?", options: ["Ich bleibe zu Hause, weil ich krank bin.", "Ich bin krank. Deshalb bleibe ich zu Hause.", "Both sentences show the same relationship, but sentence A uses because directly."], answer: 2, explanation: "A uses weil to give the reason directly. B expresses the same logic as reason + result." },
+          { stem: "Complete the sentence: weil ich gestern lange gearbeitet ___", options: ["habe", "bin", "hat"], answer: 0, explanation: "In Perfekt, the conjugated auxiliary goes to the end of the weil-clause: gearbeitet habe." },
+          { stem: "Which answer sounds more natural in small talk?", options: ["Gut.", "Gut, weil ich heute frei habe. Und dir?"], answer: 1, explanation: "A little information + a reason + a follow-up question keeps the conversation going." },
+          { stem: "Which statement is correct?", options: ["weil and denn always use the same word order.", "deshalb usually introduces a result.", "after denn the verb goes to the end."], answer: 1, explanation: "Deshalb connects a reason with its result. The other two statements are grammatically incorrect." },
         ]}
-        outputPrompt="Schreibe oder sage fünf Small-Talk-Sätze über deinen Tag: zwei mit weil, einen mit denn, einen mit deshalb und eine Rückfrage an deinen Gesprächspartner."
+        outputPrompt="Write or say five small-talk sentences about your day: two with weil, one with denn, one with deshalb, and one follow-up question."
         starters={["Mir geht es ..., weil ...", "Ich ..., denn ...", "Ich habe ..., deshalb ...", "Und du? ..."]}
       />
     </div>
