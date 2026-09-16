@@ -1,4 +1,5 @@
 import { B2_LESSON_CONTENT_ALIGNMENT } from "./b2LessonContentAlignment";
+import { getB2DetailedGrammarLesson } from "./b2GrammarExplanations";
 
 const MODELS = Object.freeze({
   1: ["Haushalte können Abfall reduzieren, indem sie Produkte mit wenig Verpackung kaufen.", "Viele Städte fördern Mehrwegsysteme, damit weniger Einwegmüll entsteht.", "Immer mehr Menschen trennen ihren Müll konsequent, wodurch mehr Wertstoffe recycelt werden können."],
@@ -31,33 +32,6 @@ const MODELS = Object.freeze({
   28: ["Obwohl technischer Fortschritt viele Chancen bietet, müssen soziale und ökologische Folgen berücksichtigt werden.", "Eine tragfähige Lösung entsteht, indem unterschiedliche Interessen verglichen und konkrete Maßnahmen begründet werden.", "Zusammenfassend bin ich der Auffassung, dass Bildung, Nachhaltigkeit und verantwortungsvoller Technologieeinsatz eng miteinander verbunden sind."],
 });
 
-const addRule = (rules, rule) => { if (rule && !rules.includes(rule)) rules.push(rule); };
-
-const grammarRulesFor = (focus = "") => {
-  const f = String(focus).toLowerCase();
-  const rules = [];
-  if (f.includes("indem") || f.includes("dadurch")) addRule(rules, "Mit indem / dadurch, dass erklärst du eine Methode. Im Nebensatz steht das konjugierte Verb am Ende.");
-  if (f.includes("um ... zu") || f.includes("damit")) addRule(rules, "um ... zu nutzt du meist bei gleichem Subjekt; damit erlaubt ein eigenes Subjekt. Im damit-Satz steht das Verb am Ende.");
-  if (f.includes("wodurch") || f.includes("sodass")) addRule(rules, "wodurch und sodass zeigen eine Folge. Im Nebensatz steht das konjugierte Verb am Ende.");
-  if (f.includes("passiv")) addRule(rules, "Passiv: werden + Partizip II. Modalpassiv: Modalverb + Partizip II + werden am Satzende.");
-  if (f.includes("nominalisierung")) addRule(rules, "Nominalisierung macht Aussagen formeller: fördern → die Förderung, auswerten → die Auswertung, anerkennen → die Anerkennung.");
-  if (f.includes("relativ")) addRule(rules, "Im Relativsatz richtet sich der Kasus des Relativpronomens nach seiner Funktion oder Präposition; das konjugierte Verb steht am Ende.");
-  if (f.includes("je ... desto")) addRule(rules, "je ... desto verbindet zwei Entwicklungen: Je + Komparativ + Nebensatz, desto + Komparativ + Hauptsatz.");
-  if (f.includes("obwohl") || f.includes("obgleich")) addRule(rules, "obwohl / obgleich räumt einen Gegensatz ein; das konjugierte Verb steht im Nebensatz am Ende.");
-  if (f.includes("trotz")) addRule(rules, "trotz steht vor einem Nomen und drückt Einräumung aus; obwohl verbindet dagegen einen ganzen Nebensatz.");
-  if (f.includes("ohne ... zu") || f.includes("statt ... zu") || f.includes("anstatt")) addRule(rules, "ohne ... zu / (an)statt ... zu verbinden Handlungen mit demselben Subjekt; der Infinitiv mit zu steht am Ende.");
-  if (f.includes("nicht nur") || f.includes("sowohl")) addRule(rules, "Zweiteilige Konnektoren verbinden parallele Informationen: nicht nur ... sondern auch / sowohl ... als auch.");
-  if (f.includes("während") || f.includes("wohingegen")) addRule(rules, "während / wohingegen eignen sich für direkte Gegenüberstellungen; im Nebensatz steht das Verb am Ende.");
-  if (f.includes("konjunktiv ii")) addRule(rules, "Konjunktiv II mit könnte, würde, wäre und sollte macht Vorschläge, Möglichkeiten und hypothetische Aussagen differenzierter.");
-  if (f.includes("falls") || f.includes("sofern")) addRule(rules, "falls / sofern formulieren Bedingungen; das konjugierte Verb steht im Nebensatz am Ende.");
-  if (f.includes("zwar")) addRule(rules, "zwar ... jedoch verbindet Einräumung und Gegenargument und eignet sich für ausgewogene B2-Argumente.");
-  if (f.includes("laut") || f.includes("zufolge") || f.includes("angaben")) addRule(rules, "Kennzeichne fremde Informationen mit laut ..., ... zufolge oder nach Angaben von ... .");
-  if (f.includes("indirekte rede")) addRule(rules, "Trenne fremde Aussagen von deiner eigenen Position, z. B. mit dass-Sätzen, Quellenangaben oder – wenn passend – Konjunktiv I.");
-  if (f.includes("aufgrund")) addRule(rules, "aufgrund nennt eine Ursache, trotz eine Einräumung; beide stehen in formeller Sprache häufig mit Genitiv.");
-  if (f.includes("review") || f.includes("verknüpfungen")) addRule(rules, "Wähle die Struktur nach Funktion: Ursache, Folge, Gegensatz, Einräumung, Ziel, Methode oder Bedingung.");
-  return rules.length ? rules : ["Nutze die angegebene B2-Struktur gezielt und kontrolliere besonders Verbposition, Kasus und Satzverknüpfung."];
-};
-
 const keywordsFor = (alignment) => [...new Set(String(alignment.lessonTopic || alignment.title || "").replace(/[–—,.:;!?()]/g, " ").split(/\s+/).filter((word) => word.length > 5))].slice(0, 6);
 
 const speakingFor = (alignment, models) => {
@@ -83,25 +57,10 @@ export const getB2ExamDomainTeaching = (day) => {
   const alignment = B2_LESSON_CONTENT_ALIGNMENT[dayNumber];
   const models = MODELS[dayNumber];
   if (!alignment || !models) return null;
-  const rules = grammarRulesFor(alignment.grammar_topic);
+  const grammarLesson = getB2DetailedGrammarLesson(dayNumber, alignment);
+  if (!grammarLesson) return null;
+  const rules = grammarLesson.rules;
   const speaking = speakingFor(alignment, models);
-  const grammarLesson = {
-    title: `B2-Grammatik: ${alignment.grammar_topic}`,
-    explanation: [
-      `Die Grammatik dieser Lektion ist direkt mit dem Thema „${alignment.title}“ verbunden. Nutze die Strukturen, um Gründe, Folgen, Vergleiche, Bedingungen oder Lösungen auszudrücken.`,
-      "Achte beim Sprechen und Schreiben auf die kommunikative Funktion und auf die Verbposition. Ein starker B2-Satz ist klar, logisch und durch ein konkretes Beispiel gestützt.",
-      "Nutze die Modellbeispiele als Muster und formuliere danach eigene Aussagen zum Tagesthema.",
-    ],
-    rules,
-    examples: models,
-    miniExercise: `Formuliere fünf eigene Sätze zu „${alignment.title}“. Nutze mindestens drei der heutigen Strukturen und entwickle mindestens einen Punkt als Position → Grund → Beispiel.`,
-    knowledgeTest: [
-      { question: "Welche Grammatik steht heute im Mittelpunkt?", options: [alignment.grammar_topic, "Nur Präsens ohne Satzverknüpfung", "Nur Wortschatz ohne Grammatik", "Ausschließlich Imperativ"], answer: alignment.grammar_topic, explanation: "Diese Strukturen sind der verbindliche Grammatikfokus dieser B2-Lektion." },
-      { question: "Welcher Satz ist ein passendes Modell für die heutige Grammatik?", options: [models[0], "Ich finde das Thema gut. Das ist alles.", "Das Thema wichtig ist und ich Meinung.", "Weil das Thema ist aktuell, ich finde gut."], answer: models[0], explanation: "Der Modellsatz verbindet das Tagesthema mit einer korrekten B2-Struktur." },
-      { question: "Was macht eine starke B2-Antwort aus?", options: ["Position + Begründung + konkretes Beispiel + passende Verknüpfung", "Viele schwierige Wörter ohne Zusammenhang", "Nur Ja oder Nein", "Nur eine Definition des Themas"], answer: "Position + Begründung + konkretes Beispiel + passende Verknüpfung", explanation: "B2 verlangt entwickelte, logisch verbundene Aussagen." },
-      { question: "Welche Strategie ist sinnvoll?", options: ["Grammatik nach ihrer Funktion wählen und die Wortstellung kontrollieren", "Jeden Satz möglichst lang machen", "Konnektoren zufällig wechseln", "Verbposition nicht prüfen"], answer: "Grammatik nach ihrer Funktion wählen und die Wortstellung kontrollieren", explanation: "Die Struktur soll zur Aussage passen und formal korrekt sein." },
-    ],
-  };
   return { alignment, models, rules, grammarLesson, speaking };
 };
 
