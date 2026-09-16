@@ -25,14 +25,14 @@ replaceOnce(
 );
 
 replaceOnce(
-  '  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;\n  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;',
-  '  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;\n  const passedAssignmentCount = courseLessons.filter((entry) => entry.isTutorMarked && entry.status === "passed").length;\n  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;',
-  "passed assignment count",
+  '  const assignmentCount = courseCompletion.total;\n  const completedCount = courseCompletion.completed;',
+  '  const assignmentCount = courseCompletion.total;\n  const passedAssignmentCount = courseCompletion.passed;\n  const completedCount = courseCompletion.completed;',
+  "canonical passed assignment count",
 );
 
 replaceOnce(
-  '  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);',
-  '  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);\n  const courseIsComplete = isGuidedCompletionLevel && courseLessons.length > 0 && !nextLesson;',
+  '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);',
+  '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);\n  const courseIsComplete = isGuidedCompletionLevel && courseCompletion.courseWorkCompleted;',
   "guided course completion state",
 );
 
@@ -56,16 +56,17 @@ source = source.replace(
 );
 
 const bottomAnchor = `          )}\n          {usesSharedA2B1Design ? (\n            <nav className="course-book-mobile-actions" aria-label="Course Book actions">`;
-const bottomInsertion = `          )}\n\n          {courseIsComplete ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              completedLessons={completedCount}\n              totalLessons={courseLessons.length}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2" }[normalizedSelectedCourseLevel];\n                if (nextLevel && levels.includes(nextLevel)) {\n                  setSelectedCourseLevel(nextLevel);\n                  setActiveFilter("all");\n                  setSearchTerm("");\n                  return;\n                }\n                navigate("/classes/");\n              }}\n            />\n          ) : null}\n\n          {usesSharedA2B1Design ? (\n            <nav className="course-book-mobile-actions" aria-label="Course Book actions">`;
+const bottomInsertion = `          )}\n\n          {courseIsComplete ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              completedRequirements={completedCount}\n              totalRequirements={courseCompletion.total}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              needsImprovement={courseCompletion.needsImprovement}\n              awaitingReview={courseCompletion.awaitingReview}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2" }[normalizedSelectedCourseLevel];\n                if (nextLevel && levels.includes(nextLevel)) {\n                  setSelectedCourseLevel(nextLevel);\n                  setActiveFilter("all");\n                  setSearchTerm("");\n                  return;\n                }\n                navigate("/classes/");\n              }}\n            />\n          ) : null}\n\n          {usesSharedA2B1Design ? (\n            <nav className="course-book-mobile-actions" aria-label="Course Book actions">`;
 replaceOnce(bottomAnchor, bottomInsertion, "bottom guided completion conclusion");
 
 const requiredMarkers = [
   'import CourseCompletionConclusion from "./CourseCompletionConclusion";',
   'const isGuidedCompletionLevel = ["A1", "A2", "B1"].includes(normalizedSelectedCourseLevel);',
-  'const passedAssignmentCount = courseLessons.filter',
-  'const courseIsComplete = isGuidedCompletionLevel',
+  'const passedAssignmentCount = courseCompletion.passed;',
+  'const courseIsComplete = isGuidedCompletionLevel && courseCompletion.courseWorkCompleted;',
   'if (isGuidedCompletionLevel && entry.isMilestone) return false;',
   '<CourseCompletionConclusion',
+  'needsImprovement={courseCompletion.needsImprovement}',
   'navigate("/classes/")',
 ];
 
@@ -74,4 +75,4 @@ requiredMarkers.forEach((marker) => {
 });
 
 fs.writeFileSync(courseTabPath, source, "utf8");
-console.log("A1-A2-B1 now use one bottom completion conclusion with Results, Attendance, Class Participation, exam prep and next-level actions.");
+console.log("A1-A2-B1 now use one bottom completion conclusion with canonical progress, Results, Attendance, Class Participation, exam prep and next-level actions.");
