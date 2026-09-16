@@ -32,9 +32,11 @@ const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   return acc;
 }, {});
 const getCurriculumEntriesForLevel = (level) => {
-  const normalized = normalizeLevel(level);
-  const aligned = alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
-  return normalized === "C2" ? mergeCanonicalC2CourseBookEntries(aligned) : aligned;
+  const requestedLevel = String(level || "").trim().toUpperCase();
+  if (requestedLevel === "C2") {
+    return mergeCanonicalC2CourseBookEntries([]);
+  }
+  return alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
 };
 
 export {
