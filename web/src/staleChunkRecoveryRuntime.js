@@ -1,3 +1,4 @@
+// Recover clients that still reference hashed Vite chunks from an older Falowen deployment.
 const RELOAD_KEY = "falowen:vite-preload-reload-at";
 const RELOAD_WINDOW_MS = 60_000;
 
