@@ -1,253 +1,162 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
-import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
-const paragraph = {
-  margin: 0,
-  lineHeight: 1.7,
-};
-
-const list = {
-  margin: 0,
-  paddingLeft: 22,
-  lineHeight: 1.75,
-};
-
-const topicGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-  gap: 12,
-};
-
-const topicCard = {
-  border: "1px solid #bfdbfe",
-  borderRadius: 12,
-  padding: 14,
-  background: "#f8fbff",
-  display: "grid",
-  gap: 8,
-};
-
-const topicTitle = {
-  margin: 0,
-  color: "#1e3a8a",
-  fontSize: "1rem",
-};
+const paragraph = { margin: 0, lineHeight: 1.7 };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
 const smallTalkIntroductionMap = {
   level: "A2",
   day: 1,
-  lessonId: "a2-day-1-small-talk-introduction",
-  title: "Deine Vorstellung",
-  centralQuestion: "Kannst du dich vorstellen? Erzähl uns etwas über dich!",
+  lessonId: "a2-day-1-small-talk-1-1",
+  title: "Small Talk 1.1",
+  centralQuestion: "Kannst du ein kurzes Small-Talk-Gespräch beginnen, weiterführen und freundlich beenden?",
   targetDurationSeconds: 60,
   branches: [
     {
-      id: "familie",
-      label: "Familie",
+      id: "einstieg",
+      label: "1. Einstieg",
       type: "topic",
-      keywords: ["Eltern", "Geschwister", "Kinder", "wohnen", "Familie"],
-      guidingQuestion: "Who is in your family? Wer gehört zu deiner Familie?",
-      sentenceStarter: "Ich habe ... / Meine Familie ...",
-      modelSentence: "Ich habe zwei Brüder und eine Schwester. Meine Familie wohnt in Accra.",
+      keywords: ["Hallo", "Guten Morgen", "wie geht's", "Wochenende", "Wetter"],
+      guidingQuestion: "How can you open a short friendly conversation? Wie kannst du ein kurzes Gespräch beginnen?",
+      sentenceStarter: "Hallo! Wie geht es dir? / Guten Morgen! Wie geht es Ihnen?",
+      modelSentence: "Guten Morgen! Wie geht es Ihnen? War Ihr Wochenende schön?",
     },
     {
-      id: "sprachen",
-      label: "Sprachen",
+      id: "thema",
+      label: "2. Thema finden",
       type: "detail",
-      keywords: ["Deutsch", "Englisch", "Twi", "sprechen", "lernen"],
-      guidingQuestion: "Which languages do you speak or learn? Welche Sprachen sprichst oder lernst du?",
-      sentenceStarter: "Ich spreche ... / Ich lerne ...",
-      modelSentence: "Ich spreche Englisch und Twi. Außerdem lerne ich Deutsch.",
+      keywords: ["Arbeit", "Studium", "Hobby", "Wetter", "Reisen", "Wochenende"],
+      guidingQuestion: "Which safe everyday topic can you use? Welches Alltagsthema passt?",
+      sentenceStarter: "Wie ist ...? / Was machst du ...? / Arbeitest du ...?",
+      modelSentence: "Was machst du gern am Wochenende? Ich spiele gern Fußball.",
     },
     {
-      id: "beruf-studium",
-      label: "Beruf / Studium",
+      id: "reagieren",
+      label: "3. Reagieren",
       type: "example",
-      keywords: ["arbeiten", "studieren", "Beruf", "Universität", "Firma"],
-      guidingQuestion: "What do you do and where? Was machst du und wo?",
-      sentenceStarter: "Ich arbeite als ... / Ich studiere ...",
-      modelSentence: "Ich arbeite als Verkäufer und arbeite in Accra. / Ich studiere Informatik an der Universität.",
+      keywords: ["Ach wirklich?", "interessant", "schön", "spannend", "verstehe"],
+      guidingQuestion: "How do you show that you are listening? Wie reagierst du natürlich?",
+      sentenceStarter: "Ach wirklich? / Das klingt ... / Das ist ja ...",
+      modelSentence: "Ach wirklich? Das klingt interessant!",
     },
     {
-      id: "hobbys",
-      label: "Hobbys",
+      id: "nachfragen",
+      label: "4. Nachfragen",
+      type: "detail",
+      keywords: ["Und du?", "Und Sie?", "Warum", "Wo", "Wie oft", "seit wann"],
+      guidingQuestion: "Which follow-up question keeps the conversation going? Welche Rückfrage passt?",
+      sentenceStarter: "Und du? / Und Sie? / Warum ...? / Wie oft ...?",
+      modelSentence: "Ich lerne seit einem Jahr Deutsch. Und du? Wie lange lernst du schon Deutsch?",
+    },
+    {
+      id: "beenden",
+      label: "5. Beenden",
       type: "closing",
-      keywords: ["Fußball", "Musik", "lesen", "Freunde", "Wochenende", "gern"],
-      guidingQuestion: "What do you enjoy doing in your free time? Was machst du gern in deiner Freizeit?",
-      sentenceStarter: "In meiner Freizeit ... / Ich ... gern, weil ...",
-      modelSentence: "In meiner Freizeit spiele ich gern Fußball, weil es Spaß macht.",
+      keywords: ["schön gesprochen", "schönen Tag", "bis bald", "bis später"],
+      guidingQuestion: "How can you end politely? Wie beendest du das Gespräch freundlich?",
+      sentenceStarter: "Es war schön, ... / Ich wünsche dir/Ihnen ... / Bis ...",
+      modelSentence: "Es war schön, mit Ihnen zu sprechen. Ich wünsche Ihnen einen schönen Tag!",
     },
   ],
-  speakingRoute: ["familie", "sprachen", "beruf-studium", "hobbys"],
+  speakingRoute: ["einstieg", "thema", "reagieren", "nachfragen", "beenden"],
   extraHelp: {
-    title: "Build your answer step by step",
+    title: "Was du aus Small Talk lernen sollst",
     instructions: [
-      "Start with one keyword. Do not try to create a long answer immediately.",
-      "Turn the keyword into one simple German sentence.",
-      "Add one extra detail: where, when, who or how often.",
-      "If possible, add a reason or example with weil, zum Beispiel or außerdem.",
-      "Connect the four branches into one short introduction.",
+      "Small Talk ist kein langer Vortrag. Ein guter Beitrag besteht oft nur aus 1–2 Sätzen und einer Rückfrage.",
+      "Beginne freundlich, wähle ein einfaches Alltagsthema und reagiere auf die Antwort deines Gesprächspartners.",
+      "Vermeide nur Ja/Nein-Antworten. Gib eine kleine Information und frage zurück.",
+      "Benutze du bei Freunden und bekannten Personen; benutzen Sie in formellen oder unbekannten Situationen.",
+      "Beende das Gespräch mit einer kurzen freundlichen Formel, statt plötzlich aufzuhören.",
     ],
     phraseGroups: [
       {
-        title: "The thinking pattern",
+        title: "Gespräch beginnen",
         items: [
-          "Keyword → simple sentence → extra detail → reason/example",
-          "Fußball → Ich spiele gern Fußball. → Ich spiele am Wochenende Fußball. → Ich spiele am Wochenende Fußball, weil es Spaß macht.",
+          "Hallo! Wie geht es dir?",
+          "Guten Morgen! Wie geht es Ihnen?",
+          "Wie war dein Wochenende?",
+          "Schönes Wetter heute, oder?",
         ],
       },
       {
-        title: "Useful connectors",
+        title: "Natürlich reagieren",
         items: [
-          "und = and",
-          "aber = but",
+          "Ach wirklich?",
+          "Das klingt interessant!",
+          "Das ist ja schön!",
+          "Oh, das verstehe ich.",
+        ],
+      },
+      {
+        title: "Nachfragen",
+        items: [
+          "Und du? / Und Sie?",
+          "Was machst du beruflich? / Was machen Sie beruflich?",
+          "Wie oft machst du das?",
+          "Warum lernst du Deutsch?",
+        ],
+      },
+      {
+        title: "Gründe und Verbindungen",
+        items: [
+          "weil = because; verb at the end",
+          "denn = because; normal word order",
+          "deshalb = therefore; verb directly after deshalb",
           "außerdem = in addition",
-          "weil = because",
-          "zum Beispiel = for example",
+        ],
+      },
+      {
+        title: "Gespräch beenden",
+        items: [
+          "Es war schön, mit dir zu sprechen.",
+          "Es war schön, mit Ihnen zu sprechen.",
+          "Ich wünsche dir/Ihnen einen schönen Tag.",
+          "Bis bald! / Bis später!",
         ],
       },
     ],
     vocabulary: [
-      "die Familie",
-      "die Geschwister",
-      "sprechen",
-      "lernen",
-      "arbeiten als",
-      "studieren",
-      "in meiner Freizeit",
-      "gern",
-      "am Wochenende",
+      "der Small Talk",
+      "das Wochenende",
+      "die Freizeit",
+      "beruflich",
+      "interessant",
+      "spannend",
+      "sich unterhalten",
+      "nachfragen",
+      "reagieren",
       "weil",
+      "denn",
+      "deshalb",
       "außerdem",
     ],
-    modelAnswer: "Ich heiße Ama und komme aus Ghana. Ich habe zwei Brüder und eine Schwester. Meine Familie wohnt in Accra. Ich spreche Englisch und Twi, und ich lerne Deutsch. Ich arbeite als Verkäuferin. In meiner Freizeit höre ich gern Musik und spiele am Wochenende Fußball, weil es Spaß macht.",
+    modelAnswer: "A: Guten Morgen! Wie geht es Ihnen? B: Danke, gut. Ich hatte ein ruhiges Wochenende. A: Ach wirklich? Das klingt schön. Was haben Sie gemacht? B: Ich war mit meiner Familie zu Hause, weil es geregnet hat. Und Sie? A: Ich habe Freunde besucht. Es war schön, mit Ihnen zu sprechen. Bis später!",
   },
 };
 
-const readingQuestions = [
-  {
-    stem: "Wo arbeitet Lisa?",
-    options: ["A. In einem Büro", "B. In einem Café", "C. In einer Schule", "D. In einem Krankenhaus"],
-  },
-  {
-    stem: "Warum liebt Lisa ihren Beruf?",
-    options: [
-      "A. Weil sie gerne reist",
-      "B. Weil sie gerne mit Kindern arbeitet",
-      "C. Weil sie Tennis mag",
-      "D. Weil sie gerne im Büro arbeitet",
-    ],
-  },
-  {
-    stem: "Wo arbeitet die erzählende Person?",
-    options: ["A. In einem Büro", "B. In einer Schule", "C. In einem Café", "D. In einem Krankenhaus"],
-  },
-  {
-    stem: "Welchen Sport mag Lisa?",
-    options: ["A. Fußball", "B. Tennis", "C. Schwimmen", "D. Volleyball"],
-  },
-  {
-    stem: "Wie war das Wetter gestern?",
-    options: ["A. Es war regnerisch", "B. Es war sonnig und warm", "C. Es war kalt", "D. Es war windig"],
-  },
-  {
-    stem: "In welchen Ländern war Lisa schon?",
-    options: [
-      "A. Frankreich und Deutschland",
-      "B. Italien und Spanien",
-      "C. Österreich und Schweiz",
-      "D. Griechenland und Kroatien",
-    ],
-  },
-  {
-    stem: "Warum mag die erzählende Person den Herbst?",
-    options: [
-      "A. Weil es sonnig ist",
-      "B. Weil es warm ist",
-      "C. Weil die Bäume so schön bunt sind",
-      "D. Weil sie gerne Tennis spielt",
-    ],
-  },
-];
-
-const listeningQuestions = [
-  {
-    stem: "Was hat Lena am Samstag vor?",
-    options: ["A. Spazieren mit Freundin", "B. Ins Kino gehen", "C. Tennis spielen", "D. Spaziergang im Park"],
-  },
-  {
-    stem: "Warum freut sich Lena auf den Actionfilm?",
-    options: ["A. Sie liebt spannende Geschichten", "B. Sie mag Comedy", "C. Sie hat ihn schon gesehen", "D. Sie liebt Horror"],
-  },
-  {
-    stem: "Welche Sportart betreibt Lena regelmäßig?",
-    options: ["A. Tennis", "B. Schwimmen", "C. Laufen", "D. Yoga"],
-  },
-  {
-    stem: "Wie war das Wetter am letzten Wochenende?",
-    options: ["A. Regnerisch und kühl", "B. Sonnig und warm", "C. Bewölkt und windig", "D. Kalt und frostig"],
-  },
-  {
-    stem: "Was schlägt Lena für das nächste Treffen vor?",
-    options: ["A. Ins Kino", "B. Tennis", "C. Spaziergang", "D. Kaffee trinken"],
-  },
-];
-
-const speakingContent = (
-  <>
-    <WorkbookTaskCard eyebrow="Group practice" title="Stell dich vor und führe ein kurzes Gespräch" practiceOnly>
-      <p style={paragraph}>
-        Prepare one connected introduction. Open each mind-map branch, practise the sentence, and combine the four parts into one answer.
-      </p>
-    </WorkbookTaskCard>
-    <SpeakingMindMap config={smallTalkIntroductionMap} />
-  </>
-);
-
-const writingContent = (
-  <WorkbookTaskCard eyebrow="Schreibaufgabe" title="Schreibe einen Brief an deinen Freund Felix">
-    <p style={paragraph}>In deinem Brief möchtest du über deine Arbeit und Familie sprechen.</p>
-
-    <section style={topicCard}>
-      <h3 style={topicTitle}>Dein Brief soll folgende Punkte enthalten:</h3>
-      <ol style={list}>
-        <li>Warum schreibst du?</li>
-        <li>Erzähle Felix etwas über deine Arbeit und deine Familie.</li>
-        <li>Frage Felix, wie es ihm geht und was bei ihm neu ist.</li>
-      </ol>
-    </section>
-
-    <section style={topicCard}>
-      <h3 style={topicTitle}>Einleitung</h3>
-      <ul style={list}>
-        <li>Beginne mit: „Lieber Felix,“</li>
-        <li>Schreibe dann: „Wie geht es dir? Ich hoffe, es geht dir gut.“</li>
-      </ul>
-    </section>
-
-    <section style={topicCard}>
-      <h3 style={topicTitle}>Hauptteil</h3>
-      <ul style={list}>
-        <li>Schreibe, warum du Felix schreibst, zum Beispiel: „Ich schreibe dir, weil ich dir von meiner Arbeit und Familie erzählen möchte.“</li>
-        <li>Erzähle über deine Arbeit: Was machst du? Ist deine Arbeit interessant?</li>
-        <li>Erzähle etwas Neues über deine Familie.</li>
-        <li>Verwende Konjunktionen wie <strong>weil</strong>, <strong>denn</strong> und <strong>deshalb</strong>.</li>
-      </ul>
-    </section>
-
-    <section style={topicCard}>
-      <h3 style={topicTitle}>Schluss</h3>
-      <ul style={list}>
-        <li>Frage Felix, was bei ihm neu ist, zum Beispiel: „Wie geht es dir? Was hast du zuletzt gemacht?“</li>
-        <li>Schreibe: „Ich freue mich auf deine Antwort.“</li>
-        <li>Verabschiede dich mit: „Viele Grüße, Dein Vorname“</li>
-      </ul>
-    </section>
+const speakingContent = <>
+  <WorkbookTaskCard eyebrow="Group practice" title="Teil 1 · Sprechen" practiceOnly>
+    <p style={paragraph}>
+      Open each mind-map branch, practise the useful phrases, and connect the five steps into one short natural conversation.
+    </p>
   </WorkbookTaskCard>
-);
+  <SpeakingMindMap config={smallTalkIntroductionMap} />
+</>;
+
+const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Brief an Felix: Arbeit und Familie">
+  <p style={paragraph}><strong>Aufgabe:</strong> Schreibe Felix einen kurzen Brief über deine Arbeit und deine Familie.</p>
+  <p style={paragraph}>Bearbeite diese Punkte:</p>
+  <ul style={list}>
+    <li>Schreibe, warum du Felix schreibst.</li>
+    <li>Erzähle etwas über deine Arbeit oder dein Studium.</li>
+    <li>Erzähle etwas Neues über deine Familie.</li>
+    <li>Verwende mindestens einen Grund mit <strong>weil</strong> oder <strong>denn</strong>.</li>
+    <li>Frage Felix am Ende, wie es ihm geht und was bei ihm neu ist.</li>
+  </ul>
+  <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Grund → Arbeit/Studium → Familie → Frage → Viele Grüße.</p>
+</WorkbookTaskCard>;
 
 const readingText = `Mein Gespräch mit Lisa
 
@@ -259,8 +168,26 @@ Zum Schluss haben wir über Reisen gesprochen. Lisa war schon in Italien und Spa
 
 Es war ein sehr nettes Gespräch, und wir haben viel gelacht!`;
 
-const SmallTalkWorkbook = () => (
-  <A2StandardTabbedWorkbookPage
+const readingQuestions = [
+  { stem: "Wo arbeitet Lisa?", options: ["A. In einem Büro", "B. In einem Café", "C. In einer Schule", "D. In einem Krankenhaus"] },
+  { stem: "Warum liebt Lisa ihren Beruf?", options: ["A. Weil sie gerne reist", "B. Weil sie gerne mit Kindern arbeitet", "C. Weil sie Tennis mag", "D. Weil sie gerne im Büro arbeitet"] },
+  { stem: "Wo arbeitet die erzählende Person?", options: ["A. In einem Büro", "B. In einer Schule", "C. In einem Café", "D. In einem Krankenhaus"] },
+  { stem: "Welchen Sport mag Lisa?", options: ["A. Fußball", "B. Tennis", "C. Schwimmen", "D. Volleyball"] },
+  { stem: "Wie war das Wetter gestern?", options: ["A. Es war regnerisch", "B. Es war sonnig und warm", "C. Es war kalt", "D. Es war windig"] },
+  { stem: "In welchen Ländern war Lisa schon?", options: ["A. Frankreich und Deutschland", "B. Italien und Spanien", "C. Österreich und Schweiz", "D. Griechenland und Kroatien"] },
+  { stem: "Warum mag die erzählende Person den Herbst?", options: ["A. Weil es sonnig ist", "B. Weil es warm ist", "C. Weil die Bäume so schön bunt sind", "D. Weil sie gerne Tennis spielt"] },
+];
+
+const listeningQuestions = [
+  { stem: "Was hat Lena am Samstag vor?", options: ["A. Spazieren mit Freundin", "B. Ins Kino gehen", "C. Tennis spielen", "D. Spaziergang im Park"] },
+  { stem: "Warum freut sich Lena auf den Actionfilm?", options: ["A. Sie liebt spannende Geschichten", "B. Sie mag Comedy", "C. Sie hat ihn schon gesehen", "D. Sie liebt Horror"] },
+  { stem: "Welche Sportart betreibt Lena regelmäßig?", options: ["A. Tennis", "B. Schwimmen", "C. Laufen", "D. Yoga"] },
+  { stem: "Wie war das Wetter am letzten Wochenende?", options: ["A. Regnerisch und kühl", "B. Sonnig und warm", "C. Bewölkt und windig", "D. Kalt und frostig"] },
+  { stem: "Was schlägt Lena für das nächste Treffen vor?", options: ["A. Ins Kino", "B. Tennis", "C. Spaziergang", "D. Kaffee trinken"] },
+];
+
+export default function A2Day1SmallTalkWorkbookPage() {
+  return <A2StandardTabbedWorkbookPage
     day={1}
     title="Small Talk"
     chapter="1.1"
@@ -268,19 +195,11 @@ const SmallTalkWorkbook = () => (
     topicPrompt="Small Talk"
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
-    schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ..."}
+    schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ...\n\nIch arbeite / studiere ...\nMeine Familie ...\n\nWie geht es dir? Was ist bei dir neu?\n\nViele Grüße\n[Dein Name]"}
     lesenText={readingText}
     lesenQuestions={readingQuestions}
     hoerenTask="Höre den Text zweimal und beantworte alle fünf Fragen. Achte auf Lenas Pläne, den Film, Sport, das Wetter und das nächste Treffen."
     hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
     hoerenQuestions={listeningQuestions}
-  />
-);
-
-export default function A2Day2SmallTalkWorkbookEnhancedPage() {
-  return (
-    <RadioFirstWorkbookGate level="A2" day={1}>
-      <SmallTalkWorkbook />
-    </RadioFirstWorkbookGate>
-  );
+  />;
 }
