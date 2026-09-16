@@ -51,3 +51,4 @@ await import("./patchA2CompletionAndDay0ClassParticipation.mjs");
 await import("./patchGuidedCourseCompletionConclusion.mjs");
 await import("./patchC2TopicDrivenCurriculum.mjs");
 await import("./patchC2CourseBookVisibility.mjs");
+await import("./patchStudentHomeAndCourseBookCleanup.mjs");
