@@ -60,12 +60,34 @@ const compactClassActions = `          <div data-class-compact-actions="true" st
               Open Course
             </a>
           </div>`;
+const compactClassActionsMarker = 'data-class-compact-actions="true"';
+const legacyCompactZoomCondition = '            {zoom?.url ? (';
+const gatedCompactZoomCondition = '            {!classEnded && nextSession && canJoinLiveClass(nextSession, now) && zoom?.url ? (';
 
-if (!classCalendar.includes('data-class-compact-actions="true"')) {
+if (!classCalendar.includes(compactClassActionsMarker)) {
   if (!classCalendar.includes(oldClassActions)) {
     throw new Error("Student cleanup patch anchor missing: class calendar actions");
   }
   classCalendar = classCalendar.replace(oldClassActions, compactClassActions);
+} else {
+  // A checkout may already contain the compact block from an older patch run.
+  // Upgrade that block in place instead of treating the marker as proof that the
+  // latest join-window behavior is present.
+  const markerIndex = classCalendar.indexOf(compactClassActionsMarker);
+  const compactBlockStart = classCalendar.lastIndexOf("          <div", markerIndex);
+  const compactBlockEndMarker = "          </div>";
+  const compactBlockEnd = classCalendar.indexOf(compactBlockEndMarker, markerIndex);
+  if (compactBlockStart === -1 || compactBlockEnd === -1 || compactBlockEnd <= compactBlockStart) {
+    throw new Error("Student cleanup patch anchor missing: existing compact class actions block");
+  }
+  const compactBlockEndExclusive = compactBlockEnd + compactBlockEndMarker.length;
+  const compactBlock = classCalendar.slice(compactBlockStart, compactBlockEndExclusive);
+  if (compactBlock.includes(legacyCompactZoomCondition)) {
+    const upgradedCompactBlock = compactBlock.replace(legacyCompactZoomCondition, gatedCompactZoomCondition);
+    classCalendar = `${classCalendar.slice(0, compactBlockStart)}${upgradedCompactBlock}${classCalendar.slice(compactBlockEndExclusive)}`;
+  } else if (!compactBlock.includes(gatedCompactZoomCondition)) {
+    throw new Error("Student cleanup patch anchor missing: compact Zoom join condition");
+  }
 }
 
 // Dashboard: the live-class block is the final dashboard content. Keep only a
