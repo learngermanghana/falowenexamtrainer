@@ -12,7 +12,12 @@ const importAnchor = 'import { getC2Day1To7Mastery } from "../data/c2Day1To7Mast
 
 if (!source.includes(coachImport)) {
   if (!source.includes(importAnchor)) throw new Error("C2 Day 1 mastery import anchor missing.");
-  source = source.replace(importAnchor, `${importAnchor}\n${coachImport}\n${speechImport}`);
+  source = source.replace(importAnchor, `${importAnchor}\n${coachImport}`);
+}
+if (!source.includes(speechImport)) {
+  const speechAnchor = source.includes(coachImport) ? coachImport : importAnchor;
+  if (!source.includes(speechAnchor)) throw new Error("C2 Day 1 speech import anchor missing.");
+  source = source.replace(speechAnchor, `${speechAnchor}\n${speechImport}`);
 }
 
 const learnPattern = /\{active === "learn" \? <>[\s\S]*?<\/\> : null\}\n\n      \{active === "speak"/;
