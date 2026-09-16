@@ -1,0 +1,27 @@
+name: C2 Course Book alignment
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/c2*.js"
+      - "web/src/components/C2*.js"
+      - "web/src/data/curriculumManifest.js"
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "scripts/patchC2*.mjs"
+      - ".github/workflows/c2-course-book-alignment.yml"
+
+jobs:
+  c2-alignment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm --prefix web ci
+      - name: Run C2 alignment regression tests
+        working-directory: web
+        run: npx jest src/data/c2LessonContentAlignment.test.js --runInBand
