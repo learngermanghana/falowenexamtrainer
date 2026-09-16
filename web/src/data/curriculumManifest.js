@@ -13,6 +13,7 @@ import { alignA2CurriculumEntries } from "./a2CurriculumAlignment.js";
 import { alignB1CurriculumEntries } from "./b1CurriculumAlignment.js";
 import { alignB2CurriculumEntries } from "./b2LessonContentAlignment.js";
 import { alignC2CurriculumEntries } from "./c2LessonContentAlignment.js";
+import { mergeCanonicalC2CourseBookEntries } from "./c2CourseBookEntries.js";
 
 const alignRuntimeCurriculumEntries = (entries = []) =>
   alignC2CurriculumEntries(
@@ -22,14 +23,19 @@ const alignRuntimeCurriculumEntries = (entries = []) =>
   );
 
 const CANONICAL_CURRICULUM = lessonCatalog;
-const CURRICULUM_ENTRIES = alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES);
+const CURRICULUM_ENTRIES = mergeCanonicalC2CourseBookEntries(
+  alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES),
+);
 const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   if (!acc[entry.level]) acc[entry.level] = [];
   acc[entry.level].push(entry);
   return acc;
 }, {});
-const getCurriculumEntriesForLevel = (level) =>
-  alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
+const getCurriculumEntriesForLevel = (level) => {
+  const normalized = normalizeLevel(level);
+  const aligned = alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
+  return normalized === "C2" ? mergeCanonicalC2CourseBookEntries(aligned) : aligned;
+};
 
 export {
   CANONICAL_CURRICULUM,
