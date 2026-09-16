@@ -52,8 +52,8 @@ replaceOnce(
 
 replaceOnce(
   `    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
-  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
-  "inline word minimum submit validation",
+  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({\n        sound: "error",\n        toastMessage: wordError,\n        toastVariant: "error",\n        showToast,\n      });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.({ preventScroll: true });\n        const blockingAlert = document.querySelector('[data-submission-word-error="true"]');\n        blockingAlert?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
+  "prominent word minimum submit validation",
 );
 
 const structuredWordDeclaration = "    const submissionWordCount = countWords(submissionAnswerText);";
@@ -84,9 +84,15 @@ replaceOnce(
 );
 
 replaceOnce(
-  `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />`,
-  `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />\n              {wordMinimumError ? (\n                <div\n                  id="assignment-word-minimum-error"\n                  role="alert"\n                  aria-live="assertive"\n                  data-submission-word-error="true"\n                  style={{\n                    marginTop: 8,\n                    border: "1px solid #fecaca",\n                    borderRadius: 10,\n                    background: "#fef2f2",\n                    color: "#991b1b",\n                    padding: "10px 12px",\n                    fontWeight: 700,\n                    lineHeight: 1.5,\n                  }}\n                >\n                  {wordMinimumError}\n                </div>\n              ) : null}`,
-  "inline word error presentation",
+  `          <div>\n            <div\n              style={{\n                border: "1px solid #e5e7eb",\n                borderRadius: 10,\n                background: selectedAssignmentEligibility.submittable ? "#ecfdf5" : "#fff7ed",\n                padding: "10px 12px",\n                marginBottom: 10,\n              }}\n            >\n              <div style={{ fontWeight: 700 }}>\n                {selectedAssignmentEligibility.submittable ? uiText.statusSubmittable : uiText.statusNotSubmittable}\n              </div>\n              {!selectedAssignmentEligibility.submittable ? (\n                <div style={styles.helperText}>\n                  {uiText.reasonLabel}: {!hasSelectedAssignment ? "Select assignment number." : selectedAssignmentEligibility.reason}\n                </div>\n              ) : null}\n            </div>\n            <label`,
+  `          <div>\n            {!isSelectedLocked ? (\n              <div\n                style={{\n                  border: "1px solid #e5e7eb",\n                  borderRadius: 10,\n                  background: selectedAssignmentEligibility.submittable ? "#ecfdf5" : "#fff7ed",\n                  padding: "10px 12px",\n                  marginBottom: 10,\n                }}\n              >\n                <div style={{ fontWeight: 700 }}>\n                  {selectedAssignmentEligibility.submittable ? uiText.statusSubmittable : uiText.statusNotSubmittable}\n                </div>\n                {!selectedAssignmentEligibility.submittable ? (\n                  <div style={styles.helperText}>\n                    {uiText.reasonLabel}: {!hasSelectedAssignment ? "Select assignment number." : selectedAssignmentEligibility.reason}\n                  </div>\n                ) : null}\n              </div>\n            ) : null}\n            <label`,
+  "hide redundant already-submitted eligibility notice",
+);
+
+replaceOnce(
+  `          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>\n            <button`,
+  `          {wordMinimumError ? (\n            <div\n              id="assignment-word-minimum-error"\n              role="alert"\n              aria-live="assertive"\n              data-submission-word-error="true"\n              style={{\n                border: "2px solid #ef4444",\n                borderRadius: 12,\n                background: "#fef2f2",\n                color: "#991b1b",\n                padding: "12px 14px",\n                display: "grid",\n                gap: 4,\n                lineHeight: 1.5,\n              }}\n            >\n              <strong style={{ fontSize: 16 }}>More words required before submission</strong>\n              <span>{wordMinimumError}</span>\n            </div>\n          ) : null}\n\n          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>\n            <button`,
+  "blocking word minimum alert beside submit action",
 );
 
 const requiredMarkers = [
@@ -94,10 +100,14 @@ const requiredMarkers = [
   "buildAssignmentSubmissionWordProgressText({",
   'data-submission-word-feedback="inline"',
   'data-submission-word-error="true"',
+  "More words required before submission",
   "minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords",
   "setWordMinimumError(wordError);",
-  'textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });',
-];
+  "toastMessage: wordError,",
+  "showToast,",
+  "!isSelectedLocked ? (",
+  "hide redundant already-submitted eligibility notice",
+].filter((marker) => marker !== "hide redundant already-submitted eligibility notice");
 
 requiredMarkers.forEach((marker) => {
   if (!source.includes(marker)) throw new Error(`Submission word feedback marker missing: ${marker}`);
@@ -114,4 +124,4 @@ if (wordValidationIndex < 0 || characterValidationIndex < 0 || wordValidationInd
 }
 
 fs.writeFileSync(targetPath, source, "utf8");
-console.log("Assignment submissions now use task-aware word targets with inline missing-word feedback.");
+console.log("Assignment submissions now use task-aware word targets with prominent blocking feedback.");
