@@ -54,6 +54,31 @@ const SpeakingExamIntroPage = () => (
       </p>
     </header>
 
+    <Section eyebrow="Teacher lecture" title="Introduction to the speaking exam">
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Watch the teacher lecture first. It introduces the speaking exam before you work through the notes and guided practice below.
+      </p>
+      <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#0f172a" }}>
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/MPDY2x3suW8?rel=0"
+          title="Teacher lecture: Introduction to the Goethe A1 Speaking Exam"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+        />
+      </div>
+      <a
+        href="https://youtu.be/MPDY2x3suW8"
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: "#3730a3", fontWeight: 800, width: "fit-content" }}
+      >
+        Open teacher lecture on YouTube
+      </a>
+    </Section>
+
     <Section eyebrow="Big picture" title="The three speaking parts">
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
