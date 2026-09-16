@@ -12,19 +12,32 @@ import { alignA1CurriculumEntries } from "./a1RouteAlignment.js";
 import { alignA2CurriculumEntries } from "./a2CurriculumAlignment.js";
 import { alignB1CurriculumEntries } from "./b1CurriculumAlignment.js";
 import { alignB2CurriculumEntries } from "./b2LessonContentAlignment.js";
+import { alignC2CurriculumEntries } from "./c2LessonContentAlignment.js";
+import { mergeCanonicalC2CourseBookEntries } from "./c2CourseBookEntries.js";
 
 const alignRuntimeCurriculumEntries = (entries = []) =>
-  alignB2CurriculumEntries(alignB1CurriculumEntries(alignA2CurriculumEntries(alignA1CurriculumEntries(entries))));
+  alignC2CurriculumEntries(
+    alignB2CurriculumEntries(
+      alignB1CurriculumEntries(alignA2CurriculumEntries(alignA1CurriculumEntries(entries))),
+    ),
+  );
 
 const CANONICAL_CURRICULUM = lessonCatalog;
-const CURRICULUM_ENTRIES = alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES);
+const CURRICULUM_ENTRIES = mergeCanonicalC2CourseBookEntries(
+  alignRuntimeCurriculumEntries(RAW_CURRICULUM_ENTRIES),
+);
 const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   if (!acc[entry.level]) acc[entry.level] = [];
   acc[entry.level].push(entry);
   return acc;
 }, {});
-const getCurriculumEntriesForLevel = (level) =>
-  alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
+const getCurriculumEntriesForLevel = (level) => {
+  const requestedLevel = String(level || "").trim().toUpperCase();
+  if (requestedLevel === "C2") {
+    return mergeCanonicalC2CourseBookEntries([]);
+  }
+  return alignRuntimeCurriculumEntries(getRawCurriculumEntriesForLevel(level));
+};
 
 export {
   CANONICAL_CURRICULUM,
