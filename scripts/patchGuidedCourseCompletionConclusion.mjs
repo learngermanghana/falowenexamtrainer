@@ -1,0 +1,77 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const courseTabPath = path.join(root, "web/src/components/CourseTab.js");
+let source = fs.readFileSync(courseTabPath, "utf8");
+
+const replaceOnce = (before, after, label) => {
+  if (source.includes(after)) return;
+  if (!source.includes(before)) throw new Error(`Could not patch ${label}: source anchor missing.`);
+  source = source.replace(before, after);
+};
+
+replaceOnce(
+  'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";',
+  'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\nimport CourseCompletionConclusion from "./CourseCompletionConclusion";',
+  "Course completion component import",
+);
+
+replaceOnce(
+  '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";',
+  '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";\n  const isGuidedCompletionLevel = ["A1", "A2", "B1"].includes(normalizedSelectedCourseLevel);',
+  "guided completion level flag",
+);
+
+replaceOnce(
+  '  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;\n  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;',
+  '  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;\n  const passedAssignmentCount = courseLessons.filter((entry) => entry.isTutorMarked && entry.status === "passed").length;\n  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;',
+  "passed assignment count",
+);
+
+replaceOnce(
+  '  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);',
+  '  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);\n  const courseIsComplete = isGuidedCompletionLevel && courseLessons.length > 0 && !nextLesson;',
+  "guided course completion state",
+);
+
+replaceOnce(
+  '      decoratedSchedule.filter((entry) => {\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
+  '      decoratedSchedule.filter((entry) => {\n        if (isGuidedCompletionLevel && entry.isMilestone) return false;\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
+  "hide guided milestone lesson cards",
+);
+
+replaceOnce(
+  '    [decoratedSchedule, searchTerm, activeFilter, nextLesson]\n  );',
+  '    [decoratedSchedule, searchTerm, activeFilter, nextLesson, isGuidedCompletionLevel]\n  );',
+  "visible lesson dependencies",
+);
+
+// The previous A2 patch suppresses the old generic completion card only for A2.
+// Extend that guard to all three tutor-guided completion levels.
+source = source.replace(
+  'normalizedSelectedCourseLevel === "A2" ? null : (',
+  'isGuidedCompletionLevel ? null : (',
+);
+
+const bottomAnchor = `          )}\n          {usesSharedA2B1Design ? (\n            <nav className="course-book-mobile-actions" aria-label="Course Book actions">`;
+const bottomInsertion = `          )}\n\n          {courseIsComplete ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              completedLessons={completedCount}\n              totalLessons={courseLessons.length}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2" }[normalizedSelectedCourseLevel];\n                if (nextLevel && levels.includes(nextLevel)) {\n                  setSelectedCourseLevel(nextLevel);\n                  setActiveFilter("all");\n                  setSearchTerm("");\n                  return;\n                }\n                navigate("/classes/");\n              }}\n            />\n          ) : null}\n\n          {usesSharedA2B1Design ? (\n            <nav className="course-book-mobile-actions" aria-label="Course Book actions">`;
+replaceOnce(bottomAnchor, bottomInsertion, "bottom guided completion conclusion");
+
+const requiredMarkers = [
+  'import CourseCompletionConclusion from "./CourseCompletionConclusion";',
+  'const isGuidedCompletionLevel = ["A1", "A2", "B1"].includes(normalizedSelectedCourseLevel);',
+  'const passedAssignmentCount = courseLessons.filter',
+  'const courseIsComplete = isGuidedCompletionLevel',
+  'if (isGuidedCompletionLevel && entry.isMilestone) return false;',
+  '<CourseCompletionConclusion',
+  'navigate("/classes/")',
+];
+
+requiredMarkers.forEach((marker) => {
+  if (!source.includes(marker)) throw new Error(`Guided completion conclusion marker missing: ${marker}`);
+});
+
+fs.writeFileSync(courseTabPath, source, "utf8");
+console.log("A1-A2-B1 now use one bottom completion conclusion with Results, Attendance, Class Participation, exam prep and next-level actions.");
