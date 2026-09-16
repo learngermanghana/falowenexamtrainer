@@ -16,7 +16,6 @@ import CourseCompletionExamGuidanceInjector from "./CourseCompletionExamGuidance
 import A2CourseBookOrientationVideoInjector from "./A2CourseBookOrientationVideoInjector";
 import A2LegacyStandardWorkbookNavigation from "./A2LegacyStandardWorkbookNavigation";
 import A2ProtectedWorkbookRouteGuard from "./A2ProtectedWorkbookRouteGuard";
-import CourseBookNextClassIndicator from "./CourseBookNextClassIndicator";
 import UniversalWorkbookLessonNavigator from "./UniversalWorkbookLessonNavigator";
 import LockedSubmissionCardCompactor from "./LockedSubmissionCardCompactor";
 import B1WorkbookWritingCheatSheetInjector from "./B1WorkbookWritingCheatSheetInjector";
@@ -234,7 +233,6 @@ export default function RouteScopedAppServices() {
         <A1SharedAssignmentWorkbookBridge assignmentKey={canonicalA1Assignment.assignmentKey} />
       ) : null}
       <CourseBookLayoutStandardizer />
-      {isCourseBook ? <CourseBookNextClassIndicator /> : null}
       {!useCanonicalA1WorkbookExperience ? <UniversalWorkbookLessonNavigator /> : null}
       <LockedSubmissionCardCompactor />
       <B1WorkbookWritingCheatSheetInjector />
