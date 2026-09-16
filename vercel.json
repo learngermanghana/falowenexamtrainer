@@ -31,6 +31,24 @@
           "value": "no-store, no-cache, must-revalidate"
         }
       ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
     }
   ],
   "routes": [
@@ -55,11 +73,32 @@
       },
       "dest": "/index.html"
     },
-    { "handle": "filesystem" },
-    { "src": "/classes/([^/]+)/?", "dest": "/classes/index.html" },
-    { "src": "/api/public/classes", "dest": "/api/public-classes.js" },
-    { "src": "/api/sync-student", "dest": "/api/sync-student.js" },
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/assets/(.*)",
+      "status": 404
+    },
+    {
+      "src": "/classes/([^/]+)/?",
+      "dest": "/classes/index.html"
+    },
+    {
+      "src": "/api/public/classes",
+      "dest": "/api/public-classes.js"
+    },
+    {
+      "src": "/api/sync-student",
+      "dest": "/api/sync-student.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }

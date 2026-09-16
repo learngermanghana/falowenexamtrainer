@@ -772,7 +772,15 @@ const AppShell = ({
             path="/campus/course/a1-day-6-family-and-hobbies-workbook"
             element={<A1WorkbookRoutePage />}
           />
-          <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
+          <Route
+            path="/campus/course/a2-day-1-small-talk-workbook"
+            element={withRadioWorkbookGate("A2", 1, <A2Day2SmallTalkWorkbookEnhancedPage />)}
+          />
+          {/* Legacy alias kept so old bookmarks continue to work. */}
+          <Route
+            path="/campus/course/a2-day-2-small-talk-workbook"
+            element={withRadioWorkbookGate("A2", 1, <A2Day2SmallTalkWorkbookEnhancedPage />)}
+          />
           <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={withRadioWorkbookGate("A2", 2, <A2Day2PersonenBeschreibenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook" element={withRadioWorkbookGate("A2", 3, <A2Day3ComparisonsWorkbookPage />)} />
           <Route path="/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook" element={withRadioWorkbookGate("A2", 4, <A2Day4WoMoechtenWirUnsTreffenWorkbookPage />)} />

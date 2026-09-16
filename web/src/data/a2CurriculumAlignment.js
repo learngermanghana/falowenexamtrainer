@@ -4,7 +4,7 @@ export const A2_EARLY_COURSE_ALIGNMENT = Object.freeze({
     title: "Small Talk 1.1 (Exercise)",
     video: "https://youtu.be/DfJ04x4JGOo",
     grammarPage: "/campus/course/a2-starter-conjunctions-day-1",
-    workbookRoute: "/campus/course/a2-day-2-small-talk-workbook",
+    workbookRoute: "/campus/course/a2-day-1-small-talk-workbook",
     assignmentId: "A2-1.1",
   }),
   2: Object.freeze({

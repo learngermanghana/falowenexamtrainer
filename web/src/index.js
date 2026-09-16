@@ -1,4 +1,5 @@
 import "./historyApiSafetyRuntime";
+import "./staleChunkRecoveryRuntime";
 import "./a1WorkbookMobileSubmit.css";
 import "./a1SubmissionConsistencyRuntime";
 import "./a1SubmissionResultFeedbackRuntime";
