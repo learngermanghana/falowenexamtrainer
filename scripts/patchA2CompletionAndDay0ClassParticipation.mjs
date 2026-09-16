@@ -53,9 +53,8 @@ const addClassParticipationToDay0 = (source, level) => {
 
 let courseTab = fs.readFileSync(courseTabPath, "utf8");
 
-// A2 already has a canonical Day 29 completion milestone at the bottom of its
-// schedule. Do not duplicate that message in the generic next-lesson slot at
-// the top once the final required lesson is complete.
+// A2 has a canonical Day 29 milestone at the bottom. Do not duplicate it in
+// the generic next-lesson slot at the top.
 const completionText = "Course Book complete";
 if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
   const completionTextIndex = courseTab.indexOf(completionText);
@@ -81,12 +80,48 @@ if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
   throw new Error("A2 generic top completion card was not suppressed.");
 }
 
-const schedule = fs.readFileSync(schedulePath, "utf8");
+let schedule = fs.readFileSync(schedulePath, "utf8");
 if (!schedule.includes('day: 29,\n    topic: "Course Completed!"')) {
   throw new Error("A2 Day 29 completion milestone is missing; cannot suppress the duplicate top message safely.");
 }
 
+// Retire the old email-based completion wording at the data source too. This
+// prevents any older milestone renderer from bringing the previous conclusion
+// back even if it reads the schedule object directly.
+const legacyCompletionStart = schedule.indexOf('const COMPLETION_CONTACT_EMAIL = "info@falowen.app";');
+const legacyCompletionEnd = schedule.indexOf("const buildA2Lesson", legacyCompletionStart);
+if (legacyCompletionStart !== -1 && legacyCompletionEnd !== -1) {
+  const modernCompletionData = `const COMPLETION_ACTIONS = [
+  { label: "Review Results", labelKey: "courseTab.completion.actions.reviewResults", href: "/campus/results" },
+  { label: "Review Attendance", labelKey: "courseTab.completion.actions.reviewAttendance", href: "/campus/attendance" },
+  { label: "Review Class Participation", labelKey: "courseTab.completion.actions.reviewParticipation", href: "/campus/account?tab=participation" },
+  { label: "Prepare for exam", labelKey: "courseTab.completion.actions.openExams", href: "/exams/question" },
+  { label: "Study Calendar", labelKey: "courseTab.completion.actions.downloadStudyCalendar", href: "/exams/study?force=1" },
+];
+
+const buildCompletionMessage = ({ level, nextLevel }) => ({
+  goal: "Review your course records, strengthen weak areas and prepare for your next step.",
+  instruction: \`You have reached the final checkpoint of your \${level} Course Book. Review Results, Attendance and Class Participation, complete any outstanding required work, and continue with focused \${level} exam preparation. Move to \${nextLevel} when your progression is confirmed.\`,
+  completion: {
+    messageKey: "courseTab.completion.message",
+    message: \`Final \${level} checkpoint: review your course records, prepare for the exam and continue to \${nextLevel} when ready.\`,
+    level,
+    nextLevel,
+    actions: COMPLETION_ACTIONS,
+    nonActionableStatus: "milestoneComplete",
+  },
+});
+
+`;
+  schedule = `${schedule.slice(0, legacyCompletionStart)}${modernCompletionData}${schedule.slice(legacyCompletionEnd)}`;
+}
+
+if (schedule.includes("Please tell us what you would like to do next by emailing") || schedule.includes("COMPLETION_CONTACT_EMAIL")) {
+  throw new Error("Legacy email-based course completion wording is still present.");
+}
+
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
+fs.writeFileSync(schedulePath, schedule, "utf8");
 
 for (const [level, day0Path] of day0Paths) {
   const source = fs.readFileSync(day0Path, "utf8");
@@ -94,5 +129,5 @@ for (const [level, day0Path] of day0Paths) {
 }
 
 console.log(
-  "A2 completion stays at the bottom Day 29 milestone; A1-A2-B1 Day 0 now explains and links Class Participation.",
+  "Legacy completion copy retired; A2 milestone remains bottom-only and A1-A2-B1 Day 0 includes Class Participation.",
 );
