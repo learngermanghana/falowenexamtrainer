@@ -49,3 +49,4 @@ await import(`${pathToFileURL(patchPath).href}?compact-navigation-fixed=1`);
 await import("./patchA1Day5WorkbookNavigationAndWQuestions.mjs");
 await import("./patchA2CompletionAndDay0ClassParticipation.mjs");
 await import("./patchGuidedCourseCompletionConclusion.mjs");
+await import("./patchC2CourseBookVisibility.mjs");
