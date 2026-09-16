@@ -24,16 +24,24 @@ const actionLink = {
 
 const CourseCompletionConclusion = ({
   level,
-  completedLessons = 0,
-  totalLessons = 0,
+  completedRequirements = 0,
+  totalRequirements = 0,
   passedAssignments = 0,
   totalAssignments = 0,
+  needsImprovement = 0,
+  awaitingReview = 0,
   onExploreNextLevel,
 }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const nextLevel = nextLevelByLevel[normalizedLevel];
 
   if (!nextLevel) return null;
+
+  const assignmentNote = needsImprovement
+    ? `${needsImprovement} ${needsImprovement === 1 ? "assignment needs" : "assignments need"} improvement`
+    : awaitingReview
+      ? `${awaitingReview} awaiting ${awaitingReview === 1 ? "review" : "review"}`
+      : "Review scores and tutor feedback";
 
   return (
     <section
@@ -63,13 +71,14 @@ const CourseCompletionConclusion = ({
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
         <div style={summaryCard}>
-          <span style={{ color: "#64748b", fontSize: 12, fontWeight: 800 }}>Course work</span>
-          <strong style={{ color: "#0f172a", fontSize: 18 }}>{completedLessons}/{totalLessons} lessons</strong>
+          <span style={{ color: "#64748b", fontSize: 12, fontWeight: 800 }}>Required work</span>
+          <strong style={{ color: "#0f172a", fontSize: 18 }}>{completedRequirements}/{totalRequirements} complete</strong>
           <span style={{ color: "#64748b", fontSize: 12 }}>Course Book requirements completed</span>
         </div>
         <div style={summaryCard}>
           <span style={{ color: "#64748b", fontSize: 12, fontWeight: 800 }}>Assignments</span>
           <strong style={{ color: "#0f172a", fontSize: 18 }}>{passedAssignments}/{totalAssignments} passed</strong>
+          <span style={{ color: needsImprovement ? "#c2410c" : awaitingReview ? "#92400e" : "#64748b", fontSize: 12 }}>{assignmentNote}</span>
           <a href="/campus/results" style={{ color: "#1d4ed8", fontSize: 12, fontWeight: 800, textDecoration: "none" }}>Review Results →</a>
         </div>
         <div style={summaryCard}>
