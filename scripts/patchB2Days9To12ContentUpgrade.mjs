@@ -57,3 +57,5 @@ if (!source.includes("const requestedAiVideo")) {
 
 fs.writeFileSync(file, source, "utf8");
 console.log("Applied B2 Day 9/12 AI videos and advanced Day 10/12 grammar notes.");
+
+await import("./patchB2ExamDomainCourseContent.mjs");
