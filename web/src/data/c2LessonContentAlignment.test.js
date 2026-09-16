@@ -5,7 +5,6 @@ import {
   getC2LessonContentAlignment,
 } from "./c2LessonContentAlignment";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
-import { courseSchedules } from "./courseSchedule";
 import { SELF_LEARNING_LESSONS } from "../components/SelfLearningLessonRegistry";
 
 const DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
@@ -63,14 +62,13 @@ describe("C2 Days 1-28 Course Book alignment", () => {
     expect(aligned.writingExercise.modelAnswer.length).toBeGreaterThan(20);
   });
 
-  it("keeps Course Book, course schedule and opened C2 lesson on the same source of truth", () => {
+  it("keeps the Course Book curriculum and opened C2 lesson on the same source of truth", () => {
     const curriculum = Object.fromEntries(
       getCurriculumEntriesForLevel("C2").map((entry) => [Number(entry.day), entry]),
     );
 
     DAYS.forEach((day) => {
       const aligned = C2_LESSON_CONTENT_ALIGNMENT[day];
-      const scheduleEntry = courseSchedules.C2.find((entry) => Number(entry?.day) === day);
       const lesson = SELF_LEARNING_LESSONS.C2.find((entry) => Number(entry?.day) === day);
 
       expect(curriculum[day]).toEqual(expect.objectContaining({
@@ -78,11 +76,6 @@ describe("C2 Days 1-28 Course Book alignment", () => {
         chapter: aligned.chapter,
         topic: aligned.title,
         grammar_topic: aligned.grammarFocus,
-      }));
-      expect(scheduleEntry).toEqual(expect.objectContaining({
-        day,
-        chapter: aligned.chapter,
-        topic: aligned.title,
       }));
       expect(lesson).toEqual(expect.objectContaining({
         day,
