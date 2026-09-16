@@ -37,12 +37,13 @@ if (courseTab.includes(duplicateNextCardMarker)) {
 
 // Class card: keep the two student actions small and direct. The timetable itself
 // already contains the schedule, so a large download action is unnecessary here.
+// Zoom access must obey the same join window as the session-level actions.
 const oldClassActions = `          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="button" style={styles.primaryButton} onClick={() => downloadCanonicalCalendar(canonicalSummary)}>Download class calendar</button>
             <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open Course Book</a>
           </div>`;
 const compactClassActions = `          <div data-class-compact-actions="true" style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center" }}>
-            {zoom?.url ? (
+            {!classEnded && nextSession && canJoinLiveClass(nextSession, now) && zoom?.url ? (
               <a
                 href={zoom.url}
                 target="_blank"
@@ -69,7 +70,49 @@ if (!classCalendar.includes('data-class-compact-actions="true"')) {
 
 // Dashboard: the live-class block is the final dashboard content. Keep only a
 // lightweight Falowen Blog link beneath it; announcements/subscription cards no
-// longer compete with the student's class information.
+// longer compete with the student's class information. Remove the hidden
+// announcement machinery too so no feed requests or rotation rerenders remain.
+generalHome = generalHome
+  .replace(
+    'import React, { useCallback, useEffect, useMemo, useState } from "react";\n',
+    'import React, { useCallback, useMemo } from "react";\n',
+  )
+  .replace('import { fetchAnnouncements } from "../services/announcementService";\n', "")
+  .replace('import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\n', "")
+  .replace(
+    '  const [announcements, setAnnouncements] = useState([]);\n  const [announcementStatus, setAnnouncementStatus] = useState("idle");\n  const [announcementIndex, setAnnouncementIndex] = useState(0);\n',
+    "",
+  );
+
+const announcementComponentStart = generalHome.indexOf("const AnnouncementSection =");
+const generalHomeComponentStart = generalHome.indexOf("const GeneralHome =");
+if (announcementComponentStart !== -1) {
+  if (generalHomeComponentStart === -1 || generalHomeComponentStart <= announcementComponentStart) {
+    throw new Error("Student cleanup patch anchor missing: GeneralHome component after announcements");
+  }
+  generalHome = `${generalHome.slice(0, announcementComponentStart)}${generalHome.slice(generalHomeComponentStart)}`;
+}
+
+const announcementLoadEffectStart = generalHome.indexOf(`  useEffect(() => {\n    let mounted = true;\n    const loadAnnouncements = async () => {`);
+if (announcementLoadEffectStart !== -1) {
+  const announcementLoadEffectEndMarker = `  }, [locale, studentProfile?.className, studentProfile?.program]);\n`;
+  const announcementLoadEffectEnd = generalHome.indexOf(announcementLoadEffectEndMarker, announcementLoadEffectStart);
+  if (announcementLoadEffectEnd === -1) {
+    throw new Error("Student cleanup patch anchor missing: announcement loading effect end");
+  }
+  generalHome = `${generalHome.slice(0, announcementLoadEffectStart)}${generalHome.slice(announcementLoadEffectEnd + announcementLoadEffectEndMarker.length)}`;
+}
+
+const announcementRotationEffectStart = generalHome.indexOf(`  useEffect(() => {\n    if (announcements.length <= 1) {`);
+if (announcementRotationEffectStart !== -1) {
+  const announcementRotationEffectEndMarker = `  }, [announcements]);\n`;
+  const announcementRotationEffectEnd = generalHome.indexOf(announcementRotationEffectEndMarker, announcementRotationEffectStart);
+  if (announcementRotationEffectEnd === -1) {
+    throw new Error("Student cleanup patch anchor missing: announcement rotation effect end");
+  }
+  generalHome = `${generalHome.slice(0, announcementRotationEffectStart)}${generalHome.slice(announcementRotationEffectEnd + announcementRotationEffectEndMarker.length)}`;
+}
+
 if (!generalHome.includes('data-dashboard-footer-blog="true"')) {
   const classCardAnchor = `      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />`;
   const classCardStart = generalHome.lastIndexOf(classCardAnchor);
