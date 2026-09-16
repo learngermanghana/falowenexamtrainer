@@ -48,15 +48,15 @@ replaceOnce(
   "visible lesson dependencies",
 );
 
-// The previous A2 patch suppresses the old generic completion card only for A2.
-// Extend that guard to all three tutor-guided completion levels.
+// Retire the old generic completion card for all tutor-guided levels. The
+// dedicated conclusion below is the single A1/A2/B1 completion surface.
 source = source.replace(
   'normalizedSelectedCourseLevel === "A2" ? null : (',
   'isGuidedCompletionLevel ? null : (',
 );
 
 const lessonListTail = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n        </>`;
-const lessonListTailWithConclusion = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n\n          {courseIsComplete ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              completedRequirements={completedCount}\n              totalRequirements={courseCompletion.total}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              needsImprovement={courseCompletion.needsImprovement}\n              awaitingReview={courseCompletion.awaitingReview}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2" }[normalizedSelectedCourseLevel];\n                if (nextLevel && levels.includes(nextLevel)) {\n                  setSelectedCourseLevel(nextLevel);\n                  setActiveFilter("all");\n                  setSearchTerm("");\n                  return;\n                }\n                navigate("/classes/");\n              }}\n            />\n          ) : null}\n        </>`;
+const lessonListTailWithConclusion = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n\n          {isGuidedCompletionLevel ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              isComplete={courseIsComplete}\n              completedRequirements={completedCount}\n              totalRequirements={courseCompletion.total}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              needsImprovement={courseCompletion.needsImprovement}\n              awaitingReview={courseCompletion.awaitingReview}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2" }[normalizedSelectedCourseLevel];\n                if (nextLevel && levels.includes(nextLevel)) {\n                  setSelectedCourseLevel(nextLevel);\n                  setActiveFilter("all");\n                  setSearchTerm("");\n                  return;\n                }\n                navigate("/classes/");\n              }}\n            />\n          ) : null}\n        </>`;
 replaceOnce(lessonListTail, lessonListTailWithConclusion, "bottom guided completion conclusion");
 
 const requiredMarkers = [
@@ -65,6 +65,8 @@ const requiredMarkers = [
   'const passedAssignmentCount = courseCompletion.passed;',
   'const courseIsComplete = isGuidedCompletionLevel && courseCompletion.courseWorkCompleted;',
   'if (isGuidedCompletionLevel && entry.isMilestone) return false;',
+  '{isGuidedCompletionLevel ? (',
+  'isComplete={courseIsComplete}',
   '<CourseCompletionConclusion',
   'needsImprovement={courseCompletion.needsImprovement}',
   'navigate("/classes/")',
@@ -75,4 +77,4 @@ requiredMarkers.forEach((marker) => {
 });
 
 fs.writeFileSync(courseTabPath, source, "utf8");
-console.log("A1-A2-B1 now use one bottom completion conclusion with canonical progress, Results, Attendance, Class Participation, exam prep and next-level actions.");
+console.log("A1-A2-B1 now use one always-visible bottom conclusion; legacy milestone cards are hidden and completion wording follows canonical progress.");
