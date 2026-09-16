@@ -1,116 +1,45 @@
+import { B2_LESSON_CONTENT_ALIGNMENT } from "../../b2LessonContentAlignment";
+
 const makeB2ScheduleEntry = ({ day, chapter, topic, goal, grammar_topic }) => ({
   day,
   topic,
   chapter,
   goal,
-  instruction: "This is a B2 self-learning lesson. Open the guided lesson, learn the topic, practise with Falowen AI, improve from feedback and self-mark your progress.",
+  instruction: "This is a B2 self-learning lesson. Open the guided lesson, learn the topic, practise speaking and writing, improve from feedback and self-mark your progress.",
   grammar_topic,
   assignment: false,
   lesen_hören: {
     video: null,
     youtube_link: null,
     grammarbook_link: null,
-    workbook_link: day === 0 ? "/campus/course/b2-day-0-self-learning-orientation-workbook" : `/campus/course/lesson/B2/${day}`,
+    workbook_link:
+      day === 0
+        ? "/campus/course/b2-day-0-self-learning-orientation-workbook"
+        : `/campus/course/lesson/B2/${day}?chapter=${chapter}`,
     assignment: false,
   },
 });
 
-export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
-  makeB2ScheduleEntry({
-    day: 0,
-    chapter: "0",
-    topic: "Day 0 Orientation",
-    goal: "Start here to learn the B2 self-learning workflow before Day 1.",
-    grammar_topic: "Course orientation, writing workflow and honest self-marking",
-  }),
-  makeB2ScheduleEntry({
-    day: 1,
-    chapter: "1.1",
-    topic: "Persönliche Identität und Selbstverständnis",
-    goal: "Über sich selbst, Werte und persönliche Entwicklung sprechen.",
-    grammar_topic: "Adjektivdeklination, klare Begründungen und strukturierte Selbstdarstellung",
-  }),
-  makeB2ScheduleEntry({
-    day: 2,
-    chapter: "1.2",
-    topic: "Beziehungen und Kommunikation",
-    goal: "Beziehungstypen, Kommunikationsstrategien und höfliche Reaktionen diskutieren.",
-    grammar_topic: "Konjunktiv II (höfliche Bitten & hypothetische Situationen)",
-  }),
-  makeB2ScheduleEntry({
-    day: 3,
-    chapter: "1.3",
-    topic: "Arbeit und Beruf",
-    goal: "Berufliche Erfahrungen, Erwartungen und Zusammenarbeit beschreiben.",
-    grammar_topic: "Konjunktiv II für höfliche Vorschläge, berufliche Wünsche und realistische Empfehlungen",
-  }),
-  makeB2ScheduleEntry({
-    day: 4,
-    chapter: "1.4",
-    topic: "Beruf und Karriere",
-    goal: "Berufliche Ziele, Karrierewege und Weiterbildung im Arbeitsleben diskutieren.",
-    grammar_topic: "Finalsätze mit damit / um ... zu",
-  }),
-  makeB2ScheduleEntry({
-    day: 5,
-    chapter: "1.5",
-    topic: "Bildung und Lernen",
-    goal: "Lernformen, Weiterbildung und Lernstrategien sachlich diskutieren.",
-    grammar_topic: "Nominalisierung von Verben",
-  }),
-  makeB2ScheduleEntry({
-    day: 6,
-    chapter: "2.1",
-    topic: "Migration und Integration",
-    goal: "Migrationserfahrungen, Integration, Sprache, Teilhabe und gesellschaftliches Zusammenleben differenziert diskutieren.",
-    grammar_topic: "Konzessive Nebensätze mit obwohl / auch wenn, trotzdem und differenzierte Argumentation",
-  }),
-  makeB2ScheduleEntry({
-    day: 7,
-    chapter: "2.2",
-    topic: "Gesellschaftliche Vielfalt",
-    goal: "Vielfalt, unterschiedliche Lebensweisen, Respekt, Teilhabe und Chancengleichheit differenziert diskutieren.",
-    grammar_topic: "Relativsätze mit Präpositionen",
-  }),
-  makeB2ScheduleEntry({
-    day: 8,
-    chapter: "2.3",
-    topic: "Reisen und Mobilität",
-    goal: "Transport, Urlaub und nachhaltige Entscheidungen vergleichen.",
-    grammar_topic: "Vergleichsformen und abwägende Argumentation",
-  }),
-  makeB2ScheduleEntry({
-    day: 9,
-    chapter: "2.4",
-    topic: "Wohnen und Nachbarschaft",
-    goal: "Wohnformen, Mietprobleme und Zusammenleben beschreiben.",
-    grammar_topic: "Relativsätze und genaue Beschreibungen",
-  }),
-  makeB2ScheduleEntry({
-    day: 10,
-    chapter: "2.5",
-    topic: "Konsum und Geld",
-    goal: "Kaufentscheidungen, Budget und Werbung diskutieren.",
-    grammar_topic: "Konzessive Verbindungen mit obwohl und trotzdem",
-  }),
-  makeB2ScheduleEntry({ day: 11, chapter: "3.1", topic: "Gesellschaft und Integration", goal: "Sprache, Teilhabe und Zusammenleben erklären.", grammar_topic: "Argumentationsstruktur mit einerseits / andererseits" }),
-  makeB2ScheduleEntry({ day: 12, chapter: "3.2", topic: "Kultur und Freizeit", goal: "Hobbys, kulturelle Angebote und persönliche Interessen bewerten.", grammar_topic: "Adjektive, Präpositionen und Bewertungen" }),
-  makeB2ScheduleEntry({ day: 13, chapter: "3.3", topic: "Familie und Generationen", goal: "Familienmodelle, Generationenkonflikte und Verantwortung beschreiben.", grammar_topic: "Relativsätze mit Präpositionen und differenzierte Beschreibungen" }),
-  makeB2ScheduleEntry({ day: 14, chapter: "3.4", topic: "Freundschaft und soziale Beziehungen", goal: "Beziehungen, Vertrauen und soziale Erwartungen erklären.", grammar_topic: "Reflexive Verben, Wechselpräpositionen und Beziehungswortschatz" }),
-  makeB2ScheduleEntry({ day: 15, chapter: "3.5", topic: "Ernährung und Konsumverhalten", goal: "Essgewohnheiten, gesunde Ernährung und Konsumentscheidungen diskutieren.", grammar_topic: "Infinitiv mit zu und Nomen-Verb-Verbindungen" }),
-  makeB2ScheduleEntry({ day: 16, chapter: "4.1", topic: "Digitalisierung im Alltag", goal: "Digitale Werkzeuge, Chancen und Abhängigkeiten bewerten.", grammar_topic: "Indirekte Rede und sachliche Wiedergabe" }),
-  makeB2ScheduleEntry({ day: 17, chapter: "4.2", topic: "Mobilität und Stadtleben", goal: "Verkehr, Stadtplanung und Lebensqualität vergleichen.", grammar_topic: "Komparativ, Superlativ und abwägende Satzstrukturen" }),
-  makeB2ScheduleEntry({ day: 18, chapter: "4.3", topic: "Natur, Klima und Verantwortung", goal: "Klimaschutz, Natur und persönliche Verantwortung erklären.", grammar_topic: "Passiv mit Modalverben und sachliche Empfehlungen" }),
-  makeB2ScheduleEntry({ day: 19, chapter: "4.4", topic: "Freiwilligenarbeit und Engagement", goal: "Ehrenamt, gesellschaftliche Hilfe und persönliche Motivation diskutieren.", grammar_topic: "Final- und Kausalsätze zur Begründung von Engagement" }),
-  makeB2ScheduleEntry({ day: 20, chapter: "4.5", topic: "Technologie und Arbeit der Zukunft", goal: "Automatisierung, neue Berufe und berufliche Kompetenzen beschreiben.", grammar_topic: "Futur I, Vermutungen und Prognosen" }),
-  makeB2ScheduleEntry({ day: 21, chapter: "5.1", topic: "Migration und neue Lebenswege", goal: "Umzug, Integration und persönliche Chancen erklären.", grammar_topic: "Konzessive Nebensätze mit obwohl, auch wenn und trotzdem" }),
-  makeB2ScheduleEntry({ day: 22, chapter: "5.2", topic: "Demokratie und Mitbestimmung", goal: "Beteiligung, Rechte und gesellschaftliche Verantwortung diskutieren.", grammar_topic: "Argumentation mit Beispielen, Gegenargumenten und Fazit" }),
-  makeB2ScheduleEntry({ day: 23, chapter: "5.3", topic: "Work-Life-Balance", goal: "Arbeit, Freizeit, Erholung und Grenzen im Alltag erklären.", grammar_topic: "Je ... desto, damit und um ... zu für Ziel und Wirkung" }),
-  makeB2ScheduleEntry({ day: 24, chapter: "5.4", topic: "Wissenschaft und Forschung im Alltag", goal: "Forschung, Medizin, Technik und Nutzen für die Gesellschaft beschreiben.", grammar_topic: "Nominalisierung und sachliche Beschreibung" }),
-  makeB2ScheduleEntry({ day: 25, chapter: "5.5", topic: "Nachhaltiger Konsum", goal: "Kaufverhalten, Ressourcen und Verantwortung kritisch bewerten.", grammar_topic: "Partizipialattribute und präzise Beschreibungen" }),
-  makeB2ScheduleEntry({ day: 26, chapter: "6.1", topic: "Behörden, Termine und formelle Kommunikation", goal: "Formelle Anliegen, Termine und schriftliche Kommunikation trainieren.", grammar_topic: "Formelle E-Mail-Struktur, höfliche Bitten und Konjunktiv II" }),
-  makeB2ScheduleEntry({ day: 27, chapter: "6.2", topic: "Prüfungstraining: Argumentieren und Reagieren", goal: "Mündliche und schriftliche B2-Prüfungsstrategien anwenden.", grammar_topic: "Redemittel für Meinung, Zustimmung, Widerspruch und Beispiele" }),
-  makeB2ScheduleEntry({ day: 28, chapter: "6.3", topic: "Review und persönlicher Fortschritt", goal: "B2-Themen wiederholen, Schwächen erkennen und nächsten Lernplan erstellen.", grammar_topic: "Wiederholung: Konnektoren, Nebensätze, Konjunktiv II und Passiv" }),
-];
+const orientation = makeB2ScheduleEntry({
+  day: 0,
+  chapter: "0",
+  topic: "Day 0 Orientation",
+  goal: "Start here to learn the B2 self-learning workflow before Day 1.",
+  grammar_topic: "Course orientation, writing workflow and honest self-marking",
+});
+
+const alignedLessons = Object.values(B2_LESSON_CONTENT_ALIGNMENT)
+  .sort((left, right) => Number(left.day) - Number(right.day))
+  .map((lesson) =>
+    makeB2ScheduleEntry({
+      day: lesson.day,
+      chapter: lesson.chapter,
+      topic: lesson.title,
+      goal: lesson.goal,
+      grammar_topic: lesson.grammar_topic,
+    })
+  );
+
+export const B2_SELF_LEARNING_COURSE_SCHEDULE = [orientation, ...alignedLessons];
 
 export default B2_SELF_LEARNING_COURSE_SCHEDULE;
