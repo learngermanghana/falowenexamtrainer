@@ -69,6 +69,17 @@ replaceText("web/src/components/A1CanonicalSubmissionPanel.jsx", [
   ],
 ]);
 
+replaceText("web/src/components/A1TutorDraftSectionCapture.jsx", [
+  [
+    'import React, { useEffect, useRef, useState } from "react";',
+    'import React, { useEffect, useMemo, useRef, useState } from "react";',
+  ],
+  [
+    '  const choiceItems = sectionProfile?.items?.filter((item) => item.type === "choice") || [];\n  const shortItems = sectionProfile?.items?.filter((item) => item.type === "short") || [];',
+    '  const choiceItems = useMemo(\n    () => sectionProfile?.items?.filter((item) => item.type === "choice") || [],\n    [sectionProfile?.items],\n  );\n  const shortItems = useMemo(\n    () => sectionProfile?.items?.filter((item) => item.type === "short") || [],\n    [sectionProfile?.items],\n  );',
+  ],
+]);
+
 const cssPath = path.join(root, "web/src/index.css");
 if (fs.existsSync(cssPath)) {
   let css = fs.readFileSync(cssPath, "utf8");
@@ -106,4 +117,4 @@ if (fs.existsSync(cssPath)) {
   }
 }
 
-console.log("Aligned A1/A2/B1 mapped-workbook guidance with direct answer capture, shared radio affordances and editable final review.");
+console.log("Aligned A1/A2/B1 mapped-workbook guidance with direct answer capture, stable answer bindings, shared radio affordances and editable final review.");
