@@ -11,6 +11,16 @@ const replaceOnce = (text, before, after, label) => {
   return text.replace(before, after);
 };
 
+const contentRefreshPath = path.join(repoRoot, "web/src/data/c1ContentRefresh.js");
+let contentRefresh = fs.readFileSync(contentRefreshPath, "utf8");
+contentRefresh = replaceOnce(
+  contentRefresh,
+  `    objectives: [\n      profile.points[0],\n      profile.points[1],\n      profile.points[2],\n      profile.points[3],\n    ].map((item) => item.replace(/^Erläutern Sie|^Zeigen Sie|^Analysieren Sie|^Bewerten Sie|^Gehen Sie|^Entwickeln Sie|^Schlagen Sie|^Formulieren Sie/, "Ich kann")),`,
+  `    objectives: [\n      \`Ich kann die zentrale Fragestellung zu „\${lesson.title}“ differenziert erklären.\`,\n      "Ich kann ein Argument mit Begründung und einem konkreten Beispiel entwickeln.",\n      "Ich kann einen ernst zu nehmenden Einwand aufnehmen und sprachlich präzise einschränken.",\n      "Ich kann einen ausgewogenen Lösungsansatz formulieren und nachvollziehbar begründen.",\n    ],`,
+  "natural C1 objectives",
+);
+fs.writeFileSync(contentRefreshPath, contentRefresh);
+
 const registryPath = path.join(repoRoot, "web/src/components/SelfLearningLessonRegistry.js");
 let registry = fs.readFileSync(registryPath, "utf8");
 registry = replaceOnce(
@@ -71,7 +81,7 @@ for (const relativePath of [
   }
 }
 
-const refreshedSource = fs.readFileSync(path.join(repoRoot, "web/src/data/c1ContentRefresh.js"), "utf8");
+const refreshedSource = fs.readFileSync(contentRefreshPath, "utf8");
 for (let day = 1; day <= 28; day += 1) {
   if (!refreshedSource.includes(`  ${day}: {`)) throw new Error(`C1 content refresh missing Day ${day}`);
 }
