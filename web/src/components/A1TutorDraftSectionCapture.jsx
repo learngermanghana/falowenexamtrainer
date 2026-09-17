@@ -93,17 +93,22 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
   useEffect(() => {
     if (!sectionProfile?.embeddedWriting || !updateSectionText || typeof document === "undefined") return undefined;
     let textarea = null;
-    let lastValue = null;
+    let lastObservedValue = null;
     let attempts = 0;
     let interval = null;
 
-    const syncValue = () => {
+    const syncValue = (allowEmpty = false) => {
       if (!textarea?.isConnected) return;
       const value = textarea.value || "";
-      if (value === lastValue) return;
-      lastValue = value;
-      if (value || savedSection.text) updateSectionText(sectionKey, value);
+      if (value === lastObservedValue) return;
+      lastObservedValue = value;
+      const storedValue = String(savedSection.text || "");
+      if (!allowEmpty && !value) return;
+      if (value === storedValue) return;
+      updateSectionText(sectionKey, value);
     };
+
+    const handleInput = () => syncValue(true);
 
     const bind = () => {
       attempts += 1;
@@ -113,11 +118,11 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
       );
       const nextTextarea = panel?.querySelector("textarea") || null;
       if (nextTextarea && nextTextarea !== textarea) {
-        textarea?.removeEventListener("input", syncValue);
+        textarea?.removeEventListener("input", handleInput);
         textarea = nextTextarea;
-        lastValue = null;
-        textarea.addEventListener("input", syncValue);
-        syncValue();
+        lastObservedValue = null;
+        textarea.addEventListener("input", handleInput);
+        syncValue(false);
       }
       if (attempts > 40 && !textarea && interval) {
         window.clearInterval(interval);
@@ -128,12 +133,12 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
     bind();
     interval = window.setInterval(() => {
       bind();
-      syncValue();
+      syncValue(false);
     }, 500);
 
     return () => {
       if (interval) window.clearInterval(interval);
-      textarea?.removeEventListener("input", syncValue);
+      textarea?.removeEventListener("input", handleInput);
     };
   }, [savedSection.text, sectionKey, sectionProfile?.embeddedWriting, updateSectionText]);
 
