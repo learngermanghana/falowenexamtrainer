@@ -40,4 +40,8 @@ await import("./patchWorkbookSubmissionAutoSelection.mjs");
 // every build/test/start finishes with clickable Teil 3/4 answers and Teil 2 autosave.
 await import("./patchA2B1MappedSubmissionCapture.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, simplified Teil 2 writing, aligned workbook opening to section navigation, re-asserted structured submission ownership, and mapped workbook answers into Submit.");
+// Final presentation pass: keep the objective guidance/progress and completion
+// review on top of the mapped-submit runtime that production actually ships.
+await import("./patchA2B1WorkbookProgressReview.mjs");
+
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, simplified Teil 2 writing, aligned workbook opening to section navigation, re-asserted structured submission ownership, mapped workbook answers into Submit, and added answer progress plus incomplete-submit review.");
