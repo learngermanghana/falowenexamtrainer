@@ -44,4 +44,8 @@ await import("./patchA2B1MappedSubmissionCapture.mjs");
 // review on top of the mapped-submit runtime that production actually ships.
 await import("./patchA2B1WorkbookProgressReview.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, simplified Teil 2 writing, aligned workbook opening to section navigation, re-asserted structured submission ownership, mapped workbook answers into Submit, and added answer progress plus incomplete-submit review.");
+// Keep all learner-facing instructions consistent with the mapped workflow:
+// answer in the workbook, review the mapped draft, and edit the final text before submit.
+await import("./patchMappedWorkbookInteractionCopy.mjs");
+
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, simplified Teil 2 writing, aligned workbook opening to section navigation, re-asserted structured submission ownership, mapped workbook answers into Submit, added answer progress plus incomplete-submit review, and aligned A1/A2/B1 learner guidance with editable final review.");
