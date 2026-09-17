@@ -69,4 +69,41 @@ replaceText("web/src/components/A1CanonicalSubmissionPanel.jsx", [
   ],
 ]);
 
-console.log("Aligned A1/A2/B1 mapped-workbook guidance with direct answer capture and editable final review.");
+const cssPath = path.join(root, "web/src/index.css");
+if (fs.existsSync(cssPath)) {
+  let css = fs.readFileSync(cssPath, "utf8");
+  const a1RadioCss = `
+
+/* A1 tutor-marked mapped answers use the same visible radio affordance as A2/B1. */
+[data-a1-clickable-answer="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 11px;
+  vertical-align: -3px;
+  box-sizing: border-box;
+  border: 2px solid #94a3b8;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+[data-a1-clickable-answer="true"]:hover::before,
+[data-a1-clickable-answer="true"]:focus-visible::before {
+  border-color: #2563eb;
+}
+
+[data-a1-clickable-answer="true"][aria-checked="true"]::before {
+  border-color: #2563eb;
+  background-color: #2563eb;
+  box-shadow: inset 0 0 0 4px #ffffff;
+}
+`;
+  if (!css.includes('[data-a1-clickable-answer="true"]::before')) {
+    css = `${css.trimEnd()}${a1RadioCss}\n`;
+    fs.writeFileSync(cssPath, css);
+  }
+}
+
+console.log("Aligned A1/A2/B1 mapped-workbook guidance with direct answer capture, shared radio affordances and editable final review.");
