@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import {
   getAllowedWorkbookTabs,
+  sanitizeA1WorkbookSearch,
   useA1WorkbookTabState,
 } from "./A1SharedAssignmentWorkbookLayout";
 import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
@@ -59,6 +60,18 @@ describe("A1 tutor-marked workbook navigation", () => {
     );
 
     expect(result.current.activeTab).toBe("grammar");
+  });
+
+  test("removes the obsolete radio flag while preserving canonical A1 submit context", () => {
+    const cleaned = sanitizeA1WorkbookSearch(
+      "?radio=done&assignmentKey=A1-0.2&assignmentId=A1-0.2&level=A1&workbookTab=submit",
+    );
+
+    expect(cleaned.has("radio")).toBe(false);
+    expect(cleaned.get("assignmentKey")).toBe("A1-0.2");
+    expect(cleaned.get("assignmentId")).toBe("A1-0.2");
+    expect(cleaned.get("level")).toBe("A1");
+    expect(cleaned.get("workbookTab")).toBe("submit");
   });
 
   test("Overview tells students to read Grammar and apply it to the assignment", () => {
