@@ -48,6 +48,7 @@ const ChoiceControl = ({ item, value, onChange, groupName }) => (
               type="radio"
               name={groupName}
               value={choice}
+              aria-label={`Question ${item.number}: ${choice}`}
               checked={selected}
               onChange={() => onChange(choice)}
               style={{ width: 18, height: 18, margin: 0 }}
