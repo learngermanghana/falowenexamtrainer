@@ -1,7 +1,14 @@
-import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
-
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import { styles } from "../styles";
+import {
+  countCompletedA1Answers,
+  readA1WorkbookDraft,
+  saveA1WorkbookDraft,
+} from "../utils/a1WorkbookDraft";
+
+const ASSIGNMENT_KEY = "A1-3";
 
 const card = {
   ...styles.card,
@@ -20,26 +27,28 @@ const listSpacing = {
   lineHeight: 1.7,
 };
 
-const infoBox = {
+const draftNoticeStyle = {
   margin: 0,
-  background: "#fef3c7",
-  borderRadius: 8,
+  border: "1px solid #bfdbfe",
+  borderRadius: 10,
+  background: "#eff6ff",
+  color: "#1e3a8a",
   padding: "10px 12px",
-  fontWeight: 700,
-  lineHeight: 1.6,
+  fontWeight: 800,
+  lineHeight: 1.55,
 };
 
-const mutedText = {
-  margin: 0,
-  color: "#4b5563",
-  lineHeight: 1.6,
+const answerInputStyle = {
+  ...styles.input,
+  minHeight: 44,
+  width: "100%",
 };
 
 const priceQuestions = [
-  "1. Wie viel kostet das Buch? – ______ kostet 20 Euro.",
-  "2. Wie viel kostet die Lampe? – ______ kostet 15 Euro.",
-  "3. Wie viel kostet das Auto? – ______ kostet 25.000 Euro.",
-  "4. Wie viel kostet der Stuhl? – ______ kostet 50 Euro.",
+  { prompt: "Wie viel kostet das Buch?", suffix: "kostet 20 Euro." },
+  { prompt: "Wie viel kostet die Lampe?", suffix: "kostet 15 Euro." },
+  { prompt: "Wie viel kostet das Auto?", suffix: "kostet 25.000 Euro." },
+  { prompt: "Wie viel kostet der Stuhl?", suffix: "kostet 50 Euro." },
 ];
 
 const familyIdeas = [
@@ -51,16 +60,16 @@ const familyIdeas = [
 ];
 
 const hobbiesQuestions = [
-  "1. Spielst du gern Fußball?",
-  "2. Schwimmst du gern?",
-  "3. Liest du gern?",
-  "4. Malst du gern?",
-  "5. Hörst du gern Musik?",
-  "6. Kochst du gern?",
-  "7. Reist du gern?",
-  "8. Machst du gern Gartenarbeit?",
-  "9. Fährst du gern Rad?",
-  "10. Wanderst du gern?",
+  "Spielst du gern Fußball?",
+  "Schwimmst du gern?",
+  "Liest du gern?",
+  "Malst du gern?",
+  "Hörst du gern Musik?",
+  "Kochst du gern?",
+  "Reist du gern?",
+  "Machst du gern Gartenarbeit?",
+  "Fährst du gern Rad?",
+  "Wanderst du gern?",
 ];
 
 const hobbiesVocabulary = [
@@ -76,275 +85,270 @@ const hobbiesVocabulary = [
   "Hiking – Wandern",
 ];
 
-const usefulVerbs = [
-  "to read – lesen",
-  "to swim – schwimmen",
-  "to play – spielen",
-  "to paint – malen",
-  "to listen – hören",
-  "to cook – kochen",
-  "to travel – reisen",
-  "to garden – gärtnern",
-  "to cycle – radfahren",
-  "to hike – wandern",
-];
-
 const usefulPhrases = [
-  "My hobby is... – Mein Hobby ist...",
-  "I like to... – Ich mag...",
-  "I enjoy... – Ich genieße...",
-  "In my free time, I... – In meiner Freizeit...",
-  "I do this hobby... – Ich mache dieses Hobby...",
-  "I often... – Ich mache oft...",
-  "I sometimes... – Ich mache manchmal...",
-  "My favorite moment was... – Mein Lieblingsmoment war...",
-  "I do this hobby with... – Ich mache dieses Hobby mit...",
-  "I do this hobby alone. – Ich mache dieses Hobby allein.",
+  "Mein Hobby ist ...",
+  "Ich ... gern.",
+  "Ich mag ...",
+  "In meiner Freizeit ...",
+  "Nein, ich ... nicht gern.",
 ];
 
-const hobbyAdjectives = [
-  "Relaxing – entspannend",
-  "Fun – lustig",
-  "Exciting – aufregend",
-  "Interesting – interessant",
-  "Challenging – herausfordernd",
-  "Healthy – gesund",
-  "Creative – kreativ",
-  "Adventurous – abenteuerlich",
-  "Energetic – energiegeladen",
-  "Inspiring – inspirierend",
-];
+const normalizeStoredSections = (stored = {}) => ({
+  "teil-1": {
+    answers: stored?.["teil-1"]?.answers && typeof stored["teil-1"].answers === "object"
+      ? stored["teil-1"].answers
+      : {},
+  },
+  "teil-2": {
+    text: String(stored?.["teil-2"]?.text || ""),
+  },
+  "teil-3": {
+    answers: stored?.["teil-3"]?.answers && typeof stored["teil-3"].answers === "object"
+      ? stored["teil-3"].answers
+      : {},
+  },
+});
 
-const exampleSentences = [
-  "I like to read books. – Ich mag Bücher lesen.",
-  "I swim twice a week. – Ich schwimme zweimal pro Woche.",
-  "Playing football is fun. – Fußballspielen macht Spaß.",
-  "She enjoys painting. – Sie genießt Malen.",
-  "We listen to music every day. – Wir hören jeden Tag Musik.",
-  "He likes to cook new recipes. – Er kocht gern neue Rezepte.",
-  "Traveling is exciting. – Reisen ist aufregend.",
-  "My mother loves gardening. – Meine Mutter liebt Gartenarbeit.",
-  "Cycling keeps me healthy. – Radfahren hält mich gesund.",
-  "Hiking is adventurous. – Wandern ist abenteuerlich.",
-];
+const DraftNotice = ({ savedAt = "" }) => (
+  <p role="status" aria-live="polite" style={draftNoticeStyle}>
+    Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted to your tutor yet.</strong>
+  </p>
+);
 
 const A1Chapter3AskingAboutPricesWorkbookPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialDraft = useMemo(() => readA1WorkbookDraft(ASSIGNMENT_KEY), []);
+  const [sections, setSections] = useState(() => normalizeStoredSections(initialDraft.sections));
+  const [savedAt, setSavedAt] = useState(initialDraft.updatedAt || "");
+
+  useEffect(() => {
+    const saved = saveA1WorkbookDraft({ assignmentKey: ASSIGNMENT_KEY, sections });
+    setSavedAt(saved.updatedAt);
+  }, [sections]);
+
+  const priceProgress = countCompletedA1Answers(sections["teil-1"].answers, priceQuestions.length);
+  const hobbiesProgress = countCompletedA1Answers(sections["teil-3"].answers, hobbiesQuestions.length);
+  const familyText = sections["teil-2"].text;
+  const familyComplete = Boolean(familyText.trim());
+  const familyWordCount = familyText.trim() ? familyText.trim().split(/\s+/).filter(Boolean).length : 0;
+  const workbookComplete = priceProgress.complete && familyComplete && hobbiesProgress.complete;
+
+  const updateNumberedAnswer = (sectionKey, number, value) => {
+    setSections((current) => ({
+      ...current,
+      [sectionKey]: {
+        ...current[sectionKey],
+        answers: {
+          ...(current[sectionKey]?.answers || {}),
+          [number]: value,
+        },
+      },
+    }));
+  };
+
+  const updateFamilyText = (value) => {
+    setSections((current) => ({
+      ...current,
+      "teil-2": { ...current["teil-2"], text: value },
+    }));
+  };
+
+  const openSubmit = () => {
+    const search = new URLSearchParams(location.search || "");
+    search.set("workbookTab", "submit");
+    search.set("assignmentKey", ASSIGNMENT_KEY);
+    search.set("assignmentId", ASSIGNMENT_KEY);
+    search.set("level", "A1");
+    navigate(
+      { pathname: location.pathname, search: `?${search.toString()}` },
+      {
+        replace: true,
+        state: {
+          ...(location.state || {}),
+          level: "A1",
+          day: 7,
+          chapter: "3",
+          assignmentKey: ASSIGNMENT_KEY,
+          assignmentId: ASSIGNMENT_KEY,
+          canonicalAssignmentKey: ASSIGNMENT_KEY,
+          inlineCourseSubmission: true,
+        },
+      },
+    );
+  };
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Chapter 3 Workbook · Asking About Prices
-        </h1>
-
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          In-app workbook for Chapter 3. Complete the exercises in your notebook
-          first, then submit your final work in the assignment submission tab.
+    <A1TutorMarkedWorkbookShell
+      fallbackAssignmentKey={ASSIGNMENT_KEY}
+      title="A1 · Chapter 3 Workbook · Asking About Prices"
+      subtitle="Day 7 · Chapter 3 · Tutor-marked assignment"
+      assignmentIntro="Answer all three Teile in the workbook. Falowen saves your work as a draft, but your tutor does not receive it until you open Review & Submit and press Submit to Tutor."
+      submitTitle="Review & Submit A1 · Chapter 3"
+      submitDescription="Review the mapped workbook draft below. It has not been sent to your tutor yet. Only Submit to Tutor sends the final assignment."
+    >
+      <div
+        data-a1-chapter3-draft-guidance="true"
+        style={{ ...card, border: "1px solid #fbbf24", background: "#fffbeb" }}
+      >
+        <strong>Workbook draft — not a submission</strong>
+        <p style={{ margin: 0, lineHeight: 1.65 }}>
+          Type your answers directly in each Teil. They are saved automatically so you do not have to copy them later.
+          Your work becomes final only after you open <strong>Review & Submit</strong> and press <strong>Submit to Tutor</strong>.
         </p>
       </div>
 
-      <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80"
-            alt="Shopping and prices in a store"
-            loading="lazy"
-            style={{
-              width: "100%",
-              borderRadius: 10,
-              maxHeight: 260,
-              objectFit: "cover",
-            }}
+      <section style={card}>
+        <h2 style={sectionTitle}>Teil 1: Preise und Kosten (Exercise 1)</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Übung 3: Frage nach dem Preis.</strong> Use the correct pronoun to complete each answer.
+        </p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {priceQuestions.map((question, index) => {
+            const number = index + 1;
+            return (
+              <label
+                key={question.prompt}
+                style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}
+              >
+                <strong>{number}. {question.prompt}</strong>
+                <div style={{ display: "grid", gridTemplateColumns: "minmax(100px, 180px) 1fr", gap: 8, alignItems: "center" }}>
+                  <input
+                    type="text"
+                    value={sections["teil-1"].answers?.[number] || ""}
+                    onChange={(event) => updateNumberedAnswer("teil-1", number, event.target.value)}
+                    aria-label={`Teil 1 answer ${number}`}
+                    placeholder="Pronomen"
+                    style={answerInputStyle}
+                    autoComplete="off"
+                  />
+                  <span>{question.suffix}</span>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontWeight: 800 }}>
+          <span>{priceProgress.completed} of {priceProgress.total} answered</span>
+          <span>{priceProgress.complete ? "Teil 1 complete" : `${priceProgress.total - priceProgress.completed} remaining`}</span>
+        </div>
+        <DraftNotice savedAt={savedAt} />
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>Teil 2: Writing About Family (Exercise 2)</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Schreibe über deine Familie.</strong> Write one short connected text. Use the ideas below as support.
+        </p>
+        <ol style={listSpacing}>
+          {familyIdeas.map((item) => <li key={item}>{item}</li>)}
+        </ol>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#f9fafb" }}>
+          <h3 style={{ ...sectionTitle, marginBottom: 8 }}>Beispiel</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Meine Familie ist klein. Meine Mutter heißt Anna und sie ist Lehrerin. Mein Vater heißt Peter und er ist Ingenieur.
+            Ich habe eine Schwester. Wir wohnen in Berlin. Meine Mutter liest gern und mein Vater spielt gern Fußball.
+          </p>
+        </div>
+
+        <label style={{ display: "grid", gap: 8 }}>
+          <strong>Your family text</strong>
+          <textarea
+            value={familyText}
+            onChange={(event) => updateFamilyText(event.target.value)}
+            aria-label="A1 Chapter 3 family writing draft"
+            placeholder="Meine Familie ..."
+            style={{ ...styles.textArea, minHeight: 190 }}
           />
+          <span style={styles.helperText}>{familyWordCount} words · {familyComplete ? "Draft saved" : "Write your answer here"}</span>
+        </label>
+        <DraftNotice savedAt={savedAt} />
+      </section>
 
-          <h2 style={sectionTitle}>Teil 1: Preise und Kosten (Exercise 1)</h2>
+      <section style={card}>
+        <h2 style={sectionTitle}>Teil 3: Hobbys (Exercise 3)</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Answer each question in a complete sentence using <strong>gern</strong>, <strong>nicht gern</strong> or <strong>mögen</strong>.
+        </p>
 
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Übung 3: Frage nach dem Preis.</strong> Übe Fragen nach dem
-            Preis und antworte darauf.
-          </p>
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#f9fafb", display: "grid", gap: 6 }}>
+          <strong>How to answer</strong>
+          <span>Ja, ich spiele gern Fußball.</span>
+          <span>Ja, ich mag Fußball.</span>
+          <span>Nein, ich spiele nicht gern Fußball.</span>
+        </div>
 
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Practice asking for the price and answering the questions by using
-            the pronouns.
-          </p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {hobbiesQuestions.map((question, index) => {
+            const number = index + 1;
+            return (
+              <label
+                key={question}
+                style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}
+              >
+                <strong>{number}. {question}</strong>
+                <input
+                  type="text"
+                  value={sections["teil-3"].answers?.[number] || ""}
+                  onChange={(event) => updateNumberedAnswer("teil-3", number, event.target.value)}
+                  aria-label={`Teil 3 answer ${number}`}
+                  placeholder="Ihre Antwort ..."
+                  style={answerInputStyle}
+                  autoComplete="off"
+                />
+              </label>
+            );
+          })}
+        </div>
 
-          <p style={infoBox}>Use the pronouns to answer.</p>
+        <div style={{ display: "grid", gap: 10, borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
+          <h3 style={sectionTitle}>Useful vocabulary</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>{hobbiesVocabulary.join(" · ")}</p>
+          <h3 style={sectionTitle}>Useful phrases</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>{usefulPhrases.join(" · ")}</p>
+        </div>
 
-          <ol style={listSpacing}>
-            {priceQuestions.map((item) => (
-              <li key={item}>{item.replace(/^\d+\.\s*/, "")}</li>
-            ))}
-          </ol>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontWeight: 800 }}>
+          <span>{hobbiesProgress.completed} of {hobbiesProgress.total} answered</span>
+          <span>{hobbiesProgress.complete ? "Teil 3 complete" : `${hobbiesProgress.total - hobbiesProgress.completed} remaining`}</span>
+        </div>
+        <DraftNotice savedAt={savedAt} />
 
-          <p style={mutedText}>
-            No text box is needed here. Write your answers in your notebook and
-            submit them through the assignment submission tab.
-          </p>
-      </div>
-
-      <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1600&q=80"
-            alt="Family together at home"
-            loading="lazy"
-            style={{
-              width: "100%",
-              borderRadius: 10,
-              maxHeight: 260,
-              objectFit: "cover",
-            }}
-          />
-
-          <h2 style={sectionTitle}>
-            Teil 2: Writing About Family (Exercise 2)
-          </h2>
-
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Schreibe über deine Familie.</strong>
-          </p>
-
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Write a short text about your family. Use the following ideas:
-          </p>
-
-          <ol style={listSpacing}>
-            {familyIdeas.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 10,
-              padding: 12,
-              background: "#fff",
-            }}
-          >
-            <h3 style={{ ...sectionTitle, marginBottom: 8 }}>
-              Example / Beispiel
-            </h3>
-
-            <p style={{ marginTop: 0, lineHeight: 1.7 }}>
-              My family is small. My mother&apos;s name is Anna and she is 45
-              years old. She is a teacher. My father&apos;s name is Peter and he
-              is 50 years old. He is an engineer. I have a sister. Her name is
-              Lisa and she is 20 years old. She studies at the university. We
-              live in a house in Berlin. My mother likes to read books, my
-              father likes to play football, and my sister likes music.
-            </p>
-
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Meine Familie ist klein. Meine Mutter heißt Anna und sie ist 45
-              Jahre alt. Sie ist Lehrerin. Mein Vater heißt Peter und er ist 50
-              Jahre alt. Er ist Ingenieur. Ich habe eine Schwester. Sie heißt
-              Lisa und sie ist 20 Jahre alt. Sie studiert an der Universität.
-              Wir wohnen in einem Haus in Berlin. Meine Mutter liest gern
-              Bücher, mein Vater spielt gern Fußball und meine Schwester mag
-              Musik.
-            </p>
+        <div
+          data-a1-chapter3-workbook-completion="true"
+          style={{
+            ...styles.card,
+            border: `2px solid ${workbookComplete ? "#22c55e" : "#fbbf24"}`,
+            background: workbookComplete ? "#f0fdf4" : "#fffbeb",
+            display: "grid",
+            gap: 10,
+            marginTop: 4,
+          }}
+        >
+          <strong>{workbookComplete ? "Workbook complete" : "Finish the workbook before submitting"}</strong>
+          <div style={{ display: "grid", gap: 5 }}>
+            <span>Teil 1 · Preise: {priceProgress.complete ? "✓" : `${priceProgress.completed}/${priceProgress.total}`}</span>
+            <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words saved` : "Writing still required"}</span>
+            <span>Teil 3 · Hobbys: {hobbiesProgress.complete ? "✓" : `${hobbiesProgress.completed}/${hobbiesProgress.total}`}</span>
           </div>
-
-          <p style={mutedText}>
-            Write your own family text in your notebook. Do not type your answer
-            on this page. Submit it in the assignment area.
+          <p style={{ margin: 0, lineHeight: 1.6, fontWeight: 800 }}>
+            Your answers are saved as a draft. <strong>They have NOT been sent to your tutor.</strong>
           </p>
-      </div>
-
-      <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80"
-            alt="People enjoying hobbies together"
-            loading="lazy"
-            style={{
-              width: "100%",
-              borderRadius: 10,
-              maxHeight: 260,
-              objectFit: "cover",
-            }}
-          />
-
-          <h2 style={sectionTitle}>Teil 3: Hobbys (Exercise 3)</h2>
-
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Answer the following questions about your hobbies using{" "}
-            <strong>gern</strong> or <strong>mögen</strong>.
-          </p>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 10,
-              padding: 12,
-              background: "#fff",
-            }}
+          <button
+            type="button"
+            onClick={openSubmit}
+            style={{ ...styles.primaryButton, width: "fit-content", minHeight: 46 }}
+            disabled={!workbookComplete}
           >
-            <h3 style={{ ...sectionTitle, marginBottom: 8 }}>
-              How to answer / Beispiel
-            </h3>
-            <p style={{ marginTop: 0, lineHeight: 1.7 }}>
-              <strong>Question:</strong> Spielst du gern Fußball?
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Answer 1:</strong> Ja, ich spiele gern Fußball.
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Answer 2:</strong> Ja, ich mag Fußball.
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Answer 3:</strong> Nein, ich spiele nicht gern Fußball.
-            </p>
-          </div>
-
-          <ol style={listSpacing}>
-            {hobbiesQuestions.map((question) => (
-              <li key={question}>{question.replace(/^\d+\.\s*/, "")}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Vocabulary List: Hobbies (Hobbys)</h3>
-          <ol style={listSpacing}>
-            {hobbiesVocabulary.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Useful Verbs</h3>
-          <ol style={listSpacing}>
-            {usefulVerbs.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Phrases</h3>
-          <ol style={listSpacing}>
-            {usefulPhrases.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Adjectives</h3>
-          <ol style={listSpacing}>
-            {hobbyAdjectives.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <h3 style={sectionTitle}>Example Sentences</h3>
-          <ol style={listSpacing}>
-            {exampleSentences.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-
-          <p style={mutedText}>
-            No typing area is needed here. Answer the questions in your notebook
-            and submit them through the assignment submission tab.
-          </p>
-      </div>
-    </div>
+            Review & Submit Assignment
+          </button>
+          {!workbookComplete ? (
+            <span style={styles.helperText}>Complete every required answer above to unlock Review & Submit.</span>
+          ) : null}
+        </div>
+      </section>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 
