@@ -10,6 +10,17 @@ export const WorkbookSection = ({ sectionKey, children }) => (
 const contentError = (assignmentKey, message) =>
   new Error(`[A1 workbook ${assignmentKey}] ${message}`);
 
+export const sanitizeA1WorkbookSearch = (search = "") => {
+  const params = new URLSearchParams(search || "");
+  params.delete("radio");
+  return params;
+};
+
+const workbookSearchText = (params) => {
+  const text = params.toString();
+  return text ? `?${text}` : "";
+};
+
 export const validateWorkbookSections = (assignment, sectionElements) => {
   const declared = assignment.sections.map(({ key }) => key);
   if (new Set(declared).size !== declared.length) {
@@ -55,28 +66,32 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   const navigate = useNavigate();
   const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar), [hasGrammar, sections]);
   const fallbackTab = sections.length ? "overview" : "assignment";
-  const requestedTab = new URLSearchParams(location.search).get("workbookTab");
+  const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const requestedTab = rawSearch.get("workbookTab");
   const activeTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
 
   useEffect(() => {
-    if (!requestedTab || allowedTabs.includes(requestedTab)) return;
-    const search = new URLSearchParams(location.search);
-    search.set("workbookTab", fallbackTab);
+    const hasLegacyRadioFlag = rawSearch.has("radio");
+    const hasInvalidRequestedTab = Boolean(requestedTab && !allowedTabs.includes(requestedTab));
+    if (!hasLegacyRadioFlag && !hasInvalidRequestedTab) return;
+
+    const search = sanitizeA1WorkbookSearch(location.search);
+    if (hasInvalidRequestedTab) search.set("workbookTab", fallbackTab);
     navigate(
-      { pathname: location.pathname, search: `?${search.toString()}`, hash: location.hash },
+      { pathname: location.pathname, search: workbookSearchText(search), hash: location.hash },
       { replace: true, state: location.state },
     );
-  }, [allowedTabs, fallbackTab, location.hash, location.pathname, location.search, location.state, navigate, requestedTab]);
+  }, [allowedTabs, fallbackTab, location.hash, location.pathname, location.search, location.state, navigate, rawSearch, requestedTab]);
 
   const openTab = useCallback((key) => {
     if (!allowedTabs.includes(key)) return;
-    const search = new URLSearchParams(location.search);
+    const search = sanitizeA1WorkbookSearch(location.search);
     search.set("workbookTab", key);
     search.set("assignmentKey", assignment.assignmentKey);
     search.set("assignmentId", assignment.assignmentKey);
     search.set("level", "A1");
     navigate(
-      { pathname: location.pathname, search: `?${search.toString()}`, hash: location.hash },
+      { pathname: location.pathname, search: workbookSearchText(search), hash: location.hash },
       {
         replace: true,
         state: {
