@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { markLetterWithAI } from "../services/coachService";
 import WritingFeedbackCard from "./WritingFeedbackCard";
@@ -22,10 +22,16 @@ export default function B1InlineWritingAnalyser({
   const [feedbackData, setFeedbackData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [analysedText, setAnalysedText] = useState("");
+  const latestTextRef = useRef(String(text || ""));
   const resolvedLevel = String(level || "B1").toUpperCase() === "A2" ? "A2" : "B1";
 
+  useEffect(() => {
+    latestTextRef.current = String(text || "");
+  }, [text]);
+
   const analyseText = async () => {
-    const draft = String(text || "").trim();
+    const draft = String(latestTextRef.current || "").trim();
     if (!draft) {
       setError("Write your German text first, then click Analyse my text.");
       return;
@@ -43,6 +49,16 @@ export default function B1InlineWritingAnalyser({
         promptType: "opinion",
         idToken,
       });
+      const latestDraft = String(latestTextRef.current || "").trim();
+      if (latestDraft !== draft) {
+        setFeedbackData(null);
+        setAnalysedText("");
+        setError(
+          "Your text changed while analysis was running. Your latest version is still saved for Submit. Click Analyse my text again to analyse the newest version.",
+        );
+        return;
+      }
+      setAnalysedText(draft);
       setFeedbackData(result);
     } catch (analyseError) {
       setError(
@@ -72,7 +88,7 @@ export default function B1InlineWritingAnalyser({
         <WritingFeedbackCard
           feedback={feedbackData.feedback || "Analysis completed."}
           level={resolvedLevel}
-          draft={text}
+          draft={analysedText || text}
           rubric={feedbackData.rubric || null}
           corrections={feedbackData.corrections || []}
           simplifiedFeedback={feedbackData.simplifiedFeedback || null}
