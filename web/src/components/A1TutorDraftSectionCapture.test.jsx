@@ -24,7 +24,7 @@ test("Health Teil 1 exposes clickable radio choices and stores the selected answ
   expect(screen.getByText("Assignment draft · Not submitted")).toBeInTheDocument();
   expect(screen.getByText("0 of 5 answered")).toBeInTheDocument();
 
-  const firstChoice = screen.getByRole("radio", { name: "Anzeige A" });
+  const firstChoice = screen.getByRole("radio", { name: "Question 1: Anzeige A" });
   fireEvent.click(firstChoice);
 
   expect(firstChoice).toBeChecked();
