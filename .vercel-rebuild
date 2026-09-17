@@ -1,3 +1,4 @@
 Vercel rebuild trigger
-Reason: deploy final A1 Day 20 canonical workbook, global Study Buddy overlay, and production AI API routing fixes after the prior build completed.
-Triggered: 2026-08-28T12:58:30+01:00
+Reason: deploy the latest A1 tutor-marked workbook tab-navigation fix and A1 Course Book health stabilization after the previous main deployment was rejected by Vercel's temporary build-rate limit.
+Target main includes: e49658ebd65d7d82cf613f043485badc09fbc261
+Triggered: 2026-09-17T21:30:00+00:00
