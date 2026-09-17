@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { styles } from "../styles";
 import {
   getA1TutorDraftProfile,
@@ -8,12 +8,11 @@ import { useA1TutorWorkbookDraft } from "./A1TutorWorkbookDraftContext";
 
 const statusText = (saveState) => {
   if (saveState === "saving") return "Saving draft…";
-  if (saveState === "saved") return "Draft saved.";
-  if (saveState === "error") return "Draft could not be saved to the cloud. Your device copy is still available.";
-  return "Draft saves automatically.";
+  if (saveState === "saved") return "Draft saved on this device.";
+  return "Draft saves automatically on this device.";
 };
 
-const ChoiceControl = ({ item, value, onChange }) => (
+const ChoiceControl = ({ item, value, onChange, groupName }) => (
   <fieldset
     style={{
       border: "1px solid #dbeafe",
@@ -47,7 +46,7 @@ const ChoiceControl = ({ item, value, onChange }) => (
           >
             <input
               type="radio"
-              name={`a1-draft-${item.number}`}
+              name={groupName}
               value={choice}
               checked={selected}
               onChange={() => onChange(choice)}
@@ -80,15 +79,65 @@ const ShortControl = ({ item, value, onChange }) => (
 
 export default function A1TutorDraftSectionCapture({ sectionKey }) {
   const draftContext = useA1TutorWorkbookDraft();
-  if (!draftContext) return null;
-  const { assignmentKey, draft, saveState, updateAnswer, updateSectionText } = draftContext;
+  const assignmentKey = draftContext?.assignmentKey || "";
+  const draft = draftContext?.draft;
+  const saveState = draftContext?.saveState;
+  const updateAnswer = draftContext?.updateAnswer;
+  const updateSectionText = draftContext?.updateSectionText;
   const profile = getA1TutorDraftProfile(assignmentKey);
   const sectionProfile = profile?.sections?.[sectionKey];
-  if (!sectionProfile || sectionProfile.readOnly || sectionProfile.required === false) return null;
-
   const savedSection = draft?.sections?.[sectionKey] || {};
   const progress = getA1TutorDraftSectionProgress({ assignmentKey, sectionKey, draft });
-  const label = sectionProfile.label || sectionKey.replace("teil-", "Teil ");
+  const label = sectionProfile?.label || sectionKey.replace("teil-", "Teil ");
+
+  useEffect(() => {
+    if (!sectionProfile?.embeddedWriting || !updateSectionText || typeof document === "undefined") return undefined;
+    let textarea = null;
+    let lastValue = null;
+    let attempts = 0;
+    let interval = null;
+
+    const syncValue = () => {
+      if (!textarea?.isConnected) return;
+      const value = textarea.value || "";
+      if (value === lastValue) return;
+      lastValue = value;
+      if (value || savedSection.text) updateSectionText(sectionKey, value);
+    };
+
+    const bind = () => {
+      attempts += 1;
+      const panels = Array.from(document.querySelectorAll('[data-a1-course-book-letter-practice="true"]'));
+      const panel = panels.find((candidate) =>
+        String(candidate.getAttribute("data-writing-task-id") || "").includes(sectionKey),
+      );
+      const nextTextarea = panel?.querySelector("textarea") || null;
+      if (nextTextarea && nextTextarea !== textarea) {
+        textarea?.removeEventListener("input", syncValue);
+        textarea = nextTextarea;
+        lastValue = null;
+        textarea.addEventListener("input", syncValue);
+        syncValue();
+      }
+      if (attempts > 40 && !textarea && interval) {
+        window.clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    bind();
+    interval = window.setInterval(() => {
+      bind();
+      syncValue();
+    }, 500);
+
+    return () => {
+      if (interval) window.clearInterval(interval);
+      textarea?.removeEventListener("input", syncValue);
+    };
+  }, [savedSection.text, sectionKey, sectionProfile?.embeddedWriting, updateSectionText]);
+
+  if (!draftContext || !sectionProfile || sectionProfile.readOnly || sectionProfile.required === false) return null;
 
   return (
     <section
@@ -146,6 +195,7 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
                 item={item}
                 value={savedSection.answers?.[item.number]}
                 onChange={(value) => updateAnswer(sectionKey, item.number, value)}
+                groupName={`a1-draft-${assignmentKey}-${sectionKey}-${item.number}`}
               />
             ) : (
               <ShortControl
