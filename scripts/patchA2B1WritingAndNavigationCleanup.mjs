@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const writingPath = path.join(root, "web/src/components/B1WritingWorkspace.js");
 const navPath = path.join(root, "web/src/components/StandardWorkbookComponents.js");
+const a2WorkbookPath = path.join(root, "web/src/components/A2StandardTabbedWorkbookPage.js");
+const submissionRuntimePath = path.join(root, "web/src/components/WorkbookSubmissionCaptureRuntime.js");
 
 const writingSource = fs.readFileSync(writingPath, "utf8");
 const simpleWorkspace = `export default function B1WritingWorkspace({ writingContext = {} }) {
@@ -44,6 +46,24 @@ nextWritingSource = nextWritingSource.replace(
   'import React, { useState } from "react";',
 );
 fs.writeFileSync(writingPath, nextWritingSource);
+
+let a2WorkbookSource = fs.readFileSync(a2WorkbookPath, "utf8");
+a2WorkbookSource = a2WorkbookSource.replace(
+  '      <A2SecondStageWritingUpgrade day={day} />\n',
+  "",
+);
+fs.writeFileSync(a2WorkbookPath, a2WorkbookSource);
+
+let submissionRuntime = fs.readFileSync(submissionRuntimePath, "utf8");
+const activePartAnchor = `  if (!activePartId) return null;\n\n  const isSelfCheck =`;
+const silentWritingAnchor = `  if (!activePartId) return null;\n  if (activePartId === "teil2") return null;\n\n  const isSelfCheck =`;
+if (!submissionRuntime.includes(silentWritingAnchor)) {
+  if (!submissionRuntime.includes(activePartAnchor)) {
+    throw new Error("Could not find mapped submission status anchor for silent Teil 2 autosave.");
+  }
+  submissionRuntime = submissionRuntime.replace(activePartAnchor, silentWritingAnchor);
+}
+fs.writeFileSync(submissionRuntimePath, submissionRuntime);
 
 let navSource = fs.readFileSync(navPath, "utf8");
 navSource = navSource.replace(
@@ -116,4 +136,4 @@ if (!navSource.includes("scrollMarginTop: 96")) {
 
 fs.writeFileSync(navPath, navSource);
 
-console.log("Simplified A2/B1 Teil 2 writing to the German text box + Analyse only and aligned workbook opening position to the section navigation.");
+console.log("Simplified A2/B1 Teil 2 writing to task + German text/Analyse, kept Teil 2 autosave silent, removed the extra A2 writing-plan card, and aligned workbook opening to the section navigation.");
