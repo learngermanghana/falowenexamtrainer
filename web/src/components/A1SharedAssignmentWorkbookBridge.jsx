@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom";
 import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
+import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
+import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes, { getA1GrammarNotesComponent } from "./A1WorkbookGrammarNotes";
 import {
   A1AssignmentNeighborLinks,
@@ -11,6 +13,7 @@ import {
   useA1WorkbookTabState,
 } from "./A1SharedAssignmentWorkbookLayout";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import { getA1TutorDraftProfile } from "../data/a1TutorDraftProfiles";
 
 const NAV_HOST_ATTRIBUTE = "data-a1-canonical-bridge-nav";
 const OVERVIEW_GUIDANCE_HOST_ATTRIBUTE = "data-a1-canonical-bridge-overview-guidance";
@@ -125,6 +128,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     [mountState.sections],
   );
   const hasGrammar = Boolean(getA1GrammarNotesComponent(assignment.assignmentKey));
+  const draftProfile = getA1TutorDraftProfile(assignment.assignmentKey);
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
   const pendingViewportTabRef = useRef("");
 
@@ -154,9 +158,6 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
     const retryInstall = () => {
       attempts += 1;
       if (attempts < 120) scheduleInstall();
-      // After the short eager window, the MutationObserver below stays armed.
-      // This matters for self-learning journeys: a learner may spend minutes on
-      // Radio/supporting materials before the actual workbook enters the DOM.
     };
 
     const install = () => {
@@ -174,10 +175,6 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         return;
       }
 
-      // Never delete a host that another React portal may still own. During
-      // StrictMode remounts and route transitions, wait for that bridge's own
-      // cleanup instead; removing its host can make React reconcile against a
-      // detached reference node and throw Node.insertBefore DOMException.
       if (findExistingBridgeHosts(pageRoot).length) {
         retryInstall();
         return;
@@ -285,7 +282,7 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
 
   if (!navHost) return null;
 
-  return (
+  const portals = (
     <>
       {createPortal(
         <A1SharedWorkbookTabBar
@@ -310,11 +307,14 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
         submissionHost,
       ) : null}
       {sectionActionHosts.map(({ key, host }) => createPortal(
-        <A1WorkbookSectionAction
-          sections={availableSections}
-          sectionKey={key}
-          onSelect={openTabFromSectionAction}
-        />,
+        <React.Fragment key={`${assignment.assignmentKey}-${key}-draft-and-action`}>
+          {draftProfile?.sections?.[key] ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
+          <A1WorkbookSectionAction
+            sections={availableSections}
+            sectionKey={key}
+            onSelect={openTabFromSectionAction}
+          />
+        </React.Fragment>,
         host,
         `${assignment.assignmentKey}-${key}-action`,
       ))}
@@ -324,6 +324,12 @@ export default function A1SharedAssignmentWorkbookBridge({ assignmentKey }) {
       ) : null}
     </>
   );
+
+  return draftProfile ? (
+    <A1TutorWorkbookDraftProvider assignment={assignment}>
+      {portals}
+    </A1TutorWorkbookDraftProvider>
+  ) : portals;
 }
 
 export const __TESTING__ = {

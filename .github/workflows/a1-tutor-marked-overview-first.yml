@@ -9,6 +9,16 @@ on:
       - "web/src/components/A1TutorMarkedOverviewGuidance.jsx"
       - "web/src/components/A1TutorMarkedWorkbookShell.js"
       - "web/src/components/A1TutorMarkedWorkbookNavigation.test.js"
+      - "web/src/components/A1TutorDraftSectionCapture.jsx"
+      - "web/src/components/A1TutorDraftSectionCapture.test.jsx"
+      - "web/src/components/A1TutorWorkbookDraftContext.jsx"
+      - "web/src/components/A1CanonicalSubmissionPanel.jsx"
+      - "web/src/components/A1Chapter3AskingAboutPricesWorkbookPage.js"
+      - "web/src/utils/a1WorkbookDraft.js"
+      - "web/src/utils/a1WorkbookDraft.test.js"
+      - "web/src/utils/a1WorkbookCloudDraft.js"
+      - "web/src/data/a1TutorDraftProfiles.js"
+      - "web/src/data/a1TutorDraftProfiles.test.js"
       - "web/src/components/RouteScopedAppServices.js"
       - "web/src/data/a1AssignmentRegistry.js"
       - "README.md"
@@ -27,11 +37,13 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Test A1 tutor-marked Overview-first flow
+      - name: Test A1 tutor flow and shared draft mapping
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1TutorDraftSectionCapture.test.jsx src/utils/a1WorkbookDraft.test.js src/data/a1TutorDraftProfiles.test.js
+      - name: Reset lifecycle patches before production build
+        run: git reset --hard HEAD
       - name: Build production web app
         working-directory: web
         run: npm run build

@@ -10,7 +10,7 @@ import A1SharedAssignmentWorkbookBridge, {
 import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 
-const GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-3", "A1-5", "A1-12.1", "A1-12.2"];
+const GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-5", "A1-12.1", "A1-12.2"];
 
 const renderBridgeWorkbook = (assignmentKey) => {
   const assignment = getA1Assignment(assignmentKey);
@@ -117,6 +117,16 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     expect(existingHosts).toHaveLength(5);
     expect(existingHosts.every((host) => host.isConnected)).toBe(true);
     expect(pageRoot.querySelectorAll("[data-a1-canonical-bridge-nav], [data-a1-canonical-bridge-overview-guidance], [data-a1-canonical-bridge-grammar], [data-a1-canonical-bridge-submission], [data-a1-canonical-bridge-footer]")).toHaveLength(5);
+  });
+
+  test("A1-3 is native now and is not owned by the legacy bridge", () => {
+    expect(getA1Assignment("A1-3")).toEqual(
+      expect.objectContaining({
+        assignmentKey: "A1-3",
+        component: "A1Chapter3AskingAboutPricesWorkbookPage",
+        layoutMode: "native",
+      }),
+    );
   });
 
   test.each(GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS)(

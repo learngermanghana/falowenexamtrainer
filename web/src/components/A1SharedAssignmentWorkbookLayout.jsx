@@ -124,12 +124,12 @@ export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false 
       { key: "overview", label: "Overview" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...sections,
-      { key: "submit", label: "Submit Assignment", submit: true },
+      { key: "submit", label: "Review & Submit", submit: true },
     ]
     : [
       { key: "assignment", label: "Assignment" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
-      { key: "submit", label: "Submit Assignment", submit: true },
+      { key: "submit", label: "Review & Submit", submit: true },
     ];
 
 export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect }) => {
@@ -142,7 +142,7 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   if (!targetKey) return null;
 
   const nextLabel = nextSection?.label || (nextSection?.number ? `Teil ${nextSection.number}` : "the next Teil");
-  const buttonLabel = isFinalSection ? "Submit Complete Assignment" : `Continue to ${nextLabel}`;
+  const buttonLabel = isFinalSection ? "Review & Submit Assignment" : `Continue to ${nextLabel}`;
 
   return (
     <div
@@ -159,8 +159,8 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
     >
       <p style={{ margin: 0, color: isFinalSection ? "#166534" : "#1e3a8a", lineHeight: 1.65, fontWeight: 700 }}>
         {isFinalSection
-          ? "This is the final required Teil. Make sure all of your answers are ready, then open the submission form for the complete assignment."
-          : "Finished this Teil? Continue to the next required Teil before submitting the assignment."}
+          ? "This is the final required Teil. Your answers are still drafts and have not been sent to your tutor. Open Review & Submit, check the complete assignment, then press the final Submit Assignment button."
+          : "Finished this Teil? Continue to the next required Teil before reviewing and submitting the assignment."}
       </p>
       <button
         type="button"

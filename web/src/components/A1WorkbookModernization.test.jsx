@@ -77,10 +77,10 @@ describe("A1 workbook modernization", () => {
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "40");
 
     fireEvent.click(screen.getByRole("tab", { name: "Teil 1 · Reading and Questions" }));
-    expect(screen.getByText("Finished this Teil? Continue to the next required Teil before submitting the assignment.")).toBeVisible();
+    expect(screen.getByText("Finished this Teil? Continue to the next required Teil before reviewing and submitting the assignment.")).toBeVisible();
     const continueCta = screen.getByRole("button", { name: "Continue to Teil 2 · Hören" });
     expect(continueCta).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Submit Complete Assignment" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review & Submit Assignment" })).not.toBeInTheDocument();
 
     const teil2Panel = document.querySelector('[data-workbook-panel="teil-2"]');
     teil2Panel.scrollIntoView = jest.fn();
@@ -93,11 +93,11 @@ describe("A1 workbook modernization", () => {
 
     const submitPanel = document.querySelector('[data-workbook-panel="submit"]');
     submitPanel.scrollIntoView = jest.fn();
-    const finalSubmitCta = screen.getByRole("button", { name: "Submit Complete Assignment" });
+    const finalSubmitCta = screen.getByRole("button", { name: "Review & Submit Assignment" });
     expect(finalSubmitCta).toBeVisible();
     fireEvent.click(finalSubmitCta);
 
-    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Review & Submit" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("canonical-a1-submit")).toHaveTextContent("Submit A1-0.2");
     expect(submitPanel.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "100");

@@ -5,9 +5,12 @@ import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1Day21WeatherResources from "./A1Day21WeatherResources";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
+import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
+import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
 import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
 import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
+import { getA1TutorDraftProfile } from "../data/a1TutorDraftProfiles";
 import { styles } from "../styles";
 
 export { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
@@ -111,6 +114,8 @@ const A1TutorMarkedWorkbookShell = ({
   const assignmentTotal = A1_ASSIGNMENT_ORDER.length;
   const assignmentProgress = Math.round((assignmentNumber / assignmentTotal) * 100);
   const isFirstA1Workbook = assignment.assignmentKey === "A1-0.1";
+  const draftProfile = getA1TutorDraftProfile(assignment.assignmentKey);
+  const sharedDraftCaptureEnabled = Boolean(draftProfile);
   const { sectionMap, overviewNodes } = splitA1WorkbookContent(children);
   const sections = assignment.sections
     .filter(({ key }) => sectionMap.has(key))
@@ -118,10 +123,11 @@ const A1TutorMarkedWorkbookShell = ({
       <WorkbookSection key={key} sectionKey={key}>
         {isFirstA1Workbook && number === 1 ? (
           <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, marginBottom: 12, background: "#eff6ff", lineHeight: 1.6 }}>
-            <strong>Reading + Questions:</strong> Read the text first, then continue directly to the questions below on this same page. Do not submit here. Finish all required parts before opening <strong>Submit Assignment</strong>.
+            <strong>Reading + Questions:</strong> Read the text first, then continue directly to the questions below on this same page. Do not submit here. Finish all required parts before opening <strong>Review &amp; Submit</strong>.
           </div>
         ) : null}
         {sectionMap.get(key)}
+        {sharedDraftCaptureEnabled ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
       </WorkbookSection>
     ));
 
@@ -147,7 +153,7 @@ const A1TutorMarkedWorkbookShell = ({
     >
       <strong>How to complete this assignment</strong>
       <p style={{ margin: 0 }}>
-        Start here in <strong>Overview</strong>. First open <strong>Grammar</strong> and read the lesson. Then open <strong>Reading + Questions</strong>: read the short text and answer the questions on the same page. Submit the assignment <strong>once</strong>, only after all required parts are finished.
+        Start here in <strong>Overview</strong>. First open <strong>Grammar</strong> and read the lesson. Then open <strong>Reading + Questions</strong>: read the short text and answer the questions on the same page. Your answers are drafts until you open <strong>Review &amp; Submit</strong> and press the final Submit Assignment button.
       </p>
     </div>
   );
@@ -155,7 +161,7 @@ const A1TutorMarkedWorkbookShell = ({
   const overview = (
     <div style={{ display: "grid", gap: 12 }}>
       <p style={{ ...styles.card, margin: 0 }}>
-        {assignmentIntro || `Complete every required Teil, then submit ${assignment.assignmentKey} once.`}
+        {assignmentIntro || `Complete every required Teil, then review and submit ${assignment.assignmentKey} once.`}
       </p>
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       {isFirstA1Workbook ? firstWorkbookOverview : <A1TutorMarkedOverviewGuidance />}
@@ -167,11 +173,28 @@ const A1TutorMarkedWorkbookShell = ({
     <div style={{ display: "grid", gap: 12 }}>
       {isFirstA1Workbook ? (
         <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 12, background: "#fff1f2", color: "#991b1b", lineHeight: 1.65 }}>
-          <strong>Grammar only.</strong> Read and learn on this page. Your assignment is under <strong>Reading + Questions</strong>. Open <strong>Submit Assignment</strong> only after all required parts are finished.
+          <strong>Grammar only.</strong> Read and learn on this page. Your assignment is under <strong>Reading + Questions</strong>. Open <strong>Review &amp; Submit</strong> only after all required parts are finished.
         </div>
       ) : null}
       <A1WorkbookGrammarNotes assignmentKey={assignment.assignmentKey} />
     </div>
+  );
+
+  const sharedLayout = (
+    <A1SharedAssignmentWorkbookLayout
+      assignmentKey={assignment.assignmentKey}
+      grammar={grammar}
+      overview={overview}
+      renderSubmission={(canonical) => (
+        <A1CanonicalSubmissionPanel
+          assignment={canonical}
+          submitTitle={submitTitle}
+          submitDescription={submitDescription}
+        />
+      )}
+    >
+      {sections}
+    </A1SharedAssignmentWorkbookLayout>
   );
 
   return (
@@ -242,20 +265,11 @@ const A1TutorMarkedWorkbookShell = ({
 
       <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />
 
-      <A1SharedAssignmentWorkbookLayout
-        assignmentKey={assignment.assignmentKey}
-        grammar={grammar}
-        overview={overview}
-        renderSubmission={(canonical) => (
-          <A1CanonicalSubmissionPanel
-            assignment={canonical}
-            submitTitle={submitTitle}
-            submitDescription={submitDescription}
-          />
-        )}
-      >
-        {sections}
-      </A1SharedAssignmentWorkbookLayout>
+      {sharedDraftCaptureEnabled ? (
+        <A1TutorWorkbookDraftProvider assignment={assignment}>
+          {sharedLayout}
+        </A1TutorWorkbookDraftProvider>
+      ) : sharedLayout}
     </div>
   );
 };
