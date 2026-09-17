@@ -25,10 +25,11 @@ fs.writeFileSync(regressionPath, regression);
 
 await import("./patchA2Day25StandardNavigation.mjs");
 await import("./patchA2Days26To28LearningUpgrade.mjs");
+await import("./patchA2WritingTemplateInsertControls.mjs");
 
 // This script is deliberately the final lifecycle step in prestart/prebuild/pretest.
 // Re-apply the structured submission lifecycle here so no earlier/later workbook
 // codemod can leave production with the legacy free-text submit page.
 await import("./patchWorkbookSubmissionAutoSelection.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, and re-asserted structured submission ownership.");
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, restored A2 Teil 2 letter template insertion, and re-asserted structured submission ownership.");
