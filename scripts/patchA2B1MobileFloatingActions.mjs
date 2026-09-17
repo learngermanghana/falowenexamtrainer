@@ -32,4 +32,8 @@ await import("./patchA2WritingTemplateInsertControls.mjs");
 // codemod can leave production with the legacy free-text submit page.
 await import("./patchWorkbookSubmissionAutoSelection.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, restored A2 Teil 2 letter template insertion, and re-asserted structured submission ownership.");
+// Mount the workbook answer-capture runtime after the structured submit patch so
+// every build/test/start finishes with clickable Teil 3/4 answers and Teil 2 autosave.
+await import("./patchA2B1MappedSubmissionCapture.mjs");
+
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, restored A2 Teil 2 letter template insertion, re-asserted structured submission ownership, and mapped workbook answers into Submit.");
