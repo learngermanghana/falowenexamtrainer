@@ -1,14 +1,22 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import { useAuth } from "../context/AuthContext";
+import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { styles } from "../styles";
 import {
+  buildA1WorkbookSubmissionText,
   countCompletedA1Answers,
   readA1WorkbookDraft,
   saveA1WorkbookDraft,
 } from "../utils/a1WorkbookDraft";
+import {
+  loadA1WorkbookCloudDraft,
+  saveA1WorkbookCloudDraft,
+} from "../utils/a1WorkbookCloudDraft";
 
 const ASSIGNMENT_KEY = "A1-3";
+const CLOUD_AUTOSAVE_DELAY_MS = 900;
 
 const card = {
   ...styles.card,
@@ -109,8 +117,16 @@ const normalizeStoredSections = (stored = {}) => ({
   },
 });
 
-const DraftNotice = ({ savedAt = "" }) => (
+const hasDraftContent = (sections = {}) => {
+  const part1 = Object.values(sections?.["teil-1"]?.answers || {}).some((value) => String(value || "").trim());
+  const part2 = Boolean(String(sections?.["teil-2"]?.text || "").trim());
+  const part3 = Object.values(sections?.["teil-3"]?.answers || {}).some((value) => String(value || "").trim());
+  return part1 || part2 || part3;
+};
+
+const DraftNotice = ({ savedAt = "", cloudStatus = "" }) => (
   <p role="status" aria-live="polite" style={draftNoticeStyle}>
+    {cloudStatus === "saving" ? "Saving draft… " : ""}
     Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted to your tutor yet.</strong>
   </p>
 );
@@ -118,14 +134,87 @@ const DraftNotice = ({ savedAt = "" }) => (
 const A1Chapter3AskingAboutPricesWorkbookPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, studentProfile } = useAuth();
+  const assignment = useMemo(() => getA1Assignment(ASSIGNMENT_KEY), []);
   const initialDraft = useMemo(() => readA1WorkbookDraft(ASSIGNMENT_KEY), []);
   const [sections, setSections] = useState(() => normalizeStoredSections(initialDraft.sections));
   const [savedAt, setSavedAt] = useState(initialDraft.updatedAt || "");
+  const [cloudReady, setCloudReady] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState("checking");
 
   useEffect(() => {
     const saved = saveA1WorkbookDraft({ assignmentKey: ASSIGNMENT_KEY, sections });
     setSavedAt(saved.updatedAt);
   }, [sections]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const restoreCloudDraft = async () => {
+      if (!user?.uid || !assignment) {
+        if (!cancelled) {
+          setCloudReady(true);
+          setCloudStatus("local-only");
+        }
+        return;
+      }
+
+      setCloudStatus("checking");
+      const result = await loadA1WorkbookCloudDraft({ user, studentProfile, assignment });
+      if (cancelled) return;
+
+      if (result.ok && !result.empty && result.data?.workbookSections) {
+        const localUpdatedAt = new Date(initialDraft.updatedAt || 0).getTime();
+        if (!hasDraftContent(initialDraft.sections) || result.updatedAtMillis > localUpdatedAt) {
+          const restored = normalizeStoredSections(result.data.workbookSections);
+          setSections(restored);
+          const localCopy = saveA1WorkbookDraft({ assignmentKey: ASSIGNMENT_KEY, sections: restored });
+          setSavedAt(localCopy.updatedAt);
+        }
+      }
+
+      setCloudReady(true);
+      setCloudStatus(result.ok ? "ready" : "error");
+    };
+
+    restoreCloudDraft();
+    return () => {
+      cancelled = true;
+    };
+  }, [assignment, initialDraft.sections, initialDraft.updatedAt, studentProfile, user]);
+
+  const buildSubmissionText = (nextSections = sections) =>
+    buildA1WorkbookSubmissionText({
+      assignment,
+      draft: { assignmentKey: ASSIGNMENT_KEY, sections: nextSections },
+    });
+
+  const syncDraftToCloud = async (source = "a1-chapter3-workbook") => {
+    if (!user?.uid || !assignment) return { ok: false, reason: "auth" };
+    const submissionText = buildSubmissionText();
+    if (!submissionText.trim()) return { ok: false, reason: "empty" };
+    setCloudStatus("saving");
+    const result = await saveA1WorkbookCloudDraft({
+      user,
+      studentProfile,
+      assignment,
+      sections,
+      submissionText,
+      source,
+    });
+    setCloudStatus(result.ok ? "saved" : "error");
+    return result;
+  };
+
+  useEffect(() => {
+    if (!cloudReady || !user?.uid || !assignment || !hasDraftContent(sections)) return undefined;
+    const timer = window.setTimeout(() => {
+      syncDraftToCloud("a1-chapter3-react-autosave");
+    }, CLOUD_AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(timer);
+    // syncDraftToCloud intentionally uses the current render's sections.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignment, cloudReady, sections, studentProfile, user?.uid]);
 
   const priceProgress = countCompletedA1Answers(sections["teil-1"].answers, priceQuestions.length);
   const hobbiesProgress = countCompletedA1Answers(sections["teil-3"].answers, hobbiesQuestions.length);
@@ -154,7 +243,10 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
     }));
   };
 
-  const openSubmit = () => {
+  const openSubmit = async () => {
+    if (!workbookComplete) return;
+    if (user?.uid) await syncDraftToCloud("a1-chapter3-open-review-submit");
+
     const search = new URLSearchParams(location.search || "");
     search.set("workbookTab", "submit");
     search.set("assignmentKey", ASSIGNMENT_KEY);
@@ -183,9 +275,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       fallbackAssignmentKey={ASSIGNMENT_KEY}
       title="A1 · Chapter 3 Workbook · Asking About Prices"
       subtitle="Day 7 · Chapter 3 · Tutor-marked assignment"
-      assignmentIntro="Answer all three Teile in the workbook. Falowen saves your work as a draft, but your tutor does not receive it until you open Review & Submit and press Submit to Tutor."
+      assignmentIntro="Answer all three Teile in the workbook. Falowen saves your work as a draft, but your tutor does not receive it until you open Review & Submit and press the final submit button."
       submitTitle="Review & Submit A1 · Chapter 3"
-      submitDescription="Review the mapped workbook draft below. It has not been sent to your tutor yet. Only Submit to Tutor sends the final assignment."
+      submitDescription="Review the mapped workbook draft below. It has not been sent to your tutor yet. The final Submit Assignment button sends it for tutor marking."
     >
       <div
         data-a1-chapter3-draft-guidance="true"
@@ -194,7 +286,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
         <strong>Workbook draft — not a submission</strong>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
           Type your answers directly in each Teil. They are saved automatically so you do not have to copy them later.
-          Your work becomes final only after you open <strong>Review & Submit</strong> and press <strong>Submit to Tutor</strong>.
+          Your work becomes final only after you open <strong>Review & Submit</strong> and press the final <strong>Submit Assignment</strong> button.
         </p>
       </div>
 
@@ -232,7 +324,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           <span>{priceProgress.completed} of {priceProgress.total} answered</span>
           <span>{priceProgress.complete ? "Teil 1 complete" : `${priceProgress.total - priceProgress.completed} remaining`}</span>
         </div>
-        <DraftNotice savedAt={savedAt} />
+        <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
       </section>
 
       <section style={card}>
@@ -263,7 +355,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           />
           <span style={styles.helperText}>{familyWordCount} words · {familyComplete ? "Draft saved" : "Write your answer here"}</span>
         </label>
-        <DraftNotice savedAt={savedAt} />
+        <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
       </section>
 
       <section style={card}>
@@ -313,7 +405,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           <span>{hobbiesProgress.completed} of {hobbiesProgress.total} answered</span>
           <span>{hobbiesProgress.complete ? "Teil 3 complete" : `${hobbiesProgress.total - hobbiesProgress.completed} remaining`}</span>
         </div>
-        <DraftNotice savedAt={savedAt} />
+        <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
 
         <div
           data-a1-chapter3-workbook-completion="true"
@@ -339,9 +431,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             type="button"
             onClick={openSubmit}
             style={{ ...styles.primaryButton, width: "fit-content", minHeight: 46 }}
-            disabled={!workbookComplete}
+            disabled={!workbookComplete || cloudStatus === "saving"}
           >
-            Review & Submit Assignment
+            {cloudStatus === "saving" ? "Saving draft…" : "Review & Submit Assignment"}
           </button>
           {!workbookComplete ? (
             <span style={styles.helperText}>Complete every required answer above to unlock Review & Submit.</span>
