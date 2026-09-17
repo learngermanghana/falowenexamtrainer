@@ -13,15 +13,8 @@ const buildSubmitClassName = (assignmentKey = "A1-assignment") =>
 const missingRequiredNumbers = (answers, total) =>
   Array.from({ length: total }, (_, index) => index + 1).filter((number) => !answers.has(number));
 
-export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", text = "" } = {}) => {
-  if (String(assignmentKey).trim().toUpperCase() !== "A1-0.2") {
-    return { ok: true, message: "" };
-  }
-
-  const answersBySection = {
-    "teil-1": new Set(),
-    "teil-2": new Set(),
-  };
+const parseA1SubmissionSections = (text = "") => {
+  const sections = new Map();
   let currentSection = "";
 
   String(text || "")
@@ -30,42 +23,75 @@ export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", 
       let line = rawLine.trim();
       if (!line) return;
 
-      const headingMatch = line.match(/^(?:teil|part)\s*([12])\b/i);
+      const headingMatch = line.match(/^(?:teil|part)\s*(\d+)\b/i);
       if (headingMatch) {
-        currentSection = `teil-${headingMatch[1]}`;
-        line = line
-          .slice(headingMatch[0].length)
-          .replace(/^[^0-9]*/, "")
-          .trim();
+        currentSection = `teil-${Number(headingMatch[1])}`;
+        if (!sections.has(currentSection)) sections.set(currentSection, []);
+        line = line.slice(headingMatch[0].length).replace(/^\s*[·:—-]?\s*/, "").trim();
         if (!line) return;
       }
 
       if (!currentSection) return;
-      const answerMatch = line.match(/^\s*(\d{1,2})\s*(?:[\).:\-]\s*|\s+)(\S.*)$/);
-      if (!answerMatch) return;
-
-      const answerNumber = Number(answerMatch[1]);
-      if (Number.isInteger(answerNumber)) answersBySection[currentSection].add(answerNumber);
+      if (!sections.has(currentSection)) sections.set(currentSection, []);
+      sections.get(currentSection).push(line);
     });
 
-  const missingTeil1 = missingRequiredNumbers(answersBySection["teil-1"], 7);
-  const missingTeil2 = missingRequiredNumbers(answersBySection["teil-2"], 5);
-  if (!missingTeil1.length && !missingTeil2.length) {
-    return { ok: true, message: "" };
+  return sections;
+};
+
+const numberedAnswersForSection = (sections, sectionKey) => {
+  const answers = new Set();
+  (sections.get(sectionKey) || []).forEach((line) => {
+    const match = line.match(/^\s*(\d{1,2})\s*(?:[\).:\-]\s*|\s+)(\S.*)$/);
+    if (match && String(match[2] || "").trim()) answers.add(Number(match[1]));
+  });
+  return answers;
+};
+
+export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", text = "" } = {}) => {
+  const normalizedAssignmentKey = String(assignmentKey).trim().toUpperCase();
+  const sections = parseA1SubmissionSections(text);
+
+  if (normalizedAssignmentKey === "A1-0.2") {
+    const teil1Answers = numberedAnswersForSection(sections, "teil-1");
+    const teil2Answers = numberedAnswersForSection(sections, "teil-2");
+    const missingTeil1 = missingRequiredNumbers(teil1Answers, 7);
+    const missingTeil2 = missingRequiredNumbers(teil2Answers, 5);
+    if (!missingTeil1.length && !missingTeil2.length) {
+      return { ok: true, message: "" };
+    }
+
+    const missing = [];
+    if (missingTeil1.length) missing.push(`Teil 1 answers ${missingTeil1.join(", ")}`);
+    if (missingTeil2.length) missing.push(`Teil 2 · Hören answers ${missingTeil2.join(", ")}`);
+    return {
+      ok: false,
+      message: `Complete both required parts before submitting A1-0.2. Use a "Teil 1" heading with answers 1–7 and a "Teil 2 · Hören" heading with answers 1–5. Missing: ${missing.join("; ")}.`,
+    };
   }
 
-  const missing = [];
-  if (missingTeil1.length) {
-    missing.push(`Teil 1 answers ${missingTeil1.join(", ")}`);
-  }
-  if (missingTeil2.length) {
-    missing.push(`Teil 2 · Hören answers ${missingTeil2.join(", ")}`);
+  if (normalizedAssignmentKey === "A1-3") {
+    const teil1Answers = numberedAnswersForSection(sections, "teil-1");
+    const teil3Answers = numberedAnswersForSection(sections, "teil-3");
+    const missingTeil1 = missingRequiredNumbers(teil1Answers, 4);
+    const missingTeil3 = missingRequiredNumbers(teil3Answers, 10);
+    const familyText = (sections.get("teil-2") || []).join(" ").trim();
+
+    if (!missingTeil1.length && familyText && !missingTeil3.length) {
+      return { ok: true, message: "" };
+    }
+
+    const missing = [];
+    if (missingTeil1.length) missing.push(`Teil 1 answers ${missingTeil1.join(", ")}`);
+    if (!familyText) missing.push("Teil 2 family writing");
+    if (missingTeil3.length) missing.push(`Teil 3 answers ${missingTeil3.join(", ")}`);
+    return {
+      ok: false,
+      message: `Your Chapter 3 workbook is still incomplete. Return to the workbook and finish: ${missing.join("; ")}. Your saved draft has not been submitted.`,
+    };
   }
 
-  return {
-    ok: false,
-    message: `Complete both required parts before submitting A1-0.2. Use a "Teil 1" heading with answers 1–7 and a "Teil 2 · Hören" heading with answers 1–5. Missing: ${missing.join("; ")}.`,
-  };
+  return { ok: true, message: "" };
 };
 
 export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, submitDescription }) {
@@ -228,6 +254,16 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
           {submitDescription || `This submission is locked to ${assignmentKey}.`}
         </p>
       </div>
+
+      {assignmentKey === "A1-3" ? (
+        <div
+          data-a1-chapter3-submit-warning="true"
+          style={{ background: "#fffbeb", border: "1px solid #fbbf24", borderRadius: 10, color: "#78350f", display: "grid", gap: 5, padding: "10px 12px", lineHeight: 1.55 }}
+        >
+          <strong>Review stage — not submitted yet</strong>
+          <span>Your Chapter 3 workbook answers are loaded as a draft below. Check them carefully. They reach your tutor only after the final Submit Assignment button succeeds.</span>
+        </div>
+      ) : null}
 
       <div
         ref={submitRootRef}
