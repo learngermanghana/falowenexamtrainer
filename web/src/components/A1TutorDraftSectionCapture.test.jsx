@@ -55,16 +55,18 @@ test("visible workbook options become the A1 draft controls instead of a duplica
 
   const visibleChoice = await screen.findByRole("radio", { name: "A) Option A" });
   expect(visibleChoice).toHaveAttribute("data-a1-clickable-answer", "true");
-  expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
-  expect(screen.getAllByRole("radio")).toHaveLength(15);
+  await waitFor(() => {
+    expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("radio")).toHaveLength(15);
+  });
 
   fireEvent.click(visibleChoice);
 
   await waitFor(() => {
     expect(readA1WorkbookDraft("A1-10").sections["teil-2"].answers[1]).toBe("A");
+    expect(screen.getByText(/1 of 5 answered/)).toBeInTheDocument();
   });
   expect(visibleChoice).toHaveAttribute("aria-checked", "true");
-  expect(screen.getByText(/1 of 5 answered/)).toBeInTheDocument();
 });
 
 test("Health Teil 3 adds ten short-answer fields and autosaves typed vocabulary", () => {
