@@ -25,7 +25,11 @@ fs.writeFileSync(regressionPath, regression);
 
 await import("./patchA2Day25StandardNavigation.mjs");
 await import("./patchA2Days26To28LearningUpgrade.mjs");
-await import("./patchA2WritingTemplateInsertControls.mjs");
+
+// Keep the A2/B1 writing page intentionally simple: task copy is owned by the
+// workbook, while the shared workspace contains only the German draft box and
+// Analyse action. Also make workbook opening settle on the section navigation.
+await import("./patchA2B1WritingAndNavigationCleanup.mjs");
 
 // This script is deliberately the final lifecycle step in prestart/prebuild/pretest.
 // Re-apply the structured submission lifecycle here so no earlier/later workbook
@@ -36,4 +40,8 @@ await import("./patchWorkbookSubmissionAutoSelection.mjs");
 // every build/test/start finishes with clickable Teil 3/4 answers and Teil 2 autosave.
 await import("./patchA2B1MappedSubmissionCapture.mjs");
 
-console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, restored A2 Teil 2 letter template insertion, re-asserted structured submission ownership, and mapped workbook answers into Submit.");
+// Final presentation pass: keep the objective guidance/progress and completion
+// review on top of the mapped-submit runtime that production actually ships.
+await import("./patchA2B1WorkbookProgressReview.mjs");
+
+console.log("Removed the A2/B1 floating Continue and Submit mobile action bar, applied final A2 learning upgrades, simplified Teil 2 writing, aligned workbook opening to section navigation, re-asserted structured submission ownership, mapped workbook answers into Submit, and added answer progress plus incomplete-submit review.");
