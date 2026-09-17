@@ -102,3 +102,6 @@ if (fs.existsSync(collocationPath)) {
 }
 
 console.log(`C1 Day 28 topic set to: ${NEW_TITLE}`);
+
+// Keep the C2 curriculum patch chain in the normal web prebuild path.
+await import("./patchC2Day1EnvironmentAlignment.mjs");
