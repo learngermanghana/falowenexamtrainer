@@ -42,6 +42,8 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1TutorDraftSectionCapture.test.jsx src/utils/a1WorkbookDraft.test.js src/data/a1TutorDraftProfiles.test.js
+      - name: Reset lifecycle patches before production build
+        run: git reset --hard HEAD
       - name: Build production web app
         working-directory: web
         run: npm run build
