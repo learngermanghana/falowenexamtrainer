@@ -6,6 +6,30 @@ import {
 } from "./teacherLectureVideoResources";
 
 describe("teacher lecture media regressions", () => {
+  test("renders the A2 Day 1 Small Talk teacher lecture through the shared lesson model", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 1,
+        chapter: "1.1",
+        topic: "Small Talk",
+      },
+      "A2",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "1.1",
+        title: "Kapitel 1.1 · Teacher lecture video",
+        url: "https://youtu.be/gsSdn-IlWWY",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/gsSdn-IlWWY" }),
+      ]),
+    );
+  });
+
   test("renders the A2 Day 14 tutor lecture alongside the AI video", () => {
     const lesson = normalizeA2B1Lesson(
       {
