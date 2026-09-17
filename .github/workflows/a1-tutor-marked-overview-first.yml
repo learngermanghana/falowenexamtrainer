@@ -9,6 +9,10 @@ on:
       - "web/src/components/A1TutorMarkedOverviewGuidance.jsx"
       - "web/src/components/A1TutorMarkedWorkbookShell.js"
       - "web/src/components/A1TutorMarkedWorkbookNavigation.test.js"
+      - "web/src/components/A1Chapter3AskingAboutPricesWorkbookPage.js"
+      - "web/src/utils/a1WorkbookDraft.js"
+      - "web/src/utils/a1WorkbookDraft.test.js"
+      - "web/src/utils/a1WorkbookCloudDraft.js"
       - "web/src/components/RouteScopedAppServices.js"
       - "web/src/data/a1AssignmentRegistry.js"
       - "README.md"
@@ -27,11 +31,11 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Test A1 tutor-marked Overview-first flow
+      - name: Test A1 tutor-marked Overview-first flow and Chapter 3 draft mapping
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx
+        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/utils/a1WorkbookDraft.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
