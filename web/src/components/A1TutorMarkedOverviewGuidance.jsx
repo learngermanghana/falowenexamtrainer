@@ -18,9 +18,7 @@ export default function A1TutorMarkedOverviewGuidance() {
       }}
     >
       <strong>How to complete this assignment</strong>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        First open <strong>Grammar</strong> and read the lesson. Then complete every required <strong>Teil</strong> in order. For multiple-choice and true/false questions, <strong>tap the answer directly beside the question</strong>; typed tasks use the answer field shown with the task. Your work saves as a draft. In <strong>Review &amp; Submit</strong>, check and edit the final answer before pressing <strong>Submit Assignment</strong>.
-      </p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>{A1_TUTOR_MARKED_OVERVIEW_GUIDANCE}</p>
     </div>
   );
 }
