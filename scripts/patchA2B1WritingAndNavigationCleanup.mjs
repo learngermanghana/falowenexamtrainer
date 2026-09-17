@@ -151,11 +151,10 @@ const objectiveChoiceCss = `
   height: 18px;
   margin-right: 11px;
   vertical-align: -3px;
-  flex: 0 0 auto;
   box-sizing: border-box;
   border: 2px solid #94a3b8;
-  border-radius: 999px;
-  background: #ffffff;
+  border-radius: 50%;
+  background-color: #ffffff;
   transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -166,7 +165,7 @@ const objectiveChoiceCss = `
 
 [data-falowen-clickable-answer="true"][aria-checked="true"]::before {
   border-color: #2563eb;
-  background: #2563eb;
+  background-color: #2563eb;
   box-shadow: inset 0 0 0 4px #ffffff;
 }
 `;
