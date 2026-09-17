@@ -121,15 +121,15 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
     fallbackAssignmentKey="A1-9"
     title="A1 · Day 16 Workbook · Negation and Food"
     subtitle="Chapter 9 · Tutor-marked assignment"
-    assignmentIntro="Complete all three parts below. Then open Submit Assignment and send your numbered answers and writing task to your tutor."
+    assignmentIntro="Complete all three parts below. For Lesen and Hören, tap the answer directly beside each question; your choices save automatically as a draft. Write the short text in the writing box, then review and edit the complete final answer before submitting."
     submitTitle="Submit A1 · Day 16 · Chapter 9"
-    submitDescription="Submit your Chapter 9 reading, listening and writing answers together for tutor marking."
+    submitDescription="Your Chapter 9 reading, listening and writing draft is mapped below. Check it and edit anything you need before you press Submit Assignment."
   >
     <div data-a1-day16-chapter9-workbook-content="true" style={{ display: "grid", gap: 16 }}>
       <section style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}>
         <strong style={{ color: "#1d4ed8" }}>Tutor-marked assignment · Chapter 9</strong>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete Teil 1, Teil 2 and Teil 3 below. When you finish, open Submit Assignment and send your final answers.
+          Complete Teil 1, Teil 2 and Teil 3 below. Tap multiple-choice answers directly where they appear. Your work saves as a draft until you review the final text and press Submit Assignment.
         </p>
         <a
           href="/campus/course/food-and-negation-day-16-9-10"
@@ -148,7 +148,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
         />
         <h2 style={{ margin: 0 }}>Teil 1 · Lesen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instructions:</strong> Read the text and choose the correct answer for questions 1–10. Only one answer is correct.
+          <strong>Instructions:</strong> Read the text and tap the correct answer for questions 1–10. Only one answer is correct. You can tap again to change your choice.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Text:</strong> Ich gehe oft in den Supermarkt, um Lebensmittel zu kaufen. Ich mag frisches Obst und Gemüse.
@@ -164,7 +164,7 @@ const A1Day16FoodAndDailyLifeWorkbookPage = () => (
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 2 · Hörverstehen</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Thema:</strong> Lebensmittel, mögen and negation. Listen to the material, then answer questions 1–5.
+          <strong>Thema:</strong> Lebensmittel, mögen and negation. Listen to the material, then tap the answer for questions 1–5.
         </p>
         <CoursebookAudioPlayer
           url="https://drive.google.com/file/d/11v0Goh3UCihxHj3HQIjwaZtgrBjF3zME/view?usp=sharing"

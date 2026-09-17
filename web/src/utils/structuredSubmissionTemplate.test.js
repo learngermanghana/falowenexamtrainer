@@ -16,14 +16,14 @@ describe("structured submission templates", () => {
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-1.2" }).parts.map((part) => part.partId))
       .toEqual(["teil1", "teil2", "teil3"]);
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-0.2" }).parts.map((part) => part.partId))
-      .toEqual(["teil1", "teil3"]);
+      .toEqual(["teil1", "teil2"]);
   });
 
   test("does not turn an A1 vocabulary reminder into a required submission part", () => {
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-8" }).parts.map((part) => part.partId))
       .toEqual(["teil1", "teil2", "teil3"]);
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-9" }).parts.map((part) => part.partId))
-      .toEqual(["teil1", "teil2", "teil3", "teil4"]);
+      .toEqual(["teil1", "teil2", "teil3"]);
   });
 
   test("A2 and B1 default to Teil 2, Teil 3 and submitted Teil 4", () => {
@@ -129,7 +129,7 @@ describe("structured submission templates", () => {
 
   test("rebuilds structured text in canonical profile order", () => {
     const profile = getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-0.2" });
-    expect(buildStructuredSubmissionTextFromSections(profile, { teil3: "1. B", teil1: "1. Guten Tag" }))
-      .toBe("TEIL 1\n1. Guten Tag\n\nTEIL 3\n1. B");
+    expect(buildStructuredSubmissionTextFromSections(profile, { teil2: "1. B", teil1: "1. Guten Tag" }))
+      .toBe("TEIL 1\n1. Guten Tag\n\nTEIL 2\n1. B");
   });
 });
