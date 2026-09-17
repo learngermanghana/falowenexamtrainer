@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1TutorDraftProfile } from "../data/a1TutorDraftProfiles";
 import { readA1WorkbookDraft } from "../utils/a1WorkbookDraft";
@@ -53,7 +53,8 @@ test("visible workbook options become the A1 draft controls instead of a duplica
     </A1TutorWorkbookDraftProvider>,
   );
 
-  const visibleChoice = await screen.findByRole("radio", { name: "A) Option A" });
+  const firstQuestion = await screen.findByRole("radiogroup", { name: "Question 1" });
+  const visibleChoice = within(firstQuestion).getByRole("radio", { name: "A) Option A" });
   expect(visibleChoice).toHaveAttribute("data-a1-clickable-answer", "true");
   await waitFor(() => {
     expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
