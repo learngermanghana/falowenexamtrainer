@@ -1,4 +1,4 @@
-import React, { Children, isValidElement, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { Children, isValidElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getA1Assignment, getA1AssignmentNeighbors } from "../data/a1AssignmentRegistry";
 import { styles } from "../styles";
@@ -68,7 +68,12 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   const fallbackTab = sections.length ? "overview" : "assignment";
   const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const requestedTab = rawSearch.get("workbookTab");
-  const activeTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
+  const requestedActiveTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
+  const [activeTab, setActiveTab] = useState(requestedActiveTab);
+
+  useEffect(() => {
+    setActiveTab((current) => (current === requestedActiveTab ? current : requestedActiveTab));
+  }, [requestedActiveTab]);
 
   useEffect(() => {
     const hasLegacyRadioFlag = rawSearch.has("radio");
@@ -85,6 +90,11 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
 
   const openTab = useCallback((key) => {
     if (!allowedTabs.includes(key)) return;
+
+    // Change the workbook panel immediately. URL synchronization is secondary so
+    // a router/history issue can never leave the visible A1 tabs unresponsive.
+    setActiveTab(key);
+
     const search = sanitizeA1WorkbookSearch(location.search);
     search.set("workbookTab", key);
     search.set("assignmentKey", assignment.assignmentKey);

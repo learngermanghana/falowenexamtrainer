@@ -1,5 +1,5 @@
 import React from "react";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import {
   getAllowedWorkbookTabs,
@@ -60,6 +60,27 @@ describe("A1 tutor-marked workbook navigation", () => {
     );
 
     expect(result.current.activeTab).toBe("grammar");
+  });
+
+  test("switches the visible tab immediately when a workbook button is clicked", () => {
+    const wrapper = ({ children }) => (
+      <MemoryRouter initialEntries={["/campus/course/a1-test-workbook?workbookTab=submit"]}>
+        {children}
+      </MemoryRouter>
+    );
+
+    const { result } = renderHook(
+      () => useA1WorkbookTabState({ assignment, sections, hasGrammar: true }),
+      { wrapper },
+    );
+
+    expect(result.current.activeTab).toBe("submit");
+
+    act(() => result.current.openTab("grammar"));
+    expect(result.current.activeTab).toBe("grammar");
+
+    act(() => result.current.openTab("teil-1"));
+    expect(result.current.activeTab).toBe("teil-1");
   });
 
   test("removes the obsolete radio flag while preserving canonical A1 submit context", () => {
