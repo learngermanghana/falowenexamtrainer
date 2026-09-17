@@ -8,6 +8,11 @@ jest.mock("./VerifiedCloudDraftSubmissionPage", () => () => (
   <div data-testid="verified-cloud-draft-submission" />
 ));
 
+// This suite verifies the shared workbook navigation contract, not draft-answer
+// DOM binding. Keeping the observer-heavy capture runtime out of this test avoids
+// retaining jsdom mutation observers while still exercising the real tab layout.
+jest.mock("./A1TutorDraftSectionCapture", () => () => null);
+
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {
@@ -33,7 +38,7 @@ describe("A1 Day 17 native standard workbook", () => {
     expect(screen.getByRole("tab", { name: /Teil 1/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 2/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 3/i })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Review & Submit" })).toBeVisible();
   });
 
   test("opens each original section through the native tabs", () => {
