@@ -1156,7 +1156,6 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
       </div>
     </div>
   );
-  );
 };
 
 export default VerifiedCloudDraftSubmissionPage;
