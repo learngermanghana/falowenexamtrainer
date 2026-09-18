@@ -36,6 +36,11 @@ for (const [relative, dayExpr] of workbookTargets) {
   source = replaceTab(source, "learn", "speak", grammar, relative);
   source = replaceTab(source, "speak", "write", speak, relative);
   source = replaceTab(source, "write", "finish", write, relative);
+  source = source
+    .replaceAll('learn:"1. Learn"', 'learn:"1. Grammar"')
+    .replaceAll('label="Learn"', 'label="Grammar"')
+    .replaceAll('>Learn: {', '>Grammar: {')
+    .replaceAll('Complete Learn, Speak, Write', 'Complete Grammar, Speak, Write');
 
   if (count(source, 'active === "learn" ? <C2StandardGrammarPanel') !== 1) {
     throw new Error(`${relative}: Grammar must mount exactly once and only on Learn/Grammar.`);
@@ -119,3 +124,27 @@ const writeBlock = panel.slice(opinionWriteStart, writePanelStart);
 
 fs.writeFileSync(panelPath, panel, "utf8");
 console.log("C2 Days 1-28 page ownership enforced: Grammar only Grammar, Speak only Speak, Write only Write.");
+
+
+const navPath = path.join(root, "web/src/components/StandardWorkbookComponents.js");
+let nav = fs.readFileSync(navPath, "utf8");
+const c2TabsAnchor = `export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;`;
+if (!nav.includes("export const C2_WORKBOOK_TABS")) {
+  if (!nav.includes(c2TabsAnchor)) throw new Error("C2 page ownership: tab definition anchor missing.");
+  nav = nav.replace(
+    c2TabsAnchor,
+    `export const C2_WORKBOOK_TABS = B2_C1_WORKBOOK_TABS.map((tab) =>
+  tab.key === "learn" ? { ...tab, label: "Grammar", description: "Learn" } : tab
+);
+
+${c2TabsAnchor}`,
+  );
+}
+nav = nav.replace(
+  "      tabs={B2_C1_WORKBOOK_TABS}",
+  '      tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}',
+);
+if (!nav.includes('label: "Grammar"') || !nav.includes('String(level || "").toUpperCase() === "C2"')) {
+  throw new Error("C2 page ownership: C2 Grammar tab label was not applied.");
+}
+fs.writeFileSync(navPath, nav, "utf8");
