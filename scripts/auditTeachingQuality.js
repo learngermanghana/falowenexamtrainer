@@ -177,10 +177,28 @@ function lessonSignals(lesson) {
     Boolean(clean(lesson.teacherVideo || lesson.video)) ||
     hasAny(corpus, [/grammar/, /grammatik/, /regel/, /erklaer/, /erklär/, /beispiel/, /teacher note/]);
 
-  const check = hasAny(corpus, [
-    /\\bcheck\\b/, /self.?check/, /knowledge test/, /\\bquiz\\b/, /\\bquestion/,
-    /\\bfragen?\\b/, /\\bwahr\\b/, /\\bfalsch\\b/, /correct answer/, /feedback/, /understanding/
-  ]);
+  const checkTerms = [
+    "check",
+    "self-check",
+    "self check",
+    "knowledge test",
+    "quiz",
+    "question",
+    "fragen",
+    "wahr",
+    "falsch",
+    "correct answer",
+    "feedback",
+    "understanding",
+    "score",
+    "iscorrect",
+    "correctly",
+    "show answer",
+    "reveal answer",
+    "selectedcorrectly",
+    "submitted",
+  ];
+  const check = checkTerms.some((term) => corpus.includes(term));
 
   const produce =
     kind === "schreiben_sprechen" ||
