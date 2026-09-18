@@ -1,0 +1,38 @@
+name: Teaching quality audit
+
+on:
+  pull_request:
+    paths:
+      - "shared/curriculumCanonical.json"
+      - "web/src/components/**"
+      - "web/src/data/**"
+      - "scripts/auditTeachingQuality.js"
+      - ".github/workflows/teaching-quality-audit.yml"
+  push:
+    branches: [main]
+    paths:
+      - "shared/curriculumCanonical.json"
+      - "web/src/components/**"
+      - "web/src/data/**"
+      - "scripts/auditTeachingQuality.js"
+      - ".github/workflows/teaching-quality-audit.yml"
+  workflow_dispatch:
+
+jobs:
+  staged-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Stage 0 · A1–C2 quick scan
+        run: node scripts/auditTeachingQuality.js --mode=quick --github-summary
+
+      - name: Stage 1 · Detailed A1 audit
+        if: always()
+        run: node scripts/auditTeachingQuality.js --mode=a1 --github-summary

@@ -10,7 +10,10 @@
     "test:integration": "firebase emulators:exec --project demo-test --only auth,firestore \"npm run test:backend -- --runInBand\"",
     "sync:curriculum": "node scripts/syncCurriculumManifest.js && node scripts/applyB2LessonContentAlignment.js && node scripts/applyA1RouteAlignment.js",
     "audit:a1-curriculum": "node scripts/auditA1CourseBook.js",
-    "check:curriculum-sync": "npm run audit:a1-curriculum && node scripts/checkCurriculumManifestSync.js"
+    "check:curriculum-sync": "npm run audit:a1-curriculum && node scripts/checkCurriculumManifestSync.js",
+    "audit:teaching:quick": "node scripts/auditTeachingQuality.js --mode=quick",
+    "audit:teaching:a1": "node scripts/auditTeachingQuality.js --mode=a1",
+    "audit:teaching:all": "node scripts/auditTeachingQuality.js --mode=all"
   },
   "keywords": [],
   "author": "",
