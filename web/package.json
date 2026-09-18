@@ -71,6 +71,7 @@
     "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue-safe.mjs",
     "audit:teaching:quick": "node ../scripts/auditTeachingQuality.js --mode=quick",
     "audit:teaching:a1": "node ../scripts/auditTeachingQuality.js --mode=a1",
-    "audit:teaching:all": "node ../scripts/auditTeachingQuality.js --mode=all"
+    "audit:teaching:all": "node ../scripts/auditTeachingQuality.js --mode=all",
+    "audit:teaching:a2": "node ../scripts/auditTeachingQuality.js --mode=a2"
   }
 }
