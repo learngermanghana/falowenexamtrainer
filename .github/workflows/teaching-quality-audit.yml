@@ -36,3 +36,7 @@ jobs:
       - name: Stage 1 · Detailed A1 audit
         if: always()
         run: node scripts/auditTeachingQuality.js --mode=a1 --github-summary
+
+      - name: Stage 2 · Detailed A2 audit
+        if: always()
+        run: node scripts/auditTeachingQuality.js --mode=a2 --github-summary

@@ -13,7 +13,8 @@
     "check:curriculum-sync": "npm run audit:a1-curriculum && node scripts/checkCurriculumManifestSync.js",
     "audit:teaching:quick": "node scripts/auditTeachingQuality.js --mode=quick",
     "audit:teaching:a1": "node scripts/auditTeachingQuality.js --mode=a1",
-    "audit:teaching:all": "node scripts/auditTeachingQuality.js --mode=all"
+    "audit:teaching:all": "node scripts/auditTeachingQuality.js --mode=all",
+    "audit:teaching:a2": "node scripts/auditTeachingQuality.js --mode=a2"
   },
   "keywords": [],
   "author": "",
