@@ -55,3 +55,4 @@ await import("./patchStudentHomeAndCourseBookCleanup.mjs");
 await import("./patchC2StandardCurrentCourseAlignment.mjs");
 await import("./patchC2StandardTeachingTestSeparation.mjs");
 await import("./patchC2All28ExamStandardization.mjs");
+await import("./patchC2StrictPageOwnership.mjs");
