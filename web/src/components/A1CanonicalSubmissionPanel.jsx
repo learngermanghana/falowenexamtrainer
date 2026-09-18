@@ -321,31 +321,26 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
         </p>
         <h2 style={{ margin: "4px 0" }}>{submitTitle || `Submit ${assignmentKey}`}</h2>
         <p style={{ color: "#475569", margin: 0 }}>
-          {submitDescription || `This submission is locked to ${assignmentKey}.`}
+          Review your answers below. You can edit them before submitting.
         </p>
       </div>
 
       {reviewSections.length ? (
         <div
           data-a1-draft-review="true"
-          style={{ background: "#fffbeb", border: "1px solid #fbbf24", borderRadius: 12, color: "#78350f", display: "grid", gap: 10, padding: "12px 14px", lineHeight: 1.55 }}
+          style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, display: "grid", gap: 8, padding: "10px 12px" }}
         >
-          <div>
-            <strong>Review stage — not submitted yet</strong>
-            <p style={{ margin: "4px 0 0" }}>
-              Your workbook answers are mapped into the submission form below. Check them, then press the final Submit Assignment button. Until that succeeds, your tutor has not received this work.
-            </p>
-          </div>
-          <div style={{ display: "grid", gap: 8 }}>
+          <strong style={{ color: "#0f172a" }}>Progress</strong>
+          <div style={{ display: "grid", gap: 7 }}>
             {reviewSections.map((section) => {
               const label = assignment.sections.find(({ key }) => key === section.sectionKey)?.label || section.sectionKey.replace("teil-", "Teil ");
               return (
                 <div key={section.sectionKey} style={{ display: "flex", gap: 10, justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: 800 }}>
-                    {label}: {section.complete ? "Complete" : `${section.completed}/${section.total} complete`}
+                  <span style={{ color: section.complete ? "#166534" : "#475569", fontWeight: 800 }}>
+                    {section.complete ? "✓ " : ""}{label} — {section.complete ? "Complete" : `${section.completed}/${section.total} complete`}
                   </span>
                   {!section.complete ? (
-                    <button type="button" style={{ ...styles.secondaryButton, minHeight: 38 }} onClick={() => openMissingSection(section.sectionKey)}>
+                    <button type="button" style={{ ...styles.secondaryButton, minHeight: 36 }} onClick={() => openMissingSection(section.sectionKey)}>
                       Finish {section.sectionKey.replace("teil-", "Teil ")}
                     </button>
                   ) : null}
@@ -353,14 +348,6 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
               );
             })}
           </div>
-        </div>
-      ) : assignmentKey === "A1-3" ? (
-        <div
-          data-a1-chapter3-submit-warning="true"
-          style={{ background: "#fffbeb", border: "1px solid #fbbf24", borderRadius: 10, color: "#78350f", display: "grid", gap: 5, padding: "10px 12px", lineHeight: 1.55 }}
-        >
-          <strong>Review stage — not submitted yet</strong>
-          <span>Your Chapter 3 workbook answers are loaded as a draft below. Check them carefully. They reach your tutor only after the final Submit Assignment button succeeds.</span>
         </div>
       ) : null}
 
@@ -423,6 +410,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
         {submissionContextReady ? (
           <VerifiedCloudDraftSubmissionPage
+            compact
             submissionContext={{
               level: "A1",
               day: assignment.day,
