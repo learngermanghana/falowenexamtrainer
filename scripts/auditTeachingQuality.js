@@ -118,6 +118,7 @@ function titleKeywords(title = "") {
 
 function findComponentEvidence(lesson) {
   const assignmentId = lower(lesson.assignmentId || lesson.id);
+  const level = clean(lesson.level).toLowerCase();
   const day = Number(lesson.day);
   const workbookSlug = lower(routeSlug(effectiveWorkbookRoute(lesson)));
   const grammarSlug = lower(routeSlug(lesson.grammarPage));
@@ -129,7 +130,10 @@ function findComponentEvidence(lesson) {
     const relLower = doc.rel.toLowerCase();
     const relCompact = relLower.replace(/[^a-z0-9]+/g, "");
     const dayTokens = [
-      "a1day" + day,
+      level + "day" + day,
+      level + "-day-" + day,
+      level + "_day_" + day,
+      level + " day " + day,
       "day" + day,
       "day-" + day,
       "day_" + day,
@@ -144,7 +148,11 @@ function findComponentEvidence(lesson) {
       if (dayTokens.some((value) => relLower.includes(value) || relCompact.includes(value.replace(/[^a-z0-9]/g, "")))) {
         score += 4;
       }
-      if (doc.lower.includes("a1 day " + day) || doc.lower.includes("day " + day + " ·") || doc.lower.includes("day " + day + " ")) {
+      if (
+        doc.lower.includes(level + " day " + day) ||
+        doc.lower.includes("day " + day + " ·") ||
+        doc.lower.includes("day " + day + " ")
+      ) {
         score += 3;
       }
     }
@@ -316,8 +324,9 @@ function quickAudit() {
   return { rows, issues };
 }
 
-function detailedA1Audit() {
-  const scoped = lessons.filter((lesson) => clean(lesson.level).toUpperCase() === "A1");
+function detailedLevelAudit(levelId) {
+  const level = clean(levelId).toUpperCase();
+  const scoped = lessons.filter((lesson) => clean(lesson.level).toUpperCase() === level);
   const issues = [];
   const rows = scoped.map((lesson) => {
     issues.push(...structuralIssues(lesson));
@@ -340,7 +349,7 @@ function detailedA1Audit() {
     }, signals);
   });
   issues.push(...duplicateIssues(scoped));
-  return { rows, issues };
+  return { level, rows, issues };
 }
 
 const icon = (value) => value ? "✓" : "—";
@@ -362,9 +371,9 @@ function quickMarkdown(audit) {
   ];
 }
 
-function a1Markdown(audit) {
+function detailedLevelMarkdown(audit, stageNumber) {
   return [
-    "## Stage 1 · Detailed A1 audit",
+    "## Stage " + stageNumber + " · Detailed " + audit.level + " audit",
     "",
     "Rubric: **Teach → Check → Produce → Transfer → Assess**. Missing signals are review prompts, not automatic judgments that a lesson is pedagogically bad.",
     "",
@@ -407,22 +416,27 @@ function stagePlanMarkdown() {
 }
 
 const quick = quickAudit();
-const a1 = mode === "a1" || mode === "all" ? detailedA1Audit() : null;
-const allIssues = quick.issues.concat(a1 ? a1.issues : []);
+const detailedAudits = [];
+if (["a1", "all"].includes(mode)) detailedAudits.push({ stage: 1, audit: detailedLevelAudit("A1") });
+if (["a2", "all"].includes(mode)) detailedAudits.push({ stage: 2, audit: detailedLevelAudit("A2") });
+
+const allIssues = quick.issues.concat(
+  ...detailedAudits.map(({ audit }) => audit.issues),
+);
 
 const markdown = [
   ...quickMarkdown(quick),
-  ...(a1 ? a1Markdown(a1) : []),
+  ...detailedAudits.flatMap(({ stage, audit }) => detailedLevelMarkdown(audit, stage)),
   ...issueMarkdown(allIssues),
   ...stagePlanMarkdown(),
-].join("\\n");
+].join("\n");
 
 if (reportPath) {
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, markdown);
 }
 if (githubSummary && process.env.GITHUB_STEP_SUMMARY) {
-  fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown + "\\n");
+  fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown + "\n");
 }
 
 console.log(markdown);
