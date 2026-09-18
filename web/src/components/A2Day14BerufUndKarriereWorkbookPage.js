@@ -50,54 +50,21 @@ const imageStyle = {
 };
 
 const lesenQuestions = [
-  {
-    stem: "Was lernt man in den ersten Tagen am neuen Arbeitsplatz kennen?",
-    options: ["A) Die Feiertage und die Nachbarn", "B) Die Kollegen und die Arbeit", "C) Nur die Hausordnung", "D) Die Deutschprüfung"],
-  },
-  {
-    stem: "Wie spricht man in Deutschland meist mit dem Chef?",
-    options: ["A) Mit Vornamen und ‚du‘", "B) Mit Spitznamen", "C) Mit ‚Sie‘", "D) Man spricht nicht mit dem Chef"],
-  },
-  {
-    stem: "Was ist der Betriebsrat?",
-    options: ["A) Ein Trainingszentrum", "B) Eine Sicherheitsfirma", "C) Eine Arbeitnehmervertretung", "D) Der Chef"],
-  },
-  {
-    stem: "Was gehört zum Arbeitnehmerschutz?",
-    options: ["A) Gratis Urlaub in Spanien", "B) Neue Kleidung jeden Tag", "C) Arbeitskleidung, Pausen und feste Arbeitszeiten", "D) Kostenloses Frühstück"],
-  },
-  {
-    stem: "Was bedeutet Gleitzeit?",
-    options: ["A) Man arbeitet immer nachts", "B) Man arbeitet immer am Wochenende", "C) Man kann Arbeitsbeginn und -ende flexibel wählen", "D) Man arbeitet von zu Hause"],
-  },
-  {
-    stem: "Wie viele Stunden arbeitet man in der Regel pro Woche in Vollzeit?",
-    options: ["A) 20–25 Stunden", "B) 30–35 Stunden", "C) 38–40 Stunden", "D) Über 50 Stunden"],
-  },
-  {
-    stem: "Was muss man machen, wenn man Urlaub möchte?",
-    options: ["A) Einfach zu Hause bleiben", "B) Den Urlaub eintragen und genehmigen lassen", "C) Den Chef anrufen", "D) Eine Reise buchen"],
-  },
-  {
-    stem: "Was bekommt man im Urlaub?",
-    options: ["A) Nichts", "B) Halbes Gehalt", "C) Urlaubsgeld vom Staat", "D) Weiter das Gehalt oder den Lohn"],
-  },
-  {
-    stem: "Was macht man bei Krankheit?",
-    options: ["A) Nichts", "B) Urlaub nehmen", "C) Sofort den Arbeitgeber informieren und zum Arzt gehen", "D) Einfach zu Hause bleiben"],
-  },
-  {
-    stem: "In welchen Berufen trägt man oft spezielle Kleidung?",
-    options: ["A) Im Büro", "B) Als Lehrer", "C) Auf der Baustelle oder am Flughafen", "D) Als Koch zu Hause"],
-  },
-  {
-    stem: "Was muss man bei einer Kündigung beachten?",
-    options: ["A) Den Arbeitgeber ignorieren", "B) Die Kündigung mündlich machen", "C) Die Kündigung schriftlich und mit Frist einreichen", "D) Eine WhatsApp schreiben"],
-  },
-  {
-    stem: "Wo kann man sich gut weiterbilden?",
-    options: ["A) In der Kneipe", "B) Bei der Polizei", "C) In der Volkshochschule", "D) Im Park"],
-  },
+  { stem: "Was lernt man in den ersten Tagen am neuen Arbeitsplatz kennen?", options: ["A) Die Feiertage und die Nachbarn", "B) Die Kollegen und die Arbeit", "C) Nur die Hausordnung", "D) Die Deutschprüfung"] },
+  { stem: "Wie spricht man in Deutschland meist mit dem Chef?", options: ["A) Mit Vornamen und ‚du‘", "B) Mit Spitznamen", "C) Mit ‚Sie‘", "D) Man spricht nicht mit dem Chef"] },
+  { stem: "Was ist der Betriebsrat?", options: ["A) Ein Trainingszentrum", "B) Eine Sicherheitsfirma", "C) Eine Arbeitnehmervertretung", "D) Der Chef"] },
+  { stem: "Was gehört zum Arbeitnehmerschutz?", options: ["A) Gratis Urlaub in Spanien", "B) Neue Kleidung jeden Tag", "C) Arbeitskleidung, Pausen und feste Arbeitszeiten", "D) Kostenloses Frühstück"] },
+  { stem: "Was bedeutet Gleitzeit?", options: ["A) Man arbeitet immer nachts", "B) Man arbeitet immer am Wochenende", "C) Man kann Arbeitsbeginn und -ende flexibel wählen", "D) Man arbeitet von zu Hause"] },
+  { stem: "Wie viele Stunden arbeitet man in der Regel pro Woche in Vollzeit?", options: ["A) 20–25 Stunden", "B) 30–35 Stunden", "C) 38–40 Stunden", "D) Über 50 Stunden"] },
+  { stem: "Was muss man machen, wenn man Urlaub möchte?", options: ["A) Einfach zu Hause bleiben", "B) Den Urlaub eintragen und genehmigen lassen", "C) Den Chef anrufen", "D) Eine Reise buchen"] },
+];
+
+const teil4Questions = [
+  { stem: "Was bekommt man im Urlaub?", options: ["A) Nichts", "B) Halbes Gehalt", "C) Urlaubsgeld vom Staat", "D) Weiter das Gehalt oder den Lohn"] },
+  { stem: "Was macht man bei Krankheit?", options: ["A) Nichts", "B) Urlaub nehmen", "C) Sofort den Arbeitgeber informieren und zum Arzt gehen", "D) Einfach zu Hause bleiben"] },
+  { stem: "In welchen Berufen trägt man oft spezielle Kleidung?", options: ["A) Im Büro", "B) Als Lehrer", "C) Auf der Baustelle oder am Flughafen", "D) Als Koch zu Hause"] },
+  { stem: "Was muss man bei einer Kündigung beachten?", options: ["A) Den Arbeitgeber ignorieren", "B) Die Kündigung mündlich machen", "C) Die Kündigung schriftlich und mit Frist einreichen", "D) Eine WhatsApp schreiben"] },
+  { stem: "Wo kann man sich gut weiterbilden?", options: ["A) In der Kneipe", "B) Bei der Polizei", "C) In der Volkshochschule", "D) Im Park"] },
 ];
 
 const PreparedCheckbox = ({ checked, onChange }) => (
@@ -126,6 +93,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
     sprechen: false,
     schreiben: false,
     lesen: false,
+    hoeren: false,
   });
 
   const setPreparedFor = (tabKey) => (event) =>
@@ -138,7 +106,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 14 Workbook · Beruf und Karriere</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Grammar, Teil 1–3, Ref or Submit below. This 5.14 workbook has no Teil 4 Hören assignment.
+          Select Grammar, Teil 1–4, Ref or Submit below. Teil 4 is the second reading assessment for this workbook.
         </p>
 
         <div
@@ -158,6 +126,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
             activeTab={activeTab}
             onChange={setActiveTab}
             tabs={STANDARD_WORKBOOK_TABS}
+            tabDescriptionOverrides={{ hoeren: "Lesen" }}
             ariaLabel="A2 Day 14 workbook sections"
             renderLegacyGrammarPanel={false}
           />
@@ -250,6 +219,18 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
         </div>
       )}
 
+      {activeTab === "hoeren" && (
+        <div style={card}>
+          <h2 style={sectionTitle}>Teil 4 · Lesen</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Lesen Sie die fünf zusätzlichen Fragen zu Urlaub, Krankheit, Arbeitskleidung, Kündigung und Weiterbildung.
+          </p>
+          <QuestionList questions={teil4Questions} />
+          <WorkbookSubmissionReminder />
+          <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
+        </div>
+      )}
+
       {activeTab === "references" && (
         <WorkbookReferenceAnswers
           level="A2"
@@ -263,12 +244,13 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           <h2 style={sectionTitle}>Submit Workbook</h2>
           <WorkbookTaskCard
             eyebrow="Final step"
-            title="Submit Teil 2 and Teil 3 only."
-            submissionNote="Teil 1 is group practice only. This 5.14 workbook has no Teil 4 Hören assignment."
+            title="Submit Teil 2, Teil 3 and Teil 4."
+            submissionNote="Teil 1 is group practice only. Teil 4 is a second reading assessment."
           >
             <ul style={listSpacing}>
               <li><strong>Teil 2 · Schreiben:</strong> submit your final formal letter.</li>
-              <li><strong>Teil 3 · Lesen:</strong> submit your reading answer letters.</li>
+              <li><strong>Teil 3 · Lesen:</strong> submit answers 1–7.</li>
+              <li><strong>Teil 4 · Lesen:</strong> submit answers 1–5.</li>
             </ul>
           </WorkbookTaskCard>
           <WorkbookSubmissionReminder />
