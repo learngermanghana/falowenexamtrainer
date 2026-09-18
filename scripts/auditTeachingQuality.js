@@ -20,12 +20,12 @@ const clean = (value = "") => String(value || "").trim();
 const lower = (value = "") => clean(value).toLowerCase();
 const token = (value = "") => lower(value)
   .normalize("NFD")
-  .replace(/[\\u0300-\\u036f]/g, "")
+  .replace(/[\u0300-\u036f]/g, "")
   .replace(/[^a-z0-9]+/g, " ")
   .trim();
 
 const isLocalCourseRoute = (value = "") => clean(value).startsWith("/campus/course/");
-const isExternalUrl = (value = "") => /^https?:\\/\\//i.test(clean(value));
+const isExternalUrl = (value = "") => { const v = lower(value); return v.startsWith("http://") || v.startsWith("https://"); };
 
 function walkFiles(root) {
   if (!fs.existsSync(root)) return [];
@@ -48,7 +48,7 @@ function readDoc(file) {
   const text = fs.readFileSync(file, "utf8");
   return {
     file,
-    rel: path.relative(repoRoot, file).replace(/\\\\/g, "/"),
+    rel: path.relative(repoRoot, file).split(path.sep).join("/"),
     text,
     lower: text.toLowerCase(),
   };
@@ -73,7 +73,10 @@ const advancedDocs = advancedDataNames
 const lessons = JSON.parse(fs.readFileSync(canonicalPath, "utf8"));
 
 function routeSlug(value = "") {
-  const raw = clean(value).replace(/^https?:\\/\\/[^/]+/i, "");
+  let raw = clean(value);
+  if (isExternalUrl(raw)) {
+    try { raw = new URL(raw).pathname; } catch (_) {}
+  }
   return raw.split("?")[0].split("/").filter(Boolean).pop() || "";
 }
 
