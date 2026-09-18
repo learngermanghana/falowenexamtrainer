@@ -68,6 +68,9 @@
     "test": "jest",
     "test:ci": "jest --runInBand",
     "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs",
-    "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue-safe.mjs"
+    "generate:public-course-catalogue": "node scripts/generate-public-course-catalogue-safe.mjs",
+    "audit:teaching:quick": "node ../scripts/auditTeachingQuality.js --mode=quick",
+    "audit:teaching:a1": "node ../scripts/auditTeachingQuality.js --mode=a1",
+    "audit:teaching:all": "node ../scripts/auditTeachingQuality.js --mode=all"
   }
 }
