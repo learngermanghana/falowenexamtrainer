@@ -33,9 +33,12 @@ const AccountSettings = () => {
   const paymentsEnabled = isPaymentsEnabled();
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
-  const [activeTab, setActiveTab] = useState(() =>
-    new URLSearchParams(window.location.search).get("tab") === "billing" ? "billing" : "studentData"
-  );
+  const [activeTab, setActiveTab] = useState(() => {
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    return ["studentData", "notifications", "billing", "upgrade"].includes(requestedTab)
+      ? requestedTab
+      : "studentData";
+  });
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
