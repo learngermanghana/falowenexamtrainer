@@ -29,21 +29,86 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Br
   <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Vorstellung → Vergleiche → Meinung → Frage → Viele Grüße.</p>
 </WorkbookTaskCard>;
 
-const readingText = `Anna ist 25 Jahre alt und wohnt in Berlin. Sie hat lange blonde Haare und arbeitet als Krankenschwester. In ihrer Freizeit liest sie gern und geht spazieren. Max ist 27 Jahre alt, trägt eine Brille und arbeitet als Mathematiklehrer. Er spielt gern Fußball und kocht. Anna ist jünger als Max. Max ist sportlicher als Anna, aber Anna liest häufiger als Max. Beide sind freundlich und hilfsbereit.`;
+const readingText = `Anna ist 25 Jahre alt und wohnt in Berlin, einer lebendigen Großstadt in Deutschland. Sie hat lange, blonde Haare, blaue Augen und ein strahlendes Lächeln. Anna arbeitet als Krankenschwester in einem Krankenhaus, wo sie sich um ihre Patienten kümmert. Sie liebt ihren Beruf, weil sie gerne anderen Menschen hilft. Ihre Kollegen schätzen sie sehr, weil sie immer freundlich und hilfsbereit ist.
+
+In ihrer Freizeit liest Anna gerne Romane, vor allem Liebesgeschichten, und geht oft im Park spazieren. Außerdem trifft sie sich regelmäßig mit ihrer besten Freundin Lisa, um Kaffee zu trinken oder ins Kino zu gehen. Anna mag auch Tiere und hat einen kleinen Hund namens Bruno, den sie oft mit in den Park nimmt.
+
+Max ist Annas Freund. Er ist 27 Jahre alt und wohnt auch in Berlin. Er hat kurze, braune Haare, grüne Augen und trägt eine Brille. Max ist Lehrer für Mathematik an einer Schule und unterrichtet dort Schüler zwischen 12 und 16 Jahren. Seine Schüler mögen ihn, weil er geduldig ist und schwierige Themen gut erklären kann.
+
+In seiner Freizeit spielt Max gerne Fußball mit seinen Freunden im Park. Er liebt es auch, neue Rezepte auszuprobieren und gemeinsam mit Anna oder Freunden zu kochen. Max ist ein humorvoller und kreativer Mensch, der immer neue Ideen hat, wie man den Alltag spannender gestalten kann. Am Wochenende unternehmen Anna und Max oft etwas zusammen, zum Beispiel Ausflüge in die Natur oder Museumsbesuche in der Stadt.`;
 
 const readingQuestions = [
-  { stem:"Wer ist älter?", options:["a) Anna","b) Max","c) Beide sind gleich alt"] },
-  { stem:"Wer spielt gern Fußball?", options:["a) Anna","b) Max","c) Beide"] },
-  { stem:"Welcher Vergleich stimmt?", options:["a) Anna ist älter als Max.","b) Max ist älter als Anna.","c) Max ist genauso alt wie Anna."] },
-  { stem:"Was haben beide gemeinsam?", options:["a) Beide sind freundlich.","b) Beide sind Lehrer.","c) Beide tragen eine Brille."] }
+  {
+    stem: "Wie alt ist Anna?",
+    options: ["a) 20 Jahre", "b) 25 Jahre", "c) 30 Jahre", "d) 27 Jahre"],
+  },
+  {
+    stem: "Was macht Anna in ihrer Freizeit?",
+    options: [
+      "a) Fußball spielen und kochen",
+      "b) Bücher lesen und spazieren gehen",
+      "c) Tanzen und malen",
+      "d) Reisen und Musik hören",
+    ],
+  },
+  {
+    stem: "Wo arbeitet Anna?",
+    options: ["a) In einer Schule", "b) In einer Tierklinik", "c) In einem Krankenhaus", "d) In einem Café"],
+  },
+  {
+    stem: "Welches Tier hat Anna?",
+    options: ["a) Eine Katze", "b) Einen Vogel", "c) Einen Hund", "d) Kein Tier"],
+  },
+  {
+    stem: "Was unterrichtet Max?",
+    options: ["a) Deutsch", "b) Mathematik", "c) Geschichte", "d) Englisch"],
+  },
+  {
+    stem: "Was macht Max oft mit seinen Freunden?",
+    options: ["a) Fußball spielen", "b) Spazieren gehen", "c) Kino besuchen", "d) Tanzen"],
+  },
+  {
+    stem: "Was unternehmen Anna und Max am Wochenende?",
+    options: [
+      "a) Sie gehen ins Fitnessstudio",
+      "b) Sie machen Ausflüge oder gehen ins Museum",
+      "c) Sie bleiben zu Hause",
+      "d) Sie besuchen Freunde in Hamburg",
+    ],
+  },
 ];
 
 const listeningQuestions = [
-  { stem:"Wie alt ist Julia?", options:["a) 24 Jahre","b) 26 Jahre","c) 28 Jahre","d) 30 Jahre"] },
-  { stem:"Was macht Julia beruflich?", options:["a) Köchin","b) Lehrerin","c) Architektin","d) Musikerin"] },
-  { stem:"Wo lebt Tobias?", options:["a) München","b) Frankfurt","c) Hamburg","d) Berlin"] },
-  { stem:"Was möchte Tobias in Zukunft machen?", options:["a) Ein Restaurant eröffnen","b) Musiker werden","c) Eine Weltreise machen","d) Lehrer werden"] },
-  { stem:"Was machen Julia und Tobias oft am Wochenende?", options:["a) Gitarre spielen","b) Gemeinsam kochen","c) In die Berge reisen","d) Ins Kino gehen"] }
+  {
+    stem: "Wie alt ist Julia?",
+    options: ["a) 24 Jahre", "b) 26 Jahre", "c) 28 Jahre", "d) 30 Jahre"],
+  },
+  {
+    stem: "Was macht Julia beruflich?",
+    options: ["a) Köchin", "b) Lehrerin", "c) Architektin", "d) Musikerin"],
+  },
+  {
+    stem: "Wo lebt Tobias?",
+    options: ["a) In München", "b) In Frankfurt", "c) In Hamburg", "d) In Berlin"],
+  },
+  {
+    stem: "Was möchte Tobias in Zukunft machen?",
+    options: [
+      "a) Ein eigenes Restaurant eröffnen",
+      "b) Musiker werden",
+      "c) Eine Weltreise machen",
+      "d) Lehrer werden",
+    ],
+  },
+  {
+    stem: "Was machen Julia und Tobias oft am Wochenende?",
+    options: [
+      "a) Sie spielen Gitarre.",
+      "b) Sie kochen gemeinsam mit Sophie.",
+      "c) Sie reisen in die Berge.",
+      "d) Sie gehen ins Kino.",
+    ],
+  },
 ];
 
 export default function A2Day3ComparisonsWorkbookPage() {
