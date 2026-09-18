@@ -68,7 +68,7 @@ export default function NextLevelPreviewPage() {
   const lockedLessons = lessons.slice(1);
   const chapter = previewLesson ? getChapter(previewLesson) : "";
   const resourceHighlights = previewLesson ? getResourceHighlights(previewLesson) : [];
-  const upgradeHref = `/classes/?level=${encodeURIComponent(previewLevel)}`;
+  const upgradeHref = "/campus/account?tab=upgrade";
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 18, paddingBottom: 70 }}>
