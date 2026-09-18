@@ -24,7 +24,18 @@ const token = (value = "") => lower(value)
   .replace(/[^a-z0-9]+/g, " ")
   .trim();
 
-const isLocalCourseRoute = (value = "") => clean(value).startsWith("/campus/course/");
+const isLocalCourseRoute = (value = "") => {
+  const raw = clean(value);
+  if (raw.startsWith("/campus/course/")) return true;
+  if (!isExternalUrl(raw)) return false;
+  try {
+    const url = new URL(raw);
+    return ["falowen.app", "www.falowen.app"].includes(url.hostname.toLowerCase()) &&
+      url.pathname.startsWith("/campus/course/");
+  } catch (_) {
+    return false;
+  }
+};
 const isExternalUrl = (value = "") => { const v = lower(value); return v.startsWith("http://") || v.startsWith("https://"); };
 
 function walkFiles(root) {
@@ -155,8 +166,10 @@ function structuralIssues(lesson) {
   const id = clean(lesson.id || lesson.assignmentId || "(unknown)");
   if (!clean(lesson.title)) issues.push({ severity: "error", id, message: "missing lesson title" });
   if (!clean(lesson.chapter)) issues.push({ severity: "error", id, message: "missing chapter" });
+  const status = lower(lesson.contentStatus);
+  const published = status === "published" || status === "";
   if (!clean(lesson.workbookRoute)) {
-    issues.push({ severity: "error", id, message: "missing workbook route" });
+    if (published) issues.push({ severity: "error", id, message: "published lesson is missing workbook route" });
   } else if (isExternalUrl(lesson.workbookRoute) && !isLocalCourseRoute(lesson.workbookRoute)) {
     issues.push({ severity: "warning", id, message: "workbook uses external URL: " + lesson.workbookRoute });
   }
@@ -166,7 +179,7 @@ function structuralIssues(lesson) {
   if (lesson.submissionRequired && !lesson.progressionEligible) {
     issues.push({ severity: "warning", id, message: "tutor-marked lesson is not progression eligible" });
   }
-  if (!["published", "draft", ""].includes(lower(lesson.contentStatus))) {
+  if (!["published", "planned", "draft", ""].includes(lower(lesson.contentStatus))) {
     issues.push({ severity: "warning", id, message: "unrecognised contentStatus: " + lesson.contentStatus });
   }
   return issues;
@@ -202,6 +215,8 @@ function quickAudit() {
     return {
       level,
       lessons: scoped.length,
+      published: scoped.filter((lesson) => ["published", ""].includes(lower(lesson.contentStatus))).length,
+      planned: scoped.filter((lesson) => lower(lesson.contentStatus) === "planned").length,
       tutorMarked: scoped.filter((lesson) => lesson.submissionRequired).length,
       localWorkbooks: scoped.filter((lesson) => isLocalCourseRoute(lesson.workbookRoute)).length,
       externalWorkbooks: scoped.filter((lesson) => isExternalUrl(lesson.workbookRoute) && !isLocalCourseRoute(lesson.workbookRoute)).length,
@@ -211,11 +226,26 @@ function quickAudit() {
   });
 
   const advancedCorpus = advancedDocs.map((doc) => doc.lower).join("\\n");
-  ["B2", "C1", "C2"].forEach((level) => {
+  ["B2", "C1"].forEach((level) => {
     if (!advancedCorpus.includes(level.toLowerCase())) {
       issues.push({ severity: "warning", id: level, message: "no advanced teaching data marker found in audit corpus" });
     }
   });
+
+  const c2AlignmentPath = path.join(dataRoot, "c2LessonContentAlignment.js");
+  const c2RuntimeSource = fs.existsSync(c2AlignmentPath) ? fs.readFileSync(c2AlignmentPath, "utf8") : "";
+  const c2RuntimeDays = new Set(
+    Array.from(c2RuntimeSource.matchAll(/^\s{2}(\d+):\s*\[\[/gm)).map((match) => Number(match[1]))
+  );
+  const c2Row = rows.find((row) => row.level === "C2");
+  if (c2Row && c2Row.lessons === 0 && c2RuntimeDays.size) {
+    c2Row.lessons = c2RuntimeDays.size;
+    c2Row.published = c2RuntimeDays.size;
+    c2Row.runtimeGenerated = true;
+  }
+  if (!c2RuntimeDays.size) {
+    issues.push({ severity: "error", id: "C2", message: "runtime-generated C2 curriculum could not be detected" });
+  }
 
   return { rows, issues };
 }
@@ -255,11 +285,12 @@ function quickMarkdown(audit) {
     "",
     "## Stage 0 · A1–C2 platform scan",
     "",
-    "| Level | Lessons | Tutor-marked | Local workbooks | External workbooks | Grammar routes | Video/teacher media |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+    "| Level | Lessons | Published | Planned | Tutor-marked | Local workbooks | External workbooks | Grammar routes | Video/teacher media |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ...audit.rows.map((row) =>
-      "| " + row.level + " | " + row.lessons + " | " + row.tutorMarked + " | " + row.localWorkbooks +
-      " | " + row.externalWorkbooks + " | " + row.grammarRoutes + " | " + row.videos + " |"
+      "| " + row.level + " | " + row.lessons + " | " + (row.published || 0) + " | " + (row.planned || 0) +
+      " | " + row.tutorMarked + " | " + row.localWorkbooks + " | " + row.externalWorkbooks +
+      " | " + row.grammarRoutes + " | " + row.videos + (row.runtimeGenerated ? " (runtime)" : "") + " |"
     ),
     "",
   ];
