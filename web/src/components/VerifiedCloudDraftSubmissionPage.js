@@ -81,7 +81,7 @@ const makeInitialCloudState = (docId = "") => ({
   remoteSource: "",
 });
 
-const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
+const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = false, onLockedChange = null }) => {
   const { user, studentProfile } = useAuth();
   const { showToast } = useToast();
   const textareaRef = useRef(null);
@@ -169,6 +169,10 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
   useEffect(() => {
     currentTextRef.current = text;
   }, [text]);
+
+  useEffect(() => {
+    onLockedChange?.(locked);
+  }, [locked, onLockedChange]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -669,7 +673,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
       });
       return;
     }
-    if (!confirmed) {
+    if (!confirmed && !compact) {
       setStatus({
         loading: false,
         error: "Please confirm that this is the correct assignment.",
@@ -894,6 +898,25 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
   };
 
   if (locked) {
+    if (compact) {
+      return (
+        <div
+          {...debugAttributes}
+          role="status"
+          style={{
+            background: "#ecfdf5",
+            border: "1px solid #86efac",
+            borderRadius: 12,
+            color: "#166534",
+            fontWeight: 800,
+            padding: "12px 14px",
+          }}
+        >
+          ✓ Already submitted — this assignment has already been sent to your tutor.
+        </div>
+      );
+    }
+
     return (
       <div {...debugAttributes}>
         {finalSubmissionState.state === "verified" ? (
@@ -910,8 +933,12 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
   const hasMinimumWords = wordCount >= MIN_SUBMISSION_WORDS;
 
   return (
-    <div {...debugAttributes} style={{ display: "grid", gap: 12 }}>
-      <InfoBox tone={cloudTone}>{cloudStatusText}</InfoBox>
+    <div {...debugAttributes} style={{ display: "grid", gap: compact ? 8 : 12 }}>
+      {!compact ? <InfoBox tone={cloudTone}>{cloudStatusText}</InfoBox> : null}
+
+      {compact && (cloudState.state === "error" || cloudState.state === "conflict") ? (
+        <InfoBox tone={cloudTone}>{cloudStatusText}</InfoBox>
+      ) : null}
 
       {pendingRemoteDraft ? (
         <div
@@ -942,61 +969,80 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
         </div>
       ) : null}
 
-      <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <div>
-          <h2 style={styles.sectionTitle}>Submit Assignment</h2>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Type or paste your answer below. Your student details are added automatically.
-          </p>
-        </div>
+      <div style={{ ...styles.card, display: "grid", gap: compact ? 10 : 12, padding: compact ? 12 : styles.card?.padding }}>
+        {!compact ? (
+          <div>
+            <h2 style={styles.sectionTitle}>Submit Assignment</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Type or paste your answer below. Your student details are added automatically.
+            </p>
+          </div>
+        ) : null}
 
         {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
-        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 10,
-            }}
-          >
-            <div style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Submit level</span>
-              <input style={styles.input} value={level} readOnly />
-            </div>
-            <div style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Assignment</span>
-              <input style={styles.input} value={assignmentTitle} readOnly />
-            </div>
-            <details style={{ ...styles.field, margin: 0 }}>
-              <summary style={{ ...styles.label, cursor: "pointer", padding: "8px 0" }}>
-                Student details
-              </summary>
-              <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
-                  <div style={styles.helperText}>Email • Enrolled level {level}</div>
-                </div>
-                <span style={styles.badge}>{studentCode || "No code"}</span>
+        <form style={{ display: "grid", gap: compact ? 10 : 12 }} onSubmit={handleSubmit}>
+          {!compact ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: 10,
+              }}
+            >
+              <div style={{ ...styles.field, margin: 0 }}>
+                <span style={styles.label}>Submit level</span>
+                <input style={styles.input} value={level} readOnly />
               </div>
-            </details>
-          </div>
+              <div style={{ ...styles.field, margin: 0 }}>
+                <span style={styles.label}>Assignment</span>
+                <input style={styles.input} value={assignmentTitle} readOnly />
+              </div>
+              <details style={{ ...styles.field, margin: 0 }}>
+                <summary style={{ ...styles.label, cursor: "pointer", padding: "8px 0" }}>
+                  Student details
+                </summary>
+                <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
+                    <div style={styles.helperText}>Email • Enrolled level {level}</div>
+                  </div>
+                  <span style={styles.badge}>{studentCode || "No code"}</span>
+                </div>
+              </details>
+            </div>
+          ) : null}
 
-          <div
-            style={{
-              background: "#ecfdf5",
-              border: "1px solid #bbf7d0",
-              borderRadius: 10,
-              fontWeight: 700,
-              padding: "10px 12px",
-            }}
-          >
-            This assignment is submittable
-          </div>
+          {!compact ? (
+            <div
+              style={{
+                background: "#ecfdf5",
+                border: "1px solid #bbf7d0",
+                borderRadius: 10,
+                fontWeight: 700,
+                padding: "10px 12px",
+              }}
+            >
+              This assignment is submittable
+            </div>
+          ) : null}
 
           <label style={{ ...styles.field, margin: 0 }}>
-            <span style={styles.label}>Your text *</span>
+            <span style={styles.label}>{compact ? "Your answers *" : "Your text *"}</span>
+            {compact && cloudState.state !== "error" && cloudState.state !== "conflict" ? (
+              <span style={{ ...styles.helperText, color: "#64748b", marginBottom: 4 }}>
+                {cloudState.state === "saved"
+                  ? "Draft saved"
+                  : cloudState.state === "restored"
+                  ? "Draft loaded"
+                  : cloudState.state === "saving"
+                  ? "Saving draft…"
+                  : ready
+                  ? "Draft ready"
+                  : "Loading draft…"}
+              </span>
+            ) : null}
             <textarea
               ref={textareaRef}
               value={text}
@@ -1009,76 +1055,86 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
               spellCheck={false}
               maxLength={MAX_SUBMISSION_CHARACTERS}
               data-minimum-words={MIN_SUBMISSION_WORDS}
-              style={{ ...styles.textArea, minHeight: 220 }}
+              style={{ ...styles.textArea, minHeight: compact ? 240 : 220 }}
               placeholder={ready ? "Type your answer here or paste it in." : "Checking the newest cloud draft…"}
               disabled={!ready || status.loading}
             />
-            <span style={styles.helperText}>
-              {text.length.toLocaleString()} / {MAX_SUBMISSION_CHARACTERS.toLocaleString()} characters · {wordCount} words ·{" "}
-              {!hasMinimumWords
-                ? `Minimum ${MIN_SUBMISSION_WORDS} words before submitting`
-                : text.trim().length < MIN_SUBMISSION_CHARACTERS
-                ? `Minimum ${MIN_SUBMISSION_CHARACTERS} characters`
-                : "Ready to submit"}
-            </span>
+            {!compact ? (
+              <span style={styles.helperText}>
+                {text.length.toLocaleString()} / {MAX_SUBMISSION_CHARACTERS.toLocaleString()} characters · {wordCount} words ·{" "}
+                {!hasMinimumWords
+                  ? `Minimum ${MIN_SUBMISSION_WORDS} words before submitting`
+                  : text.trim().length < MIN_SUBMISSION_CHARACTERS
+                  ? `Minimum ${MIN_SUBMISSION_CHARACTERS} characters`
+                  : "Ready to submit"}
+              </span>
+            ) : null}
           </label>
 
-          <div>
-            <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-              {GERMAN_SPECIAL_CHARACTERS.map((character) => (
-                <button
-                  key={character}
-                  type="button"
-                  style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
-                  onClick={() => insertCharacter(character)}
-                  disabled={!ready || status.loading}
-                >
-                  {character}
-                </button>
-              ))}
+          {!compact ? (
+            <div>
+              <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                {GERMAN_SPECIAL_CHARACTERS.map((character) => (
+                  <button
+                    key={character}
+                    type="button"
+                    style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
+                    onClick={() => insertCharacter(character)}
+                    disabled={!ready || status.loading}
+                  >
+                    {character}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
-            <input
-              type="checkbox"
-              checked={confirmed}
-              onChange={(event) => setConfirmed(event.target.checked)}
-              disabled={!ready || status.loading}
-            />
-            <span style={{ ...styles.label, margin: 0 }}>
-              I checked that this is the correct assignment.
-            </span>
-          </label>
+          {!compact ? (
+            <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
+              <input
+                type="checkbox"
+                checked={confirmed}
+                onChange={(event) => setConfirmed(event.target.checked)}
+                disabled={!ready || status.loading}
+              />
+              <span style={{ ...styles.label, margin: 0 }}>
+                I checked that this is the correct assignment.
+              </span>
+            </label>
+          ) : null}
 
-          <details style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
-            <summary style={{ fontWeight: 700, cursor: "pointer", padding: "4px 0" }}>Review details</summary>
-            <div style={{ marginTop: 6 }}>
-              <div style={styles.helperText}>Day: {day}</div>
-              <div style={styles.helperText}>Chapter: {chapter || "–"}</div>
-              <div style={styles.helperText}>Assignment key: {assignmentKey || "–"}</div>
-              <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
-            </div>
-          </details>
+          {!compact ? (
+            <details style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
+              <summary style={{ fontWeight: 700, cursor: "pointer", padding: "4px 0" }}>Review details</summary>
+              <div style={{ marginTop: 6 }}>
+                <div style={styles.helperText}>Day: {day}</div>
+                <div style={styles.helperText}>Chapter: {chapter || "–"}</div>
+                <div style={styles.helperText}>Assignment key: {assignmentKey || "–"}</div>
+                <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
+              </div>
+            </details>
+          ) : null}
 
           <div
             data-a1-submission-actions
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gridTemplateColumns: compact ? "1fr" : "repeat(auto-fit, minmax(180px, 1fr))",
               gap: 10,
               alignItems: "center",
             }}
           >
-            <button
-              type="button"
-              style={{ ...styles.secondaryButton, display: "inline-flex", justifyContent: "center", minHeight: 44 }}
-              onClick={handleManualSave}
-              disabled={!ready || status.loading || !normalizeText(text)}
-            >
-              {status.loading ? "Saving…" : "Save draft"}
-            </button>
+            {!compact ? (
+              <button
+                type="button"
+                style={{ ...styles.secondaryButton, display: "inline-flex", justifyContent: "center", minHeight: 44 }}
+                onClick={handleManualSave}
+                disabled={!ready || status.loading || !normalizeText(text)}
+              >
+                {status.loading ? "Saving…" : "Save draft"}
+              </button>
+            ) : null}
 
             <button
               type="submit"
@@ -1089,17 +1145,17 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null }) => {
                 display: "inline-flex",
                 justifyContent: "center",
                 alignItems: "center",
-                minHeight: 44,
+                minHeight: 46,
                 opacity: 1,
                 visibility: "visible",
               }}
               disabled={!ready || status.loading || !hasMinimumWords}
             >
-              {finalSubmissionState.state === "saving" ? "Submitting…" : "Submit assignment"}
+              {finalSubmissionState.state === "saving" ? "Submitting…" : "Submit Assignment"}
             </button>
           </div>
 
-          <span style={styles.helperText}>Your first confirmed submission is final.</span>
+          {!compact ? <span style={styles.helperText}>Your first confirmed submission is final.</span> : null}
         </form>
       </div>
     </div>
