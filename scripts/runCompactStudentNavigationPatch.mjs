@@ -1,3 +1,4 @@
+// Deployment retry marker: C2 strict page ownership.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
