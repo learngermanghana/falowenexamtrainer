@@ -120,6 +120,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   const workbookSeedUserEditedRef = useRef(false);
   const [autoResolveMessage, setAutoResolveMessage] = useState("");
   const [submissionGuardMessage, setSubmissionGuardMessage] = useState("");
+  const [submissionLocked, setSubmissionLocked] = useState(false);
   const searchParams = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
   const requestedTab = searchParams.get("workbookTab");
   const assignmentKey = assignment.assignmentKey;
@@ -139,6 +140,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     workbookSeedUserEditedRef.current = false;
     setAutoResolveMessage("");
     setSubmissionGuardMessage("");
+    setSubmissionLocked(false);
   }, [assignmentKey]);
 
   useEffect(() => {
@@ -320,12 +322,14 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
           Tutor-marked assignment
         </p>
         <h2 style={{ margin: "4px 0" }}>{submitTitle || `Submit ${assignmentKey}`}</h2>
-        <p style={{ color: "#475569", margin: 0 }}>
-          Review your answers below. You can edit them before submitting.
-        </p>
+        {!submissionLocked ? (
+          <p style={{ color: "#475569", margin: 0 }}>
+            Review your answers below. You can edit them before submitting.
+          </p>
+        ) : null}
       </div>
 
-      {reviewSections.length ? (
+      {!submissionLocked && reviewSections.length ? (
         <div
           data-a1-draft-review="true"
           style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, display: "grid", gap: 8, padding: "10px 12px" }}
@@ -411,6 +415,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
         {submissionContextReady ? (
           <VerifiedCloudDraftSubmissionPage
             compact
+            onLockedChange={setSubmissionLocked}
             submissionContext={{
               level: "A1",
               day: assignment.day,
