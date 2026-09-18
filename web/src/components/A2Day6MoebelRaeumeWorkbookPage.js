@@ -62,6 +62,8 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
         { stem: "Wie ist das Essen in der Mensa?", options: ["a) Es ist gesund", "b) Es ist sehr gut", "c) Es ist vegetarisch", "d) Es ist billig"] },
         { stem: "Was ist in der WG verboten?", options: ["a) Schuhe", "b) Fahrräder", "c) Bücher", "d) Haustiere"] },
         { stem: "Wo möchte ich später arbeiten?", options: ["a) In der U-Bahn", "b) An der Universität", "c) Im Zoo", "d) In der Mensa"] },
+        { stem: "Welche Wohnung ist 70 Quadratmeter groß?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
+        { stem: "Welche Wohnung hat einen Balkon?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
       ]}
       hoerenTask="Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung. Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein."
       hoerenAudioUrl="https://youtu.be/WuA8Xabn-Uw"
