@@ -1,4 +1,4 @@
 Vercel rebuild trigger
-Reason: deploy the latest A1 tutor-marked workbook tab-navigation fix and A1 Course Book health stabilization after the previous main deployment was rejected by Vercel's temporary build-rate limit.
-Target main includes: e49658ebd65d7d82cf613f043485badc09fbc261
-Triggered: 2026-09-17T21:30:00+00:00
+Reason: user-requested production retry for the latest A1 tutor-marked workbook tab-navigation fix and A1 Course Book health stabilization after the previous temporary build-rate limit.
+Target main includes: e01799669fe0e915cb72454b856efed7ef1434a4
+Triggered: 2026-09-18T06:28:00+00:00
