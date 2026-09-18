@@ -118,20 +118,47 @@ function titleKeywords(title = "") {
 
 function findComponentEvidence(lesson) {
   const assignmentId = lower(lesson.assignmentId || lesson.id);
-  const workbookSlug = lower(routeSlug(lesson.workbookRoute));
+  const day = Number(lesson.day);
+  const workbookSlug = lower(routeSlug(effectiveWorkbookRoute(lesson)));
   const grammarSlug = lower(routeSlug(lesson.grammarPage));
   const keywords = titleKeywords(lesson.title);
+  const compactKeywords = keywords.map((word) => word.replace(/\s+/g, ""));
 
   return componentDocs.map((doc) => {
     let score = 0;
+    const relLower = doc.rel.toLowerCase();
+    const relCompact = relLower.replace(/[^a-z0-9]+/g, "");
+    const dayTokens = [
+      "a1day" + day,
+      "day" + day,
+      "day-" + day,
+      "day_" + day,
+      "day " + day,
+    ];
+
     if (assignmentId && doc.lower.includes(assignmentId)) score += 6;
     if (workbookSlug && workbookSlug.length > 8 && doc.lower.includes(workbookSlug)) score += 5;
     if (grammarSlug && grammarSlug.length > 8 && doc.lower.includes(grammarSlug)) score += 4;
-    keywords.forEach((word) => { if (doc.lower.includes(word)) score += 1; });
+
+    if (Number.isFinite(day)) {
+      if (dayTokens.some((value) => relLower.includes(value) || relCompact.includes(value.replace(/[^a-z0-9]/g, "")))) {
+        score += 4;
+      }
+      if (doc.lower.includes("a1 day " + day) || doc.lower.includes("day " + day + " ·") || doc.lower.includes("day " + day + " ")) {
+        score += 3;
+      }
+    }
+
+    keywords.forEach((word, index) => {
+      const compact = compactKeywords[index];
+      if (compact && relCompact.includes(compact)) score += 4;
+      else if (doc.lower.includes(word)) score += 2;
+    });
+
     return Object.assign({}, doc, { score });
-  }).filter((doc) => doc.score >= 3)
+  }).filter((doc) => doc.score >= 4)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 8);
+    .slice(0, 10);
 }
 
 function hasAny(text, patterns) {
@@ -277,7 +304,7 @@ function detailedA1Audit() {
   const rows = scoped.map((lesson) => {
     issues.push(...structuralIssues(lesson));
     const signals = lessonSignals(lesson);
-    if (signals.score < 4) {
+    if (signals.score < 5) {
       const missing = ["teach", "check", "produce", "transfer", "assess"].filter((key) => !signals[key]);
       issues.push({
         severity: signals.score <= 2 ? "error" : "warning",
