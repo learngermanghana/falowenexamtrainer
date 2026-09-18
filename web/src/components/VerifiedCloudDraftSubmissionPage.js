@@ -81,7 +81,7 @@ const makeInitialCloudState = (docId = "") => ({
   remoteSource: "",
 });
 
-const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = false }) => {
+const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = false, onLockedChange = null }) => {
   const { user, studentProfile } = useAuth();
   const { showToast } = useToast();
   const textareaRef = useRef(null);
@@ -169,6 +169,10 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
   useEffect(() => {
     currentTextRef.current = text;
   }, [text]);
+
+  useEffect(() => {
+    onLockedChange?.(locked);
+  }, [locked, onLockedChange]);
 
   useEffect(() => {
     mountedRef.current = true;
