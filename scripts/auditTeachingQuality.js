@@ -82,6 +82,25 @@ const advancedDocs = advancedDataNames
   .map(readDoc);
 
 const lessons = JSON.parse(fs.readFileSync(canonicalPath, "utf8"));
+const inAppRouteConfigPath = path.join(dataRoot, "inAppWorkbookRoutes.json");
+const inAppRouteConfig = fs.existsSync(inAppRouteConfigPath)
+  ? JSON.parse(fs.readFileSync(inAppRouteConfigPath, "utf8"))
+  : {};
+
+function effectiveWorkbookRoute(lesson = {}) {
+  const level = clean(lesson.level).toUpperCase();
+  const day = String(Number(lesson.day));
+  const chapter = clean(lesson.chapter);
+  const configured = inAppRouteConfig?.[level]?.[day];
+  if (configured) {
+    const route = configured[chapter] || configured["*"];
+    if (route) return route;
+  }
+  if (level === "B1" && Number(day) >= 1 && Number(day) <= 28) {
+    return "/campus/course/lesson/B1/" + day + "?view=workbook";
+  }
+  return clean(lesson.workbookRoute);
+}
 
 function routeSlug(value = "") {
   let raw = clean(value);
@@ -124,6 +143,7 @@ function lessonSignals(lesson) {
   const corpus = evidenceDocs.map((doc) => doc.lower).join("\\n");
   const kind = lower(lesson.kind);
   const tutorMarked = Boolean(lesson.submissionRequired);
+  const workbookRoute = effectiveWorkbookRoute(lesson);
 
   const teach =
     Boolean(clean(lesson.grammarPage)) ||
@@ -143,12 +163,12 @@ function lessonSignals(lesson) {
     ]);
 
   const transfer =
-    Boolean(clean(lesson.workbookRoute)) &&
+    Boolean(clean(workbookRoute)) &&
     (teach || hasAny(corpus, [/workbookconnection/, /workbook bridge/, /transfer/, /guided practice/, /lesson objective/, /instruction/]));
 
   const assess = tutorMarked
-    ? Boolean(clean(lesson.assignmentId)) && Boolean(clean(lesson.workbookRoute))
-    : Boolean(clean(lesson.workbookRoute)) && (check || produce);
+    ? Boolean(clean(lesson.assignmentId)) && Boolean(clean(workbookRoute))
+    : Boolean(clean(workbookRoute)) && (check || produce);
 
   return {
     teach,
@@ -168,10 +188,11 @@ function structuralIssues(lesson) {
   if (!clean(lesson.chapter)) issues.push({ severity: "error", id, message: "missing chapter" });
   const status = lower(lesson.contentStatus);
   const published = status === "published" || status === "";
-  if (!clean(lesson.workbookRoute)) {
-    if (published) issues.push({ severity: "error", id, message: "published lesson is missing workbook route" });
-  } else if (isExternalUrl(lesson.workbookRoute) && !isLocalCourseRoute(lesson.workbookRoute)) {
-    issues.push({ severity: "warning", id, message: "workbook uses external URL: " + lesson.workbookRoute });
+  const workbookRoute = effectiveWorkbookRoute(lesson);
+  if (!clean(workbookRoute)) {
+    if (published) issues.push({ severity: "error", id, message: "published lesson is missing effective workbook route" });
+  } else if (isExternalUrl(workbookRoute) && !isLocalCourseRoute(workbookRoute)) {
+    issues.push({ severity: "warning", id, message: "effective workbook uses external URL: " + workbookRoute });
   }
   if (lesson.submissionRequired && !clean(lesson.assignmentId)) {
     issues.push({ severity: "error", id, message: "tutor-marked lesson has no assignmentId" });
@@ -218,8 +239,8 @@ function quickAudit() {
       published: scoped.filter((lesson) => ["published", ""].includes(lower(lesson.contentStatus))).length,
       planned: scoped.filter((lesson) => lower(lesson.contentStatus) === "planned").length,
       tutorMarked: scoped.filter((lesson) => lesson.submissionRequired).length,
-      localWorkbooks: scoped.filter((lesson) => isLocalCourseRoute(lesson.workbookRoute)).length,
-      externalWorkbooks: scoped.filter((lesson) => isExternalUrl(lesson.workbookRoute) && !isLocalCourseRoute(lesson.workbookRoute)).length,
+      localWorkbooks: scoped.filter((lesson) => isLocalCourseRoute(effectiveWorkbookRoute(lesson))).length,
+      externalWorkbooks: scoped.filter((lesson) => isExternalUrl(effectiveWorkbookRoute(lesson)) && !isLocalCourseRoute(effectiveWorkbookRoute(lesson))).length,
       grammarRoutes: scoped.filter((lesson) => clean(lesson.grammarPage)).length,
       videos: scoped.filter((lesson) => clean(lesson.teacherVideo || lesson.video)).length,
     };
@@ -305,7 +326,7 @@ function a1Markdown(audit) {
     "| Day | Lesson | Teach | Check | Produce | Transfer | Assess | Coverage |",
     "| ---: | --- | :---: | :---: | :---: | :---: | :---: | ---: |",
     ...audit.rows.map((row) =>
-      "| " + row.day + " | " + row.id + " · " + row.title.replace(/\\|/g, "\\|") +
+      "| " + row.day + " | " + row.id + " · " + row.title.split("|").join("\\|") +
       " | " + icon(row.teach) + " | " + icon(row.check) + " | " + icon(row.produce) +
       " | " + icon(row.transfer) + " | " + icon(row.assess) + " | " + row.score + "/5 |"
     ),
