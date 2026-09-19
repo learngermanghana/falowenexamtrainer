@@ -1,3 +1,5 @@
+import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge";
+
 const rows = [
 [1,"Kreislaufwirtschaft und Wegwerfgesellschaft","Nuancierte Bewertung und Registersteuerung","Wie Kreislaufwirtschaft Produktion, Konsum, Reparatur und Wiederverwendung verändern kann.",[
 "Verbraucher tragen die größte Verantwortung dafür, die Wegwerfgesellschaft zu überwinden.","Ohne verbindliche Regeln werden Unternehmen kaum ausreichend langlebige und reparierbare Produkte anbieten.","Wiederverwendung und Reparatur sind langfristig wichtiger als ein immer effizienteres Recycling."]],
@@ -43,18 +45,18 @@ const rows = [
 "Digitale Verwaltungsangebote sollten zum Standard werden, solange persönliche Alternativen erhalten bleiben.","Bürgerfreundlichkeit hängt stärker von verständlichen Verfahren als von möglichst kurzen Bearbeitungszeiten ab.","Institutionen gewinnen Vertrauen, wenn Zuständigkeiten und Entscheidungen transparent nachvollziehbar sind."]],
 [22,"Reisen, Tourismus und kulturelle Begegnung","Temporale Verknüpfungen und zeitliche Logik","Wie Reisen Begegnung ermöglicht und zugleich ökologische sowie soziale Folgen erzeugt.",[
 "Tourismus fördert kulturelles Verständnis nur dann, wenn Reisende sich tatsächlich mit dem Zielort auseinandersetzen.","Beliebte Reiseziele dürfen Besucherzahlen begrenzen, um Lebensqualität und Umwelt zu schützen.","Längere, seltenere Reisen sind gesellschaftlich sinnvoller als viele kurze Flugreisen."]],
-[23,"Versicherungen, individuelle Vorsorge und Solidarität","Hedging, Einschränkung und Präzision","Wie Gesellschaften Risiken zwischen Eigenverantwortung, Pflichtversicherung und Solidarität verteilen.",[
-"Grundlegende Lebensrisiken sollten möglichst solidarisch und nicht ausschließlich privat abgesichert werden.","Mehr Eigenverantwortung kann zu bewussteren Entscheidungen führen, darf aber Menschen mit geringem Einkommen nicht überfordern.","Pflichtversicherungen sind gerechtfertigt, wenn individuelle Entscheidungen erhebliche Folgen für die Gemeinschaft haben."]],
-[24,"Demografischer Wandel und Generationengerechtigkeit","Konditionalität und abgestufte Schlussfolgerungen","Wie Alterung Rente, Pflege, Arbeitsmarkt und die Verteilung von Lasten zwischen Generationen verändert.",[
-"Eine alternde Gesellschaft muss längere Lebensarbeitszeiten ernsthaft in Betracht ziehen.","Generationengerechtigkeit verlangt, dass politische Entscheidungen langfristige Belastungen nicht einseitig auf Jüngere verschieben.","Zuwanderung kann demografische Probleme abmildern, ersetzt aber keine umfassende Reform von Rente und Pflege."]],
-[25,"Digitalisierung, Zugang und Medienkompetenz","Vorsichtige evidenzbasierte Schlussfolgerungen","Wie Digitalisierung Zugang zu Bildung, Behörden, Information und Teilhabe verändert.",[
-"Digitale Angebote verbessern gesellschaftliche Teilhabe nur, wenn analoge Alternativen für bestimmte Gruppen erhalten bleiben.","Medienkompetenz sollte als grundlegende Kulturtechnik ähnlich systematisch vermittelt werden wie Lesen und Schreiben.","Der Staat sollte digitale Infrastruktur als Teil der öffentlichen Daseinsvorsorge behandeln."]],
-[26,"Organisationen, Führung und Entscheidungsprozesse","Komplexe Satzperioden und kontrollierte Verdichtung","Wie Organisationen Effizienz, Transparenz, Verantwortung und Mitbestimmung austarieren.",[
-"Gute Führung zeigt sich stärker in klaren Entscheidungsprozessen als in der Persönlichkeit einzelner Führungskräfte.","Mehr Mitbestimmung kann Entscheidungen verbessern, auch wenn Prozesse dadurch langsamer werden.","Verantwortung sollte in Organisationen eindeutig zugeordnet sein und nicht hinter komplexen Strukturen verschwinden."]],
-[27,"Zivilgesellschaft, Ehrenamt und gesellschaftliches Engagement","Präzisionsredaktion und Kollokationskontrolle","Wie freiwilliges Engagement Zusammenhalt stärkt und wo die Verantwortung staatlicher Institutionen beginnt.",[
-"Ehrenamt kann staatliche Leistungen sinnvoll ergänzen, darf sie aber nicht dauerhaft ersetzen.","Gesellschaftliches Engagement sollte stärker öffentlich anerkannt und institutionell unterstützt werden.","Freiwilliges Engagement ist besonders wertvoll, weil es nicht vollständig durch finanzielle Anreize gesteuert wird."]],
-[28,"Zukunft der Gesellschaft: Freiheit, Sicherheit und Verantwortung","Synthese, Perspektivwechsel und C2-Gesamtintegration","Wie moderne Gesellschaften Freiheit, Sicherheit, Innovation, Gerechtigkeit und Verantwortung langfristig austarieren.",[
-"Mehr Sicherheit rechtfertigt Einschränkungen individueller Freiheit nur, wenn diese notwendig, transparent und überprüfbar sind.","Technischer Fortschritt sollte daran gemessen werden, ob seine Vorteile gesellschaftlich möglichst breit zugänglich sind.","Eine zukunftsfähige Gesellschaft braucht sowohl individuelle Verantwortung als auch handlungsfähige öffentliche Institutionen."]]
+[23,"Internationale Zusammenarbeit und Diplomatie","Hedging, vorsichtige Kritik und diplomatische Formulierungen","Wie Konflikte, Interessen und Kooperation sprachlich vorsichtig verhandelt werden.",[
+"Diplomatische Sprache sollte klare Kritik ermöglichen, ohne Konflikte unnötig zu verschärfen.","Ein tragfähiger Kompromiss ist häufig wichtiger als die vollständige Durchsetzung der eigenen Position.","Internationale Zusammenarbeit bleibt auch dann sinnvoll, wenn zentrale Interessen nicht vollständig übereinstimmen."]],
+[24,"Gesellschaftliche Kontroversen und öffentliche Debatten","Argumentationslogik: These, Begründung, Beleg, Einwand und Reaktion","Wie kontroverse Positionen logisch, fair und evidenzbasiert vertreten werden können.",[
+"Eine überzeugende Position muss auch ein starkes Gegenargument ernst nehmen.","Öffentliche Debatten gewinnen an Qualität, wenn Behauptungen nachvollziehbar begründet und belegt werden.","Ein Kompromiss ist nicht automatisch ausgewogen, nur weil er zwischen zwei Positionen liegt."]],
+[25,"Daten, Statistik und wissenschaftliche Evidenz","Evidentialität und vorsichtige Schlussfolgerungen","Wie stark Aussagen aus Daten, Studien und Korrelationen formuliert werden dürfen.",[
+"Eine statistische Korrelation rechtfertigt noch keine eindeutige kausale Schlussfolgerung.","Politische oder gesellschaftliche Entscheidungen sollten die Grenzen wissenschaftlicher Evidenz offen benennen.","Unsicherheit in Daten zu markieren schwächt eine Argumentation nicht, sondern kann ihre Glaubwürdigkeit erhöhen."]],
+[26,"Philosophie, Ethik und technischer Fortschritt","Satzperioden, Einbettung und hierarchische Satzstruktur","Wie abstrakte Begriffe und ethische Konflikte logisch und sprachlich präzise untersucht werden können.",[
+"Technischer Fortschritt sollte nicht nur nach Effizienz, sondern auch nach seinen sozialen und ethischen Folgen beurteilt werden.","Eine ethische Position ist nur dann überzeugend, wenn ihre Voraussetzungen und möglichen Gegenargumente offengelegt werden.","Nicht alles, was technisch möglich ist, ist deshalb bereits gesellschaftlich wünschenswert."]],
+[27,"Akademisches Schreiben und formelle Korrespondenz","Redundanz, Präzision, Register und Kohäsion","Wie anspruchsvolle Texte präzise, kohärent und adressatengerecht überarbeitet werden.",[
+"Ein akademischer Text wird nicht durch möglichst lange Sätze besser, sondern durch klare Bezüge und präzise Verben.","Formelle Korrespondenz sollte sachlich bleiben, ohne unnötig distanziert oder bürokratisch zu wirken.","Überarbeiten bedeutet auch, Redundanzen zu streichen und mehrdeutige Bezüge eindeutig zu machen."]],
+[28,"C2 Prüfungssimulation: Stellungnahme, Umformung und Synthese","Register, Nuance, Evidenz, Kohäsion und Reformulierung","Wie C2-Kompetenzen unter Prüfungsbedingungen flexibel kombiniert und kontrolliert werden.",[
+"Eine starke C2-Leistung verbindet sprachliche Komplexität mit klarer Argumentationslogik.","Reformulierung ist nur gelungen, wenn Bedeutung, Register und grammatische Beziehungen erhalten bleiben.","Die Endkontrolle sollte Inhalt, Kohäsion, Kasus, Wortstellung, Register und Evidenzstärke gemeinsam prüfen."]]
 ];
 
 const grammarMethods = {
@@ -80,94 +82,16 @@ const grammarMethods = {
 20:["Diskurspartikeln und Abtönungen verändern Haltung und Gesprächswirkung; in formellen Texten sparsam einsetzen.","Die Position ist durchaus nachvollziehbar, greift jedoch zu kurz.","Man könnte allerdings einwenden, dass die Verantwortung nicht allein bei den Plattformen liegt."],
 21:["Institutioneller Stil lebt von festen Verb-Nomen-Verbindungen, nicht von möglichst komplizierten Einzelwörtern.","einen Antrag stellen · Auskunft erteilen · Verantwortung übernehmen · Maßnahmen umsetzen", "Die Behörde sollte transparent Auskunft darüber erteilen, nach welchen Kriterien Entscheidungen getroffen werden."],
 22:["Temporale Verknüpfungen müssen Abfolge, Gleichzeitigkeit oder Dauer eindeutig machen.","Bevor eine Region den Tourismus ausweitet, sollte sie Belastungsgrenzen bestimmen.","Während Besucherzahlen steigen, verschärft sich mancherorts der Druck auf Wohnraum und Infrastruktur."],
-23:["Hedging begrenzt die Reichweite einer Aussage: tendenziell, unter bestimmten Bedingungen, weitgehend, nur bedingt.","Private Vorsorge kann unter bestimmten Bedingungen zusätzliche Sicherheit schaffen.","Diese Lösung dürfte vor allem für Haushalte mit stabilem Einkommen tragfähig sein."],
-24:["Konditionale Schlussfolgerungen sollten abgestuft sein: wenn, sofern, vorausgesetzt, andernfalls, daraus folgt nicht automatisch.","Sofern die Erwerbsquote steigt, lässt sich ein Teil des demografischen Drucks abfedern.","Daraus folgt jedoch nicht automatisch, dass strukturelle Reformen entbehrlich werden."],
-25:["Evidenzbasierte Schlussfolgerungen markieren Grenzen der Daten und vermeiden Übertreibung.","Die Maßnahme dürfte den Zugang verbessern, sofern technische und sprachliche Barrieren berücksichtigt werden.","Aus den vorliegenden Daten lässt sich nicht ohne Weiteres ableiten, dass digitale Angebote alle Gruppen gleichermaßen erreichen."],
-26:["Komplexe Satzperioden brauchen eine klare Hierarchie: Hauptaussage, Bedingung, Einordnung und Folge.","Obwohl mehr Beteiligung Zeit kostet, kann sie, sofern Zuständigkeiten klar bleiben, die Qualität von Entscheidungen erhöhen.","Verdichte nur dort, wo der logische Zusammenhang beim ersten Lesen erhalten bleibt."],
-27:["C2-Präzision entsteht beim Überarbeiten: Verb-Nomen-Verbindung, Kasus, Bedeutungsumfang und Register kontrollieren.","Engagement leisten → sich engagieren / einen Beitrag leisten", "Zivilgesellschaftliche Initiativen können einen wichtigen Beitrag zum gesellschaftlichen Zusammenhalt leisten."],
-28:["Synthese verbindet mehrere Perspektiven, ohne Unterschiede einzuebnen. Formuliere Gewichtung und Bedingungen ausdrücklich.","Einerseits schützt Regulierung vor Risiken; andererseits kann sie Innovation begrenzen.","Eine tragfähige Lösung setzt voraus, dass Freiheit, Sicherheit und soziale Folgen gleichzeitig berücksichtigt werden."]
-};
-
-const topicKnowledge = {
-1:{
- chapter:"1.1",
- coreQuestion:"Wie können Produkte und Rohstoffe möglichst lange genutzt werden, ohne dass Bezahlbarkeit, Komfort und wirtschaftliche Interessen völlig außer Acht geraten?",
- englishDefinition:"A circular economy is a system in which products and materials stay in use for as long as possible. Products are designed to last, be repaired, reused, refurbished and shared. Recycling comes later, when reuse or repair is no longer practical. A throwaway society follows a more linear pattern: take resources, make a product, use it for a short time and throw it away.",
- germanDefinition:"Kreislaufwirtschaft bedeutet, Produkte und Rohstoffe möglichst lange im Umlauf zu halten. Produkte sollen langlebig, reparierbar und wiederverwendbar sein. Erst wenn Reparatur oder Wiederverwendung nicht mehr sinnvoll sind, werden Materialien recycelt. Eine Wegwerfgesellschaft funktioniert dagegen eher linear: Rohstoffe entnehmen → produzieren → kaufen → kurz nutzen → wegwerfen.",
- linearModel:"Rohstoffe → Produktion → Kaufen → kurz nutzen → Wegwerfen",
- circularModel:"Rohstoffe → langlebig produzieren → nutzen → reparieren → wiederverwenden/aufbereiten → recyceln",
- exampleTitle:"Beispiel: Smartphone",
- example:"In einer Wegwerfgesellschaft wird ein Smartphone bei einem Defekt schnell ersetzt. In einer Kreislaufwirtschaft wäre es so konstruiert, dass Akku und Display repariert oder ersetzt werden können. Danach kann das Gerät weiterverwendet, gebraucht verkauft oder professionell aufbereitet werden. Erst am Ende werden wertvolle Rohstoffe zurückgewonnen.",
- actors:[
-  ["Verbraucher","kaufen, nutzen, pflegen, reparieren lassen, wiederverwenden und entsorgen"],
-  ["Hersteller","entscheiden über Material, Haltbarkeit, Reparierbarkeit, Ersatzteile und Produktdesign"],
-  ["Staat","setzt Regeln und Anreize, zum Beispiel Reparaturrechte, Mindeststandards oder steuerliche Vorteile"]
- ],
- tensions:[
-  ["niedriger Preis und Bequemlichkeit","Langlebigkeit und Ressourcenschonung"],
-  ["kurzfristiger Absatz und Gewinn","lange Produktlebensdauer und Reparierbarkeit"],
-  ["unternehmerische Freiheit","staatliche Umwelt- und Produktregeln"],
-  ["individuelle Konsumfreiheit","gesellschaftliche Verantwortung für Abfall und Rohstoffe"]
- ],
- perspectives:[
-  ["Verbraucher tragen die größte Verantwortung","Frage: Können Kaufentscheidungen den Markt verändern, oder sind nachhaltige Alternativen oft zu teuer bzw. nicht verfügbar?"],
-  ["Unternehmen brauchen strengere Regeln","Frage: Reichen freiwillige Maßnahmen aus, oder braucht es verbindliche Vorgaben für Haltbarkeit, Ersatzteile und Reparatur?"],
-  ["Reparieren und Wiederverwenden sind wichtiger als Recycling","Frage: Ist es besser, Abfall zunächst zu vermeiden und Produkte länger zu nutzen, bevor Materialien recycelt werden?"]
- ],
- vocabulary:[
-  ["die Kreislaufwirtschaft","circular economy"],
-  ["die Wegwerfgesellschaft","throwaway society"],
-  ["die Lebensdauer","service life / lifespan"],
-  ["die Reparierbarkeit","repairability"],
-  ["die Wiederverwendung","reuse"],
-  ["die Aufbereitung","refurbishment / reconditioning"],
-  ["der Rohstoff","raw material"],
-  ["die Ressourcenschonung","conservation of resources"],
-  ["die Abfallvermeidung","waste prevention"],
-  ["das Recht auf Reparatur","right to repair"]
- ],
- collocations:[
-  ["Ressourcen schonen","conserve resources","Langlebige Produkte können natürliche Ressourcen schonen."],
-  ["die Lebensdauer verlängern","extend the lifespan","Reparaturen können die Lebensdauer elektronischer Geräte deutlich verlängern."],
-  ["Produkte reparierbar gestalten","design products to be repairable","Hersteller sollten Produkte so gestalten, dass zentrale Bauteile repariert werden können."],
-  ["Abfall vermeiden","prevent waste","Wiederverwendung hilft, Abfall bereits vor dem Recycling zu vermeiden."],
-  ["Rohstoffe zurückgewinnen","recover raw materials","Aus alten Geräten lassen sich wertvolle Rohstoffe zurückgewinnen."],
-  ["Verantwortung übernehmen für + Akk.","take responsibility for","Hersteller, Verbraucher und Staat müssen Verantwortung für einen nachhaltigeren Umgang mit Ressourcen übernehmen."]
- ],
- checks:[
-  {
-   question:"Was ist die Kernfrage bei „Kreislaufwirtschaft und Wegwerfgesellschaft“?",
-   options:[
-    "Wie können Produkte und Rohstoffe länger genutzt und Abfälle reduziert werden, ohne andere Interessen völlig zu ignorieren?",
-    "Wie kann man möglichst viele neue Produkte in kurzer Zeit verkaufen?",
-    "Wie kann Recycling jede Form von Reparatur und Wiederverwendung ersetzen?"
-   ],
-   answerIndex:0,
-   explanation:"Die Kreislaufwirtschaft versucht, Ressourcen länger im Umlauf zu halten. Dabei müssen ökologische, wirtschaftliche und soziale Interessen gegeneinander abgewogen werden."
-  },
-  {
-   question:"Welche zwei Interessen oder Werte können bei diesem Thema in Spannung geraten?",
-   options:[
-    "Bequemlichkeit und niedrige Preise ↔ Langlebigkeit und Ressourcenschonung",
-    "Grammatik ↔ Aussprache",
-    "Reisen ↔ Mehrsprachigkeit"
-   ],
-   answerIndex:0,
-   explanation:"Ein billiges oder bequem austauschbares Produkt kann kurzfristig attraktiv sein, während langlebige, reparierbare Produkte Ressourcen sparen sollen."
-  },
-  {
-   question:"Welche Kollokation passt zu einem ersten Argument über langlebige Produkte?",
-   options:["die Lebensdauer verlängern","eine Lebensdauer machen","Ressourcen sprechen"],
-   answerIndex:0,
-   explanation:"„die Lebensdauer verlängern“ ist eine natürliche Kollokation: Reparatur und gutes Produktdesign können die Nutzungsdauer eines Produkts verlängern."
-  }
- ],
- challenge:"Erkläre zunächst in eigenen Worten den Unterschied zwischen Wegwerfgesellschaft und Kreislaufwirtschaft. Nenne danach zwei Interessenkonflikte und formuliere eine differenzierte Position zu einer der drei Kursaussagen."
-}
+23:["Diplomatische Sprache kombiniert klare Positionen mit kontrollierter Abschwächung: nur bedingt, insofern, unter Vorbehalt, grundsätzlich.","Dieser Einschätzung lässt sich grundsätzlich zustimmen, allerdings bleibt offen, ob ...","Ein möglicher Kompromiss bestünde darin, ...; zugleich wäre zu berücksichtigen, dass ..."],
+24:["C2-Argumentation folgt einer erkennbaren Logik: These → Begründung → Beleg → Einwand → Reaktion → Schluss.","Für diese Position spricht ..., allerdings ist der Einwand ernst zu nehmen, dass ...","Der Einwand greift insofern zu kurz, als ...; daraus lässt sich jedoch nicht ableiten, dass ..."],
+25:["Evidentialität markiert, wie stark Daten eine Aussage tragen: belegen, nahelegen, darauf hindeuten, vermuten lassen, nicht ausschließen.","Die Daten legen einen Zusammenhang nahe, belegen jedoch keinen eindeutigen Kausalmechanismus.","Aus den vorliegenden Befunden lässt sich nicht ohne Weiteres schließen, dass ..."],
+26:["Komplexe Satzperioden brauchen eine klare Hierarchie aus Hauptaussage, Einbettung, Bedingung und Folgerung.","Die Frage, inwieweit technischer Fortschritt ethisch vertretbar ist, lässt sich nur beantworten, wenn Nutzen, Risiken und Verteilungseffekte getrennt betrachtet werden.","Verdichte nur dort, wo der logische Bezug auch beim ersten Lesen eindeutig bleibt."],
+27:["C2-Redaktion prüft Präzision, Redundanz, Bezüge, Register und Kohäsion systematisch.","schwaches Verb: eine Analyse machen → präziser: analysieren / auswerten / untersuchen","Ein präziser Fachtext streicht Wiederholungen, klärt Pronomenbezüge und wählt Verben nach ihrer tatsächlichen Bedeutung."],
+28:["Die Prüfungssimulation verlangt flexible Auswahl: Struktur nach Funktion wählen, nicht nach Schwierigkeit.","Vor dem Abgeben: Bedeutung → Argumentationslogik → Register → Evidenz → Kasus/Rektion → Wortstellung → Kohäsion.","Eine gelungene Synthese verbindet Perspektiven, ohne Unterschiede einzuebnen oder Unsicherheit als Gewissheit darzustellen."]
 };
 
 const reformulationProfile = {
-2:["Schulreform","zusätzliche Förderung","Bildungschancen"],4:["Medienberichterstattung","eine unabhängige Quellenprüfung","Verlässlichkeit der Informationen"],6:["Chancengerechtigkeit","gezielte Förderprogramme","gesellschaftliche Teilhabe"],8:["Automatisierung","Weiterbildungsprogramme","Beschäftigungschancen"],10:["medizinische Forschung","strengere Prüfverfahren","Patientensicherheit"],12:["Integration","Sprach- und Bildungsangebote","gesellschaftliche Teilhabe"],14:["Erinnerungskultur","neue Vermittlungsformate","Zugang zu kulturellem Gedächtnis"],16:["Werberegulierung","mehr Transparenz","selbstbestimmte Kaufentscheidungen"],18:["Weiterbildung","betriebliche Lernangebote","berufliche Anpassungsfähigkeit"],20:["Plattformregulierung","transparente Algorithmen","Qualität öffentlicher Debatten"],22:["nachhaltiger Tourismus","Besucherlenkung","Lebensqualität am Zielort"],24:["Renten- und Pflegepolitik","langfristige Reformen","Generationengerechtigkeit"],26:["Organisationsentwicklung","klare Zuständigkeiten","Qualität von Entscheidungen"],28:["gesellschaftliche Zukunftspolitik","transparente Abwägungsverfahren","Vertrauen in langfristige Entscheidungen"]
+2:["Schulreform","zusätzliche Förderung","Bildungschancen"],4:["Medienberichterstattung","eine unabhängige Quellenprüfung","Verlässlichkeit der Informationen"],6:["Chancengerechtigkeit","gezielte Förderprogramme","gesellschaftliche Teilhabe"],8:["Automatisierung","Weiterbildungsprogramme","Beschäftigungschancen"],10:["medizinische Forschung","strengere Prüfverfahren","Patientensicherheit"],12:["Integration","Sprach- und Bildungsangebote","gesellschaftliche Teilhabe"],14:["Erinnerungskultur","neue Vermittlungsformate","Zugang zu kulturellem Gedächtnis"],16:["Werberegulierung","mehr Transparenz","selbstbestimmte Kaufentscheidungen"],18:["Weiterbildung","betriebliche Lernangebote","berufliche Anpassungsfähigkeit"],20:["Plattformregulierung","transparente Algorithmen","Qualität öffentlicher Debatten"],22:["nachhaltiger Tourismus","Besucherlenkung","Lebensqualität am Zielort"],24:["öffentliche Debatten","eine nachvollziehbare Argumentationslinie","Qualität der Debatte"],26:["technischer Fortschritt","eine sorgfältige ethische Abwägung","gesellschaftliche Vertretbarkeit"],28:["C2-Prüfungssimulation","eine systematische Endkontrolle","sprachliche und argumentative Präzision"]
 };
 
 function makeReformulations(day,title){
@@ -181,5 +105,24 @@ function makeReformulations(day,title){
  ];
 }
 
-export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:topicKnowledge[day]||null,writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
+function buildTopicKnowledge(day,perspectives){
+ const knowledge=getC2TopicKnowledge(day);
+ if(!knowledge)return null;
+ return {
+  ...knowledge,
+  coreQuestion:knowledge.core,
+  englishDefinition:knowledge.en,
+  germanDefinition:knowledge.de,
+  exampleTitle:Number(day)===1?"Beispiel: Smartphone":"Konkretes Beispiel",
+  vocabulary:knowledge.vocab,
+  collocations:getC2TopicCollocations(day),
+  checks:getC2TopicChecks(day),
+  perspectives:(perspectives||[]).map((claim)=>[claim,"Welche Annahme, Bedingung oder Grenze musst du prüfen, bevor du dieser Aussage zustimmst?"]),
+  challenge:`Erkläre zuerst die Kernfrage in eigenen Worten. Nenne einen Zielkonflikt und formuliere anschließend eine differenzierte Position zu einer der drei Kursaussagen.`,
+  linearModel:Number(day)===1?"Rohstoffe → Produktion → Kaufen → kurz nutzen → Wegwerfen":"",
+  circularModel:Number(day)===1?"Rohstoffe → langlebig produzieren → nutzen → reparieren → wiederverwenden/aufbereiten → recyceln":"",
+ };
+}
+
+export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:buildTopicKnowledge(day,perspectives),writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
 export const getC2ExamStandard=(day)=>C2_EXAM_STANDARD[Number(day)]||null;
