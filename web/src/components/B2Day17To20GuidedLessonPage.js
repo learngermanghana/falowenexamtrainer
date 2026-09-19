@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import B2Day17To20GrammarNotes from "./B2Day17To20GrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -27,33 +28,6 @@ const NoteBox = ({ children, tone = "blue" }) => {
 };
 
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
-
-const summaries = {
-  17: {
-    title: "Mobilität und Stadtleben: Lebensqualität in deutschen Städten",
-    intro: "Mobilität entscheidet in Deutschland stark darüber, wie angenehm das Leben in einer Stadt ist. Es geht um Staus, Radwege, Busse, Bahnen, Lärm, Sicherheit und die Frage, wie Menschen schnell und klimafreundlich unterwegs sein können.",
-    points: ["Gute Stadtplanung verbindet öffentliche Verkehrsmittel, Radwege und sichere Fußwege.", "Autos bleiben praktisch, aber sie verursachen Staus, Lärm und Platzprobleme.", "Eine starke B2-Antwort vergleicht Verkehrsmittel und erklärt, wie Mobilität die Lebensqualität beeinflusst."],
-    vocabulary: ["der Nahverkehr", "der Radweg", "die Innenstadt", "der Stau", "die Lebensqualität"],
-  },
-  18: {
-    title: "Natur, Klima und Verantwortung: Klimaschutz konkret erklären",
-    intro: "Beim Thema Natur und Klima geht es in Deutschland um persönliche Verantwortung, politische Regeln und nachhaltige Entscheidungen. Klimaschutz zeigt sich im Energieverbrauch, in Grünflächen, im Konsum und in der Mobilität.",
-    points: ["Klimaschutz braucht sowohl individuelles Verhalten als auch klare Regeln von Politik und Unternehmen.", "Grünflächen, Energiesparen und weniger Müll verbessern Alltag und Umwelt.", "Eine gute B2-Antwort nennt eine Maßnahme, erklärt ihre Wirkung und erwähnt mögliche Grenzen."],
-    vocabulary: ["die Verantwortung", "die Grünfläche", "Emissionen senken", "Energie sparen", "nachhaltig handeln"],
-  },
-  19: {
-    title: "Freiwilligenarbeit und Engagement: Gesellschaft mitgestalten",
-    intro: "Freiwilligenarbeit ist in Deutschland ein wichtiger Teil des gesellschaftlichen Lebens. Viele Menschen engagieren sich in Vereinen, sozialen Projekten, Nachbarschaftshilfe, Sportgruppen oder Umweltinitiativen.",
-    points: ["Ehrenamt hilft nicht nur anderen Menschen, sondern schafft auch Kontakte und Vertrauen.", "Vereine und Initiativen geben Menschen die Möglichkeit, Verantwortung zu übernehmen.", "In deiner B2-Antwort solltest du Motivation, Nutzen und mögliche Schwierigkeiten des Engagements erklären."],
-    vocabulary: ["das Ehrenamt", "der Verein", "sich engagieren", "der Zusammenhalt", "Verantwortung übernehmen"],
-  },
-  20: {
-    title: "Technologie und Arbeit der Zukunft: Veränderung verstehen",
-    intro: "Technologie verändert in Deutschland Ausbildung, Büroarbeit, Industrie, Pflege, Handel und viele Dienstleistungen. Automatisierung und KI können Arbeit erleichtern, verlangen aber neue Kompetenzen.",
-    points: ["Digitale Kompetenzen werden in fast allen Berufen wichtiger.", "Automatisierung kann Aufgaben übernehmen, aber auch Unsicherheit bei Arbeitnehmern auslösen.", "Eine gute B2-Antwort bewertet Chancen und Risiken und nennt Weiterbildung als mögliche Lösung."],
-    vocabulary: ["die Automatisierung", "die Weiterbildung", "digitale Kompetenzen", "der Arbeitsplatz", "KI einsetzen"],
-  },
-};
 
 const embedUrl = (url = "") => {
   try {
@@ -144,7 +118,7 @@ export default function B2Day17To20GuidedLessonPage({ lesson, canonicalLesson = 
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}
         </Section>
-        <B2Day17To20GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} />
+         day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} />
       </> : null}
 
       {active === "speak" ? <Section title="Speaking builder">
@@ -164,7 +138,7 @@ export default function B2Day17To20GuidedLessonPage({ lesson, canonicalLesson = 
       {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
 
       {active === "finish" ? <Section title={`Summary B2 Day ${day}`}>
-        <FinishSummary day={day} />
+        <B2TopicIntroduction day={day} mode="review" />
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
         <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button>
       </Section> : null}
