@@ -1,0 +1,25 @@
+name: Verify C2 starter-only template
+
+on:
+  push:
+    branches:
+      - verify/c2-starter-only-20260919
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm --prefix web ci
+      - name: Run focused C2 tests
+        working-directory: web
+        run: npx jest --runInBand src/data/c2OpinionWritingTemplate.test.js src/components/C2UnifiedGuidedWorkbookPage.test.js src/components/C2TabPageOwnershipRegression.test.js
+      - name: Run production build
+        run: npm --prefix web run build
