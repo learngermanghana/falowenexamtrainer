@@ -32,6 +32,8 @@ const C2_TOPIC_KNOWLEDGE = {
 const GENERAL_C2_COLLOCATIONS = [
   ["Interessen gegeneinander abwägen","weigh interests against each other","Eine differenzierte Position wägt unterschiedliche Interessen gegeneinander ab."],
   ["eine Position differenziert begründen","justify a position in a nuanced way","Auf C2 sollte eine Position differenziert begründet und begrenzt werden."],
+  ["eine Annahme kritisch prüfen","critically examine an assumption","Vor einer Schlussfolgerung sollte die zugrunde liegende Annahme kritisch geprüft werden."],
+  ["eine Schlussfolgerung einschränken","qualify a conclusion","Wenn die Evidenz begrenzt ist, muss die Schlussfolgerung entsprechend eingeschränkt werden."],
 ];
 
 const getC2TopicKnowledge=(day)=>C2_TOPIC_KNOWLEDGE[Number(day)]||null;
@@ -39,7 +41,14 @@ const getC2TopicKnowledge=(day)=>C2_TOPIC_KNOWLEDGE[Number(day)]||null;
 const getC2TopicCollocations=(day)=>{
   const knowledge=getC2TopicKnowledge(day);
   if(!knowledge)return[];
-  return [...knowledge.coll.map(([phrase,example])=>[phrase,"topic collocation",example]),...GENERAL_C2_COLLOCATIONS];
+  const items=[...knowledge.coll.map(([phrase,example])=>[phrase,"topic collocation",example]),...GENERAL_C2_COLLOCATIONS];
+  const seen=new Set();
+  return items.filter(([phrase])=>{
+    const key=String(phrase||"").trim().toLowerCase();
+    if(!key||seen.has(key))return false;
+    seen.add(key);
+    return true;
+  }).slice(0,6);
 };
 
 const getC2TopicChecks=(day)=>{
