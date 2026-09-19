@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
-import './i18n';
 import AppStartupBoundary from './components/AppStartupBoundary';
 import reportWebVitals from './reportWebVitals';
 
