@@ -16,7 +16,7 @@ const readResult = (root) => {
   if (!section) return null;
 
   const text = String(section.textContent || "").replace(/\s+/g, " ");
-  const level = text.match(/Suggested level:\s*(A1|A2|B1|B2)/i)?.[1]?.toUpperCase() || "A1";
+  const level = text.match(/Suggested level:\s*(A1|A2|B1|B2|C1)/i)?.[1]?.toUpperCase() || "A1";
   const score = text.match(/Score:\s*(\d+)\s*\/\s*(\d+)/i);
   return {
     section,
