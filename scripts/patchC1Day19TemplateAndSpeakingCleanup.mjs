@@ -30,7 +30,7 @@ Eine mögliche Alternative bestünde darin, [Alternative]. Im Gegensatz zu [ursp
 
 Zusammenfassend lässt sich festhalten, dass [Thema] differenziert betrachtet werden muss. Meines Erachtens ist [eigene Position] sinnvoll, sofern [Bedingung]. Statt ausschließlich auf [eine Lösung] zu setzen, sollte ein ausgewogener Ansatz verfolgt werden, der [Aspekt 1] und [Aspekt 2] miteinander verbindet.`;
 
-const newTemplateBody = `In der heutigen Zeit wird häufig über [Thema] diskutiert. Dieses Thema ist von großer gesellschaftlicher Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Im Folgenden werde ich zunächst erläutern, nach welchen Kriterien [Entscheidung oder Maßnahme] beurteilt werden sollte. Anschließend werde ich anhand eines konkreten Beispiels argumentieren, mögliche Einwände darstellen und schließlich eine Alternative erläutern.
+const lighterGoetheTemplate = `In der heutigen Zeit wird häufig über [Thema] diskutiert. Dieses Thema ist von großer gesellschaftlicher Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Im Folgenden werde ich zunächst erläutern, nach welchen Kriterien [Entscheidung oder Maßnahme] beurteilt werden sollte. Anschließend werde ich anhand eines konkreten Beispiels argumentieren, mögliche Einwände darstellen und schließlich eine Alternative erläutern.
 
 Bei der Beurteilung von [Thema] sollten mehrere Kriterien berücksichtigt werden. Von besonderer Bedeutung ist zunächst ...
 
@@ -42,20 +42,30 @@ Eine mögliche Alternative bestünde darin, ... Ich bin der Auffassung, dass die
 
 Zusammenfassend lässt sich festhalten, dass [Thema] differenziert betrachtet werden muss. Meines Erachtens sollte eine ausgewogene und sinnvolle Lösung gefunden werden, da sowohl individuelle Bedürfnisse als auch gesellschaftliche Interessen berücksichtigt werden müssen.`;
 
+const newTemplateBody = `In der heutigen Zeit wird oft über [Thema] diskutiert. Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Ich vertrete die Ansicht, dass [eigene Meinung].
+
+Zunächst ist festzustellen, dass [Grund / Hauptargument].
+
+Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].
+
+Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
+
+Zusammenfassend lässt sich festhalten, dass [kurzes Fazit]. Ich bin der Auffassung, dass [eigene Position].`;
+
 let workspace = fs.readFileSync(workspacePath, "utf8");
 const declaration = (body) => `export const C1_OPINION_ESSAY_TEMPLATE = \`${body}\`;`;
 const newDeclaration = declaration(newTemplateBody);
 
-for (const oldBody of [legacyAdvantagesTemplate, previousGoetheTemplate]) {
+for (const oldBody of [legacyAdvantagesTemplate, previousGoetheTemplate, lighterGoetheTemplate]) {
   const oldDeclaration = declaration(oldBody);
   if (workspace.includes(oldDeclaration)) workspace = workspace.replace(oldDeclaration, newDeclaration);
 }
 if (!workspace.includes(newDeclaration)) {
-  throw new Error("The lighter Goethe-aligned C1 essay template is missing.");
+  throw new Error("The approved concise C1 essay template is missing.");
 }
 
 const legacyAnchor = "export const LEGACY_C1_OPINION_ESSAY_TEMPLATES = [";
-for (const body of [legacyAdvantagesTemplate, previousGoetheTemplate]) {
+for (const body of [legacyAdvantagesTemplate, previousGoetheTemplate, lighterGoetheTemplate]) {
   const serialized = JSON.stringify(body);
   if (!workspace.includes(serialized)) {
     if (!workspace.includes(legacyAnchor)) throw new Error("The C1 legacy template list was not found.");
@@ -76,4 +86,4 @@ if (lessonPage.includes("C1SpeakGrammarGuide") && duplicateCount > 0) {
 }
 
 fs.writeFileSync(lessonPagePath, lessonPage, "utf8");
-console.log("C1 now migrates untouched drafts to the lighter Goethe template and keeps one speaking question.");
+console.log("C1 now migrates untouched drafts to the approved concise template and keeps one speaking question.");
