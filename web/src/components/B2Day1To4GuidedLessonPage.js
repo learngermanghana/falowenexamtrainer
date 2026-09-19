@@ -8,6 +8,7 @@ import B2Day6MigrationIntegrationGrammarNotes from "./B2Day6MigrationIntegration
 import B2Day14To16GrammarNotes from "./B2Day14To16GrammarNotes";
 import B2KnowledgeChoicePractice from "./B2KnowledgeChoicePractice";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -152,6 +153,7 @@ export default function B2Day1To4GuidedLessonPage({ lesson, canonicalLesson = nu
 
     {active === "learn" ? <>
       <Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the guided grammar notes.</NoteBox>}</Section>
+      <B2TopicIntroduction day={day} />
       <QuickGrammarPreview lesson={lesson} />
       <B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(quizDone) => setProgress((old) => old.quizDone === quizDone ? old : ({ ...old, quizDone }))} />
       <Section title="Deep grammar notes"><NoteBox>Now read the complete grammar explanation, examples and practice below. The quick check above is the first checkpoint; these notes deepen the same grammar.</NoteBox></Section>
