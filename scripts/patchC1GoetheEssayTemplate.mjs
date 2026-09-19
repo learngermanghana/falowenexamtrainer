@@ -30,17 +30,15 @@ Eine mögliche Alternative bestünde darin, [Alternative]. Im Gegensatz zu [ursp
 
 Zusammenfassend lässt sich festhalten, dass [Thema] differenziert betrachtet werden muss. Meines Erachtens ist [eigene Position] sinnvoll, sofern [Bedingung]. Statt ausschließlich auf [eine Lösung] zu setzen, sollte ein ausgewogener Ansatz verfolgt werden, der [Aspekt 1] und [Aspekt 2] miteinander verbindet.`;
 
-const newTemplate = `In der heutigen Zeit wird häufig über [Thema] diskutiert. Dieses Thema ist von großer gesellschaftlicher Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Im Folgenden werde ich zunächst erläutern, nach welchen Kriterien [Entscheidung oder Maßnahme] beurteilt werden sollte. Anschließend werde ich anhand eines konkreten Beispiels argumentieren, mögliche Einwände darstellen und schließlich eine Alternative erläutern.
+const newTemplate = `In der heutigen Zeit wird oft über [Thema] diskutiert. Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Ich vertrete die Ansicht, dass [eigene Meinung].
 
-Bei der Beurteilung von [Thema] sollten mehrere Kriterien berücksichtigt werden. Von besonderer Bedeutung ist zunächst ...
+Zunächst ist festzustellen, dass [Grund / Hauptargument].
 
-Ein anschauliches Beispiel hierfür ist ... Daran zeigt sich, dass ...
+Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].
 
-Andererseits sollte berücksichtigt werden, dass ...
+Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
 
-Eine mögliche Alternative bestünde darin, ... Ich bin der Auffassung, dass diese Lösung sinnvoller wäre, weil ...
-
-Zusammenfassend lässt sich festhalten, dass [Thema] differenziert betrachtet werden muss. Meines Erachtens sollte eine ausgewogene und sinnvolle Lösung gefunden werden, da sowohl individuelle Bedürfnisse als auch gesellschaftliche Interessen berücksichtigt werden müssen.`;
+Zusammenfassend lässt sich festhalten, dass [kurzes Fazit]. Ich bin der Auffassung, dass [eigene Position].`;
 
 const declaration = (body) => `export const C1_OPINION_ESSAY_TEMPLATE = \`${body}\`;`;
 const desiredDeclaration = declaration(newTemplate);
@@ -56,15 +54,17 @@ if (!source.includes(desiredDeclaration)) {
 
 const updated = fs.readFileSync(workspacePath, "utf8");
 const requiredMarkers = [
-  "nach welchen Kriterien [Entscheidung oder Maßnahme] beurteilt werden sollte",
-  "Von besonderer Bedeutung ist zunächst ...",
-  "Ein anschauliches Beispiel hierfür ist ... Daran zeigt sich, dass ...",
-  "Andererseits sollte berücksichtigt werden, dass ...",
-  "Eine mögliche Alternative bestünde darin, ... Ich bin der Auffassung, dass diese Lösung sinnvoller wäre, weil ...",
-  "Meines Erachtens sollte eine ausgewogene und sinnvolle Lösung gefunden werden",
-];
+  "In der heutigen Zeit wird oft über [Thema] diskutiert.",
+  "Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft.",
+  "Ich vertrete die Ansicht, dass [eigene Meinung].",
+  "Zunächst ist festzustellen, dass [Grund / Hauptargument].",
+  "Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].",
+  "Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].",
+  "Zusammenfassend lässt sich festhalten, dass [kurzes Fazit].",
+  "Ich bin der Auffassung, dass [eigene Position].",
+]
 for (const marker of requiredMarkers) {
   if (!updated.includes(marker)) throw new Error(`C1 Goethe essay template marker missing: ${marker}`);
 }
 
-console.log("Applied the lighter Goethe-aligned C1 essay template for a roughly 230-word response.");
+console.log("Applied the concise approved C1 opinion template.");
