@@ -49,8 +49,9 @@ const box = {
   gap: 4,
 };
 
-export default function B2TopicIntroduction({ day }) {
+export default function B2TopicIntroduction({ day, mode = "learn" }) {
   const topic = getB2TopicFoundation(day);
+  const reviewMode = mode === "review";
   if (!topic) return null;
 
   return (
@@ -59,7 +60,7 @@ export default function B2TopicIntroduction({ day }) {
       data-b2-topic-intro={topic.day}
     >
       <div>
-        <div style={{ fontWeight: 900, color: "#1d4ed8" }}>B2 · Thema kurz verstehen</div>
+        <div style={{ fontWeight: 900, color: "#1d4ed8" }}>{reviewMode ? "B2 · Thema wiederholen" : "B2 · Thema kurz verstehen"}</div>
         <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{topic.title}</h2>
       </div>
 
