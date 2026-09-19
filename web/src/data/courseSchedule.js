@@ -1,6 +1,7 @@
 import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
+import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";
 
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
@@ -701,7 +702,28 @@ const c1Schedule = [
     instruction: "",
     assignment: true,
   },
-];
+].map((entry) => {
+  const day = Number(entry.day || 0);
+  if (day < 1 || day > 28) return entry;
+  const profile = getC1ContentProfile(day);
+  const canonicalTitle = getC1CanonicalTitle(day) || entry.topic;
+  const grammarTitle = getC1CanonicalGrammarTitle(day);
+  return {
+    ...entry,
+    topic: canonicalTitle,
+    title: canonicalTitle,
+    lessonTitle: canonicalTitle,
+    grammar_topic: grammarTitle || entry.grammar_topic,
+    goal: profile ? `Ziel: ${profile.aim}.` : entry.goal,
+    instruction: profile
+      ? `Leitfrage: ${profile.question} Öffne die Lektion und arbeite die aktualisierten C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.`
+      : entry.instruction,
+    c1ContentRefresh: profile
+      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points }
+      : entry.c1ContentRefresh,
+  };
+})
+;
 
 const resolveC1LessonLinks = (assignmentDay) =>
   assignmentDay === 0
@@ -762,7 +784,7 @@ const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
     topic: entry.topic,
     goal: entry.goal,
     instruction: entry.instruction,
-    grammar_topic: null,
+    grammar_topic: entry.grammar_topic || null,
     assignment: entry.assignment === true,
     video: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
     youtube_link: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
@@ -781,12 +803,16 @@ const getCourseBookDictionaryEntries = (level) => {
 };
 
 const buildDictionaryBackedSchedule = (level) =>
-  getCourseBookDictionaryEntries(level).map((entry) => ({
+  getCourseBookDictionaryEntries(level).map((entry) => {
+    const resolvedTitle = entry.lessonTitle || entry.title || entry.topic || entry.de || `${level} ${entry.chapter}`;
+    return {
     day: Number(entry.assignmentDay || 0),
-    topic: entry.topic || entry.de || `${level} ${entry.chapter}`,
+    topic: resolvedTitle,
+    title: resolvedTitle,
+    lessonTitle: resolvedTitle,
     chapter: entry.chapter || null,
-    goal: `Arbeite am ${level}-Thema ${entry.chapter}: ${entry.topic || entry.de || ""}.`,
-    instruction: "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
+    goal: entry.goal || `Arbeite am ${level}-Thema ${entry.chapter}: ${resolvedTitle}.`,
+    instruction: entry.instruction || "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
     grammar_topic: entry.grammar_topic || null,
     assignment: entry.assignment === true,
     lesen_hören: {
@@ -797,7 +823,8 @@ const buildDictionaryBackedSchedule = (level) =>
       grammarbook_link: entry.grammarbook_link || entry.schreiben_sprechen?.grammar_link || "",
       workbook_link: entry.workbook_link || entry.schreiben_sprechen?.workbook_link || "",
     },
-  }));
+  };
+  });
 
 const RAW_COURSE_SCHEDULES = {
   A1: [
@@ -2344,12 +2371,16 @@ const overlayCanonicalCurriculumResources = ({ entry, level, lesen_hören, schre
     };
   };
 
+  const preserveRefreshedC1Identity = String(level || "").toUpperCase() === "C1";
+  const refreshedC1Title = entry.lessonTitle || entry.title || entry.topic;
+
   return {
     entry: {
       ...entry,
-      topic: canonical.title || entry.topic,
-      title: canonical.title || entry.title,
-      assignmentTitle: canonical.title || entry.assignmentTitle,
+      topic: preserveRefreshedC1Identity ? entry.topic : canonical.title || entry.topic,
+      title: preserveRefreshedC1Identity ? refreshedC1Title : canonical.title || entry.title,
+      lessonTitle: preserveRefreshedC1Identity ? refreshedC1Title : entry.lessonTitle,
+      assignmentTitle: preserveRefreshedC1Identity ? refreshedC1Title : canonical.title || entry.assignmentTitle,
       assignment: canonical.submissionRequired,
       progressionEligible: canonical.progressionEligible,
       assignmentId: canonical.assignment_id,
@@ -2434,7 +2465,7 @@ const normalizeCourseSchedules = (schedules) =>
           const levelSpecificInstruction =
             level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
               ? DEFAULT_INSTRUCTION_EN
-              : ["B1", "B2", "C1"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+              : ["B1", "B2"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
                 ? DEFAULT_INSTRUCTION_DE
                 : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);

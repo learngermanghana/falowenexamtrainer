@@ -14,6 +14,7 @@ import B1TutorLessonPage from "./B1TutorLessonPage";
 import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../data/b2LessonContentAlignment";
 import { alignC2SelfLearningLesson } from "../data/c2LessonContentAlignment";
+import { alignC1LessonContent } from "../data/c1ContentRefresh";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import { C2_DAY_1_TO_7_LESSONS } from "../data/c2Day1To7Mastery";
 import { C2_DAY_8_TO_14_LESSONS } from "../data/c2Day8To14Mastery";
@@ -75,7 +76,7 @@ const c2Lessons = [
 
 export const SELF_LEARNING_LESSONS = {
   B2: [b2Day0Orientation,b2Day1PersoenlicheIdentitaet,b2Day2AlltagUndZeitmanagement,b2Day3ArbeitUndBeruf,b2Day4BildungUndLernen,b2Day5GesundheitUndWohlbefinden,b2Day6MigrationUndIntegration,b2Day7GesellschaftlicheVielfalt,...b2FallbackLessons],
-  C1: [c1Day0Orientation,c1Day1ZieleUndLernweg,c1Day2KulturUndIdentitaet,c1Day3MedienUndInformationskompetenz,c1Day4BeziehungenUndTeamarbeit,c1Day5BeruflicheEntwicklung,c1Day6GesundheitUndLebensstil,c1Day7ReisenUndNachhaltigkeit,c1Day8WohnenUndStadtentwicklung,c1Day9KonsumUndWerbung,c1Day10IntegrationUndGesellschaft,c1Day11EngagementUndEhrenamt,c1Day12FreizeitUndKultur,c1Day13Mehrsprachigkeit,c1Day14InnovationUndZukunft,c1Day15BildungUndLebenslangesLernen,c1Day16TechnologieImAlltag,...c1FallbackLessons],
+  C1: [c1Day0Orientation,c1Day1ZieleUndLernweg,c1Day2KulturUndIdentitaet,c1Day3MedienUndInformationskompetenz,c1Day4BeziehungenUndTeamarbeit,c1Day5BeruflicheEntwicklung,c1Day6GesundheitUndLebensstil,c1Day7ReisenUndNachhaltigkeit,c1Day8WohnenUndStadtentwicklung,c1Day9KonsumUndWerbung,c1Day10IntegrationUndGesellschaft,c1Day11EngagementUndEhrenamt,c1Day12FreizeitUndKultur,c1Day13Mehrsprachigkeit,c1Day14InnovationUndZukunft,c1Day15BildungUndLebenslangesLernen,c1Day16TechnologieImAlltag,...c1FallbackLessons].map((lesson) => alignC1LessonContent(lesson)),
   C2: c2Lessons,
 };
 

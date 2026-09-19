@@ -1,3 +1,68 @@
+export const C1_CANONICAL_TITLES = Object.freeze([
+  "Ziele und Lernweg",
+  "Kultur und Identität",
+  "Medien und Informationskompetenz",
+  "Beziehungen und Teamarbeit",
+  "Berufliche Entwicklung",
+  "Gesundheit und Lebensstil",
+  "Reisen und Nachhaltigkeit",
+  "Wohnen und Stadtentwicklung",
+  "Konsum und Werbung",
+  "Integration und Gesellschaft",
+  "Engagement und Ehrenamt",
+  "Freizeit und Kultur",
+  "Mehrsprachigkeit",
+  "Innovation und Zukunft",
+  "Bildung und lebenslanges Lernen",
+  "Technologie im Alltag",
+  "Umweltverantwortung",
+  "Gesellschaftlicher Zusammenhalt",
+  "Arbeitswelt und Automatisierung",
+  "Digitale Gesundheit",
+  "Gesellschaftliche Teilhabe und Integration",
+  "Demokratie und Mitbestimmung",
+  "Work-Life-Balance",
+  "Verkehr und Infrastruktur",
+  "Wissenschaft und Forschungsethik",
+  "Nachhaltiger Konsum",
+  "Digitale Verwaltung",
+  "Demografischer Wandel",
+]);
+
+export const C1_CANONICAL_GRAMMAR_TITLES = Object.freeze([
+  "Relativsätze mit Präpositionen",
+  "Partizip I und Partizip II als Adjektiv",
+  "Konjunktiv I für indirekte Rede",
+  "Erweiterte Partizipialattribute",
+  "Konditionale und finale Strukturen",
+  "Kausale, konsekutive und konzessive Strukturen",
+  "Erweiterte Vergleichsformen und abwägende Argumentation",
+  "Nominalisierung und Präpositionalstil bei Wohnen und Stadtentwicklung",
+  "Konzessive und adversative Strukturen bei Konsum und Werbung",
+  "Passiv, Modalpassiv und differenzierte Bewertung bei Integration und Gesellschaft",
+  "Finale, kausale und konditionale Strukturen bei Engagement und Ehrenamt",
+  "Erweiterte Vergleichs- und Bewertungsstrukturen bei Freizeit und Kultur",
+  "Nominalstil und Relativsätze bei Mehrsprachigkeit",
+  "Zukunftsformen, Modalpassiv und Hypothesen bei Innovation und Zukunft",
+  "Konzessive und kausale Strukturen bei Bildung und lebenslangem Lernen",
+  "Passiv, Zustandspassiv und Einschränkungen bei Technologie im Alltag",
+  "Argumentationsstruktur und Nominalstil bei Umwelt und Verantwortung",
+  "Adversative und konzessive Strukturen bei Gesellschaft und Zusammenhalt",
+  "Futur, Modalverben und Einschränkungen bei Arbeit der Zukunft",
+  "Digitale Gesundheit klar erklären: Passiv und Nominalisierung",
+  "Temporale und kausale Strukturen bei Migration und Teilhabe",
+  "Indirekte Rede und argumentative Distanz bei Politik und Mitbestimmung",
+  "Konzessive und finale Strukturen bei Freizeit und Work-Life-Balance",
+  "Vergleiche, Passiv und Nominalstil bei Mobilität und Infrastruktur",
+  "Wissenschaftlich argumentieren: Quellenbezug, Konjunktiv I und vorsichtige Bewertung",
+  "Adjektivdeklination, Partizipialattribute und Abwägung bei nachhaltigem Konsum",
+  "Formelle Sprache, Passiv und Nominalstil bei Digitalisierung und Verwaltung",
+  "Ursache, Folge und Abwägung beim demografischen Wandel",
+]);
+
+export const getC1CanonicalTitle = (day) => C1_CANONICAL_TITLES[Number(day) - 1] || null;
+export const getC1CanonicalGrammarTitle = (day) => C1_CANONICAL_GRAMMAR_TITLES[Number(day) - 1] || null;
+
 const DAY_PROFILES = {
   1: {
     aim: "realistische Lernziele in messbare Etappen übersetzen und den Lernweg flexibel steuern",
@@ -212,7 +277,7 @@ const makeWritingContent = (lesson, profile) => {
   if (formal) {
     return {
       taskType,
-      topic: `Schreiben: ${lesson.title}. Verfassen Sie eine formelle Nachricht auf C1-Niveau zum Thema „${lesson.title}“. Ausgangsfrage: ${profile.question} Bearbeiten Sie die folgenden Punkte sachlich und vollständig.`,
+      topic: `Schreiben: ${lesson.title}. Verfassen Sie eine formelle Nachricht auf C1-Niveau zum Thema „${canonicalTitle}“. Ausgangsfrage: ${profile.question} Bearbeiten Sie die folgenden Punkte sachlich und vollständig.`,
       structure: ["Betreff und höfliche Anrede", profile.points[0], profile.points[1], profile.points[2], profile.points[3], "Formulieren Sie einen konkreten, realistischen Vorschlag und bitten Sie höflich um Rückmeldung."],
       usefulLines: ["Sehr geehrte Damen und Herren,", "ich wende mich an Sie, weil ...", "Besonders relevant ist in diesem Zusammenhang, dass ...", "Kritisch ist für mich jedoch, dass ...", "Als praktikable Lösung schlage ich vor, dass ...", "Für eine kurze Rückmeldung wäre ich Ihnen sehr dankbar."],
     };
@@ -227,20 +292,26 @@ const makeWritingContent = (lesson, profile) => {
 
 export const alignC1LessonContent = (lesson) => {
   if (String(lesson?.level || "").toUpperCase() !== "C1") return lesson;
-  const profile = DAY_PROFILES[Number(lesson?.day || 0)];
+  const day = Number(lesson?.day || 0);
+  const profile = DAY_PROFILES[day];
   if (!profile) return lesson;
+  const canonicalTitle = getC1CanonicalTitle(day) || lesson.title;
+  const canonicalGrammarTitle = getC1CanonicalGrammarTitle(day) || lesson.grammar_topic || lesson.grammarFocus || "";
+  const canonicalLesson = { ...lesson, title: canonicalTitle, lessonTitle: canonicalTitle, topic: profile.question };
 
   const originalGrammar = lesson.grammarLesson || {};
-  const writing = makeWritingContent(lesson, profile);
+  const writing = makeWritingContent(canonicalLesson, profile);
   const originalWritingBuilder = lesson.writingBuilder || {};
   const originalExamples = Array.isArray(originalGrammar.examples) ? originalGrammar.examples : [];
   const originalRules = Array.isArray(originalGrammar.rules) ? originalGrammar.rules : [];
   const originalExplanations = Array.isArray(originalGrammar.explanation) ? originalGrammar.explanation : [];
 
   return {
-    ...lesson,
+    ...canonicalLesson,
+    grammar_topic: canonicalGrammarTitle,
+    grammarFocus: canonicalGrammarTitle,
     explanation: [
-      `In diesem Kapitel arbeitest du nicht nur am Wortschatz zu „${lesson.title}“, sondern an der Fähigkeit, ${profile.aim}.`,
+      `In diesem Kapitel arbeitest du nicht nur am Wortschatz zu „${canonicalTitle}“, sondern an der Fähigkeit, ${profile.aim}.`,
       "Auf C1-Niveau soll deine Antwort nicht bei einer persönlichen Meinung stehen bleiben. Trenne Behauptung, Begründung, Beispiel, Gegenargument und Schlussfolgerung deutlich voneinander.",
       `Übertrage die Grammatik des Tages konsequent auf das Thema. So wird aus einer isolierten Regel ein sprachliches Werkzeug für eine präzise C1-Argumentation.`,
     ],
@@ -255,20 +326,20 @@ export const alignC1LessonContent = (lesson) => {
       ...originalGrammar,
       explanation: [
         ...originalExplanations.slice(0, 3),
-        `C1-Transfer: Nutze diese Struktur nicht als Selbstzweck. Setze sie beim Thema „${lesson.title}“ ein, um Aussagen genauer zu begründen, einzuschränken oder miteinander zu verknüpfen.`,
+        `C1-Transfer: Nutze diese Struktur nicht als Selbstzweck. Setze sie beim Thema „${canonicalTitle}“ ein, um Aussagen genauer zu begründen, einzuschränken oder miteinander zu verknüpfen.`,
       ],
       rules: [
         ...originalRules.slice(0, 5),
         `Typischer Fehler: ${profile.mistake}`,
       ],
       examples: originalExamples.slice(0, 6),
-      miniExercise: `Formuliere zum Thema „${lesson.title}“ vier zusammenhängende C1-Sätze: eine klare Aussage, eine Begründung, ein konkretes Beispiel und einen Einwand. Verwende dabei die Grammatik dieses Kapitels mindestens zweimal korrekt.`,
+      miniExercise: `Formuliere zum Thema „${canonicalTitle}“ vier zusammenhängende C1-Sätze: eine klare Aussage, eine Begründung, ein konkretes Beispiel und einen Einwand. Verwende dabei die Grammatik dieses Kapitels mindestens zweimal korrekt.`,
     },
     speakingTopic: `Sprechen: ${profile.question}`,
     speakingBuilder: {
       ...(lesson.speakingBuilder || {}),
       question: profile.question,
-      branches: makeSpeakingBranches(lesson, profile),
+      branches: makeSpeakingBranches(canonicalLesson, profile),
       plan: [
         "Einleitung: Formuliere die Fragestellung mit eigenen Worten und nenne deine Grundposition.",
         "Hauptargument: Begründe einen zentralen Punkt präzise.",
@@ -300,9 +371,11 @@ export const alignC1LessonContent = (lesson) => {
       writing: writing.topic,
     },
     c1ContentRefresh: {
+      title: canonicalTitle,
+      grammarTitle: canonicalGrammarTitle,
       aim: profile.aim,
       question: profile.question,
-      speakingBranches: makeSpeakingBranches(lesson, profile),
+      speakingBranches: makeSpeakingBranches(canonicalLesson, profile),
       writingPoints: profile.points,
     },
   };

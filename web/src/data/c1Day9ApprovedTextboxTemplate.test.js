@@ -2,35 +2,35 @@ import lesson from "./selfLearningLessons/c1/day9KonsumUndWerbung";
 import { C1_APPROVED_OPINION_ESSAY_TEMPLATE } from "./c1ApprovedOpinionEssayTemplate";
 import { getStandardWritingConfig } from "./standardLessonJourney";
 
-test("C1 Day 9 places the approved template with recommendation and outlook in the actual writing textbox", () => {
+test("C1 Day 9 places the approved concise template in the actual writing textbox", () => {
   const config = getStandardWritingConfig(lesson);
 
   expect(config.taskType).toMatch(/C1 opinion essay|Stellungnahme/i);
   expect(config.opinionTemplate).toBe(C1_APPROVED_OPINION_ESSAY_TEMPLATE);
   expect(config.opinionTemplate).toContain(
-    "In der heutigen Zeit wird häufig über [Thema] diskutiert.",
+    "In der heutigen Zeit wird oft über [Thema] diskutiert.",
   );
   expect(config.opinionTemplate).toContain(
-    "da es sowohl [Bereich 1] als auch [Bereich 2] betrifft",
+    "Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft.",
   );
   expect(config.opinionTemplate).toContain(
-    "Einerseits bietet [Thema] zahlreiche Vorteile.",
+    "Ich vertrete die Ansicht, dass [eigene Meinung].",
   );
   expect(config.opinionTemplate).toContain(
-    "Andererseits sollte berücksichtigt werden, dass [Nachteil oder Problem].",
+    "Zunächst ist festzustellen, dass [Grund / Hauptargument].",
   );
   expect(config.opinionTemplate).toContain(
-    "Dennoch bin ich der Auffassung, dass [eigene Position mit Begründung].",
+    "Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].",
   );
   expect(config.opinionTemplate).toContain(
-    "sowohl Chancen als auch Herausforderungen mit sich bringt",
+    "Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].",
   );
   expect(config.opinionTemplate).toContain(
-    "Daher wäre es empfehlenswert, [konkrete Maßnahme oder ausgewogene Lösung].",
+    "Zusammenfassend lässt sich festhalten, dass [kurzes Fazit].",
   );
   expect(config.opinionTemplate).toContain(
-    "langfristig ein angemessener Ausgleich zwischen [Aspekt 1] und [Aspekt 2] geschaffen werden",
+    "Ich bin der Auffassung, dass [eigene Position].",
   );
-  expect(config.opinionTemplate).not.toContain("[Fragestellung / Titel]");
+  expect(config.opinionTemplate).not.toContain("Einerseits bietet");
   expect(config.opinionTemplate).not.toContain("personalisierte Werbung");
 });
