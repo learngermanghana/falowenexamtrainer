@@ -4,19 +4,16 @@ import {getC2Day1To7Mastery} from "../data/c2Day1To7Mastery";
 import C2Day1GuidedWorkbookPage from "./C2Day1GuidedWorkbookPage";
 import C2Days2To5GuidedWorkbookPage from "./C2Days2To5GuidedWorkbookPage";
 import C2Days6To11GuidedWorkbookPage from "./C2Days6To11GuidedWorkbookPage";
-import C2AlignedTeachingSummary from "./C2AlignedTeachingSummary";
-
-const GuidedWithSummary=({children,lesson})=><>{children}<C2AlignedTeachingSummary lesson={lesson}/></>;
 
 const C2Day1To7MasteryPage=({lesson})=>{
  const day=Number(lesson?.day||0);
- if(day===1)return <GuidedWithSummary lesson={lesson}><C2Day1GuidedWorkbookPage lesson={lesson}/></GuidedWithSummary>;
- if(day>=2&&day<=5)return <GuidedWithSummary lesson={lesson}><C2Days2To5GuidedWorkbookPage lesson={lesson}/></GuidedWithSummary>;
- if(day>=6&&day<=7)return <GuidedWithSummary lesson={lesson}><C2Days6To11GuidedWorkbookPage lesson={lesson}/></GuidedWithSummary>;
+ if(day===1)return <C2Day1GuidedWorkbookPage lesson={lesson}/>;
+ if(day>=2&&day<=5)return <C2Days2To5GuidedWorkbookPage lesson={lesson}/>;
+ if(day>=6&&day<=7)return <C2Days6To11GuidedWorkbookPage lesson={lesson}/>;
  const d=lesson?.c2Mastery||getC2Day1To7Mastery(day);
  if(!d)return null;
  const card={...styles.card,display:"grid",gap:10};
- return <><main style={{...styles.container,display:"grid",gap:14}} data-c2-mastery-day={day}>
+ return <main style={{...styles.container,display:"grid",gap:14}} data-c2-mastery-day={day}>
   <header style={card}><strong>C2 · Day {day} · Chapter {d.chapter}</strong><h1 style={{...styles.title,margin:0}}>{d.title}</h1><p>{d.topic}</p><strong>{d.grammarFocus}</strong><p>C2 focus: correctness, precision, register, nuance and natural collocation.</p></header>
   <section style={card}><h2>Lernziele</h2><ul>{d.objectives.map(x=><li key={x}>{x}</li>)}</ul></section>
   <section style={card}><h2>Präziser Wortschatz</h2>{d.vocabulary.map(([a,b])=><p key={a}><strong>{a}</strong> — {b}</p>)}</section>
@@ -26,6 +23,6 @@ const C2Day1To7MasteryPage=({lesson})=>{
   <section style={card}><h2>Reformulation</h2><p><strong>Starting version:</strong> {d.reformulation[0]}</p><details><summary>Show one C2 model</summary><p>{d.reformulation[1]}</p></details></section>
   <section style={card}><h2>Original Production</h2><p>{d.production}</p></section>
   <section style={card}><h2>C2 Challenge</h2><p>{d.challenge}</p><strong>Final check: precision · register · nuance · natural collocation.</strong></section>
- </main><C2AlignedTeachingSummary lesson={lesson}/></>;
+ </main>;
 };
 export default C2Day1To7MasteryPage;
