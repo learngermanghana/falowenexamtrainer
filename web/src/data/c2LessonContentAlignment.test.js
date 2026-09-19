@@ -87,6 +87,32 @@ describe("C2 Days 1-28 Course Book alignment", () => {
     });
   });
 
+  it("uses the new C2 Day 1 circular-economy course and excludes the legacy Identity lesson", () => {
+    const day1 = getC2LessonContentAlignment(1);
+    const serialized = JSON.stringify(day1);
+
+    expect(day1).toEqual(expect.objectContaining({
+      chapter: "1.1",
+      title: "Kreislaufwirtschaft und Wegwerfgesellschaft",
+      grammarFocus: "Nuancierte Bewertung und Registersteuerung",
+      collocationTopic: "Kreislaufwirtschaft und Wegwerfgesellschaft",
+    }));
+    expect(day1.vocabulary.map(([word]) => word)).toEqual(expect.arrayContaining([
+      "die Kreislaufwirtschaft",
+      "die Wegwerfgesellschaft",
+      "die Reparierbarkeit",
+      "die Ressourcenschonung",
+    ]));
+    expect(day1.collocations.map(([phrase]) => phrase)).toEqual(expect.arrayContaining([
+      "Ressourcen schonen",
+      "die Lebensdauer verlängern",
+      "Abfall vermeiden",
+    ]));
+    expect(serialized).not.toContain("sprachliche Zugehörigkeit");
+    expect(serialized).not.toContain("soziale Distanz markieren");
+    expect(serialized).not.toContain("Sprache, Identität und Gesellschaft");
+  });
+
   it("preserves assignment and progression fields while aligning C2 content", () => {
     const original = {
       level: "C2",
