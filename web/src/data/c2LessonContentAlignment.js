@@ -32,6 +32,7 @@ const buildCurrentC2Mastery = (day) => {
       "themenspezifischen Wortschatz und natürliche Kollokationen verwenden",
     ],
     vocabulary: knowledge.vocab,
+    collocationTopic: standard.title,
     collocations: getC2TopicCollocations(dayNumber),
     contrast: grammarExamples,
     nuance: {
