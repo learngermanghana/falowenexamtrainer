@@ -20,6 +20,6 @@ jobs:
         run: npm --prefix web ci
       - name: Run focused C1 tests
         working-directory: web
-        run: npx jest --runInBand src/data/c1CourseBookCanonicalAlignment.test.js src/data/c1Day9ApprovedTextboxTemplate.test.js src/components/GuidedWritingWorkspace.test.js src/components/WritingCheatSheetTabs.test.js
+        run: npx jest --runInBand src/data/c1CourseBookCanonicalAlignment.test.js src/data/c1Day9ApprovedTextboxTemplate.test.js src/components/GuidedWritingWorkspace.test.js src/components/WritingCheatSheetTabs.c1Template.test.js
       - name: Run production build
         run: npm --prefix web run build
