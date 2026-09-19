@@ -2366,12 +2366,16 @@ const overlayCanonicalCurriculumResources = ({ entry, level, lesen_hören, schre
     };
   };
 
+  const preserveRefreshedC1Identity = String(level || "").toUpperCase() === "C1";
+  const refreshedC1Title = entry.lessonTitle || entry.title || entry.topic;
+
   return {
     entry: {
       ...entry,
-      topic: canonical.title || entry.topic,
-      title: canonical.title || entry.title,
-      assignmentTitle: canonical.title || entry.assignmentTitle,
+      topic: preserveRefreshedC1Identity ? entry.topic : canonical.title || entry.topic,
+      title: preserveRefreshedC1Identity ? refreshedC1Title : canonical.title || entry.title,
+      lessonTitle: preserveRefreshedC1Identity ? refreshedC1Title : entry.lessonTitle,
+      assignmentTitle: preserveRefreshedC1Identity ? refreshedC1Title : canonical.title || entry.assignmentTitle,
       assignment: canonical.submissionRequired,
       progressionEligible: canonical.progressionEligible,
       assignmentId: canonical.assignment_id,
@@ -2456,7 +2460,7 @@ const normalizeCourseSchedules = (schedules) =>
           const levelSpecificInstruction =
             level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
               ? DEFAULT_INSTRUCTION_EN
-              : ["B1", "B2", "C1"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+              : ["B1", "B2"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
                 ? DEFAULT_INSTRUCTION_DE
                 : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
