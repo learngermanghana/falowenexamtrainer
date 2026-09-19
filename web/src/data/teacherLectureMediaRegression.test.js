@@ -30,6 +30,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("renders the A2 Day 2 Personen beschreiben teacher lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 2,
+        chapter: "1.2",
+        topic: "Personen beschreiben",
+      },
+      "A2",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "1.2",
+        title: "Kapitel 1.2 · Teacher lecture video",
+        url: "https://youtu.be/9s2SOb7ZipA",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/9s2SOb7ZipA" }),
+      ]),
+    );
+  });
+
   test("renders the A2 Day 14 tutor lecture alongside the AI video", () => {
     const lesson = normalizeA2B1Lesson(
       {
