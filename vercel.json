@@ -51,7 +51,7 @@
       ]
     },
     {
-      "source": "/campus/(.*)",
+      "source": "/campus/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "source": "/exams/(.*)",
+      "source": "/exams/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "source": "/login/?",
+      "source": "/login/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -116,7 +116,7 @@
       ]
     },
     {
-      "source": "/signup/?",
+      "source": "/signup/:path*",
       "headers": [
         {
           "key": "X-Robots-Tag",
