@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 
@@ -430,7 +429,6 @@ const ProgressBar = ({ value }) => (
 );
 
 const PlacementTestPage = () => {
-  const { t, i18n } = useTranslation();
   const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
   const initialProgress = useMemo(() => {
     const saved = getPlacementProgress();
@@ -467,13 +465,13 @@ const PlacementTestPage = () => {
   const canRevealAnswerKey = reviewUnlocked;
 
   useEffect(() => {
-    const pageTitle = t("placementPage.meta.title", { defaultValue: placementTest.title });
-    const pageDescription = t("placementPage.meta.description", { defaultValue: placementTest.subtitle });
+    const pageTitle = placementTest.title;
+    const pageDescription = placementTest.subtitle;
 
     updatePageMeta({
       title: pageTitle,
       description: pageDescription,
-      lang: i18n.language,
+      lang: "en",
       canonicalPath: "/placement-test",
       ogType: "article",
       structuredData: [
@@ -496,7 +494,7 @@ const PlacementTestPage = () => {
         },
       ],
     });
-  }, [i18n.language, t]);
+  }, []);
 
   useEffect(() => {
     savePlacementProgress({ answers: placementAnswers, startedAt, completedAt, reviewUnlocked, activeSectionIndex });
