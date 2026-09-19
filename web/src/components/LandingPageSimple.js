@@ -8,7 +8,7 @@ const COPY = {
     languageLabel: "Language",
     login: "Log in",
     signup: "Sign up",
-    badge: "German and French learning in one place",
+    badge: "German A1–C2 and French learning in one place",
     title: "Learn. Practise. Get ready for your exam.",
     subtitle:
       "Falowen brings your course book, assignments, tutor feedback, attendance, and exam practice together in one simple learning hub.",
@@ -18,7 +18,7 @@ const COPY = {
     joinProgram: "Start {{program}}",
     viewClasses: "View classes",
     benefits: [
-      { icon: "📘", title: "Structured lessons", text: "Follow a clear course plan from A1 to advanced levels." },
+      { icon: "📘", title: "Structured lessons", text: "Follow structured German learning from A1 to C2, plus French study paths." },
       { icon: "✍️", title: "Tutor feedback", text: "Submit work and learn from corrections and scores." },
       { icon: "🎯", title: "Exam preparation", text: "Practise speaking, writing, listening, and reading." },
     ],
@@ -38,15 +38,15 @@ const COPY = {
     finalTitle: "Ready to start learning?",
     finalText: "Create your Falowen account or log in to continue your course.",
     contact: "Need help? Chat with us on WhatsApp",
-    metaTitle: "Falowen Learning Hub | German and French Courses",
+    metaTitle: "Falowen | Learn German A1–C2 Online & French Courses",
     metaDescription:
-      "Join Falowen for structured German and French lessons, tutor feedback, assignments, progress tracking, and exam preparation.",
+      "Learn German A1–C2 online with Falowen plus French courses, structured lessons, tutor feedback, listening, writing, speaking, progress tracking and exam preparation.",
   },
   de: {
     languageLabel: "Sprache",
     login: "Anmelden",
     signup: "Registrieren",
-    badge: "Deutsch und Französisch an einem Ort lernen",
+    badge: "Deutsch A1–C2 und Französisch an einem Ort lernen",
     title: "Lernen. Üben. Sicher in die Prüfung gehen.",
     subtitle:
       "Falowen vereint Kursbuch, Aufgaben, Tutor-Feedback, Anwesenheit und Prüfungsvorbereitung in einer einfachen Lernplattform.",
@@ -76,7 +76,7 @@ const COPY = {
     finalTitle: "Bereit zum Lernen?",
     finalText: "Erstelle dein Falowen-Konto oder melde dich an, um deinen Kurs fortzusetzen.",
     contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
-    metaTitle: "Falowen Lernplattform | Deutsch- und Französischkurse",
+    metaTitle: "Falowen | Deutsch A1–C2 online lernen & Französischkurse",
     metaDescription:
       "Lerne Deutsch und Französisch mit strukturierten Lektionen, Tutor-Feedback, Aufgaben, Fortschrittsanzeige und Prüfungsvorbereitung.",
   },
