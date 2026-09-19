@@ -12,24 +12,29 @@ const add = (before, after, already) => {
   s = s.replace(before, after);
 };
 
-add(
-  'import { C2_DAY_15_TO_21_LESSONS } from "../data/c2Day15To21Mastery";',
-  'import { C2_DAY_15_TO_21_LESSONS } from "../data/c2Day15To21Mastery";\nimport { C2_DAY_22_TO_28_LESSONS } from "../data/c2Day22To28Mastery";',
-  'import { C2_DAY_22_TO_28_LESSONS } from "../data/c2Day22To28Mastery";'
-);
+const unifiedC2Renderer='if (normalizedLevel === "C2" && day >= 1 && day <= 28) page = <C2UnifiedGuidedWorkbookPage';
+if(s.includes(unifiedC2Renderer)){
+  console.log("C2 unified workbook already owns Days 1-28; legacy Days 22-28 mastery patch skipped.");
+}else{
+  add(
+    'import { C2_DAY_15_TO_21_LESSONS } from "../data/c2Day15To21Mastery";',
+    'import { C2_DAY_15_TO_21_LESSONS } from "../data/c2Day15To21Mastery";\nimport { C2_DAY_22_TO_28_LESSONS } from "../data/c2Day22To28Mastery";',
+    'import { C2_DAY_22_TO_28_LESSONS } from "../data/c2Day22To28Mastery";'
+  );
 
-add(
-  '  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS],',
-  '  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS,...C2_DAY_22_TO_28_LESSONS],',
-  '...C2_DAY_22_TO_28_LESSONS'
-);
+  add(
+    '  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS],',
+    '  C2: [...C2_DAY_1_TO_7_LESSONS,...C2_DAY_8_TO_14_LESSONS,...C2_DAY_15_TO_21_LESSONS,...C2_DAY_22_TO_28_LESSONS],',
+    '...C2_DAY_22_TO_28_LESSONS'
+  );
 
-add(
-  'normalizedLevel === "C2" && day >= 8 && day <= 21',
-  'normalizedLevel === "C2" && day >= 8 && day <= 28',
-  'normalizedLevel === "C2" && day >= 8 && day <= 28'
-);
+  add(
+    'normalizedLevel === "C2" && day >= 8 && day <= 21',
+    'normalizedLevel === "C2" && day >= 8 && day <= 28',
+    'normalizedLevel === "C2" && day >= 8 && day <= 28'
+  );
 
-fs.writeFileSync(file, s, "utf8");
-console.log("Registered C2 Days 22-28 mastery lessons.");
+  fs.writeFileSync(file, s, "utf8");
+  console.log("Registered C2 Days 22-28 mastery lessons.");
+}
 await import("./patchC2CourseBookVisibility.mjs");
