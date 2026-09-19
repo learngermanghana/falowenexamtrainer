@@ -113,7 +113,7 @@ function buildTopicKnowledge(day,perspectives){
   coreQuestion:knowledge.core,
   englishDefinition:knowledge.en,
   germanDefinition:knowledge.de,
-  exampleTitle:"Konkretes Beispiel",
+  exampleTitle:Number(day)===1?"Beispiel: Smartphone":"Konkretes Beispiel",
   vocabulary:knowledge.vocab,
   collocations:getC2TopicCollocations(day),
   checks:getC2TopicChecks(day),
