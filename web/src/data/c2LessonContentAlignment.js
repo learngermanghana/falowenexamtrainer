@@ -9,6 +9,7 @@ const C2_CANONICAL_MASTERY = Object.freeze({
   ...C2_DAY_8_TO_14_MASTERY,
   ...C2_DAY_15_TO_21_MASTERY,
   ...C2_DAY_22_TO_28_MASTERY,
+  1: getCurrentCourseMasteryOverride(1) || C2_DAY_1_TO_7_MASTERY[1],
 });
 
 // Extra collocations are deliberately keyed by the canonical C2 day. They only
@@ -88,7 +89,7 @@ const uniqueCollocations = (items = []) => {
 
 const getCanonicalC2Mastery = (day) => C2_CANONICAL_MASTERY[Number(day)] || null;
 
-const getCurrentCourseMasteryOverride = (day) => {
+function getCurrentCourseMasteryOverride(day) {
   const dayNumber = Number(day);
   if (dayNumber !== 1) return null;
 
@@ -123,7 +124,7 @@ const getCurrentCourseMasteryOverride = (day) => {
     production: knowledge.challenge,
     challenge: knowledge.challenge,
   };
-};
+}
 
 const enhanceC2Mastery = (day, source = null) => {
   const dayNumber = Number(day);
