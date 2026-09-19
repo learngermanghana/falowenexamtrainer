@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './goetheFreeChatMobile.css';
+import './i18n';
 import App from './App';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
