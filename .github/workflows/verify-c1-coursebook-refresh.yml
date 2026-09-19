@@ -1,0 +1,25 @@
+name: Verify C1 Course Book refresh
+
+on:
+  push:
+    branches:
+      - fix/c1-coursebook-canonical-and-template-20260919
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm --prefix web ci
+      - name: Run focused C1 tests
+        working-directory: web
+        run: npx jest --runInBand src/data/c1CourseBookCanonicalAlignment.test.js src/data/c1Day9ApprovedTextboxTemplate.test.js src/components/GuidedWritingWorkspace.test.js src/components/WritingCheatSheetTabs.test.js
+      - name: Run production build
+        run: npm --prefix web run build
