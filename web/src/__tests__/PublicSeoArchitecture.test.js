@@ -38,8 +38,8 @@ describe("public SEO architecture", () => {
     });
     expect(sitemap).not.toContain("/campus/");
     expect(sitemap).not.toContain("/exams/");
-    expect(vercel).toContain('"source": "/campus/(.*)"');
-    expect(vercel).toContain('"source": "/exams/(.*)"');
+    expect(vercel).toContain('"source": "/campus/:path*"');
+    expect(vercel).toContain('"source": "/exams/:path*"');
     expect(vercel).toContain('"key": "X-Robots-Tag"');
     expect(vercel).toContain('"value": "noindex, nofollow, noarchive"');
     expect(robots).not.toContain("Disallow: /campus/");
