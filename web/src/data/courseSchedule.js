@@ -1,6 +1,7 @@
 import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
+import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";
 
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
@@ -701,7 +702,28 @@ const c1Schedule = [
     instruction: "",
     assignment: true,
   },
-];
+].map((entry) => {
+  const day = Number(entry.day || 0);
+  if (day < 1 || day > 28) return entry;
+  const profile = getC1ContentProfile(day);
+  const canonicalTitle = getC1CanonicalTitle(day) || entry.topic;
+  const grammarTitle = getC1CanonicalGrammarTitle(day);
+  return {
+    ...entry,
+    topic: canonicalTitle,
+    title: canonicalTitle,
+    lessonTitle: canonicalTitle,
+    grammar_topic: grammarTitle || entry.grammar_topic,
+    goal: profile ? `Ziel: ${profile.aim}.` : entry.goal,
+    instruction: profile
+      ? `Leitfrage: ${profile.question} Öffne die Lektion und arbeite die aktualisierten C1-Inhalte in Learn → Speak → Write → Finish → Ref durch.`
+      : entry.instruction,
+    c1ContentRefresh: profile
+      ? { title: canonicalTitle, grammarTitle, aim: profile.aim, question: profile.question, writingPoints: profile.points }
+      : entry.c1ContentRefresh,
+  };
+})
+;
 
 const resolveC1LessonLinks = (assignmentDay) =>
   assignmentDay === 0
