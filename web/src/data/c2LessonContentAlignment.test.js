@@ -6,6 +6,8 @@ import {
 } from "./c2LessonContentAlignment";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { SELF_LEARNING_LESSONS } from "../components/SelfLearningLessonRegistry";
+import { getC2ExamStandard } from "./c2ExamStandardContent";
+import { getC2TopicKnowledge } from "./c2TopicKnowledge";
 
 const DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
 
@@ -111,6 +113,33 @@ describe("C2 Days 1-28 Course Book alignment", () => {
     expect(serialized).not.toContain("sprachliche Zugehörigkeit");
     expect(serialized).not.toContain("soziale Distanz markieren");
     expect(serialized).not.toContain("Sprache, Identität und Gesellschaft");
+  });
+
+  it.each(DAYS)("gives Day %i current-course topic knowledge rather than legacy mastery content", (day) => {
+    const aligned = getC2LessonContentAlignment(day);
+    const standard = getC2ExamStandard(day);
+    const knowledge = getC2TopicKnowledge(day);
+
+    expect(knowledge).toEqual(expect.objectContaining({
+      chapter: expect.any(String),
+      core: expect.any(String),
+      en: expect.any(String),
+      de: expect.any(String),
+      example: expect.any(String),
+      actors: expect.any(Array),
+      tensions: expect.any(Array),
+      vocab: expect.any(Array),
+      coll: expect.any(Array),
+    }));
+    expect(knowledge.actors.length).toBeGreaterThanOrEqual(3);
+    expect(knowledge.tensions.length).toBeGreaterThanOrEqual(3);
+    expect(knowledge.vocab.length).toBeGreaterThanOrEqual(6);
+    expect(knowledge.coll.length).toBeGreaterThanOrEqual(4);
+
+    expect(aligned.title).toBe(standard.title);
+    expect(aligned.topic).toBe(standard.topic);
+    expect(aligned.grammarFocus).toBe(standard.grammarFocus);
+    expect(aligned.topicKnowledge).toBe(knowledge);
   });
 
   it("preserves assignment and progression fields while aligning C2 content", () => {
