@@ -32,7 +32,8 @@ describe("A2.2 content upgrade", () => {
   });
 
   it("gives custom Day 17 the A2.2 grammar upgrade without changing its pharmacy assessment", () => {
-    expect(grammarWrapper).toContain("<A2SecondStageGrammarUpgrade day={day} />");
+    expect(grammarWrapper).toContain("const numericDay = Number(day);");
+    expect(grammarWrapper).toContain("<A2SecondStageGrammarUpgrade day={numericDay} />");
     expect(day17).toContain('<A2B1GrammarNotesTab level="A2" day={17} />');
     expect(day17).toContain('src="https://www.youtube.com/embed/jgl__L4L9kE"');
     expect(day17).toContain('stem: "Warum ging Anna in die Apotheke?"');
