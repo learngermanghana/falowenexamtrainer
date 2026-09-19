@@ -1,3 +1,5 @@
+import { getC2TopicKnowledge } from "./c2TopicKnowledge";
+
 const rows = [
 [1,"Kreislaufwirtschaft und Wegwerfgesellschaft","Nuancierte Bewertung und Registersteuerung","Wie Kreislaufwirtschaft Produktion, Konsum, Reparatur und Wiederverwendung verändern kann.",[
 "Verbraucher tragen die größte Verantwortung dafür, die Wegwerfgesellschaft zu überwinden.","Ohne verbindliche Regeln werden Unternehmen kaum ausreichend langlebige und reparierbare Produkte anbieten.","Wiederverwendung und Reparatur sind langfristig wichtiger als ein immer effizienteres Recycling."]],
@@ -88,84 +90,6 @@ const grammarMethods = {
 28:["Synthese verbindet mehrere Perspektiven, ohne Unterschiede einzuebnen. Formuliere Gewichtung und Bedingungen ausdrücklich.","Einerseits schützt Regulierung vor Risiken; andererseits kann sie Innovation begrenzen.","Eine tragfähige Lösung setzt voraus, dass Freiheit, Sicherheit und soziale Folgen gleichzeitig berücksichtigt werden."]
 };
 
-const topicKnowledge = {
-1:{
- chapter:"1.1",
- coreQuestion:"Wie können Produkte und Rohstoffe möglichst lange genutzt werden, ohne dass Bezahlbarkeit, Komfort und wirtschaftliche Interessen völlig außer Acht geraten?",
- englishDefinition:"A circular economy is a system in which products and materials stay in use for as long as possible. Products are designed to last, be repaired, reused, refurbished and shared. Recycling comes later, when reuse or repair is no longer practical. A throwaway society follows a more linear pattern: take resources, make a product, use it for a short time and throw it away.",
- germanDefinition:"Kreislaufwirtschaft bedeutet, Produkte und Rohstoffe möglichst lange im Umlauf zu halten. Produkte sollen langlebig, reparierbar und wiederverwendbar sein. Erst wenn Reparatur oder Wiederverwendung nicht mehr sinnvoll sind, werden Materialien recycelt. Eine Wegwerfgesellschaft funktioniert dagegen eher linear: Rohstoffe entnehmen → produzieren → kaufen → kurz nutzen → wegwerfen.",
- linearModel:"Rohstoffe → Produktion → Kaufen → kurz nutzen → Wegwerfen",
- circularModel:"Rohstoffe → langlebig produzieren → nutzen → reparieren → wiederverwenden/aufbereiten → recyceln",
- exampleTitle:"Beispiel: Smartphone",
- example:"In einer Wegwerfgesellschaft wird ein Smartphone bei einem Defekt schnell ersetzt. In einer Kreislaufwirtschaft wäre es so konstruiert, dass Akku und Display repariert oder ersetzt werden können. Danach kann das Gerät weiterverwendet, gebraucht verkauft oder professionell aufbereitet werden. Erst am Ende werden wertvolle Rohstoffe zurückgewonnen.",
- actors:[
-  ["Verbraucher","kaufen, nutzen, pflegen, reparieren lassen, wiederverwenden und entsorgen"],
-  ["Hersteller","entscheiden über Material, Haltbarkeit, Reparierbarkeit, Ersatzteile und Produktdesign"],
-  ["Staat","setzt Regeln und Anreize, zum Beispiel Reparaturrechte, Mindeststandards oder steuerliche Vorteile"]
- ],
- tensions:[
-  ["niedriger Preis und Bequemlichkeit","Langlebigkeit und Ressourcenschonung"],
-  ["kurzfristiger Absatz und Gewinn","lange Produktlebensdauer und Reparierbarkeit"],
-  ["unternehmerische Freiheit","staatliche Umwelt- und Produktregeln"],
-  ["individuelle Konsumfreiheit","gesellschaftliche Verantwortung für Abfall und Rohstoffe"]
- ],
- perspectives:[
-  ["Verbraucher tragen die größte Verantwortung","Frage: Können Kaufentscheidungen den Markt verändern, oder sind nachhaltige Alternativen oft zu teuer bzw. nicht verfügbar?"],
-  ["Unternehmen brauchen strengere Regeln","Frage: Reichen freiwillige Maßnahmen aus, oder braucht es verbindliche Vorgaben für Haltbarkeit, Ersatzteile und Reparatur?"],
-  ["Reparieren und Wiederverwenden sind wichtiger als Recycling","Frage: Ist es besser, Abfall zunächst zu vermeiden und Produkte länger zu nutzen, bevor Materialien recycelt werden?"]
- ],
- vocabulary:[
-  ["die Kreislaufwirtschaft","circular economy"],
-  ["die Wegwerfgesellschaft","throwaway society"],
-  ["die Lebensdauer","service life / lifespan"],
-  ["die Reparierbarkeit","repairability"],
-  ["die Wiederverwendung","reuse"],
-  ["die Aufbereitung","refurbishment / reconditioning"],
-  ["der Rohstoff","raw material"],
-  ["die Ressourcenschonung","conservation of resources"],
-  ["die Abfallvermeidung","waste prevention"],
-  ["das Recht auf Reparatur","right to repair"]
- ],
- collocations:[
-  ["Ressourcen schonen","conserve resources","Langlebige Produkte können natürliche Ressourcen schonen."],
-  ["die Lebensdauer verlängern","extend the lifespan","Reparaturen können die Lebensdauer elektronischer Geräte deutlich verlängern."],
-  ["Produkte reparierbar gestalten","design products to be repairable","Hersteller sollten Produkte so gestalten, dass zentrale Bauteile repariert werden können."],
-  ["Abfall vermeiden","prevent waste","Wiederverwendung hilft, Abfall bereits vor dem Recycling zu vermeiden."],
-  ["Rohstoffe zurückgewinnen","recover raw materials","Aus alten Geräten lassen sich wertvolle Rohstoffe zurückgewinnen."],
-  ["Verantwortung übernehmen für + Akk.","take responsibility for","Hersteller, Verbraucher und Staat müssen Verantwortung für einen nachhaltigeren Umgang mit Ressourcen übernehmen."]
- ],
- checks:[
-  {
-   question:"Was ist die Kernfrage bei „Kreislaufwirtschaft und Wegwerfgesellschaft“?",
-   options:[
-    "Wie können Produkte und Rohstoffe länger genutzt und Abfälle reduziert werden, ohne andere Interessen völlig zu ignorieren?",
-    "Wie kann man möglichst viele neue Produkte in kurzer Zeit verkaufen?",
-    "Wie kann Recycling jede Form von Reparatur und Wiederverwendung ersetzen?"
-   ],
-   answerIndex:0,
-   explanation:"Die Kreislaufwirtschaft versucht, Ressourcen länger im Umlauf zu halten. Dabei müssen ökologische, wirtschaftliche und soziale Interessen gegeneinander abgewogen werden."
-  },
-  {
-   question:"Welche zwei Interessen oder Werte können bei diesem Thema in Spannung geraten?",
-   options:[
-    "Bequemlichkeit und niedrige Preise ↔ Langlebigkeit und Ressourcenschonung",
-    "Grammatik ↔ Aussprache",
-    "Reisen ↔ Mehrsprachigkeit"
-   ],
-   answerIndex:0,
-   explanation:"Ein billiges oder bequem austauschbares Produkt kann kurzfristig attraktiv sein, während langlebige, reparierbare Produkte Ressourcen sparen sollen."
-  },
-  {
-   question:"Welche Kollokation passt zu einem ersten Argument über langlebige Produkte?",
-   options:["die Lebensdauer verlängern","eine Lebensdauer machen","Ressourcen sprechen"],
-   answerIndex:0,
-   explanation:"„die Lebensdauer verlängern“ ist eine natürliche Kollokation: Reparatur und gutes Produktdesign können die Nutzungsdauer eines Produkts verlängern."
-  }
- ],
- challenge:"Erkläre zunächst in eigenen Worten den Unterschied zwischen Wegwerfgesellschaft und Kreislaufwirtschaft. Nenne danach zwei Interessenkonflikte und formuliere eine differenzierte Position zu einer der drei Kursaussagen."
-}
-};
-
 const reformulationProfile = {
 2:["Schulreform","zusätzliche Förderung","Bildungschancen"],4:["Medienberichterstattung","eine unabhängige Quellenprüfung","Verlässlichkeit der Informationen"],6:["Chancengerechtigkeit","gezielte Förderprogramme","gesellschaftliche Teilhabe"],8:["Automatisierung","Weiterbildungsprogramme","Beschäftigungschancen"],10:["medizinische Forschung","strengere Prüfverfahren","Patientensicherheit"],12:["Integration","Sprach- und Bildungsangebote","gesellschaftliche Teilhabe"],14:["Erinnerungskultur","neue Vermittlungsformate","Zugang zu kulturellem Gedächtnis"],16:["Werberegulierung","mehr Transparenz","selbstbestimmte Kaufentscheidungen"],18:["Weiterbildung","betriebliche Lernangebote","berufliche Anpassungsfähigkeit"],20:["Plattformregulierung","transparente Algorithmen","Qualität öffentlicher Debatten"],22:["nachhaltiger Tourismus","Besucherlenkung","Lebensqualität am Zielort"],24:["Renten- und Pflegepolitik","langfristige Reformen","Generationengerechtigkeit"],26:["Organisationsentwicklung","klare Zuständigkeiten","Qualität von Entscheidungen"],28:["gesellschaftliche Zukunftspolitik","transparente Abwägungsverfahren","Vertrauen in langfristige Entscheidungen"]
 };
@@ -181,5 +105,5 @@ function makeReformulations(day,title){
  ];
 }
 
-export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:topicKnowledge[day]||null,writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
+export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:getC2TopicKnowledge(day),writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
 export const getC2ExamStandard=(day)=>C2_EXAM_STANDARD[Number(day)]||null;
