@@ -32,6 +32,9 @@ describe("B1 short topic introductions in Grammar", () => {
     expect(screen.getByRole("heading", { name: "Traditionelles und digitales Lernen" })).toBeVisible();
     expect(screen.getByText("Beispiel")).toBeVisible();
     expect(screen.getByText("Denkfrage")).toBeVisible();
+    expect(screen.getByText("Beispiel").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
+    expect(screen.getByText("Denkfrage").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
+
     expect(screen.getByText(/Flexibilität oder persönlicher Kontakt/)).toBeVisible();
     expect(screen.queryByText("Vorteile, Nachteile und Meinung ausdrücken")).not.toBeInTheDocument();
   });
