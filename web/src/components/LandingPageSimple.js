@@ -28,6 +28,7 @@ const COPY = {
       { title: "Join your class", text: "Choose a live class or self-learning option." },
       { title: "Learn in Falowen", text: "Open lessons, submit assignments, and track progress." },
     ],
+    levelsTitle: "German A1–C2 courses and exam preparation",
     exploreTitle: "Useful links",
     resources: [
       { label: "Upcoming classes", href: "/classes/" },
@@ -66,6 +67,7 @@ const COPY = {
       { title: "Kurs beitreten", text: "Wähle einen Live-Kurs oder eine Selbstlernoption." },
       { title: "Mit Falowen lernen", text: "Öffne Lektionen, reiche Aufgaben ein und verfolge deinen Fortschritt." },
     ],
+    levelsTitle: "Deutschkurse A1–C2 und Prüfungsvorbereitung",
     exploreTitle: "Nützliche Links",
     resources: [
       { label: "Kommende Kurse", href: "/classes/" },
@@ -104,6 +106,7 @@ const COPY = {
       { title: "Rejoignez votre cours", text: "Choisissez un cours en direct ou une option d'auto-apprentissage." },
       { title: "Apprenez avec Falowen", text: "Ouvrez les leçons, envoyez les devoirs et suivez vos progrès." },
     ],
+    levelsTitle: "Cours d’allemand A1–C2 et préparation aux examens",
     exploreTitle: "Liens utiles",
     resources: [
       { label: "Prochains cours", href: "/classes/" },
@@ -390,6 +393,24 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
               </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="falowen-section">
+          <h2>{copy.levelsTitle}</h2>
+          <div className="falowen-resources">
+            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+              <a key={level} href={`/learn-german-${level.toLowerCase()}`} className="falowen-resource-link">
+                German {level}
+              </a>
+            ))}
+          </div>
+          <div className="falowen-resources">
+            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+              <a key={level} href={`/goethe-${level.toLowerCase()}-preparation`} className="falowen-resource-link">
+                {level} exam preparation
+              </a>
             ))}
           </div>
         </section>
