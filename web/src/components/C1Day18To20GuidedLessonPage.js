@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1Day18To20GrammarNotes from "./C1Day18To20GrammarNotes";
 import C1GrammarQuickCheck from "./C1GrammarQuickCheck";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
@@ -47,7 +48,7 @@ export default function C1Day18To20GuidedLessonPage({ lesson, canonicalLesson = 
     <header style={{ ...card, background: "#0f172a", color: "white" }}><span style={styles.badge}>C1 · Day {day}</span><h1 style={{ margin: 0 }}>{lesson.title}</h1><p style={{ margin: 0 }}>{lesson.topic}</p></header>
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
 
-    {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the grammar notes below.</NoteBox>}</Section><C1Day18To20GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></> : null}
+    {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the grammar notes below.</NoteBox>}</Section><C1TopicIntroduction day={day} title={lesson.title} /><C1Day18To20GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></> : null}
 
     {active === "speak" ? <Section title="Speaking builder"><C1SpeakGrammarGuide lesson={lesson} branchesOverride={branches} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
 
