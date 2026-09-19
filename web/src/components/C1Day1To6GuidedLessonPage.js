@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
@@ -175,6 +176,7 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "C1 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the knowledge questions below.</NoteBox>}
         </Section>
+        <C1TopicIntroduction day={Number(lesson.day)} title={lesson.title} />
         <C1KnowledgeChoicePractice
           lesson={lesson}
           completed={progress.learnDone}

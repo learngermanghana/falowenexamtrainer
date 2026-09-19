@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
 import C1SpeakGrammarGuide from "./C1SpeakGrammarGuide";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
@@ -47,7 +48,7 @@ export default function C1Day12To14GuidedLessonPage({ lesson, canonicalLesson = 
     <header style={{ ...card, background: "#0f172a", color: "white" }}><span style={styles.badge}>C1 · Day {day}</span><h1 style={{ margin: 0 }}>{lesson.title}</h1><p style={{ margin: 0 }}>{lesson.topic}</p></header>
     <AdvancedSelfLearningTabNav level="C1" day={day} activeTab={active} onChange={setActive} />
 
-    {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section><C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /></> : null}
+    {active === "learn" ? <><Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section><C1TopicIntroduction day={day} title={lesson.title} /><C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /></> : null}
     {active === "speak" ? <Section title="Speaking builder"><C1SpeakGrammarGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label><input type="checkbox" checked={progress.speakDone} onChange={(e) => setProgress((old) => ({ ...old, speakDone: e.target.checked }))} /> I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><WritingCheatSheetTabs level="C1" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={styles.linkButton}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="C1" lesson={lesson} workbookId={`C1-day-${day}`} /> : null}
