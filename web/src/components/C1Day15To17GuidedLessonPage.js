@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1Day15To17GrammarNotes from "./C1Day15To17GrammarNotes";
 import C1GrammarQuickCheck from "./C1GrammarQuickCheck";
 import C1KnowledgeChoicePractice from "./C1KnowledgeChoicePractice";
@@ -53,6 +54,7 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
 
     {active === "learn" ? <>
       <Section title="AI video">{videoEmbed ? <iframe title={video?.title || "C1 video"} src={videoEmbed} style={{ width: "100%", minHeight: 360, border: 0, borderRadius: 14 }} allowFullScreen /> : <NoteBox>Continue with the Learn activity below.</NoteBox>}</Section>
+      <C1TopicIntroduction day={day} title={lesson.title} />
       {day <= 16 ? <C1KnowledgeChoicePractice lesson={lesson} completed={progress.quizDone} onCompleteChange={(quizDone) => setProgress((old) => ({ ...old, quizDone, learnDone: quizDone || old.learnDone }))} /> : <><C1Day15To17GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /><C1GrammarQuickCheck day={day} completed={progress.learnDone} onCompleteChange={(learnDone) => setProgress((old) => ({ ...old, learnDone }))} /></>}
     </> : null}
 
