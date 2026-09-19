@@ -10,7 +10,7 @@
 const TEACHER_LECTURE_VIDEO_ENTRIES = {
   A2: {
     1: [{ chapter: "1.1", topic: "Small Talk", tutor_lecture_video: "https://youtu.be/gsSdn-IlWWY" }],
-    2: [{ chapter: "1.2", topic: "Personen beschreiben", tutor_lecture_video: "https://youtu.be/iB-yVVqI1DQ" }],
+    2: [{ chapter: "1.2", topic: "Personen beschreiben", tutor_lecture_video: "https://youtu.be/9s2SOb7ZipA" }],
     3: [{ chapter: "1.3", topic: "A2 Day 3", tutor_lecture_video: "https://youtu.be/Sc6TPEyyzA0" }],
     4: [{ chapter: "2.4", tutor_lecture_video: "" }],
     5: [{ chapter: "2.5", topic: "A2 Day 5", tutor_lecture_video: "https://youtu.be/0ZddddnHvuI" }],

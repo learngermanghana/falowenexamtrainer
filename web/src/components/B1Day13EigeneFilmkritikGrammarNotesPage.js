@@ -55,16 +55,57 @@ export default function B1Day13EigeneFilmkritikGrammarNotesPage() {
 
       <section style={card}>
         <h2 style={title}>2. Passiv für Regie und Produktion</h2>
+
         <div style={box}>
-          <strong>Präteritum-Passiv</strong>
-          <span>Der Film <strong>wurde</strong> von Christopher Nolan <strong>gedreht</strong>. / Der Film <strong>wurde</strong> im Jahr 2010 <strong>veröffentlicht</strong>.</span>
+          <strong>Die Grundidee auf Englisch</strong>
+          <span>
+            Im Passiv ist <strong>werden</strong> ein Hilfsverb. Es zeigt, dass etwas <em>gemacht wird</em>:
+            <strong> wird / werden = is / are being</strong>,
+            <strong> wurde / wurden = was / were</strong> und
+            <strong> ist / sind ... worden = has / have been</strong>.
+          </span>
+          <span><strong>Formel:</strong> werden + Partizip II → Der Film wird gedreht. = The film is being shot.</span>
         </div>
+
         <div style={box}>
-          <strong>Perfekt-Passiv</strong>
-          <span>Der Film <strong>ist</strong> in vielen Ländern <strong>gezeigt worden</strong>. / Er <strong>ist</strong> für mehrere Preise <strong>nominiert worden</strong>.</span>
+          <strong>Präsens-Passiv: wird / werden</strong>
+          <span><strong>Singular:</strong> Der Film <strong>wird gedreht</strong>. = The film is being shot.</span>
+          <span><strong>Plural:</strong> Die Szenen <strong>werden gedreht</strong>. = The scenes are being shot.</span>
+          <span>Der Film <strong>wird veröffentlicht</strong>. = The film is being released.</span>
         </div>
+
+        <div style={box}>
+          <strong>Präteritum-Passiv: wurde / wurden</strong>
+          <span><strong>Singular:</strong> Der Film <strong>wurde</strong> von Christopher Nolan <strong>gedreht</strong>. = The film was directed / shot by Christopher Nolan.</span>
+          <span><strong>Plural:</strong> Die Szenen <strong>wurden</strong> in den USA <strong>gedreht</strong>. = The scenes were shot in the USA.</span>
+          <span>Der Film <strong>wurde</strong> im Jahr 2010 <strong>veröffentlicht</strong>. = The film was released in 2010.</span>
+        </div>
+
+        <div style={box}>
+          <strong>Perfekt-Passiv: ist / sind + Partizip II + worden</strong>
+          <span>Der Film <strong>ist</strong> in vielen Ländern <strong>gezeigt worden</strong>. = The film has been shown in many countries.</span>
+          <span>Die Schauspieler <strong>sind</strong> für mehrere Preise <strong>nominiert worden</strong>. = The actors have been nominated for several awards.</span>
+          <span><strong>Merke:</strong> Im Perfekt-Passiv benutzt du <strong>worden</strong>, nicht <strong>geworden</strong>.</span>
+        </div>
+
+        <div style={box}>
+          <strong>worden oder geworden?</strong>
+          <span><strong>worden</strong> gehört zum Passiv: Der Film ist gedreht <strong>worden</strong>. = The film has been shot.</span>
+          <span><strong>geworden</strong> bedeutet „become / became“: Der Film ist sehr bekannt <strong>geworden</strong>. = The film became / has become very well known.</span>
+          <span>Er ist Regisseur <strong>geworden</strong>. = He became a director.</span>
+        </div>
+
+        <div style={good}>
+          <strong>Schnellvergleich:</strong>
+          <span>Der Film <strong>wird gedreht</strong>. → is being shot</span>
+          <span>Der Film <strong>wurde gedreht</strong>. → was shot</span>
+          <span>Der Film <strong>ist gedreht worden</strong>. → has been shot</span>
+          <span>Der Film <strong>ist berühmt geworden</strong>. → became / has become famous</span>
+        </div>
+
         <div style={good}><strong>Richtig:</strong> Der Film wurde in den USA gedreht und kam 2010 ins Kino.</div>
         <div style={warn}><strong>Falsch:</strong> Der Film hat in den USA gedreht worden.</div>
+        <div style={warn}><strong>Auch falsch:</strong> Der Film ist in den USA gedreht geworden. → Im Passiv heißt es: <strong>ist ... gedreht worden</strong>.</div>
       </section>
 
       <section style={card}>
