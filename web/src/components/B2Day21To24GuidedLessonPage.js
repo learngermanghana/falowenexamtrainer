@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import B2Day21To24GrammarNotes from "./B2Day21To24GrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -27,33 +28,6 @@ const NoteBox = ({ children, tone = "blue" }) => {
 };
 
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
-
-const summaries = {
-  21: {
-    title: "Migration und neue Lebenswege: Ankommen und Chancen nutzen",
-    intro: "Migration bedeutet oft, das eigene Leben neu zu organisieren. In Deutschland geht es dabei um Sprache, Arbeit, Wohnung, Behörden, soziale Kontakte und die Frage, wie man Schritt für Schritt ankommt.",
-    points: ["Ein neuer Lebensweg braucht Vorbereitung, Geduld und klare Informationen.", "Sprachkurse, Beratung und Kontakte helfen, Unsicherheit zu reduzieren.", "Eine gute B2-Antwort erklärt Herausforderungen und Chancen ausgewogen."],
-    vocabulary: ["der Umzug", "ankommen", "die Beratung", "die Chance", "sich orientieren"],
-  },
-  22: {
-    title: "Demokratie und Mitbestimmung: Verantwortung im Alltag",
-    intro: "Demokratie zeigt sich in Deutschland nicht nur bei Wahlen. Menschen können sich auch in Schulen, Vereinen, Gemeinden, Initiativen und Diskussionen beteiligen.",
-    points: ["Mitbestimmung bedeutet, Rechte zu kennen und Verantwortung zu übernehmen.", "Beteiligung stärkt Vertrauen, wenn Menschen das Gefühl haben, gehört zu werden.", "Eine starke B2-Antwort nennt konkrete Formen der Beteiligung und bewertet ihren Nutzen."],
-    vocabulary: ["die Mitbestimmung", "die Wahl", "sich beteiligen", "die Verantwortung", "die Meinung vertreten"],
-  },
-  23: {
-    title: "Work-Life-Balance: Arbeit und Erholung vereinbaren",
-    intro: "Work-Life-Balance ist in Deutschland ein wichtiges Thema, weil Arbeit, Familie, Gesundheit und Freizeit miteinander vereinbart werden müssen. Es geht um Grenzen, Pausen, flexible Arbeitszeiten und mentale Gesundheit.",
-    points: ["Erholung ist wichtig, damit Menschen langfristig gesund und produktiv bleiben.", "Flexible Arbeitszeiten können helfen, aber nicht jeder Beruf erlaubt dieselbe Freiheit.", "Eine gute B2-Antwort nennt Ursachen von Stress und realistische Lösungen."],
-    vocabulary: ["die Erholung", "die Grenze", "flexible Arbeitszeiten", "Stress abbauen", "die Vereinbarkeit"],
-  },
-  24: {
-    title: "Wissenschaft und Forschung im Alltag: Fortschritt verstehen",
-    intro: "Forschung beeinflusst in Deutschland viele Lebensbereiche: Medizin, Technik, Umwelt, Verkehr und digitale Dienste. Wissenschaftliche Ergebnisse helfen, Probleme besser zu verstehen und Lösungen zu entwickeln.",
-    points: ["Forschung bringt Fortschritt, braucht aber Vertrauen, Transparenz und klare Regeln.", "Medizinische und technische Entwicklungen können den Alltag verbessern.", "Eine gute B2-Antwort erklärt Nutzen und mögliche Risiken sachlich."],
-    vocabulary: ["die Forschung", "die Studie", "die Entwicklung", "Daten auswerten", "der Fortschritt"],
-  },
-};
 
 const embedUrl = (url = "") => {
   try {
@@ -144,6 +118,7 @@ export default function B2Day21To24GuidedLessonPage({ lesson, canonicalLesson = 
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}
         </Section>
+        <B2TopicIntroduction day={day} />
         <B2Day21To24GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} />
       </> : null}
 
@@ -164,7 +139,7 @@ export default function B2Day21To24GuidedLessonPage({ lesson, canonicalLesson = 
       {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
 
       {active === "finish" ? <Section title={`Summary B2 Day ${day}`}>
-        <FinishSummary day={day} />
+        <B2TopicIntroduction day={day} mode="review" />
         {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
         <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button>
       </Section> : null}

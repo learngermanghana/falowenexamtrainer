@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import B2Day7GesellschaftlicheVielfaltGrammarNotes from "./B2Day7GesellschaftlicheVielfaltGrammarNotes";
 import B2Day7To13GrammarNotes from "./B2Day7To13GrammarNotes";
 import B2Day14To16GrammarNotes from "./B2Day14To16GrammarNotes";
@@ -55,125 +56,6 @@ const Section = ({ title, children }) => (
     {children}
   </section>
 );
-
-const summaries = {
-  7: {
-    title: "Gesellschaftliche Vielfalt: Respekt und Teilhabe im Alltag",
-    intro:
-      "Deutschland ist eine vielfältige Gesellschaft. Menschen mit unterschiedlichen Sprachen, Kulturen, Religionen, Familienformen, Fähigkeiten und Lebenswegen begegnen sich in Schule, Ausbildung, Arbeit, Vereinen und Nachbarschaften.",
-    points: [
-      "Vielfalt kann neue Perspektiven, Mehrsprachigkeit, Kreativität und gemeinsames Lernen fördern.",
-      "Vorurteile, Diskriminierung, Sprachbarrieren und ungleiche Zugänge können Teilhabe erschweren.",
-      "In deiner B2-Antwort solltest du eine Chance, eine Herausforderung und konkrete Maßnahmen für Respekt und Chancengleichheit erklären.",
-    ],
-    vocabulary: [
-      "die Vielfalt",
-      "die Teilhabe",
-      "die Chancengleichheit",
-      "das Vorurteil",
-      "die Ausgrenzung",
-    ],
-  },
-  8: {
-    title: "Reisen und Mobilität: Unterwegs in Deutschland",
-    intro:
-      "Mobilität ist in Deutschland eng mit Alltag und Nachhaltigkeit verbunden. Viele Menschen vergleichen Auto, Bahn, Fahrrad und Flugzeug nach Kosten, Flexibilität, Zeit und Umweltwirkung.",
-    points: [
-      "In Städten sind Bahn, Bus und Fahrrad oft praktisch, während auf dem Land das Auto wichtiger bleibt.",
-      "Reisen wird häufig unter dem Blickwinkel von Komfort, Preis und Klimaschutz diskutiert.",
-      "Eine gute B2-Antwort vergleicht mindestens zwei Verkehrsmittel und nennt klare Vor- und Nachteile.",
-    ],
-    vocabulary: ["der öffentliche Verkehr", "die Verbindung", "die Mobilität", "klimafreundlich", "die Verspätung"],
-  },
-  9: {
-    title: "Wohnen und Nachbarschaft: Zusammenleben in Deutschland",
-    intro:
-      "Wohnen in Deutschland bedeutet oft, Regeln und Rücksicht zu beachten: Mietvertrag, Hausordnung, Ruhezeiten und Kommunikation mit Vermietern oder Nachbarn sind wichtige Alltagsthemen.",
-    points: [
-      "Viele Konflikte entstehen durch Lärm, Reparaturen, Nebenkosten oder unterschiedliche Erwartungen.",
-      "Höfliche und sachliche Kommunikation ist wichtig, besonders bei Beschwerden.",
-      "In deiner Antwort solltest du Problem, Folge und Lösung klar nennen.",
-    ],
-    vocabulary: ["die Miete", "die Nebenkosten", "die Hausordnung", "die Ruhezeit", "der Vermieter"],
-  },
-  10: {
-    title: "Konsum und Geld: Bewusst einkaufen in Deutschland",
-    intro:
-      "Beim Konsum geht es in Deutschland nicht nur um Preise, sondern auch um Qualität, Herkunft, Werbung, Nachhaltigkeit und persönliche Verantwortung.",
-    points: [
-      "Viele Menschen vergleichen Angebote, planen ihr Budget und achten auf Sonderaktionen.",
-      "Gleichzeitig wird diskutiert, wie Werbung Kaufentscheidungen beeinflusst.",
-      "Eine starke B2-Antwort wägt Preis, Bedarf, Qualität und Verantwortung gegeneinander ab.",
-    ],
-    vocabulary: ["das Budget", "die Werbung", "das Angebot", "die Qualität", "bewusst konsumieren"],
-  },
-  11: {
-    title: "Gesellschaft und Integration: Teilhabe in Deutschland",
-    intro:
-      "Integration betrifft in Deutschland Sprache, Arbeit, Schule, Behörden, Vereine und Nachbarschaft. Es geht darum, wie Menschen aktiv am gesellschaftlichen Leben teilnehmen können.",
-    points: [
-      "Deutschkenntnisse helfen bei Arbeit, Ausbildung, Ämtern und sozialen Kontakten.",
-      "Integration ist keine Einbahnstraße: Zugewanderte und Aufnahmegesellschaft tragen beide Verantwortung.",
-      "In deiner B2-Antwort solltest du konkrete Möglichkeiten nennen, wie Teilhabe leichter werden kann.",
-    ],
-    vocabulary: ["die Teilhabe", "die Integration", "die Zugehörigkeit", "der Sprachkurs", "Vorurteile abbauen"],
-  },
-  12: {
-    title: "Kultur und Freizeit: Kontakte durch Aktivitäten",
-    intro:
-      "Freizeit und Kultur helfen in Deutschland oft beim Ankommen. Vereine, Kurse, Stadtfeste, Sportgruppen und kulturelle Angebote schaffen Kontakte außerhalb von Schule oder Arbeit.",
-    points: [
-      "Vereine spielen eine große Rolle, weil Menschen dort regelmäßig zusammenkommen.",
-      "Kulturelle Angebote zeigen regionale Unterschiede und helfen, eine Stadt besser kennenzulernen.",
-      "Eine gute B2-Antwort erklärt, warum Freizeit nicht nur Erholung, sondern auch soziale Teilhabe ist.",
-    ],
-    vocabulary: ["der Verein", "die Veranstaltung", "das Stadtfest", "die Freizeit", "Kontakte knüpfen"],
-  },
-  13: {
-    title: "Familie und Generationen: Verantwortung und Freiheit",
-    intro:
-      "Familienleben in Deutschland ist vielfältig: klassische Familien, Alleinerziehende, Patchworkfamilien und Menschen, die allein leben. Gleichzeitig werden Generationenfragen wie Pflege, Freiheit und Verantwortung diskutiert.",
-    points: [
-      "Jüngere Menschen wünschen oft Selbstständigkeit, während ältere Generationen Erfahrung und Sicherheit betonen.",
-      "Pflege, Kinderbetreuung und finanzielle Verantwortung können Familien stark belasten.",
-      "In deiner B2-Antwort solltest du unterschiedliche Perspektiven fair vergleichen.",
-    ],
-    vocabulary: ["die Generation", "die Verantwortung", "die Pflege", "die Selbstständigkeit", "das Familienmodell"],
-  },
-  14: {
-    title: "Freundschaft und soziale Beziehungen: Vertrauen im Alltag",
-    intro:
-      "In Deutschland entstehen Freundschaften oft langsam, aber sie können sehr zuverlässig sein. Pünktlichkeit, Ehrlichkeit, klare Absprachen und persönliche Grenzen spielen in Beziehungen eine wichtige Rolle.",
-    points: [
-      "Freundschaft bedeutet nicht nur Kontakt, sondern auch Vertrauen, Unterstützung und Respekt.",
-      "Digitale Kontakte können hilfreich sein, ersetzen aber nicht immer persönliche Nähe.",
-      "Eine gute B2-Antwort beschreibt Eigenschaften und erklärt, warum sie wichtig sind.",
-    ],
-    vocabulary: ["das Vertrauen", "die Zuverlässigkeit", "die Grenze", "die Ehrlichkeit", "sich verlassen auf"],
-  },
-  15: {
-    title: "Ernährung und Konsumverhalten: Bewusst essen",
-    intro:
-      "Ernährung ist in Deutschland ein Alltagsthema mit vielen Perspektiven: Gesundheit, Preis, Herkunft, Tierwohl, Nachhaltigkeit und Zeit spielen bei Essgewohnheiten eine Rolle.",
-    points: [
-      "Viele Menschen achten auf gesunde Ernährung, aber Alltag, Geld und Zeit beeinflussen Entscheidungen.",
-      "Bio-Produkte, regionale Lebensmittel und vegetarische Ernährung werden häufig diskutiert.",
-      "In deiner B2-Antwort solltest du zeigen, dass Konsum Entscheidungen und Kompromisse bedeutet.",
-    ],
-    vocabulary: ["die Ernährung", "das Lebensmittel", "regional", "verarbeitet", "die Gewohnheit"],
-  },
-  16: {
-    title: "Digitalisierung im Alltag: Chancen und Risiken",
-    intro:
-      "Digitale Werkzeuge prägen in Deutschland Arbeit, Schule, Behörden, Kommunikation und Einkauf. Sie machen vieles schneller, bringen aber auch Fragen zu Datenschutz und Abhängigkeit mit sich.",
-    points: [
-      "Online-Dienste können Zeit sparen, wenn sie verständlich und sicher gestaltet sind.",
-      "Datenschutz ist wichtig, weil viele persönliche Informationen digital gespeichert werden.",
-      "Eine gute B2-Antwort nennt Chancen und Risiken und kommt zu einer ausgewogenen Meinung.",
-    ],
-    vocabulary: ["die Digitalisierung", "der Datenschutz", "die App", "die Speicherung", "abhängig sein von"],
-  },
-};
 
 const embedUrl = (url = "") => {
   try {
@@ -335,6 +217,7 @@ export default function B2Day7To16GuidedLessonPage({ lesson, canonicalLesson = n
               <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>
             )}
           </Section>
+          <B2TopicIntroduction day={day} />
           <GrammarNotes
             day={day}
             checked={progress.learnDone}
@@ -378,7 +261,7 @@ export default function B2Day7To16GuidedLessonPage({ lesson, canonicalLesson = n
 
       {active === "finish" ? (
         <Section title={`Summary B2 Day ${day}`}>
-          <FinishSummary day={day} />
+          <B2TopicIntroduction day={day} mode="review" />
           {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}
           <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button>
         </Section>

@@ -6,6 +6,7 @@ import B2Day7To13GrammarNotes from "./B2Day7To13GrammarNotes";
 import B2KnowledgeChoicePractice from "./B2KnowledgeChoicePractice";
 import B2QuizFirstLearnPreview from "./B2QuizFirstLearnPreview";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -132,6 +133,7 @@ export default function B2Day6To10SelfTutoringPage({ lesson, canonicalLesson = n
     <AdvancedSelfLearningTabNav level="B2" day={day} activeTab={active} onChange={setActive} />
     {active === "learn" ? <>
       <Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">Continue with the quick grammar preview and interactive check below.</NoteBox>}</Section>
+      <B2TopicIntroduction day={day} />
       <B2QuizFirstLearnPreview lesson={guidedLesson} />
       <B2KnowledgeChoicePractice lesson={guidedLesson} onCompleteChange={(quizDone) => setProgress((old) => old.quizDone === quizDone ? old : { ...old, quizDone })} />
       <Section title="Deep grammar notes"><GrammarNotes day={day} checked={progress.learnNotesDone} onCheckedChange={(learnNotesDone) => setProgress((old) => ({ ...old, learnNotesDone }))} /></Section>
