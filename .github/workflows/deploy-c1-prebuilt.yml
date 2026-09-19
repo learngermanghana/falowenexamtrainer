@@ -1,0 +1,39 @@
+name: Deploy verified C1 prebuilt
+
+on:
+  push:
+    branches:
+      - fix/c1-coursebook-canonical-and-template-20260919
+    paths:
+      - .github/workflows/deploy-c1-prebuilt.yml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: team_vYAAqPf7zycxvsCSqqPFo5qc
+      VERCEL_PROJECT_ID: prj_6Hx7qU9tTDyerFk9C5c1IzC2K9wt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Require Vercel token
+        run: test -n "$VERCEL_TOKEN"
+      - name: Install dependencies
+        run: npm --prefix web ci
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+      - name: Pull production project settings
+        working-directory: web
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build Vercel output locally
+        working-directory: web
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Deploy prebuilt output to production
+        working-directory: web
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
