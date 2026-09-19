@@ -1,0 +1,22 @@
+name: Diagnose Falowen build
+
+on:
+  push:
+    branches:
+      - diagnose/falowen-build-20260919
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm --prefix web ci
+      - name: Run production build
+        run: npm --prefix web run build
