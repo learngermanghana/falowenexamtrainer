@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import C1TopicIntroduction from "./C1TopicIntroduction";
 import C1Day7ReisenGrammarNotes from "./C1Day7ReisenGrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -175,6 +176,7 @@ export default function CompactC1LessonPage({ lesson, canonicalLesson = null }) 
             {videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "Lesson video"} src={videoEmbed} allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}
           </div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes.</NoteBox>}
         </Section>
+        <C1TopicIntroduction day={Number(lesson.day)} title={lesson.title} />
         {isC1Day7Grammar ? (
           <C1Day7ReisenGrammarNotes
             checked={progress.learnDone}
