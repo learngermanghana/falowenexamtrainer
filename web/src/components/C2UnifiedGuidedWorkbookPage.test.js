@@ -42,9 +42,8 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("buildC2OpinionWritingTemplate");
     expect(page).toContain('!String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved');
     expect(page).toContain("C2-Schreibvorlage ist bereits im Textfeld gespeichert");
+    expect(page).toContain("Nutzen Sie nur die Satzanfänge als Gerüst");
     expect(page).toContain("Vorlage wiederherstellen");
-    expect(page).toContain("alle Platzhalter ersetzt");
-    expect(page).toContain("Platzhalter offen");
   });
 
 
