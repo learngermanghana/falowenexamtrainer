@@ -8,7 +8,7 @@ const COPY = {
     languageLabel: "Language",
     login: "Log in",
     signup: "Sign up",
-    badge: "German and French learning in one place",
+    badge: "German A1–C2 and French learning in one place",
     title: "Learn. Practise. Get ready for your exam.",
     subtitle:
       "Falowen brings your course book, assignments, tutor feedback, attendance, and exam practice together in one simple learning hub.",
@@ -18,7 +18,7 @@ const COPY = {
     joinProgram: "Start {{program}}",
     viewClasses: "View classes",
     benefits: [
-      { icon: "📘", title: "Structured lessons", text: "Follow a clear course plan from A1 to advanced levels." },
+      { icon: "📘", title: "Structured lessons", text: "Follow structured German learning from A1 to C2, plus French study paths." },
       { icon: "✍️", title: "Tutor feedback", text: "Submit work and learn from corrections and scores." },
       { icon: "🎯", title: "Exam preparation", text: "Practise speaking, writing, listening, and reading." },
     ],
@@ -28,6 +28,7 @@ const COPY = {
       { title: "Join your class", text: "Choose a live class or self-learning option." },
       { title: "Learn in Falowen", text: "Open lessons, submit assignments, and track progress." },
     ],
+    levelsTitle: "German A1–C2 courses and exam preparation",
     exploreTitle: "Useful links",
     resources: [
       { label: "Upcoming classes", href: "/classes/" },
@@ -38,15 +39,15 @@ const COPY = {
     finalTitle: "Ready to start learning?",
     finalText: "Create your Falowen account or log in to continue your course.",
     contact: "Need help? Chat with us on WhatsApp",
-    metaTitle: "Falowen Learning Hub | German and French Courses",
+    metaTitle: "Falowen | Learn German A1–C2 Online & French Courses",
     metaDescription:
-      "Join Falowen for structured German and French lessons, tutor feedback, assignments, progress tracking, and exam preparation.",
+      "Learn German A1–C2 online with Falowen plus French courses, structured lessons, tutor feedback, listening, writing, speaking, progress tracking and exam preparation.",
   },
   de: {
     languageLabel: "Sprache",
     login: "Anmelden",
     signup: "Registrieren",
-    badge: "Deutsch und Französisch an einem Ort lernen",
+    badge: "Deutsch A1–C2 und Französisch an einem Ort lernen",
     title: "Lernen. Üben. Sicher in die Prüfung gehen.",
     subtitle:
       "Falowen vereint Kursbuch, Aufgaben, Tutor-Feedback, Anwesenheit und Prüfungsvorbereitung in einer einfachen Lernplattform.",
@@ -66,6 +67,7 @@ const COPY = {
       { title: "Kurs beitreten", text: "Wähle einen Live-Kurs oder eine Selbstlernoption." },
       { title: "Mit Falowen lernen", text: "Öffne Lektionen, reiche Aufgaben ein und verfolge deinen Fortschritt." },
     ],
+    levelsTitle: "Deutschkurse A1–C2 und Prüfungsvorbereitung",
     exploreTitle: "Nützliche Links",
     resources: [
       { label: "Kommende Kurse", href: "/classes/" },
@@ -76,7 +78,7 @@ const COPY = {
     finalTitle: "Bereit zum Lernen?",
     finalText: "Erstelle dein Falowen-Konto oder melde dich an, um deinen Kurs fortzusetzen.",
     contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
-    metaTitle: "Falowen Lernplattform | Deutsch- und Französischkurse",
+    metaTitle: "Falowen | Deutsch A1–C2 online lernen & Französischkurse",
     metaDescription:
       "Lerne Deutsch und Französisch mit strukturierten Lektionen, Tutor-Feedback, Aufgaben, Fortschrittsanzeige und Prüfungsvorbereitung.",
   },
@@ -104,6 +106,7 @@ const COPY = {
       { title: "Rejoignez votre cours", text: "Choisissez un cours en direct ou une option d'auto-apprentissage." },
       { title: "Apprenez avec Falowen", text: "Ouvrez les leçons, envoyez les devoirs et suivez vos progrès." },
     ],
+    levelsTitle: "Cours d’allemand A1–C2 et préparation aux examens",
     exploreTitle: "Liens utiles",
     resources: [
       { label: "Prochains cours", href: "/classes/" },
@@ -390,6 +393,24 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
               </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="falowen-section">
+          <h2>{copy.levelsTitle}</h2>
+          <div className="falowen-resources">
+            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+              <a key={level} href={`/learn-german-${level.toLowerCase()}`} className="falowen-resource-link">
+                German {level}
+              </a>
+            ))}
+          </div>
+          <div className="falowen-resources">
+            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+              <a key={level} href={`/goethe-${level.toLowerCase()}-preparation`} className="falowen-resource-link">
+                {level} exam preparation
+              </a>
             ))}
           </div>
         </section>

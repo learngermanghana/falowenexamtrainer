@@ -61,12 +61,12 @@ const faq = [
   {
     question: "What level of German do you teach?",
     answer:
-      "Falowen supports German learners from A1 to C1 with live classes, self-learning tracks, recorded teacher videos, workbooks, grammar support, exam preparation, and AI-assisted practice.",
+      "Falowen supports German learners from A1 to C2 with live classes, self-learning tracks, recorded teacher videos, workbooks, grammar support, exam preparation, and AI-assisted practice.",
   },
   {
     question: "Do I need prior German knowledge?",
     answer:
-      "No. Beginners can start at A1, while continuing learners can join the right A2, B1, B2, or C1 path after placement guidance.",
+      "No. Beginners can start at A1, while continuing learners can join the right A2, B1, B2, C1, or C2 path after placement guidance.",
   },
 ];
 
@@ -78,7 +78,7 @@ const seoCountryPaths = {
 };
 
 const coreFeatures = [
-  "German levels A1, A2, B1, B2, and C1",
+  "German levels A1, A2, B1, B2, C1, and C2",
   "Falowen Radio listening practice",
   "AI grammar video support",
   "Teacher-recorded lesson videos",
@@ -100,7 +100,7 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
     const canonicalPath = seoCountryPaths[currentPath] ? currentPath : "/learn-german-ghana";
     const marketLabel = market || seoCountryPaths[canonicalPath] || "Ghana";
     const descriptionContent =
-      `Learn German in ${marketLabel} with Falowen: A1 to C1 courses, live and recorded teacher lessons, AI grammar videos, Falowen Radio, workbooks, attendance tracking, exam prep, and an AI Study Buddy.`;
+      `Learn German in ${marketLabel} with Falowen: A1 to C2 courses, live and recorded teacher lessons, AI grammar videos, Falowen Radio, workbooks, attendance tracking, exam prep, and an AI Study Buddy.`;
 
     const organizationSchema = {
       "@context": "https://schema.org",
@@ -162,7 +162,7 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
     };
 
     updatePageMeta({
-      title: `Learn German in ${marketLabel} & Africa | A1-C1 German Classes | Falowen`,
+      title: `Learn German in ${marketLabel} & Africa | A1-C2 German Classes | Falowen`,
       description: descriptionContent,
       canonicalPath,
       ogType: "website",
@@ -183,7 +183,7 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
     {
       title: "Exam-ready German training",
       description:
-        "We support A1 to C1 German with speaking, writing, reading, listening, attendance tracking, and exam-style tasks so you feel confident on test day.",
+        "We support A1 to C2 German with speaking, writing, reading, listening, attendance tracking, and exam-style tasks so you feel confident on test day.",
     },
     {
       title: "Tutor feedback that keeps you improving",
@@ -193,7 +193,7 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
   ];
 
   const steps = [
-    "Pick your level (A1, A2, B1, B2, or C1) and preferred schedule.",
+    "Pick your level (A1, A2, B1, B2, C1, or C2) and preferred schedule.",
     "Join a cohort and get onboarding support from our team.",
     "Complete daily practice tasks on your phone or laptop.",
     "Attend live classes and receive tutor feedback.",
@@ -232,14 +232,14 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
               <Pill>German lessons in Ghana</Pill>
               <Pill>German lessons in Nigeria</Pill>
               <Pill>German lessons in Sierra Leone</Pill>
-              <Pill>A1 to C1 German</Pill>
+              <Pill>A1 to C2 German</Pill>
               <Pill>Exam preparation</Pill>
             </div>
             <h1 style={{ margin: 0, fontSize: 34 }}>
               Falowen: Learn German in Ghana, Nigeria, Sierra Leone, and across Africa.
             </h1>
             <p style={{ margin: 0, fontSize: 15, color: "#e0e7ff", lineHeight: 1.7 }}>
-              Falowen helps learners across Ghana, Nigeria, Sierra Leone, and Africa gain real German fluency from A1 to C1.
+              Falowen helps learners across Ghana, Nigeria, Sierra Leone, and Africa build German skills from A1 to C2.
               Study with live classes, teacher-recorded videos, Falowen Radio, AI grammar video support, improved workbooks,
               attendance tracking, exam preparation, and a Study Buddy with AI.
             </p>
@@ -323,6 +323,20 @@ const SeoLandingPage = ({ onSignUp, onLogin, market = "Ghana" }) => {
               Move between our placement assessment, exam practice tools, and latest blog articles to build a complete
               study flow.
             </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 2 }}>
+              {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+                <a key={level} href={`/learn-german-${level.toLowerCase()}`} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                  German {level} course
+                </a>
+              ))}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 2 }}>
+              {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
+                <a key={level} href={`/goethe-${level.toLowerCase()}-preparation`} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                  {level} exam preparation
+                </a>
+              ))}
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
                 Take placement assessment

@@ -42,6 +42,12 @@ replaceAccountOnce(
 const activeTabBefore = `  const [activeTab, setActiveTab] = useState(() =>
     new URLSearchParams(window.location.search).get("tab") === "billing" ? "billing" : "studentData"
   );`;
+const queryDrivenActiveTabBefore = `  const [activeTab, setActiveTab] = useState(() => {
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    return ["studentData", "notifications", "billing", "upgrade"].includes(requestedTab)
+      ? requestedTab
+      : "studentData";
+  });`;
 const previousActiveTabAfter = `  const [activeTab, setActiveTab] = useState(() => {
     const requestedTab = new URLSearchParams(window.location.search).get("tab");
     return ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
@@ -82,6 +88,8 @@ const activeTabAfter = `  const location = useLocation();
 
 if (account.includes(previousActiveTabAfter)) {
   account = account.replace(previousActiveTabAfter, activeTabAfter);
+} else if (account.includes(queryDrivenActiveTabBefore)) {
+  account = account.replace(queryDrivenActiveTabBefore, activeTabAfter);
 } else {
   replaceAccountOnce(activeTabBefore, activeTabAfter, "Account participation deep-link state");
 }
