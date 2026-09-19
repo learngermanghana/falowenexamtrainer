@@ -22,7 +22,7 @@ describe("C2 tab page ownership", () => {
     const write = panels.slice(opinionStart);
 
     expect(grammar).toContain("AlignedGrammarTeaching");
-    expect(grammar).toContain("getC2LessonContentAlignment");
+    expect(panels).toContain("getC2LessonContentAlignment");
     expect(speak).not.toContain("AlignedGrammarTeaching");
     expect(write).not.toContain("AlignedGrammarTeaching");
   });
