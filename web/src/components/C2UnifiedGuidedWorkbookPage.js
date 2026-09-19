@@ -103,7 +103,6 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
  const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved}catch{return buildC2OpinionWritingTemplate(standard)}});
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
  const words=useMemo(()=>draft.trim()?draft.trim().split(/\s+/).length:0,[draft]);
- const placeholders=useMemo(()=>(draft.match(/\[[^\]]+\]/g)||[]).length,[draft]);
  const restoreTemplate=()=>{
   if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
   setDraft(template);
@@ -113,12 +112,12 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
   <div style={{display:"grid",gap:9}}>{standard.perspectives.map((quote,index)=><Opinion key={quote} index={index+1}>{quote}</Opinion>)}</div>
   <div style={{...sub,background:"#f0fdf4",borderColor:"#bbf7d0"}}>
    <strong>C2-Schreibvorlage ist bereits im Textfeld gespeichert</strong>
-   <span style={{lineHeight:1.65}}>Ersetzen Sie alle eckigen Klammern durch Ihre eigenen Inhalte. Die Vorlage führt Sie durch alle drei Beiträge, Gegenargumente, Synthese und Fazit. Ihre bereits gespeicherte Antwort wird beim erneuten Öffnen beibehalten.</span>
+   <span style={{lineHeight:1.65}}>Nutzen Sie nur die Satzanfänge als Gerüst und ergänzen Sie Ihre eigenen Argumente, Beispiele und Bewertungen. Ihre bereits gespeicherte Antwort wird beim erneuten Öffnen beibehalten.</span>
    <div><button type="button" onClick={restoreTemplate} style={styles.secondaryButton}>Vorlage wiederherstellen</button></div>
   </div>
   <textarea value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75}}/>
-  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa 350 Wörter · {placeholders} Platzhalter offen</div>
-  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt, alle Platzhalter ersetzt und meinen Text überarbeitet.</label>
+  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa 350 Wörter</div>
+  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt und meinen Text überarbeitet.</label>
  </Section>;
 }
 
