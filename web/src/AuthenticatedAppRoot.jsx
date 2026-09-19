@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import './goetheFreeChatMobile.css';
 import App from './App';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
@@ -10,22 +11,7 @@ import SelfLearningLessonDirectNavigationFix from './components/SelfLearningLess
 import A1CanonicalChapterLessonRoute from './components/A1CanonicalChapterLessonRoute';
 import A1ChapterSpecificLessonRouteBoundary from './components/A1ChapterSpecificLessonRouteBoundary';
 import A1ChapterResourceHubRoute, {
-import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
-import A1Day5FinalWorkbookOpenFix from './components/A1Day5FinalWorkbookOpenFix';
-import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
-import A1SharedPracticeWorkbookNavigation from './components/A1SharedPracticeWorkbookNavigation';
-import RequestedLessonAiVideoHeader from './components/RequestedLessonAiVideoHeader';
-import A1Day11DirectWorkbookRoute, {
-import A1Day16Chapter9DirectWorkbookRoute, {
-import A1Day20Chapter123DirectWorkbookRoute, {
-import A1SpeakingExamIntroEntryRoute, {
-import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
-import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
-import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
-import './goetheFreeChatMobile.css';
-
-A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
+  A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
 } from './components/A1ChapterResourceHubRoute';
 import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
 import A1Day5FinalWorkbookOpenFix from './components/A1Day5FinalWorkbookOpenFix';
@@ -46,7 +32,6 @@ import A1SpeakingExamIntroEntryRoute, {
 } from './components/A1SpeakingExamIntroEntryRoute';
 import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
 import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
-import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 
