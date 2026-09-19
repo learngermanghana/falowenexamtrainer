@@ -14,13 +14,13 @@ describe("configured teacher lecture lesson normalization", () => {
     expect(lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         title: "Kapitel 1.2 · Teacher lecture video",
-        url: "https://youtu.be/iB-yVVqI1DQ",
+        url: "https://youtu.be/9s2SOb7ZipA",
       }),
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          url: "https://youtu.be/iB-yVVqI1DQ",
+          url: "https://youtu.be/9s2SOb7ZipA",
         }),
       ]),
     );
