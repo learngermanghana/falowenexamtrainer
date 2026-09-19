@@ -12,6 +12,7 @@ describe("public SEO architecture", () => {
   const indexHtml = fs.readFileSync(path.resolve(root, "../index.html"), "utf8");
   const sitemap = fs.readFileSync(path.resolve(root, "../public/sitemap.xml"), "utf8");
   const robots = fs.readFileSync(path.resolve(root, "../public/robots.txt"), "utf8");
+  const vercel = fs.readFileSync(path.resolve(root, "../../vercel.json"), "utf8");
 
   test("publishes A1-C2 course and exam landing routes before authentication", () => {
     expect(app).toContain("/^\\/learn-german-(a1|a2|b1|b2|c1|c2)");
@@ -37,8 +38,12 @@ describe("public SEO architecture", () => {
     });
     expect(sitemap).not.toContain("/campus/");
     expect(sitemap).not.toContain("/exams/");
-    expect(robots).toContain("Disallow: /campus/");
-    expect(robots).toContain("Disallow: /exams/");
+    expect(vercel).toContain('"source": "/campus/(.*)"');
+    expect(vercel).toContain('"source": "/exams/(.*)"');
+    expect(vercel).toContain('"key": "X-Robots-Tag"');
+    expect(vercel).toContain('"value": "noindex, nofollow, noarchive"');
+    expect(robots).not.toContain("Disallow: /campus/");
+    expect(robots).not.toContain("Disallow: /exams/");
   });
 
   test("keeps strong internal links between the homepage, levels and exam preparation", () => {
