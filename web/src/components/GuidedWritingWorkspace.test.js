@@ -32,37 +32,33 @@ test("old question-only drafts remain automatic", () => {
   expect(migrateGuidedWritingState({ answers: { a: "one" }, view: "questions" }).combinedDraftMode).toBe("auto");
 });
 
-test("C1 opinion writing uses the approved concise model with recommendation and outlook", () => {
+test("C1 opinion writing uses the revised concise approved scaffold", () => {
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "In der heutigen Zeit wird häufig über [Thema] diskutiert.",
+    "In der heutigen Zeit wird oft über [Thema] diskutiert.",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "da es sowohl [Bereich 1] als auch [Bereich 2] betrifft",
+    "Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft.",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Ein wesentlicher Vorteil besteht darin, dass [Vorteil und Erklärung]",
+    "Ich vertrete die Ansicht, dass [eigene Meinung].",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Andererseits sollte berücksichtigt werden, dass [Nachteil oder Problem]",
+    "Zunächst ist festzustellen, dass [Grund / Hauptargument].",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Einige Menschen sind der Ansicht, dass [Gegenargument]",
+    "Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Dennoch bin ich der Auffassung, dass [eigene Position mit Begründung]",
+    "Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "sowohl Chancen als auch Herausforderungen mit sich bringt",
+    "Zusammenfassend lässt sich festhalten, dass [kurzes Fazit].",
   );
   expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "Daher wäre es empfehlenswert, [konkrete Maßnahme oder ausgewogene Lösung]",
+    "Ich bin der Auffassung, dass [eigene Position].",
   );
-  expect(C1_OPINION_ESSAY_TEMPLATE).toContain(
-    "langfristig ein angemessener Ausgleich zwischen [Aspekt 1] und [Aspekt 2] geschaffen werden",
-  );
+  expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("Einerseits bietet");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("INTRODUCTION");
-  expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("ADVANTAGES");
-  expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("PROPOSED SOLUTION");
   expect(C1_OPINION_ESSAY_TEMPLATE).not.toContain("personalisierte Werbung");
 });
 
