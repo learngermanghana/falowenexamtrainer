@@ -3,7 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { styles } from "../styles";
-import { getC2Day1To7Mastery } from "../data/c2Day1To7Mastery";
+import { getC2ExamStandard } from "../data/c2ExamStandardContent";
 
 const card = {
   ...styles.card,
@@ -158,8 +158,9 @@ const UMFORMUNGEN = [
   },
 ];
 
-export default function C2Day1GuidedWorkbookPage({ lesson }) {
-  const mastery = lesson?.c2Mastery || getC2Day1To7Mastery(1);
+export default function C2Day1GuidedWorkbookPage() {
+  const standard = getC2ExamStandard(1);
+  const topicKnowledge = standard?.topicKnowledge;
   const storageKey = "falowen:c2:day1:guided-workbook";
   const [active, setActive] = useState("learn");
   const [progress, setProgress] = useState(() => {
@@ -188,7 +189,7 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
   const wordCount = useMemo(() => writingDraft.trim() ? writingDraft.trim().split(/\s+/).length : 0, [writingDraft]);
   const finishReady = progress.learnDone && progress.speakDone && progress.writeDone && Boolean(progress.confidence);
 
-  if (!mastery) return null;
+  if (!standard || !topicKnowledge) return null;
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 18 }} data-c2-day1-guided-workbook="true">
@@ -198,23 +199,85 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <span style={{ ...styles.badge, background: "rgba(255,255,255,.14)", color: "#fff" }}>C2</span>
           <span style={{ ...styles.badge, background: "rgba(255,255,255,.14)", color: "#fff" }}>Day 1</span>
-          <span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Chapter {mastery.chapter}</span>
+          <span style={{ ...styles.badge, background: "rgba(37,99,235,.9)", color: "#fff" }}>Chapter {topicKnowledge.chapter}</span>
         </div>
         <div>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.2rem)" }}>{mastery.title}</h1>
-          <p style={{ margin: "10px 0 0", color: "#dbeafe", lineHeight: 1.65 }}>{mastery.topic}</p>
+          <h1 style={{ margin: 0, fontSize: "clamp(2rem,5vw,3.2rem)" }}>{standard.title}</h1>
+          <p style={{ margin: "10px 0 0", color: "#dbeafe", lineHeight: 1.65 }}>{standard.topic}</p>
         </div>
         <div style={{ border: "1px solid rgba(255,255,255,.2)", borderRadius: 14, padding: 13, background: "rgba(255,255,255,.08)" }}>
-          <strong>Today’s C2 control:</strong> {mastery.grammarFocus}
+          <strong>Today’s C2 control:</strong> {standard.grammarFocus}
         </div>
       </header>
 
       <AdvancedSelfLearningTabNav level="C2" day={1} activeTab={active} onChange={setActive} />
 
       {active === "learn" ? <>
-        <Section title="Think first · Meaning before sophisticated German">
+        <Section title="Thema verstehen · Kreislaufwirtschaft zuerst verstehen">
+          <div data-c2-day1-topic-foundation="true" style={{ display: "grid", gap: 14 }}>
+            <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 14, background: "#eff6ff", lineHeight: 1.7 }}>
+              <strong>In simple English</strong>
+              <p style={{ margin: "7px 0 0" }}>{topicKnowledge.englishDefinition}</p>
+            </div>
+            <div style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 14, background: "#fff", lineHeight: 1.7 }}>
+              <strong>Auf Deutsch</strong>
+              <p style={{ margin: "7px 0 0" }}>{topicKnowledge.germanDefinition}</p>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+              <div style={{ border: "1px solid #fecaca", borderRadius: 14, padding: 14, background: "#fff7f7" }}>
+                <strong>Wegwerfgesellschaft · linear</strong>
+                <p style={{ marginBottom: 0, lineHeight: 1.7 }}>{topicKnowledge.linearModel}</p>
+              </div>
+              <div style={{ border: "1px solid #bbf7d0", borderRadius: 14, padding: 14, background: "#f0fdf4" }}>
+                <strong>Kreislaufwirtschaft · circular</strong>
+                <p style={{ marginBottom: 0, lineHeight: 1.7 }}>{topicKnowledge.circularModel}</p>
+              </div>
+            </div>
+            <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, lineHeight: 1.7 }}>
+              <strong>{topicKnowledge.exampleTitle}</strong>
+              <p style={{ marginBottom: 0 }}>{topicKnowledge.example}</p>
+            </div>
+            <div>
+              <strong style={{ display: "block", marginBottom: 8 }}>Wer trägt Verantwortung?</strong>
+              <div style={{ display: "grid", gap: 8 }}>
+                {topicKnowledge.actors.map(([actor, role]) => (
+                  <div key={actor} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
+                    <strong>{actor}</strong> — {role}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <strong style={{ display: "block", marginBottom: 8 }}>Welche Interessen geraten in Spannung?</strong>
+              <div style={{ display: "grid", gap: 8 }}>
+                {topicKnowledge.tensions.map(([left, right]) => (
+                  <div key={left} style={{ border: "1px solid #fde68a", borderRadius: 12, padding: 12, background: "#fffbeb" }}>
+                    <strong>{left}</strong> ↔ <strong>{right}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 14, background: "#eef2ff", lineHeight: 1.7 }}>
+              <strong>Kernfrage für die Stunde</strong>
+              <p style={{ marginBottom: 0 }}>{topicKnowledge.coreQuestion}</p>
+            </div>
+            <div>
+              <strong style={{ display: "block", marginBottom: 8 }}>Die drei Kursaussagen verstehen</strong>
+              <div style={{ display: "grid", gap: 8 }}>
+                {topicKnowledge.perspectives.map(([claim, guide]) => (
+                  <div key={claim} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 5 }}>
+                    <strong>{claim}</strong>
+                    <span style={{ color: "#475569" }}>{guide}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Think first · Topic knowledge before sophisticated German">
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>
-            At C2, the goal is not to replace every simple sentence with a difficult one. First decide what social effect you need. Then choose the language that produces that effect precisely.
+            At C2, strong German is not enough if the topic itself is unclear. First understand the issue, the actors and the conflict of interests. Then choose precise German to evaluate those ideas.
           </p>
           <div style={{ display: "grid", gap: 10 }}>
             <ThinkingStep number="1" title="Meaning" question="What exactly do I want to communicate? Agreement, criticism, distance, solidarity, uncertainty?" example="I disagree with the position." />
@@ -233,18 +296,28 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
 
         <Section title="Precise vocabulary and collocations">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
-            {mastery.vocabulary.map(([word, meaning]) => <div key={word} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}><strong>{word}</strong><div style={{ color: "#64748b" }}>{meaning}</div></div>)}
+            {topicKnowledge.vocabulary.map(([word, meaning]) => <div key={word} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}><strong>{word}</strong><div style={{ color: "#64748b" }}>{meaning}</div></div>)}
           </div>
           <div style={{ display: "grid", gap: 10 }}>
-            {mastery.collocations.map(([phrase, meaning, example]) => <div key={phrase} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12, background: "#eff6ff" }}><strong>{phrase}</strong> — {meaning}<p style={{ margin: "6px 0 0" }}>{example}</p></div>)}
+            {topicKnowledge.collocations.map(([phrase, meaning, example]) => <div key={phrase} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12, background: "#eff6ff" }}><strong>{phrase}</strong> — {meaning}<p style={{ margin: "6px 0 0" }}>{example}</p></div>)}
           </div>
         </Section>
 
-        <Section title="Meaning & nuance check">
-          <strong>{mastery.nuance.q}</strong>
-          <ol style={{ margin: 0, paddingLeft: 22, lineHeight: 1.8 }}>{mastery.nuance.o.map((option) => <li key={option}>{option}</li>)}</ol>
-          <details><summary>Show answer and reasoning</summary><p><strong>{mastery.nuance.o[mastery.nuance.a]}</strong></p><p>{mastery.nuance.e}</p></details>
-          <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={progress.learnDone} onChange={(e) => setProgress((old) => ({ ...old, learnDone: e.target.checked }))} />I can explain why the academic option fits better.</label>
+        <Section title="Topic check · Vorbereitung auf die Unterrichtsfragen">
+          <div style={{ display: "grid", gap: 10 }}>
+            {topicKnowledge.checks.map((check, index) => (
+              <details key={check.question} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 800 }}>{index + 1}. {check.question}</summary>
+                <ol style={{ lineHeight: 1.7 }}>{check.options.map((option) => <li key={option}>{option}</li>)}</ol>
+                <p><strong>Antwort:</strong> {check.options[check.answerIndex]}</p>
+                <p style={{ marginBottom: 0 }}>{check.explanation}</p>
+              </details>
+            ))}
+          </div>
+          <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 700, lineHeight: 1.5 }}>
+            <input type="checkbox" checked={progress.learnDone} onChange={(e) => setProgress((old) => ({ ...old, learnDone: e.target.checked }))} style={{ marginTop: 4 }} />
+            I understand the topic, can explain the main conflict, and can use at least one suitable collocation before I start speaking.
+          </label>
         </Section>
       </> : null}
 
@@ -377,7 +450,7 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
 
       {active === "finish" ? <Section title="Finish C2 Day 1">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
-          <ProgressCard label="Learn" done={progress.learnDone} detail="Register and nuance understood" />
+          <ProgressCard label="Learn" done={progress.learnDone} detail="Topic, conflict and C2 language understood" />
           <ProgressCard label="Speak" done={progress.speakDone} detail="Five-minute Goethe-style presentation completed" />
           <ProgressCard label="Write" done={progress.writeDone} detail={`${wordCount} words · essay and Umformung practice completed`} />
         </div>
@@ -394,8 +467,8 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
           <p><strong>Example:</strong> Die Regierung möchte durch finanzielle Anreize Reparaturen fördern. → Die Regierung schafft finanzielle Anreize <strong>zur Förderung</strong> von Reparaturen.</p>
         </Section>
         <Section title="C2 challenge">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>{mastery.challenge}</p>
-          <strong>Final control: meaning · register · precision · nuance · natural collocation.</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>{topicKnowledge.challenge}</p>
+          <strong>Final control: topic knowledge · argument · register · precision · nuance · natural collocation.</strong>
         </Section>
       </> : null}
     </main>
