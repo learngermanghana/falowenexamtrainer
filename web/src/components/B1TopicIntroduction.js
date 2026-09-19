@@ -188,6 +188,8 @@ const exampleBox = {
   padding: 12,
   background: "#ffffff",
   lineHeight: 1.7,
+  display: "grid",
+  gap: 4,
 };
 
 export default function B1TopicIntroduction({ day }) {
