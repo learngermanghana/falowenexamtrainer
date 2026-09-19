@@ -6,6 +6,7 @@ import{styles}from"../styles";
 import{getC2ExamStandard}from"../data/c2ExamStandardContent";
 import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
+import{buildC2OpinionWritingTemplate}from"../data/c2OpinionWritingTemplate";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
@@ -98,15 +99,25 @@ function Speak({standard,knowledge,completed,onCompleteChange}){
 
 function OpinionWrite({standard,day,completed,onCompleteChange}){
  const key=`falowen:c2:day${day}:unified-opinion`;
- const[draft,setDraft]=useState(()=>{try{return localStorage.getItem(key)||""}catch{return""}});
+ const template=useMemo(()=>buildC2OpinionWritingTemplate(standard),[standard]);
+ const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return saved===null?buildC2OpinionWritingTemplate(standard):saved}catch{return buildC2OpinionWritingTemplate(standard)}});
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
  const words=useMemo(()=>draft.trim()?draft.trim().split(/\s+/).length:0,[draft]);
+ const restoreTemplate=()=>{
+  if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
+  setDraft(template);
+ };
  return <Section title="Schreiben · Stellungnahme">
-  <p style={{margin:0,lineHeight:1.75}}>Schreiben Sie eine ausführliche Stellungnahme von circa 350 Wörtern zu „{standard.title}“. Beziehen Sie sich auf alle drei Beiträge und entwickeln Sie eine eigene, begründete Position.</p>
+  <p style={{margin:0,lineHeight:1.75}}>Schreiben Sie einen ausführlichen Leserbrief bzw. eine E-Mail von circa 350 Wörtern an die Redaktion zum Thema „{standard.title}“. Beziehen Sie sich auf alle drei Beiträge, begründen Sie Ihre Argumentation mit Beispielen und entwickeln Sie eine eigene, differenzierte Position.</p>
   <div style={{display:"grid",gap:9}}>{standard.perspectives.map((quote,index)=><Opinion key={quote} index={index+1}>{quote}</Opinion>)}</div>
-  <textarea value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:420,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75}}/>
+  <div style={{...sub,background:"#f0fdf4",borderColor:"#bbf7d0"}}>
+   <strong>C2-Schreibvorlage ist bereits im Textfeld gespeichert</strong>
+   <span style={{lineHeight:1.65}}>Ersetzen Sie alle eckigen Klammern durch Ihre eigenen Inhalte. Die Vorlage führt Sie durch alle drei Beiträge, Gegenargumente, Synthese und Fazit. Ihre bereits gespeicherte Antwort wird beim erneuten Öffnen beibehalten.</span>
+   <div><button type="button" onClick={restoreTemplate} style={styles.secondaryButton}>Vorlage wiederherstellen</button></div>
+  </div>
+  <textarea value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75}}/>
   <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa 350 Wörter</div>
-  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt und meinen Text überarbeitet.</label>
+  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt, alle Platzhalter ersetzt und meinen Text überarbeitet.</label>
  </Section>;
 }
 
