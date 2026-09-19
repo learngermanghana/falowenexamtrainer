@@ -784,7 +784,7 @@ const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
     topic: entry.topic,
     goal: entry.goal,
     instruction: entry.instruction,
-    grammar_topic: null,
+    grammar_topic: entry.grammar_topic || null,
     assignment: entry.assignment === true,
     video: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
     youtube_link: assignmentDay === 1 ? "https://youtu.be/McNk1VTFvMk" : "",
@@ -803,12 +803,16 @@ const getCourseBookDictionaryEntries = (level) => {
 };
 
 const buildDictionaryBackedSchedule = (level) =>
-  getCourseBookDictionaryEntries(level).map((entry) => ({
+  getCourseBookDictionaryEntries(level).map((entry) => {
+    const resolvedTitle = entry.lessonTitle || entry.title || entry.topic || entry.de || `${level} ${entry.chapter}`;
+    return {
     day: Number(entry.assignmentDay || 0),
-    topic: entry.topic || entry.de || `${level} ${entry.chapter}`,
+    topic: resolvedTitle,
+    title: resolvedTitle,
+    lessonTitle: resolvedTitle,
     chapter: entry.chapter || null,
-    goal: `Arbeite am ${level}-Thema ${entry.chapter}: ${entry.topic || entry.de || ""}.`,
-    instruction: "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
+    goal: entry.goal || `Arbeite am ${level}-Thema ${entry.chapter}: ${resolvedTitle}.`,
+    instruction: entry.instruction || "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
     grammar_topic: entry.grammar_topic || null,
     assignment: entry.assignment === true,
     lesen_hören: {
@@ -819,7 +823,8 @@ const buildDictionaryBackedSchedule = (level) =>
       grammarbook_link: entry.grammarbook_link || entry.schreiben_sprechen?.grammar_link || "",
       workbook_link: entry.workbook_link || entry.schreiben_sprechen?.workbook_link || "",
     },
-  }));
+  };
+  });
 
 const RAW_COURSE_SCHEDULES = {
   A1: [
