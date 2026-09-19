@@ -217,7 +217,8 @@ export default function B2Day7To16GuidedLessonPage({ lesson, canonicalLesson = n
               <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>
             )}
           </Section>
-          
+          <B2TopicIntroduction day={day} />
+          <GrammarNotes
             day={day}
             checked={progress.learnDone}
             onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))}
