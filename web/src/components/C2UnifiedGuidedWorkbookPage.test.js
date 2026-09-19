@@ -40,10 +40,11 @@ describe("C2 unified topic-first workbook", () => {
 
   test("preloads and preserves the reusable C2 opinion template on opinion days", () => {
     expect(page).toContain("buildC2OpinionWritingTemplate");
-    expect(page).toContain("saved===null?buildC2OpinionWritingTemplate(standard):saved");
+    expect(page).toContain('!String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved');
     expect(page).toContain("C2-Schreibvorlage ist bereits im Textfeld gespeichert");
     expect(page).toContain("Vorlage wiederherstellen");
     expect(page).toContain("alle Platzhalter ersetzt");
+    expect(page).toContain("Platzhalter offen");
   });
 
 
