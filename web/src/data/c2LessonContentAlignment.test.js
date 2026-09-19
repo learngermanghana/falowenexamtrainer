@@ -142,6 +142,25 @@ describe("C2 Days 1-28 Course Book alignment", () => {
     expect(aligned.topicKnowledge).toBe(knowledge);
   });
 
+  it("keeps the new C2 Days 23–28 curriculum tail", () => {
+    const expected = [
+      [23, "4.4", "Internationale Zusammenarbeit und Diplomatie"],
+      [24, "4.5", "Gesellschaftliche Kontroversen und öffentliche Debatten"],
+      [25, "5.1", "Daten, Statistik und wissenschaftliche Evidenz"],
+      [26, "5.2", "Philosophie, Ethik und technischer Fortschritt"],
+      [27, "5.3", "Akademisches Schreiben und formelle Korrespondenz"],
+      [28, "5.4", "C2 Prüfungssimulation: Stellungnahme, Umformung und Synthese"],
+    ];
+
+    expected.forEach(([day, chapter, title]) => {
+      expect(getC2LessonContentAlignment(day)).toEqual(expect.objectContaining({
+        day,
+        chapter,
+        title,
+      }));
+    });
+  });
+
   it("preserves assignment and progression fields while aligning C2 content", () => {
     const original = {
       level: "C2",
