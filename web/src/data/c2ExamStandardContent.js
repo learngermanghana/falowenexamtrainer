@@ -1,4 +1,4 @@
-import { getC2TopicKnowledge } from "./c2TopicKnowledge";
+import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge";
 
 const rows = [
 [1,"Kreislaufwirtschaft und Wegwerfgesellschaft","Nuancierte Bewertung und Registersteuerung","Wie Kreislaufwirtschaft Produktion, Konsum, Reparatur und Wiederverwendung verändern kann.",[
@@ -105,5 +105,24 @@ function makeReformulations(day,title){
  ];
 }
 
-export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:getC2TopicKnowledge(day),writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
+function buildTopicKnowledge(day,perspectives){
+ const knowledge=getC2TopicKnowledge(day);
+ if(!knowledge)return null;
+ return {
+  ...knowledge,
+  coreQuestion:knowledge.core,
+  englishDefinition:knowledge.en,
+  germanDefinition:knowledge.de,
+  exampleTitle:"Konkretes Beispiel",
+  vocabulary:knowledge.vocab,
+  collocations:getC2TopicCollocations(day),
+  checks:getC2TopicChecks(day),
+  perspectives:(perspectives||[]).map((claim)=>[claim,"Welche Annahme, Bedingung oder Grenze musst du prüfen, bevor du dieser Aussage zustimmst?"]),
+  challenge:`Erkläre zuerst die Kernfrage in eigenen Worten. Nenne einen Zielkonflikt und formuliere anschließend eine differenzierte Position zu einer der drei Kursaussagen.`,
+  linearModel:Number(day)===1?"Rohstoffe → Produktion → Kaufen → kurz nutzen → Wegwerfen":"",
+  circularModel:Number(day)===1?"Rohstoffe → langlebig produzieren → nutzen → reparieren → wiederverwenden/aufbereiten → recyceln":"",
+ };
+}
+
+export const C2_EXAM_STANDARD = Object.freeze(Object.fromEntries(rows.map(([day,title,grammarFocus,topic,perspectives])=>[day,{day,title,grammarFocus,topic,perspectives,grammar:grammarMethods[day],topicKnowledge:buildTopicKnowledge(day,perspectives),writeType:day%2?"opinion":"reformulation",reformulations:day%2?[]:makeReformulations(day,title)}])));
 export const getC2ExamStandard=(day)=>C2_EXAM_STANDARD[Number(day)]||null;
