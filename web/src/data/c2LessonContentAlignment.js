@@ -2,6 +2,7 @@ import { C2_DAY_1_TO_7_MASTERY } from "./c2Day1To7Mastery";
 import { C2_DAY_8_TO_14_MASTERY } from "./c2Day8To14Mastery";
 import { C2_DAY_15_TO_21_MASTERY } from "./c2Day15To21Mastery";
 import { C2_DAY_22_TO_28_MASTERY } from "./c2Day22To28Mastery";
+import { getC2ExamStandard } from "./c2ExamStandardContent";
 
 const C2_CANONICAL_MASTERY = Object.freeze({
   ...C2_DAY_1_TO_7_MASTERY,
@@ -14,7 +15,7 @@ const C2_CANONICAL_MASTERY = Object.freeze({
 // supplement the collocations already authored in that day's mastery lesson.
 // This prevents a second, stale topic list from drifting away from Course Book.
 const C2_COLLOCATION_SUPPLEMENTS = Object.freeze({
-  1: [["sprachliche Zugehörigkeit signalisieren","signal linguistic belonging","Die Wortwahl kann sprachliche Zugehörigkeit zu einer Gruppe signalisieren."],["ein Register wählen","choose a register","Je nach Adressat muss ein angemessenes Register gewählt werden."],["soziale Distanz markieren","mark social distance","Ein sehr formeller Ton kann soziale Distanz markieren."]],
+  1: [["Abfall vermeiden","prevent waste","Wiederverwendung hilft, Abfall bereits vor dem Recycling zu vermeiden."],["die Lebensdauer verlängern","extend the lifespan","Reparaturen können die Lebensdauer von Produkten deutlich verlängern."],["Rohstoffe zurückgewinnen","recover raw materials","Aus nicht mehr nutzbaren Produkten lassen sich wertvolle Rohstoffe zurückgewinnen."]],
   2: [["Lerninhalte strukturieren","structure learning content","Lehrkräfte strukturieren komplexe Lerninhalte nach ihrer Relevanz."],["Vorwissen aktivieren","activate prior knowledge","Eine gute Einführung aktiviert vorhandenes Vorwissen."],["Informationen adressatengerecht aufbereiten","prepare information for an audience","Fachwissen muss für unterschiedliche Zielgruppen adressatengerecht aufbereitet werden."]],
   3: [["Daten auswerten","analyse data","Forschende werten die erhobenen Daten systematisch aus."],["eine Schlussfolgerung absichern","support a conclusion","Zusätzliche Messungen können eine Schlussfolgerung empirisch absichern."],["Evidenz vorlegen","present evidence","Für die These muss belastbare Evidenz vorgelegt werden."]],
   4: [["eine Quelle überprüfen","verify a source","Vor der Veröffentlichung sollte die Quelle überprüft werden."],["Berichterstattung einordnen","contextualise coverage","Lesende müssen zugespitzte Berichterstattung kritisch einordnen."],["Distanz zu einer Behauptung wahren","maintain distance from a claim","Journalistische Texte sollten Distanz zu unbelegten Behauptungen wahren."]],
@@ -87,9 +88,46 @@ const uniqueCollocations = (items = []) => {
 
 const getCanonicalC2Mastery = (day) => C2_CANONICAL_MASTERY[Number(day)] || null;
 
+const getCurrentCourseMasteryOverride = (day) => {
+  const dayNumber = Number(day);
+  if (dayNumber !== 1) return null;
+
+  const standard = getC2ExamStandard(1);
+  const knowledge = standard?.topicKnowledge;
+  if (!standard || !knowledge) return null;
+
+  const firstCheck = knowledge.checks?.[0] || {};
+  return {
+    chapter: knowledge.chapter,
+    title: standard.title,
+    topic: standard.topic,
+    grammarFocus: standard.grammarFocus,
+    objectives: [
+      "Kreislaufwirtschaft und Wegwerfgesellschaft inhaltlich unterscheiden",
+      "Interessen von Verbrauchern, Herstellern und Staat gegeneinander abwägen",
+      "nuancierte Bewertungen mit thematisch passenden C2-Kollokationen formulieren",
+    ],
+    vocabulary: knowledge.vocabulary,
+    collocations: knowledge.collocations,
+    contrast: Array.isArray(standard.grammar) ? standard.grammar.slice(1) : [],
+    nuance: {
+      q: firstCheck.question || "Was ist die Kernfrage der Kreislaufwirtschaft?",
+      o: firstCheck.options || [],
+      a: Number.isInteger(firstCheck.answerIndex) ? firstCheck.answerIndex : 0,
+      e: firstCheck.explanation || "",
+    },
+    reformulation: [
+      "Recycling allein reicht aus.",
+      "Recycling erscheint als alleinige Strategie nur bedingt ausreichend, wenn Abfallvermeidung und Wiederverwendung vernachlässigt werden.",
+    ],
+    production: knowledge.challenge,
+    challenge: knowledge.challenge,
+  };
+};
+
 const enhanceC2Mastery = (day, source = null) => {
   const dayNumber = Number(day);
-  const canonical = getCanonicalC2Mastery(dayNumber);
+  const canonical = getCurrentCourseMasteryOverride(dayNumber) || getCanonicalC2Mastery(dayNumber);
   const mastery = canonical || source;
   if (!mastery) return null;
 
@@ -192,6 +230,7 @@ export {
   C2_COLLOCATION_SUPPLEMENTS,
   C2_LESSON_CONTENT_ALIGNMENT,
   getCanonicalC2Mastery,
+  getCurrentCourseMasteryOverride,
   getC2LessonContentAlignment,
   enhanceC2Mastery,
   alignC2CurriculumEntry,
