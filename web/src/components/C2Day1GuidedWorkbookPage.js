@@ -91,6 +91,49 @@ const SPEAK_QUOTES = [
   "„Reparieren und Wiederverwenden sind langfristig wichtiger als Recycling.“",
 ];
 
+const C2_SPEAK_IDEAS = [
+  {
+    title: "1. Verantwortung der Verbraucher",
+    ideas: ["Wegwerfmentalität", "Kaufentscheidungen", "langlebige Produkte", "Nachfrage verändern"],
+    prompt: "Inwiefern können Verbraucher durch ihr Kaufverhalten nachhaltigen Konsum fördern?",
+    starter: "Verbraucher tragen insofern Verantwortung, als ...",
+    example:
+      "Wer langlebige und reparierbare Produkte bevorzugt, kann die Nachfrage nach kurzlebigen Wegwerfprodukten verringern. Allerdings bleibt diese Wirkung begrenzt, wenn nachhaltige Alternativen deutlich teurer oder kaum verfügbar sind.",
+  },
+  {
+    title: "2. Verantwortung der Hersteller",
+    ideas: ["Produktlebenszyklen", "Reparierbarkeit", "Ersatzteile", "Wiederverwendbarkeit"],
+    prompt: "Welche Verantwortung haben Unternehmen bereits bei der Entwicklung eines Produkts?",
+    starter: "Die Verantwortung der Hersteller liegt weniger darin, ... als vielmehr darin, ...",
+    example:
+      "Unternehmen beeinflussen den Ressourcenverbrauch bereits durch die Produktgestaltung. Wenn Geräte modular aufgebaut, reparierbar und mit Ersatzteilen versorgt werden, verlängert sich ihre Nutzungsdauer erheblich.",
+  },
+  {
+    title: "3. Reparieren und Wiederverwenden statt nur Recycling",
+    ideas: ["Ressourcenschonung", "Mehrwegsysteme", "Reparatursysteme", "Rohstoffverbrauch"],
+    prompt: "Warum können Reparatur und Wiederverwendung wirksamer sein als Recycling allein?",
+    starter: "Recycling ist zwar grundsätzlich sinnvoll, greift jedoch zu kurz, wenn ...",
+    example:
+      "Recycling gewinnt einen Teil der Rohstoffe zurück, verbraucht aber ebenfalls Energie und Ressourcen. Wiederverwendung und Reparatur können dagegen verhindern, dass ein funktionsfähiges Produkt überhaupt zu Abfall wird.",
+  },
+  {
+    title: "4. Staatliche Rahmenbedingungen und Anreize",
+    ideas: ["steuerliche Anreize", "Recht auf Reparatur", "Mindeststandards", "wirtschaftliche Anreize"],
+    prompt: "Welche politischen Maßnahmen könnten die Kreislaufwirtschaft wirksamer machen?",
+    starter: "Ohne geeignete regulatorische und wirtschaftliche Anreize dürfte es schwierig sein, ...",
+    example:
+      "Steuerliche Vorteile für Reparaturen, verbindliche Standards für Ersatzteile und klare Anforderungen an die Reparierbarkeit könnten nachhaltige Entscheidungen für Verbraucher und Unternehmen attraktiver machen.",
+  },
+  {
+    title: "5. Differenzierte Schlussposition",
+    ideas: ["geteilte Verantwortung", "Verbraucher", "Unternehmen", "Politik", "langfristige Wirkung"],
+    prompt: "Welche Akteure müssen zusammenwirken, damit die Wegwerfgesellschaft tatsächlich zurückgedrängt wird?",
+    starter: "Zusammenfassend erscheint mir weniger ein einzelner Akteur entscheidend als vielmehr ...",
+    example:
+      "Eine Kreislaufwirtschaft kann langfristig nur funktionieren, wenn Verbraucher bewusster konsumieren, Unternehmen langlebige Produkte entwickeln und der Staat geeignete Rahmenbedingungen schafft.",
+  },
+];
+
 const WRITE_OPINIONS = [
   "„Hersteller sollten verpflichtet werden, Produkte so zu bauen, dass sie länger halten und leichter repariert werden können.“",
   "„Nicht Unternehmen, sondern Verbraucher entscheiden mit ihrem Kaufverhalten, ob die Wegwerfgesellschaft bestehen bleibt.“",
@@ -219,6 +262,33 @@ export default function C2Day1GuidedWorkbookPage({ lesson }) {
           <div style={{ display: "grid", gap: 10, padding: "clamp(14px,3vw,24px)", borderRadius: 16, background: "#f1f5f9" }}>
             {SPEAK_QUOTES.map((quote) => <OpinionBox key={quote}>{quote}</OpinionBox>)}
           </div>
+
+          <div
+            data-c2-day1-speaking-ideas="true"
+            style={{ display: "grid", gap: 12, padding: "clamp(14px,3vw,22px)", borderRadius: 16, border: "1px solid #c7d2fe", background: "#eef2ff" }}
+          >
+            <div>
+              <strong style={{ display: "block", fontSize: "1.05rem" }}>Ideen für Ihren Vortrag</strong>
+              <p style={{ margin: "5px 0 0", color: "#475569", lineHeight: 1.65 }}>
+                Wie bei A2 und B1: Wählen Sie 3–4 Ideen und bauen Sie daraus Ihre eigene Antwort.
+                Entwickeln Sie jeden Punkt als <strong>Aussage → Begründung → Beispiel → Einordnung</strong>.
+                Sie müssen nicht alle Ideen verwenden.
+              </p>
+            </div>
+            {C2_SPEAK_IDEAS.map((branch) => (
+              <div
+                key={branch.title}
+                style={{ border: "1px solid #c7d2fe", borderRadius: 14, padding: 13, background: "#fff", display: "grid", gap: 7 }}
+              >
+                <strong>{branch.title}</strong>
+                <div><strong>Ideen:</strong> {branch.ideas.join(" · ")}</div>
+                <div><strong>Leitfrage:</strong> {branch.prompt}</div>
+                <div style={{ color: "#1e3a8a" }}><strong>C2-Satzanfang:</strong> {branch.starter}</div>
+                <div style={{ color: "#334155" }}><strong>So können Sie den Gedanken entwickeln:</strong> {branch.example}</div>
+              </div>
+            ))}
+          </div>
+
           <div style={{ lineHeight: 1.7 }}>
             <strong>Achten Sie darauf, dass Sie</strong>
             <ul style={{ marginBottom: 0 }}>
