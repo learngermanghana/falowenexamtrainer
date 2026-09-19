@@ -135,17 +135,7 @@ export default function B1Day13EigeneFilmkritikGrammarNotesPage() {
       </section>
 
       <section style={card}>
-        <h2 style={title}>5. Empfehlung mit Konjunktiv II</h2>
-        <ul style={list}>
-          <li>Ich <strong>würde</strong> den Film weiterempfehlen, weil er sehr spannend ist.</li>
-          <li>Ich <strong>würde</strong> ihn nicht für Kinder empfehlen, da einige Szenen zu dunkel sind.</li>
-          <li>Ich <strong>würde</strong> den Film noch einmal sehen, weil die Handlung komplex ist.</li>
-          <li>Für Fans von Thrillern <strong>wäre</strong> der Film sehr geeignet.</li>
-        </ul>
-      </section>
-
-      <section style={card}>
-        <h2 style={title}>6. Struktur für einen Meinungsaufsatz</h2>
+        <h2 style={title}>5. Struktur für einen Meinungsaufsatz</h2>
         <ol style={list}>
           <li><strong>Einleitung:</strong> Thema nennen und kurz erklären, warum es wichtig ist.</li>
           <li><strong>Meinung:</strong> Ich bin der Meinung, dass ...</li>
@@ -165,7 +155,7 @@ export default function B1Day13EigeneFilmkritikGrammarNotesPage() {
           <li>Ein Kritikpunkt ist, dass ...</li>
           <li>In meinem Heimatland sind solche Filme beliebt, weil ...</li>
           <li>Zusammenfassend kann ich sagen, dass ...</li>
-          <li>Ich würde den Film weiterempfehlen / nicht weiterempfehlen.</li>
+          <li>Ich empfehle den Film / Ich empfehle den Film nicht.</li>
         </ul>
       </section>
 

@@ -51,7 +51,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     10: [{ chapter: "4.10", tutor_lecture_video: "" }],
     11: [{ chapter: "4.11", topic: "Teamspiele und kooperative Aktivitäten", tutor_lecture_video: "https://youtu.be/UL-gk2klvWQ" }],
     12: [{ chapter: "4.12", tutor_lecture_video: "" }],
-    13: [{ chapter: "4.13", tutor_lecture_video: "" }],
+    13: [{ chapter: "4.13", topic: "Eigene Filmkritik schreiben", tutor_lecture_video: "https://youtu.be/NwieoHEBZVs" }],
     14: [{ chapter: "5.14", tutor_lecture_video: "" }],
     15: [{ chapter: "5.15", tutor_lecture_video: "" }],
     16: [{ chapter: "5.16", tutor_lecture_video: "" }],

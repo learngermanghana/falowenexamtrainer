@@ -53,6 +53,26 @@ describe("A2/B1 tutor grammar AI videos", () => {
     expect(model.videoResource.title).toMatch(/AI video/i);
   });
 
+  test("B1 Day 13 uses the requested AI video without teaching Konjunktiv II recommendations", async () => {
+    const model = getA2B1GrammarVideoModel("B1", 13);
+    expect(model).toEqual(
+      expect.objectContaining({
+        sourceUrl: "https://youtu.be/mH1nb8qJWhU",
+        embedUrl: "https://www.youtube-nocookie.com/embed/mH1nb8qJWhU",
+      }),
+    );
+
+    renderWithRouter(<A2B1GrammarNotesTab level="B1" day={13} />);
+
+    expect(await screen.findByTitle(/AI grammar video/i, {}, { timeout: 5000 })).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/mH1nb8qJWhU",
+    );
+    expect(screen.queryByText(/Empfehlung mit Konjunktiv II/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ich würde den Film weiterempfehlen/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/5\. Struktur für einen Meinungsaufsatz/i)).toBeVisible();
+  });
+
   test("does not add a video-only grammar card when a B1 deep-grammar page is unavailable", async () => {
     renderWithRouter(<A2B1GrammarNotesTab level="B1" day={24} />);
 

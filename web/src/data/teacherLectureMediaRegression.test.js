@@ -102,6 +102,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("renders the B1 Day 13 film review teacher lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 13,
+        chapter: "4.13",
+        topic: "Eigene Filmkritik schreiben",
+      },
+      "B1",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "4.13",
+        title: "Kapitel 4.13 · Teacher lecture video",
+        url: "https://youtu.be/NwieoHEBZVs",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/NwieoHEBZVs" }),
+      ]),
+    );
+  });
+
   test("keeps ready-made Day 1 to 28 slots for A2 through C1", () => {
     ["A2", "B1", "B2", "C1"].forEach((level) => {
       expect(Object.keys(TEACHER_LECTURE_VIDEO_RESOURCES[level]).map(Number)).toEqual(
