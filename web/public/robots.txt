@@ -6,10 +6,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
-Disallow: /campus/
-Disallow: /exams/
-Disallow: /onboarding
-Disallow: /payment-complete
 Disallow: /server-status
 
 # Sitemaps
