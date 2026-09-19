@@ -28,6 +28,10 @@ export const B2_C1_WORKBOOK_TABS = [
   { key: "references", label: "Ref", description: "Notes" },
 ];
 
+export const C2_WORKBOOK_TABS = B2_C1_WORKBOOK_TABS.map((tab) =>
+  tab.key === "learn" ? { ...tab, label: "Grammar", description: "Learn" } : tab
+);
+
 export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;
 
 export const getA2B1WorkbookContextFromAriaLabel = (ariaLabel = "") => {
@@ -58,6 +62,7 @@ export const getWorkbookTabsWithLegacyGrammar = ({ tabs = STANDARD_WORKBOOK_TABS
 
 export const getWorkbookTabsForLevel = (level) => {
   const normalizedLevel = String(level || "").toUpperCase();
+  if (normalizedLevel === "C2") return C2_WORKBOOK_TABS;
   if (normalizedLevel === "B2" || normalizedLevel === "C1") return B2_C1_WORKBOOK_TABS;
   return A2_B1_WORKBOOK_TABS;
 };
@@ -242,7 +247,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
     <WorkbookTabNav
       activeTab={activeTab}
       onChange={onChange}
-      tabs={B2_C1_WORKBOOK_TABS}
+      tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
       ariaLabel={`${String(level || "").toUpperCase()} Day ${day} self-learning sections`}
       renderLegacyGrammarPanel={false}
     />

@@ -55,6 +55,29 @@ for (const [relative, dayExpr] of workbookTargets) {
   fs.writeFileSync(file, source, "utf8");
 }
 
+const masteryPageTargets = [
+  "web/src/components/C2Day1To7MasteryPage.js",
+  "web/src/components/C2Day8To14MasteryPage.js",
+];
+
+for (const relative of masteryPageTargets) {
+  const file = path.join(root, relative);
+  let source = fs.readFileSync(file, "utf8");
+  source = source
+    .replace('import C2AlignedTeachingSummary from "./C2AlignedTeachingSummary";\n', "")
+    .replace(/\nconst GuidedWithSummary=\(\{children,lesson\}\)=><>\{children\}<C2AlignedTeachingSummary lesson=\{lesson\}\/><\/>;\n/, "\n")
+    .replace(/<GuidedWithSummary lesson=\{lesson\}>(<C2Day1GuidedWorkbookPage lesson=\{lesson\}\/>)<\/GuidedWithSummary>/g, "$1")
+    .replace(/<GuidedWithSummary lesson=\{lesson\}>(<C2Days2To5GuidedWorkbookPage lesson=\{lesson\}\/>)<\/GuidedWithSummary>/g, "$1")
+    .replace(/<GuidedWithSummary lesson=\{lesson\}>(<C2Days6To11GuidedWorkbookPage lesson=\{lesson\}\/>)<\/GuidedWithSummary>/g, "$1")
+    .replace(/<>\s*(<C2Days6To11GuidedWorkbookPage lesson=\{lesson\}\/>)\s*<C2AlignedTeachingSummary lesson=\{lesson\}\/\s*>\s*<\/>/g, "$1")
+    .replace(/<><main([\s\S]*?)<\/main><C2AlignedTeachingSummary lesson=\{lesson\}\/\s*><\/>/g, "<main$1</main>");
+
+  if (source.includes("C2AlignedTeachingSummary")) {
+    throw new Error(`${relative}: global C2 teaching summary still leaks across tabs.`);
+  }
+  fs.writeFileSync(file, source, "utf8");
+}
+
 const panelPath = path.join(root, "web/src/components/C2StandardExamPanels.js");
 let panel = fs.readFileSync(panelPath, "utf8");
 

@@ -2,11 +2,37 @@ import React,{useEffect,useMemo,useState}from"react";
 import{styles}from"../styles";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
 import{getC2ExamStandard}from"../data/c2ExamStandardContent";
+import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:14,background:"#f8fbff",display:"grid",gap:7};
 const Section=({title,children})=><section style={card}><h2 style={{margin:0,fontSize:"1.18rem"}}>{title}</h2>{children}</section>;
 const completion=(checked,onChange,label)=><label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(checked)} onChange={e=>onChange?.(e.target.checked)} style={{marginTop:4}}/>{label}</label>;
+const DetailList=({items=[]})=><ul style={{margin:0,paddingLeft:22,lineHeight:1.7}}>{items.filter(Boolean).map(item=><li key={item}>{item}</li>)}</ul>;
+
+const AlignedGrammarTeaching=({day})=>{
+ const aligned=getC2LessonContentAlignment(day);
+ const grammar=aligned?.grammarNotes;
+ const checks=Array.isArray(aligned?.grammarChecks)?aligned.grammarChecks:[];
+ if(!grammar)return null;
+ return <>
+  <Section title={grammar.title}>
+   <span style={{...styles.badge,width:"fit-content",background:"#eef2ff",color:"#3730a3"}}>Detailed C2 grammar notes</span>
+   <div><strong>When and why to use it</strong><p style={{marginBottom:0,lineHeight:1.7}}>{grammar.usage}</p></div>
+   <div><strong>Structure / word order</strong><p style={{marginBottom:0,lineHeight:1.7}}>{grammar.wordOrder}</p></div>
+   <div><strong>Examples from today’s topic</strong><DetailList items={grammar.examples}/></div>
+   <div><strong>Common mistakes</strong><DetailList items={grammar.commonMistakes}/></div>
+  </Section>
+  {checks.length?<Section title="Grammar checks with explanations">
+   {checks.map((check,index)=><details key={`${index}-${check.question}`} style={{border:"1px solid #e2e8f0",borderRadius:12,padding:12}}>
+    <summary style={{cursor:"pointer",fontWeight:800}}>{index+1}. {check.question}</summary>
+    {Array.isArray(check.options)&&check.options.length?<ol style={{lineHeight:1.7}}>{check.options.map(option=><li key={option}>{option}</li>)}</ol>:null}
+    <p style={{marginBottom:4}}><strong>Answer:</strong> {check.options?.[check.answerIndex]||"See explanation"}</p>
+    <p style={{margin:0,lineHeight:1.7}}>{check.explanation}</p>
+   </details>)}
+  </Section>:null}
+ </>;
+};
 
 export function C2StandardGrammarPanel({day,completed,onCompleteChange}){
  const d=getC2ExamStandard(day);if(!d)return null;
@@ -34,6 +60,7 @@ export function C2StandardGrammarPanel({day,completed,onCompleteChange}){
    ].map(([t,x])=><div key={t} style={sub}><strong>{t}</strong><span>{x}</span></div>)}</div>
    <p style={{margin:0,color:"#475569",lineHeight:1.7}}>Nutze diese Redemittel nur, wenn sie zur Aussage passen. C2 bedeutet präzise Argumentation, nicht möglichst viele feste Formeln.</p>
   </Section>}
+  <AlignedGrammarTeaching day={day}/>
   <Section title="Grammar check">{completion(completed,onCompleteChange,"Ich kann die heutige Struktur erklären und sie bewusst in Sprechen oder Schreiben einsetzen.")}</Section>
  </div>;
 }
