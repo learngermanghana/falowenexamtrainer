@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import B2TopicIntroduction from "./B2TopicIntroduction";
 import B2Day25To28GrammarNotes from "./B2Day25To28GrammarNotes";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
@@ -22,33 +23,6 @@ const NoteBox = ({ children, tone = "blue" }) => {
   return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 12, background, color, lineHeight: 1.65 }}>{children}</div>;
 };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
-
-const summaries = {
-  25: {
-    title: "Nachhaltiger Konsum: Bewusste Entscheidungen treffen",
-    intro: "Nachhaltiger Konsum bedeutet, beim Kaufen nicht nur auf den Preis zu achten. In Deutschland wird oft über regionale Produkte, faire Kleidung, Verpackung, Ressourcen und Wiederverwendung gesprochen.",
-    points: ["Kaufentscheidungen zeigen Verantwortung gegenüber Umwelt und Gesellschaft.", "Nachhaltige Produkte können teurer sein, aber langfristig Ressourcen sparen.", "Eine gute B2-Antwort vergleicht Preis, Qualität, Herkunft und Umweltwirkung."],
-    vocabulary: ["nachhaltiger Konsum", "die Verpackung", "regional", "fair produziert", "Ressourcen sparen"],
-  },
-  26: {
-    title: "Behörden, Termine und formelle Kommunikation: Klar schreiben",
-    intro: "Formelle Kommunikation ist in Deutschland wichtig, besonders bei Behörden, Terminen, Verträgen und offiziellen Anfragen. Man muss höflich, genau und vollständig schreiben.",
-    points: ["Eine gute Nachricht nennt zuerst das Anliegen und danach die konkrete Bitte.", "Indirekte Fragen klingen höflicher als direkte Fragen.", "In deiner B2-Antwort solltest du klare Struktur und passende Höflichkeitsformen zeigen."],
-    vocabulary: ["der Termin", "die Unterlagen", "die Bestätigung", "das Anliegen", "mit freundlichen Grüßen"],
-  },
-  27: {
-    title: "Prüfungstraining: Argumentieren und Reagieren",
-    intro: "In der B2-Prüfung musst du nicht perfekt sprechen, aber klar reagieren. Du brauchst Meinung, Begründung, Beispiel und eine passende Reaktion auf andere Positionen.",
-    points: ["Redemittel helfen dir, Zeit zu gewinnen und strukturierter zu antworten.", "Gute Antworten enthalten nicht nur Meinung, sondern auch Grund und Beispiel.", "Eine starke B2-Antwort bleibt höflich, auch wenn du widersprichst."],
-    vocabulary: ["meiner Meinung nach", "zustimmen", "widersprechen", "ein Beispiel nennen", "argumentieren"],
-  },
-  28: {
-    title: "Review und persönlicher Fortschritt: B2 sicherer anwenden",
-    intro: "Day 28 ist eine Wiederholung. Hier geht es darum, die wichtigsten B2-Strukturen zu kontrollieren und einen klaren nächsten Lernplan zu entwickeln.",
-    points: ["Prüfe besonders Verbposition, Artikel, Kasus, Konnektoren und Satzende.", "Wiederholung zeigt dir, welche Themen sicher sind und welche du weiter üben musst.", "Eine gute Abschlussantwort nennt Fortschritt, Schwächen und konkrete nächste Schritte."],
-    vocabulary: ["die Wiederholung", "der Fortschritt", "die Schwäche", "sich verbessern", "der Lernplan"],
-  },
-};
 
 const embedUrl = (url = "") => {
   try {
@@ -119,10 +93,10 @@ export default function B2Day25To28GuidedLessonPage({ lesson, canonicalLesson = 
       {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActive(tab)} style={{ ...(active === tab ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44 }}>{labels[tab]}</button>)}
     </div>
 
-    {active === "learn" ? <><Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}</Section><B2Day25To28GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} /></> : null}
+    {active === "learn" ? <><Section title="AI video">{video?.url ? <div style={{ display: "grid", gap: 10 }}><strong>{video.title || "Lesson video"}</strong>{video.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{video.description}</p> : null}{videoEmbed ? <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", background: "#0f172a" }}><iframe title={video.title || "B2 lesson video"} src={videoEmbed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} /></div> : null}</div> : <NoteBox tone="amber">No dedicated AI video has been added yet. Continue with the grammar notes below.</NoteBox>}</Section><B2TopicIntroduction day={day} /><B2Day25To28GrammarNotes day={day} checked={progress.learnDone} onCheckedChange={(checked) => setProgress((old) => ({ ...old, learnDone: checked }))} /></> : null}
     {active === "speak" ? <Section title="Speaking builder"><NoteBox tone="amber"><strong>Sprechfrage:</strong> {lesson.speakingBuilder?.question || lesson.speakingTopic || lesson.topic}</NoteBox><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "center", fontWeight: 800 }}><input type="checkbox" checked={progress.speakDone} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />I completed a speaking practice.</label></Section> : null}
     {active === "write" ? <Section title="Guided writing builder"><WritingCheatSheetTabs level="B2" day={day}><WritingTaskPrompt lesson={lesson} />{workbookUrl ? <a href={workbookUrl} style={{ ...styles.linkButton, width: "fit-content" }}>Open lesson workbook</a> : null}<GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} /></WritingCheatSheetTabs></Section> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
-    {active === "finish" ? <Section title={`Summary B2 Day ${day}`}><FinishSummary day={day} />{progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
+    {active === "finish" ? <Section title={`Summary B2 Day ${day}`}><B2TopicIntroduction day={day} mode="review" />{progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is saved as complete on this device.</NoteBox> : null}<button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={finish}>I have completed</button></Section> : null}
   </div>;
 }
