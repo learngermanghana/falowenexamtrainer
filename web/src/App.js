@@ -167,6 +167,7 @@ import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
+import GermanLevelSeoPage from "./components/GermanLevelSeoPage";
 import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
 import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
@@ -394,6 +395,29 @@ function App() {
     "/learn-german-sierra-leone": "Sierra Leone",
     "/learn-german-africa": "Africa",
   };
+
+  const germanLevelSeoMatch = location.pathname.match(/^\/learn-german-(a1|a2|b1|b2|c1|c2)\/?$/i);
+  const germanExamSeoMatch = location.pathname.match(/^\/goethe-(a1|a2|b1|b2|c1|c2)-preparation\/?$/i);
+
+  if (germanLevelSeoMatch || germanExamSeoMatch) {
+    const seoLevel = String((germanLevelSeoMatch || germanExamSeoMatch)?.[1] || "a1").toUpperCase();
+    const seoMode = germanExamSeoMatch ? "exam" : "course";
+    return (
+      <GermanLevelSeoPage
+        level={seoLevel}
+        mode={seoMode}
+        onSignUp={() => {
+          setSignupProgram("german");
+          setAuthMode("signup");
+          navigate("/signup?program=german");
+        }}
+        onLogin={() => {
+          setAuthMode("login");
+          navigate("/login/");
+        }}
+      />
+    );
+  }
 
   if (seoMarkets[location.pathname]) {
     return (
