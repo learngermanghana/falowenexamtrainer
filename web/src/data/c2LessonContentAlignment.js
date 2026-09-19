@@ -2,19 +2,21 @@ import { C2_DAY_1_TO_7_MASTERY } from "./c2Day1To7Mastery";
 import { C2_DAY_8_TO_14_MASTERY } from "./c2Day8To14Mastery";
 import { C2_DAY_15_TO_21_MASTERY } from "./c2Day15To21Mastery";
 import { C2_DAY_22_TO_28_MASTERY } from "./c2Day22To28Mastery";
+import { getC2ExamStandard } from "./c2ExamStandardContent";
 
 const C2_CANONICAL_MASTERY = Object.freeze({
   ...C2_DAY_1_TO_7_MASTERY,
   ...C2_DAY_8_TO_14_MASTERY,
   ...C2_DAY_15_TO_21_MASTERY,
   ...C2_DAY_22_TO_28_MASTERY,
+  1: getCurrentCourseMasteryOverride(1) || C2_DAY_1_TO_7_MASTERY[1],
 });
 
 // Extra collocations are deliberately keyed by the canonical C2 day. They only
 // supplement the collocations already authored in that day's mastery lesson.
 // This prevents a second, stale topic list from drifting away from Course Book.
 const C2_COLLOCATION_SUPPLEMENTS = Object.freeze({
-  1: [["sprachliche Zugehörigkeit signalisieren","signal linguistic belonging","Die Wortwahl kann sprachliche Zugehörigkeit zu einer Gruppe signalisieren."],["ein Register wählen","choose a register","Je nach Adressat muss ein angemessenes Register gewählt werden."],["soziale Distanz markieren","mark social distance","Ein sehr formeller Ton kann soziale Distanz markieren."]],
+  1: [["Abfall vermeiden","prevent waste","Wiederverwendung hilft, Abfall bereits vor dem Recycling zu vermeiden."],["die Lebensdauer verlängern","extend the lifespan","Reparaturen können die Lebensdauer von Produkten deutlich verlängern."],["Rohstoffe zurückgewinnen","recover raw materials","Aus nicht mehr nutzbaren Produkten lassen sich wertvolle Rohstoffe zurückgewinnen."]],
   2: [["Lerninhalte strukturieren","structure learning content","Lehrkräfte strukturieren komplexe Lerninhalte nach ihrer Relevanz."],["Vorwissen aktivieren","activate prior knowledge","Eine gute Einführung aktiviert vorhandenes Vorwissen."],["Informationen adressatengerecht aufbereiten","prepare information for an audience","Fachwissen muss für unterschiedliche Zielgruppen adressatengerecht aufbereitet werden."]],
   3: [["Daten auswerten","analyse data","Forschende werten die erhobenen Daten systematisch aus."],["eine Schlussfolgerung absichern","support a conclusion","Zusätzliche Messungen können eine Schlussfolgerung empirisch absichern."],["Evidenz vorlegen","present evidence","Für die These muss belastbare Evidenz vorgelegt werden."]],
   4: [["eine Quelle überprüfen","verify a source","Vor der Veröffentlichung sollte die Quelle überprüft werden."],["Berichterstattung einordnen","contextualise coverage","Lesende müssen zugespitzte Berichterstattung kritisch einordnen."],["Distanz zu einer Behauptung wahren","maintain distance from a claim","Journalistische Texte sollten Distanz zu unbelegten Behauptungen wahren."]],
@@ -45,7 +47,7 @@ const C2_COLLOCATION_SUPPLEMENTS = Object.freeze({
 });
 
 const C2_GRAMMAR_GUIDANCE = Object.freeze({
-  1:["Use register shifts to express the same meaning appropriately for different audiences.","Keep the core proposition stable; change vocabulary, stance markers and degree of explicitness rather than distorting the message.","Do not confuse formal language with unnecessarily long or archaic language."],
+  1:["Use nuanced evaluation to show how strongly you support a circular-economy measure and under which conditions.","Keep the topic claim visible, then add stance, limitation and condition with forms such as grundsätzlich, nur bedingt, sofern and wenn.","Do not discuss the topic with generic environmental language only; connect each evaluation to a concrete actor, trade-off or measure."],
   2:["Use information structure to control what the reader processes as known, new or especially important.","German main clauses keep the finite verb in position two; moving an element into the Vorfeld changes focus, not the verb-second rule.","Do not front an element unless the resulting focus matches the intended message."],
   3:["Use nominal style for compact academic reference and verbal style when actions and agents should remain transparent.","When nominalising, preserve the logical roles with genitives or prepositional complements; when verbalising, restore a clear subject and finite verb.","Avoid stacking several abstract nouns when a clear verb would be easier to process."],
   4:["Use indirect speech to attribute information and mark distance from a source.","Konjunktiv I normally keeps the reporting clause separate from the reported proposition; use Konjunktiv II where forms would otherwise be ambiguous.","Do not present a disputed quotation as an established fact after removing the source marker."],
@@ -87,9 +89,46 @@ const uniqueCollocations = (items = []) => {
 
 const getCanonicalC2Mastery = (day) => C2_CANONICAL_MASTERY[Number(day)] || null;
 
+function getCurrentCourseMasteryOverride(day) {
+  const dayNumber = Number(day);
+  if (dayNumber !== 1) return null;
+
+  const standard = getC2ExamStandard(1);
+  const knowledge = standard?.topicKnowledge;
+  if (!standard || !knowledge) return null;
+
+  const firstCheck = knowledge.checks?.[0] || {};
+  return {
+    chapter: knowledge.chapter,
+    title: standard.title,
+    topic: standard.topic,
+    grammarFocus: standard.grammarFocus,
+    objectives: [
+      "Kreislaufwirtschaft und Wegwerfgesellschaft inhaltlich unterscheiden",
+      "Interessen von Verbrauchern, Herstellern und Staat gegeneinander abwägen",
+      "nuancierte Bewertungen mit thematisch passenden C2-Kollokationen formulieren",
+    ],
+    vocabulary: knowledge.vocabulary,
+    collocations: knowledge.collocations,
+    contrast: Array.isArray(standard.grammar) ? standard.grammar.slice(1) : [],
+    nuance: {
+      q: firstCheck.question || "Was ist die Kernfrage der Kreislaufwirtschaft?",
+      o: firstCheck.options || [],
+      a: Number.isInteger(firstCheck.answerIndex) ? firstCheck.answerIndex : 0,
+      e: firstCheck.explanation || "",
+    },
+    reformulation: [
+      "Recycling allein reicht aus.",
+      "Recycling erscheint als alleinige Strategie nur bedingt ausreichend, wenn Abfallvermeidung und Wiederverwendung vernachlässigt werden.",
+    ],
+    production: knowledge.challenge,
+    challenge: knowledge.challenge,
+  };
+}
+
 const enhanceC2Mastery = (day, source = null) => {
   const dayNumber = Number(day);
-  const canonical = getCanonicalC2Mastery(dayNumber);
+  const canonical = getCurrentCourseMasteryOverride(dayNumber) || getCanonicalC2Mastery(dayNumber);
   const mastery = canonical || source;
   if (!mastery) return null;
 
@@ -192,6 +231,7 @@ export {
   C2_COLLOCATION_SUPPLEMENTS,
   C2_LESSON_CONTENT_ALIGNMENT,
   getCanonicalC2Mastery,
+  getCurrentCourseMasteryOverride,
   getC2LessonContentAlignment,
   enhanceC2Mastery,
   alignC2CurriculumEntry,

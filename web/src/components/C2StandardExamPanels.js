@@ -10,6 +10,24 @@ const Section=({title,children})=><section style={card}><h2 style={{margin:0,fon
 const completion=(checked,onChange,label)=><label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(checked)} onChange={e=>onChange?.(e.target.checked)} style={{marginTop:4}}/>{label}</label>;
 const DetailList=({items=[]})=><ul style={{margin:0,paddingLeft:22,lineHeight:1.7}}>{items.filter(Boolean).map(item=><li key={item}>{item}</li>)}</ul>;
 
+const TopicFoundation=({knowledge})=>{
+ if(!knowledge)return null;
+ return <Section title="Thema verstehen · Inhalt vor Argumentation">
+  <div data-c2-topic-foundation="true" style={{display:"grid",gap:12}}>
+   <div style={{...sub,background:"#eff6ff"}}><strong>In simple English</strong><span style={{lineHeight:1.7}}>{knowledge.englishDefinition}</span></div>
+   <div style={{...sub,background:"#fff"}}><strong>Auf Deutsch</strong><span style={{lineHeight:1.7}}>{knowledge.germanDefinition}</span></div>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10}}>
+    <div style={{...sub,background:"#fff7f7"}}><strong>Wegwerfgesellschaft · linear</strong><span>{knowledge.linearModel}</span></div>
+    <div style={{...sub,background:"#f0fdf4"}}><strong>Kreislaufwirtschaft · circular</strong><span>{knowledge.circularModel}</span></div>
+   </div>
+   <div style={sub}><strong>{knowledge.exampleTitle}</strong><span style={{lineHeight:1.7}}>{knowledge.example}</span></div>
+   <div><strong>Wer trägt Verantwortung?</strong><div style={{display:"grid",gap:8,marginTop:8}}>{knowledge.actors?.map(([actor,role])=><div key={actor} style={sub}><strong>{actor}</strong><span>{role}</span></div>)}</div></div>
+   <div><strong>Welche Interessen geraten in Spannung?</strong><div style={{display:"grid",gap:8,marginTop:8}}>{knowledge.tensions?.map(([left,right])=><div key={left} style={{...sub,background:"#fffbeb"}}><span><strong>{left}</strong> ↔ <strong>{right}</strong></span></div>)}</div></div>
+   <div style={{...sub,background:"#eef2ff"}}><strong>Kernfrage</strong><span style={{lineHeight:1.7}}>{knowledge.coreQuestion}</span></div>
+  </div>
+ </Section>;
+};
+
 const AlignedGrammarTeaching=({day})=>{
  const aligned=getC2LessonContentAlignment(day);
  const grammar=aligned?.grammarNotes;
@@ -38,12 +56,15 @@ export function C2StandardGrammarPanel({day,completed,onCompleteChange}){
  const d=getC2ExamStandard(day);if(!d)return null;
  const [principle,...examples]=d.grammar||[];
  return <div style={{display:"grid",gap:14}}>
+  <TopicFoundation knowledge={d.topicKnowledge}/>
   <Section title={`Grammar · ${d.grammarFocus}`}>
    <span style={{...styles.badge,width:"fit-content",background:"#dbeafe",color:"#1e3a8a"}}>C2 Day {day} · {d.title}</span>
    <p style={{margin:0,lineHeight:1.75,color:"#334155"}}>{principle}</p>
    <div style={{display:"grid",gap:10}}>{examples.map((x,i)=><div key={x} style={sub}><strong>{i===0?"Grundmuster":"C2-Anwendung"}</strong><span style={{lineHeight:1.7}}>{x}</span></div>)}</div>
    <div style={{border:"1px solid #cbd5e1",borderRadius:14,padding:14,display:"grid",gap:8}}><strong>So kontrollierst du die Struktur</strong><ol style={{margin:0,paddingLeft:22,lineHeight:1.8}}><li>Zuerst Bedeutung und logische Funktion bestimmen.</li><li>Dann die passende C2-Struktur wählen — nicht nur eine kompliziertere Form.</li><li>Kasus, Rektion, Verbposition und Bezug kontrollieren.</li><li>Prüfen, ob die Formulierung natürlich und präzise bleibt.</li></ol></div>
   </Section>
+  {d.topicKnowledge?.vocabulary?.length?<Section title={`Wortschatz · ${d.title}`}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10}}>{d.topicKnowledge.vocabulary.map(([word,meaning])=><div key={word} style={sub}><strong>{word}</strong><span style={{color:"#64748b"}}>{meaning}</span></div>)}</div></Section>:null}
+  {d.topicKnowledge?.collocations?.length?<Section title="Kollokationen · Das Thema argumentieren"><div style={{display:"grid",gap:10}}>{d.topicKnowledge.collocations.map(([phrase,meaning,example])=><div key={phrase} style={sub}><strong>{phrase}</strong><span style={{color:"#64748b"}}>{meaning}</span><span style={{lineHeight:1.7}}>{example}</span></div>)}</div></Section>:null}
   {d.writeType==="reformulation"?<Section title="Umformung · Methode für die heutige Schreibaufgabe">
    <p style={{margin:0,lineHeight:1.75}}>Bei einer Umformung bleibt die Bedeutung gleich, während sich die grammatische Struktur ändert. Das vorgegebene Wort muss unverändert verwendet werden.</p>
    <div style={{display:"grid",gap:10}}>{[["1","Bedeutung sichern","Fasse die Kernaussage des Ausgangssatzes kurz zusammen."],["2","Vorgabewort analysieren","Erkenne, welche Konstruktion das Wort auslöst: Präposition, Nomen, feste Wendung oder Satzverknüpfung."],["3","Satz neu bauen","Nicht Wort für Wort ersetzen. Baue die Aussage um die neue Struktur herum neu auf."],["4","Grammatik nachziehen","Kontrolliere Kasus, Artikel, Genitiv, Großschreibung, Verbform und Wortstellung."],["5","Vergleichen","Ausgangssatz und Umformung müssen dieselbe Aussage enthalten; das Vorgabewort bleibt exakt gleich."]].map(([n,t,text])=><div key={n} style={sub}><strong>{n}. {t}</strong><span>{text}</span></div>)}</div>
