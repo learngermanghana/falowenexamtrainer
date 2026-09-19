@@ -46,22 +46,31 @@ describe("A2 situation-first grammar flow", () => {
     expect(getA2Situation(28).title).toBe("Über die Zukunft sprechen");
   });
 
-  test("orders A2 Learn as situation, thinking support, grammar, then collocations", () => {
-    const source = fs.readFileSync(
+  test("orders A2 Learn as situation, thinking support, grammar, second-stage grammar, then collocations", () => {
+    const contentSource = fs.readFileSync(
       path.resolve(__dirname, "A2B1WorkbookGrammarNotesContent.js"),
       "utf8",
     );
-    const renderStart = source.indexOf('<div style={{ display: "grid", gap: 16 }}>');
+    const wrapperSource = fs.readFileSync(
+      path.resolve(__dirname, "A2B1WorkbookGrammarNotes.js"),
+      "utf8",
+    );
+    const renderStart = contentSource.indexOf('<div style={{ display: "grid", gap: 16 }}>');
 
-    const situationIndex = source.indexOf("<A2SituationIntroduction", renderStart);
-    const thinkingIndex = source.indexOf("<A2ThinkingFirstGrammarGuide", renderStart);
-    const grammarIndex = source.indexOf("<GrammarNotes />", renderStart);
-    const collocationIndex = source.indexOf("<A2TopicCollocationPractice", renderStart);
+    const situationIndex = contentSource.indexOf("<A2SituationIntroduction", renderStart);
+    const thinkingIndex = contentSource.indexOf("<A2ThinkingFirstGrammarGuide", renderStart);
+    const grammarIndex = contentSource.indexOf("<GrammarNotes />", renderStart);
 
     expect(situationIndex).toBeGreaterThan(renderStart);
     expect(thinkingIndex).toBeGreaterThan(situationIndex);
     expect(grammarIndex).toBeGreaterThan(thinkingIndex);
-    expect(collocationIndex).toBeGreaterThan(grammarIndex);
+    expect(contentSource).not.toContain("<A2TopicCollocationPractice");
+
+    const secondStageIndex = wrapperSource.indexOf("<A2SecondStageGrammarUpgrade");
+    const collocationIndex = wrapperSource.indexOf("<A2TopicCollocationPractice");
+
+    expect(secondStageIndex).toBeGreaterThan(-1);
+    expect(collocationIndex).toBeGreaterThan(secondStageIndex);
   });
 
   test("keeps A2 and B1 introductions level-specific", () => {

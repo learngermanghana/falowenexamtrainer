@@ -24,7 +24,6 @@ import A2Day22DieWochePlanungGrammarPage from "./A2Day22DieWochePlanungGrammarPa
 import A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage from "./A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage";
 import A2Day24EinenUrlaubPlanenGrammarPage from "./A2Day24EinenUrlaubPlanenGrammarPage";
 import A2Day28UeberDieZukunftSprechenGrammarPage from "./A2Day28UeberDieZukunftSprechenGrammarPage";
-import A2TopicCollocationPractice from "./A2TopicCollocationPractice";
 import A2SituationIntroduction from "./A2SituationIntroduction";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
@@ -99,11 +98,10 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const numericDay = Number(day);
   const GrammarNotes = getA2B1GrammarNotesComponent(level, day);
-  const showA2Collocations = normalizedLevel === "A2" && numericDay >= 1 && numericDay <= 28;
   const showA2SituationIntro = normalizedLevel === "A2" && numericDay >= 1 && numericDay <= 28;
   const showB1TopicIntro = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 28;
 
-  if (!GrammarNotes && !showA2Collocations && !showA2SituationIntro && !showB1TopicIntro) {
+  if (!GrammarNotes && !showA2SituationIntro && !showB1TopicIntro) {
     return (
       <section style={{ display: "grid", gap: 10 }}>
         <h2 style={{ margin: 0 }}>Grammar Notes</h2>
@@ -135,7 +133,6 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       {showDays17To21Guide ? <A2Days17To21ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {showDays22To28Guide ? <A2Days22To28ThinkingFirstGrammarGuide day={numericDay} /> : null}
       {GrammarNotes ? <GrammarNotes /> : <section style={{ display: "grid", gap: 8 }}><h2 style={{ margin: 0 }}>Grammar Notes</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{normalizedLevel === "A2" ? "The short situation introduction prepares the lesson. A separate deep-grammar page has not been added for this day yet." : "The short topic introduction prepares the content for this lesson. A separate deep-grammar page has not been added yet."}</p></section>}
-      {showA2Collocations ? <A2TopicCollocationPractice day={numericDay} /> : null}
     </div>
   );
 };
