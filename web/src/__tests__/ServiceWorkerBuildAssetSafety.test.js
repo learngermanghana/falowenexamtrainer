@@ -38,8 +38,12 @@ describe("service worker build asset safety", () => {
     expect(serviceWorker).toContain("const pruneObsoleteBuildAssets");
     expect(serviceWorker).toContain("/\\.(?:js|css)$/.test(url.pathname)");
     expect(serviceWorker).toContain("!retainedAssetSet.has(url.pathname)");
+    expect(serviceWorker).toContain("cachedManifest?.revision === manifest.revision");
+    expect(serviceWorker).toContain("cachedManifest.previousAssets");
+    expect(serviceWorker).toContain("(cachedManifest?.assets || [])");
     expect(serviceWorker).toContain("...manifest.assets");
-    expect(serviceWorker).toContain("...(cachedManifest?.assets || [])");
+    expect(serviceWorker).toContain("...previousAssets");
+    expect(serviceWorker).toContain("JSON.stringify({ ...manifest, previousAssets })");
 
     const refreshBlock = serviceWorker.slice(
       serviceWorker.indexOf("const refreshBuildAssetPrecache"),
