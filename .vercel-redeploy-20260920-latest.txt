@@ -1,1 +1,2 @@
 Retry production deployment for latest main after Vercel Hobby build-rate limit.
+Retry after canonicalTitle fix merged at 04e1df273a90880b58e8953ea65b9ddadf898fdb.
