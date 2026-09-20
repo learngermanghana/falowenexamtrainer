@@ -222,15 +222,15 @@ const precacheBuildAssets = async (cache, assets) => {
   }
 };
 
-const pruneObsoleteBuildAssets = async (cache, currentAssets) => {
-  const currentAssetSet = new Set(currentAssets);
+const pruneObsoleteBuildAssets = async (cache, retainedAssets) => {
+  const retainedAssetSet = new Set(retainedAssets);
   const cachedRequests = await cache.keys();
   const obsoleteRequests = cachedRequests.filter((request) => {
     const url = new URL(request.url);
     return (
       isVersionedBuildAsset(url) &&
       /\.(?:js|css)$/.test(url.pathname) &&
-      !currentAssetSet.has(url.pathname)
+      !retainedAssetSet.has(url.pathname)
     );
   });
 
@@ -252,7 +252,15 @@ const refreshBuildAssetPrecache = ({ force = false } = {}) => {
     }
 
     await precacheBuildAssets(cache, manifest.assets);
-    await pruneObsoleteBuildAssets(cache, manifest.assets);
+
+    const retainedAssets = [
+      ...new Set([
+        ...manifest.assets,
+        ...(cachedManifest?.assets || []),
+      ]),
+    ];
+    await pruneObsoleteBuildAssets(cache, retainedAssets);
+
     await cache.put(
       BUILD_ASSET_MANIFEST_URL,
       new Response(JSON.stringify(manifest), {
