@@ -13,7 +13,6 @@ export const A1_RADIO_FIRST_WORKBOOK_ROUTES = Object.freeze({
   "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook": Object.freeze({ day: 3, chapter: "1.2" }),
   "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook": Object.freeze({ day: 5, chapter: "1.3" }),
   "/campus/course/a1-day-6-family-and-hobbies-workbook": Object.freeze({ day: 6, chapter: "2.3" }),
-  "/campus/course/a1-chapter-5-german-cases-workbook": Object.freeze({ day: 9, chapter: "5" }),
   "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook": Object.freeze({ day: 13 }),
   "/campus/course/modal-verbs-day-14-3-6": Object.freeze({ day: 14, chapter: "3.6" }),
   "/campus/course/speaking-exams-intro-4-7": Object.freeze({ day: 15, chapter: "4.7" }),
