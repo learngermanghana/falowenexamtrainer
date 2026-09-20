@@ -34,19 +34,25 @@ describe("service worker build asset safety", () => {
     expect(serviceWorker).toContain("await refreshBuildAssetPrecache({ force: true })");
   });
 
-  it("prunes obsolete hashed build chunks after the current build is fully precached", () => {
+  it("retains the current and immediately previous build while pruning older chunks", () => {
     expect(serviceWorker).toContain("const pruneObsoleteBuildAssets");
     expect(serviceWorker).toContain("/\\.(?:js|css)$/.test(url.pathname)");
-    expect(serviceWorker).toContain("!currentAssetSet.has(url.pathname)");
+    expect(serviceWorker).toContain("!retainedAssetSet.has(url.pathname)");
+    expect(serviceWorker).toContain("cachedManifest?.revision === manifest.revision");
+    expect(serviceWorker).toContain("cachedManifest.previousAssets");
+    expect(serviceWorker).toContain("(cachedManifest?.assets || [])");
+    expect(serviceWorker).toContain("...manifest.assets");
+    expect(serviceWorker).toContain("...previousAssets");
+    expect(serviceWorker).toContain("JSON.stringify({ ...manifest, previousAssets })");
 
     const refreshBlock = serviceWorker.slice(
       serviceWorker.indexOf("const refreshBuildAssetPrecache"),
       serviceWorker.indexOf('self.addEventListener("install"'),
     );
     expect(refreshBlock.indexOf("await precacheBuildAssets(cache, manifest.assets)")).toBeLessThan(
-      refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, manifest.assets)")
+      refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, retainedAssets)")
     );
-    expect(refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, manifest.assets)")).toBeLessThan(
+    expect(refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, retainedAssets)")).toBeLessThan(
       refreshBlock.indexOf("await cache.put(")
     );
   });
