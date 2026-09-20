@@ -15,6 +15,12 @@ describe("canonical A1 workbook experience", () => {
         "/campus/course/a1-day-2-kapitel-1-1-workbook",
       ),
     ).toBe(true);
+    expect(
+      shouldUseNativeA1WorkbookExperience(
+        "/campus/course/a1-chapter-5-german-cases-workbook",
+        "?assignmentKey=A1-5&assignmentId=A1-5&level=A1",
+      ),
+    ).toBe(true);
   });
 
   test("normalizes a trailing slash", () => {
