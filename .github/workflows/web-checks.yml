@@ -64,6 +64,12 @@ jobs:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/A1WorkbookSectionTabs.test.js src/components/WorkbookInlineEnhancements.test.jsx src/components/A1Day13RevisionNumberCleanup.test.jsx src/components/VerbotenErlaubtPage.test.jsx src/a1WorkbookMobileSubmit.test.js
 
+      - name: Test service worker offline build caching
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/__tests__/ServiceWorkerBuildAssetSafety.test.js src/__tests__/PublicAuthServiceWorker.test.js
+
       - name: Test Preposition Case Coach
         working-directory: web
         env:
