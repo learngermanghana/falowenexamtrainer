@@ -167,31 +167,88 @@ self.addEventListener("message", (event) => {
   }
 });
 
-const readBuildPrecacheAssets = async () => {
+const normalizeBuildPrecacheManifest = (payload = {}) => {
+  const revision = typeof payload?.revision === "string" ? payload.revision.trim() : "";
+  const assets = Array.isArray(payload?.assets)
+    ? [...new Set(
+        payload.assets.filter(
+          (asset) => typeof asset === "string" && asset.startsWith(VERSIONED_ASSET_PREFIX)
+        )
+      )].sort()
+    : [];
+
+  if (!revision || !assets.length) {
+    throw new Error("Build asset manifest is missing a revision or assets");
+  }
+
+  return { revision, assets };
+};
+
+const readBuildPrecacheManifest = async () => {
   const response = await fetch(BUILD_ASSET_MANIFEST_URL, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Build asset manifest returned ${response.status}`);
   }
 
-  const payload = await response.json();
-  if (!Array.isArray(payload?.assets)) return [];
+  return normalizeBuildPrecacheManifest(await response.json());
+};
 
-  return payload.assets.filter(
-    (asset) => typeof asset === "string" && asset.startsWith(VERSIONED_ASSET_PREFIX)
-  );
+const readCachedBuildPrecacheManifest = async (cache) => {
+  const response = await cache.match(BUILD_ASSET_MANIFEST_URL);
+  if (!response) return null;
+
+  try {
+    return normalizeBuildPrecacheManifest(await response.json());
+  } catch (error) {
+    return null;
+  }
 };
 
 const precacheBuildAssets = async (cache, assets) => {
   for (let index = 0; index < assets.length; index += BUILD_PRECACHE_BATCH_SIZE) {
     const batch = assets.slice(index, index + BUILD_PRECACHE_BATCH_SIZE);
-    const results = await Promise.allSettled(
-      batch.map((asset) => cache.add(new Request(asset, { cache: "reload" })))
+    await Promise.all(
+      batch.map(async (asset) => {
+        const cached = await cache.match(asset);
+        if (cached) return;
+
+        const response = await fetch(asset, { cache: "reload" });
+        if (!response.ok) {
+          throw new Error(`Build asset ${asset} returned ${response.status}`);
+        }
+        await cache.put(asset, response);
+      })
     );
-    const failed = results.filter((result) => result.status === "rejected");
-    if (failed.length) {
-      console.warn(`Failed to precache ${failed.length} build asset(s) in batch`);
-    }
   }
+};
+
+let buildPrecacheRefreshPromise = null;
+
+const refreshBuildAssetPrecache = ({ force = false } = {}) => {
+  if (buildPrecacheRefreshPromise) return buildPrecacheRefreshPromise;
+
+  buildPrecacheRefreshPromise = (async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const manifest = await readBuildPrecacheManifest();
+    const cachedManifest = await readCachedBuildPrecacheManifest(cache);
+
+    if (!force && cachedManifest?.revision === manifest.revision) {
+      return false;
+    }
+
+    await precacheBuildAssets(cache, manifest.assets);
+    await cache.put(
+      BUILD_ASSET_MANIFEST_URL,
+      new Response(JSON.stringify(manifest), {
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    return true;
+  })().finally(() => {
+    buildPrecacheRefreshPromise = null;
+  });
+
+  return buildPrecacheRefreshPromise;
 };
 
 self.addEventListener("install", (event) => {
@@ -199,22 +256,10 @@ self.addEventListener("install", (event) => {
     (async () => {
       const cache = await caches.open(CACHE_NAME);
       await cache.addAll(STATIC_ASSETS);
-
-      try {
-        const buildAssets = await readBuildPrecacheAssets();
-        await cache.put(
-          BUILD_ASSET_MANIFEST_URL,
-          new Response(JSON.stringify({ assets: buildAssets }), {
-            headers: { "Content-Type": "application/json" },
-          })
-        );
-        await precacheBuildAssets(cache, buildAssets);
-      } catch (error) {
-        console.error("Failed to precache versioned build assets", error);
-      }
-    })().catch((error) => console.error("Failed to precache offline assets", error))
+      await refreshBuildAssetPrecache({ force: true });
+      await self.skipWaiting();
+    })()
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -302,8 +347,17 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(request.url);
 
   if (request.mode === "navigate") {
+    const isAuthNavigation = isPublicAuthPath(requestUrl.pathname);
+    if (!isAuthNavigation) {
+      event.waitUntil(
+        refreshBuildAssetPrecache().catch((error) => {
+          console.error("Failed to refresh build asset precache", error);
+        })
+      );
+    }
+
     event.respondWith(
-      isPublicAuthPath(requestUrl.pathname)
+      isAuthNavigation
         ? handleAuthNavigationRequest(request)
         : handleNavigationRequest(request)
     );

@@ -6,13 +6,32 @@ const serviceWorker = fs.readFileSync(
   path.join(repositoryRoot, "web/public/firebase-messaging-sw.js"),
   "utf8",
 );
+const viteConfig = fs.readFileSync(
+  path.join(repositoryRoot, "web/vite.config.js"),
+  "utf8",
+);
 
 describe("service worker build asset safety", () => {
-  it("does not intercept Vite versioned JavaScript and CSS bundles", () => {
+  it("serves Vite versioned JavaScript and CSS bundles from the exact build cache", () => {
     expect(serviceWorker).toContain('const VERSIONED_ASSET_PREFIX = "/assets/"');
-    expect(serviceWorker).toContain("isVersionedBuildAsset(requestUrl)");
-    expect(serviceWorker).toContain("return;");
+    expect(serviceWorker).toContain("handleVersionedBuildAssetRequest(request)");
+    expect(serviceWorker).toContain("event.respondWith(handleVersionedBuildAssetRequest(request))");
     expect(serviceWorker).not.toContain('const cacheableDestinations = ["style", "script", "image", "font"]');
+  });
+
+  it("emits and refreshes a revisioned build manifest after later deployments", () => {
+    expect(viteConfig).toContain("createHash('sha256')");
+    expect(viteConfig).toContain("JSON.stringify({ revision, assets }, null, 2)");
+    expect(serviceWorker).toContain("cachedManifest?.revision === manifest.revision");
+    expect(serviceWorker).toContain("refreshBuildAssetPrecache()");
+    expect(serviceWorker).toContain("event.waitUntil(");
+  });
+
+  it("rejects incomplete build precaches so they can retry", () => {
+    expect(serviceWorker).toContain("await Promise.all(");
+    expect(serviceWorker).not.toContain("Promise.allSettled");
+    expect(serviceWorker).toContain("Failed to refresh build asset precache");
+    expect(serviceWorker).toContain("await refreshBuildAssetPrecache({ force: true })");
   });
 
   it("never serves the offline HTML document as a static asset response", () => {
@@ -25,7 +44,7 @@ describe("service worker build asset safety", () => {
     expect(staticHandler).toContain("return Response.error()");
   });
 
-  it("bumps the offline cache to replace older controlling workers", () => {
-    expect(serviceWorker).toContain('`${CACHE_PREFIX}-v13`');
+  it("uses the current offline cache version", () => {
+    expect(serviceWorker).toContain('`${CACHE_PREFIX}-v14`');
   });
 });
