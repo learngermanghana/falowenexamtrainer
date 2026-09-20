@@ -34,6 +34,35 @@ describe("service worker build asset safety", () => {
     expect(serviceWorker).toContain("await refreshBuildAssetPrecache({ force: true })");
   });
 
+  it("prunes obsolete hashed build chunks after the current build is fully precached", () => {
+    expect(serviceWorker).toContain("const pruneObsoleteBuildAssets");
+    expect(serviceWorker).toContain("/\\.(?:js|css)$/.test(url.pathname)");
+    expect(serviceWorker).toContain("!currentAssetSet.has(url.pathname)");
+
+    const refreshBlock = serviceWorker.slice(
+      serviceWorker.indexOf("const refreshBuildAssetPrecache"),
+      serviceWorker.indexOf('self.addEventListener("install"'),
+    );
+    expect(refreshBlock.indexOf("await precacheBuildAssets(cache, manifest.assets)")).toBeLessThan(
+      refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, manifest.assets)")
+    );
+    expect(refreshBlock.indexOf("await pruneObsoleteBuildAssets(cache, manifest.assets)")).toBeLessThan(
+      refreshBlock.indexOf("await cache.put(")
+    );
+  });
+
+  it("returns successful network responses even when runtime cache writes fail", () => {
+    const cacheHandler = serviceWorker.slice(
+      serviceWorker.indexOf("const cacheNetworkResponse"),
+      serviceWorker.indexOf("const handleAuthNavigationRequest"),
+    );
+
+    expect(cacheHandler).toContain("try {");
+    expect(cacheHandler).toContain("await cache.put(request, response.clone())");
+    expect(cacheHandler).toContain("Failed to cache network response");
+    expect(cacheHandler).toContain("return response");
+  });
+
   it("never serves the offline HTML document as a static asset response", () => {
     const staticHandler = serviceWorker.slice(
       serviceWorker.indexOf("const handleStaticRequest"),
