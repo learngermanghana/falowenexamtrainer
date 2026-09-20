@@ -176,12 +176,19 @@ const normalizeBuildPrecacheManifest = (payload = {}) => {
         )
       )].sort()
     : [];
+  const previousAssets = Array.isArray(payload?.previousAssets)
+    ? [...new Set(
+        payload.previousAssets.filter(
+          (asset) => typeof asset === "string" && asset.startsWith(VERSIONED_ASSET_PREFIX)
+        )
+      )].sort()
+    : [];
 
   if (!revision || !assets.length) {
     throw new Error("Build asset manifest is missing a revision or assets");
   }
 
-  return { revision, assets };
+  return { revision, assets, previousAssets };
 };
 
 const readBuildPrecacheManifest = async () => {
@@ -253,17 +260,21 @@ const refreshBuildAssetPrecache = ({ force = false } = {}) => {
 
     await precacheBuildAssets(cache, manifest.assets);
 
+    const previousAssets =
+      cachedManifest?.revision === manifest.revision
+        ? cachedManifest.previousAssets
+        : (cachedManifest?.assets || []);
     const retainedAssets = [
       ...new Set([
         ...manifest.assets,
-        ...(cachedManifest?.assets || []),
+        ...previousAssets,
       ]),
     ];
     await pruneObsoleteBuildAssets(cache, retainedAssets);
 
     await cache.put(
       BUILD_ASSET_MANIFEST_URL,
-      new Response(JSON.stringify(manifest), {
+      new Response(JSON.stringify({ ...manifest, previousAssets }), {
         headers: { "Content-Type": "application/json" },
       })
     );
