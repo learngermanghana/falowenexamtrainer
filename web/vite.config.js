@@ -8,6 +8,22 @@ const getClientEnv = (mode) => {
   );
 };
 
+const offlinePrecacheManifest = () => ({
+  name: 'falowen-offline-precache-manifest',
+  generateBundle(_options, bundle) {
+    const assets = Object.values(bundle)
+      .map((output) => `/${output.fileName}`)
+      .filter((fileName) => fileName.startsWith('/assets/') && /\.(?:js|css)$/.test(fileName))
+      .sort();
+
+    this.emitFile({
+      type: 'asset',
+      fileName: 'offline-build-assets.json',
+      source: JSON.stringify({ assets }, null, 2),
+    });
+  },
+});
+
 const APP_LAZY_ROUTE_COMPONENTS = new Set([
   "CourseTab",
   "CourseLessonPage",
@@ -106,6 +122,7 @@ const splitVendorChunk = (id) => {
 
 export default defineConfig(({ mode }) => ({
   plugins: [
+    offlinePrecacheManifest(),
     lazyLevelPages(),
     react({
       include: /\.[jt]sx?$/,
