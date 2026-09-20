@@ -277,7 +277,7 @@ const makeWritingContent = (lesson, profile) => {
   if (formal) {
     return {
       taskType,
-      topic: `Schreiben: ${lesson.title}. Verfassen Sie eine formelle Nachricht auf C1-Niveau zum Thema „${canonicalTitle}“. Ausgangsfrage: ${profile.question} Bearbeiten Sie die folgenden Punkte sachlich und vollständig.`,
+      topic: `Schreiben: ${lesson.title}. Verfassen Sie eine formelle Nachricht auf C1-Niveau zum Thema „${lesson.title}“. Ausgangsfrage: ${profile.question} Bearbeiten Sie die folgenden Punkte sachlich und vollständig.`,
       structure: ["Betreff und höfliche Anrede", profile.points[0], profile.points[1], profile.points[2], profile.points[3], "Formulieren Sie einen konkreten, realistischen Vorschlag und bitten Sie höflich um Rückmeldung."],
       usefulLines: ["Sehr geehrte Damen und Herren,", "ich wende mich an Sie, weil ...", "Besonders relevant ist in diesem Zusammenhang, dass ...", "Kritisch ist für mich jedoch, dass ...", "Als praktikable Lösung schlage ich vor, dass ...", "Für eine kurze Rückmeldung wäre ich Ihnen sehr dankbar."],
     };

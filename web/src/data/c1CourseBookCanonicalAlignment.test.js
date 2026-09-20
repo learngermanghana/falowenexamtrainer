@@ -1,6 +1,7 @@
 import { courseSchedules } from "./courseSchedule";
 import {
   C1_CANONICAL_TITLES,
+  alignC1LessonContent,
   getC1CanonicalGrammarTitle,
   getC1ContentProfile,
 } from "./c1ContentRefresh";
@@ -33,6 +34,19 @@ describe("C1 Course Book canonical alignment", () => {
       expect(entry.instruction).toContain("Learn → Speak → Write → Finish → Ref");
     },
   );
+
+  test("builds formal C1 writing prompts from the canonical lesson title without a runtime reference error", () => {
+    const aligned = alignC1LessonContent({
+      level: "C1",
+      day: 27,
+      title: "Legacy title",
+      writingTaskType: "Formal letter / E-Mail",
+    });
+
+    expect(aligned.title).toBe("Digitale Verwaltung");
+    expect(aligned.writingTopic).toContain("Schreiben: Digitale Verwaltung");
+    expect(aligned.writingTopic).toContain("zum Thema „Digitale Verwaltung“");
+  });
 
   test("keeps the reconciled Day 17-28 identities instead of the retired Course Book titles", () => {
     const byDay = Object.fromEntries(c1Days.map((entry) => [Number(entry.day), entry.topic]));
