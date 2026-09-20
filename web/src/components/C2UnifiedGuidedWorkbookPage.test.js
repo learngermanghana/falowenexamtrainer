@@ -46,6 +46,15 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("Vorlage wiederherstellen");
   });
 
+  test("supports a direct Write-template deep link and visible entry action", () => {
+    expect(page).toContain('new URLSearchParams(location.search||"").get("view")');
+    expect(page).toContain('C2_WORKBOOK_VIEWS.has(value)?value:"learn"');
+    expect(page).toContain('params.set("view",next)');
+    expect(page).toContain('onClick={()=>changeView("write")}');
+    expect(page).toContain("Open writing template");
+    expect(page).toContain('onChange={changeView}');
+  });
+
 
   test("keeps topic knowledge ahead of grammar and speaking support", () => {
     expect(page).toContain("Thema verstehen");

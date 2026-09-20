@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useState}from"react";
+import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
 import{AdvancedSelfLearningTabNav}from"./StandardWorkbookComponents";
@@ -132,15 +133,22 @@ function ReformulationWrite({standard,day,completed,onCompleteChange}){
  </Section>;
 }
 
+const C2_WORKBOOK_VIEWS=new Set(["learn","speak","write","finish","references"]);
+
 export default function C2UnifiedGuidedWorkbookPage({lesson}){
+ const location=useLocation();
+ const navigate=useNavigate();
  const day=Number(lesson?.day||0);
  const standard=getC2ExamStandard(day);
  const knowledge=getC2TopicKnowledge(day);
  const mastery=lesson?.c2Mastery||getC2LessonContentAlignment(day);
  const storageKey=`falowen:c2:day${day}:unified-progress`;
- const[active,setActive]=useState("learn");
+ const requestedView=useMemo(()=>{const value=new URLSearchParams(location.search||"").get("view")||"";return C2_WORKBOOK_VIEWS.has(value)?value:"learn"},[location.search]);
+ const[active,setActive]=useState(requestedView);
  const[progress,setProgress]=useState(()=>{try{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:"",...JSON.parse(localStorage.getItem(storageKey)||"{}")}}catch{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""}}});
  useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(progress))}catch{}},[storageKey,progress]);
+ useEffect(()=>{setActive(requestedView)},[requestedView]);
+ const changeView=(next)=>{if(!C2_WORKBOOK_VIEWS.has(next))return;setActive(next);const params=new URLSearchParams(location.search||"");if(next==="learn")params.delete("view");else params.set("view",next);const search=params.toString();navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true})};
  if(!day||!standard||!knowledge||!mastery)return null;
  const ready=progress.learnDone&&progress.speakDone&&progress.writeDone&&Boolean(progress.confidence);
  return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day}>
@@ -150,8 +158,9 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
    <h1 style={{margin:0,fontSize:"clamp(2rem,5vw,3.1rem)"}}>{standard.title}</h1>
    <p style={{margin:0,color:"#dbeafe",lineHeight:1.7}}>{standard.topic}</p>
    <div style={{border:"1px solid rgba(255,255,255,.2)",borderRadius:14,padding:13,background:"rgba(255,255,255,.08)"}}><strong>Today’s C2 control:</strong> {standard.grammarFocus}</div>
+   {standard.writeType==="opinion"?<div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{color:"#dbeafe",fontWeight:700}}>C2 writing template ready in Write.</span><button type="button" onClick={()=>changeView("write")} style={styles.secondaryButton}>Open writing template</button></div>:null}
   </header>
-  <AdvancedSelfLearningTabNav level="C2" day={day} activeTab={active} onChange={setActive}/>
+  <AdvancedSelfLearningTabNav level="C2" day={day} activeTab={active} onChange={changeView}/>
   {active==="learn"?<Learn day={day} standard={standard} knowledge={knowledge} mastery={mastery} completed={progress.learnDone} onCompleteChange={learnDone=>setProgress(p=>({...p,learnDone}))}/>:null}
   {active==="speak"?<Speak standard={standard} knowledge={knowledge} completed={progress.speakDone} onCompleteChange={speakDone=>setProgress(p=>({...p,speakDone}))}/>:null}
   {active==="write"?(standard.writeType==="opinion"?<OpinionWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>:<ReformulationWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>):null}
