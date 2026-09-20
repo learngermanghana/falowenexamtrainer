@@ -7,9 +7,11 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v13`;
+const CACHE_NAME = `${CACHE_PREFIX}-v14`;
 const OFFLINE_URL = "/offline.html";
 const VERSIONED_ASSET_PREFIX = "/assets/";
+const BUILD_ASSET_MANIFEST_URL = "/offline-build-assets.json";
+const BUILD_PRECACHE_BATCH_SIZE = 8;
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
 const PUBLIC_AUTH_PATHS = [
@@ -165,12 +167,52 @@ self.addEventListener("message", (event) => {
   }
 });
 
+const readBuildPrecacheAssets = async () => {
+  const response = await fetch(BUILD_ASSET_MANIFEST_URL, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Build asset manifest returned ${response.status}`);
+  }
+
+  const payload = await response.json();
+  if (!Array.isArray(payload?.assets)) return [];
+
+  return payload.assets.filter(
+    (asset) => typeof asset === "string" && asset.startsWith(VERSIONED_ASSET_PREFIX)
+  );
+};
+
+const precacheBuildAssets = async (cache, assets) => {
+  for (let index = 0; index < assets.length; index += BUILD_PRECACHE_BATCH_SIZE) {
+    const batch = assets.slice(index, index + BUILD_PRECACHE_BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map((asset) => cache.add(new Request(asset, { cache: "reload" })))
+    );
+    const failed = results.filter((result) => result.status === "rejected");
+    if (failed.length) {
+      console.warn(`Failed to precache ${failed.length} build asset(s) in batch`);
+    }
+  }
+};
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .catch((error) => console.error("Failed to precache offline assets", error))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(STATIC_ASSETS);
+
+      try {
+        const buildAssets = await readBuildPrecacheAssets();
+        await cache.put(
+          BUILD_ASSET_MANIFEST_URL,
+          new Response(JSON.stringify({ assets: buildAssets }), {
+            headers: { "Content-Type": "application/json" },
+          })
+        );
+        await precacheBuildAssets(cache, buildAssets);
+      } catch (error) {
+        console.error("Failed to precache versioned build assets", error);
+      }
+    })().catch((error) => console.error("Failed to precache offline assets", error))
   );
   self.skipWaiting();
 });
@@ -241,6 +283,18 @@ const handleStaticRequest = async (request) => {
   }
 };
 
+const handleVersionedBuildAssetRequest = async (request) => {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+
+  try {
+    const response = await fetch(request);
+    return await cacheNetworkResponse(request, response);
+  } catch (error) {
+    return Response.error();
+  }
+};
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
@@ -258,10 +312,10 @@ self.addEventListener("fetch", (event) => {
 
   if (requestUrl.origin !== self.location.origin) return;
 
-  // Vite filenames are content-hashed and deployment-specific. Let the browser
-  // request them directly so an older service worker can never replace a JS/CSS
-  // module with an offline HTML response or reject the module request.
+  // Vite build assets are content-hashed, so an exact cache hit is safe. The
+  // install step precaches the current build chunks to keep lazy routes offline.
   if (isVersionedBuildAsset(requestUrl)) {
+    event.respondWith(handleVersionedBuildAssetRequest(request));
     return;
   }
 
