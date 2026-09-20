@@ -222,6 +222,21 @@ const precacheBuildAssets = async (cache, assets) => {
   }
 };
 
+const pruneObsoleteBuildAssets = async (cache, currentAssets) => {
+  const currentAssetSet = new Set(currentAssets);
+  const cachedRequests = await cache.keys();
+  const obsoleteRequests = cachedRequests.filter((request) => {
+    const url = new URL(request.url);
+    return (
+      isVersionedBuildAsset(url) &&
+      /\.(?:js|css)$/.test(url.pathname) &&
+      !currentAssetSet.has(url.pathname)
+    );
+  });
+
+  await Promise.all(obsoleteRequests.map((request) => cache.delete(request)));
+};
+
 let buildPrecacheRefreshPromise = null;
 
 const refreshBuildAssetPrecache = ({ force = false } = {}) => {
@@ -237,6 +252,7 @@ const refreshBuildAssetPrecache = ({ force = false } = {}) => {
     }
 
     await precacheBuildAssets(cache, manifest.assets);
+    await pruneObsoleteBuildAssets(cache, manifest.assets);
     await cache.put(
       BUILD_ASSET_MANIFEST_URL,
       new Response(JSON.stringify(manifest), {
@@ -281,8 +297,13 @@ const cacheNetworkResponse = async (request, response) => {
   const requestUrl = new URL(request.url);
   if (isPublicAuthPath(requestUrl.pathname) || !response?.ok) return response;
 
-  const cache = await caches.open(CACHE_NAME);
-  await cache.put(request, response.clone());
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(request, response.clone());
+  } catch (error) {
+    console.warn(`Failed to cache network response for ${requestUrl.pathname}`, error);
+  }
+
   return response;
 };
 
