@@ -8,6 +8,34 @@ const getClientEnv = (mode) => {
   );
 };
 
+const APP_LAZY_ROUTE_COMPONENTS = new Set([
+  "CourseTab",
+  "CourseLessonPage",
+  "AssignmentSubmissionPage",
+  "AccountSettings",
+  "ClassDiscussionPage",
+  "GrammarQuestionTab",
+  "AttendanceTab",
+  "ClassMembersTab",
+  "SpeechTrainerPage",
+  "LetterPracticePage",
+  "CourseStructurePage",
+  "CourseResourceViewerPage",
+  "FullClassCalendarPage",
+  "StudentResultsPage",
+  "GeneralHome",
+  "SpeakingPage",
+  "WritingPage",
+  "VocabExamPage",
+  "ExamResources",
+  "HorenPage",
+  "LesenPage",
+  "StudyCalendarPage",
+  "QuestionOfDayPage",
+  "MyExamFilePage",
+  "TutorMarkingPage",
+]);
+
 const lazyLevelPages = () => ({
   name: 'falowen-lazy-level-pages',
   enforce: 'pre',
@@ -15,11 +43,15 @@ const lazyLevelPages = () => ({
     const normalizedId = id.replace(/\\/g, '/');
     if (!normalizedId.includes('/src/') || normalizedId.includes('/node_modules/')) return null;
 
-    const routeImportPattern = /^import\s+([A-Za-z0-9_]+(?:Page|Course))\s+from\s+["']([^"']+)["'];\s*$/gm;
+    const routeImportPattern = /^import\s+([A-Za-z0-9_]+)\s+from\s+["']([^"']+)["'];\s*$/gm;
+    const isAppEntry = normalizedId.endsWith("/src/App.js");
     let converted = 0;
     const transformed = code.replace(routeImportPattern, (match, componentName, sourcePath) => {
       const sourceFile = sourcePath.split('/').pop() || '';
-      if (!/^(A1|A2|B1|B2|C1|C2)/i.test(sourceFile)) return match;
+      const isLevelRoute = /^(A1|A2|B1|B2|C1|C2)/i.test(sourceFile)
+        && /(?:Page|Course)$/.test(componentName);
+      const isAppRoute = isAppEntry && APP_LAZY_ROUTE_COMPONENTS.has(componentName);
+      if (!isLevelRoute && !isAppRoute) return match;
 
       converted += 1;
       return `const ${componentName} = __falowenCreateLazyRoute(() => import("${sourcePath}"), "${componentName}");`;
@@ -27,7 +59,7 @@ const lazyLevelPages = () => ({
 
     if (!converted) return null;
 
-    const helper = `const __falowenCreateLazyRoute = (loader, displayName) => {\n  const LazyComponent = React.lazy(loader);\n  const LazyRoute = (props) => React.createElement(\n    React.Suspense,\n    { fallback: React.createElement("div", { style: { padding: 16 } }, "Loading lesson…") },\n    React.createElement(LazyComponent, props),\n  );\n  LazyRoute.displayName = displayName;\n  return LazyRoute;\n};\n`;
+    const helper = `const __falowenCreateLazyRoute = (loader, displayName) => {\n  const LazyComponent = React.lazy(loader);\n  const LazyRoute = (props) => React.createElement(\n    React.Suspense,\n    { fallback: React.createElement("div", { style: { padding: 16 } }, "Loading…") },\n    React.createElement(LazyComponent, props),\n  );\n  LazyRoute.displayName = displayName;\n  return LazyRoute;\n};\n`;
     const hasReactDefaultImport = /^import\s+React(?:\s*,|\s+from)/m.test(transformed);
     const reactImport = hasReactDefaultImport ? '' : 'import React from "react";\n';
 
