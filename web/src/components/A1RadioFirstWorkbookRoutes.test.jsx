@@ -151,6 +151,29 @@ describe("A1 route-scoped Falowen Radio", () => {
     ).toBeNull();
   });
 
+  test("Day 9 direct workbook behaves like Day 10 while the lesson flow keeps Radio first", () => {
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-chapter-5-german-cases-workbook",
+        "?assignmentKey=A1-5&assignmentId=A1-5&level=A1",
+      ),
+    ).toBeNull();
+
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/a1-day-10-objects-colors-possessive-articles-workbook",
+        "?assignmentKey=A1-6&assignmentId=A1-6&level=A1",
+      ),
+    ).toBeNull();
+
+    expect(
+      resolveA1RadioFirstWorkbookRoute(
+        "/campus/course/lesson/A1/9",
+        "?chapter=5&hub=1",
+      ),
+    ).toEqual({ day: 9, chapter: "5" });
+  });
+
   test("uses the approved Day 13 revision video", () => {
     expect(
       resolveA1RadioFirstWorkbookRoute(
