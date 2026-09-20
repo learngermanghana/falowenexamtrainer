@@ -1,5 +1,5 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
 
@@ -78,21 +78,15 @@ const accusativePractice = [
 ];
 
 const A1Chapter5GermanCasesWorkbookPage = () => {
-
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Chapter 5 Workbook · Nominative & Akkusative, Definite & Indefinite Articles
-        </h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          German Cases · Chapter 5. This workbook is now organized on one page,
-          so complete Teil 1, Teil 2, and Teil 3 from top to bottom.
-        </p>
-      </div>
-
+    <A1TutorMarkedWorkbookShell
+      fallbackAssignmentKey="A1-5"
+      title="A1 · Day 9 Workbook · German Cases"
+      subtitle="Chapter 5 · Nominative & Akkusative, Definite & Indefinite Articles"
+      assignmentIntro="Complete Teil 1, Teil 2 and Teil 3. Your answers are saved as a draft until you open Review & Submit and send the assignment."
+      submitTitle="Review & Submit A1 · Chapter 5"
+      submitDescription="Review your German Cases workbook answers below. The final Submit Assignment button sends them to your tutor for marking."
+    >
       <div style={sectionCard}>
         <img
           src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80"
@@ -323,11 +317,10 @@ const A1Chapter5GermanCasesWorkbookPage = () => {
         </ol>
 
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Kein Texteingabefeld hier: Write your final responses in your notebook
-          and submit through the assignment submission tab.
+          Enter your final answers in the workbook draft fields below. They are saved as a draft until you open Review & Submit.
         </p>
       </div>
-    </div>
+    </A1TutorMarkedWorkbookShell>
   );
 };
 

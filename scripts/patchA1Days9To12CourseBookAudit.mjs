@@ -13,18 +13,26 @@ const replaceOnce = (relativePath, before, after, label) => {
   fs.writeFileSync(targetPath, source, "utf8");
 };
 
-replaceOnce(
-  "web/src/components/A1Chapter5GermanCasesWorkbookPage.js",
-  "A1 · Chapter 5 Workbook · Nominative & Akkusative, Definite & Indefinite Articles",
-  "A1 · Chapter 5 Workbook · German Cases: Nominative and Accusative",
-  "Day 9 workbook title",
-);
-replaceOnce(
-  "web/src/components/A1Chapter5GermanCasesWorkbookPage.js",
-  "German Cases · Chapter 5. This workbook is now organized on one page,\n          so complete Teil 1, Teil 2, and Teil 3 from top to bottom.",
-  "German Cases · Chapter 5. This assignment practises definite articles in the nominative and accusative. Complete Teil 1, Teil 2 and Teil 3 from top to bottom.",
-  "Day 9 scope description",
-);
+const day9WorkbookPath = "web/src/components/A1Chapter5GermanCasesWorkbookPage.js";
+const day9WorkbookSource = fs.readFileSync(path.join(root, day9WorkbookPath), "utf8");
+const day9UsesNativeShell =
+  day9WorkbookSource.includes('fallbackAssignmentKey="A1-5"')
+  && day9WorkbookSource.includes('title="A1 · Day 9 Workbook · German Cases"');
+
+if (!day9UsesNativeShell) {
+  replaceOnce(
+    day9WorkbookPath,
+    "A1 · Chapter 5 Workbook · Nominative & Akkusative, Definite & Indefinite Articles",
+    "A1 · Chapter 5 Workbook · German Cases: Nominative and Accusative",
+    "Day 9 workbook title",
+  );
+  replaceOnce(
+    day9WorkbookPath,
+    "German Cases · Chapter 5. This workbook is now organized on one page,\n          so complete Teil 1, Teil 2, and Teil 3 from top to bottom.",
+    "German Cases · Chapter 5. This assignment practises definite articles in the nominative and accusative. Complete Teil 1, Teil 2 and Teil 3 from top to bottom.",
+    "Day 9 scope description",
+  );
+}
 
 replaceOnce(
   "web/src/components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js",

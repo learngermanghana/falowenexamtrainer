@@ -32,6 +32,13 @@ describe("canonical A1 assignment registry", () => {
     expect(assignment.submissionEnabled).toBe(true);
   });
 
+  test("keeps A1-5 German Cases on the native workbook shell", () => {
+    const assignment = A1_ASSIGNMENT_REGISTRY["A1-5"];
+    expect(assignment.workbookRoute).toBe("/campus/course/a1-chapter-5-german-cases-workbook");
+    expect(assignment.layoutMode).toBe("native");
+    expect(assignment.sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
+  });
+
   test("keeps A1-0.2 sections consecutive after the Hören rename", () => {
     expect(A1_ASSIGNMENT_REGISTRY["A1-0.2"].sections).toEqual([
       { key: "teil-1", number: 1, label: "Teil 1 · Reading and Questions" },
