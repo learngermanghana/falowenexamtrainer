@@ -1,0 +1,35 @@
+# Falowen
+
+> Official navigation and product guidance for Falowen, a language-learning campus for German and French learners.
+
+Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
+
+## Primary documentation
+
+- [Falowen Help / How Falowen Works](https://www.falowen.app/help): Human-readable official guide.
+- [Falowen Help & Navigation Knowledge Base](https://www.falowen.app/falowen-help.md): AI-readable Markdown source of truth.
+- [Placement Test](https://www.falowen.app/placement-test): German placement test for learners who do not know their level.
+- [Upcoming Classes](https://www.falowen.app/learn-german-ghana/upcoming-classes): Public class information.
+
+## Core navigation
+
+- Course Book: https://www.falowen.app/campus/course
+- Results: https://www.falowen.app/campus/results
+- Attendance: https://www.falowen.app/campus/attendance
+- Exam File: https://www.falowen.app/campus/examFile
+- Exams Room: https://www.falowen.app/exams/overview
+- Study Calendar: https://www.falowen.app/exams/study
+- Vocabulary: https://www.falowen.app/campus/vocab
+- Account: https://www.falowen.app/campus/account
+- Billing: https://www.falowen.app/campus/account?tab=billing
+
+## Important guidance
+
+- New learners without active access must start their one-time 7-day free trial or complete tuition payment before entering the full campus.
+- Progress and scores are retained for 30 days after a free trial ends.
+- Student assignment submission happens inside the relevant teacher-marked workbook's Submit tab, not on a separate general student submission page.
+- Complete Falowen Radio first when the current lesson requires it.
+- B2 and C1 are self-learning tracks; standard class Attendance, Exam File and Class Members tabs are intentionally hidden for those learners.
+- Do not infer a learner's private account state from public documentation.
+
+For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md.

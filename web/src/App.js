@@ -440,7 +440,11 @@ function App() {
     return <PlacementTestPage />;
   }
 
-  if (location.pathname === "/learn-german-ghana/falowen-guide") {
+  if (
+    location.pathname === "/help" ||
+    location.pathname === "/help/" ||
+    location.pathname === "/learn-german-ghana/falowen-guide"
+  ) {
     return <PublicStudentGuidePage />;
   }
 

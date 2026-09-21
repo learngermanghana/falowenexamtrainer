@@ -33,6 +33,7 @@ const COPY = {
     resources: [
       { label: "Upcoming classes", href: "/classes/" },
       { label: "Free placement test", href: "/placement-test" },
+      { label: "How Falowen works", href: "/help" },
       { label: "Free lesson", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
       { label: "Falowen blog", href: "https://blog.falowen.app", external: true },
     ],
@@ -72,6 +73,7 @@ const COPY = {
     resources: [
       { label: "Kommende Kurse", href: "/classes/" },
       { label: "Kostenloser Einstufungstest", href: "/placement-test" },
+      { label: "So funktioniert Falowen", href: "/help" },
       { label: "Kostenlose Lektion", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
       { label: "Falowen-Blog", href: "https://blog.falowen.app", external: true },
     ],
@@ -111,6 +113,7 @@ const COPY = {
     resources: [
       { label: "Prochains cours", href: "/classes/" },
       { label: "Test de niveau gratuit", href: "/placement-test" },
+      { label: "Comment fonctionne Falowen", href: "/help" },
       { label: "Leçon gratuite", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
       { label: "Blog Falowen", href: "https://blog.falowen.app", external: true },
     ],

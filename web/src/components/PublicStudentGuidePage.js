@@ -8,72 +8,211 @@ const cardStyle = {
   gap: 10,
 };
 
+const linkStyle = {
+  color: "#1d4ed8",
+  fontWeight: 800,
+  overflowWrap: "anywhere",
+};
+
+const RouteLink = ({ href, children }) => (
+  <a href={href} style={linkStyle}>{children || href}</a>
+);
+
+const routeRows = [
+  ["Not sure of German level", "Placement Test", "/placement-test"],
+  ["New German registration", "Sign up", "/signup?program=german"],
+  ["Existing account", "Log in", "/login/"],
+  ["Start or continue lessons", "Course Book", "/campus/course"],
+  ["Scores and tutor feedback", "Results", "/campus/results"],
+  ["Class attendance", "Attendance", "/campus/attendance"],
+  ["Goethe/exam information", "Exam File", "/campus/examFile"],
+  ["Exam-style practice", "Exams Room", "/exams/overview"],
+  ["Study/exam planning", "Study Calendar", "/exams/study"],
+  ["Vocabulary practice", "Vocabulary", "/campus/vocab"],
+  ["Tuition, balance, receipts", "Account → Billing", "/campus/account?tab=billing"],
+];
+
 const PublicStudentGuidePage = () => {
   useEffect(() => {
     const description =
-      "Understand Falowen before signup: dashboard tabs, A1 Lesen/Hören design, A2-C1 grammar and workbook structure, and B2/C1 self-learning with AI support for German learners in Ghana and across Africa.";
+      "Official Falowen help: signup, free trial, Course Book, Falowen Radio, assignments, Results, Attendance, exams, billing and account navigation.";
 
     updatePageMeta({
-      title: "How Falowen Works | Learn German in Ghana & Africa",
+      title: "Falowen Help | How Falowen Works",
       description,
-      canonicalPath: "/learn-german-ghana/falowen-guide",
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: "How Falowen Works for New German Learners",
-        description,
-        author: { "@type": "Organization", name: "Falowen" },
-        publisher: { "@type": "Organization", name: "Falowen" },
-      },
+      canonicalPath: "/help",
+      structuredData: [
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: "Falowen Help & Navigation Guide",
+          description,
+          dateModified: "2026-09-21",
+          author: { "@type": "Organization", name: "Falowen" },
+          publisher: { "@type": "Organization", name: "Falowen" },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Where do Falowen students submit assignments?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Students submit inside the relevant teacher-marked workbook using its Submit tab. There is no separate general student submission page.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Where can a Falowen student see scores and feedback?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Open Results at https://www.falowen.app/campus/results.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Where can a Falowen student check tuition or a balance?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Open Account, then Billing at https://www.falowen.app/campus/account?tab=billing.",
+              },
+            },
+          ],
+        },
+      ],
     });
   }, []);
 
   return (
     <main style={{ ...styles.container, maxWidth: 980, display: "grid", gap: 14 }}>
       <section style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <h1 style={{ margin: 0 }}>Falowen Student Guide (Before You Sign Up)</h1>
+        <p style={{ ...styles.badge, width: "fit-content", margin: 0 }}>Official Falowen guide</p>
+        <h1 style={{ margin: 0 }}>Falowen Help & Navigation</h1>
         <p style={{ margin: 0, color: "#1f2937", lineHeight: 1.7 }}>
-          This page explains how Falowen is structured for new students who want to learn German in Ghana and across Africa.
+          Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
+        </p>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink>.
         </p>
       </section>
 
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>Dashboard structure</h2>
-        <p style={{ margin: 0 }}>Falowen student navigation has five main tabs:</p>
-        <ul style={{ margin: 0 }}>
-          <li><strong>My Course</strong> (Course Book, Submit, Exam File, Attendance)</li>
-          <li><strong>Falowen AI</strong> (Grammar, Writing, Speech, Vocabulary)</li>
-          <li><strong>Results</strong></li>
-          <li><strong>Discussion</strong></li>
-          <li><strong>Account</strong></li>
+        <h2 style={{ margin: 0 }}>Start here</h2>
+        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
+          <li>If you do not know your German level, use the <RouteLink href="/placement-test">Placement Test</RouteLink>.</li>
+          <li>If you are ready to register, use <RouteLink href="/signup?program=german">German signup</RouteLink> or <RouteLink href="/signup?program=french">French signup</RouteLink>.</li>
+          <li>If you already registered, go to <RouteLink href="/login/">Log in</RouteLink>.</li>
+          <li>After signup, activate access with the one-time 7-day free trial or tuition payment.</li>
+          <li>Complete onboarding, then start from the <RouteLink href="/campus/course">Course Book</RouteLink>.</li>
+        </ol>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Quick route map</h2>
+        <div style={{ display: "grid", gap: 8 }}>
+          {routeRows.map(([need, destination, route]) => (
+            <div
+              key={route}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1.25fr) minmax(0, .9fr) minmax(0, 1.5fr)",
+                gap: 10,
+                padding: "10px 0",
+                borderBottom: "1px solid #e5e7eb",
+                alignItems: "start",
+              }}
+            >
+              <span>{need}</span>
+              <strong>{destination}</strong>
+              <RouteLink href={route}>{route}</RouteLink>
+            </div>
+          ))}
+        </div>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Campus routes require a Falowen account and can redirect a learner who has not yet activated access.
+        </p>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Free trial, payment and access</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
+          <li>A new learner can activate one one-time 7-day free trial.</li>
+          <li>Starting the trial does not count as a tuition payment or reduce the tuition balance.</li>
+          <li>After the trial ends, progress and scores are retained for 30 days so the learner can pay and continue with the same student code and progress.</li>
+          <li>Use <RouteLink href="/campus/account?tab=billing">Account → Billing</RouteLink> for tuition, balance, payment history and available receipts.</li>
         </ul>
       </section>
 
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>How A1 is designed</h2>
-        <p style={{ margin: 0 }}>
-          At A1, the early exam-focused foundation is designed around <strong>Lesen (reading)</strong> and <strong>Hören (listening)</strong>, while building essential grammar and vocabulary for beginners.
+        <h2 style={{ margin: 0 }}>Course Book and assignments</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          The normal flow is <strong>Course Book → current lesson → Falowen Radio when required → Learn/Grammar → workbook → Submit when required → Results after marking.</strong>
         </p>
-      </section>
-
-      <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>A2 to C1 learning structure</h2>
-        <p style={{ margin: 0 }}>
-          A2, B1, B2, and C1 follow a similar pattern: each learning unit includes <strong>Grammar</strong> and a <strong>Workbook</strong>.
-        </p>
-        <p style={{ margin: 0 }}>Each workbook is split into four parts:</p>
-        <ul style={{ margin: 0 }}>
-          <li>Teil 1</li>
-          <li>Teil 2</li>
-          <li>Teil 3</li>
-          <li>Teil 4</li>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
+          <li>If Falowen Radio appears first, complete it before continuing.</li>
+          <li>Self-practice should not be submitted unless the lesson explicitly identifies it as a teacher-marked assignment.</li>
+          <li>Student submission lives inside the relevant teacher-marked workbook's <strong>Submit</strong> tab. There is no separate general student submission page.</li>
+          <li>If a workbook has no Submit tab, do not assume it needs tutor submission.</li>
         </ul>
       </section>
 
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>B2 and C1 difference</h2>
+        <h2 style={{ margin: 0 }}>Levels</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>A1:</strong> mixes foundation lessons, self-practice and teacher-marked assignments.</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>A2 and B1:</strong> use grammar/learning material, workbook tasks and teacher-marked submissions.</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>B2 and C1:</strong> are self-learning tracks with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden for these learners.</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>C2:</strong> uses advanced self-learning and AI-supported practice. Do not assume a teacher-marked Submit requirement unless the current page explicitly provides one.</p>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Results, attendance and exams</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Results:</strong> <RouteLink href="/campus/results" /> — marked work, scores, feedback and progress. Teacher-marked course assignments use a standard 60% pass threshold.
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Attendance:</strong> <RouteLink href="/campus/attendance" /> — attendance rate plus present, absent and pending sessions. The page can generate an Attendance Record / Attendance Transcript PDF.
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Exam File:</strong> <RouteLink href="/campus/examFile" /> — Goethe/exam information for applicable enrolled tracks.
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Exams Room:</strong> <RouteLink href="/exams/overview" /> — separate exam-style practice.
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Study Calendar:</strong> <RouteLink href="/exams/study" /> — study and exam-preparation planning.
+        </p>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Account</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
+          <li><RouteLink href="/campus/account?tab=studentData">Student Data</RouteLink> — profile and student information.</li>
+          <li><RouteLink href="/campus/account?tab=notifications">Notifications</RouteLink> — notification settings.</li>
+          <li><RouteLink href="/campus/account?tab=billing">Billing</RouteLink> — tuition, balance, payment history and available receipts.</li>
+          <li><RouteLink href="/campus/account?tab=upgrade">Upgrade</RouteLink> — next-level upgrade eligibility. Outstanding balances can block an upgrade.</li>
+        </ul>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>If something looks wrong</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
+          <li><strong>Workbook returns to Falowen Radio:</strong> finish the required Radio step, then use Continue.</li>
+          <li><strong>No Submit tab:</strong> the activity may be self-practice or not currently teacher-marked.</li>
+          <li><strong>No result yet:</strong> marking or synchronization may still be pending.</li>
+          <li><strong>B2/C1 learner cannot see Attendance or Exam File:</strong> those class-based tabs are intentionally hidden for self-learning tracks.</li>
+          <li><strong>Payment made but access has not updated:</strong> use the setup/account status refresh flow.</li>
+        </ul>
+      </section>
+
+      <section style={{ ...cardStyle, background: "#f8fafc" }}>
+        <h2 style={{ margin: 0 }}>For AI assistants and support tools</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Answer the learner's immediate question, name the Falowen destination, give the direct official route, and say what to do there. Do not invent private account state or force a Falowen navigation question back into grammar practice.
+        </p>
         <p style={{ margin: 0 }}>
-          B2 and C1 are designed as self-learning tracks with AI support. Students practice independently in the app, while tutor support is provided through email.
+          Full machine-readable source: <RouteLink href="/falowen-help.md">https://www.falowen.app/falowen-help.md</RouteLink>
         </p>
       </section>
     </main>

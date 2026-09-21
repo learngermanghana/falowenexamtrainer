@@ -363,3 +363,14 @@ The web app supports Google authentication through `GoogleAuthProvider`. If you 
 ## Deploy to Vercel
 
 The repository includes `vercel.json` so Vercel can build the frontend in `web/` and serve it from the project root. `vercel.json` rewrites all routes to `index.html` for client-side routing; no extra configuration is needed.
+## Public Falowen help and AI discovery
+
+Falowen keeps an official public help source so learners, search engines and AI assistants can route people to the correct place without guessing.
+
+- Human help page: `https://www.falowen.app/help`
+- AI-readable source of truth: `web/public/falowen-help.md` → `https://www.falowen.app/falowen-help.md`
+- AI discovery index: `web/public/llms.txt` → `https://www.falowen.app/llms.txt`
+- Repo documentation pointer: `docs/FALOWEN_HELP_AND_NAVIGATION.md`
+- Discovery controls: `web/public/robots.txt` and `web/public/sitemap.xml`
+
+When signup, trial/payment, Course Book, submission, Results, Attendance, Exam File, Account or level-visibility rules change, update the public Markdown knowledge base and `PublicStudentGuidePage.js` together. Keep `src/data/falowenPublicHelpDiscovery.test.js` passing so the public route and machine-readable sources do not silently disappear.
