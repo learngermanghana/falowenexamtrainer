@@ -24,6 +24,25 @@ describe("workbook assignment context", () => {
     ).toBe("?view=workbook&assignmentKey=A1-0.2&assignmentId=A1-0.2&level=A1");
   });
 
+  test.each(["A1", "A2", "B1", "B2", "C1"])(
+    "%s context synchronization preserves a completed Falowen Radio handoff",
+    (level) => {
+      const assignmentKey = `${level}-TEST`;
+      const search = buildWorkbookContextSearch({
+        search: "?radio=done&workbookTab=submit",
+        level,
+        assignmentKey,
+      });
+      const params = new URLSearchParams(search);
+
+      expect(params.get("radio")).toBe("done");
+      expect(params.get("workbookTab")).toBe("submit");
+      expect(params.get("assignmentKey")).toBe(assignmentKey);
+      expect(params.get("assignmentId")).toBe(assignmentKey);
+      expect(params.get("level")).toBe(level);
+    },
+  );
+
   test("requires both route and state to match the same assignment", () => {
     const context = {
       search: "?assignmentKey=A1-0.2&assignmentId=A1-0.2&level=A1",
