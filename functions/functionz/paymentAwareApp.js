@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
+const { isTrialStudent } = require("./trialLifecycle");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 
 const DEFAULT_TUITION_CURRENCY = "GHS";
@@ -455,6 +456,7 @@ app.post("/paystack/webhook", async (req, res) => {
     const paymentStatus = tuitionFee && totalPaid < tuitionFee ? "partial" : "paid";
 
     const now = new Date();
+    const convertingTrial = isTrialStudent(student);
     const existingStart = student.contractStart ? new Date(student.contractStart) : null;
     const existingEnd = student.contractEnd ? new Date(student.contractEnd) : null;
     const carryoverUntil = student.upgradeCarryoverUntil
@@ -474,7 +476,13 @@ app.post("/paystack/webhook", async (req, res) => {
     let contractStartDate;
     let finalMonths;
     let contractEndDate;
-    if (appendAfterActive) {
+    if (convertingTrial) {
+      // Paid access begins when payment is confirmed, even if the learner pays
+      // before the seven-day trial ends.
+      contractStartDate = now;
+      finalMonths = targetMonths;
+      contractEndDate = addMonths(contractStartDate, finalMonths);
+    } else if (appendAfterActive) {
       const candidate = [carryoverValid ? carryoverUntil : null, endValid ? existingEnd : null]
         .filter(Boolean)
         .sort((a, b) => b.getTime() - a.getTime())[0];
@@ -499,6 +507,12 @@ app.post("/paystack/webhook", async (req, res) => {
       contractEnd: contractEndDate ? contractEndDate.toISOString() : "",
       contractTermMonths: finalMonths,
       status: "Active",
+      enrollmentType: "paid",
+      dataDeleteAt: "",
+      trialStartedAt: "",
+      trialEndsAt: "",
+      trialUsedAt: "",
+      trialEndNoticeSent: "",
       paystackReference: reference,
       lastPaymentTuitionAmount: tuitionAmountPaid,
       lastPaymentCheckoutAmount: checkoutAmountPaid,
