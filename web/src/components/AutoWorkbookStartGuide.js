@@ -6,6 +6,7 @@ import { A1_GRAMMAR_ROUTE_ENTRIES } from "../data/a1GrammarRoutes";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../data/a2GrammarRoutes";
 import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
+import { isTutorMarkedWorkbookMatch } from "../utils/workbookContext";
 import {
   A1_DAY6_WORKBOOK_PATH,
   A1_DAY18_CHAPTER121_PATH,
@@ -31,14 +32,6 @@ export {
 const workbookRouteIndex = buildWorkbookRouteIndex();
 const SUPPORT_GUIDE_HOST_ATTR = "data-workbook-supporting-materials-host";
 const GRAMMAR_BACK_HOST_ATTR = "data-grammar-back-to-workbook-host";
-
-export const isTutorMarkedWorkbookMatch = (match) => {
-  if (!match || String(match.level || "").trim().toUpperCase() === "") return false;
-  const resource = match.resource || {};
-  const hasResourceAssignmentFlag = Object.prototype.hasOwnProperty.call(resource, "assignment");
-  if (hasResourceAssignmentFlag) return resource.assignment === true;
-  return match.entry?.assignment === true;
-};
 
 const GRAMMAR_ROUTE_ENTRIES = [
   ...A1_GRAMMAR_ROUTE_ENTRIES.map((entry) => ({ ...entry, level: "A1" })),
