@@ -1,44 +1,14 @@
 jest.mock("./A1CanonicalSubmissionPanel", () => () => null);
 
 import React from "react";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { cleanup } from "@testing-library/react";
 import A1SharedAssignmentWorkbookBridge, {
   __TESTING__,
   discoverA1BridgeSections,
 } from "./A1SharedAssignmentWorkbookBridge";
-import { A1_TUTOR_MARKED_OVERVIEW_GUIDANCE } from "./A1TutorMarkedOverviewGuidance";
-import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
 
-const GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-12.1", "A1-12.2"];
-
-const renderBridgeWorkbook = (assignmentKey) => {
-  const assignment = getA1Assignment(assignmentKey);
-  const sections = assignment.sections
-    .map(({ label }, index) => `<section id="section-${index + 1}"><h2>${label}</h2><p>Assignment content</p></section>`)
-    .join("");
-
-  document.body.innerHTML = `
-    <main>
-      <div id="workbook">
-        <h1>${assignment.title}</h1>
-        <p id="overview-copy">Read the assignment overview.</p>
-        ${sections}
-      </div>
-    </main>
-    <div id="react-root"></div>
-  `;
-
-  const container = document.querySelector("#react-root");
-  render(
-    <MemoryRouter initialEntries={[assignment.workbookRoute]}>
-      <A1SharedAssignmentWorkbookBridge assignmentKey={assignmentKey} />
-    </MemoryRouter>,
-    { container },
-  );
-
-  return assignment;
-};
+const FORMER_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-10", "A1-12.1", "A1-12.2"];
 
 describe("A1SharedAssignmentWorkbookBridge", () => {
   beforeEach(() => {
@@ -132,56 +102,22 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     );
   });
 
-  test.each(GRAMMAR_ENABLED_BRIDGE_ASSIGNMENT_KEYS)(
-    "%s opens with the shared Grammar guidance on Overview",
-    async (assignmentKey) => {
-      const assignment = renderBridgeWorkbook(assignmentKey);
-      expect(assignment.layoutMode).toBe("bridge");
-
-      const guidanceHost = await waitFor(() => {
-        const host = document.querySelector(
-          `[data-a1-canonical-bridge-overview-guidance="true"][data-assignment-key="${assignmentKey}"]`,
-        );
-        expect(host).not.toBeNull();
-        return host;
-      });
-
-      expect(guidanceHost.style.display).toBe("");
-      expect(guidanceHost.textContent).toContain("How to complete this assignment");
-      expect(guidanceHost.textContent).toContain(A1_TUTOR_MARKED_OVERVIEW_GUIDANCE);
-
-      const grammarButton = Array.from(document.querySelectorAll('[role="tab"]')).find(
-        (button) => button.textContent === "Grammar",
+  test.each(FORMER_BRIDGE_ASSIGNMENT_KEYS)(
+    "%s has been migrated off the legacy bridge onto native shared navigation",
+    (assignmentKey) => {
+      expect(getA1Assignment(assignmentKey)).toEqual(
+        expect.objectContaining({
+          assignmentKey,
+          layoutMode: "native",
+        }),
       );
-      expect(grammarButton).toBeTruthy();
-      fireEvent.click(grammarButton);
-
-      await waitFor(() => expect(guidanceHost.style.display).toBe("none"));
     },
   );
 
-  test("A1-10 omits Grammar guidance because the bridge has no Grammar tab", async () => {
-    const assignment = renderBridgeWorkbook("A1-10");
-    expect(assignment.layoutMode).toBe("bridge");
-
-    const guidanceHost = await waitFor(() => {
-      const host = document.querySelector(
-        '[data-a1-canonical-bridge-overview-guidance="true"][data-assignment-key="A1-10"]',
-      );
-      expect(host).not.toBeNull();
-      return host;
-    });
-
-    await waitFor(() => {
-      const tabLabels = Array.from(document.querySelectorAll('[role="tab"]')).map(
-        (button) => button.textContent,
-      );
-      expect(tabLabels).toContain("Overview");
-      expect(tabLabels).not.toContain("Grammar");
-    });
-
-    expect(guidanceHost.style.display).toBe("none");
-    expect(guidanceHost.querySelector('[data-a1-tutor-marked-grammar-guidance="true"]')).toBeNull();
-    expect(guidanceHost.textContent).not.toContain("open the Grammar tab");
+  test("no canonical tutor-marked A1 assignment depends on the legacy bridge", () => {
+    const bridgeAssignments = A1_ASSIGNMENT_ORDER.filter(
+      (assignmentKey) => getA1Assignment(assignmentKey)?.layoutMode === "bridge",
+    );
+    expect(bridgeAssignments).toEqual([]);
   });
 });
