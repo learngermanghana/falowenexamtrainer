@@ -14,13 +14,17 @@ const serialize = (value) => {
 
 export const buildC2CloudDraftDocId = (day) => `day-${Number(day)}`;
 
-export const useC2CloudDraftField = ({ day, field, value, setValue }) => {
+export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhenMissing = false, defaultValue }) => {
   const { user } = useAuth();
   const [cloudReady, setCloudReady] = useState(false);
   const valueRef = useRef(value);
   const remoteSerializedRef = useRef(null);
   const skipNextSaveRef = useRef(false);
   const saveTimerRef = useRef(null);
+  const migrationKey = user?.uid && day && field
+    ? `falowen:c2:cloud-migrated:${user.uid}:${Number(day)}:${field}`
+    : "";
+  const defaultSerialized = serialize(defaultValue);
 
   valueRef.current = value;
 
@@ -39,27 +43,53 @@ export const useC2CloudDraftField = ({ day, field, value, setValue }) => {
       (snapshot) => {
         const data = snapshot.exists() ? snapshot.data() || {} : {};
         const hasRemoteField = Object.prototype.hasOwnProperty.call(data, field);
+        const localSerialized = serialize(valueRef.current);
+        let migrationComplete = false;
+        try {
+          migrationComplete = Boolean(migrationKey && window.localStorage.getItem(migrationKey));
+        } catch (_error) {
+          migrationComplete = false;
+        }
+        const canSeedLegacy = Boolean(seedCloudWhenMissing && !migrationComplete);
+
         if (hasRemoteField) {
           const remoteValue = data[field];
           const remoteSerialized = serialize(remoteValue);
+          const shouldPreferLegacyLocal = Boolean(
+            canSeedLegacy
+            && defaultSerialized !== undefined
+            && remoteSerialized === defaultSerialized
+            && localSerialized !== defaultSerialized
+          );
+
           remoteSerializedRef.current = remoteSerialized;
-          if (remoteSerialized !== serialize(valueRef.current)) {
+          if (!shouldPreferLegacyLocal && remoteSerialized !== localSerialized) {
             skipNextSaveRef.current = true;
             setValue(remoteValue);
           }
+          if (!shouldPreferLegacyLocal && migrationKey) {
+            try {
+              window.localStorage.setItem(migrationKey, "1");
+            } catch (_error) {
+              // Local migration marker is best-effort only.
+            }
+          }
         } else {
-          remoteSerializedRef.current = null;
+          remoteSerializedRef.current = canSeedLegacy ? null : localSerialized;
         }
         setCloudReady(true);
       },
       (error) => {
         console.error(`C2 cloud draft load failed for ${field}`, error);
+        if (!seedCloudWhenMissing) {
+          remoteSerializedRef.current = serialize(valueRef.current);
+        }
         setCloudReady(true);
       },
     );
 
     return unsubscribe;
-  }, [day, field, setValue, user?.uid]);
+  }, [day, defaultSerialized, field, migrationKey, seedCloudWhenMissing, setValue, user?.uid]);
 
   useEffect(() => {
     if (saveTimerRef.current) {
@@ -95,7 +125,16 @@ export const useC2CloudDraftField = ({ day, field, value, setValue }) => {
           updatedAt: serverTimestamp(),
         },
         { merge: true },
-      ).catch((error) => {
+      ).then(() => {
+        remoteSerializedRef.current = serializedValue;
+        if (migrationKey) {
+          try {
+            window.localStorage.setItem(migrationKey, "1");
+          } catch (_error) {
+            // Local migration marker is best-effort only.
+          }
+        }
+      }).catch((error) => {
         console.error(`C2 cloud draft save failed for ${field}`, error);
       });
     }, SAVE_DELAY_MS);
@@ -106,7 +145,7 @@ export const useC2CloudDraftField = ({ day, field, value, setValue }) => {
         saveTimerRef.current = null;
       }
     };
-  }, [cloudReady, day, field, user?.uid, value]);
+  }, [cloudReady, day, field, migrationKey, user?.uid, value]);
 
   return {
     cloudEnabled: Boolean(db && user?.uid),
