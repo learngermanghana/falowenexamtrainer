@@ -5,10 +5,7 @@ import { getConfiguredInAppWorkbookResourceRoute } from "./inAppWorkbookRoutes";
 import { getA1Assignment } from "./a1AssignmentRegistry";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
-import {
-  chooseWorkbookAssignment,
-  isTutorMarkedWorkbookMatch,
-} from "../utils/workbookContext";
+import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import { resolveWorkbookSubmissionContext } from "../utils/workbookSubmissionContext";
 
 const ROOT = path.resolve(__dirname, "..");
@@ -97,11 +94,11 @@ describe("all tutor-marked A1/A2/B1 assignments", () => {
         expect(route).toMatch(/^\/campus\/course\//);
         expect(route).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
 
-        const pathname = normalizeInAppPath(route);
+        const target = new URL(route, "https://www.falowen.app");
+        const pathname = normalizeInAppPath(target.pathname);
         const match = workbookRouteIndex.get(pathname);
         expect(match).toBeTruthy();
         expect(String(match.level || "").toUpperCase()).toBe(level);
-        expect(isTutorMarkedWorkbookMatch(match)).toBe(true);
 
         const inlineAssignments = getInlineCourseAssignments(level, day);
         const inline = inlineAssignments.find(
@@ -109,11 +106,13 @@ describe("all tutor-marked A1/A2/B1 assignments", () => {
         );
         expect(inline).toBeTruthy();
 
-        const chosen = chooseWorkbookAssignment({
-          assignments: inlineAssignments,
-          chapter: String(match.resource?.chapter || chapter),
+        const resolvedAssignment = resolveTutorMarkedWorkbookAssignment({
+          level,
+          day,
+          pathname: target.pathname,
+          search: target.search,
         });
-        expect(chosen?.assignmentKey).toBe(assignmentKey);
+        expect(resolvedAssignment?.assignmentKey).toBe(assignmentKey);
 
         const locked = resolveWorkbookSubmissionContext({
           submissionContext: {
@@ -136,11 +135,16 @@ describe("all tutor-marked A1/A2/B1 assignments", () => {
   );
 
   test("A1 self-practice is not accidentally classified as tutor-marked", () => {
-    const practice = workbookRouteIndex.get(
-      "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
-    );
-    expect(practice).toBeTruthy();
-    expect(isTutorMarkedWorkbookMatch(practice)).toBe(false);
+    const pathname = "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook";
+    expect(workbookRouteIndex.get(pathname)).toBeTruthy();
+    expect(
+      resolveTutorMarkedWorkbookAssignment({
+        level: "A1",
+        day: 3,
+        pathname,
+        search: "",
+      }),
+    ).toBeNull();
   });
 
   test("all 19 A1 tutor assignments resolve to the native canonical registry", () => {
