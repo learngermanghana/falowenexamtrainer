@@ -124,7 +124,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day1RadioRegression.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/A1Day1RadioRegression.test.js
       - name: Test pinned Day 0 Course Book behavior
         working-directory: web
         env:
