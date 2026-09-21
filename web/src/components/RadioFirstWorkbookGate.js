@@ -44,7 +44,17 @@ export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" 
     const tutorAssignment = getA1AssignmentByDayAndChapter(day, chapter);
     if (tutorAssignment) {
       params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
-      const canonicalHref = buildA1TutorMarkedWorkbookHref(tutorAssignment, params.toString());
+      const assignmentWithDirectRoute = {
+        ...tutorAssignment,
+        workbookRoute: addDay20WorkbookView(
+          { level: "A1", day, chapter },
+          tutorAssignment.workbookRoute,
+        ),
+      };
+      const canonicalHref = buildA1TutorMarkedWorkbookHref(
+        assignmentWithDirectRoute,
+        params.toString(),
+      );
       return canonicalHref || `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
     }
 
