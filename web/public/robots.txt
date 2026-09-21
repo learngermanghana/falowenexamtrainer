@@ -1,12 +1,27 @@
 # Robots.txt for https://www.falowen.app/
-# Allow crawlers to index the public learning and exam resources while keeping
-# internal APIs out of search results.
+# Public Falowen learning/help content is crawlable. Internal APIs and admin
+# surfaces stay excluded.
 
+# ChatGPT Search / OpenAI web discovery.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /server-status
+
+# Google Gemini product token. Google Search discovery continues through
+# Google's normal crawlers; the same private paths remain excluded here.
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /server-status
+
+# Bingbot and other search/AI crawlers are covered by the public wildcard.
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
 Disallow: /server-status
 
-# Sitemaps
 Sitemap: https://www.falowen.app/sitemap.xml
