@@ -15,6 +15,29 @@ permissions:
   contents: read
 
 jobs:
+  tutor-marked-assignment-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Audit all 75 tutor-marked A1, A2 and B1 assignments
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/data/tutorMarkedAssignmentIntegrity.test.js
+
   a1-curriculum:
     runs-on: ubuntu-latest
     steps:
