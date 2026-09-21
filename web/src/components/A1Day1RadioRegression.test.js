@@ -47,6 +47,7 @@ describe("A1 Day 1 Falowen Radio", () => {
 
     expect(source).toContain('data-radio-first-workbook-gate="true"');
     expect(source).toContain("const RadioFirstWorkbookGate = ({ level, day, children, resource = null })");
-    expect(source).toContain("const radio = resource || getRadioResource(level, day)");
+    expect(source).toContain("export const resolveRadioFirstWorkbookResource = (level, day)");
+    expect(source).toContain("const radio = resource || resolveRadioFirstWorkbookResource(level, day)");
   });
 });

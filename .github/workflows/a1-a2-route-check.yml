@@ -120,6 +120,11 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/AutoWorkbookStartGuide.test.js src/components/WorkbookStartGuide.test.js
+      - name: Test A1 Day 1 Falowen Radio
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/A1Day1RadioRegression.test.js
       - name: Test pinned Day 0 Course Book behavior
         working-directory: web
         env:
@@ -228,11 +233,6 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/data/requestedLessonMediaMappings.test.js src/data/writingVideoResources.test.js src/components/B1WorkbookWritingCheatSheetInjector.test.js
-      - name: Test A1 Day 1 Falowen Radio
-        working-directory: web
-        env:
-          CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1Day1RadioRegression.test.js
       - name: Test A1 Radio-first workbook handoff
         working-directory: web
         env:
