@@ -9,6 +9,7 @@ import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
 
 const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+const TRIAL_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
 const SetupCheckpoint = () => {
   const { studentProfile, refreshUser, saveStudentProfile, logout } = useAuth();
@@ -49,16 +50,33 @@ const SetupCheckpoint = () => {
   }, [paidAmount, studentProfile?.paymentIntentAmount]);
 
   const trialState = useMemo(() => {
-    const endsAtMs = toDateMs(studentProfile?.trialEndsAt);
+    const endsAtMs = toDateMs(studentProfile?.trialEndsAt || studentProfile?.contractEnd);
     const startedAtMs = toDateMs(studentProfile?.trialStartedAt);
     const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
+    const explicitDeleteAtMs = toDateMs(studentProfile?.dataDeleteAt);
+    const dataDeleteAtMs = Number.isFinite(explicitDeleteAtMs)
+      ? explicitDeleteAtMs
+      : Number.isFinite(endsAtMs)
+      ? endsAtMs + TRIAL_RETENTION_MS
+      : NaN;
     const wasUsed =
       Number.isFinite(startedAtMs) ||
       Number.isFinite(endsAtMs) ||
       Number.isFinite(usedAtMs);
     const active = Number.isFinite(endsAtMs) && endsAtMs > Date.now();
-    return { active, endsAtMs, wasUsed };
-  }, [studentProfile?.trialEndsAt, studentProfile?.trialStartedAt, studentProfile?.trialUsedAt]);
+    const retained =
+      Number.isFinite(endsAtMs) &&
+      endsAtMs <= Date.now() &&
+      Number.isFinite(dataDeleteAtMs) &&
+      dataDeleteAtMs > Date.now();
+    return { active, endsAtMs, dataDeleteAtMs, retained, wasUsed };
+  }, [
+    studentProfile?.contractEnd,
+    studentProfile?.dataDeleteAt,
+    studentProfile?.trialEndsAt,
+    studentProfile?.trialStartedAt,
+    studentProfile?.trialUsedAt,
+  ]);
 
   const handleStartTrial = async () => {
     if (trialState.wasUsed || startingTrial) return;
@@ -67,10 +85,18 @@ const SetupCheckpoint = () => {
     try {
       const startedAt = new Date();
       const endsAt = new Date(startedAt.getTime() + TRIAL_DURATION_MS);
+      const dataDeleteAt = new Date(endsAt.getTime() + TRIAL_RETENTION_MS);
       await saveStudentProfile({
+        status: "trial_active",
+        enrollmentType: "trial",
+        contractStart: startedAt.toISOString(),
+        contractEnd: endsAt.toISOString(),
+        contractTermMonths: 0,
         trialStartedAt: startedAt.toISOString(),
         trialEndsAt: endsAt.toISOString(),
         trialUsedAt: startedAt.toISOString(),
+        dataDeleteAt: dataDeleteAt.toISOString(),
+        trialEndNoticeSent: "",
       });
       setStatus("Your 7-day free trial is active. Opening your Falowen campus...");
     } catch (error) {
@@ -104,6 +130,13 @@ const SetupCheckpoint = () => {
         month: "short",
         day: "numeric",
       }).format(new Date(trialState.endsAtMs))
+    : "";
+  const dataDeleteLabel = Number.isFinite(trialState.dataDeleteAtMs)
+    ? new Intl.DateTimeFormat(locale || "en", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(new Date(trialState.dataDeleteAtMs))
     : "";
 
   return (
@@ -140,7 +173,7 @@ const SetupCheckpoint = () => {
             </h3>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
               {trialState.wasUsed
-                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Your progress is saved. Complete your tuition payment to continue.`
+                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Learning access is paused, but your account and progress are saved${dataDeleteLabel ? ` until ${dataDeleteLabel}` : " for 30 days"}. Complete payment to reactivate this same account.`
                 : "Start your one-time 7-day free trial for full student access, or pay your tuition now. Starting the trial does not count as a payment or reduce your tuition balance."}
             </p>
           </div>
@@ -222,8 +255,9 @@ const SetupCheckpoint = () => {
         <div style={{ ...styles.card, margin: 0, background: "#fef3c7", border: "1px solid #f59e0b" }}>
           <h3 style={{ margin: "0 0 4px" }}>Limited access active</h3>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Until you start the free trial or complete payment, live classes and community features stay locked. Account & Billing remains available
-            so you can return to your student code and payment link anytime.
+            {trialState.retained
+              ? "Your trial learning access is paused. Account & Billing remains available during the 30-day recovery window so payment can restore this same student code and progress."
+              : "Until you start the free trial or complete payment, live classes and community features stay locked. Account & Billing remains available so you can return to your student code and payment link anytime."}
           </p>
           {!checkpoints.paymentReady && (
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
