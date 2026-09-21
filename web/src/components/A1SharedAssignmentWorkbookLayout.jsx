@@ -10,11 +10,8 @@ export const WorkbookSection = ({ sectionKey, children }) => (
 const contentError = (assignmentKey, message) =>
   new Error(`[A1 workbook ${assignmentKey}] ${message}`);
 
-export const sanitizeA1WorkbookSearch = (search = "") => {
-  const params = new URLSearchParams(search || "");
-  params.delete("radio");
-  return params;
-};
+export const sanitizeA1WorkbookSearch = (search = "") =>
+  new URLSearchParams(search || "");
 
 const workbookSearchText = (params) => {
   const text = params.toString();
@@ -76,17 +73,16 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   }, [requestedActiveTab]);
 
   useEffect(() => {
-    const hasLegacyRadioFlag = rawSearch.has("radio");
     const hasInvalidRequestedTab = Boolean(requestedTab && !allowedTabs.includes(requestedTab));
-    if (!hasLegacyRadioFlag && !hasInvalidRequestedTab) return;
+    if (!hasInvalidRequestedTab) return;
 
     const search = sanitizeA1WorkbookSearch(location.search);
-    if (hasInvalidRequestedTab) search.set("workbookTab", fallbackTab);
+    search.set("workbookTab", fallbackTab);
     navigate(
       { pathname: location.pathname, search: workbookSearchText(search), hash: location.hash },
       { replace: true, state: location.state },
     );
-  }, [allowedTabs, fallbackTab, location.hash, location.pathname, location.search, location.state, navigate, rawSearch, requestedTab]);
+  }, [allowedTabs, fallbackTab, location.hash, location.pathname, location.search, location.state, navigate, requestedTab]);
 
   const openTab = useCallback((key) => {
     if (!allowedTabs.includes(key)) return;
