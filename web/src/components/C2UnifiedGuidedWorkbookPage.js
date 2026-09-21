@@ -8,6 +8,7 @@ import{getC2ExamStandard}from"../data/c2ExamStandardContent";
 import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 import{buildC2OpinionWritingTemplate}from"../data/c2OpinionWritingTemplate";
+import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
@@ -81,9 +82,12 @@ function Learn({day,standard,knowledge,mastery,completed,onCompleteChange}){
  </div>;
 }
 
-function Speak({standard,knowledge,completed,onCompleteChange}){
+function Speak({standard,knowledge,day,completed,onCompleteChange}){
  const[support,setSupport]=useState("full");
- const[plan,setPlan]=useState("");
+ const planKey=`falowen:c2:day${day}:unified-speech-plan`;
+ const[plan,setPlan]=useState(()=>{try{return localStorage.getItem(planKey)||""}catch{return""}});
+ useEffect(()=>{try{localStorage.setItem(planKey,plan)}catch{}},[planKey,plan]);
+ useC2CloudDraftField({day,field:"speechPlan",value:plan,setValue:setPlan});
  const branches=speakingBranches(standard,knowledge);
  return <Section title="Sprechen · Erst verstehen, dann argumentieren">
   <div style={{display:"grid",gap:12}}>
@@ -103,6 +107,7 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
  const template=useMemo(()=>buildC2OpinionWritingTemplate(standard),[standard]);
  const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved}catch{return buildC2OpinionWritingTemplate(standard)}});
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
+ useC2CloudDraftField({day,field:"opinionDraft",value:draft,setValue:setDraft});
  const words=useMemo(()=>draft.trim()?draft.trim().split(/\s+/).length:0,[draft]);
  const restoreTemplate=()=>{
   if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
@@ -126,6 +131,7 @@ function ReformulationWrite({standard,day,completed,onCompleteChange}){
  const key=`falowen:c2:day${day}:unified-reformulations`;
  const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return{}}});
  useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(answers))}catch{}},[key,answers]);
+ useC2CloudDraftField({day,field:"reformulationAnswers",value:answers,setValue:setAnswers});
  return <Section title="Schreiben · Umformung">
   <p style={{margin:0,lineHeight:1.75}}><strong>Testbereich:</strong> Formulieren Sie jeden Satz neu. Verwenden Sie das vorgegebene Wort unverändert und erhalten Sie die Bedeutung. Hier werden keine Musterlösungen angezeigt.</p>
   <div style={{display:"grid",gap:12}}>{standard.reformulations.map((item,index)=><article key={item.cue+index} style={{...sub,background:"#fff"}}><strong>{index+1}. {item.source}</strong><div><strong>Vorgegebenes Wort:</strong> <span style={{...styles.badge,background:"#dbeafe",color:"#1e3a8a"}}>{item.cue}</span></div><textarea value={answers[index]||""} onChange={e=>setAnswers(old=>({...old,[index]:e.target.value}))} placeholder="Ihre Umformung" style={{minHeight:92,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit",lineHeight:1.65}}/></article>)}</div>
@@ -147,6 +153,7 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const[active,setActive]=useState(requestedView);
  const[progress,setProgress]=useState(()=>{try{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:"",...JSON.parse(localStorage.getItem(storageKey)||"{}")}}catch{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""}}});
  useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(progress))}catch{}},[storageKey,progress]);
+ useC2CloudDraftField({day,field:"progress",value:progress,setValue:setProgress});
  useEffect(()=>{setActive(requestedView)},[requestedView]);
  const changeView=(next)=>{if(!C2_WORKBOOK_VIEWS.has(next))return;setActive(next);const params=new URLSearchParams(location.search||"");if(next==="learn")params.delete("view");else params.set("view",next);const search=params.toString();navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true})};
  if(!day||!standard||!knowledge||!mastery)return null;
@@ -162,7 +169,7 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
   </header>
   <AdvancedSelfLearningTabNav level="C2" day={day} activeTab={active} onChange={changeView}/>
   {active==="learn"?<Learn day={day} standard={standard} knowledge={knowledge} mastery={mastery} completed={progress.learnDone} onCompleteChange={learnDone=>setProgress(p=>({...p,learnDone}))}/>:null}
-  {active==="speak"?<Speak standard={standard} knowledge={knowledge} completed={progress.speakDone} onCompleteChange={speakDone=>setProgress(p=>({...p,speakDone}))}/>:null}
+  {active==="speak"?<Speak standard={standard} knowledge={knowledge} day={day} completed={progress.speakDone} onCompleteChange={speakDone=>setProgress(p=>({...p,speakDone}))}/>:null}
   {active==="write"?(standard.writeType==="opinion"?<OpinionWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>:<ReformulationWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>):null}
   {active==="finish"?<Section title={`Finish C2 Day ${day}`}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}><Progress label="Learn" done={progress.learnDone} detail="Topic knowledge, language and grammar understood"/><Progress label="Speak" done={progress.speakDone} detail="Structured C2 speaking completed"/><Progress label="Write" done={progress.writeDone} detail={standard.writeType==="opinion"?"Opinion task completed":"Reformulation test completed"}/></div><label style={{display:"grid",gap:7}}><strong>Confidence</strong><select value={progress.confidence} onChange={e=>setProgress(p=>({...p,confidence:e.target.value}))} style={styles.select}><option value="">Select confidence</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label><label style={{display:"grid",gap:7}}><strong>Reflection</strong><textarea value={progress.reflection} onChange={e=>setProgress(p=>({...p,reflection:e.target.value}))} placeholder="What topic idea or C2 structure still needs work?" style={{minHeight:110,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit"}}/></label><div style={{border:`1px solid ${ready?"#86efac":"#fde68a"}`,borderRadius:14,padding:13,background:ready?"#f0fdf4":"#fffbeb"}}>{ready?"Day complete: Learn, Speak and Write are finished.":"Complete Learn, Speak, Write and choose a confidence level."}</div></Section>:null}
   {active==="references"?<><Section title="Topic reference"><p style={{margin:0,lineHeight:1.75}}>{knowledge.de}</p><p><strong>Kernfrage:</strong> {knowledge.core}</p></Section><Section title="C2 control"><p style={{margin:0,lineHeight:1.75}}>{mastery.challenge}</p><strong>Final check: topic knowledge · task fulfilment · grammar function · register · evidence · cohesion · natural collocation.</strong></Section></>:null}
