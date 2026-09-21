@@ -497,7 +497,111 @@ async function appendStudentToStudentsSheetSafely(student) {
   }
 }
 
+function extractSpreadsheetIdFromUrl(value) {
+  const match = String(value || "").match(/\/spreadsheets\/d\/([^/]+)/i);
+  return match ? match[1] : "";
+}
+
+async function purgeStudentFromSheets({
+  studentCode = "",
+  uid = "",
+  email = "",
+  scoresSpreadsheetId = "",
+  scoresSpreadsheetUrl = "",
+  scoresTabName = "scores_backup",
+} = {}) {
+  const studentsSpreadsheetId = process.env.STUDENTS_SHEET_ID;
+  const studentsTabName = process.env.STUDENTS_SHEET_TAB || "students";
+  if (!studentsSpreadsheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
+
+  const normalizedCode = String(studentCode || "").trim().toLowerCase();
+  const normalizedUid = String(uid || "").trim();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedCode && !normalizedUid && !normalizedEmail) {
+    throw new Error("Student code, uid or email is required for sheet purge.");
+  }
+
+  const sheets = await getSheetsClient();
+
+  const studentHeaderData = await loadHeaderMap(sheets, studentsSpreadsheetId, studentsTabName);
+  const studentCodeCol = findCol(studentHeaderData.headerMap, "StudentCode", "Student Code", "studentcode");
+  const uidCol = findCol(studentHeaderData.headerMap, "uid", "UID", "User Id", "UserID", "User ID");
+  const emailCol = findCol(studentHeaderData.headerMap, "Email", "email");
+
+  const codeValues = studentCodeCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, studentCodeCol);
+  const uidValues = uidCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, uidCol);
+  const emailValues = emailCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, emailCol);
+
+  const studentRows = new Set();
+  codeValues.forEach((value, index) => {
+    if (normalizedCode && String(value || "").trim().toLowerCase() === normalizedCode) studentRows.add(index + 2);
+  });
+  uidValues.forEach((value, index) => {
+    if (normalizedUid && String(value || "").trim() === normalizedUid) studentRows.add(index + 2);
+  });
+  emailValues.forEach((value, index) => {
+    if (normalizedEmail && String(value || "").trim().toLowerCase() === normalizedEmail) studentRows.add(index + 2);
+  });
+
+  const studentRowsDeleted = await deleteDuplicateRows(
+    sheets,
+    studentsSpreadsheetId,
+    studentsTabName,
+    Array.from(studentRows)
+  );
+
+  const resolvedScoresSpreadsheetId =
+    String(scoresSpreadsheetId || "").trim() ||
+    extractSpreadsheetIdFromUrl(scoresSpreadsheetUrl);
+
+  let scoreRowsDeleted = 0;
+  if (resolvedScoresSpreadsheetId && normalizedCode) {
+    const scoreHeaderData = await loadHeaderMap(
+      sheets,
+      resolvedScoresSpreadsheetId,
+      scoresTabName
+    );
+    const scoreCodeCol = findCol(
+      scoreHeaderData.headerMap,
+      "StudentCode",
+      "Student Code",
+      "studentcode",
+      "student_code"
+    );
+
+    if (scoreCodeCol !== null) {
+      const scoreCodes = await getColumnValues(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreCodeCol
+      );
+      const scoreRows = [];
+      scoreCodes.forEach((value, index) => {
+        if (String(value || "").trim().toLowerCase() === normalizedCode) {
+          scoreRows.push(index + 2);
+        }
+      });
+      scoreRowsDeleted = await deleteDuplicateRows(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreRows
+      );
+    }
+  }
+
+  return { studentRowsDeleted, scoreRowsDeleted };
+}
+
 module.exports = {
   upsertStudentToSheet,
   appendStudentToStudentsSheetSafely,
+  purgeStudentFromSheets,
 };
