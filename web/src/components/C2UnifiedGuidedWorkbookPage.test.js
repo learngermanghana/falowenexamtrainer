@@ -68,6 +68,11 @@ describe("C2 unified topic-first workbook", () => {
     expect(cloudSync).toContain("setDoc");
     expect(cloudSync).toContain('ownerUid: user.uid');
     expect(cloudSync).toContain('{ merge: true }');
+    expect(cloudSync).toContain("seedCloudWhenMissing");
+    expect(cloudSync).toContain("shouldPreferLegacyLocal");
+    expect(cloudSync).toContain("cloud-migrated");
+    expect(page).toContain("legacyDraftSeedAllowed");
+    expect(page).toContain("legacyProgressSeedAllowed");
   });
 
 
