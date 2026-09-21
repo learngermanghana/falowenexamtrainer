@@ -32,6 +32,14 @@ const workbookRouteIndex = buildWorkbookRouteIndex();
 const SUPPORT_GUIDE_HOST_ATTR = "data-workbook-supporting-materials-host";
 const GRAMMAR_BACK_HOST_ATTR = "data-grammar-back-to-workbook-host";
 
+export const isTutorMarkedWorkbookMatch = (match) => {
+  if (!match || String(match.level || "").trim().toUpperCase() === "") return false;
+  const resource = match.resource || {};
+  const hasResourceAssignmentFlag = Object.prototype.hasOwnProperty.call(resource, "assignment");
+  if (hasResourceAssignmentFlag) return resource.assignment === true;
+  return match.entry?.assignment === true;
+};
+
 const GRAMMAR_ROUTE_ENTRIES = [
   ...A1_GRAMMAR_ROUTE_ENTRIES.map((entry) => ({ ...entry, level: "A1" })),
   ...A2_GRAMMAR_ROUTE_ENTRIES.map((entry) => ({ ...entry, level: "A2" })),
@@ -170,6 +178,10 @@ const AutoWorkbookStartGuide = () => {
     SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
     || isSelfManagedB1LessonWorkbook(pathname, search);
   const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
+  const shouldSyncTutorMarkedContext = isTutorMarkedWorkbookMatch(match);
+  const workbookContextSync = shouldSyncTutorMarkedContext
+    ? <WorkbookContextSync match={match} />
+    : null;
 
   useEffect(() => {
     if (!grammarWorkbookTarget || typeof document === "undefined") {
@@ -257,6 +269,7 @@ const AutoWorkbookStartGuide = () => {
   ) {
     return (
       <>
+        {workbookContextSync}
         <A1Day18Kapitel122WorkbookPage />
         {inlineEnhancements}
       </>
@@ -266,6 +279,7 @@ const AutoWorkbookStartGuide = () => {
   if (!shouldRenderGuide) {
     return (
       <>
+        {workbookContextSync}
         {grammarReturn}
         {inlineEnhancements}
       </>
@@ -276,7 +290,7 @@ const AutoWorkbookStartGuide = () => {
 
   return (
     <>
-      {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
+      {workbookContextSync}
       {portalHost ? (
         createPortal(guide, portalHost)
       ) : (
