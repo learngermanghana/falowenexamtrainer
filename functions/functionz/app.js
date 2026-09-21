@@ -22,6 +22,11 @@ const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts"
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
+const {
+  TRIAL_EXPIRED_STATUS,
+  getTrialLifecycle,
+  isTrialStudent,
+} = require("./trialLifecycle");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
 const { courseSchedulesByName } = require("../data/classSchedules");
@@ -528,16 +533,34 @@ const buildLoginDiagnosticProfile = (docSnap) => {
     studentCode: data.studentCode || data.studentcode || docSnap.id,
     studentcode: data.studentcode || data.studentCode || docSnap.id,
     level: data.level || "",
+    contractStart: data.contractStart || "",
     contractEnd: data.contractEnd || "",
+    trialStartedAt: data.trialStartedAt || "",
+    trialEndsAt: data.trialEndsAt || "",
+    dataDeleteAt: data.dataDeleteAt || "",
+    enrollmentType: data.enrollmentType || data.EnrollmentType || "",
+    paid: data.paid ?? data.initialPaymentAmount ?? 0,
+    initialPaymentAmount: data.initialPaymentAmount ?? data.paid ?? 0,
     paymentStatus: data.paymentStatus || "",
   };
 };
 
-const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const ACTIVE_STUDENT_STATUSES = ["active", "trial_active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
 const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
 
 const buildLoginDiagnostic = (profile) => {
   if (!profile) return { exists: false, reason: "not_found" };
+
+  const trialLifecycle = getTrialLifecycle(profile);
+  if (trialLifecycle.isRetained) {
+    return {
+      exists: true,
+      reason: "trial_retained",
+      trialEndsAt: trialLifecycle.trialEnd.toISOString(),
+      dataDeleteAt: trialLifecycle.dataDeleteAt.toISOString(),
+      profile,
+    };
+  }
 
   const status = String(profile.status || "").trim().toLowerCase();
   if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) {
@@ -811,8 +834,13 @@ app.post("/attendance/checkin", async (req, res) => {
 
 app.post("/admin/purge-expired-students", async (req, res) => {
   try {
-    const secret = req.headers["x-cron-secret"];
-    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+    const headerSecret = String(req.headers["x-cron-secret"] || "");
+    const authorization = String(req.headers.authorization || "");
+    const bearerSecret = authorization.match(/^Bearer\s+(.+)$/i)?.[1] || "";
+    if (
+      !process.env.CRON_SECRET ||
+      (headerSecret !== process.env.CRON_SECRET && bearerSecret !== process.env.CRON_SECRET)
+    ) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -822,6 +850,9 @@ app.post("/admin/purge-expired-students", async (req, res) => {
     const now = new Date();
     const nowIso = now.toISOString();
     const nowMs = now.getTime();
+    const requestedIdentifier = String(
+      req.body?.studentCode || req.body?.studentcode || req.body?.email || ""
+    ).trim();
 
     let deletedStudents = 0;
     let authDeleted = 0;
@@ -832,83 +863,132 @@ app.post("/admin/purge-expired-students", async (req, res) => {
     let skippedInvalid = 0;
     let skippedNonStudent = 0;
     let skippedFailed = 0;
+    let retainedTrials = 0;
+    let trialsMarkedExpired = 0;
 
-    let lastDoc = null;
-    while (true) {
-      let query = db
-        .collection("students")
-        .where("contractEnd", ">", "")
-        .orderBy("contractEnd")
-        .limit(25);
+    const processStudent = async (docSnap) => {
+      scanned += 1;
+      const data = docSnap.data() || {};
+      const uid = data.uid;
 
-      if (lastDoc) {
-        query = query.startAfter(lastDoc);
+      if (data.purgeStatus === "failed") {
+        skippedFailed += 1;
+        return;
       }
 
-      const snap = await query.get();
+      if (data.role && data.role !== "student") {
+        skippedNonStudent += 1;
+        return;
+      }
 
-      if (snap.empty) break;
+      const trialLifecycle = getTrialLifecycle(data, now);
+      const contractEndDate = trialLifecycle.isTrial
+        ? trialLifecycle.trialEnd
+        : parseContractEnd(data.contractEnd);
 
-      lastDoc = snap.docs[snap.docs.length - 1];
+      if (!contractEndDate) {
+        skippedInvalid += 1;
+        return;
+      }
 
-      for (const docSnap of snap.docs) {
-        scanned += 1;
-        const data = docSnap.data() || {};
-        const uid = data.uid;
-        const contractEndDate = parseContractEnd(data.contractEnd);
+      if (contractEndDate.getTime() >= nowMs) {
+        skippedActive += 1;
+        return;
+      }
 
-        if (data.purgeStatus === "failed") {
-          skippedFailed += 1;
-          continue;
+      if (trialLifecycle.isTrial && trialLifecycle.isRetained) {
+        retainedTrials += 1;
+        const dataDeleteAt = trialLifecycle.dataDeleteAt.toISOString();
+        const trialEndsAt = trialLifecycle.trialEnd.toISOString();
+        const alreadyMarked =
+          String(data.status || "").trim().toLowerCase() === TRIAL_EXPIRED_STATUS &&
+          String(data.dataDeleteAt || "") === dataDeleteAt;
+
+        if (!alreadyMarked) {
+          const updates = {
+            status: TRIAL_EXPIRED_STATUS,
+            enrollmentType: "trial",
+            contractEnd: data.contractEnd || trialEndsAt,
+            trialEndsAt: data.trialEndsAt || trialEndsAt,
+            dataDeleteAt,
+            updated_at: admin.firestore.FieldValue.serverTimestamp(),
+          };
+          await docSnap.ref.set(updates, { merge: true });
+          await appendStudentToStudentsSheetSafely({ ...data, ...updates }).catch((error) => {
+            console.warn("Trial expiry sheet sync failed", docSnap.id, error?.message || error);
+          });
+          trialsMarkedExpired += 1;
         }
+        return;
+      }
 
-        if (data.role && data.role !== "student") {
-          skippedNonStudent += 1;
-          continue;
-        }
+      // Paid contracts retain the existing purge policy. Trial records reach
+      // this branch only after their 30-day recovery window has elapsed.
+      if (trialLifecycle.isTrial && !trialLifecycle.shouldPurge) {
+        skippedInvalid += 1;
+        return;
+      }
 
-        if (!contractEndDate) {
-          skippedInvalid += 1;
-          continue;
-        }
-
-        if (contractEndDate.getTime() >= nowMs) {
-          skippedActive += 1;
-          continue;
-        }
-
-        // Delete Auth user (best effort)
-        if (uid) {
-          try {
-            await admin.auth().deleteUser(uid);
-            authDeleted += 1;
-          } catch (err) {
-            if (err?.code === "auth/user-not-found") authMissing += 1;
-            else console.warn("Auth delete failed", docSnap.id, err?.message || err);
-          }
-        }
-
-        // Delete Firestore doc
+      if (uid) {
         try {
-          if (typeof db.recursiveDelete === "function") {
-            await db.recursiveDelete(docSnap.ref);
-          } else {
-            await docSnap.ref.delete(); // NOTE: doesn't delete subcollections
-          }
-          deletedStudents += 1;
+          await admin.auth().deleteUser(uid);
+          authDeleted += 1;
         } catch (err) {
-          firestoreFailed += 1;
-          console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+          if (err?.code === "auth/user-not-found") authMissing += 1;
+          else console.warn("Auth delete failed", docSnap.id, err?.message || err);
+        }
+      }
 
-          // ✅ mark so we don't loop forever
-          await docSnap.ref.set(
-            {
-              purgeStatus: "failed",
-              purgeError: String(err?.message || "unknown"),
-              purgeFailedAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-            { merge: true }
-          );
+      try {
+        if (typeof db.recursiveDelete === "function") {
+          await db.recursiveDelete(docSnap.ref);
+        } else {
+          await docSnap.ref.delete();
+        }
+        deletedStudents += 1;
+      } catch (err) {
+        firestoreFailed += 1;
+        console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+        await docSnap.ref.set(
+          {
+            purgeStatus: "failed",
+            purgeError: String(err?.message || "unknown"),
+            purgeFailedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
+    };
+
+    if (requestedIdentifier) {
+      const docSnap = await findStudentForLoginIdentifier(db, requestedIdentifier);
+      if (!docSnap) {
+        return res.json({
+          ok: true,
+          alreadyDeleted: true,
+          requestedIdentifier,
+          deletedStudents,
+          retainedTrials,
+          nowIso,
+        });
+      }
+      await processStudent(docSnap);
+    } else {
+      let lastDoc = null;
+      while (true) {
+        let query = db
+          .collection("students")
+          .where("contractEnd", ">", "")
+          .orderBy("contractEnd")
+          .limit(25);
+
+        if (lastDoc) query = query.startAfter(lastDoc);
+        const snap = await query.get();
+        if (snap.empty) break;
+
+        lastDoc = snap.docs[snap.docs.length - 1];
+        for (const docSnap of snap.docs) {
+          await processStudent(docSnap);
         }
       }
     }
@@ -924,6 +1004,9 @@ app.post("/admin/purge-expired-students", async (req, res) => {
       skippedInvalid,
       skippedNonStudent,
       skippedFailed,
+      retainedTrials,
+      trialsMarkedExpired,
+      requestedIdentifier: requestedIdentifier || undefined,
       nowIso,
     });
   } catch (err) {
@@ -1724,6 +1807,7 @@ app.post("/paystack/webhook", async (req, res) => {
      *   at upgradeCarryoverUntil (or current contract end) so the learner does not lose time.
      */
     const now = new Date();
+    const convertingTrial = isTrialStudent(studentData);
 
     const existingStart = studentData.contractStart ? new Date(studentData.contractStart) : null;
     const existingEnd = studentData.contractEnd ? new Date(studentData.contractEnd) : null;
@@ -1747,7 +1831,11 @@ app.post("/paystack/webhook", async (req, res) => {
     let finalMonths;
     let contractEndDate;
 
-    if (shouldAppendAfterActiveContract) {
+    if (convertingTrial) {
+      contractStartDate = now;
+      finalMonths = targetMonths;
+      contractEndDate = addMonths(contractStartDate, finalMonths);
+    } else if (shouldAppendAfterActiveContract) {
       const appendStartCandidate = [carryoverIsValid ? carryoverUntil : null, endIsValid ? existingEnd : null]
         .filter(Boolean)
         .sort((a, b) => b.getTime() - a.getTime())[0];
@@ -1779,6 +1867,12 @@ app.post("/paystack/webhook", async (req, res) => {
       contractEnd: contractEndDate ? contractEndDate.toISOString() : "",
       contractTermMonths: finalMonths,
       status: "Active",
+      enrollmentType: "paid",
+      dataDeleteAt: "",
+      trialStartedAt: "",
+      trialEndsAt: "",
+      trialUsedAt: "",
+      trialEndNoticeSent: "",
       paystackReference: data?.reference || studentData.paystackReference || "",
       level: shouldApplyQueuedUpgrade ? queuedUpgradeLevel : studentData.level,
       className: shouldApplyQueuedUpgrade ? "" : studentData.className,
