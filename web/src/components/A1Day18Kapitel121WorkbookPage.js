@@ -1,8 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import AppBackButton from "./navigation/AppBackButton";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
-import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
+import React from "react";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import { styles } from "../styles";
 
 const LEVEL = "A1";
@@ -90,176 +87,67 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-const A1Day18Kapitel121WorkbookPage = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const params = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
-  const requestedTab = params.get("workbookTab");
-  const [activeTab, setActiveTab] = useState(requestedTab === "submit" ? "submit" : "assignment");
+const A1Day18Kapitel121WorkbookPage = () => (
+  <A1TutorMarkedWorkbookShell
+    fallbackAssignmentKey="A1-12.1"
+    title="A1 · Day 18 Workbook · Kapitel 12.1"
+    subtitle="Two Case Prepositions · Tutor-marked assignment"
+    assignmentIntro="Complete all three Teile. Record your answers in the draft controls, then open Review & Submit to send the complete assignment."
+    submitTitle="Review & Submit A1 · Day 18 · Kapitel 12.1"
+    submitDescription="Review the mapped Lesen and Hören answers for A1-12.1, make any final edits, then press Submit Assignment."
+  >
+    <section style={card}>
+      <h2 style={{ margin: 0 }}>Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort</h2>
+      <h3 style={{ margin: 0 }}>Ein Tag im Leben von Anna und Ben</h3>
+      <p style={{ margin: 0, lineHeight: 1.75 }}>
+        Anna und Ben sind gute Freunde, und beide haben interessante Berufe. Anna ist Ärztin und arbeitet in einem großen Krankenhaus. Ben ist Lehrer und unterrichtet an einer Grundschule.
+      </p>
+      <p style={{ margin: 0, lineHeight: 1.75 }}>
+        Jeden Morgen muss Anna früh aufstehen, weil sie um 7 Uhr im Krankenhaus sein muss. Sie kann oft nicht frühstücken, weil sie so früh losfahren muss. Anna liebt ihren Beruf, weil sie Menschen helfen kann. Manchmal muss sie auch am Wochenende arbeiten, aber das stört sie nicht.
+      </p>
+      <p style={{ margin: 0, lineHeight: 1.75 }}>
+        Ben kann jeden Morgen etwas länger schlafen, weil die Schule erst um 8 Uhr beginnt. Er mag seinen Beruf, weil er gerne mit Kindern arbeitet. In der Schule darf Ben viele verschiedene Fächer unterrichten. Nach der Arbeit kann er oft Sport machen oder sich mit Freunden treffen.
+      </p>
+      <p style={{ margin: 0, lineHeight: 1.75 }}>
+        Beide, Anna und Ben, müssen sich gut organisieren, um ihre Arbeit und Freizeit in Einklang zu bringen. Anna möchte nächstes Jahr einen Urlaub machen, aber sie weiß noch nicht, wohin. Ben will vielleicht einen Sprachkurs besuchen, weil er seine Englischkenntnisse verbessern möchte.
+      </p>
+      <QuestionList questions={readingQuestions} />
+    </section>
 
-  const assignmentKey = useMemo(() => {
-    const assignment = getInlineCourseAssignments(LEVEL, DAY).find(
-      (item) => String(item.chapter || "").trim() === CHAPTER
-    );
-    return assignment?.assignmentKey || FALLBACK_ASSIGNMENT_KEY;
-  }, []);
+    <section style={card}>
+      <h2 style={{ margin: 0 }}>Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen</h2>
+      {adverts.map((advert, index) => (
+        <article key={advert.title} style={questionCard}>
+          <strong>Anzeige {index + 1}: {advert.title}</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>{advert.text}</p>
+          <strong>{index + 1}. {advert.question}</strong>
+          <span>a) Richtig</span>
+          <span>b) Falsch</span>
+        </article>
+      ))}
+    </section>
 
-  useEffect(() => {
-    setActiveTab(requestedTab === "submit" ? "submit" : "assignment");
-  }, [requestedTab]);
-
-  const openTab = (tab) => {
-    const next = new URLSearchParams(location.search || "");
-    next.set("workbookTab", tab);
-    next.set("assignmentKey", assignmentKey);
-    next.set("assignmentId", assignmentKey);
-    next.set("level", LEVEL);
-    setActiveTab(tab);
-    navigate(
-      { pathname: location.pathname, search: `?${next.toString()}` },
-      {
-        replace: true,
-        state: {
-          ...(location.state || {}),
-          level: LEVEL,
-          day: DAY,
-          assignmentKey,
-          assignmentId: assignmentKey,
-          canonicalAssignmentKey: assignmentKey,
-          inlineCourseSubmission: true,
-        },
-      }
-    );
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 18 Workbook · Kapitel 12.1</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Lesen und Hören · Tutor-marked assignment</p>
-        <p style={{ margin: 0, color: "#475569" }}>
-          Complete all three parts, then use Submit to send your final answers for {assignmentKey}.
-        </p>
-        <div role="tablist" aria-label="Kapitel 12.1 workbook tabs" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {[
-            { key: "assignment", label: "Assignment" },
-            { key: "submit", label: "Submit" },
-          ].map((tab) => {
-            const selected = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => openTab(tab.key)}
-                style={{
-                  ...styles.secondaryButton,
-                  background: selected ? "#2563eb" : "#fff",
-                  borderColor: selected ? "#2563eb" : "#93c5fd",
-                  color: selected ? "#fff" : "#1d4ed8",
-                  fontWeight: 800,
-                  minWidth: 120,
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
-      {activeTab === "assignment" ? (
-        <>
-          <section style={card}>
-            <h2 style={{ margin: 0 }}>Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort</h2>
-            <h3 style={{ margin: 0 }}>Ein Tag im Leben von Anna und Ben</h3>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              Anna und Ben sind gute Freunde, und beide haben interessante Berufe. Anna ist Ärztin und arbeitet in einem großen Krankenhaus. Ben ist Lehrer und unterrichtet an einer Grundschule.
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              Jeden Morgen muss Anna früh aufstehen, weil sie um 7 Uhr im Krankenhaus sein muss. Sie kann oft nicht frühstücken, weil sie so früh losfahren muss. Anna liebt ihren Beruf, weil sie Menschen helfen kann. Manchmal muss sie auch am Wochenende arbeiten, aber das stört sie nicht.
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              Ben kann jeden Morgen etwas länger schlafen, weil die Schule erst um 8 Uhr beginnt. Er mag seinen Beruf, weil er gerne mit Kindern arbeitet. In der Schule darf Ben viele verschiedene Fächer unterrichten. Nach der Arbeit kann er oft Sport machen oder sich mit Freunden treffen.
-            </p>
-            <p style={{ margin: 0, lineHeight: 1.75 }}>
-              Beide, Anna und Ben, müssen sich gut organisieren, um ihre Arbeit und Freizeit in Einklang zu bringen. Anna möchte nächstes Jahr einen Urlaub machen, aber sie weiß noch nicht, wohin. Ben will vielleicht einen Sprachkurs besuchen, weil er seine Englischkenntnisse verbessern möchte.
-            </p>
-            <QuestionList questions={readingQuestions} />
-          </section>
-
-          <section style={card}>
-            <h2 style={{ margin: 0 }}>Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen</h2>
-            {adverts.map((advert, index) => (
-              <article key={advert.title} style={questionCard}>
-                <strong>Anzeige {index + 1}: {advert.title}</strong>
-                <p style={{ margin: 0, lineHeight: 1.7 }}>{advert.text}</p>
-                <strong>{index + 1}. {advert.question}</strong>
-                <span>a) Richtig</span>
-                <span>b) Falsch</span>
-              </article>
-            ))}
-          </section>
-
-          <section style={card}>
-            <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Watch the video, then decide whether each statement is Richtig or Falsch.
-            </p>
-            <iframe
-              title="Kapitel 12.1 Hören"
-              src="https://www.youtube.com/embed/m07lKGJAoF8"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              style={{ width: "100%", minHeight: 315, border: 0, borderRadius: 10 }}
-            />
-            {listeningTasks.map((question, index) => (
-              <article key={question} style={questionCard}>
-                <strong>{index + 1}. {question}</strong>
-                <span>a) Richtig</span>
-                <span>b) Falsch</span>
-              </article>
-            ))}
-          </section>
-
-          <div style={{ ...card, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-            <strong>Finished Kapitel 12.1?</strong>
-            <p style={{ margin: 0 }}>Open Submit and send all final answers for tutor marking.</p>
-            <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => openTab("submit")}>
-              Open Submit Tab
-            </button>
-          </div>
-        </>
-      ) : (
-        <section style={{ ...card, border: "1px solid #bfdbfe" }}>
-          <div>
-            <p style={{ color: "#1d4ed8", fontSize: 13, fontWeight: 900, letterSpacing: ".04em", margin: 0, textTransform: "uppercase" }}>
-              Tutor-marked assignment
-            </p>
-            <h2 style={{ margin: "4px 0" }}>Submit A1 · Day 18 · Kapitel 12.1</h2>
-            <p style={{ color: "#475569", margin: 0 }}>
-              This submission is locked to {assignmentKey}, so your work is saved under the correct assignment.
-            </p>
-          </div>
-          <div className="a1-day18-kapitel121-submit-tab">
-            <style>{`.a1-day18-kapitel121-submit-tab > div > section:first-child { display: none !important; }
-              .a1-day18-kapitel121-submit-tab select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
-              submissionContext={{
-                level: LEVEL,
-                day: DAY,
-                assignmentKey,
-                canonicalAssignmentKey: assignmentKey,
-              }}
-            />
-          </div>
-        </section>
-      )}
-    </div>
-  );
-};
+    <section style={card}>
+      <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Watch the video, then decide whether each statement is Richtig or Falsch.
+      </p>
+      <iframe
+        title="Kapitel 12.1 Hören"
+        src="https://www.youtube.com/embed/m07lKGJAoF8"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        style={{ width: "100%", minHeight: 315, border: 0, borderRadius: 10 }}
+      />
+      {listeningTasks.map((question, index) => (
+        <article key={question} style={questionCard}>
+          <strong>{index + 1}. {question}</strong>
+          <span>a) Richtig</span>
+          <span>b) Falsch</span>
+        </article>
+      ))}
+    </section>
+  </A1TutorMarkedWorkbookShell>
+);
 
 export default A1Day18Kapitel121WorkbookPage;

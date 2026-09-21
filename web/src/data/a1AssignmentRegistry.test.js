@@ -1,7 +1,9 @@
 import {
   A1_ASSIGNMENT_ORDER,
   A1_ASSIGNMENT_REGISTRY,
+  buildA1TutorMarkedWorkbookHref,
   getA1AssignmentByChapter,
+  getA1AssignmentByDayAndChapter,
   getA1AssignmentByRoute,
   getA1AssignmentNeighbors,
 } from "./a1AssignmentRegistry";
@@ -37,6 +39,32 @@ describe("canonical A1 assignment registry", () => {
     expect(assignment.workbookRoute).toBe("/campus/course/a1-chapter-5-german-cases-workbook");
     expect(assignment.layoutMode).toBe("native");
     expect(assignment.sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
+  });
+
+  test("all tutor-marked A1 assignments now use the native shared workbook navigation", () => {
+    expect(A1_ASSIGNMENT_ORDER).toHaveLength(19);
+    expect(A1_ASSIGNMENT_ORDER.filter(
+      (key) => A1_ASSIGNMENT_REGISTRY[key].layoutMode !== "native",
+    )).toEqual([]);
+  });
+
+  test("resolves tutor assignments by both day and chapter so self-practice chapters stay separate", () => {
+    expect(getA1AssignmentByDayAndChapter(16, "9")?.assignmentKey).toBe("A1-9");
+    expect(getA1AssignmentByDayAndChapter(16, "10")?.assignmentKey).toBe("A1-10");
+    expect(getA1AssignmentByDayAndChapter(3, "1.1")).toBeNull();
+    expect(getA1AssignmentByDayAndChapter(2, "1.1")?.assignmentKey).toBe("A1-1.1");
+  });
+
+  test("builds the same canonical tutor context used by the Day 1 workbook", () => {
+    const href = buildA1TutorMarkedWorkbookHref("A1-9", "chapter=9&hub=1&radio=done");
+    const url = new URL(href, "https://www.falowen.app");
+    expect(url.pathname).toBe("/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook");
+    expect(url.searchParams.get("assignmentKey")).toBe("A1-9");
+    expect(url.searchParams.get("assignmentId")).toBe("A1-9");
+    expect(url.searchParams.get("level")).toBe("A1");
+    expect(url.searchParams.get("radio")).toBe("done");
+    expect(url.searchParams.has("chapter")).toBe(false);
+    expect(url.searchParams.has("hub")).toBe(false);
   });
 
   test("keeps A1-0.2 sections consecutive after the Hören rename", () => {

@@ -6,6 +6,7 @@ import { getC2TopicKnowledge } from "../data/c2TopicKnowledge";
 describe("C2 unified topic-first workbook", () => {
   const page = fs.readFileSync(path.join(__dirname, "C2UnifiedGuidedWorkbookPage.js"), "utf8");
   const registry = fs.readFileSync(path.join(__dirname, "SelfLearningLessonRegistry.js"), "utf8");
+  const cloudSync = fs.readFileSync(path.join(__dirname, "../utils/c2CloudDraftSync.js"), "utf8");
 
   test.each(Array.from({ length: 28 }, (_, index) => index + 1))("Day %i has a complete topic foundation", (day) => {
     const standard = getC2ExamStandard(day);
@@ -53,6 +54,20 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('onClick={()=>changeView("write")}');
     expect(page).toContain("Open writing template");
     expect(page).toContain('onChange={changeView}');
+  });
+
+  test("syncs C2 progress and drafts through the signed-in account while retaining local fallback", () => {
+    expect(page).toContain('field:"progress"');
+    expect(page).toContain('field:"speechPlan"');
+    expect(page).toContain('field:"opinionDraft"');
+    expect(page).toContain('field:"reformulationAnswers"');
+    expect(page).toContain("localStorage.setItem");
+
+    expect(cloudSync).toContain('doc(db, "users", user.uid, "c2Drafts"');
+    expect(cloudSync).toContain("onSnapshot");
+    expect(cloudSync).toContain("setDoc");
+    expect(cloudSync).toContain('ownerUid: user.uid');
+    expect(cloudSync).toContain('{ merge: true }');
   });
 
 
