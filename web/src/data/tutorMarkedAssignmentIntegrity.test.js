@@ -19,7 +19,7 @@ const b1ShellSource = fs.readFileSync(path.join(COMPONENTS, "B1StandardWorkbookP
 const workbookRouteIndex = buildWorkbookRouteIndex();
 
 const EXPECTED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 28, C1: 28 };
-const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 4, C1: 7 };
+const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 22, B2: 4, C1: 7 };
 
 const tutorAssignments = (level) =>
   getCurriculumEntriesForLevel(level).filter(
@@ -80,7 +80,7 @@ const getB1DayComponent = (day) => {
   return mapSource.match(new RegExp("\\b" + day + ":\\s*([A-Za-z0-9_]+)"))?.[1] || "";
 };
 
-describe("all tutor-marked A1/A2/B1 assignments", () => {
+describe("all tutor-marked A1 through C1 assignments", () => {
   test.each(Object.entries(EXPECTED_COUNTS))(
     "%s has the expected complete tutor-marked assignment inventory",
     (level, expectedCount) => {
