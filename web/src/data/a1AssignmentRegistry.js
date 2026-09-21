@@ -26,6 +26,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day2Kapitel11WorkbookPage",
   "A1Day3PronounsIntroducingYourselfWorkbookPage",
   "A1Chapter3AskingAboutPricesWorkbookPage",
+  "A1Day4NumbersForBeginnersWorkbookPage",
   "A1Chapter5GermanCasesWorkbookPage",
   "A1Day8CountriesAndLanguagesWorkbookPage",
   "A1Day10ObjectsColorsPossessiveArticlesWorkbookPage",
@@ -33,6 +34,8 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day12TwentyFourHourClockAndDatesWorkbookPage",
   "A1Day16FoodAndDailyLifeWorkbookPage",
   "A1Day17InstructionsDirectionsKapitel11WorkbookPage",
+  "A1Day18Kapitel121WorkbookPage",
+  "A1Day18Kapitel122WorkbookPage",
   "A1Day20LetterWritingWorkbookPage",
   "A1Day21WeatherWorkbookPage",
   "A1Day22HealthBodyPartsWorkbookPage",
@@ -95,6 +98,34 @@ export const getA1AssignmentByChapter = (chapter = "") => {
   return Object.values(A1_ASSIGNMENT_REGISTRY).find(
     (entry) => normalizeA1Chapter(entry.chapter) === normalizedChapter,
   ) || null;
+};
+
+export const getA1AssignmentByDayAndChapter = (day, chapter = "") => {
+  const normalizedChapter = normalizeA1Chapter(chapter);
+  const normalizedDay = Number(day);
+  if (!Number.isFinite(normalizedDay) || !normalizedChapter) return null;
+  return Object.values(A1_ASSIGNMENT_REGISTRY).find(
+    (entry) => Number(entry.day) === normalizedDay && normalizeA1Chapter(entry.chapter) === normalizedChapter,
+  ) || null;
+};
+
+export const buildA1TutorMarkedWorkbookHref = (assignmentOrKey, search = "") => {
+  const assignment = typeof assignmentOrKey === "string"
+    ? getA1Assignment(assignmentOrKey)
+    : assignmentOrKey;
+  if (!assignment?.assignmentKey || !assignment?.workbookRoute) return "";
+
+  const destination = new URL(assignment.workbookRoute, "https://www.falowen.app");
+  const params = new URLSearchParams(search || "");
+  params.delete("hub");
+  params.delete("chapter");
+  destination.searchParams.forEach((value, key) => params.set(key, value));
+  params.set("assignmentKey", assignment.assignmentKey);
+  params.set("assignmentId", assignment.assignmentKey);
+  params.set("level", "A1");
+
+  const query = params.toString();
+  return `${destination.pathname}${query ? `?${query}` : ""}${destination.hash || ""}`;
 };
 
 export const getA1AssignmentByRoute = (pathname, search = "") => {
