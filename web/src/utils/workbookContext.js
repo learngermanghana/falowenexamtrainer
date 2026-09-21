@@ -2,14 +2,6 @@ import { normalizeCourseAssignmentKey } from "./courseLessonAssignments";
 
 const normalizeChapter = (value) => String(value || "").trim().toLowerCase();
 
-export const isTutorMarkedWorkbookMatch = (match) => {
-  if (!match || !String(match.level || "").trim()) return false;
-  const resource = match.resource || {};
-  const hasResourceAssignmentFlag = Object.prototype.hasOwnProperty.call(resource, "assignment");
-  if (hasResourceAssignmentFlag) return resource.assignment === true;
-  return match.entry?.assignment === true;
-};
-
 export const chooseWorkbookAssignment = ({ assignments = [], chapter = "" } = {}) => {
   if (!assignments.length) return null;
   const targetChapter = normalizeChapter(chapter);
