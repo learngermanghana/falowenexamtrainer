@@ -7,6 +7,8 @@ import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import { resolveWorkbookSubmissionContext } from "../utils/workbookSubmissionContext";
+import { courseSchedules } from "./courseSchedule";
+import { resolvePublishedAdvancedTutorAssignment } from "../components/AdvancedTutorMarkedSubmissionPanel";
 
 const ROOT = path.resolve(__dirname, "..");
 const COMPONENTS = path.join(ROOT, "components");
@@ -16,11 +18,17 @@ const a2ShellSource = fs.readFileSync(path.join(COMPONENTS, "A2StandardTabbedWor
 const b1ShellSource = fs.readFileSync(path.join(COMPONENTS, "B1StandardWorkbookPage.js"), "utf8");
 const workbookRouteIndex = buildWorkbookRouteIndex();
 
-const EXPECTED_COUNTS = { A1: 19, A2: 28, B1: 28 };
+const EXPECTED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 28, C1: 28 };
+const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 4, C1: 7 };
 
 const tutorAssignments = (level) =>
   getCurriculumEntriesForLevel(level).filter(
     (entry) => entry.assignment === true && entry.progressionEligible !== false,
+  );
+
+const publishedTutorAssignments = (level) =>
+  tutorAssignments(level).filter(
+    (entry) => String(entry.contentStatus || "published").toLowerCase() !== "planned",
   );
 
 const escapeRegex = (value = "") =>
@@ -48,12 +56,14 @@ const collectWorkbookComponentSource = (baseName, seen = new Set(), depth = 0) =
 };
 
 const componentImportFor = (source, componentName) => {
-  const match = source.match(
+  const escapedName = escapeRegex(componentName);
+  const direct = source.match(
     new RegExp(
-      "import\\s+" + escapeRegex(componentName) + "\\s+from\\s+[\"']\\.\\/components\\/([^\"']+)[\"']",
+      "import\\s+" + escapedName + "\\s+from\\s+[\"']\\.\\/([^\"']+)[\"']",
     ),
   );
-  return match?.[1] || "";
+  if (direct?.[1]) return direct[1].replace(/^components\//, "");
+  return "";
 };
 
 const getA2RouteComponent = (pathname) => {
@@ -77,6 +87,13 @@ describe("all tutor-marked A1/A2/B1 assignments", () => {
       const assignments = tutorAssignments(level);
       expect(assignments).toHaveLength(expectedCount);
       expect(new Set(assignments.map((entry) => entry.assignment_id)).size).toBe(expectedCount);
+    },
+  );
+
+  test.each(Object.entries(EXPECTED_PUBLISHED_COUNTS))(
+    "%s exposes only its published tutor-marked assignments",
+    (level, expectedCount) => {
+      expect(publishedTutorAssignments(level)).toHaveLength(expectedCount);
     },
   );
 
@@ -188,6 +205,57 @@ describe("all tutor-marked A1/A2/B1 assignments", () => {
       }
     });
   });
+
+  test.each(["B2", "C1"])(
+    "%s published teacher-marked lessons resolve to locked submission contexts",
+    (level) => {
+      publishedTutorAssignments(level).forEach((entry) => {
+        const day = Number(entry.day);
+        const assignmentKey = String(entry.assignment_id);
+        const resolved = resolvePublishedAdvancedTutorAssignment({ level, day });
+
+        expect(resolved).toEqual(
+          expect.objectContaining({
+            level,
+            day,
+            chapter: entry.chapter,
+            assignmentKey,
+            canonicalAssignmentKey: assignmentKey,
+          }),
+        );
+
+        expect(
+          resolveWorkbookSubmissionContext({ submissionContext: resolved }),
+        ).toEqual(
+          expect.objectContaining({
+            level,
+            day,
+            assignmentKey,
+            locked: true,
+          }),
+        );
+
+        expect(JSON.stringify(courseSchedules[level] || [])).toContain(assignmentKey);
+      });
+    },
+  );
+
+  test.each(["B2", "C1"])(
+    "%s planned teacher assignments stay unavailable until published",
+    (level) => {
+      tutorAssignments(level)
+        .filter((entry) => String(entry.contentStatus || "").toLowerCase() === "planned")
+        .forEach((entry) => {
+          expect(
+            resolvePublishedAdvancedTutorAssignment({
+              level,
+              day: Number(entry.day),
+              canonicalLesson: entry,
+            }),
+          ).toBeNull();
+        });
+    },
+  );
 
   test("all 28 B1 workbook components own the correct canonical Submit context", () => {
     expect(b1ShellSource).toContain("assignmentKey: config.assignmentKey");
