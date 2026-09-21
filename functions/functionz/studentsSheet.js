@@ -233,6 +233,15 @@ async function upsertStudentToSheet(student) {
   const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
   const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
   const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colEnrollmentType = findCol(headerMap, "EnrollmentType", "Enrollment Type");
+  const colDataDeleteAt = findCol(headerMap, "DataDeleteAt", "Data Delete At");
+  const colTrialStartedAt = findCol(headerMap, "TrialStartedAt", "Trial Started At");
+  const colTrialEndsAt = findCol(headerMap, "TrialEndsAt", "Trial Ends At");
+  const colTrialEndNoticeSent = findCol(
+    headerMap,
+    "TrialEndNoticeSent",
+    "Trial End Notice Sent"
+  );
   const colEmergencyPhone = findCol(
     headerMap,
     "Emergency Contact (Phone Number)",
@@ -359,6 +368,11 @@ async function upsertStudentToSheet(student) {
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colEnrollmentType, student.enrollmentType ?? student.EnrollmentType ?? "");
+    pushCell(colDataDeleteAt, student.dataDeleteAt ?? student.DataDeleteAt ?? "");
+    pushCell(colTrialStartedAt, student.trialStartedAt || "");
+    pushCell(colTrialEndsAt, student.trialEndsAt || "");
+    pushCell(colTrialEndNoticeSent, student.trialEndNoticeSent || "");
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
@@ -410,6 +424,14 @@ async function upsertStudentToSheet(student) {
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colEnrollmentType !== null)
+    row[colEnrollmentType] = student.enrollmentType ?? student.EnrollmentType ?? "";
+  if (colDataDeleteAt !== null)
+    row[colDataDeleteAt] = student.dataDeleteAt ?? student.DataDeleteAt ?? "";
+  if (colTrialStartedAt !== null) row[colTrialStartedAt] = student.trialStartedAt || "";
+  if (colTrialEndsAt !== null) row[colTrialEndsAt] = student.trialEndsAt || "";
+  if (colTrialEndNoticeSent !== null)
+    row[colTrialEndNoticeSent] = student.trialEndNoticeSent || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
