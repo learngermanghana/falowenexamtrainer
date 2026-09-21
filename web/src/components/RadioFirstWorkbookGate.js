@@ -8,6 +8,7 @@ import { courseDebug } from "../lib/courseDebug";
 import { styles } from "../styles";
 import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 import { addDay20WorkbookView } from "../utils/a1ChapterResourceHubState";
+import { buildA1TutorMarkedWorkbookHref, getA1AssignmentByDayAndChapter } from "../data/a1AssignmentRegistry";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
@@ -40,6 +41,13 @@ export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" 
     const params = new URLSearchParams(search);
     const day = Number(match[1]);
     const chapter = params.get("chapter") || "";
+    const tutorAssignment = getA1AssignmentByDayAndChapter(day, chapter);
+    if (tutorAssignment) {
+      params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+      const canonicalHref = buildA1TutorMarkedWorkbookHref(tutorAssignment, params.toString());
+      return canonicalHref || `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+    }
+
     const configuredWorkbook = getConfiguredInAppWorkbookResourceRoute({
       level: "A1", day, chapter,
     });
