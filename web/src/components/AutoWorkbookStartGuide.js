@@ -6,7 +6,7 @@ import { A1_GRAMMAR_ROUTE_ENTRIES } from "../data/a1GrammarRoutes";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../data/a2GrammarRoutes";
 import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
-import { isTutorMarkedWorkbookMatch } from "../utils/workbookContext";
+import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import {
   A1_DAY6_WORKBOOK_PATH,
   A1_DAY18_CHAPTER121_PATH,
@@ -168,9 +168,14 @@ const AutoWorkbookStartGuide = () => {
     [pathname, search]
   );
   const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
-  const shouldSyncTutorMarkedContext = isTutorMarkedWorkbookMatch(match);
-  const workbookContextSync = shouldSyncTutorMarkedContext
-    ? <WorkbookContextSync match={match} />
+  const tutorMarkedAssignment = resolveTutorMarkedWorkbookAssignment({
+    level: match?.level,
+    day: match?.day,
+    pathname,
+    search,
+  });
+  const workbookContextSync = tutorMarkedAssignment
+    ? <WorkbookContextSync match={match} assignmentOverride={tutorMarkedAssignment} />
     : null;
 
   useEffect(() => {
