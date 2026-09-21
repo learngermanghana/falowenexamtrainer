@@ -86,8 +86,9 @@ function Speak({standard,knowledge,day,completed,onCompleteChange}){
  const[support,setSupport]=useState("full");
  const planKey=`falowen:c2:day${day}:unified-speech-plan`;
  const[plan,setPlan]=useState(()=>{try{return localStorage.getItem(planKey)||""}catch{return""}});
+ const[legacyPlanSeedAllowed]=useState(()=>{try{return Boolean(String(localStorage.getItem(planKey)||"").trim())}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(planKey,plan)}catch{}},[planKey,plan]);
- useC2CloudDraftField({day,field:"speechPlan",value:plan,setValue:setPlan});
+ useC2CloudDraftField({day,field:"speechPlan",value:plan,setValue:setPlan,seedCloudWhenMissing:legacyPlanSeedAllowed,defaultValue:""});
  const branches=speakingBranches(standard,knowledge);
  return <Section title="Sprechen · Erst verstehen, dann argumentieren">
   <div style={{display:"grid",gap:12}}>
@@ -106,8 +107,9 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
  const key=`falowen:c2:day${day}:unified-opinion`;
  const template=useMemo(()=>buildC2OpinionWritingTemplate(standard),[standard]);
  const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved}catch{return buildC2OpinionWritingTemplate(standard)}});
+ const[legacyDraftSeedAllowed]=useState(()=>{try{const saved=localStorage.getItem(key)||"";return Boolean(String(saved).trim()&&saved!==template)}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
- useC2CloudDraftField({day,field:"opinionDraft",value:draft,setValue:setDraft});
+ useC2CloudDraftField({day,field:"opinionDraft",value:draft,setValue:setDraft,seedCloudWhenMissing:legacyDraftSeedAllowed,defaultValue:template});
  const words=useMemo(()=>draft.trim()?draft.trim().split(/\s+/).length:0,[draft]);
  const restoreTemplate=()=>{
   if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
@@ -130,8 +132,9 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
 function ReformulationWrite({standard,day,completed,onCompleteChange}){
  const key=`falowen:c2:day${day}:unified-reformulations`;
  const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return{}}});
+ const[legacyAnswersSeedAllowed]=useState(()=>{try{const saved=JSON.parse(localStorage.getItem(key)||"{}");return Object.values(saved||{}).some(value=>String(value||"").trim())}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(answers))}catch{}},[key,answers]);
- useC2CloudDraftField({day,field:"reformulationAnswers",value:answers,setValue:setAnswers});
+ useC2CloudDraftField({day,field:"reformulationAnswers",value:answers,setValue:setAnswers,seedCloudWhenMissing:legacyAnswersSeedAllowed,defaultValue:{}});
  return <Section title="Schreiben · Umformung">
   <p style={{margin:0,lineHeight:1.75}}><strong>Testbereich:</strong> Formulieren Sie jeden Satz neu. Verwenden Sie das vorgegebene Wort unverändert und erhalten Sie die Bedeutung. Hier werden keine Musterlösungen angezeigt.</p>
   <div style={{display:"grid",gap:12}}>{standard.reformulations.map((item,index)=><article key={item.cue+index} style={{...sub,background:"#fff"}}><strong>{index+1}. {item.source}</strong><div><strong>Vorgegebenes Wort:</strong> <span style={{...styles.badge,background:"#dbeafe",color:"#1e3a8a"}}>{item.cue}</span></div><textarea value={answers[index]||""} onChange={e=>setAnswers(old=>({...old,[index]:e.target.value}))} placeholder="Ihre Umformung" style={{minHeight:92,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit",lineHeight:1.65}}/></article>)}</div>
@@ -151,9 +154,11 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const storageKey=`falowen:c2:day${day}:unified-progress`;
  const requestedView=useMemo(()=>{const value=new URLSearchParams(location.search||"").get("view")||"";return C2_WORKBOOK_VIEWS.has(value)?value:"learn"},[location.search]);
  const[active,setActive]=useState(requestedView);
- const[progress,setProgress]=useState(()=>{try{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:"",...JSON.parse(localStorage.getItem(storageKey)||"{}")}}catch{return{learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""}}});
+ const defaultProgress={learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""};
+ const[progress,setProgress]=useState(()=>{try{return{...defaultProgress,...JSON.parse(localStorage.getItem(storageKey)||"{}")}}catch{return defaultProgress}});
+ const[legacyProgressSeedAllowed]=useState(()=>{try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");return Boolean(saved&&(saved.learnDone||saved.speakDone||saved.writeDone||String(saved.confidence||"").trim()||String(saved.reflection||"").trim()))}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(progress))}catch{}},[storageKey,progress]);
- useC2CloudDraftField({day,field:"progress",value:progress,setValue:setProgress});
+ useC2CloudDraftField({day,field:"progress",value:progress,setValue:setProgress,seedCloudWhenMissing:legacyProgressSeedAllowed,defaultValue:defaultProgress});
  useEffect(()=>{setActive(requestedView)},[requestedView]);
  const changeView=(next)=>{if(!C2_WORKBOOK_VIEWS.has(next))return;setActive(next);const params=new URLSearchParams(location.search||"");if(next==="learn")params.delete("view");else params.set("view",next);const search=params.toString();navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true})};
  if(!day||!standard||!knowledge||!mastery)return null;
