@@ -33,6 +33,7 @@ const NATIVE_SHARED_LAYOUT_COMPONENTS = new Set([
   "A1Day11UnderstandingTimeWorkbookPage",
   "A1Day12TwentyFourHourClockAndDatesWorkbookPage",
   "A1Day16FoodAndDailyLifeWorkbookPage",
+  "A1Day16FoodAndNegationKapitel10WorkbookPage",
   "A1Day17InstructionsDirectionsKapitel11WorkbookPage",
   "A1Day18Kapitel121WorkbookPage",
   "A1Day18Kapitel122WorkbookPage",
