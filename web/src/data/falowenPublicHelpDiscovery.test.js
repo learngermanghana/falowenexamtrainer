@@ -43,13 +43,16 @@ describe("Falowen public help and AI discovery", () => {
     expect(robots).toContain("Allow: /");
   });
 
-  test("keeps the help page discoverable from the sitemap and homepage", () => {
+  test("keeps only the canonical help page in the sitemap and links it from the homepage", () => {
     expect(sitemap).toContain("https://www.falowen.app/help");
+    expect(sitemap).not.toContain("https://www.falowen.app/learn-german-ghana/falowen-guide");
     expect(landing).toContain('href: "/help"');
   });
 
-  test("serves the public help route with a canonical /help page", () => {
+  test("serves canonical /help and redirects the legacy guide route", () => {
     expect(app).toContain('location.pathname === "/help"');
+    expect(app).toContain('location.pathname === "/learn-german-ghana/falowen-guide"');
+    expect(app).toContain('<Navigate to="/help" replace />');
     expect(guide).toContain('canonicalPath: "/help"');
     expect(guide).toContain('href="/falowen-help.md"');
   });
