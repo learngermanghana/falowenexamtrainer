@@ -32,6 +32,7 @@ const ZOOM_WEBHOOK_SECRET = defineSecret("ZOOM_WEBHOOK_SECRET");
 
 let appInstance;
 let appendStudentToStudentsSheetSafely;
+let purgeStudentFromSheets;
 
 const getApp = () => {
   if (!appInstance) {
@@ -47,6 +48,13 @@ const getStudentAppender = () => {
     ({ appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet"));
   }
   return appendStudentToStudentsSheetSafely;
+};
+
+const getStudentSheetPurger = () => {
+  if (!purgeStudentFromSheets) {
+    ({ purgeStudentFromSheets } = require("./functionz/studentsSheet"));
+  }
+  return purgeStudentFromSheets;
 };
 
 
@@ -167,6 +175,8 @@ const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
 const UNPAID_SIGNUP_GRACE_DAYS = 7;
 const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
+const TRIAL_RETENTION_DAYS = 30;
+const TRIAL_RETENTION_MS = TRIAL_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const CONTRACT_EXPIRY_GRACE_DAYS = 30;
 const CONTRACT_EXPIRY_GRACE_MS = CONTRACT_EXPIRY_GRACE_DAYS * 24 * 60 * 60 * 1000;
 
@@ -292,13 +302,71 @@ const hasStudentMadePayment = (student = {}) => {
   return paidFields.some((value) => Number(value) > 0);
 };
 
+const getTrialEndMillis = (student = {}) =>
+  getMillisFromTimestampLike(student.trialEndsAt);
+
+const getTrialPurgeMillis = (student = {}) => {
+  const explicit = getMillisFromTimestampLike(student.trialPurgeAt);
+  if (Number.isFinite(explicit)) return explicit;
+
+  const trialEndMs = getTrialEndMillis(student);
+  return Number.isFinite(trialEndMs)
+    ? trialEndMs + TRIAL_RETENTION_MS
+    : Number.NaN;
+};
+
+const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
+  const trialEndMs = getTrialEndMillis(student);
+  if (!Number.isFinite(trialEndMs)) return { state: "not_trial" };
+  if (hasStudentMadePayment(student)) {
+    return { state: "converted", trialEndMs, purgeAtMs: getTrialPurgeMillis(student) };
+  }
+
+  const purgeAtMs = getTrialPurgeMillis(student);
+  if (nowMs < trialEndMs) return { state: "active", trialEndMs, purgeAtMs };
+  if (!Number.isFinite(purgeAtMs) || nowMs < purgeAtMs) {
+    return { state: "expired", trialEndMs, purgeAtMs };
+  }
+  return { state: "purge_due", trialEndMs, purgeAtMs };
+};
+
 const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
   if (!student || hasStudentMadePayment(student)) return false;
+
+  // Trial accounts have their own lifecycle: 7 days of access plus a 30-day
+  // recovery window. Never let the generic 7-day unpaid-signup cleanup remove them.
+  if (Number.isFinite(getTrialEndMillis(student))) return false;
 
   const joinedAtMs = getMillisFromTimestampLike(student.joined_at);
   if (!Number.isFinite(joinedAtMs)) return false;
 
   return joinedAtMs < cutoffMs;
+};
+
+const deleteFirestoreScoresForStudent = async (db, studentCode) => {
+  const raw = String(studentCode || "").trim();
+  if (!raw) return 0;
+
+  const codeVariants = Array.from(new Set([raw, raw.toUpperCase(), raw.toLowerCase()]));
+  const scoreRefs = new Map();
+
+  for (const field of ["studentcode", "studentCode"]) {
+    const snapshot = await db
+      .collection("scores")
+      .where(field, "in", codeVariants)
+      .get();
+    snapshot.docs.forEach((docSnap) => scoreRefs.set(docSnap.ref.path, docSnap.ref));
+  }
+
+  const refs = Array.from(scoreRefs.values());
+  let deleted = 0;
+  for (let offset = 0; offset < refs.length; offset += 400) {
+    const batch = db.batch();
+    refs.slice(offset, offset + 400).forEach((ref) => batch.delete(ref));
+    await batch.commit();
+    deleted += Math.min(400, refs.length - offset);
+  }
+  return deleted;
 };
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
@@ -877,6 +945,177 @@ exports.archiveOldThreads = onSchedule(
 
     await Promise.all(batches);
     console.log(`archiveOldThreads: archived ${snapshot.size} threads`);
+
+    return null;
+  }
+);
+
+
+exports.cleanupExpiredTrials = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every day 02:45",
+    timeZone: "Etc/UTC",
+    secrets: [
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+      RESULTS_SHEET_PUBLISHED_CSV_URL,
+    ],
+  },
+  async () => {
+    const db = getFirestore();
+    const auth = getAdmin().auth();
+    const nowMs = Date.now();
+
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    const snapshot = await db.collection("students").get();
+    if (snapshot.empty) {
+      console.log("cleanupExpiredTrials: no student records found");
+      return null;
+    }
+
+    let trialRecords = 0;
+    let markedActive = 0;
+    let markedExpired = 0;
+    let converted = 0;
+    let purged = 0;
+    let scoreDocsDeleted = 0;
+    let sheetStudentRowsDeleted = 0;
+    let sheetScoreRowsDeleted = 0;
+    let failed = 0;
+
+    for (const docSnap of snapshot.docs) {
+      const student = docSnap.data() || {};
+      const lifecycle = getTrialLifecycleState(student, nowMs);
+      if (lifecycle.state === "not_trial") continue;
+      trialRecords += 1;
+
+      const currentStatus = normalizeValue(student.status);
+      const expectedPurgeIso = Number.isFinite(lifecycle.purgeAtMs)
+        ? new Date(lifecycle.purgeAtMs).toISOString()
+        : "";
+
+      if (lifecycle.state === "converted") {
+        const updates = {
+          trialRetentionStatus: "converted",
+          updated_at: FieldValue.serverTimestamp(),
+        };
+        if (currentStatus === "trial_active" || currentStatus === "trial_expired") {
+          updates.status = "Active";
+        }
+        if (!student.trialConvertedAt) {
+          updates.trialConvertedAt = FieldValue.serverTimestamp();
+        }
+        if (student.trialPurgeAt) {
+          updates.trialPurgeAt = FieldValue.delete();
+        }
+        await docSnap.ref.set(updates, { merge: true });
+        converted += 1;
+        continue;
+      }
+
+      if (lifecycle.state === "active") {
+        const updates = {};
+        if (currentStatus !== "trial_active") updates.status = "trial_active";
+        if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
+          updates.trialPurgeAt = expectedPurgeIso;
+        }
+        if (student.trialRetentionStatus !== "active") updates.trialRetentionStatus = "active";
+        if (Object.keys(updates).length) {
+          updates.updated_at = FieldValue.serverTimestamp();
+          await docSnap.ref.set(updates, { merge: true });
+        }
+        markedActive += 1;
+        continue;
+      }
+
+      if (lifecycle.state === "expired") {
+        const updates = {};
+        if (currentStatus !== "trial_expired") updates.status = "trial_expired";
+        if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
+          updates.trialPurgeAt = expectedPurgeIso;
+        }
+        if (student.trialRetentionStatus !== "retained") updates.trialRetentionStatus = "retained";
+        if (!student.trialExpiredAt) updates.trialExpiredAt = FieldValue.serverTimestamp();
+        if (Object.keys(updates).length) {
+          updates.updated_at = FieldValue.serverTimestamp();
+          await docSnap.ref.set(updates, { merge: true });
+        }
+        markedExpired += 1;
+        continue;
+      }
+
+      const studentCode = String(
+        student.studentCode || student.studentcode || docSnap.id || ""
+      ).trim();
+      const uid = String(student.uid || "").trim();
+      const email = String(student.email || "").trim();
+
+      try {
+        const sheetResult = await getStudentSheetPurger()({
+          studentCode,
+          uid,
+          email,
+          scoresSpreadsheetUrl: RESULTS_SHEET_PUBLISHED_CSV_URL.value(),
+          scoresTabName: "scores_backup",
+        });
+        sheetStudentRowsDeleted += Number(sheetResult?.studentRowsDeleted || 0);
+        sheetScoreRowsDeleted += Number(sheetResult?.scoreRowsDeleted || 0);
+
+        scoreDocsDeleted += await deleteFirestoreScoresForStudent(db, studentCode);
+
+        if (uid) {
+          try {
+            await auth.deleteUser(uid);
+          } catch (error) {
+            if (error?.code !== "auth/user-not-found") throw error;
+          }
+        }
+
+        if (typeof db.recursiveDelete === "function") {
+          await db.recursiveDelete(docSnap.ref);
+        } else {
+          await docSnap.ref.delete();
+        }
+        purged += 1;
+      } catch (error) {
+        failed += 1;
+        console.error("cleanupExpiredTrials: purge failed", {
+          studentId: docSnap.id,
+          studentCode,
+          errorMessage: error?.message || String(error),
+          code: error?.code,
+        });
+        await docSnap.ref.set(
+          {
+            status: "trial_expired",
+            trialRetentionStatus: "purge_failed",
+            purgeStatus: "failed",
+            purgeError: String(error?.message || "unknown"),
+            purgeFailedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
+    }
+
+    console.log("cleanupExpiredTrials: completed", {
+      scanned: snapshot.size,
+      trialRecords,
+      markedActive,
+      markedExpired,
+      converted,
+      purged,
+      scoreDocsDeleted,
+      sheetStudentRowsDeleted,
+      sheetScoreRowsDeleted,
+      failed,
+      retentionDays: TRIAL_RETENTION_DAYS,
+    });
 
     return null;
   }
