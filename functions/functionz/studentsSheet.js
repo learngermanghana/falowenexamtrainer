@@ -101,6 +101,27 @@ async function loadHeaderMap(sheets, sheetId, tabName) {
   return { headers, headerMap };
 }
 
+async function ensureHeaders(sheets, sheetId, tabName, requiredHeaders = []) {
+  let loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  const missing = requiredHeaders.filter(
+    (header) => !loaded.headerMap.has(normalizeHeader(header))
+  );
+
+  if (!missing.length) return loaded;
+
+  const startCol = loaded.headers.length;
+  const endCol = startCol + missing.length - 1;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colToA1(startCol)}1:${colToA1(endCol)}1`,
+    valueInputOption: "RAW",
+    requestBody: { values: [missing] },
+  });
+
+  loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  return loaded;
+}
+
 function findCol(headerMap, ...candidates) {
   for (const c of candidates) {
     const idx = headerMap.get(normalizeHeader(c));
@@ -215,7 +236,12 @@ async function upsertStudentToSheet(student) {
   if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
 
   const sheets = await getSheetsClient();
-  const { headers, headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
+  const { headers, headerMap } = await ensureHeaders(sheets, sheetId, tabName, [
+    "TrialStartedAt",
+    "TrialEndsAt",
+    "TrialPurgeAt",
+    "TrialUsedAt",
+  ]);
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
@@ -233,6 +259,10 @@ async function upsertStudentToSheet(student) {
   const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
   const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
   const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colTrialStartedAt = findCol(headerMap, "TrialStartedAt", "Trial Started At");
+  const colTrialEndsAt = findCol(headerMap, "TrialEndsAt", "Trial Ends At");
+  const colTrialPurgeAt = findCol(headerMap, "TrialPurgeAt", "Trial Purge At");
+  const colTrialUsedAt = findCol(headerMap, "TrialUsedAt", "Trial Used At");
   const colEmergencyPhone = findCol(
     headerMap,
     "Emergency Contact (Phone Number)",
@@ -359,6 +389,10 @@ async function upsertStudentToSheet(student) {
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colTrialStartedAt, student.trialStartedAt || "");
+    pushCell(colTrialEndsAt, student.trialEndsAt || "");
+    pushCell(colTrialPurgeAt, student.trialPurgeAt || "");
+    pushCell(colTrialUsedAt, student.trialUsedAt || "");
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
@@ -410,6 +444,10 @@ async function upsertStudentToSheet(student) {
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colTrialStartedAt !== null) row[colTrialStartedAt] = student.trialStartedAt || "";
+  if (colTrialEndsAt !== null) row[colTrialEndsAt] = student.trialEndsAt || "";
+  if (colTrialPurgeAt !== null) row[colTrialPurgeAt] = student.trialPurgeAt || "";
+  if (colTrialUsedAt !== null) row[colTrialUsedAt] = student.trialUsedAt || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
