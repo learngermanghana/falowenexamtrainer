@@ -1,0 +1,19 @@
+# Falowen Help & Navigation
+
+The canonical help and navigation knowledge base is committed at:
+
+`web/public/falowen-help.md`
+
+It is intentionally stored under `web/public` so the same reviewed documentation is served publicly at:
+
+https://www.falowen.app/falowen-help.md
+
+Human-readable guide:
+
+https://www.falowen.app/help
+
+AI discovery index:
+
+https://www.falowen.app/llms.txt
+
+When Falowen changes routes, signup/trial/payment rules, level visibility, assignment submission behavior, Results, Attendance, Exam File or Account tabs, update the public Markdown source and the human Help page together.
