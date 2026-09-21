@@ -110,6 +110,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test A1 Day 16 Radio completion persistence
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/A1Day16RadioCompletionPersistence.test.js
       - name: Test workbook routes and supporting materials
         working-directory: web
         env:
