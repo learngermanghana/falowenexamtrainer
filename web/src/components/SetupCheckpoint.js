@@ -8,7 +8,9 @@ import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus"
 import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
 
-const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const TRIAL_DURATION_MS = 7 * DAY_MS;
+const TRIAL_RETENTION_MS = 30 * DAY_MS;
 
 const SetupCheckpoint = () => {
   const { studentProfile, refreshUser, saveStudentProfile, logout } = useAuth();
@@ -52,13 +54,14 @@ const SetupCheckpoint = () => {
     const endsAtMs = toDateMs(studentProfile?.trialEndsAt);
     const startedAtMs = toDateMs(studentProfile?.trialStartedAt);
     const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
+    const purgeAtMs = toDateMs(studentProfile?.trialPurgeAt);
     const wasUsed =
       Number.isFinite(startedAtMs) ||
       Number.isFinite(endsAtMs) ||
       Number.isFinite(usedAtMs);
     const active = Number.isFinite(endsAtMs) && endsAtMs > Date.now();
-    return { active, endsAtMs, wasUsed };
-  }, [studentProfile?.trialEndsAt, studentProfile?.trialStartedAt, studentProfile?.trialUsedAt]);
+    return { active, endsAtMs, purgeAtMs, wasUsed };
+  }, [studentProfile?.trialEndsAt, studentProfile?.trialPurgeAt, studentProfile?.trialStartedAt, studentProfile?.trialUsedAt]);
 
   const handleStartTrial = async () => {
     if (trialState.wasUsed || startingTrial) return;
@@ -67,10 +70,13 @@ const SetupCheckpoint = () => {
     try {
       const startedAt = new Date();
       const endsAt = new Date(startedAt.getTime() + TRIAL_DURATION_MS);
+      const purgeAt = new Date(endsAt.getTime() + TRIAL_RETENTION_MS);
       await saveStudentProfile({
         trialStartedAt: startedAt.toISOString(),
         trialEndsAt: endsAt.toISOString(),
         trialUsedAt: startedAt.toISOString(),
+        trialPurgeAt: purgeAt.toISOString(),
+        status: "trial_active",
       });
       setStatus("Your 7-day free trial is active. Opening your Falowen campus...");
     } catch (error) {
@@ -104,6 +110,13 @@ const SetupCheckpoint = () => {
         month: "short",
         day: "numeric",
       }).format(new Date(trialState.endsAtMs))
+    : "";
+  const trialPurgeLabel = Number.isFinite(trialState.purgeAtMs)
+    ? new Intl.DateTimeFormat(locale || "en", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(new Date(trialState.purgeAtMs))
     : "";
 
   return (
@@ -140,7 +153,7 @@ const SetupCheckpoint = () => {
             </h3>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
               {trialState.wasUsed
-                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Your progress is saved. Complete your tuition payment to continue.`
+                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Your progress and scores are retained${trialPurgeLabel ? ` until ${trialPurgeLabel}` : " for 30 days after the trial ends"}. Complete your tuition payment before then to continue with the same student code and progress.`
                 : "Start your one-time 7-day free trial for full student access, or pay your tuition now. Starting the trial does not count as a payment or reduce your tuition balance."}
             </p>
           </div>

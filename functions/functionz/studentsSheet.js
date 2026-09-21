@@ -101,6 +101,27 @@ async function loadHeaderMap(sheets, sheetId, tabName) {
   return { headers, headerMap };
 }
 
+async function ensureHeaders(sheets, sheetId, tabName, requiredHeaders = []) {
+  let loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  const missing = requiredHeaders.filter(
+    (header) => !loaded.headerMap.has(normalizeHeader(header))
+  );
+
+  if (!missing.length) return loaded;
+
+  const startCol = loaded.headers.length;
+  const endCol = startCol + missing.length - 1;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colToA1(startCol)}1:${colToA1(endCol)}1`,
+    valueInputOption: "RAW",
+    requestBody: { values: [missing] },
+  });
+
+  loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  return loaded;
+}
+
 function findCol(headerMap, ...candidates) {
   for (const c of candidates) {
     const idx = headerMap.get(normalizeHeader(c));
@@ -215,7 +236,21 @@ async function upsertStudentToSheet(student) {
   if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
 
   const sheets = await getSheetsClient();
-  const { headers, headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
+  const hasTrialMetadata = [
+    student.trialStartedAt,
+    student.trialEndsAt,
+    student.trialPurgeAt,
+    student.trialUsedAt,
+  ].some((value) => value !== undefined && value !== null && String(value).trim() !== "");
+
+  const { headers, headerMap } = hasTrialMetadata
+    ? await ensureHeaders(sheets, sheetId, tabName, [
+        "TrialStartedAt",
+        "TrialEndsAt",
+        "TrialPurgeAt",
+        "TrialUsedAt",
+      ])
+    : await loadHeaderMap(sheets, sheetId, tabName);
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
@@ -233,6 +268,10 @@ async function upsertStudentToSheet(student) {
   const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
   const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
   const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colTrialStartedAt = findCol(headerMap, "TrialStartedAt", "Trial Started At");
+  const colTrialEndsAt = findCol(headerMap, "TrialEndsAt", "Trial Ends At");
+  const colTrialPurgeAt = findCol(headerMap, "TrialPurgeAt", "Trial Purge At");
+  const colTrialUsedAt = findCol(headerMap, "TrialUsedAt", "Trial Used At");
   const colEmergencyPhone = findCol(
     headerMap,
     "Emergency Contact (Phone Number)",
@@ -359,6 +398,10 @@ async function upsertStudentToSheet(student) {
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colTrialStartedAt, student.trialStartedAt || "");
+    pushCell(colTrialEndsAt, student.trialEndsAt || "");
+    pushCell(colTrialPurgeAt, student.trialPurgeAt || "");
+    pushCell(colTrialUsedAt, student.trialUsedAt || "");
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
@@ -410,6 +453,10 @@ async function upsertStudentToSheet(student) {
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colTrialStartedAt !== null) row[colTrialStartedAt] = student.trialStartedAt || "";
+  if (colTrialEndsAt !== null) row[colTrialEndsAt] = student.trialEndsAt || "";
+  if (colTrialPurgeAt !== null) row[colTrialPurgeAt] = student.trialPurgeAt || "";
+  if (colTrialUsedAt !== null) row[colTrialUsedAt] = student.trialUsedAt || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
@@ -459,7 +506,111 @@ async function appendStudentToStudentsSheetSafely(student) {
   }
 }
 
+function extractSpreadsheetIdFromUrl(value) {
+  const match = String(value || "").match(/\/spreadsheets\/d\/([^/]+)/i);
+  return match ? match[1] : "";
+}
+
+async function purgeStudentFromSheets({
+  studentCode = "",
+  uid = "",
+  email = "",
+  scoresSpreadsheetId = "",
+  scoresSpreadsheetUrl = "",
+  scoresTabName = "scores_backup",
+} = {}) {
+  const studentsSpreadsheetId = process.env.STUDENTS_SHEET_ID;
+  const studentsTabName = process.env.STUDENTS_SHEET_TAB || "students";
+  if (!studentsSpreadsheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
+
+  const normalizedCode = String(studentCode || "").trim().toLowerCase();
+  const normalizedUid = String(uid || "").trim();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedCode && !normalizedUid && !normalizedEmail) {
+    throw new Error("Student code, uid or email is required for sheet purge.");
+  }
+
+  const sheets = await getSheetsClient();
+
+  const studentHeaderData = await loadHeaderMap(sheets, studentsSpreadsheetId, studentsTabName);
+  const studentCodeCol = findCol(studentHeaderData.headerMap, "StudentCode", "Student Code", "studentcode");
+  const uidCol = findCol(studentHeaderData.headerMap, "uid", "UID", "User Id", "UserID", "User ID");
+  const emailCol = findCol(studentHeaderData.headerMap, "Email", "email");
+
+  const codeValues = studentCodeCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, studentCodeCol);
+  const uidValues = uidCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, uidCol);
+  const emailValues = emailCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, emailCol);
+
+  const studentRows = new Set();
+  codeValues.forEach((value, index) => {
+    if (normalizedCode && String(value || "").trim().toLowerCase() === normalizedCode) studentRows.add(index + 2);
+  });
+  uidValues.forEach((value, index) => {
+    if (normalizedUid && String(value || "").trim() === normalizedUid) studentRows.add(index + 2);
+  });
+  emailValues.forEach((value, index) => {
+    if (normalizedEmail && String(value || "").trim().toLowerCase() === normalizedEmail) studentRows.add(index + 2);
+  });
+
+  const studentRowsDeleted = await deleteDuplicateRows(
+    sheets,
+    studentsSpreadsheetId,
+    studentsTabName,
+    Array.from(studentRows)
+  );
+
+  const resolvedScoresSpreadsheetId =
+    String(scoresSpreadsheetId || "").trim() ||
+    extractSpreadsheetIdFromUrl(scoresSpreadsheetUrl);
+
+  let scoreRowsDeleted = 0;
+  if (resolvedScoresSpreadsheetId && normalizedCode) {
+    const scoreHeaderData = await loadHeaderMap(
+      sheets,
+      resolvedScoresSpreadsheetId,
+      scoresTabName
+    );
+    const scoreCodeCol = findCol(
+      scoreHeaderData.headerMap,
+      "StudentCode",
+      "Student Code",
+      "studentcode",
+      "student_code"
+    );
+
+    if (scoreCodeCol !== null) {
+      const scoreCodes = await getColumnValues(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreCodeCol
+      );
+      const scoreRows = [];
+      scoreCodes.forEach((value, index) => {
+        if (String(value || "").trim().toLowerCase() === normalizedCode) {
+          scoreRows.push(index + 2);
+        }
+      });
+      scoreRowsDeleted = await deleteDuplicateRows(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreRows
+      );
+    }
+  }
+
+  return { studentRowsDeleted, scoreRowsDeleted };
+}
+
 module.exports = {
   upsertStudentToSheet,
   appendStudentToStudentsSheetSafely,
+  purgeStudentFromSheets,
 };

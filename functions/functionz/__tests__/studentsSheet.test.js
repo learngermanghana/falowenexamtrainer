@@ -1,5 +1,6 @@
 const mockBatchUpdate = jest.fn();
 const mockAppend = jest.fn();
+const mockUpdate = jest.fn();
 const mockValuesGet = jest.fn();
 const mockSpreadsheetsGet = jest.fn();
 
@@ -13,6 +14,7 @@ const installGoogleApisMock = () => {
         spreadsheets: {
           values: {
             get: mockValuesGet,
+            update: mockUpdate,
             batchUpdate: mockBatchUpdate,
             append: mockAppend,
           },
@@ -29,6 +31,7 @@ describe('upsertStudentToSheet paid field sync', () => {
     jest.resetModules();
     mockBatchUpdate.mockReset();
     mockAppend.mockReset();
+    mockUpdate.mockReset();
     mockValuesGet.mockReset();
     mockSpreadsheetsGet.mockReset();
     installGoogleApisMock();
@@ -94,6 +97,88 @@ describe('upsertStudentToSheet paid field sync', () => {
       expect.arrayContaining([
         expect.objectContaining({ range: 'students!E2', values: [[3000]] }),
         expect.objectContaining({ range: 'students!F2', values: [[0]] }),
+      ])
+    );
+  });
+
+  it('adds and writes trial retention columns when trial metadata is present', async () => {
+    const baseHeaders = [
+      'Name',
+      'Phone',
+      'Location',
+      'Level',
+      'Paid',
+      'Balance',
+      'ContractStart',
+      'ContractEnd',
+      'StudentCode',
+      'Email',
+    ];
+    const trialHeaders = [
+      ...baseHeaders,
+      'TrialStartedAt',
+      'TrialEndsAt',
+      'TrialPurgeAt',
+      'TrialUsedAt',
+    ];
+
+    mockValuesGet
+      .mockResolvedValueOnce({ data: { values: [baseHeaders] } })
+      .mockResolvedValueOnce({ data: { values: [trialHeaders] } })
+      .mockResolvedValueOnce({ data: { values: [['TRIAL123']] } })
+      .mockResolvedValueOnce({ data: { values: [['trial@example.com']] } });
+
+    const { upsertStudentToSheet } = require('../studentsSheet');
+
+    const result = await upsertStudentToSheet({
+      name: 'Trial Student',
+      studentCode: 'TRIAL123',
+      email: 'trial@example.com',
+      level: 'A1',
+      status: 'trial_active',
+      trialStartedAt: '2026-09-21T10:00:00.000Z',
+      trialEndsAt: '2026-09-28T10:00:00.000Z',
+      trialPurgeAt: '2026-10-28T10:00:00.000Z',
+      trialUsedAt: '2026-09-21T10:00:00.000Z',
+    });
+
+    expect(result).toEqual({ action: 'updated', row: 2 });
+    expect(mockUpdate).toHaveBeenCalledTimes(1);
+    expect(mockUpdate.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        spreadsheetId: 'sheet-123',
+        range: 'students!K1:N1',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[
+            'TrialStartedAt',
+            'TrialEndsAt',
+            'TrialPurgeAt',
+            'TrialUsedAt',
+          ]],
+        },
+      })
+    );
+
+    const write = mockBatchUpdate.mock.calls[0][0].requestBody.data;
+    expect(write).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          range: 'students!K2',
+          values: [['2026-09-21T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!L2',
+          values: [['2026-09-28T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!M2',
+          values: [['2026-10-28T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!N2',
+          values: [['2026-09-21T10:00:00.000Z']],
+        }),
       ])
     );
   });
