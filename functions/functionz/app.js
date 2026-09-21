@@ -533,7 +533,7 @@ const buildLoginDiagnosticProfile = (docSnap) => {
   };
 };
 
-const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current", "trial_active", "trial_expired"];
 const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
 
 const buildLoginDiagnostic = (profile) => {
