@@ -236,12 +236,21 @@ async function upsertStudentToSheet(student) {
   if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
 
   const sheets = await getSheetsClient();
-  const { headers, headerMap } = await ensureHeaders(sheets, sheetId, tabName, [
-    "TrialStartedAt",
-    "TrialEndsAt",
-    "TrialPurgeAt",
-    "TrialUsedAt",
-  ]);
+  const hasTrialMetadata = [
+    student.trialStartedAt,
+    student.trialEndsAt,
+    student.trialPurgeAt,
+    student.trialUsedAt,
+  ].some((value) => value !== undefined && value !== null && String(value).trim() !== "");
+
+  const { headers, headerMap } = hasTrialMetadata
+    ? await ensureHeaders(sheets, sheetId, tabName, [
+        "TrialStartedAt",
+        "TrialEndsAt",
+        "TrialPurgeAt",
+        "TrialUsedAt",
+      ])
+    : await loadHeaderMap(sheets, sheetId, tabName);
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
