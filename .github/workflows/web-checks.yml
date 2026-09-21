@@ -32,7 +32,7 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
-      - name: Audit all 75 tutor-marked A1, A2 and B1 assignments
+      - name: Audit all published tutor-marked A1 through C1 assignments
         working-directory: web
         env:
           CI: true
