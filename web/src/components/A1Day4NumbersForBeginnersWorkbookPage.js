@@ -1,5 +1,5 @@
 import React from "react";
-import AppBackButton from "./navigation/AppBackButton";
+import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 
 import { styles } from "../styles";
 
@@ -72,97 +72,71 @@ const teil2Questions = [
   },
 ];
 
-const A1Day4NumbersForBeginnersWorkbookPage = () => {
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses
-        </h1>
-
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2 · Tutor-marked assignment</p>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete both workbook Teile below. Use the Grammar notes for the full 0–10,000 number-building patterns and for using numbers in phone numbers and addresses, then submit your final answers once.
-        </p>
-      </div>
-
-      <div style={card}>
-        <img
-          src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1600&q=80"
-          alt="Notebook page with numbers and study notes"
-          loading="lazy"
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            maxHeight: 280,
-            objectFit: "cover",
-          }}
-        />
-
-        <h2 style={sectionTitle}>Teil 1: Reading / Writing</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Numbers for Beginners (A1.1) (Exercise).</strong> Instructions: Read each question carefully and choose
-          the correct answer (a, b, or c). Use a dictionary to look up any words you don&apos;t understand.
-        </p>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Schreiben Aufgabe (Writing Task): Schreiben Sie die folgenden Zahlen auf Deutsch. Benutzen Sie ein Wörterbuch,
-          wenn Sie ein Wort nicht verstehen.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Instructions: Write the following numbers in German. Use a dictionary if you don&apos;t understand a word.
-        </p>
-        <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>16</li>
-          <li>98</li>
-          <li>555</li>
-          <li>1020</li>
-          <li>8553</li>
-        </ol>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Beispiel (Example): 25 – fünfundzwanzig. Extra note from today&apos;s material: zweitausendvier.
-        </p>
-      </div>
-
-      <div style={card}>
-        <h2 style={sectionTitle}>Teil 2: Questions</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The questions progress from <strong>basic number recognition</strong> to <strong>numbers in context</strong> and then <strong>larger numbers</strong>. They all belong to this one Teil 2 section.
-        </p>
-
-        {teil2Questions.map((question) => (
-          <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
-            {question.options.map((option) => (
-              <p key={option} style={optionLine}>{option}</p>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <div
+const A1Day4NumbersForBeginnersWorkbookPage = () => (
+  <A1TutorMarkedWorkbookShell
+    fallbackAssignmentKey="A1-2"
+    title="A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses"
+    subtitle="Chapter 2 · Tutor-marked assignment"
+    assignmentIntro="Complete both workbook Teile. Your answers are saved as a draft until you open Review & Submit and send the assignment."
+    submitTitle="Review & Submit A1 · Day 4 · Chapter 2"
+    submitDescription="Review the mapped number answers below, make any final edits, then press Submit Assignment once."
+  >
+    <div style={card}>
+      <img
+        src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1600&q=80"
+        alt="Notebook page with numbers and study notes"
+        loading="lazy"
         style={{
-          ...card,
-          border: "1px solid #c7d2fe",
-          background: "#eef2ff",
+          width: "100%",
+          borderRadius: 10,
+          maxHeight: 280,
+          objectFit: "cover",
         }}
-      >
-        <h2 style={sectionTitle}>Final Submission</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          After completing both Teile, use the Submit Assignment tab. The correct A1 Day 4 assignment is selected automatically.
-        </p>
-        <p style={{ margin: 0, fontWeight: 700, color: "#1d4ed8" }}>
-          Submit the assignment once when both Teile are complete.
-        </p>
-      </div>
+      />
+
+      <h2 style={sectionTitle}>Teil 1: Reading / Writing</h2>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        <strong>Numbers for Beginners (A1.1) (Exercise).</strong> Instructions: Read each question carefully and choose
+        the correct answer (a, b, or c). Use a dictionary to look up any words you don&apos;t understand.
+      </p>
+
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Schreiben Aufgabe (Writing Task): Schreiben Sie die folgenden Zahlen auf Deutsch. Benutzen Sie ein Wörterbuch,
+        wenn Sie ein Wort nicht verstehen.
+      </p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Instructions: Write the following numbers in German. Use a dictionary if you don&apos;t understand a word.
+      </p>
+      <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+        <li>16</li>
+        <li>98</li>
+        <li>555</li>
+        <li>1020</li>
+        <li>8553</li>
+      </ol>
+
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Beispiel (Example): 25 – fünfundzwanzig. Extra note from today&apos;s material: zweitausendvier.
+      </p>
     </div>
-  );
-};
+
+    <div style={card}>
+      <h2 style={sectionTitle}>Teil 2: Questions</h2>
+
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        The questions progress from <strong>basic number recognition</strong> to <strong>numbers in context</strong> and then <strong>larger numbers</strong>. They all belong to this one Teil 2 section.
+      </p>
+
+      {teil2Questions.map((question) => (
+        <div key={question.stem} style={questionBlock}>
+          <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+          {question.options.map((option) => (
+            <p key={option} style={optionLine}>{option}</p>
+          ))}
+        </div>
+      ))}
+    </div>
+  </A1TutorMarkedWorkbookShell>
+);
 
 export default A1Day4NumbersForBeginnersWorkbookPage;
