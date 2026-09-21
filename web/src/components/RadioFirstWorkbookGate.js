@@ -16,7 +16,7 @@ const completedRadioSteps = new Set();
 
 const radioStepKey = (level, day) => `${String(level || "").trim().toUpperCase()}:${Number(day)}`;
 
-const getRadioResource = (level, day) =>
+export const resolveRadioFirstWorkbookResource = (level, day) =>
   getLessonRadioResource(level, day) || getB1Day5RadioResource(level, day);
 
 const hasCompletedRadioStep = (search = "", level = "", day = "") => {
@@ -81,10 +81,11 @@ export const openCompletedWorkbook = (locationLike, windowRef) => {
   return true;
 };
 
-export const shouldShowRadioFirst = (level, day) => Boolean(getRadioResource(level, day));
+export const shouldShowRadioFirst = (level, day) =>
+  Boolean(resolveRadioFirstWorkbookResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
-  const radio = resource || getRadioResource(level, day);
+  const radio = resource || resolveRadioFirstWorkbookResource(level, day);
   const location = useLocation();
   const navigate = useNavigate();
   const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
