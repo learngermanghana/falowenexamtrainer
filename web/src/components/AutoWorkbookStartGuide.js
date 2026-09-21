@@ -174,9 +174,6 @@ const AutoWorkbookStartGuide = () => {
     () => findGrammarWorkbookTarget({ pathname, search }),
     [pathname, search]
   );
-  const usesSelfManagedSubmissionTabs =
-    SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
-    || isSelfManagedB1LessonWorkbook(pathname, search);
   const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
   const shouldSyncTutorMarkedContext = isTutorMarkedWorkbookMatch(match);
   const workbookContextSync = shouldSyncTutorMarkedContext
