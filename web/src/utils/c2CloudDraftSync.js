@@ -24,6 +24,7 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
   const migrationKey = user?.uid && day && field
     ? `falowen:c2:cloud-migrated:${user.uid}:${Number(day)}:${field}`
     : "";
+  const defaultSerialized = serialize(defaultValue);
 
   valueRef.current = value;
 
@@ -43,7 +44,6 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
         const data = snapshot.exists() ? snapshot.data() || {} : {};
         const hasRemoteField = Object.prototype.hasOwnProperty.call(data, field);
         const localSerialized = serialize(valueRef.current);
-        const defaultSerialized = serialize(defaultValue);
         let migrationComplete = false;
         try {
           migrationComplete = Boolean(migrationKey && window.localStorage.getItem(migrationKey));
@@ -89,7 +89,7 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
     );
 
     return unsubscribe;
-  }, [day, defaultValue, field, migrationKey, seedCloudWhenMissing, setValue, user?.uid]);
+  }, [day, defaultSerialized, field, migrationKey, seedCloudWhenMissing, setValue, user?.uid]);
 
   useEffect(() => {
     if (saveTimerRef.current) {
