@@ -133,11 +133,55 @@ const formatDateForLoginError = (value) => {
 
 const normalizePaymentStatus = (value) => String(value || "").trim().toLowerCase();
 
-const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const ACTIVE_STUDENT_STATUSES = ["active", "trial_active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
 const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
+const TRIAL_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+
+const getTrialRetentionState = (profile, nowMs = Date.now()) => {
+  if (!profile) return { isTrial: false, retained: false };
+
+  const enrollmentType = String(
+    profile.enrollmentType ?? profile.EnrollmentType ?? ""
+  ).trim().toLowerCase();
+  const status = String(profile.status || "").trim().toLowerCase();
+  const paymentStatus = normalizePaymentStatus(profile.paymentStatus);
+  const amountPaid = Number(profile.paid ?? profile.initialPaymentAmount ?? 0);
+  const explicitlyPaid =
+    (enrollmentType && enrollmentType !== "trial") ||
+    ["paid", "partial"].includes(paymentStatus) ||
+    (Number.isFinite(amountPaid) && amountPaid > 0);
+  if (explicitlyPaid) return { isTrial: false, retained: false };
+
+  const trialEndMs = toMillis(
+    profile.trialEndsAt ||
+      (enrollmentType === "trial" || ["trial_active", "trial_expired"].includes(status)
+        ? profile.contractEnd
+        : "")
+  );
+  const isTrial =
+    enrollmentType === "trial" ||
+    ["trial_active", "trial_expired"].includes(status) ||
+    Number.isFinite(toMillis(profile.trialStartedAt)) ||
+    Number.isFinite(trialEndMs);
+  if (!isTrial || !Number.isFinite(trialEndMs)) {
+    return { isTrial, retained: false };
+  }
+
+  const explicitDeleteAtMs = toMillis(profile.dataDeleteAt ?? profile.DataDeleteAt);
+  const dataDeleteAtMs = Number.isFinite(explicitDeleteAtMs)
+    ? explicitDeleteAtMs
+    : trialEndMs + TRIAL_RETENTION_MS;
+  return {
+    isTrial: true,
+    retained: trialEndMs <= nowMs && dataDeleteAtMs > nowMs,
+    trialEndMs,
+    dataDeleteAtMs,
+  };
+};
 
 const getStudentSupportReason = (profile, fallbackReason = "student_access_blocked") => {
   if (!profile) return "profile_not_found";
+  if (getTrialRetentionState(profile).retained) return "trial_retained";
   const status = String(profile.status || "").trim().toLowerCase();
   if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) return "inactive_status";
 
@@ -162,6 +206,10 @@ const buildStudentSupportDiagnostic = (profile, reason = "student_access_blocked
 
 const getStudentAccessBlockReason = (profile) => {
   if (!profile) return "No student profile was found for this login. Please contact support.";
+
+  // Expired trials may still sign in during the 30-day recovery window so the
+  // payment checkpoint can restore the same account and saved progress.
+  if (getTrialRetentionState(profile).retained) return "";
 
   const status = String(profile.status || "").trim().toLowerCase();
   if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) {
@@ -608,6 +656,12 @@ export const AuthProvider = ({ children }) => {
         contractStart: profile.contractStart || "",
         contractEnd: profile.contractEnd || "",
         contractTermMonths: profile.contractTermMonths ?? null,
+        enrollmentType: profile.enrollmentType || "",
+        trialStartedAt: profile.trialStartedAt || "",
+        trialEndsAt: profile.trialEndsAt || "",
+        trialUsedAt: profile.trialUsedAt || "",
+        dataDeleteAt: profile.dataDeleteAt || "",
+        trialEndNoticeSent: profile.trialEndNoticeSent || "",
         joined_at: new Date().toISOString(),
         updated_at: serverTimestamp(),
         syncedToSheets: false,

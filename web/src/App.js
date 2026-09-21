@@ -264,6 +264,7 @@ function App() {
     if (typeof window === "undefined") return "german";
     return localStorage.getItem(programStorageKey) || "german";
   });
+  const [accessClockMs, setAccessClockMs] = useState(() => Date.now());
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -299,6 +300,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem(programStorageKey, signupProgram);
   }, [programStorageKey, signupProgram]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setAccessClockMs(Date.now()), 30 * 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (location.pathname.startsWith("/signup")) {
@@ -347,12 +353,12 @@ function App() {
     [studentProfile?.balanceDue]
   );
 
-  const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
-  const hasActiveTrial = Number.isFinite(trialEndMs) && trialEndMs > Date.now();
+  const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > accessClockMs;
+  const hasActiveTrial = Number.isFinite(trialEndMs) && trialEndMs > accessClockMs;
   const hasQueuedUpgradeAccess =
     String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
     Number.isFinite(upgradeCarryoverMs) &&
-    upgradeCarryoverMs > Date.now();
+    upgradeCarryoverMs > accessClockMs;
   const canAccessLegacy =
     !Number.isFinite(contractEndMs) && (["paid", "partial"].includes(paymentStatus) || balanceCleared);
   const awaitingPayment =

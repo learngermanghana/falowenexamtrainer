@@ -9,6 +9,10 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const { FieldValue, FieldPath } = require("firebase-admin/firestore");
+const {
+  TRIAL_EXPIRED_STATUS,
+  getTrialLifecycle,
+} = require("./functionz/trialLifecycle");
 
 const getAdmin = () => {
   if (!admin.apps.length) {
@@ -294,6 +298,10 @@ const hasStudentMadePayment = (student = {}) => {
 
 const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
   if (!student || hasStudentMadePayment(student)) return false;
+
+  // Seven-day trials have their own 30-day recovery lifecycle. The generic
+  // unpaid-signup cleanup must never delete them at the seven-day boundary.
+  if (getTrialLifecycle(student).isTrial) return false;
 
   const joinedAtMs = getMillisFromTimestampLike(student.joined_at);
   if (!Number.isFinite(joinedAtMs)) return false;
@@ -973,6 +981,8 @@ exports.cleanupExpiredStudentContracts = onSchedule(
     let skippedNonStudent = 0;
     let skippedFailed = 0;
     let firestoreFailed = 0;
+    let retainedTrials = 0;
+    let trialsMarkedExpired = 0;
 
     let lastDoc = null;
     while (true) {
@@ -1005,15 +1015,54 @@ exports.cleanupExpiredStudentContracts = onSchedule(
           continue;
         }
 
-        const contractEndMs = getContractEndMillis(student.contractEnd);
-        if (!Number.isFinite(contractEndMs)) {
-          skippedInvalid += 1;
-          continue;
-        }
+        const trialLifecycle = getTrialLifecycle(student, new Date(nowMs));
+        if (trialLifecycle.isTrial) {
+          if (trialLifecycle.isActive) {
+            skippedWithinGrace += 1;
+            continue;
+          }
 
-        if (contractEndMs + CONTRACT_EXPIRY_GRACE_MS >= nowMs) {
-          skippedWithinGrace += 1;
-          continue;
+          if (trialLifecycle.isRetained) {
+            retainedTrials += 1;
+            const dataDeleteAt = trialLifecycle.dataDeleteAt.toISOString();
+            const trialEndsAt = trialLifecycle.trialEnd.toISOString();
+            const alreadyMarked =
+              normalizeValue(student.status) === TRIAL_EXPIRED_STATUS &&
+              String(student.dataDeleteAt || "") === dataDeleteAt;
+
+            if (!alreadyMarked) {
+              await docSnap.ref.set(
+                {
+                  status: TRIAL_EXPIRED_STATUS,
+                  enrollmentType: "trial",
+                  contractEnd: student.contractEnd || trialEndsAt,
+                  trialEndsAt: student.trialEndsAt || trialEndsAt,
+                  dataDeleteAt,
+                  updated_at: FieldValue.serverTimestamp(),
+                },
+                { merge: true }
+              );
+              trialsMarkedExpired += 1;
+            }
+            skippedWithinGrace += 1;
+            continue;
+          }
+
+          if (!trialLifecycle.shouldPurge) {
+            skippedInvalid += 1;
+            continue;
+          }
+        } else {
+          const contractEndMs = getContractEndMillis(student.contractEnd);
+          if (!Number.isFinite(contractEndMs)) {
+            skippedInvalid += 1;
+            continue;
+          }
+
+          if (contractEndMs + CONTRACT_EXPIRY_GRACE_MS >= nowMs) {
+            skippedWithinGrace += 1;
+            continue;
+          }
         }
 
         const uid = String(student.uid || "").trim();
@@ -1071,6 +1120,8 @@ exports.cleanupExpiredStudentContracts = onSchedule(
       skippedNonStudent,
       skippedFailed,
       firestoreFailed,
+      retainedTrials,
+      trialsMarkedExpired,
       graceDays: CONTRACT_EXPIRY_GRACE_DAYS,
     });
 

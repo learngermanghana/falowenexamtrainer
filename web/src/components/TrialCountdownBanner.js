@@ -73,7 +73,7 @@ const TrialCountdownBanner = ({ studentProfile, onCompletePayment }) => {
       </span>
       <strong style={{ fontSize: 18, color: "#14532d" }}>{title}</strong>
       <p style={{ ...styles.helperText, margin: 0, color: "#166534", lineHeight: 1.6 }}>
-        Your learning progress is being saved. Complete your tuition payment before {endLabel} to continue without interruption.
+        Your learning progress is being saved. Complete payment before {endLabel} to continue without interruption. If the trial ends, learning access pauses but your account and progress stay recoverable for 30 days.
       </p>
       <PrimaryActionBar align="start">
         <button type="button" style={styles.primaryButton} onClick={onCompletePayment}>

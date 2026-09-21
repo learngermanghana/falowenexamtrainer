@@ -26,6 +26,9 @@ import {
 } from "../lib/signupDataQuality";
 
 const MIN_INITIAL_PAYMENT = 2000;
+const TRIAL_ACCESS_DAYS = 7;
+const TRIAL_RETENTION_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
@@ -317,6 +320,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
       // Store the base Paystack link, but create the actual checkout URL on-demand
       // via the backend so we can validate amounts and attach clear metadata.
       const paystackLink = paystackLinkForLevel(selectedLevel);
+      const trialStartedAt = new Date();
+      const trialEndsAt = new Date(trialStartedAt.getTime() + TRIAL_ACCESS_DAYS * DAY_MS);
+      const dataDeleteAt = new Date(trialEndsAt.getTime() + TRIAL_RETENTION_DAYS * DAY_MS);
 
       await signup(cleanedEmail, password, {
         name: cleanedName,
@@ -335,10 +341,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
         paymentStatus,
         paystackLink,
         paymentIntentAmount: intendedPaymentAmount || null,
-        status: "Active",
-        contractStart: "",
-        contractEnd: "",
+        status: "trial_active",
+        enrollmentType: "trial",
+        contractStart: trialStartedAt.toISOString(),
+        contractEnd: trialEndsAt.toISOString(),
         contractTermMonths: 0,
+        trialStartedAt: trialStartedAt.toISOString(),
+        trialEndsAt: trialEndsAt.toISOString(),
+        trialUsedAt: trialStartedAt.toISOString(),
+        dataDeleteAt: dataDeleteAt.toISOString(),
+        trialEndNoticeSent: "",
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
@@ -347,9 +359,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const amountCopy = intendedPaymentAmount
         ? `You chose to pay ${formatMoney(intendedPaymentAmount)} now.`
         : "Choose how much to pay now inside the app.";
-      const accessCopy = `Pay at least ${formatMoney(
+      const trialEndLabel = new Intl.DateTimeFormat(locale || "en", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(trialEndsAt);
+      const accessCopy = `Your 7-day free trial is active now through ${trialEndLabel}. You can enter Falowen and explore before paying. Pay at least ${formatMoney(
         MIN_INITIAL_PAYMENT
-      )} to unlock 1-month access, or clear the full balance to unlock 6 months.`;
+      )} for 1-month paid access, or clear the full balance for 6 months.`;
       const paymentInstruction = paymentsEnabled
         ? "Open the tuition card in the app to start Paystack checkout."
         : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
@@ -656,7 +673,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Full payment is selected by default and unlocks 6 months of access. Part payment unlocks 1 month of access, with the remaining balance due afterward. We confirm Paystack payments before marking you as paid.
+            Your 7-day Falowen trial starts as soon as your account is created, so you can explore before paying. Full payment unlocks 6 months of paid access; part payment unlocks 1 month. We confirm Paystack payments before marking you as paid.
           </p>
 
           <TuitionStatusCard

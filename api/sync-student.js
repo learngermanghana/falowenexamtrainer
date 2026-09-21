@@ -138,6 +138,11 @@ module.exports = async function handler(req, res) {
       Balance: findCol("Balance", "BalanceDue", "Balance Due"),
       ContractStart: findCol("ContractStart", "Contract Start"),
       ContractEnd: findCol("ContractEnd", "Contract End"),
+      EnrollmentType: findCol("EnrollmentType", "Enrollment Type"),
+      DataDeleteAt: findCol("DataDeleteAt", "Data Delete At"),
+      TrialStartedAt: findCol("TrialStartedAt", "Trial Started At"),
+      TrialEndsAt: findCol("TrialEndsAt", "Trial Ends At"),
+      TrialEndNoticeSent: findCol("TrialEndNoticeSent", "Trial End Notice Sent"),
       EmergencyPhone: findCol(
         "Emergency Contact (Phone Number)",
         "Emergency Contact Phone",
@@ -231,6 +236,11 @@ module.exports = async function handler(req, res) {
       setCell(COL.Balance, get("balance", "Balance"));
       setCell(COL.ContractStart, get("contractStart", "ContractStart"));
       setCell(COL.ContractEnd, get("contractEnd", "ContractEnd"));
+      setCell(COL.EnrollmentType, get("enrollmentType", "EnrollmentType"));
+      setCell(COL.DataDeleteAt, get("dataDeleteAt", "DataDeleteAt"));
+      setCell(COL.TrialStartedAt, get("trialStartedAt", "TrialStartedAt"));
+      setCell(COL.TrialEndsAt, get("trialEndsAt", "TrialEndsAt"));
+      setCell(COL.TrialEndNoticeSent, get("trialEndNoticeSent", "TrialEndNoticeSent"));
       setCell(COL.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
       setCell(COL.Status, get("status", "Status"));
       setCell(COL.EnrollDate, get("enrollDate", "EnrollDate"));
@@ -264,6 +274,11 @@ module.exports = async function handler(req, res) {
     setRow(COL.Balance, get("balance", "Balance"));
     setRow(COL.ContractStart, get("contractStart", "ContractStart"));
     setRow(COL.ContractEnd, get("contractEnd", "ContractEnd"));
+    setRow(COL.EnrollmentType, get("enrollmentType", "EnrollmentType"));
+    setRow(COL.DataDeleteAt, get("dataDeleteAt", "DataDeleteAt"));
+    setRow(COL.TrialStartedAt, get("trialStartedAt", "TrialStartedAt"));
+    setRow(COL.TrialEndsAt, get("trialEndsAt", "TrialEndsAt"));
+    setRow(COL.TrialEndNoticeSent, get("trialEndNoticeSent", "TrialEndNoticeSent"));
     setRow(COL.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
     setRow(COL.Status, get("status", "Status"));
     setRow(COL.EnrollDate, get("enrollDate", "EnrollDate"));
