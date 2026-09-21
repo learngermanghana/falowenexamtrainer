@@ -1,6 +1,8 @@
 import { normalizeCourseAssignmentKey } from "./courseLessonAssignments";
 
 const normalizeChapter = (value) => String(value || "").trim().toLowerCase();
+const RADIO_COMPLETE_PARAM = "radio";
+const RADIO_COMPLETE_VALUE = "done";
 
 export const chooseWorkbookAssignment = ({ assignments = [], chapter = "" } = {}) => {
   if (!assignments.length) return null;
@@ -24,9 +26,16 @@ export const workbookContextMatches = ({ search = "", state = null, level = "", 
 };
 
 export const buildWorkbookContextSearch = ({ search = "", level = "", assignmentKey = "" } = {}) => {
-  const params = new URLSearchParams(search || "");
+  const source = new URLSearchParams(search || "");
+  const completedRadio = source.get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE;
+  const params = new URLSearchParams(source);
   params.set("assignmentKey", assignmentKey);
   params.set("assignmentId", assignmentKey);
   params.set("level", String(level || "").trim().toUpperCase());
+
+  // radio=done is a durable workbook-journey marker. Never let submission
+  // context synchronization send a learner back into Falowen Radio.
+  if (completedRadio) params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+
   return `?${params.toString()}`;
 };
