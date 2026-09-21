@@ -2,11 +2,16 @@ import fs from "fs";
 import path from "path";
 import { getCurriculumEntriesForLevel } from "./germanAssignmentCatalog";
 import { getConfiguredInAppWorkbookResourceRoute } from "./inAppWorkbookRoutes";
-import { getA1Assignment } from "./a1AssignmentRegistry";
+import { buildA1TutorMarkedWorkbookHref, getA1Assignment } from "./a1AssignmentRegistry";
+import { getA1RadioResource } from "./a1RadioResources";
+import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import { resolveWorkbookSubmissionContext } from "../utils/workbookSubmissionContext";
+import { buildWorkbookContextSearch } from "../utils/workbookContext";
+import { buildCompletedRadioHref } from "../components/RadioFirstWorkbookGate";
+import { sanitizeA1WorkbookSearch } from "../components/A1SharedAssignmentWorkbookLayout";
 import { courseSchedules } from "./courseSchedule";
 import { resolvePublishedAdvancedTutorAssignment } from "../components/AdvancedTutorMarkedSubmissionPanel";
 
@@ -79,6 +84,26 @@ const getB1DayComponent = (day) => {
   const mapSource = courseLessonSource.slice(mapStart, mapEnd);
   return mapSource.match(new RegExp("\\b" + day + ":\\s*([A-Za-z0-9_]+)"))?.[1] || "";
 };
+
+const collectJourneySensitiveSourceFiles = (directory) => {
+  if (!fs.existsSync(directory)) return [];
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) return collectJourneySensitiveSourceFiles(fullPath);
+    if (!/\.(?:js|jsx)$/.test(entry.name) || /\.test\.(?:js|jsx)$/.test(entry.name)) return [];
+    if (!/(Workbook|Radio|Course|Assignment|Submission|Navigation|Route)/i.test(entry.name)) return [];
+    return [fullPath];
+  });
+};
+
+const radioDeletionOffenders = () =>
+  [
+    ...collectJourneySensitiveSourceFiles(COMPONENTS),
+    ...collectJourneySensitiveSourceFiles(path.join(ROOT, "utils")),
+    ...collectJourneySensitiveSourceFiles(path.join(ROOT, "data")),
+  ]
+    .filter((filename) => /\.delete\(\s*["']radio["']\s*\)/.test(fs.readFileSync(filename, "utf8")))
+    .map((filename) => path.relative(ROOT, filename));
 
 describe("all tutor-marked A1 through C1 assignments", () => {
   test.each(Object.entries(EXPECTED_COUNTS))(
@@ -256,6 +281,85 @@ describe("all tutor-marked A1 through C1 assignments", () => {
         });
     },
   );
+
+  test("all 19 A1 tutor-marked workbooks keep Radio completion through canonical URL and tab normalization", () => {
+    tutorAssignments("A1").forEach((entry) => {
+      const assignment = getA1Assignment(entry.assignment_id);
+      expect(assignment).toBeTruthy();
+
+      const initialSearch =
+        `?radio=done&assignmentKey=${assignment.assignmentKey}&assignmentId=${assignment.assignmentKey}&level=A1`;
+      const href = buildA1TutorMarkedWorkbookHref(assignment, initialSearch);
+      const target = new URL(href, "https://www.falowen.app");
+
+      expect(target.searchParams.get("radio")).toBe("done");
+      expect(target.searchParams.get("assignmentKey")).toBe(assignment.assignmentKey);
+      expect(target.searchParams.get("assignmentId")).toBe(assignment.assignmentKey);
+      expect(target.searchParams.get("level")).toBe("A1");
+
+      const normalized = sanitizeA1WorkbookSearch(target.search);
+      normalized.set("workbookTab", "submit");
+      expect(normalized.get("radio")).toBe("done");
+
+      const radio = getA1RadioResource(assignment.day, assignment.chapter);
+      if (radio) {
+        const handoff = buildCompletedRadioHref({
+          pathname: assignment.workbookPath,
+          search: `?assignmentKey=${assignment.assignmentKey}&assignmentId=${assignment.assignmentKey}&level=A1`,
+        });
+        const completed = new URL(handoff, "https://www.falowen.app");
+        expect(completed.searchParams.get("radio")).toBe("done");
+        expect(completed.searchParams.get("assignmentKey")).toBe(assignment.assignmentKey);
+      }
+    });
+  });
+
+  test.each(["A2", "B1", "B2", "C1"])(
+    "%s published tutor-marked lessons with Falowen Radio keep completion through handoff and context sync",
+    (level) => {
+      publishedTutorAssignments(level).forEach((entry) => {
+        const day = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day);
+        const chapter = String(entry.chapter || "").trim();
+        const assignmentKey = String(entry.assignment_id || entry.assignmentId || "").trim();
+        const radio = getLessonRadioResource(level, day);
+        if (!radio) return;
+
+        const configuredRoute = getConfiguredInAppWorkbookResourceRoute({ level, day, chapter });
+        const route = configuredRoute || `/campus/course/lesson/${level}/${day}?view=workbook`;
+        const target = new URL(route, "https://www.falowen.app");
+        const params = new URLSearchParams(target.search);
+        params.set("assignmentKey", assignmentKey);
+        params.set("assignmentId", assignmentKey);
+        params.set("level", level);
+
+        const handoff = buildCompletedRadioHref({
+          pathname: target.pathname,
+          search: `?${params.toString()}`,
+          hash: target.hash,
+        });
+        const completed = new URL(handoff, "https://www.falowen.app");
+        expect(completed.searchParams.get("radio")).toBe("done");
+        expect(completed.searchParams.get("assignmentKey")).toBe(assignmentKey);
+        expect(completed.searchParams.get("assignmentId")).toBe(assignmentKey);
+        expect(completed.searchParams.get("level")).toBe(level);
+
+        const synchronized = new URLSearchParams(
+          buildWorkbookContextSearch({
+            search: completed.search,
+            level,
+            assignmentKey,
+          }),
+        );
+        expect(synchronized.get("radio")).toBe("done");
+        expect(synchronized.get("assignmentKey")).toBe(assignmentKey);
+        expect(synchronized.get("assignmentId")).toBe(assignmentKey);
+      });
+    },
+  );
+
+  test("workbook and navigation production code never explicitly deletes the completed Radio marker", () => {
+    expect(radioDeletionOffenders()).toEqual([]);
+  });
 
   test("all 28 B1 workbook components own the correct canonical Submit context", () => {
     expect(b1ShellSource).toContain("assignmentKey: config.assignmentKey");
