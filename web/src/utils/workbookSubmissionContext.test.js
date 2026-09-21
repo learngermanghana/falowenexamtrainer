@@ -27,17 +27,17 @@ describe("workbook submission context", () => {
     );
   });
 
-  test("does not lock B2 or C1 self-learning submissions", () => {
+  test("locks explicit B2 and C1 teacher-marked submission contexts", () => {
     expect(
       resolveWorkbookSubmissionContext({
         submissionContext: { level: "B2", day: 2, assignmentKey: "B2-1.2" },
-      }).locked,
-    ).toBe(false);
+      }),
+    ).toEqual(expect.objectContaining({ level: "B2", day: 2, assignmentKey: "B2-1.2", locked: true }));
     expect(
       resolveWorkbookSubmissionContext({
-        submissionContext: { level: "C1", day: 2, assignmentKey: "C1-1.2" },
-      }).locked,
-    ).toBe(false);
+        submissionContext: { level: "C1", day: 10, assignmentKey: "C1-2.5" },
+      }),
+    ).toEqual(expect.objectContaining({ level: "C1", day: 10, assignmentKey: "C1-2.5", locked: true }));
   });
 
   test("resolves A2 Day 10 by exact canonical key", () => {

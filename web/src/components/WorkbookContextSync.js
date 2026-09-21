@@ -7,18 +7,19 @@ import {
   workbookContextMatches,
 } from "../utils/workbookContext";
 
-const WorkbookContextSync = ({ match }) => {
+const WorkbookContextSync = ({ match, assignmentOverride = null }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const level = String(match?.level || "").trim().toUpperCase();
   const day = Number(match?.day);
   const assignment = useMemo(
     () =>
+      assignmentOverride ||
       chooseWorkbookAssignment({
         assignments: getInlineCourseAssignments(level, day),
         chapter: match?.resource?.chapter,
       }),
-    [day, level, match?.resource?.chapter]
+    [assignmentOverride, day, level, match?.resource?.chapter]
   );
   const assignmentKey = assignment?.assignmentKey || "";
 

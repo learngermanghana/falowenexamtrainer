@@ -1,4 +1,4 @@
-const WORKBOOK_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1"]);
+const WORKBOOK_SUBMISSION_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1"]);
 
 const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
 const normalizeAssignmentKey = (value) =>

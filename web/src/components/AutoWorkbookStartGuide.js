@@ -6,6 +6,7 @@ import { A1_GRAMMAR_ROUTE_ENTRIES } from "../data/a1GrammarRoutes";
 import { A2_GRAMMAR_ROUTE_ENTRIES } from "../data/a2GrammarRoutes";
 import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
+import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import {
   A1_DAY6_WORKBOOK_PATH,
   A1_DAY18_CHAPTER121_PATH,
@@ -166,10 +167,16 @@ const AutoWorkbookStartGuide = () => {
     () => findGrammarWorkbookTarget({ pathname, search }),
     [pathname, search]
   );
-  const usesSelfManagedSubmissionTabs =
-    SELF_MANAGED_WORKBOOK_SUBMISSION_PATHS.has(normalizedPathname)
-    || isSelfManagedB1LessonWorkbook(pathname, search);
   const shouldRenderGuide = shouldRenderWorkbookGuide({ pathname, search, match });
+  const tutorMarkedAssignment = resolveTutorMarkedWorkbookAssignment({
+    level: match?.level,
+    day: match?.day,
+    pathname,
+    search,
+  });
+  const workbookContextSync = tutorMarkedAssignment
+    ? <WorkbookContextSync match={match} assignmentOverride={tutorMarkedAssignment} />
+    : null;
 
   useEffect(() => {
     if (!grammarWorkbookTarget || typeof document === "undefined") {
@@ -257,6 +264,7 @@ const AutoWorkbookStartGuide = () => {
   ) {
     return (
       <>
+        {workbookContextSync}
         <A1Day18Kapitel122WorkbookPage />
         {inlineEnhancements}
       </>
@@ -266,6 +274,7 @@ const AutoWorkbookStartGuide = () => {
   if (!shouldRenderGuide) {
     return (
       <>
+        {workbookContextSync}
         {grammarReturn}
         {inlineEnhancements}
       </>
@@ -276,7 +285,7 @@ const AutoWorkbookStartGuide = () => {
 
   return (
     <>
-      {usesSelfManagedSubmissionTabs ? <WorkbookContextSync match={match} /> : null}
+      {workbookContextSync}
       {portalHost ? (
         createPortal(guide, portalHost)
       ) : (

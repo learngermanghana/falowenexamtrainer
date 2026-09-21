@@ -9,7 +9,7 @@ import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
 import { getA2SpeakingMindMap } from "../data/speakingMindMaps/a2";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import {
   A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
   WorkbookTabNav,
@@ -305,7 +305,15 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Submit only your final answers here. Include Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören in one submission.
           </p>
-          <AssignmentSubmissionPage />
+          <ContextualAssignmentSubmissionPage
+            submissionContext={{
+              level: "A2",
+              day: 13,
+              assignmentKey: "A2-5.13",
+              canonicalAssignmentKey: "A2-5.13",
+              workbookId: "A2Day13Vorstellungsgespraech",
+            }}
+          />
         </div>
       )}
     </div>
