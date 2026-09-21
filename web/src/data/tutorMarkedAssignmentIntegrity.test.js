@@ -4,13 +4,12 @@ import { getCurriculumEntriesForLevel } from "./germanAssignmentCatalog";
 import { getConfiguredInAppWorkbookResourceRoute } from "./inAppWorkbookRoutes";
 import { buildA1TutorMarkedWorkbookHref, getA1Assignment } from "./a1AssignmentRegistry";
 import { getA1RadioResource } from "./a1RadioResources";
-import { getLessonRadioResource } from "./lessonRadioDictionary";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import { buildWorkbookRouteIndex, normalizeInAppPath } from "../utils/courseWorkbookRoutes";
 import { resolveTutorMarkedWorkbookAssignment } from "../utils/tutorMarkedWorkbookContext";
 import { resolveWorkbookSubmissionContext } from "../utils/workbookSubmissionContext";
 import { buildWorkbookContextSearch } from "../utils/workbookContext";
-import { buildCompletedRadioHref } from "../components/RadioFirstWorkbookGate";
+import { buildCompletedRadioHref, resolveRadioFirstWorkbookResource } from "../components/RadioFirstWorkbookGate";
 import { sanitizeA1WorkbookSearch } from "../components/A1SharedAssignmentWorkbookLayout";
 import { courseSchedules } from "./courseSchedule";
 import { resolvePublishedAdvancedTutorAssignment } from "../components/AdvancedTutorMarkedSubmissionPanel";
@@ -321,7 +320,7 @@ describe("all tutor-marked A1 through C1 assignments", () => {
         const day = Number(entry.displayDay ?? entry.assignmentDay ?? entry.day);
         const chapter = String(entry.chapter || "").trim();
         const assignmentKey = String(entry.assignment_id || entry.assignmentId || "").trim();
-        const radio = getLessonRadioResource(level, day);
+        const radio = resolveRadioFirstWorkbookResource(level, day);
         if (!radio) return;
 
         const configuredRoute = getConfiguredInAppWorkbookResourceRoute({ level, day, chapter });
@@ -356,6 +355,50 @@ describe("all tutor-marked A1 through C1 assignments", () => {
       });
     },
   );
+
+  test("B1-2.5 fallback Radio is included in the cross-level handoff audit", () => {
+    const entry = publishedTutorAssignments("B1").find(
+      (candidate) => String(candidate.assignment_id || candidate.assignmentId) === "B1-2.5",
+    );
+    expect(entry).toBeTruthy();
+
+    const radio = resolveRadioFirstWorkbookResource("B1", Number(entry.day));
+    expect(radio).toEqual(
+      expect.objectContaining({
+        key: "b1-day5-besichtigungstermin-falowen-radio",
+        youtubeId: "TBMrwDohEdE",
+      }),
+    );
+
+    const assignmentKey = "B1-2.5";
+    const configuredRoute = getConfiguredInAppWorkbookResourceRoute({
+      level: "B1",
+      day: Number(entry.day),
+      chapter: String(entry.chapter || ""),
+    });
+    const target = new URL(
+      configuredRoute || `/campus/course/lesson/B1/${entry.day}?view=workbook`,
+      "https://www.falowen.app",
+    );
+    const params = new URLSearchParams(target.search);
+    params.set("assignmentKey", assignmentKey);
+    params.set("assignmentId", assignmentKey);
+    params.set("level", "B1");
+
+    const handoff = new URL(
+      buildCompletedRadioHref({
+        pathname: target.pathname,
+        search: `?${params.toString()}`,
+        hash: target.hash,
+      }),
+      "https://www.falowen.app",
+    );
+
+    expect(handoff.searchParams.get("radio")).toBe("done");
+    expect(handoff.searchParams.get("assignmentKey")).toBe(assignmentKey);
+    expect(handoff.searchParams.get("assignmentId")).toBe(assignmentKey);
+    expect(handoff.searchParams.get("level")).toBe("B1");
+  });
 
   test("workbook and navigation production code never explicitly deletes the completed Radio marker", () => {
     expect(radioDeletionOffenders()).toEqual([]);
