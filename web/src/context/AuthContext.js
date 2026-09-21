@@ -133,7 +133,7 @@ const formatDateForLoginError = (value) => {
 
 const normalizePaymentStatus = (value) => String(value || "").trim().toLowerCase();
 
-const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current", "trial_active", "trial_expired"];
 const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
 
 const getStudentSupportReason = (profile, fallbackReason = "student_access_blocked") => {
