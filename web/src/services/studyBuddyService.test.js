@@ -47,6 +47,25 @@ describe("Study Buddy conversation memory", () => {
     expect(secondPrompt).toContain("STUDENT MESSAGE:\nWarum?");
   });
 
+  it("treats Falowen navigation questions as in-scope and supplies the canonical Course Book path", async () => {
+    callAI.mockResolvedValue({ reply: "Tap Learn to open your Course Book." });
+
+    await requestStudyBuddyReply({
+      message: "Where can I access my course book?",
+      level: "A2",
+      idToken: "",
+    });
+
+    const prompt = callAI.mock.calls[0][0].payload.message;
+    expect(prompt).toContain("FALOWEN NAVIGATION SUPPORT (authoritative)");
+    expect(prompt).toContain("tap/click the visible Learn navigation item");
+    expect(prompt).toContain("https://www.falowen.app/campus/course");
+    expect(prompt).toContain("Falowen navigation/support questions are not unrelated");
+    expect(prompt).toContain("My Library");
+    expect(prompt).toContain("Learning Hub");
+    expect(prompt).toContain("My Hub");
+  });
+
   it("stores successful exchanges and keeps levels separated", async () => {
     callAI.mockResolvedValue({ reply: "Ein kurzes Beispiel." });
 

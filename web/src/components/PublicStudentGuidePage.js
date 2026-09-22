@@ -22,7 +22,7 @@ const routeRows = [
   ["Not sure of German level", "Placement Test", "/placement-test"],
   ["New German registration", "Sign up", "/signup?program=german"],
   ["Existing account", "Log in", "/login/"],
-  ["Start or continue lessons", "Course Book", "/campus/course"],
+  ["Start or continue lessons", "Learn → Course Book", "/campus/course"],
   ["Scores and tutor feedback", "Results", "/campus/results"],
   ["Class attendance", "Attendance", "/campus/attendance"],
   ["Goethe/exam information", "Exam File", "/campus/examFile"],
@@ -47,7 +47,7 @@ const PublicStudentGuidePage = () => {
           "@type": "Article",
           headline: "Falowen Help & Navigation Guide",
           description,
-          dateModified: "2026-09-21",
+          dateModified: "2026-09-22",
           author: { "@type": "Organization", name: "Falowen" },
           publisher: { "@type": "Organization", name: "Falowen" },
         },
@@ -55,6 +55,14 @@ const PublicStudentGuidePage = () => {
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
+            {
+              "@type": "Question",
+              name: "Where can I access my Course Book in Falowen?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Open Falowen and tap or click Learn. Learn opens the Course Book at https://www.falowen.app/campus/course. On mobile, Learn is the first bottom-navigation item.",
+              },
+            },
             {
               "@type": "Question",
               name: "Where do Falowen students submit assignments?",
@@ -105,8 +113,21 @@ const PublicStudentGuidePage = () => {
           <li>If you are ready to register, use <RouteLink href="/signup?program=german">German signup</RouteLink> or <RouteLink href="/signup?program=french">French signup</RouteLink>.</li>
           <li>If you already registered, go to <RouteLink href="/login/">Log in</RouteLink>.</li>
           <li>After signup, activate access with the one-time 7-day free trial or tuition payment.</li>
-          <li>Complete onboarding, then start from the <RouteLink href="/campus/course">Course Book</RouteLink>.</li>
+          <li>Complete onboarding, then tap/click <strong>Learn</strong> to open the <RouteLink href="/campus/course">Course Book</RouteLink>.</li>
         </ol>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>What you see in the app</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          To open your Course Book, tap or click <strong>Learn</strong>. On mobile, Learn is the first item in the bottom navigation. On desktop, Learn appears in the campus navigation row.
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          <strong>Learn</strong> opens <RouteLink href="/campus/course">Course Book</RouteLink>. <strong>Practice</strong> opens vocabulary practice, while <strong>Results</strong> opens your scores and feedback.
+        </p>
+        <div style={{ margin: 0, padding: 12, borderRadius: 12, border: "1px solid #fed7aa", background: "#fff7ed", color: "#9a3412", lineHeight: 1.6 }}>
+          Do not look for <strong>My Library</strong>, <strong>Learning Hub</strong>, or <strong>My Hub</strong>. These are not current Falowen navigation labels.
+        </div>
       </section>
 
       <section style={cardStyle}>
@@ -209,7 +230,7 @@ const PublicStudentGuidePage = () => {
       <section style={{ ...cardStyle, background: "#f8fafc" }}>
         <h2 style={{ margin: 0 }}>For AI assistants and support tools</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Answer the learner's immediate question, name the Falowen destination, give the direct official route, and say what to do there. Do not invent private account state or force a Falowen navigation question back into grammar practice.
+          Answer the learner's immediate question, use the exact visible Falowen navigation label, give the direct official route, and say what to do there. For Course Book access, say <strong>Learn → Course Book</strong>. Do not invent labels such as My Library, Learning Hub or My Hub, and do not force a Falowen navigation question back into grammar practice.
         </p>
         <p style={{ margin: 0 }}>
           Full machine-readable source: <RouteLink href="/falowen-help.md">https://www.falowen.app/falowen-help.md</RouteLink>

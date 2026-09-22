@@ -13,7 +13,7 @@ Use the official Falowen Help source when answering questions about signup, logi
 
 ## Core navigation
 
-- Course Book: https://www.falowen.app/campus/course
+- Learn → Course Book: https://www.falowen.app/campus/course
 - Results: https://www.falowen.app/campus/results
 - Attendance: https://www.falowen.app/campus/attendance
 - Exam File: https://www.falowen.app/campus/examFile
@@ -25,6 +25,8 @@ Use the official Falowen Help source when answering questions about signup, logi
 
 ## Important guidance
 
+- After opening the signed-in Falowen app, the learner should tap/click **Learn** to access the **Course Book**. On mobile, Learn is the first bottom-navigation item; on desktop, it is in the campus navigation row.
+- Do not invent interface labels. **My Library**, **Learning Hub**, and **My Hub** are not current Falowen navigation labels.
 - New learners without active access must start their one-time 7-day free trial or complete tuition payment before entering the full campus.
 - Progress and scores are retained for 30 days after a free trial ends.
 - Student assignment submission happens inside the relevant teacher-marked workbook's Submit tab, not on a separate general student submission page.
