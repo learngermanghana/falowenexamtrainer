@@ -125,7 +125,7 @@ const PublicStudentGuidePage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Learn</strong> opens <RouteLink href="/campus/course">Course Book</RouteLink>. <strong>Practice</strong> opens vocabulary practice, while <strong>Results</strong> opens your scores and feedback.
         </p>
-        <div style={{ ...styles.warningBox, margin: 0 }}>
+        <div style={{ margin: 0, padding: 12, borderRadius: 12, border: "1px solid #fed7aa", background: "#fff7ed", color: "#9a3412", lineHeight: 1.6 }}>
           Do not look for <strong>My Library</strong>, <strong>Learning Hub</strong>, or <strong>My Hub</strong>. These are not current Falowen navigation labels.
         </div>
       </section>
