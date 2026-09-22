@@ -76,7 +76,8 @@ describe("shared A2 workbook regression", () => {
     expect(day21).toContain("Schreiben Sie einen Brief an einen Freund oder eine Freundin");
     expect(day21).toContain("Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind");
     expect(day21).toContain("Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann");
-    expect(day21).toContain("LlXsNA1a8lc");
+    expect(day21).toContain("Qg0tQFveI0M");
+    expect(day21).not.toContain('hoerenAudioUrl="https://youtu.be/LlXsNA1a8lc"');
     expect(day21).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
 

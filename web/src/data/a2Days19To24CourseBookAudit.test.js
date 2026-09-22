@@ -39,11 +39,14 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).not.toMatch(/Frauensachen|Berufswahl|vor 50 Jahren/i);
   });
 
-  test("keeps Day 21 fully focused on weekend planning", () => {
+  test("keeps Day 21 fully focused on weekend planning with a separate Teil 4 Hören", () => {
     const source = readComponent("A2Day21EinWochenendePlanenWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="8.21"');
     expect(source).toContain("Unser Wochenende in Köln");
+    expect(source).toContain('hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"');
+    expect(source).toContain("separate Goethe-Hören-Übung");
+    expect(source).not.toContain('hoerenAudioUrl="https://youtu.be/LlXsNA1a8lc"');
     expect(source).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
 
