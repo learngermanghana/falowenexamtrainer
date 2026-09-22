@@ -5,7 +5,7 @@ import {
   normalizeA1Chapter,
 } from "./a1CanonicalLessonRoutes";
 
-const practice = ({ routeKey, chapter, day, title, destination, aliases = [] }) => ({
+const practice = ({ routeKey, chapter, day, title, destination, aliases = [], singlePage = false }) => ({
   routeKey: normalizeA1Chapter(routeKey || chapter),
   chapter: normalizeA1Chapter(chapter),
   day,
@@ -14,6 +14,7 @@ const practice = ({ routeKey, chapter, day, title, destination, aliases = [] }) 
   aliases: aliases.map(normalizeA1Chapter),
   assignmentKey: null,
   kind: "practice",
+  singlePage,
 });
 
 const ASSIGNMENT_LESSONS = Object.values(A1_ASSIGNMENT_REGISTRY).map((assignment) => ({
@@ -55,6 +56,7 @@ const PRACTICE_LESSONS = [
     day: 6,
     title: "Family and Hobbies",
     destination: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    singlePage: true,
   }),
   practice({
     chapter: "3.5",
@@ -111,6 +113,59 @@ export const A1_CANONICAL_LESSON_CATALOG = Object.freeze(
     )}`,
   })),
 );
+
+export const A1_COURSE_LESSON_ORDER = Object.freeze([
+  "0.1",
+  "0.2",
+  "1.1",
+  "1.1-practice",
+  "1.2",
+  "1.2-practice",
+  "2",
+  "1.3",
+  "2.3",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "3.5",
+  "3.6",
+  "4.7",
+  "9",
+  "10",
+  "11",
+  "12.1",
+  "12.2",
+  "5.9",
+  "12.3",
+  "13",
+  "14.1",
+  "14.2",
+  "5.10",
+]);
+
+const A1_COURSE_LESSON_BY_ROUTE_KEY = new Map(
+  A1_CANONICAL_LESSON_CATALOG.map((lesson) => [lesson.routeKey, lesson]),
+);
+
+export const getA1CourseLessonNeighbors = (identity = "") => {
+  const current = getA1CanonicalLesson(identity);
+  if (!current) return { previous: null, next: null };
+
+  const index = A1_COURSE_LESSON_ORDER.indexOf(current.routeKey);
+  if (index < 0) return { previous: null, next: null };
+
+  return {
+    previous: index > 0
+      ? A1_COURSE_LESSON_BY_ROUTE_KEY.get(A1_COURSE_LESSON_ORDER[index - 1]) || null
+      : null,
+    next: index < A1_COURSE_LESSON_ORDER.length - 1
+      ? A1_COURSE_LESSON_BY_ROUTE_KEY.get(A1_COURSE_LESSON_ORDER[index + 1]) || null
+      : null,
+  };
+};
 
 const lookupTokens = (lesson) => new Set([
   lesson.routeKey,

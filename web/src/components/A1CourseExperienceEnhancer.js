@@ -450,7 +450,8 @@ export const applyA1LessonFormatting = (root = document, locationLike = window.l
   });
   if (!routeInfo || !title || !container) return false;
 
-  const sections = findA1TeilHeadings(mainRoot);
+  const singlePageWorkbook = Boolean(mainRoot.querySelector('[data-a1-single-page-workbook="true"]'));
+  const sections = singlePageWorkbook ? [] : findA1TeilHeadings(mainRoot);
   const submitButton = findNativeSubmitButton(mainRoot);
   updateLessonMetadata({ root, container, title, routeInfo, sections, submitButton });
   updateTeilNavigation({ root, mainRoot, headerContainer: container, sections, submitButton });

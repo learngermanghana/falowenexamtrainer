@@ -221,4 +221,23 @@ describe("A1CourseExperienceEnhancer", () => {
     expect(css).toContain("background: #ffedd5");
     expect(css).toContain("color: #9a3412");
   });
+
+  test("single-page A1 workbook does not receive generated Teil navigation", () => {
+    document.body.innerHTML = `
+      <main class="layout-main">
+        <div data-a1-single-page-workbook="true">
+          <div><button>Back to Course Book</button><h1>Family, Languages, Questions and Hobbies</h1></div>
+          <div><h2>Teil 1 · Family vocabulary</h2></div>
+          <div><h2>Teil 2 · Hobbies</h2></div>
+        </div>
+      </main>
+    `;
+
+    expect(applyA1LessonFormatting(document, {
+      pathname: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+      search: "?radio=done",
+    })).toBe(true);
+    expect(document.querySelector('[data-a1-teil-navigation="true"]')).toBeNull();
+  });
+
 });

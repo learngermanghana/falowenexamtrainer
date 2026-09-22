@@ -1,6 +1,8 @@
 import {
   A1_CANONICAL_LESSON_CATALOG,
+  A1_COURSE_LESSON_ORDER,
   getA1CanonicalLesson,
+  getA1CourseLessonNeighbors,
   getA1CanonicalLessonForLegacyRoute,
   getA1CanonicalLessonsForChapter,
 } from "./a1CanonicalLessonCatalog";
@@ -50,6 +52,12 @@ describe("A1 canonical lesson catalog", () => {
       assignmentKey: "A1-1.2",
       destination: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
     });
+    expect(getA1CanonicalLesson("2.3")).toMatchObject({
+      day: 6,
+      kind: "practice",
+      singlePage: true,
+      destination: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    });
     expect(getA1CanonicalLesson("A1-1.2-PRACTICE")).toMatchObject({
       routeKey: "1.2-practice",
       day: 3,
@@ -78,6 +86,46 @@ describe("A1 canonical lesson catalog", () => {
     expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.2-PRACTICE" })).toMatchObject({
       routeKey: "1.2-practice",
       assignmentKey: null,
+    });
+  });
+
+  test("course sequence includes assignments and self-practice exactly once", () => {
+    expect(A1_COURSE_LESSON_ORDER).toHaveLength(A1_CANONICAL_LESSON_CATALOG.length);
+    expect(new Set(A1_COURSE_LESSON_ORDER).size).toBe(A1_COURSE_LESSON_ORDER.length);
+    expect([...A1_COURSE_LESSON_ORDER].sort()).toEqual(
+      A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey).sort(),
+    );
+  });
+
+  test("Day 7 Asking About Prices navigates back to Day 6 self-practice instead of the previous tutor assignment", () => {
+    const neighbors = getA1CourseLessonNeighbors("A1-3");
+
+    expect(neighbors.previous).toMatchObject({
+      routeKey: "2.3",
+      day: 6,
+      kind: "practice",
+      title: "Family and Hobbies",
+      lessonRoute: "/campus/course/lesson/A1/chapter/2.3",
+    });
+    expect(neighbors.next).toMatchObject({
+      routeKey: "4",
+      day: 8,
+      kind: "assignment",
+      title: "Countries, Languages & Travel",
+      lessonRoute: "/campus/course/lesson/A1/chapter/4",
+    });
+  });
+
+  test("assignment footer sequence crosses self-learning days in both directions", () => {
+    expect(getA1CourseLessonNeighbors("A1-2").next).toMatchObject({
+      routeKey: "1.3",
+      day: 5,
+      kind: "practice",
+    });
+    expect(getA1CourseLessonNeighbors("A1-14.1").next).toMatchObject({
+      routeKey: "14.2",
+      day: 23,
+      kind: "practice",
     });
   });
 

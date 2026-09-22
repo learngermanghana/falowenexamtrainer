@@ -224,7 +224,12 @@ const restoreManagedElements = (root = document) => {
 
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
-  if (resolveA1SharedPracticeLesson({ pathname: locationLike?.pathname }) && hasCompletedA1PracticeMaterials(locationLike?.search)) {
+  const practiceLesson = resolveA1SharedPracticeLesson({ pathname: locationLike?.pathname });
+  if (practiceLesson?.singlePage) {
+    restoreManagedElements(root);
+    return false;
+  }
+  if (practiceLesson && hasCompletedA1PracticeMaterials(locationLike?.search)) {
     restoreManagedElements(root);
     return false;
   }

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
 const pageStyle = {
@@ -186,16 +185,15 @@ const hobbies = [
 ];
 
 const writingTemplate = [
-  ["My name is + your name.", "Mein Name ist + dein Name.", "Mein Name ist Anna."],
-  ["I come from + your country.", "Ich komme aus + Land.", "Ich komme aus Deutschland."],
-  ["I am + number + years old.", "Ich bin + Zahl + Jahre alt.", "Ich bin 20 Jahre alt."],
-  ["My father is called + name.", "Mein Vater heißt + Name.", "Mein Vater heißt Peter."],
-  ["My mother is called + name.", "Meine Mutter heißt + Name.", "Meine Mutter heißt Maria."],
-  ["Marital status", "Ich bin ledig / verheiratet / geschieden / verwitwet.", "Ich bin ledig."],
-  ["Children", "Ich habe keine Kinder. / Ich habe + Zahl + Kind(er).", "Ich habe ein Kind."],
-  ["Hobby", "Mein Hobby ist + Hobby.", "Mein Hobby ist Lesen."],
-  ["Languages", "Ich spreche + Sprache.", "Ich spreche Deutsch und Englisch."],
+  ["Name", "Ich heiße … / Mein Name ist …", "Ich heiße Ama."],
+  ["Country", "Ich komme aus …", "Ich komme aus Ghana."],
+  ["Age", "Ich bin … Jahre alt.", "Ich bin 24 Jahre alt."],
+  ["Family", "Ich habe … / Mein(e) … heißt …", "Ich habe zwei Brüder. Meine Mutter heißt Adwoa."],
+  ["Hobby", "Ich … gern. / Mein Hobby ist …", "Ich höre gern Musik."],
+  ["Languages", "Ich spreche … / Ich spreche ein bisschen …", "Ich spreche Englisch und ein bisschen Deutsch."],
 ];
+
+const DAY6_WRITING_DRAFT_KEY = "falowen:a1:day6:family-writing-draft";
 
 const familyQuiz = [
   {
@@ -492,11 +490,7 @@ function TypedGapPractice({ title, items }) {
   );
 }
 
-const heroImageUrl =
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
-
 const A1FamilyLanguagesQuestionsWorkbookPage = () => {
-  const navigate = useNavigate();
   const [prepared, setPrepared] = useState({
     family: false,
     writing: false,
@@ -506,33 +500,64 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
   });
 
   const [showWritingModel, setShowWritingModel] = useState(false);
+  const [writingDraft, setWritingDraft] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return window.localStorage.getItem(DAY6_WRITING_DRAFT_KEY) || "";
+    } catch (_error) {
+      return "";
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(DAY6_WRITING_DRAFT_KEY, writingDraft);
+    } catch (_error) {
+      // Draft persistence is best-effort on restricted browsers.
+    }
+  }, [writingDraft]);
+
+  const writingWordCount = writingDraft.trim() ? writingDraft.trim().split(/\s+/).length : 0;
 
   const setPreparedFor = (tabKey) => (event) => {
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
   };
 
   return (
-    <div style={pageStyle}>
+    <div data-a1-single-page-workbook="true" style={pageStyle}>
       <div style={cardStyle}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
-        <img
-          src={heroImageUrl}
-          alt="Students learning together"
-          style={{ width: "100%", height: 240, objectFit: "cover", borderRadius: 14 }}
-        />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <span style={chipStyle}>A1 · Day 6</span>
+          <span style={chipStyle}>Kapitel 2.3</span>
+          <span style={chipStyle}>Self-practice</span>
+        </div>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies
+          Family, Languages, Questions and Hobbies
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-          Everything is on one page. Move section by section and mark each part when you finish it.
+          Work straight down this page. There are no separate Teil tabs. Learn the language, practise it immediately,
+          then finish with a short paragraph about yourself and your family.
         </p>
+
+        <div style={infoBoxStyle}>
+          <strong>By the end of this lesson you should be able to:</strong>
+          <ul style={listStyle}>
+            <li>name common family members and use <strong>mein / meine</strong> correctly in simple sentences;</li>
+            <li>say which languages you speak and use <strong>ein bisschen</strong> naturally;</li>
+            <li>form a yes/no question by putting the conjugated verb first;</li>
+            <li>talk about hobbies with <strong>gern</strong>;</li>
+            <li>write 6–8 connected sentences about yourself and your family.</li>
+          </ul>
+        </div>
       </div>
 
       <div id="family" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 1 · Family Vocabulary</h2>
+        <h2 style={sectionTitle}>Family vocabulary</h2>
 
         <div style={infoBoxStyle}>
           <strong>Family Members</strong>
@@ -546,7 +571,12 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         </div>
 
         <div style={questionCardStyle}>
-          <strong>Sentence models</strong>
+          <strong>Use the family word inside a sentence</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Use <strong>mein</strong> with masculine and neuter family nouns and <strong>meine</strong> with feminine
+            and plural nouns: <strong>mein Vater</strong>, <strong>mein Kind</strong>, <strong>meine Mutter</strong>,
+            <strong>meine Eltern</strong>.
+          </p>
           <div style={sentenceBoxStyle}>
             Das ist meine Mutter.
             <br />
@@ -565,15 +595,14 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       </div>
 
       <div id="writing" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 2 · Writing About Your Family</h2>
+        <h2 style={sectionTitle}>Write about yourself and your family</h2>
 
         <div style={warningBoxStyle}>
-          <strong>Writing template</strong>
+          <strong>Build your paragraph with these sentence frames</strong>
           <ol style={listStyle}>
-            {writingTemplate.map(([english, german, example]) => (
-              <li key={english}>
-                <div>{english}</div>
-                <div>{german}</div>
+            {writingTemplate.map(([purpose, german, example]) => (
+              <li key={purpose}>
+                <strong>{purpose}:</strong> {german}
                 <div>
                   <em>Example:</em> {example}
                 </div>
@@ -582,35 +611,32 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           </ol>
         </div>
 
-        <div
-          style={{
-            border: "1px solid #bbf7d0",
-            borderRadius: 12,
-            background: "#f0fdf4",
-            padding: 14,
-            display: "grid",
-            gap: 8,
-          }}
-        >
-          <strong>Final writing task</strong>
-          <p style={{ margin: 0 }}>
-            Write 6–8 sentences about yourself and your family. Include your name, country, age, family, one hobby, and
-            languages.
-          </p>
-        </div>
-
         <div style={questionCardStyle}>
-          <strong>Where to write and submit</strong>
+          <strong>Your practice paragraph</strong>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            After reading the template, go to the group discussion page and write your 6–8 sentence paragraph there.
+            Write 6–8 sentences. Try to include your name, country, age, at least two family details, one hobby and the
+            languages you speak. This is self-practice, so edit freely before you compare with the model.
           </p>
-          <div>
-            <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/discussion")}>
-              Open Group Discussion
-            </button>
-          </div>
-          <div style={{ color: "#374151", fontSize: "0.95rem" }}>
-            Page link: https://www.falowen.app/campus/discussion
+          <textarea
+            data-a1-day6-writing-draft="true"
+            value={writingDraft}
+            onChange={(event) => setWritingDraft(event.target.value)}
+            rows={9}
+            placeholder="Ich heiße … Ich komme aus … Ich bin … Jahre alt. Meine Familie …"
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              borderRadius: 10,
+              border: "1px solid #94a3b8",
+              font: "inherit",
+              lineHeight: 1.7,
+              resize: "vertical",
+              boxSizing: "border-box",
+            }}
+          />
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", color: "#475569" }}>
+            <span>Draft saves on this device automatically.</span>
+            <span>{writingWordCount} words</span>
           </div>
         </div>
 
@@ -634,7 +660,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       </div>
 
       <div id="languages" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 3 · Languages and „ein bisschen“</h2>
+        <h2 style={sectionTitle}>Languages and „ein bisschen“</h2>
 
         <div style={infoBoxStyle}>
           <strong>Language Names</strong>
@@ -695,19 +721,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         </div>
 
         <div style={questionCardStyle}>
-          <strong>More examples</strong>
-          <div style={{ lineHeight: 1.8 }}>
-            Ich spreche ein bisschen Englisch.
-            <br />
-            Ama spricht ein bisschen Französisch.
-            <br />
-            Wir sprechen ein bisschen Deutsch.
-            <br />
-            Er versteht ein bisschen Spanisch.
-          </div>
-        </div>
-
-        <div style={questionCardStyle}>
           <strong>Asking about languages</strong>
           <SentencePattern
             parts={[
@@ -731,7 +744,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       </div>
 
       <div id="questions" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 4 · Forming Yes-or-No Questions</h2>
+        <h2 style={sectionTitle}>Forming yes/no questions</h2>
 
         <div style={infoBoxStyle}>
           <strong>Basic structure</strong>
@@ -784,40 +797,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
             <li>Keep the remaining information after the subject.</li>
             <li>Add a question mark.</li>
           </ol>
-        </div>
-
-        <div style={questionCardStyle}>
-          <strong>More verb-first examples</strong>
-          <div style={{ display: "grid", gap: 12 }}>
-            <SentencePattern
-              parts={[
-                { type: "verb", text: "Spielt" },
-                { type: "subject", text: "er" },
-                { type: "rest", text: "Fußball?" },
-              ]}
-            />
-            <SentencePattern
-              parts={[
-                { type: "verb", text: "Hört" },
-                { type: "subject", text: "sie" },
-                { type: "rest", text: "Musik?" },
-              ]}
-            />
-            <SentencePattern
-              parts={[
-                { type: "verb", text: "Kochst" },
-                { type: "subject", text: "du" },
-                { type: "rest", text: "gern?" },
-              ]}
-            />
-            <SentencePattern
-              parts={[
-                { type: "verb", text: "Sprichst" },
-                { type: "subject", text: "du" },
-                { type: "rest", text: "Deutsch?" },
-              ]}
-            />
-          </div>
         </div>
 
         <div style={warningBoxStyle}>
@@ -896,7 +875,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       </div>
 
       <div id="hobbies" style={cardStyle}>
-        <h2 style={sectionTitle}>Teil 5 · Hobbies</h2>
+        <h2 style={sectionTitle}>Hobbies and „gern“</h2>
 
         <div style={infoBoxStyle}>
           <strong>Common Hobbies Vocabulary</strong>
@@ -912,7 +891,8 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         <div style={questionCardStyle}>
           <strong>Talking about hobbies with gern</strong>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Use <strong>verb + gern</strong> to say what you enjoy doing.
+            Use <strong>gern</strong> with the activity verb: <strong>Ich lese gern.</strong> This is often more natural
+            than translating “my hobby is …” word for word. You can still say <strong>Mein Hobby ist Lesen.</strong>
           </p>
           <div style={chipStyle}>Ich + conjugated verb + gern.</div>
           <div style={answerCardStyle}>

@@ -24,58 +24,34 @@ describe("A1WorkbookSectionTabs", () => {
     expect(getA1TeilNumber("Teil 4 · Hören")).toBe(4);
   });
 
-  it("keeps the A1 Day 6 nested workbook wrapper visible after radio completion", () => {
+  it("keeps A1 Day 6 as one page with no Teil navigation", () => {
     document.body.innerHTML = `
       <main class="layout-main">
-        <nav data-a1-teil-navigation="true">
-          <button>Overview</button>
-          <button>Teil 1</button>
-          <button>Teil 2</button>
-          <button>Teil 3</button>
-          <button>Teil 4</button>
-          <button>Teil 5</button>
-        </nav>
-        <div id="day6-workbook">
-          <div id="hero"><h1>A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies</h1></div>
-          <div id="family"><h2>Teil 1 · Family Vocabulary</h2><p>Family content</p></div>
-          <div id="writing"><h2>Teil 2 · Writing About Your Family</h2><p>Writing content</p></div>
-          <div id="languages"><h2>Teil 3 · Languages and ein bisschen</h2><p>Language content</p></div>
-          <div id="questions"><h2>Teil 4 · Forming Yes-or-No Questions</h2><p>Question content</p></div>
-          <div id="hobbies"><h2>Teil 5 · Hobbies</h2><p>Hobby content</p></div>
+        <nav data-a1-teil-navigation="true"><button>Overview</button><button>Teil 1</button></nav>
+        <div id="day6-workbook" data-a1-single-page-workbook="true">
+          <div id="family"><h2>Family vocabulary</h2><p>Family content</p></div>
+          <div id="writing"><h2>Write about yourself and your family</h2><p>Writing content</p></div>
+          <div id="languages"><h2>Languages and ein bisschen</h2><p>Language content</p></div>
+          <div id="questions"><h2>Forming yes/no questions</h2><p>Question content</p></div>
+          <div id="hobbies"><h2>Hobbies and gern</h2><p>Hobby content</p></div>
         </div>
       </main>
     `;
-
-    const main = document.querySelector("main");
-    const sections = findA1WorkbookTeilSections(main);
-
-    expect(sections).toHaveLength(5);
-    expect(sections.map(({ startElement }) => startElement.id)).toEqual([
-      "family",
-      "writing",
-      "languages",
-      "questions",
-      "hobbies",
-    ]);
 
     expect(
       applyA1WorkbookSectionTabs(document, {
         pathname: "/campus/course/a1-day-6-family-and-hobbies-workbook",
         search: "?radio=done",
       })
-    ).toBe(true);
+    ).toBe(false);
 
-    expect(document.querySelector("#day6-workbook").style.display).not.toBe("none");
-    expect(document.querySelector("#family").style.display).toBe("none");
-    expect(document.querySelector('[data-a1-workbook-overview="true"]')).not.toBeNull();
-
-    const teilOne = Array.from(document.querySelectorAll('[data-a1-teil-navigation="true"] button'))
-      .find((button) => button.textContent === "Teil 1");
-    teilOne.click();
-
-    expect(document.querySelector("#day6-workbook").style.display).not.toBe("none");
+    expect(document.querySelector("#day6-workbook").style.display).toBe("");
     expect(document.querySelector("#family").style.display).toBe("");
-    expect(document.querySelector("#writing").style.display).toBe("none");
+    expect(document.querySelector("#writing").style.display).toBe("");
+    expect(document.querySelector("#languages").style.display).toBe("");
+    expect(document.querySelector("#questions").style.display).toBe("");
+    expect(document.querySelector("#hobbies").style.display).toBe("");
+    expect(document.querySelector('[data-a1-workbook-overview="true"]')).toBeNull();
   });
 
   it("groups continuation cards with the preceding Teil and leaves the next-lesson footer visible", () => {

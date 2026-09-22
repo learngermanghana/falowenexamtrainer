@@ -193,7 +193,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
   }, [location.pathname, requestedView]);
 
   useEffect(() => {
-    if (!practice || !materialsDone || typeof document === "undefined") return undefined;
+    if (!practice || practice.singlePage || !materialsDone || typeof document === "undefined") return undefined;
 
     let disposed = false;
     let frame = null;
@@ -288,7 +288,7 @@ export default function A1SharedPracticeWorkbookNavigation() {
     window.scrollTo?.({ top: 0, behavior: "smooth" });
   }, []);
 
-  if (!practice || !materialsDone || !navMount || !sections.length) return null;
+  if (!practice || practice.singlePage || !materialsDone || !navMount || !sections.length) return null;
 
   return createPortal(
     <section
