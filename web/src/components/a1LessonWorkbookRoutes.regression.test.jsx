@@ -90,8 +90,10 @@ describe("A1 lesson and workbook routing regressions", () => {
         <A1Day6FamilyAndHobbiesWorkbookPage />
       </MemoryRouter>,
     );
-    expect(screen.getByRole("heading", { name: /Family, Languages, Yes\/No Questions and Hobbies/i })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Family, Languages, Questions and Hobbies/i })).toBeVisible();
     expect(screen.getByText("What is 'mother' in German?", { exact: false })).toBeVisible();
-    expect(screen.getByRole("button", { name: /Open Group Discussion/i })).toBeEnabled();
+    expect(document.querySelector('[data-a1-day6-writing-draft="true"]')).toBeTruthy();
+    expect(screen.queryByText(/^Teil 1/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Open Group Discussion/i })).not.toBeInTheDocument();
   });
 });
