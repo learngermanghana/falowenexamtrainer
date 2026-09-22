@@ -25,25 +25,53 @@ const speakingContent = <>
   </WorkbookTaskCard>
 </>;
 
-const lesenText = `Pass und Visum, Einwohnermeldeamt und Aufenthaltstitel
+const lesenText = `Meine Pläne für die nächsten Jahre
 
-Für die Einreise nach Deutschland brauchen Sie einen gültigen Reisepass oder ein anderes Dokument, das Ihre Identität bestätigt. Bürger, die nicht aus der EU kommen, brauchen zusätzlich ein Visum. Das Visum bekommen Sie bei der Deutschen Botschaft oder beim Konsulat in Ihrem Land.
+David hat seinen A2-Deutschkurs fast beendet und denkt über seine Zukunft nach. Zuerst möchte er die B1-Prüfung bestehen. Deshalb plant er, jeden Tag Deutsch zu lesen und zweimal pro Woche mit Freunden zu sprechen.
 
-Nach der Ankunft müssen Sie sich beim Einwohnermeldeamt anmelden und danach zur Ausländerbehörde gehen. Dort bekommen Sie einen Aufenthaltstitel. Wenn Ihre Deutschkenntnisse noch nicht ausreichen, können oder müssen Sie einen Integrationskurs machen. Ein Integrationskurs vermittelt Deutsch und Wissen über das Leben in Deutschland.
+Beruflich interessiert David sich für IT. Im nächsten Jahr möchte er eine Weiterbildung beginnen, damit er bessere Chancen auf dem Arbeitsmarkt hat. Wenn er genug Berufserfahrung gesammelt hat, kann er sich vorstellen, in einem internationalen Unternehmen zu arbeiten.
 
-Für die Arbeitssuche hilft die Arbeitsagentur. Dokumente aus dem Heimatland müssen oft übersetzt und anerkannt werden. Wichtig sind auch Kranken-, Renten- und Pflegeversicherung.`;
+Auch privat hat David Pläne. Er möchte Geld sparen und in zwei Jahren eine größere Wohnung suchen. Außerdem möchte er mehr reisen und neue Länder kennenlernen. Gesundheit ist ihm ebenfalls wichtig: Er will regelmäßig Sport machen und weniger Stress haben.
+
+David weiß, dass nicht jeder Plan genau so funktionieren wird. Trotzdem findet er es hilfreich, klare Ziele zu haben und Schritt für Schritt daran zu arbeiten.`;
 
 const lesenQuestions = [
-  { stem: "Was braucht man zur Einreise nach Deutschland?", options: ["A) Einen Mietvertrag", "B) Einen deutschen Führerschein", "C) Einen gültigen Reisepass", "D) Ein Bankkonto"] },
-  { stem: "Wo bekommt man ein Visum für Deutschland?", options: ["A) Beim Einwohnermeldeamt", "B) Bei der Deutschen Botschaft im Heimatland", "C) Beim Jugendamt", "D) Bei der Arbeitsagentur"] },
-  { stem: "Was bekommt man bei der Ausländerbehörde?", options: ["A) Ein Bankkonto", "B) Einen Führerschein", "C) Einen Aufenthaltstitel", "D) Einen Arbeitsvertrag"] },
-  { stem: "Was ist ein Integrationskurs?", options: ["A) Ein Kurs zum Autofahren", "B) Ein Kurs für Deutsch und Leben in Deutschland", "C) Ein Kurs über Finanzen", "D) Ein Sportkurs"] },
-  { stem: "Was macht man mit Dokumenten aus dem Heimatland, wenn man arbeiten möchte?", options: ["A) Man wirft sie weg", "B) Man muss sie verstecken", "C) Man muss sie übersetzen und anerkennen lassen", "D) Man schickt sie an das Jugendamt"] },
-  { stem: "Wer hilft bei der Arbeitssuche?", options: ["A) Das Kino", "B) Das Rathaus", "C) Die Arbeitsagentur", "D) Die Polizei"] },
-  { stem: "Welche Versicherungen sind besonders wichtig?", options: ["A) Auto- und Handyversicherung", "B) Reise- und Hausratversicherung", "C) Kranken-, Renten- und Pflegeversicherung", "D) Lebensversicherung und Haftpflichtversicherung"] },
+  {
+    stem: "Was möchte David zuerst erreichen?",
+    options: ["A) Die B1-Prüfung bestehen", "B) Sofort ein Haus kaufen", "C) Deutsch nicht mehr lernen", "D) Eine lange Reise machen"],
+  },
+  {
+    stem: "Wie möchte David sein Deutsch verbessern?",
+    options: ["A) Täglich lesen und regelmäßig mit Freunden sprechen", "B) Nur Filme sehen", "C) Nur einmal im Monat lernen", "D) Keine Gespräche führen"],
+  },
+  {
+    stem: "Warum möchte David eine IT-Weiterbildung beginnen?",
+    options: ["A) Damit er bessere Chancen auf dem Arbeitsmarkt hat.", "B) Weil er nicht arbeiten möchte.", "C) Damit er weniger Deutsch lernt.", "D) Weil er sofort umziehen muss."],
+  },
+  {
+    stem: "Was plant David privat?",
+    options: ["A) Geld sparen, später umziehen und reisen", "B) Seine Wohnung sofort verkaufen", "C) Nie mehr reisen", "D) Nur arbeiten"],
+  },
+  {
+    stem: "Wie denkt David über Zukunftspläne?",
+    options: ["A) Klare Ziele helfen, auch wenn nicht alles genau so funktioniert.", "B) Pläne sind immer nutzlos.", "C) Jeder Plan muss perfekt funktionieren.", "D) Man soll keine Ziele haben."],
+  },
 ];
 
-const hoerenQuestions = [];
+const hoerenQuestions = [
+  {
+    stem: "Worum geht es im Beitrag?",
+    options: ["A) Um Zukunftspläne und Ziele", "B) Nur um Essen", "C) Um eine Reklamation", "D) Nur um das Wetter"],
+  },
+  {
+    stem: "Welche Formulierung kann man für Zukunftspläne benutzen?",
+    options: ["A) Ich möchte ...", "B) Gestern habe ich ...", "C) Bitte öffnen Sie ...", "D) Es tut mir leid ..."],
+  },
+  {
+    stem: "Was solltest du beim Sprechen über die Zukunft erklären?",
+    options: ["A) Deine Ziele und Gründe", "B) Nur deinen Namen", "C) Nur das Datum", "D) Keine persönlichen Pläne"],
+  },
+];
 
 export default function A2Day28UeberDieZukunftSprechenWorkbookPage() {
   return (
@@ -58,7 +86,7 @@ export default function A2Day28UeberDieZukunftSprechenWorkbookPage() {
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinen Zukunftsplänen erzählen. Zuerst ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
-      hoerenTask="Teil 4 ist zusätzliche Hörpraxis. Für A2-10.28 gibt es keine Teil-4-Abgabe."
+      hoerenTask="Hören Sie den Beitrag zu Zukunftsplänen. Achten Sie auf Ziele, Zeitangaben und Gründe und beantworten Sie anschließend die Fragen."
       hoerenAudioUrl="https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
       hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
