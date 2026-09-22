@@ -239,20 +239,25 @@ export const WorkbookTabNav = ({
   );
 };
 
-export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) => (
-  <div
-    data-advanced-self-learning-navigation
-    style={{ position: "sticky", top: 0, zIndex: 35 }}
-  >
-    <WorkbookTabNav
-      activeTab={activeTab}
-      onChange={onChange}
-      tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
-      ariaLabel={`${String(level || "").toUpperCase()} Day ${day} self-learning sections`}
-      renderLegacyGrammarPanel={false}
-    />
-  </div>
-);
+export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+
+  return (
+    <div
+      data-advanced-self-learning-navigation
+      data-sticky-navigation={normalizedLevel === "C2" ? "false" : "true"}
+      style={normalizedLevel === "C2" ? undefined : { position: "sticky", top: 0, zIndex: 35 }}
+    >
+      <WorkbookTabNav
+        activeTab={activeTab}
+        onChange={onChange}
+        tabs={normalizedLevel === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
+        ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
+        renderLegacyGrammarPanel={false}
+      />
+    </div>
+  );
+};
 
 export const WorkbookTaskCard = ({
   eyebrow = "Your task",
