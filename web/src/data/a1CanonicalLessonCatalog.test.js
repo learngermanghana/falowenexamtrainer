@@ -52,6 +52,12 @@ describe("A1 canonical lesson catalog", () => {
       assignmentKey: "A1-1.2",
       destination: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
     });
+    expect(getA1CanonicalLesson("2.3")).toMatchObject({
+      day: 6,
+      kind: "practice",
+      singlePage: true,
+      destination: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    });
     expect(getA1CanonicalLesson("A1-1.2-PRACTICE")).toMatchObject({
       routeKey: "1.2-practice",
       day: 3,
