@@ -102,26 +102,50 @@ const optionButtonStyle = (selected, correct, submitted) => ({
   cursor: "pointer",
 });
 
-const familyMembers = [
-  ["die Mutter", "mother"],
-  ["der Vater", "father"],
-  ["die Eltern", "parents"],
-  ["die Schwester", "sister"],
-  ["der Bruder", "brother"],
-  ["die Geschwister", "siblings"],
-  ["die Großmutter (Oma)", "grandmother"],
-  ["der Großvater (Opa)", "grandfather"],
-  ["die Großeltern", "grandparents"],
-  ["die Tante", "aunt"],
-  ["der Onkel", "uncle"],
-  ["die Cousine", "female cousin"],
-  ["der Cousin", "male cousin"],
-  ["die Tochter", "daughter"],
-  ["der Sohn", "son"],
-  ["das Kind", "child"],
-  ["die Kinder", "children"],
-  ["die Ehefrau", "wife"],
-  ["der Ehemann", "husband"],
+const familyGroups = [
+  {
+    title: "Immediate family",
+    icon: "🏠",
+    items: [
+      ["👩", "die Mutter", "mother"],
+      ["👨", "der Vater", "father"],
+      ["👪", "die Eltern", "parents"],
+      ["👧", "die Schwester", "sister"],
+      ["👦", "der Bruder", "brother"],
+      ["👨‍👩‍👧‍👦", "die Geschwister", "siblings"],
+    ],
+  },
+  {
+    title: "Grandparents",
+    icon: "🌳",
+    items: [
+      ["👵", "die Großmutter (Oma)", "grandmother"],
+      ["👴", "der Großvater (Opa)", "grandfather"],
+      ["👵👴", "die Großeltern", "grandparents"],
+    ],
+  },
+  {
+    title: "Extended family",
+    icon: "🤝",
+    items: [
+      ["👩", "die Tante", "aunt"],
+      ["👨", "der Onkel", "uncle"],
+      ["👧", "die Cousine", "female cousin"],
+      ["👦", "der Cousin", "male cousin"],
+    ],
+  },
+  {
+    title: "Your own family",
+    icon: "❤️",
+    items: [
+      ["👧", "die Tochter", "daughter"],
+      ["👦", "der Sohn", "son"],
+      ["🧒", "das Kind", "child"],
+      ["🧒🧒", "die Kinder", "children"],
+      ["👩", "die Ehefrau", "wife"],
+      ["👨", "der Ehemann", "husband"],
+    ],
+  },
 ];
 
 const languageNames = [
@@ -335,15 +359,70 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
       <div id="family" style={cardStyle}>
         <h2 style={sectionTitle}>Family vocabulary</h2>
 
-        <div style={infoBoxStyle}>
-          <strong>Family Members</strong>
-          <div style={{ display: "grid", gap: 6 }}>
-            {familyMembers.map(([german, english]) => (
-              <div key={german}>
-                {german} – {english}
+        <div style={{ display: "grid", gap: 14 }} data-a1-family-vocabulary-grid="true">
+          {familyGroups.map((group) => (
+            <section
+              key={group.title}
+              style={{
+                border: "1px solid #dbeafe",
+                borderRadius: 14,
+                background: "#f8fbff",
+                padding: 14,
+                display: "grid",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                <span aria-hidden="true" style={{ fontSize: "1.35rem" }}>{group.icon}</span>
+                <strong style={{ fontSize: "1rem" }}>{group.title}</strong>
               </div>
-            ))}
-          </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                  gap: 10,
+                }}
+              >
+                {group.items.map(([emoji, german, english]) => (
+                  <div
+                    key={german}
+                    style={{
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 12,
+                      background: "#fff",
+                      padding: "11px 12px",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                      minWidth: 0,
+                    }}
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        fontSize: "1.35rem",
+                        lineHeight: 1.2,
+                        width: 28,
+                        flex: "0 0 28px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {emoji}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: "#0f172a", lineHeight: 1.35 }}>
+                        {german}
+                      </div>
+                      <div style={{ color: "#64748b", fontSize: "0.94rem", marginTop: 2 }}>
+                        {english}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
 
         <div style={questionCardStyle}>
