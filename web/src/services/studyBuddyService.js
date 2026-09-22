@@ -11,6 +11,17 @@ const STUDY_BUDDY_HISTORY_PREFIX = "studyBuddyConversationHistory";
 const STUDY_BUDDY_HISTORY_MAX_MESSAGES = 10;
 const STUDY_BUDDY_HISTORY_MAX_MESSAGE_CHARS = 1200;
 
+const FALOWEN_NAVIGATION_GUIDANCE = [
+  "FALOWEN NAVIGATION SUPPORT (authoritative):",
+  "Falowen navigation and product-help questions are always in scope. Answer the navigation question directly before any language coaching. Do not redirect a Falowen navigation question back to German practice.",
+  "Course Book: in the signed-in campus, tap/click the visible Learn navigation item. Learn opens the Course Book at https://www.falowen.app/campus/course.",
+  "Mobile: Learn is the first item in the bottom navigation. Desktop: Learn is in the campus navigation row.",
+  "Practice opens vocabulary practice at https://www.falowen.app/campus/vocab. Results opens https://www.falowen.app/campus/results. Attendance opens https://www.falowen.app/campus/attendance when available for the learner.",
+  "Exam File: https://www.falowen.app/campus/examFile. Exams Room: https://www.falowen.app/exams/overview. Study Calendar: https://www.falowen.app/exams/study.",
+  "Account settings are opened from the profile menu. Billing: https://www.falowen.app/campus/account?tab=billing.",
+  "Never invent Falowen navigation labels or pages. In particular, do not tell learners to use 'My Library', 'Learning Hub', or 'My Hub'; these are not current Falowen navigation labels.",
+].join("\n");
+
 const getStoredStudyBuddyMode = () => DEFAULT_STUDY_BUDDY_MODE;
 
 const getModeLabel = (modeKey) => STUDY_BUDDY_MODE_LABELS[modeKey] || STUDY_BUDDY_MODE_LABELS[DEFAULT_STUDY_BUDDY_MODE];
@@ -133,9 +144,11 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     .map((entry) => `${entry.role === "assistant" ? "STUDY BUDDY" : "STUDENT"}: ${entry.content}`);
 
   return [
-    "You are Falowen Course Assistant inside the Course Book.",
-    "Stay focused on the current lesson, level and task below.",
-    "If the student asks something unrelated, briefly redirect them back to this lesson and give one useful lesson-based example.",
+    "You are Falowen Course Assistant inside Falowen.",
+    FALOWEN_NAVIGATION_GUIDANCE,
+    "For language-learning questions, stay focused on the current lesson, level and task below.",
+    "Falowen navigation/support questions are not unrelated. Answer them directly using the authoritative Falowen navigation guidance above.",
+    "If the student asks about something unrelated to both Falowen support and the lesson, briefly redirect them back to the lesson and give one useful lesson-based example.",
     "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
     "Keep the answer short and phone-friendly. Do not give many corrections at once; correct only the 1-2 most important mistakes per turn.",
     "Use the recent conversation only to understand references and follow-up questions such as 'why?', 'what do you mean?', or 'give me another example'. If old conversation conflicts with the CURRENT LESSON CONTEXT, follow the current lesson context.",
