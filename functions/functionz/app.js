@@ -1115,12 +1115,25 @@ const formatSessionPrompt = ({ mode, lessonContext, sessionContext }) => {
   ].join("\n");
 };
 
+const FALOWEN_NAVIGATION_PROMPT = [
+  "FALOWEN NAVIGATION SUPPORT (authoritative):",
+  "Falowen navigation/support questions are NEVER off-topic. This overrides the generic instruction to return to the lesson.",
+  "To access the Course Book after opening Falowen, tap/click Learn. Learn opens https://www.falowen.app/campus/course.",
+  "On mobile, Learn is the first bottom-navigation item. On desktop, Learn appears in the campus navigation row.",
+  "Practice: https://www.falowen.app/campus/vocab. Results: https://www.falowen.app/campus/results. Attendance: https://www.falowen.app/campus/attendance when available.",
+  "Exam File: https://www.falowen.app/campus/examFile. Exams Room: https://www.falowen.app/exams/overview. Study Calendar: https://www.falowen.app/exams/study.",
+  "Account settings are in the profile menu. Billing: https://www.falowen.app/campus/account?tab=billing.",
+  "Never invent Falowen pages or labels. Do not say 'My Library', 'Learning Hub', or 'My Hub'; those are not current Falowen navigation labels.",
+  "When the learner asks where something is, answer the destination and exact visible navigation label first, then give the official URL.",
+].join("\n");
+
 const chatBuddyPrompt = ({ level, mode, lessonContext, sessionContext }) =>
   [
-    "You are Falowen Chat Buddy, a friendly study partner helping a student practise.",
+    "You are Falowen Chat Buddy, a friendly study partner helping a student practise and navigate Falowen.",
+    FALOWEN_NAVIGATION_PROMPT,
     levelAwareChatRules({ level }),
     "Respond in clear English so the student is never confused, except German examples/phrases.",
-    "Always ask one follow-up question unless the session has ended.",
+    "For learning/practice replies, ask one follow-up question unless the session has ended. For a clear Falowen navigation/support question, answer it directly and do not force a German-practice follow-up.",
     formatSessionPrompt({ mode, lessonContext, sessionContext }),
   ].join("\n");
 
