@@ -7,6 +7,7 @@ describe("C2 unified topic-first workbook", () => {
   const page = fs.readFileSync(path.join(__dirname, "C2UnifiedGuidedWorkbookPage.js"), "utf8");
   const registry = fs.readFileSync(path.join(__dirname, "SelfLearningLessonRegistry.js"), "utf8");
   const cloudSync = fs.readFileSync(path.join(__dirname, "../utils/c2CloudDraftSync.js"), "utf8");
+  const workbookComponents = fs.readFileSync(path.join(__dirname, "StandardWorkbookComponents.js"), "utf8");
 
   test.each(Array.from({ length: 28 }, (_, index) => index + 1))("Day %i has a complete topic foundation", (day) => {
     const standard = getC2ExamStandard(day);
@@ -73,6 +74,14 @@ describe("C2 unified topic-first workbook", () => {
     expect(cloudSync).toContain("cloud-migrated");
     expect(page).toContain("legacyDraftSeedAllowed");
     expect(page).toContain("legacyProgressSeedAllowed");
+    expect(cloudSync).toContain("pendingSaveRef");
+    expect(cloudSync).toContain('window.addEventListener("pagehide", flushOnExit)');
+    expect(cloudSync).toContain("flushPendingSave()");
+  });
+
+  test("keeps the C2 section navigation in normal document flow", () => {
+    expect(workbookComponents).toContain('data-sticky-navigation={normalizedLevel === "C2" ? "false" : "true"}');
+    expect(workbookComponents).toContain('style={normalizedLevel === "C2" ? undefined : { position: "sticky", top: 0, zIndex: 35 }}');
   });
 
 
