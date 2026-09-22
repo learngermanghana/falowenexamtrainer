@@ -53,8 +53,9 @@ const isPersistentFooter = (element) => {
 
 export const findA1WorkbookTeilSections = (mainRoot) => {
   if (!mainRoot?.querySelectorAll) return [];
+
   const seen = new Set();
-  return Array.from(mainRoot.querySelectorAll("h2, h3"))
+  const numberedHeadings = Array.from(mainRoot.querySelectorAll("h2, h3"))
     .map((heading) => ({ heading, number: getA1TeilNumber(heading.textContent) }))
     .filter(({ number }) => Number.isFinite(number))
     .filter(({ number }) => {
@@ -62,16 +63,31 @@ export const findA1WorkbookTeilSections = (mainRoot) => {
       seen.add(number);
       return true;
     })
-    .sort((left, right) => left.number - right.number)
-    .map(({ heading, number }) => {
-      const suffix = String(heading.textContent || "").replace(/^\s*Teil\s*\d+\s*[·:—-]?\s*/i, "").trim();
-      return {
-        heading,
-        number,
-        label: suffix ? `Teil ${number} · ${suffix}` : `Teil ${number}`,
-        startElement: getTopLevelChild(mainRoot, heading) || heading.closest("section") || heading.parentElement,
-      };
-    });
+    .sort((left, right) => left.number - right.number);
+
+  const topLevelParents = numberedHeadings
+    .map(({ heading }) => getTopLevelChild(mainRoot, heading))
+    .filter(Boolean);
+  const sharedPageRoot = topLevelParents.length === numberedHeadings.length
+    && topLevelParents.length > 1
+    && topLevelParents.every((element) => element === topLevelParents[0])
+    ? topLevelParents[0]
+    : null;
+
+  return numberedHeadings.map(({ heading, number }) => {
+    const suffix = String(heading.textContent || "").replace(/^\s*Teil\s*\d+\s*[·:—-]?\s*/i, "").trim();
+    const localSection = sharedPageRoot ? getTopLevelChild(sharedPageRoot, heading) : null;
+    return {
+      heading,
+      number,
+      label: suffix ? `Teil ${number} · ${suffix}` : `Teil ${number}`,
+      startElement:
+        localSection
+        || heading.closest("section")
+        || getTopLevelChild(mainRoot, heading)
+        || heading.parentElement,
+    };
+  });
 };
 
 export const buildA1WorkbookContentGroups = (mainRoot, sections = []) => {
