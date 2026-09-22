@@ -251,7 +251,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
       <WorkbookTabNav
         activeTab={activeTab}
         onChange={onChange}
-        tabs={normalizedLevel === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
+        tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
         ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
         renderLegacyGrammarPanel={false}
       />
