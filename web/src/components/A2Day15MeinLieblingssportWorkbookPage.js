@@ -22,14 +22,6 @@ const lesenQuestions = [
     stem: "Was bietet der Seniorenclub \"Aktiv im Alter\" an?",
     options: ["A) Schwimmkurse", "B) Fitnessprogramme", "C) Kletterkurse", "D) Tanzshows"],
   },
-  {
-    stem: "Was plant die Stadtverwaltung in den nächsten Monaten?",
-    options: ["A) Die Eröffnung eines neuen Fitnessstudios", "B) Die Eröffnung eines neuen Kletterparks", "C) Die Eröffnung einer neuen Schwimmhalle", "D) Die Eröffnung eines Stadions"],
-  },
-  {
-    stem: "Welche Rolle spielt Sport in der Stadt?",
-    options: ["A) Eine unwichtige Rolle", "B) Eine wichtige Rolle zur Förderung der Lebensqualität", "C) Eine Rolle nur für junge Menschen", "D) Eine Rolle nur für Profisportler"],
-  },
 ];
 
 const hoerenQuestions = [
@@ -57,7 +49,7 @@ const hoerenQuestions = [
 
 const lesenText = `Sportangebote in unserer Stadt
 
-In unserer Stadt gibt es ein breites Angebot an Sportmöglichkeiten für Jung und Alt. Besonders beliebt sind die Kurse im Fitnessstudio "Fit & Fun", wo man alles von Yoga bis Zumba ausprobieren kann. Für diejenigen, die lieber draußen aktiv sind, bietet der Sportverein "Grün-Weiß" Mannschaftssportarten wie Fußball, Handball und Volleyball an. Auch der jährliche Stadtlauf ist sehr beliebt und unterstützt lokale Wohltätigkeitsorganisationen. Die Schwimmhalle befindet sich im Stadtzentrum und der Seniorenclub "Aktiv im Alter" bietet Fitnessprogramme an. In den nächsten Monaten plant die Stadtverwaltung die Eröffnung eines neuen Kletterparks. Sport spielt in der Stadt eine wichtige Rolle und trägt zur Lebensqualität bei.`;
+In unserer Stadt gibt es ein breites Angebot an Sportmöglichkeiten für Jung und Alt. Besonders beliebt sind die Kurse im Fitnessstudio "Fit & Fun", wo man alles von Yoga bis Zumba ausprobieren kann. Für diejenigen, die lieber draußen aktiv sind, bietet der Sportverein "Grün-Weiß" Mannschaftssportarten wie Fußball, Handball und Volleyball an. Auch der jährliche Stadtlauf ist sehr beliebt und unterstützt lokale Wohltätigkeitsorganisationen. Die Schwimmhalle befindet sich im Stadtzentrum und der Seniorenclub "Aktiv im Alter" bietet Fitnessprogramme an.`;
 
 export default function A2Day15MeinLieblingssportWorkbookPage() {
   return (
