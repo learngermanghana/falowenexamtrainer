@@ -5,7 +5,7 @@ import {
   normalizeA1Chapter,
 } from "./a1CanonicalLessonRoutes";
 
-const practice = ({ routeKey, chapter, day, title, destination, aliases = [] }) => ({
+const practice = ({ routeKey, chapter, day, title, destination, aliases = [], singlePage = false }) => ({
   routeKey: normalizeA1Chapter(routeKey || chapter),
   chapter: normalizeA1Chapter(chapter),
   day,
@@ -14,6 +14,7 @@ const practice = ({ routeKey, chapter, day, title, destination, aliases = [] }) 
   aliases: aliases.map(normalizeA1Chapter),
   assignmentKey: null,
   kind: "practice",
+  singlePage,
 });
 
 const ASSIGNMENT_LESSONS = Object.values(A1_ASSIGNMENT_REGISTRY).map((assignment) => ({
@@ -55,6 +56,7 @@ const PRACTICE_LESSONS = [
     day: 6,
     title: "Family and Hobbies",
     destination: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    singlePage: true,
   }),
   practice({
     chapter: "3.5",
