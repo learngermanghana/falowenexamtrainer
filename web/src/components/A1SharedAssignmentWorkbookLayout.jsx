@@ -1,6 +1,7 @@
 import React, { Children, isValidElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { getA1Assignment, getA1AssignmentNeighbors } from "../data/a1AssignmentRegistry";
+import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
@@ -260,19 +261,27 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
   );
 };
 
+const a1LessonNeighborLabel = (lesson) =>
+  `Day ${lesson.day} · ${lesson.title}`;
+
 export const A1AssignmentNeighborLinks = ({ assignmentKey }) => {
-  const neighbors = getA1AssignmentNeighbors(assignmentKey);
+  const neighbors = getA1CourseLessonNeighbors(assignmentKey);
   return (
     <nav
-      aria-label="Previous and next A1 assignments"
+      aria-label="Previous and next A1 lessons"
       data-a1-assignment-neighbors="true"
+      data-a1-course-neighbors="true"
       style={{ ...styles.card, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}
     >
       {neighbors.previous ? (
-        <Link to={neighbors.previous.workbookRoute}>← {neighbors.previous.assignmentKey}</Link>
+        <Link to={neighbors.previous.lessonRoute}>
+          ← {a1LessonNeighborLabel(neighbors.previous)}
+        </Link>
       ) : <span />}
       {neighbors.next ? (
-        <Link to={neighbors.next.workbookRoute}>{neighbors.next.assignmentKey} →</Link>
+        <Link to={neighbors.next.lessonRoute}>
+          {a1LessonNeighborLabel(neighbors.next)} →
+        </Link>
       ) : <span />}
     </nav>
   );
