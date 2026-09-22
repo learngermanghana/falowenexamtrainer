@@ -91,7 +91,12 @@ const readingQuestions = [
   { stem: "Wie kann man kostenlos im Internet surfen?", options: ["A) Mit Auslandstarif", "B) Mit Guthaben-Karten", "C) Mit Video-Ident", "D) Mit öffentlichem WLAN"] },
 ];
 
-const listeningQuestions = [];
+const listeningQuestions = [
+  { stem: "Was hat Miriam gestern verloren?", options: ["A) Ihren Laptop", "B) Ihr Handy", "C) Ihre Tasche", "D) Ihren Ausweis"] },
+  { stem: "Wo möchte Miriam ein neues Handy bestellen?", options: ["A) Im Supermarkt", "B) Auf www.jumiagh.com", "C) Im Rathaus", "D) In der Bibliothek"] },
+  { stem: "Was fragt sie beim Kundenservice?", options: ["A) Nur nach der Farbe", "B) Nach Modell-Empfehlung sowie Bestellung und Lieferung", "C) Nur nach Rabatten", "D) Nach einem Auslandstarif"] },
+  { stem: "Was ist ihr wichtig beim neuen Handy?", options: ["A) Gute Kamera und lange Akkulaufzeit", "B) Sehr großes Gewicht", "C) Nur Spiele", "D) Keine Internetfunktion"] },
+];
 
 export default function A2Day27DigitaleKommunikationWorkbookPage() {
   return <A2StandardTabbedWorkbookPage
@@ -105,7 +110,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
     schreibenPlaceholder={"Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich mein Handy verloren habe. ...\n\nKönnten Sie mir bitte ein passendes Modell empfehlen? ...\n\nMit freundlichen Grüßen\n[Name]"}
     lesenText={readingText}
     lesenQuestions={readingQuestions}
-    hoerenTask="Teil 4 ist zusätzliche Hörpraxis. Für A2-10.27 gibt es keine Teil-4-Abgabe."
+    hoerenTask="Sieh dir den Beitrag zur digitalen Kommunikation an und beantworte danach die vier Fragen."
     hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
     hoerenQuestions={listeningQuestions}
     showWorkbookGuidance={false}
