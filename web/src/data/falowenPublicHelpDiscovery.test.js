@@ -18,6 +18,7 @@ describe("Falowen public help and AI discovery", () => {
   const guide = read(path.join(SRC, "components", "PublicStudentGuidePage.js"));
   const studyBuddy = read(path.join(SRC, "services", "studyBuddyService.js"));
   const backendApp = read(path.join(ROOT, "functions", "functionz", "app.js"));
+  const compactNavigationPatch = read(path.join(ROOT, "scripts", "patchCompactStudentNavigation.mjs"));
 
   test("publishes the canonical learner routes in the AI-readable help source", () => {
     [
@@ -49,7 +50,8 @@ describe("Falowen public help and AI discovery", () => {
       expect(source).toContain("Learning Hub");
       expect(source).toContain("My Hub");
     });
-    expect(app).toContain('{ key: "learn", label: "Learn", route: "/campus/course"');
+    expect(compactNavigationPatch).toContain('label: "Learn"');
+    expect(compactNavigationPatch).toContain('route: "/campus/course"');
   });
 
   test("keeps both Study Buddy prompt layers aligned with Falowen navigation support", () => {
