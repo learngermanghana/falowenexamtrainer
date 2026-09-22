@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { db, doc, onSnapshot, serverTimestamp, setDoc } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 
@@ -21,12 +21,39 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
   const remoteSerializedRef = useRef(null);
   const skipNextSaveRef = useRef(false);
   const saveTimerRef = useRef(null);
+  const pendingSaveRef = useRef(null);
   const migrationKey = user?.uid && day && field
     ? `falowen:c2:cloud-migrated:${user.uid}:${Number(day)}:${field}`
     : "";
   const defaultSerialized = serialize(defaultValue);
 
   valueRef.current = value;
+
+  const flushPendingSave = useCallback(() => {
+    if (saveTimerRef.current && typeof window !== "undefined") {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+
+    const pending = pendingSaveRef.current;
+    if (!pending) return;
+
+    pendingSaveRef.current = null;
+    setDoc(pending.draftRef, pending.payload, { merge: true })
+      .then(() => {
+        remoteSerializedRef.current = pending.serializedValue;
+        if (migrationKey) {
+          try {
+            window.localStorage.setItem(migrationKey, "1");
+          } catch (_error) {
+            // Local migration marker is best-effort only.
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(`C2 cloud draft save failed for ${field}`, error);
+      });
+  }, [field, migrationKey]);
 
   useEffect(() => {
     setCloudReady(false);
@@ -64,6 +91,11 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
 
           remoteSerializedRef.current = remoteSerialized;
           if (!shouldPreferLegacyLocal && remoteSerialized !== localSerialized) {
+            if (saveTimerRef.current && typeof window !== "undefined") {
+              window.clearTimeout(saveTimerRef.current);
+              saveTimerRef.current = null;
+            }
+            pendingSaveRef.current = null;
             skipNextSaveRef.current = true;
             setValue(remoteValue);
           }
@@ -111,33 +143,21 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
     }
 
     const draftRef = doc(db, "users", user.uid, "c2Drafts", buildC2CloudDraftDocId(day));
-    saveTimerRef.current = window.setTimeout(() => {
-      setDoc(
-        draftRef,
-        {
-          ownerUid: user.uid,
-          uid: user.uid,
-          userId: user.uid,
-          level: "C2",
-          day: Number(day),
-          [field]: value,
-          [`${field}UpdatedAt`]: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true },
-      ).then(() => {
-        remoteSerializedRef.current = serializedValue;
-        if (migrationKey) {
-          try {
-            window.localStorage.setItem(migrationKey, "1");
-          } catch (_error) {
-            // Local migration marker is best-effort only.
-          }
-        }
-      }).catch((error) => {
-        console.error(`C2 cloud draft save failed for ${field}`, error);
-      });
-    }, SAVE_DELAY_MS);
+    pendingSaveRef.current = {
+      draftRef,
+      serializedValue,
+      payload: {
+        ownerUid: user.uid,
+        uid: user.uid,
+        userId: user.uid,
+        level: "C2",
+        day: Number(day),
+        [field]: value,
+        [`${field}UpdatedAt`]: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+    };
+    saveTimerRef.current = window.setTimeout(flushPendingSave, SAVE_DELAY_MS);
 
     return () => {
       if (saveTimerRef.current) {
@@ -145,7 +165,19 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
         saveTimerRef.current = null;
       }
     };
-  }, [cloudReady, day, field, migrationKey, user?.uid, value]);
+  }, [cloudReady, day, field, flushPendingSave, user?.uid, value]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const flushOnExit = () => flushPendingSave();
+    window.addEventListener("pagehide", flushOnExit);
+
+    return () => {
+      window.removeEventListener("pagehide", flushOnExit);
+      flushPendingSave();
+    };
+  }, [flushPendingSave]);
 
   return {
     cloudEnabled: Boolean(db && user?.uid),
