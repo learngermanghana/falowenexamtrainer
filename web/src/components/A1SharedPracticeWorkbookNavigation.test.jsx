@@ -172,4 +172,15 @@ describe("A1 shared self-practice navigation", () => {
     await new Promise((resolve) => window.setTimeout(resolve, 10));
     expect(screen.queryByRole("region", { name: "A1 self-practice workbook navigation" })).not.toBeInTheDocument();
   });
+
+  test("Day 6 is configured as a single-page practice lesson without shared section navigation", () => {
+    expect(resolveA1SharedPracticeLesson({
+      pathname: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    })).toMatchObject({
+      day: 6,
+      chapter: "2.3",
+      singlePage: true,
+    });
+  });
+
 });
