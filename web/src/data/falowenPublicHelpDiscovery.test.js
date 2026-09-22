@@ -4,6 +4,7 @@ import path from "path";
 const SRC = path.resolve(__dirname, "..");
 const WEB = path.resolve(SRC, "..");
 const PUBLIC = path.join(WEB, "public");
+const ROOT = path.resolve(WEB, "..");
 
 const read = (filename) => fs.readFileSync(filename, "utf8");
 
@@ -15,6 +16,8 @@ describe("Falowen public help and AI discovery", () => {
   const app = read(path.join(SRC, "App.js"));
   const landing = read(path.join(SRC, "components", "LandingPageSimple.js"));
   const guide = read(path.join(SRC, "components", "PublicStudentGuidePage.js"));
+  const studyBuddy = read(path.join(SRC, "services", "studyBuddyService.js"));
+  const backendApp = read(path.join(ROOT, "functions", "functionz", "app.js"));
 
   test("publishes the canonical learner routes in the AI-readable help source", () => {
     [
@@ -35,6 +38,30 @@ describe("Falowen public help and AI discovery", () => {
   test("publishes llms discovery links to the official help sources", () => {
     expect(llms).toContain("https://www.falowen.app/help");
     expect(llms).toContain("https://www.falowen.app/falowen-help.md");
+  });
+
+  test("documents the exact current Learn to Course Book path and rejects invented labels", () => {
+    [help, llms, guide].forEach((source) => {
+      expect(source).toContain("Learn");
+      expect(source).toContain("Course Book");
+      expect(source).toContain("/campus/course");
+      expect(source).toContain("My Library");
+      expect(source).toContain("Learning Hub");
+      expect(source).toContain("My Hub");
+    });
+    expect(app).toContain('{ key: "learn", label: "Learn", route: "/campus/course"');
+  });
+
+  test("keeps both Study Buddy prompt layers aligned with Falowen navigation support", () => {
+    [studyBuddy, backendApp].forEach((source) => {
+      expect(source).toContain("FALOWEN NAVIGATION SUPPORT (authoritative)");
+      expect(source).toContain("https://www.falowen.app/campus/course");
+      expect(source).toContain("My Library");
+      expect(source).toContain("Learning Hub");
+      expect(source).toContain("My Hub");
+    });
+    expect(studyBuddy).toContain("Falowen navigation/support questions are not unrelated");
+    expect(backendApp).toContain("Falowen navigation/support questions are NEVER off-topic");
   });
 
   test("does not block OpenAI search or Google Extended from public help", () => {
