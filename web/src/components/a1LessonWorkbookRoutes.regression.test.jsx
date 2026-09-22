@@ -92,6 +92,12 @@ describe("A1 lesson and workbook routing regressions", () => {
     );
     expect(screen.getByRole("heading", { name: /Family, Languages, Questions and Hobbies/i })).toBeVisible();
     expect(screen.getByText("What is 'mother' in German?", { exact: false })).toBeVisible();
+    expect(screen.getByText("Immediate family")).toBeVisible();
+    expect(screen.getByText("Grandparents")).toBeVisible();
+    expect(screen.getByText("Extended family")).toBeVisible();
+    expect(screen.getByText("Your own family")).toBeVisible();
+    expect(document.querySelector('[data-a1-family-vocabulary-grid="true"]')).toBeTruthy();
+    expect(screen.getByText("die Großmutter (Oma)")).toBeVisible();
     expect(screen.getByText("My name is … / I am called …")).toBeVisible();
     expect(screen.getByText("I speak English and a little German.")).toBeVisible();
     expect(document.querySelector('[data-a1-day6-writing-draft="true"]')).toBeNull();
