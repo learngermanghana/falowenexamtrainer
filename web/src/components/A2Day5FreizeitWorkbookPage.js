@@ -32,17 +32,17 @@ const schreibenContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="
 const restaurantReadingText = `Im Restaurant\n\nKellner: Guten Abend, haben Sie reserviert?\nGast: Ja, einen Tisch für zwei auf den Namen Müller.\nKellner: Darf ich Ihnen schon Getränke bringen?\nGast: Die Speisekarte bitte zuerst.\nGast: Wir bestellen eine Flasche Weißwein und Wasser. Als Vorspeise nehmen wir zweimal die Suppe. Als Hauptspeise nehmen wir Nudeln, eine Pizza und einen grünen Salat.\nKellner: Ist alles in Ordnung?\nGast: Die Suppe ist köstlich, aber leider kalt.\nKellner: Entschuldigen Sie, ich bringe sofort eine neue.\nGast: Außerdem haben Sie den grünen Salat vergessen.\nKellner: Das tut mir leid. Als Entschuldigung laden wir Sie zum Nachtisch ein.\nGast: Dann nehmen wir ein Tiramisu und einen Schokoladenkuchen.\nGast: Wir möchten gern bezahlen.\nKellner: Bar oder mit Karte?\nGast: Bar, bitte.`;
 
 const lesenQuestions = [
-  { stem:"Welche Hauptspeisen bestellen die Gäste?", options:["a) Schnitzel und Reis","b) Nur Suppe","c) Nudeln, Pizza und Salat","d) Fisch und Kartoffeln"] },
-  { stem:"Was hat der Kellner vergessen?", options:["a) Wasser","b) Die Pizza","c) Den grünen Salat","d) Die Rechnung"] },
-  { stem:"Welche Nachspeisen bestellen die Gäste?", options:["a) Eis und Kuchen","b) Obst","c) Schokoladenkuchen und Tiramisu","d) Keine"] },
-  { stem:"Was ist mit der Suppe nicht in Ordnung?", options:["a) Sie ist zu teuer.","b) Die Suppe ist kalt.","c) Sie ist zu salzig.","d) Sie fehlt."] },
-  { stem:"Wie bezahlt der Gast?", options:["a) Mit Karte","b) Per Überweisung","c) In bar","d) Mit Scheck"] },
-  { stem:"Was macht Anna abends gerne?", options:["a) Sie trinkt Tee und liest.","b) Sie sieht fern.","c) Sie telefoniert."] },
-  { stem:"Welches Brettspiel spielt Anna oft?", options:["a) Schach","b) Mensch ärgere dich nicht","c) Uno"] },
+  { stem:"Welche Hauptspeisen bestellen die Gäste?", options:["a) Nudeln, Pizza und Salat","b) Schnitzel und Reis","c) Nur Suppe","d) Fisch und Kartoffeln"] },
+  { stem:"Was hat der Kellner vergessen?", options:["a) Wasser","b) Den grünen Salat","c) Die Pizza","d) Die Rechnung"] },
+  { stem:"Was ist mit der Suppe nicht in Ordnung?", options:["a) Sie ist kalt.","b) Sie ist zu teuer.","c) Sie ist zu salzig.","d) Sie fehlt."] },
+  { stem:"Welche Nachspeisen bestellen die Gäste?", options:["a) Eis und Kuchen","b) Tiramisu und Schokoladenkuchen","c) Obst","d) Keine"] },
+  { stem:"Wie bezahlt der Gast?", options:["a) Mit Karte","b) Bar","c) Per Überweisung","d) Mit Scheck"] }
 ];
 
 const hoerenQuestions = [
-  { stem:"Was macht Anna jeden Morgen?", options:["a) Sie geht joggen.","b) Sie macht Yoga.","c) Sie schwimmt."] },
+  { stem:"Was macht Anna abends gerne?", options:["a) Tee trinken und lesen","b) Fernsehen","c) Telefonieren"] },
+  { stem:"Welches Brettspiel spielt Anna oft?", options:["a) Schach","b) Mensch ärgere dich nicht","c) Uno"] },
+  { stem:"Was macht Anna jeden Morgen?", options:["a) Joggen","b) Yoga","c) Schwimmen"] },
   { stem:"Wo war Anna letztes Wochenende mit Freunden?", options:["a) Am Strand","b) In den Bergen","c) Im Park"] },
   { stem:"Welche Musik hört Anna zum Konzentrieren?", options:["a) Pop","b) Klassische Musik","c) Jazz"] }
 ];

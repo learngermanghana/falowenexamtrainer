@@ -37,53 +37,19 @@ Wenn das Wetter schön ist, werde ich anschließend mit meinen Freunden schwimme
 Wenn ich länger frei habe, mache ich gerne größere Pläne. In den Sommerferien werde ich sehr oft mit meinen Freunden unterwegs sein. Wir werden zum See fahren. Dort werden wir im Zelt übernachten und beim Lagerfeuer sitzen. Eine oder zwei Wochen möchte ich gerne reisen. Ein Freund wird mich auf der Reise begleiten, wir werden mit dem Zug losfahren. Wir planen eine Route durch das ganze Land, von West bis Ost und von Süd bis Nord. Mit Rucksäcken und Wanderschuhen werden wir auch in die Berge fahren. Am liebsten würde ich dort in einer Hütte übernachten. Wir werden sehen, ob wir das auch schaffen werden. Ein Abenteuer wird es aber ganz bestimmt.`;
 
 const readingQuestions = [
-  {
-    stem: "Was macht der Erzähler am liebsten am Wochenende?",
-    options: ["a) In die Berge fahren", "b) Faul sein", "c) Viel essen", "d) Lernen"],
-  },
-  {
-    stem: "Welchen Sport macht er manchmal am Wochenende?",
-    options: ["a) Tennis spielen", "b) Laufen", "c) Wandern", "d) Hockey spielen"],
-  },
-  {
-    stem: "Was macht er gern mit Freunden am Wochenende?",
-    options: ["a) Schwimmen gehen", "b) Faul sein", "c) Shoppen", "d) Wandern"],
-  },
-  {
-    stem: "Was plant der Erzähler mit den Freunden im Sommer?",
-    options: ["a) Eine Radtour", "b) In einen Vergnügungspark fahren", "c) Schach spielen", "d) Zum See fahren und dort im Zelt übernachten"],
-  },
-  {
-    stem: "Welche größeren Pläne hat er in den Sommerferien?",
-    options: ["a) Einen Urlaub am Meer", "b) Eine Route mit dem Zug durch das ganze Land", "c) Eine Reise in die nächste Stadt", "d) Campen mit dem Zelt in den Bergen"],
-  },
-  {
-    stem: "Wann treffen sich Anna, Ben und Claudia am Samstag?",
-    options: ["a) Um 9 Uhr", "b) Um 10 Uhr", "c) Um 11 Uhr"],
-  },
-  {
-    stem: "Was bringt Claudia zum Ausflug mit?",
-    options: ["a) Ein Zelt", "b) Einen Rucksack mit Snacks und Getränken", "c) Einen Reiseführer"],
-  },
+  { stem: "Was macht der Erzähler am liebsten am Wochenende?", options: ["a) In die Berge fahren", "b) Faul sein", "c) Viel essen", "d) Lernen"] },
+  { stem: "Welchen Sport macht er manchmal am Wochenende?", options: ["a) Tennis spielen", "b) Laufen", "c) Wandern", "d) Hockey spielen"] },
+  { stem: "Was macht er gern mit Freunden am Wochenende?", options: ["a) Schwimmen gehen", "b) Faul sein", "c) Shoppen", "d) Wandern"] },
+  { stem: "Was plant der Erzähler mit den Freunden im Sommer?", options: ["a) Eine Radtour", "b) In einen Vergnügungspark fahren", "c) Schach spielen", "d) Zum See fahren und dort im Zelt übernachten"] },
+  { stem: "Welche größeren Pläne hat er in den Sommerferien?", options: ["a) Einen Urlaub am Meer", "b) Eine Route mit dem Zug durch das ganze Land", "c) Eine Reise in die nächste Stadt", "d) Campen mit dem Zelt in den Bergen"] },
 ];
 
 const listeningQuestions = [
-  {
-    stem: "Wann treffen sich Anna, Ben und Claudia am Samstag?",
-    options: ["a) Um 9 Uhr", "b) Um 10 Uhr", "c) Um 11 Uhr"],
-  },
-  {
-    stem: "Was bringt Claudia zum Ausflug mit?",
-    options: ["a) Ein Zelt", "b) Einen Rucksack mit Snacks und Getränken", "c) Einen Reiseführer"],
-  },
-  {
-    stem: "Was wollen sie am Sonntag im Park machen?",
-    options: ["a) Spielen und spazieren gehen", "b) Fußball spielen", "c) Fotos machen"],
-  },
-  {
-    stem: "Was planen sie am Samstagabend?",
-    options: ["a) Ein Konzert zu besuchen", "b) Ein Picknick im Park", "c) In einem Restaurant essen und einen Film schauen"],
-  },
+  { stem: "Wann treffen sich Anna, Ben und Claudia am Samstag?", options: ["a) Um 9 Uhr", "b) Um 10 Uhr", "c) Um 11 Uhr"] },
+  { stem: "Was bringt Claudia zum Ausflug mit?", options: ["a) Ein Zelt", "b) Einen Rucksack mit Snacks und Getränken", "c) Einen Reiseführer"] },
+  { stem: "Was möchten Ben und Anna im Wald machen?", options: ["a) Einen Film schauen", "b) Ein Picknick machen", "c) Eine Wanderung machen"] },
+  { stem: "Was planen sie am Samstagabend?", options: ["a) Ein Konzert zu besuchen", "b) Ein Picknick im Park", "c) In einem Restaurant essen und einen Film schauen"] },
+  { stem: "Was wollen sie am Sonntag im Park machen?", options: ["a) Spielen und spazieren gehen", "b) Fußball spielen", "c) Fotos machen"] },
 ];
 
 export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
@@ -99,7 +65,7 @@ export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
       schreibenPlaceholder={"Sehr geehrter Herr Asadu,\n\nich schreibe Ihnen, weil ...\n\nWir könnten am ... zusammen ...\nHaben Sie um ... Zeit? Wir könnten uns ... treffen.\n\nKönnten Sie bitte ... mitbringen?\n\nIch freue mich auf Ihre Antwort.\n\nMit freundlichen Grüßen\n[Ihr Name]"}
       lesenText={readingText}
       lesenQuestions={readingQuestions}
-      hoerenTask="Hören: Ein Wochenende mit Freunden planen. Sieh dir das eingebettete Video an und beantworte danach die vier Fragen."
+      hoerenTask="Hören: Ein Wochenende mit Freunden planen. Sieh dir das eingebettete Video an und beantworte danach die fünf Fragen."
       hoerenAudioUrl="https://youtu.be/tHAo8hxjKmw"
       hoerenQuestions={listeningQuestions}
     />

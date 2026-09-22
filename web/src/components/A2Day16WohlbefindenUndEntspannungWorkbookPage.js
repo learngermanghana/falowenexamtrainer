@@ -149,27 +149,39 @@ Unsere spezialisierten Therapeuten bieten Behandlungen für Rückenschmerzen, Sp
 Anzeige F: Laufgruppe im Stadtpark
 Treffen Sie sich mit anderen Laufbegeisterten und bleiben Sie fit. Unsere Laufgruppe trifft sich jeden Sonntag um 9:00 Uhr am Haupteingang des Stadtparks. Egal ob Anfänger oder Fortgeschrittene, alle sind willkommen. Genießen Sie die frische Luft und die Gemeinschaft. Für weitere Informationen schreiben Sie an laufgruppe@gesund.de.`;
 
+const advertChoices = [
+  "A) Anzeige A",
+  "B) Anzeige B",
+  "C) Anzeige C",
+  "D) Anzeige D",
+  "E) Anzeige E",
+  "F) Anzeige F",
+];
+
 const lesenQuestions = [
   {
     stem: "Welche Anzeige informiert über einen Kochkurs für gesunde Ernährung?",
-    options: ["A) Anzeige A", "B) Anzeige C", "C) Anzeige D", "D) Anzeige F"],
+    options: advertChoices,
   },
   {
     stem: "Wo kann man einen Rabatt für eine Jahresmitgliedschaft im Fitnessstudio bekommen?",
-    options: ["A) Anzeige B", "B) Anzeige A", "C) Anzeige E", "D) Anzeige C"],
+    options: advertChoices,
   },
   {
     stem: "Wer bietet Physiotherapie speziell für Rückenschmerzen an?",
-    options: ["A) Anzeige D", "B) Anzeige E", "C) Anzeige B", "D) Anzeige F"],
+    options: advertChoices,
   },
   {
     stem: "Welche Anzeige ist für eine Laufgruppe im Stadtpark?",
-    options: ["A) Anzeige A", "B) Anzeige C", "C) Anzeige F", "D) Anzeige D"],
+    options: advertChoices,
   },
   {
     stem: "Wo kann man einen Yoga-Kurs für Anfänger besuchen?",
-    options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige E", "D) Anzeige D"],
+    options: advertChoices,
   },
+];
+
+const hoerenQuestions = [
   {
     stem: "Was wird als ein einfacher Anfang für eine gesunde Ernährung empfohlen?",
     options: ["A) Mehr Fleisch essen", "B) Mehr Obst und Gemüse essen", "C) Mehr Fast Food essen"],
@@ -178,9 +190,6 @@ const lesenQuestions = [
     stem: "Wie lange sollte man täglich mindestens gehen oder sich bewegen?",
     options: ["A) 10 Minuten", "B) 20 Minuten", "C) 30 Minuten"],
   },
-];
-
-const hoerenQuestions = [
   {
     stem: "Was kann motivierend sein, um fit zu bleiben?",
     options: ["A) Der Besuch eines Fitnessstudios", "B) Mehr zu schlafen", "C) Mehr Fernsehen schauen"],

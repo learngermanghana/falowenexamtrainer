@@ -114,9 +114,7 @@ const patchReadingContent = (root) => {
 const patchDay13Workbook = (root) => {
   patchListeningMedia(root);
   patchWritingPrompt(root);
-  // Keep the canonical seven-question Teil 3 from the legacy workbook.
-  // The A2-5.13 answer key is tied to that assessment, so do not replace it
-  // with the later five-question interview fallback.
+  patchReadingContent(root);
 };
 
 const A2Day13VorstellungsgespraechWorkbookPage = () => {
