@@ -98,5 +98,14 @@ describe("A1 lesson and workbook routing regressions", () => {
     expect(screen.queryByText("Your practice paragraph")).not.toBeInTheDocument();
     expect(screen.queryByText(/^Teil 1/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Open Group Discussion/i })).not.toBeInTheDocument();
+    expect(screen.getByText("„Ein bisschen“ = a little / a bit")).toBeVisible();
+    expect(screen.queryByText("The sentence pattern")).not.toBeInTheDocument();
+    expect(screen.queryByText("Languages self-check")).not.toBeInTheDocument();
+    expect(screen.queryByText("See the positions")).not.toBeInTheDocument();
+    expect(screen.queryByText("Yes-or-no question versus W-question")).not.toBeInTheDocument();
+    expect(screen.queryByText("Practice · Change the statement into a question")).not.toBeInTheDocument();
+    expect(screen.queryByText("Yes/No questions self-check")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Ich schwimme gern.", { exact: true }).length).toBeGreaterThan(0);
+    expect(screen.getByText("Schwimmst du gern?", { exact: true })).toBeVisible();
   });
 });
