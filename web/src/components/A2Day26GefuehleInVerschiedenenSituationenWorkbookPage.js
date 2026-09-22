@@ -24,22 +24,35 @@ const speakingContent = <>
   </WorkbookTaskCard>
 </>;
 
-const lesenText = `Schwangerschaft, Elternzeit und Kinderbetreuung
+const lesenText = `Gefühle im Alltag
 
-Das Leben mit Kindern beginnt schon in der Schwangerschaft. Wenn Sie Fragen zum Thema Schwangerschaft haben, können Sie zu einer Schwangerschaftsberatung gehen. In der Schwangerschaft sollten Sie regelmäßig zu einem Frauenarzt gehen. Er beantwortet Ihre Fragen und kontrolliert die Gesundheit von Ihrem Kind. Ähnliche Aufgaben hat auch eine Hebamme. Sie berät und hilft Ihnen während der Schwangerschaft und auch nach der Geburt von Ihrem Kind. Die Hebamme ist auch bei der Geburt dabei.
+Am Montag hatte Leila eine wichtige Deutschprüfung. Vor der Prüfung war sie sehr nervös, weil sie Angst vor schwierigen Aufgaben hatte. Ihre Freundin erinnerte sie daran, ruhig zu atmen und zuerst die einfachen Fragen zu beantworten. Nach der Prüfung fühlte Leila sich erleichtert.
 
-Wenn Sie eine feste Arbeitsstelle haben, können Sie schon vor der Geburt in Mutterschutz gehen. Der Mutterschutz dauert insgesamt mindestens 14 Wochen. Nach dem Mutterschutz können Sie Elternzeit nehmen. In den ersten 12 Monaten der Elternzeit bekommt man Elterngeld. Wenn Ihr Partner auch Elternzeit nimmt, sind es 14 Monate.
+Am Mittwoch bekam sie die Nachricht, dass sie die Prüfung bestanden hatte. Sie war überrascht und sehr stolz auf sich. Am Abend rief sie ihre Familie an, weil sie die gute Nachricht teilen wollte.
 
-Ihr Kind muss regelmäßig zum Kinderarzt. Dort gibt es Vorsorgeuntersuchungen und Impfungen. Kinder unter drei Jahren können in eine Kinderkrippe gehen oder bei einer Tagesmutter oder einem Tagesvater bleiben. Kinder ab drei Jahren können in den Kindergarten oder in eine Kindertagesstätte gehen. In den Schulferien haben die Städte spezielle Freizeitangebote für Kinder, die nicht viel kosten.`;
+Am Freitag hatte Leila einen kleinen Streit mit einer Kollegin. Zuerst war sie wütend und enttäuscht. Später sprachen beide ruhig miteinander und erklärten, was passiert war. Danach fühlte Leila sich wieder besser. Sie merkte, dass offene Gespräche ihr helfen, schwierige Gefühle zu verstehen.`;
 
 const lesenQuestions = [
-  { stem: "Was macht ein Frauenarzt während der Schwangerschaft?", options: ["A) Er hilft bei der Geburt.", "B) Er beantwortet Fragen und kontrolliert die Gesundheit des Kindes.", "C) Er sorgt für die Kinderbetreuung.", "D) Er hilft beim Babysitting."] },
-  { stem: "Wie lange dauert der Mutterschutz in Deutschland mindestens?", options: ["A) 6 Wochen", "B) 12 Wochen", "C) 14 Wochen", "D) 18 Wochen"] },
-  { stem: "Wie lange kann man Elterngeld bekommen?", options: ["A) 6 Monate", "B) 12 Monate", "C) 14 Monate", "D) 3 Jahre"] },
-  { stem: "Was ist eine Voraussetzung für den Erhalt von Elterngeld?", options: ["A) Man muss einen festen Arbeitsvertrag haben.", "B) Man muss eine Ausbildung abgeschlossen haben.", "C) Man muss einen Führerschein haben.", "D) Man muss viel Geld verdienen."] },
-  { stem: "Was müssen Kinder regelmäßig beim Kinderarzt machen?", options: ["A) Impfungen und Vorsorgeuntersuchungen", "B) Nur Impfungen", "C) Nur Vorsorgeuntersuchungen", "D) Nur eine Untersuchung bei Krankheit"] },
-  { stem: "Ab welchem Alter können Kinder in den Kindergarten gehen?", options: ["A) Ab 1 Jahr", "B) Ab 2 Jahren", "C) Ab 3 Jahren", "D) Ab 5 Jahren"] },
-  { stem: "Was können Kinder in den Schulferien machen?", options: ["A) Nur zu Hause bleiben", "B) An speziellen Freizeitangeboten in der Stadt teilnehmen", "C) Nur ins Kino gehen", "D) Nur Sport treiben"] },
+  {
+    stem: "Warum war Leila vor der Prüfung nervös?",
+    options: ["A) Sie hatte Angst vor schwierigen Aufgaben.", "B) Sie hatte die Prüfung schon bestanden.", "C) Sie wollte nicht lernen.", "D) Sie war im Urlaub."],
+  },
+  {
+    stem: "Was empfahl ihre Freundin?",
+    options: ["A) Ruhig atmen und zuerst einfache Fragen beantworten", "B) Die Prüfung verlassen", "C) Nicht antworten", "D) Sofort die Familie anrufen"],
+  },
+  {
+    stem: "Wie fühlte Leila sich nach der Prüfung?",
+    options: ["A) Erleichtert", "B) Einsam", "C) Wütend", "D) Gelangweilt"],
+  },
+  {
+    stem: "Wie reagierte Leila auf die Nachricht, dass sie bestanden hatte?",
+    options: ["A) Sie war überrascht und stolz.", "B) Sie war traurig.", "C) Sie war enttäuscht.", "D) Sie war gleichgültig."],
+  },
+  {
+    stem: "Was half Leila nach dem Streit?",
+    options: ["A) Ein ruhiges Gespräch", "B) Mehr Streit", "C) Die Arbeit verlassen", "D) Niemandem zuhören"],
+  },
 ];
 
 export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() {
@@ -55,7 +68,7 @@ export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() 
       schreibenPlaceholder="Liebe/r ...,\n\nvielen Dank für deine Hilfe. Ich war sehr ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
-      hoerenTask="Teil 4 ist nur zusätzliche Hörpraxis. Für A2-10.26 gibt es keine Teil-4-Abgabe."
+      hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie darauf, welche Gefühle genannt werden, wodurch sie entstehen und wie die Personen reagieren."
       hoerenAudioUrl="https://youtu.be/9OVfA1B-nuU"
       hoerenQuestions={[]}
       showWorkbookGuidance={false}
