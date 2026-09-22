@@ -81,6 +81,43 @@ describe("A2 Days 1-28 assessment integrity", () => {
     expect(wrapper).not.toContain("patchReadingContent(root);");
   });
 
+  test("Day 18 keeps stable A-F advert codes and the original 5+5 split", () => {
+    const source = read("A2Day18DieBankAnrufenWorkbookPage.js");
+    const answerKey = manifestEntryFor("A2-7.18");
+
+    expect(questionCount(source, "lesenQuestions")).toBe(5);
+    expect(questionCount(source, "hoerenQuestions")).toBe(5);
+    expect((source.match(/options: bankChoices/g) || []).length).toBe(5);
+
+    [
+      "A) Deutsche Bank",
+      "B) Sparkasse",
+      "C) Commerzbank",
+      "D) Volksbank",
+      "E) Postbank",
+      "F) ING-DiBa",
+    ].forEach((choice) => expect(source).toContain(choice));
+
+    expect(answerKey.answers.teil3).toEqual({
+      Answer1: "B) Sparkasse",
+      Answer2: "F) ING-DiBa",
+      Answer3: "B) Sparkasse",
+      Answer4: "D) Volksbank",
+      Answer5: "C) Commerzbank",
+    });
+    expect(answerKey.answers.teil4).toEqual({
+      Answer1: "B) Reisepass, Meldebescheinigung, Einkommensnachweis",
+      Answer2: "B) Eine Stunde",
+      Answer3: "B) Drei",
+      Answer4: "A) Basiskonto",
+      Answer5: "D) Die Formulare vor dem Termin online ausfüllen",
+    });
+
+    expect(
+      source.match(/D\) Die Formulare vor dem Termin online ausfüllen/g) || [],
+    ).toHaveLength(1);
+  });
+
   test("special A2 structures remain explicit", () => {
     expect(read("A2Day14BerufUndKarriereWorkbookPage.js")).toContain("Teil 4 · Lesen");
     expect(read("A2Day20TypischeReklamationssituationenWorkbookPage.js")).toContain("hoerenGroups");
