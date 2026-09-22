@@ -111,7 +111,7 @@ describe("A1 canonical lesson catalog", () => {
       routeKey: "4",
       day: 8,
       kind: "assignment",
-      title: "Countries and Languages",
+      title: "Countries, Languages & Travel",
       lessonRoute: "/campus/course/lesson/A1/chapter/4",
     });
   });
