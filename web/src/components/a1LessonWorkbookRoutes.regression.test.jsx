@@ -92,7 +92,10 @@ describe("A1 lesson and workbook routing regressions", () => {
     );
     expect(screen.getByRole("heading", { name: /Family, Languages, Questions and Hobbies/i })).toBeVisible();
     expect(screen.getByText("What is 'mother' in German?", { exact: false })).toBeVisible();
-    expect(document.querySelector('[data-a1-day6-writing-draft="true"]')).toBeTruthy();
+    expect(screen.getByText("My name is … / I am called …")).toBeVisible();
+    expect(screen.getByText("I speak English and a little German.")).toBeVisible();
+    expect(document.querySelector('[data-a1-day6-writing-draft="true"]')).toBeNull();
+    expect(screen.queryByText("Your practice paragraph")).not.toBeInTheDocument();
     expect(screen.queryByText(/^Teil 1/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Open Group Discussion/i })).not.toBeInTheDocument();
   });
