@@ -123,7 +123,7 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
    <span style={{lineHeight:1.65}}>Nutzen Sie nur die Satzanfänge als Gerüst und ergänzen Sie Ihre eigenen Argumente, Beispiele und Bewertungen. Ihre bereits gespeicherte Antwort wird beim erneuten Öffnen beibehalten.</span>
    <div><button type="button" onClick={restoreTemplate} style={styles.secondaryButton}>Vorlage wiederherstellen</button></div>
   </div>
-  <textarea value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75}}/>
+  <textarea data-c2-opinion-editor="true" value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75,overflowAnchor:"none"}}/>
   <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa 350 Wörter</div>
   <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt und meinen Text überarbeitet.</label>
  </Section>;
