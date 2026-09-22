@@ -170,6 +170,9 @@ const lesenQuestions = [
     stem: "Wo kann man einen Yoga-Kurs für Anfänger besuchen?",
     options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige E", "D) Anzeige D"],
   },
+];
+
+const hoerenQuestions = [
   {
     stem: "Was wird als ein einfacher Anfang für eine gesunde Ernährung empfohlen?",
     options: ["A) Mehr Fleisch essen", "B) Mehr Obst und Gemüse essen", "C) Mehr Fast Food essen"],
@@ -178,9 +181,6 @@ const lesenQuestions = [
     stem: "Wie lange sollte man täglich mindestens gehen oder sich bewegen?",
     options: ["A) 10 Minuten", "B) 20 Minuten", "C) 30 Minuten"],
   },
-];
-
-const hoerenQuestions = [
   {
     stem: "Was kann motivierend sein, um fit zu bleiben?",
     options: ["A) Der Besuch eines Fitnessstudios", "B) Mehr zu schlafen", "C) Mehr Fernsehen schauen"],
