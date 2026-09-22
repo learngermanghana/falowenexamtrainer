@@ -75,8 +75,13 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("legacyDraftSeedAllowed");
     expect(page).toContain("legacyProgressSeedAllowed");
     expect(cloudSync).toContain("pendingSaveRef");
+    expect(cloudSync).toContain("dirtySerializedRef");
+    expect(cloudSync).toContain("WriterId");
+    expect(cloudSync).toContain("shouldPreserveNewerLocalC2Draft");
     expect(cloudSync).toContain('window.addEventListener("pagehide", flushOnExit)');
     expect(cloudSync).toContain("flushPendingSave()");
+    expect(page).toContain('data-c2-opinion-editor="true"');
+    expect(page).toContain('overflowAnchor:"none"');
   });
 
   test("keeps the C2 section navigation in normal document flow", () => {
