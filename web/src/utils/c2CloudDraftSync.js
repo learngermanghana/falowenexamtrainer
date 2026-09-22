@@ -12,6 +12,16 @@ const serialize = (value) => {
   }
 };
 
+export const shouldPreserveNewerLocalC2Draft = ({
+  remoteSerialized,
+  localSerialized,
+  dirtySerialized,
+  isOwnWrite,
+}) => Boolean(
+  remoteSerialized !== localSerialized
+  && (dirtySerialized === localSerialized || isOwnWrite)
+);
+
 export const buildC2CloudDraftDocId = (day) => `day-${Number(day)}`;
 
 export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhenMissing = false, defaultValue }) => {
@@ -22,6 +32,12 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
   const skipNextSaveRef = useRef(false);
   const saveTimerRef = useRef(null);
   const pendingSaveRef = useRef(null);
+  const dirtySerializedRef = useRef(null);
+  const writerIdRef = useRef(
+    typeof globalThis !== "undefined" && typeof globalThis.crypto?.randomUUID === "function"
+      ? globalThis.crypto.randomUUID()
+      : `c2-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
   const migrationKey = user?.uid && day && field
     ? `falowen:c2:cloud-migrated:${user.uid}:${Number(day)}:${field}`
     : "";
@@ -42,6 +58,9 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
     setDoc(pending.draftRef, pending.payload, { merge: true })
       .then(() => {
         remoteSerializedRef.current = pending.serializedValue;
+        if (serialize(valueRef.current) === pending.serializedValue) {
+          dirtySerializedRef.current = null;
+        }
         if (migrationKey) {
           try {
             window.localStorage.setItem(migrationKey, "1");
@@ -88,14 +107,25 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
             && remoteSerialized === defaultSerialized
             && localSerialized !== defaultSerialized
           );
+          const isOwnWrite = data[`${field}WriterId`] === writerIdRef.current;
+          const shouldPreserveLocal = shouldPreserveNewerLocalC2Draft({
+            remoteSerialized,
+            localSerialized,
+            dirtySerialized: dirtySerializedRef.current,
+            isOwnWrite,
+          });
 
           remoteSerializedRef.current = remoteSerialized;
-          if (!shouldPreferLegacyLocal && remoteSerialized !== localSerialized) {
+          if (remoteSerialized === localSerialized) {
+            dirtySerializedRef.current = null;
+          }
+          if (!shouldPreferLegacyLocal && !shouldPreserveLocal && remoteSerialized !== localSerialized) {
             if (saveTimerRef.current && typeof window !== "undefined") {
               window.clearTimeout(saveTimerRef.current);
               saveTimerRef.current = null;
             }
             pendingSaveRef.current = null;
+            dirtySerializedRef.current = null;
             skipNextSaveRef.current = true;
             setValue(remoteValue);
           }
@@ -142,6 +172,7 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
       return undefined;
     }
 
+    dirtySerializedRef.current = serializedValue;
     const draftRef = doc(db, "users", user.uid, "c2Drafts", buildC2CloudDraftDocId(day));
     pendingSaveRef.current = {
       draftRef,
@@ -153,6 +184,7 @@ export const useC2CloudDraftField = ({ day, field, value, setValue, seedCloudWhe
         level: "C2",
         day: Number(day),
         [field]: value,
+        [`${field}WriterId`]: writerIdRef.current,
         [`${field}UpdatedAt`]: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },
