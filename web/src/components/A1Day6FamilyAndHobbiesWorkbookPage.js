@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
@@ -185,15 +185,13 @@ const hobbies = [
 ];
 
 const writingTemplate = [
-  ["Name", "Ich heiße … / Mein Name ist …", "Ich heiße Ama."],
-  ["Country", "Ich komme aus …", "Ich komme aus Ghana."],
-  ["Age", "Ich bin … Jahre alt.", "Ich bin 24 Jahre alt."],
-  ["Family", "Ich habe … / Mein(e) … heißt …", "Ich habe zwei Brüder. Meine Mutter heißt Adwoa."],
-  ["Hobby", "Ich … gern. / Mein Hobby ist …", "Ich höre gern Musik."],
-  ["Languages", "Ich spreche … / Ich spreche ein bisschen …", "Ich spreche Englisch und ein bisschen Deutsch."],
+  ["Name", "Ich heiße … / Mein Name ist …", "My name is … / I am called …", "Ich heiße Ama.", "My name is Ama."],
+  ["Country", "Ich komme aus …", "I come from …", "Ich komme aus Ghana.", "I come from Ghana."],
+  ["Age", "Ich bin … Jahre alt.", "I am … years old.", "Ich bin 24 Jahre alt.", "I am 24 years old."],
+  ["Family", "Ich habe … / Mein(e) … heißt …", "I have … / My … is called …", "Ich habe zwei Brüder. Meine Mutter heißt Adwoa.", "I have two brothers. My mother is called Adwoa."],
+  ["Hobby", "Ich … gern. / Mein Hobby ist …", "I like to … / My hobby is …", "Ich höre gern Musik.", "I like listening to music."],
+  ["Languages", "Ich spreche … / Ich spreche ein bisschen …", "I speak … / I speak a little …", "Ich spreche Englisch und ein bisschen Deutsch.", "I speak English and a little German."],
 ];
-
-const DAY6_WRITING_DRAFT_KEY = "falowen:a1:day6:family-writing-draft";
 
 const familyQuiz = [
   {
@@ -500,25 +498,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
   });
 
   const [showWritingModel, setShowWritingModel] = useState(false);
-  const [writingDraft, setWritingDraft] = useState(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      return window.localStorage.getItem(DAY6_WRITING_DRAFT_KEY) || "";
-    } catch (_error) {
-      return "";
-    }
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(DAY6_WRITING_DRAFT_KEY, writingDraft);
-    } catch (_error) {
-      // Draft persistence is best-effort on restricted browsers.
-    }
-  }, [writingDraft]);
-
-  const writingWordCount = writingDraft.trim() ? writingDraft.trim().split(/\s+/).length : 0;
 
   const setPreparedFor = (tabKey) => (event) => {
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -600,44 +579,19 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         <div style={warningBoxStyle}>
           <strong>Build your paragraph with these sentence frames</strong>
           <ol style={listStyle}>
-            {writingTemplate.map(([purpose, german, example]) => (
-              <li key={purpose}>
-                <strong>{purpose}:</strong> {german}
+            {writingTemplate.map(([purpose, german, english, example, exampleEnglish]) => (
+              <li key={purpose} style={{ marginBottom: 10 }}>
+                <div><strong>{purpose}:</strong> {german}</div>
+                <div style={{ color: "#475569" }}><strong>English:</strong> {english}</div>
                 <div>
                   <em>Example:</em> {example}
+                </div>
+                <div style={{ color: "#475569" }}>
+                  <em>English:</em> {exampleEnglish}
                 </div>
               </li>
             ))}
           </ol>
-        </div>
-
-        <div style={questionCardStyle}>
-          <strong>Your practice paragraph</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Write 6–8 sentences. Try to include your name, country, age, at least two family details, one hobby and the
-            languages you speak. This is self-practice, so edit freely before you compare with the model.
-          </p>
-          <textarea
-            data-a1-day6-writing-draft="true"
-            value={writingDraft}
-            onChange={(event) => setWritingDraft(event.target.value)}
-            rows={9}
-            placeholder="Ich heiße … Ich komme aus … Ich bin … Jahre alt. Meine Familie …"
-            style={{
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: 10,
-              border: "1px solid #94a3b8",
-              font: "inherit",
-              lineHeight: 1.7,
-              resize: "vertical",
-              boxSizing: "border-box",
-            }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", color: "#475569" }}>
-            <span>Draft saves on this device automatically.</span>
-            <span>{writingWordCount} words</span>
-          </div>
         </div>
 
         <div style={questionCardStyle}>
