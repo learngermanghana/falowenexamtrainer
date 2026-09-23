@@ -1,5 +1,6 @@
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import {
+  A1_WORKBOOK_DRAFT_UPDATED_EVENT,
   buildA1WorkbookDraftStorageKey,
   buildA1WorkbookSubmissionText,
   countCompletedA1Answers,
@@ -13,6 +14,29 @@ beforeEach(() => {
 
 test("stores A1 drafts by canonical assignment key instead of day", () => {
   expect(buildA1WorkbookDraftStorageKey("A1-3")).not.toBe(buildA1WorkbookDraftStorageKey("A1-4"));
+});
+
+
+test("announces same-page A1 draft updates so Review & Submit can refresh immediately", async () => {
+  const listener = jest.fn();
+  window.addEventListener(A1_WORKBOOK_DRAFT_UPDATED_EVENT, listener);
+
+  const saved = saveA1WorkbookDraft({
+    assignmentKey: "A1-3",
+    sections: {
+      "teil-1": { answers: { 1: "Es" } },
+    },
+  });
+
+  await Promise.resolve();
+
+  expect(listener).toHaveBeenCalledTimes(1);
+  expect(listener.mock.calls[0][0].detail).toEqual({
+    assignmentKey: "A1-3",
+    draft: saved,
+  });
+
+  window.removeEventListener(A1_WORKBOOK_DRAFT_UPDATED_EVENT, listener);
 });
 
 test("maps A1 Chapter 3 workbook responses into one canonical tutor submission", () => {
