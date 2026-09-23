@@ -1,32 +1,30 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
 
-const lesenText = `Mein Arbeitsweg
+const lesenText = `Verkehrsmittel
 
-Jonas wohnt am Stadtrand und arbeitet im Zentrum. Jeden Morgen geht er zuerst fünf Minuten zu Fuß zur Bushaltestelle. Dann fährt er mit dem Bus bis zum Hauptbahnhof. Dort steigt er in die U-Bahn um. Insgesamt braucht er ungefähr 40 Minuten bis zur Arbeit.
-
-Früher fuhr Jonas oft mit dem Auto. Das war zwar bequem, aber morgens gab es viel Stau und die Parkplätze im Zentrum waren teuer. Jetzt benutzt er lieber öffentliche Verkehrsmittel. Wenn das Wetter gut ist und er später anfangen kann, fährt er manchmal mit dem Fahrrad zur Arbeit. Dafür braucht er ungefähr 50 Minuten, aber er findet die Bewegung angenehm.`;
+In München treffen sich drei Studenten. Matthias erzählt von seinem Urlaub in Norddeutschland und der Insel seiner Eltern. Bernd berichtet über Reisen nach Barcelona und Paris mit Tram, Taxi und U-Bahn. Thomas aus Österreich erzählt von Motorradtouren in den Bergen und viel Verkehr auf den Autobahnen.`;
 
 const lesenQuestions = [
   {
-    stem: "Wo wohnt Jonas?",
-    options: ["A) Im Stadtzentrum", "B) Am Stadtrand", "C) Neben seinem Büro", "D) Am Hauptbahnhof"],
+    stem: "Wohin fuhr Matthias?",
+    options: ["A) In die Südsee", "B) Ans Mittelmeer", "C) An die Nordsee", "D) An die Ostsee"],
   },
   {
-    stem: "Wie kommt Jonas zuerst zur Bushaltestelle?",
-    options: ["A) Zu Fuß", "B) Mit dem Auto", "C) Mit der U-Bahn", "D) Mit dem Fahrrad"],
+    stem: "Wo leben die Eltern von Matthias?",
+    options: ["A) In einer Großstadt", "B) Auf einer Insel", "C) Im Hotel", "D) In den Bergen"],
   },
   {
-    stem: "Wo steigt Jonas in die U-Bahn um?",
-    options: ["A) Vor seinem Haus", "B) Im Büro", "C) Am Hauptbahnhof", "D) Am Stadtrand"],
+    stem: "Aus welchem Land stammt der Student Bernd?",
+    options: ["A) Aus der Schweiz", "B) Aus Deutschland", "C) Aus Frankreich", "D) Aus Österreich"],
   },
   {
-    stem: "Warum fährt Jonas nicht mehr so oft mit dem Auto?",
-    options: ["A) Er hat keinen Führerschein.", "B) Es gibt viel Stau und Parken ist teuer.", "C) Sein Auto ist zu klein.", "D) Die Arbeit verbietet Autos."],
+    stem: "Mit welchem Fahrzeug besichtigte Bernd die Stadt Paris?",
+    options: ["A) Mit der U-Bahn", "B) Mit dem Auto", "C) Mit dem Fahrrad", "D) Mit dem Bus"],
   },
   {
-    stem: "Wann fährt Jonas manchmal mit dem Fahrrad?",
-    options: ["A) Wenn das Wetter gut ist und er später anfangen kann.", "B) Nur im Winter.", "C) Wenn der Bus schneller ist.", "D) Jeden Morgen."],
+    stem: "Was mag der Österreicher Thomas?",
+    options: ["A) Den Wind und das Meer", "B) Überfüllte Autobahnen", "C) Große Städte", "D) Die Berge und die Natur"],
   },
 ];
 
@@ -49,8 +47,8 @@ export default function A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage() {
         schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinem Arbeitsweg erzählen. Normalerweise ..."
         lesenText={lesenText}
         lesenQuestions={lesenQuestions}
-        hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie auf Verkehrsmittel, Wege, Dauer und Gründe für die Wahl des Verkehrsmittels."
-        hoerenAudioUrl="https://youtu.be/LtARwiCljLY"
+        hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
+        hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"
         hoerenQuestions={[]}
         showWorkbookGuidance={false}
       />
