@@ -265,11 +265,9 @@ const A1TutorMarkedWorkbookShell = ({
 
       <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />
 
-      {sharedDraftCaptureEnabled ? (
-        <A1TutorWorkbookDraftProvider assignment={assignment}>
-          {sharedLayout}
-        </A1TutorWorkbookDraftProvider>
-      ) : sharedLayout}
+      <A1TutorWorkbookDraftProvider assignment={assignment}>
+        {sharedLayout}
+      </A1TutorWorkbookDraftProvider>
     </div>
   );
 };

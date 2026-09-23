@@ -144,6 +144,14 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   }, [assignmentKey]);
 
   useEffect(() => {
+    // A manual edit belongs to the current Review & Submit visit. Once the
+    // student leaves that tab, the next visit may safely map the latest
+    // workbook draft again. While they remain on Submit, cross-tab/local
+    // draft refreshes must never clear this guard.
+    if (requestedTab !== "submit") workbookSeedUserEditedRef.current = false;
+  }, [requestedTab]);
+
+  useEffect(() => {
     if (requestedTab !== "submit" || draftContext?.assignmentKey !== assignmentKey) return;
     draftContext.refreshDraft?.();
   }, [assignmentKey, draftContext?.assignmentKey, draftContext?.refreshDraft, requestedTab]);
@@ -192,7 +200,6 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
   useEffect(() => {
     if (requestedTab !== "submit" || !submissionContextReady || !mappedWorkbookText) return undefined;
-    workbookSeedUserEditedRef.current = false;
     let attempts = 0;
     let timer = null;
 
