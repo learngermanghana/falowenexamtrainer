@@ -1,4 +1,5 @@
 const STORAGE_PREFIX = "falowen:a1:workbook-draft:v1";
+export const A1_WORKBOOK_DRAFT_UPDATED_EVENT = "falowen:a1:workbook-draft-updated";
 
 const normalizeAssignmentKey = (value = "") =>
   String(value || "").trim().toUpperCase().replace(/[^A-Z0-9._-]/g, "-");
@@ -34,6 +35,24 @@ export const readA1WorkbookDraft = (assignmentKey = "") => {
   }
 };
 
+const announceA1WorkbookDraftUpdated = (draft) => {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") return;
+  const EventCtor = window.CustomEvent;
+  if (typeof EventCtor !== "function") return;
+
+  const dispatch = () => {
+    window.dispatchEvent(new EventCtor(A1_WORKBOOK_DRAFT_UPDATED_EVENT, {
+      detail: {
+        assignmentKey: draft.assignmentKey,
+        draft,
+      },
+    }));
+  };
+
+  if (typeof queueMicrotask === "function") queueMicrotask(dispatch);
+  else Promise.resolve().then(dispatch);
+};
+
 export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {} } = {}) => {
   const next = {
     version: 1,
@@ -49,6 +68,11 @@ export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {} } = {}) 
       console.warn("Could not save A1 workbook draft", error);
     }
   }
+
+  // Same-page localStorage writes do not emit the browser "storage" event.
+  // Notify the workbook shell immediately so Review & Submit reflects answers
+  // typed directly inside a Teil without waiting for the cloud autosave round-trip.
+  announceA1WorkbookDraftUpdated(next);
 
   return next;
 };
