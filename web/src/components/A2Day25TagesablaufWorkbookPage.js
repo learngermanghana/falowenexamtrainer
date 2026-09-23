@@ -44,9 +44,7 @@ export default function A2Day25TagesablaufWorkbookPage() {
       schreibenPlaceholder="Liebe/r ...,\n\nmein Tag beginnt normalerweise um ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
-      hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie auf Reihenfolge, Uhrzeiten und typische Aktivitäten im Tagesablauf. Notieren Sie drei wichtige Details und vergleichen Sie sie mit Ihrem eigenen Alltag."
-      hoerenAudioUrl="https://youtu.be/m7nP2qE9gNg"
-      hoerenQuestions={[]}
+      showHoeren={false}
       showWorkbookGuidance={false}
     />
   );
