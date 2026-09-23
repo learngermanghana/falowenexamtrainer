@@ -79,9 +79,10 @@ const PreparedCheckbox = ({ checked, onChange }) => <label style={{ display: "in
 const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultImages.sprechen} alt={alt} loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />;
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
-const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", lesenText, lesenQuestions = [], hoerenTask, hoerenAudioUrl, hoerenQuestions = [], showWorkbookGuidance = true }) => {
+const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", lesenText, lesenQuestions = [], hoerenTask, hoerenAudioUrl, hoerenQuestions = [], showHoeren = true, showWorkbookGuidance = true }) => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
+  const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
   const assignmentKey = `A2-${chapter}`;
   const resolvedWorkbookId = workbookId || `A2Day${day}Workbook`;
   const submissionContext = {
@@ -102,7 +103,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
       <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
       <p style={{ ...styles.subtitle, margin: 0 }}>Select Grammar, Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.</p>
-      <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={tabs} ariaLabel={`A2 Day ${day} workbook sections`} /></div>
+      <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={visibleTabs} ariaLabel={`A2 Day ${day} workbook sections`} /></div>
     </div>
     {showWorkbookGuidance ? <A2B1WorkbookGuidance /> : null}
 
@@ -130,7 +131,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
     {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><p style={{ margin: 0 }}>Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.</p><p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{lesenText || "Read a short A2 text about the lesson topic. Identify the main idea, important details and the correct answer letters."}</p><QuestionList questions={lesenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-    {activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
+    {showHoeren && activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
 
     {activeTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
     {activeTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
