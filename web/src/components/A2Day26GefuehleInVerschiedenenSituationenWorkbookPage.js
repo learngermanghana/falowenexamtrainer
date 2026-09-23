@@ -68,8 +68,8 @@ export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() 
       schreibenPlaceholder="Liebe/r ...,\n\nvielen Dank für deine Hilfe. Ich war sehr ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
-      hoerenTask="Hören Sie Falowen Radio noch einmal und achten Sie darauf, welche Gefühle genannt werden, wodurch sie entstehen und wie die Personen reagieren."
-      hoerenAudioUrl="https://youtu.be/9OVfA1B-nuU"
+      hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
+      hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
       hoerenQuestions={[]}
       showWorkbookGuidance={false}
     />
