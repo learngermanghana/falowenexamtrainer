@@ -144,6 +144,11 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   }, [assignmentKey]);
 
   useEffect(() => {
+    if (requestedTab !== "submit" || draftContext?.assignmentKey !== assignmentKey) return;
+    draftContext.refreshDraft?.();
+  }, [assignmentKey, draftContext?.assignmentKey, draftContext?.refreshDraft, requestedTab]);
+
+  useEffect(() => {
     if (requestedTab !== "submit" || submissionContextReady) return;
 
     const nextSearch = new URLSearchParams(location.search || "");
