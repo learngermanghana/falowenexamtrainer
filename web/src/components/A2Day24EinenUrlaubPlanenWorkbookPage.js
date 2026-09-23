@@ -1,32 +1,46 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
 
-const lesenText = `Urlaub in Salzburg
+const lesenText = `Internet-Anzeigen: Sechs Personen suchen im Internet nach Lokalen. Lesen Sie die Aufgaben und die Anzeigen a bis f. Welche Anzeige passt zu welcher Person? Für eine Aufgabe gibt es keine Lösung: Schreiben Sie X.
 
-Sandra und Miriam möchten im August vier Tage nach Salzburg reisen. Sie haben ein Budget von ungefähr 700 Euro pro Person. Weil die Zugverbindung gut ist, möchten sie nicht mit dem Auto fahren. Ihr Hotel liegt in der Nähe des Hauptbahnhofs und das Frühstück ist im Preis enthalten.
+Anzeigen (a–f)
+a: Park-Café mit Torten, Kuchen, italienischem Eis, Sonnenterrasse und Spielplatz.
+b: Catering für Hochzeiten/private Feiern; Essen, Möbel, Deko, Service, Kinderbetreuung.
+c: Weinhaus mit internationalen Spezialitäten, 3-Gänge-Menü, ruhigem Garten, Raum für kleine Feiern.
+d: Café am Fluss, großes Frühstück am Wochenende, samstags Live-Musik am Abend.
+e: Towabu Indoor-Spiel + Spaß; Kindergeburtstagspartys mit Programm.
+f: Ausflugsrestaurant am See; norddeutsche Küche; Räume bis 150 Personen für Feiern.`;
 
-Für den ersten Tag planen sie einen Spaziergang durch die Altstadt. Am zweiten Tag möchten sie die Festung Hohensalzburg besuchen. Wenn das Wetter am dritten Tag gut ist, machen sie einen Ausflug an einen See. Bei Regen wollen sie stattdessen ein Museum besuchen. Vor der Reise prüfen beide ihre Ausweise, Tickets und die Wettervorhersage. Miriam nimmt außerdem eine kleine Reiseapotheke mit.`;
+const advertChoices = [
+  "A) Anzeige a",
+  "B) Anzeige b",
+  "C) Anzeige c",
+  "D) Anzeige d",
+  "E) Anzeige e",
+  "F) Anzeige f",
+  "X) Keine passende Anzeige",
+];
 
 const lesenQuestions = [
   {
-    stem: "Wie lange möchten Sandra und Miriam in Salzburg bleiben?",
-    options: ["A) Zwei Tage", "B) Vier Tage", "C) Eine Woche", "D) Zwei Wochen"],
+    stem: "Sarah heiratet bald und möchte mit vielen Gästen in einem Lokal feiern.",
+    options: advertChoices,
   },
   {
-    stem: "Wie möchten sie nach Salzburg reisen?",
-    options: ["A) Mit dem Zug", "B) Mit dem Auto", "C) Mit dem Flugzeug", "D) Mit dem Schiff"],
+    stem: "Petra will mit Geschäftspartnern in der Stadt essen gehen und über die Arbeit sprechen.",
+    options: advertChoices,
   },
   {
-    stem: "Was ist im Hotelpreis enthalten?",
-    options: ["A) Abendessen", "B) Frühstück", "C) Museumstickets", "D) Zugtickets"],
+    stem: "Jens feiert seinen Geburtstag zu Hause und möchte guten Wein anbieten.",
+    options: advertChoices,
   },
   {
-    stem: "Was planen sie bei Regen am dritten Tag?",
-    options: ["A) Einen Ausflug an den See", "B) Einen Museumsbesuch", "C) Eine Rückreise", "D) Eine Fahrradtour"],
+    stem: "Karsten lädt am Abend Gäste zu sich nach Hause ein, möchte aber nicht kochen.",
+    options: advertChoices,
   },
   {
-    stem: "Was prüfen sie vor der Reise?",
-    options: ["A) Nur das Hotel", "B) Ausweise, Tickets und Wettervorhersage", "C) Nur die Restaurants", "D) Ihre Arbeitszeiten"],
+    stem: "Gabriele und ihre Tochter feiern Kindergeburtstag und möchten Kuchen essen gehen.",
+    options: advertChoices,
   },
 ];
 
@@ -42,7 +56,7 @@ export default function A2Day24EinenUrlaubPlanenWorkbookPage() {
       schreibenPlaceholder="Liebe Sandra,\n\nich möchte gern unseren Urlaub planen. Hast du ..."
       lesenText={lesenText}
       lesenQuestions={lesenQuestions}
-      hoerenTask="Hören Sie das Urlaubsplanungs-Video und achten Sie auf Reiseziel, Transport, Unterkunft, Budget und Aktivitäten."
+      hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
       hoerenAudioUrl="https://youtu.be/iPScKV6JWaA"
       hoerenQuestions={[]}
       showWorkbookGuidance={false}
