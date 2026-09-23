@@ -243,9 +243,12 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
     }));
   };
 
-  const openSubmit = async () => {
+  const openSubmit = () => {
     if (!workbookComplete) return;
-    if (user?.uid) await syncDraftToCloud("a1-chapter3-open-review-submit");
+
+    // Review should open from the already-saved local draft immediately.
+    // Cloud persistence continues in the background instead of blocking the UI.
+    if (user?.uid) void syncDraftToCloud("a1-chapter3-open-review-submit");
 
     const search = new URLSearchParams(location.search || "");
     search.set("workbookTab", "submit");
