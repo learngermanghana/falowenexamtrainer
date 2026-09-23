@@ -11,26 +11,36 @@ d: Café am Fluss, großes Frühstück am Wochenende, samstags Live-Musik am Abe
 e: Towabu Indoor-Spiel + Spaß; Kindergeburtstagspartys mit Programm.
 f: Ausflugsrestaurant am See; norddeutsche Küche; Räume bis 150 Personen für Feiern.`;
 
+const advertChoices = [
+  "A) Anzeige a",
+  "B) Anzeige b",
+  "C) Anzeige c",
+  "D) Anzeige d",
+  "E) Anzeige e",
+  "F) Anzeige f",
+  "X) Keine passende Anzeige",
+];
+
 const lesenQuestions = [
   {
     stem: "Sarah heiratet bald und möchte mit vielen Gästen in einem Lokal feiern.",
-    options: ["A) a", "B) b", "C) c", "D) f"],
+    options: advertChoices,
   },
   {
     stem: "Petra will mit Geschäftspartnern in der Stadt essen gehen und über die Arbeit sprechen.",
-    options: ["A) a", "B) c", "C) d", "D) f"],
+    options: advertChoices,
   },
   {
     stem: "Jens feiert seinen Geburtstag zu Hause und möchte guten Wein anbieten.",
-    options: ["A) b", "B) c", "C) d", "D) X"],
+    options: advertChoices,
   },
   {
     stem: "Karsten lädt am Abend Gäste zu sich nach Hause ein, möchte aber nicht kochen.",
-    options: ["A) a", "B) b", "C) e", "D) f"],
+    options: advertChoices,
   },
   {
     stem: "Gabriele und ihre Tochter feiern Kindergeburtstag und möchten Kuchen essen gehen.",
-    options: ["A) a", "B) d", "C) e", "D) f"],
+    options: advertChoices,
   },
 ];
 
