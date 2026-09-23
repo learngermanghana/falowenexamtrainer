@@ -102,7 +102,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     <div style={card}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
       <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
-      <p style={{ ...styles.subtitle, margin: 0 }}>Select Grammar, Teil 1–4, Ref or Submit below. The tabs stay visible at the top of the workbook.</p>
+      <p style={{ ...styles.subtitle, margin: 0 }}>{showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below."} The tabs stay visible at the top of the workbook.</p>
       <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={visibleTabs} ariaLabel={`A2 Day ${day} workbook sections`} /></div>
     </div>
     {showWorkbookGuidance ? <A2B1WorkbookGuidance /> : null}
