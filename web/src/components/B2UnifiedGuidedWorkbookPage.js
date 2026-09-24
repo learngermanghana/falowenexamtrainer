@@ -347,6 +347,10 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       <B2TopicIntroduction day={day} />
       <Section title="Grammar / Learn">
         <div style={{ ...sub, background: "#f8fafc" }}><strong>Grammar focus</strong><span>{alignment.grammar_topic}</span><span><strong>Goal:</strong> {alignment.goal}</span></div>
+        <div data-b2-grammar-video-status="missing" style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }}>
+          <strong>Grammar video not added yet</strong>
+          <span>Für diesen B2-Tag wurde noch kein passendes Grammatikvideo hinzugefügt. Falowen zeigt bewusst kein altes oder themenfremdes Video.</span>
+        </div>
         <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700, lineHeight: 1.5 }}><input type="checkbox" checked={Boolean(progress.learnDone)} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} style={{ marginTop: 4 }} />Ich habe das Thema und den Grammatikfokus verstanden.</label>
       </Section>
     </> : null}

@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import FalowenRadioTabContent from "./FalowenRadioTabContent";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { getB1Day5RadioResource } from "../data/b1Day5Media";
+import { getB2C1RadioResource } from "../data/b2C1LessonMediaOverrides";
 import { courseDebug } from "../lib/courseDebug";
 import { styles } from "../styles";
 import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
@@ -16,8 +17,19 @@ const completedRadioSteps = new Set();
 
 const radioStepKey = (level, day) => `${String(level || "").trim().toUpperCase()}:${Number(day)}`;
 
-export const resolveRadioFirstWorkbookResource = (level, day) =>
-  getLessonRadioResource(level, day) || getB1Day5RadioResource(level, day);
+export const hasPlayableRadioResource = (resource) =>
+  Boolean(
+    String(resource?.youtubeId || "").trim() ||
+      String(resource?.url || "").trim(),
+  );
+
+export const resolveRadioFirstWorkbookResource = (level, day) => {
+  const resource =
+    getB2C1RadioResource(level, day) ||
+    getLessonRadioResource(level, day) ||
+    getB1Day5RadioResource(level, day);
+  return hasPlayableRadioResource(resource) ? resource : null;
+};
 
 const hasCompletedRadioStep = (search = "", level = "", day = "") => {
   try {

@@ -1,7 +1,9 @@
 import {
   buildCompletedRadioHref,
   buildCompletedRadioSearch,
+  hasPlayableRadioResource,
   openCompletedWorkbook,
+  shouldShowRadioFirst,
 } from "./RadioFirstWorkbookGate";
 
 describe("RadioFirstWorkbookGate navigation", () => {
@@ -71,5 +73,26 @@ describe("A1 direct Radio destinations", () => {
       "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook?radio=done"
     );
     expect(href).not.toContain("assignmentKey=A1-1.1");
+  });
+});
+
+
+describe("Radio link gating", () => {
+  test("requires a real URL or YouTube ID before showing a Radio page", () => {
+    expect(hasPlayableRadioResource(null)).toBe(false);
+    expect(hasPlayableRadioResource({})).toBe(false);
+    expect(hasPlayableRadioResource({ youtubeId: "   " })).toBe(false);
+    expect(hasPlayableRadioResource({ youtubeId: "abc123" })).toBe(true);
+    expect(hasPlayableRadioResource({ url: "https://youtu.be/abc123" })).toBe(true);
+  });
+
+  test("does not show Falowen Radio for B2 while no B2 Radio link exists", () => {
+    expect(shouldShowRadioFirst("B2", 1)).toBe(false);
+    expect(shouldShowRadioFirst("B2", 2)).toBe(false);
+    expect(shouldShowRadioFirst("B2", 28)).toBe(false);
+  });
+
+  test("still recognises a configured C1 Radio override with a playable link", () => {
+    expect(shouldShowRadioFirst("C1", 11)).toBe(true);
   });
 });

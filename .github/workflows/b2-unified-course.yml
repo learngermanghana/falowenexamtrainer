@@ -5,10 +5,15 @@ on:
     paths:
       - "web/src/components/B2UnifiedGuidedWorkbookPage.js"
       - "web/src/components/B2UnifiedGuidedWorkbookPage.test.js"
+      - "web/src/components/B2MediaGatePolicy.test.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
       - "web/src/components/StandardWorkbookComponents.js"
+      - "web/src/components/RadioFirstWorkbookGate.js"
+      - "web/src/components/RadioFirstWorkbookGate.test.js"
+      - "web/src/components/StandardLessonWritingCoachPage.js"
+      - "web/src/components/StandardLessonWritingCoachPage.test.js"
       - "web/src/data/b2SkillCycle.js"
       - "web/src/data/b2ReadingPractice.js"
       - "web/src/data/b2ListeningPractice.js"
@@ -19,6 +24,8 @@ on:
       - "web/src/data/b2Day16Day17AiVideos.test.js"
       - "web/src/data/lessonRadioDictionary.js"
       - "web/src/data/lessonRadioDictionary.test.js"
+      - "web/src/data/lessonModel.js"
+      - "web/src/data/lessonModel.test.js"
       - "web/src/data/additionalLessonVideoResources.js"
       - "web/src/data/writingVideoResources.js"
       - "web/src/data/writingVideoResources.test.js"
@@ -27,6 +34,8 @@ on:
       - "web/src/data/lessonCatalog.js"
       - "web/src/services/b2AudioService.js"
       - "web/src/utils/b2CloudDraftSync.js"
+      - "web/src/utils/courseBookEntries.js"
+      - "web/src/utils/courseBookEntries.test.js"
       - "functions/functionz/r2CourseAudio.js"
       - "functions/functionz/app.js"
       - "functions/functionz/__tests__/r2CourseAudio.test.js"
@@ -53,9 +62,12 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/components/B2UnifiedGuidedWorkbookPage.test.js
+          src/components/B2MediaGatePolicy.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
+          src/components/RadioFirstWorkbookGate.test.js
+          src/utils/courseBookEntries.test.js
           src/data/b2MediaReset.test.js
           src/data/b2Day11FalowenRadio.test.js
           src/data/b2Day13To15RequestedAiVideos.test.js

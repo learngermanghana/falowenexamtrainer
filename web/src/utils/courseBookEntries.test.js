@@ -142,6 +142,34 @@ describe("course book task entries", () => {
     }));
   });
 
+  it("removes stale B2 Radio, video and grammar-link fields from Course Book cards", () => {
+    const entry = normalizeCourseBookEntry(
+      {
+        day: 2,
+        chapter: "1.2",
+        topic: "Legacy B2",
+        grammarPage: "https://drive.google.com/wrong-grammar",
+        grammarbook_link: "https://drive.google.com/wrong-grammar",
+        grammar_link: "https://drive.google.com/wrong-grammar",
+        video: "https://youtu.be/wrong-video",
+        youtube_link: "https://youtu.be/wrong-video",
+        ai_grammar_video: "https://youtu.be/wrong-ai",
+        falowenRadio: { youtubeId: "wrong-radio" },
+        workbook_link: "/campus/course/lesson/B2/2?view=workbook",
+      },
+      { level: "B2" }
+    );
+
+    expect(entry.grammarPage).toBe("");
+    expect(entry.grammarbook_link).toBeNull();
+    expect(entry.grammar_link).toBeNull();
+    expect(entry.video).toBeNull();
+    expect(entry.youtube_link).toBeNull();
+    expect(entry.ai_grammar_video).toBeNull();
+    expect(entry.falowenRadio).toBeNull();
+    expect(entry.workbook_link).toBe("/campus/course/lesson/B2/2?view=workbook");
+  });
+
   it("corrects the A1 Day 3 titles and separates practice from assignment", () => {
     const entries = expandCourseBookEntries([{
       day: 3,
