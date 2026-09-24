@@ -7,11 +7,6 @@ const b2Day6MigrationUndIntegration = makeLesson({
   title: "Migration und Integration",
   topic: "Migrationserfahrungen, Integration, Sprache, Teilhabe und gesellschaftliches Zusammenleben differenziert diskutieren",
   heroImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
-  videoResource: {
-    title: "B2 AI lesson video: Migration und Integration",
-    description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
-    url: "",
-  },
   grammarFocus: "Konzessive Nebensätze mit obwohl / auch wenn, trotzdem und differenzierte Argumentation",
   objectives: [
     "Ich kann Ursachen und Folgen von Migration sachlich erklären.",
