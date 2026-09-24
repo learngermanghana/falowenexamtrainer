@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 import { useTranslation } from "react-i18next";
 import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
+import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
 import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
@@ -735,6 +736,7 @@ const AppShell = ({
               />
             }
           />
+          <Route path="/campus/course/preview/:level" element={<NextLevelPreviewPage />} />
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route

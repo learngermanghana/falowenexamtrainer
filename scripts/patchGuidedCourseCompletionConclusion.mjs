@@ -12,68 +12,84 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-replaceOnce(
-  'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";',
-  'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\nimport CourseCompletionConclusion from "./CourseCompletionConclusion";',
-  "Course completion component import",
-);
-
-replaceOnce(
-  '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";',
-  '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";\n  const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);',
-  "course conclusion level flag",
-);
-
-replaceOnce(
-  '  const assignmentCount = courseCompletion.total;\n  const completedCount = courseCompletion.completed;',
-  '  const assignmentCount = courseCompletion.total;\n  const passedAssignmentCount = courseCompletion.passed;\n  const completedCount = courseCompletion.completed;',
-  "canonical passed assignment count",
-);
-
-replaceOnce(
-  '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);',
-  '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);\n  const courseIsComplete = isCourseConclusionLevel && courseCompletion.courseWorkCompleted;',
-  "course completion state",
-);
-
-replaceOnce(
-  '      decoratedSchedule.filter((entry) => {\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
-  '      decoratedSchedule.filter((entry) => {\n        if (isCourseConclusionLevel && entry.isMilestone) return false;\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
-  "hide milestone lesson cards",
-);
-
-replaceOnce(
-  '    [decoratedSchedule, searchTerm, activeFilter, nextLesson]\n  );',
-  '    [decoratedSchedule, searchTerm, activeFilter, nextLesson, isCourseConclusionLevel]\n  );',
-  "visible lesson dependencies",
-);
-
-// Retire the old generic completion card wherever the dedicated conclusion is used.
-source = source.replace(
-  'normalizedSelectedCourseLevel === "A2" ? null : (',
-  'isCourseConclusionLevel ? null : (',
-);
-
-const lessonListTail = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n        </>`;
-const lessonListTailWithConclusion = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n\n          {isCourseConclusionLevel ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              isComplete={courseIsComplete}\n              completedRequirements={completedCount}\n              totalRequirements={courseCompletion.total}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              needsImprovement={courseCompletion.needsImprovement}\n              awaitingReview={courseCompletion.awaitingReview}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2", B2: "C1", C1: "C2" }[normalizedSelectedCourseLevel];\n                if (nextLevel) navigate(\`/campus/course/preview/\${nextLevel}\`);\n              }}\n            />\n          ) : null}\n        </>`;
-replaceOnce(lessonListTail, lessonListTailWithConclusion, "bottom course completion conclusion");
-
-const requiredMarkers = [
+const hasModernC2AwareConclusion = [
   'import CourseCompletionConclusion from "./CourseCompletionConclusion";',
   'const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);',
-  'const passedAssignmentCount = courseCompletion.passed;',
-  'const courseIsComplete = isCourseConclusionLevel && courseCompletion.courseWorkCompleted;',
-  'if (isCourseConclusionLevel && entry.isMilestone) return false;',
-  '{isCourseConclusionLevel ? (',
-  'isComplete={courseIsComplete}',
-  '<CourseCompletionConclusion',
-  'needsImprovement={courseCompletion.needsImprovement}',
-  'navigate(`/campus/course/preview/${nextLevel}`)',
-];
+  "const passedAssignmentCount = isC2CourseBook",
+  "const courseIsComplete = isCourseConclusionLevel && (",
+  "if (isCourseConclusionLevel && entry.isMilestone) return false;",
+  "totalRequirements={isC2CourseBook ? courseLessons.length",
+  "<CourseCompletionConclusion",
+].every((marker) => source.includes(marker));
 
-requiredMarkers.forEach((marker) => {
-  if (!source.includes(marker)) throw new Error(`Course completion conclusion marker missing: ${marker}`);
-});
+if (!hasModernC2AwareConclusion) {
+  replaceOnce(
+    'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";',
+    'import YouTubeSubscribeButton from "./YouTubeSubscribeButton";\nimport CourseCompletionConclusion from "./CourseCompletionConclusion";',
+    "Course completion component import",
+  );
+
+  replaceOnce(
+    '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";',
+    '  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";\n  const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);',
+    "course conclusion level flag",
+  );
+
+  replaceOnce(
+    '  const assignmentCount = courseCompletion.total;\n  const completedCount = courseCompletion.completed;',
+    '  const assignmentCount = courseCompletion.total;\n  const passedAssignmentCount = courseCompletion.passed;\n  const completedCount = courseCompletion.completed;',
+    "canonical passed assignment count",
+  );
+
+  replaceOnce(
+    '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);',
+    '  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);\n  const courseIsComplete = isCourseConclusionLevel && courseCompletion.courseWorkCompleted;',
+    "course completion state",
+  );
+
+  replaceOnce(
+    '      decoratedSchedule.filter((entry) => {\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
+    '      decoratedSchedule.filter((entry) => {\n        if (isCourseConclusionLevel && entry.isMilestone) return false;\n        if (!lessonMatchesSearch(entry, searchTerm)) return false;',
+    "hide milestone lesson cards",
+  );
+
+  replaceOnce(
+    '    [decoratedSchedule, searchTerm, activeFilter, nextLesson]\n  );',
+    '    [decoratedSchedule, searchTerm, activeFilter, nextLesson, isCourseConclusionLevel]\n  );',
+    "visible lesson dependencies",
+  );
+
+  // Retire the old generic completion card wherever the dedicated conclusion is used.
+  source = source.replace(
+    'normalizedSelectedCourseLevel === "A2" ? null : (',
+    'isCourseConclusionLevel ? null : (',
+  );
+
+  const lessonListTail = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n        </>`;
+  const lessonListTailWithConclusion = `          ) : (\n            <section style={courseBookStyles.emptyState}>\n              <h3 style={{ marginTop: 0 }}>No lessons found</h3>\n              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>\n            </section>\n          )}\n\n          {isCourseConclusionLevel ? (\n            <CourseCompletionConclusion\n              level={normalizedSelectedCourseLevel}\n              isComplete={courseIsComplete}\n              completedRequirements={completedCount}\n              totalRequirements={courseCompletion.total}\n              passedAssignments={passedAssignmentCount}\n              totalAssignments={assignmentCount}\n              needsImprovement={courseCompletion.needsImprovement}\n              awaitingReview={courseCompletion.awaitingReview}\n              onExploreNextLevel={() => {\n                const nextLevel = { A1: "A2", A2: "B1", B1: "B2", B2: "C1", C1: "C2" }[normalizedSelectedCourseLevel];\n                if (nextLevel) navigate(\`/campus/course/preview/\${nextLevel}\`);\n              }}\n            />\n          ) : null}\n        </>`;
+  replaceOnce(lessonListTail, lessonListTailWithConclusion, "bottom course completion conclusion");
+
+  const requiredMarkers = [
+    'import CourseCompletionConclusion from "./CourseCompletionConclusion";',
+    'const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);',
+    'const passedAssignmentCount = courseCompletion.passed;',
+    'const courseIsComplete = isCourseConclusionLevel && courseCompletion.courseWorkCompleted;',
+    'if (isCourseConclusionLevel && entry.isMilestone) return false;',
+    '{isCourseConclusionLevel ? (',
+    'isComplete={courseIsComplete}',
+    '<CourseCompletionConclusion',
+    'needsImprovement={courseCompletion.needsImprovement}',
+    'navigate(`/campus/course/preview/${nextLevel}`)',
+  ];
+
+  requiredMarkers.forEach((marker) => {
+    if (!source.includes(marker)) throw new Error(`Course completion conclusion marker missing: ${marker}`);
+  });
+
+
+} else {
+  console.log("CourseTab already has the C2-aware course conclusion; legacy conclusion rewrite skipped.");
+}
 
 fs.writeFileSync(courseTabPath, source, "utf8");
 

@@ -18,9 +18,13 @@ replaceOnce(
   "CourseTab snapshot service import",
 );
 
-const progressAnchor = `  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);`;
-const progressWithSync = `${progressAnchor}\n\n  useEffect(() => {\n    if (loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;\n    const timer = setTimeout(() => {\n      persistCourseCompletionSnapshot({\n        progress: courseCompletion,\n        level: normalizedSelectedCourseLevel,\n        user,\n        studentProfile,\n      }).catch((error) => {\n        console.warn("Could not sync Course Book completion snapshot", error);\n      });\n    }, 500);\n    return () => clearTimeout(timer);\n  }, [courseCompletion, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user]);`;
-replaceOnce(progressAnchor, progressWithSync, "CourseTab snapshot effect");
+if (!source.includes("persistCourseCompletionSnapshot({")) {
+  const progressAnchor = `  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);`;
+  const progressWithSync = `${progressAnchor}\n\n  useEffect(() => {\n    if (loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;\n    const timer = setTimeout(() => {\n      persistCourseCompletionSnapshot({\n        progress: courseCompletion,\n        level: normalizedSelectedCourseLevel,\n        user,\n        studentProfile,\n      }).catch((error) => {\n        console.warn("Could not sync Course Book completion snapshot", error);\n      });\n    }, 500);\n    return () => clearTimeout(timer);\n  }, [courseCompletion, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user]);`;
+  replaceOnce(progressAnchor, progressWithSync, "CourseTab snapshot effect");
+} else {
+  console.log("CourseTab completion snapshot effect already present; legacy snapshot rewrite skipped.");
+}
 
 const requiredMarkers = [
   'from "../services/courseCompletionSnapshotService"',

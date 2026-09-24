@@ -56,13 +56,9 @@ home = home.replace(
 });
 
 // Keep access and navigation help visible on Home without duplicating learning actions.
-const guideStartMarker = "const CompactCourseGuide = (";
-const guideEndMarker = "\n\nconst AnnouncementSection =";
-const guideStart = generalHome.indexOf(guideStartMarker);
-const guideEnd = generalHome.indexOf(guideEndMarker, guideStart);
-if (guideStart === -1 || guideEnd === -1) {
-  throw new Error("Could not locate the Home course guide block.");
-}
+const homeGuideAlreadyOpen =
+  generalHome.includes('data-home-course-access-guide="open"') &&
+  generalHome.includes("Course access and navigation");
 
 const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey }) => {
   const className = studentProfile?.className || "Not assigned yet";
@@ -107,7 +103,19 @@ const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey 
   );
 };`;
 
-generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
+if (!homeGuideAlreadyOpen) {
+  const guideStartMarker = "const CompactCourseGuide = (";
+  const guideStart = generalHome.indexOf(guideStartMarker);
+  const announcementEnd = generalHome.indexOf("\n\nconst AnnouncementSection =", guideStart);
+  const generalHomeEnd = generalHome.indexOf("\n\nconst GeneralHome = (", guideStart);
+  const guideEnd = announcementEnd >= 0 ? announcementEnd : generalHomeEnd;
+  if (guideStart === -1 || guideEnd === -1) {
+    throw new Error("Could not locate the Home course guide block.");
+  }
+  generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
+} else {
+  console.log("Home course access/navigation guide is already permanently open; legacy guide rewrite skipped.");
+}
 
 [
   "Expand course guide, access and navigation help",
@@ -121,87 +129,113 @@ if (!generalHome.includes('data-home-course-access-guide="open"') || !generalHom
 }
 
 // Course Book: replace page-count progress with the canonical completion engine.
-courseTab = replaceOnce(
-  courseTab,
-  'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";',
-  'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";\nimport { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";',
-  "CourseTab completion-engine import",
-);
+const hasModernC2AwareCourseProgress = [
+  "const courseCompletion = useMemo(",
+  "const effectivePracticeProgress = useMemo(",
+  "findCourseBookEntryForRequirement",
+  'source: "c2-cloud-progress"',
+  "Complete inside lesson",
+].every((marker) => courseTab.includes(marker));
 
-const oldCourseProgressBlock = `  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
-  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
-  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;
-  const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
-  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);`;
-const newCourseProgressBlock = `  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
-  const courseCompletion = useMemo(
-    () =>
-      buildCourseCompletionProgress({
-        level: normalizedSelectedCourseLevel,
-        progressByAssignmentId,
-        selfLearningProgressByDay: readSelfLearningProgressByDay(normalizedSelectedCourseLevel),
-      }),
-    [normalizedSelectedCourseLevel, practiceProgress, progressByAssignmentId],
+if (!hasModernC2AwareCourseProgress) {
+  courseTab = replaceOnce(
+    courseTab,
+    'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";',
+    'import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";\nimport { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";',
+    "CourseTab completion-engine import",
   );
-  const assignmentCount = courseCompletion.total;
-  const completedCount = courseCompletion.completed;
-  const progressPercent = courseCompletion.completionPercent;
-  const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);`;
-courseTab = replaceOnce(courseTab, oldCourseProgressBlock, newCourseProgressBlock, "CourseTab canonical progress calculation");
 
-courseTab = courseTab.replace(
-  '<p style={courseBookStyles.statLabel}>Assignments</p>',
-  '<p style={courseBookStyles.statLabel}>Required work</p>',
-);
+  const oldCourseProgressBlock = `  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+    const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
+    const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;
+    const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
+    const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);`;
+  const newCourseProgressBlock = `  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+    const courseCompletion = useMemo(
+      () =>
+        buildCourseCompletionProgress({
+          level: normalizedSelectedCourseLevel,
+          progressByAssignmentId,
+          selfLearningProgressByDay: readSelfLearningProgressByDay(normalizedSelectedCourseLevel),
+        }),
+      [normalizedSelectedCourseLevel, practiceProgress, progressByAssignmentId],
+    );
+    const assignmentCount = courseCompletion.total;
+    const completedCount = courseCompletion.completed;
+    const progressPercent = courseCompletion.completionPercent;
+    const nextLesson = findCourseBookEntryForRequirement(courseLessons, courseCompletion.next);`;
+  courseTab = replaceOnce(courseTab, oldCourseProgressBlock, newCourseProgressBlock, "CourseTab canonical progress calculation");
 
-const practiceStat = `              <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Practice</p>
-                <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>Practical completed: {practicalCompletedCount}/{practiceEntries.length}</p>
-              </div>`;
-const masteryStat = `              <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Mastery</p>
-                <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>
-                  {courseCompletion.masteryAvailable ? \`${"${courseCompletion.masteryPercent ?? 0}"}% passed\` : "Self-learning"}
-                </p>
-              </div>`;
-courseTab = replaceOnce(courseTab, practiceStat, masteryStat, "CourseTab mastery stat");
+  courseTab = courseTab.replace(
+    '<p style={courseBookStyles.statLabel}>Assignments</p>',
+    '<p style={courseBookStyles.statLabel}>Required work</p>',
+  );
 
-courseTab = courseTab.replace(
-  '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseLessons.length} lessons completed</p>',
-  '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseCompletion.total} required {courseCompletion.mode === "self-learning" ? "lessons" : "assignments"} completed</p>',
-);
+  const practiceStat = `              <div style={courseBookStyles.statCard}>
+                  <p style={courseBookStyles.statLabel}>Practice</p>
+                  <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>Practical completed: {practicalCompletedCount}/{practiceEntries.length}</p>
+                </div>`;
+  const masteryStat = `              <div style={courseBookStyles.statCard}>
+                  <p style={courseBookStyles.statLabel}>Mastery</p>
+                  <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>
+                    {courseCompletion.masteryAvailable ? \`${"${courseCompletion.masteryPercent ?? 0}"}% passed\` : "Self-learning"}
+                  </p>
+                </div>`;
+  courseTab = replaceOnce(courseTab, practiceStat, masteryStat, "CourseTab mastery stat");
 
-courseTab = courseTab.replace(
-  ': `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}',
-  ': isSelfLearningLevel\n                        ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."\n                        : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}',
-);
+  courseTab = courseTab.replace(
+    '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseLessons.length} lessons completed</p>',
+    '<p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseCompletion.total} required {courseCompletion.mode === "self-learning" ? "lessons" : "assignments"} completed</p>',
+  );
 
-courseTab = courseTab.replace(
-  '{!nextLesson.isTutorMarked ? (\n                    <label',
-  '{!nextLesson.isTutorMarked && !isSelfLearningLevel ? (\n                    <label',
-);
+  courseTab = courseTab.replace(
+    ': `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}',
+    ': isSelfLearningLevel\n                        ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."\n                        : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}',
+  );
 
-const lessonPracticeState = `                    const practiceState = practiceProgress[entry.assignmentKey] || {};
-                    const practiceMeta = practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly;`;
-const canonicalLessonPracticeState = `                    const practiceState = practiceProgress[entry.assignmentKey] || {};
-                    const canonicalSelfLearningState = isSelfLearningLevel
-                      ? courseCompletion.states.find((item) => Number(item.requirement?.day) === Number(entry.day)) || null
-                      : null;
-                    const canonicalSelfLearningComplete = Boolean(canonicalSelfLearningState?.completed);
-                    const practiceMeta = isSelfLearningLevel
-                      ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
-                      : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);`;
-courseTab = replaceOnce(courseTab, lessonPracticeState, canonicalLessonPracticeState, "CourseTab self-learning card state");
+  courseTab = courseTab.replace(
+    '{!nextLesson.isTutorMarked ? (\n                    <label',
+    '{!nextLesson.isTutorMarked && !isSelfLearningLevel ? (\n                    <label',
+  );
 
-courseTab = courseTab.replace(
-  '<input type="checkbox" checked={Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />\n                                    Completed',
-  '<input type="checkbox" disabled={isSelfLearningLevel} checked={isSelfLearningLevel ? canonicalSelfLearningComplete : Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />\n                                    {isSelfLearningLevel ? "Complete inside lesson" : "Completed"}',
-);
+  const lessonPracticeState = `                    const practiceState = practiceProgress[entry.assignmentKey] || {};
+                      const practiceMeta = practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly;`;
+  const canonicalLessonPracticeState = `                    const practiceState = practiceProgress[entry.assignmentKey] || {};
+                      const canonicalSelfLearningState = isSelfLearningLevel
+                        ? courseCompletion.states.find((item) => Number(item.requirement?.day) === Number(entry.day)) || null
+                        : null;
+                      const canonicalSelfLearningComplete = Boolean(canonicalSelfLearningState?.completed);
+                      const practiceMeta = isSelfLearningLevel
+                        ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
+                        : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);`;
+  courseTab = replaceOnce(courseTab, lessonPracticeState, canonicalLessonPracticeState, "CourseTab self-learning card state");
 
-courseTab = courseTab.replaceAll(
-  'practiceState.completed ? (',
-  '(isSelfLearningLevel ? canonicalSelfLearningComplete : practiceState.completed) ? (',
-);
+  courseTab = courseTab.replace(
+    '<input type="checkbox" checked={Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />\n                                    Completed',
+    '<input type="checkbox" disabled={isSelfLearningLevel} checked={isSelfLearningLevel ? canonicalSelfLearningComplete : Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />\n                                    {isSelfLearningLevel ? "Complete inside lesson" : "Completed"}',
+  );
+
+  courseTab = courseTab.replaceAll(
+    'practiceState.completed ? (',
+    '(isSelfLearningLevel ? canonicalSelfLearningComplete : practiceState.completed) ? (',
+  );
+
+
+} else {
+  [
+    'import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";',
+    "const courseCompletion = useMemo(",
+    "const effectivePracticeProgress = useMemo(",
+    "findCourseBookEntryForRequirement",
+    'source: "c2-cloud-progress"',
+    "Complete inside lesson",
+  ].forEach((marker) => {
+    if (!courseTab.includes(marker)) {
+      throw new Error(`CourseTab modern completion marker missing: ${marker}`);
+    }
+  });
+  console.log("CourseTab already has canonical A1-C1 completion plus C2 cloud progress; legacy CourseTab rewrite skipped.");
+}
 
 // Guided writing: publish a monotonic Write-complete signal into the standard
 // B2/C1 lesson progress key. Ref/video activity never writes this marker.

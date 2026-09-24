@@ -14,6 +14,16 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
+const hasFinalResultFeedbackPresentation = [
+  "hasStructuredResultFeedback",
+  "getImproveLessonDestination",
+  'data-result-recovery="true"',
+  'data-improve-this-lesson="true"',
+  "Your previous submission stays in Falowen",
+  "recoveryFromResults: true",
+].every((marker) => source.includes(marker));
+
+if (!hasFinalResultFeedbackPresentation) {
 replaceOnce(
   `const getNextStep = (item = {}) => {
   if (item.numericScore < PASS_MARK) {
@@ -276,6 +286,11 @@ source = source.replace(
 
 if (source.includes("Improve and resubmit") || source.includes("/campus/course?submitWork=1")) {
   throw new Error("Results still contains the retired generic resubmission action.");
+}
+
+
+} else {
+  console.log("Results feedback presentation already has the final recovery structure; legacy rewrite skipped.");
 }
 
 fs.writeFileSync(resultHistoryPath, source, "utf8");
