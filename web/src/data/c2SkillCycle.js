@@ -29,6 +29,22 @@ export const getC2DayTabs = (day) => {
   ];
 };
 
+
+export const getC2SpeakingSupport = (day) => {
+  const numericDay = Number(day);
+  if ([3, 7].includes(numericDay)) return "full";
+  if ([11, 15, 19].includes(numericDay)) return "keywords";
+  if ([23, 27].includes(numericDay)) return "exam";
+  return "full";
+};
+
+export const getC2SpeakingSupportNote = (day) => {
+  const mode = getC2SpeakingSupport(day);
+  if (mode === "full") return "Early speaking stage: sentence starters and idea support are available.";
+  if (mode === "keywords") return "Middle speaking stage: work mainly from keywords and guiding questions.";
+  return "Late speaking stage: start in exam mode and build the argument independently.";
+};
+
 export const C2_SKILL_DAYS = Object.freeze(
   C2_SKILL_ORDER.reduce((groups, skill) => {
     groups[skill] = Object.freeze(
