@@ -26,15 +26,16 @@ const grammarThinking = {
     example: "Idea: The train is faster than the bus → different → schneller + als → Der Zug ist schneller als der Bus.",
   },
   4: {
-    title: "Wo oder Wohin: first ask location or movement",
-    question: "Is something already in a place, or is it moving to a place?",
+    title: "Wo oder Wohin: first ask place or destination",
+    question: "Does the sentence tell us where the action happens, or where the person is going?",
     steps: [
-      "Wo? = location / position → usually Dativ.",
-      "Wohin? = movement to a destination → usually Akkusativ.",
-      "Think of the picture: already there or moving there?",
-      "Then choose the article: im Park / in den Park.",
+      "1. Find the noun and its basic article: der Park, der See, das Café.",
+      "2. Wo? = location / place of the action → Dativ.",
+      "3. Wohin? = destination / change of place → Akkusativ.",
+      "4. Choose the full article first: in dem Park / in den Park; in dem Café / in das Café.",
+      "5. Use the short form only afterwards: in dem → im, in das → ins, an dem → am, an das → ans.",
     ],
-    example: "Idea: We meet in the park → location → Wo? → im Park. We go to the park → movement → Wohin? → in den Park.",
+    example: "Idea: We meet in the café → das Café → Wo? → Dativ → in dem Café → im Café. We go into the café → Wohin? → Akkusativ → in das Café → ins Café.",
   },
   5: {
     title: "Separable verbs: find the verb in two pieces",
