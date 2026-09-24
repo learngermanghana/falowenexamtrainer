@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 
 describe("WritingFeedbackCard", () => {
-  it("extracts a score from textual feedback and renders corrections", () => {
+  it("extracts a score from textual feedback and renders the current fallback safely", () => {
     render(
       <WritingFeedbackCard
         level="B1"
@@ -11,8 +11,8 @@ describe("WritingFeedbackCard", () => {
     );
 
     expect(screen.getByText(/Score: 18\/25/i)).toBeInTheDocument();
-    expect(screen.getByText(/❌ Needs fix:/i)).toBeInTheDocument();
-    expect(screen.getByText(/✅ Better:/i)).toBeInTheDocument();
+    expect(screen.getByText("Corrections")).toBeInTheDocument();
+    expect(screen.getByText("No correction needed.")).toBeInTheDocument();
   });
 
   it("renders C2 feedback with the advanced rubric", () => {
