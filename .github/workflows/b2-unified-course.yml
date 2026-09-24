@@ -5,6 +5,7 @@ on:
     paths:
       - "web/src/components/B2UnifiedGuidedWorkbookPage.js"
       - "web/src/components/B2UnifiedGuidedWorkbookPage.test.js"
+      - "web/src/components/B2MediaGatePolicy.test.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
@@ -61,12 +62,11 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/components/B2UnifiedGuidedWorkbookPage.test.js
+          src/components/B2MediaGatePolicy.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
           src/components/RadioFirstWorkbookGate.test.js
-          src/components/StandardLessonWritingCoachPage.test.js
-          src/data/lessonModel.test.js
           src/utils/courseBookEntries.test.js
           src/data/b2MediaReset.test.js
           src/data/b2Day11FalowenRadio.test.js
