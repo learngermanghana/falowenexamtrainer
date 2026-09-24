@@ -16,6 +16,8 @@ import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/cour
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
+import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
+import { getC2SkillLabel } from "../data/c2SkillCycle";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -54,7 +56,7 @@ const getA1CourseBookSection = (entry) => {
   return A1_COURSE_BOOK_SECTIONS.find(({ firstDay, lastDay }) => day >= firstDay && day <= lastDay);
 };
 
-const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
+const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1", "C2"]);
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
     video: "https://youtu.be/a1-day0-tutorial",
@@ -699,6 +701,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     user,
     level: selectedCourseLevel,
   });
+  const isC2Selected = String(selectedCourseLevel || "").toUpperCase() === "C2";
+  const { byDay: c2ProgressByDay, summary: c2SkillSummary, loading: loadingC2Progress } = useC2CourseProgress({
+    enabled: isC2Selected,
+  });
 
   const schedule = useMemo(() => {
     const seenByDay = {};
@@ -755,19 +761,35 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
   const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
   const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
-  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, practiceProgress)).length;
+  const isC2CourseBook = normalizedSelectedCourseLevel === "C2";
+  const effectivePracticeProgress = useMemo(() => {
+    if (!isC2CourseBook) return practiceProgress;
+    const next = { ...practiceProgress };
+    courseLessons.forEach((entry) => {
+      const day = Number(getCourseBookDisplayDay(entry) || entry.day || 0);
+      const cloud = c2ProgressByDay[day];
+      next[entry.assignmentKey] = {
+        ...(next[entry.assignmentKey] || {}),
+        completed: Boolean(cloud?.dayComplete),
+        confidence: cloud?.confidence || "",
+        source: "c2-cloud-progress",
+      };
+    });
+    return next;
+  }, [c2ProgressByDay, courseLessons, isC2CourseBook, practiceProgress]);
+  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, effectivePracticeProgress)).length;
   const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
-  const nextLesson = getNextCourseBookEntry(courseLessons, practiceProgress);
+  const nextLesson = getNextCourseBookEntry(courseLessons, effectivePracticeProgress);
   const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
-  const followingLesson = nextLessonIndex >= 0 ? courseLessons.slice(nextLessonIndex + 1).find((entry) => !isCourseBookEntryComplete(entry, practiceProgress)) || null : null;
+  const followingLesson = nextLessonIndex >= 0 ? courseLessons.slice(nextLessonIndex + 1).find((entry) => !isCourseBookEntryComplete(entry, effectivePracticeProgress)) || null : null;
   const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
   const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
-  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
+  const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};
 
   const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);
-  const practicalCompletedCount = practiceEntries.filter((entry) => practiceProgress[entry.assignmentKey]?.completed).length;
+  const practicalCompletedCount = practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).length;
   const completedPracticeDays = new Set(
-    practiceEntries.filter((entry) => practiceProgress[entry.assignmentKey]?.completed).map((entry) => Number(entry.day))
+    practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).map((entry) => Number(entry.day))
   );
   const earnedBadges = PRACTICE_CLUSTER_BADGES.filter((badge) => badge.days.every((day) => completedPracticeDays.has(day)));
 
@@ -913,7 +935,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <h2 style={courseBookStyles.heroTitle}>Course Book</h2>
                 <p style={courseBookStyles.heroText}>
                   Follow the lessons in order. Your badges now use real submissions and marked scores from Falowen.
-                  {loadingLessonProgress ? " Syncing progress..." : ""}
+                  {loadingLessonProgress || (isC2CourseBook && loadingC2Progress) ? " Syncing progress..." : ""}
                 </p>
                 {lessonProgressError ? <p style={{ margin: "6px 0 0", color: "#fee2e2", fontSize: 13 }}>{lessonProgressError}</p> : null}
               </div>
@@ -943,17 +965,42 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <p style={courseBookStyles.statValue}>{decoratedSchedule.length}</p>
               </div>
               <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Assignments</p>
-                <p style={courseBookStyles.statValue}>{assignmentCount}</p>
-              </div>
-              <div style={courseBookStyles.statCard}>
                 <p style={courseBookStyles.statLabel}>Progress</p>
                 <p style={courseBookStyles.statValue}>{progressPercent}%</p>
               </div>
-              <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Practice</p>
-                <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>Practical completed: {practicalCompletedCount}/{practiceEntries.length}</p>
-              </div>
+              {isC2CourseBook ? (
+                <>
+                  {[
+                    ["lesen", "Lesen"],
+                    ["hoeren", "Hören"],
+                    ["speak", "Sprechen"],
+                    ["write", "Schreiben"],
+                  ].map(([key, label]) => (
+                    <div key={key} style={courseBookStyles.statCard}>
+                      <p style={courseBookStyles.statLabel}>{label}</p>
+                      <p style={{ ...courseBookStyles.statValue, fontSize: 18 }}>
+                        {c2SkillSummary[key]?.completed || 0}/{c2SkillSummary[key]?.total || 7}
+                      </p>
+                      {key === "hoeren" && c2SkillSummary[key]?.waitingForSource ? (
+                        <p style={{ margin: "4px 0 0", color: "#dbeafe", fontSize: 11 }}>
+                          {c2SkillSummary[key].waitingForSource} source{c2SkillSummary[key].waitingForSource === 1 ? "" : "s"} pending
+                        </p>
+                      ) : null}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Assignments</p>
+                    <p style={courseBookStyles.statValue}>{assignmentCount}</p>
+                  </div>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Practice</p>
+                    <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>Practical completed: {practicalCompletedCount}/{practiceEntries.length}</p>
+                  </div>
+                </>
+              )}
               <div style={courseBookStyles.statCard}>
                 <p style={courseBookStyles.statLabel}>Mode</p>
                 <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>{isSelfLearningLevel ? "Self-learning" : isDerivedLevel ? "Class plan" : "Tutor guided"}</p>
@@ -1039,7 +1086,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   <p style={{ ...styles.helperText, margin: 0 }}>
                     {nextLesson.isTutorMarked
                       ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
-                      : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
+                      : isC2CourseBook
+                        ? `Complete Grammar/Learn and today’s ${getC2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Progress syncs automatically across devices.`
+                        : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
                   </p>
                   {!nextLesson.isTutorMarked ? (
                     <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "#334155", fontWeight: 800 }}>
@@ -1133,32 +1182,50 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               <h3 style={courseBookStyles.lessonTitle}>{getCourseBookEntryTitle(entry)}</h3>
                               <div style={courseBookStyles.lessonMeta}>
                                 {isCurrent ? <span style={{ ...courseBookStyles.chip, background: "#dbeafe", borderColor: "#93c5fd", color: "#1d4ed8" }}>Current</span> : null}
+                                {isC2CourseBook ? <span style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getC2SkillLabel(entry.day)?.label}</span> : null}
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
                                 {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
                                 {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
                               </div>
                               {!entry.isTutorMarked ? (
-                                <div style={courseBookStyles.practiceControls}>
-                                  <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#334155", fontWeight: 700 }}>
-                                    <input type="checkbox" checked={Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />
-                                    Completed
-                                  </label>
-                                  <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
-                                    <option value="">Confidence</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                  </select>
-                                  {practiceState.completed ? (
+                                isC2CourseBook ? (() => {
+                                  const dayProgress = c2ProgressByDay[Number(entry.day)] || {};
+                                  const skill = getC2SkillLabel(entry.day)?.label || "Skill";
+                                  return (
+                                    <div style={courseBookStyles.practiceControls}>
+                                      <span style={{ ...courseBookStyles.chip, background: dayProgress.learnDone ? "#f0fdf4" : "#f8fafc", color: dayProgress.learnDone ? "#166534" : "#475569" }}>
+                                        Grammar {dayProgress.learnDone ? "✓" : "pending"}
+                                      </span>
+                                      <span style={{ ...courseBookStyles.chip, background: dayProgress.skillDone ? "#f0fdf4" : dayProgress.waitingForListeningSource ? "#fffbeb" : "#f8fafc", color: dayProgress.skillDone ? "#166534" : dayProgress.waitingForListeningSource ? "#92400e" : "#475569" }}>
+                                        {skill} {dayProgress.skillDone ? "✓" : dayProgress.waitingForListeningSource ? "source pending" : "pending"}
+                                      </span>
+                                      {dayProgress.readingFirstAttemptScore ? (
+                                        <span style={courseBookStyles.chip}>
+                                          First try {dayProgress.readingFirstAttemptScore.correct}/{dayProgress.readingFirstAttemptScore.total}
+                                        </span>
+                                      ) : null}
+                                      <span style={{ ...courseBookStyles.statusChip, color: dayProgress.dayComplete ? "#166534" : "#475569", border: `1px solid ${dayProgress.dayComplete ? "#86efac" : "#cbd5e1"}`, background: dayProgress.dayComplete ? "#f0fdf4" : "#f8fafc" }}>
+                                        {dayProgress.dayComplete ? "Day complete" : "In progress"}
+                                      </span>
+                                    </div>
+                                  );
+                                })() : (
+                                  <div style={courseBookStyles.practiceControls}>
+                                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#334155", fontWeight: 700 }}>
+                                      <input type="checkbox" checked={Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />
+                                      Completed
+                                    </label>
+                                    <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
+                                      <option value="">Confidence</option>
+                                      <option value="low">Low</option>
+                                      <option value="medium">Medium</option>
+                                      <option value="high">High</option>
+                                    </select>
                                     <span style={{ ...courseBookStyles.statusChip, color: practiceMeta.color, border: `1px solid ${practiceMeta.border}`, background: practiceMeta.background }}>
                                       {practiceMeta.key}
                                     </span>
-                                  ) : (
-                                    <span style={{ ...courseBookStyles.statusChip, color: practiceMeta.color, border: `1px solid ${practiceMeta.border}`, background: practiceMeta.background }}>
-                                      {practiceMeta.key}
-                                    </span>
-                                  )}
-                                </div>
+                                  </div>
+                                )
                               ) : null}
                             </div>
                           </div>
