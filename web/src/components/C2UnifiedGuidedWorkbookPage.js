@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useState}from"react";
+import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
@@ -9,12 +9,13 @@ import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 import{getC2WritingFormat}from"../data/c2WritingFormats";
 import{getC2ReadingPractice}from"../data/c2ReadingPractice";
-import{getC2ListeningPractice}from"../data/c2ListeningPractice";
+import{getC2ListeningPractice,hasC2ListeningSource}from"../data/c2ListeningPractice";
 import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel,getC2SpeakingSupport,getC2SpeakingSupportNote}from"../data/c2SkillCycle";
 import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
 import{useC2CourseProgress}from"../hooks/useC2CourseProgress";
 import{useAuth}from"../context/AuthContext";
 import{markLetterWithAI}from"../services/coachService";
+import{fetchC2AudioPlaybackUrl}from"../services/c2AudioService";
 import WritingFeedbackCard from"./WritingFeedbackCard";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
@@ -236,13 +237,77 @@ const youtubeEmbedUrl=(url)=>{
 };
 
 function ListeningPractice({day,completed,onCompleteChange}){
+ const{idToken}=useAuth();
  const practice=getC2ListeningPractice(day);
+ const audioKey=String(practice?.audioKey||"").trim();
  const audioUrl=String(practice?.audioUrl||"").trim();
- const embed=youtubeEmbedUrl(audioUrl);
+ const hasSource=hasC2ListeningSource(practice);
+ const embed=!audioKey?youtubeEmbedUrl(audioUrl):"";
+ const[signedAudioUrl,setSignedAudioUrl]=useState("");
+ const[audioState,setAudioState]=useState(audioKey?"loading":"idle");
+ const[audioError,setAudioError]=useState("");
+ const[refreshNonce,setRefreshNonce]=useState(0);
+ const retryRef=useRef(0);
+
+ useEffect(()=>{
+  let cancelled=false;
+  if(!audioKey){
+   setSignedAudioUrl("");
+   setAudioState("idle");
+   setAudioError("");
+   return()=>{cancelled=true};
+  }
+  if(!idToken){
+   setSignedAudioUrl("");
+   setAudioState("error");
+   setAudioError("Bitte melden Sie sich erneut an, um das Audio abzuspielen.");
+   return()=>{cancelled=true};
+  }
+  setAudioState("loading");
+  setAudioError("");
+  fetchC2AudioPlaybackUrl({day,key:audioKey,idToken})
+   .then(({url})=>{
+    if(cancelled)return;
+    setSignedAudioUrl(url);
+    setAudioState("ready");
+   })
+   .catch((error)=>{
+    if(cancelled)return;
+    setSignedAudioUrl("");
+    setAudioState("error");
+    setAudioError(error?.response?.data?.error||error?.message||"Das Audio konnte nicht geladen werden.");
+   });
+  return()=>{cancelled=true};
+ },[day,audioKey,idToken,refreshNonce]);
+
+ const refreshAudio=()=>{
+  retryRef.current=0;
+  setRefreshNonce(value=>value+1);
+ };
+ const handleAudioError=()=>{
+  if(!audioKey)return;
+  if(retryRef.current<1){
+   retryRef.current+=1;
+   setRefreshNonce(value=>value+1);
+   return;
+  }
+  setAudioState("error");
+  setAudioError("Das Audio konnte nicht abgespielt werden. Bitte laden Sie es erneut.");
+ };
+ const handleCanPlay=()=>{
+  retryRef.current=0;
+  setAudioState("ready");
+  setAudioError("");
+ };
+
  if(!practice)return <Section title="Hören"><p style={{margin:0}}>Für diesen Tag ist keine Hörübung vorgesehen.</p></Section>;
  return <Section title={`Hören · ${practice.title}`}>
-  {!audioUrl?<div data-c2-listening-awaiting-source="true" style={{...sub,background:"#fffbeb",borderColor:"#fde68a"}}><strong>Hörquelle wird ergänzt</strong><span>Für dieses Thema ist noch kein Audio- oder YouTube-Link eingetragen. Es werden bewusst noch keine Fragen angezeigt. Die Fragen werden erst aus dem tatsächlichen Transkript erstellt, damit sie genau zum Hörtext passen.</span></div>:<>
-   {embed?<div style={{position:"relative",paddingTop:"56.25%",borderRadius:14,overflow:"hidden",background:"#0f172a"}}><iframe title={`C2 Day ${day} Hören`} src={embed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}}/></div>:<a href={audioUrl} target="_blank" rel="noreferrer" style={styles.secondaryButton}>Hörquelle öffnen</a>}
+  {!hasSource?<div data-c2-listening-awaiting-source="true" style={{...sub,background:"#fffbeb",borderColor:"#fde68a"}}><strong>Hörquelle wird ergänzt</strong><span>Für dieses Thema ist noch kein Audio- oder YouTube-Link eingetragen. Es werden bewusst noch keine Fragen angezeigt. Die Fragen werden erst aus dem tatsächlichen Transkript erstellt, damit sie genau zum Hörtext passen.</span></div>:<>
+   {audioKey?<>
+    {audioState==="loading"?<div style={{...sub,background:"#eff6ff"}}><strong>Audio wird geladen …</strong><span>Falowen bereitet die geschützte Hördatei für die Wiedergabe vor.</span></div>:null}
+    {signedAudioUrl?<div style={{...sub,background:"#fff"}}><strong>Hörtext</strong><audio data-c2-r2-audio="true" controls preload="metadata" src={signedAudioUrl} onError={handleAudioError} onCanPlay={handleCanPlay} style={{width:"100%"}}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{color:"#64748b",fontSize:13}}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div>:null}
+    {audioState==="error"?<div data-c2-audio-error="true" style={{...sub,background:"#fff7f7",borderColor:"#fecaca"}}><strong>Audio momentan nicht verfügbar</strong><span>{audioError}</span><div><button type="button" onClick={refreshAudio} style={styles.secondaryButton}>Audio erneut laden</button></div></div>:null}
+   </>:embed?<div style={{position:"relative",paddingTop:"56.25%",borderRadius:14,overflow:"hidden",background:"#0f172a"}}><iframe title={`C2 Day ${day} Hören`} src={embed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}}/></div>:<div style={{...sub,background:"#fff"}}><strong>Hörtext</strong><audio controls preload="metadata" src={audioUrl} style={{width:"100%"}}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio></div>}
    <div style={{...sub,background:"#eff6ff"}}><strong>Noch keine Verständnisfragen</strong><span>Die Fragen werden ergänzt, sobald das Transkript der endgültigen Aufnahme vorliegt.</span></div>
    <label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)} style={{marginTop:4}}/>Ich habe den vollständigen Hörtext aufmerksam gehört.</label>
   </>}
@@ -312,7 +377,7 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const skillFocus=getC2SkillFocus(day);
  const skillLabel=getC2SkillLabel(day);
  const listening=getC2ListeningPractice(day);
- const listeningAvailable=Boolean(String(listening?.audioUrl||"").trim());
+ const listeningAvailable=hasC2ListeningSource(listening);
  const{byDay:c2CourseProgress}=useC2CourseProgress({enabled:true});
  const cycleStart=day%4===0?day-3:null;
  const cycleDays=cycleStart?Array.from({length:4},(_,index)=>cycleStart+index):[];
