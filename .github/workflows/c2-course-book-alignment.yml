@@ -22,6 +22,9 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Install web dependencies
         run: npm --prefix web ci
-      - name: Run C2 alignment regression tests
+      - name: Run C2 alignment and rotating-skill regression tests
         working-directory: web
-        run: npx jest src/data/c2LessonContentAlignment.test.js --runInBand
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/data/c2LessonContentAlignment.test.js
+          src/components/C2UnifiedGuidedWorkbookPage.test.js
