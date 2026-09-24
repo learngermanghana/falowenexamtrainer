@@ -3,6 +3,7 @@ import { collection, db, onSnapshot } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { C2_SKILL_DAYS, getC2SkillFocus } from "../data/c2SkillCycle";
 import { getC2ListeningPractice } from "../data/c2ListeningPractice";
+import { getC2ReadingPractice } from "../data/c2ReadingPractice";
 
 export const buildC2DayProgress = (day, data = {}) => {
   const progress = data?.progress && typeof data.progress === "object" ? data.progress : {};
@@ -35,7 +36,17 @@ export const buildC2DayProgress = (day, data = {}) => {
     dayComplete,
     confidence: String(progress.confidence || ""),
     waitingForListeningSource: skillFocus === "hoeren" && !listeningAvailable,
-    readingFirstAttemptScore: data?.readingFirstAttemptScore || null,
+    readingFirstAttemptScore: (() => {
+      const practice = getC2ReadingPractice(day);
+      const firstAttempts = data?.readingFirstAttempts && typeof data.readingFirstAttempts === "object"
+        ? data.readingFirstAttempts
+        : {};
+      if (!practice?.questions?.length) return null;
+      const answered = practice.questions.filter((_, index) => Number.isInteger(firstAttempts[index])).length;
+      if (!answered) return null;
+      const correct = practice.questions.filter((question, index) => firstAttempts[index] === question.answerIndex).length;
+      return { correct, answered, total: practice.questions.length };
+    })(),
   };
 };
 
