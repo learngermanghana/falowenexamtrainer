@@ -95,11 +95,15 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss.");
   });
 
-  test("keeps Hören transcript-first with empty sources and no invented questions", () => {
+  test("keeps Hören transcript-first while enabling only uploaded sources", () => {
     C2_SKILL_DAYS.hoeren.forEach((day) => {
       const listening = getC2ListeningPractice(day);
       expect(listening).toBeTruthy();
-      expect(listening.audioKey).toBe("");
+      if (day === 2) {
+        expect(listening.audioKey).toBe("c2/day-02/day-02.m4a");
+      } else {
+        expect(listening.audioKey).toBe("");
+      }
       expect(listening.audioUrl).toBe("");
       expect(listening.transcript).toBe("");
       expect(listening.questions).toBeUndefined();
