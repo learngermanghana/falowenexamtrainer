@@ -117,119 +117,46 @@ describe("requested lesson media mappings", () => {
     );
   });
 
-  test("maps B2 Day 6 Chapter 2.1 to the requested Falowen Radio while preserving its AI video", () => {
-    expect(B2_C1_LESSON_RADIO_OVERRIDES.B2[6]).toEqual(
-      expect.objectContaining({
-        key: "b2-day6-migration-integration-falowen-radio",
-        title: "Migration und Integration 2.1",
-        youtubeId: "LjxT4I6BmFw",
-      }),
-    );
+  test("keeps B2 Falowen Radio slots but clears their old YouTube IDs", () => {
+    Object.values(B2_C1_LESSON_RADIO_OVERRIDES.B2).forEach((resource) => {
+      expect(resource.key).toContain("b2-day");
+      expect(resource.youtubeId).toBe("");
+    });
 
-    const b2Day6 = normalizeB2C1Lesson(
-      { level: "B2", day: 6, chapter: "2.1", title: "Migration und Integration" },
+    const b2Day11 = normalizeB2C1Lesson(
+      { level: "B2", day: 11, chapter: "3.1", title: "Gesellschaft und Integration" },
       "B2",
     );
-
-    expect(b2Day6.resources.falowenRadio).toEqual(
+    expect(b2Day11.resources.falowenRadio).toEqual(
       expect.objectContaining({
-        key: "b2-day6-migration-integration-falowen-radio",
-        youtubeId: "LjxT4I6BmFw",
+        key: "b2-day11-gesellschaft-integration-falowen-radio",
+        youtubeId: "",
       }),
     );
-    expect(b2Day6.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        key: "b2-day6-migration-integration-ai-video",
-        chapter: "2.1",
-        url: "https://youtu.be/LORxwfzaAyU",
-      }),
-    );
-    expect(b2Day6.resources.aiVideo.url).not.toContain("LjxT4I6BmFw");
-    expect(b2Day6.resources.falowenRadio.youtubeId).not.toBe("LORxwfzaAyU");
   });
 
-  test("maps B2 Day 8 and Day 9 to the requested Falowen Radio videos without replacing AI video ownership", () => {
-    const b2Day8 = normalizeB2C1Lesson(
-      { level: "B2", day: 8, chapter: "2.3", title: "Reisen und Mobilität" },
-      "B2",
-    );
-    const b2Day9 = normalizeB2C1Lesson(
-      { level: "B2", day: 9, chapter: "2.4", title: "Wohnen und Nachbarschaft" },
-      "B2",
-    );
+  test("keeps B2 lesson-video slots but clears old grammar video URLs", () => {
+    Object.values(B2_C1_LESSON_VIDEO_OVERRIDES.B2).forEach((dayConfig) => {
+      dayConfig.videoResources.forEach((resource) => {
+        expect(resource.key).toContain("b2-day");
+        expect(resource.url).toBe("");
+      });
+    });
 
-    expect(b2Day8.resources.falowenRadio).toEqual(
-      expect.objectContaining({
-        key: "b2-day8-reisen-mobilitaet-falowen-radio",
-        youtubeId: "hxB5dwtbo6Q",
-      }),
-    );
-    expect(b2Day8.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        key: "b2-day8-reisen-mobilitaet-ai-video",
-        chapter: "2.3",
-        url: "https://youtu.be/RjRBspPCmCY",
-      }),
-    );
-    expect(b2Day8.resources.aiVideo.url).not.toContain("hxB5dwtbo6Q");
-
-    expect(b2Day9.resources.falowenRadio).toEqual(
-      expect.objectContaining({
-        key: "b2-day9-wohnen-nachbarschaft-falowen-radio",
-        youtubeId: "kVvR1zgJE-s",
-      }),
-    );
-    expect(b2Day9.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        key: "b2-day9-wohnen-nachbarschaft-ai-video",
-        chapter: "2.4",
-        url: "https://youtu.be/-JeT2wS94uk",
-      }),
-    );
-    expect(b2Day9.resources.aiVideo.url).not.toContain("kVvR1zgJE-s");
-  });
-
-  test("adds the approved B2 Day 8 Chapter 2.3 AI video to the lesson dictionary", () => {
     const dictionary = { B2: {}, C1: {} };
     applyB2C1LessonVideoOverrides(dictionary);
+    Object.values(dictionary.B2).forEach((dayConfig) => {
+      dayConfig.videoResources.forEach((resource) => expect(resource.url).toBe(""));
+    });
 
-    expect(dictionary.B2[8].videoResources).toContainEqual(
-      expect.objectContaining({
-        key: "b2-day8-reisen-mobilitaet-ai-video",
-        chapter: "2.3",
-        url: "https://youtu.be/RjRBspPCmCY",
-      }),
+    const b2Day10 = normalizeB2C1Lesson(
+      { level: "B2", day: 10, chapter: "2.5", title: "Konsum und Geld" },
+      "B2",
     );
+    expect(b2Day10.resources.aiVideo).toBeNull();
   });
 
-  test("maps the requested B2 Day 9 and Day 12 AI videos to the correct chapters", () => {
-    const dictionary = { B2: {}, C1: {} };
-    applyB2C1LessonVideoOverrides(dictionary);
-
-    expect(dictionary.B2[9].videoResources[0]).toEqual(
-      expect.objectContaining({
-        key: "b2-day9-wohnen-nachbarschaft-ai-video",
-        chapter: "2.4",
-        url: "https://youtu.be/-JeT2wS94uk",
-      }),
-    );
-    expect(dictionary.B2[12].videoResources[0]).toEqual(
-      expect.objectContaining({
-        key: "b2-day12-kultur-freizeit-ai-video",
-        chapter: "3.2",
-        url: "https://youtu.be/foXp2VHEf1I",
-      }),
-    );
-  });
-
-  test("maps B2 Day 10 and C1 Day 14 to the requested AI videos without changing Radio ownership", () => {
-    expect(B2_C1_LESSON_VIDEO_OVERRIDES.B2[10].videoResources[0]).toEqual(
-      expect.objectContaining({
-        key: "b2-day10-konsum-geld-ai-video",
-        chapter: "2.5",
-        url: "https://youtu.be/vRgpiPZ5AAw",
-      }),
-    );
+  test("does not change the approved C1 Day 14 AI video", () => {
     expect(B2_C1_LESSON_VIDEO_OVERRIDES.C1[14].videoResources[0]).toEqual(
       expect.objectContaining({
         key: "c1-day14-innovation-zukunft-ai-video",
@@ -238,59 +165,12 @@ describe("requested lesson media mappings", () => {
       }),
     );
 
-    const b2Day10 = normalizeB2C1Lesson(
-      { level: "B2", day: 10, chapter: "2.5", title: "Konsum und Geld" },
-      "B2",
-    );
     const c1Day14 = normalizeB2C1Lesson(
       { level: "C1", day: 14, chapter: "3.4", title: "Innovation und Zukunft" },
       "C1",
     );
-
-    expect(b2Day10.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        chapter: "2.5",
-        url: "https://youtu.be/vRgpiPZ5AAw",
-      }),
-    );
     expect(c1Day14.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        chapter: "3.4",
-        url: "https://youtu.be/GEQNr4JedlM",
-      }),
+      expect.objectContaining({ url: "https://youtu.be/GEQNr4JedlM" }),
     );
-    expect(b2Day10.resources.falowenRadio).toBeNull();
-    expect(c1Day14.resources.falowenRadio).toBeNull();
-  });
-
-  test("maps B2 Day 11 Chapter 3.1 to the requested AI video while preserving Falowen Radio", () => {
-    expect(B2_C1_LESSON_VIDEO_OVERRIDES.B2[11].videoResources[0]).toEqual(
-      expect.objectContaining({
-        key: "b2-day11-gesellschaft-integration-ai-video",
-        chapter: "3.1",
-        url: "https://youtu.be/TC85wRlhtCc",
-      }),
-    );
-
-    const b2Day11 = normalizeB2C1Lesson(
-      { level: "B2", day: 11, chapter: "3.1", title: "Gesellschaft und Integration" },
-      "B2",
-    );
-
-    expect(b2Day11.resources.aiVideo).toEqual(
-      expect.objectContaining({
-        key: "b2-day11-gesellschaft-integration-ai-video",
-        chapter: "3.1",
-        url: "https://youtu.be/TC85wRlhtCc",
-      }),
-    );
-    expect(b2Day11.resources.falowenRadio).toEqual(
-      expect.objectContaining({
-        key: "b2-day11-gesellschaft-integration-falowen-radio",
-        youtubeId: "AWEHnJd1o3M",
-      }),
-    );
-    expect(b2Day11.resources.aiVideo.url).not.toContain("AWEHnJd1o3M");
-    expect(b2Day11.resources.falowenRadio.youtubeId).not.toBe("TC85wRlhtCc");
   });
 });
