@@ -123,8 +123,8 @@ const createC2AudioSignedUrl = async ({
   const region = "auto";
   const service = "s3";
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-  const host = `${config.accountId}.r2.cloudflarestorage.com`;
-  const canonicalUri = `/${encodePath(config.bucket)}/${encodePath(validated.key)}`;
+  const host = `${config.bucket}.${config.accountId}.r2.cloudflarestorage.com`;
+  const canonicalUri = `/${encodePath(validated.key)}`;
 
   const queryEntries = [
     ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
