@@ -1,0 +1,41 @@
+name: B2 unified course
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/B2UnifiedGuidedWorkbookPage.js"
+      - "web/src/components/B2UnifiedGuidedWorkbookPage.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/StandardWorkbookComponents.js"
+      - "web/src/data/b2SkillCycle.js"
+      - "web/src/data/b2ListeningPractice.js"
+      - "web/src/serviceWorkerRegistration.js"
+      - "web/public/firebase-messaging-sw.js"
+      - "web/src/__tests__/ServiceWorkerBuildAssetSafety.test.js"
+      - ".github/workflows/b2-unified-course.yml"
+
+jobs:
+  b2-unified:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Test B2 rotating course and C2 navigation regression
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/components/B2UnifiedGuidedWorkbookPage.test.js
+          src/components/C2UnifiedGuidedWorkbookPage.test.js
+          src/__tests__/ServiceWorkerBuildAssetSafety.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build
