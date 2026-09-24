@@ -74,19 +74,9 @@ test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", ()
   ),
 );
 
-test.each([
-  [1, "Persönliche Identität und Selbstverständnis"],
-  [2, "Beziehungen und Kommunikation"],
-  [3, "Öffentliches Leben vs. Privatsphäre"],
-  [4, "Bildung und Lernen"],
-  [27, "Prüfungstraining: Argumentieren und Reagieren 6.2"],
-])("B2 Day %i keeps the Falowen Radio slot with no old YouTube ID", (day, title) =>
-  expect(getLessonRadioResource("B2", day)).toEqual(
-    expect.objectContaining({
-      title,
-      youtubeId: "",
-    }),
-  ),
+test.each([1, 2, 3, 4, 27])(
+  "B2 Day %i no longer exposes a retired Falowen Radio slot",
+  (day) => expect(getLessonRadioResource("B2", day)).toBeNull(),
 );
 
 test("C1 Day 2 Kultur und Identität radio remains available", () =>
