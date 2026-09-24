@@ -13,11 +13,6 @@ import C1LastGuidedLessonPage from "./C1Day27To28GuidedLessonPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
 import { C1_DAY3_RADIO_OVERRIDE } from "../data/c1Day3RadioOverride";
 
-const B2_DAY2_GRAMMAR_ROUTE = "/campus/course/lesson/B2/2?view=grammar";
-const B2_DAY2_WORKBOOK_ROUTE = "/campus/course/lesson/B2/2?view=workbook";
-const B2_DAY3_GRAMMAR_ROUTE = "/campus/course/lesson/B2/3?view=grammar";
-const B2_DAY3_WORKBOOK_ROUTE = "/campus/course/lesson/B2/3?view=workbook";
-
 export const shouldMountMarkMyLetter = () => false;
 
 export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
@@ -26,11 +21,23 @@ export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
   if (level === "C1" && day === 3) {
     return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), falowenRadio: C1_DAY3_RADIO_OVERRIDE } };
   }
-  if (level === "B2" && (day === 2 || day === 3)) {
-    const grammarRoute = day === 2 ? B2_DAY2_GRAMMAR_ROUTE : B2_DAY3_GRAMMAR_ROUTE;
-    const workbookRoute = day === 2 ? B2_DAY2_WORKBOOK_ROUTE : B2_DAY3_WORKBOOK_ROUTE;
-    const chapter = day === 2 ? "1.2" : "1.3";
-    return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), grammarBook: { url: grammarRoute }, workbook: { url: workbookRoute }, resourceGroups: [{ chapter, grammarBook: { url: grammarRoute }, workbook: { url: workbookRoute } }] } };
+  if (level === "B2" && day >= 1 && day <= 28) {
+    const resources = canonicalLesson?.resources || {};
+    const resourceGroups = Array.isArray(resources.resourceGroups)
+      ? resources.resourceGroups.map((group) => ({ ...group, grammarBook: null }))
+      : resources.resourceGroups;
+    return {
+      ...(canonicalLesson || {}),
+      resources: {
+        ...resources,
+        falowenRadio: null,
+        grammarBook: null,
+        teacherVideo: null,
+        aiVideo: null,
+        videos: [],
+        resourceGroups,
+      },
+    };
   }
   return canonicalLesson;
 };
@@ -101,4 +108,4 @@ export default function StandardLessonWritingCoachPage({ lesson, canonicalLesson
   return <div ref={rootRef}><LessonPage lesson={lesson} canonicalLesson={resolvedCanonicalLesson} /></div>;
 }
 
-export const __TESTING__ = { B2_DAY2_GRAMMAR_ROUTE, B2_DAY2_WORKBOOK_ROUTE, B2_DAY3_GRAMMAR_ROUTE, B2_DAY3_WORKBOOK_ROUTE, viewButtonLabel };
+export const __TESTING__ = { viewButtonLabel };
