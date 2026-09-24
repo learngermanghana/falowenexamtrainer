@@ -194,7 +194,7 @@ const getCourseTaskInstruction = (submissionContext) => {
     .trim()
     .slice(0, 180);
   return task
-    ? `Exact course task: ${task}. Judge task completion, greeting, pronouns, tone and closing against this exact register. Do not mark a formal task as informal or an informal task as formal.`
+    ? `Exact course task: ${task}. Judge task completion, organisation, register and required text type against this exact task. For correspondence, also check greeting, pronouns and closing. For essays or argumentative texts, do not require letter conventions.`
     : "";
 };
 
