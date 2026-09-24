@@ -56,13 +56,9 @@ home = home.replace(
 });
 
 // Keep access and navigation help visible on Home without duplicating learning actions.
-const guideStartMarker = "const CompactCourseGuide = (";
-const guideEndMarker = "\n\nconst AnnouncementSection =";
-const guideStart = generalHome.indexOf(guideStartMarker);
-const guideEnd = generalHome.indexOf(guideEndMarker, guideStart);
-if (guideStart === -1 || guideEnd === -1) {
-  throw new Error("Could not locate the Home course guide block.");
-}
+const homeGuideAlreadyOpen =
+  generalHome.includes('data-home-course-access-guide="open"') &&
+  generalHome.includes("Course access and navigation");
 
 const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey }) => {
   const className = studentProfile?.className || "Not assigned yet";
@@ -107,7 +103,19 @@ const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey 
   );
 };`;
 
-generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
+if (!homeGuideAlreadyOpen) {
+  const guideStartMarker = "const CompactCourseGuide = (";
+  const guideStart = generalHome.indexOf(guideStartMarker);
+  const announcementEnd = generalHome.indexOf("\n\nconst AnnouncementSection =", guideStart);
+  const generalHomeEnd = generalHome.indexOf("\n\nconst GeneralHome = (", guideStart);
+  const guideEnd = announcementEnd >= 0 ? announcementEnd : generalHomeEnd;
+  if (guideStart === -1 || guideEnd === -1) {
+    throw new Error("Could not locate the Home course guide block.");
+  }
+  generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
+} else {
+  console.log("Home course access/navigation guide is already permanently open; legacy guide rewrite skipped.");
+}
 
 [
   "Expand course guide, access and navigation help",
