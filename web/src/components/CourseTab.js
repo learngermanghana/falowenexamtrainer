@@ -1028,7 +1028,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   <div style={courseBookStyles.statCard}>
                     <p style={courseBookStyles.statLabel}>Mastery</p>
                     <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>
-                      {courseCompletion?.masteryAvailable ? `${courseCompletion.masteryPercent ?? 0}% passed` : "Self-learning"}
+                      {courseCompletion.masteryAvailable ? `${courseCompletion.masteryPercent ?? 0}% passed` : "Self-learning"}
                     </p>
                   </div>
                 </>
