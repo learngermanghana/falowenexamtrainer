@@ -23,6 +23,8 @@ on:
       - "web/src/data/writingVideoResources.js"
       - "web/src/data/writingVideoResources.test.js"
       - "web/src/data/writingVideoResources.b2Day4.test.js"
+      - "web/src/data/courseSchedule.js"
+      - "web/src/data/lessonCatalog.js"
       - "web/src/services/b2AudioService.js"
       - "web/src/utils/b2CloudDraftSync.js"
       - "functions/functionz/r2CourseAudio.js"
@@ -79,3 +81,6 @@ jobs:
       - name: Test B2 and C2 private R2 signing
         working-directory: functions
         run: npx jest --runInBand functionz/__tests__/r2CourseAudio.test.js
+      - name: Check backend route syntax
+        working-directory: functions
+        run: node --check functionz/app.js
