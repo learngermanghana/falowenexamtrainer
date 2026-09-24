@@ -18,8 +18,8 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       <Suspense fallback={<p style={{ margin: 0 }}>Loading grammar notes…</p>}>
         <LazyA2B1GrammarNotesContent level={level} day={day} />
       </Suspense>
-      {normalizedLevel === "A2" ? <A2SecondStageGrammarUpgrade day={numericDay} /> : null}
-      {showA2Collocations ? <A2TopicCollocationPractice day={numericDay} /> : null}
+      {normalizedLevel === "A2" && numericDay !== 4 ? <A2SecondStageGrammarUpgrade day={numericDay} /> : null}
+      {showA2Collocations && numericDay !== 4 ? <A2TopicCollocationPractice day={numericDay} /> : null}
     </>
   );
 };
