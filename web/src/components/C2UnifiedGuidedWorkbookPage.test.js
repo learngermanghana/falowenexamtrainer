@@ -99,6 +99,7 @@ describe("C2 unified topic-first workbook", () => {
     C2_SKILL_DAYS.hoeren.forEach((day) => {
       const listening = getC2ListeningPractice(day);
       expect(listening).toBeTruthy();
+      expect(listening.audioKey).toBe("");
       expect(listening.audioUrl).toBe("");
       expect(listening.transcript).toBe("");
       expect(listening.questions).toBeUndefined();
@@ -106,6 +107,9 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("Es werden bewusst noch keine Fragen angezeigt.");
     expect(page).toContain("Die Fragen werden erst aus dem tatsächlichen Transkript erstellt");
     expect(page).toContain("Hören source is still pending and does not block completion.");
+    expect(page).toContain('data-c2-r2-audio="true"');
+    expect(page).toContain("fetchC2AudioPlaybackUrl");
+    expect(page).toContain("Die Aufnahme wird direkt hier in Falowen abgespielt.");
   });
 
   test("reduces speaking support deliberately across the seven speaking days", () => {
