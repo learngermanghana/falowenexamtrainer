@@ -33,10 +33,44 @@ const B2_TOPIC_FOUNDATIONS = Object.freeze({
   28: { intro: "Die B2-Prüfung verlangt, bekannte Themen flexibel miteinander zu verbinden. Entscheidend ist nicht, möglichst kompliziert zu klingen, sondern klare Argumente, passende Beispiele und sichere Strukturen zu verwenden.", example: "Bei einem Thema über KI im Beruf verbindet eine gute Antwort Ursache, Folge, Gegenargument, Beispiel und eine realistische Lösung.", tension: "sprachliche Komplexität ↔ Klarheit und kontrollierte Argumentation", question: "Welche B2-Strukturen kannst du sicher genug einsetzen, ohne den Satz zu verlieren?" },
 });
 
+const B2_TOPIC_ENGLISH_FOUNDATIONS = Object.freeze({
+  1: "Everyday waste comes from packaging, disposable products and unplanned purchases. Waste prevention starts before you throw something away: use products longer, choose reusable options, repair items, and buy only what you really need.",
+  2: "Sorting waste is only one part of recycling. The key question is whether materials can be collected, sorted, reused or turned into new products. A circular economy tries to keep raw materials in use for as long as possible.",
+  3: "Food waste happens in homes, shops and restaurants. Food is often thrown away even when it is still edible. Better planning, suitable portion sizes and redistribution can reduce unnecessary waste.",
+  4: "Packaging protects products, but it also creates a lot of waste. Conscious shopping means thinking about single-use versus reusable packaging, unnecessary wrapping, material choice and practical alternatives.",
+  5: "Sustainable mobility does not mean that one form of transport is always best. Distance, infrastructure, cost, time and emissions all matter. Good transport choices often combine several options.",
+  6: "Saving energy concerns households, companies and government. It also includes expanding renewable energy such as solar and wind. Using less energy and producing cleaner energy solve different parts of the same problem.",
+  7: "Climate-friendly housing is about buildings, energy use and the way cities are designed. Good insulation, green spaces, short distances and less sealed land can improve quality of life while also protecting the climate.",
+  8: "Educational fairness does not mean that every learner receives exactly the same support. Some learners need extra help, equipment or financial support so that unequal starting points do not become permanent disadvantages.",
+  9: "Compulsory schooling creates a shared educational framework. Schools must also assess performance, support weaker learners and take responsibility for progress. The debate is often about how much pressure is useful and what fair support should look like.",
+  10: "Kindergarten provides childcare and early education at the same time. Children develop language, social skills and independence, while parents can organize work and family life more easily. Quality depends strongly on staff, group size and educational support.",
+  11: "Digital tools can support teaching, but technology alone does not automatically improve learning. Platforms, videos and online exercises are most useful when they are used purposefully and learners develop media literacy.",
+  12: "University study and further training create opportunities, but they also cost money for learners and society. Debates about fees concern funding, access and who should contribute, while lifelong learning becomes more important as jobs change.",
+  13: "Science and research influence medicine, technology, the environment and everyday life. It is important not only to know a result, but also to understand how it was produced, what its limits are and what practical benefit it really shows.",
+  14: "Misinformation can sound convincing because real facts are mixed with false conclusions or unclear sources. Reliable information is easier to recognize when sources are traceable, data can be checked and the context is transparent.",
+  15: "Housing shortages and high rents are strongest where many people want to live but affordable housing is limited. Possible responses include new construction, subsidies, better use of existing housing and rules for the rental market.",
+  16: "Cities and rural areas offer different kinds of quality of life. Cities often have stronger infrastructure and shorter distances, while rural areas can offer more space and quiet. The key question is which services are actually accessible.",
+  17: "Balancing family and work becomes easier when childcare, working hours and responsibilities fit together. Problems arise when childcare opening times and work schedules do not match.",
+  18: "A shortage of skilled workers means that employers cannot fill enough jobs with qualified people. Training, apprenticeships, recognition of foreign qualifications and better working conditions can all be part of the solution.",
+  19: "Working from home can reduce commuting and make work more flexible, but constant digital availability can blur the boundary between work and free time. Clear rules and real recovery time are therefore important.",
+  20: "Social media combines private self-presentation with public visibility. Photos, opinions and personal data can be forwarded, stored and judged later in ways the user did not originally expect.",
+  21: "AI can explain, organize and generate ideas for learning. In school and university, learners still need to check sources, identify AI use where required and understand the work they submit.",
+  22: "Automation usually changes individual tasks before it replaces entire jobs. Routine work may disappear while new tasks and skills emerge. Fair change depends on preparing workers early enough.",
+  23: "Personalized advertising often uses browsing behavior, searches and interest profiles. Ads may become more relevant, but platforms also collect and analyze a large amount of personal data.",
+  24: "Telemedicine can reduce travel and improve access, especially for advice and follow-up questions. It cannot replace every physical examination, and sensitive health data needs strong protection.",
+  25: "Tourism creates income and jobs, but it can also put pressure on places through traffic, high prices and large visitor numbers. Sustainable tourism tries to balance economic benefit with environmental protection and local quality of life.",
+  26: "Integration is a long-term process. Language helps people access work, education, public services and social contact, but recognition of qualifications and fair participation are also important.",
+  27: "Equality means that people should have fair opportunities and rights. Discrimination can be direct or can result from procedures that systematically disadvantage some groups, so both rules and practical measures are needed.",
+  28: "The B2 exam requires learners to connect familiar topics flexibly. The goal is not to sound as complicated as possible, but to use clear arguments, suitable examples and reliable language structures.",
+});
+
+
 export const getB2TopicFoundation = (day) => {
-  const content = B2_TOPIC_FOUNDATIONS[Number(day)] || null;
+  const numericDay = Number(day);
+  const content = B2_TOPIC_FOUNDATIONS[numericDay] || null;
+  const englishIntro = B2_TOPIC_ENGLISH_FOUNDATIONS[numericDay] || "";
   const lesson = getB2LessonContentAlignment(day);
-  return content && lesson ? { ...content, day: Number(day), chapter: lesson.chapter, title: lesson.title } : null;
+  return content && lesson ? { ...content, englishIntro, day: numericDay, chapter: lesson.chapter, title: lesson.title } : null;
 };
 
 const box = {
@@ -60,11 +94,24 @@ export default function B2TopicIntroduction({ day, mode = "learn" }) {
       data-b2-topic-intro={topic.day}
     >
       <div>
-        <div style={{ fontWeight: 900, color: "#1d4ed8" }}>{reviewMode ? "B2 · Thema wiederholen" : "B2 · Thema kurz verstehen"}</div>
+        <div style={{ fontWeight: 900, color: "#1d4ed8" }}>{reviewMode ? "B2 · Thema wiederholen" : "B2 · Thema zuerst verstehen"}</div>
         <h2 style={{ margin: "4px 0 0", fontSize: "1.2rem" }}>{topic.title}</h2>
+        {!reviewMode ? (
+          <p style={{ margin: "7px 0 0", color: "#475569", lineHeight: 1.65 }}>
+            First understand what the topic means and what the main issue is. Then use the B2 grammar to express those ideas clearly.
+          </p>
+        ) : null}
       </div>
 
-      <p style={{ margin: 0, lineHeight: 1.75 }}>{topic.intro}</p>
+      <div style={{ ...box, background: "#eff6ff", borderColor: "#bfdbfe" }}>
+        <strong>In simple English</strong>
+        <span>{topic.englishIntro}</span>
+      </div>
+
+      <div style={box}>
+        <strong>Auf Deutsch</strong>
+        <span>{topic.intro}</span>
+      </div>
 
       <div style={box}>
         <strong>Konkretes Beispiel</strong>
