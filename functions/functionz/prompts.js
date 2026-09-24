@@ -204,7 +204,7 @@ const markPrompt = ({ schreibenLevel, studentName, program, submissionContext })
   const courseTaskInstruction = getCourseTaskInstruction(submissionContext);
   const language = program === "french" ? "French" : "German";
   const normalizedLevel = String(schreibenLevel || "").toUpperCase();
-  const isAdvancedGerman = program !== "french" && ["B1", "B2", "C1"].includes(normalizedLevel);
+  const isAdvancedGerman = program !== "french" && ["B1", "B2", "C1", "C2"].includes(normalizedLevel);
   const persona = program === "french"
     ? "You are a supportive French writing coach."
     : "You are Herr Felix, a supportive German letter writing trainer.";
@@ -228,17 +228,17 @@ A1/A2 German marking rules:
 - Do not label correct phrases as wrong just because a more advanced phrase exists.
 - Do not suggest "Rückmeldung" unless the task is formal or business-like.`;
   const advancedGermanRules = isAdvancedGerman ? `
-Advanced German marking rules for B1/B2/C1:
+Advanced German marking rules for B1/B2/C1/C2:
 - Before scoring, silently run a full error audit for: article/gender, case, adjective endings, plural forms, verb agreement, verb position, tense/modal construction, word order, spelling, capitalization, word choice, register, coherence and task fulfillment.
-- corrections should include the most important real errors, not just spelling. For B1/B2/C1 return 8 to 12 corrections when the draft contains enough errors.
+- corrections should include the most important real errors, not just spelling. For B1/B2/C1/C2 return 8 to 12 corrections when the draft contains enough errors.
 - Prioritize systemic grammar problems over minor spelling: verb agreement, article/case, adjective endings, noun plural, separable verbs, passive/modal passive, prepositions, and sentence structure.
 - For C1, be strict: relevant ideas alone do not justify a high score if basic grammar is unstable. If article/case/adjective endings/verb position errors are frequent, grammar should normally be 0 to 2 out of 5 and total score should normally stay below 16/25.
-- For C1, mention if the content is relevant but the language level is closer to B1/B2 than stable C1.
+- For C1, mention if the content is relevant but the language level is closer to B1/B2 than stable C1.\n- For C2, be stricter on nuance, precision, register control, cohesion, evidence strength and natural collocation. Relevant ideas alone do not justify a high score if the language lacks C2-level control.\n- For C2, explicitly identify when the text is accurate but still reads closer to C1 because nuance, idiomatic precision or register flexibility is limited.
 - mainIssues must name concrete patterns, for example "article/case errors", "verb position after dass/weil", "wrong adjective endings", "unclear pronoun reference", or "word choice/register".
 - improvedVersion should correct the full draft naturally without making it unrealistically advanced.` : "";
 
   return `${persona}
-You help students prepare for A1, A2, B1, B2, and C1 ${language} exam letters or essays.
+You help students prepare for A1, A2, B1, B2, C1, and C2 ${language} exam letters or essays.
 The student has submitted a ${schreibenLevel} ${language} letter or essay.
 Always answer in English inside the JSON string values.
 Student name: ${studentName}.
@@ -288,7 +288,7 @@ Feedback rules:
 - corrections must never include items where wrong and correct are identical.
 - If a sentence is correct but can be improved stylistically, do not put it in corrections. Put it in mainIssues or nextTask as an optional improvement.
 - For A1/A2, limit corrections to the 5 most useful actual errors.
-- For B1/B2/C1, return 8 to 12 useful actual errors when the draft contains enough errors.
+- For B1/B2/C1/C2, return 8 to 12 useful actual errors when the draft contains enough errors.
 - Prefer grammar, word order, article/case, adjective-ending, agreement and word-choice errors over optional style improvements.
 - Do not include instructions about going to "my course" or submitting lesen/horen answers.
 - ${campusInstruction}
