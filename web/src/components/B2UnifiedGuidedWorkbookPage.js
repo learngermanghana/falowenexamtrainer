@@ -225,15 +225,15 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     navigate({ pathname: location.pathname, search: params.toString() ? `?${params.toString()}` : "" }, { replace: true });
   };
 
-  if (!day || !alignment || !skillFocus) return null;
-
-  const skillDone = skillFocus === "lesen"
-    ? Boolean(progress.lesenDone)
-    : skillFocus === "hoeren"
-      ? (listeningAvailable ? Boolean(progress.hoerenDone) : true)
-      : skillFocus === "speak"
-        ? Boolean(progress.speakDone)
-        : Boolean(progress.writeDone);
+  const skillDone = !skillFocus
+    ? false
+    : skillFocus === "lesen"
+      ? Boolean(progress.lesenDone)
+      : skillFocus === "hoeren"
+        ? (listeningAvailable ? Boolean(progress.hoerenDone) : true)
+        : skillFocus === "speak"
+          ? Boolean(progress.speakDone)
+          : Boolean(progress.writeDone);
   const ready = Boolean(progress.learnDone && skillDone);
 
   useEffect(() => {
@@ -241,6 +241,8 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       setProgress((old) => ({ ...old, completedAt: new Date().toISOString() }));
     }
   }, [progress.completedAt, ready]);
+
+  if (!day || !alignment || !skillFocus) return null;
 
   return <main style={{ ...styles.container, display: "grid", gap: 18 }} data-b2-unified-day={day} data-b2-skill-focus={skillFocus}>
     <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
@@ -263,7 +265,7 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       <B2TopicIntroduction day={day} />
       <Section title="Grammar / Learn">
         <div style={{ ...sub, background: "#f8fafc" }}><strong>Grammar focus</strong><span>{alignment.grammar_topic}</span><span><strong>Goal:</strong> {alignment.goal}</span></div>
-        <B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(complete) => complete && setProgress((old) => ({ ...old, learnDone: true }))} />
+        <B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(complete) => complete && setProgress((old) => old.learnDone ? old : ({ ...old, learnDone: true }))} />
         <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700, lineHeight: 1.5 }}><input type="checkbox" checked={Boolean(progress.learnDone)} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} style={{ marginTop: 4 }} />Ich habe das Thema und den Grammatikfokus verstanden.</label>
       </Section>
     </> : null}
