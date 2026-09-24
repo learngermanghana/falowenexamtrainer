@@ -192,6 +192,13 @@ function ListeningPractice({ day, progress, setProgress }) {
   if (!practice) return null;
 
   return <Section title={`Hören · ${practice.title}`}>
+    {Array.isArray(practice.vocabulary) && practice.vocabulary.length ? <div data-b2-listening-vocabulary="true" style={{ ...sub, background: "#f8fafc", borderColor: "#cbd5e1" }}>
+      <strong>Vor dem Hören · wichtige Wörter</strong>
+      <span style={{ color: "#64748b", fontSize: 13 }}>Diese Hilfe erklärt nur die schwierigsten Begriffe. Versuchen Sie trotzdem, den Hörtext zuerst als Ganzes zu verstehen.</span>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 8 }}>
+        {practice.vocabulary.map((item) => <div key={item.de} style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 10, background: "#fff" }}><strong>{item.de}</strong><div style={{ color: "#475569", marginTop: 3 }}>{item.en}</div></div>)}
+      </div>
+    </div> : null}
     {!hasSource ? <div style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }} data-b2-listening-awaiting-source="true">
       <strong>Hörquelle wird ergänzt</strong>
       <span>Für diesen neuen B2-Hörtag ist noch keine endgültige Aufnahme eingetragen. Es werden keine alten Falowen-Radio- oder AI-Video-Inhalte wiederverwendet.</span>
