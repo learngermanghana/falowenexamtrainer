@@ -65,8 +65,8 @@ export const buildAssignmentSubmissionWordError = ({ wordCount, minimumWords, le
     const requirement = normalizedChapter === "12.3"
       ? "both letters"
       : "the letter-writing task and answers";
-    return `Your answer has ${current} word${current === 1 ? "" : "s"}. You need at least ${target} words for ${requirement}. Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
+    return `Cannot submit yet. Your answer has ${current} word${current === 1 ? "" : "s"}. This task needs at least ${target} words for ${requirement}. Add ${remaining} more word${remaining === 1 ? "" : "s"}, then press Submit assignment again.`;
   }
 
-  return `Your answer has ${current} word${current === 1 ? "" : "s"}. You need at least ${target} words. Add ${remaining} more word${remaining === 1 ? "" : "s"} before submitting.`;
+  return `Cannot submit yet. Your answer has ${current} word${current === 1 ? "" : "s"}. This task needs at least ${target} words. Add ${remaining} more word${remaining === 1 ? "" : "s"}, then press Submit assignment again.`;
 };
