@@ -24,6 +24,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Test C2 AI writing prompt contract
+        run: node functions/functionz/prompts.courseTask.test.js
       - name: Install web dependencies
         run: npm --prefix web ci
       - name: Run C2 alignment and rotating-skill regression tests
