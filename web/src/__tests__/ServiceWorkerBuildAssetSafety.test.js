@@ -10,6 +10,10 @@ const viteConfig = fs.readFileSync(
   path.join(repositoryRoot, "web/vite.config.js"),
   "utf8",
 );
+const registration = fs.readFileSync(
+  path.join(repositoryRoot, "web/src/serviceWorkerRegistration.js"),
+  "utf8",
+);
 
 describe("service worker build asset safety", () => {
   it("serves Vite versioned JavaScript and CSS bundles from the exact build cache", () => {
@@ -77,6 +81,15 @@ describe("service worker build asset safety", () => {
 
     expect(staticHandler).not.toContain("caches.match(OFFLINE_URL)");
     expect(staticHandler).toContain("return Response.error()");
+  });
+
+  it("reloads an already-open Falowen tab when a later build revision appears", () => {
+    expect(registration).toContain('const BUILD_REVISION_KEY = "falowen:loaded-build-revision"');
+    expect(registration).toContain("const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000");
+    expect(registration).toContain("checkForNewBuild");
+    expect(registration).toContain("window.sessionStorage");
+    expect(registration).toContain("window.location.reload()");
+    expect(registration).toContain('document.addEventListener("visibilitychange"');
   });
 
   it("uses the current offline cache version", () => {
