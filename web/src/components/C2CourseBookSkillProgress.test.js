@@ -3,6 +3,7 @@ import path from "path";
 import { buildC2DayProgress, summarizeC2SkillProgress } from "../hooks/useC2CourseProgress";
 import { getC2SpeakingSupport } from "../data/c2SkillCycle";
 import { getC2WritingFormat } from "../data/c2WritingFormats";
+import { C2_COURSE_BOOK_ENTRIES } from "../data/c2CourseBookEntries";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -25,6 +26,25 @@ describe("C2 Course Book skill progress", () => {
     expect(courseTab).toContain('["speak", "Sprechen"]');
     expect(courseTab).toContain('["write", "Schreiben"]');
     expect(courseTab).toContain("c2SkillSummary[key]?.completed");
+  });
+
+  test("Course Book instructions follow each day’s rotating main skill", () => {
+    expect(C2_COURSE_BOOK_ENTRIES).toHaveLength(28);
+
+    const expected = {
+      1: ["lesen", "Lesen"],
+      2: ["hoeren", "Hören"],
+      3: ["speak", "Speak"],
+      4: ["write", "Write"],
+    };
+
+    Object.entries(expected).forEach(([day, [skillFocus, skillLabel]]) => {
+      const entry = C2_COURSE_BOOK_ENTRIES.find((item) => Number(item.day) === Number(day));
+      expect(entry).toEqual(expect.objectContaining({ skillFocus, skillLabel }));
+      expect(entry.instruction).toContain(`today’s ${skillLabel} task`);
+      expect(entry.instruction).toContain("Only the assigned main skill is required for this day");
+      expect(entry.instruction).not.toContain("complete the writing task and compare your work with the model");
+    });
   });
 
   test("keeps Hören source-pending separate from course completion", () => {
