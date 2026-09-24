@@ -74,72 +74,7 @@ const WRITING_VIDEO_RESOURCES = {
       url: "https://youtu.be/1JYyJfnumig",
     },
   },
-  B2: {
-    1: {
-      key: "b2-day1-persoenliche-identitaet-writing-video",
-      title: "B2 Day 1 · Persönliche Identität · Writing explanation",
-      description:
-        "Watch this video before writing. It explains the task, the recommended structure and how to develop a clear B2 opinion text.",
-      url: "https://youtu.be/w8TaNHk-a0U",
-    },
-    2: {
-      key: "b2-day2-beziehungen-kommunikation-writing-video",
-      chapter: "1.2",
-      title: "B2 Day 2 · Beziehungen und Kommunikation · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting the B2 Day 2 text. It explains how to understand the Chapter 1.2 task, organise the response and cover every required point.",
-      url: "https://youtu.be/eozUFkeHBYc",
-    },
-    3: {
-      key: "b2-day3-oeffentliches-privates-leben-writing-video",
-      title: "B2 Day 3 · Öffentliches und privates Leben · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting your B2 text. It explains how to understand the task, structure the response and address every required point.",
-      url: "https://youtu.be/qCO2p1Ahy7U",
-    },
-    4: {
-      key: "b2-day4-bildung-lernen-writing-video",
-      chapter: "1.4",
-      title: "B2 Day 4 · Bildung und Lernen · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting the B2 Day 4 text. Use it to understand the Chapter 1.4 task, organise the response and cover every required point.",
-      url: "https://youtu.be/ltTxYa_T2xc",
-    },
-    5: {
-      key: "b2-day5-bildung-lernen-writing-video",
-      chapter: "1.5",
-      title: "B2 Day 5 · Bildung und Lernen · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting the B2 Day 5 opinion text. Use it to compare learning formats, explain why Weiterbildung matters and cover all required points clearly.",
-      url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
-    },
-    6: {
-      key: "b2-day6-migration-integration-writing-video",
-      chapter: "2.1",
-      title: "B2 Day 6 · Migration und Integration · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting the B2 Day 6 opinion text. Use it to organise the integration argument, explain difficulties, propose measures and describe their benefits clearly.",
-      url: "https://youtu.be/19WaMcKL8v4",
-    },
-    7: {
-      key: "b2-day7-gesellschaftliche-vielfalt-writing-video",
-      chapter: "2.2",
-      title: "B2 Day 7 · Gesellschaftliche Vielfalt · Schreiben explanation",
-      description:
-        "Watch this Schreiben video on the Write page before drafting the B2 Day 7 text. Use it to understand the Chapter 2.2 task, organise the response and cover every required point clearly.",
-      url: "https://youtu.be/pzvyE35CZbI",
-    },
-    12: {
-      key: "b2-day12-kultur-freizeit-letter-writing-video",
-      format: "letter",
-      title: "B2 Day 12 · Kultur und Freizeit · Brief schreiben",
-      description:
-        "Watch this Schreiben lesson before starting the task. It teaches you how to understand the letter prompt, organise the opening, cover every required point, connect your ideas and finish with an appropriate closing.",
-      badge: "Watch before writing · Letter guide",
-      heading: "Learn how to write this B2 letter",
-      url: "https://youtu.be/3xWokVVz8cs",
-    },
-  },
+  B2: {},
   C1: {
     8: {
       key: "c1-day8-wohnen-stadtentwicklung-writing-video",
