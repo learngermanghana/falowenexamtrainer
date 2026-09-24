@@ -1,8 +1,12 @@
 const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-sw.js`;
 const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
 const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const BUILD_MANIFEST_PATH = `${process.env.PUBLIC_URL || ""}/offline-build-assets.json`;
+const BUILD_REVISION_KEY = "falowen:loaded-build-revision";
+const BUILD_REVISION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 let registrationStarted = false;
+let buildRevisionTimer = null;
 
 const getLastForceRefreshAt = () => {
   try {
@@ -24,6 +28,55 @@ const markForceRefreshAt = (timestamp) => {
 const requestSkipWaiting = (worker) => {
   if (!worker || typeof worker.postMessage !== "function") return;
   worker.postMessage({ type: "SKIP_WAITING" });
+};
+
+const getLoadedBuildRevision = () => {
+  try {
+    return window.sessionStorage.getItem(BUILD_REVISION_KEY) || "";
+  } catch (error) {
+    return "";
+  }
+};
+
+const setLoadedBuildRevision = (revision) => {
+  try {
+    window.sessionStorage.setItem(BUILD_REVISION_KEY, revision);
+  } catch (error) {
+    // Build refresh still works through the service worker if storage is blocked.
+  }
+};
+
+const fetchCurrentBuildRevision = async () => {
+  const response = await fetch(BUILD_MANIFEST_PATH, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Build manifest returned ${response.status}`);
+  const payload = await response.json();
+  return typeof payload?.revision === "string" ? payload.revision.trim() : "";
+};
+
+const checkForNewBuild = async ({ reloadOnChange = true } = {}) => {
+  if (typeof window === "undefined") return false;
+  const revision = await fetchCurrentBuildRevision();
+  if (!revision) return false;
+
+  const loadedRevision = getLoadedBuildRevision();
+  if (!loadedRevision) {
+    setLoadedBuildRevision(revision);
+    return false;
+  }
+  if (loadedRevision === revision) return false;
+
+  setLoadedBuildRevision(revision);
+  if (reloadOnChange) window.location.reload();
+  return true;
+};
+
+const startBuildRevisionChecks = () => {
+  if (typeof window === "undefined" || buildRevisionTimer) return;
+  buildRevisionTimer = window.setInterval(() => {
+    checkForNewBuild().catch((error) =>
+      console.error("Falowen build revision check failed", error)
+    );
+  }, BUILD_REVISION_CHECK_INTERVAL_MS);
 };
 
 const forcePeriodicRefresh = async (registration) => {
@@ -74,7 +127,14 @@ const setupUpdateHandlers = (registration) => {
 };
 
 const setupUpdateChecks = (registration) => {
-  const runUpdate = () => registration.update().catch((error) => console.error("Service worker update check failed", error));
+  const runUpdate = async () => {
+    try {
+      await registration.update();
+      await checkForNewBuild();
+    } catch (error) {
+      console.error("Service worker/build update check failed", error);
+    }
+  };
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
@@ -95,6 +155,8 @@ const startRegistration = () => {
       setupUpdateHandlers(registration);
       setupUpdateChecks(registration);
       await registration.update();
+      await checkForNewBuild({ reloadOnChange: false });
+      startBuildRevisionChecks();
       await forcePeriodicRefresh(registration);
     })
     .catch((error) => {
@@ -133,4 +195,9 @@ export const __private__ = {
   getLastForceRefreshAt,
   markForceRefreshAt,
   startRegistration,
+  checkForNewBuild,
+  fetchCurrentBuildRevision,
+  getLoadedBuildRevision,
+  setLoadedBuildRevision,
+  startBuildRevisionChecks,
 };
