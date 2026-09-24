@@ -80,6 +80,6 @@ describe("service worker build asset safety", () => {
   });
 
   it("uses the current offline cache version", () => {
-    expect(serviceWorker).toContain('`${CACHE_PREFIX}-v14`');
+    expect(serviceWorker).toContain('`${CACHE_PREFIX}-v15`');
   });
 });
