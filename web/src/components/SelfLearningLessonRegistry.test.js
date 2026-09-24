@@ -41,37 +41,49 @@ beforeEach(() => {
 });
 
 describe("self-learning lesson Falowen Radio integration", () => {
-  test.each(["B2", "C1"])("%s lesson with a Radio entry shows the listening-only resource", (level) => {
-    renderRegisteredLesson(level, 1, radio);
+  test("B2 ignores retired Falowen Radio metadata and opens the redesigned lesson directly", () => {
+    renderRegisteredLesson("B2", 1, radio);
+
+    expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Test Radio Episode")).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Grammar" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Lesen" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Review" })).toBeInTheDocument();
+  });
+
+  test("C1 lesson with a Radio entry keeps the listening-only entrance", () => {
+    renderRegisteredLesson("C1", 1, radio);
 
     expect(screen.getByRole("heading", { name: "🎙️ Falowen Radio" })).toBeInTheDocument();
     expect(screen.getByText("Test Radio Episode")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /continue to teil/i })).toBeInTheDocument();
-    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
   });
 
-  test.each([
-    ["B2", "B2 AI lesson video: Persönliche Identität", "https://www.youtube.com/embed/HhUUkc8zgEc"],
-    ["C1", "Video explanation: Relativsätze mit Präpositionen", "https://www.youtube.com/embed/u41XmMwb5PU"],
-  ])("%s opens the lesson-owned AI video after Falowen Radio", (level, title, src) => {
-    renderRegisteredLesson(level, 1, radio);
+  test("C1 opens its lesson-owned AI video after Falowen Radio", () => {
+    renderRegisteredLesson("C1", 1, radio);
 
     fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
 
     expect(screen.getByRole("heading", { name: "AI video" })).toBeInTheDocument();
-    expect(screen.getByTitle(title)).toHaveAttribute("src", src);
-    expect(screen.queryByTitle("Test Radio Episode")).not.toBeInTheDocument();
-    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
+    expect(screen.getByTitle("Video explanation: Relativsätze mit Präpositionen")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/u41XmMwb5PU",
+    );
   });
 
-  test.each(["B2", "C1"])("%s lesson without Radio opens the lesson UI directly", (level) => {
-    renderRegisteredLesson(level, 28);
+  test("B2 lesson without Radio opens the new rotating lesson UI directly", () => {
+    renderRegisteredLesson("B2", 28);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
-    expect(screen.queryByText(/choose your learning material/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Grammar" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Write" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Review" })).toBeInTheDocument();
+  });
+
+  test("C1 lesson without Radio opens the lesson UI directly", () => {
+    renderRegisteredLesson("C1", 28);
+
+    expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
   });
 
@@ -94,16 +106,16 @@ describe("self-learning lesson Falowen Radio integration", () => {
     expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
   });
 
-  test.each([
-    ["B2", 1, "B2 Day 1 · Persönliche Identität · Writing explanation", "https://www.youtube.com/embed/w8TaNHk-a0U"],
-    ["C1", 8, "C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation", "https://www.youtube.com/embed/VdczhJS9ClY"],
-  ])("%s Day %i keeps the saved Schreiben video on the Write page", (level, day, title, src) => {
-    renderRegisteredLesson(level, day);
+  test("C1 Day 8 keeps the saved Schreiben video on the Write page", () => {
+    renderRegisteredLesson("C1", 8);
 
     fireEvent.click(screen.getByRole("button", { name: "3. Write" }));
 
     expect(screen.getByText("Watch before writing · Essay Ideas")).toBeInTheDocument();
-    expect(screen.getByTitle(title)).toHaveAttribute("src", src);
+    expect(screen.getByTitle("C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation")).toHaveAttribute(
+      "src",
+      "https://www.youtube.com/embed/VdczhJS9ClY",
+    );
   });
 
   test("A1 remains outside the B2/C1 self-learning registry and without generic Radio capability", () => {
