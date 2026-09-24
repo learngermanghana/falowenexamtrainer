@@ -15,7 +15,15 @@ assert.match(
 );
 assert.match(
   formalPrompt,
-  /Do not mark a formal task as informal or an informal task as formal\./,
+  /Judge task completion, organisation, register and required text type against this exact task\./,
+);
+assert.match(
+  formalPrompt,
+  /For correspondence, also check greeting, pronouns and closing\./,
+);
+assert.match(
+  formalPrompt,
+  /For essays or argumentative texts, do not require letter conventions\./,
 );
 
 const standardPrompt = markPrompt({
