@@ -2,9 +2,11 @@ import fs from "fs";
 import path from "path";
 import { getC2ExamStandard } from "../data/c2ExamStandardContent";
 import { getC2TopicKnowledge } from "../data/c2TopicKnowledge";
-import { getC2SkillFocus, C2_SKILL_DAYS } from "../data/c2SkillCycle";
+import { getC2SkillFocus, getC2SpeakingSupport, C2_SKILL_DAYS } from "../data/c2SkillCycle";
 import { getC2ReadingPractice } from "../data/c2ReadingPractice";
 import { getC2ListeningPractice } from "../data/c2ListeningPractice";
+import { getC2WritingFormat } from "../data/c2WritingFormats";
+import { buildC2DayProgress, summarizeC2SkillProgress } from "../hooks/useC2CourseProgress";
 
 describe("C2 unified topic-first workbook", () => {
   const page = fs.readFileSync(path.join(__dirname, "C2UnifiedGuidedWorkbookPage.js"), "utf8");
@@ -45,14 +47,21 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("The other production skills are not required today.");
   });
 
-  test("uses the full opinion-writing workspace on the seven assigned writing days", () => {
-    expect(page).toContain("buildC2OpinionWritingTemplate");
-    expect(page).toContain('!String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved');
-    expect(page).toContain("C2-Schreibvorlage ist bereits im Textfeld gespeichert");
-    expect(page).toContain("Nutzen Sie nur die Satzanfänge als Gerüst");
+  test("varies the seven substantial writing days instead of repeating one format", () => {
+    const labels = C2_SKILL_DAYS.write.map((day) => getC2WritingFormat(day, "Thema").label);
+    expect(labels).toEqual([
+      "Leserbrief",
+      "Formelle E-Mail",
+      "Argumentativer Beitrag",
+      "Zusammenfassung + Bewertung",
+      "Stellungnahme",
+      "Synthese mehrerer Positionen",
+      "Prüfungssimulation",
+    ]);
+    expect(page).toContain("getC2WritingFormat");
+    expect(page).toContain("Passende C2-Schreibvorlage ist bereits im Textfeld gespeichert");
     expect(page).toContain("Vorlage wiederherstellen");
     expect(page).toContain('active==="write"?<OpinionWrite');
-    expect(page).not.toContain('active==="write"?(standard.writeType');
   });
 
   test("only allows deep links to sections assigned to that C2 day", () => {
@@ -79,6 +88,10 @@ describe("C2 unified topic-first workbook", () => {
     });
     expect(page).toContain("Sie sehen sofort, ob sie richtig ist und warum.");
     expect(page).toContain('Richtige Antwort:');
+    expect(page).toContain('field:"readingAnswers"');
+    expect(page).toContain('field:"readingFirstAttempts"');
+    expect(page).toContain("Eine falsche erste Antwort blockiert den Abschluss nicht.");
+    expect(page).toContain("Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss.");
   });
 
   test("keeps Hören transcript-first with empty sources and no invented questions", () => {
@@ -94,10 +107,43 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("so Hören does not block this day");
   });
 
+  test("reduces speaking support deliberately across the seven speaking days", () => {
+    expect(C2_SKILL_DAYS.speak.map(getC2SpeakingSupport)).toEqual([
+      "full", "full", "keywords", "keywords", "keywords", "exam", "exam",
+    ]);
+    expect(page).toContain("Recommended support for this stage");
+  });
+
+  test("builds day completion separately from first-attempt learning scores", () => {
+    const readingDay = buildC2DayProgress(1, {
+      progress: { learnDone: true, lesenDone: true, confidence: "medium" },
+      readingFirstAttempts: { 0: 1, 1: 0, 2: 1, 3: 2, 4: 1 },
+    });
+    expect(readingDay.dayComplete).toBe(true);
+    expect(readingDay.readingFirstAttemptScore).toEqual(
+      expect.objectContaining({ answered: 5, total: 5 }),
+    );
+
+    const summary = summarizeC2SkillProgress({
+      1: readingDay,
+      3: { skillFocus: "speak", skillDone: true, dayComplete: true },
+    });
+    expect(summary.lesen.completed).toBe(1);
+    expect(summary.speak.completed).toBe(1);
+  });
+
+  test("shows a recap after each four-day cycle without adding another assignment", () => {
+    expect(page).toContain("4-day cycle recap");
+    expect(page).toContain("This is a recap only. It does not add another assignment.");
+    expect(page).toContain("day%4===0?day-3:null");
+  });
+
   test("syncs C2 progress and drafts through the signed-in account while retaining local fallback", () => {
     expect(page).toContain('field:"progress"');
     expect(page).toContain('field:"speechPlan"');
     expect(page).toContain('field:"opinionDraft"');
+    expect(page).toContain('field:"readingAnswers"');
+    expect(page).toContain('field:"readingFirstAttempts"');
     expect(page).toContain("localStorage.setItem");
 
     expect(cloudSync).toContain('doc(db, "users", user.uid, "c2Drafts"');
