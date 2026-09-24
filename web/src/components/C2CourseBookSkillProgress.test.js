@@ -48,18 +48,25 @@ describe("C2 Course Book skill progress", () => {
     });
   });
 
-  test("keeps Hören source-pending separate from course completion", () => {
+  test("keeps the source-pending completion exemption only for Hören days without audio", () => {
     const day2 = buildC2DayProgress(2, {
       progress: { learnDone: true, hoerenDone: false },
     });
+    const day6 = buildC2DayProgress(6, {
+      progress: { learnDone: true, hoerenDone: false },
+    });
 
-    expect(day2.waitingForListeningSource).toBe(true);
+    expect(day2.waitingForListeningSource).toBe(false);
     expect(day2.skillDone).toBe(false);
-    expect(day2.dayComplete).toBe(true);
+    expect(day2.dayComplete).toBe(false);
 
-    const summary = summarizeC2SkillProgress({ 2: day2 });
+    expect(day6.waitingForListeningSource).toBe(true);
+    expect(day6.skillDone).toBe(false);
+    expect(day6.dayComplete).toBe(true);
+
+    const summary = summarizeC2SkillProgress({ 2: day2, 6: day6 });
     expect(summary.hoeren.completed).toBe(0);
-    expect(summary.hoeren.waitingForSource).toBe(7);
+    expect(summary.hoeren.waitingForSource).toBe(6);
   });
 
   test("keeps first-attempt reading score informational only", () => {
