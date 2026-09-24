@@ -14,6 +14,7 @@ import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
+import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
@@ -813,6 +814,21 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
   const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
   const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};
+
+  useEffect(() => {
+    if (isC2CourseBook || loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;
+    const timer = setTimeout(() => {
+      persistCourseCompletionSnapshot({
+        progress: courseCompletion,
+        level: normalizedSelectedCourseLevel,
+        user,
+        studentProfile,
+      }).catch((error) => {
+        console.warn("Could not sync Course Book completion snapshot", error);
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [courseCompletion, isC2CourseBook, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user]);
 
   const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);
   const practicalCompletedCount = practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).length;
