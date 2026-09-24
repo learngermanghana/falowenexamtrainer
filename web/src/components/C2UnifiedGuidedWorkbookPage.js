@@ -243,11 +243,37 @@ function ListeningPractice({day,completed,onCompleteChange}){
  const audioUrl=String(practice?.audioUrl||"").trim();
  const hasSource=hasC2ListeningSource(practice);
  const embed=!audioKey?youtubeEmbedUrl(audioUrl):"";
+ const transcriptParagraphs=Array.isArray(practice?.transcript)
+  ?practice.transcript.filter(Boolean)
+  :String(practice?.transcript||"").split(/\n\s*\n/).map(value=>value.trim()).filter(Boolean);
+ const questions=Array.isArray(practice?.questions)?practice.questions:[];
+ const answerKey=`falowen:c2:day${day}:listening-answers`;
+ const firstAttemptKey=`falowen:c2:day${day}:listening-first-attempts`;
+ const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(answerKey)||"{}")}catch{return{}}});
+ const[firstAttempts,setFirstAttempts]=useState(()=>{try{return JSON.parse(localStorage.getItem(firstAttemptKey)||"{}")}catch{return{}}});
+ const[legacyAnswersSeedAllowed]=useState(()=>{try{return Object.keys(JSON.parse(localStorage.getItem(answerKey)||"{}")).length>0}catch{return false}});
+ const[legacyFirstAttemptsSeedAllowed]=useState(()=>{try{return Object.keys(JSON.parse(localStorage.getItem(firstAttemptKey)||"{}")).length>0}catch{return false}});
+ const[showTranscript,setShowTranscript]=useState(false);
  const[signedAudioUrl,setSignedAudioUrl]=useState("");
  const[audioState,setAudioState]=useState(audioKey?"loading":"idle");
  const[audioError,setAudioError]=useState("");
  const[refreshNonce,setRefreshNonce]=useState(0);
  const retryRef=useRef(0);
+
+ useEffect(()=>{try{localStorage.setItem(answerKey,JSON.stringify(answers))}catch{}},[answerKey,answers]);
+ useEffect(()=>{try{localStorage.setItem(firstAttemptKey,JSON.stringify(firstAttempts))}catch{}},[firstAttemptKey,firstAttempts]);
+ useC2CloudDraftField({day,field:"listeningAnswers",value:answers,setValue:setAnswers,seedCloudWhenMissing:legacyAnswersSeedAllowed,defaultValue:{}});
+ useC2CloudDraftField({day,field:"listeningFirstAttempts",value:firstAttempts,setValue:setFirstAttempts,seedCloudWhenMissing:legacyFirstAttemptsSeedAllowed,defaultValue:{}});
+
+ const answered=questions.filter((_,index)=>Number.isInteger(answers[index])).length;
+ const firstAttemptAnswered=questions.filter((_,index)=>Number.isInteger(firstAttempts[index])).length;
+ const firstAttemptCorrect=questions.filter((item,index)=>firstAttempts[index]===item.answerIndex).length;
+ const chooseAnswer=(index,optionIndex)=>{
+  setAnswers(old=>({...old,[index]:optionIndex}));
+  setFirstAttempts(old=>Number.isInteger(old[index])?old:{...old,[index]:optionIndex});
+ };
+
+ useEffect(()=>{if(questions.length&&answered===questions.length&&!completed)onCompleteChange?.(true)},[answered,questions.length,completed,onCompleteChange]);
 
  useEffect(()=>{
   let cancelled=false;
@@ -308,8 +334,39 @@ function ListeningPractice({day,completed,onCompleteChange}){
     {signedAudioUrl?<div style={{...sub,background:"#fff"}}><strong>Hörtext</strong><audio data-c2-r2-audio="true" controls preload="metadata" src={signedAudioUrl} onError={handleAudioError} onCanPlay={handleCanPlay} style={{width:"100%"}}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{color:"#64748b",fontSize:13}}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div>:null}
     {audioState==="error"?<div data-c2-audio-error="true" style={{...sub,background:"#fff7f7",borderColor:"#fecaca"}}><strong>Audio momentan nicht verfügbar</strong><span>{audioError}</span><div><button type="button" onClick={refreshAudio} style={styles.secondaryButton}>Audio erneut laden</button></div></div>:null}
    </>:embed?<div style={{position:"relative",paddingTop:"56.25%",borderRadius:14,overflow:"hidden",background:"#0f172a"}}><iframe title={`C2 Day ${day} Hören`} src={embed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}}/></div>:<div style={{...sub,background:"#fff"}}><strong>Hörtext</strong><audio controls preload="metadata" src={audioUrl} style={{width:"100%"}}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio></div>}
-   <div style={{...sub,background:"#eff6ff"}}><strong>Noch keine Verständnisfragen</strong><span>Die Fragen werden ergänzt, sobald das Transkript der endgültigen Aufnahme vorliegt.</span></div>
-   <label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)} style={{marginTop:4}}/>Ich habe den vollständigen Hörtext aufmerksam gehört.</label>
+
+   {transcriptParagraphs.length?<div style={{...sub,background:"#f8fafc",borderColor:"#cbd5e1"}}>
+    <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+     <div><strong>Transkript</strong><div style={{color:"#64748b",fontSize:13,marginTop:3}}>Versuchen Sie den ersten Durchgang möglichst ohne Transkript. Danach können Sie es zum Mitlesen oder Überprüfen einblenden.</div></div>
+     <button type="button" onClick={()=>setShowTranscript(value=>!value)} aria-expanded={showTranscript} style={styles.secondaryButton}>{showTranscript?"Transkript ausblenden":"Transkript anzeigen"}</button>
+    </div>
+    {showTranscript?<article data-c2-listening-transcript="true" style={{display:"grid",gap:12,lineHeight:1.8,marginTop:6}}>{transcriptParagraphs.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</article>:null}
+   </div>:null}
+
+   {questions.length?<>
+    <div style={{...sub,background:"#eff6ff"}}><strong>Verständnis und Argumentation</strong><span>Hören Sie den Beitrag aufmerksam und beantworten Sie alle Fragen. Sie erhalten sofort Rückmeldung. Eine falsche erste Antwort blockiert den Abschluss nicht.</span></div>
+    <div style={{display:"grid",gap:14}}>{questions.map((item,index)=>{
+     const selected=answers[index];
+     const hasAnswer=Number.isInteger(selected);
+     const correct=selected===item.answerIndex;
+     return <article key={item.question} style={{...sub,background:"#fff"}}>
+      <strong>{index+1}. {item.question}</strong>
+      <div style={{display:"grid",gap:8}}>{item.options.map((option,optionIndex)=>{
+       const isSelected=selected===optionIndex;
+       const isCorrectOption=hasAnswer&&optionIndex===item.answerIndex;
+       const background=isCorrectOption?"#f0fdf4":isSelected?"#fff7ed":"#fff";
+       const border=isCorrectOption?"2px solid #86efac":isSelected?"2px solid #fdba74":"1px solid #cbd5e1";
+       return <button key={option} type="button" onClick={()=>chooseAnswer(index,optionIndex)} style={{...styles.secondaryButton,textAlign:"left",justifyContent:"flex-start",background,border,color:"#0f172a"}}>{String.fromCharCode(65+optionIndex)}. {option}</button>;
+      })}</div>
+      {hasAnswer?<div style={{border:`1px solid ${correct?"#86efac":"#fecaca"}`,borderRadius:12,padding:11,background:correct?"#f0fdf4":"#fff7f7",lineHeight:1.65}}><strong>{correct?"Richtig.":"Noch nicht richtig."}</strong> {!correct?<span>Richtige Antwort: <strong>{String.fromCharCode(65+item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </span>:null}<span>{item.explanation}</span></div>:null}
+     </article>;
+    })}</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}>
+     <div style={{...sub,background:answered===questions.length?"#f0fdf4":"#f8fafc"}}><strong>{answered}/{questions.length} Fragen beantwortet</strong><span>{answered===questions.length?"Hören ist für heute abgeschlossen.":"Beantworten Sie alle Fragen. Fehler sind erlaubt — die Aufgabe dient dem direkten Lernen."}</span></div>
+     <div style={{...sub,background:"#f8fafc"}}><strong>Erster Versuch: {firstAttemptCorrect}/{questions.length}</strong><span>{firstAttemptAnswered<questions.length?`${firstAttemptAnswered}/${questions.length} erste Antworten erfasst`:"Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss."}</span></div>
+    </div>
+   </>:<div style={{...sub,background:"#eff6ff"}}><strong>Noch keine Verständnisfragen</strong><span>Die Fragen werden ergänzt, sobald das Transkript der endgültigen Aufnahme vorliegt.</span></div>}
+   {!questions.length?<label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)} style={{marginTop:4}}/>Ich habe den vollständigen Hörtext aufmerksam gehört.</label>:null}
   </>}
  </Section>;
 }
