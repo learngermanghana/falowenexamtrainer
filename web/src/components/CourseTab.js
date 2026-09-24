@@ -13,6 +13,7 @@ import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
+import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
@@ -760,8 +761,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
   const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
-  const assignmentCount = courseLessons.filter((entry) => entry.isTutorMarked).length;
   const isC2CourseBook = normalizedSelectedCourseLevel === "C2";
+  const courseCompletion = useMemo(
+    () =>
+      isC2CourseBook
+        ? null
+        : buildCourseCompletionProgress({
+            level: normalizedSelectedCourseLevel,
+            progressByAssignmentId,
+            selfLearningProgressByDay: readSelfLearningProgressByDay(normalizedSelectedCourseLevel),
+          }),
+    [isC2CourseBook, normalizedSelectedCourseLevel, practiceProgress, progressByAssignmentId],
+  );
   const effectivePracticeProgress = useMemo(() => {
     if (!isC2CourseBook) return practiceProgress;
     const next = { ...practiceProgress };
@@ -777,11 +788,28 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
     return next;
   }, [c2ProgressByDay, courseLessons, isC2CourseBook, practiceProgress]);
-  const completedCount = courseLessons.filter((entry) => isCourseBookEntryComplete(entry, effectivePracticeProgress)).length;
-  const progressPercent = courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0;
-  const nextLesson = getNextCourseBookEntry(courseLessons, effectivePracticeProgress);
+  const assignmentCount = isC2CourseBook
+    ? courseLessons.filter((entry) => entry.isTutorMarked).length
+    : (courseCompletion?.total || 0);
+  const completedCount = isC2CourseBook
+    ? courseLessons.filter((entry) => isCourseBookEntryComplete(entry, effectivePracticeProgress)).length
+    : (courseCompletion?.completed || 0);
+  const progressPercent = isC2CourseBook
+    ? (courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0)
+    : (courseCompletion?.completionPercent || 0);
+  const nextLesson = isC2CourseBook
+    ? getNextCourseBookEntry(courseLessons, effectivePracticeProgress)
+    : findCourseBookEntryForRequirement(courseLessons, courseCompletion?.next);
   const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
-  const followingLesson = nextLessonIndex >= 0 ? courseLessons.slice(nextLessonIndex + 1).find((entry) => !isCourseBookEntryComplete(entry, effectivePracticeProgress)) || null : null;
+  const followingLesson = nextLessonIndex >= 0
+    ? courseLessons.slice(nextLessonIndex + 1).find((entry) =>
+        isC2CourseBook
+          ? !isCourseBookEntryComplete(entry, effectivePracticeProgress)
+          : Number(entry.day) === Number(courseCompletion?.states?.find((state) =>
+              !state.completed && Number(state.requirement?.day) > Number(nextLesson?.day)
+            )?.requirement?.day)
+      ) || null
+    : null;
   const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
   const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
   const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};
