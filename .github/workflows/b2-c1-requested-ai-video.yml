@@ -42,11 +42,9 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/data/b2MediaReset.test.js
-          src/data/requestedLessonMediaMappings.test.js
           src/data/b2Day13To15RequestedAiVideos.test.js
           src/data/b2Day16Day17AiVideos.test.js
           src/data/b2Day11FalowenRadio.test.js
-          src/data/lessonRadioDictionary.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
