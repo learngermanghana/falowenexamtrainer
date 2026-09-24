@@ -1,6 +1,7 @@
 import React from "react";
 import { styles } from "../styles";
 import { getC2DayTabs } from "../data/c2SkillCycle";
+import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import {
   filterA2B1WorkbookTabsByProfile,
@@ -245,16 +246,23 @@ export const WorkbookTabNav = ({
 export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) => {
   const normalizedLevel = String(level || "").toUpperCase();
 
+  const rotatingTabs = normalizedLevel === "C2"
+    ? getC2DayTabs(day)
+    : normalizedLevel === "B2"
+      ? getB2DayTabs(day)
+      : B2_C1_WORKBOOK_TABS;
+  const sticky = !["B2", "C2"].includes(normalizedLevel);
+
   return (
     <div
       data-advanced-self-learning-navigation
-      data-sticky-navigation={normalizedLevel === "C2" ? "false" : "true"}
-      style={normalizedLevel === "C2" ? undefined : { position: "sticky", top: 0, zIndex: 35 }}
+      data-sticky-navigation={sticky ? "true" : "false"}
+      style={sticky ? { position: "sticky", top: 0, zIndex: 35 } : undefined}
     >
       <WorkbookTabNav
         activeTab={activeTab}
         onChange={onChange}
-        tabs={normalizedLevel === "C2" ? getC2DayTabs(day) : B2_C1_WORKBOOK_TABS}
+        tabs={rotatingTabs}
         ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
         renderLegacyGrammarPanel={false}
       />
