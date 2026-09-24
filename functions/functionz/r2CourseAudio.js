@@ -1,5 +1,4 @@
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const crypto = require("crypto");
 
 const C2_LISTENING_DAYS = new Set([2, 6, 10, 14, 18, 22, 26]);
 const DEFAULT_EXPIRES_SECONDS = 60 * 60;
@@ -63,20 +62,49 @@ const getR2AudioConfig = (env = process.env) => {
     throw error;
   }
 
+  if (!/^[a-z0-9][a-z0-9.-]*[a-z0-9]$|^[a-z0-9]$/i.test(bucket)) {
+    const error = new Error("Invalid R2 bucket name");
+    error.code = "R2_AUDIO_NOT_CONFIGURED";
+    error.missing = ["R2_AUDIO_BUCKET"];
+    throw error;
+  }
+
   return { accountId, accessKeyId, secretAccessKey, bucket, expiresIn };
 };
 
-const createR2Client = ({ accountId, accessKeyId, secretAccessKey }) =>
-  new S3Client({
-    region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-  });
+const awsEncode = (value) =>
+  encodeURIComponent(String(value)).replace(/[!'()*]/g, (char) =>
+    `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
 
-const createC2AudioSignedUrl = async ({ day, key, env = process.env }) => {
+const encodePath = (value) =>
+  String(value)
+    .split("/")
+    .map((segment) => awsEncode(segment))
+    .join("/");
+
+const sha256Hex = (value) =>
+  crypto.createHash("sha256").update(value, "utf8").digest("hex");
+
+const hmac = (key, value, encoding) =>
+  crypto.createHmac("sha256", key).update(value, "utf8").digest(encoding);
+
+const formatAmzDate = (date) =>
+  date.toISOString().replace(/[:-]|\.\d{3}/g, "");
+
+const buildCanonicalQuery = (entries) =>
+  entries
+    .map(([key, value]) => [awsEncode(key), awsEncode(value)])
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+const createC2AudioSignedUrl = async ({
+  day,
+  key,
+  env = process.env,
+  now = new Date(),
+}) => {
   const validated = validateC2AudioKey({ day, key });
   if (!validated) {
     const error = new Error("Invalid C2 audio object key");
@@ -85,21 +113,56 @@ const createC2AudioSignedUrl = async ({ day, key, env = process.env }) => {
   }
 
   const config = getR2AudioConfig(env);
-  const client = createR2Client(config);
-  const url = await getSignedUrl(
-    client,
-    new GetObjectCommand({
-      Bucket: config.bucket,
-      Key: validated.key,
-    }),
-    { expiresIn: config.expiresIn },
-  );
+  const requestDate = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(requestDate.getTime())) {
+    throw new Error("Invalid signing date");
+  }
+
+  const amzDate = formatAmzDate(requestDate);
+  const dateStamp = amzDate.slice(0, 8);
+  const region = "auto";
+  const service = "s3";
+  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+  const host = `${config.accountId}.r2.cloudflarestorage.com`;
+  const canonicalUri = `/${encodePath(config.bucket)}/${encodePath(validated.key)}`;
+
+  const queryEntries = [
+    ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
+    ["X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD"],
+    ["X-Amz-Credential", `${config.accessKeyId}/${credentialScope}`],
+    ["X-Amz-Date", amzDate],
+    ["X-Amz-Expires", String(config.expiresIn)],
+    ["X-Amz-SignedHeaders", "host"],
+  ];
+  const canonicalQuery = buildCanonicalQuery(queryEntries);
+  const canonicalHeaders = `host:${host}\n`;
+  const canonicalRequest = [
+    "GET",
+    canonicalUri,
+    canonicalQuery,
+    canonicalHeaders,
+    "host",
+    "UNSIGNED-PAYLOAD",
+  ].join("\n");
+
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256Hex(canonicalRequest),
+  ].join("\n");
+
+  const dateKey = hmac(`AWS4${config.secretAccessKey}`, dateStamp);
+  const regionKey = hmac(dateKey, region);
+  const serviceKey = hmac(regionKey, service);
+  const signingKey = hmac(serviceKey, "aws4_request");
+  const signature = hmac(signingKey, stringToSign, "hex");
 
   return {
-    url,
+    url: `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`,
     key: validated.key,
     expiresIn: config.expiresIn,
-    expiresAt: new Date(Date.now() + config.expiresIn * 1000).toISOString(),
+    expiresAt: new Date(requestDate.getTime() + config.expiresIn * 1000).toISOString(),
   };
 };
 
