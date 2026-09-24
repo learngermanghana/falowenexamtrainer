@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import { getC2ExamStandard } from "../data/c2ExamStandardContent";
 import { getC2TopicKnowledge } from "../data/c2TopicKnowledge";
+import { getC2SkillFocus, C2_SKILL_DAYS } from "../data/c2SkillCycle";
+import { getC2ReadingPractice } from "../data/c2ReadingPractice";
+import { getC2ListeningPractice } from "../data/c2ListeningPractice";
 
 describe("C2 unified topic-first workbook", () => {
   const page = fs.readFileSync(path.join(__dirname, "C2UnifiedGuidedWorkbookPage.js"), "utf8");
@@ -32,29 +35,63 @@ describe("C2 unified topic-first workbook", () => {
     expect(registry).not.toContain("<C2Day8To14MasteryPage");
   });
 
-  test("keeps Learn teaching and Write testing separated", () => {
-    expect(page).toContain("Im Learn-Bereich lernen, im Write-Bereich testen");
-    expect(page).toContain("Hier werden keine Musterlösungen angezeigt");
-    expect(page).toContain("standard.reformulations.map");
-    expect(page).not.toContain("item.model");
-    expect(page).not.toContain("item.note");
+  test("uses a balanced seven-day-per-skill rotation instead of requiring every skill daily", () => {
+    expect(C2_SKILL_DAYS.lesen).toEqual([1, 5, 9, 13, 17, 21, 25]);
+    expect(C2_SKILL_DAYS.hoeren).toEqual([2, 6, 10, 14, 18, 22, 26]);
+    expect(C2_SKILL_DAYS.speak).toEqual([3, 7, 11, 15, 19, 23, 27]);
+    expect(C2_SKILL_DAYS.write).toEqual([4, 8, 12, 16, 20, 24, 28]);
+    expect(Array.from({ length: 28 }, (_, index) => getC2SkillFocus(index + 1))).toHaveLength(28);
+    expect(page).toContain("Today: Grammar/Learn +");
+    expect(page).toContain("The other production skills are not required today.");
   });
 
-  test("preloads and preserves the reusable C2 opinion template on opinion days", () => {
+  test("uses the full opinion-writing workspace on the seven assigned writing days", () => {
     expect(page).toContain("buildC2OpinionWritingTemplate");
     expect(page).toContain('!String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved');
     expect(page).toContain("C2-Schreibvorlage ist bereits im Textfeld gespeichert");
     expect(page).toContain("Nutzen Sie nur die Satzanfänge als Gerüst");
     expect(page).toContain("Vorlage wiederherstellen");
+    expect(page).toContain('active==="write"?<OpinionWrite');
+    expect(page).not.toContain('active==="write"?(standard.writeType');
   });
 
-  test("supports a direct Write-template deep link and visible entry action", () => {
-    expect(page).toContain('new URLSearchParams(location.search||"").get("view")');
-    expect(page).toContain('C2_WORKBOOK_VIEWS.has(value)?value:"learn"');
+  test("only allows deep links to sections assigned to that C2 day", () => {
+    expect(page).toContain('new Set(getC2DayTabs(day).map(({key})=>key))');
+    expect(page).toContain('allowedViews.has(value)?value:"learn"');
+    expect(page).toContain('if(!allowedViews.has(next))return');
     expect(page).toContain('params.set("view",next)');
+    expect(page).toContain('skillFocus==="write"');
     expect(page).toContain('onClick={()=>changeView("write")}');
     expect(page).toContain("Open writing template");
-    expect(page).toContain('onChange={changeView}');
+  });
+
+  test("creates instant-feedback Lesen practice on every reading day", () => {
+    C2_SKILL_DAYS.lesen.forEach((day) => {
+      const reading = getC2ReadingPractice(day);
+      expect(reading).toBeTruthy();
+      expect(reading.text.length).toBeGreaterThanOrEqual(4);
+      expect(reading.questions).toHaveLength(5);
+      reading.questions.forEach((question) => {
+        expect(question.options.length).toBeGreaterThanOrEqual(4);
+        expect(Number.isInteger(question.answerIndex)).toBe(true);
+        expect(question.explanation.length).toBeGreaterThan(20);
+      });
+    });
+    expect(page).toContain("Sie sehen sofort, ob sie richtig ist und warum.");
+    expect(page).toContain('Richtige Antwort:');
+  });
+
+  test("keeps Hören transcript-first with empty sources and no invented questions", () => {
+    C2_SKILL_DAYS.hoeren.forEach((day) => {
+      const listening = getC2ListeningPractice(day);
+      expect(listening).toBeTruthy();
+      expect(listening.audioUrl).toBe("");
+      expect(listening.transcript).toBe("");
+      expect(listening.questions).toBeUndefined();
+    });
+    expect(page).toContain("Es werden bewusst noch keine Fragen angezeigt.");
+    expect(page).toContain("Die Fragen werden erst aus dem tatsächlichen Transkript erstellt");
+    expect(page).toContain("so Hören does not block this day");
   });
 
   test("syncs C2 progress and drafts through the signed-in account while retaining local fallback", () => {
