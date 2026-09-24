@@ -74,6 +74,7 @@ describe("B2 media reset after topic changes", () => {
     const sources = [
       "lessonRadioDictionary.js",
       "b2C1LessonMediaOverrides.js",
+      "additionalLessonVideoResources.js",
       "selfLearningLessons/b2/day1PersoenlicheIdentitaet.js",
       "selfLearningLessons/b2/day2AlltagUndZeitmanagement.js",
       "selfLearningLessons/b2/day4BildungUndLernen.js",
@@ -85,7 +86,7 @@ describe("B2 media reset after topic changes", () => {
       "0lTNin1NTgc", "OdfuQzJ_etM", "wYwEi4myS2A", "0rBDjwRe9UY", "2-SRhPEQdNU",
       "xSrh7VYNgrM", "LjxT4I6BmFw", "hxB5dwtbo6Q", "kVvR1zgJE-s", "AWEHnJd1o3M",
       "juDa8R56Mtc", "9LLc7AAqrOc", "BdO8p8C-aSs",
-      "HhUUkc8zgEc", "ZfCAaLGV2c4", "coQ8W5vynsI", "DiUEWUBJBio", "LORxwfzaAyU",
+      "HhUUkc8zgEc", "ZfCAaLGV2c4", "coQ8W5vynsI", "DiUEWUBJBio", "LORxwfzaAyU", "cmKLSjWi4S0",
       "RjRBspPCmCY", "-JeT2wS94uk", "vRgpiPZ5AAw", "TC85wRlhtCc", "foXp2VHEf1I",
       "MGtC8QQrdSs", "Hqowo8xhrpw", "5fdtLPqHe7A", "ioHsbvDoLag", "i167ok5kIFg",
     ];
