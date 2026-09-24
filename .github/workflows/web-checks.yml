@@ -104,6 +104,12 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
+      - name: Test concise A2 Day 4 grammar
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/A2Day4SimpleGrammar.test.js
+
       - name: Test A1 workbook visibility, submit mounting, exam cards and mobile layout
         working-directory: web
         env:
