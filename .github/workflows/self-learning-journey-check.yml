@@ -32,6 +32,16 @@ jobs:
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
+      - name: Test B2 topic-first learning and submission isolation
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          ./node_modules/.bin/react-scripts test --watchAll=false --runTestsByPath
+          src/components/B2TopicIntroduction.test.jsx
+          src/components/B2SelfLearningSubmissionIsolation.test.js
+
+
       - name: Test shared materials selector
         working-directory: web
         env:
@@ -43,15 +53,6 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.test.js
-
-      - name: Test B2 topic-first learning and submission isolation
-        working-directory: web
-        env:
-          CI: true
-        run: >-
-          npm run test:ci -- --runTestsByPath
-          src/components/B2TopicIntroduction.test.jsx
-          src/components/B2SelfLearningSubmissionIsolation.test.js
 
 
       - name: Test B2 and C1 registry coverage
