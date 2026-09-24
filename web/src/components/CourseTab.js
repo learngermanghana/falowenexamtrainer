@@ -1118,9 +1118,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
                       : isC2CourseBook
                         ? `Complete Grammar/Learn and today’s ${getC2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Progress syncs automatically across devices.`
-                        : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
+                        : isSelfLearningLevel
+                          ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."
+                          : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
                   </p>
-                  {!nextLesson.isTutorMarked ? (
+                  {!nextLesson.isTutorMarked && !isSelfLearningLevel ? (
                     <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "#334155", fontWeight: 800 }}>
                       <input
                         type="checkbox"
@@ -1201,7 +1203,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
-                    const practiceMeta = practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly;
+                    const canonicalSelfLearningState = !isC2CourseBook && isSelfLearningLevel
+                      ? courseCompletion?.states?.find((item) => Number(item.requirement?.day) === Number(entry.day)) || null
+                      : null;
+                    const canonicalSelfLearningComplete = Boolean(canonicalSelfLearningState?.completed);
+                    const practiceMeta = isSelfLearningLevel
+                      ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
+                      : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
                     const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
                       <article className="course-book-lesson-card" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
@@ -1242,15 +1250,22 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 })() : (
                                   <div style={courseBookStyles.practiceControls}>
                                     <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#334155", fontWeight: 700 }}>
-                                      <input type="checkbox" checked={Boolean(practiceState.completed)} onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })} />
-                                      Completed
+                                      <input
+                                        type="checkbox"
+                                        disabled={isSelfLearningLevel}
+                                        checked={isSelfLearningLevel ? canonicalSelfLearningComplete : Boolean(practiceState.completed)}
+                                        onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })}
+                                      />
+                                      {isSelfLearningLevel ? "Complete inside lesson" : "Completed"}
                                     </label>
-                                    <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
-                                      <option value="">Confidence</option>
-                                      <option value="low">Low</option>
-                                      <option value="medium">Medium</option>
-                                      <option value="high">High</option>
-                                    </select>
+                                    {!isSelfLearningLevel ? (
+                                      <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
+                                        <option value="">Confidence</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                      </select>
+                                    ) : null}
                                     <span style={{ ...courseBookStyles.statusChip, color: practiceMeta.color, border: `1px solid ${practiceMeta.border}`, background: practiceMeta.background }}>
                                       {practiceMeta.key}
                                     </span>
