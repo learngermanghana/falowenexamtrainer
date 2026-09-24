@@ -65,16 +65,17 @@ function GrammarTeaching({mastery,standard}){
  </Section>;
 }
 
-function Learn({day,standard,knowledge,mastery,completed,onCompleteChange}){
+function Learn({day,standard,knowledge,mastery,skillFocus,completed,onCompleteChange}){
  const checks=getC2TopicChecks(day);
  return <div style={{display:"grid",gap:14}}>
   <TopicFoundation standard={standard} knowledge={knowledge}/>
   <TopicLanguage mastery={mastery}/>
   <GrammarTeaching mastery={mastery} standard={standard}/>
-  {standard.writeType==="reformulation"?<Section title="Umformung · Im Learn-Bereich lernen, im Write-Bereich testen">
-   <p style={{margin:0,lineHeight:1.75}}>Lerne hier die Transformationsfamilien und die Methode. Die konkreten Lösungen der heutigen Write-Aufgabe werden hier bewusst nicht gezeigt.</p>
+  {skillFocus==="write"?<Section title="Argumentation · Schreiben vorbereiten">
+   <p style={{margin:0,lineHeight:1.75}}>Plane zuerst Position → Begründung → Beispiel → Gegenargument → Reaktion → Synthese. Die heutige Grammatik soll die Argumentation präziser machen, nicht unnötig kompliziert.</p>
+  </Section>:standard.writeType==="reformulation"?<Section title="Umformung · kurzes Grammatiktraining">
+   <p style={{margin:0,lineHeight:1.75}}>Nutze die Transformationsfamilien heute als Grammatiktraining. Sie sind nicht die Hauptaufgabe des Tages.</p>
    <div style={{display:"grid",gap:9}}>{TRANSFORMATION_FAMILIES.map(([name,example])=><div key={name} style={sub}><strong>{name}</strong><span>{example}</span></div>)}</div>
-   <ol style={{margin:0,paddingLeft:22,lineHeight:1.8}}><li>Bedeutung des Ausgangssatzes sichern.</li><li>Vorgabewort unverändert lassen.</li><li>Neue Struktur vollständig aufbauen.</li><li>Kasus, Artikel, Verbform und Wortstellung nachziehen.</li><li>Beide Sätze auf gleiche Bedeutung vergleichen.</li></ol>
   </Section>:<Section title="Argumentation · Inhalt vor Form">
    <p style={{margin:0,lineHeight:1.75}}>Plane zuerst Position → Begründung → Beispiel → Gegenargument → Reaktion → Synthese. Nutze die heutige Grammatik nur dort, wo sie die logische Beziehung oder das Register präziser macht.</p>
   </Section>}
