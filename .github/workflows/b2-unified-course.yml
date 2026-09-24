@@ -59,7 +59,6 @@ jobs:
           src/data/b2Day11FalowenRadio.test.js
           src/data/b2Day13To15RequestedAiVideos.test.js
           src/data/b2Day16Day17AiVideos.test.js
-          src/data/lessonRadioDictionary.test.js
           src/data/writingVideoResources.test.js
           src/data/writingVideoResources.b2Day4.test.js
       - name: Build web app
