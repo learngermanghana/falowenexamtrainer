@@ -30,6 +30,7 @@ on:
       - "functions/functionz/r2CourseAudio.js"
       - "functions/functionz/app.js"
       - "functions/functionz/__tests__/r2CourseAudio.test.js"
+      - "scripts/auditCourseMediaAndSpeaking.mjs"
       - ".github/workflows/b2-unified-course.yml"
 
 jobs:
