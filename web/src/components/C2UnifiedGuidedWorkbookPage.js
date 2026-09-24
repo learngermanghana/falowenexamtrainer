@@ -7,7 +7,7 @@ import{styles}from"../styles";
 import{getC2ExamStandard}from"../data/c2ExamStandardContent";
 import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
-import{buildC2OpinionWritingTemplate}from"../data/c2OpinionWritingTemplate";
+import{getC2WritingFormat}from"../data/c2WritingFormats";
 import{getC2ReadingPractice}from"../data/c2ReadingPractice";
 import{getC2ListeningPractice}from"../data/c2ListeningPractice";
 import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel,getC2SpeakingSupport,getC2SpeakingSupportNote}from"../data/c2SkillCycle";
@@ -111,9 +111,10 @@ function Speak({standard,knowledge,day,completed,onCompleteChange}){
 }
 
 function OpinionWrite({standard,day,completed,onCompleteChange}){
+ const format=useMemo(()=>getC2WritingFormat(day,standard.title),[day,standard.title]);
  const key=`falowen:c2:day${day}:unified-opinion`;
- const template=useMemo(()=>buildC2OpinionWritingTemplate(standard),[standard]);
- const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?buildC2OpinionWritingTemplate(standard):saved}catch{return buildC2OpinionWritingTemplate(standard)}});
+ const template=format.template;
+ const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?template:saved}catch{return template}});
  const[legacyDraftSeedAllowed]=useState(()=>{try{const saved=localStorage.getItem(key)||"";return Boolean(String(saved).trim()&&saved!==template)}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
  useC2CloudDraftField({day,field:"opinionDraft",value:draft,setValue:setDraft,seedCloudWhenMissing:legacyDraftSeedAllowed,defaultValue:template});
@@ -122,20 +123,19 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
   if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
   setDraft(template);
  };
- return <Section title="Schreiben · Stellungnahme">
-  <p style={{margin:0,lineHeight:1.75}}>Schreiben Sie einen ausführlichen Leserbrief bzw. eine E-Mail von circa 350 Wörtern an die Redaktion zum Thema „{standard.title}“. Beziehen Sie sich auf alle drei Beiträge, begründen Sie Ihre Argumentation mit Beispielen und entwickeln Sie eine eigene, differenzierte Position.</p>
+ return <Section title={`Schreiben · ${format.label}`}>
+  <p style={{margin:0,lineHeight:1.75}}>{format.instruction}</p>
   <div style={{display:"grid",gap:9}}>{standard.perspectives.map((quote,index)=><Opinion key={quote} index={index+1}>{quote}</Opinion>)}</div>
   <div style={{...sub,background:"#f0fdf4",borderColor:"#bbf7d0"}}>
-   <strong>C2-Schreibvorlage ist bereits im Textfeld gespeichert</strong>
-   <span style={{lineHeight:1.65}}>Nutzen Sie nur die Satzanfänge als Gerüst und ergänzen Sie Ihre eigenen Argumente, Beispiele und Bewertungen. Ihre bereits gespeicherte Antwort wird beim erneuten Öffnen beibehalten.</span>
+   <strong>Passende C2-Schreibvorlage ist bereits im Textfeld gespeichert</strong>
+   <span style={{lineHeight:1.65}}>Nutzen Sie die Satzanfänge und Abschnittshinweise nur als Gerüst. Entwickeln Sie Ihre eigenen Argumente, Beispiele und Bewertungen. Ihre gespeicherte Antwort bleibt beim erneuten Öffnen erhalten.</span>
    <div><button type="button" onClick={restoreTemplate} style={styles.secondaryButton}>Vorlage wiederherstellen</button></div>
   </div>
   <textarea data-c2-opinion-editor="true" value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75,overflowAnchor:"none"}}/>
-  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa 350 Wörter</div>
-  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle drei Beiträge berücksichtigt und meinen Text überarbeitet.</label>
+  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa {format.targetWords} Wörter</div>
+  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe die Aufgabe vollständig bearbeitet und meinen Text überarbeitet.</label>
  </Section>;
 }
-
 function ReadingPractice({day,completed,onCompleteChange}){
  const practice=getC2ReadingPractice(day);
  const answerKey=`falowen:c2:day${day}:reading-answers`;
