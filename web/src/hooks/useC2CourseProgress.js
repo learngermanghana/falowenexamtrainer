@@ -24,7 +24,6 @@ export const buildC2DayProgress = (day, data = {}) => {
 
   const dayComplete = Boolean(
     progress.learnDone
-      && progress.confidence
       && (skillFocus === "hoeren" && !listeningAvailable ? true : skillDone),
   );
 

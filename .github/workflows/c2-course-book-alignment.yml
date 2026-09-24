@@ -6,6 +6,8 @@ on:
       - "web/src/data/c2*.js"
       - "web/src/components/C2*.js"
       - "web/src/components/CourseTab.js"
+      - "web/src/components/WritingFeedbackCard.js"
+      - "web/src/components/WritingFeedbackCard.test.js"
       - "web/src/hooks/useC2CourseProgress.js"
       - "web/src/data/curriculumManifest.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
@@ -22,6 +24,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Test C2 AI writing prompt contract
+        run: node functions/functionz/prompts.courseTask.test.js
       - name: Install web dependencies
         run: npm --prefix web ci
       - name: Run C2 alignment and rotating-skill regression tests
@@ -31,3 +35,4 @@ jobs:
           src/data/c2LessonContentAlignment.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
           src/components/C2CourseBookSkillProgress.test.js
+          src/components/WritingFeedbackCard.test.js

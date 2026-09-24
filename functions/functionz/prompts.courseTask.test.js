@@ -15,7 +15,15 @@ assert.match(
 );
 assert.match(
   formalPrompt,
-  /Do not mark a formal task as informal or an informal task as formal\./,
+  /Judge task completion, organisation, register and required text type against this exact task\./,
+);
+assert.match(
+  formalPrompt,
+  /For correspondence, also check greeting, pronouns and closing\./,
+);
+assert.match(
+  formalPrompt,
+  /For essays or argumentative texts, do not require letter conventions\./,
 );
 
 const standardPrompt = markPrompt({
@@ -26,4 +34,17 @@ const standardPrompt = markPrompt({
 });
 
 assert.doesNotMatch(standardPrompt, /Exact course task:/);
-console.log("A1 course-task writing prompt contract passed.");
+
+const c2Prompt = markPrompt({
+  schreibenLevel: "C2",
+  studentName: "Student",
+  program: "german",
+  submissionContext: "course-task:C2 Day 28 Prüfungssimulation",
+});
+
+assert.match(c2Prompt, /A1, A2, B1, B2, C1, and C2 German/);
+assert.match(c2Prompt, /Advanced German marking rules for B1\/B2\/C1\/C2/);
+assert.match(c2Prompt, /For C2, be stricter on nuance, precision, register control, cohesion, evidence strength and natural collocation/);
+assert.match(c2Prompt, /reads closer to C1/);
+
+console.log("A1/C2 course-task writing prompt contract passed.");

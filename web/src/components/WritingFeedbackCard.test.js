@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 
 describe("WritingFeedbackCard", () => {
-  it("extracts a score from textual feedback and renders corrections", () => {
+  it("extracts a score from textual feedback and renders the current fallback safely", () => {
     render(
       <WritingFeedbackCard
         level="B1"
@@ -11,8 +11,27 @@ describe("WritingFeedbackCard", () => {
     );
 
     expect(screen.getByText(/Score: 18\/25/i)).toBeInTheDocument();
-    expect(screen.getByText(/❌ Needs fix:/i)).toBeInTheDocument();
-    expect(screen.getByText(/✅ Better:/i)).toBeInTheDocument();
+    expect(screen.getByText("Corrections")).toBeInTheDocument();
+    expect(screen.getByText("No correction needed.")).toBeInTheDocument();
+  });
+
+  it("renders C2 feedback with the advanced rubric", () => {
+    render(
+      <WritingFeedbackCard
+        level="C2"
+        structuredFeedback={{
+          score: 21,
+          maxScore: 25,
+          summary: "Strong C2 control with minor precision issues.",
+          strengths: ["Nuanced argumentation"],
+          mainIssues: ["Use more precise collocations"],
+          rubric: { task: 5, coherence: 4, grammar: 4, lexis: 4, overall: 21 },
+          corrections: [],
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/Score: 21\/25/i)).toBeInTheDocument();
   });
 
   it("renders normalized rubric objects without NaN or object text", () => {

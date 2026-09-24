@@ -29,9 +29,11 @@ export const B2_C1_WORKBOOK_TABS = [
   { key: "references", label: "Ref", description: "Notes" },
 ];
 
-export const C2_WORKBOOK_TABS = B2_C1_WORKBOOK_TABS.map((tab) =>
-  tab.key === "learn" ? { ...tab, label: "Grammar", description: "Learn" } : tab
-);
+export const C2_WORKBOOK_TABS = B2_C1_WORKBOOK_TABS.map((tab) => {
+  if (tab.key === "learn") return { ...tab, label: "Grammar", description: "Learn" };
+  if (tab.key === "finish") return { ...tab, key: "review", label: "Review", description: "Wiederholen" };
+  return tab;
+});
 
 export const STANDARD_WORKBOOK_TABS = A2_B1_WORKBOOK_TABS;
 

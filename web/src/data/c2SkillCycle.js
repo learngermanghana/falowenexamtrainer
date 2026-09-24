@@ -24,7 +24,7 @@ export const getC2DayTabs = (day) => {
   return [
     { key: "learn", label: "Grammar", description: "Learn" },
     ...(focus && skill ? [{ key: focus, ...skill }] : []),
-    { key: "finish", label: "Finish", description: "Complete" },
+    { key: "review", label: "Review", description: "Wiederholen" },
     { key: "references", label: "Ref", description: "Notes" },
   ];
 };

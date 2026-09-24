@@ -44,7 +44,7 @@ describe("C2 unified topic-first workbook", () => {
     expect(C2_SKILL_DAYS.write).toEqual([4, 8, 12, 16, 20, 24, 28]);
     expect(Array.from({ length: 28 }, (_, index) => getC2SkillFocus(index + 1))).toHaveLength(28);
     expect(page).toContain("Today: Grammar/Learn +");
-    expect(page).toContain("The other production skills are not required today.");
+    expect(page).toContain("Review is revision only; it does not add another assignment.");
   });
 
   test("varies the seven substantial writing days instead of repeating one format", () => {
@@ -66,6 +66,7 @@ describe("C2 unified topic-first workbook", () => {
 
   test("only allows deep links to sections assigned to that C2 day", () => {
     expect(page).toContain('new Set(getC2DayTabs(day).map(({key})=>key))');
+    expect(page).toContain('rawValue==="finish"?"review":rawValue');
     expect(page).toContain('allowedViews.has(value)?value:"learn"');
     expect(page).toContain('if(!allowedViews.has(next))return');
     expect(page).toContain('params.set("view",next)');
@@ -104,7 +105,7 @@ describe("C2 unified topic-first workbook", () => {
     });
     expect(page).toContain("Es werden bewusst noch keine Fragen angezeigt.");
     expect(page).toContain("Die Fragen werden erst aus dem tatsächlichen Transkript erstellt");
-    expect(page).toContain("so Hören does not block this day");
+    expect(page).toContain("Hören source is still pending and does not block completion.");
   });
 
   test("reduces speaking support deliberately across the seven speaking days", () => {
@@ -116,7 +117,7 @@ describe("C2 unified topic-first workbook", () => {
 
   test("builds day completion separately from first-attempt learning scores", () => {
     const readingDay = buildC2DayProgress(1, {
-      progress: { learnDone: true, lesenDone: true, confidence: "medium" },
+      progress: { learnDone: true, lesenDone: true },
       readingFirstAttempts: { 0: 1, 1: 0, 2: 1, 3: 2, 4: 1 },
     });
     expect(readingDay.dayComplete).toBe(true);
@@ -142,6 +143,7 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('field:"progress"');
     expect(page).toContain('field:"speechPlan"');
     expect(page).toContain('field:"opinionDraft"');
+    expect(page).toContain('field:"writingFeedback"');
     expect(page).toContain('field:"readingAnswers"');
     expect(page).toContain('field:"readingFirstAttempts"');
     expect(page).toContain("localStorage.setItem");
@@ -164,6 +166,33 @@ describe("C2 unified topic-first workbook", () => {
     expect(cloudSync).toContain("flushPendingSave()");
     expect(page).toContain('data-c2-opinion-editor="true"');
     expect(page).toContain('overflowAnchor:"none"');
+  });
+
+  test("replaces Finish with a useful Review page and automatic completion", () => {
+    expect(page).toContain('active==="review"?<C2ReviewPage');
+    expect(page).toContain("Das Wichtigste heute");
+    expect(page).toContain("Grammatik merken");
+    expect(page).toContain("Wortschatz · 6 wichtige Ausdrücke");
+    expect(page).toContain("Kann ich das?");
+    expect(page).toContain("Next up");
+    expect(page).not.toContain("<strong>Confidence</strong>");
+    expect(page).not.toContain("<strong>Reflection</strong>");
+    expect(page).toContain("const ready=Boolean(progress.learnDone&&skillDone)");
+  });
+
+  test("adds next-assignment navigation below every C2 workbook", () => {
+    expect(page).toContain('aria-label="C2 workbook navigation"');
+    expect(page).toContain("Next assignment · Day");
+    expect(page).toContain('/campus/course/lesson/C2/');
+    expect(page).toContain("<C2WorkbookNextNavigation day={day} navigate={navigate}/>");
+  });
+
+  test("adds C2 AI analysis to the writing page", () => {
+    expect(page).toContain('level:"C2"');
+    expect(page).toContain("Analyse my text");
+    expect(page).toContain("AI-Schreibanalyse");
+    expect(page).toContain("<WritingFeedbackCard level=\"C2\"");
+    expect(page).toContain('field:"writingFeedback"');
   });
 
   test("keeps the C2 section navigation in normal document flow", () => {

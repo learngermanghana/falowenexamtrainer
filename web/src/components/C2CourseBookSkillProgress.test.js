@@ -42,14 +42,15 @@ describe("C2 Course Book skill progress", () => {
       const entry = C2_COURSE_BOOK_ENTRIES.find((item) => Number(item.day) === Number(day));
       expect(entry).toEqual(expect.objectContaining({ skillFocus, skillLabel }));
       expect(entry.instruction).toContain(`today’s ${skillLabel} task`);
-      expect(entry.instruction).toContain("Only the assigned main skill is required for this day");
+      expect(entry.instruction).toContain("Day completion is automatic");
+      expect(entry.instruction).toContain("use Review to revise");
       expect(entry.instruction).not.toContain("complete the writing task and compare your work with the model");
     });
   });
 
   test("keeps Hören source-pending separate from course completion", () => {
     const day2 = buildC2DayProgress(2, {
-      progress: { learnDone: true, confidence: "medium", hoerenDone: false },
+      progress: { learnDone: true, hoerenDone: false },
     });
 
     expect(day2.waitingForListeningSource).toBe(true);
@@ -63,7 +64,7 @@ describe("C2 Course Book skill progress", () => {
 
   test("keeps first-attempt reading score informational only", () => {
     const day1 = buildC2DayProgress(1, {
-      progress: { learnDone: true, lesenDone: true, confidence: "high" },
+      progress: { learnDone: true, lesenDone: true },
       readingFirstAttempts: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
     });
 
@@ -73,6 +74,16 @@ describe("C2 Course Book skill progress", () => {
     );
     expect(workbook).toContain("Erster Versuch:");
     expect(workbook).toContain("Er entscheidet nicht über den Kursabschluss.");
+  });
+
+  test("does not require confidence or reflection to complete a C2 day", () => {
+    const day1 = buildC2DayProgress(1, {
+      progress: { learnDone: true, lesenDone: true },
+    });
+    expect(day1.dayComplete).toBe(true);
+    expect(workbook).not.toContain("<strong>Confidence</strong>");
+    expect(workbook).not.toContain("<strong>Reflection</strong>");
+    expect(workbook).toContain("Review is revision only");
   });
 
   test("reduces speaking help and varies writing formats as the course advances", () => {

@@ -22,7 +22,7 @@ const C2_COURSE_BOOK_ENTRIES = Object.freeze(
         grammar_topic: lesson.grammarFocus,
         grammarFocus: lesson.grammarFocus,
         goal: Array.isArray(lesson.objectives) ? lesson.objectives.join(" · ") : lesson.topic,
-        instruction: `Complete Grammar/Learn, then today’s ${skillLabel} task. Only the assigned main skill is required for this day; use Finish to record confidence and review progress.`,
+        instruction: `Complete Grammar/Learn, then today’s ${skillLabel} task. Day completion is automatic; use Review to revise the key ideas, grammar and vocabulary.`,
         skillFocus,
         skillLabel,
         assignment: false,
