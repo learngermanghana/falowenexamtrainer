@@ -10,6 +10,7 @@ import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/ger
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import CourseCompletionConclusion from "./CourseCompletionConclusion";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
@@ -758,6 +759,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
   const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
   const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";
+  const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);
   const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(normalizedSelectedCourseLevel);
   const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
@@ -814,6 +816,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
   const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
   const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};
+  const passedAssignmentCount = isC2CourseBook ? 0 : (courseCompletion?.passed || 0);
+  const courseIsComplete = isCourseConclusionLevel && (
+    isC2CourseBook
+      ? courseLessons.length > 0 && completedCount === courseLessons.length
+      : Boolean(courseCompletion?.courseWorkCompleted)
+  );
 
   useEffect(() => {
     if (isC2CourseBook || loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;
@@ -840,13 +848,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const visibleLessons = useMemo(
     () =>
       decoratedSchedule.filter((entry) => {
+        if (isCourseConclusionLevel && entry.isMilestone) return false;
         if (!lessonMatchesSearch(entry, searchTerm)) return false;
         if (activeFilter === "next") return entry.assignmentKey === nextLesson?.assignmentKey;
         if (activeFilter === "assignments") return entry.isTutorMarked;
         if (activeFilter === "selfLearning") return !entry.isTutorMarked;
         return true;
       }),
-    [decoratedSchedule, searchTerm, activeFilter, nextLesson]
+    [decoratedSchedule, searchTerm, activeFilter, nextLesson, isCourseConclusionLevel]
   );
 
   const groupedLessons = useMemo(() => {
@@ -1332,6 +1341,24 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>
             </section>
           )}
+
+          {isCourseConclusionLevel ? (
+            <CourseCompletionConclusion
+              level={normalizedSelectedCourseLevel}
+              isComplete={courseIsComplete}
+              completedRequirements={completedCount}
+              totalRequirements={isC2CourseBook ? courseLessons.length : (courseCompletion?.total || 0)}
+              passedAssignments={passedAssignmentCount}
+              totalAssignments={isC2CourseBook ? 0 : assignmentCount}
+              needsImprovement={isC2CourseBook ? 0 : (courseCompletion?.needsImprovement || 0)}
+              awaitingReview={isC2CourseBook ? 0 : (courseCompletion?.awaitingReview || 0)}
+              onExploreNextLevel={() => {
+                const nextLevel = { A1: "A2", A2: "B1", B1: "B2", B2: "C1", C1: "C2" }[normalizedSelectedCourseLevel];
+                if (nextLevel) navigate(`/campus/course/preview/${nextLevel}`);
+              }}
+            />
+          ) : null}
+
           {usesSharedA2B1Design ? (
             <nav className="course-book-mobile-actions" aria-label="Course Book actions">
               <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson)}>
