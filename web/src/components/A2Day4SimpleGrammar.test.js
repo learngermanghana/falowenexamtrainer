@@ -10,15 +10,18 @@ describe("A2 Day 4 simple Wo/Wohin grammar", () => {
 
   test("teaches the core Wo and Wohin rule directly", () => {
     expect(grammar).toContain("Wo? = Where?");
-    expect(grammar).toContain("Location / position →");
+    expect(grammar).toContain("Something is located at a place →");
     expect(grammar).toContain("Dativ");
     expect(grammar).toContain("Wohin? = Where to?");
-    expect(grammar).toContain("Movement / destination →");
+    expect(grammar).toContain("The destination changes:");
     expect(grammar).toContain("Akkusativ");
     expect(grammar).toContain("Wir treffen uns");
+    expect(grammar).toContain("in dem Café");
     expect(grammar).toContain("im Café");
     expect(grammar).toContain("Wir gehen");
+    expect(grammar).toContain("in das Café");
     expect(grammar).toContain("ins Café");
+    expect(grammar).toContain("movement alone does not automatically mean Akkusativ");
   });
 
   test("includes all two-way prepositions without nine numbered reading sections", () => {
