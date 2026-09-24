@@ -7,7 +7,7 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v14`;
+const CACHE_NAME = `${CACHE_PREFIX}-v15`;
 const OFFLINE_URL = "/offline.html";
 const VERSIONED_ASSET_PREFIX = "/assets/";
 const BUILD_ASSET_MANIFEST_URL = "/offline-build-assets.json";
