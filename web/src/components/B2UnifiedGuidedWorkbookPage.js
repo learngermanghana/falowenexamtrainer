@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
-import B2KnowledgeChoicePractice from "./B2KnowledgeChoicePractice";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -12,6 +11,7 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
 import { getB2ListeningPractice, hasB2ListeningSource } from "../data/b2ListeningPractice";
+import { getB2ReadingPractice } from "../data/b2ReadingPractice";
 import { getB2DayTabs, getB2SkillFocus, getB2SkillLabel } from "../data/b2SkillCycle";
 import {
   getStandardLessonStorageKey,
@@ -19,6 +19,9 @@ import {
   getStandardWritingConfig,
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
+import fetchB2AudioPlaybackUrl from "../services/b2AudioService";
+import { useB2CloudDraftField } from "../utils/b2CloudDraftSync";
 
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const sub = { border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 };
@@ -32,55 +35,13 @@ const normalizeVocab = (lesson = {}) => {
     .slice(0, 6);
 };
 
-const getReadingQuestions = (day) => {
-  const current = B2_TOPIC_FOUNDATIONS[day];
-  const alignment = getB2LessonContentAlignment(day);
-  if (!current || !alignment) return [];
-  const otherDays = [1, 5, 9, 13, 17, 21, 25].filter((candidate) => candidate !== day);
-  const picks = otherDays.slice(0, 3);
-  const optionsFrom = (field, correct) => [
-    correct,
-    ...picks.map((candidate) => B2_TOPIC_FOUNDATIONS[candidate]?.[field]).filter(Boolean),
-  ].slice(0, 4);
-  return [
-    {
-      question: "Welches konkrete Beispiel wird im Text genannt?",
-      options: optionsFrom("example", current.example),
-      answer: current.example,
-      explanation: "Das Beispiel steht ausdrücklich im Lesetext und macht das Thema konkret.",
-    },
-    {
-      question: "Welcher Zielkonflikt steht im Mittelpunkt?",
-      options: optionsFrom("tension", current.tension),
-      answer: current.tension,
-      explanation: "Der Text stellt genau diese beiden Interessen einander gegenüber.",
-    },
-    {
-      question: "Welche Leitfrage passt zum Text?",
-      options: optionsFrom("question", current.question),
-      answer: current.question,
-      explanation: "Diese Leitfrage fasst die zentrale Abwägung des Textes zusammen.",
-    },
-    {
-      question: "Welches Lernziel gehört zu diesem Thema?",
-      options: [
-        alignment.goal,
-        ...picks.map((candidate) => getB2LessonContentAlignment(candidate)?.goal).filter(Boolean),
-      ].slice(0, 4),
-      answer: alignment.goal,
-      explanation: "Das Lernziel verbindet Inhalt, Bewertung und die sprachliche Aufgabe des Tages.",
-    },
-  ];
-};
-
 function ReadingPractice({ day, progress, setProgress }) {
-  const foundation = B2_TOPIC_FOUNDATIONS[day];
-  const alignment = getB2LessonContentAlignment(day);
-  const questions = useMemo(() => getReadingQuestions(day), [day]);
+  const practice = getB2ReadingPractice(day);
+  const questions = Array.isArray(practice?.questions) ? practice.questions : [];
   const answers = progress.readingAnswers || {};
   const firstAttempts = progress.readingFirstAttempts || {};
-  const answered = questions.filter((_, index) => answers[index]).length;
-  const firstCorrect = questions.filter((item, index) => firstAttempts[index] === item.answer).length;
+  const answered = questions.filter((_, index) => Number.isInteger(answers[index])).length;
+  const firstCorrect = questions.filter((item, index) => firstAttempts[index] === item.answerIndex).length;
 
   useEffect(() => {
     if (questions.length && answered === questions.length && !progress.lesenDone) {
@@ -88,56 +49,56 @@ function ReadingPractice({ day, progress, setProgress }) {
     }
   }, [answered, progress.lesenDone, questions.length, setProgress]);
 
-  if (!foundation || !alignment) return null;
+  if (!practice) return null;
 
-  const choose = (index, option) => {
+  const choose = (index, optionIndex) => {
     setProgress((old) => ({
       ...old,
-      readingAnswers: { ...(old.readingAnswers || {}), [index]: option },
-      readingFirstAttempts: old.readingFirstAttempts?.[index]
+      readingAnswers: { ...(old.readingAnswers || {}), [index]: optionIndex },
+      readingFirstAttempts: Number.isInteger(old.readingFirstAttempts?.[index])
         ? old.readingFirstAttempts
-        : { ...(old.readingFirstAttempts || {}), [index]: option },
+        : { ...(old.readingFirstAttempts || {}), [index]: optionIndex },
     }));
   };
 
-  return <Section title={`Lesen · ${alignment.title}`}>
-    <div style={{ ...sub, background: "#f8fafc", lineHeight: 1.75 }}>
+  return <Section title={`Lesen · ${practice.title}`}>
+    <article style={{ ...sub, background: "#f8fafc", lineHeight: 1.8 }} data-b2-reading-text="true">
       <strong>Lesetext</strong>
-      <p style={{ margin: 0 }}>{foundation.intro}</p>
-      <p style={{ margin: 0 }}>{foundation.example}</p>
-      <p style={{ margin: 0 }}><strong>Abwägung:</strong> {foundation.tension}. {alignment.goal}</p>
-    </div>
+      {practice.paragraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}>{paragraph}</p>)}
+    </article>
     <div style={{ ...sub, background: "#eff6ff" }}>
       <strong>Textverständnis</strong>
-      <span>Beantworten Sie alle Fragen. Sie erhalten sofort Rückmeldung; der erste Versuch dient nur als Lernstand.</span>
+      <span>Lesen Sie den vollständigen Text und beantworten Sie alle fünf Fragen. Sie erhalten sofort Rückmeldung; der erste Versuch dient nur als Lernstand.</span>
     </div>
     <div style={{ display: "grid", gap: 14 }}>
       {questions.map((item, index) => {
         const selected = answers[index];
-        const hasAnswer = Boolean(selected);
-        const correct = selected === item.answer;
+        const hasAnswer = Number.isInteger(selected);
+        const correct = selected === item.answerIndex;
         return <article key={item.question} style={sub}>
           <strong>{index + 1}. {item.question}</strong>
           <div style={{ display: "grid", gap: 8 }}>
-            {item.options.map((option) => (
-              <button
+            {item.options.map((option, optionIndex) => {
+              const isCorrectOption = hasAnswer && optionIndex === item.answerIndex;
+              const isSelected = selected === optionIndex;
+              return <button
                 key={option}
                 type="button"
-                onClick={() => choose(index, option)}
+                onClick={() => choose(index, optionIndex)}
                 style={{
                   ...styles.secondaryButton,
                   textAlign: "left",
                   justifyContent: "flex-start",
-                  background: hasAnswer && option === item.answer ? "#f0fdf4" : selected === option ? "#fff7ed" : "#fff",
-                  border: hasAnswer && option === item.answer ? "2px solid #86efac" : selected === option ? "2px solid #fdba74" : "1px solid #cbd5e1",
+                  background: isCorrectOption ? "#f0fdf4" : isSelected ? "#fff7ed" : "#fff",
+                  border: isCorrectOption ? "2px solid #86efac" : isSelected ? "2px solid #fdba74" : "1px solid #cbd5e1",
                   color: "#0f172a",
                 }}
               >
-                {option}
-              </button>
-            ))}
+                {String.fromCharCode(65 + optionIndex)}. {option}
+              </button>;
+            })}
           </div>
-          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{item.answer}</strong>. </> : null}{item.explanation}</div> : null}
+          {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}</div> : null}
         </article>;
       })}
     </div>
@@ -148,15 +109,126 @@ function ReadingPractice({ day, progress, setProgress }) {
   </Section>;
 }
 
-function ListeningPractice({ day }) {
+function ListeningPractice({ day, progress, setProgress }) {
+  const { idToken } = useAuth();
   const practice = getB2ListeningPractice(day);
+  const audioKey = String(practice?.audioKey || "").trim();
   const hasSource = hasB2ListeningSource(practice);
+  const transcriptParagraphs = Array.isArray(practice?.transcript)
+    ? practice.transcript.filter(Boolean)
+    : String(practice?.transcript || "").split(/\n\s*\n/).map((value) => value.trim()).filter(Boolean);
+  const questions = Array.isArray(practice?.questions) ? practice.questions : [];
+  const answers = progress.listeningAnswers || {};
+  const firstAttempts = progress.listeningFirstAttempts || {};
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [signedAudioUrl, setSignedAudioUrl] = useState("");
+  const [audioState, setAudioState] = useState(audioKey ? "loading" : "idle");
+  const [audioError, setAudioError] = useState("");
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const retryRef = useRef(0);
+
+  const answered = questions.filter((_, index) => Number.isInteger(answers[index])).length;
+  const firstCorrect = questions.filter((item, index) => firstAttempts[index] === item.answerIndex).length;
+
+  useEffect(() => {
+    if (questions.length && answered === questions.length && !progress.hoerenDone) {
+      setProgress((old) => ({ ...old, hoerenDone: true }));
+    }
+  }, [answered, progress.hoerenDone, questions.length, setProgress]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!audioKey) {
+      setSignedAudioUrl("");
+      setAudioState("idle");
+      setAudioError("");
+      return () => { cancelled = true; };
+    }
+    if (!idToken) {
+      setSignedAudioUrl("");
+      setAudioState("error");
+      setAudioError("Bitte melden Sie sich erneut an, um das Audio abzuspielen.");
+      return () => { cancelled = true; };
+    }
+
+    setAudioState("loading");
+    setAudioError("");
+    fetchB2AudioPlaybackUrl({ day, key: audioKey, idToken })
+      .then(({ url }) => {
+        if (cancelled) return;
+        setSignedAudioUrl(url);
+        setAudioState("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setSignedAudioUrl("");
+        setAudioState("error");
+        setAudioError(error?.response?.data?.error || error?.message || "Das Audio konnte nicht geladen werden.");
+      });
+    return () => { cancelled = true; };
+  }, [audioKey, day, idToken, refreshNonce]);
+
+  const choose = (index, optionIndex) => {
+    setProgress((old) => ({
+      ...old,
+      listeningAnswers: { ...(old.listeningAnswers || {}), [index]: optionIndex },
+      listeningFirstAttempts: Number.isInteger(old.listeningFirstAttempts?.[index])
+        ? old.listeningFirstAttempts
+        : { ...(old.listeningFirstAttempts || {}), [index]: optionIndex },
+    }));
+  };
+
+  const handleAudioError = () => {
+    if (!audioKey) return;
+    if (retryRef.current < 1) {
+      retryRef.current += 1;
+      setRefreshNonce((value) => value + 1);
+      return;
+    }
+    setAudioState("error");
+    setAudioError("Das Audio konnte nicht abgespielt werden. Bitte laden Sie es erneut.");
+  };
+
   if (!practice) return null;
+
   return <Section title={`Hören · ${practice.title}`}>
     {!hasSource ? <div style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }} data-b2-listening-awaiting-source="true">
       <strong>Hörquelle wird ergänzt</strong>
-      <span>Die B2-Hörseite ist vorbereitet. Sobald die echte Aufnahme und das Transkript vorliegen, kommen hier derselbe Falowen-Audioplayer, ein optionales Transkript und Fragen aus dem tatsächlichen Hörtext hinein.</span>
-    </div> : null}
+      <span>Für diesen neuen B2-Hörtag ist noch keine endgültige Aufnahme eingetragen. Es werden keine alten Falowen-Radio- oder AI-Video-Inhalte wiederverwendet.</span>
+    </div> : <>
+      {audioState === "loading" ? <div style={{ ...sub, background: "#eff6ff" }}><strong>Audio wird geladen …</strong><span>Falowen bereitet die geschützte Aufnahme vor.</span></div> : null}
+      {signedAudioUrl ? <div style={sub}><strong>Hörtext</strong><audio data-b2-r2-audio="true" controls preload="metadata" src={signedAudioUrl} onError={handleAudioError} onCanPlay={() => { retryRef.current = 0; setAudioState("ready"); setAudioError(""); }} style={{ width: "100%" }}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{ color: "#64748b", fontSize: 13 }}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div> : null}
+      {audioState === "error" ? <div style={{ ...sub, background: "#fff7f7", borderColor: "#fecaca" }}><strong>Audio momentan nicht verfügbar</strong><span>{audioError}</span><div><button type="button" onClick={() => { retryRef.current = 0; setRefreshNonce((value) => value + 1); }} style={styles.secondaryButton}>Audio erneut laden</button></div></div> : null}
+
+      {transcriptParagraphs.length ? <div style={{ ...sub, background: "#f8fafc" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div><strong>Transkript</strong><div style={{ color: "#64748b", fontSize: 13, marginTop: 3 }}>Versuchen Sie den ersten Durchgang ohne Transkript. Danach können Sie es zum Mitlesen oder Überprüfen einblenden.</div></div>
+          <button type="button" onClick={() => setShowTranscript((value) => !value)} aria-expanded={showTranscript} style={styles.secondaryButton}>{showTranscript ? "Transkript ausblenden" : "Transkript anzeigen"}</button>
+        </div>
+        {showTranscript ? <article data-b2-listening-transcript="true" style={{ display: "grid", gap: 12, lineHeight: 1.8 }}>{transcriptParagraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}>{paragraph}</p>)}</article> : null}
+      </div> : null}
+
+      {questions.length ? <div style={{ display: "grid", gap: 14 }}>
+        {questions.map((item, index) => {
+          const selected = answers[index];
+          const hasAnswer = Number.isInteger(selected);
+          const correct = selected === item.answerIndex;
+          return <article key={item.question} style={sub}>
+            <strong>{index + 1}. {item.question}</strong>
+            <div style={{ display: "grid", gap: 8 }}>{item.options.map((option, optionIndex) => {
+              const isCorrectOption = hasAnswer && optionIndex === item.answerIndex;
+              const isSelected = selected === optionIndex;
+              return <button key={option} type="button" onClick={() => choose(index, optionIndex)} style={{ ...styles.secondaryButton, textAlign: "left", justifyContent: "flex-start", background: isCorrectOption ? "#f0fdf4" : isSelected ? "#fff7ed" : "#fff", border: isCorrectOption ? "2px solid #86efac" : isSelected ? "2px solid #fdba74" : "1px solid #cbd5e1", color: "#0f172a" }}>{String.fromCharCode(65 + optionIndex)}. {option}</button>;
+            })}</div>
+            {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}</div> : null}
+          </article>;
+        })}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
+          <div style={{ ...sub, background: answered === questions.length ? "#f0fdf4" : "#f8fafc" }}><strong>{answered}/{questions.length} beantwortet</strong><span>{answered === questions.length ? "Hören ist für heute abgeschlossen." : "Beantworten Sie alle Fragen."}</span></div>
+          <div style={{ ...sub, background: "#f8fafc" }}><strong>Erster Versuch: {firstCorrect}/{questions.length}</strong><span>Nur Lernstand — kein Blockieren des Kursabschlusses.</span></div>
+        </div>
+      </div> : <div style={{ ...sub, background: "#eff6ff" }}><strong>Fragen folgen mit dem endgültigen Transkript</strong><span>Die Fragen werden erst aus der tatsächlichen Aufnahme erstellt, damit sie exakt zum Hörtext passen.</span></div>}
+    </>}
   </Section>;
 }
 
@@ -207,14 +279,17 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
         writeDone: false,
         readingAnswers: {},
         readingFirstAttempts: {},
+        listeningAnswers: {},
+        listeningFirstAttempts: {},
         ...JSON.parse(localStorage.getItem(storageKey) || "{}"),
       };
     } catch {
-      return { learnDone: false, lesenDone: false, hoerenDone: false, speakDone: false, writeDone: false, readingAnswers: {}, readingFirstAttempts: {} };
+      return { learnDone: false, lesenDone: false, hoerenDone: false, speakDone: false, writeDone: false, readingAnswers: {}, readingFirstAttempts: {}, listeningAnswers: {}, listeningFirstAttempts: {} };
     }
   });
 
   useEffect(() => { try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch {} }, [progress, storageKey]);
+  useB2CloudDraftField({ day, field: "progress", value: progress, setValue: setProgress, seedCloudWhenMissing: true, defaultValue: { learnDone: false, lesenDone: false, hoerenDone: false, speakDone: false, writeDone: false, readingAnswers: {}, readingFirstAttempts: {}, listeningAnswers: {}, listeningFirstAttempts: {} } });
   useEffect(() => setActive(requestedView), [requestedView]);
 
   const changeView = (next) => {
@@ -265,13 +340,12 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       <B2TopicIntroduction day={day} />
       <Section title="Grammar / Learn">
         <div style={{ ...sub, background: "#f8fafc" }}><strong>Grammar focus</strong><span>{alignment.grammar_topic}</span><span><strong>Goal:</strong> {alignment.goal}</span></div>
-        <B2KnowledgeChoicePractice lesson={lesson} onCompleteChange={(complete) => complete && setProgress((old) => old.learnDone ? old : ({ ...old, learnDone: true }))} />
         <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700, lineHeight: 1.5 }}><input type="checkbox" checked={Boolean(progress.learnDone)} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} style={{ marginTop: 4 }} />Ich habe das Thema und den Grammatikfokus verstanden.</label>
       </Section>
     </> : null}
 
     {active === "lesen" ? <ReadingPractice day={day} progress={progress} setProgress={setProgress} /> : null}
-    {active === "hoeren" ? <ListeningPractice day={day} /> : null}
+    {active === "hoeren" ? <ListeningPractice day={day} progress={progress} setProgress={setProgress} /> : null}
     {active === "speak" ? <Section title="Sprechen"><B2SpeakingSupportGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700 }}><input type="checkbox" checked={Boolean(progress.speakDone)} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />Ich habe die Sprechaufgabe abgeschlossen.</label></Section> : null}
     {active === "write" ? <Section title="Schreiben"><WritingCheatSheetTabs level="B2" day={day}><WritingTaskPrompt lesson={lesson} /><GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={({ complete }) => setProgress((old) => old.writeDone === Boolean(complete) ? old : ({ ...old, writeDone: Boolean(complete) }))} /></WritingCheatSheetTabs></Section> : null}
     {active === "review" ? <Review day={day} alignment={alignment} lesson={lesson} skillLabel={skillLabel} ready={ready} progress={progress} /> : null}
