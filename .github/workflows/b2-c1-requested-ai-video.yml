@@ -6,6 +6,14 @@ on:
       - "web/src/data/b2C1LessonMediaOverrides.js"
       - "web/src/data/requestedLessonMediaMappings.test.js"
       - "web/src/data/b2Day13To15RequestedAiVideos.test.js"
+      - "web/src/data/b2Day16Day17AiVideos.test.js"
+      - "web/src/data/b2Day11FalowenRadio.test.js"
+      - "web/src/data/b2MediaReset.test.js"
+      - "web/src/data/lessonRadioDictionary.js"
+      - "web/src/data/lessonRadioDictionary.test.js"
+      - "web/src/data/selfLearningLessons/b2/**"
+      - "shared/curriculumCanonical.json"
+      - "web/src/data/lessonCatalog.js"
       - "web/src/data/lessonModel.js"
       - "web/src/data/lessonVideoDictionary.js"
       - "web/src/data/additionalLessonVideoResources.js"
@@ -27,11 +35,18 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Test requested lesson media ownership
+      - name: Test B2 media reset and remaining media ownership
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/requestedLessonMediaMappings.test.js src/data/b2Day13To15RequestedAiVideos.test.js
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/data/b2MediaReset.test.js
+          src/data/requestedLessonMediaMappings.test.js
+          src/data/b2Day13To15RequestedAiVideos.test.js
+          src/data/b2Day16Day17AiVideos.test.js
+          src/data/b2Day11FalowenRadio.test.js
+          src/data/lessonRadioDictionary.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
