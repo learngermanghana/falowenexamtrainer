@@ -9,6 +9,10 @@ on:
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
       - "web/src/components/StandardWorkbookComponents.js"
+      - "web/src/components/RadioFirstWorkbookGate.js"
+      - "web/src/components/RadioFirstWorkbookGate.test.js"
+      - "web/src/components/StandardLessonWritingCoachPage.js"
+      - "web/src/components/StandardLessonWritingCoachPage.test.js"
       - "web/src/data/b2SkillCycle.js"
       - "web/src/data/b2ReadingPractice.js"
       - "web/src/data/b2ListeningPractice.js"
@@ -19,6 +23,8 @@ on:
       - "web/src/data/b2Day16Day17AiVideos.test.js"
       - "web/src/data/lessonRadioDictionary.js"
       - "web/src/data/lessonRadioDictionary.test.js"
+      - "web/src/data/lessonModel.js"
+      - "web/src/data/lessonModel.test.js"
       - "web/src/data/additionalLessonVideoResources.js"
       - "web/src/data/writingVideoResources.js"
       - "web/src/data/writingVideoResources.test.js"
@@ -56,6 +62,9 @@ jobs:
           src/components/C2UnifiedGuidedWorkbookPage.test.js
           src/components/SelfLearningLessonRegistry.test.js
           src/components/SelfLearningLessonRegistry.mediaRoles.test.js
+          src/components/RadioFirstWorkbookGate.test.js
+          src/components/StandardLessonWritingCoachPage.test.js
+          src/data/lessonModel.test.js
           src/data/b2MediaReset.test.js
           src/data/b2Day11FalowenRadio.test.js
           src/data/b2Day13To15RequestedAiVideos.test.js
