@@ -104,13 +104,6 @@ const WoTreffenUnsGrammarPage = () => (
         </div>
       </div>
 
-      <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 12, padding: 12, lineHeight: 1.75 }}>
-        <strong>Important:</strong> movement alone does not automatically mean Akkusativ.
-        <br />
-        <strong>Ich laufe im Park.</strong> has movement, but the person stays inside the park, so the sentence still answers <strong>Wo?</strong> → Dativ.
-        <br />
-        Ask: <strong>Where is the action happening?</strong> or <strong>Where is the destination?</strong>
-      </div>
     </section>
 
     <section style={card}>
