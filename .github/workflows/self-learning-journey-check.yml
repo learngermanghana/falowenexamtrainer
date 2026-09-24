@@ -8,6 +8,9 @@ on:
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "web/src/components/SelfLearningLessonRegistry.test.js"
       - "web/src/components/SelfLearningLessonRegistry.standardization.test.js"
+      - "web/src/components/B2TopicIntroduction.jsx"
+      - "web/src/components/B2TopicIntroduction.test.jsx"
+      - "web/src/components/B2SelfLearningSubmissionIsolation.test.js"
       - "web/src/components/selfLearning/SelfLearningJourneyGate.js"
       - "web/src/components/selfLearning/SelfLearningJourneyGate.test.js"
       - "web/src/data/a1Day19SubmissionRestoration.test.js"
@@ -29,6 +32,16 @@ jobs:
       - working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
+      - name: Test B2 topic-first learning and submission isolation
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          ./node_modules/.bin/jest --runInBand --runTestsByPath
+          src/components/B2TopicIntroduction.test.jsx
+          src/components/B2SelfLearningSubmissionIsolation.test.js
+
+
       - name: Test shared materials selector
         working-directory: web
         env:
@@ -40,6 +53,7 @@ jobs:
         env:
           CI: true
         run: npm run test:ci -- --runTestsByPath src/components/SelfLearningLessonRegistry.test.js
+
 
       - name: Test B2 and C1 registry coverage
         working-directory: web

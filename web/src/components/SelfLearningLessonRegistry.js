@@ -11,7 +11,6 @@ import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import C2UnifiedGuidedWorkbookPage from "./C2UnifiedGuidedWorkbookPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
-import AdvancedTutorMarkedSubmissionPanel from "./AdvancedTutorMarkedSubmissionPanel";
 import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../data/b2LessonContentAlignment";
 import { alignC2SelfLearningLesson } from "../data/c2LessonContentAlignment";
@@ -82,16 +81,7 @@ export const SELF_LEARNING_LESSONS = {
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
-export const SelfLearningLessonFrame = ({ children, level, day, canonicalLesson }) => (
-  <>
-    {children}
-    <AdvancedTutorMarkedSubmissionPanel
-      level={level}
-      day={day}
-      canonicalLesson={canonicalLesson}
-    />
-  </>
-);
+export const SelfLearningLessonFrame = ({ children }) => <>{children}</>;
 
 const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const normalizedLevel = String(level || "").toUpperCase();

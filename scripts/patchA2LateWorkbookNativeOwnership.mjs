@@ -167,8 +167,16 @@ const groupingAfter = `  const groupedLessons = useMemo(() => {
         : null,
   ]);`;
 if (!courseTab.includes("getA2CourseBookSection(entry)")) {
-  if (!courseTab.includes(groupingBefore)) throw new Error("Could not find Course Book grouping block.");
-  courseTab = courseTab.replace(groupingBefore, groupingAfter);
+  if (courseTab.includes(groupingBefore)) {
+    courseTab = courseTab.replace(groupingBefore, groupingAfter);
+  } else {
+    const groupingStart = courseTab.indexOf("  const groupedLessons = useMemo(() => {");
+    const groupingEnd = courseTab.indexOf("  const persistPracticeProgress", groupingStart);
+    if (groupingStart < 0 || groupingEnd < 0) {
+      throw new Error("Could not find current Course Book grouping region.");
+    }
+    courseTab = `${courseTab.slice(0, groupingStart)}${groupingAfter}\n\n${courseTab.slice(groupingEnd)}`;
+  }
 }
 
 const a1Intro = `                  {section?.key === "a1-2" && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === 13) ? (
