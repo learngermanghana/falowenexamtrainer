@@ -84,7 +84,7 @@ describe("self-learning lesson Falowen Radio integration", () => {
     renderRegisteredLesson("C1", 28);
 
     expect(screen.queryByRole("heading", { name: "🎙️ Falowen Radio" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Learn" })).toBeInTheDocument();
   });
 
   test("C1 Engagement und Ehrenamt uses the Day 1 standout Radio-to-tabs workbook", () => {
@@ -96,12 +96,12 @@ describe("self-learning lesson Falowen Radio integration", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /continue to teil/i }));
 
-    expect(screen.getByRole("heading", { name: /Engagement und Ehrenamt/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "1. Learn" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "2. Speak" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "3. Write" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "4. Finish" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "5. Ref" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Engagement und Ehrenamt", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Learn" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Speak" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Write" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Finish" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Ref" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Teil 1 · Sprechen/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/supporting materials/i)).not.toBeInTheDocument();
   });
@@ -109,7 +109,7 @@ describe("self-learning lesson Falowen Radio integration", () => {
   test("C1 Day 8 keeps the saved Schreiben video on the Write page", () => {
     renderRegisteredLesson("C1", 8);
 
-    fireEvent.click(screen.getByRole("button", { name: "3. Write" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Write" }));
 
     expect(screen.getByText("Watch before writing · Essay Ideas")).toBeInTheDocument();
     expect(screen.getByTitle("C1 Day 8 · Wohnen und Stadtentwicklung · Writing explanation")).toHaveAttribute(
