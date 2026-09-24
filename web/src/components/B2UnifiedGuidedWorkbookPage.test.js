@@ -30,9 +30,24 @@ describe("B2 unified C2-style course structure", () => {
     expect(getB2DayTabs(4).map((tab) => tab.key)).not.toContain("finish");
   });
 
-  test("prepares only the seven designated Hören days for private R2 audio and real transcripts", () => {
+  test("connects Day 2 to its real R2 audio while later Hören days stay pending", () => {
     expect(Object.keys(B2_LISTENING_PRACTICE).map(Number)).toEqual([2, 6, 10, 14, 18, 22, 26]);
-    Object.values(B2_LISTENING_PRACTICE).forEach((practice) => {
+
+    const day2 = B2_LISTENING_PRACTICE[2];
+    expect(day2.audioKey).toBe("b2/day-02/day.02.m4a");
+    expect(day2.audioUrl).toBeUndefined();
+    expect(Array.isArray(day2.transcript)).toBe(true);
+    expect(day2.transcript.length).toBeGreaterThanOrEqual(10);
+    expect(day2.vocabulary).toHaveLength(8);
+    expect(day2.questions).toHaveLength(5);
+    day2.questions.forEach((question) => {
+      expect(question.options).toHaveLength(4);
+      expect(Number.isInteger(question.answerIndex)).toBe(true);
+      expect(question.explanation.length).toBeGreaterThan(20);
+    });
+
+    [6, 10, 14, 18, 22, 26].forEach((day) => {
+      const practice = B2_LISTENING_PRACTICE[day];
       expect(practice.audioKey).toBe("");
       expect(practice.transcript).toBe("");
       expect(practice.audioUrl).toBeUndefined();
@@ -71,6 +86,8 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("Erster Versuch:");
     expect(page).toContain('data-b2-listening-awaiting-source="true"');
     expect(page).toContain('data-b2-r2-audio="true"');
+    expect(page).toContain('data-b2-listening-vocabulary="true"');
+    expect(page).toContain("Vor dem Hören · wichtige Wörter");
     expect(page).toContain("fetchB2AudioPlaybackUrl");
     expect(page).toContain("Transkript anzeigen");
     expect(page).toContain("Transkript ausblenden");
