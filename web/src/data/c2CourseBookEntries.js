@@ -1,10 +1,13 @@
 import { C2_LESSON_CONTENT_ALIGNMENT } from "./c2LessonContentAlignment.js";
+import { getC2SkillFocus, getC2SkillLabel } from "./c2SkillCycle.js";
 
 const C2_COURSE_BOOK_ENTRIES = Object.freeze(
   Object.entries(C2_LESSON_CONTENT_ALIGNMENT)
     .sort(([leftDay], [rightDay]) => Number(leftDay) - Number(rightDay))
     .map(([dayKey, lesson]) => {
       const day = Number(dayKey);
+      const skillFocus = getC2SkillFocus(day);
+      const skillLabel = getC2SkillLabel(day)?.label || "main skill";
 
       return Object.freeze({
         level: "C2",
@@ -19,7 +22,9 @@ const C2_COURSE_BOOK_ENTRIES = Object.freeze(
         grammar_topic: lesson.grammarFocus,
         grammarFocus: lesson.grammarFocus,
         goal: Array.isArray(lesson.objectives) ? lesson.objectives.join(" · ") : lesson.topic,
-        instruction: "Work through the C2 mastery lesson, study the matched collocations and grammar notes, then complete the writing task and compare your work with the model.",
+        instruction: `Complete Grammar/Learn, then today’s ${skillLabel} task. Only the assigned main skill is required for this day; use Finish to record confidence and review progress.`,
+        skillFocus,
+        skillLabel,
         assignment: false,
         submissionRequired: false,
         progressionEligible: true,
