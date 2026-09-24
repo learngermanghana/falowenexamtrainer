@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { B2_SKILL_DAYS, getB2DayTabs, getB2SkillFocus } from "../data/b2SkillCycle";
 import { B2_LISTENING_PRACTICE } from "../data/b2ListeningPractice";
+import { B2_READING_PRACTICE } from "../data/b2ReadingPractice";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -29,12 +30,25 @@ describe("B2 unified C2-style course structure", () => {
     expect(getB2DayTabs(4).map((tab) => tab.key)).not.toContain("finish");
   });
 
-  test("prepares only the seven designated Hören days for real source/transcript content", () => {
+  test("prepares only the seven designated Hören days for private R2 audio and real transcripts", () => {
     expect(Object.keys(B2_LISTENING_PRACTICE).map(Number)).toEqual([2, 6, 10, 14, 18, 22, 26]);
     Object.values(B2_LISTENING_PRACTICE).forEach((practice) => {
       expect(practice.audioKey).toBe("");
-      expect(practice.audioUrl).toBe("");
       expect(practice.transcript).toBe("");
+      expect(practice.audioUrl).toBeUndefined();
+    });
+  });
+
+  test("provides full reading practice on all seven Lesen days", () => {
+    expect(Object.keys(B2_READING_PRACTICE).map(Number)).toEqual([1, 5, 9, 13, 17, 21, 25]);
+    Object.values(B2_READING_PRACTICE).forEach((practice) => {
+      expect(practice.paragraphs).toHaveLength(5);
+      expect(practice.questions).toHaveLength(5);
+      practice.questions.forEach((question) => {
+        expect(question.options).toHaveLength(4);
+        expect(Number.isInteger(question.answerIndex)).toBe(true);
+      });
+      expect(practice.paragraphs.join(" ").split(/\s+/).length).toBeGreaterThan(250);
     });
   });
 
@@ -51,10 +65,18 @@ describe("B2 unified C2-style course structure", () => {
     expect(nav).toContain('["B2", "C2"].includes(normalizedLevel)');
   });
 
-  test("keeps reading feedback, pending Hören, automatic completion and the new Review design", () => {
+  test("keeps reading feedback, private Hören, cloud sync, automatic completion and the new Review design", () => {
+    expect(page).toContain("getB2ReadingPractice");
     expect(page).toContain("Textverständnis");
     expect(page).toContain("Erster Versuch:");
     expect(page).toContain('data-b2-listening-awaiting-source="true"');
+    expect(page).toContain('data-b2-r2-audio="true"');
+    expect(page).toContain("fetchB2AudioPlaybackUrl");
+    expect(page).toContain("Transkript anzeigen");
+    expect(page).toContain("Transkript ausblenden");
+    expect(page).toContain('field: "progress"');
+    expect(page).toContain("useB2CloudDraftField");
+    expect(page).not.toContain("B2KnowledgeChoicePractice");
     expect(page).toContain("Hörquelle wird ergänzt");
     expect(page).toContain("Review · B2 Day");
     expect(page).toContain("Day complete ✓");
