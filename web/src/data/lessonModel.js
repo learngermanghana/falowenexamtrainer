@@ -56,10 +56,22 @@ const mergeVideos = (...groups) => {
 };
 const isTeacherVideo = (item = {}) =>
   /teacher|tutor lecture/.test(`${item.key || ""} ${item.title || ""}`.toLowerCase());
-const getLessonRadio = (level, day) =>
-  getB2C1RadioResource(level, day) ||
-  getLessonRadioResource(level, day) ||
-  getB1Day5RadioResource(level, day);
+const hasPlayableRadioResource = (resource) =>
+  Boolean(
+    String(resource?.youtubeId || "").trim() ||
+      String(resource?.url || "").trim(),
+  );
+
+const getLessonRadio = (level, day) => {
+  const resource =
+    getB2C1RadioResource(level, day) ||
+    getLessonRadioResource(level, day) ||
+    getB1Day5RadioResource(level, day);
+  return hasPlayableRadioResource(resource) ? resource : null;
+};
+
+const isRedesignedB2Day = (level, day) =>
+  level === "B2" && Number(day) >= 1 && Number(day) <= 28;
 
 const shouldHideGrammarBook = ({ level, day }) => level === "A1" && Number(day) === 5;
 
@@ -311,11 +323,17 @@ export const normalizeLesson = (rawLesson = {}, requestedLevel = rawLesson.level
   const day = Number(rawLesson.day ?? rawLesson.assignmentDay ?? 0);
   const primary = firstLesson(rawLesson);
   const capabilities = LEVEL_CAPABILITIES[level] || LEVEL_CAPABILITIES.A1;
-  const groups = resourceGroups(rawLesson, level, day);
-  const configuredVideos = mergeVideos(
-    getLessonVideoResources(level, day, rawLesson),
-    getAdditionalLessonVideoResources(level, day),
-  );
+  const rawGroups = resourceGroups(rawLesson, level, day);
+  const strictB2 = isRedesignedB2Day(level, day);
+  const groups = strictB2
+    ? rawGroups.map((group) => ({ ...group, grammarBook: null }))
+    : rawGroups;
+  const configuredVideos = strictB2
+    ? []
+    : mergeVideos(
+        getLessonVideoResources(level, day, rawLesson),
+        getAdditionalLessonVideoResources(level, day),
+      );
   const cleanedConfiguredVideos = removeLegacyDuplicatedA1TeacherVideos({
     level,
     day,
