@@ -333,10 +333,15 @@ notification = replaceOnce(
 
 // Course Book: keep canonical completion, but make the first screen smaller and student-focused.
 if (!courseTab.includes("const latestCourseResult = useMemo(")) {
+  const latestResultAnchor = courseTab.includes(
+    `  const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};`,
+  )
+    ? `  const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};`
+    : `  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};`;
   courseTab = replaceOnce(
     courseTab,
-    `  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};`,
-    `  const nextPracticeState = nextLesson ? practiceProgress[nextLesson.assignmentKey] || {} : {};
+    latestResultAnchor,
+    `${latestResultAnchor}
   const latestCourseResult = useMemo(() => {
     const scored = Object.values(progressByAssignmentId || {}).filter((record) => {
       const score = Number(record?.latestScore ?? record?.bestScore);
@@ -420,7 +425,7 @@ if (!courseTab.includes('data-compact-course-hero="true"')) {
                   ) : (
                     "All required course work is complete."
                   )}
-                  {loadingLessonProgress ? " Syncing progress…" : ""}
+                  {loadingLessonProgress || (isC2CourseBook && loadingC2Progress) ? " Syncing progress…" : ""}
                 </p>
                 {lessonProgressError ? <p style={{ margin: "4px 0 0", color: "#b91c1c", fontSize: 12 }}>{lessonProgressError}</p> : null}
               </div>
@@ -459,20 +464,43 @@ if (!courseTab.includes('data-compact-course-hero="true"')) {
             <div className="course-book-quick-stats" style={courseBookStyles.statGrid}>
               <div style={courseBookStyles.statCard}>
                 <p style={courseBookStyles.statLabel}>Completed</p>
-                <p style={courseBookStyles.statValue}>{completedCount}/{courseCompletion.total || courseLessons.length}</p>
+                <p style={courseBookStyles.statValue}>{completedCount}/{isC2CourseBook ? courseLessons.length : (courseCompletion?.total || courseLessons.length)}</p>
               </div>
-              <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Next lesson</p>
-                <p style={{ ...courseBookStyles.statValue, fontSize: 14, overflowWrap: "anywhere" }}>
-                  {nextLesson ? getCourseBookDayLabel(nextLesson, dayTaskCounts) : "Course complete"}
-                </p>
-                {nextLessonTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{nextLessonTitle}</p> : null}
-              </div>
-              <div style={courseBookStyles.statCard}>
-                <p style={courseBookStyles.statLabel}>Latest result</p>
-                <p style={courseBookStyles.statValue}>{latestResultScore !== null ? \`${"${Math.round(latestResultScore)}"}/100\` : "—"}</p>
-                {latestResultTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{latestResultTitle}</p> : null}
-              </div>
+              {isC2CourseBook ? (
+                <>
+                  {[
+                    ["lesen", "Lesen"],
+                    ["hoeren", "Hören"],
+                    ["speak", "Sprechen"],
+                    ["write", "Schreiben"],
+                  ].map(([key, label]) => (
+                    <div key={key} style={courseBookStyles.statCard}>
+                      <p style={courseBookStyles.statLabel}>{label}</p>
+                      <p style={courseBookStyles.statValue}>{c2SkillSummary[key]?.completed || 0}/{c2SkillSummary[key]?.total || 7}</p>
+                      {key === "hoeren" && c2SkillSummary[key]?.waitingForSource ? (
+                        <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 10 }}>
+                          {c2SkillSummary[key].waitingForSource} source{c2SkillSummary[key].waitingForSource === 1 ? "" : "s"} pending
+                        </p>
+                      ) : null}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Next lesson</p>
+                    <p style={{ ...courseBookStyles.statValue, fontSize: 14, overflowWrap: "anywhere" }}>
+                      {nextLesson ? getCourseBookDayLabel(nextLesson, dayTaskCounts) : "Course complete"}
+                    </p>
+                    {nextLessonTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{nextLessonTitle}</p> : null}
+                  </div>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Latest result</p>
+                    <p style={courseBookStyles.statValue}>{latestResultScore !== null ? Math.round(latestResultScore) + "/100" : "—"}</p>
+                    {latestResultTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{latestResultTitle}</p> : null}
+                  </div>
+                </>
+              )}
             </div>
 
             <div style={{ display: "grid", gap: 5 }}>
