@@ -74,29 +74,17 @@ test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", ()
   ),
 );
 
-test("B2 Day 1 radio remains available", () =>
-  expect(getLessonRadioResource("B2", 1)).toEqual(
+test.each([
+  [1, "Persönliche Identität und Selbstverständnis"],
+  [2, "Beziehungen und Kommunikation"],
+  [3, "Öffentliches Leben vs. Privatsphäre"],
+  [4, "Bildung und Lernen"],
+  [27, "Prüfungstraining: Argumentieren und Reagieren 6.2"],
+])("B2 Day %i keeps the Falowen Radio slot with no old YouTube ID", (day, title) =>
+  expect(getLessonRadioResource("B2", day)).toEqual(
     expect.objectContaining({
-      title: "Persönliche Identität und Selbstverständnis",
-      youtubeId: "0lTNin1NTgc",
-    }),
-  ),
-);
-
-test("B2 Day 2 Beziehungen und Kommunikation uses the requested radio", () =>
-  expect(getLessonRadioResource("B2", 2)).toEqual(
-    expect.objectContaining({
-      title: "Beziehungen und Kommunikation",
-      youtubeId: "OdfuQzJ_etM",
-    }),
-  ),
-);
-
-test("B2 Day 3 Öffentliches Leben vs. Privatsphäre uses the requested radio", () =>
-  expect(getLessonRadioResource("B2", 3)).toEqual(
-    expect.objectContaining({
-      title: "Öffentliches Leben vs. Privatsphäre",
-      youtubeId: "wYwEi4myS2A",
+      title,
+      youtubeId: "",
     }),
   ),
 );

@@ -10,7 +10,7 @@ const b2Day4BildungUndLernen = makeLesson({
   videoResource: {
     title: "AI video: Bildung und Lernen",
     description: "KI-gestützte Lektion zu Lernstrategien, Online-Lernen, Präsenzunterricht und Weiterbildung.",
-    url: "https://youtu.be/coQ8W5vynsI",
+    url: "",
   },
   grammarFocus: "Finalsätze mit damit / um ... zu und klare Zielbegründungen",
   objectives: [

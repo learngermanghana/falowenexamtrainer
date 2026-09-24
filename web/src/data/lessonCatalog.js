@@ -1392,7 +1392,7 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/17pVc0VfLm32z4zmkaaa_cdshKJEQQxYa/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1D1eb-iwfl_WA2sXPOSPD_66NCiTB4o2w/view?usp=sharing",
-    "video": "https://youtu.be/a9LxkxNdnEg",
+    "video": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
@@ -1408,7 +1408,7 @@ const lessonCatalog = Object.freeze([
     "assignmentType": "Lesen & Hören",
     "grammarPage": "https://drive.google.com/file/d/1Mlt-cK6YqPuJe9iCWfqT9DOG9oKhJBdK/view?usp=sharing",
     "workbookRoute": "https://drive.google.com/file/d/1XCLW0y-MMyIu_bNO3EkKIgp-8QLKgEek/view?usp=sharing",
-    "video": "https://youtu.be/ZfCAaLGV2c4",
+    "video": "",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"

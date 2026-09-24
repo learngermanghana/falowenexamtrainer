@@ -10,7 +10,7 @@ const b2Day5GesundheitUndWohlbefinden = makeLesson({
   videoResource: {
     title: "B2 Day 5 · AI video: Bildung und Lernen",
     description: "AI explanation for B2 Day 5, chapter 1.5: Bildung und Lernen, Nominalisierung von Verben and B2 writing practice.",
-    url: "https://youtu.be/DiUEWUBJBio",
+    url: "",
   },
   grammarFocus: "Nominalisierung von Verben für sachliche und formelle B2-Sätze",
   objectives: [
