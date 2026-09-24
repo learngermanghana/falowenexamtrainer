@@ -1,4 +1,4 @@
 Vercel rebuild trigger
-Reason: user-requested production retry for the latest A1 tutor-marked workbook tab-navigation fix and A1 Course Book health stabilization after the previous temporary build-rate limit.
-Target main includes: e01799669fe0e915cb72454b856efed7ef1434a4
-Triggered: 2026-09-18T06:28:00+00:00
+Reason: deploy merged C2 Review, next-assignment navigation, and C2 AI writing analysis after automatic main deployment did not start.
+Target main includes: cc777fd5f21cc6db31719ef7b549d1298b2cec5d
+Triggered: 2026-09-24
