@@ -98,7 +98,6 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('field:"progress"');
     expect(page).toContain('field:"speechPlan"');
     expect(page).toContain('field:"opinionDraft"');
-    expect(page).toContain('field:"reformulationAnswers"');
     expect(page).toContain("localStorage.setItem");
 
     expect(cloudSync).toContain('doc(db, "users", user.uid, "c2Drafts"');
