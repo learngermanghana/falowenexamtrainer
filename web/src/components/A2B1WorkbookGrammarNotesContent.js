@@ -50,6 +50,7 @@ import B1Day22BeziehungWichtigGrammarNotesPage from "./B1Day22BeziehungWichtigGr
 import B1Day23ErstesDateGrammarNotesPage from "./B1Day23ErstesDateGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import B1TopicIntroduction from "./B1TopicIntroduction";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 import B1Days12To17LearningUpgrade from "./B1Days12To17LearningUpgrade";
 import B1Days18To23LearningUpgrade from "./B1Days18To23LearningUpgrade";
 import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
@@ -125,6 +126,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
       {GrammarNotes ? <A2B1GrammarVideoCard level={level} day={day} /> : null}
       {showA2SituationIntro ? <A2SituationIntroduction day={numericDay} /> : null}
       {showB1TopicIntro ? <B1TopicIntroduction day={numericDay} /> : null}
+      {normalizedLevel === "B1" && GrammarNotes ? <B1GrammarEnglishSupport day={numericDay} /> : null}
       {showB1Day17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null}
       {showB1Days18To23Upgrade ? <B1Days18To23LearningUpgrade day={numericDay} /> : null}
       {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}

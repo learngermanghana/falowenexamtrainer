@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "web/src/components/B1Day*.js"
+      - "web/src/components/B1GrammarEnglishSupport.js"
+      - "web/src/components/B1GrammarEnglishSupport.test.js"
       - "web/src/components/B1Days12To17LearningUpgrade*.js"
       - "web/src/components/B1Days12To17LearningUpgrade*.jsx"
       - "web/src/components/A2B1WorkbookGrammarNotes*.js"
@@ -18,6 +20,8 @@ on:
       - "audit/b1-*"
     paths:
       - "web/src/components/B1Day*.js"
+      - "web/src/components/B1GrammarEnglishSupport.js"
+      - "web/src/components/B1GrammarEnglishSupport.test.js"
       - "web/src/components/B1Days12To17LearningUpgrade*.js"
       - "web/src/components/B1Days12To17LearningUpgrade*.jsx"
       - "web/src/components/A2B1WorkbookGrammarNotes*.js"
@@ -57,3 +61,4 @@ jobs:
           src/data/b1Days17To22CourseBookAudit.test.js
           src/data/b1Days23To28CourseBookAudit.test.js
           src/components/B1Days12To17LearningUpgrade.test.js
+          src/components/B1GrammarEnglishSupport.test.js
