@@ -54,6 +54,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("renders the A2 Day 4 Wo möchten wir uns treffen teacher lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 4,
+        chapter: "2.4",
+        topic: "Wo möchten wir uns treffen?",
+      },
+      "A2",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "2.4",
+        title: "Kapitel 2.4 · Teacher lecture video",
+        url: "https://youtu.be/pkSJnAPEKrM",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/pkSJnAPEKrM" }),
+      ]),
+    );
+  });
+
   test("renders the A2 Day 14 tutor lecture alongside the AI video", () => {
     const lesson = normalizeA2B1Lesson(
       {
