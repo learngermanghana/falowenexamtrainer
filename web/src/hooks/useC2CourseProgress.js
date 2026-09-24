@@ -58,7 +58,9 @@ export const summarizeC2SkillProgress = (byDay = {}) =>
         completed: days.filter((day) => Boolean(byDay[day]?.skillDone)).length,
         total: days.length,
         dayComplete: days.filter((day) => Boolean(byDay[day]?.dayComplete)).length,
-        waitingForSource: days.filter((day) => Boolean(byDay[day]?.waitingForListeningSource)).length,
+        waitingForSource: days.filter((day) =>
+          Boolean((byDay[day] || buildC2DayProgress(day, {})).waitingForListeningSource)
+        ).length,
       },
     ]),
   );
@@ -80,7 +82,12 @@ export const useC2CourseProgress = ({ enabled = true } = {}) => {
     const unsubscribe = onSnapshot(
       ref,
       (snapshot) => {
-        const next = {};
+        const next = Object.fromEntries(
+          Array.from({ length: 28 }, (_, index) => {
+            const day = index + 1;
+            return [day, buildC2DayProgress(day, {})];
+          }),
+        );
         snapshot.docs.forEach((entry) => {
           const match = String(entry.id || "").match(/^day-(\d+)$/);
           if (!match) return;
