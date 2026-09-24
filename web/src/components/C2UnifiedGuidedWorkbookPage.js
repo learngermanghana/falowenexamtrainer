@@ -13,6 +13,9 @@ import{getC2ListeningPractice}from"../data/c2ListeningPractice";
 import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel,getC2SpeakingSupport,getC2SpeakingSupportNote}from"../data/c2SkillCycle";
 import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
 import{useC2CourseProgress}from"../hooks/useC2CourseProgress";
+import{useAuth}from"../context/AuthContext";
+import{markLetterWithAI}from"../services/coachService";
+import WritingFeedbackCard from"./WritingFeedbackCard";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
@@ -111,17 +114,50 @@ function Speak({standard,knowledge,day,completed,onCompleteChange}){
 }
 
 function OpinionWrite({standard,day,completed,onCompleteChange}){
+ const{user,idToken,studentProfile}=useAuth();
  const format=useMemo(()=>getC2WritingFormat(day,standard.title),[day,standard.title]);
  const key=`falowen:c2:day${day}:unified-opinion`;
+ const feedbackKey=`falowen:c2:day${day}:writing-feedback`;
  const template=format.template;
  const[draft,setDraft]=useState(()=>{try{const saved=localStorage.getItem(key);return !String(saved||"").trim()?template:saved}catch{return template}});
  const[legacyDraftSeedAllowed]=useState(()=>{try{const saved=localStorage.getItem(key)||"";return Boolean(String(saved).trim()&&saved!==template)}catch{return false}});
+ const[feedbackData,setFeedbackData]=useState(()=>{try{return JSON.parse(localStorage.getItem(feedbackKey)||"null")}catch{return null}});
+ const[legacyFeedbackSeedAllowed]=useState(()=>{try{return Boolean(localStorage.getItem(feedbackKey))}catch{return false}});
+ const[analysing,setAnalysing]=useState(false);
+ const[analysisError,setAnalysisError]=useState("");
  useEffect(()=>{try{localStorage.setItem(key,draft)}catch{}},[key,draft]);
+ useEffect(()=>{try{if(feedbackData)localStorage.setItem(feedbackKey,JSON.stringify(feedbackData));else localStorage.removeItem(feedbackKey)}catch{}},[feedbackKey,feedbackData]);
  useC2CloudDraftField({day,field:"opinionDraft",value:draft,setValue:setDraft,seedCloudWhenMissing:legacyDraftSeedAllowed,defaultValue:template});
+ useC2CloudDraftField({day,field:"writingFeedback",value:feedbackData,setValue:setFeedbackData,seedCloudWhenMissing:legacyFeedbackSeedAllowed,defaultValue:null});
  const words=useMemo(()=>draft.trim()?draft.trim().split(/\s+/).length:0,[draft]);
+ const hasPlaceholders=/\[[^\]]+\]/.test(draft);
  const restoreTemplate=()=>{
   if(draft.trim()&&draft!==template&&typeof window!=="undefined"&&!window.confirm("Die aktuelle Antwort wird durch die C2-Vorlage ersetzt. Fortfahren?"))return;
   setDraft(template);
+  setFeedbackData(null);
+ };
+ const analyseDraft=async()=>{
+  const text=String(draft||"").trim();
+  if(!text){setAnalysisError("Write your C2 text first, then click Analyse my text.");return;}
+  if(hasPlaceholders){setAnalysisError("Replace the remaining [placeholders] with your own content before AI analysis.");return;}
+  if(words<80){setAnalysisError("Develop the text a little further before AI analysis so the feedback is meaningful.");return;}
+  setAnalysing(true);
+  setAnalysisError("");
+  try{
+   const result=await markLetterWithAI({
+    text,
+    level:"C2",
+    studentName:String(studentProfile?.name||studentProfile?.fullName||user?.displayName||user?.email||"Student"),
+    program:studentProfile?.program,
+    submissionContext:`course-task:C2 Day ${day} ${format.label} ${standard.title}`,
+    promptType:format.label==="Formelle E-Mail"?"formal-letter":"argument",
+    idToken,
+   });
+   if(String(draft||"").trim()!==text){setAnalysisError("Your text changed while analysis was running. Click Analyse my text again for the newest version.");return;}
+   setFeedbackData(result?.structuredFeedback||result);
+  }catch(error){
+   setAnalysisError(error?.response?.data?.error||error?.message||"Falowen could not analyse your text right now. Please try again.");
+  }finally{setAnalysing(false);}
  };
  return <Section title={`Schreiben · ${format.label}`}>
   <p style={{margin:0,lineHeight:1.75}}>{format.instruction}</p>
@@ -132,7 +168,14 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
    <div><button type="button" onClick={restoreTemplate} style={styles.secondaryButton}>Vorlage wiederherstellen</button></div>
   </div>
   <textarea data-c2-opinion-editor="true" value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Schreiben Sie hier Ihren vollständigen C2-Text ..." style={{minHeight:520,border:"1px solid #94a3b8",borderRadius:12,padding:14,font:"inherit",lineHeight:1.75,overflowAnchor:"none"}}/>
-  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa {format.targetWords} Wörter</div>
+  <div style={{fontWeight:700,color:"#475569"}}>{words} Wörter · Ziel: circa {format.targetWords} Wörter · automatisch gespeichert</div>
+  <div style={{...sub,background:"#eff6ff",borderColor:"#bfdbfe"}}>
+   <strong>AI-Schreibanalyse</strong>
+   <span>Wenn Ihr Text fertig ist, kann Falowen ihn auf C2-Niveau bewerten: Aufgabenbezug, Kohäsion, Grammatik, Wortschatz, Register, Nuance und Präzision.</span>
+   <div><button type="button" onClick={analyseDraft} disabled={analysing} style={styles.primaryButton}>{analysing?"Analysing your text…":feedbackData?"Analyse again":"Analyse my text"}</button></div>
+   {analysisError?<div role="alert" style={{color:"#b91c1c",fontWeight:700}}>{analysisError}</div>:null}
+  </div>
+  {feedbackData?<WritingFeedbackCard level="C2" draft={draft} structuredFeedback={feedbackData}/>:null}
   <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe die Aufgabe vollständig bearbeitet und meinen Text überarbeitet.</label>
  </Section>;
 }
@@ -205,6 +248,58 @@ function ListeningPractice({day,completed,onCompleteChange}){
    <label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)} style={{marginTop:4}}/>Ich habe den vollständigen Hörtext aufmerksam gehört.</label>
   </>}
  </Section>;
+}
+
+function C2ReviewPage({day,standard,knowledge,skillFocus,skillLabel,progress,setProgress,listeningAvailable,c2CourseProgress,ready,cycleDays}){
+ const grammarRule=standard.grammar?.[0]||standard.grammarFocus;
+ const grammarExample=standard.grammar?.[1]||"";
+ const tension=knowledge.tensions?.[0]?.join(" ↔ ")||"";
+ const collocation=knowledge.coll?.[0]?.[0]||knowledge.vocab?.[0]?.[0]||"";
+ const readingScore=c2CourseProgress?.[day]?.readingFirstAttemptScore||null;
+ const writingFormat=skillFocus==="write"?getC2WritingFormat(day,standard.title):null;
+ const reviewChecks=[
+  "Ich kann die Kernfrage des heutigen Themas in eigenen Worten erklären.",
+  tension?`Ich kann den Zielkonflikt „${tension}“ erläutern.`:"Ich kann einen zentralen Zielkonflikt des Themas erläutern.",
+  collocation?`Ich kann „${collocation}“ passend in einer C2-Antwort verwenden.`:"Ich kann eine passende C2-Kollokation verwenden.",
+ ];
+ const nextDay=day<28?day+1:null;
+ const nextStandard=nextDay?getC2ExamStandard(nextDay):null;
+ const nextSkill=nextDay?getC2SkillLabel(nextDay)?.label:null;
+ const skillResult=skillFocus==="lesen"
+  ?(readingScore?`First attempt: ${readingScore.correct}/${readingScore.total}. This score is for learning only.`:"Lesen completed. First-attempt score will appear after the questions are answered.")
+  :skillFocus==="hoeren"
+    ?(!listeningAvailable?"Hören source is still pending and does not block completion.":progress.hoerenDone?"Hören completed.":"Hören is not complete yet.")
+    :skillFocus==="speak"
+      ?(progress.speakDone?"3–5 minute C2 speaking task completed.":"Complete the speaking task to finish the day.")
+      :(progress.writeDone?`${writingFormat?.label||"Writing"} completed. Your draft and AI feedback save across devices.`:`${writingFormat?.label||"Writing"} is still in progress. Your draft saves automatically.`);
+ return <Section title={`Review · C2 Day ${day}`}>
+  <div style={{...sub,background:ready?"#f0fdf4":"#fffbeb",borderColor:ready?"#86efac":"#fde68a"}}><strong>{ready?"Day complete ✓":"Day not complete yet"}</strong><span>{ready?`Grammar/Learn and ${skillLabel?.label} are complete. Review is revision only — no extra assignment.`:`Complete Grammar/Learn and today’s ${skillLabel?.label} task. Review itself is not graded.`}</span></div>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}}>
+   <div style={sub}><strong>Das Wichtigste heute</strong><span>{knowledge.de}</span><span><strong>Kernfrage:</strong> {knowledge.core}</span>{tension?<span><strong>Zielkonflikt:</strong> {tension}</span>:null}</div>
+   <div style={sub}><strong>Grammatik merken</strong><span>{grammarRule}</span>{grammarExample?<span><strong>Beispiel:</strong> {grammarExample}</span>:null}</div>
+  </div>
+  <div style={sub}><strong>Wortschatz · 6 wichtige Ausdrücke</strong><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:8}}>{(knowledge.vocab||[]).slice(0,6).map(([de,en])=><div key={de} style={{border:"1px solid #e2e8f0",borderRadius:10,padding:10,background:"#fff"}}><strong>{de}</strong><div style={{color:"#64748b",marginTop:3}}>{en}</div></div>)}</div></div>
+  <div style={sub}><strong>Today's skill result · {skillLabel?.label}</strong><span>{skillResult}</span></div>
+  <div style={{...sub,background:"#f8fafc"}}><strong>Kann ich das?</strong>{reviewChecks.map((label,index)=><label key={label} style={{display:"flex",gap:9,alignItems:"flex-start",lineHeight:1.55}}><input type="checkbox" checked={Boolean(progress.reviewChecks?.[index])} onChange={e=>setProgress(p=>({...p,reviewChecks:{...(p.reviewChecks||{}),[index]:e.target.checked}}))} style={{marginTop:4}}/><span>{label}</span></label>)}<span style={{color:"#64748b",fontSize:13}}>Diese Selbstkontrolle ist freiwillig und beeinflusst den Kursabschluss nicht.</span></div>
+  {cycleDays.length?<div style={{...sub,background:"#f8fafc"}}><strong>4-day cycle recap</strong><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))",gap:8}}>{cycleDays.map(cycleDay=>{const label=getC2SkillLabel(cycleDay)?.label||"Skill";const complete=cycleDay===day?ready:Boolean(c2CourseProgress[cycleDay]?.dayComplete);return <div key={cycleDay} style={{border:"1px solid #e2e8f0",borderRadius:10,padding:10,background:complete?"#f0fdf4":"#fff"}}><strong>Day {cycleDay} · {label}</strong><div style={{marginTop:4,color:complete?"#166534":"#64748b"}}>{complete?"Complete ✓":"Not complete"}</div></div>})}</div><span style={{color:"#64748b"}}>This is a recap only. It does not add another assignment.</span></div>:null}
+  <div style={{...sub,background:"#eff6ff",borderColor:"#bfdbfe"}}><strong>Next up</strong>{nextDay?<span>Day {nextDay} · {nextSkill}: {nextStandard?.title}</span>:<span>You have reached Day 28. Use the Course Book to review your full C2 progress.</span>}</div>
+ </Section>;
+}
+
+function C2WorkbookNextNavigation({day,navigate}){
+ const nextDay=day<28?day+1:null;
+ const nextKnowledge=nextDay?getC2TopicKnowledge(nextDay):null;
+ const nextStandard=nextDay?getC2ExamStandard(nextDay):null;
+ const nextSkill=nextDay?getC2SkillLabel(nextDay)?.label:null;
+ const goNext=()=>{
+  if(!nextDay){navigate("/campus/course");return;}
+  const chapter=String(nextKnowledge?.chapter||"").trim();
+  navigate(`/campus/course/lesson/C2/${nextDay}${chapter?`?chapter=${encodeURIComponent(chapter)}`:""}`);
+ };
+ return <nav aria-label="C2 workbook navigation" style={{...card,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+  <button type="button" onClick={()=>navigate("/campus/course")} style={styles.secondaryButton}>Course Book</button>
+  <button type="button" onClick={goNext} style={styles.primaryButton}>{nextDay?`Next assignment · Day ${nextDay} · ${nextSkill} · ${nextStandard?.title}`:"Back to Course Book"}</button>
+ </nav>;
 }
 
 
