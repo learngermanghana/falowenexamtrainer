@@ -791,7 +791,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const completedPracticeDays = new Set(
     practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).map((entry) => Number(entry.day))
   );
-  const earnedBadges = PRACTICE_CLUSTER_BADGES.filter((badge) => badge.days.every((day) => completedPracticeDays.has(day)));
+  const earnedBadges = isC2CourseBook ? [] : PRACTICE_CLUSTER_BADGES.filter((badge) => badge.days.every((day) => completedPracticeDays.has(day)));
 
   const visibleLessons = useMemo(
     () =>
@@ -934,7 +934,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <p style={courseBookStyles.heroEyebrow}>{selectedCourseLevel || "Course"} learning journey</p>
                 <h2 style={courseBookStyles.heroTitle}>Course Book</h2>
                 <p style={courseBookStyles.heroText}>
-                  Follow the lessons in order. Your badges now use real submissions and marked scores from Falowen.
+                  {isC2CourseBook
+                    ? "Follow the 28-day C2 rotation. Grammar/Learn and the daily main skill sync automatically across your devices."
+                    : "Follow the lessons in order. Your badges now use real submissions and marked scores from Falowen."}
                   {loadingLessonProgress || (isC2CourseBook && loadingC2Progress) ? " Syncing progress..." : ""}
                 </p>
                 {lessonProgressError ? <p style={{ margin: "6px 0 0", color: "#fee2e2", fontSize: 13 }}>{lessonProgressError}</p> : null}
