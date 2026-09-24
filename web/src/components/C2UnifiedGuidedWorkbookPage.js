@@ -8,6 +8,9 @@ import{getC2ExamStandard}from"../data/c2ExamStandardContent";
 import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 import{buildC2OpinionWritingTemplate}from"../data/c2OpinionWritingTemplate";
+import{getC2ReadingPractice}from"../data/c2ReadingPractice";
+import{getC2ListeningPractice}from"../data/c2ListeningPractice";
+import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel}from"../data/c2SkillCycle";
 import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
@@ -142,7 +145,64 @@ function ReformulationWrite({standard,day,completed,onCompleteChange}){
  </Section>;
 }
 
-const C2_WORKBOOK_VIEWS=new Set(["learn","speak","write","finish","references"]);
+
+function ReadingPractice({day,completed,onCompleteChange}){
+ const practice=getC2ReadingPractice(day);
+ const key=`falowen:c2:day${day}:reading-answers`;
+ const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return{}}});
+ useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(answers))}catch{}},[key,answers]);
+ const questions=practice?.questions||[];
+ const answered=questions.filter((_,index)=>Number.isInteger(answers[index])).length;
+ useEffect(()=>{if(questions.length&&answered===questions.length&&!completed)onCompleteChange?.(true)},[answered,questions.length,completed,onCompleteChange]);
+ if(!practice)return <Section title="Lesen"><p style={{margin:0}}>Für diesen Tag ist keine Leseaufgabe vorgesehen.</p></Section>;
+ return <Section title={`Lesen · ${practice.title}`}>
+  <div style={{...sub,background:"#eff6ff"}}><strong>So arbeiten Sie</strong><span>Lesen Sie den Text aufmerksam. Klicken Sie bei jeder Frage auf eine Antwort. Sie sehen sofort, ob sie richtig ist und warum.</span></div>
+  <article style={{display:"grid",gap:12,lineHeight:1.8,fontSize:"1.02rem"}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</article>
+  <div style={{display:"grid",gap:14}}>{questions.map((item,index)=>{
+   const selected=answers[index];
+   const hasAnswer=Number.isInteger(selected);
+   const correct=selected===item.answerIndex;
+   return <article key={item.question} style={{...sub,background:"#fff"}}>
+    <strong>{index+1}. {item.question}</strong>
+    <div style={{display:"grid",gap:8}}>{item.options.map((option,optionIndex)=>{
+     const isSelected=selected===optionIndex;
+     const isCorrectOption=hasAnswer&&optionIndex===item.answerIndex;
+     const background=isCorrectOption?"#f0fdf4":isSelected?"#fff7ed":"#fff";
+     const border=isCorrectOption?"2px solid #86efac":isSelected?"2px solid #fdba74":"1px solid #cbd5e1";
+     return <button key={option} type="button" onClick={()=>setAnswers(old=>({...old,[index]:optionIndex}))} style={{...styles.secondaryButton,textAlign:"left",justifyContent:"flex-start",background,border,color:"#0f172a"}}>{String.fromCharCode(65+optionIndex)}. {option}</button>;
+    })}</div>
+    {hasAnswer?<div style={{border:`1px solid ${correct?"#86efac":"#fecaca"}`,borderRadius:12,padding:11,background:correct?"#f0fdf4":"#fff7f7",lineHeight:1.65}}><strong>{correct?"Richtig.":"Noch nicht richtig."}</strong> {!correct?<span>Richtige Antwort: <strong>{String.fromCharCode(65+item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </span>:null}<span>{item.explanation}</span></div>:null}
+   </article>;
+  })}</div>
+  <div style={{...sub,background:answered===questions.length?"#f0fdf4":"#f8fafc"}}><strong>{answered}/{questions.length} Fragen beantwortet</strong><span>{answered===questions.length?"Lesen ist für heute abgeschlossen.":"Beantworten Sie alle Fragen. Fehler sind erlaubt — die Aufgabe dient dem direkten Lernen."}</span></div>
+ </Section>;
+}
+
+const youtubeEmbedUrl=(url)=>{
+ const value=String(url||"").trim();
+ if(!value)return"";
+ const short=value.match(/youtu\.be\/([A-Za-z0-9_-]+)/);
+ const watch=value.match(/[?&]v=([A-Za-z0-9_-]+)/);
+ const embed=value.match(/youtube\.com\/embed\/([A-Za-z0-9_-]+)/);
+ const id=short?.[1]||watch?.[1]||embed?.[1]||"";
+ return id?`https://www.youtube.com/embed/${id}`:"";
+};
+
+function ListeningPractice({day,completed,onCompleteChange}){
+ const practice=getC2ListeningPractice(day);
+ const audioUrl=String(practice?.audioUrl||"").trim();
+ const embed=youtubeEmbedUrl(audioUrl);
+ if(!practice)return <Section title="Hören"><p style={{margin:0}}>Für diesen Tag ist keine Hörübung vorgesehen.</p></Section>;
+ return <Section title={`Hören · ${practice.title}`}>
+  {!audioUrl?<div data-c2-listening-awaiting-source="true" style={{...sub,background:"#fffbeb",borderColor:"#fde68a"}}><strong>Hörquelle wird ergänzt</strong><span>Für dieses Thema ist noch kein Audio- oder YouTube-Link eingetragen. Es werden bewusst noch keine Fragen angezeigt. Die Fragen werden erst aus dem tatsächlichen Transkript erstellt, damit sie genau zum Hörtext passen.</span></div>:<>
+   {embed?<div style={{position:"relative",paddingTop:"56.25%",borderRadius:14,overflow:"hidden",background:"#0f172a"}}><iframe title={`C2 Day ${day} Hören`} src={embed} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{position:"absolute",inset:0,width:"100%",height:"100%",border:0}}/></div>:<a href={audioUrl} target="_blank" rel="noreferrer" style={styles.secondaryButton}>Hörquelle öffnen</a>}
+   <div style={{...sub,background:"#eff6ff"}}><strong>Noch keine Verständnisfragen</strong><span>Die Fragen werden ergänzt, sobald das Transkript der endgültigen Aufnahme vorliegt.</span></div>
+   <label style={{display:"flex",gap:8,alignItems:"flex-start",fontWeight:700,lineHeight:1.5}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)} style={{marginTop:4}}/>Ich habe den vollständigen Hörtext aufmerksam gehört.</label>
+  </>}
+ </Section>;
+}
+
+const C2_WORKBOOK_VIEWS=new Set(["learn","lesen","hoeren","speak","write","finish","references"]);
 
 export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const location=useLocation();
