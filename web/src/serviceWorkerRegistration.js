@@ -1,62 +1,17 @@
 const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-sw.js`;
-const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
-const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 let registrationStarted = false;
-
-const getLastForceRefreshAt = () => {
-  try {
-    return Number(window.localStorage.getItem(FORCE_REFRESH_KEY) || 0);
-  } catch (error) {
-    return 0;
-  }
-};
-
-const markForceRefreshAt = (timestamp) => {
-  try {
-    window.localStorage.setItem(FORCE_REFRESH_KEY, String(timestamp));
-    return Number(window.localStorage.getItem(FORCE_REFRESH_KEY)) === timestamp;
-  } catch (error) {
-    return false;
-  }
-};
 
 const requestSkipWaiting = (worker) => {
   if (!worker || typeof worker.postMessage !== "function") return;
   worker.postMessage({ type: "SKIP_WAITING" });
 };
 
-const forcePeriodicRefresh = async (registration) => {
-  if (typeof window === "undefined") return;
-
-  const now = Date.now();
-  const lastRefreshAt = getLastForceRefreshAt();
-  const shouldForceRefresh = !lastRefreshAt || now - lastRefreshAt >= FORCE_REFRESH_INTERVAL_MS;
-
-  if (!shouldForceRefresh) return;
-
-  if (!markForceRefreshAt(now)) {
-    return;
-  }
-
-  try {
-    await registration.update();
-  } catch (error) {
-    console.error("Failed to refresh service worker assets", error);
-  }
-
-  window.location.reload();
-};
-
 const setupUpdateHandlers = (registration) => {
-  let hasRefreshed = false;
-
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (hasRefreshed || !navigator.serviceWorker.controller) return;
-    hasRefreshed = true;
-    window.location.reload();
-  });
-
+  // A returning mobile tab may receive a new worker immediately. Let updates
+  // activate in the background; reloading here destroys the student's open work.
+  // The next page load uses the new app, with stale-chunk recovery as a
+  // fallback when a genuinely missing module requires a reload.
   if (registration.waiting) {
     requestSkipWaiting(registration.waiting);
   }
@@ -95,7 +50,6 @@ const startRegistration = () => {
       setupUpdateHandlers(registration);
       setupUpdateChecks(registration);
       await registration.update();
-      await forcePeriodicRefresh(registration);
     })
     .catch((error) => {
       registrationStarted = false;
@@ -127,10 +81,7 @@ export const registerOfflineServiceWorker = () => {
 };
 
 export const __private__ = {
-  forcePeriodicRefresh,
   setupUpdateHandlers,
   setupUpdateChecks,
-  getLastForceRefreshAt,
-  markForceRefreshAt,
   startRegistration,
 };

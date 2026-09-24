@@ -8,6 +8,7 @@ import App from './App';
 import AppStartupBoundary from './components/AppStartupBoundary';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
+import LearningSessionBoundary from './components/LearningSessionBoundary';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
@@ -64,6 +65,7 @@ const AuthenticatedAppRoutes = () => (
     <A1Day13RevisionNumberCleanup />
     <AuthProvider>
       <ToastProvider>
+        <LearningSessionBoundary>
         <A1ChapterSpecificLessonRouteBoundary>
           <RouteScopedAppServices />
           <SelfLearningLessonDirectNavigationFix />
@@ -111,6 +113,7 @@ const AuthenticatedAppRoutes = () => (
             <Route path="*" element={<App />} />
           </Routes>
         </A1ChapterSpecificLessonRouteBoundary>
+        </LearningSessionBoundary>
       </ToastProvider>
     </AuthProvider>
   </>
