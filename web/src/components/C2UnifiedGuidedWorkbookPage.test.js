@@ -219,9 +219,10 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('field:"writingFeedback"');
   });
 
-  test("keeps the C2 section navigation in normal document flow", () => {
-    expect(workbookComponents).toContain('data-sticky-navigation={normalizedLevel === "C2" ? "false" : "true"}');
-    expect(workbookComponents).toContain('style={normalizedLevel === "C2" ? undefined : { position: "sticky", top: 0, zIndex: 35 }}');
+  test("keeps the B2 and C2 section navigation in normal document flow", () => {
+    expect(workbookComponents).toContain('const sticky = !["B2", "C2"].includes(normalizedLevel)');
+    expect(workbookComponents).toContain('data-sticky-navigation={sticky ? "true" : "false"}');
+    expect(workbookComponents).toContain('style={sticky ? { position: "sticky", top: 0, zIndex: 35 } : undefined}');
   });
 
 
