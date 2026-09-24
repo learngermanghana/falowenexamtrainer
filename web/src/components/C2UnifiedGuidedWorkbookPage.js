@@ -212,32 +212,92 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const standard=getC2ExamStandard(day);
  const knowledge=getC2TopicKnowledge(day);
  const mastery=lesson?.c2Mastery||getC2LessonContentAlignment(day);
+ const skillFocus=getC2SkillFocus(day);
+ const skillLabel=getC2SkillLabel(day);
+ const listening=getC2ListeningPractice(day);
+ const listeningAvailable=Boolean(String(listening?.audioUrl||"").trim());
+ const allowedViews=useMemo(()=>new Set(getC2DayTabs(day).map(({key})=>key)),[day]);
  const storageKey=`falowen:c2:day${day}:unified-progress`;
- const requestedView=useMemo(()=>{const value=new URLSearchParams(location.search||"").get("view")||"";return C2_WORKBOOK_VIEWS.has(value)?value:"learn"},[location.search]);
+ const requestedView=useMemo(()=>{
+  const value=new URLSearchParams(location.search||"").get("view")||"";
+  return allowedViews.has(value)?value:"learn";
+ },[location.search,allowedViews]);
  const[active,setActive]=useState(requestedView);
- const defaultProgress={learnDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""};
+ const defaultProgress={learnDone:false,lesenDone:false,hoerenDone:false,speakDone:false,writeDone:false,confidence:"",reflection:""};
  const[progress,setProgress]=useState(()=>{try{return{...defaultProgress,...JSON.parse(localStorage.getItem(storageKey)||"{}")}}catch{return defaultProgress}});
- const[legacyProgressSeedAllowed]=useState(()=>{try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");return Boolean(saved&&(saved.learnDone||saved.speakDone||saved.writeDone||String(saved.confidence||"").trim()||String(saved.reflection||"").trim()))}catch{return false}});
+ const[legacyProgressSeedAllowed]=useState(()=>{try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");return Boolean(saved&&(saved.learnDone||saved.lesenDone||saved.hoerenDone||saved.speakDone||saved.writeDone||String(saved.confidence||"").trim()||String(saved.reflection||"").trim()))}catch{return false}});
  useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(progress))}catch{}},[storageKey,progress]);
  useC2CloudDraftField({day,field:"progress",value:progress,setValue:setProgress,seedCloudWhenMissing:legacyProgressSeedAllowed,defaultValue:defaultProgress});
  useEffect(()=>{setActive(requestedView)},[requestedView]);
- const changeView=(next)=>{if(!C2_WORKBOOK_VIEWS.has(next))return;setActive(next);const params=new URLSearchParams(location.search||"");if(next==="learn")params.delete("view");else params.set("view",next);const search=params.toString();navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true})};
- if(!day||!standard||!knowledge||!mastery)return null;
- const ready=progress.learnDone&&progress.speakDone&&progress.writeDone&&Boolean(progress.confidence);
- return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day}>
+ const changeView=(next)=>{
+  if(!allowedViews.has(next))return;
+  setActive(next);
+  const params=new URLSearchParams(location.search||"");
+  if(next==="learn")params.delete("view");else params.set("view",next);
+  const search=params.toString();
+  navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true});
+ };
+ if(!day||!standard||!knowledge||!mastery||!skillFocus)return null;
+
+ const skillDone=skillFocus==="lesen"
+  ?Boolean(progress.lesenDone)
+  :skillFocus==="hoeren"
+    ?(listeningAvailable?Boolean(progress.hoerenDone):true)
+    :skillFocus==="speak"
+      ?Boolean(progress.speakDone)
+      :Boolean(progress.writeDone);
+ const ready=Boolean(progress.learnDone&&skillDone&&progress.confidence);
+ const skillDetail=skillFocus==="lesen"
+  ?"Reading text and instant-feedback questions completed"
+  :skillFocus==="hoeren"
+    ?(listeningAvailable?"Full listening source completed":"Audio source not added yet · temporarily not required")
+    :skillFocus==="speak"
+      ?"Structured 3–5 minute C2 speaking completed"
+      :"Full C2 opinion writing task completed";
+ const skillProgressDone=skillFocus==="lesen"
+  ?progress.lesenDone
+  :skillFocus==="hoeren"
+    ?progress.hoerenDone
+    :skillFocus==="speak"
+      ?progress.speakDone
+      :progress.writeDone;
+
+ return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day} data-c2-skill-focus={skillFocus}>
   <AppBackButton label="Back to Course Book" fallbackPath="/campus/course"/>
   <header style={{...card,padding:"clamp(20px,4vw,34px)",background:"linear-gradient(135deg,#0f172a,#1e3a8a 58%,#2563eb)",color:"#fff"}}>
-   <div style={{display:"flex",gap:8,flexWrap:"wrap"}}><span style={{...styles.badge,background:"rgba(255,255,255,.14)",color:"#fff"}}>C2</span><span style={{...styles.badge,background:"rgba(255,255,255,.14)",color:"#fff"}}>Day {day}</span><span style={{...styles.badge,background:"rgba(37,99,235,.9)",color:"#fff"}}>Chapter {knowledge.chapter}</span></div>
+   <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+    <span style={{...styles.badge,background:"rgba(255,255,255,.14)",color:"#fff"}}>C2</span>
+    <span style={{...styles.badge,background:"rgba(255,255,255,.14)",color:"#fff"}}>Day {day}</span>
+    <span style={{...styles.badge,background:"rgba(37,99,235,.9)",color:"#fff"}}>Chapter {knowledge.chapter}</span>
+    <span style={{...styles.badge,background:"rgba(250,204,21,.18)",color:"#fef3c7"}}>Main skill: {skillLabel?.label}</span>
+   </div>
    <h1 style={{margin:0,fontSize:"clamp(2rem,5vw,3.1rem)"}}>{standard.title}</h1>
    <p style={{margin:0,color:"#dbeafe",lineHeight:1.7}}>{standard.topic}</p>
    <div style={{border:"1px solid rgba(255,255,255,.2)",borderRadius:14,padding:13,background:"rgba(255,255,255,.08)"}}><strong>Today’s C2 control:</strong> {standard.grammarFocus}</div>
-   {standard.writeType==="opinion"?<div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{color:"#dbeafe",fontWeight:700}}>C2 writing template ready in Write.</span><button type="button" onClick={()=>changeView("write")} style={styles.secondaryButton}>Open writing template</button></div>:null}
+   <div style={{color:"#dbeafe",fontWeight:700}}>Today: Grammar/Learn + {skillLabel?.label} + Finish. The other production skills are not required today.</div>
+   {skillFocus==="write"?<div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><span style={{color:"#dbeafe",fontWeight:700}}>C2 writing template ready in Write.</span><button type="button" onClick={()=>changeView("write")} style={styles.secondaryButton}>Open writing template</button></div>:null}
   </header>
+
   <AdvancedSelfLearningTabNav level="C2" day={day} activeTab={active} onChange={changeView}/>
-  {active==="learn"?<Learn day={day} standard={standard} knowledge={knowledge} mastery={mastery} completed={progress.learnDone} onCompleteChange={learnDone=>setProgress(p=>({...p,learnDone}))}/>:null}
+
+  {active==="learn"?<Learn day={day} standard={standard} knowledge={knowledge} mastery={mastery} skillFocus={skillFocus} completed={progress.learnDone} onCompleteChange={learnDone=>setProgress(p=>({...p,learnDone}))}/>:null}
+  {active==="lesen"?<ReadingPractice day={day} completed={progress.lesenDone} onCompleteChange={lesenDone=>setProgress(p=>({...p,lesenDone}))}/>:null}
+  {active==="hoeren"?<ListeningPractice day={day} completed={progress.hoerenDone} onCompleteChange={hoerenDone=>setProgress(p=>({...p,hoerenDone}))}/>:null}
   {active==="speak"?<Speak standard={standard} knowledge={knowledge} day={day} completed={progress.speakDone} onCompleteChange={speakDone=>setProgress(p=>({...p,speakDone}))}/>:null}
-  {active==="write"?(standard.writeType==="opinion"?<OpinionWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>:<ReformulationWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>):null}
-  {active==="finish"?<Section title={`Finish C2 Day ${day}`}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}><Progress label="Learn" done={progress.learnDone} detail="Topic knowledge, language and grammar understood"/><Progress label="Speak" done={progress.speakDone} detail="Structured C2 speaking completed"/><Progress label="Write" done={progress.writeDone} detail={standard.writeType==="opinion"?"Opinion task completed":"Reformulation test completed"}/></div><label style={{display:"grid",gap:7}}><strong>Confidence</strong><select value={progress.confidence} onChange={e=>setProgress(p=>({...p,confidence:e.target.value}))} style={styles.select}><option value="">Select confidence</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label><label style={{display:"grid",gap:7}}><strong>Reflection</strong><textarea value={progress.reflection} onChange={e=>setProgress(p=>({...p,reflection:e.target.value}))} placeholder="What topic idea or C2 structure still needs work?" style={{minHeight:110,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit"}}/></label><div style={{border:`1px solid ${ready?"#86efac":"#fde68a"}`,borderRadius:14,padding:13,background:ready?"#f0fdf4":"#fffbeb"}}>{ready?"Day complete: Learn, Speak and Write are finished.":"Complete Learn, Speak, Write and choose a confidence level."}</div></Section>:null}
+  {active==="write"?<OpinionWrite standard={standard} day={day} completed={progress.writeDone} onCompleteChange={writeDone=>setProgress(p=>({...p,writeDone}))}/>:null}
+
+  {active==="finish"?<Section title={`Finish C2 Day ${day}`}>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}>
+    <Progress label="Grammar / Learn" done={progress.learnDone} detail="Topic knowledge, language and grammar understood"/>
+    {skillFocus==="hoeren"&&!listeningAvailable
+      ?<div style={{border:"1px solid #fde68a",borderRadius:14,padding:13,background:"#fffbeb",display:"grid",gap:4}}><strong>Waiting for source · Hören</strong><span style={{color:"#64748b",fontSize:13}}>The real audio/video has not been added yet, so Hören does not block this day.</span></div>
+      :<Progress label={skillLabel?.label||"Main skill"} done={Boolean(skillProgressDone)} detail={skillDetail}/>}
+   </div>
+   <label style={{display:"grid",gap:7}}><strong>Confidence</strong><select value={progress.confidence} onChange={e=>setProgress(p=>({...p,confidence:e.target.value}))} style={styles.select}><option value="">Select confidence</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+   <label style={{display:"grid",gap:7}}><strong>Reflection</strong><textarea value={progress.reflection} onChange={e=>setProgress(p=>({...p,reflection:e.target.value}))} placeholder={`What was difficult in today’s ${skillLabel?.label||"C2"} work?`} style={{minHeight:110,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit"}}/></label>
+   <div style={{border:`1px solid ${ready?"#86efac":"#fde68a"}`,borderRadius:14,padding:13,background:ready?"#f0fdf4":"#fffbeb"}}>{ready?`Day complete: Grammar/Learn and ${skillLabel?.label} are finished.`:`Complete Grammar/Learn, today’s ${skillLabel?.label} requirement, and choose a confidence level.`}</div>
+  </Section>:null}
+
   {active==="references"?<><Section title="Topic reference"><p style={{margin:0,lineHeight:1.75}}>{knowledge.de}</p><p><strong>Kernfrage:</strong> {knowledge.core}</p></Section><Section title="C2 control"><p style={{margin:0,lineHeight:1.75}}>{mastery.challenge}</p><strong>Final check: topic knowledge · task fulfilment · grammar function · register · evidence · cohesion · natural collocation.</strong></Section></>:null}
  </main>;
 }
