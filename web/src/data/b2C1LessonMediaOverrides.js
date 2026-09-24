@@ -8,7 +8,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 6 · Migration und Integration · AI video",
           description:
             "AI video lesson for using obwohl, auch wenn and trotzdem when discussing migration and integration.",
-          url: "https://youtu.be/LORxwfzaAyU",
+          url: "",
         }),
       ]),
     }),
@@ -20,7 +20,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 8 · Reisen und Mobilität · AI video",
           description:
             "AI video lesson for comparing transport, travel choices and sustainable mobility at B2 level.",
-          url: "https://youtu.be/RjRBspPCmCY",
+          url: "",
         }),
       ]),
     }),
@@ -32,7 +32,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 9 · Wohnen und Nachbarschaft · AI video",
           description:
             "AI video lesson for discussing housing, neighbourhood problems, indirect questions and polite complaints at B2 level.",
-          url: "https://youtu.be/-JeT2wS94uk",
+          url: "",
         }),
       ]),
     }),
@@ -44,7 +44,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 10 · Konsum und Geld · AI video",
           description:
             "AI video lesson for discussing consumption, money, advertising and purchasing decisions at B2 level.",
-          url: "https://youtu.be/vRgpiPZ5AAw",
+          url: "",
         }),
       ]),
     }),
@@ -56,7 +56,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 11 · Gesellschaft und Integration · AI video",
           description:
             "AI video lesson for discussing society, integration and participation at B2 level.",
-          url: "https://youtu.be/TC85wRlhtCc",
+          url: "",
         }),
       ]),
     }),
@@ -68,7 +68,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 12 · Kultur und Freizeit · AI video",
           description:
             "AI video lesson for discussing culture and leisure while using temporal clauses accurately at B2 level.",
-          url: "https://youtu.be/foXp2VHEf1I",
+          url: "",
         }),
       ]),
     }),
@@ -80,7 +80,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 13 · Chapter 3.3 · AI video",
           description:
             "AI video lesson for the B2 Day 13 Chapter 3.3 course topic.",
-          url: "https://youtu.be/MGtC8QQrdSs",
+          url: "",
         }),
       ]),
     }),
@@ -92,7 +92,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 14 · Chapter 3.4 · AI video",
           description:
             "AI video lesson for the B2 Day 14 Chapter 3.4 course topic.",
-          url: "https://youtu.be/Hqowo8xhrpw",
+          url: "",
         }),
       ]),
     }),
@@ -104,7 +104,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 15 · Chapter 3.5 · AI video",
           description:
             "AI video lesson for the B2 Day 15 Chapter 3.5 course topic.",
-          url: "https://youtu.be/5fdtLPqHe7A",
+          url: "",
         }),
       ]),
     }),
@@ -116,7 +116,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 16 · Digitalisierung im Alltag · AI video",
           description:
             "AI video lesson for evaluating digital tools, opportunities, risks, data protection and dependence in everyday life.",
-          url: "https://youtu.be/ioHsbvDoLag",
+          url: "",
         }),
       ]),
     }),
@@ -128,7 +128,7 @@ export const B2_C1_LESSON_VIDEO_OVERRIDES = Object.freeze({
           title: "B2 Day 17 · Mobilität und Stadtleben · AI video",
           description:
             "AI video lesson for comparing transport, urban planning and quality of life at B2 level.",
-          url: "https://youtu.be/i167ok5kIFg",
+          url: "",
         }),
       ]),
     }),
@@ -226,7 +226,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     5: Object.freeze({
       key: "b2-day5-bildung-lernen-falowen-radio",
       title: "Bildung und Lernen 1.5",
-      youtubeId: "xSrh7VYNgrM",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Bildung und Lernen ein. Danach gehst du weiter zum Lernteil.",
@@ -234,7 +234,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     6: Object.freeze({
       key: "b2-day6-migration-integration-falowen-radio",
       title: "Migration und Integration 2.1",
-      youtubeId: "LjxT4I6BmFw",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Migration, Integration und gesellschaftliche Teilhabe ein. Danach gehst du weiter zum Lernteil.",
@@ -242,7 +242,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     8: Object.freeze({
       key: "b2-day8-reisen-mobilitaet-falowen-radio",
       title: "Reisen und Mobilität 2.3",
-      youtubeId: "hxB5dwtbo6Q",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Reisen, Mobilität und nachhaltige Verkehrsmittel ein. Danach gehst du weiter zum Lernteil.",
@@ -250,7 +250,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     9: Object.freeze({
       key: "b2-day9-wohnen-nachbarschaft-falowen-radio",
       title: "Wohnen und Nachbarschaft 2.4",
-      youtubeId: "kVvR1zgJE-s",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Wohnen, Nachbarschaft und das Zusammenleben ein. Danach gehst du weiter zum Lernteil.",
@@ -258,7 +258,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     11: Object.freeze({
       key: "b2-day11-gesellschaft-integration-falowen-radio",
       title: "Gesellschaft und Integration 3.1",
-      youtubeId: "AWEHnJd1o3M",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Gesellschaft, Integration und Teilhabe ein. Danach gehst du weiter zum Lernteil.",
@@ -266,7 +266,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     12: Object.freeze({
       key: "b2-day12-kultur-freizeit-falowen-radio",
       title: "Kultur und Freizeit 3.2",
-      youtubeId: "juDa8R56Mtc",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Kultur, Freizeit und soziale Teilhabe ein. Danach gehst du weiter zum Lernteil.",
@@ -274,7 +274,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     13: Object.freeze({
       key: "b2-day13-familie-generationen-falowen-radio",
       title: "Familie und Generationen 3.3",
-      youtubeId: "9LLc7AAqrOc",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Familie, Generationen und Verantwortung ein. Danach gehst du weiter zum Lernteil.",
@@ -282,7 +282,7 @@ export const B2_C1_LESSON_RADIO_OVERRIDES = Object.freeze({
     14: Object.freeze({
       key: "b2-day14-freundschaft-beziehungen-falowen-radio",
       title: "Freundschaft und soziale Beziehungen 3.4",
-      youtubeId: "BdO8p8C-aSs",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Freundschaft, Vertrauen und soziale Beziehungen ein. Danach gehst du weiter zum Lernteil.",
