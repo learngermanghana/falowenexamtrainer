@@ -10,6 +10,7 @@ import B2Day26To28SelfTutoringPage from "./B2Day26To28SelfTutoringPage";
 import B2Day7To16GuidedLessonPage from "./B2Day7To16GuidedLessonPage";
 import C1Day8To10GuidedLessonPage from "./C1Day8To10GuidedLessonPage";
 import C2UnifiedGuidedWorkbookPage from "./C2UnifiedGuidedWorkbookPage";
+import B2UnifiedGuidedWorkbookPage from "./B2UnifiedGuidedWorkbookPage";
 import B1TutorLessonPage from "./B1TutorLessonPage";
 import { removeTeacherLectureFromCanonicalLesson, removeTeacherLectureFromLesson } from "./selfLearning/TeacherLectureSupportingMaterials";
 import { B2_LESSON_CONTENT_ALIGNMENT } from "../data/b2LessonContentAlignment";
@@ -90,6 +91,7 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   const pageCanonicalLesson = removeTeacherLectureFromCanonicalLesson(canonicalLesson);
   let page;
   if (normalizedLevel === "C2" && day >= 1 && day <= 28) page = <C2UnifiedGuidedWorkbookPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
+  else if (normalizedLevel === "B2" && day >= 1 && day <= 28) page = <B2UnifiedGuidedWorkbookPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (day === 0) page = <SelfLearningEditableLessonPageV2 lesson={pageLesson} falowenRadio={null} />;
   else if (normalizedLevel === "C1" && day >= 8 && day <= 10) page = <C1Day8To10GuidedLessonPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
   else if (normalizedLevel === "B2" && day >= 26 && day <= 28) page = <B2Day26To28SelfTutoringPage lesson={pageLesson} canonicalLesson={pageCanonicalLesson} />;
