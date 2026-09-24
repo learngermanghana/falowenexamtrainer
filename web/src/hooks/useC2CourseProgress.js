@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { collection, db, onSnapshot } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { C2_SKILL_DAYS, getC2SkillFocus } from "../data/c2SkillCycle";
-import { getC2ListeningPractice } from "../data/c2ListeningPractice";
+import { getC2ListeningPractice, hasC2ListeningSource } from "../data/c2ListeningPractice";
 import { getC2ReadingPractice } from "../data/c2ReadingPractice";
 
 export const buildC2DayProgress = (day, data = {}) => {
   const progress = data?.progress && typeof data.progress === "object" ? data.progress : {};
   const skillFocus = getC2SkillFocus(day);
   const listeningAvailable = skillFocus === "hoeren"
-    ? Boolean(String(getC2ListeningPractice(day)?.audioUrl || "").trim())
+    ? hasC2ListeningSource(getC2ListeningPractice(day))
     : true;
 
   const skillDone = skillFocus === "lesen"
