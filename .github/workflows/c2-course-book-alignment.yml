@@ -5,6 +5,8 @@ on:
     paths:
       - "web/src/data/c2*.js"
       - "web/src/components/C2*.js"
+      - "web/src/components/CourseTab.js"
+      - "web/src/hooks/useC2CourseProgress.js"
       - "web/src/data/curriculumManifest.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
       - "scripts/patchC2*.mjs"
@@ -28,3 +30,4 @@ jobs:
           npx jest --runInBand --runTestsByPath
           src/data/c2LessonContentAlignment.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
+          src/components/C2CourseBookSkillProgress.test.js
