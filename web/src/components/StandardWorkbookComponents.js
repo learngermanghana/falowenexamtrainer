@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { getC2DayTabs } from "../data/c2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import {
   filterA2B1WorkbookTabsByProfile,
@@ -251,7 +252,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
       <WorkbookTabNav
         activeTab={activeTab}
         onChange={onChange}
-        tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}
+        tabs={normalizedLevel === "C2" ? getC2DayTabs(day) : B2_C1_WORKBOOK_TABS}
         ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
         renderLegacyGrammarPanel={false}
       />
