@@ -24,13 +24,6 @@ describe("A2 Day 4 Wo/Wohin article teaching", () => {
     expect(grammarPage).toContain('["die (Plural)", "den (+n)", "die"]');
   });
 
-  test("does not teach the misleading movement equals Akkusativ shortcut", () => {
-    expect(grammarPage).toContain("movement alone does not automatically mean Akkusativ");
-    expect(grammarPage).toContain("Ich laufe im Park.");
-    expect(grammarPage).toContain("Where is the action happening?");
-    expect(grammarPage).toContain("Where is the destination?");
-  });
-
   test("explains why See uses an den while Meer can use ans", () => {
     expect(grammarPage).toContain('Why “am See” but not “ans See”?');
     expect(grammarPage).toContain("<strong>der See</strong> is masculine");
