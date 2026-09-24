@@ -71,6 +71,8 @@ describe("B2 unified C2-style course structure", () => {
     expect(registry).toContain('import B2UnifiedGuidedWorkbookPage from "./B2UnifiedGuidedWorkbookPage"');
     expect(registry).toContain('normalizedLevel === "B2" && day >= 1 && day <= 28');
     expect(registry).toContain("<B2UnifiedGuidedWorkbookPage");
+    expect(registry).toContain('shouldShowRadioFirst("B2", day)');
+    expect(registry).toContain('<RadioFirstWorkbookGate level="B2" day={day}>');
   });
 
   test("uses non-sticky rotating navigation like C2", () => {
@@ -95,6 +97,9 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("useB2CloudDraftField");
     expect(page).not.toContain("B2KnowledgeChoicePractice");
     expect(page).toContain("Hörquelle wird ergänzt");
+    expect(page).toContain('data-b2-grammar-video-status="missing"');
+    expect(page).toContain("Grammar video not added yet");
+    expect(page).toContain("Falowen zeigt bewusst kein altes oder themenfremdes Video.");
     expect(page).toContain("Review · B2 Day");
     expect(page).toContain("Day complete ✓");
     expect(page).toContain("Das Wichtigste heute");
