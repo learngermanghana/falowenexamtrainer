@@ -1,5 +1,5 @@
 export const C2_LISTENING_PRACTICE = Object.freeze({
-  2: { title: "Schulpflicht und Bildungsgerechtigkeit", audioKey: "", audioUrl: "", transcript: "" },
+  2: { title: "Schulpflicht und Bildungsgerechtigkeit", audioKey: "c2/day-02/day-02.m4a", audioUrl: "", transcript: "" },
   6: { title: "Soziale Ungleichheit und Chancengerechtigkeit", audioKey: "", audioUrl: "", transcript: "" },
   10: { title: "Medizin, Gesundheit und Forschungsethik", audioKey: "", audioUrl: "", transcript: "" },
   14: { title: "Kultur, Literatur und gesellschaftliches Gedächtnis", audioKey: "", audioUrl: "", transcript: "" },
