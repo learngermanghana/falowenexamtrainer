@@ -6,6 +6,7 @@ const CEFR_EXPECTATIONS = {
   B1: "Range, coherence, grammatical control, register",
   B2: "Range, coherence, grammatical control, register",
   C1: "Range, coherence, grammatical control, register",
+  C2: "Nuance, precision, cohesion, register flexibility, grammatical control",
 };
 
 const RUBRIC_LABELS = {
@@ -180,7 +181,7 @@ const WritingFeedbackCard = ({
 }) => {
   const [copyState, setCopyState] = useState("");
   const normalizedLevel = String(level || "A1").toUpperCase();
-  const correctionDisplayLimit = ["B1", "B2", "C1"].includes(normalizedLevel) ? 10 : 5;
+  const correctionDisplayLimit = ["B1", "B2", "C1", "C2"].includes(normalizedLevel) ? 10 : 5;
   const structured =
     structuredFeedback && typeof structuredFeedback === "object"
       ? structuredFeedback
