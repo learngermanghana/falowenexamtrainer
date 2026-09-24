@@ -20,7 +20,6 @@ import WritingFeedbackCard from"./WritingFeedbackCard";
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
 const Section=({title,children})=><section style={card}><h2 style={{margin:0,fontSize:"1.18rem"}}>{title}</h2>{children}</section>;
-const Progress=({label,done,detail})=><div style={{border:`1px solid ${done?"#86efac":"#cbd5e1"}`,borderRadius:14,padding:13,background:done?"#f0fdf4":"#fff",display:"grid",gap:4}}><strong>{done?"Complete":"Not complete"} · {label}</strong><span style={{color:"#64748b",fontSize:13}}>{detail}</span></div>;
 const Opinion=({children,index})=><blockquote style={{margin:0,border:"1px solid #cbd5e1",borderRadius:14,padding:16,background:"#fff",fontStyle:"italic",lineHeight:1.7}}>{index?index+". ":""}„{children}“</blockquote>;
 
 const TRANSFORMATION_FAMILIES=[
@@ -275,7 +274,7 @@ function C2ReviewPage({day,standard,knowledge,skillFocus,skillLabel,progress,set
  return <Section title={`Review · C2 Day ${day}`}>
   <div style={{...sub,background:ready?"#f0fdf4":"#fffbeb",borderColor:ready?"#86efac":"#fde68a"}}><strong>{ready?"Day complete ✓":"Day not complete yet"}</strong><span>{ready?`Grammar/Learn and ${skillLabel?.label} are complete. Review is revision only — no extra assignment.`:`Complete Grammar/Learn and today’s ${skillLabel?.label} task. Review itself is not graded.`}</span></div>
   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}}>
-   <div style={sub}><strong>Das Wichtigste heute</strong><span>{knowledge.de}</span><span><strong>Kernfrage:</strong> {knowledge.core}</span>{tension?<span><strong>Zielkonflikt:</strong> {tension}</span>:null}</div>
+   <div style={sub}><strong>Das Wichtigste heute</strong><span>1. <strong>Kernfrage:</strong> {knowledge.core}</span><span>2. <strong>Konkretes Beispiel:</strong> {knowledge.example}</span>{tension?<span>3. <strong>Zielkonflikt:</strong> {tension}</span>:<span>3. Entwickeln Sie eine differenzierte Position statt einer pauschalen Bewertung.</span>}</div>
    <div style={sub}><strong>Grammatik merken</strong><span>{grammarRule}</span>{grammarExample?<span><strong>Beispiel:</strong> {grammarExample}</span>:null}</div>
   </div>
   <div style={sub}><strong>Wortschatz · 6 wichtige Ausdrücke</strong><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:8}}>{(knowledge.vocab||[]).slice(0,6).map(([de,en])=><div key={de} style={{border:"1px solid #e2e8f0",borderRadius:10,padding:10,background:"#fff"}}><strong>{de}</strong><div style={{color:"#64748b",marginTop:3}}>{en}</div></div>)}</div></div>
@@ -349,20 +348,6 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
       ?Boolean(progress.speakDone)
       :Boolean(progress.writeDone);
  const ready=Boolean(progress.learnDone&&skillDone);
- const skillDetail=skillFocus==="lesen"
-  ?"Reading text and instant-feedback questions completed"
-  :skillFocus==="hoeren"
-    ?(listeningAvailable?"Full listening source completed":"Audio source not added yet · temporarily not required")
-    :skillFocus==="speak"
-      ?"Structured 3–5 minute C2 speaking completed"
-      :"Full C2 opinion writing task completed";
- const skillProgressDone=skillFocus==="lesen"
-  ?progress.lesenDone
-  :skillFocus==="hoeren"
-    ?progress.hoerenDone
-    :skillFocus==="speak"
-      ?progress.speakDone
-      :progress.writeDone;
 
  return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day} data-c2-skill-focus={skillFocus}>
   <AppBackButton label="Back to Course Book" fallbackPath="/campus/course"/>
