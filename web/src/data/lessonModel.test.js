@@ -40,6 +40,33 @@ describe("canonical lesson model", () => {
     );
   });
   test("keeps A2/B1 workbook capabilities", () => expect(normalizeA2B1Lesson({ day: 9 }, "B1").lessonType).toBe("fourPartWorkbook"));
+  test("redesigned B2 blocks stale Radio, grammar links and legacy videos but preserves the workbook", () => {
+    const lesson = normalizeB2C1Lesson({
+      level: "B2",
+      day: 2,
+      chapter: "1.2",
+      video: "https://youtu.be/wrong-old-video",
+      youtube_link: "https://youtu.be/wrong-old-video",
+      ai_video: "https://youtu.be/wrong-ai-video",
+      grammarbook_link: "https://drive.google.com/wrong-old-grammar",
+      workbook_link: "/campus/course/lesson/B2/2?view=workbook",
+      lesen_hören: {
+        chapter: "1.2",
+        grammar_link: "https://drive.google.com/wrong-nested-grammar",
+        workbook_link: "/campus/course/lesson/B2/2?view=workbook",
+      },
+    }, "B2");
+
+    expect(lesson.resources.falowenRadio).toBeNull();
+    expect(lesson.resources.grammarBook).toBeNull();
+    expect(lesson.resources.teacherVideo).toBeNull();
+    expect(lesson.resources.aiVideo).toBeNull();
+    expect(lesson.resources.videos).toEqual([]);
+    expect(lesson.resources.resourceGroups.every((group) => group.grammarBook === null)).toBe(true);
+    expect(lesson.resources.workbook).toEqual(
+      expect.objectContaining({ url: "/campus/course/lesson/B2/2?view=workbook" }),
+    );
+  });
   test.each(["B2", "C1"])("keeps %s self-learning compatibility", (level) => {
     const lesson = normalizeB2C1Lesson({ day: 1, assignment: true }, level);
     expect(lesson.lessonType).toBe("selfLearning");
