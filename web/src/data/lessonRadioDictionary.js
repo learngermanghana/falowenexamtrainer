@@ -274,7 +274,7 @@ export const LESSON_RADIO_DICTIONARY = {
     1: {
       key: "b2-day1-persoenliche-identitaet-falowen-radio",
       title: "Persönliche Identität und Selbstverständnis",
-      youtubeId: "0lTNin1NTgc",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
@@ -282,7 +282,7 @@ export const LESSON_RADIO_DICTIONARY = {
     2: {
       key: "b2-day2-beziehungen-kommunikation-falowen-radio",
       title: "Beziehungen und Kommunikation",
-      youtubeId: "OdfuQzJ_etM",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema Beziehungen und Kommunikation ein. Danach gehst du weiter zum Lernteil.",
@@ -290,7 +290,7 @@ export const LESSON_RADIO_DICTIONARY = {
     3: {
       key: "b2-day3-oeffentliches-privates-leben-falowen-radio",
       title: "Öffentliches Leben vs. Privatsphäre",
-      youtubeId: "wYwEi4myS2A",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf das Thema öffentliches Leben, Privatsphäre und persönliche Grenzen ein. Danach gehst du weiter zum Lernteil.",
@@ -298,7 +298,7 @@ export const LESSON_RADIO_DICTIONARY = {
     4: {
       key: "b2-day4-bildung-lernen-falowen-radio",
       title: "Bildung und Lernen",
-      youtubeId: "0rBDjwRe9UY",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Lernstrategien, Prüfungen und Weiterbildung ein. Danach gehst du weiter zum Lernteil.",
@@ -306,7 +306,7 @@ export const LESSON_RADIO_DICTIONARY = {
     27: {
       key: "b2-day27-pruefungstraining-argumentieren-reagieren-falowen-radio",
       title: "Prüfungstraining: Argumentieren und Reagieren 6.2",
-      youtubeId: "2-SRhPEQdNU",
+      youtubeId: "",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf Prüfungstraining, Argumentieren und Reagieren ein. Danach gehst du weiter zum Lernteil.",
