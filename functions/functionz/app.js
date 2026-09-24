@@ -21,6 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
+const { validateC2AudioKey, createC2AudioSignedUrl } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -436,6 +437,58 @@ async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   return authedUser;
 }
 
+const C2_MEDIA_STAFF_ROLES = new Set(["admin", "teacher", "tutor", "staff", "instructor"]);
+const C2_MEDIA_ACTIVE_STATUSES = new Set([
+  "active",
+  "paid",
+  "partial",
+  "pending",
+  "enrolled",
+  "registered",
+  "ongoing",
+  "current",
+  "trial_active",
+]);
+const C2_MEDIA_BLOCKED_PAYMENT_STATUSES = new Set([
+  "failed",
+  "overdue",
+  "rejected",
+  "cancelled",
+  "canceled",
+]);
+
+const hasC2StaffAccess = (authedUser, student = {}) => {
+  if (authedUser?.admin === true) return true;
+  return [authedUser?.role, student?.role]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .some((role) => C2_MEDIA_STAFF_ROLES.has(role));
+};
+
+const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
+  if (hasC2StaffAccess(authedUser, student)) return "";
+
+  if (!student) return "student_profile_missing";
+
+  const hasC2Level = [
+    student.level,
+    student.currentLevel,
+    student.courseLevel,
+    student.className,
+  ].some((value) => /\bC2\b/i.test(String(value || "")));
+  if (!hasC2Level) return "c2_not_assigned";
+
+  const status = String(student.status || "").trim().toLowerCase();
+  if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
+
+  const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
+  if (C2_MEDIA_BLOCKED_PAYMENT_STATUSES.has(paymentStatus)) return "payment_blocked";
+
+  const contractEnd = parseContractEnd(student.contractEnd);
+  if (contractEnd && contractEnd.getTime() <= Date.now()) return "contract_ended";
+
+  return "";
+};
+
 function loadScoresModule() {
   if (getScoresForStudent) return getScoresForStudent;
 
@@ -600,6 +653,50 @@ app.get("/metrics", (_req, res) => {
     metrics: snapshot,
     memory: process.memoryUsage(),
   });
+});
+
+app.get("/course-media/c2/audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const day = Number(req.query?.day);
+    const key = String(req.query?.key || "").trim();
+    const validated = validateC2AudioKey({ day, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid C2 audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getC2MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      return res.status(403).json({
+        error: "C2 audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createC2AudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("C2 R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "C2 audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_C2_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid C2 audio request" });
+    }
+    console.error("Failed to create C2 audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this C2 audio right now." });
+  }
 });
 
 app.post("/auth/login-diagnostics", async (req, res) => {
