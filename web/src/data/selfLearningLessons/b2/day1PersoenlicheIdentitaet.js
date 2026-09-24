@@ -10,7 +10,7 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
   videoResource: {
     title: "B2 AI lesson video: Persönliche Identität",
     description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
-    url: "https://youtu.be/HhUUkc8zgEc",
+    url: "",
   },
   grammarFocus: "Adjektivdeklination, klare Begründungen und strukturierte Selbstdarstellung",
   objectives: [
