@@ -6,6 +6,8 @@ on:
       - "web/src/data/c2*.js"
       - "web/src/components/C2*.js"
       - "web/src/components/CourseTab.js"
+      - "web/src/components/WritingFeedbackCard.js"
+      - "web/src/components/WritingFeedbackCard.test.js"
       - "web/src/hooks/useC2CourseProgress.js"
       - "web/src/data/curriculumManifest.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
@@ -31,3 +33,4 @@ jobs:
           src/data/c2LessonContentAlignment.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
           src/components/C2CourseBookSkillProgress.test.js
+          src/components/WritingFeedbackCard.test.js
