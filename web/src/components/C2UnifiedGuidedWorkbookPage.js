@@ -133,20 +133,6 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
  </Section>;
 }
 
-function ReformulationWrite({standard,day,completed,onCompleteChange}){
- const key=`falowen:c2:day${day}:unified-reformulations`;
- const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return{}}});
- const[legacyAnswersSeedAllowed]=useState(()=>{try{const saved=JSON.parse(localStorage.getItem(key)||"{}");return Object.values(saved||{}).some(value=>String(value||"").trim())}catch{return false}});
- useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(answers))}catch{}},[key,answers]);
- useC2CloudDraftField({day,field:"reformulationAnswers",value:answers,setValue:setAnswers,seedCloudWhenMissing:legacyAnswersSeedAllowed,defaultValue:{}});
- return <Section title="Schreiben · Umformung">
-  <p style={{margin:0,lineHeight:1.75}}><strong>Testbereich:</strong> Formulieren Sie jeden Satz neu. Verwenden Sie das vorgegebene Wort unverändert und erhalten Sie die Bedeutung. Hier werden keine Musterlösungen angezeigt.</p>
-  <div style={{display:"grid",gap:12}}>{standard.reformulations.map((item,index)=><article key={item.cue+index} style={{...sub,background:"#fff"}}><strong>{index+1}. {item.source}</strong><div><strong>Vorgegebenes Wort:</strong> <span style={{...styles.badge,background:"#dbeafe",color:"#1e3a8a"}}>{item.cue}</span></div><textarea value={answers[index]||""} onChange={e=>setAnswers(old=>({...old,[index]:e.target.value}))} placeholder="Ihre Umformung" style={{minHeight:92,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit",lineHeight:1.65}}/></article>)}</div>
-  <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe alle Umformungen bearbeitet und jedes Vorgabewort unverändert verwendet.</label>
- </Section>;
-}
-
-
 function ReadingPractice({day,completed,onCompleteChange}){
  const practice=getC2ReadingPractice(day);
  const key=`falowen:c2:day${day}:reading-answers`;
@@ -203,7 +189,6 @@ function ListeningPractice({day,completed,onCompleteChange}){
  </Section>;
 }
 
-const C2_WORKBOOK_VIEWS=new Set(["learn","lesen","hoeren","speak","write","finish","references"]);
 
 export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const location=useLocation();
