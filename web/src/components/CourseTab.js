@@ -1022,12 +1022,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               ) : (
                 <>
                   <div style={courseBookStyles.statCard}>
-                    <p style={courseBookStyles.statLabel}>Assignments</p>
+                    <p style={courseBookStyles.statLabel}>Required work</p>
                     <p style={courseBookStyles.statValue}>{assignmentCount}</p>
                   </div>
                   <div style={courseBookStyles.statCard}>
-                    <p style={courseBookStyles.statLabel}>Practice</p>
-                    <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>Practical completed: {practicalCompletedCount}/{practiceEntries.length}</p>
+                    <p style={courseBookStyles.statLabel}>Mastery</p>
+                    <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>
+                      {courseCompletion?.masteryAvailable ? `${courseCompletion.masteryPercent ?? 0}% passed` : "Self-learning"}
+                    </p>
                   </div>
                 </>
               )}
@@ -1049,7 +1051,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <div style={courseBookStyles.progressShell}>
                 <div style={{ ...courseBookStyles.progressFill, width: `${progressPercent}%` }} />
               </div>
-              <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{completedCount} of {courseLessons.length} lessons completed</p>
+              <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{isC2CourseBook ? `${completedCount} of ${courseLessons.length} days completed` : `${completedCount} of ${courseCompletion?.total || 0} required ${courseCompletion?.mode === "self-learning" ? "lessons" : "assignments"} completed`}</p>
             </div>
           </section>
 
