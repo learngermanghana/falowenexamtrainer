@@ -224,7 +224,7 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         title: "B2 Day 3 · Kontrast und Konzession · AI grammar video",
         description:
           "Grammar video for während, wohingegen, obwohl, trotz, zwar ... aber and other contrast and concession structures.",
-        url: "https://youtu.be/cmKLSjWi4S0",
+        url: "",
       },
     ],
   },
