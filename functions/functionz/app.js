@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateC2AudioKey, createC2AudioSignedUrl } = require("./r2CourseAudio");
+const { validateC2AudioKey, validateB2AudioKey, createC2AudioSignedUrl, createB2AudioSignedUrl } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -489,6 +489,31 @@ const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
   return "";
 };
 
+const getB2MediaAccessBlockReason = ({ authedUser, student }) => {
+  if (hasC2StaffAccess(authedUser, student)) return "";
+
+  if (!student) return "student_profile_missing";
+
+  const hasB2Level = [
+    student.level,
+    student.currentLevel,
+    student.courseLevel,
+    student.className,
+  ].some((value) => /\bB2\b/i.test(String(value || "")));
+  if (!hasB2Level) return "b2_not_assigned";
+
+  const status = String(student.status || "").trim().toLowerCase();
+  if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
+
+  const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
+  if (C2_MEDIA_BLOCKED_PAYMENT_STATUSES.has(paymentStatus)) return "payment_blocked";
+
+  const contractEnd = parseContractEnd(student.contractEnd);
+  if (contractEnd && contractEnd.getTime() <= Date.now()) return "contract_ended";
+
+  return "";
+};
+
 function loadScoresModule() {
   if (getScoresForStudent) return getScoresForStudent;
 
@@ -696,6 +721,50 @@ app.get("/course-media/c2/audio-url", async (req, res) => {
     }
     console.error("Failed to create C2 audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this C2 audio right now." });
+  }
+});
+
+app.get("/course-media/b2/audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const day = Number(req.query?.day);
+    const key = String(req.query?.key || "").trim();
+    const validated = validateB2AudioKey({ day, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid B2 audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getB2MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      return res.status(403).json({
+        error: "B2 audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createB2AudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("B2 R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "B2 audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_COURSE_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid B2 audio request" });
+    }
+    console.error("Failed to create B2 audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this B2 audio right now." });
   }
 });
 

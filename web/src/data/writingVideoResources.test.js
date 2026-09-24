@@ -15,12 +15,6 @@ describe("writing video resources", () => {
     ["B1", 8, "https://youtu.be/kGQWOEfhP-k"],
     ["B1", 20, "https://youtu.be/og1iVBKnIb0"],
     ["B1", 21, "https://youtu.be/1JYyJfnumig"],
-    ["B2", 1, "https://youtu.be/w8TaNHk-a0U"],
-    ["B2", 3, "https://youtu.be/qCO2p1Ahy7U"],
-    ["B2", 5, "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL"],
-    ["B2", 6, "https://youtu.be/19WaMcKL8v4"],
-    ["B2", 7, "https://youtu.be/pzvyE35CZbI"],
-    ["B2", 12, "https://youtu.be/3xWokVVz8cs"],
     ["C1", 8, "https://youtu.be/VdczhJS9ClY"],
     ["C1", 9, "https://youtu.be/tpj8TV8DaH8"],
     ["C1", 10, "https://youtu.be/I5OU_ZXz4c0"],
@@ -107,40 +101,13 @@ describe("writing video resources", () => {
     );
   });
 
-  test("maps B2 Day 5, Day 6 and Day 7 to their Write pages", () => {
-    expect(getWritingVideoResource("B2", 5)).toEqual(
-      expect.objectContaining({
-        key: "b2-day5-bildung-lernen-writing-video",
-        chapter: "1.5",
-        title: expect.stringContaining("Bildung und Lernen"),
-        url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
-      }),
-    );
-    expect(getWritingVideoResource("B2", 6)).toEqual(
-      expect.objectContaining({
-        key: "b2-day6-migration-integration-writing-video",
-        chapter: "2.1",
-        title: expect.stringContaining("Migration und Integration"),
-        url: "https://youtu.be/19WaMcKL8v4",
-      }),
-    );
-    expect(getWritingVideoResource("B2", 7)).toEqual(
-      expect.objectContaining({
-        key: "b2-day7-gesellschaftliche-vielfalt-writing-video",
-        chapter: "2.2",
-        title: expect.stringContaining("Gesellschaftliche Vielfalt"),
-        url: "https://youtu.be/pzvyE35CZbI",
-      }),
-    );
+  test("returns no writing videos for the redesigned B2 course", () => {
+    [1, 2, 3, 4, 5, 6, 7, 12].forEach((day) => {
+      expect(getWritingVideoResource("B2", day)).toBeNull();
+    });
   });
 
-  test("maps B2 Day 3 and C1 Day 10, Day 11 and Day 12 to their writing pages", () => {
-    expect(getWritingVideoResource("B2", 3)).toEqual(
-      expect.objectContaining({
-        key: "b2-day3-oeffentliches-privates-leben-writing-video",
-        url: "https://youtu.be/qCO2p1Ahy7U",
-      }),
-    );
+  test("maps C1 Day 10, Day 11 and Day 12 to their writing pages", () => {
     expect(getWritingVideoResource("C1", 10)).toEqual(
       expect.objectContaining({
         key: "c1-day10-integration-gesellschaft-writing-video",
@@ -162,25 +129,8 @@ describe("writing video resources", () => {
     );
   });
 
-  test("classifies B2 Day 12 as a letter-writing guide", () => {
-    expect(getWritingVideoResource("B2", 12)).toEqual(
-      expect.objectContaining({
-        key: "b2-day12-kultur-freizeit-letter-writing-video",
-        format: "letter",
-        title: expect.stringContaining("Brief schreiben"),
-        badge: "Watch before writing · Letter guide",
-        heading: "Learn how to write this B2 letter",
-        url: "https://youtu.be/3xWokVVz8cs",
-      }),
-    );
-  });
-
-  test("normalizes level casing and numeric day values", () => {
-    expect(getWritingVideoResource(" b2 ", "1")).toEqual(
-      expect.objectContaining({
-        key: "b2-day1-persoenliche-identitaet-writing-video",
-      }),
-    );
+  test("normalizes level casing and numeric day values for empty redesigned B2 media", () => {
+    expect(getWritingVideoResource(" b2 ", "1")).toBeNull();
   });
 
   test("returns null when no writing video has been added", () => {

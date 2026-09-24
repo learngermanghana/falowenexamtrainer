@@ -1,11 +1,17 @@
 const crypto = require("crypto");
 
-const C2_LISTENING_DAYS = new Set([2, 6, 10, 14, 18, 22, 26]);
+const COURSE_LISTENING_DAYS = Object.freeze({
+  B2: new Set([2, 6, 10, 14, 18, 22, 26]),
+  C2: new Set([2, 6, 10, 14, 18, 22, 26]),
+});
+const C2_LISTENING_DAYS = COURSE_LISTENING_DAYS.C2;
+const B2_LISTENING_DAYS = COURSE_LISTENING_DAYS.B2;
 const DEFAULT_EXPIRES_SECONDS = 60 * 60;
 const MIN_EXPIRES_SECONDS = 60;
 const MAX_EXPIRES_SECONDS = 60 * 60 * 24 * 7;
 
 const clean = (value) => String(value || "").trim();
+const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
 
 const clampExpiry = (value) => {
   const parsed = Number(value);
@@ -16,27 +22,41 @@ const clampExpiry = (value) => {
   );
 };
 
-const normalizeDay = (value) => {
+const normalizeDay = (level, value) => {
+  const normalizedLevel = normalizeLevel(level);
   const day = Number(value);
-  return Number.isInteger(day) && C2_LISTENING_DAYS.has(day) ? day : null;
+  const allowedDays = COURSE_LISTENING_DAYS[normalizedLevel];
+  return Number.isInteger(day) && allowedDays?.has(day) ? day : null;
 };
 
-const expectedPrefixForDay = (day) =>
-  `c2/day-${String(day).padStart(2, "0")}/`;
+const expectedPrefixForDay = (level, day) =>
+  `${normalizeLevel(level).toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
 
 const isAudioObjectKey = (key) =>
   /\.(?:mp3|m4a|aac|wav|ogg|webm)$/i.test(key);
 
-const validateC2AudioKey = ({ day, key }) => {
-  const normalizedDay = normalizeDay(day);
+const validateCourseAudioKey = ({ level, day, key }) => {
+  const normalizedLevel = normalizeLevel(level);
+  const normalizedDay = normalizeDay(normalizedLevel, day);
   const normalizedKey = clean(key).replace(/^\/+/, "");
 
+  if (!COURSE_LISTENING_DAYS[normalizedLevel]) return null;
   if (!normalizedDay || !normalizedKey) return null;
   if (normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
-  if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedDay))) return null;
+  if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) return null;
   if (!isAudioObjectKey(normalizedKey)) return null;
 
-  return { day: normalizedDay, key: normalizedKey };
+  return { level: normalizedLevel, day: normalizedDay, key: normalizedKey };
+};
+
+const validateC2AudioKey = ({ day, key }) => {
+  const validated = validateCourseAudioKey({ level: "C2", day, key });
+  return validated ? { day: validated.day, key: validated.key } : null;
+};
+
+const validateB2AudioKey = ({ day, key }) => {
+  const validated = validateCourseAudioKey({ level: "B2", day, key });
+  return validated ? { day: validated.day, key: validated.key } : null;
 };
 
 const getR2AudioConfig = (env = process.env) => {
@@ -99,16 +119,17 @@ const buildCanonicalQuery = (entries) =>
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
 
-const createC2AudioSignedUrl = async ({
+const createCourseAudioSignedUrl = async ({
+  level,
   day,
   key,
   env = process.env,
   now = new Date(),
 }) => {
-  const validated = validateC2AudioKey({ day, key });
+  const validated = validateCourseAudioKey({ level, day, key });
   if (!validated) {
-    const error = new Error("Invalid C2 audio object key");
-    error.code = "INVALID_C2_AUDIO_KEY";
+    const error = new Error("Invalid course audio object key");
+    error.code = "INVALID_COURSE_AUDIO_KEY";
     throw error;
   }
 
@@ -160,16 +181,29 @@ const createC2AudioSignedUrl = async ({
 
   return {
     url: `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`,
+    level: validated.level,
     key: validated.key,
     expiresIn: config.expiresIn,
     expiresAt: new Date(requestDate.getTime() + config.expiresIn * 1000).toISOString(),
   };
 };
 
+const createC2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
+  createCourseAudioSignedUrl({ level: "C2", day, key, env, now });
+
+const createB2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
+  createCourseAudioSignedUrl({ level: "B2", day, key, env, now });
+
 module.exports = {
+  COURSE_LISTENING_DAYS,
   C2_LISTENING_DAYS,
+  B2_LISTENING_DAYS,
   DEFAULT_EXPIRES_SECONDS,
+  validateCourseAudioKey,
   validateC2AudioKey,
+  validateB2AudioKey,
   getR2AudioConfig,
+  createCourseAudioSignedUrl,
   createC2AudioSignedUrl,
+  createB2AudioSignedUrl,
 };

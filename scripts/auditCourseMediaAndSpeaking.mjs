@@ -13,8 +13,6 @@ const requiredMarkers = {
     'url: "https://youtu.be/F67RRmGNK1c"',
   ],
   "web/src/data/b2C1LessonMediaOverrides.js": [
-    'key: "b2-day11-gesellschaft-integration-falowen-radio"',
-    'youtubeId: ""',
     'key: "c1-day16-technologie-alltag-ai-video"',
     'url: "https://youtu.be/H4mPDTiMkwg"',
     'key: "c1-day17-umwelt-verantwortung-ai-video"',
@@ -63,6 +61,9 @@ const forbiddenMarkers = {
     'youtube_link: "https://youtu.be/AWEHnJd1o3M"',
   ],
   "web/src/data/b2C1LessonMediaOverrides.js": [
+    "b2-day11-gesellschaft-integration-falowen-radio",
+    "b2-day13-chapter-3-3-ai-video",
+    "b2-day16-digitalisierung-alltag-ai-video",
     "LjxT4I6BmFw",
     "hxB5dwtbo6Q",
     "kVvR1zgJE-s",
@@ -82,6 +83,8 @@ const forbiddenMarkers = {
     "i167ok5kIFg",
   ],
   "web/src/data/lessonRadioDictionary.js": [
+    "b2-day1-persoenliche-identitaet-falowen-radio",
+    "b2-day11-gesellschaft-integration-falowen-radio",
     "0lTNin1NTgc",
     "OdfuQzJ_etM",
     "wYwEi4myS2A",
@@ -89,7 +92,12 @@ const forbiddenMarkers = {
     "2-SRhPEQdNU",
   ],
   "web/src/data/additionalLessonVideoResources.js": [
+    "b2-day3-kontrast-konzession-ai-grammar-video",
     "cmKLSjWi4S0",
+  ],
+  "web/src/data/writingVideoResources.js": [
+    "b2-day1-persoenliche-identitaet-writing-video",
+    "b2-day4-bildung-lernen-writing-video",
   ],
   "web/src/data/selfLearningLessons/b2/day1PersoenlicheIdentitaet.js": ["HhUUkc8zgEc"],
   "web/src/data/selfLearningLessons/b2/day2AlltagUndZeitmanagement.js": ["ZfCAaLGV2c4"],

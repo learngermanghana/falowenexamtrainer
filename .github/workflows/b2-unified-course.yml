@@ -6,16 +6,35 @@ on:
       - "web/src/components/B2UnifiedGuidedWorkbookPage.js"
       - "web/src/components/B2UnifiedGuidedWorkbookPage.test.js"
       - "web/src/components/SelfLearningLessonRegistry.js"
+      - "web/src/components/SelfLearningLessonRegistry.test.js"
+      - "web/src/components/SelfLearningLessonRegistry.mediaRoles.test.js"
       - "web/src/components/StandardWorkbookComponents.js"
       - "web/src/data/b2SkillCycle.js"
+      - "web/src/data/b2ReadingPractice.js"
       - "web/src/data/b2ListeningPractice.js"
-      - "web/src/serviceWorkerRegistration.js"
-      - "web/public/firebase-messaging-sw.js"
-      - "web/src/__tests__/ServiceWorkerBuildAssetSafety.test.js"
+      - "web/src/data/b2C1LessonMediaOverrides.js"
+      - "web/src/data/b2MediaReset.test.js"
+      - "web/src/data/b2Day11FalowenRadio.test.js"
+      - "web/src/data/b2Day13To15RequestedAiVideos.test.js"
+      - "web/src/data/b2Day16Day17AiVideos.test.js"
+      - "web/src/data/lessonRadioDictionary.js"
+      - "web/src/data/lessonRadioDictionary.test.js"
+      - "web/src/data/additionalLessonVideoResources.js"
+      - "web/src/data/writingVideoResources.js"
+      - "web/src/data/writingVideoResources.test.js"
+      - "web/src/data/writingVideoResources.b2Day4.test.js"
+      - "web/src/data/courseSchedule.js"
+      - "web/src/data/lessonCatalog.js"
+      - "web/src/services/b2AudioService.js"
+      - "web/src/utils/b2CloudDraftSync.js"
+      - "functions/functionz/r2CourseAudio.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/__tests__/r2CourseAudio.test.js"
+      - "scripts/auditCourseMediaAndSpeaking.mjs"
       - ".github/workflows/b2-unified-course.yml"
 
 jobs:
-  b2-unified:
+  b2-unified-web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +46,7 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm ci
-      - name: Test B2 rotating course and C2 navigation regression
+      - name: Test B2 redesign, media cleanup and C2 regression
         working-directory: web
         env:
           CI: true
@@ -35,7 +54,33 @@ jobs:
           npx jest --runInBand --runTestsByPath
           src/components/B2UnifiedGuidedWorkbookPage.test.js
           src/components/C2UnifiedGuidedWorkbookPage.test.js
-          src/__tests__/ServiceWorkerBuildAssetSafety.test.js
+          src/components/SelfLearningLessonRegistry.test.js
+          src/components/SelfLearningLessonRegistry.mediaRoles.test.js
+          src/data/b2MediaReset.test.js
+          src/data/b2Day11FalowenRadio.test.js
+          src/data/b2Day13To15RequestedAiVideos.test.js
+          src/data/b2Day16Day17AiVideos.test.js
+          src/data/writingVideoResources.test.js
+          src/data/writingVideoResources.b2Day4.test.js
       - name: Build web app
         working-directory: web
         run: npm run build
+
+  b2-r2-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install function dependencies
+        working-directory: functions
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test B2 and C2 private R2 signing
+        working-directory: functions
+        run: npx jest --runInBand functionz/__tests__/r2CourseAudio.test.js
+      - name: Check backend route syntax
+        working-directory: functions
+        run: node --check functionz/app.js

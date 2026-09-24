@@ -270,48 +270,7 @@ export const LESSON_RADIO_DICTIONARY = {
         "Höre aufmerksam zu und stimme dich auf klimafreundliches Leben im Alltag ein. Danach gehst du weiter zum Workbook.",
     },
   },
-  B2: {
-    1: {
-      key: "b2-day1-persoenliche-identitaet-falowen-radio",
-      title: "Persönliche Identität und Selbstverständnis",
-      youtubeId: "",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema persönliche Identität und Selbstverständnis ein. Danach gehst du weiter zum Lernteil.",
-    },
-    2: {
-      key: "b2-day2-beziehungen-kommunikation-falowen-radio",
-      title: "Beziehungen und Kommunikation",
-      youtubeId: "",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema Beziehungen und Kommunikation ein. Danach gehst du weiter zum Lernteil.",
-    },
-    3: {
-      key: "b2-day3-oeffentliches-privates-leben-falowen-radio",
-      title: "Öffentliches Leben vs. Privatsphäre",
-      youtubeId: "",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf das Thema öffentliches Leben, Privatsphäre und persönliche Grenzen ein. Danach gehst du weiter zum Lernteil.",
-    },
-    4: {
-      key: "b2-day4-bildung-lernen-falowen-radio",
-      title: "Bildung und Lernen",
-      youtubeId: "",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Lernstrategien, Prüfungen und Weiterbildung ein. Danach gehst du weiter zum Lernteil.",
-    },
-    27: {
-      key: "b2-day27-pruefungstraining-argumentieren-reagieren-falowen-radio",
-      title: "Prüfungstraining: Argumentieren und Reagieren 6.2",
-      youtubeId: "",
-      duration: "",
-      instruction:
-        "Höre aufmerksam zu und stimme dich auf Prüfungstraining, Argumentieren und Reagieren ein. Danach gehst du weiter zum Lernteil.",
-    },
-  },
+  B2: {},
   C1: {
     1: {
       key: "c1-day1-ziele-lernweg-falowen-radio",

@@ -7,11 +7,6 @@ const b2Day2AlltagUndZeitmanagement = makeLesson({
   title: "Beziehungen und Kommunikation",
   topic: "Beziehungstypen, Kommunikationsstrategien und höfliche Reaktionen diskutieren",
   heroImage: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1600&q=80",
-  videoResource: {
-    title: "B2 AI lesson video: Beziehungen und Kommunikation",
-    description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
-    url: "",
-  },
   grammarFocus: "Konjunktiv II (höfliche Bitten & hypothetische Situationen)",
   objectives: [
     "Ich kann verschiedene Beziehungstypen und Kommunikationsprobleme differenziert beschreiben.",
