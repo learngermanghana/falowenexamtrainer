@@ -252,14 +252,32 @@ export const normalizeCourseBookEntry = (entry = {}, options = {}) => {
     { level, displayDay, chapter, assignmentId }
   );
 
-  if (options.normalizeResources === false) return normalized;
+  const strictB2 = level === "B2" && Number(day) >= 1 && Number(day) <= 28;
+  const safeNormalized = strictB2
+    ? {
+        ...normalized,
+        grammarPage: "",
+        grammarbook_link: null,
+        grammar_link: null,
+        video: null,
+        youtube_link: null,
+        ai_video: null,
+        ai_grammar_video: null,
+        falowenRadio: null,
+        radio: null,
+        radio_link: null,
+        radioUrl: null,
+      }
+    : normalized;
+
+  if (options.normalizeResources === false) return safeNormalized;
 
   return {
-    ...normalized,
-    lesen_hören: normalizeLessonCollection(normalized.lesen_hören, normalized, "lesen_hören", level),
+    ...safeNormalized,
+    lesen_hören: normalizeLessonCollection(safeNormalized.lesen_hören, safeNormalized, "lesen_hören", level),
     schreiben_sprechen: normalizeLessonCollection(
-      normalized.schreiben_sprechen,
-      normalized,
+      safeNormalized.schreiben_sprechen,
+      safeNormalized,
       "schreiben_sprechen",
       level
     ),
