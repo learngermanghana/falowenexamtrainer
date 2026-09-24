@@ -167,7 +167,9 @@ nav = nav.replace(
   "      tabs={B2_C1_WORKBOOK_TABS}",
   '      tabs={String(level || "").toUpperCase() === "C2" ? C2_WORKBOOK_TABS : B2_C1_WORKBOOK_TABS}',
 );
-if (!nav.includes('label: "Grammar"') || !nav.includes('String(level || "").toUpperCase() === "C2"')) {
+const hasLegacyC2Tabs = nav.includes('label: "Grammar"') && nav.includes('String(level || "").toUpperCase() === "C2"');
+const hasRotatingC2Tabs = nav.includes("getC2DayTabs(day)") && nav.includes('normalizedLevel === "C2"');
+if (!hasLegacyC2Tabs && !hasRotatingC2Tabs) {
   throw new Error("C2 page ownership: C2 Grammar tab label was not applied.");
 }
 fs.writeFileSync(navPath, nav, "utf8");
