@@ -32,11 +32,14 @@ describe("B2 concise topic foundations", () => {
       day,
       chapter: lesson.chapter,
       title: lesson.title,
+      englishIntro: expect.any(String),
       intro: expect.any(String),
       example: expect.any(String),
       tension: expect.any(String),
       question: expect.any(String),
     }));
+    expect(foundation.englishIntro.length).toBeGreaterThan(80);
+    expect(foundation.englishIntro.length).toBeLessThan(650);
     expect(foundation.intro.length).toBeGreaterThan(90);
     expect(foundation.intro.length).toBeLessThan(600);
     expect(foundation.example.length).toBeGreaterThan(35);
@@ -50,17 +53,22 @@ describe("B2 concise topic foundations", () => {
     );
   });
 
-  test("renders B2 topic understanding without turning it into another long grammar section", () => {
-    render(<B2TopicIntroduction day={19} />);
+  test("renders English topic meaning before German and grammar", () => {
+    const { container } = render(<B2TopicIntroduction day={19} />);
 
-    expect(screen.getByText("B2 · Thema kurz verstehen")).toBeVisible();
+    expect(screen.getByText("B2 · Thema zuerst verstehen")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Homeoffice, ständige Erreichbarkeit und Work-Life-Balance" })).toBeVisible();
+    expect(screen.getByText("In simple English")).toBeVisible();
+    expect(screen.getByText("Auf Deutsch")).toBeVisible();
     expect(screen.getByText("Konkretes Beispiel")).toBeVisible();
     expect(screen.getByText("Abwägung")).toBeVisible();
     expect(screen.getByText("Leitfrage")).toBeVisible();
-    expect(screen.getByText("Konkretes Beispiel").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
-    expect(screen.getByText("Abwägung").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
-    expect(screen.getByText("Leitfrage").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
+
+    const source = container.textContent || "";
+    expect(source.indexOf("In simple English")).toBeLessThan(source.indexOf("Auf Deutsch"));
+    expect(source.indexOf("Auf Deutsch")).toBeLessThan(source.indexOf("Konkretes Beispiel"));
+    expect(screen.getByText("In simple English").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
+    expect(screen.getByText("Auf Deutsch").parentElement).toHaveStyle({ display: "grid", gap: "4px" });
   });
 
   test("supports a current-topic review without old static summaries", () => {
