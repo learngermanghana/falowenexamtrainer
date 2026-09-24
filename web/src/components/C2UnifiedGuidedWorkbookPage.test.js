@@ -95,18 +95,26 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss.");
   });
 
-  test("keeps Hören transcript-first while enabling only uploaded sources", () => {
+  test("uses the real Day 2 transcript and instant-feedback listening questions", () => {
     C2_SKILL_DAYS.hoeren.forEach((day) => {
       const listening = getC2ListeningPractice(day);
       expect(listening).toBeTruthy();
+      expect(listening.audioUrl).toBe("");
       if (day === 2) {
         expect(listening.audioKey).toBe("c2/day-02/day-02.m4a");
+        expect(Array.isArray(listening.transcript)).toBe(true);
+        expect(listening.transcript.length).toBeGreaterThanOrEqual(10);
+        expect(listening.questions).toHaveLength(6);
+        listening.questions.forEach((question) => {
+          expect(question.options).toHaveLength(4);
+          expect(Number.isInteger(question.answerIndex)).toBe(true);
+          expect(question.explanation.length).toBeGreaterThan(20);
+        });
       } else {
         expect(listening.audioKey).toBe("");
+        expect(listening.transcript).toBe("");
+        expect(listening.questions).toBeUndefined();
       }
-      expect(listening.audioUrl).toBe("");
-      expect(listening.transcript).toBe("");
-      expect(listening.questions).toBeUndefined();
     });
     expect(page).toContain("Es werden bewusst noch keine Fragen angezeigt.");
     expect(page).toContain("Die Fragen werden erst aus dem tatsächlichen Transkript erstellt");
@@ -114,6 +122,12 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('data-c2-r2-audio="true"');
     expect(page).toContain("fetchC2AudioPlaybackUrl");
     expect(page).toContain("Die Aufnahme wird direkt hier in Falowen abgespielt.");
+    expect(page).toContain("Transkript anzeigen");
+    expect(page).toContain("Transkript ausblenden");
+    expect(page).toContain('data-c2-listening-transcript="true"');
+    expect(page).toContain('field:"listeningAnswers"');
+    expect(page).toContain('field:"listeningFirstAttempts"');
+    expect(page).toContain("Verständnis und Argumentation");
   });
 
   test("reduces speaking support deliberately across the seven speaking days", () => {
@@ -154,6 +168,8 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain('field:"writingFeedback"');
     expect(page).toContain('field:"readingAnswers"');
     expect(page).toContain('field:"readingFirstAttempts"');
+    expect(page).toContain('field:"listeningAnswers"');
+    expect(page).toContain('field:"listeningFirstAttempts"');
     expect(page).toContain("localStorage.setItem");
 
     expect(cloudSync).toContain('doc(db, "users", user.uid, "c2Drafts"');
