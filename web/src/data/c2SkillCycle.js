@@ -1,3 +1,4 @@
+// C2 rotating skill cycle
 const C2_SKILL_ORDER = Object.freeze(["lesen", "hoeren", "speak", "write"]);
 
 const C2_SKILL_LABELS = Object.freeze({
