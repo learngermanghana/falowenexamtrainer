@@ -459,7 +459,6 @@ const A2_SCHEDULE = [
 const resolveB2LessonLinks = (assignmentDay) =>
   assignmentDay === 1
     ? {
-        grammarbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes",
         workbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook",
       }
     : {};
