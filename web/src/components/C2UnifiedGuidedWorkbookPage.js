@@ -10,8 +10,9 @@ import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 import{buildC2OpinionWritingTemplate}from"../data/c2OpinionWritingTemplate";
 import{getC2ReadingPractice}from"../data/c2ReadingPractice";
 import{getC2ListeningPractice}from"../data/c2ListeningPractice";
-import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel}from"../data/c2SkillCycle";
+import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel,getC2SpeakingSupport,getC2SpeakingSupportNote}from"../data/c2SkillCycle";
 import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
+import{useC2CourseProgress}from"../hooks/useC2CourseProgress";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
@@ -87,7 +88,8 @@ function Learn({day,standard,knowledge,mastery,skillFocus,completed,onCompleteCh
 }
 
 function Speak({standard,knowledge,day,completed,onCompleteChange}){
- const[support,setSupport]=useState("full");
+ const recommendedSupport=getC2SpeakingSupport(day);
+ const[support,setSupport]=useState(recommendedSupport);
  const planKey=`falowen:c2:day${day}:unified-speech-plan`;
  const[plan,setPlan]=useState(()=>{try{return localStorage.getItem(planKey)||""}catch{return""}});
  const[legacyPlanSeedAllowed]=useState(()=>{try{return Boolean(String(localStorage.getItem(planKey)||"").trim())}catch{return false}});
@@ -97,6 +99,7 @@ function Speak({standard,knowledge,day,completed,onCompleteChange}){
  return <Section title="Sprechen · Erst verstehen, dann argumentieren">
   <div style={{display:"grid",gap:12}}>
    <p style={{margin:0,lineHeight:1.75}}>Halten Sie einen strukturierten 3–5-minütigen Beitrag zu „{standard.title}“. Wägen Sie die drei Kursaussagen ab, geben Sie Beispiele und formulieren Sie eine eigene Synthese.</p>
+   <div style={{...sub,background:"#fffbeb",borderColor:"#fde68a"}}><strong>Recommended support for this stage: {recommendedSupport==="full"?"Mit Hilfe":recommendedSupport==="keywords"?"Weniger Hilfe":"Prüfungsmodus"}</strong><span>{getC2SpeakingSupportNote(day)}</span></div>
    <div style={{display:"grid",gap:9}}>{standard.perspectives.map((quote,index)=><Opinion key={quote} index={index+1}>{quote}</Opinion>)}</div>
    <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{[["full","1. Mit Hilfe"],["keywords","2. Weniger Hilfe"],["exam","3. Prüfungsmodus"]].map(([value,label])=><button key={value} type="button" onClick={()=>setSupport(value)} style={support===value?styles.primaryButton:styles.secondaryButton}>{label}</button>)}</div>
    {support!=="exam"?<div style={{display:"grid",gap:10}}>{branches.map(branch=><div key={branch.title} style={{...sub,background:"#eef2ff"}}><strong>{branch.title}</strong><div><strong>Ideen:</strong> {branch.ideas.join(" · ")}</div><div><strong>Leitfrage:</strong> {branch.prompt}</div>{support==="full"?<div style={{color:"#1e3a8a"}}><strong>C2-Satzanfang:</strong> {branch.starter}</div>:null}</div>)}</div>:<div style={{...sub,background:"#f0fdf4"}}><strong>Prüfungsmodus</strong><span>Entwickeln Sie Position, Begründung, Beispiel, Gegenargument und Synthese ohne Ideenbank.</span></div>}
@@ -135,15 +138,28 @@ function OpinionWrite({standard,day,completed,onCompleteChange}){
 
 function ReadingPractice({day,completed,onCompleteChange}){
  const practice=getC2ReadingPractice(day);
- const key=`falowen:c2:day${day}:reading-answers`;
- const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return{}}});
- useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(answers))}catch{}},[key,answers]);
+ const answerKey=`falowen:c2:day${day}:reading-answers`;
+ const firstAttemptKey=`falowen:c2:day${day}:reading-first-attempts`;
+ const[answers,setAnswers]=useState(()=>{try{return JSON.parse(localStorage.getItem(answerKey)||"{}")}catch{return{}}});
+ const[firstAttempts,setFirstAttempts]=useState(()=>{try{return JSON.parse(localStorage.getItem(firstAttemptKey)||"{}")}catch{return{}}});
+ const[legacyAnswersSeedAllowed]=useState(()=>{try{return Object.keys(JSON.parse(localStorage.getItem(answerKey)||"{}")).length>0}catch{return false}});
+ const[legacyFirstAttemptsSeedAllowed]=useState(()=>{try{return Object.keys(JSON.parse(localStorage.getItem(firstAttemptKey)||"{}")).length>0}catch{return false}});
+ useEffect(()=>{try{localStorage.setItem(answerKey,JSON.stringify(answers))}catch{}},[answerKey,answers]);
+ useEffect(()=>{try{localStorage.setItem(firstAttemptKey,JSON.stringify(firstAttempts))}catch{}},[firstAttemptKey,firstAttempts]);
+ useC2CloudDraftField({day,field:"readingAnswers",value:answers,setValue:setAnswers,seedCloudWhenMissing:legacyAnswersSeedAllowed,defaultValue:{}});
+ useC2CloudDraftField({day,field:"readingFirstAttempts",value:firstAttempts,setValue:setFirstAttempts,seedCloudWhenMissing:legacyFirstAttemptsSeedAllowed,defaultValue:{}});
  const questions=practice?.questions||[];
  const answered=questions.filter((_,index)=>Number.isInteger(answers[index])).length;
+ const firstAttemptAnswered=questions.filter((_,index)=>Number.isInteger(firstAttempts[index])).length;
+ const firstAttemptCorrect=questions.filter((item,index)=>firstAttempts[index]===item.answerIndex).length;
+ const chooseAnswer=(index,optionIndex)=>{
+  setAnswers(old=>({...old,[index]:optionIndex}));
+  setFirstAttempts(old=>Number.isInteger(old[index])?old:{...old,[index]:optionIndex});
+ };
  useEffect(()=>{if(questions.length&&answered===questions.length&&!completed)onCompleteChange?.(true)},[answered,questions.length,completed,onCompleteChange]);
  if(!practice)return <Section title="Lesen"><p style={{margin:0}}>Für diesen Tag ist keine Leseaufgabe vorgesehen.</p></Section>;
  return <Section title={`Lesen · ${practice.title}`}>
-  <div style={{...sub,background:"#eff6ff"}}><strong>So arbeiten Sie</strong><span>Lesen Sie den Text aufmerksam. Klicken Sie bei jeder Frage auf eine Antwort. Sie sehen sofort, ob sie richtig ist und warum.</span></div>
+  <div style={{...sub,background:"#eff6ff"}}><strong>So arbeiten Sie</strong><span>Lesen Sie den Text aufmerksam. Klicken Sie bei jeder Frage auf eine Antwort. Sie sehen sofort, ob sie richtig ist und warum. Eine falsche erste Antwort blockiert den Abschluss nicht.</span></div>
   <article style={{display:"grid",gap:12,lineHeight:1.8,fontSize:"1.02rem"}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</article>
   <div style={{display:"grid",gap:14}}>{questions.map((item,index)=>{
    const selected=answers[index];
@@ -156,15 +172,17 @@ function ReadingPractice({day,completed,onCompleteChange}){
      const isCorrectOption=hasAnswer&&optionIndex===item.answerIndex;
      const background=isCorrectOption?"#f0fdf4":isSelected?"#fff7ed":"#fff";
      const border=isCorrectOption?"2px solid #86efac":isSelected?"2px solid #fdba74":"1px solid #cbd5e1";
-     return <button key={option} type="button" onClick={()=>setAnswers(old=>({...old,[index]:optionIndex}))} style={{...styles.secondaryButton,textAlign:"left",justifyContent:"flex-start",background,border,color:"#0f172a"}}>{String.fromCharCode(65+optionIndex)}. {option}</button>;
+     return <button key={option} type="button" onClick={()=>chooseAnswer(index,optionIndex)} style={{...styles.secondaryButton,textAlign:"left",justifyContent:"flex-start",background,border,color:"#0f172a"}}>{String.fromCharCode(65+optionIndex)}. {option}</button>;
     })}</div>
     {hasAnswer?<div style={{border:`1px solid ${correct?"#86efac":"#fecaca"}`,borderRadius:12,padding:11,background:correct?"#f0fdf4":"#fff7f7",lineHeight:1.65}}><strong>{correct?"Richtig.":"Noch nicht richtig."}</strong> {!correct?<span>Richtige Antwort: <strong>{String.fromCharCode(65+item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </span>:null}<span>{item.explanation}</span></div>:null}
    </article>;
   })}</div>
-  <div style={{...sub,background:answered===questions.length?"#f0fdf4":"#f8fafc"}}><strong>{answered}/{questions.length} Fragen beantwortet</strong><span>{answered===questions.length?"Lesen ist für heute abgeschlossen.":"Beantworten Sie alle Fragen. Fehler sind erlaubt — die Aufgabe dient dem direkten Lernen."}</span></div>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}>
+   <div style={{...sub,background:answered===questions.length?"#f0fdf4":"#f8fafc"}}><strong>{answered}/{questions.length} Fragen beantwortet</strong><span>{answered===questions.length?"Lesen ist für heute abgeschlossen.":"Beantworten Sie alle Fragen. Fehler sind erlaubt — die Aufgabe dient dem direkten Lernen."}</span></div>
+   <div style={{...sub,background:"#f8fafc"}}><strong>Erster Versuch: {firstAttemptCorrect}/{questions.length}</strong><span>{firstAttemptAnswered<questions.length?`${firstAttemptAnswered}/${questions.length} erste Antworten erfasst`:"Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss."}</span></div>
+  </div>
  </Section>;
 }
-
 const youtubeEmbedUrl=(url)=>{
  const value=String(url||"").trim();
  if(!value)return"";
@@ -201,6 +219,9 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
  const skillLabel=getC2SkillLabel(day);
  const listening=getC2ListeningPractice(day);
  const listeningAvailable=Boolean(String(listening?.audioUrl||"").trim());
+ const{byDay:c2CourseProgress}=useC2CourseProgress({enabled:true});
+ const cycleStart=day%4===0?day-3:null;
+ const cycleDays=cycleStart?Array.from({length:4},(_,index)=>cycleStart+index):[];
  const allowedViews=useMemo(()=>new Set(getC2DayTabs(day).map(({key})=>key)),[day]);
  const storageKey=`falowen:c2:day${day}:unified-progress`;
  const requestedView=useMemo(()=>{
@@ -281,6 +302,7 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
    <label style={{display:"grid",gap:7}}><strong>Confidence</strong><select value={progress.confidence} onChange={e=>setProgress(p=>({...p,confidence:e.target.value}))} style={styles.select}><option value="">Select confidence</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
    <label style={{display:"grid",gap:7}}><strong>Reflection</strong><textarea value={progress.reflection} onChange={e=>setProgress(p=>({...p,reflection:e.target.value}))} placeholder={`What was difficult in today’s ${skillLabel?.label||"C2"} work?`} style={{minHeight:110,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit"}}/></label>
    <div style={{border:`1px solid ${ready?"#86efac":"#fde68a"}`,borderRadius:14,padding:13,background:ready?"#f0fdf4":"#fffbeb"}}>{ready?`Day complete: Grammar/Learn and ${skillLabel?.label} are finished.`:`Complete Grammar/Learn, today’s ${skillLabel?.label} requirement, and choose a confidence level.`}</div>
+   {cycleDays.length?<div style={{...sub,background:"#f8fafc"}}><strong>4-day cycle recap</strong><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))",gap:8}}>{cycleDays.map(cycleDay=>{const label=getC2SkillLabel(cycleDay)?.label||"Skill";const complete=cycleDay===day?ready:Boolean(c2CourseProgress[cycleDay]?.dayComplete);return <div key={cycleDay} style={{border:"1px solid #e2e8f0",borderRadius:10,padding:10,background:complete?"#f0fdf4":"#fff"}}><strong>Day {cycleDay} · {label}</strong><div style={{marginTop:4,color:complete?"#166534":"#64748b"}}>{complete?"Complete ✓":"Not complete"}</div></div>})}</div><span style={{color:"#64748b"}}>This is a recap only. It does not add another assignment.</span></div>:null}
   </Section>:null}
 
   {active==="references"?<><Section title="Topic reference"><p style={{margin:0,lineHeight:1.75}}>{knowledge.de}</p><p><strong>Kernfrage:</strong> {knowledge.core}</p></Section><Section title="C2 control"><p style={{margin:0,lineHeight:1.75}}>{mastery.challenge}</p><strong>Final check: topic knowledge · task fulfilment · grammar function · register · evidence · cohesion · natural collocation.</strong></Section></>:null}
