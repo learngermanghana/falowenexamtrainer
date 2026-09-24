@@ -131,8 +131,9 @@ if (!generalHome.includes('data-home-course-access-guide="open"') || !generalHom
 // Course Book: replace page-count progress with the canonical completion engine.
 const hasModernC2AwareCourseProgress = [
   "const courseCompletion = useMemo(",
+  "const effectivePracticeProgress = useMemo(",
+  "findCourseBookEntryForRequirement",
   'source: "c2-cloud-progress"',
-  "courseCompletion.masteryAvailable",
   "Complete inside lesson",
 ].every((marker) => courseTab.includes(marker));
 
@@ -225,8 +226,8 @@ if (!hasModernC2AwareCourseProgress) {
     'import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";',
     "const courseCompletion = useMemo(",
     "const effectivePracticeProgress = useMemo(",
+    "findCourseBookEntryForRequirement",
     'source: "c2-cloud-progress"',
-    "courseCompletion.masteryAvailable",
     "Complete inside lesson",
   ].forEach((marker) => {
     if (!courseTab.includes(marker)) {
