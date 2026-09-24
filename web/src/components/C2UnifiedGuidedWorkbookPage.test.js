@@ -105,7 +105,7 @@ describe("C2 unified topic-first workbook", () => {
     });
     expect(page).toContain("Es werden bewusst noch keine Fragen angezeigt.");
     expect(page).toContain("Die Fragen werden erst aus dem tatsächlichen Transkript erstellt");
-    expect(page).toContain("so Hören does not block this day");
+    expect(page).toContain("Hören source is still pending and does not block completion.");
   });
 
   test("reduces speaking support deliberately across the seven speaking days", () => {
