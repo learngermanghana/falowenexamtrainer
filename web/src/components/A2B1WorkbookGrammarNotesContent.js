@@ -98,7 +98,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const numericDay = Number(day);
   const GrammarNotes = getA2B1GrammarNotesComponent(level, day);
-  const showA2SituationIntro = normalizedLevel === "A2" && numericDay >= 1 && numericDay <= 28;
+  const showA2SituationIntro = normalizedLevel === "A2" && numericDay >= 1 && numericDay <= 28 && numericDay !== 4;
   const showB1TopicIntro = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 28;
 
   if (!GrammarNotes && !showA2SituationIntro && !showB1TopicIntro) {
@@ -110,7 +110,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
     );
   }
 
-  const showDays2To6Guide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6;
+  const showDays2To6Guide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6 && numericDay !== 4;
   const showDays7To11Guide = normalizedLevel === "A2" && numericDay >= 7 && numericDay <= 11;
   const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
   const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
