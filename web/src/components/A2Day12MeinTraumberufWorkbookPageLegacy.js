@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
@@ -206,18 +207,7 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 2 · Assignment: Schreiben</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Aufgabe: Bewerbung um eine Stelle – Fähigkeiten und Fertigkeiten</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            Sie sind jetzt in Deutschland und möchten sich um eine Arbeitsstelle bewerben. Schreiben Sie eine E-Mail an
-            ein Unternehmen, in der Sie:
-          </p>
-          <ul style={listSpacing}>
-            <li>Fragen, ob es noch offene Stellen in der Firma gibt.</li>
-            <li>Ihre Fähigkeiten und Fertigkeiten beschreiben, die für den Job relevant sind.</li>
-            <li>Fragen nach den Arbeitszeiten und dem Gehalt.</li>
-          </ul>
+          <A2GoetheWritingTaskCard day={12} />
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this
             page.
