@@ -2,6 +2,7 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = {
   ...styles.card,
@@ -64,6 +65,8 @@ const B1Day1TraumweltGrammarNotesPage = () => {
           style={{ width: "100%", borderRadius: 14, maxHeight: 280, objectFit: "cover" }}
         />
       </header>
+
+      <B1GrammarEnglishSupport day={1} />
 
       <section style={card}>
         <h2 style={sectionTitle}>Warum lernen wir Präsens und Perfekt?</h2>

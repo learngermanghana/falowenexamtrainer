@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -52,6 +53,8 @@ export default function B1Day9WorkLifeBalanceGrammarNotesPage() {
           Grammatikfokus: Ziele, Methoden, Alternativen und Gegensätze mit <strong>um … zu</strong>, <strong>damit</strong>, <strong>indem</strong>, <strong>ohne … zu</strong>, <strong>statt … zu</strong>, <strong>obwohl</strong> und <strong>trotzdem</strong> ausdrücken.
         </p>
       </header>
+
+      <B1GrammarEnglishSupport day={9} />
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>Warum brauchst du diese Grammatik?</h2>

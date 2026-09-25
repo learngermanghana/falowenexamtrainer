@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const box = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, background: "#fff", lineHeight: 1.75, display: "grid", gap: 8 };
@@ -20,6 +21,8 @@ export default function B1Day18WegeZumWunschberufGrammarNotesPage() {
           Grammatikfokus: Berufswege beschreiben mit Infinitiv mit zu, Relativsätzen, je nachdem, Nebensätzen und Bewerbungsvokabular.
         </p>
       </header>
+
+      <B1GrammarEnglishSupport day={18} />
 
       <section style={card}>
         <h2 style={title}>Warum ist diese Grammatik für das Thema nützlich?</h2>

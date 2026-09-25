@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -52,6 +53,8 @@ export default function B1Day10DigitaleAuszeitGrammarNotesPage() {
           Grammatikfokus: Gewohnheiten, Strategien und Wirkungen mit <strong>Komparativ</strong>, <strong>Superlativ</strong>, <strong>so … wie</strong>, <strong>als</strong> und <strong>je … desto</strong> vergleichen.
         </p>
       </header>
+
+      <B1GrammarEnglishSupport day={10} />
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>Warum passt diese Grammatik zum Thema?</h2>

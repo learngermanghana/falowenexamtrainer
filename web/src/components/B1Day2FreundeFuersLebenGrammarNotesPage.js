@@ -2,6 +2,7 @@ import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = {
   ...styles.card,
@@ -72,6 +73,8 @@ const B1Day2FreundeFuersLebenGrammarNotesPage = () => {
           style={{ width: "100%", borderRadius: 14, maxHeight: 300, objectFit: "cover" }}
         />
       </header>
+
+      <B1GrammarEnglishSupport day={2} />
 
       <section style={card}>
         <h2 style={sectionTitle}>Warum passt diese Grammatik zum Thema Freundschaft?</h2>
