@@ -11,6 +11,7 @@ const read = (filename) => fs.readFileSync(filename, "utf8");
 describe("Falowen public help and AI discovery", () => {
   const help = read(path.join(PUBLIC, "falowen-help.md"));
   const llms = read(path.join(PUBLIC, "llms.txt"));
+  const navigation = JSON.parse(read(path.join(PUBLIC, "falowen-navigation.json")));
   const robots = read(path.join(PUBLIC, "robots.txt"));
   const sitemap = read(path.join(PUBLIC, "sitemap.xml"));
   const app = read(path.join(SRC, "App.js"));
@@ -39,6 +40,18 @@ describe("Falowen public help and AI discovery", () => {
   test("publishes llms discovery links to the official help sources", () => {
     expect(llms).toContain("https://www.falowen.app/help");
     expect(llms).toContain("https://www.falowen.app/falowen-help.md");
+    expect(llms).toContain("https://www.falowen.app/falowen-navigation.json");
+  });
+
+  test("publishes structured intent routes, aliases, state rules and deprecated labels", () => {
+    expect(navigation.sourceOfTruth.structuredNavigation).toBe("https://www.falowen.app/falowen-navigation.json");
+    expect(navigation.navigation.find((item) => item.id === "course-book")).toMatchObject({
+      label: "Learn → Course Book",
+      route: "/campus/course",
+    });
+    expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
+    expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
+    expect(navigation.deprecatedLabels).toEqual(expect.arrayContaining(["My Library", "Learning Hub", "My Hub", "My Course", "Falowen AI", "Discussion"]));
   });
 
   test("documents the exact current Learn to Course Book path and rejects invented labels", () => {
@@ -84,5 +97,6 @@ describe("Falowen public help and AI discovery", () => {
     expect(app).toContain('<Navigate to="/help" replace />');
     expect(guide).toContain('canonicalPath: "/help"');
     expect(guide).toContain('href="/falowen-help.md"');
+    expect(guide).toContain('href="/falowen-navigation.json"');
   });
 });
