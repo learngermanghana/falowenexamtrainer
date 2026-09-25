@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const box = {
@@ -33,6 +34,8 @@ export default function B1Day15MedienHomeofficeGrammarNotesPage() {
           Grammatikfokus: Passiv im Präsens und Passiv mit Modalverben für digitale Prozesse, Regeln und Arbeitsabläufe.
         </p>
       </header>
+
+      <B1GrammarEnglishSupport day={15} />
 
       <section style={card}>
         <h2 style={title}>Warum passt das Passiv zu diesem Thema?</h2>
