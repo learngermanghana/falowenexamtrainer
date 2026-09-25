@@ -42,6 +42,6 @@ jobs:
       - name: Run A2 Goethe writing regressions
         working-directory: web
         run: npm test -- --runInBand --runTestsByPath src/components/A2GoetheWritingTasks.test.js
-      - name: Build production bundle
+      - name: Compile web bundle
         working-directory: web
-        run: npm run build
+        run: npx vite build
