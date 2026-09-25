@@ -123,6 +123,7 @@ const createSelfLearningLessonComponent = (level, lesson) => {
     const effectiveCanonicalLesson = skipRadio
       ? {
           ...(canonicalLesson || {}),
+          skipFalowenRadio: true,
           resources: {
             ...(canonicalLesson?.resources || {}),
             falowenRadio: null,
