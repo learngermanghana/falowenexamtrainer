@@ -7,6 +7,7 @@ import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
@@ -228,16 +229,7 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Aufgabenstellung (A2-Niveau):</strong> Sie möchten ein bestimmtes Medikament kaufen und schreiben deswegen einen Brief oder eine E-Mail an eine Apotheke.
-          </p>
-
-          <p style={{ margin: 0 }}><strong>Write about these three points:</strong></p>
-          <ol style={listSpacing}>
-            <li>Beschreiben Sie kurz, warum Sie das Medikament benötigen.</li>
-            <li>Fragen Sie nach den Kosten und ob die Versicherung das Medikament übernimmt.</li>
-            <li>Fragen Sie nach der richtigen Dosierung oder möglichen Nebenwirkungen.</li>
-          </ol>
+          <A2GoetheWritingTaskCard day={17} />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing through the Submit tab on this workbook.
