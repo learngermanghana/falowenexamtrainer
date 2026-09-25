@@ -18,6 +18,15 @@ export const shouldMountMarkMyLetter = () => false;
 export const resolveCanonicalLessonForPage = (lesson, canonicalLesson) => {
   const level = String(lesson?.level || "").toUpperCase();
   const day = Number(lesson?.day || 0);
+  if (canonicalLesson?.skipFalowenRadio) {
+    return {
+      ...(canonicalLesson || {}),
+      resources: {
+        ...(canonicalLesson?.resources || {}),
+        falowenRadio: null,
+      },
+    };
+  }
   if (level === "C1" && day === 3) {
     return { ...(canonicalLesson || {}), resources: { ...(canonicalLesson?.resources || {}), falowenRadio: C1_DAY3_RADIO_OVERRIDE } };
   }
