@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import BookPdfDownloadInjector, {
   getA2B1WorkbookExperienceContext,
+  getA2B1WorkbookNavigationDestination,
   getPrintableBookKind,
   isPrintableBookRoute,
   needsInlineA1PdfAction,
@@ -66,6 +67,18 @@ describe("BookPdfDownloadInjector helpers", () => {
       day: 8,
     });
     expect(getA2B1WorkbookExperienceContext("/campus/course/lesson/B1/8", "?view=grammar")).toBeNull();
+  });
+
+  it("opens adjacent A2 workbooks directly and skips the repeated Radio gate", () => {
+    expect(getA2B1WorkbookNavigationDestination("A2", 5)).toBe(
+      "/campus/course/a2-day-5-freizeit-workbook?radio=done",
+    );
+  });
+
+  it("keeps B1 on its workbook route while skipping the repeated Radio gate", () => {
+    expect(getA2B1WorkbookNavigationDestination("B1", 5)).toBe(
+      "/campus/course/lesson/B1/5?view=workbook&radio=done",
+    );
   });
 
   it("shows teacher-first media, AI revision, PDF and navigation for A2 Day 14", () => {
