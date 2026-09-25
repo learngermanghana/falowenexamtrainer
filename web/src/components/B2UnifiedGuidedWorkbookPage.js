@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
+import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
@@ -245,6 +246,7 @@ function Review({ day, alignment, lesson, skillLabel, ready, progress }) {
   const nextDay = day < 28 ? day + 1 : null;
   const nextAlignment = nextDay ? getB2LessonContentAlignment(nextDay) : null;
   const nextSkill = nextDay ? getB2SkillLabel(nextDay)?.label : null;
+  const reviewKeyPoints = getB2ReviewKeyPoints(day);
   return <Section title={`Review · B2 Day ${day}`}>
     <div style={{ ...sub, background: ready ? "#f0fdf4" : "#fffbeb", borderColor: ready ? "#86efac" : "#fde68a" }}>
       <strong>{ready ? "Day complete ✓" : "Day not complete yet"}</strong>
@@ -254,6 +256,7 @@ function Review({ day, alignment, lesson, skillLabel, ready, progress }) {
       <div style={sub}><strong>Das Wichtigste heute</strong><span><strong>Kernfrage:</strong> {foundation?.question || alignment.goal}</span><span><strong>Konkretes Beispiel:</strong> {foundation?.example || alignment.lessonTopic}</span><span><strong>Abwägung:</strong> {foundation?.tension || alignment.goal}</span></div>
       <div style={sub}><strong>Grammatik merken</strong><span>{alignment.grammar_topic}</span></div>
     </div>
+    {reviewKeyPoints.length ? <div data-b2-review-key-points="true" style={{ ...sub, background: "#f8fafc", borderColor: "#cbd5e1" }}><strong>Kernantwort · 3 Punkte</strong>{reviewKeyPoints.map((point, index) => <span key={point}>{index + 1}. {point}</span>)}</div> : null}
     {vocab.length ? <div style={sub}><strong>Wortschatz · wichtige Ausdrücke</strong><div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{vocab.map((word) => <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{word}</span>)}</div></div> : null}
     <div style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}><strong>Next up</strong>{nextDay ? <span>Day {nextDay} · {nextSkill}: {nextAlignment?.title}</span> : <span>You have reached Day 28. Use the Course Book to review your full B2 progress.</span>}</div>
     {progress.completedAt ? <div style={{ ...sub, background: "#f0fdf4" }}><strong>Saved complete</strong><span>{progress.completedAt}</span></div> : null}
