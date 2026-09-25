@@ -6,6 +6,7 @@ import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
@@ -199,20 +200,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
             style={imageStyle}
           />
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
-          <WorkbookTaskCard
-            eyebrow="Your assignment · Writing"
-            title="Schreiben Sie einen formellen Brief an Ihren Kollegen."
-            submissionNote="Submit your final writing through the Submit tab."
-          >
-            <p style={{ margin: 0 }}>
-              Ihr Kollege hat Ihnen ein berufliches Seminar vorgeschlagen, das Ihre Karriere fördern könnte.
-            </p>
-            <ol style={listSpacing}>
-              <li>Bedanken Sie sich für den Vorschlag.</li>
-              <li>Zeigen Sie, dass Sie interessiert sind.</li>
-              <li>Fragen Sie nach weiteren Details: Inhalt, Termine und Kosten.</li>
-            </ol>
-          </WorkbookTaskCard>
+          <A2GoetheWritingTaskCard day={14} />
 
           <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
