@@ -1,0 +1,386 @@
+{
+  "schemaVersion": 1,
+  "lastReviewed": "2026-09-25",
+  "canonicalBaseUrl": "https://www.falowen.app",
+  "sourceOfTruth": {
+    "humanHelp": "https://www.falowen.app/help",
+    "aiHelp": "https://www.falowen.app/falowen-help.md",
+    "structuredNavigation": "https://www.falowen.app/falowen-navigation.json"
+  },
+  "assistantRules": [
+    "Answer the learner's immediate navigation or support question first.",
+    "Use current visible Falowen labels and official routes only.",
+    "Do not invent pages, tabs, learner status, scores, attendance, payment status or assignment requirements.",
+    "If a route depends on level or access, explain the relevant prerequisite briefly.",
+    "For private account state, explain where to check it rather than claiming to know it."
+  ],
+  "navigation": [
+    {
+      "id": "placement-test",
+      "label": "Placement Test",
+      "route": "/placement-test",
+      "purpose": "Find the appropriate German level before registration",
+      "requiresLogin": false,
+      "aliases": [
+        "level test",
+        "placement",
+        "what level am I"
+      ]
+    },
+    {
+      "id": "signup-german",
+      "label": "German signup",
+      "route": "/signup?program=german",
+      "purpose": "Create a new German learner account",
+      "requiresLogin": false,
+      "aliases": [
+        "register for German",
+        "join German"
+      ]
+    },
+    {
+      "id": "signup-french",
+      "label": "French signup",
+      "route": "/signup?program=french",
+      "purpose": "Create a new French learner account",
+      "requiresLogin": false,
+      "aliases": [
+        "register for French",
+        "join French"
+      ]
+    },
+    {
+      "id": "login",
+      "label": "Log in",
+      "route": "/login/",
+      "purpose": "Open an existing Falowen account",
+      "requiresLogin": false,
+      "aliases": [
+        "sign in",
+        "existing account"
+      ]
+    },
+    {
+      "id": "course-book",
+      "label": "Learn → Course Book",
+      "route": "/campus/course",
+      "purpose": "Start or continue course lessons",
+      "requiresLogin": true,
+      "aliases": [
+        "my lesson",
+        "course materials",
+        "my course",
+        "continue learning"
+      ]
+    },
+    {
+      "id": "vocabulary",
+      "label": "Practice",
+      "route": "/campus/vocab",
+      "purpose": "Open vocabulary practice",
+      "requiresLogin": true,
+      "aliases": [
+        "vocabulary",
+        "vocab",
+        "practice words"
+      ]
+    },
+    {
+      "id": "results",
+      "label": "Results",
+      "route": "/campus/results",
+      "purpose": "View marked work, scores, tutor feedback and progress",
+      "requiresLogin": true,
+      "aliases": [
+        "marks",
+        "grades",
+        "corrections",
+        "feedback",
+        "score"
+      ]
+    },
+    {
+      "id": "attendance",
+      "label": "Attendance",
+      "route": "/campus/attendance",
+      "purpose": "View attendance and generate an attendance record/transcript",
+      "requiresLogin": true,
+      "aliases": [
+        "attendance record",
+        "attendance transcript",
+        "presence"
+      ]
+    },
+    {
+      "id": "exam-file",
+      "label": "Exam File",
+      "route": "/campus/examFile",
+      "purpose": "View Goethe/exam information for applicable enrolled tracks",
+      "requiresLogin": true,
+      "aliases": [
+        "exam information",
+        "Goethe details"
+      ]
+    },
+    {
+      "id": "exams-room",
+      "label": "Exams Room",
+      "route": "/exams/overview",
+      "purpose": "Open separate exam-style practice",
+      "requiresLogin": true,
+      "aliases": [
+        "exam practice",
+        "mock exam",
+        "Goethe practice"
+      ]
+    },
+    {
+      "id": "study-calendar",
+      "label": "Study Calendar",
+      "route": "/exams/study",
+      "purpose": "Plan study and exam preparation",
+      "requiresLogin": true,
+      "aliases": [
+        "study plan",
+        "exam plan",
+        "calendar"
+      ]
+    },
+    {
+      "id": "student-data",
+      "label": "Account → Student Data",
+      "route": "/campus/account?tab=studentData",
+      "purpose": "View profile and student information",
+      "requiresLogin": true,
+      "aliases": [
+        "profile",
+        "student data"
+      ]
+    },
+    {
+      "id": "notifications",
+      "label": "Account → Notifications",
+      "route": "/campus/account?tab=notifications",
+      "purpose": "Manage notification settings",
+      "requiresLogin": true,
+      "aliases": [
+        "notification settings",
+        "alerts"
+      ]
+    },
+    {
+      "id": "billing",
+      "label": "Account → Billing",
+      "route": "/campus/account?tab=billing",
+      "purpose": "View tuition, balance, payment history and available receipts",
+      "requiresLogin": true,
+      "aliases": [
+        "fees",
+        "tuition",
+        "balance",
+        "receipt",
+        "payments"
+      ]
+    },
+    {
+      "id": "upgrade",
+      "label": "Account → Upgrade",
+      "route": "/campus/account?tab=upgrade",
+      "purpose": "Check or start movement to the next level",
+      "requiresLogin": true,
+      "aliases": [
+        "next level",
+        "upgrade course",
+        "move to A2",
+        "move to B1"
+      ]
+    }
+  ],
+  "lessonAnatomy": [
+    {
+      "label": "Falowen Radio",
+      "meaning": "Required audio/radio step on lessons that use a radio-first gate",
+      "gate": "Complete it before the workbook when the lesson requires it."
+    },
+    {
+      "label": "Learn / Grammar",
+      "meaning": "Teaching material, explanations and guided lesson content"
+    },
+    {
+      "label": "Hören",
+      "meaning": "Listening practice"
+    },
+    {
+      "label": "Lesen",
+      "meaning": "Reading practice"
+    },
+    {
+      "label": "Schreiben",
+      "meaning": "Writing practice"
+    },
+    {
+      "label": "Sprechen",
+      "meaning": "Speaking practice"
+    },
+    {
+      "label": "Workbook",
+      "meaning": "Lesson exercises and practice tasks"
+    },
+    {
+      "label": "Submit",
+      "meaning": "Teacher-marked submission panel when the current workbook is configured for tutor marking"
+    }
+  ],
+  "intentRoutes": [
+    {
+      "intent": "continue my lesson",
+      "destinationId": "course-book",
+      "steps": [
+        "Open Falowen",
+        "Tap or click Learn",
+        "Continue from the Course Book"
+      ]
+    },
+    {
+      "intent": "find my homework or assignment",
+      "destinationId": "course-book",
+      "steps": [
+        "Open Learn → Course Book",
+        "Open the current lesson",
+        "Open its workbook",
+        "If Falowen Radio is required, complete it first"
+      ]
+    },
+    {
+      "intent": "submit teacher-marked work",
+      "destinationId": "course-book",
+      "steps": [
+        "Open the relevant teacher-marked workbook",
+        "Use the Submit tab"
+      ],
+      "guardrail": "There is no separate general student submission page."
+    },
+    {
+      "intent": "see my correction, score or feedback",
+      "destinationId": "results",
+      "steps": [
+        "Open Results",
+        "Open the relevant marked assignment"
+      ]
+    },
+    {
+      "intent": "practise for an exam",
+      "destinationId": "exams-room",
+      "steps": [
+        "Open Exams Room",
+        "Choose the available exam-style practice"
+      ]
+    },
+    {
+      "intent": "check attendance",
+      "destinationId": "attendance",
+      "steps": [
+        "Open Attendance",
+        "Review present, absent or pending sessions"
+      ],
+      "guardrail": "B2/C1 self-learning students do not use the standard class Attendance tab."
+    },
+    {
+      "intent": "get a receipt or check fees",
+      "destinationId": "billing",
+      "steps": [
+        "Open Account",
+        "Open Billing",
+        "Check payment history, balance and available receipt links"
+      ]
+    },
+    {
+      "intent": "move to the next level",
+      "destinationId": "upgrade",
+      "steps": [
+        "Open Account",
+        "Open Upgrade"
+      ],
+      "guardrail": "An outstanding balance can block an upgrade."
+    }
+  ],
+  "accessStates": [
+    {
+      "state": "new-unactivated",
+      "meaning": "Registered but full campus access is not active",
+      "nextAction": "Use the setup checkpoint to start the one-time 7-day trial or complete tuition payment."
+    },
+    {
+      "state": "trial-active",
+      "meaning": "Temporary student access is active",
+      "nextAction": "Use the campus normally during the 7-day trial."
+    },
+    {
+      "state": "trial-ended",
+      "meaning": "Trial access has expired",
+      "nextAction": "Complete tuition payment to continue. Progress and scores are retained for 30 days after trial end."
+    },
+    {
+      "state": "paid-active",
+      "meaning": "Paid learner access is active",
+      "nextAction": "Use Learn → Course Book to continue."
+    },
+    {
+      "state": "radio-gated",
+      "meaning": "The lesson requires Falowen Radio before workbook access",
+      "nextAction": "Complete Falowen Radio, then use Continue."
+    },
+    {
+      "state": "self-practice",
+      "meaning": "The workbook is practice and not configured for tutor marking",
+      "nextAction": "Complete the work; do not look for a Submit tab unless the lesson explicitly provides one."
+    },
+    {
+      "state": "marking-pending",
+      "meaning": "Work may have been submitted but a marked result is not yet available",
+      "nextAction": "Check Results later; do not resubmit blindly."
+    }
+  ],
+  "levelRules": {
+    "A1": "Mixes foundation lessons, self-practice and teacher-marked assignments. Do not describe every workbook as a submission.",
+    "A2": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
+    "B1": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
+    "B2": "Self-learning track with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden.",
+    "C1": "Self-learning track with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden.",
+    "C2": "Advanced self-learning and AI-supported practice. Do not invent a teacher-marked assignment requirement unless the current page explicitly provides one."
+  },
+  "deprecatedLabels": [
+    "My Library",
+    "Learning Hub",
+    "My Hub",
+    "My Course",
+    "Falowen AI",
+    "Discussion"
+  ],
+  "troubleshooting": [
+    {
+      "problem": "Workbook keeps returning to Falowen Radio",
+      "action": "Complete the required Radio step, then use Continue."
+    },
+    {
+      "problem": "No Submit tab",
+      "action": "Treat the activity as self-practice unless the page explicitly identifies teacher marking."
+    },
+    {
+      "problem": "No result yet",
+      "action": "Check Results. Marking or synchronization may still be pending."
+    },
+    {
+      "problem": "B2/C1 cannot see Attendance, Exam File or Class Members",
+      "action": "These class-based tabs are intentionally hidden for B2/C1 self-learning."
+    },
+    {
+      "problem": "Payment was made but access has not updated",
+      "action": "Use the setup/account status refresh flow."
+    },
+    {
+      "problem": "Trial ended",
+      "action": "Complete tuition payment within the 30-day retention period to continue with the same stored progress and scores."
+    }
+  ]
+}
