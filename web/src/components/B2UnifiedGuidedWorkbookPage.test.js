@@ -82,6 +82,13 @@ describe("B2 unified C2-style course structure", () => {
     expect(nav).toContain('["B2", "C2"].includes(normalizedLevel)');
   });
 
+  test("opens previous and next B2 lessons directly without repeating Radio", () => {
+    expect(page).toContain('aria-label="B2 workbook navigation"');
+    expect(page).toContain("← Previous lesson");
+    expect(page).toContain('/campus/course/lesson/B2/${day - 1}?radio=done');
+    expect(page).toContain('/campus/course/lesson/B2/${day + 1}?radio=done');
+  });
+
   test("keeps reading feedback, private Hören, cloud sync, automatic completion and the new Review design", () => {
     expect(page).toContain("getB2ReadingPractice");
     expect(page).toContain("Textverständnis");
