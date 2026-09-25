@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const sectionTitle = { margin: 0, fontSize: "1.15rem" };
@@ -54,6 +55,8 @@ export default function B1Day5BesichtigungsterminGrammarNotesPage() {
           style={{ width: "100%", borderRadius: 14, maxHeight: 290, objectFit: "cover" }}
         />
       </header>
+
+      <B1GrammarEnglishSupport day={5} />
 
       <section style={card}>
         <h2 style={sectionTitle}>Warum passt diese Grammatik zum Besichtigungstermin?</h2>
