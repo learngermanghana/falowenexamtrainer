@@ -11,6 +11,7 @@ const MIN_EXPIRES_SECONDS = 60;
 const MAX_EXPIRES_SECONDS = 60 * 60 * 24 * 7;
 const DEFAULT_COURSE_MEDIA_STAFF_EMAILS = Object.freeze(["staff@falowen.app"]);
 const COURSE_MEDIA_STAFF_ROLES = new Set(["admin", "teacher", "tutor", "staff", "instructor"]);
+const COURSE_LEVEL_ORDER = Object.freeze(["A1", "A2", "B1", "B2", "C1", "C2"]);
 
 const clean = (value) => String(value || "").trim();
 const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
@@ -34,6 +35,23 @@ const hasCourseMediaStaffAccess = ({ authedUser = {}, student = {}, env = proces
 
   const email = normalizeEmail(authedUser?.email || student?.email);
   return Boolean(email && getCourseMediaStaffEmails(env).has(email));
+};
+
+const getCourseLevelIndex = (value) => {
+  const match = String(value || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return match ? COURSE_LEVEL_ORDER.indexOf(match[1]) : -1;
+};
+
+const hasCourseMediaLevelAccess = ({ student = {}, requiredLevel = "" } = {}) => {
+  const requiredIndex = getCourseLevelIndex(requiredLevel);
+  if (requiredIndex < 0) return false;
+
+  return [
+    student?.level,
+    student?.currentLevel,
+    student?.courseLevel,
+    student?.className,
+  ].some((value) => getCourseLevelIndex(value) >= requiredIndex);
 };
 
 const clampExpiry = (value) => {
@@ -225,6 +243,7 @@ module.exports = {
   DEFAULT_COURSE_MEDIA_STAFF_EMAILS,
   getCourseMediaStaffEmails,
   hasCourseMediaStaffAccess,
+  hasCourseMediaLevelAccess,
   validateCourseAudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
