@@ -1,0 +1,39 @@
+name: Study Buddy course grounding
+
+on:
+  pull_request:
+    paths:
+      - "web/src/services/studyBuddyLessonContext.js"
+      - "web/src/services/studyBuddyLessonContext.test.js"
+      - "web/src/services/studyBuddyService.js"
+      - "web/src/services/studyBuddyService.test.js"
+      - "web/src/components/StudyBuddyBar.js"
+      - "web/src/components/StudyBuddyChatInterface.test.js"
+      - ".github/workflows/study-buddy-course-grounding.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  study-buddy-course-context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test exact lesson grounding and Study Buddy conversation behavior
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyLessonContext.test.js src/services/studyBuddyService.test.js src/components/StudyBuddyChatInterface.test.js
