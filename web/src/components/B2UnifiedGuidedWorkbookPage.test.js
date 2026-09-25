@@ -31,7 +31,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(getB2DayTabs(4).map((tab) => tab.key)).not.toContain("finish");
   });
 
-  test("connects Day 2 to its real R2 audio while later Hören days stay pending", () => {
+  test("connects Days 2 and 6 to their real R2 audio while later Hören days stay pending", () => {
     expect(Object.keys(B2_LISTENING_PRACTICE).map(Number)).toEqual([2, 6, 10, 14, 18, 22, 26]);
 
     const day2 = B2_LISTENING_PRACTICE[2];
@@ -41,13 +41,27 @@ describe("B2 unified C2-style course structure", () => {
     expect(day2.transcript.length).toBeGreaterThanOrEqual(10);
     expect(day2.vocabulary).toHaveLength(8);
     expect(day2.questions).toHaveLength(5);
-    day2.questions.forEach((question) => {
-      expect(question.options).toHaveLength(4);
-      expect(Number.isInteger(question.answerIndex)).toBe(true);
-      expect(question.explanation.length).toBeGreaterThan(20);
+
+    const day6 = B2_LISTENING_PRACTICE[6];
+    expect(day6.audioKey).toBe("b2/day-06/day-06.m4a");
+    expect(day6.audioUrl).toBeUndefined();
+    expect(Array.isArray(day6.transcript)).toBe(true);
+    expect(day6.transcript.length).toBeGreaterThanOrEqual(30);
+    expect(day6.vocabulary).toHaveLength(8);
+    expect(day6.questions).toHaveLength(5);
+    expect(day6.transcript.join(" ")).toContain("Energieeffizienz bedeutet");
+    expect(day6.transcript.join(" ")).toContain("Speicherkapazität bedeutet");
+    expect(day6.questions[4].options[day6.questions[4].answerIndex]).toContain("saubere Energiequellen");
+
+    [day2, day6].forEach((practice) => {
+      practice.questions.forEach((question) => {
+        expect(question.options).toHaveLength(4);
+        expect(Number.isInteger(question.answerIndex)).toBe(true);
+        expect(question.explanation.length).toBeGreaterThan(20);
+      });
     });
 
-    [6, 10, 14, 18, 22, 26].forEach((day) => {
+    [10, 14, 18, 22, 26].forEach((day) => {
       const practice = B2_LISTENING_PRACTICE[day];
       expect(practice.audioKey).toBe("");
       expect(practice.transcript).toBe("");
