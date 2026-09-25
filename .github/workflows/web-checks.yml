@@ -32,6 +32,10 @@ jobs:
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
 
+      - name: Generate Falowen AI course map
+        working-directory: web
+        run: npm run generate:ai-course-map
+
       - name: Verify Falowen public help and AI discovery
         working-directory: web
         env:
