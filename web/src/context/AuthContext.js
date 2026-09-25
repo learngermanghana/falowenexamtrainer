@@ -598,7 +598,9 @@ export const AuthProvider = ({ children }) => {
         address: profile.address || "",            // ✅ NEW FIELD
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
-        status: profile.status || "Active",
+        status: profile.status || "pending",
+        trialStatus: profile.trialStatus || "active",
+        trialStartedAt: serverTimestamp(),
         initialPaymentAmount: profile.initialPaymentAmount ?? 0,
         tuitionFee: profile.tuitionFee ?? null,
         balanceDue: profile.balanceDue ?? null,
