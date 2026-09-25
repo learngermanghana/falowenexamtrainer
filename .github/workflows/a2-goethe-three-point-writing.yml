@@ -1,0 +1,47 @@
+name: A2 Goethe Three-Point Writing
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/data/a2GoetheWritingTasks.js'
+      - 'web/src/components/A2GoetheWritingTaskCard.js'
+      - 'web/src/components/A2GoetheWritingTasks.test.js'
+      - 'web/src/components/A2StandardTabbedWorkbookPage.js'
+      - 'web/src/components/A2Day12MeinTraumberufWorkbookPageLegacy.js'
+      - 'web/src/components/A2Day13VorstellungsgespraechWorkbookPageLegacy.js'
+      - 'web/src/components/A2Day14BerufUndKarriereWorkbookPage.js'
+      - 'web/src/components/A2Day17InDieApothekeGehenWorkbookPage.js'
+      - '.github/workflows/a2-goethe-three-point-writing.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/src/data/a2GoetheWritingTasks.js'
+      - 'web/src/components/A2GoetheWritingTaskCard.js'
+      - 'web/src/components/A2GoetheWritingTasks.test.js'
+      - 'web/src/components/A2StandardTabbedWorkbookPage.js'
+      - 'web/src/components/A2Day12MeinTraumberufWorkbookPageLegacy.js'
+      - 'web/src/components/A2Day13VorstellungsgespraechWorkbookPageLegacy.js'
+      - 'web/src/components/A2Day14BerufUndKarriereWorkbookPage.js'
+      - 'web/src/components/A2Day17InDieApothekeGehenWorkbookPage.js'
+      - '.github/workflows/a2-goethe-three-point-writing.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Run A2 Goethe writing regressions
+        working-directory: web
+        run: npm test -- --runInBand --runTestsByPath src/components/A2GoetheWritingTasks.test.js
+      - name: Build production bundle
+        working-directory: web
+        run: npm run build
