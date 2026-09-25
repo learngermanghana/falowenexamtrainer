@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { getA2GoetheWritingTask, getA2GoetheWritingTasks } from "../data/a2GoetheWritingTasks";
 
 describe("A2 Goethe-style Teil 2 writing tasks", () => {
@@ -21,5 +23,21 @@ describe("A2 Goethe-style Teil 2 writing tasks", () => {
     expect(task.situation).toMatch(/Schule oder zur Arbeit/i);
     expect(task.points.join(" ")).toMatch(/Verkehrsmittel/i);
     expect(task.points.join(" ")).not.toMatch(/Autohaus|Autohändler/i);
+  });
+});
+
+
+test("all A2 workbook surfaces route Teil 2 through the canonical Goethe card", () => {
+  const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
+  const shared = read("A2StandardTabbedWorkbookPage.js");
+  expect(shared).toContain("<A2GoetheWritingTaskCard day={day} />");
+
+  [
+    ["A2Day12MeinTraumberufWorkbookPageLegacy.js", 12],
+    ["A2Day13VorstellungsgespraechWorkbookPageLegacy.js", 13],
+    ["A2Day14BerufUndKarriereWorkbookPage.js", 14],
+    ["A2Day17InDieApothekeGehenWorkbookPage.js", 17],
+  ].forEach(([file, day]) => {
+    expect(read(file)).toContain(`<A2GoetheWritingTaskCard day={${day}} />`);
   });
 });
