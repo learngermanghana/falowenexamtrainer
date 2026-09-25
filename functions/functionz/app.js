@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateC2AudioKey, validateB2AudioKey, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess } = require("./r2CourseAudio");
+const { validateC2AudioKey, validateB2AudioKey, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -461,13 +461,9 @@ const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
 
   if (!student) return "student_profile_missing";
 
-  const hasC2Level = [
-    student.level,
-    student.currentLevel,
-    student.courseLevel,
-    student.className,
-  ].some((value) => /\bC2\b/i.test(String(value || "")));
-  if (!hasC2Level) return "c2_not_assigned";
+  if (!hasCourseMediaLevelAccess({ student, requiredLevel: "C2" })) {
+    return "c2_not_assigned";
+  }
 
   const status = String(student.status || "").trim().toLowerCase();
   if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
@@ -486,13 +482,9 @@ const getB2MediaAccessBlockReason = ({ authedUser, student }) => {
 
   if (!student) return "student_profile_missing";
 
-  const hasB2Level = [
-    student.level,
-    student.currentLevel,
-    student.courseLevel,
-    student.className,
-  ].some((value) => /\bB2\b/i.test(String(value || "")));
-  if (!hasB2Level) return "b2_not_assigned";
+  if (!hasCourseMediaLevelAccess({ student, requiredLevel: "B2" })) {
+    return "b2_not_assigned";
+  }
 
   const status = String(student.status || "").trim().toLowerCase();
   if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
