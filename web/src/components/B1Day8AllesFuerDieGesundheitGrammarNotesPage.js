@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const heroImage =
   "https://images.unsplash.com/photo-1494390248081-4e521a5940db?auto=format&fit=crop&w=1600&q=80";
@@ -107,6 +108,8 @@ export default function B1Day8AllesFuerDieGesundheitGrammarNotesPage() {
           Grammatikfokus: Modalverben für Empfehlungen, Möglichkeiten, Pflichten und gesunde Grenzen.
         </p>
       </header>
+
+      <B1GrammarEnglishSupport day={8} />
 
       <section style={{ ...card, background: "linear-gradient(135deg, #eff6ff, #ffffff)" }}>
         <h2 style={{ margin: 0 }}>Worum geht es?</h2>
