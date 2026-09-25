@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const sectionTitle = { margin: 0, fontSize: "1.15rem" };
@@ -52,6 +53,8 @@ export default function B1Day6StadtOderLandGrammarNotesPage() {
           style={{ width: "100%", borderRadius: 14, maxHeight: 290, objectFit: "cover" }}
         />
       </header>
+
+      <B1GrammarEnglishSupport day={6} />
 
       <section style={card}>
         <h2 style={sectionTitle}>Lernziele</h2>
