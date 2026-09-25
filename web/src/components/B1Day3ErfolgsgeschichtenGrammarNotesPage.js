@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const sectionTitle = { margin: 0, fontSize: "1.15rem" };
@@ -31,6 +32,8 @@ const B1Day3ErfolgsgeschichtenGrammarNotesPage = () => (
         Grammatik zum Thema <strong>Erfolgsgeschichten</strong>: Personen, Leistungen, Hindernisse und erfolgreiche Projekte genauer beschreiben.
       </p>
     </header>
+
+      <B1GrammarEnglishSupport day={3} />
 
     <section style={card}>
       <h2 style={sectionTitle}>Warum brauchst du diese Grammatik?</h2>
