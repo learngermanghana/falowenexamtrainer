@@ -363,8 +363,11 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
 
     <nav aria-label="B2 workbook navigation" style={{ ...card, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-      <button type="button" onClick={() => navigate("/campus/course")} style={styles.secondaryButton}>Course Book</button>
-      <button type="button" onClick={() => day < 28 ? navigate(`/campus/course/lesson/B2/${day + 1}`) : navigate("/campus/course")} style={styles.primaryButton}>{day < 28 ? `Next assignment · Day ${day + 1} · ${getB2SkillLabel(day + 1)?.label} · ${getB2LessonContentAlignment(day + 1)?.title}` : "Back to Course Book"}</button>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {day > 1 ? <button type="button" onClick={() => navigate(`/campus/course/lesson/B2/${day - 1}?radio=done`)} style={styles.secondaryButton}>← Previous lesson</button> : null}
+        <button type="button" onClick={() => navigate("/campus/course")} style={styles.secondaryButton}>Course Book</button>
+      </div>
+      <button type="button" onClick={() => day < 28 ? navigate(`/campus/course/lesson/B2/${day + 1}?radio=done`) : navigate("/campus/course")} style={styles.primaryButton}>{day < 28 ? `Next assignment · Day ${day + 1} · ${getB2SkillLabel(day + 1)?.label} · ${getB2LessonContentAlignment(day + 1)?.title}` : "Back to Course Book"}</button>
     </nav>
   </main>;
 }
