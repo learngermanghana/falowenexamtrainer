@@ -9,9 +9,32 @@ const B2_LISTENING_DAYS = COURSE_LISTENING_DAYS.B2;
 const DEFAULT_EXPIRES_SECONDS = 60 * 60;
 const MIN_EXPIRES_SECONDS = 60;
 const MAX_EXPIRES_SECONDS = 60 * 60 * 24 * 7;
+const DEFAULT_COURSE_MEDIA_STAFF_EMAILS = Object.freeze(["staff@falowen.app"]);
+const COURSE_MEDIA_STAFF_ROLES = new Set(["admin", "teacher", "tutor", "staff", "instructor"]);
 
 const clean = (value) => String(value || "").trim();
 const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
+const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
+
+const getCourseMediaStaffEmails = (env = process.env) => {
+  const configured = String(env.COURSE_MEDIA_STAFF_EMAILS || "")
+    .split(",")
+    .map(normalizeEmail)
+    .filter(Boolean);
+  return new Set(configured.length ? configured : DEFAULT_COURSE_MEDIA_STAFF_EMAILS);
+};
+
+const hasCourseMediaStaffAccess = ({ authedUser = {}, student = {}, env = process.env } = {}) => {
+  if (authedUser?.admin === true) return true;
+
+  const hasStaffRole = [authedUser?.role, student?.role]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .some((role) => COURSE_MEDIA_STAFF_ROLES.has(role));
+  if (hasStaffRole) return true;
+
+  const email = normalizeEmail(authedUser?.email || student?.email);
+  return Boolean(email && getCourseMediaStaffEmails(env).has(email));
+};
 
 const clampExpiry = (value) => {
   const parsed = Number(value);
@@ -199,6 +222,9 @@ module.exports = {
   C2_LISTENING_DAYS,
   B2_LISTENING_DAYS,
   DEFAULT_EXPIRES_SECONDS,
+  DEFAULT_COURSE_MEDIA_STAFF_EMAILS,
+  getCourseMediaStaffEmails,
+  hasCourseMediaStaffAccess,
   validateCourseAudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
