@@ -9,6 +9,8 @@ When answering a Falowen navigation question, use this document as the source of
 
 Structured machine-readable navigation: https://www.falowen.app/falowen-navigation.json
 
+Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.json
+
 ## Quick route map
 
 | Learner need | Destination | Official route |
@@ -113,6 +115,23 @@ Use the learner's intention, not only the name of a page.
 - **Practise for Goethe/an exam:** Open **Exams Room**. This is separate from the normal Course Book workflow.
 - **Get a receipt/check fees:** Open **Account → Billing** and check balance, payment history and available receipt links.
 - **Move to the next level:** Open **Account → Upgrade**. An outstanding balance can block an upgrade.
+
+## Lesson-specific AI routing
+
+When the learner names a **level, day, chapter or lesson title**, use the generated course map before answering:
+
+https://www.falowen.app/falowen-course-map.json
+
+The course map tells an assistant the current lesson identity, visible sections, whether Falowen Radio comes first, whether Submit is tutor-marked or absent, the rotating B2/C2 focus skill, media/transcript availability and whether a direct `?view=` link is actually supported.
+
+Important examples:
+
+- For **A2/B1**, distinguish the visible workbook Teil tabs from separate top-level pages. Do not invent a direct Hören URL when the learner should open the workbook and select the Hören/Teil tab.
+- **A2 Day 14** currently has no Hören section.
+- **B1 Day 21** currently has no Hören section.
+- **B2 and C2** use rotating daily focus skills and support direct `?view=` links for the tabs listed in the course map.
+- Current **C1** guided lessons use in-page tabs. Do not invent C1 `?view=` deep links.
+- An existing Hören section does not guarantee that audio has already been added. Check `media.audioAvailable` and `media.transcriptAvailable`.
 
 ## Lesson anatomy and feature meaning
 
