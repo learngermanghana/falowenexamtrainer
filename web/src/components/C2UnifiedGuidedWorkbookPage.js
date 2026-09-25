@@ -6,6 +6,7 @@ import{AdvancedSelfLearningTabNav}from"./StandardWorkbookComponents";
 import{styles}from"../styles";
 import{getC2ExamStandard}from"../data/c2ExamStandardContent";
 import{getC2TopicKnowledge,getC2TopicChecks}from"../data/c2TopicKnowledge";
+import{getC2ReviewKeyPoints}from"../data/c2ReviewKeyPoints";
 import{getC2LessonContentAlignment}from"../data/c2LessonContentAlignment";
 import{getC2WritingFormat}from"../data/c2WritingFormats";
 import{getC2ReadingPractice}from"../data/c2ReadingPractice";
@@ -377,6 +378,7 @@ function C2ReviewPage({day,standard,knowledge,skillFocus,skillLabel,progress,set
  const tension=knowledge.tensions?.[0]?.join(" ↔ ")||"";
  const collocation=knowledge.coll?.[0]?.[0]||knowledge.vocab?.[0]?.[0]||"";
  const readingScore=c2CourseProgress?.[day]?.readingFirstAttemptScore||null;
+ const reviewKeyPoints=getC2ReviewKeyPoints(day);
  const writingFormat=skillFocus==="write"?getC2WritingFormat(day,standard.title):null;
  const reviewChecks=[
   "Ich kann die Kernfrage des heutigen Themas in eigenen Worten erklären.",
@@ -399,6 +401,7 @@ function C2ReviewPage({day,standard,knowledge,skillFocus,skillLabel,progress,set
    <div style={sub}><strong>Das Wichtigste heute</strong><span>1. <strong>Kernfrage:</strong> {knowledge.core}</span><span>2. <strong>Konkretes Beispiel:</strong> {knowledge.example}</span>{tension?<span>3. <strong>Zielkonflikt:</strong> {tension}</span>:<span>3. Entwickeln Sie eine differenzierte Position statt einer pauschalen Bewertung.</span>}</div>
    <div style={sub}><strong>Grammatik merken</strong><span>{grammarRule}</span>{grammarExample?<span><strong>Beispiel:</strong> {grammarExample}</span>:null}</div>
   </div>
+  {reviewKeyPoints.length?<div data-c2-review-key-points="true" style={{...sub,background:"#f8fafc",borderColor:"#cbd5e1"}}><strong>Kernantwort · 3 Punkte</strong>{reviewKeyPoints.map((point,index)=><span key={point}>{index+1}. {point}</span>)}</div>:null}
   <div style={sub}><strong>Wortschatz · 6 wichtige Ausdrücke</strong><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:8}}>{(knowledge.vocab||[]).slice(0,6).map(([de,en])=><div key={de} style={{border:"1px solid #e2e8f0",borderRadius:10,padding:10,background:"#fff"}}><strong>{de}</strong><div style={{color:"#64748b",marginTop:3}}>{en}</div></div>)}</div></div>
   <div style={sub}><strong>Today's skill result · {skillLabel?.label}</strong><span>{skillResult}</span></div>
   <div style={{...sub,background:"#f8fafc"}}><strong>Kann ich das?</strong>{reviewChecks.map((label,index)=><label key={label} style={{display:"flex",gap:9,alignItems:"flex-start",lineHeight:1.55}}><input type="checkbox" checked={Boolean(progress.reviewChecks?.[index])} onChange={e=>setProgress(p=>({...p,reviewChecks:{...(p.reviewChecks||{}),[index]:e.target.checked}}))} style={{marginTop:4}}/><span>{label}</span></label>)}<span style={{color:"#64748b",fontSize:13}}>Diese Selbstkontrolle ist freiwillig und beeinflusst den Kursabschluss nicht.</span></div>
