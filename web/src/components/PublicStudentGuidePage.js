@@ -102,7 +102,7 @@ const PublicStudentGuidePage = () => {
           Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
         </p>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink> and <RouteLink href="/falowen-navigation.json">structured navigation JSON</RouteLink>.
+          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink>, <RouteLink href="/falowen-navigation.json">structured navigation JSON</RouteLink>, and <RouteLink href="/falowen-course-map.json">generated A1–C2 lesson map</RouteLink>.
         </p>
       </section>
 
@@ -246,7 +246,7 @@ const PublicStudentGuidePage = () => {
           Answer the learner's immediate question, use the exact visible Falowen navigation label, give the direct official route, and say what to do there. For Course Book access, say <strong>Learn → Course Book</strong>. Do not invent labels such as My Library, Learning Hub or My Hub, and do not force a Falowen navigation question back into grammar practice.
         </p>
         <p style={{ margin: 0 }}>
-          Machine-readable sources: <RouteLink href="/falowen-help.md">falowen-help.md</RouteLink> and <RouteLink href="/falowen-navigation.json">falowen-navigation.json</RouteLink>
+          Machine-readable sources: <RouteLink href="/falowen-help.md">falowen-help.md</RouteLink>, <RouteLink href="/falowen-navigation.json">falowen-navigation.json</RouteLink>, and <RouteLink href="/falowen-course-map.json">falowen-course-map.json</RouteLink>
         </p>
       </section>
     </main>
