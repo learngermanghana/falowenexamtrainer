@@ -16,4 +16,8 @@ AI discovery index:
 
 https://www.falowen.app/llms.txt
 
-When Falowen changes routes, signup/trial/payment rules, level visibility, assignment submission behavior, Results, Attendance, Exam File or Account tabs, update the public Markdown source and the human Help page together.
+Structured route/intent/state map:
+
+https://www.falowen.app/falowen-navigation.json
+
+When Falowen changes routes, signup/trial/payment rules, level visibility, assignment submission behavior, Results, Attendance, Exam File or Account tabs, update the public Markdown source, structured navigation JSON, llms.txt and the human Help page together.

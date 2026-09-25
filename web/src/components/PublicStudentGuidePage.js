@@ -47,7 +47,7 @@ const PublicStudentGuidePage = () => {
           "@type": "Article",
           headline: "Falowen Help & Navigation Guide",
           description,
-          dateModified: "2026-09-22",
+          dateModified: "2026-09-25",
           author: { "@type": "Organization", name: "Falowen" },
           publisher: { "@type": "Organization", name: "Falowen" },
         },
@@ -102,7 +102,7 @@ const PublicStudentGuidePage = () => {
           Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
         </p>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink>.
+          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink> and <RouteLink href="/falowen-navigation.json">structured navigation JSON</RouteLink>.
         </p>
       </section>
 
@@ -188,6 +188,19 @@ const PublicStudentGuidePage = () => {
       </section>
 
       <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Common things students want to do</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
+          <li><strong>Continue a lesson:</strong> Learn → Course Book → current lesson.</li>
+          <li><strong>Find homework:</strong> Learn → Course Book → current lesson → workbook. Complete Falowen Radio first when required.</li>
+          <li><strong>Submit work:</strong> use the Submit tab inside the relevant teacher-marked workbook.</li>
+          <li><strong>See a correction:</strong> open <RouteLink href="/campus/results">Results</RouteLink>.</li>
+          <li><strong>Practise for an exam:</strong> open <RouteLink href="/exams/overview">Exams Room</RouteLink>.</li>
+          <li><strong>Get a receipt:</strong> open <RouteLink href="/campus/account?tab=billing">Account → Billing</RouteLink>.</li>
+          <li><strong>Move to the next level:</strong> open <RouteLink href="/campus/account?tab=upgrade">Account → Upgrade</RouteLink>.</li>
+        </ul>
+      </section>
+
+      <section style={cardStyle}>
         <h2 style={{ margin: 0 }}>Results, attendance and exams</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Results:</strong> <RouteLink href="/campus/results" /> — marked work, scores, feedback and progress. Teacher-marked course assignments use a standard 60% pass threshold.
@@ -233,7 +246,7 @@ const PublicStudentGuidePage = () => {
           Answer the learner's immediate question, use the exact visible Falowen navigation label, give the direct official route, and say what to do there. For Course Book access, say <strong>Learn → Course Book</strong>. Do not invent labels such as My Library, Learning Hub or My Hub, and do not force a Falowen navigation question back into grammar practice.
         </p>
         <p style={{ margin: 0 }}>
-          Full machine-readable source: <RouteLink href="/falowen-help.md">https://www.falowen.app/falowen-help.md</RouteLink>
+          Machine-readable sources: <RouteLink href="/falowen-help.md">falowen-help.md</RouteLink> and <RouteLink href="/falowen-navigation.json">falowen-navigation.json</RouteLink>
         </p>
       </section>
     </main>

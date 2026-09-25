@@ -1,11 +1,13 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **22 September 2026**.
+Last reviewed: **25 September 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
 When answering a Falowen navigation question, use this document as the source of truth. Do not invent a page, payment state, assignment requirement, score, attendance record or learner status.
+
+Structured machine-readable navigation: https://www.falowen.app/falowen-navigation.json
 
 ## Quick route map
 
@@ -98,6 +100,56 @@ The standard class **Attendance, Exam File and Class Members** tabs are intentio
 ### C2
 
 C2 uses advanced self-learning and AI-supported practice. There is currently no canonical C2 teacher-marked assignment inventory. Do not invent a Submit requirement unless the current page explicitly provides one.
+
+
+## How-to task routes
+
+Use the learner's intention, not only the name of a page.
+
+- **Continue my lesson:** Open **Learn → Course Book**, then continue the current lesson.
+- **Find homework/assignment:** Open **Learn → Course Book → current lesson → workbook**. Complete Falowen Radio first when the lesson requires it.
+- **Submit teacher-marked work:** Open the relevant teacher-marked workbook and use its **Submit** tab. There is no separate general student submission page.
+- **See a correction, score or feedback:** Open **Results** and select the relevant marked assignment.
+- **Practise for Goethe/an exam:** Open **Exams Room**. This is separate from the normal Course Book workflow.
+- **Get a receipt/check fees:** Open **Account → Billing** and check balance, payment history and available receipt links.
+- **Move to the next level:** Open **Account → Upgrade**. An outstanding balance can block an upgrade.
+
+## Lesson anatomy and feature meaning
+
+Depending on level and lesson, a Course Book lesson can contain **Falowen Radio, Learn/Grammar, Hören, Lesen, Schreiben, Sprechen, Workbook** and **Submit**.
+
+- **Falowen Radio:** required first on lessons using the radio-first gate.
+- **Learn / Grammar:** teaching material and guided explanations.
+- **Hören:** listening practice.
+- **Lesen:** reading practice.
+- **Schreiben:** writing practice.
+- **Sprechen:** speaking practice.
+- **Workbook:** lesson exercises and practice.
+- **Submit:** only for work configured for tutor marking.
+
+## Learner-state decision guide
+
+- **Registered but not activated:** start the one-time 7-day free trial or complete tuition payment on the setup checkpoint.
+- **Trial active:** campus access is temporarily active; use Learn → Course Book normally.
+- **Trial ended:** tuition payment restores continuing access; progress and scores are retained for 30 days after trial end.
+- **Radio-gated lesson:** complete Falowen Radio, then continue to the workbook.
+- **Self-practice workbook:** do the exercise but do not look for Submit unless the page explicitly provides tutor marking.
+- **Marking pending:** check Results; do not resubmit blindly simply because a result is not visible yet.
+
+## Student wording and Falowen terminology
+
+Translate informal student wording to the exact current Falowen label:
+
+| Student may say | Use this Falowen destination |
+| --- | --- |
+| homework, assignment, course material, my lesson | Learn → Course Book |
+| marks, grades, correction, feedback | Results |
+| words, vocabulary practice | Practice / Vocabulary |
+| fees, tuition, balance, receipt, payment | Account → Billing |
+| exam practice, mock exam, Goethe practice | Exams Room |
+| study plan, exam plan | Study Calendar |
+| profile | Account → Student Data |
+| next level | Account → Upgrade |
 
 ## Results and feedback
 
