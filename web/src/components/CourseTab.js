@@ -21,6 +21,7 @@ import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
 import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
 import { getC2SkillLabel } from "../data/c2SkillCycle";
+import { getB2SkillLabel } from "../data/b2SkillCycle";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -764,6 +765,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
   const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
   const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+  const isB2CourseBook = normalizedSelectedCourseLevel === "B2";
   const isC2CourseBook = normalizedSelectedCourseLevel === "C2";
   const courseCompletion = useMemo(
     () =>
@@ -1145,8 +1147,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
                       : isC2CourseBook
                         ? `Complete Grammar/Learn and today’s ${getC2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Progress syncs automatically across devices.`
-                        : isSelfLearningLevel
-                          ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."
+                        : isB2CourseBook
+                          ? `Complete Grammar/Learn and today’s ${getB2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Review is revision only.`
+                          : isSelfLearningLevel
+                            ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."
                           : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
                   </p>
                   {!nextLesson.isTutorMarked && !isSelfLearningLevel ? (
@@ -1248,6 +1252,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               <div style={courseBookStyles.lessonMeta}>
                                 {isCurrent ? <span style={{ ...courseBookStyles.chip, background: "#dbeafe", borderColor: "#93c5fd", color: "#1d4ed8" }}>Current</span> : null}
                                 {isC2CourseBook ? <span style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getC2SkillLabel(entry.day)?.label}</span> : null}
+                                {isB2CourseBook ? <span data-b2-main-skill={getB2SkillLabel(entry.day)?.label || ""} style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getB2SkillLabel(entry.day)?.label}</span> : null}
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
                                 {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
                                 {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}

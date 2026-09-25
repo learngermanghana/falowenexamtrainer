@@ -12,6 +12,7 @@ describe("B2 unified C2-style course structure", () => {
   const page = read("B2UnifiedGuidedWorkbookPage.js");
   const registry = read("SelfLearningLessonRegistry.js");
   const nav = read("StandardWorkbookComponents.js");
+  const courseTab = read("CourseTab.js");
 
   test("uses the agreed four-day rotating main-skill cycle", () => {
     expect(B2_SKILL_DAYS.lesen).toEqual([1, 5, 9, 13, 17, 21, 25]);
@@ -107,6 +108,14 @@ describe("B2 unified C2-style course structure", () => {
     expect(registry).toContain("<B2UnifiedGuidedWorkbookPage");
     expect(registry).toContain('shouldShowRadioFirst("B2", day)');
     expect(registry).toContain('<RadioFirstWorkbookGate level="B2" day={day}>');
+  });
+
+  test("shows the B2 main skill directly on each Course Book card like C2", () => {
+    expect(courseTab).toContain('import { getB2SkillLabel } from "../data/b2SkillCycle"');
+    expect(courseTab).toContain('const isB2CourseBook = normalizedSelectedCourseLevel === "B2"');
+    expect(courseTab).toContain('data-b2-main-skill={getB2SkillLabel(entry.day)?.label || ""}');
+    expect(courseTab).toContain('Main: {getB2SkillLabel(entry.day)?.label}');
+    expect(courseTab).toContain('today’s ${getB2SkillLabel(nextLesson.day)?.label || "main skill"}');
   });
 
   test("uses non-sticky rotating navigation like C2", () => {
