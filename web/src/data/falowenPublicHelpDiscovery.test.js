@@ -12,6 +12,7 @@ describe("Falowen public help and AI discovery", () => {
   const help = read(path.join(PUBLIC, "falowen-help.md"));
   const llms = read(path.join(PUBLIC, "llms.txt"));
   const navigation = JSON.parse(read(path.join(PUBLIC, "falowen-navigation.json")));
+  const courseMap = JSON.parse(read(path.join(PUBLIC, "falowen-course-map.json")));
   const robots = read(path.join(PUBLIC, "robots.txt"));
   const sitemap = read(path.join(PUBLIC, "sitemap.xml"));
   const app = read(path.join(SRC, "App.js"));
@@ -41,6 +42,7 @@ describe("Falowen public help and AI discovery", () => {
     expect(llms).toContain("https://www.falowen.app/help");
     expect(llms).toContain("https://www.falowen.app/falowen-help.md");
     expect(llms).toContain("https://www.falowen.app/falowen-navigation.json");
+    expect(llms).toContain("https://www.falowen.app/falowen-course-map.json");
   });
 
   test("publishes structured intent routes, aliases, state rules and deprecated labels", () => {
@@ -52,6 +54,26 @@ describe("Falowen public help and AI discovery", () => {
     expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
     expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
     expect(navigation.deprecatedLabels).toEqual(expect.arrayContaining(["My Library", "Learning Hub", "My Hub", "My Course", "Falowen AI", "Discussion"]));
+  });
+
+  test("publishes the generated A1-C2 lesson map with exact level rules", () => {
+    expect(courseMap.counts).toMatchObject({ A1: 29, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
+    expect(courseMap.lessons).toHaveLength(173);
+
+    const a2Day14 = courseMap.lessons.find((lesson) => lesson.level === "A2" && lesson.day === 14);
+    const b1Day21 = courseMap.lessons.find((lesson) => lesson.level === "B1" && lesson.day === 21);
+    const b2Day6 = courseMap.lessons.find((lesson) => lesson.level === "B2" && lesson.day === 6);
+    const c1Day16 = courseMap.lessons.find((lesson) => lesson.level === "C1" && lesson.day === 16);
+    const c2Day2 = courseMap.lessons.find((lesson) => lesson.level === "C2" && lesson.day === 2);
+
+    expect(a2Day14.availableSections.some((section) => section.key === "hoeren")).toBe(false);
+    expect(b1Day21.availableSections.some((section) => section.key === "hoeren")).toBe(false);
+    expect(b2Day6.skillFocus).toBe("hoeren");
+    expect(b2Day6.sectionRoutes.hoeren).toContain("view=hoeren");
+    expect(c1Day16.sectionRoutes).toBeUndefined();
+    expect(c2Day2.skillFocus).toBe("hoeren");
+    expect(c2Day2.media.audioAvailable).toBe(true);
+    expect(courseMap.assistantRules.join(" ")).toContain("Do not invent ?view= links for C1");
   });
 
   test("documents the exact current Learn to Course Book path and rejects invented labels", () => {
@@ -98,5 +120,6 @@ describe("Falowen public help and AI discovery", () => {
     expect(guide).toContain('canonicalPath: "/help"');
     expect(guide).toContain('href="/falowen-help.md"');
     expect(guide).toContain('href="/falowen-navigation.json"');
+    expect(guide).toContain('href="/falowen-course-map.json"');
   });
 });
