@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { getC2ExamStandard } from "../data/c2ExamStandardContent";
 import { getC2TopicKnowledge } from "../data/c2TopicKnowledge";
+import { getC2ReviewKeyPoints } from "../data/c2ReviewKeyPoints";
 import { getC2SkillFocus, getC2SpeakingSupport, C2_SKILL_DAYS } from "../data/c2SkillCycle";
 import { getC2ReadingPractice } from "../data/c2ReadingPractice";
 import { getC2ListeningPractice } from "../data/c2ListeningPractice";
@@ -27,6 +28,13 @@ describe("C2 unified topic-first workbook", () => {
     expect(knowledge.example.length).toBeGreaterThan(40);
     expect(knowledge.actors.length).toBeGreaterThanOrEqual(3);
     expect(knowledge.tensions.length).toBeGreaterThanOrEqual(3);
+
+    const reviewPoints = getC2ReviewKeyPoints(day);
+    expect(reviewPoints).toHaveLength(3);
+    reviewPoints.forEach((point) => {
+      expect(point.length).toBeGreaterThan(35);
+      expect(point.length).toBeLessThan(230);
+    });
   });
 
   test("routes every live C2 day through the unified workbook", () => {
@@ -195,6 +203,9 @@ describe("C2 unified topic-first workbook", () => {
   test("replaces Finish with a useful Review page and automatic completion", () => {
     expect(page).toContain('active==="review"?<C2ReviewPage');
     expect(page).toContain("Das Wichtigste heute");
+    expect(page).toContain("Kernantwort · 3 Punkte");
+    expect(page).toContain('data-c2-review-key-points="true"');
+    expect(page).toContain("getC2ReviewKeyPoints(day)");
     expect(page).toContain("Grammatik merken");
     expect(page).toContain("Wortschatz · 6 wichtige Ausdrücke");
     expect(page).toContain("Kann ich das?");
@@ -202,6 +213,14 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).not.toContain("<strong>Confidence</strong>");
     expect(page).not.toContain("<strong>Reflection</strong>");
     expect(page).toContain("const ready=Boolean(progress.learnDone&&skillDone)");
+  });
+
+  test("gives Day 6 three concise model points instead of a finished paragraph", () => {
+    expect(getC2ReviewKeyPoints(6)).toEqual([
+      "Soziale Ungleichheiten entstehen nicht nur durch persönliche Entscheidungen, sondern auch durch Bildung, Herkunft, Wohnort und gesellschaftliche Strukturen.",
+      "Gleiche Qualifikationen führen nicht automatisch zu gleichen Chancen, wenn Menschen unterschiedlichen Zugang zu Netzwerken, Arbeit oder Bildung haben.",
+      "Faire Chancen brauchen sowohl gezielte gesellschaftliche Maßnahmen als auch Eigenverantwortung und persönliche Initiative.",
+    ]);
   });
 
   test("adds direct previous/next navigation below every C2 workbook", () => {
