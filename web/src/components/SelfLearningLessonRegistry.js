@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
 import StandardLessonWritingCoachPage from "./StandardLessonWritingCoachPage";
 import B2Day1To4GuidedLessonPage from "./B2Day1To4GuidedLessonPage";
@@ -111,7 +112,42 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   return <SelfLearningLessonFrame level={normalizedLevel} day={day} lesson={lesson} canonicalLesson={canonicalLesson}>{page}</SelfLearningLessonFrame>;
 };
 
-const componentRegistry = Object.fromEntries(Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) => lessons.map((lesson) => [lessonKey(level, lesson.day), ({ canonicalLesson }) => renderSelfLearningPage({ level, lesson, canonicalLesson })])));
+export const shouldSkipSelfLearningRadio = (level, search = "") =>
+  String(level || "").toUpperCase() === "C1"
+  && new URLSearchParams(search || "").get("radio") === "done";
+
+const createSelfLearningLessonComponent = (level, lesson) => {
+  const SelfLearningLessonComponent = ({ canonicalLesson }) => {
+    const location = useLocation();
+    const skipRadio = shouldSkipSelfLearningRadio(level, location.search);
+    const effectiveCanonicalLesson = skipRadio
+      ? {
+          ...(canonicalLesson || {}),
+          resources: {
+            ...(canonicalLesson?.resources || {}),
+            falowenRadio: null,
+          },
+        }
+      : canonicalLesson;
+
+    return renderSelfLearningPage({
+      level,
+      lesson,
+      canonicalLesson: effectiveCanonicalLesson,
+    });
+  };
+
+  return SelfLearningLessonComponent;
+};
+
+const componentRegistry = Object.fromEntries(
+  Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) =>
+    lessons.map((lesson) => [
+      lessonKey(level, lesson.day),
+      createSelfLearningLessonComponent(level, lesson),
+    ])
+  )
+);
 const B1RadioLessonComponent = ({ canonicalLesson }) => <B1TutorLessonPage canonicalLesson={canonicalLesson} />;
 const hasB1Radio = (day) => Boolean(getLessonRadioResource("B1", day) || getB1Day5RadioResource("B1", day));
 export const getSelfLearningLessonComponent = (level, day) => { const normalizedLevel = String(level || "").toUpperCase(); const dayNumber = Number(day || 0); if (normalizedLevel === "B1" && dayNumber > 0 && hasB1Radio(dayNumber)) return B1RadioLessonComponent; return componentRegistry[lessonKey(normalizedLevel, dayNumber)] || null; };
