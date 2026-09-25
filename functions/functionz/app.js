@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateC2AudioKey, validateB2AudioKey, createC2AudioSignedUrl, createB2AudioSignedUrl } = require("./r2CourseAudio");
+const { validateC2AudioKey, validateB2AudioKey, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -437,7 +437,6 @@ async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   return authedUser;
 }
 
-const C2_MEDIA_STAFF_ROLES = new Set(["admin", "teacher", "tutor", "staff", "instructor"]);
 const C2_MEDIA_ACTIVE_STATUSES = new Set([
   "active",
   "paid",
@@ -457,15 +456,8 @@ const C2_MEDIA_BLOCKED_PAYMENT_STATUSES = new Set([
   "canceled",
 ]);
 
-const hasC2StaffAccess = (authedUser, student = {}) => {
-  if (authedUser?.admin === true) return true;
-  return [authedUser?.role, student?.role]
-    .map((value) => String(value || "").trim().toLowerCase())
-    .some((role) => C2_MEDIA_STAFF_ROLES.has(role));
-};
-
 const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
-  if (hasC2StaffAccess(authedUser, student)) return "";
+  if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
 
   if (!student) return "student_profile_missing";
 
@@ -490,7 +482,7 @@ const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
 };
 
 const getB2MediaAccessBlockReason = ({ authedUser, student }) => {
-  if (hasC2StaffAccess(authedUser, student)) return "";
+  if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
 
   if (!student) return "student_profile_missing";
 
@@ -743,6 +735,11 @@ app.get("/course-media/b2/audio-url", async (req, res) => {
     const student = profileMatch?.data || null;
     const accessBlockReason = getB2MediaAccessBlockReason({ authedUser, student });
     if (accessBlockReason) {
+      log.warn("course_media.b2.access_denied", {
+        reason: accessBlockReason,
+        day: validated.day,
+        hasStudentProfile: Boolean(student),
+      });
       return res.status(403).json({
         error: "B2 audio access is not available for this account.",
         code: accessBlockReason,
