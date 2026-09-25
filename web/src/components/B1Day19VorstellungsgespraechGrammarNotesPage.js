@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const sectionTitle = { margin: 0, fontSize: "1.15rem" };
@@ -33,6 +34,8 @@ export default function B1Day19VorstellungsgespraechGrammarNotesPage() {
         <h1 style={{ ...styles.title, margin: 0 }}>Das Vorstellungsgespräch</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Grammatikfokus: höflich und professionell sprechen mit <strong>Konjunktiv II</strong>, <strong>Sie-Form</strong> und begründenden Nebensätzen.</p>
       </header>
+
+      <B1GrammarEnglishSupport day={19} />
 
       <section style={card}>
         <h2 style={sectionTitle}>Warum brauchst du diese Grammatik?</h2>
