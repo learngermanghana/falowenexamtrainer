@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
+import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 
 export const SCHOOL_PRINT_STAMP = "learn Language Education Academy";
 
@@ -44,6 +45,52 @@ const findScheduleEntryByWorkbookPath = (level, pathname) => {
   return (courseSchedules?.[level] || []).find((entry) =>
     workbookLinksForEntry(entry).includes(normalizedPath),
   ) || null;
+};
+
+const markRadioCompleted = (route = "") => {
+  const raw = String(route || "").trim();
+  if (!raw) return "";
+
+  try {
+    const url = new URL(raw, "https://www.falowen.app");
+    if (!["falowen.app", "www.falowen.app"].includes(url.hostname)) return "";
+    if (!url.pathname.startsWith("/campus/course/")) return "";
+
+    url.searchParams.set("radio", "done");
+    const query = url.searchParams.toString();
+    return `${url.pathname}${query ? `?${query}` : ""}${url.hash || ""}`;
+  } catch {
+    return "";
+  }
+};
+
+export const getA2B1WorkbookNavigationDestination = (level, day) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  const numericDay = Number(day);
+  if (!A2_B1_LEVELS.has(normalizedLevel) || !Number.isFinite(numericDay) || numericDay < 1 || numericDay > MAX_A2_B1_DAY) {
+    return "";
+  }
+
+  const entry = (courseSchedules?.[normalizedLevel] || []).find((item) => Number(item?.day) === numericDay) || null;
+  const resources = [entry, ...toArray(entry?.lesen_hören), ...toArray(entry?.schreiben_sprechen)].filter(Boolean);
+
+  for (const resource of resources) {
+    const chapter = resource?.chapter || entry?.chapter || "";
+    const configured = getConfiguredInAppWorkbookResourceRoute({
+      level: normalizedLevel,
+      day: numericDay,
+      chapter,
+    });
+    const configuredDestination = markRadioCompleted(configured);
+    if (configuredDestination) return configuredDestination;
+
+    const explicitDestination = markRadioCompleted(
+      resource?.workbook_link || resource?.workbookLink || resource?.workbookRoute || "",
+    );
+    if (explicitDestination) return explicitDestination;
+  }
+
+  return markRadioCompleted(`/campus/course/lesson/${normalizedLevel}/${numericDay}?view=workbook`);
 };
 
 export const getA2B1WorkbookExperienceContext = (pathname = "", search = "") => {
@@ -282,6 +329,8 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
   const courseProgress = Math.max(0, Math.min(100, Math.round((day / MAX_A2_B1_DAY) * 100)));
   const previousDay = day > 1 ? day - 1 : null;
   const nextDay = day < MAX_A2_B1_DAY ? day + 1 : null;
+  const previousDestination = previousDay ? getA2B1WorkbookNavigationDestination(level, previousDay) : "";
+  const nextDestination = nextDay ? getA2B1WorkbookNavigationDestination(level, nextDay) : "";
 
   return (
     <section className="book-pdf-download-action a2-b1-workbook-experience" style={experienceStyle} aria-label={`${level} workbook tools`}>
@@ -321,17 +370,17 @@ const A2B1WorkbookExperience = ({ context, onPrint, onNavigate }) => {
         </button>
         <button
           type="button"
-          style={previousDay ? inlineButtonStyle : disabledActionStyle}
-          disabled={!previousDay}
-          onClick={() => previousDay && onNavigate(`/campus/course/lesson/${level}/${previousDay}?view=workbook`)}
+          style={previousDestination ? inlineButtonStyle : disabledActionStyle}
+          disabled={!previousDestination}
+          onClick={() => previousDestination && onNavigate(previousDestination)}
         >
           ← Previous lesson
         </button>
         <button
           type="button"
-          style={nextDay ? inlineButtonStyle : disabledActionStyle}
-          disabled={!nextDay}
-          onClick={() => nextDay && onNavigate(`/campus/course/lesson/${level}/${nextDay}?view=workbook`)}
+          style={nextDestination ? inlineButtonStyle : disabledActionStyle}
+          disabled={!nextDestination}
+          onClick={() => nextDestination && onNavigate(nextDestination)}
         >
           Next lesson →
         </button>
