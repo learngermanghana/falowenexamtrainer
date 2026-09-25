@@ -1,6 +1,7 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
+import B1GrammarEnglishSupport from "./B1GrammarEnglishSupport";
 
 const card = { ...styles.card, display: "grid", gap: 14 };
 const box = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, background: "#fff", lineHeight: 1.75 };
@@ -14,6 +15,8 @@ export default function B1Day22BeziehungWichtigGrammarNotesPage() {
       <h1 style={{ ...styles.title, margin: 0 }}>Was ist in einer Beziehung wichtig?</h1>
       <p style={{ ...styles.subtitle, margin: 0 }}>Grammatikfokus: Erwartungen, Eigenschaften und gegenseitiges Verhalten mit dass-Sätzen, Relativsätzen und reziproken Ausdrücken beschreiben.</p>
     </header>
+
+      <B1GrammarEnglishSupport day={22} />
     <section style={card}><h2 style={{ margin: 0 }}>1. Erwartungen mit dass</h2><div style={box}>Mir ist wichtig, <strong>dass man offen miteinander spricht</strong>.<br/>Ich finde, <strong>dass Vertrauen eine wichtige Rolle spielt</strong>.</div><p style={{margin:0}}>Im dass-Satz steht das konjugierte Verb am Ende.</p></section>
     <section style={card}><h2 style={{ margin: 0 }}>2. Personen mit Relativsätzen beschreiben</h2><ul style={list}><li>Ich wünsche mir einen Partner, <strong>der zuverlässig ist</strong>.</li><li>Ich schätze Menschen, <strong>die ehrlich kommunizieren</strong>.</li><li>Eine gute Freundin ist jemand, <strong>auf den man sich verlassen kann</strong>.</li></ul></section>
     <section style={card}><h2 style={{ margin: 0 }}>3. Gegenseitiges Verhalten</h2><ul style={list}><li>Wir sprechen offen <strong>miteinander</strong>.</li><li>Partner sollten <strong>füreinander</strong> da sein.</li><li>Man kann viel <strong>voneinander</strong> lernen.</li><li>In einer Beziehung muss man sich <strong>aufeinander</strong> verlassen können.</li></ul></section>
