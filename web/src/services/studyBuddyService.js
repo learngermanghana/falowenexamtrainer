@@ -1,5 +1,6 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
+import { getStudyBuddyLessonContext } from "./studyBuddyLessonContext";
 
 const DEFAULT_STUDY_BUDDY_MODE = "lesson";
 const STUDY_BUDDY_MODE_LABELS = {
@@ -29,6 +30,7 @@ const getModeLabel = (modeKey) => STUDY_BUDDY_MODE_LABELS[modeKey] || STUDY_BUDD
 const getBrowserLessonContext = () => {
   if (typeof window === "undefined" || typeof document === "undefined") return {};
 
+  const structured = getStudyBuddyLessonContext();
   const route = `${window.location.pathname || ""}${window.location.search || ""}`;
   const pageTitle = document.title || "Falowen course page";
   const headings = Array.from(document.querySelectorAll("h1, h2, h3"))
@@ -37,16 +39,17 @@ const getBrowserLessonContext = () => {
     .slice(0, 6);
   const visibleBadges = Array.from(document.querySelectorAll("span, button"))
     .map((node) => String(node.textContent || "").trim())
-    .filter((text) => /^(A1|A2|B1|B2|C1|Day\s+\d+|Teil\s+\d+|Learn|Speak|Write|Finish)$/i.test(text))
-    .slice(0, 8);
+    .filter((text) => /^(A1|A2|B1|B2|C1|C2|Day\s+\d+|Teil\s+\d+|Learn|Lesen|Hören|Speak|Write|Review|Ref|Finish)$/i.test(text))
+    .slice(0, 12);
 
   return {
     route,
     pageTitle,
-    lessonTitle: headings[0] || pageTitle,
-    topic: headings.slice(1, 4).join(" · "),
+    lessonTitle: structured.title || headings[0] || pageTitle,
+    topic: structured.topic || headings.slice(1, 4).join(" · "),
     visibleHeadings: headings.join(" | "),
     visibleBadges: visibleBadges.join(" | "),
+    ...structured,
   };
 };
 
@@ -121,12 +124,39 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     ...browserContext,
     ...(lessonContext && typeof lessonContext === "object" ? lessonContext : {}),
   };
+  const taskItems = Array.isArray(context.currentTask?.items)
+    ? context.currentTask.items
+      .map((item) => {
+        const options = Array.isArray(item?.options) && item.options.length
+          ? ` Options: ${item.options.map((option, index) => `${String.fromCharCode(65 + index)}. ${option}`).join(" / ")}`
+          : "";
+        return `${item?.number || "?"}. ${item?.question || ""}${options}`;
+      })
+      .filter(Boolean)
+      .join(" | ")
+    : "";
+  const progressSummary = context.progress && typeof context.progress === "object"
+    ? Object.entries(context.progress).map(([key, value]) => `${key}=${value}`).join(", ")
+    : "";
+
   const contextLines = [
+    `Context source: ${context.source || "page"}`,
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
+    `Day: ${context.day || "Not provided"}`,
+    `Chapter: ${context.chapter || "Not provided"}`,
     `Current page: ${context.pageTitle || "Course page"}`,
     `Route: ${context.route || ""}`,
-    `Lesson title: ${context.lessonTitle || "Not provided"}`,
-    `Topic/headings: ${context.topic || context.visibleHeadings || "Use the current lesson topic if visible"}`,
+    `Lesson title: ${context.title || context.lessonTitle || "Not provided"}`,
+    `Topic: ${context.topic || context.visibleHeadings || "Use the current lesson topic if visible"}`,
+    `Goal: ${context.goal || "Not provided"}`,
+    `Grammar focus: ${context.grammarFocus || "Not provided"}`,
+    `Main skill: ${context.mainSkill || "Not provided"}`,
+    `Active section: ${context.activeView || "Not provided"}`,
+    `Vocabulary: ${Array.isArray(context.vocabulary) && context.vocabulary.length ? context.vocabulary.join(" | ") : "Not provided"}`,
+    `Current task: ${context.currentTask?.title || "Not provided"}`,
+    `Current task instruction: ${context.currentTask?.instruction || "Not provided"}`,
+    `Current task items: ${taskItems || "Not provided"}`,
+    `Student progress on this day: ${progressSummary || "Not provided"}`,
     `Visible badges/tabs: ${context.visibleBadges || ""}`,
     `Mode: ${getModeLabel(selectedMode)}`,
   ];
@@ -147,6 +177,10 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     "You are Falowen Course Assistant inside Falowen.",
     FALOWEN_NAVIGATION_GUIDANCE,
     "For language-learning questions, stay focused on the current lesson, level and task below.",
+    "When structured course context is present, treat it as authoritative over guessed page text. Use the exact day, topic, grammar focus, vocabulary, main skill and current task.",
+    "If the student refers to a numbered Lesen/Hören question such as 'question 3', use the matching Current task item. Give a hint or explain the relevant language first; do not reveal the correct option before the student has tried unless they explicitly ask for the answer.",
+    "For grammar questions such as 'Why is this Dativ?', explain the rule using the current lesson's grammar focus and vocabulary before adding a generic example.",
+    "Use the progress summary to avoid telling the student to repeat sections they have already completed unless revision is useful.",
     "Falowen navigation/support questions are not unrelated. Answer them directly using the authoritative Falowen navigation guidance above.",
     "If the student asks about something unrelated to both Falowen support and the lesson, briefly redirect them back to the lesson and give one useful lesson-based example.",
     "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
@@ -170,13 +204,16 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
 
 export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) => {
   const conversationHistory = readStudyBuddyConversationHistory({ idToken, level });
+  const structuredLessonContext = lessonContext && typeof lessonContext === "object" && Object.keys(lessonContext).length
+    ? lessonContext
+    : getStudyBuddyLessonContext();
   const response = await callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message: buildCourseFocusedMessage({ message, mode, lessonContext, conversationHistory }),
+      message: buildCourseFocusedMessage({ message, mode, lessonContext: structuredLessonContext, conversationHistory }),
       level,
       mode: mode || getStoredStudyBuddyMode(),
-      lessonContext: lessonContext || null,
+      lessonContext: structuredLessonContext || null,
     },
     idToken,
   });
