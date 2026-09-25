@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import SpeakingMindMap from "./SpeakingMindMap";
@@ -196,18 +197,7 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 2 · Assignment: Schreiben</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Thema: Bewerbung um eine Stelle im CityMall Einkaufszentrum</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            Sie möchten sich bei CityMall Einkaufszentrum um eine Stelle als Verkäufer/in oder Kundenservice-Mitarbeiter/in bewerben. Schreiben Sie einen formellen Brief.
-          </p>
-          <p style={{ margin: 0 }}>Punkte, die Sie beachten sollen:</p>
-          <ol style={listSpacing}>
-            <li>Warum schreiben Sie den Brief?</li>
-            <li>Was sind Ihre Erfahrungen und Stärken?</li>
-            <li>Was erwarten Sie?</li>
-          </ol>
+          <A2GoetheWritingTaskCard day={13} />
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the <strong>Submit</strong> tab of this workbook.
           </p>
