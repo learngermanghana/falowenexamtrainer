@@ -3,6 +3,7 @@ import path from "path";
 import { B2_SKILL_DAYS, getB2DayTabs, getB2SkillFocus } from "../data/b2SkillCycle";
 import { B2_LISTENING_PRACTICE } from "../data/b2ListeningPractice";
 import { B2_READING_PRACTICE } from "../data/b2ReadingPractice";
+import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -67,6 +68,25 @@ describe("B2 unified C2-style course structure", () => {
     });
   });
 
+  test("gives every B2 review exactly three concise model points", () => {
+    Array.from({ length: 28 }, (_, index) => index + 1).forEach((day) => {
+      const points = getB2ReviewKeyPoints(day);
+      expect(points).toHaveLength(3);
+      points.forEach((point) => {
+        expect(point.length).toBeGreaterThan(30);
+        expect(point.length).toBeLessThan(230);
+      });
+    });
+  });
+
+  test("keeps Day 2 focused on recycling, reuse and the circular economy", () => {
+    expect(getB2ReviewKeyPoints(2)).toEqual([
+      "Mülltrennung ist wichtig, aber sie ist nur der erste Schritt eines funktionierenden Recyclingprozesses.",
+      "Wiederverwendung ist oft sinnvoller als Recycling, weil Produkte und Materialien dabei länger direkt genutzt werden.",
+      "Kreislaufwirtschaft bedeutet, Rohstoffe möglichst lange im Umlauf zu halten und Abfall so weit wie möglich zu vermeiden.",
+    ]);
+  });
+
   test("routes every B2 day through the unified workbook", () => {
     expect(registry).toContain('import B2UnifiedGuidedWorkbookPage from "./B2UnifiedGuidedWorkbookPage"');
     expect(registry).toContain('normalizedLevel === "B2" && day >= 1 && day <= 28');
@@ -110,6 +130,9 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("Review · B2 Day");
     expect(page).toContain("Day complete ✓");
     expect(page).toContain("Das Wichtigste heute");
+    expect(page).toContain("Kernantwort · 3 Punkte");
+    expect(page).toContain('data-b2-review-key-points="true"');
+    expect(page).toContain("getB2ReviewKeyPoints(day)");
     expect(page).toContain("Next up");
     expect(page).toContain("Review is revision only");
     expect(page).toContain("completedAt: new Date().toISOString()");
