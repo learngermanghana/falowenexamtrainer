@@ -5,6 +5,8 @@ const {
   getR2AudioConfig,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
+  getCourseMediaStaffEmails,
+  hasCourseMediaStaffAccess,
 } = require("../r2CourseAudio");
 
 describe("B2/C2 R2 course audio", () => {
@@ -46,6 +48,39 @@ describe("B2/C2 R2 course audio", () => {
 
     expect(config.bucket).toBe("falowen-course-audio");
     expect(config.expiresIn).toBe(60);
+  });
+
+  test("recognizes authenticated Falowen staff without requiring a student profile", () => {
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "staff@falowen.app" },
+      student: null,
+      env: {},
+    })).toBe(true);
+
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "other@example.com" },
+      student: { role: "teacher" },
+      env: {},
+    })).toBe(true);
+
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "other@example.com" },
+      student: null,
+      env: {},
+    })).toBe(false);
+  });
+
+  test("supports a configurable protected-course staff email allowlist", () => {
+    const env = { COURSE_MEDIA_STAFF_EMAILS: "audio-admin@example.com, tutor@example.com" };
+    expect(Array.from(getCourseMediaStaffEmails(env))).toEqual([
+      "audio-admin@example.com",
+      "tutor@example.com",
+    ]);
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "TUTOR@example.com" },
+      student: null,
+      env,
+    })).toBe(true);
   });
 
   test("creates C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
