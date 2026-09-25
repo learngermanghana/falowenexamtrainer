@@ -18,6 +18,8 @@ import {
   A2SecondStageSpeakingUpgrade,
   A2SecondStageWritingUpgrade,
 } from "./A2SecondStageLearningUpgrade";
+import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
+import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -92,7 +94,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     canonicalAssignmentKey: assignmentKey,
     workbookId: resolvedWorkbookId,
   };
-  const writingTaskTitle = schreibenTask || `${title} · Teil 2 writing task`;
+  const canonicalWritingTask = getA2GoetheWritingTask(day);
+  const writingTaskTitle = canonicalWritingTask?.title || schreibenTask || `${title} · Teil 2 writing task`;
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
   const listeningTask = normalizeLearnerTaskCopy(
     hoerenTask || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor.",
@@ -123,7 +126,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       <HeroImage type="schreiben" alt="Learner writing a German workbook answer" />
       <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
       <A2SecondStageWritingUpgrade day={day} />
-      {schreibenContent ? schreibenContent : <WorkbookTaskCard eyebrow="Writing task" title="Write your final text"><p style={{ margin: 0, lineHeight: 1.7 }}>{schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}</p><p style={{ margin: 0, color: "#1d4ed8", fontWeight: 700 }}>Write approximately 60–80 words, then copy your finished answer into the Submit tab.</p></WorkbookTaskCard>}
+      {canonicalWritingTask ? <A2GoetheWritingTaskCard day={day} /> : (schreibenContent ? schreibenContent : <WorkbookTaskCard eyebrow="Writing task" title="Write your final text"><p style={{ margin: 0, lineHeight: 1.7 }}>{schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}</p></WorkbookTaskCard>)}
       <CourseInlinePracticePanel type="writing" title="A2 writing workspace" description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting." writingContext={{ level: "A2", courseLevel: "A2", day, lessonId: `A2-day-${day}`, workbookId: resolvedWorkbookId, writingTaskId: `${resolvedWorkbookId}-teil-2-writing`, taskTitle: writingTaskTitle, draftPlaceholder: schreibenPlaceholder }} />
       <WorkbookSubmissionReminder />
       <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
