@@ -204,10 +204,12 @@ describe("C2 unified topic-first workbook", () => {
     expect(page).toContain("const ready=Boolean(progress.learnDone&&skillDone)");
   });
 
-  test("adds next-assignment navigation below every C2 workbook", () => {
+  test("adds direct previous/next navigation below every C2 workbook", () => {
     expect(page).toContain('aria-label="C2 workbook navigation"');
+    expect(page).toContain("← Previous lesson");
     expect(page).toContain("Next assignment · Day");
-    expect(page).toContain('/campus/course/lesson/C2/');
+    expect(page).toContain('navigate(`/campus/course/lesson/C2/${previousDay}`)');
+    expect(page).toContain('navigate(`/campus/course/lesson/C2/${nextDay}`)');
     expect(page).toContain("<C2WorkbookNextNavigation day={day} navigate={navigate}/>");
   });
 
