@@ -100,6 +100,31 @@ describe("UniversalWorkbookLessonNavigator", () => {
     );
   });
 
+  test.each(["B2", "C1"])("%s navigation opens the self-learning workbook directly and skips repeated Radio", (level) => {
+    const entries = buildWorkbookNavigationEntries();
+    const day5 = entries[level].find((entry) => entry.day === 5);
+    const day6 = entries[level].find((entry) => entry.day === 6);
+
+    expect(day5.destination).toBe(`/campus/course/lesson/${level}/5?radio=done`);
+    expect(day6.destination).toBe(`/campus/course/lesson/${level}/6?radio=done`);
+
+    const navigation = resolveWorkbookNavigation({
+      pathname: `/campus/course/lesson/${level}/5`,
+      search: "?radio=done",
+    });
+
+    expect(navigation).toEqual(
+      expect.objectContaining({
+        level,
+        current: expect.objectContaining({ day: 5 }),
+        next: expect.objectContaining({
+          day: 6,
+          destination: `/campus/course/lesson/${level}/6?radio=done`,
+        }),
+      })
+    );
+  });
+
   test("returns no next lesson after the final A2 workbook", () => {
     const navigation = resolveWorkbookNavigation({
       pathname: "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",

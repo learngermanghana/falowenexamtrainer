@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getA1CanonicalLessonForLegacyRoute } from "../data/a1CanonicalLessonCatalog";
 
-const SELF_LEARNING_COURSE_DESTINATION = /^\/campus\/course\/(?:lesson\/(?:B2|C1)\/\d+|(?:b2|c1)-)/i;
+const SELF_LEARNING_COURSE_DESTINATION = /^\/campus\/course\/(?:lesson\/(?:B2|C1|C2)\/\d+|(?:b2|c1|c2)-)/i;
 const A1_LEGACY_LESSON_DESTINATION = /^\/campus\/course\/lesson\/A1\/(\d+)\/?$/i;
 const A1_DAY0_WORKBOOK_ROUTE = "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook";
 

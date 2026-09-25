@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
+import { getSelfLearningLessonComponent, shouldSkipSelfLearningRadio } from "./SelfLearningLessonRegistry";
 import { normalizeLesson } from "../data/lessonModel";
 
 jest.mock("react-router-dom", () => ({
@@ -41,6 +41,13 @@ beforeEach(() => {
 });
 
 describe("self-learning lesson Falowen Radio integration", () => {
+  test("direct C1 workbook navigation skips a repeated Radio entrance", () => {
+    expect(shouldSkipSelfLearningRadio("C1", "?radio=done")).toBe(true);
+    expect(shouldSkipSelfLearningRadio("C1", "?view=write&radio=done")).toBe(true);
+    expect(shouldSkipSelfLearningRadio("C1", "")).toBe(false);
+    expect(shouldSkipSelfLearningRadio("B2", "?radio=done")).toBe(false);
+  });
+
   test("B2 ignores retired Falowen Radio metadata and opens the redesigned lesson directly", () => {
     renderRegisteredLesson("B2", 1, radio);
 

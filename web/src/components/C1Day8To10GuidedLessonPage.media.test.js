@@ -23,6 +23,15 @@ describe("C1 Day 8 to 10 requested media", () => {
     ).toBe(canonicalRadio);
   });
 
+  it("skips the Day 9 fallback Radio after direct workbook navigation", () => {
+    expect(
+      resolveC1Day8To10Radio(9, {
+        skipFalowenRadio: true,
+        resources: { falowenRadio: null },
+      }),
+    ).toBeNull();
+  });
+
   it("does not add the Day 9 radio to other C1 days", () => {
     expect(resolveC1Day8To10Radio(8)).toBeNull();
     expect(resolveC1Day8To10Radio(10)).toBeNull();

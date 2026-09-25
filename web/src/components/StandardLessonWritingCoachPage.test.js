@@ -47,6 +47,20 @@ test("B2 fallback paths scrub stale grammar, Radio and video resources", () => {
   expect(canonical.resources.resourceGroups[0].grammarBook).toBeNull();
 });
 
+test("direct C1 workbook navigation does not recreate the Day 3 Radio override", () => {
+  const canonical = resolveCanonicalLessonForPage(
+    { level: "C1", day: 3 },
+    {
+      skipFalowenRadio: true,
+      resources: {
+        falowenRadio: { youtubeId: "should-not-return" },
+      },
+    },
+  );
+
+  expect(canonical.resources.falowenRadio).toBeNull();
+});
+
 test("legacy view labels remain available without inventing B2 media", () => {
   expect(__TESTING__.viewButtonLabel("workbook")).toBe("3. Write");
   expect(__TESTING__.viewButtonLabel("grammar")).toBe("1. Learn");

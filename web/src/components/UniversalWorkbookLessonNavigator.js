@@ -49,6 +49,17 @@ const navigationResources = (entry = {}) => {
 };
 
 const resolveResourceDestination = (level, entry = {}, resource = {}) => {
+  const day = Number(entry?.day);
+
+  // B2 and C1 use the self-learning workbook page itself as the canonical
+  // lesson destination. Workbook-to-workbook navigation should therefore
+  // open that page directly instead of routing through a legacy workbook URL
+  // or an intermediate ?view=workbook state. Carry radio=done so a learner
+  // who is already moving between workbooks does not see Falowen Radio again.
+  if (["B2", "C1"].includes(level) && Number.isFinite(day)) {
+    return `/campus/course/lesson/${level}/${day}?radio=done`;
+  }
+
   const chapter = resource?.chapter || entry?.chapter || "";
   const fallback = resource?.workbook_link || resource?.workbookRoute || entry?.workbook_link || entry?.workbookRoute || "";
   const resolved = resolveStrictInAppWorkbookRoute({
@@ -60,8 +71,7 @@ const resolveResourceDestination = (level, entry = {}, resource = {}) => {
   const destination = normalizeCourseDestination(resolved);
   if (destination) return destination;
 
-  const day = Number(entry?.day);
-  if (["B1", "B2", "C1"].includes(level) && Number.isFinite(day)) {
+  if (level === "B1" && Number.isFinite(day)) {
     return `/campus/course/lesson/${level}/${day}?view=workbook`;
   }
 

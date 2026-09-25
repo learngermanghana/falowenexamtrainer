@@ -408,17 +408,23 @@ function C2ReviewPage({day,standard,knowledge,skillFocus,skillLabel,progress,set
 }
 
 function C2WorkbookNextNavigation({day,navigate}){
+ const previousDay=day>1?day-1:null;
  const nextDay=day<28?day+1:null;
- const nextKnowledge=nextDay?getC2TopicKnowledge(nextDay):null;
  const nextStandard=nextDay?getC2ExamStandard(nextDay):null;
  const nextSkill=nextDay?getC2SkillLabel(nextDay)?.label:null;
+ const goPrevious=()=>{
+  if(!previousDay)return;
+  navigate(`/campus/course/lesson/C2/${previousDay}`);
+ };
  const goNext=()=>{
   if(!nextDay){navigate("/campus/course");return;}
-  const chapter=String(nextKnowledge?.chapter||"").trim();
-  navigate(`/campus/course/lesson/C2/${nextDay}${chapter?`?chapter=${encodeURIComponent(chapter)}`:""}`);
+  navigate(`/campus/course/lesson/C2/${nextDay}`);
  };
  return <nav aria-label="C2 workbook navigation" style={{...card,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-  <button type="button" onClick={()=>navigate("/campus/course")} style={styles.secondaryButton}>Course Book</button>
+  <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+   {previousDay?<button type="button" onClick={goPrevious} style={styles.secondaryButton}>← Previous lesson</button>:null}
+   <button type="button" onClick={()=>navigate("/campus/course")} style={styles.secondaryButton}>Course Book</button>
+  </div>
   <button type="button" onClick={goNext} style={styles.primaryButton}>{nextDay?`Next assignment · Day ${nextDay} · ${nextSkill} · ${nextStandard?.title}`:"Back to Course Book"}</button>
  </nav>;
 }
