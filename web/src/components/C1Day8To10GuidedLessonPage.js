@@ -27,7 +27,9 @@ export const C1_DAY9_FALOWEN_RADIO = {
 };
 
 export const resolveC1Day8To10Radio = (day, canonicalLesson = null) =>
-  canonicalLesson?.resources?.falowenRadio || (Number(day) === 9 ? C1_DAY9_FALOWEN_RADIO : null);
+  canonicalLesson?.skipFalowenRadio
+    ? null
+    : canonicalLesson?.resources?.falowenRadio || (Number(day) === 9 ? C1_DAY9_FALOWEN_RADIO : null);
 
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#bbf7d0", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] };
