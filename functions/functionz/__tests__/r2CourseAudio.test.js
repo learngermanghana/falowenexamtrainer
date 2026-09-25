@@ -7,6 +7,7 @@ const {
   createB2AudioSignedUrl,
   getCourseMediaStaffEmails,
   hasCourseMediaStaffAccess,
+  hasCourseMediaLevelAccess,
 } = require("../r2CourseAudio");
 
 describe("B2/C2 R2 course audio", () => {
@@ -67,6 +68,33 @@ describe("B2/C2 R2 course audio", () => {
       authedUser: { email: "other@example.com" },
       student: null,
       env: {},
+    })).toBe(false);
+  });
+
+  test("allows learners to use earlier-level protected audio through normal course progression", () => {
+    expect(hasCourseMediaLevelAccess({
+      student: { currentLevel: "B2" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { level: "C1" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { className: "C2 Advanced Klasse" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { courseLevel: "B1" },
+      requiredLevel: "B2",
+    })).toBe(false);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { currentLevel: "C1" },
+      requiredLevel: "C2",
     })).toBe(false);
   });
 
