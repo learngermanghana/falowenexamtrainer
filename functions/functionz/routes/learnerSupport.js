@@ -94,6 +94,244 @@ const RESUME_VIEW_LABELS = {
 };
 const resumeViewLabel = (value = "") => RESUME_VIEW_LABELS[lower(value)] || clean(value);
 
+const LEARNING_PLAN_MAX_ITEMS = 3;
+const INACTIVITY_REVIEW_DAYS = 3;
+
+const daysSince = (value, nowMs = Date.now()) => {
+  const millis = toMillis(value);
+  if (!millis) return null;
+  return Math.max(0, Math.floor((nowMs - millis) / DAY_MS));
+};
+
+const safeActionItem = ({
+  id,
+  type,
+  title,
+  helper = "",
+  url = "",
+  actionLabel = "Open",
+  priority = 50,
+  category = "course",
+  reason = "",
+} = {}) => ({
+  id: clean(id),
+  type: clean(type),
+  title: clean(title),
+  helper: clean(helper),
+  url: clean(url),
+  actionLabel: clean(actionLabel),
+  priority: Number(priority) || 50,
+  category: clean(category) || "course",
+  reason: clean(reason),
+});
+
+const addUniquePlanItem = (items, item) => {
+  if (!item?.id || !item?.title) return;
+  const duplicate = items.some((existing) =>
+    existing.id === item.id ||
+    (item.url && existing.url === item.url && existing.type === item.type)
+  );
+  if (!duplicate) items.push(item);
+};
+
+const buildDailyLearningPlan = ({
+  access = {},
+  completion = null,
+  review = {},
+  resume = null,
+  attendance = {},
+  nextAction = null,
+  level = "",
+  nowMs = Date.now(),
+} = {}) => {
+  const items = [];
+  const completionPercent = finiteNumber(completion?.completionPercent);
+  const resumeInactiveDays = daysSince(resume?.lastActivityAt, nowMs);
+  const reviewInactiveDays = daysSince(review?.updatedAt, nowMs);
+  const inactivityDays = [resumeInactiveDays, reviewInactiveDays]
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b)[0] ?? null;
+
+  if (!access.allowed) {
+    addUniquePlanItem(items, safeActionItem({
+      id: "restore-access",
+      type: nextAction?.type || "restore-access",
+      title: nextAction?.label || "Restore your Falowen access",
+      helper: "Course progress is paused until your access is active again.",
+      url: nextAction?.url || "/campus/account?tab=billing",
+      actionLabel: nextAction?.type === "contact-support" ? "Get help" : "Open billing",
+      priority: 100,
+      category: "access",
+      reason: nextAction?.reason || access.reason || "access_blocked",
+    }));
+  } else {
+    if (review?.needsImprovement && review?.lesson?.route) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "repair-latest-work",
+        type: "review-and-retry",
+        title: review.lesson.title
+          ? `Improve: ${review.lesson.title}`
+          : "Improve your latest tutor-marked work",
+        helper: "Use the tutor feedback first, then correct the important mistakes and resubmit.",
+        url: review.lesson.route,
+        actionLabel: "Review & retry",
+        priority: 100,
+        category: "repair",
+        reason: "latest_work_needs_improvement",
+      }));
+    }
+
+    const nextLesson = completionNextLesson(completion, level);
+    const pendingReview = Number(completion?.awaitingReview || 0) > 0 || review?.pending === true;
+    if (pendingReview && nextLesson?.route) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "continue-while-marking",
+        type: "continue-course",
+        title: nextLesson.title ? `Continue: ${nextLesson.title}` : "Continue your next lesson",
+        helper: "Your submitted work is waiting for tutor marking. You can keep learning while you wait.",
+        url: nextLesson.route,
+        actionLabel: "Continue lesson",
+        priority: 90,
+        category: "course",
+        reason: "continue_while_marking_pending",
+      }));
+    }
+
+    if (!review?.needsImprovement && !pendingReview && resume?.lastRoute && resume.completed !== true) {
+      const viewLabel = resumeViewLabel(resume.activeView || "lesson");
+      const lessonLabel = resume.title
+        ? resume.title
+        : `${resume.level || level}${resume.day ? ` Day ${resume.day}` : ""}`.trim();
+      addUniquePlanItem(items, safeActionItem({
+        id: "resume-last-section",
+        type: "resume-learning",
+        title: viewLabel && lower(viewLabel) !== "learn"
+          ? `Finish ${lessonLabel} · ${viewLabel}`
+          : `Continue ${lessonLabel}`,
+        helper: resume.radioDone === true
+          ? "Falowen Radio is complete. Continue from your last synced section."
+          : "Continue from the exact section where you stopped.",
+        url: resume.lastRoute,
+        actionLabel: viewLabel && lower(viewLabel) !== "learn" ? `Continue ${viewLabel}` : "Continue",
+        priority: 85,
+        category: "course",
+        reason: "resume_last_active_section",
+      }));
+    }
+
+    if (!review?.needsImprovement && !pendingReview && !(resume?.lastRoute && resume.completed !== true) && nextLesson?.route) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "next-course-item",
+        type: "continue-course",
+        title: nextLesson.title ? `Start: ${nextLesson.title}` : "Continue your Course Book",
+        helper: "This is your next incomplete course item.",
+        url: nextLesson.route,
+        actionLabel: "Start lesson",
+        priority: 80,
+        category: "course",
+        reason: "next_incomplete_course_item",
+      }));
+    }
+
+    if (
+      Number.isFinite(inactivityDays) &&
+      inactivityDays >= INACTIVITY_REVIEW_DAYS &&
+      resume?.lastRoute &&
+      resume.completed !== true
+    ) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "return-warmup",
+        type: "warmup-review",
+        title: "Do a 5-minute return warm-up",
+        helper: `You have been away for ${inactivityDays} day${inactivityDays === 1 ? "" : "s"}. Review the last lesson briefly before continuing.`,
+        url: resume.lastRoute,
+        actionLabel: "Review last lesson",
+        priority: 65,
+        category: "review",
+        reason: "return_after_inactivity",
+      }));
+    }
+
+    if (attendance?.available && finiteNumber(attendance.rate) !== null && Number(attendance.rate) < 70) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "attendance-reset",
+        type: "attendance-support",
+        title: "Check your class attendance",
+        helper: "Your attendance is below 70%. Review missed class work before your next live session.",
+        url: "/campus/attendance",
+        actionLabel: "Open attendance",
+        priority: 55,
+        category: "attendance",
+        reason: "low_attendance",
+      }));
+    }
+
+    if (normalizeLevel(level) === "A1" && completionPercent !== null && completionPercent >= 80 && completion?.courseWorkCompleted !== true) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "a1-finish-prep",
+        type: "exam-prep",
+        title: "Begin your A1 finish plan",
+        helper: "You are close to completing A1. Add short exam practice while you finish the remaining Course Book work.",
+        url: "/exams/overview",
+        actionLabel: "Practise for A1",
+        priority: 50,
+        category: "transition",
+        reason: "a1_near_completion",
+      }));
+    }
+
+    if (completion?.courseWorkCompleted === true) {
+      addUniquePlanItem(items, safeActionItem({
+        id: normalizeLevel(level) === "A1" ? "a1-transition" : "exam-practice",
+        type: normalizeLevel(level) === "A1" ? "level-transition" : "exam-practice",
+        title: normalizeLevel(level) === "A1"
+          ? "Start your A1 → A2 transition"
+          : "Move into focused exam practice",
+        helper: normalizeLevel(level) === "A1"
+          ? "Review your weak areas, practise the A1 exam format, then preview the A2 learning path."
+          : "Your Course Book work is complete. Use Exams Room for focused exam practice.",
+        url: "/exams/overview",
+        actionLabel: "Open Exams Room",
+        priority: 75,
+        category: "transition",
+        reason: normalizeLevel(level) === "A1" ? "a1_course_completed" : "course_work_completed",
+      }));
+    }
+
+    if (!items.length && nextAction?.url) {
+      addUniquePlanItem(items, safeActionItem({
+        id: "authoritative-next-action",
+        type: nextAction.type || "continue-course",
+        title: nextAction.label || "Continue learning",
+        helper: "This is the next action from your current Falowen progress.",
+        url: nextAction.url,
+        actionLabel: "Continue",
+        priority: 70,
+        category: "course",
+        reason: nextAction.reason || "authoritative_next_action",
+      }));
+    }
+  }
+
+  const sorted = items
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, LEARNING_PLAN_MAX_ITEMS)
+    .map(({ priority, ...item }, index) => ({ ...item, position: index + 1 }));
+
+  return {
+    title: "Your learning plan today",
+    summary:
+      !access.allowed
+        ? "Restore access before continuing your course."
+        : sorted.length === 1
+          ? "Focus on this one next step."
+          : "Complete these in order. Falowen updates the plan as your progress changes.",
+    inactivityDays,
+    items: sorted,
+    primaryAction: sorted[0] || null,
+  };
+};
+
 const hasPaidAccess = (student = {}) => {
   const paymentStatus = lower(student.paymentStatus);
   if (paymentStatus === "paid" || paymentStatus === "active") return true;
@@ -608,10 +846,19 @@ async function learnerSupportStateHandler(req, res) {
     const attendance = getAttendanceState(student);
     const resume = safeResumeState(rawResume);
     const nextAction = buildNextAction({ access, completion, review, resume, level });
+    const learningPlan = buildDailyLearningPlan({
+      access,
+      completion,
+      review,
+      resume,
+      attendance,
+      nextAction,
+      level,
+    });
 
     return res.json({
       ok: true,
-      schemaVersion: 2,
+      schemaVersion: 3,
       generatedAt: new Date().toISOString(),
       student: {
         level,
@@ -644,6 +891,7 @@ async function learnerSupportStateHandler(req, res) {
             : "Falowen Radio is enforced by the lesson route when a lesson requires it.",
       },
       nextAction,
+      learningPlan,
       requestContext: {
         route: clean(req.query?.route).slice(0, 500) || null,
       },
@@ -664,4 +912,6 @@ module.exports = {
   completionNextLesson,
   safeResumeState,
   loadLatestLessonResume,
+  buildDailyLearningPlan,
+  daysSince,
 };
