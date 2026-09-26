@@ -29,14 +29,7 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Br
   <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Vorstellung → Vergleiche → Meinung → Frage → Viele Grüße.</p>
 </WorkbookTaskCard>;
 
-const readingText = `Anna ist 25 Jahre alt und wohnt in Berlin. Sie hat lange blonde Haare und arbeitet als Krankenschwester. In ihrer Freizeit liest sie gern und geht spazieren. Max ist 27 Jahre alt, trägt eine Brille und arbeitet als Mathematiklehrer. Er spielt gern Fußball und kocht. Anna ist jünger als Max. Max ist sportlicher als Anna, aber Anna liest häufiger als Max. Beide sind freundlich und hilfsbereit.`;
 
-const readingQuestions = [
-  { stem:"Wer ist älter?", options:["a) Anna","b) Max","c) Beide sind gleich alt"] },
-  { stem:"Wer spielt gern Fußball?", options:["a) Anna","b) Max","c) Beide"] },
-  { stem:"Welcher Vergleich stimmt?", options:["a) Anna ist älter als Max.","b) Max ist älter als Anna.","c) Max ist genauso alt wie Anna."] },
-  { stem:"Was haben beide gemeinsam?", options:["a) Beide sind freundlich.","b) Beide sind Lehrer.","c) Beide tragen eine Brille."] }
-];
 
 const listeningQuestions = [
   { stem:"Wie alt ist Julia?", options:["a) 24 Jahre","b) 26 Jahre","c) 28 Jahre","d) 30 Jahre"] },
@@ -56,8 +49,6 @@ export default function A2Day3ComparisonsWorkbookPage() {
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
     schreibenPlaceholder={"Lieber Felix,\n\nmeine Mutter ist ... und mein Vater ist ...\n\nMeine Mutter ist ... als mein Vater. Mein Vater ist genauso ... wie ...\n\nIch mag ... besonders, weil ...\n\nWie sind deine Eltern?\n\nViele Grüße\n[Dein Name]"}
-    lesenText={readingText}
-    lesenQuestions={readingQuestions}
     hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die fünf Hörverstehen-Fragen."
     hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"
     hoerenQuestions={listeningQuestions}
