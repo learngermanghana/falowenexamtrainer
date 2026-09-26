@@ -101,32 +101,7 @@ export const B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(14),
-  reading: {
-    title: "Lesen Sie den Text über lebenslanges Lernen und beantworten Sie die sieben Fragen.",
-    instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Lebenslanges Lernen mit Büchern und Laptop",
-    text: {
-      title: "Lebenslanges Lernen im 21. Jahrhundert",
-      questionTitle: "Fragen zum Text",
-      paragraphs: [
-        "Im 21. Jahrhundert ist lebenslanges Lernen wichtiger denn je. Der Arbeitsmarkt verändert sich ständig, neue Technologien entstehen, und die Anforderungen an Arbeitnehmer steigen. Viele Menschen erkennen, dass sie ihre Fähigkeiten regelmäßig aktualisieren müssen, um beruflich erfolgreich zu sein.",
-        "Lifelong Learning, also das kontinuierliche Lernen im Laufe des Lebens, kann in vielen Formen stattfinden. Es gibt formelle Weiterbildungsmöglichkeiten wie Abendkurse, Online-Programme und berufliche Seminare. Aber auch informelles Lernen, zum Beispiel durch das Lesen von Fachbüchern oder das Hören von Podcasts, ist eine Möglichkeit, neues Wissen zu erwerben.",
-        "Ein Vorteil des lebenslangen Lernens ist, dass es den Menschen ermöglicht, auf dem Arbeitsmarkt wettbewerbsfähig zu bleiben. Durch neue Qualifikationen können sie sich für bessere Positionen bewerben oder ihre aktuelle Stelle sichern. Ein weiterer Vorteil ist, dass das Lernen das Gehirn aktiv hält und den Geist jung erhält.",
-        "Allerdings gibt es auch Herausforderungen. Viele Menschen haben nicht die Zeit oder das Geld, um regelmäßig an Kursen teilzunehmen. Zudem kann es schwierig sein, die Motivation aufrechtzuerhalten, vor allem, wenn man nicht sofort Ergebnisse sieht.",
-        "Insgesamt bietet lebenslanges Lernen viele Chancen, sowohl für die berufliche als auch für die persönliche Entwicklung. Es fördert Kreativität und Anpassungsfähigkeit, zwei Fähigkeiten, die in der modernen Welt immer wichtiger werden. Mit den richtigen Ressourcen und etwas Disziplin kann jeder das lebenslange Lernen in seinen Alltag integrieren.",
-      ],
-      questions: [
-        { stem: "Was ist ein Hauptgrund für die Bedeutung des lebenslangen Lernens?", options: ["a) Die Welt wird immer einfacher.", "b) Der Arbeitsmarkt verändert sich schnell.", "c) Schulen bieten keine gute Bildung mehr.", "d) Es gibt keine neuen Technologien."] },
-        { stem: "Was ist ein Vorteil des informellen Lernens laut Text?", options: ["a) Es ist billiger als formelles Lernen.", "b) Es bringt sofort Ergebnisse.", "c) Es ist immer effektiver.", "d) Es ist schwerer als formelles Lernen."] },
-        { stem: "Warum ist lebenslanges Lernen gut für das Gehirn?", options: ["a) Es macht die Menschen glücklich.", "b) Es hält den Geist jung und aktiv.", "c) Es garantiert eine Gehaltserhöhung.", "d) Es reduziert die Arbeitsbelastung."] },
-        { stem: "Was ist eine der größten Herausforderungen beim lebenslangen Lernen?", options: ["a) Die Kosten für Kurse.", "b) Das Finden von guten Lehrern.", "c) Die Langeweile der Lerninhalte.", "d) Der Mangel an formellen Lernmöglichkeiten."] },
-        { stem: "Wie beschreibt der Text die Rolle der Technologie beim Lernen?", options: ["a) Technologie macht Lernen einfacher und zugänglicher.", "b) Technologie erschwert das Lernen.", "c) Technologie ist irrelevant für das Lernen.", "d) Technologie ersetzt die Lehrer."] },
-        { stem: "Welche Fähigkeit fördert lebenslanges Lernen besonders?", options: ["a) Schnelles Arbeiten.", "b) Kreativität und Anpassungsfähigkeit.", "c) Mathematische Fähigkeiten.", "d) Handwerkliches Geschick."] },
-        { stem: "Was ist laut Text notwendig, um lebenslanges Lernen in den Alltag zu integrieren?", options: ["a) Sehr viel Freizeit.", "b) Geld für teure Kurse.", "c) Die richtige Einstellung und Disziplin.", "d) Einen Hochschulabschluss."] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(14),
   listening: {
     title: "Hören Sie den Dialog über lebenslanges Lernen und beantworten Sie die fünf Fragen.",
     instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",

@@ -88,32 +88,7 @@ export const B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(12),
-  reading: {
-    title: "Lesen Sie den Text über Abenteuer und beantworten Sie die sieben Fragen.",
-    instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Abenteuer in Wald und Natur",
-    text: {
-      title: "Was bedeutet Abenteuer?",
-      questionTitle: "Fragen",
-      paragraphs: [
-        "Abenteuer ist ein Begriff, der für jeden Menschen etwas anderes bedeuten kann. Für manche Menschen ist Abenteuer gleichbedeutend mit Reisen in ferne Länder, während andere den Nervenkitzel in Extremsportarten suchen. Doch was macht ein Abenteuer wirklich aus?",
-        "Viele Menschen sehnen sich nach Abenteuern, weil sie das Bedürfnis haben, aus ihrem Alltagstrott auszubrechen. Der Reiz des Unbekannten und die Möglichkeit, etwas Neues zu erleben, spielen dabei eine große Rolle. Besonders bei jungen Menschen ist der Wunsch nach Abenteuern weit verbreitet. Eine Weltreise, das Besteigen eines Berges oder das Erkunden von Wäldern – all das sind Abenteuer, die unvergessliche Erlebnisse versprechen.",
-        "Jedoch hat jede Form des Abenteuers auch ihre Schattenseiten. Abenteuer können mit Risiken verbunden sein, sei es durch gefährliche Situationen oder finanzielle Schwierigkeiten. Nicht jeder Mensch ist bereit, diese Risiken einzugehen. Doch für diejenigen, die sich darauf einlassen, kann das Abenteuer eine unvergessliche Erfahrung sein, die ihnen neue Perspektiven auf das Leben eröffnet.",
-        "Es gibt auch Abenteurer, die ihre Abenteuer im Alltag finden. Ein neues Hobby ausprobieren, sich beruflich neu orientieren oder einfach einmal eine andere Perspektive einnehmen – all das kann ebenso abenteuerlich sein wie eine Reise um die Welt.",
-        "Am Ende bleibt die Frage, ob ein Leben ohne Abenteuer wirklich lebenswert ist. Manche Menschen sind glücklich, wenn sie in ihrem geregelten Alltag bleiben können, während andere den Nervenkitzel und die Unvorhersehbarkeit eines Abenteuers benötigen. Die Entscheidung liegt bei jedem selbst.",
-      ],
-      questions: [
-        { stem: "Was bedeutet für viele Menschen das Abenteuer?", options: ["a) Der Nervenkitzel des Unbekannten.", "b) Die Freude am Alltag.", "c) Die Routine des Lebens.", "d) Das Risiko, das es mit sich bringt."] },
-        { stem: "Warum suchen besonders junge Menschen nach Abenteuern?", options: ["a) Um eine neue Karriere zu finden.", "b) Um den Alltag zu durchbrechen.", "c) Um Stabilität zu gewinnen.", "d) Um finanzielle Probleme zu lösen."] },
-        { stem: "Was kann ein Abenteuer mit sich bringen?", options: ["a) Nur positive Erfahrungen.", "b) Risiken und Herausforderungen.", "c) Sicherheit und Ruhe.", "d) Eine genaue Planung."] },
-        { stem: "Wie können Abenteurer im Alltag Abenteuer finden?", options: ["a) Indem sie nur reisen.", "b) Durch alltägliche Veränderungen.", "c) Durch gefährliche Aktivitäten.", "d) Indem sie nichts Neues ausprobieren."] },
-        { stem: "Was ist ein Risiko bei Abenteuern?", options: ["a) Beruflicher Erfolg.", "b) Finanzielle Unsicherheiten.", "c) Ein geregeltes Leben.", "d) Eine klare Zukunftsplanung."] },
-        { stem: "Was verspricht ein Abenteuer?", options: ["a) Einfache Lösungen.", "b) Unvergessliche Erlebnisse.", "c) Vorhersehbarkeit.", "d) Keine Veränderung."] },
-        { stem: "Wie entscheiden sich manche Menschen in Bezug auf Abenteuer?", options: ["a) Sie meiden jede Form von Abenteuer.", "b) Sie suchen den Nervenkitzel im Alltag.", "c) Sie wählen ein Leben voller Routine.", "d) Sie ignorieren das Unbekannte."] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(12),
   listening: {
     title: "Hören Sie den Bericht über ein Abenteuer in den Bergen und beantworten Sie die fünf Fragen.",
     instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",

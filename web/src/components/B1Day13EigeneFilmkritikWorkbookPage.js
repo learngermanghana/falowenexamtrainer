@@ -107,32 +107,7 @@ export const B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(13),
-  reading: {
-    title: "Lesen Sie die Filmkritik und beantworten Sie die sieben Fragen.",
-    instructions: "Lesen Sie zuerst die komplette Kritik. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Kino und Filmkritik Lesen",
-    text: {
-      title: "Filmkritik: Die Nacht des Unbekannten",
-      questionTitle: "Fragen",
-      paragraphs: [
-        "Vor ein paar Tagen sah ich den neuen Thriller 'Die Nacht des Unbekannten', und ich muss sagen, dass dieser Film mich von Anfang an in seinen Bann gezogen hat. Die Handlung beginnt mit einem geheimnisvollen Mord, der in einer kleinen Stadt passiert. Niemand weiß, wer der Täter ist, und die Hauptfigur, ein erfahrener Ermittler, macht sich auf die Suche nach Antworten.",
-        "Während des Films gibt es viele Momente, die mich buchstäblich auf die Kante meines Sitzes gebracht haben. Besonders die Szene, in der der Ermittler im Dunkeln durch die Straßen geht und plötzlich eine Gestalt hinter ihm auftaucht, hat mein Herz schneller schlagen lassen. Die Filmmusik hat perfekt zur Atmosphäre beigetragen und die Spannung noch verstärkt.",
-        "Ein weiteres Highlight des Films ist die Wendung am Ende. Man denkt die ganze Zeit, dass man weiß, wer der Mörder ist, doch dann gibt es eine überraschende Enthüllung, die alles verändert. Es stellt sich heraus, dass jemand, den man nicht verdächtigt hätte, der wahre Täter ist.",
-        "Nicht nur die Handlung, sondern auch die schauspielerischen Leistungen waren herausragend. Der Hauptdarsteller hat es geschafft, die Angst und Verzweiflung seines Charakters überzeugend darzustellen. Auch die Nebenfiguren hatten Tiefe und trugen zur dichten Atmosphäre bei.",
-        "Dennoch gibt es auch einige Schwächen. Manchmal waren die Dialoge etwas klischeehaft, und einige Szenen hätten kürzer sein können. Aber insgesamt hat der Film mich voll und ganz überzeugt und ich würde ihn jedem empfehlen, der gerne spannende Filme schaut.",
-      ],
-      questions: [
-        { stem: "Was passiert zu Beginn des Films?", options: ["a) Ein mysteriöser Mord.", "b) Eine Verfolgungsjagd.", "c) Ein Autounfall.", "d) Eine Explosion."] },
-        { stem: "Was macht die Hauptfigur im Film?", options: ["a) Er ist ein Dieb.", "b) Er ist ein Polizist.", "c) Er ist ein Ermittler.", "d) Er ist ein Arzt."] },
-        { stem: "Welche Szene hat den Erzähler besonders gefesselt?", options: ["a) Ein Verhör.", "b) Ein Treffen mit dem Mörder.", "c) Eine nächtliche Verfolgung.", "d) Ein Streit zwischen den Charakteren."] },
-        { stem: "Wer ist der wahre Täter?", options: ["a) Ein Fremder.", "b) Ein Freund des Ermittlers.", "c) Eine unbekannte Person.", "d) Eine unerwartete Figur."] },
-        { stem: "Wie wird die Filmmusik beschrieben?", options: ["a) Beruhigend.", "b) Unbedeutend.", "c) Spannungssteigernd.", "d) Unpassend."] },
-        { stem: "Welche Schwäche hat der Film laut dem Erzähler?", options: ["a) Die Handlung war langweilig.", "b) Die Dialoge waren klischeehaft.", "c) Die Schauspieler waren schlecht.", "d) Die Filmmusik war unpassend."] },
-        { stem: "Würde der Erzähler den Film empfehlen?", options: ["a) Ja.", "b) Nein.", "c) Nur unter bestimmten Umständen.", "d) Er hat es nicht gesagt."] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(13),
   listening: {
     title: "Hören Sie den Vortrag über Spannung im Film und beantworten Sie die fünf Fragen.",
     instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
