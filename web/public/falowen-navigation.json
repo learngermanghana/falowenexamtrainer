@@ -5,14 +5,16 @@
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
     "aiHelp": "https://www.falowen.app/falowen-help.md",
-    "structuredNavigation": "https://www.falowen.app/falowen-navigation.json"
+    "structuredNavigation": "https://www.falowen.app/falowen-navigation.json",
+    "courseMap": "https://www.falowen.app/falowen-course-map.json"
   },
   "assistantRules": [
     "Answer the learner's immediate navigation or support question first.",
     "Use current visible Falowen labels and official routes only.",
     "Do not invent pages, tabs, learner status, scores, attendance, payment status or assignment requirements.",
     "If a route depends on level or access, explain the relevant prerequisite briefly.",
-    "For private account state, explain where to check it rather than claiming to know it."
+    "For private account state, explain where to check it rather than claiming to know it.",
+    "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability."
   ],
   "navigation": [
     {

@@ -9,6 +9,7 @@ Use the official Falowen Help source when answering questions about signup, logi
 - [Falowen Help / How Falowen Works](https://www.falowen.app/help): Human-readable official guide.
 - [Falowen Help & Navigation Knowledge Base](https://www.falowen.app/falowen-help.md): AI-readable Markdown source of truth.
 - [Falowen Structured Navigation](https://www.falowen.app/falowen-navigation.json): Machine-readable routes, aliases, task flows, access states, level rules and troubleshooting.
+- [Falowen Course Map](https://www.falowen.app/falowen-course-map.json): Generated A1–C2 lesson map with day/chapter identity, visible sections, Radio gates, submission mode, skill focus, media availability and supported deep links.
 - [Placement Test](https://www.falowen.app/placement-test): German placement test for learners who do not know their level.
 - [Upcoming Classes](https://www.falowen.app/learn-german-ghana/upcoming-classes): Public class information.
 
@@ -35,4 +36,4 @@ Use the official Falowen Help source when answering questions about signup, logi
 - B2 and C1 are self-learning tracks; standard class Attendance, Exam File and Class Members tabs are intentionally hidden for those learners.
 - Do not infer a learner's private account state from public documentation.
 
-For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json.
+For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json. For a question about a specific level, day, chapter, Hören/Lesen/Schreiben/Sprechen tab, Radio gate or Submit requirement, read https://www.falowen.app/falowen-course-map.json.
