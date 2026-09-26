@@ -825,3 +825,36 @@
   line-height: 1.45;
   color: #b91c1c;
 }
+
+
+.study-buddy-daily-plan {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.study-buddy-daily-plan li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: #475569;
+}
+
+.study-buddy-daily-plan li button {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 6px 9px;
+  background: #ffffff;
+  color: #1e3a8a;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.study-buddy-daily-plan li button:hover,
+.study-buddy-daily-plan li button:focus-visible {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
