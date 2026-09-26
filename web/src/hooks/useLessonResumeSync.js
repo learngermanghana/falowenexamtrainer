@@ -21,6 +21,7 @@ export const useLessonResumeSync = ({
   progress,
   setProgress,
   completed,
+  onRemoteRadioDone,
   source = "lesson",
 } = {}) => {
   const { user, studentProfile } = useAuth();
@@ -50,6 +51,7 @@ export const useLessonResumeSync = ({
       level,
       day,
       onChange: (remote) => {
+        if (remote?.radioDone === true) onRemoteRadioDone?.(remote);
         if (remote?.sections && typeof setProgress === "function") {
           setProgress((current) => {
             const merged = mergeResumeSectionsIntoProgress(current, remote.sections);
@@ -64,7 +66,7 @@ export const useLessonResumeSync = ({
         setCloudReady(true);
       },
     });
-  }, [day, level, setProgress, user?.uid]);
+  }, [day, level, onRemoteRadioDone, setProgress, user?.uid]);
 
   useEffect(() => {
     if (!cloudReady || !user?.uid || !level || !Number.isInteger(Number(day))) return undefined;
