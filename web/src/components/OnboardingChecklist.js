@@ -1,174 +1,152 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import { LESSON_VIDEO_DICTIONARY } from "../data/lessonVideoDictionary";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
-import { toDateMs } from "../lib/dateUtils";
+import { getTrialAccessState } from "../lib/trialAccess";
 import { useToast } from "../context/ToastContext";
-import SetupCheckpoint from "./SetupCheckpoint";
-import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
-import {
-  getPublicFunnelContext,
-  trackPublicFunnelEvent,
-} from "../lib/publicFunnelTracking";
 
-const getYouTubeId = (url = "") => {
-  const match = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/i);
-  return match?.[1] || "";
+const day0WorkbookByLevel = {
+  A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+  A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+  B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+  B2: "/campus/course/lesson/B2/0",
+  C1: "/campus/course/lesson/C1/0",
 };
 
-const Step = ({ number, title, description }) => (
-  <li style={{ display: "grid", gridTemplateColumns: "42px minmax(0, 1fr)", gap: 12, alignItems: "start" }}>
-    <span
-      style={{
-        width: 38,
-        height: 38,
-        borderRadius: "50%",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#dbeafe",
-        color: "#1e40af",
-        fontWeight: 900,
-      }}
-    >
-      {number}
-    </span>
-    <div style={{ display: "grid", gap: 3 }}>
-      <strong>{title}</strong>
-      <span style={{ ...styles.helperText, lineHeight: 1.55 }}>{description}</span>
-    </div>
-  </li>
+const StatusItem = ({ label, value }) => (
+  <div
+    style={{
+      border: "1px solid #e2e8f0",
+      borderRadius: 14,
+      padding: 14,
+      background: "#ffffff",
+      display: "grid",
+      gap: 4,
+    }}
+  >
+    <span style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>{label}</span>
+    <strong style={{ color: "#0f172a" }}>{value || "Not available"}</strong>
+  </div>
 );
 
 const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [watchedVideo, setWatchedVideo] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
+  const [savingAction, setSavingAction] = useState("");
+
   const level = detectLevelKey(studentProfile);
-  const video = useMemo(() => LESSON_VIDEO_DICTIONARY?.[level]?.[0]?.videoResources?.[0] || null, [level]);
-  const videoId = getYouTubeId(video?.url);
-  const paymentConfirmed = useMemo(() => {
-    const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
-    const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
-    return ["paid", "partial"].includes(paymentStatus) || hasClearedBalance(balanceDue);
-  }, [studentProfile?.balance, studentProfile?.balanceDue, studentProfile?.paymentStatus]);
-  const activeTrial = useMemo(() => {
-    const trialEndsAtMs = toDateMs(studentProfile?.trialEndsAt);
-    return Number.isFinite(trialEndsAtMs) && trialEndsAtMs > Date.now();
-  }, [studentProfile?.trialEndsAt]);
-  const accessConfirmed = paymentConfirmed || activeTrial;
+  const className = studentProfile?.className || "Not assigned yet";
+  const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
+  const balanceDue = Math.max(Number(studentProfile?.balanceDue ?? studentProfile?.balance) || 0, 0);
+  const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
+  const trialAccess = useMemo(() => getTrialAccessState(studentProfile), [studentProfile]);
+  const firstLessonPath = day0WorkbookByLevel[level] || "/campus/course";
 
-  useEffect(() => {
-    if (!accessConfirmed) return;
-    const context = getPublicFunnelContext();
-    if (!context.sessionId && !context.source && !context.video) return;
-    trackPublicFunnelEvent("onboarding_view", { level, onboardingVideo: videoId });
-  }, [accessConfirmed, level, videoId]);
+  const accessLabel = paymentComplete
+    ? "Paid access active"
+    : trialAccess.active
+      ? `7-day trial · ${trialAccess.daysRemaining} day${trialAccess.daysRemaining === 1 ? "" : "s"} remaining`
+      : "Access setup required";
 
-  const openDashboard = async ({ skippedVideo = false } = {}) => {
-    setSaving(true);
-    setSaveError("");
+  const paymentLabel = paymentComplete
+    ? "Paid"
+    : paymentStatus === "partial"
+      ? "Part payment received"
+      : "Not paid yet";
+
+  const finishAndGo = async (destination, actionName) => {
+    setSavingAction(actionName);
     try {
       await onSaveOnboarding?.();
-      trackPublicFunnelEvent("onboarding_completed", {
-        level,
-        onboardingVideo: videoId,
-        skippedVideo: skippedVideo || !watchedVideo,
-      });
-      showToast(
-        skippedVideo || !watchedVideo
-          ? "Dashboard opened. You can watch the welcome video later from the course resources."
-          : "Welcome to Falowen. Your dashboard is ready.",
-        "success"
-      );
-      navigate("/", { replace: true });
+      showToast("Your Falowen setup is ready.", "success");
+      navigate(destination, { replace: true });
     } catch (error) {
-      console.error("Failed to save onboarding", error);
-      setSaveError("We could not open your dashboard yet. Please try again.");
+      console.error("Failed to complete onboarding", error);
+      showToast("We could not finish setup. Please try again.", "error");
     } finally {
-      setSaving(false);
+      setSavingAction("");
     }
   };
 
-  if (!accessConfirmed) {
-    return <SetupCheckpoint />;
-  }
-
   return (
     <div className="onboarding-page">
-      <section className="onboarding-focus-card">
-        <div className="onboarding-intro">
+      <section
+        className="onboarding-focus-card"
+        style={{ display: "grid", gap: 18, maxWidth: 860, margin: "0 auto" }}
+      >
+        <div style={{ display: "grid", gap: 8 }}>
           <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
             Welcome to Falowen{level ? ` · ${level}` : ""}
           </span>
-          <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.12 }}>Watch this before your dashboard opens</h1>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 17 }}>
-            This short introduction shows you where to learn, how to complete your work, and where to get help. If the video fails to load, you can still continue to your dashboard.
+          <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 40px)", lineHeight: 1.12 }}>
+            Your learning account is ready
+          </h1>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 16 }}>
+            We already have what we need from signup. Review your course details below, then choose what you want to do next.
           </p>
         </div>
 
-        {videoId ? (
-          <>
-            <div className="onboarding-video">
-              <iframe
-                title={video?.title || "Falowen welcome video"}
-                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-            <div className="onboarding-video-subscribe">
-              <span>New student? Subscribe to the YouTube channel so you do not miss new lessons.</span>
-              <YouTubeSubscribeButton label="Subscribe to LLEA Ghana on YouTube" />
-            </div>
-          </>
-        ) : (
-          <div className="onboarding-video-placeholder">
-            <span aria-hidden style={{ fontSize: 38 }}>▶️</span>
-            <strong>Your welcome video is being prepared.</strong>
-            <span style={styles.helperText}>Read the easy steps below, then continue to your dashboard.</span>
-          </div>
-        )}
-
-        <div
-          style={{
-            border: "1px solid #bfdbfe",
-            borderRadius: 14,
-            padding: 12,
-            background: "#eff6ff",
-            color: "#1e3a8a",
-            lineHeight: 1.6,
-            fontWeight: 700,
-          }}
-        >
-          Video not playing? Do not worry. Students with a confirmed payment or an active free trial can continue to the dashboard and watch the video later.
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+          <StatusItem label="Level" value={level || studentProfile?.level || "Not selected"} />
+          <StatusItem label="Class" value={className} />
+          <StatusItem label="Access" value={accessLabel} />
+          <StatusItem label="Payment" value={paymentLabel} />
+          <StatusItem label="Start point" value={level ? `${level} Day 0` : "Course start"} />
         </div>
 
-        <section className="onboarding-steps" aria-labelledby="easy-steps-title">
-          <h2 id="easy-steps-title" style={{ margin: 0 }}>Your 3 easy steps</h2>
-          <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 16 }}>
-            <Step number="1" title="Open Campus and the Course Book" description="Start from Campus, open the Course Book, and follow the current lesson in order." />
-            <Step number="2" title="Complete and submit inside the workbook" description="Use the lesson tabs, finish the required work, and submit through the Submit tab inside the Course Book when it appears. There is no separate student submission page." />
-            <Step number="3" title="Use Results, Attendance and Exams Room correctly" description="Check marked work in Results, record class attendance when required, and use Exams Room only for separate exam-style practice." />
-          </ol>
+        <section
+          style={{
+            ...styles.card,
+            margin: 0,
+            display: "grid",
+            gap: 8,
+            background: "#f8fafc",
+            border: "1px solid #cbd5e1",
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: 18 }}>What happens next?</h2>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+            Your progress is saved automatically. Start from Day 0 so Falowen can prepare you for the course structure. You can review your class details anytime, and if you started with the free trial you can complete payment from Account & Billing without losing your progress.
+          </p>
         </section>
 
-        <label className="onboarding-confirmation">
-          <input type="checkbox" checked={watchedVideo} onChange={(event) => setWatchedVideo(event.target.checked)} />
-          <span>
-            <strong>{videoId ? "I watched the video and understand the easy steps." : "I read and understand the easy steps."}</strong>
-            <small>Your dashboard can open after you confirm. If the video does not play, use Continue to dashboard.</small>
-          </span>
-        </label>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+          <button
+            type="button"
+            style={styles.primaryButton}
+            disabled={Boolean(savingAction)}
+            onClick={() => finishAndGo(firstLessonPath, "start")}
+          >
+            {savingAction === "start" ? "Opening..." : "Start learning"}
+          </button>
 
-        <button type="button" className="onboarding-open-dashboard" onClick={() => openDashboard({ skippedVideo: !watchedVideo })} disabled={saving}>
-          {saving ? "Opening dashboard..." : watchedVideo ? "Open my dashboard" : "Continue to dashboard"}
-        </button>
-        {saveError ? <p style={{ margin: 0, color: "#b91c1c", textAlign: "center" }}>{saveError}</p> : null}
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            disabled={Boolean(savingAction)}
+            onClick={() => finishAndGo("/campus/account", "class")}
+          >
+            {savingAction === "class" ? "Opening..." : "View class details"}
+          </button>
+
+          {!paymentComplete ? (
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              disabled={Boolean(savingAction)}
+              onClick={() => finishAndGo("/campus/account?tab=billing", "payment")}
+            >
+              {savingAction === "payment" ? "Opening..." : "Pay now"}
+            </button>
+          ) : null}
+        </div>
+
+        {!trialAccess.active && !paymentComplete ? (
+          <p style={{ ...styles.helperText, margin: 0, color: "#92400e" }}>
+            Your trial is not currently active. Open billing to complete payment and restore course access.
+          </p>
+        ) : null}
       </section>
     </div>
   );
