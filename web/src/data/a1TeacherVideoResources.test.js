@@ -87,6 +87,20 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
+  test("Day 15 chapter 4.7 uses the new teacher video", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(15, "4.7");
+
+    expect(configuredVideo).toEqual(
+      expect.objectContaining({
+        chapter: "4.7",
+        topic: "Introduction to Speaking Exams",
+        url: "https://youtu.be/sLvFPtyfpjQ",
+      })
+    );
+    expect(configuredVideo?.url).not.toContain("6Jxg3lqZAFU");
+    expect(configuredVideo?.url).not.toContain("o9nn_hSDzw8");
+  });
+
   test("Day 13 chapter 3.5 exposes only the latest teacher lecture", () => {
     const configuredVideos = getA1TeacherVideoResources(13, "3.5");
 

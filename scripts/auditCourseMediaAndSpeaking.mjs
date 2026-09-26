@@ -26,7 +26,7 @@ const requiredMarkers = {
   ],
   "web/src/data/lessonVideoDictionary.js": [
     'https://youtu.be/7h0XURhtGFg',
-    'url: "https://youtu.be/PP38eObAMh8"',
+    'url: "https://youtu.be/sLvFPtyfpjQ"',
   ],
   "web/src/components/ObjectsAndColorsPage.js": [
     'stem: "5) Das sind ___ Bücher."',
@@ -35,8 +35,8 @@ const requiredMarkers = {
     '[11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],',
   ],
   "web/src/components/Day0StudentWorkflowUpgrade.js": [
-    'id: "PP38eObAMh8"',
-    'url: "https://youtu.be/PP38eObAMh8"',
+    'id: "sLvFPtyfpjQ"',
+    'url: "https://youtu.be/sLvFPtyfpjQ"',
   ],
   "web/src/components/A2StandardTabbedWorkbookPage.js": [
     '<SpeakingMindMap config={getA2SpeakingMindMap(day)} />',

@@ -22,7 +22,7 @@ const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
   title: "A1 Orientation AI video",
   description:
     "Watch this A1 orientation video first, then continue with the Day 0 guide and workbook.",
-  url: "https://youtu.be/PP38eObAMh8",
+  url: "https://youtu.be/sLvFPtyfpjQ",
 };
 
 const A2_DAY0_ORIENTATION_VIDEO_RESOURCE = {

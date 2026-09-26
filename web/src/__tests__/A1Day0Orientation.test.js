@@ -7,6 +7,13 @@ const source = fs.readFileSync(
 );
 
 describe("A1 Day 0 student orientation", () => {
+  it("uses the new Falowen orientation video and removes the previous video", () => {
+    expect(source).toContain('A1_DAY0_ORIENTATION_VIDEO_URL = "https://youtu.be/sLvFPtyfpjQ"');
+    expect(source).toContain('A1_DAY0_ORIENTATION_VIDEO_EMBED = "https://www.youtube-nocookie.com/embed/sLvFPtyfpjQ"');
+    expect(source).toContain("A1 orientation video");
+    expect(source).not.toContain("6Jxg3lqZAFU");
+  });
+
   it("uses an A1-specific orientation instead of the generic Day 0 page", () => {
     expect(source).not.toContain('CurrentDay0OrientationPage');
     expect(source).toContain('data-a1-day0-orientation="true"');
