@@ -87,6 +87,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("A1");
@@ -344,20 +345,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(cleanedEmail, studentCode);
-      const balanceText = balanceDue > 0 ? ` Balance due: ${formatMoney(balanceDue)}.` : "";
+      const balanceText = balanceDue > 0 ? ` Your tuition balance is ${formatMoney(balanceDue)}.` : "";
       const amountCopy = intendedPaymentAmount
-        ? `You chose to pay ${formatMoney(intendedPaymentAmount)} now.`
-        : "Choose how much to pay now inside the app.";
-      const accessCopy = `Pay at least ${formatMoney(
-        MIN_INITIAL_PAYMENT
-      )} to unlock 1-month access, or clear the full balance to unlock 6 months.`;
+        ? `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`
+        : "You can choose your payment inside Falowen.";
       const paymentInstruction = paymentsEnabled
-        ? "Open the tuition card in the app to start Paystack checkout."
-        : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
-      const paymentRedirectNote = "You'll always see your student code and tuition status under Account & Billing.";
-      const successMessage = `Account created! Your student code is ${studentCode}. ${amountCopy} ${accessCopy} ${paymentInstruction} ${paymentRedirectNote}${balanceText}`;
+        ? "You can start your trial now or pay immediately through Paystack for paid access."
+        : "You can start your trial now. If you want to pay immediately, sign in on the web app and open Account & Billing.";
+      const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. You can start learning before payment. ${amountCopy} ${paymentInstruction}${balanceText}`;
       setMessage(successMessage);
-      showToast(`${successMessage} Finish setup inside the app.`, "success");
+      showToast(`Your 7-day trial is active. Start learning now.`, "success");
       triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
     } catch (error) {
       console.error(error);
@@ -425,7 +422,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              Create your account to unlock guided exam practice, tutor feedback, and your personalized learning path.
+              Create your account and start your 7-day trial immediately. You can explore before payment or pay right away if you prefer.
             </p>
           </div>
         </div>
@@ -473,8 +470,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
 
           <label style={styles.label}>{t("signupPage.fields.password")}</label>
+          <div style={{ position: "relative" }}>
           <input
-            type="password"
+            type={showPasswords ? "text" : "password"}
             required
             minLength={8}
             autoComplete="new-password"
@@ -487,16 +485,26 @@ const SignUpPage = ({ onLogin, onBack }) => {
               clearFieldError("password");
               setAuthError("");
             }}
-            style={inputStyle}
+            style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
             placeholder="At least 8 characters with letters and numbers"
           />
+          <button
+            type="button"
+            onClick={() => setShowPasswords((value) => !value)}
+            aria-pressed={showPasswords}
+            style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
+          >
+            {showPasswords ? "Hide" : "Show"}
+          </button>
+          </div>
           {fieldErrors.password ? <p style={styles.fieldError}>{fieldErrors.password}</p> : null}
 
           <PasswordGuidance password={password} />
 
           <label style={styles.label}>{t("signupPage.fields.confirmPassword")}</label>
+          <div style={{ position: "relative" }}>
           <input
-            type="password"
+            type={showPasswords ? "text" : "password"}
             required
             minLength={8}
             autoComplete="new-password"
@@ -509,9 +517,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
               clearFieldError("confirmPassword");
               setAuthError("");
             }}
-            style={inputStyle}
+            style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
             placeholder="Enter password again"
           />
+          <button
+            type="button"
+            onClick={() => setShowPasswords((value) => !value)}
+            aria-pressed={showPasswords}
+            style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
+          >
+            {showPasswords ? "Hide" : "Show"}
+          </button>
+          </div>
           {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
           <label style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
@@ -530,9 +547,17 @@ const SignUpPage = ({ onLogin, onBack }) => {
               </option>
             ))}
           </select>
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            We load speaking and writing tasks from the sheet that matches your level.
-          </p>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: -2 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              We load speaking and writing tasks that match your level.
+            </p>
+            <a
+              href="/placement-test"
+              style={{ color: "#1d4ed8", fontWeight: 700, fontSize: 13, textDecoration: "none" }}
+            >
+              Not sure of your level? Take the placement test
+            </a>
+          </div>
 
           <label style={styles.label}>{t("signupPage.fields.phone")}</label>
           <input
@@ -773,8 +798,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </div>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? t("signupPage.actions.creating") : t("signupPage.actions.signUp")}
+            {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
           </button>
+          <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
+            Start your 7-day trial without payment, or pay immediately after signup if you prefer.
+          </p>
         </form>
 
         {showConsentDetails && (
@@ -853,8 +881,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
         {authError && <div style={styles.errorBox}>{authError}</div>}
         {message && (
-          <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#166534", borderColor: "#22c55e" }}>
-            {message}
+          <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#166534", borderColor: "#22c55e", display: "grid", gap: 12 }}>
+            <strong style={{ fontSize: 16 }}>Your Falowen account is ready</strong>
+            <span>{message}</span>
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/campus"; }}
+              style={{ ...styles.primaryButton, width: "100%" }}
+            >
+              Start learning
+            </button>
           </div>
         )}
 

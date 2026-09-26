@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import SignUpPage from "../components/SignUpPage";
 
 jest.mock("../components/SignUpPageLegacy", () => () => (
@@ -64,22 +64,15 @@ describe("mobile signup field behaviour", () => {
     expect(screen.getByLabelText("Location")).toHaveAttribute("autocapitalize", "words");
   });
 
-  it("shows a password visibility control while a password field is active", async () => {
+  it("leaves password visibility ownership to the inline signup controls", async () => {
     render(<SignUpPage />);
 
-    const password = screen.getByLabelText("Password");
-    const confirmation = screen.getByLabelText("Confirm password");
-    fireEvent.focus(password);
-
-    const toggle = await screen.findByRole("button", { name: "Show passwords" });
-    fireEvent.pointerDown(toggle);
-    fireEvent.click(toggle);
-
-    expect(password).toHaveAttribute("type", "text");
-    expect(confirmation).toHaveAttribute("type", "text");
-    expect(screen.getByRole("button", { name: "Hide passwords" })).toHaveAttribute(
-      "aria-pressed",
-      "true"
+    await waitFor(() =>
+      expect(screen.getByLabelText("Password")).toHaveAttribute("name", "password")
     );
+
+    expect(screen.getByLabelText("Password")).toHaveAttribute("type", "password");
+    expect(screen.getByLabelText("Confirm password")).toHaveAttribute("type", "password");
+    expect(screen.queryByRole("button", { name: "Show passwords" })).not.toBeInTheDocument();
   });
 });

@@ -127,6 +127,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   // shared
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // signup-only fields
   const [name, setName] = useState("");
@@ -367,11 +368,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
         {mode === "login" && (
           <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
-            <p style={{ ...styles.helperText, marginBottom: 4 }}>
-              Returning Falowen student? Use your existing email and choose a new password. We'll import your profile automatically.
-            </p>
+            <strong style={{ display: "block", marginBottom: 4 }}>Welcome back</strong>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              New student? Switch to "Create account" and sign up normally.
+              Sign in with your email or student code to continue from where you stopped.
             </p>
           </div>
         )}
@@ -426,15 +425,25 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           />
 
           <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
-            placeholder={mode === "signup" ? "At least 8 characters with letters and numbers" : undefined}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
+              placeholder={mode === "signup" ? "At least 8 characters with letters and numbers" : undefined}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-pressed={showPassword}
+              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
           {mode === "signup" && <PasswordGuidance password={password} />}
 
@@ -491,7 +500,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading || googleLoading}>
-            {loading ? "Please wait ..." : mode === "login" ? "Log in" : "Sign up"}
+            {loading ? "Please wait ..." : mode === "login" ? "Log in" : "Create account & start 7-day trial"}
           </button>
         </form>
 
