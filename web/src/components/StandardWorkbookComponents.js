@@ -312,7 +312,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
     >
       <WorkbookTabNav
         activeTab={activeTab}
-        onChange={onChange}
+        onChange={selectAdvancedTab}
         tabs={rotatingTabs}
         ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
         renderLegacyGrammarPanel={false}
