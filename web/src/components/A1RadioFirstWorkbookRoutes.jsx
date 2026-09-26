@@ -76,8 +76,10 @@ export default function A1RadioFirstWorkbookRoutes() {
   const location = useLocation();
   const route = resolveA1RadioFirstWorkbookRoute(location.pathname, location.search);
   const completed = hasCompletedA1RadioFirstStep(location.search);
+  const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
+  const forceRadio = requestedView === "radio";
   const resource = route ? getA1RadioResource(route.day, route.chapter) : null;
-  const shouldShow = Boolean(route && resource && !completed);
+  const shouldShow = Boolean(route && resource && (forceRadio || !completed));
 
   useEffect(() => {
     if (!shouldShow || typeof document === "undefined") return undefined;
