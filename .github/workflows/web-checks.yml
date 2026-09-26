@@ -67,7 +67,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/components/UniversalLessonSectionDeepLinks.test.jsx src/components/RadioFirstWorkbookGate.test.js src/data/falowenPublicHelpDiscovery.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/UniversalLessonSectionDeepLinks.test.jsx src/components/RadioFirstWorkbookGate.test.js src/components/SelfLearningLessonRegistry.test.js src/data/falowenPublicHelpDiscovery.test.js
 
   tutor-marked-assignment-integrity:
     runs-on: ubuntu-latest
