@@ -15,7 +15,8 @@
     "If a route depends on level or access, explain the relevant prerequisite briefly.",
     "For private account state, explain where to check it rather than claiming to know it.",
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
-    "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio."
+    "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
+    "Never infer a specific learner's access, payment, marking, attendance or completion state from public navigation data. Inside authenticated Falowen support, use the protected learner-state service and follow its nextAction."
   ],
   "navigation": [
     {
