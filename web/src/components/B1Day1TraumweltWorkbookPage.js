@@ -196,7 +196,6 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
-  const [writingView, setWritingView] = useState("schreiben");
   const mark = setPreparedFor;
   return (
     <>
@@ -266,80 +265,37 @@ const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             title="Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?"
             submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
           >
-            <p style={mobileTextStyle}>
-              Schreiben Sie Ihre <strong>eigene Meinung</strong> zur Frage, ob persönlicher Kontakt im Traumberuf wichtiger ist als flexible Arbeit im Homeoffice. Sagen Sie klar, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist, nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre Meinung.
-            </p>
+            <ol style={listSpacing}>
+              <li>Sagen Sie, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist.</li>
+              <li>Nennen Sie einen Vorteil oder Nachteil von Homeoffice.</li>
+              <li>Begründen Sie Ihre Meinung.</li>
+            </ol>
           </WorkbookTaskCard>
 
-          <img
-            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
-            alt="Student writing a B1 opinion text"
-            loading="lazy"
-            style={tabImageStyle}
+          <B1WritingWorkspace
+            writingContext={{
+              level: "B1",
+              courseLevel: "B1",
+              day: 1,
+              lessonId: "B1-day-1",
+              workbookId: "B1-day-1",
+              writingTaskId: "B1-day-1-teil-2-writing",
+              taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
+              taskPoints: [
+                "Sagen Sie, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist.",
+                "Nennen Sie einen Vorteil oder Nachteil von Homeoffice.",
+                "Begründen Sie Ihre Meinung.",
+              ],
+              draftPlaceholder: "Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...",
+            }}
           />
-
-          <div style={questionCardStyle}>
-            <strong>Beispielmeinung aus dem Online-Gästebuch</strong>
-            <p style={{ ...mobileTextStyle, color: "#475569" }}>
-              Lesen Sie Tanjas Meinung als Beispiel. Sie müssen nicht direkt darauf reagieren.
-            </p>
-            <p style={mobileTextStyle}>
-              Tanja: „Ich finde es wichtig, dass man im Traumberuf mit anderen Menschen in Kontakt steht. Aber heute arbeiten viele im Homeoffice, und oft haben sie wenig persönlichen Kontakt mit Kollegen. Meiner Meinung nach kann das den Beruf nicht so erfüllend machen wie bei direkter Zusammenarbeit im Büro.“
-            </p>
-          </div>
-
-          <div style={writingTabsWrapStyle}>
-            <button type="button" style={writingSubTabButtonStyle(writingView === "schreiben")} onClick={() => setWritingView("schreiben")}>Schreiben</button>
-            <button type="button" style={writingSubTabButtonStyle(writingView === "cheatSheet")} onClick={() => setWritingView("cheatSheet")}>Cheat sheet</button>
-          </div>
-
-          {writingView === "schreiben" && (
-            <B1WritingWorkspace
-              writingContext={{
-                level: "B1",
-                courseLevel: "B1",
-                day: 1,
-                lessonId: "B1-day-1",
-                workbookId: "B1-day-1",
-                writingTaskId: "B1-day-1-teil-2-writing",
-                taskTitle: "Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?",
-                taskPoints: [
-                  "Äußern Sie Ihre eigene Meinung zur Leitfrage.",
-                  "Sagen Sie, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist.",
-                  "Nennen Sie Vorteile oder Nachteile von Homeoffice und begründen Sie Ihre Meinung.",
-                ],
-                draftPlaceholder: "Liebe Forum-Mitglieder,\n\nich bin der Meinung, dass ...",
-              }}
-            />
-          )}
-
-          {writingView === "cheatSheet" && (
-            <div style={writingPanelStyle}>
-              <strong>Cheat sheet · Writing support template</strong>
-              <p style={templateTextStyle}>{`Liebe Forum-Mitglieder,
-
-heutzutage ist das Thema [Thema] ein sehr wichtiges Thema in unserem Leben. Ich bin der Meinung, dass [Ihre Meinung], weil [Begründung].
-
-Einerseits gibt es viele Vorteile. Zum Beispiel [Modalverb/Verb] [weitere Information].
-
-Andererseits gibt es auch Nachteile. Ein Beispiel dafür sind [Nomen], wie [weitere Information].
-
-Ich glaube, dass [Ihre abschließende Meinung].
-
-Zusammenfassend lässt sich sagen, dass [Thema] unser Leben positiv/negativ beeinflussen kann.
-Ich hoffe, dass meine Meinung hilft, das Thema zu verstehen.
-
-Mit freundlichen Grüßen
-[Ihr Name]`}</p>
-            </div>
-          )}
 
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </section>
       )}
 
-{activeTab === "lesen" && (
+      {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
