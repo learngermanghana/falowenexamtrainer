@@ -44,6 +44,7 @@ describe("self-learning lesson Falowen Radio integration", () => {
   test("direct C1 workbook navigation skips a repeated Radio entrance", () => {
     expect(shouldSkipSelfLearningRadio("C1", "?radio=done")).toBe(true);
     expect(shouldSkipSelfLearningRadio("C1", "?view=write&radio=done")).toBe(true);
+    expect(shouldSkipSelfLearningRadio("C1", "?view=radio&radio=done")).toBe(false);
     expect(shouldSkipSelfLearningRadio("C1", "")).toBe(false);
     expect(shouldSkipSelfLearningRadio("B2", "?radio=done")).toBe(false);
   });
