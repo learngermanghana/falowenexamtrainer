@@ -64,9 +64,10 @@ const SmartResumeCard = () => {
     };
   }, [resume]);
 
-  const action = supportAction || rawResumeAction;
-  const learningAction = ["resume-learning", "continue-course", "review-and-retry"].includes(action?.type)
-    ? action
+  const learningAction = supportAction
+    ? (["resume-learning", "continue-course", "review-and-retry"].includes(supportAction.type)
+        ? supportAction
+        : null)
     : rawResumeAction;
 
   if (loading || error || !resume || !learningAction?.url) return null;
