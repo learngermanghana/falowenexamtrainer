@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { normalizeA2B1SectionView, normalizeAdvancedSectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
