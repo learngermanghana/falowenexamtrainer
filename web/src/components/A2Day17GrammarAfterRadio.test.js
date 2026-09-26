@@ -22,11 +22,15 @@ describe("A2 Day 17 grammar after Falowen Radio", () => {
     );
   });
 
-  test("radio-complete workbook opens Grammar first instead of hiding the updated notes in Teil 1", () => {
-    const source = read("A2Day17InDieApothekeGehenWorkbookPage.js");
-    expect(source).toContain('get("radio") === "done"');
-    expect(source).toContain('useState(() => (radioCompleted ? "grammar" : "sprechen"))');
-    expect(source).toContain('if (radioCompleted) setActiveTab("grammar")');
-    expect(source).toContain("Falowen Radio complete — start with the Grammar notes");
+  test("radio-complete behavior lives in the shared A2 workbook shell", () => {
+    const day17 = read("A2Day17InDieApothekeGehenWorkbookPage.js");
+    const shared = read("A2StandardTabbedWorkbookPage.js");
+
+    expect(day17).toContain("A2StandardTabbedWorkbookPage");
+    expect(day17).toContain("openGrammarAfterRadio");
+    expect(shared).toContain('get("radio") === "done"');
+    expect(shared).toContain('radioCompleted ? "grammar" : "sprechen"');
+    expect(shared).toContain('if (radioCompleted) setActiveTab("grammar")');
+    expect(shared).toContain("Falowen Radio complete");
   });
 });

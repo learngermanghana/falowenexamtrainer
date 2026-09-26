@@ -23,22 +23,25 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     });
   });
 
-  test("keeps Day 13 focused on Vorstellungsgespräch content", () => {
-    const wrapper = readComponent("A2Day13VorstellungsgespraechWorkbookPage.js");
+  test("keeps Day 13 focused on Vorstellungsgespräch through the shared shell", () => {
+    const source = readComponent("A2Day13VorstellungsgespraechWorkbookPage.js");
 
-    expect(wrapper).toContain("patchReadingContent");
-    expect(wrapper).toContain("Tipps für ein erfolgreiches Vorstellungsgespräch");
-    expect(wrapper).toContain("Fragen Sie nach den Arbeitszeiten, den Aufgaben oder den Weiterbildungsmöglichkeiten.");
-    expect(wrapper).toContain("readingHeading.textContent = DAY13_READING_TITLE");
-    expect(wrapper).toContain("if (readingText?.tagName === \"P\") readingText.textContent = DAY13_READING_TEXT");
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("day={13}");
+    expect(source).toContain('chapter="5.13"');
+    expect(source).toContain('title="Ein Vorstellungsgespräch"');
+    expect(source).toContain('hoerenAudioUrl="https://youtu.be/kr9Rj2j-ghw"');
+    expect(source).not.toMatch(/patchReadingContent|WorkbookPageLegacy|MutationObserver/);
   });
 
-  test("keeps Day 14 grammar and submission locked to 5.14", () => {
+  test("keeps Day 14 on the shared shell and intentionally without Hören", () => {
     const source = readComponent("A2Day14BerufUndKarriereWorkbookPage.js");
 
-    expect(source).toContain('<A2B1GrammarNotesTab level="A2" day={14} />');
-    expect(source).toContain('assignmentKey: "A2-5.14"');
-    expect(source).toContain('canonicalAssignmentKey: "A2-5.14"');
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("day={14}");
+    expect(source).toContain('chapter="5.14"');
+    expect(source).toContain('workbookId="A2Day14BerufUndKarriere"');
+    expect(source).toContain("showHoeren={false}");
   });
 
   test("moves Day 15 onto the standard shell with canonical chapter 6.15", () => {
@@ -59,13 +62,16 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain('chapter="6.16"');
   });
 
-  test("renders Day 17 grammar after Falowen Radio instead of a blank tab", () => {
+  test("renders Day 17 through the shared shell and preserves Radio-to-Grammar handoff", () => {
     const source = readComponent("A2Day17InDieApothekeGehenWorkbookPage.js");
+    const shared = readComponent("A2StandardTabbedWorkbookPage.js");
 
-    expect(source).toContain('radioCompleted ? "grammar" : "sprechen"');
-    expect(source).toContain('<A2B1GrammarNotesTab level="A2" day={17} />');
-    expect(source).toContain('assignmentKey: "A2-6.17"');
-    expect(source).toContain('canonicalAssignmentKey: "A2-6.17"');
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("day={17}");
+    expect(source).toContain('chapter="6.17"');
+    expect(source).toContain("openGrammarAfterRadio");
+    expect(shared).toContain('radioCompleted ? "grammar" : "sprechen"');
+    expect(shared).toContain('if (radioCompleted) setActiveTab("grammar")');
   });
 
   test("keeps Day 18 on the standard shell with canonical chapter 7.18", () => {
