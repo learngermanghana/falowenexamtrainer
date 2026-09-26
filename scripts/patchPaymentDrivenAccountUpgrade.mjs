@@ -191,12 +191,19 @@ function patchAccountSettings() {
     `const ${MARKER} = true;\n\nconst formatDate = (value) => {\n`,
     "AccountSettings marker",
   );
-  content = replaceOnce(
-    content,
-    '  const { user, studentProfile, saveStudentProfile } = useAuth();\n',
-    '  const { user, studentProfile, idToken } = useAuth();\n',
-    "AccountSettings auth values",
-  );
+  if (content.includes('  const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();\n')) {
+    content = content.replace(
+      '  const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();\n',
+      '  const { user, studentProfile, idToken, refreshStudentProfile } = useAuth();\n',
+    );
+  } else {
+    content = replaceOnce(
+      content,
+      '  const { user, studentProfile, saveStudentProfile } = useAuth();\n',
+      '  const { user, studentProfile, idToken } = useAuth();\n',
+      "AccountSettings auth values",
+    );
+  }
 
   const oldBilling = `  const billingSummary = useMemo(() => {\n    const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);\n    const tuition = Math.max(Number(studentProfile?.tuitionFee ?? getTuitionFeeForLevel(studentProfile?.level)) || 0, 0);\n    const explicitBalanceRaw = studentProfile?.balanceDue ?? studentProfile?.balance;\n    const explicitBalance = explicitBalanceRaw === undefined || explicitBalanceRaw === null\n      ? null\n      : Math.max(Number(explicitBalanceRaw) || 0, 0);\n    const derivedBalance = Math.max(tuition - paid, 0);\n    const balanceDue = explicitBalance === null ? derivedBalance : Math.min(explicitBalance, derivedBalance);\n    return { paidAmount: paid, tuitionFee: tuition, balanceDue };\n  }, [studentProfile]);\n`;
   const newBilling = `  const billingSummary = useMemo(() => {\n    const upgradeStatus = String(studentProfile?.upgradeStatus || "").toLowerCase();\n    if (upgradeStatus === "pending") {\n      const tuition = Math.max(Number(studentProfile?.upgradeTuitionFee || 0) || 0, 0);\n      const paid = Math.max(Number(studentProfile?.upgradePaid || 0) || 0, 0);\n      const balanceDue = Math.max(Number(studentProfile?.upgradeBalanceDue ?? Math.max(tuition - paid, 0)) || 0, 0);\n      return { paidAmount: paid, tuitionFee: tuition, balanceDue, isUpgrade: true };\n    }\n\n    const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);\n    const tuition = Math.max(Number(studentProfile?.tuitionFee ?? getTuitionFeeForLevel(studentProfile?.level)) || 0, 0);\n    const explicitBalanceRaw = studentProfile?.balanceDue ?? studentProfile?.balance;\n    const explicitBalance = explicitBalanceRaw === undefined || explicitBalanceRaw === null\n      ? null\n      : Math.max(Number(explicitBalanceRaw) || 0, 0);\n    const derivedBalance = Math.max(tuition - paid, 0);\n    const balanceDue = explicitBalance === null ? derivedBalance : Math.min(explicitBalance, derivedBalance);\n    return { paidAmount: paid, tuitionFee: tuition, balanceDue, isUpgrade: false };\n  }, [studentProfile]);\n`;
