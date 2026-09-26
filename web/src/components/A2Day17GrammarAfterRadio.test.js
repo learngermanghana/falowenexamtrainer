@@ -6,8 +6,8 @@ import { getWorkbookTabsWithLegacyGrammar } from "./StandardWorkbookComponents";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
-describe("A2 Day 17 grammar after Falowen Radio", () => {
-  test("Day 17 workbook exposes Grammar before the standard workbook sections", () => {
+describe("A2 Day 17 standard workbook flow", () => {
+  test("Day 17 still exposes the shared Grammar tab", () => {
     const result = getWorkbookTabsWithLegacyGrammar({
       ariaLabel: "A2 Day 17 workbook sections",
     });
@@ -22,15 +22,14 @@ describe("A2 Day 17 grammar after Falowen Radio", () => {
     );
   });
 
-  test("radio-complete behavior lives in the shared A2 workbook shell", () => {
+  test("Day 17 opens like every normal A2 workbook even after radio completion", () => {
     const day17 = read("A2Day17InDieApothekeGehenWorkbookPage.js");
     const shared = read("A2StandardTabbedWorkbookPage.js");
 
     expect(day17).toContain("A2StandardTabbedWorkbookPage");
-    expect(day17).toContain("openGrammarAfterRadio");
-    expect(shared).toContain('get("radio") === "done"');
-    expect(shared).toContain('radioCompleted ? "grammar" : "sprechen"');
-    expect(shared).toContain('if (radioCompleted) setActiveTab("grammar")');
-    expect(shared).toContain("Falowen Radio complete");
+    expect(day17).not.toContain("openGrammarAfterRadio");
+    expect(shared).toContain('useState("sprechen")');
+    expect(shared).not.toContain('get("radio") === "done"');
+    expect(shared).not.toContain("radioCompleted");
   });
 });

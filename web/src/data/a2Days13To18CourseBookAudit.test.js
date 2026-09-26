@@ -62,16 +62,16 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain('chapter="6.16"');
   });
 
-  test("renders Day 17 through the shared shell and preserves Radio-to-Grammar handoff", () => {
+  test("keeps Day 17 on the normal shared workbook opening flow", () => {
     const source = readComponent("A2Day17InDieApothekeGehenWorkbookPage.js");
     const shared = readComponent("A2StandardTabbedWorkbookPage.js");
 
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain("day={17}");
     expect(source).toContain('chapter="6.17"');
-    expect(source).toContain("openGrammarAfterRadio");
-    expect(shared).toContain('radioCompleted ? "grammar" : "sprechen"');
-    expect(shared).toContain('if (radioCompleted) setActiveTab("grammar")');
+    expect(source).not.toContain("openGrammarAfterRadio");
+    expect(shared).toContain('useState("sprechen")');
+    expect(shared).not.toContain("radioCompleted");
   });
 
   test("keeps Day 18 on the standard shell with canonical chapter 7.18", () => {
