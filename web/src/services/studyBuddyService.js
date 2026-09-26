@@ -152,7 +152,7 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     `Context source: ${context.source || "page"}`,
     `Falowen access state: ${supportAccess?.state || "Not provided"}`,
     `Falowen access reason: ${supportAccess?.reason || "Not provided"}`,
-    `Course completion: ${supportCourse?.completionPercent ?? "Not provided"}%`,
+    `Course completion: ${supportCourse?.completionPercent !== null && supportCourse?.completionPercent !== undefined ? `${supportCourse.completionPercent}%` : "Not provided"}`,
     `Latest review status: ${supportReview?.status || "Not provided"}`,
     `Latest review score: ${supportReview?.score ?? "Not provided"}`,
     `Authoritative next action: ${supportNextAction?.label || "Not provided"}`,
