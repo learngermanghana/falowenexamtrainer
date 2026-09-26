@@ -11,6 +11,7 @@ describe("B2 grammar content coverage", () => {
       expect(grammar.title).toBe(alignment.grammar_topic);
       expect(grammar.context).toBe(alignment.lessonTopic);
       expect(grammar.goal).toBe(alignment.goal);
+      expect(grammar.whyThisGrammar.length).toBeGreaterThan(90);
       expect(grammar.focuses.length).toBeGreaterThanOrEqual(2);
       expect(grammar.modelSentence.length).toBeGreaterThan(45);
       expect(grammar.miniExercise.length).toBeGreaterThan(70);
@@ -26,15 +27,33 @@ describe("B2 grammar content coverage", () => {
     });
   });
 
+  test("updated B2 topics use grammar with a clear communicative purpose", () => {
+    expect(getB2GrammarLesson(5).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["während / wohingegen", "je ... desto", "Konjunktiv II"]),
+    );
+    expect(getB2GrammarLesson(6).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["Passiv", "Modalpassiv", "falls / sofern", "wodurch / sodass"]),
+    );
+    expect(getB2GrammarLesson(8).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["um ... zu / damit", "Passiv", "Modalpassiv", "Nominalisierung"]),
+    );
+    expect(getB2GrammarLesson(18).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["je ... desto", "Passiv", "Modalpassiv", "Nominalisierung"]),
+    );
+    expect(getB2GrammarLesson(21).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["falls / sofern", "Passiv", "Modalpassiv", "Konjunktiv II", "indem / dadurch, dass"]),
+    );
+  });
+
   test("representative days teach the structures named by the curriculum", () => {
     expect(getB2GrammarLesson(2).focuses.map((item) => item.title)).toEqual(
-      expect.arrayContaining(["Passiv", "Modalpassiv", "Nominalisierung", "Relativsätze"]),
+      expect.arrayContaining(["Passiv", "Modalpassiv", "Nominalisierung"]),
     );
     expect(getB2GrammarLesson(7).focuses.map((item) => item.title)).toEqual(
       expect.arrayContaining(["Relativsätze mit Präpositionen", "Konjunktiv II"]),
     );
     expect(getB2GrammarLesson(14).focuses.map((item) => item.title)).toEqual(
-      expect.arrayContaining(["indirekte Rede und Quellenangaben", "Passiv", "zwar ... jedoch"]),
+      expect.arrayContaining(["indirekte Rede und Quellenangaben", "obwohl / trotz", "zwar ... jedoch"]),
     );
     expect(getB2GrammarLesson(26).focuses.map((item) => item.title)).toEqual(
       expect.arrayContaining(["obwohl / trotz", "obgleich", "während / wohingegen", "Relativsätze mit Präpositionen"]),

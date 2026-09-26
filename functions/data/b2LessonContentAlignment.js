@@ -17,7 +17,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Mülltrennung, Recycling und Kreislaufwirtschaft",
     lessonTopic: "Recyclingprozesse, Wiederverwendung und Kreislaufwirtschaft",
     goal: "Recyclingprozesse und Wiederverwendung sachlich beschreiben und bewerten.",
-    grammar_topic: "Passiv und Modalpassiv · Nominalisierung · Relativsätze",
+    grammar_topic: "Passiv und Modalpassiv · Nominalisierung",
   }),
   3: Object.freeze({
     day: 3,
@@ -25,7 +25,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Lebensmittelverschwendung und nachhaltiger Konsum",
     lessonTopic: "Lebensmittel retten, Konsum planen und Verschwendung reduzieren",
     goal: "Ursachen und Lösungen für Lebensmittelverschwendung differenziert diskutieren.",
-    grammar_topic: "je ... desto · obwohl / trotz · indem / ohne ... zu / statt ... zu",
+    grammar_topic: "je ... desto · obwohl / trotz · ohne ... zu / statt ... zu",
   }),
   4: Object.freeze({
     day: 4,
@@ -33,7 +33,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Plastik, Verpackungen und bewusster Einkauf",
     lessonTopic: "Verpackungsmüll, Mehrweg und bewusste Kaufentscheidungen",
     goal: "Alternativen zu Einwegverpackungen vergleichen und ihre Vorteile begründen.",
-    grammar_topic: "ohne ... zu / statt ... zu · nicht nur ... sondern auch · indem / dadurch / wodurch",
+    grammar_topic: "ohne ... zu / statt ... zu · nicht nur ... sondern auch · indem / dadurch, dass",
   }),
   5: Object.freeze({
     day: 5,
@@ -41,7 +41,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Nachhaltige Mobilität und öffentlicher Verkehr",
     lessonTopic: "Bus, Bahn, Fahrrad, Auto und nachhaltige Stadtmobilität",
     goal: "Verkehrsmittel vergleichen und Maßnahmen für nachhaltige Mobilität begründen.",
-    grammar_topic: "während / wohingegen · je ... desto · indem / dadurch, dass",
+    grammar_topic: "während / wohingegen · je ... desto · Konjunktiv II",
   }),
   6: Object.freeze({
     day: 6,
@@ -49,7 +49,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Energie sparen und erneuerbare Energien",
     lessonTopic: "Energieverbrauch, erneuerbare Energien und praktische Einsparmaßnahmen",
     goal: "Energiepolitik, Verbrauch und erneuerbare Lösungen sachlich diskutieren.",
-    grammar_topic: "Passiv und Modalpassiv · Nominalisierung · obwohl / trotz · sodass / wodurch",
+    grammar_topic: "Passiv und Modalpassiv · falls / sofern · wodurch / sodass",
   }),
   7: Object.freeze({
     day: 7,
@@ -57,7 +57,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Klimafreundliches Wohnen und grüne Städte",
     lessonTopic: "Energieeffiziente Gebäude, Grünflächen und nachhaltige Stadtentwicklung",
     goal: "Klimafreundliches Wohnen beschreiben und realistische Stadtmaßnahmen vorschlagen.",
-    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · sodass / obwohl / trotz",
+    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · wodurch / sodass",
   }),
   8: Object.freeze({
     day: 8,
@@ -65,7 +65,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Bildungsgerechtigkeit und Zugang zu Bildung",
     lessonTopic: "Chancengleichheit, Förderung und Zugang zu Schule und Hochschule",
     goal: "Ungleiche Bildungschancen erklären und konkrete Fördermaßnahmen begründen.",
-    grammar_topic: "um ... zu / damit · indem / dadurch, dass · Nominalisierung",
+    grammar_topic: "um ... zu / damit · Passiv und Modalpassiv · Nominalisierung",
   }),
   9: Object.freeze({
     day: 9,
@@ -97,7 +97,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Studium, Studiengebühren und lebenslanges Lernen",
     lessonTopic: "Hochschulzugang, Finanzierung, Weiterbildung und Chancengleichheit",
     goal: "Studienfinanzierung und Weiterbildung mit Vor- und Nachteilen argumentativ bewerten.",
-    grammar_topic: "obwohl / trotz / zwar ... jedoch · je ... desto · Nominalisierung · Konjunktiv II",
+    grammar_topic: "zwar ... jedoch · je ... desto · obwohl / trotz · Konjunktiv II",
   }),
   13: Object.freeze({
     day: 13,
@@ -113,7 +113,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Wissenschaft, Desinformation und verlässliche Quellen",
     lessonTopic: "Quellen prüfen, Forschung einordnen und Desinformation erkennen",
     goal: "Quellen und wissenschaftliche Aussagen kritisch einordnen und Einschränkungen formulieren.",
-    grammar_topic: "indirekte Rede und Quellenangaben · Passiv · obwohl / zwar ... jedoch",
+    grammar_topic: "indirekte Rede und Quellenangaben · obwohl / zwar ... jedoch",
   }),
   15: Object.freeze({
     day: 15,
@@ -145,7 +145,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Arbeitswelt, Fachkräftemangel und Weiterbildung",
     lessonTopic: "Qualifikation, Weiterbildung, Fachkräfte und Wandel am Arbeitsmarkt",
     goal: "Fachkräftemangel und Weiterbildung mit Ursachen, Folgen und Maßnahmen diskutieren.",
-    grammar_topic: "je ... desto · damit / um ... zu · Passiv · Nominalisierung",
+    grammar_topic: "je ... desto · Passiv und Modalpassiv · Nominalisierung",
   }),
   19: Object.freeze({
     day: 19,
@@ -169,7 +169,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Künstliche Intelligenz in Schule und Universität",
     lessonTopic: "KI beim Lernen, Regeln, Quellenprüfung und akademische Verantwortung",
     goal: "Chancen und Grenzen von KI in Bildung begründen und sinnvolle Regeln vorschlagen.",
-    grammar_topic: "Passiv · indem / dadurch, dass · sofern · Konjunktiv II",
+    grammar_topic: "falls / sofern · Passiv und Modalpassiv · Konjunktiv II · indem / dadurch, dass",
   }),
   22: Object.freeze({
     day: 22,
@@ -193,7 +193,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Digitale Gesundheit, Telemedizin und medizinische Technologie",
     lessonTopic: "Gesundheitsdaten, Telemedizin, Versorgung und digitale Systeme",
     goal: "Digitale Gesundheitsangebote mit Chancen, Bedingungen und Risiken diskutieren.",
-    grammar_topic: "Passiv und Modalpassiv · indem / dadurch, dass · sofern · sodass / wodurch",
+    grammar_topic: "Passiv und Modalpassiv · indem / dadurch, dass · sofern · wodurch / sodass",
   }),
   25: Object.freeze({
     day: 25,
