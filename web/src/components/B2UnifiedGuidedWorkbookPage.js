@@ -332,6 +332,7 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       writingTaskType: writingTask.taskType,
       writingTopic: writingTask.lead,
       writingPromptBullets: [...writingTask.bullets],
+      questions: [],
     };
   }, [writingLesson, writingTask]);
   const skillFocus = getB2SkillFocus(day);
