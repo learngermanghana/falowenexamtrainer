@@ -13,7 +13,9 @@ const read = (file) => fs.readFileSync(file, "utf8");
 
 const normalize = (value = "") =>
   String(value)
-    .normalize("NFKC")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ß/g, "ss")
     .toLowerCase()
     .replace(/[“”„\"'’`]/g, "")
     .replace(/[.,;:!?()[\]{}]/g, " ")
@@ -174,7 +176,7 @@ const resolveQuestionArray = (source, values, propName) => {
   if (prop.error) return { present: true, questions: null, error: prop.error };
 
   const expression = prop.expression;
-  if (/^[A-Za-z_$][\\w$]*$/.test(expression)) {
+  if (/^[A-Za-z_$][\w$]*$/.test(expression)) {
     const questions = values[expression];
     return Array.isArray(questions)
       ? { present: true, questions }
