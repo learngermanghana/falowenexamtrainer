@@ -190,6 +190,7 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
         resource={radio}
         actionLabel={isContinuing ? "Opening workbook…" : "Continue to workbook →"}
         actionDisabled={isContinuing}
+        persistCompletionInUrl={false}
         onContinue={handleContinue}
       />
     </div>
