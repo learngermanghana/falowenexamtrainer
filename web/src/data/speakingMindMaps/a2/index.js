@@ -298,6 +298,54 @@ const apothekeBranches = [
   ),
 ];
 
+const wochePlanenBranches = [
+  branch(
+    "wochenstart",
+    "1. Wochenstart",
+    "topic",
+    ["Montag", "Dienstag", "Arbeit", "Schule"],
+    "Wie beginnt deine Woche?",
+    "Am Montag ... / Zu Beginn der Woche ...",
+    "Am Montag arbeite ich bis 17 Uhr, und am Dienstag habe ich am Vormittag Unterricht.",
+  ),
+  branch(
+    "termine",
+    "2. Termine",
+    "detail",
+    ["Termin", "Arzt", "Deutschkurs", "Uhrzeit"],
+    "Welche festen Termine hast du?",
+    "Am ... habe ich ... / Um ... Uhr muss ich ...",
+    "Am Mittwoch habe ich um 10 Uhr einen Arzttermin, und um 18 Uhr muss ich zum Deutschkurs gehen.",
+  ),
+  branch(
+    "freizeit",
+    "3. Freizeit",
+    "example",
+    ["Freunde", "Sport", "Familie", "frei"],
+    "Wann hast du Freizeit und was möchtest du machen?",
+    "Am ... kann ich ... / Danach möchte ich ...",
+    "Donnerstagabend kann ich Freunde treffen, und danach möchte ich noch kurz spazieren gehen.",
+  ),
+  branch(
+    "organisation",
+    "4. Organisation",
+    "detail",
+    ["Kalender", "zuerst", "danach", "planen"],
+    "Wie organisierst du deine Woche?",
+    "Zuerst ... Danach ... / Ich trage ... in meinen Kalender ein.",
+    "Ich trage wichtige Termine in meinen Kalender ein. Zuerst plane ich die Arbeit, danach meine Freizeit.",
+  ),
+  branch(
+    "alternative",
+    "5. Alternative",
+    "closing",
+    ["passt", "leider nicht", "Wie wäre es", "Treffen"],
+    "Wie reagierst du, wenn ein vorgeschlagener Termin nicht passt?",
+    "Da kann ich leider nicht. Wie wäre es mit ...?",
+    "Am Freitag kann ich leider nicht. Wie wäre es mit Samstag um 15 Uhr?",
+  ),
+];
+
 const topics = [
   [1, "a2-day-1-small-talk", "Small Talk", "Wie führst du ein kurzes freundliches Gespräch?", ["Begrüßung", "Kennenlernen", "Arbeit oder Studium", "Freizeit", "Gespräch beenden"], earlyA2LessonBranchesByDay[1]],
   [2, "a2-day-2-personen-beschreiben", "Deine Beschreibung", "Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?", ["Aussehen", "Charakter", "Kleidung", "Besondere Merkmale"], personenBeschreibenBranches],
@@ -320,7 +368,7 @@ const topics = [
   [19, "a2-day-19-einkaufen", "Einkaufen: wo und wie?", "Wo kaufst du gern ein und warum?", ["Geschäft", "Produkte", "Preis", "Qualität", "Meinung"]],
   [20, "a2-day-20-reklamation", "Reklamationssituationen", "Wie reklamierst du ein Problem höflich?", ["Produkt", "Problem", "Wunsch", "Beleg", "Lösung"]],
   [21, "a2-day-21-wochenende", "Ein Wochenende planen", "Was planst du für das Wochenende?", ["Tag", "Aktivität", "Personen", "Ort", "Plan B"]],
-  [22, "a2-day-22-woche", "Die Woche planen", "Wie planst du deine Woche?", ["Wochentage", "Arbeit", "Freizeit", "Hausarbeit", "Termine"]],
+  [22, "a2-day-22-woche", "Die Woche planen", "Wie planst du deine Woche?", ["Wochentage", "Arbeit", "Freizeit", "Hausarbeit", "Termine"], wochePlanenBranches],
   [23, "a2-day-23-schulweg-arbeitsweg", "Weg zur Schule oder Arbeit", "Wie kommst du zur Schule oder zur Arbeit?", ["Verkehrsmittel", "Dauer", "Route", "Kosten", "Problem"]],
   [24, "a2-day-24-urlaub-planen", "Einen Urlaub planen", "Wie planst du deinen nächsten Urlaub?", ["Reiseziel", "Unterkunft", "Transport", "Aktivitäten", "Budget"]],
   [25, "a2-day-25-tagesablauf", "Tagesablauf", "Wie sieht dein normaler Tag aus?", ["Morgen", "Mittag", "Nachmittag", "Abend", "Routine"]],
