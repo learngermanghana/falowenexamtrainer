@@ -14,10 +14,6 @@ export default function A2Day24EinenUrlaubPlanenWorkbookPage() {
       topicPrompt="Plane einen Urlaub. Nenne Reiseziel, Zeitraum, Budget, Transport, Unterkunft, Aktivitäten und wichtige Vorbereitungen."
       schreibenTask="Sie möchten zusammen mit Sandra einen Urlaub planen. Schreiben Sie ihr eine E-Mail. Laden Sie sie zur gemeinsamen Planung ein, schlagen Sie einen Termin und Treffpunkt vor und fragen Sie nach ihrer Meinung zu Reiseziel, Transport oder Unterkunft."
       schreibenPlaceholder="Liebe Sandra,\n\nich möchte gern unseren Urlaub planen. Hast du ..."
-      hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
-      hoerenAudioUrl="https://youtu.be/iPScKV6JWaA"
-      hoerenQuestions={[]}
-      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
