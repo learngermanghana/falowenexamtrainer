@@ -11,6 +11,8 @@ import {
 } from "./StandardWorkbookComponents";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { styles } from "../styles";
+import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 
 const card = {
   ...styles.card,
@@ -175,6 +177,20 @@ const getYouTubeEmbedUrl = (listening = {}) => {
   return `https://www.youtube-nocookie.com/embed/${listening.videoId}?rel=0&playsinline=1`;
 };
 
+export const resolveB1CanonicalAssignmentSections = (config = {}) => {
+  const canonicalWriting = getB1WritingTask(config.day);
+  const canonicalReading = getB1ReadingTask(config.day);
+
+  return {
+    writing: canonicalWriting
+      ? { ...(config.writing || {}), ...canonicalWriting }
+      : (config.writing || {}),
+    reading: canonicalReading
+      ? { ...(config.reading || {}), ...canonicalReading }
+      : (config.reading || {}),
+  };
+};
+
 export default function B1StandardWorkbookPage({ config, renderSections = null }) {
   const [activeTab, setActiveTab] = useState("grammar");
   const [prepared, setPrepared] = useState({
@@ -188,8 +204,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
     setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
 
   const speaking = config.speaking || {};
-  const writing = config.writing || {};
-  const reading = config.reading || {};
+  const { writing, reading } = resolveB1CanonicalAssignmentSections(config);
   const listening = config.listening || { status: "planned" };
   const embedUrl = getYouTubeEmbedUrl(listening);
   const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
