@@ -39,20 +39,20 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
       "A2 Day 25 workbook sections",
       "A2 Day 26 workbook sections",
       "A2 Day 27 workbook sections",
-      "B1 Day 24 workbook sections",
+      "A2 Day 28 workbook sections",
     ].forEach((ariaLabel) => {
       const resolved = getWorkbookTabsWithLegacyGrammar({
         tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
         ariaLabel,
       });
 
-      expect(resolved.tabs.map((tab) => tab.key)).not.toContain("grammar");
+      expect(resolved.tabs.map((tab) => tab.key)).toContain("grammar");
     });
 
     expect(getWorkbookTabsWithLegacyGrammar({
-      tabs: STANDARD_WORKBOOK_TABS,
-      ariaLabel: "A2 Day 28 workbook sections",
-    }).tabs[0].key).toBe("grammar");
+      tabs: A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
+      ariaLabel: "B1 Day 24 workbook sections",
+    }).tabs.map((tab) => tab.key)).not.toContain("grammar");
   });
 
   it("resolves workbook days from both legacy A2 slugs and B1 lesson routes", () => {
@@ -120,11 +120,8 @@ describe("A2/B1 legacy workbook grammar-tab regression", () => {
   });
 
   it("keeps late A2 grammar availability aligned with the shared registry", () => {
-    [17, 18, 19, 20, 21, 22, 23, 24, 28].forEach((day) => {
+    [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28].forEach((day) => {
       expect(getA2B1GrammarNotesComponent("A2", day)).not.toBeNull();
-    });
-    [25, 26, 27].forEach((day) => {
-      expect(getA2B1GrammarNotesComponent("A2", day)).toBeNull();
     });
 
     expect(read("A2LegacyStandardWorkbookNavigationImpl.js")).toContain('return "grammar"');

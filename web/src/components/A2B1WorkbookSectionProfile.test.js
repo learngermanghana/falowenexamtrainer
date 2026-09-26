@@ -31,8 +31,8 @@ describe("A2/B1 workbook section profiles", () => {
 
     expect(profile.listening).toBe(false);
     expect(profile.part4).toBe("reading");
-    expect(profile.grammar).toBe(false);
-    expect(tabs.map((tab) => tab.key)).not.toContain("grammar");
+    expect(profile.grammar).toBe(true);
+    expect(tabs.map((tab) => tab.key)).toContain("grammar");
     expect(part4).toMatchObject({ label: "Teil 4", description: "Lesen" });
   });
 
