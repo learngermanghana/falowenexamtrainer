@@ -8,12 +8,17 @@ export const TRIAL_RETENTION_MS = 30 * DAY_MS;
 export const TRIAL_ENDING_SOON_MS = 2 * DAY_MS;
 export const TRIAL_RETENTION_ENDING_SOON_MS = 3 * DAY_MS;
 
-const resolveTrialStartMs = (studentProfile = {}) => {
+const resolveExplicitTrialStartMs = (studentProfile = {}) => {
   const startedAtMs = toDateMs(studentProfile?.trialStartedAt);
   if (Number.isFinite(startedAtMs)) return startedAtMs;
 
   const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
-  if (Number.isFinite(usedAtMs)) return usedAtMs;
+  return Number.isFinite(usedAtMs) ? usedAtMs : Number.NaN;
+};
+
+const resolveTrialStartMs = (studentProfile = {}) => {
+  const explicitStartMs = resolveExplicitTrialStartMs(studentProfile);
+  if (Number.isFinite(explicitStartMs)) return explicitStartMs;
 
   const joinedAtMs = toDateMs(studentProfile?.joined_at || studentProfile?.joinedAt);
   return Number.isFinite(joinedAtMs) ? joinedAtMs : Number.NaN;
@@ -71,9 +76,9 @@ export const getTrialLifecycleState = (studentProfile = {}, nowMs = Date.now()) 
   const purgeAtMs = purgeAt.value;
   const trialStatus = String(studentProfile?.trialStatus || "").trim().toLowerCase();
   const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
-  const startedAtMs = resolveTrialStartMs(studentProfile);
+  const explicitStartedAtMs = resolveExplicitTrialStartMs(studentProfile);
   const wasUsed =
-    Number.isFinite(startedAtMs) ||
+    Number.isFinite(explicitStartedAtMs) ||
     Number.isFinite(usedAtMs) ||
     Number.isFinite(endsAtMs) ||
     ["expired", "used", "ended"].includes(trialStatus);
