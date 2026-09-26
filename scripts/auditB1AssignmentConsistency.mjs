@@ -110,7 +110,7 @@ const extractConfigChapter = (combinedSource) =>
 const CUSTOM_BASELINE_DAYS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 11, 19, 20, 22]);
 const LEGACY_PROXY_BASELINE_DAYS = new Set([1, 3, 6, 22]);
 const DOM_PATCH_BASELINE_DAYS = new Set([1, 21]);
-const PLANNED_BASELINE_DAYS = new Set([23]);
+const PLANNED_BASELINE_COUNTS = new Map([[23, 1]]);
 
 const liveRows = [];
 
@@ -130,7 +130,7 @@ for (const route of routeEntries) {
   const combinedSource = chain.map((entry) => entry.source).join("\n");
   const usesSharedShell = combinedSource.includes("B1StandardWorkbookPage");
   const usesLegacyProxy = chain.length > 1 || /WorkbookPageLegacy|WorkbookPageV2/.test(chain[0].source);
-  const usesDomPatch = /MutationObserver|useLayoutEffect|document\.querySelector|querySelectorAll/.test(chain[0].source);
+  const usesDomPatch = /MutationObserver|useLayoutEffect|document\.querySelector|querySelectorAll/.test(combinedSource);
   const plannedCount = (combinedSource.match(/status\s*:\s*"planned"/g) || []).length;
   const assignmentKey = extractAssignmentKey(combinedSource);
   const configDay = extractConfigDay(combinedSource);
@@ -181,11 +181,18 @@ for (const route of routeEntries) {
     warn(`Day ${route.day}`, "uses DOM observer/layout patching instead of declarative shared-shell configuration");
   }
 
-  if (plannedCount && !PLANNED_BASELINE_DAYS.has(route.day)) {
-    fail(`Day ${route.day}`, `unexpected planned placeholder section(s): ${plannedCount}`);
+  const allowedPlannedCount = PLANNED_BASELINE_COUNTS.get(route.day) || 0;
+  if (plannedCount > allowedPlannedCount) {
+    fail(
+      `Day ${route.day}`,
+      `planned placeholder count increased from baseline ${allowedPlannedCount} to ${plannedCount}`,
+    );
   }
   if (plannedCount) {
-    warn(`Day ${route.day}`, `${plannedCount} planned placeholder section remains`);
+    warn(
+      `Day ${route.day}`,
+      `${plannedCount} planned placeholder section remains (baseline cap: ${allowedPlannedCount})`,
+    );
   }
 
   const readingAnswers = Object.keys(manifestEntry?.answers?.teil3 || {}).length;
@@ -212,19 +219,61 @@ for (const route of routeEntries) {
 }
 
 const grammarMapMatch = grammarSource.match(/B1:\s*\{([\s\S]*?)\n\s*\},\n\};/);
-const deepGrammarDays = new Set(
+const importedGrammarByComponent = new Map(
+  [...grammarSource.matchAll(
+    /import\s+(B1Day(\d+)\w+GrammarNotesPage)\s+from\s+"\.\/([^"]+)";/g,
+  )].map((match) => [
+    match[1],
+    {
+      day: Number(match[2]),
+      file: path.join(COMPONENT_ROOT, `${match[3]}.js`),
+    },
+  ]),
+);
+
+const mappedGrammarByDay = new Map(
   grammarMapMatch
-    ? [...grammarMapMatch[1].matchAll(/\b(\d+)\s*:/g)].map((match) => Number(match[1]))
+    ? [...grammarMapMatch[1].matchAll(/\b(\d+)\s*:\s*([A-Za-z_$][\w$]*)/g)]
+        .map((match) => [Number(match[1]), match[2]])
     : [],
 );
+
+const deepGrammarDays = new Set();
+for (const day of expectedDays) {
+  const component = mappedGrammarByDay.get(day);
+  if (!component) continue;
+
+  const imported = importedGrammarByComponent.get(component);
+  if (!imported || imported.day !== day) {
+    fail(
+      "Grammar",
+      `Day ${day} must map to its own B1Day${day}...GrammarNotesPage; found ${component}`,
+    );
+    continue;
+  }
+  if (!fs.existsSync(imported.file)) {
+    fail("Grammar", `Day ${day} mapped grammar file is missing: ${path.relative(ROOT, imported.file)}`);
+    continue;
+  }
+  deepGrammarDays.add(day);
+}
+
 const missingDeepGrammar = expectedDays.filter((day) => !deepGrammarDays.has(day));
 const expectedMissingDeepGrammar = [24, 25, 26, 27, 28];
-if (JSON.stringify(missingDeepGrammar) !== JSON.stringify(expectedMissingDeepGrammar)) {
-  const unexpected = missingDeepGrammar.filter((day) => !expectedMissingDeepGrammar.includes(day));
-  if (unexpected.length) fail("Grammar", `additional days lost day-specific grammar notes: ${unexpected.join(",")}`);
+const unexpectedMissingDeepGrammar = missingDeepGrammar.filter(
+  (day) => !expectedMissingDeepGrammar.includes(day),
+);
+if (unexpectedMissingDeepGrammar.length) {
+  fail(
+    "Grammar",
+    `additional days lost day-specific grammar notes: ${unexpectedMissingDeepGrammar.join(",")}`,
+  );
 }
 if (missingDeepGrammar.length) {
-  warn("Grammar", `no day-specific deep grammar page for Days ${missingDeepGrammar.join(", ")}; these currently fall back to the B1 topic introduction`);
+  warn(
+    "Grammar",
+    `no day-specific deep grammar page for Days ${missingDeepGrammar.join(", ")}; these currently fall back to the B1 topic introduction`,
+  );
 }
 
 const missingSheetLinks = b1Manifest
@@ -242,8 +291,9 @@ if (missingSheetLinks.length) {
 const grammarFiles = expectedDays
   .filter((day) => deepGrammarDays.has(day))
   .map((day) => {
-    const match = grammarSource.match(new RegExp(`import\\s+(B1Day${day}\\w+GrammarNotesPage)\\s+from\\s+"\\./([^"]+)";`));
-    return match ? { day, file: path.join(COMPONENT_ROOT, `${match[2]}.js`) } : null;
+    const component = mappedGrammarByDay.get(day);
+    const imported = importedGrammarByComponent.get(component);
+    return imported ? { day, file: imported.file } : null;
   })
   .filter(Boolean);
 
