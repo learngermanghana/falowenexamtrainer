@@ -23,6 +23,7 @@ export default function A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage() {
         hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
         hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"
         hoerenQuestions={[]}
+      hoerenSelfCheck
         showWorkbookGuidance={false}
       />
     </div>
