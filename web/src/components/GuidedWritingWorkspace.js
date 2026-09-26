@@ -484,7 +484,7 @@ export default function GuidedWritingWorkspace({
 
   const analyse = async () => {
     const draft = finalEssay.trim();
-    if (!draft || analysisStatus === "loading" || placeholderWarning) return;
+    if (!draft || analysisStatus === "loading" || placeholderWarning || starterEllipsisWarning) return;
 
     setAnalysisStatus("loading");
     setAnalysisError("");
