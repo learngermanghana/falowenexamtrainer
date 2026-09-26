@@ -128,6 +128,7 @@ export const B1_LISTENING_TASKS = Object.freeze({
     embedUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/preview",
     externalUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/view?usp=sharing",
     videoTitle: "B1 Day 9 Hören · Stress reduzieren",
+    submitRequired: false,
     selfCheckText: "Complete the listening task independently and mark your own answers. Only Teil 2 Schreiben and Teil 3 Lesen are submitted for tutor evaluation.",
     questions: [
       q("Was ist ein wichtiger Tipp, um Stress zu reduzieren?", ["A) Ungeplante Aufgaben erledigen", "B) Realistische Ziele setzen", "C) Mehr Verpflichtungen übernehmen", "D) Aufgaben ignorieren"]),
@@ -145,6 +146,7 @@ export const B1_LISTENING_TASKS = Object.freeze({
     embedUrl: "https://drive.google.com/file/d/1oU9BMq28aRoX5LKk7huwo5lP9z6lwhB0/preview",
     externalUrl: "https://drive.google.com/file/d/1oU9BMq28aRoX5LKk7huwo5lP9z6lwhB0/view?usp=sharing",
     videoTitle: "B1 Day 10 Hören · Zeit für sich und Selbstfürsorge",
+    submitRequired: false,
     selfCheckText: "Complete the listening exercise independently and mark your own answers. Teil 4 is self-check; only Teil 2 Schreiben and Teil 3 Lesen are submitted for tutor evaluation.",
     questions: [
       q("Was ist laut dem Hörtext ein häufiges Problem in unserer Gesellschaft?", ["A) Zu wenig Arbeit", "B) Zu viel Freizeit", "C) Stress und Überarbeitung", "D) Zu viel Schlaf"]),
