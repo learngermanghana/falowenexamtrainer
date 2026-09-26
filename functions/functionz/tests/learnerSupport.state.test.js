@@ -175,7 +175,7 @@ describe("learner support state", () => {
 
     expect(action).toEqual({
       type: "resume-learning",
-      label: "Continue Migration und Integration · hoeren",
+      label: "Continue Migration und Integration · Hören",
       reason: "resume_last_active_section",
       url: "/campus/course/lesson/B2/6?view=hoeren&radio=done",
     });
