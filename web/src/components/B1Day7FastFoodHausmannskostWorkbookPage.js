@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -50,24 +51,11 @@ const Prepared = ({ checked, onChange }) => (
   </label>
 );
 
-export default function B1Day7FastFoodHausmannskostWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const mark = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
-
+const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 7 · Kapitel 3.7</span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Fast Food vs. Hausmannskost</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Choose Teil 1–4, Ref or Submit. Each section starts with the exact task.</p>
-        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 7 workbook sections" />
-      </header>
-
-      <A2B1WorkbookGuidance level="B1" />
-
-      {activeTab === "sprechen" && (
+    <>
+{activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={title}>Teil 1 · Sprechen (Group Practice)</h2>
           <WorkbookTaskCard eyebrow="Question of the Day · Speaking" title="Fast Food oder Hausmannskost – was ist besser?" practiceOnly submissionNote="Prepare a 1–2 minute answer. Teil 1 is not submitted.">
@@ -88,7 +76,7 @@ export default function B1Day7FastFoodHausmannskostWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "schreiben" && (
+{activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind Fertiggerichte eine gute Wahl für eine gesunde Ernährung? Schreiben Sie Ihre Meinung." submissionNote="Write approximately 80 words and submit your final text through Submit.">
@@ -106,7 +94,7 @@ export default function B1Day7FastFoodHausmannskostWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "lesen" && (
+{activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie sieben Textfragen und fünf Anzeige-Fragen." submissionNote="Submit only answer letters, for example: Text: 1A, 2B. Anzeigen: 1F, 2B.">
@@ -122,7 +110,7 @@ export default function B1Day7FastFoodHausmannskostWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+{activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C.">
@@ -134,23 +122,21 @@ export default function B1Day7FastFoodHausmannskostWorkbookPage() {
           <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
         </section>
       )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day7FastFoodHausmannskost", level: "B1", day: 7, workbookId: "B1Day7FastFoodHausmannskost" }} workbookId="B1Day7FastFoodHausmannskost" />
-      )}
-
-      {activeTab === "submit" && (
-        <section style={card}>
-          <h2 style={title}>Submit workbook answers</h2>
-          <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
-            <p style={{ margin: 0 }}>Paste your writing, reading answers and listening answers below.</p>
-          </WorkbookTaskCard>
-          <div className="b1-day7-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day7-submission-page > div > section:first-child { display: none !important; }.b1-day7-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 7, assignmentKey: "B1-3.7", canonicalAssignmentKey: "B1-3.7" }} />
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
+};
+
+const config = {
+  day: 7,
+  chapter: "3.7",
+  assignmentKey: "B1-3.7",
+  workbookId: "B1Day7FastFoodHausmannskost",
+  title: "Fast Food oder Hausmannskost",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 7 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day7FastFoodHausmannskostWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day7PreservedSections} />;
 }
