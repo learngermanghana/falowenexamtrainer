@@ -308,18 +308,19 @@ export default function GuidedWritingWorkspace({
     : state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
   const completeCount = questions.filter((question) => question.complete).length;
   const placeholderWarning = hasUnfilledPlaceholders(finalEssay);
+  const starterEllipsisWarning = singleBoxMode && /(^|\s)\.\.\.(?=\s|$)/m.test(String(finalEssay || ""));
   const finalWordCount = countWords(finalEssay);
   const minimumWordCount = Math.max(0, Number(config.minimumWords || 0));
   const meetsMinimumWords = minimumWordCount === 0 || finalWordCount >= minimumWordCount;
   const allComplete = singleBoxMode
-    ? Boolean(finalEssay.trim()) && !placeholderWarning && meetsMinimumWords
+    ? Boolean(finalEssay.trim()) && !placeholderWarning && !starterEllipsisWarning && meetsMinimumWords
     : completeCount === questions.length;
   const totalMissingWords = questions.reduce((sum, question) => sum + Math.max(question.minimumWords - question.words, 0), 0);
   const nextQuestion = questions.find((question) => !question.complete);
   const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
   const promptText = getMainWritingPrompt(config);
-  const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning;
+  const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning && !starterEllipsisWarning;
 
   const update = (updater) =>
     setState((old) => ({
@@ -736,7 +737,7 @@ export default function GuidedWritingWorkspace({
         <h3 style={{ margin: 0 }}>{singleBoxMode ? `Your ${formalMode ? "formal letter" : opinionMode ? "opinion essay" : "text"}` : "Your combined text"}</h3>
         <small style={{ color: "#475569", fontWeight: 700 }}>
           {singleBoxMode
-            ? "Use your points above, then edit the template into one complete exam-style answer"
+            ? "Use the short starters only as a structure. Replace every ... with your own ideas."
             : state.combinedDraftMode === "auto"
               ? "Automatically built from your answers"
               : "You are editing the combined version"}
@@ -775,7 +776,7 @@ export default function GuidedWritingWorkspace({
           <div style={{ border: "1px solid #fed7aa", borderRadius: 14, padding: 12, background: "#fffbeb", display: "grid", gap: 8 }}>
             <strong>Step 2 · Turn your points into German</strong>
             <span style={{ color: "#92400e", lineHeight: 1.65 }}>
-              A template is already placed in the box when it is empty. Replace every bracket like <strong>[Anlass]</strong> with your own words.
+              The template gives only sentence starters. Replace every <strong>...</strong> with your own content and build the full answer yourself.
             </span>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button type="button" onClick={() => insertTemplate(templateText)} style={styles.secondaryButton}>
