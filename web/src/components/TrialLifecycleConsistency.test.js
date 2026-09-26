@@ -75,6 +75,31 @@ describe("central trial lifecycle", () => {
     expect(state.paid).toBe(false);
   });
 
+  test("legacy joined_at alone does not consume the one-time trial", () => {
+    const now = new Date("2026-09-26T12:00:00Z").getTime();
+    const state = getTrialLifecycleState({
+      joined_at: new Date(now - 20 * DAY_MS).toISOString(),
+      paymentStatus: "pending",
+      balanceDue: 3000,
+    }, now);
+
+    expect(state.key).toBe("unused");
+    expect(state.active).toBe(false);
+  });
+
+  test("joined_at can still backfill an explicitly active trial start", () => {
+    const now = new Date("2026-09-26T12:00:00Z").getTime();
+    const state = getTrialLifecycleState({
+      trialStatus: "active",
+      joined_at: new Date(now - DAY_MS).toISOString(),
+      paymentStatus: "pending",
+      balanceDue: 3000,
+    }, now);
+
+    expect(state.key).toBe("active");
+    expect(state.daysRemaining).toBe(6);
+  });
+
   test("dashboard, onboarding, billing and checkpoint all use the shared lifecycle", () => {
     const files = [
       "TrialCountdownBanner.js",
