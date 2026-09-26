@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLatestLessonResume } from "../hooks/useLessonResumeSync";
+import { useAuth } from "../context/AuthContext";
+import { fetchLearnerSupportState } from "../services/learnerSupportService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { styles } from "../styles";
 import { PillBadge, PrimaryActionBar } from "./ui";
@@ -29,10 +31,47 @@ const visibleSectionCount = (sections = {}) =>
 
 const SmartResumeCard = () => {
   const navigate = useNavigate();
+  const { idToken } = useAuth();
   const { loading, resume, error } = useLatestLessonResume();
+  const [supportAction, setSupportAction] = useState(null);
 
-  if (loading || error || !resume || resume.completed === true || !resume.lastRoute) return null;
+  useEffect(() => {
+    let cancelled = false;
+    if (!idToken) {
+      setSupportAction(null);
+      return undefined;
+    }
 
+    fetchLearnerSupportState({ idToken })
+      .then((state) => {
+        if (!cancelled) setSupportAction(state?.nextAction || null);
+      })
+      .catch(() => {
+        if (!cancelled) setSupportAction(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [idToken, resume?.lastActivityAtClient, resume?.lastRoute]);
+
+  const rawResumeAction = useMemo(() => {
+    if (!resume || resume.completed === true || !resume.lastRoute) return null;
+    return {
+      type: "resume-learning",
+      label: "",
+      url: resume.lastRoute,
+    };
+  }, [resume]);
+
+  const action = supportAction || rawResumeAction;
+  const learningAction = ["resume-learning", "continue-course", "review-and-retry"].includes(action?.type)
+    ? action
+    : rawResumeAction;
+
+  if (loading || error || !resume || !learningAction?.url) return null;
+
+  const isExactResume = learningAction.type === "resume-learning";
   const level = String(resume.level || "").toUpperCase();
   const day = Number(resume.day || 0);
   const view = String(resume.activeView || "learn").toLowerCase();
@@ -48,7 +87,7 @@ const SmartResumeCard = () => {
 
   const openResume = () => {
     triggerInteractionFeedback({ sound: "open" });
-    navigate(resume.lastRoute);
+    navigate(learningAction.url);
   };
 
   return (
@@ -66,12 +105,14 @@ const SmartResumeCard = () => {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "start" }}>
         <div style={{ display: "grid", gap: 5 }}>
           <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 800 }}>
-            Continue where you stopped
+            {isExactResume ? "Continue where you stopped" : "Your next step"}
           </p>
           <h2 style={{ margin: 0, fontSize: 20 }}>
-            {level}{day ? ` · Day ${day}` : ""} · {sectionLabel}
+            {isExactResume
+              ? <>{level}{day ? ` · Day ${day}` : ""} · {sectionLabel}</>
+              : learningAction.label || "Continue learning"}
           </h2>
-          {resume.title ? (
+          {isExactResume && resume.title ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#475569" }}>{resume.title}</p>
           ) : null}
         </div>
@@ -79,15 +120,15 @@ const SmartResumeCard = () => {
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#475569", fontSize: 13 }}>
-        {sectionTotal > 0 ? (
+        {isExactResume && sectionTotal > 0 ? (
           <span>{completedSections}/{sectionTotal} tracked sections complete</span>
         ) : null}
-        {radioLabel ? <span>{sectionTotal > 0 ? "· " : ""}{radioLabel}</span> : null}
+        {isExactResume && radioLabel ? <span>{sectionTotal > 0 ? "· " : ""}{radioLabel}</span> : null}
       </div>
 
       <PrimaryActionBar align="start">
         <button type="button" style={styles.primaryButton} onClick={openResume}>
-          Continue {sectionLabel}
+          {isExactResume ? `Continue ${sectionLabel}` : "Continue"}
         </button>
       </PrimaryActionBar>
     </section>
