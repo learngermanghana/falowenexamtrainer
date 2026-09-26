@@ -43,6 +43,7 @@ const hasCompletedRadioStep = (search = "", level = "", day = "") => {
 export const buildCompletedRadioSearch = (search = "") => {
   const params = new URLSearchParams(search);
   params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+  if (String(params.get("view") || "").toLowerCase() === "radio") params.delete("view");
   const query = params.toString();
   return query ? `?${query}` : "";
 };
@@ -100,17 +101,19 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
   const radio = resource || resolveRadioFirstWorkbookResource(level, day);
   const location = useLocation();
   const navigate = useNavigate();
-  const completedAtMount = !radio || hasCompletedRadioStep(location.search, level, day);
+  const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
+  const forceRadio = Boolean(radio && requestedView === "radio");
+  const completedAtMount = !radio || (!forceRadio && hasCompletedRadioStep(location.search, level, day));
   const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
   const [isContinuing, setIsContinuing] = useState(false);
   const continueHref = buildCompletedRadioHref(location);
 
   useEffect(() => {
-    if (!hasEnteredWorkbook && hasCompletedRadioStep(location.search, level, day)) {
+    if (!forceRadio && !hasEnteredWorkbook && hasCompletedRadioStep(location.search, level, day)) {
       setHasEnteredWorkbook(true);
       setIsContinuing(false);
     }
-  }, [day, hasEnteredWorkbook, level, location.search]);
+  }, [day, forceRadio, hasEnteredWorkbook, level, location.search]);
 
   useEffect(() => {
     courseDebug("radioGate:state", {
