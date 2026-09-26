@@ -17,7 +17,7 @@ describe("A1 Day 18 tutor-marked workbook ownership", () => {
         assignmentKey,
         day: 18,
         chapter,
-        nativeSharedLayout: true,
+        layoutMode: "native",
       }),
     );
     expect(assignment.sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
