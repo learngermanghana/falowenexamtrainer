@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -94,6 +95,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(5);
   const mark = setPreparedFor;
   return (
     <>
@@ -142,8 +144,8 @@ const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Schreiben Sie eine höfliche E-Mail an den Vermieter."
-            submissionNote="Write approximately 80–100 words and submit your final email through the Submit tab."
+            title={writing.title}
+            submissionNote={writing.submissionNote}
           >
             <ol style={listStyle}>
               <li>Erklären Sie, dass Sie sich für die Wohnung interessieren.</li>
