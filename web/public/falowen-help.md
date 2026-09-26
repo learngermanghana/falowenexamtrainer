@@ -116,6 +116,23 @@ Use the learner's intention, not only the name of a page.
 - **Get a receipt/check fees:** Open **Account → Billing** and check balance, payment history and available receipt links.
 - **Move to the next level:** Open **Account → Upgrade**. An outstanding balance can block an upgrade.
 
+## Authenticated learner-state support
+
+Inside the signed-in Falowen campus, Study Buddy can use the protected learner-state endpoint at `/api/support/student-state`.
+
+This endpoint requires the learner's Firebase ID token and returns only support-safe state such as:
+
+- current level and class
+- access state (trial, paid, payment required, contract ended)
+- course completion and next lesson
+- latest submission/review state
+- attendance summary when already available on the learner profile
+- one authoritative `nextAction` and `nextAction.url`
+
+AI assistants must **not** guess a learner's payment, access, marking, attendance or completion state from the public course map. Public navigation data explains where things are; authenticated learner state explains what this specific learner should do next.
+
+Falowen Radio remains enforced by the lesson route. If learner state reports Radio completion as unknown, do not claim it is complete.
+
 ## Lesson-specific AI routing
 
 When the learner names a **level, day, chapter or lesson title**, use the generated course map before answering:

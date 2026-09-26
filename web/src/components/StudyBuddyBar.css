@@ -792,3 +792,36 @@
     width: 100%;
   }
 }
+
+
+.study-buddy-next-reason {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #64748b;
+  text-transform: capitalize;
+}
+
+.study-buddy-next-action-button {
+  margin-top: 10px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 12px;
+  padding: 9px 14px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.study-buddy-next-action-button:hover,
+.study-buddy-next-action-button:focus-visible {
+  transform: translateY(-1px);
+}
+
+.study-buddy-next-error {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #b91c1c;
+}

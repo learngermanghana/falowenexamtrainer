@@ -8,6 +8,7 @@ import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
+import { fetchLearnerSupportState } from "../services/learnerSupportService";
 import {
   clearStudyBuddyConversationHistory,
   logStudyBuddyUsage,
@@ -98,6 +99,9 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [recommendedAssignment, setRecommendedAssignment] = useState("");
   const [leaderboardPosition, setLeaderboardPosition] = useState(null);
   const [leaderboardLevel, setLeaderboardLevel] = useState("");
+  const [learnerSupportState, setLearnerSupportState] = useState(null);
+  const [learnerSupportError, setLearnerSupportError] = useState("");
+  const [isLearnerSupportLoading, setIsLearnerSupportLoading] = useState(false);
 
   const trackStudyBuddyEvent = useCallback(
     (event, metadata = {}) =>
@@ -534,12 +538,42 @@ const StudyBuddyBar = ({ studentProfile }) => {
     }, 80);
   }, [t, trackStudyBuddyEvent]);
 
+  const loadLearnerNextAction = useCallback(async () => {
+    setIsCollapsed(false);
+    setLearnerSupportError("");
+    setIsLearnerSupportLoading(true);
+    trackStudyBuddyEvent("shortcut_click", {
+      shortcutKey: "next_action",
+      shortcutLabel: "What should I do next?",
+    });
+    try {
+      const route =
+        typeof window !== "undefined"
+          ? `${window.location.pathname || ""}${window.location.search || ""}`
+          : "";
+      const response = await fetchLearnerSupportState({ idToken, route });
+      setLearnerSupportState(response || null);
+      triggerInteractionFeedback({ sound: "success" });
+    } catch (error) {
+      console.error("Could not load learner support state", error);
+      setLearnerSupportError(error?.message || "Could not load your next step.");
+      triggerInteractionFeedback({ sound: "error" });
+    } finally {
+      setIsLearnerSupportLoading(false);
+    }
+  }, [idToken, trackStudyBuddyEvent]);
+
   const quickLinks = useMemo(
     () => [
       {
         key: "ask",
         label: t("studyBuddy.qa.jumpButton", { defaultValue: "Ask AI" }),
         action: focusQuickQuestion,
+      },
+      {
+        key: "next-action",
+        label: isLearnerSupportLoading ? "Checking next step…" : "What should I do next?",
+        action: loadLearnerNextAction,
       },
       {
         key: "course",
@@ -578,7 +612,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
     ],
-    [focusQuickQuestion, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
+    [focusQuickQuestion, isLearnerSupportLoading, loadLearnerNextAction, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
   );
 
   useEffect(() => {
@@ -748,7 +782,36 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
           <div className="study-buddy-insight study-buddy-next-up">
             <p className="study-buddy-label">{t("studyBuddy.insights.nextUp")}</p>
-            <div className="study-buddy-value">{primarySuggestion}</div>
+            <div className="study-buddy-value">
+              {isLearnerSupportLoading
+                ? "Checking your Falowen progress…"
+                : learnerSupportState?.nextAction?.label || primarySuggestion}
+            </div>
+            {learnerSupportState?.nextAction?.reason ? (
+              <div className="study-buddy-next-reason">
+                {learnerSupportState.nextAction.reason.replace(/_/g, " ")}
+              </div>
+            ) : null}
+            {learnerSupportState?.nextAction?.url ? (
+              <button
+                type="button"
+                className="study-buddy-next-action-button"
+                onClick={() => {
+                  const destination = learnerSupportState.nextAction.url;
+                  trackStudyBuddyEvent("next_action_open", {
+                    destination,
+                    actionType: learnerSupportState.nextAction.type || "",
+                  });
+                  triggerInteractionFeedback({ sound: "open" });
+                  navigate(destination);
+                }}
+              >
+                Continue
+              </button>
+            ) : null}
+            {learnerSupportError ? (
+              <div className="study-buddy-next-error" role="alert">{learnerSupportError}</div>
+            ) : null}
           </div>
 
           <button
