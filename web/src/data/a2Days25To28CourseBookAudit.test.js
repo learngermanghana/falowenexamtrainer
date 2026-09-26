@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { A2_READING_TASKS } from "./a2ReadingTasks";
+import { A2_LISTENING_MODES, A2_LISTENING_TASKS } from "./a2ListeningTasks";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
@@ -26,15 +27,16 @@ describe("A2 Course Book final audit · Days 25–28", () => {
   test("keeps Day 25 on canonical Lesen with no Hören assignment", () => {
     const source = readComponent("A2Day25TagesablaufWorkbookPage.js");
     expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
-    expect(source).toContain("showHoeren={false}");
+    expect(A2_LISTENING_TASKS[25].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(source).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
-    expect(source).not.toContain("hoerenAudioUrl=");
+    expect(A2_LISTENING_TASKS[25].audioUrl).toBe("");
   });
 
   test("keeps Day 26 fully focused on feelings", () => {
     const source = readComponent("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
     expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
-    expect(source).toContain("JEJZypJfrD8");
+    expect(A2_LISTENING_TASKS[26].audioUrl).toContain("JEJZypJfrD8");
+    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
     expect(source).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
   });
 
@@ -48,7 +50,8 @@ describe("A2 Course Book final audit · Days 25–28", () => {
   test("moves Day 28 to the standard shell with future-focused reading and grammar", () => {
     const source = readComponent("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
     expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
-    expect(source).toContain("Teuu287XY_M");
+    expect(A2_LISTENING_TASKS[28].audioUrl).toContain("Teuu287XY_M");
+    expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(source).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
 
     const grammarRoute = getA2GrammarRoute({ day: 28, chapter: "10.28" });
