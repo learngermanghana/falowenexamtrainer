@@ -298,12 +298,28 @@ const hasStudentMadePayment = (student = {}) => {
   const paymentStatus = normalizeValue(student.paymentStatus);
   if (["paid", "partial"].includes(paymentStatus)) return true;
 
-  const paidFields = [student.paid, student.paidAmount, student.initialPaymentAmount];
-  return paidFields.some((value) => Number(value) > 0);
+  const confirmedPaidFields = [student.paid, student.paidAmount];
+  return confirmedPaidFields.some((value) => Number(value) > 0);
 };
 
-const getTrialEndMillis = (student = {}) =>
-  getMillisFromTimestampLike(student.trialEndsAt);
+const getTrialStartMillis = (student = {}) => {
+  const startedAtMs = getMillisFromTimestampLike(student.trialStartedAt);
+  if (Number.isFinite(startedAtMs)) return startedAtMs;
+
+  const usedAtMs = getMillisFromTimestampLike(student.trialUsedAt);
+  return Number.isFinite(usedAtMs) ? usedAtMs : Number.NaN;
+};
+
+const getTrialEndMillis = (student = {}) => {
+  const explicitEndMs = getMillisFromTimestampLike(student.trialEndsAt);
+  if (Number.isFinite(explicitEndMs)) return explicitEndMs;
+
+  if (normalizeValue(student.trialStatus) !== "active") return Number.NaN;
+  const startedAtMs = getTrialStartMillis(student);
+  return Number.isFinite(startedAtMs)
+    ? startedAtMs + UNPAID_SIGNUP_GRACE_MS
+    : Number.NaN;
+};
 
 const getTrialPurgeMillis = (student = {}) => {
   const explicit = getMillisFromTimestampLike(student.trialPurgeAt);
