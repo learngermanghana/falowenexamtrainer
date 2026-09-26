@@ -408,10 +408,10 @@
       },
       "teil4": {
         "Answer1": "B) Ins Kino gehen",
-        "Answer2": "A) Weil sie spannende Geschichten liebt",
+        "Answer2": "A) Sie liebt spannende Geschichten",
         "Answer3": "A) Tennis",
-        "Answer4": "B) Es war sonnig und warm",
-        "Answer5": "C) Einen Spaziergang Machen"
+        "Answer4": "B) Sonnig und warm",
+        "Answer5": "C) Spaziergang"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1bENY4-5AG9hrgaDKqyNpTwKT02i58wGva6tVRn-hhbE/gviz/tq?tqx=out:html&sheet=Key",
@@ -430,7 +430,7 @@
       },
       "teil4": {
         "Answer1": "B) Weil er in Deutschland arbeiten möchte.",
-        "Answer2": "C) Sprachkurse, Online-Apps und das Üben mit Freunden.",
+        "Answer2": "C) Sprachkurse, Apps und Freunde",
         "Answer3": "A) Jeden Tag eine Stunde."
       }
     },
@@ -449,11 +449,11 @@
         "Answer5": "B) Dienstag und Donnerstag"
       },
       "teil4": {
-        "Answer1": "B) Julia ist 26 Jahre alt",
-        "Answer2": "C) Julia arbeitet als Architektin",
-        "Answer3": "B) Tobias lebt in Frankfurt",
-        "Answer4": "A) Tobias möchte ein eigenes Restaurant eröffnen",
-        "Answer5": "B) Julia und Tobias kochen am Wochenende oft mit Sophie"
+        "Answer1": "B) 26 Jahre",
+        "Answer2": "C) Architektin",
+        "Answer3": "B) Frankfurt",
+        "Answer4": "A) Ein Restaurant eröffnen",
+        "Answer5": "B) Gemeinsam kochen"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1ftIKdxbCKTlcDJUj7uHNWZu-dRfH_Tuja0FzTgS_97M/gviz/tq?tqx=out:html&sheet=Key",
@@ -582,8 +582,8 @@
       },
       "teil4": {
         "Answer1": "B) Griechenland",
-        "Answer2": "A) Eine woche",
-        "Answer3": "B) Der strand von",
+        "Answer2": "A) Eine Woche",
+        "Answer3": "B) Der Strand von Elafonissi",
         "Answer4": "B) Eine Bootstour",
         "Answer5": "A) Nach Kreta zu reisen"
       }
@@ -625,11 +625,11 @@
         "Answer5": "C) Die S8 fährt erst ab 08:30 Uhr."
       },
       "teil4": {
-        "Answer1": "B) in die Berge",
-        "Answer2": "B) Ein Mittel..",
+        "Answer1": "B) In die Berge",
+        "Answer2": "B) Ein mittelgroßes Auto",
         "Answer3": "B) 50 Euro",
         "Answer4": "C) Führerschein und Kreditkarte",
-        "Answer5": "B) Das Auto auf mögliche"
+        "Answer5": "B) Das Auto auf mögliche Schäden"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/16aS6UmVL-kQqcje1f3rDeqobEnkoNsxUwCNE_iBokI4/gviz/tq?tqx=out:html&sheet=Key",
@@ -647,11 +647,11 @@
         "Answer5": "B) Anzeige B"
       },
       "teil4": {
-        "Answer1": "B) um 6 Uhr",
-        "Answer2": "C) Beginnt die Visite",
-        "Answer3": "B) um 9 Uhr",
-        "Answer4": "B) fuhrt wichtige",
-        "Answer5": "C) Vor 18 Uhr"
+        "Answer1": "B) Um 6:00 Uhr",
+        "Answer2": "C) Beginnt die Visite auf der Station",
+        "Answer3": "B) Um 9:00 Uhr",
+        "Answer4": "B) Führt wichtige Telefonate",
+        "Answer5": "C) Vor 18:00 Uhr"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1z8wEWz-HJxm1DUvr0a7OE5md3Gj4OR5ZJ3SpJNI-hyQ/gviz/tq?tqx=out:html&sheet=Key",
