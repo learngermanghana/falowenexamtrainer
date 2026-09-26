@@ -146,6 +146,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
   const supportNextAction = learnerState?.nextAction || null;
   const supportReview = learnerState?.review || null;
   const supportCourse = learnerState?.course || null;
+  const supportResume = supportCourse?.resume || null;
+  const supportRadio = learnerState?.radio || null;
   const supportAccess = learnerState?.access || null;
 
   const contextLines = [
@@ -157,6 +159,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     `Latest review score: ${supportReview?.score ?? "Not provided"}`,
     `Authoritative next action: ${supportNextAction?.label || "Not provided"}`,
     `Authoritative next URL: ${supportNextAction?.url || "Not provided"}`,
+    `Synced resume: ${supportResume ? `${supportResume.level || ""} Day ${supportResume.day || ""} · ${supportResume.activeView || "learn"}` : "Not provided"}`,
+    `Synced Radio completion: ${supportRadio?.completed === true ? "complete" : supportRadio?.completed === false ? "not complete" : "unknown"}`,
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
     `Day: ${context.day || "Not provided"}`,
     `Chapter: ${context.chapter || "Not provided"}`,
