@@ -7,8 +7,8 @@ import { subscribeLessonResume } from "../services/lessonResumeService";
 
 let mockRemoteChange = null;
 
-jest.mock("../context/AuthContext", () => ({
-  useAuth: () => ({ user: { uid: "student-1" } }),
+jest.mock("../firebase", () => ({
+  auth: { currentUser: { uid: "student-1" } },
 }));
 
 jest.mock("../services/lessonResumeService", () => ({
