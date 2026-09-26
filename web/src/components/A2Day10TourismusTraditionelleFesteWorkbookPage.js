@@ -33,64 +33,7 @@ const schreibenContent = (
   </WorkbookTaskCard>
 );
 
-const lesenText = `Grundrechte und gesellschaftliches Leben in Deutschland
 
-Die deutsche Verfassung heißt Grundgesetz. Im Grundgesetz stehen die wichtigsten rechtlichen und politischen Regeln der Bundesrepublik Deutschland. Im Grundgesetz steht zum Beispiel, dass Deutschland ein demokratischer Staat ist.
-
-Das heißt: Jeder kann beim politischen Leben mitmachen, zum Beispiel in Verbänden, Initiativen, Gewerkschaften oder Parteien. Die politischen Parteien haben verschiedene Programme und Ziele. Die größten Parteien heißen SPD, CDU, Bündnis 90/Die Grünen, FDP, AfD und Die Linke. Es gibt noch viele andere kleinere Parteien.
-
-Im Grundgesetz stehen auch die Rechte und Pflichten von Menschen in Deutschland. Wichtige Pflichten sind die Schulpflicht, die Steuerpflicht und die Pflicht zur Einhaltung der Gesetze.
-
-Wichtige Rechte sind die Menschenwürde, die Gleichberechtigung, die Gleichheit vor dem Gesetz, das Recht auf freie Meinungsäußerung, die Versammlungsfreiheit, die Freizügigkeit, die Berufsfreiheit, der Schutz von Ehe und Familie, das Wahlrecht und die Religionsfreiheit.
-
-Das Wahlrecht sagt: Die Menschen in Deutschland dürfen wählen und sie dürfen auch gewählt werden. Die Wahlen müssen geheim, allgemein und frei sein. Es gibt die Europawahl, die Bundestagswahl, die Landtagswahl und die Kommunalwahl. Bei Europawahlen und Kommunalwahlen dürfen auch EU-Bürger wählen, die in Deutschland wohnen.
-
-Normalerweise ist das ab 18 Jahren. In einigen Bundesländern kann man bei Kommunalwahlen auch schon ab 16 Jahren wählen. Bei Landtagswahlen und Bundestagswahlen dürfen nur deutsche Bürger wählen, die mindestens 18 Jahre alt sind.
-
-An vielen Orten gibt es Integrationsräte oder Integrationsbeiräte. Sie werden normalerweise von Migranten gewählt. Sie vertreten politische Interessen von Migranten, helfen bei Fragen und Problemen und wollen das Zusammenleben verbessern.
-
-Die Religionsfreiheit sagt: Jeder darf seine Religion frei wählen und ausüben. In den Schulen gibt es unter anderem evangelischen und katholischen Religionsunterricht und an manchen Schulen auch christlich-orthodoxen, jüdischen und islamischen Religionsunterricht.
-
-In Deutschland kann die sexuelle Orientierung offen ausgelebt werden. Seit dem 1. Oktober 2017 dürfen auch gleichgeschlechtliche Paare in Deutschland mit allen Rechten und Pflichten heiraten.`;
-
-const lesenQuestions = [
-  {
-    stem: "Was steht im Grundgesetz?",
-    options: [
-      "a) Die Namen aller Politiker in Deutschland",
-      "b) Die wichtigsten rechtlichen und politischen Regeln",
-      "c) Die Schulnoten der Schüler in Deutschland",
-    ],
-  },
-  {
-    stem: "Was ist ein Beispiel für eine Pflicht laut Grundgesetz?",
-    options: ["a) Man muss einen Führerschein haben", "b) Man muss eine Partei gründen", "c) Man muss Steuern zahlen"],
-  },
-  {
-    stem: "Welche Aussage über das Wahlrecht ist richtig?",
-    options: ["a) Nur Männer dürfen wählen", "b) EU-Bürger dürfen bei Kommunalwahlen wählen", "c) Wählen darf man nur ab 21 Jahren"],
-  },
-  {
-    stem: "Was macht ein Integrationsbeirat?",
-    options: ["a) Er kontrolliert den Unterricht", "b) Er vertritt die Interessen von Migranten", "c) Er plant Autobahnen"],
-  },
-  {
-    stem: "Welche Religionen haben in deutschen Schulen teilweise eigenen Unterricht?",
-    options: [
-      "a) Christlich-orthodox, jüdisch, islamisch, evangelisch und katholisch",
-      "b) Nur buddhistisch",
-      "c) Nur atheistisch",
-    ],
-  },
-  {
-    stem: "Seit wann dürfen gleichgeschlechtliche Paare in Deutschland heiraten?",
-    options: ["a) Seit 2005", "b) Seit 1. Oktober 2017", "c) Seit 1990"],
-  },
-  {
-    stem: "Was bedeutet Religionsfreiheit?",
-    options: ["a) Man darf keine Religion zeigen", "b) Der Staat bestimmt die Religion", "c) Jeder darf seine Religion frei wählen und ausüben"],
-  },
-];
 
 const hoerenQuestions = [
   {
@@ -132,8 +75,6 @@ export default function A2Day10TourismusTraditionelleFesteWorkbookPage() {
       schreibenTask="Schreiben Sie einen Brief und laden Sie einen Freund oder eine Freundin zu einem Fest ein."
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Liebe/r ...\n\nich möchte dich zu ... einladen. Das Fest findet ... statt."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Höre den Beitrag über das Oktoberfest. Achte auf Ort, Dauer, Essen, Kleidung und Aktivitäten. Submitte deine Antwortbuchstaben im Submit-Tab."
       hoerenAudioUrl="https://youtu.be/yOfTCQDn_JM"
       hoerenQuestions={hoerenQuestions}
