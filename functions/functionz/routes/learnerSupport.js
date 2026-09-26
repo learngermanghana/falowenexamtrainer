@@ -490,6 +490,18 @@ const buildNextAction = ({
     };
   }
 
+  const nextLesson = completionNextLesson(completion, level);
+  const pending = Number(completion?.awaitingReview || 0) > 0 || review?.pending === true;
+
+  if (pending && nextLesson?.route) {
+    return {
+      type: "continue-course",
+      label: nextLesson.title ? `Continue: ${nextLesson.title}` : `Continue ${nextLesson.level || level} Day ${nextLesson.day || ""}`.trim(),
+      reason: "continue_while_marking_pending",
+      url: nextLesson.route,
+    };
+  }
+
   if (resume?.lastRoute && resume.completed !== true) {
     const viewLabel = clean(resume.activeView || "lesson");
     const lessonLabel = resume.title
@@ -505,13 +517,11 @@ const buildNextAction = ({
     };
   }
 
-  const nextLesson = completionNextLesson(completion, level);
   if (nextLesson?.route) {
-    const pending = Number(completion?.awaitingReview || 0) > 0 || review?.pending === true;
     return {
       type: "continue-course",
       label: nextLesson.title ? `Continue: ${nextLesson.title}` : `Continue ${nextLesson.level || level} Day ${nextLesson.day || ""}`.trim(),
-      reason: pending ? "continue_while_marking_pending" : "next_incomplete_course_item",
+      reason: "next_incomplete_course_item",
       url: nextLesson.route,
     };
   }
