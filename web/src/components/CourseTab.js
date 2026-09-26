@@ -931,6 +931,32 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;
   };
 
+  const getSmartProgressForEntry = (entry) => {
+    if (!entry) return null;
+    const displayDay = Number(getCourseBookDisplayDay(entry) || entry.day || 0);
+    const resume = lessonResumeByDay[displayDay] || null;
+    const practiceState = practiceProgress[entry.assignmentKey] || {};
+    const canonicalSelfLearningState =
+      !isC2CourseBook && isSelfLearningLevel
+        ? courseCompletion?.states?.find((item) => Number(item.requirement?.day) === displayDay) || null
+        : null;
+    const selfLearningComplete = isC2CourseBook
+      ? Boolean(c2ProgressByDay[displayDay]?.dayComplete)
+      : Boolean(canonicalSelfLearningState?.completed);
+
+    return resolveCourseBookSmartProgress({
+      entry,
+      resume,
+      dayTaskCount: dayTaskCounts[String(displayDay)] || 1,
+      tutorStatus: entry.status,
+      selfLearningComplete,
+      practiceComplete: Boolean(practiceState.completed),
+    });
+  };
+
+  const nextLessonSmartProgress = nextLesson ? getSmartProgressForEntry(nextLesson) : null;
+  const nextLessonHref = nextLessonSmartProgress?.continueUrl || (nextLesson ? getLessonHref(nextLesson) : "");
+
   const openLesson = (entry, destination = "") => {
     navigate(destination || getLessonHref(entry), {
       state: {
@@ -1022,7 +1048,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     ))}
                   </select>
                 </label>
-                <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
+                <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson, nextLessonHref)}>
                   Continue learning
                 </button>
                 {canShowCourseSubmit ? (
@@ -1182,12 +1208,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   ) : null}
                 </div>
                 <a
-                  href={getLessonHref(nextLesson)}
+                  href={nextLessonHref}
                   style={{ ...styles.primaryButton, textDecoration: "none" }}
-                  aria-label={`Open ${nextLessonTitle}`}
-                  onClick={(event) => handleLessonLinkClick(event, nextLesson)}
+                  aria-label={`Continue ${nextLessonTitle}`}
+                  onClick={(event) => handleLessonLinkClick(event, nextLesson, nextLessonHref)}
                 >
-                  Open: {nextLessonTitle}
+                  {nextLessonSmartProgress?.resumeMatches
+                    ? nextLessonSmartProgress.continueLabel
+                    : `Open: ${nextLessonTitle}`}
                 </a>
               </section>
             ) : (
@@ -1443,7 +1471,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
           {usesSharedA2B1Design ? (
             <nav className="course-book-mobile-actions" aria-label="Course Book actions">
-              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson)}>
+              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson, nextLessonHref)}>
                 Continue
               </button>
               <button type="button" onClick={() => setCourseSubmitOpen(true)}>
