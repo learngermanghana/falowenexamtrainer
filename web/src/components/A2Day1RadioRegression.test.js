@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
+import { A2_LISTENING_MODES, A2_LISTENING_TASKS } from "../data/a2ListeningTasks";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
@@ -23,22 +24,20 @@ describe("A2 Day 1 Small Talk Falowen Radio", () => {
     expect(source).toContain('workbookId="A2Day1SmallTalk"');
   });
 
-  it("keeps Teil 4 as the original five-question listening task", () => {
-    const source = read("A2Day2SmallTalkWorkbookEnhancedPage.js");
-    const listeningBlock = source.match(/const listeningQuestions = \[([\s\S]*?)\n\];/);
+  it("keeps Teil 4 as the canonical five-question listening task", () => {
     const answerManifest = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, "../../../functions/data/answerKeyManifest.json"), "utf8"),
     );
     const smallTalkKey = answerManifest["A2 1.1 Small Talk"];
+    const listening = A2_LISTENING_TASKS[1];
 
-    expect(listeningBlock).not.toBeNull();
-    expect((listeningBlock?.[1].match(/stem:/g) || [])).toHaveLength(5);
+    expect(listening.mode).toBe(A2_LISTENING_MODES.GRADED);
+    expect(listening.audioUrl).toBe("https://youtu.be/z5yj1HQZbQo");
+    expect(listening.questions).toHaveLength(5);
     expect(Object.keys(smallTalkKey.answers.teil3)).toHaveLength(5);
     expect(Object.keys(smallTalkKey.answers.teil4)).toHaveLength(5);
-    expect(source).toContain('hoerenQuestions={listeningQuestions}');
-    expect(source).toContain("beantworte alle fünf Fragen");
-    expect(source).not.toContain('hoerenQuestions={readingQuestions}');
-    expect(source).toContain('stem: "Was hat Lena am Samstag vor?"');
-    expect(source).toContain('stem: "Was schlägt Lena für das nächste Treffen vor?"');
+    expect(listening.task).toContain("beantworte alle fünf Fragen");
+    expect(listening.questions[0].stem).toBe("Was hat Lena am Samstag vor?");
+    expect(listening.questions[4].stem).toBe("Was schlägt Lena für das nächste Treffen vor?");
   });
 });
