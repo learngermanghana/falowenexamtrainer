@@ -192,6 +192,11 @@ export const resolveB1CanonicalAssignmentSections = (config = {}) => {
   };
 };
 
+export const resolveB1WorkbookTabs = (listening = {}) =>
+  listening.status === "unavailable"
+    ? A2_B1_WORKBOOK_TABS_WITH_GRAMMAR.filter((tab) => tab.key !== "hoeren")
+    : A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
+
 export default function B1StandardWorkbookPage({ config, renderSections = null }) {
   const [activeTab, setActiveTab] = useState("grammar");
   const [prepared, setPrepared] = useState({
@@ -212,6 +217,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
     : (config.listening || { status: "planned" });
   const embedUrl = getYouTubeEmbedUrl(listening);
   const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
+  const workbookTabs = resolveB1WorkbookTabs(listening);
+  const hasListeningTab = listening.status !== "unavailable";
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -222,13 +229,15 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
         </span>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · {config.title}</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          {config.subtitle || "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."}
+          {config.subtitle || (hasListeningTab
+            ? "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
+            : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4 · Hören.")}
         </p>
         <SectionImage image={config.heroImage} alt={config.heroAlt} />
         <WorkbookTabNav
           activeTab={activeTab}
           onChange={setActiveTab}
-          tabs={A2_B1_WORKBOOK_TABS_WITH_GRAMMAR}
+          tabs={workbookTabs}
           ariaLabel={`B1 Day ${config.day} workbook sections`}
         />
       </div>
@@ -401,7 +410,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+      {activeTab === "hoeren" && hasListeningTab && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Hören ({listeningRequiresSubmission ? "Assignment" : "Self-check"})</h2>
           <WorkbookTaskCard
@@ -475,7 +484,9 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
               config.submitNote ||
               (listeningRequiresSubmission
                 ? "Teil 1 is group practice. Teil 4 is a listening assignment and must be submitted."
-                : "Teil 1 is group practice. Teil 4 may be self-check depending on the lesson.")
+                : hasListeningTab
+                  ? "Teil 1 is group practice. Teil 4 is self-check for this lesson."
+                  : "Teil 1 is group practice. This lesson has no Teil 4 · Hören.")
             }
           >
             <p style={{ margin: 0 }}>
