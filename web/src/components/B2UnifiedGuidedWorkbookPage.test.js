@@ -99,6 +99,8 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("grammar.focuses.map");
     expect(page).toContain("<strong>Regeln</strong>");
     expect(page).toContain("<strong>Beispiele</strong>");
+    expect(page).toContain('data-b2-grammar-relevance="true"');
+    expect(page).toContain("Warum diese Grammatik?");
     expect(page).toContain("Modellsatz für heute");
     expect(page).toContain("Mini-Übung");
     expect(page).toContain("<GrammarLessonContent day={day} />");
