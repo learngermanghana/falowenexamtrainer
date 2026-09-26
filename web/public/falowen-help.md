@@ -133,6 +133,20 @@ AI assistants must **not** guess a learner's payment, access, marking, attendanc
 
 Falowen Radio remains enforced by the lesson route. If learner state reports Radio completion as unknown, do not claim it is complete.
 
+### Cross-device Smart Resume
+
+Falowen stores one authenticated lesson-resume record per learner, level and day. It can include the last active section, exact resume route, tracked section completion, lesson completion and Falowen Radio completion.
+
+- The dashboard **Continue where you stopped** card uses this cloud record.
+- C1, B2 and C2 section progress can hydrate onto another signed-in device while existing local storage remains as a fallback.
+- A1, A2 and B1 store the exact workbook section last opened; tutor submission/review status remains authoritative in the learner-state service.
+- Falowen Radio completion is monotonic: once completed, opening the lesson on another device does not reset it.
+- If work is awaiting tutor review, the learner-state service can override an old Submit resume and direct the learner to the canonical next lesson.
+- If reviewed work failed, correction/retry remains higher priority than Smart Resume.
+- If access is blocked by trial/payment/contract state, Smart Resume must not bypass that access decision.
+
+Public AI assistants cannot read these private resume records. They may use the public course map for navigation structure, but learner-specific resume state is available only inside authenticated Falowen support.
+
 ## Lesson-specific AI routing
 
 When the learner names a **level, day, chapter or lesson title**, use the generated course map before answering:

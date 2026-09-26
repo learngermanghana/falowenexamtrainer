@@ -9,6 +9,7 @@ const {
   normalizeProgressStatus,
   completionNextLesson,
   learnerSupportStateHandler,
+  safeResumeState,
 } = require("../routes/learnerSupport");
 
 describe("learner support state", () => {
@@ -148,6 +149,91 @@ describe("learner support state", () => {
       label: "Continue: Möbel & Räume",
       reason: "continue_while_marking_pending",
       url: "/campus/course/lesson/A2/6?chapter=3.6&view=workbook",
+    });
+  });
+
+  test("resumes the exact unfinished cloud section before a later untouched lesson", () => {
+    const action = buildNextAction({
+      access: { allowed: true, state: "paid-active" },
+      level: "B2",
+      review: { status: "none", pending: false },
+      resume: {
+        level: "B2",
+        day: 6,
+        title: "Migration und Integration",
+        activeView: "hoeren",
+        lastRoute: "/campus/course/lesson/B2/6?view=hoeren&radio=done",
+        completed: false,
+      },
+      completion: {
+        level: "B2",
+        nextDay: 7,
+        nextLabel: "Gesellschaftliche Vielfalt",
+        nextRoute: "/campus/course/lesson/B2/7",
+      },
+    });
+
+    expect(action).toEqual({
+      type: "resume-learning",
+      label: "Continue Migration und Integration · Hören",
+      reason: "resume_last_active_section",
+      url: "/campus/course/lesson/B2/6?view=hoeren&radio=done",
+    });
+  });
+
+  test("keeps marking-pending progression ahead of an old Submit resume", () => {
+    const action = buildNextAction({
+      access: { allowed: true, state: "paid-active" },
+      level: "A2",
+      review: { pending: true },
+      resume: {
+        level: "A2",
+        day: 5,
+        activeView: "submit",
+        lastRoute: "/campus/course/a2-day-5-workbook?view=submit&radio=done",
+        completed: false,
+      },
+      completion: {
+        level: "A2",
+        nextDay: 6,
+        nextLabel: "Möbel & Räume",
+        nextRoute: "/campus/course/lesson/A2/6?chapter=3.6",
+        awaitingReview: 1,
+      },
+    });
+
+    expect(action).toMatchObject({
+      type: "continue-course",
+      reason: "continue_while_marking_pending",
+      url: "/campus/course/lesson/A2/6?chapter=3.6",
+    });
+  });
+
+  test("returns safe cross-device Radio and section state", () => {
+    expect(
+      safeResumeState({
+        level: "C1",
+        day: 16,
+        chapter: "3.1",
+        title: "Technologie im Alltag",
+        activeView: "write",
+        lastRoute: "/campus/course/lesson/C1/16?view=write&radio=done",
+        sections: { learn: true, speak: true, write: false, secret: "ignore" },
+        radioDone: true,
+        completed: false,
+        lastActivityAtClient: "2026-09-26T07:30:00.000Z",
+      }),
+    ).toEqual({
+      level: "C1",
+      day: 16,
+      chapter: "3.1",
+      title: "Technologie im Alltag",
+      activeView: "write",
+      lastRoute: "/campus/course/lesson/C1/16?view=write&radio=done",
+      sections: { learn: true, speak: true, write: false },
+      completed: false,
+      radioDone: true,
+      lastActivityAt: "2026-09-26T07:30:00.000Z",
     });
   });
 

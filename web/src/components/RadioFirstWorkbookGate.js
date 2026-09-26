@@ -11,6 +11,8 @@ import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRo
 import { addDay20WorkbookView } from "../utils/a1ChapterResourceHubState";
 import { buildA1TutorMarkedWorkbookHref, getA1AssignmentByDayAndChapter } from "../data/a1AssignmentRegistry";
 import { getA1GrammarRoute } from "../data/a1GrammarRoutes";
+import { auth } from "../firebase";
+import { subscribeLessonResume } from "../services/lessonResumeService";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
@@ -114,6 +116,7 @@ export const shouldShowRadioFirst = (level, day) =>
 
 const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
   const radio = resource || resolveRadioFirstWorkbookResource(level, day);
+  const userId = auth?.currentUser?.uid || "";
   const location = useLocation();
   const navigate = useNavigate();
   const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
@@ -129,6 +132,22 @@ const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
       setIsContinuing(false);
     }
   }, [day, forceRadio, hasEnteredWorkbook, level, location.search]);
+
+  useEffect(() => {
+    if (!radio || forceRadio || !userId || hasEnteredWorkbook) return undefined;
+
+    return subscribeLessonResume({
+      userId,
+      level,
+      day,
+      onChange: (remote) => {
+        if (remote?.radioDone !== true) return;
+        completedRadioSteps.add(radioStepKey(level, day));
+        setHasEnteredWorkbook(true);
+        setIsContinuing(false);
+      },
+    });
+  }, [day, forceRadio, hasEnteredWorkbook, level, radio, userId]);
 
   useEffect(() => {
     courseDebug("radioGate:state", {

@@ -11,6 +11,7 @@ import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { useToast } from "../context/ToastContext";
+import { useLessonResumeSync } from "../hooks/useLessonResumeSync";
 import { getStandardLessonStorageKey, getStandardWritingCloudField, getStandardWritingConfig } from "../data/standardLessonJourney";
 import { styles } from "../styles";
 
@@ -80,6 +81,20 @@ export default function C1Day24To26GuidedLessonPage({ lesson, canonicalLesson = 
   const storageKey = getStandardLessonStorageKey(effectiveLesson, "progress");
   const [progress, setProgress] = useState(() => { try { return { learnDone: false, speakDone: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnDone: false, speakDone: false, completed: false }; } });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
+
+  useLessonResumeSync({
+    level: "C1",
+    day: Number(lesson.day),
+    chapter: lesson.chapter || "",
+    title: lesson.title || "",
+    activeView: active,
+    radioDone: !radio || entered,
+    progress,
+    setProgress,
+    completed: Boolean(progress.completed),
+    onRemoteRadioDone: () => setEntered(true),
+    source: "c1-guided",
+  });
 
   if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><header style={{ ...card, borderColor: "#bfdbfe", background: "linear-gradient(135deg,#eff6ff,#f8fafc)" }}><span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>Start here</span><h1 style={{ margin: 0 }}>C1 · Day {day} · {effectiveLesson.title}</h1><p style={{ margin: 0, color: "#475569" }}>Listen to Falowen Radio first. Continue opens Learn, Speak, Write and Finish.</p></header><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => { setEntered(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>;
 

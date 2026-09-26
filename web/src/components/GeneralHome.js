@@ -15,6 +15,7 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import SmartResumeCard from "./SmartResumeCard";
 import { detectLevelKey } from "../lib/day0Workbook";
 
 const day0WorkbookByLevel = {
@@ -476,6 +477,8 @@ const GeneralHome = ({
           </PrimaryActionBar>
         </section>
       ) : null}
+
+      <SmartResumeCard />
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
 

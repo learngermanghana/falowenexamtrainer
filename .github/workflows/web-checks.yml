@@ -42,6 +42,39 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/data/falowenPublicHelpDiscovery.test.js
 
+  smart-resume-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            functions/package-lock.json
+            web/package-lock.json
+
+      - name: Install Functions dependencies
+        working-directory: functions
+        run: npm install --no-audit --no-fund --loglevel=error
+
+      - name: Test learner-state smart resume priority
+        working-directory: functions
+        run: npx jest functionz/tests/learnerSupport.state.test.js --runInBand
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test cloud lesson progress and smart resume
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/services/lessonResumeService.test.js src/components/SmartResumeCard.test.js src/components/RadioFirstWorkbookGate.cloudResume.test.jsx
+
   learner-support-state:
     runs-on: ubuntu-latest
     steps:

@@ -13,6 +13,7 @@ import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { useToast } from "../context/ToastContext";
+import { useLessonResumeSync } from "../hooks/useLessonResumeSync";
 import { getC1Day16To20SpeakingScaffold } from "../data/c1Day16To20SpeakingScaffolds";
 import { getStandardLessonStorageKey, getStandardWritingCloudField, getStandardWritingConfig } from "../data/standardLessonJourney";
 import { styles } from "../styles";
@@ -38,6 +39,20 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
     }
   });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
+
+  useLessonResumeSync({
+    level: "C1",
+    day: Number(lesson.day),
+    chapter: lesson.chapter || "",
+    title: lesson.title || "",
+    activeView: active,
+    radioDone: !radio || entered,
+    progress,
+    setProgress,
+    completed: Boolean(progress.completed),
+    onRemoteRadioDone: () => setEntered(true),
+    source: "c1-guided",
+  });
   if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
 
   const video = lesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;

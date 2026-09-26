@@ -13,6 +13,7 @@ import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
 import { useToast } from "../context/ToastContext";
+import { useLessonResumeSync } from "../hooks/useLessonResumeSync";
 import { useAuth } from "../context/AuthContext";
 import {
   getStandardLessonStorageKey,
@@ -102,6 +103,20 @@ export default function C1Day1To6GuidedLessonPage({ lesson, canonicalLesson = nu
   });
 
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
+
+  useLessonResumeSync({
+    level: "C1",
+    day: Number(lesson.day),
+    chapter: lesson.chapter || "",
+    title: lesson.title || "",
+    activeView: active,
+    radioDone: !radio || entered,
+    progress,
+    setProgress,
+    completed: Boolean(progress.completed),
+    onRemoteRadioDone: () => setEntered(true),
+    source: "c1-guided",
+  });
 
   if (!entered && radio) {
     return (

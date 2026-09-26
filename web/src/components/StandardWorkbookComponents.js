@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { normalizeA2B1SectionView, normalizeAdvancedSectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
+import { recordLessonResumeActivity } from "../services/lessonResumeService";
 import { getC2DayTabs } from "../data/c2SkillCycle";
 import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
@@ -168,6 +169,19 @@ export const WorkbookTabNav = ({
     if (!effectiveKeys.has(requestedView)) return;
     if (requestedView !== activeTab) onChange?.(requestedView);
   }, [activeTab, effectiveKeys, legacyGrammarContext, onChange, requestedView]);
+
+  useEffect(() => {
+    if (!legacyGrammarContext?.level || !legacyGrammarContext?.day) return;
+    const params = new URLSearchParams(location.search || "");
+    recordLessonResumeActivity({
+      level: legacyGrammarContext.level,
+      day: legacyGrammarContext.day,
+      activeView: activeTab || requestedView || "workbook",
+      route: `${location.pathname}${location.search || ""}`,
+      radioDone: params.get("radio") === "done" ? true : undefined,
+      source: "a2-b1-workbook",
+    }).catch(() => {});
+  }, [activeTab, legacyGrammarContext, location.pathname, location.search, requestedView]);
 
   const selectTab = (key) => {
     onChange?.(key);
