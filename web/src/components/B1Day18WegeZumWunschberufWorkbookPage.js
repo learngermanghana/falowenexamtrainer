@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
   day: 18,
@@ -102,43 +103,7 @@ export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
       "Ich möchte meine ... verbessern.",
       "Ein Vorteil dieses Berufs ist, dass ...",
       "Eine Herausforderung ist, dass ...",
-      "Zusammenfassend kann ich sagen, dass ...",
-    ],
-  },
-  writing: {
-    title: "Gibt es verschiedene Wege zum Wunschberuf?",
-    instructions: "Lesen Sie Lenas Meinung und schreiben Sie Ihre eigene Antwort. Erklären Sie, ob es verschiedene Wege zum Wunschberuf gibt und welche Wege Sie sinnvoll finden.",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Berufsplanung und Bewerbung schreiben",
-    sourceTitle: "Aufgabe",
-    sourceText: "Gibt es verschiedene Wege zum Wunschberuf? Schreiben Sie Ihre Meinung. Lena: Es gibt viele Wege, um den Wunschberuf zu erreichen. Ich stimme dem zu, denn manche Menschen machen eine Ausbildung, andere studieren an einer Universität. Dennoch kann man auch durch Praktika oder Weiterbildungen ein Ziel erreichen. Ich finde, dass jeder seinen eigenen Weg wählen sollte, je nachdem, was am besten zu ihm passt. Was denken Sie darüber?",
-    taskPoints: [
-      "Beziehen Sie sich kurz auf Lenas Meinung.",
-      "Schreiben Sie, ob Sie zustimmen oder nicht.",
-      "Nennen Sie verschiedene Wege: Ausbildung, Studium, Praktikum oder Weiterbildung.",
-      "Erklären Sie, warum Menschen unterschiedliche Wege brauchen.",
-      "Schreiben Sie ein klares Fazit.",
-    ],
-    supportStructure: [
-      "Einleitung: Ich finde Lenas Meinung interessant, weil ...",
-      "Meinung: Ich stimme ihr zu / Ich stimme ihr teilweise zu.",
-      "Begründung 1: Eine Ausbildung ist sinnvoll, wenn ...",
-      "Begründung 2: Ein Studium oder Praktikum kann helfen, weil ...",
-      "Fazit: Deshalb denke ich, dass jeder den Weg wählen sollte, der zu ihm passt.",
-    ],
-    vocabulary: [
-      "der Wunschberuf",
-      "die Ausbildung",
-      "das Studium",
-      "das Praktikum",
-      "die Weiterbildung",
-      "die Qualifikation",
-      "Berufserfahrung sammeln",
-      "sich bewerben",
-      "eigene Stärken erkennen",
-      "zum Ziel passen",
-    ],
-    template: "Ich finde Lenas Meinung sehr richtig. Es gibt nicht nur einen Weg zum Wunschberuf, weil jeder Mensch andere Stärken und Möglichkeiten hat. Manche brauchen ein Studium, andere erreichen ihr Ziel durch eine Ausbildung oder praktische Erfahrung. Praktika sind auch wichtig, weil man den Beruf besser kennenlernen kann. Meiner Meinung nach sollte jeder den Weg wählen, der zu seinen Interessen und Lebensumständen passt. Zusammenfassend denke ich, dass verschiedene Wege zum Wunschberuf möglich und sinnvoll sind.",
+     writing: getB1WritingTask(18),edene Wege zum Wunschberuf möglich und sinnvoll sind.",
   },
   reading: {
     title: "Lesen Sie den Text über Berufswahl und beantworten Sie die sieben Fragen.",
