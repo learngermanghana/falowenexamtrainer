@@ -6,6 +6,7 @@ import { B2_READING_PRACTICE } from "../data/b2ReadingPractice";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
+import { B2_WRITE_DAYS, getB2WritingTask } from "../data/b2WritingTasks";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -15,6 +16,8 @@ describe("B2 unified C2-style course structure", () => {
   const registry = read("SelfLearningLessonRegistry.js");
   const nav = read("StandardWorkbookComponents.js");
   const courseTab = read("CourseTab.js");
+  const writingPrompt = read("WritingTaskPrompt.js");
+  const writingWorkspace = read("GuidedWritingWorkspace.js");
 
   test("uses the agreed four-day rotating main-skill cycle", () => {
     expect(B2_SKILL_DAYS.lesen).toEqual([1, 5, 9, 13, 17, 21, 25]);
@@ -104,6 +107,35 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("Modellsatz für heute");
     expect(page).toContain("Mini-Übung");
     expect(page).toContain("<GrammarLessonContent day={day} />");
+  });
+
+  test("uses exactly four Goethe-style points on every B2 Write day", () => {
+    expect(B2_WRITE_DAYS).toEqual([4, 8, 12, 16, 20, 24, 28]);
+
+    B2_WRITE_DAYS.forEach((day) => {
+      expect(getB2WritingTask(day).bullets).toHaveLength(4);
+    });
+
+    expect([4, 8, 12, 20].map((day) => getB2WritingTask(day).type)).toEqual([
+      "opinion", "opinion", "opinion", "opinion",
+    ]);
+    expect([16, 24, 28].map((day) => getB2WritingTask(day).type)).toEqual([
+      "formal", "formal", "formal",
+    ]);
+  });
+
+  test("connects the canonical B2 writing task, note, word minimum and starter template to the Write page", () => {
+    expect(page).toContain('applyB2WritingTaskToLesson');
+    expect(page).toContain('getB2WritingTask(day)');
+    expect(page).toContain('minimumWords: writingTask.minimumWords');
+    expect(page).toContain('<WritingTaskPrompt lesson={writingLesson} />');
+    expect(page).toContain('<GuidedWritingWorkspace config={writingConfig}');
+
+    expect(writingPrompt).toContain('data-writing-task-note="true"');
+    expect(writingWorkspace).toContain('data-writing-word-requirement="true"');
+    expect(writingWorkspace).toContain('const meetsMinimumWords');
+    expect(writingWorkspace).toContain('starterEllipsisWarning');
+    expect(writingWorkspace).toContain('Replace every <strong>...</strong> with your own content');
   });
 
   test("gives every B2 review exactly three concise model points", () => {
