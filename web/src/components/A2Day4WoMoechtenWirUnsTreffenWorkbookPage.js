@@ -28,21 +28,7 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Fo
   <p style={paragraph}><strong>Useful structure:</strong> Sehr geehrter Herr Asadu, → Grund → Vorschlag → Zeit/Ort → Bitte → Mit freundlichen Grüßen.</p>
 </WorkbookTaskCard>;
 
-const readingText = `Pläne für die Freizeit
 
-Für das Wochenende und die Ferien mache ich gern Pläne. An den freien Samstagen und Sonntagen werde ich lange schlafen. Dann klingelt der Wecker nicht. Aber ich werde für die Wochenenden nicht zu viel planen, weil ich gern faul bin und nichts tue. Aber ich werde vielleicht zum Sport gehen. Manchmal habe ich am Wochenende ein Turnier. Diesen Sonntag zum Beispiel werde ich mit meinem Team in eine andere Stadt fahren. Wir werden dort ein Match gegen einen anderen Hockeyverein spielen. Das wird bestimmt ein Spaß.
-
-Wenn das Wetter schön ist, werde ich anschließend mit meinen Freunden schwimmen gehen. In der Nähe gibt es einen See, der wird schon warm genug sein.
-
-Wenn ich länger frei habe, mache ich gerne größere Pläne. In den Sommerferien werde ich sehr oft mit meinen Freunden unterwegs sein. Wir werden zum See fahren. Dort werden wir im Zelt übernachten und beim Lagerfeuer sitzen. Eine oder zwei Wochen möchte ich gerne reisen. Ein Freund wird mich auf der Reise begleiten, wir werden mit dem Zug losfahren. Wir planen eine Route durch das ganze Land, von West bis Ost und von Süd bis Nord. Mit Rucksäcken und Wanderschuhen werden wir auch in die Berge fahren. Am liebsten würde ich dort in einer Hütte übernachten. Wir werden sehen, ob wir das auch schaffen werden. Ein Abenteuer wird es aber ganz bestimmt.`;
-
-const readingQuestions = [
-  { stem: "Was macht der Erzähler am liebsten am Wochenende?", options: ["a) In die Berge fahren", "b) Faul sein", "c) Viel essen", "d) Lernen"] },
-  { stem: "Welchen Sport macht er manchmal am Wochenende?", options: ["a) Tennis spielen", "b) Laufen", "c) Wandern", "d) Hockey spielen"] },
-  { stem: "Was macht er gern mit Freunden am Wochenende?", options: ["a) Schwimmen gehen", "b) Faul sein", "c) Shoppen", "d) Wandern"] },
-  { stem: "Was plant der Erzähler mit den Freunden im Sommer?", options: ["a) Eine Radtour", "b) In einen Vergnügungspark fahren", "c) Schach spielen", "d) Zum See fahren und dort im Zelt übernachten"] },
-  { stem: "Welche größeren Pläne hat er in den Sommerferien?", options: ["a) Einen Urlaub am Meer", "b) Eine Route mit dem Zug durch das ganze Land", "c) Eine Reise in die nächste Stadt", "d) Campen mit dem Zelt in den Bergen"] },
-];
 
 const listeningQuestions = [
   { stem: "Wann treffen sich Anna, Ben und Claudia am Samstag?", options: ["a) Um 9 Uhr", "b) Um 10 Uhr", "c) Um 11 Uhr"] },
@@ -63,8 +49,6 @@ export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
       sprechenContent={speakingContent}
       schreibenContent={writingContent}
       schreibenPlaceholder={"Sehr geehrter Herr Asadu,\n\nich schreibe Ihnen, weil ...\n\nWir könnten am ... zusammen ...\nHaben Sie um ... Zeit? Wir könnten uns ... treffen.\n\nKönnten Sie bitte ... mitbringen?\n\nIch freue mich auf Ihre Antwort.\n\nMit freundlichen Grüßen\n[Ihr Name]"}
-      lesenText={readingText}
-      lesenQuestions={readingQuestions}
       hoerenTask="Hören: Ein Wochenende mit Freunden planen. Sieh dir das eingebettete Video an und beantworte danach die fünf Fragen."
       hoerenAudioUrl="https://youtu.be/tHAo8hxjKmw"
       hoerenQuestions={listeningQuestions}
