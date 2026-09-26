@@ -60,20 +60,29 @@ describe("Falowen public help and AI discovery", () => {
     expect(courseMap.counts).toMatchObject({ A1: 29, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
     expect(courseMap.lessons).toHaveLength(173);
 
+    const a1Day1 = courseMap.lessons.find((lesson) => lesson.level === "A1" && lesson.day === 1);
+    const a2Day6 = courseMap.lessons.find((lesson) => lesson.level === "A2" && lesson.day === 6);
     const a2Day14 = courseMap.lessons.find((lesson) => lesson.level === "A2" && lesson.day === 14);
+    const b1Day15 = courseMap.lessons.find((lesson) => lesson.level === "B1" && lesson.day === 15);
     const b1Day21 = courseMap.lessons.find((lesson) => lesson.level === "B1" && lesson.day === 21);
     const b2Day6 = courseMap.lessons.find((lesson) => lesson.level === "B2" && lesson.day === 6);
     const c1Day16 = courseMap.lessons.find((lesson) => lesson.level === "C1" && lesson.day === 16);
     const c2Day2 = courseMap.lessons.find((lesson) => lesson.level === "C2" && lesson.day === 2);
 
+    expect(a1Day1.sectionRoutes.radio).toContain("view=radio");
+    expect(a1Day1.sectionRoutes.submit).toContain("view=submit");
+    expect(a2Day6.sectionRoutes.hoeren).toContain("view=hoeren");
     expect(a2Day14.availableSections.some((section) => section.key === "hoeren")).toBe(false);
+    expect(a2Day14.sectionRoutes.hoeren).toBeUndefined();
+    expect(b1Day15.sectionRoutes.schreiben).toContain("view=schreiben");
     expect(b1Day21.availableSections.some((section) => section.key === "hoeren")).toBe(false);
+    expect(b1Day21.sectionRoutes.hoeren).toBeUndefined();
     expect(b2Day6.skillFocus).toBe("hoeren");
     expect(b2Day6.sectionRoutes.hoeren).toContain("view=hoeren");
-    expect(c1Day16.sectionRoutes).toBeUndefined();
+    expect(c1Day16.sectionRoutes.write).toContain("view=write");
     expect(c2Day2.skillFocus).toBe("hoeren");
     expect(c2Day2.media.audioAvailable).toBe(true);
-    expect(courseMap.assistantRules.join(" ")).toContain("Do not invent ?view= links for C1");
+    expect(courseMap.assistantRules.join(" ")).toContain("A1 through C2");
   });
 
   test("documents the exact current Learn to Course Book path and rejects invented labels", () => {
