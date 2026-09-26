@@ -136,6 +136,9 @@ describe("B2 unified C2-style course structure", () => {
     expect(writingWorkspace).toContain('const meetsMinimumWords');
     expect(writingWorkspace).toContain('starterEllipsisWarning');
     expect(writingWorkspace).toContain('Replace every <strong>...</strong> with your own content');
+    expect(writingWorkspace).toContain("const b2PlanningBullets");
+    expect(writingWorkspace).toContain("Write one short idea for each of the four task points");
+    expect(writingWorkspace).toContain("placeholder={planningNotesPlaceholder}");
   });
 
   test("gives every B2 review exactly three concise model points", () => {
