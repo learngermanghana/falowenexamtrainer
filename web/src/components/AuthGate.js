@@ -53,6 +53,70 @@ const appendSupportDetails = (message, error) => {
   return `${message}\n${details.join("\n")}`;
 };
 
+const getRecoveryAction = (error, identifier = "") => {
+  const code = String(error?.code || "");
+  const reason = String(getDiagnosticValue(error, "reason") || "").toLowerCase();
+  const profile = error?.diagnostic?.profile || {};
+  const diagnosticEmail = getDiagnosticValue(error, "email");
+  const paystackLink = profile?.paystackLink || getDiagnosticValue(error, "paystackLink");
+  const enteredEmail = String(identifier || "").includes("@");
+
+  if (["auth/invalid-credential", "auth/wrong-password", "auth/password-mismatch", "auth/too-many-requests"].includes(code)) {
+    return {
+      kind: "reset",
+      title: "Reset your password",
+      description: enteredEmail
+        ? "Send a reset link to the email address above."
+        : diagnosticEmail
+          ? `Use the email on this account: ${diagnosticEmail}`
+          : "Enter the email address linked to this student account, then request a reset link.",
+    };
+  }
+
+  if (["auth/payment-status-blocked", "auth/contract-ended"].includes(code) || reason === "payment_status" || reason === "contract_ended") {
+    return {
+      kind: paystackLink ? "payment" : "support",
+      title: code === "auth/contract-ended" ? "Renew your access" : "Continue payment",
+      description: paystackLink
+        ? "Open the saved Falowen payment link. Your account is only marked paid after Paystack confirms the transaction."
+        : "This account needs a payment or renewal update. Contact Falowen support with the details shown below.",
+      href: paystackLink || "",
+    };
+  }
+
+  if (["auth/account-inactive", "auth/user-disabled", "auth/student-access-blocked", "auth/login-diagnostic"].includes(code)) {
+    return {
+      kind: "support",
+      title: "Contact support",
+      description: "Falowen found the account, but its current status requires an admin review before login can continue.",
+    };
+  }
+
+  if (code === "auth/user-not-found") {
+    return enteredEmail
+      ? {
+          kind: "signup",
+          title: "No account found",
+          description: "Check the email for a typo. If you are new to Falowen, create an account.",
+        }
+      : {
+          kind: "email",
+          title: "Try your email address",
+          description: "If the student code is not recognized, sign in with the email attached to your Falowen account.",
+        };
+  }
+
+  if (code === "auth/permission-denied" || code === "permission-denied") {
+    return {
+      kind: "support",
+      title: "Account lookup needs support",
+      description: "Falowen could not verify this account record. Contact support instead of creating a duplicate account.",
+    };
+  }
+
+  return null;
+};
+
 const formatAuthErrorMessage = (error, mode = "login") => {
   const code = error?.code;
   let message = "";
@@ -143,6 +207,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [resetting, setResetting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [recoveryAction, setRecoveryAction] = useState(null);
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
@@ -166,6 +231,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setLoading(true);
     setMessage("");
     setAuthError("");
+    setRecoveryAction(null);
 
     try {
       if (mode === "signup") {
@@ -233,6 +299,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       console.error(error);
       const errorMessage = formatAuthErrorMessage(error, mode);
       setAuthError(errorMessage);
+      if (mode === "login") {
+        setRecoveryAction(getRecoveryAction(error, email));
+      }
       showToast(errorMessage, "error");
       triggerInteractionFeedback({
         sound: "error",
@@ -258,6 +327,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setResetting(true);
     setMessage("");
     setAuthError("");
+    setRecoveryAction(null);
 
     try {
       await resetPassword(email);
@@ -291,6 +361,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setGoogleLoading(true);
     setMessage("");
     setAuthError("");
+    setRecoveryAction(null);
 
     try {
       const result = await loginWithGoogle();
@@ -312,6 +383,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       console.error(error);
       const errorMessage = formatAuthErrorMessage(error, "login");
       setAuthError(errorMessage);
+      setRecoveryAction(getRecoveryAction(error, email));
       showToast(errorMessage, "error");
       triggerInteractionFeedback({
         sound: "error",
@@ -326,6 +398,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
     setAuthError("");
     setMessage("");
+    setRecoveryAction(null);
     triggerInteractionFeedback({
       sound: "open",
       vibratePattern: [35],
@@ -419,7 +492,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             type={mode === "login" ? "text" : "email"}
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setRecoveryAction(null);
+            }}
             style={inputStyle}
             placeholder={mode === "login" ? "you@email.com or STU12345" : undefined}
           />
@@ -530,6 +606,80 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         )}
 
         {authError && <div style={{ ...styles.errorBox, whiteSpace: "pre-line" }}>{authError}</div>}
+
+        {mode === "login" && recoveryAction ? (
+          <section
+            aria-label="Login recovery"
+            style={{
+              ...styles.card,
+              marginTop: 10,
+              background: "#f8fafc",
+              border: "1px solid #cbd5e1",
+              display: "grid",
+              gap: 9,
+            }}
+          >
+            <strong>{recoveryAction.title}</strong>
+            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.55 }}>{recoveryAction.description}</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {recoveryAction.kind === "reset" ? (
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={resetting || loading}
+                  style={styles.secondaryButton}
+                >
+                  {resetting ? "Sending reset email ..." : "Reset password"}
+                </button>
+              ) : null}
+
+              {recoveryAction.kind === "email" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("");
+                    setPassword("");
+                    setAuthError("");
+                    setRecoveryAction(null);
+                  }}
+                  style={styles.secondaryButton}
+                >
+                  Use email login
+                </button>
+              ) : null}
+
+              {recoveryAction.kind === "payment" && recoveryAction.href ? (
+                <a
+                  href={recoveryAction.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ ...styles.primaryButton, display: "inline-flex", textDecoration: "none" }}
+                >
+                  Continue payment
+                </a>
+              ) : null}
+
+              {recoveryAction.kind === "signup" ? (
+                <button
+                  type="button"
+                  onClick={onSwitchToSignup ? onSwitchToSignup : toggleMode}
+                  style={styles.secondaryButton}
+                >
+                  Create account
+                </button>
+              ) : null}
+
+              {recoveryAction.kind === "support" ? (
+                <a
+                  href="mailto:info@falowen.app?subject=Falowen%20login%20support"
+                  style={{ ...styles.secondaryButton, display: "inline-flex", textDecoration: "none" }}
+                >
+                  Contact support
+                </a>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
 
         {message && (
           <div
