@@ -59,10 +59,18 @@ describe("A2 Course Book final audit · Days 25–28", () => {
     expect(grammarRoute).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
   });
 
-  test("keeps late-A2 shared thinking support available for Days 25–28", () => {
+  test("keeps late-A2 grammar focused on each day-specific grammar page", () => {
     const grammarSource = readComponent("A2B1WorkbookGrammarNotesContent.js");
-    expect(grammarSource).toContain("numericDay >= 22 && numericDay <= 28");
-    expect(grammarSource).toContain("A2Days22To28ThinkingFirstGrammarGuide");
-    expect(grammarSource).toContain("A2TopicCollocationPractice");
+    [
+      "A2Day25TagesablaufGrammarPage",
+      "A2Day26GefuehleGrammarPage",
+      "A2Day27DigitaleKommunikationGrammarPage",
+      "A2Day28UeberDieZukunftSprechenGrammarPage",
+    ].forEach((componentName) => expect(grammarSource).toContain(componentName));
+
+    expect(grammarSource).not.toContain("A2Days22To28ThinkingFirstGrammarGuide");
+    expect(grammarSource).not.toContain("A2SituationIntroduction");
+    expect(readComponent("A2B1WorkbookGrammarNotes.js")).not.toContain("A2TopicCollocationPractice");
+    expect(readComponent("A2B1WorkbookGrammarNotes.js")).not.toContain("A2SecondStageGrammarUpgrade");
   });
 });
