@@ -1,0 +1,37 @@
+name: B1 assignment consistency
+
+on:
+  pull_request:
+    paths:
+      - "functions/data/answerKeyManifest.json"
+      - "scripts/auditB1AssignmentConsistency.mjs"
+      - "web/src/components/B1*Workbook*.js"
+      - "web/src/components/B1*GrammarNotesPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/CourseLessonPage.js"
+      - ".github/workflows/b1-assignment-consistency.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "functions/data/answerKeyManifest.json"
+      - "scripts/auditB1AssignmentConsistency.mjs"
+      - "web/src/components/B1*Workbook*.js"
+      - "web/src/components/B1*GrammarNotesPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/CourseLessonPage.js"
+      - ".github/workflows/b1-assignment-consistency.yml"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit B1 Days 1-28
+        run: node scripts/auditB1AssignmentConsistency.mjs
