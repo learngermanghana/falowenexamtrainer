@@ -470,8 +470,6 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
   const search=params.toString();
   navigate({pathname:location.pathname,search:search?`?${search}`:""},{replace:true});
  };
- if(!day||!standard||!knowledge||!mastery||!skillFocus)return null;
-
  const skillDone=skillFocus==="lesen"
   ?Boolean(progress.lesenDone)
   :skillFocus==="hoeren"
@@ -493,6 +491,8 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
   completed:ready,
   source:"c2-unified",
  });
+
+ if(!day||!standard||!knowledge||!mastery||!skillFocus)return null;
 
  return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day} data-c2-skill-focus={skillFocus}>
   <AppBackButton label="Back to Course Book" fallbackPath="/campus/course"/>
