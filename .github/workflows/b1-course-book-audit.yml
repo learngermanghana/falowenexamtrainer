@@ -64,6 +64,7 @@ jobs:
           src/data/b1Days13To16CourseBookAudit.test.js
           src/data/b1Days17To22CourseBookAudit.test.js
           src/data/b1Days23To28CourseBookAudit.test.js
+          src/data/b1ListeningTasks.test.js
           src/components/B1Days12To17LearningUpgrade.test.js
           src/components/B1GrammarEnglishSupport.test.js
           src/components/B1CanonicalAssignmentSource.test.js
