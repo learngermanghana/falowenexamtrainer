@@ -18,7 +18,7 @@ ich wende mich an Sie, da ...
 ...
 
 Falls Sie weitere Informationen benötigen, stehe ich Ihnen gerne zur Verfügung.
-Ich freue mich im Voraus auf Ihre Rückmeldung.
+Ich bedanke mich im Voraus für Ihre Unterstützung und freue mich auf Ihre Rückmeldung.
 
 Mit freundlichen Grüßen
 ...`;
