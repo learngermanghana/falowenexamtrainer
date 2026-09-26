@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import { A2_LISTENING_MODES, A2_LISTENING_TASKS } from "./a2ListeningTasks";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
@@ -30,7 +31,7 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain("day={13}");
     expect(source).toContain('chapter="5.13"');
     expect(source).toContain('title="Ein Vorstellungsgespräch"');
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/kr9Rj2j-ghw"');
+    expect(A2_LISTENING_TASKS[13].audioUrl).toBe("https://youtu.be/kr9Rj2j-ghw");
     expect(source).not.toMatch(/patchReadingContent|WorkbookPageLegacy|MutationObserver/);
   });
 
@@ -41,7 +42,7 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain("day={14}");
     expect(source).toContain('chapter="5.14"');
     expect(source).toContain('workbookId="A2Day14BerufUndKarriere"');
-    expect(source).toContain("showHoeren={false}");
+    expect(A2_LISTENING_TASKS[14].mode).toBe(A2_LISTENING_MODES.NONE);
   });
 
   test("moves Day 15 onto the standard shell with canonical chapter 6.15", () => {
