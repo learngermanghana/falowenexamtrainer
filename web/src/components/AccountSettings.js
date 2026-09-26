@@ -10,7 +10,7 @@ import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus"
 import { formatCurrency } from "../lib/formatters";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
-import { getTrialAccessState } from "../lib/trialAccess";
+import { getTrialLifecycleState } from "../lib/trialAccess";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -59,7 +59,7 @@ const AccountSettings = () => {
   const balanceDue = billingSummary.balanceDue;
 
   const paymentAttempt = useMemo(() => getPaymentAttempt(studentProfile), [studentProfile]);
-  const trialAccess = useMemo(() => getTrialAccessState(studentProfile), [studentProfile]);
+  const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
   const normalizedPaymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
 
@@ -97,27 +97,62 @@ const AccountSettings = () => {
         border: "#93c5fd",
       };
     }
-    if (trialAccess.active) {
+    if (trialLifecycle.key === "ending_soon") {
+      return {
+        key: "trial-ending",
+        label: "Trial ending soon",
+        title: "Pay before your trial ends",
+        body: `Your trial has ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining. Your progress is saved, and payment keeps access uninterrupted.`,
+        tone: "#92400e",
+        background: "#fffbeb",
+        border: "#fcd34d",
+      };
+    }
+    if (trialLifecycle.key === "active") {
       return {
         key: "trial",
         label: "Trial active",
         title: "7-day trial active",
-        body: `You can continue learning during your trial. ${trialAccess.daysRemaining} day${trialAccess.daysRemaining === 1 ? "" : "s"} remaining.`,
+        body: `You can continue learning during your trial. ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining.`,
         tone: "#166534",
         background: "#f0fdf4",
         border: "#86efac",
+      };
+    }
+    if (trialLifecycle.key === "expired_retained") {
+      return {
+        key: "trial-expired",
+        label: "Trial expired · data retained",
+        title: "Restore access by paying",
+        body: `Your course access has ended, but your progress is retained for ${trialLifecycle.retentionDaysRemaining} more day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"}. Pay now to continue with the same account.`,
+        tone: "#9a3412",
+        background: "#fff7ed",
+        border: "#fdba74",
+      };
+    }
+    if (trialLifecycle.key === "retention_ending_soon") {
+      return {
+        key: "retention-ending",
+        label: "Recovery window ending soon",
+        title: "Saved progress is nearing removal",
+        body: `Your retained trial data has ${trialLifecycle.retentionDaysRemaining} day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"} left before the recovery window ends. Pay now to restore access before then.`,
+        tone: "#991b1b",
+        background: "#fef2f2",
+        border: "#fca5a5",
       };
     }
     return {
       key: "attention",
       label: "Payment needs attention",
       title: "Complete payment to continue",
-      body: "Your account does not currently have confirmed paid access. Use the payment section below or refresh status if you have already paid.",
+      body: trialLifecycle.key === "purge_due"
+        ? "The trial recovery window has ended. Contact Falowen support if you need help restoring access."
+        : "Your account does not currently have confirmed paid access. Use the payment section below or refresh status if you have already paid.",
       tone: "#9a3412",
       background: "#fff7ed",
       border: "#fdba74",
     };
-  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialAccess.active, trialAccess.daysRemaining]);
+  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining]);
 
   React.useEffect(() => {
     if (paymentCleared && paymentAttempt) {

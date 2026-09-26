@@ -6,14 +6,11 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
-import { toDateMs } from "../lib/dateUtils";
+import { getTrialLifecycleState, TRIAL_LENGTH_MS, TRIAL_RETENTION_MS } from "../lib/trialAccess";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const TRIAL_DURATION_MS = 7 * DAY_MS;
-const TRIAL_RETENTION_MS = 30 * DAY_MS;
 
 const SetupCheckpoint = () => {
-  const { studentProfile, refreshUser, saveStudentProfile, logout } = useAuth();
+  const { studentProfile, refreshStudentProfile, saveStudentProfile, logout } = useAuth();
   const { i18n } = useTranslation();
   const locale = i18n.language;
   const [status, setStatus] = useState("");
@@ -50,32 +47,26 @@ const SetupCheckpoint = () => {
     return intended;
   }, [paidAmount, studentProfile?.paymentIntentAmount]);
 
-  const trialState = useMemo(() => {
-    const endsAtMs = toDateMs(studentProfile?.trialEndsAt);
-    const startedAtMs = toDateMs(studentProfile?.trialStartedAt);
-    const usedAtMs = toDateMs(studentProfile?.trialUsedAt);
-    const purgeAtMs = toDateMs(studentProfile?.trialPurgeAt);
-    const wasUsed =
-      Number.isFinite(startedAtMs) ||
-      Number.isFinite(endsAtMs) ||
-      Number.isFinite(usedAtMs);
-    const active = Number.isFinite(endsAtMs) && endsAtMs > Date.now();
-    return { active, endsAtMs, purgeAtMs, wasUsed };
-  }, [studentProfile?.trialEndsAt, studentProfile?.trialPurgeAt, studentProfile?.trialStartedAt, studentProfile?.trialUsedAt]);
+  const trialState = useMemo(
+    () => getTrialLifecycleState(studentProfile),
+    [studentProfile]
+  );
+  const trialWasUsed = trialState.key !== "unused";
 
   const handleStartTrial = async () => {
-    if (trialState.wasUsed || startingTrial) return;
+    if (trialWasUsed || startingTrial) return;
     setStartingTrial(true);
     setStatus("");
     try {
       const startedAt = new Date();
-      const endsAt = new Date(startedAt.getTime() + TRIAL_DURATION_MS);
+      const endsAt = new Date(startedAt.getTime() + TRIAL_LENGTH_MS);
       const purgeAt = new Date(endsAt.getTime() + TRIAL_RETENTION_MS);
       await saveStudentProfile({
         trialStartedAt: startedAt.toISOString(),
         trialEndsAt: endsAt.toISOString(),
         trialUsedAt: startedAt.toISOString(),
         trialPurgeAt: purgeAt.toISOString(),
+        trialStatus: "active",
         status: "trial_active",
       });
       setStatus("Your 7-day free trial is active. Opening your Falowen campus...");
@@ -94,8 +85,8 @@ const SetupCheckpoint = () => {
     setRefreshing(true);
     setStatus("");
     try {
-      await refreshUser();
-      setStatus("Status refreshed. If your payment is confirmed, you'll unlock full access.");
+      await refreshStudentProfile?.();
+      setStatus("Status refreshed from your Falowen student record.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not refresh status.";
       setStatus(message);
@@ -138,8 +129,8 @@ const SetupCheckpoint = () => {
           style={{
             ...styles.card,
             margin: 0,
-            borderColor: trialState.wasUsed ? "#e2e8f0" : "#93c5fd",
-            background: trialState.wasUsed ? "#f8fafc" : "#eff6ff",
+            borderColor: trialWasUsed ? "#e2e8f0" : "#93c5fd",
+            background: trialWasUsed ? "#f8fafc" : "#eff6ff",
             display: "grid",
             gap: 12,
           }}
@@ -149,12 +140,18 @@ const SetupCheckpoint = () => {
               Choose how you want to continue
             </span>
             <h3 style={{ margin: "10px 0 4px" }}>
-              {trialState.wasUsed ? "Continue with tuition payment" : "Start free or pay now"}
+              {trialWasUsed ? "Continue with tuition payment" : "Start free or pay now"}
             </h3>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-              {trialState.wasUsed
-                ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Your progress and scores are retained${trialPurgeLabel ? ` until ${trialPurgeLabel}` : " for 30 days after the trial ends"}. Complete your tuition payment before then to continue with the same student code and progress.`
-                : "Start your one-time 7-day free trial for full student access, or pay your tuition now. Starting the trial does not count as a payment or reduce your tuition balance."}
+              {trialState.key === "expired_retained"
+                ? `Your free trial has ended. Your progress and scores are still retained${trialPurgeLabel ? ` until ${trialPurgeLabel}` : " for the 30-day recovery window"}. Pay now to restore access with the same student code and progress.`
+                : trialState.key === "retention_ending_soon"
+                  ? `Your trial has ended and the recovery window is nearly over. Your saved progress is due for removal${trialPurgeLabel ? ` on ${trialPurgeLabel}` : " soon"}. Pay now to restore access before then.`
+                  : trialState.key === "purge_due"
+                    ? "Your trial recovery window has ended. Contact Falowen support if you need help restoring access."
+                    : trialWasUsed
+                      ? `Your one-time free trial${trialEndLabel ? ` ended on ${trialEndLabel}` : " has already been used"}. Complete tuition payment to continue with the same account.`
+                      : "Start your one-time 7-day free trial for full student access, or pay your tuition now. Starting the trial does not count as a payment or reduce your tuition balance."}
             </p>
           </div>
 
@@ -165,7 +162,7 @@ const SetupCheckpoint = () => {
               gap: 10,
             }}
           >
-            {!trialState.wasUsed ? (
+            {!trialWasUsed ? (
               <button
                 type="button"
                 style={{ ...styles.primaryButton, width: "100%" }}

@@ -9,6 +9,7 @@ import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 import { savePaymentAttempt } from "../lib/paymentAttempt";
 
 const PAYMENT_GRACE_PERIOD_DAYS = 7;
+const PAYMENT_DRIVEN_ACCOUNT_UPGRADE_2026_08 = true;
 
 const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) => {
   const numeric = Number(value);
@@ -33,6 +34,7 @@ const TuitionStatusCard = ({
   description,
   checkoutAmountOverride,
   paymentActionLabel,
+  paymentPurpose = "balance",
 }) => {
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -144,6 +146,22 @@ const TuitionStatusCard = ({
     Boolean(idToken);
 
   const paymentGraceNotice = useMemo(() => {
+    if (String(paymentPurpose || "balance").toLowerCase() === "level_upgrade") {
+      const upgradeStatus = String(studentProfile?.upgradeStatus || "").toLowerCase();
+      if (upgradeStatus === "expired") return { daysLeft: 0, isExpired: true };
+      if (upgradeStatus === "pending") {
+        const graceEndMs = new Date(studentProfile?.upgradeGraceEnd || "").getTime();
+        if (Number.isFinite(graceEndMs)) {
+          const millisecondsLeft = graceEndMs - Date.now();
+          return {
+            daysLeft: Math.max(Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)), 0),
+            isExpired: millisecondsLeft <= 0,
+          };
+        }
+      }
+      return null;
+    }
+
     const paymentStatus = `${studentProfile?.paymentStatus || ""}`.toLowerCase();
     if (paymentStatus === "paid") return null;
 
@@ -173,6 +191,9 @@ const TuitionStatusCard = ({
     studentProfile?.joined_at,
     studentProfile?.paymentStatus,
     studentProfile?.upgradeCarryoverUntil,
+    studentProfile?.upgradeGraceEnd,
+    studentProfile?.upgradeStatus,
+    paymentPurpose,
   ]);
 
   const feeSummary = amountToPay > 0 ? (
@@ -241,6 +262,7 @@ const TuitionStatusCard = ({
         body: JSON.stringify({
           studentCode,
           amount: amountToPay,
+          purpose: paymentPurpose,
           redirectUrl: `${window.location.origin}/payment-complete`,
         }),
       });
