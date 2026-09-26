@@ -350,8 +350,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
         ? `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`
         : "You can choose your payment inside Falowen.";
       const paymentInstruction = paymentsEnabled
-        ? "When you are ready, use Account & Billing to complete Paystack payment."
-        : "When you are ready to pay, sign in on the web app and open Account & Billing.";
+        ? "You can start your trial now or pay immediately through Paystack for paid access."
+        : "You can start your trial now. If you want to pay immediately, sign in on the web app and open Account & Billing.";
       const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. You can start learning before payment. ${amountCopy} ${paymentInstruction}${balanceText}`;
       setMessage(successMessage);
       showToast(`Your 7-day trial is active. Start learning now.`, "success");
@@ -422,7 +422,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              Create your account and start your 7-day trial immediately. Explore guided practice, tutor feedback, and your learning path before payment.
+              Create your account and start your 7-day trial immediately. You can explore before payment or pay right away if you prefer.
             </p>
           </div>
         </div>
@@ -801,7 +801,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
-            No payment is required to begin your trial. Your trial starts when your account is created.
+            Start your 7-day trial without payment, or pay immediately after signup if you prefer.
           </p>
         </form>
 
