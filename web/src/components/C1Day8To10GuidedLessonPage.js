@@ -78,6 +78,7 @@ export default function C1Day8To10GuidedLessonPage({ lesson, canonicalLesson = n
     progress,
     setProgress,
     completed: Boolean(progress.completed),
+    onRemoteRadioDone: () => setEntered(true),
     source: "c1-guided",
   });
 
