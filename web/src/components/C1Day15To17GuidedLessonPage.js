@@ -50,6 +50,7 @@ export default function C1Day15To17GuidedLessonPage({ lesson, canonicalLesson = 
     progress,
     setProgress,
     completed: Boolean(progress.completed),
+    onRemoteRadioDone: () => setEntered(true),
     source: "c1-guided",
   });
   if (!entered && radio) return <div style={{ ...styles.container, display: "grid", gap: 18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="C1" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
