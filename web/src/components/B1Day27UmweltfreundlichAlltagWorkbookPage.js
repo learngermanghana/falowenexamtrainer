@@ -29,8 +29,9 @@ export const B1_DAY27_UMWELTFREUNDLICH_ALLTAG_WORKBOOK_CONFIG = {
     activityOrdered: true,
     activityPoints: ["Was kann man zu Hause tun?", "Wie kann man umweltfreundlich einkaufen?", "Wie kann man umweltfreundlich unterwegs sein?", "Was fällt euch schwer? Was klappt gut?"],
     answerStructure: ["Das Thema vorstellen.", "Möglichkeiten zu Hause beschreiben.", "Einkaufen und Mobilität erklären.", "Schwierigkeiten und Vorteile vergleichen.", "Eine realistische Lösung formulieren."],
-    usefulPhrases: ["Zu Hause kann man umweltfreundlicher leben, indem man ...", "Beim Einkaufen ist es sinnvoll, ...", "Unterwegs könnte man öfter ...", "Für mich ist swriting: getB1WritingTask(27),ehrsmittel", "Umweltschutz", "kleine Schritte machen"],
+    usefulPhrases: ["Zu Hause kann man umweltfreundlicher leben, indem man ...", "Beim Einkaufen ist es sinnvoll, ...", "Unterwegs könnte man öfter ...", "Für mich ist schwierig, dass ...", "Gut klappt schon, dass ..."],
   },
+  writing: getB1WritingTask(27),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",

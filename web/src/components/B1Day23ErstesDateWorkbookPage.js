@@ -99,10 +99,10 @@ export const B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG = {
       "Ein Nachteil könnte sein, dass …",
       "Im Vergleich zu einem Restaurant ist ein Spaziergang …",
       "Für ein gutes erstes Date ist wichtig, dass …",
-      "writing: getB1WritingTask(23),ennenlernen",
-      "eine Beziehung entwickeln",
+      "Ich würde diese Möglichkeit wählen, weil …",
     ],
   },
+  writing: getB1WritingTask(23),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions:

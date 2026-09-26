@@ -103,8 +103,10 @@ export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
       "Ich möchte meine ... verbessern.",
       "Ein Vorteil dieses Berufs ist, dass ...",
       "Eine Herausforderung ist, dass ...",
-     writing: getB1WritingTask(18),edene Wege zum Wunschberuf möglich und sinnvoll sind.",
+      "Zusammenfassend kann ich sagen, dass ...",
+    ],
   },
+  writing: getB1WritingTask(18),
   reading: {
     title: "Lesen Sie den Text über Berufswahl und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

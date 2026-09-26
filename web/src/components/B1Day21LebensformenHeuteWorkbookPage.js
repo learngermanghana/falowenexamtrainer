@@ -179,8 +179,11 @@ const config = {
       "Meiner Meinung nach …",
       "Einerseits …, andererseits …",
       "Ein Vorteil/Nachteil ist, dass …",
-      "Für mich passt … am beswriting: getB1WritingTask(21),bekommen", "Privatsphäre haben", "sich einsam fühlen"],
+      "Für mich passt … am besten, weil …",
+      "Obwohl …, finde ich …",
+    ],
   },
+  writing: getB1WritingTask(21),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle fünf Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

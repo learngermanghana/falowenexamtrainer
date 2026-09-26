@@ -28,8 +28,9 @@ export const B1_DAY28_KLIMAFREUNDLICH_LEBEN_WORKBOOK_CONFIG = {
     activityTitle: "Thema: Klimafreundlich leben – Was kann jeder Einzelne tun?",
     activityPoints: ["Beschreiben Sie Möglichkeiten für klimafreundliches Leben.", "Nennen Sie Vorteile und Nachteile.", "Beschreiben Sie die Situation in Ihrem Land.", "Sagen Sie, welche Maßnahme für Sie persönlich realistisch ist."],
     answerStructure: ["Das Thema Klimaschutz kurz vorstellen.", "Beispiele aus Energie, Verkehr, Konsum und Ernährung nennen.", "Vorteile und Nachteile erklären.", "Die Situation im eigenen Land beschreiben.", "Eine persönliche Meinung und einen Schluss formulieren."],
-    usefulPhrases: ["In meinem Land kann man klimafreundlich leben, indem man ...", "Ein Vorteil ist, dass ...", "Ein Nachteil ist jedoch, dass ...", "Für viele Menschen ist es schwierig, weil ...", "Trwriting: getB1WritingTask(28),k vermeiden", "Strom sparen", "einen Beitrag leisten"],
+    usefulPhrases: ["In meinem Land kann man klimafreundlich leben, indem man ...", "Ein Vorteil ist, dass ...", "Ein Nachteil ist jedoch, dass ...", "Für viele Menschen ist es schwierig, weil ...", "Trotzdem kann jeder einen kleinen Beitrag leisten."],
   },
+  writing: getB1WritingTask(28),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",

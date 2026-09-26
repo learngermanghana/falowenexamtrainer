@@ -40,8 +40,9 @@ const config = {
       "Ein persönliches Beispiel oder eine typische Reklamation nennen.",
       "Tipps für sicheres Einkaufen geben und die Meinung zusammenfassen.",
     ],
-    usefulPhrases: ["Ich möchte die Ware zurückgeben.", "Das Produkt ist beschädigt angekommen.", "Wie funktioniert die Rücksendung?", "Ich möchte mein Geld zwriting: getB1WritingTask(25),eiten", "Ersatz verlangen", "den Kaufpreis erstatten"],
+    usefulPhrases: ["Ich möchte die Ware zurückgeben.", "Das Produkt ist beschädigt angekommen.", "Wie funktioniert die Rücksendung?", "Ich möchte mein Geld zurück.", "Könnten Sie mir bitte Ersatz schicken?"],
   },
+  writing: getB1WritingTask(25),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

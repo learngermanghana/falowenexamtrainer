@@ -118,10 +118,10 @@ export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
       "Ein Beispiel für nachhaltigen Konsum ist …",
       "Meiner Meinung nach sollten wir mehr auf … achten.",
       "Einerseits …, andererseits …",
-      "In Zukunft wird nachhawriting: getB1WritingTask(24),st konsumieren",
-      "CO₂-Ausstoß reduzieren",
+      "In Zukunft wird nachhaltiger Konsum immer wichtiger sein, weil …",
     ],
   },
+  writing: getB1WritingTask(24),
   reading: {
     title:
       "Lesen Sie den Text und entscheiden Sie bei allen sieben Aussagen: richtig oder falsch.",

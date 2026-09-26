@@ -91,10 +91,10 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
       "Falls unser Gepäck verloren geht, sollten wir ...",
       "Wir könnten den Kundenservice kontaktieren.",
       "Am wichtigsten ist, dass man ruhig bleibt.",
-      "Ich würde eiwriting: getB1WritingTask(26),rvice kontaktieren",
-      "eine Lösung finden",
+      "Ich würde eine Reiseversicherung abschließen, weil ...",
     ],
   },
+  writing: getB1WritingTask(26),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
