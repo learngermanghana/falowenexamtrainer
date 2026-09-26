@@ -4,33 +4,8 @@ import { WorkbookTaskCard } from "./StandardWorkbookComponents";
 
 const writingListStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
 
-const bankChoices = [
-  "A) Deutsche Bank",
-  "B) Sparkasse",
-  "C) Commerzbank",
-  "D) Volksbank",
-  "E) Postbank",
-  "F) ING-DiBa",
-];
 
-const bankAdvertText = [
-  "A · Deutsche Bank — Konto eröffnen, Beratung, Online-Banking · Mo–Fr 9:00–17:00, Sa 10:00–14:00 · mehrere Standorte in der Stadt",
-  "B · Sparkasse — Konto eröffnen, Kreditkarten, Beratung für neue Kunden · Mo–Fr 8:00–18:00, Sa 9:00–13:00 · zentral gelegen",
-  "C · Commerzbank — Konto eröffnen, Kreditkarten, Versicherungen · Mo–Fr 9:00–16:00 · wenige Standorte",
-  "D · Volksbank — Konto eröffnen, Beratung, Online-Banking, Kreditkarten · Mo–Fr 9:00–18:00, Sa geschlossen · Filialen in den Vororten",
-  "E · Postbank — Konto eröffnen, Kreditkarten, Sparen · Mo–Fr 8:00–16:00, Sa 10:00–12:00 · Filialen in der Innenstadt",
-  "F · ING-DiBa — Online-Konto eröffnen, Kreditkarten, telefonische Beratung · 24/7 Online-Service · keine persönlichen Filialen",
-  "",
-  "Antwortregel: Verwenden Sie für jede Frage den festen Bankcode A–F aus der Anzeige. Die Buchstaben ändern sich nicht von Frage zu Frage.",
-].join("\n");
 
-const lesenQuestions = [
-  { stem: "Welche Bank hat die längsten Öffnungszeiten?", options: bankChoices },
-  { stem: "Welche Bank bietet keine persönlichen Filialen an?", options: bankChoices },
-  { stem: "Welche Bank ist zentral gelegen und bietet Beratung für neue Kunden?", options: bankChoices },
-  { stem: "Welche Bank hat Filialen in den Vororten?", options: bankChoices },
-  { stem: "Welche Bank hat die kürzesten Öffnungszeiten?", options: bankChoices },
-];
 
 const hoerenQuestions = [
   {
@@ -97,8 +72,6 @@ export default function A2Day18DieBankAnrufenWorkbookPage() {
       showSpeakingTaskCard={false}
       schreibenTask="Sie sind jetzt in Ghana und Ihre Karte wurde gesperrt. Schreiben Sie einen Brief an Ihre Bank in Ghana."
       schreibenContent={schreibenContent}
-      lesenText={bankAdvertText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Hören Sie das Gespräch über einen Anruf bei der Bank. Achten Sie auf Dokumente, Termin, Dauer des Gesprächs, Kontomodelle und Online-Formulare."
       hoerenAudioUrl="https://youtu.be/cHKVQOLWv7c"
       hoerenQuestions={hoerenQuestions}
