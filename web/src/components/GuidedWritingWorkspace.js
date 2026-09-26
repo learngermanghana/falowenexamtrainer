@@ -16,33 +16,37 @@ import WritingFeedbackCard from "./WritingFeedbackCard";
 import PrepositionCaseCoachField from "./PrepositionCaseCoachField";
 import { normalizeWritingFeedback } from "../lib/writingFeedbackNormalizer";
 
-const FORMAL_LETTER_TEMPLATE = `Betreff: ...
+const FORMAL_LETTER_TEMPLATE = `FORMAL LETTER · Use this for complaints, enquiries, applications or official emails
 
-Sehr geehrte Frau ... / Sehr geehrter Herr ...,
+Betreff: [präzises Anliegen]
 
-ich bitte um Verständnis, weil ...
+Sehr geehrte Damen und Herren,
+Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
 
-Zurzeit ...
+hiermit wende ich mich an Sie, da [Anlass] aus meiner Sicht einer Klärung bedarf.
 
-Für die kommenden Tage schlage ich vor, dass ...
+Zunächst möchte ich darauf hinweisen, dass [Punkt 1]. Darüber hinaus ist zu berücksichtigen, dass [Punkt 2].
 
-Mir ist bewusst, dass ...
+Ich bitte Sie daher höflich um [konkrete Bitte] und um eine zeitnahe Rückmeldung.
+
+Für Ihre Unterstützung danke ich Ihnen im Voraus.
 
 Mit freundlichen Grüßen
-...`;
+[Ihr Name]`;
 
-const OPINION_ESSAY_TEMPLATE = `In der heutigen Zeit wird oft über ... diskutiert.
+const OPINION_ESSAY_TEMPLATE = `OPINION ESSAY · Use this for Meinungsbeitrag, Stellungnahme or argument writing
 
-Meiner Meinung nach ...
+In der heutigen Zeit wird oft über [Thema] diskutiert.
 
-Ein wichtiger Grund dafür ist, dass ...
-Ein weiterer Grund ist, dass ...
+Meiner Meinung nach [eigene Meinung].
 
-Eine andere Möglichkeit wäre, ...
+Ein wichtiger Grund dafür ist, dass [Grund 1]. Außerdem sollte man berücksichtigen, dass [Grund 2].
 
-Ein Vorteil davon ist, dass ...
+Natürlich gibt es auch andere Meinungen. Einige Menschen sind der Ansicht, dass [Gegenargument]. Dennoch bin ich der Meinung, dass [eigene Position stärken].
 
-Zusammenfassend lässt sich sagen, dass ...`;
+Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
+
+Zusammenfassend lässt sich sagen, dass [kurzes Fazit].`;
 
 export const C1_OPINION_ESSAY_TEMPLATE = `In der heutigen Zeit wird oft über [Thema] diskutiert. Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Ich vertrete die Ansicht, dass [eigene Meinung].
 
