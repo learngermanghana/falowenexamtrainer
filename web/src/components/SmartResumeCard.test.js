@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SmartResumeCard from "./SmartResumeCard";
 import { useLatestLessonResume } from "../hooks/useLessonResumeSync";
@@ -118,10 +118,10 @@ describe("SmartResumeCard", () => {
     });
 
     const { container } = render(<SmartResumeCard />);
-    await Promise.resolve();
-    await Promise.resolve();
 
-    expect(container.querySelector("[data-smart-resume-card]")).toBeNull();
+    await waitFor(() => {
+      expect(container.querySelector("[data-smart-resume-card]")).toBeNull();
+    });
   });
 
   test("does not show a resume card after the last recorded lesson is complete", () => {
