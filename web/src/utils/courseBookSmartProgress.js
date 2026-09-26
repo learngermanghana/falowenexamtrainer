@@ -93,6 +93,7 @@ export const summarizeResumeSections = (sections = {}) =>
 const completedTutorStatuses = new Set(["passed", "milestonecomplete", "selfmarkedcomplete"]);
 const waitingTutorStatuses = new Set(["submitted", "resubmitted"]);
 const failedTutorStatuses = new Set(["failed", "needs_correction", "needs-improvement"]);
+const inProgressTutorStatuses = new Set(["inprogress", "in_progress", "in-progress"]);
 
 export const resolveCourseBookSmartProgress = ({
   entry = {},
@@ -157,18 +158,20 @@ export const resolveCourseBookSmartProgress = ({
     };
   }
 
-  if (resumeMatches) {
+  if (resumeMatches || inProgressTutorStatuses.has(status)) {
     return {
       ...STATUS_STYLES.inProgress,
       label: activeViewLabel ? `In progress · ${activeViewLabel}` : STATUS_STYLES.inProgress.label,
-      detail: radioDone ? "Falowen Radio complete" : "Continue from your last synced section.",
+      detail: resumeMatches
+        ? (radioDone ? "Falowen Radio complete" : "Continue from your last synced section.")
+        : "A saved draft or lesson activity is already in progress.",
       activeView,
       activeViewLabel,
       sections,
       radioDone,
       resumeMatches,
       continueLabel: activeViewLabel ? `Continue ${activeViewLabel}` : "Continue",
-      continueUrl: resume?.lastRoute || "",
+      continueUrl: resumeMatches ? resume?.lastRoute || "" : "",
     };
   }
 
