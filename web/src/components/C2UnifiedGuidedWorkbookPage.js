@@ -13,6 +13,7 @@ import{getC2ReadingPractice}from"../data/c2ReadingPractice";
 import{getC2ListeningPractice,hasC2ListeningSource}from"../data/c2ListeningPractice";
 import{getC2DayTabs,getC2SkillFocus,getC2SkillLabel,getC2SpeakingSupport,getC2SpeakingSupportNote}from"../data/c2SkillCycle";
 import{useC2CloudDraftField}from"../utils/c2CloudDraftSync";
+import{useLessonResumeSync}from"../hooks/useLessonResumeSync";
 import{useC2CourseProgress}from"../hooks/useC2CourseProgress";
 import{useAuth}from"../context/AuthContext";
 import{markLetterWithAI}from"../services/coachService";
@@ -479,6 +480,19 @@ export default function C2UnifiedGuidedWorkbookPage({lesson}){
       ?Boolean(progress.speakDone)
       :Boolean(progress.writeDone);
  const ready=Boolean(progress.learnDone&&skillDone);
+ useLessonResumeSync({
+  level:"C2",
+  day,
+  chapter:knowledge?.chapter||lesson?.chapter||"",
+  title:standard?.title||lesson?.title||"",
+  activeView:active,
+  route:`${location.pathname}${location.search||""}`,
+  radioDone:new URLSearchParams(location.search||"").get("radio")==="done",
+  progress,
+  setProgress,
+  completed:ready,
+  source:"c2-unified",
+ });
 
  return <main style={{...styles.container,display:"grid",gap:18}} data-c2-unified-day={day} data-c2-skill-focus={skillFocus}>
   <AppBackButton label="Back to Course Book" fallbackPath="/campus/course"/>
