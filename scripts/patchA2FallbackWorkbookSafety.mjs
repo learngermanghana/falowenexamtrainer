@@ -215,11 +215,9 @@ if (!standardSource.includes("tabDescriptionOverrides = null")) {
   standardSource = standardSource.replace(workbookTabPropsAnchor, workbookTabPropsWithOverrides);
 }
 
-const effectiveTabsAnchor = `  } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
-  const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
+const effectiveTabsAnchor = `  const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
   const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");`;
-const displayTabsBlock = `  } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
-  const displayTabs = tabDescriptionOverrides
+const displayTabsBlock = `  const displayTabs = tabDescriptionOverrides
     ? effectiveTabs.map((tab) =>
         Object.prototype.hasOwnProperty.call(tabDescriptionOverrides, tab.key)
           ? { ...tab, description: tabDescriptionOverrides[tab.key] }
