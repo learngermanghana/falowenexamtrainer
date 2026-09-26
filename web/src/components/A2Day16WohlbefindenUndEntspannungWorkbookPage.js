@@ -134,28 +134,6 @@ const schreibenContent = (
 
 
 
-const hoerenQuestions = [
-  {
-    stem: "Was wird als ein einfacher Anfang für eine gesunde Ernährung empfohlen?",
-    options: ["A) Mehr Fleisch essen", "B) Mehr Obst und Gemüse essen", "C) Mehr Fast Food essen"],
-  },
-  {
-    stem: "Wie lange sollte man täglich mindestens gehen oder sich bewegen?",
-    options: ["A) 10 Minuten", "B) 20 Minuten", "C) 30 Minuten"],
-  },
-  {
-    stem: "Was kann motivierend sein, um fit zu bleiben?",
-    options: ["A) Der Besuch eines Fitnessstudios", "B) Mehr zu schlafen", "C) Mehr Fernsehen schauen"],
-  },
-  {
-    stem: "Warum ist der regelmäßige Besuch beim Arzt wichtig?",
-    options: ["A) Um neue Rezepte zu bekommen", "B) Um Krankheiten frühzeitig zu erkennen", "C) Um Medikamente zu kaufen"],
-  },
-  {
-    stem: "Welche Sportarten werden im Text als motivierend erwähnt?",
-    options: ["A) Yoga und Pilates", "B) Schwimmen und Laufen", "C) Tanzen und Radfahren"],
-  },
-];
 
 export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
   return (
@@ -169,9 +147,6 @@ export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
       schreibenTask="E-Mail an einen Arzt wegen Ihrer Gesundheit"
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ..."
-      hoerenTask="Hören Sie den Text über gesunde Ernährung, Bewegung, Fitness und regelmäßige Arztbesuche. Wählen Sie jeweils die richtige Antwort."
-      hoerenAudioUrl="https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing"
-      hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
     />
   );
