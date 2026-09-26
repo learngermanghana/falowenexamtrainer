@@ -29,50 +29,6 @@ export default function A2Day7WohnungSuchenWorkbookPage() {
       showSpeakingTaskCard={false}
       schreibenTask="Sie möchten eine Wohnung in einer bestimmten Stadt mieten. Schreiben Sie eine E-Mail an den Vermieter."
       schreibenContent={schreibenContent}
-      hoerenTask="Sieh dir das eingebettete Video zur Wohnungsbeschreibung an. Achte auf Stockwerk, Größe, Zimmer, Ausstattung und Nebenkosten. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/hM1iPUq1Spg"
-      hoerenQuestions={[
-        {
-          stem: "In welchem Stockwerk befindet sich die Wohnung?",
-          options: [
-            "a) Im ersten Stock",
-            "b) Im zweiten Stock",
-            "c) Im dritten Stock",
-          ],
-        },
-        {
-          stem: "Wie groß ist die Wohnung?",
-          options: [
-            "a) 70 Quadratmeter",
-            "b) 75 Quadratmeter",
-            "c) 80 Quadratmeter",
-          ],
-        },
-        {
-          stem: "Wie viele Zimmer hat die Wohnung?",
-          options: [
-            "a) Zwei",
-            "b) Drei",
-            "c) Vier",
-          ],
-        },
-        {
-          stem: "Was gehört zur Wohnung?",
-          options: [
-            "a) Ein Balkon",
-            "b) Ein Garten",
-            "c) Eine Garage",
-          ],
-        },
-        {
-          stem: "Wie hoch sind die Nebenkosten?",
-          options: [
-            "a) 100 Euro",
-            "b) 150 Euro",
-            "c) 200 Euro",
-          ],
-        },
-      ]}
     />
   );
 }

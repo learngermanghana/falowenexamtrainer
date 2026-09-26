@@ -9,7 +9,6 @@ const A2Day14BerufUndKarriereWorkbookPage = () => (
     workbookId="A2Day14BerufUndKarriere"
     topicPrompt="Beruf und Karriere"
     mindMapOnlySpeaking
-    showHoeren={false}
   />
 );
 

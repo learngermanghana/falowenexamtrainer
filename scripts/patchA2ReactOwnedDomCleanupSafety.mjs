@@ -1,8 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const listeningPath = path.join(root, "web/src/data/a2ListeningTasks.js");
+const { A2_SELF_CHECK_LISTENING_DAYS } = await import(pathToFileURL(listeningPath).href);
+const selfCheckDaysLiteral = JSON.stringify(A2_SELF_CHECK_LISTENING_DAYS);
 const targetPath = path.join(root, "web/src/components/a2GoetheListeningOnlyCleanup.js");
 const guidancePath = path.join(root, "web/src/components/A2B1WorkbookGuidance.js");
 const regressionPath = path.join(root, "web/src/components/A2SharedWorkbookRegression.test.js");
@@ -221,7 +224,7 @@ const guidanceDayReplacement = `${guidanceDayAnchor}
     );
   }, [workbookLevel]);
   const isGoetheSelfCheckDay =
-    workbookLevel === "A2" && [21, 22, 23, 24, 26].includes(Number(workbookDay));
+    workbookLevel === "A2" && ${selfCheckDaysLiteral}.includes(Number(workbookDay));
   const isDay25ReadingOnly = workbookLevel === "A2" && Number(workbookDay) === 25;`;
 if (!guidanceSource.includes("const isGoetheSelfCheckDay =")) {
   if (!guidanceSource.includes(guidanceDayAnchor)) {

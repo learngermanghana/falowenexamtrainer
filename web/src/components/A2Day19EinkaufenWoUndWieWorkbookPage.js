@@ -20,13 +20,6 @@ const schreibenContent = (
 
 
 
-const hoerenQuestions = [
-  { stem: "Was bietet Online-Shopping den Verbrauchern?", options: ["A) Hohe Preise", "B) Bequeme Möglichkeit, Produkte nach Hause zu bestellen", "C) Weniger Auswahl"] },
-  { stem: "Was ist ein Nachteil des Online-Shoppings?", options: ["A) Geringe Anzahl von Rücksendungen", "B) Hohe Anzahl von Rücksendungen und Umweltbelastung", "C) Niedrige Preise"] },
-  { stem: "Worauf müssen Verbraucher beim Online-Kauf achten?", options: ["A) Auf vertrauenswürdige Websites und Schutz persönlicher Daten", "B) Auf hohe Preise", "C) Auf schnelle Lieferung"] },
-  { stem: "Wo sollten die Produkte, die online gekauft werden, herkommen?", options: ["A) Aus nachhaltigen Quellen und fairen Bedingungen", "B) Aus dem Ausland", "C) Aus teuren Geschäften"] },
-  { stem: "Wie hat das Internet den Konsum verändert?", options: ["A) Es hat den Konsum eingeschränkt", "B) Es hat den Konsum revolutioniert und neue Möglichkeiten geschaffen", "C) Es hat keine großen Veränderungen gebracht"] },
-];
 
 export default function A2Day19EinkaufenWoUndWieWorkbookPage() {
   return (
@@ -39,9 +32,6 @@ export default function A2Day19EinkaufenWoUndWieWorkbookPage() {
       schreibenTask="Einladung zum Einkaufen"
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dich zum Einkaufen einladen, weil ..."
-      hoerenTask="Hören Sie den Text ‚Online Shopping und Konsumverhalten‘ und wählen Sie jeweils die richtige Antwort."
-      hoerenAudioUrl="https://drive.google.com/file/d/1OsT5j6Y7a-rMdB0HlRJJ98gTgSvxm_LB/view?usp=sharing"
-      hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
     />
   );

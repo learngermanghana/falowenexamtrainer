@@ -6,8 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8");
 
 const requiredMarkers = {
-  "web/src/components/A2Day3ComparisonsWorkbookPage.js": [
-    'hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"',
+  "web/src/data/a2ListeningTasks.js": [
+    'audioUrl: "https://youtu.be/z0hve7zCDEo"',
   ],
   "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js": [
     'url: "https://youtu.be/F67RRmGNK1c"',
@@ -53,7 +53,7 @@ const requiredMarkers = {
 };
 
 const forbiddenMarkers = {
-  "web/src/components/A2Day3ComparisonsWorkbookPage.js": [
+  "web/src/data/a2ListeningTasks.js": [
     "https://youtu.be/Ml50uHYxBx8",
   ],
   "web/src/data/courseSchedule.js": [

@@ -35,33 +35,6 @@ const schreibenContent = (
 
 
 
-const hoerenQuestions = [
-  {
-    stem: "Wo findet das Oktoberfest statt?",
-    options: ["a) Berlin", "b) Hamburg", "c) München", "d) Frankfurt"],
-  },
-  {
-    stem: "Wie lange dauert das Oktoberfest?",
-    options: ["a) Eine Woche", "b) Zwei Wochen", "c) Drei Wochen", "d) Vier Wochen"],
-  },
-  {
-    stem: "Welche traditionellen Gerichte werden auf dem Oktoberfest serviert?",
-    options: [
-      "a) Pizza und Pasta",
-      "b) Brezeln, Bratwurst und Schweinebraten",
-      "c) Sushi und Ramen",
-      "d) Tacos und Burritos",
-    ],
-  },
-  {
-    stem: "Welche Kleidung tragen viele Menschen auf dem Oktoberfest?",
-    options: ["a) Anzüge und Kleider", "b) Lederhosen und Dirndl", "c) Jeans und T-Shirts", "d) Bademode"],
-  },
-  {
-    stem: "Was gibt es neben Essen und Trinken noch auf dem Oktoberfest?",
-    options: ["a) Konzerte und Opern", "b) Fahrgeschäfte und Spiele", "c) Sportveranstaltungen", "d) Filmvorführungen"],
-  },
-];
 
 export default function A2Day10TourismusTraditionelleFesteWorkbookPage() {
   return (
@@ -75,9 +48,6 @@ export default function A2Day10TourismusTraditionelleFesteWorkbookPage() {
       schreibenTask="Schreiben Sie einen Brief und laden Sie einen Freund oder eine Freundin zu einem Fest ein."
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Liebe/r ...\n\nich möchte dich zu ... einladen. Das Fest findet ... statt."
-      hoerenTask="Höre den Beitrag über das Oktoberfest. Achte auf Ort, Dauer, Essen, Kleidung und Aktivitäten. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/yOfTCQDn_JM"
-      hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
     />
   );

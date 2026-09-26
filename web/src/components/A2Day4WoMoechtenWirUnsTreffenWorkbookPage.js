@@ -30,13 +30,6 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Fo
 
 
 
-const listeningQuestions = [
-  { stem: "Wann treffen sich Anna, Ben und Claudia am Samstag?", options: ["a) Um 9 Uhr", "b) Um 10 Uhr", "c) Um 11 Uhr"] },
-  { stem: "Was bringt Claudia zum Ausflug mit?", options: ["a) Ein Zelt", "b) Einen Rucksack mit Snacks und Getränken", "c) Einen Reiseführer"] },
-  { stem: "Was möchten Ben und Anna im Wald machen?", options: ["a) Einen Film schauen", "b) Ein Picknick machen", "c) Eine Wanderung machen"] },
-  { stem: "Was planen sie am Samstagabend?", options: ["a) Ein Konzert zu besuchen", "b) Ein Picknick im Park", "c) In einem Restaurant essen und einen Film schauen"] },
-  { stem: "Was wollen sie am Sonntag im Park machen?", options: ["a) Spielen und spazieren gehen", "b) Fußball spielen", "c) Fotos machen"] },
-];
 
 export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
   return (
@@ -49,9 +42,6 @@ export default function A2Day4WoMoechtenWirUnsTreffenWorkbookPage() {
       sprechenContent={speakingContent}
       schreibenContent={writingContent}
       schreibenPlaceholder={"Sehr geehrter Herr Asadu,\n\nich schreibe Ihnen, weil ...\n\nWir könnten am ... zusammen ...\nHaben Sie um ... Zeit? Wir könnten uns ... treffen.\n\nKönnten Sie bitte ... mitbringen?\n\nIch freue mich auf Ihre Antwort.\n\nMit freundlichen Grüßen\n[Ihr Name]"}
-      hoerenTask="Hören: Ein Wochenende mit Freunden planen. Sieh dir das eingebettete Video an und beantworte danach die fünf Fragen."
-      hoerenAudioUrl="https://youtu.be/tHAo8hxjKmw"
-      hoerenQuestions={listeningQuestions}
     />
   );
 }

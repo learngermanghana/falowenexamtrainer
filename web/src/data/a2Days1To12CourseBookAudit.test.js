@@ -5,6 +5,7 @@ import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { courseSchedules } from "./courseSchedule";
 import { getConfiguredInAppWorkbookResourceRoute } from "./inAppWorkbookRoutes";
+import { A2_LISTENING_TASKS } from "./a2ListeningTasks";
 
 const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
 const componentRoot = path.resolve(__dirname, "../components");
@@ -135,7 +136,7 @@ describe("A2 Course Book batch audit · Days 1–12", () => {
     expect(source).toContain("day={12}");
     expect(source).toContain('chapter="5.12"');
     expect(source).toContain('workbookId="A2Day12MeinTraumberuf"');
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/VGzHSjn3O-A"');
+    expect(A2_LISTENING_TASKS[12].audioUrl).toBe("https://youtu.be/VGzHSjn3O-A");
     expect(source).not.toMatch(/WorkbookPageLegacy|patchListeningMedia|MutationObserver/);
   });
 });

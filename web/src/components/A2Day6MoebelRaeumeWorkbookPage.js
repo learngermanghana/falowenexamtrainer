@@ -47,15 +47,6 @@ export default function A2Day6MoebelRaeumeWorkbookPage() {
       schreibenTask="Sie sind vor Kurzem umgezogen. Schreiben Sie einer Freundin oder einem Freund eine E-Mail über Ihr neues Zimmer und bearbeiten Sie alle drei Punkte."
       schreibenContent={schreibenContent}
       schreibenPlaceholder={"Hallo ... ,\n\nich schreibe dir, weil ...\n\nMein neues Zimmer ...\n\nBesonders gefällt mir ..., weil ...\n\nViele Grüße\n[Dein Name]"}
-      hoerenTask="Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung. Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein."
-      hoerenAudioUrl="https://youtu.be/WuA8Xabn-Uw"
-      hoerenQuestions={[
-        { stem: "Welche Wohnung ist 70 Quadratmeter groß?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-        { stem: "Welche Wohnung hat einen Balkon?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-        { stem: "Wie hoch sind die Nebenkosten für die 3-Zimmer-Wohnung?", options: ["a) 150 Euro pro Monat", "b) 200 Euro pro Monat"] },
-        { stem: "Welche Wohnung erlaubt Haustiere?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-        { stem: "Welche Wohnung ist ab dem 1. August verfügbar?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-      ]}
     />
   );
 }

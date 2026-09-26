@@ -13,7 +13,6 @@ export default function A2Day25TagesablaufWorkbookPage() {
       topicPrompt="Beschreibe deinen Tagesablauf vom Aufstehen bis zum Schlafengehen. Nenne Uhrzeiten, Arbeit oder Schule, Essen, Freizeit und Abendroutine."
       schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihren Tagesablauf. Beschreiben Sie Ihren Morgen, Ihren Arbeits- oder Schultag und Ihren Abend. Fragen Sie anschließend nach dem Tagesablauf der anderen Person."
       schreibenPlaceholder="Liebe/r ...,\n\nmein Tag beginnt normalerweise um ..."
-      showHoeren={false}
       showWorkbookGuidance={false}
     />
   );

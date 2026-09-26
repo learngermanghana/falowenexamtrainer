@@ -37,10 +37,6 @@ export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() 
       sprechenContent={speakingContent}
       schreibenTask="Ihr Nachbar hat Ihnen geholfen, als Sie krank waren. Schreiben Sie eine kurze Dankesnachricht. Bedanken Sie sich, erklären Sie, wie Sie sich durch die Hilfe gefühlt haben, und bieten Sie an, sich zu revanchieren."
       schreibenPlaceholder="Liebe/r ...,\n\nvielen Dank für deine Hilfe. Ich war sehr ..."
-      hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
-      hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
-      hoerenQuestions={[]}
-      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );

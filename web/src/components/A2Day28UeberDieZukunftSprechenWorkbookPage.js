@@ -27,20 +27,6 @@ const speakingContent = <>
 
 
 
-const hoerenQuestions = [
-  {
-    stem: "Worum geht es im Beitrag?",
-    options: ["A) Um Zukunftspläne und Ziele", "B) Nur um Essen", "C) Um eine Reklamation", "D) Nur um das Wetter"],
-  },
-  {
-    stem: "Welche Formulierung kann man für Zukunftspläne benutzen?",
-    options: ["A) Ich möchte ...", "B) Gestern habe ich ...", "C) Bitte öffnen Sie ...", "D) Es tut mir leid ..."],
-  },
-  {
-    stem: "Was solltest du beim Sprechen über die Zukunft erklären?",
-    options: ["A) Deine Ziele und Gründe", "B) Nur deinen Namen", "C) Nur das Datum", "D) Keine persönlichen Pläne"],
-  },
-];
 
 export default function A2Day28UeberDieZukunftSprechenWorkbookPage() {
   return (
@@ -53,9 +39,6 @@ export default function A2Day28UeberDieZukunftSprechenWorkbookPage() {
       sprechenContent={speakingContent}
       schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihre Zukunftspläne. Beschreiben Sie Ihre beruflichen oder schulischen Ziele, nennen Sie mindestens einen persönlichen Wunsch und fragen Sie nach den Zukunftsplänen der anderen Person."
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinen Zukunftsplänen erzählen. Zuerst ..."
-      hoerenTask="Hören Sie den Beitrag zu Zukunftsplänen. Achten Sie auf Ziele, Zeitangaben und Gründe und beantworten Sie anschließend die Fragen."
-      hoerenAudioUrl="https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
-      hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
     />
   );

@@ -33,50 +33,6 @@ export default function A2Day9UrlaubWorkbookPage() {
       showSpeakingTaskCard={false}
       schreibenTask="Sie planen einen Urlaub und möchten eine Unterkunft reservieren. Schreiben Sie eine E-Mail an ein Hotel."
       schreibenContent={schreibenContent}
-      hoerenTask="Sieh dir das eingebettete Video über Annas letzten Sommerurlaub an. Achte auf das Reiseziel, die Dauer, besondere Orte, Aktivitäten und Annas Wunsch. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/Q6PjXP6Ccik"
-      hoerenQuestions={[
-        {
-          stem: "Wohin ist Anna im letzten Sommerurlaub gereist?",
-          options: [
-            "a) Italien",
-            "b) Griechenland",
-            "c) Spanien",
-          ],
-        },
-        {
-          stem: "Wie lange blieb Anna auf Kreta?",
-          options: [
-            "a) Eine Woche",
-            "b) Zwei Wochen",
-            "c) Drei Tage",
-          ],
-        },
-        {
-          stem: "Was hat Anna besonders gut gefallen?",
-          options: [
-            "a) Die Altstadt von Chania",
-            "b) Der Strand von Elafonissi",
-            "c) Die Berge",
-          ],
-        },
-        {
-          stem: "Was haben Anna und ihre Freunde am letzten Tag gemacht?",
-          options: [
-            "a) Eine Wanderung",
-            "b) Eine Bootstour",
-            "c) Einen Museumsbesuch",
-          ],
-        },
-        {
-          stem: "Was hofft Anna bald wieder zu tun?",
-          options: [
-            "a) Nach Kreta zu reisen",
-            "b) Nach Italien zu reisen",
-            "c) Nach Spanien zu reisen",
-          ],
-        },
-      ]}
     />
   );
 }

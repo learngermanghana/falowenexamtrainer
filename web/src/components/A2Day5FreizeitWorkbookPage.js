@@ -31,13 +31,6 @@ const schreibenContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="
 
 
 
-const hoerenQuestions = [
-  { stem:"Was macht Anna abends gerne?", options:["a) Tee trinken und lesen","b) Fernsehen","c) Telefonieren"] },
-  { stem:"Welches Brettspiel spielt Anna oft?", options:["a) Schach","b) Mensch ärgere dich nicht","c) Uno"] },
-  { stem:"Was macht Anna jeden Morgen?", options:["a) Joggen","b) Yoga","c) Schwimmen"] },
-  { stem:"Wo war Anna letztes Wochenende mit Freunden?", options:["a) Am Strand","b) In den Bergen","c) Im Park"] },
-  { stem:"Welche Musik hört Anna zum Konzentrieren?", options:["a) Pop","b) Klassische Musik","c) Jazz"] }
-];
 
 export default function A2Day5FreizeitWorkbookPage() {
   return <A2StandardTabbedWorkbookPage
@@ -50,8 +43,5 @@ export default function A2Day5FreizeitWorkbookPage() {
     schreibenTask="Du möchtest mit deinem Freund Alex am Wochenende etwas unternehmen. Schreibe Alex eine kurze E-Mail."
     schreibenContent={schreibenContent}
     schreibenPlaceholder={"Lieber Alex,\n\nich habe am Wochenende Zeit und möchte gern ...\n\nHast du am ... Zeit? Was möchtest du machen? Wir könnten ...\n\nViele Grüße\n[Dein Name]"}
-    hoerenTask="Sieh dir das eingebettete Video über Anna und ihre Freizeit an und beantworte danach die Fragen."
-    hoerenAudioUrl="https://youtu.be/V8gcgVcUGQM"
-    hoerenQuestions={hoerenQuestions}
   />;
 }

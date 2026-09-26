@@ -31,13 +31,6 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Br
 
 
 
-const listeningQuestions = [
-  { stem:"Wie alt ist Julia?", options:["a) 24 Jahre","b) 26 Jahre","c) 28 Jahre","d) 30 Jahre"] },
-  { stem:"Was macht Julia beruflich?", options:["a) Köchin","b) Lehrerin","c) Architektin","d) Musikerin"] },
-  { stem:"Wo lebt Tobias?", options:["a) München","b) Frankfurt","c) Hamburg","d) Berlin"] },
-  { stem:"Was möchte Tobias in Zukunft machen?", options:["a) Ein Restaurant eröffnen","b) Musiker werden","c) Eine Weltreise machen","d) Lehrer werden"] },
-  { stem:"Was machen Julia und Tobias oft am Wochenende?", options:["a) Gitarre spielen","b) Gemeinsam kochen","c) In die Berge reisen","d) Ins Kino gehen"] }
-];
 
 export default function A2Day3ComparisonsWorkbookPage() {
   return <A2StandardTabbedWorkbookPage
@@ -49,8 +42,5 @@ export default function A2Day3ComparisonsWorkbookPage() {
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
     schreibenPlaceholder={"Lieber Felix,\n\nmeine Mutter ist ... und mein Vater ist ...\n\nMeine Mutter ist ... als mein Vater. Mein Vater ist genauso ... wie ...\n\nIch mag ... besonders, weil ...\n\nWie sind deine Eltern?\n\nViele Grüße\n[Dein Name]"}
-    hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die fünf Hörverstehen-Fragen."
-    hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"
-    hoerenQuestions={listeningQuestions}
   />;
 }
