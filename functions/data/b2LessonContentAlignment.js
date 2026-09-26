@@ -49,7 +49,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Energie sparen und erneuerbare Energien",
     lessonTopic: "Energieverbrauch, erneuerbare Energien und praktische Einsparmaßnahmen",
     goal: "Energiepolitik, Verbrauch und erneuerbare Lösungen sachlich diskutieren.",
-    grammar_topic: "Passiv und Modalpassiv · falls / sofern · sodass / wodurch",
+    grammar_topic: "Passiv und Modalpassiv · falls / sofern · wodurch / sodass",
   }),
   7: Object.freeze({
     day: 7,
@@ -57,7 +57,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Klimafreundliches Wohnen und grüne Städte",
     lessonTopic: "Energieeffiziente Gebäude, Grünflächen und nachhaltige Stadtentwicklung",
     goal: "Klimafreundliches Wohnen beschreiben und realistische Stadtmaßnahmen vorschlagen.",
-    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · sodass / wodurch",
+    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · wodurch / sodass",
   }),
   8: Object.freeze({
     day: 8,
@@ -193,7 +193,7 @@ const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
     title: "Digitale Gesundheit, Telemedizin und medizinische Technologie",
     lessonTopic: "Gesundheitsdaten, Telemedizin, Versorgung und digitale Systeme",
     goal: "Digitale Gesundheitsangebote mit Chancen, Bedingungen und Risiken diskutieren.",
-    grammar_topic: "Passiv und Modalpassiv · indem / dadurch, dass · sofern · sodass / wodurch",
+    grammar_topic: "Passiv und Modalpassiv · indem / dadurch, dass · sofern · wodurch / sodass",
   }),
   25: Object.freeze({
     day: 25,
