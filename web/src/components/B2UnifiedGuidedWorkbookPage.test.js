@@ -4,6 +4,8 @@ import { B2_SKILL_DAYS, getB2DayTabs, getB2SkillFocus } from "../data/b2SkillCyc
 import { B2_LISTENING_PRACTICE } from "../data/b2ListeningPractice";
 import { B2_READING_PRACTICE } from "../data/b2ReadingPractice";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
+import { getB2GrammarLesson } from "../data/b2GrammarLessons";
+import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -81,6 +83,25 @@ describe("B2 unified C2-style course structure", () => {
       });
       expect(practice.paragraphs.join(" ").split(/\s+/).length).toBeGreaterThan(250);
     });
+  });
+
+  test("renders substantial grammar content for every B2 Course Book day", () => {
+    Array.from({ length: 28 }, (_, index) => index + 1).forEach((day) => {
+      const grammar = getB2GrammarLesson(day);
+      const alignment = getB2LessonContentAlignment(day);
+      expect(grammar.title).toBe(alignment.grammar_topic);
+      expect(grammar.focuses.length).toBeGreaterThanOrEqual(2);
+    });
+
+    expect(page).toContain('import { getB2GrammarLesson } from "../data/b2GrammarLessons"');
+    expect(page).toContain("const GrammarLessonContent = ({ day })");
+    expect(page).toContain('data-b2-grammar-content={day}');
+    expect(page).toContain("grammar.focuses.map");
+    expect(page).toContain("<strong>Regeln</strong>");
+    expect(page).toContain("<strong>Beispiele</strong>");
+    expect(page).toContain("Modellsatz für heute");
+    expect(page).toContain("Mini-Übung");
+    expect(page).toContain("<GrammarLessonContent day={day} />");
   });
 
   test("gives every B2 review exactly three concise model points", () => {

@@ -11,6 +11,7 @@ import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
+import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2ListeningPractice, hasB2ListeningSource } from "../data/b2ListeningPractice";
 import { getB2ReadingPractice } from "../data/b2ReadingPractice";
 import { getB2DayTabs, getB2SkillFocus, getB2SkillLabel } from "../data/b2SkillCycle";
@@ -27,6 +28,54 @@ import { useB2CloudDraftField } from "../utils/b2CloudDraftSync";
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const sub = { border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
+
+const GrammarLessonContent = ({ day }) => {
+  const grammar = getB2GrammarLesson(day);
+  if (!grammar) return null;
+
+  return <div data-b2-grammar-content={day} style={{ display: "grid", gap: 14 }}>
+    <div style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}>
+      <strong>{grammar.title}</strong>
+      <span><strong>Heute im Kontext:</strong> {grammar.context}</span>
+      <span><strong>Lernziel:</strong> {grammar.goal}</span>
+    </div>
+
+    <div style={{ display: "grid", gap: 12 }}>
+      {grammar.focuses.map((item) => <article key={item.title} style={sub}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
+          <strong style={{ fontSize: "1.03rem" }}>{item.title}</strong>
+          <span style={{ color: "#64748b", fontSize: 13 }}>{item.english}</span>
+        </div>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>{item.explanation}</p>
+        <div style={{ borderRadius: 10, padding: 10, background: "#f8fafc", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", lineHeight: 1.6 }}>
+          {item.pattern}
+        </div>
+        <div>
+          <strong>Regeln</strong>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 22, lineHeight: 1.65 }}>
+            {item.rules.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </div>
+        <div>
+          <strong>Beispiele</strong>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 22, lineHeight: 1.65 }}>
+            {item.examples.map((example) => <li key={example}>{example}</li>)}
+          </ul>
+        </div>
+      </article>)}
+    </div>
+
+    <div style={{ ...sub, background: "#f0fdf4", borderColor: "#bbf7d0" }}>
+      <strong>Modellsatz für heute</strong>
+      <span>{grammar.modelSentence}</span>
+    </div>
+    <div style={{ ...sub, background: "#fff7ed", borderColor: "#fed7aa" }}>
+      <strong>Mini-Übung</strong>
+      <span>{grammar.miniExercise}</span>
+    </div>
+  </div>;
+};
+
 
 const normalizeVocab = (lesson = {}) => {
   const raw = Array.isArray(lesson.vocabulary) ? lesson.vocabulary : Array.isArray(lesson.keywords) ? lesson.keywords : [];
@@ -349,7 +398,7 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     {active === "learn" ? <>
       <B2TopicIntroduction day={day} />
       <Section title="Grammar / Learn">
-        <div style={{ ...sub, background: "#f8fafc" }}><strong>Grammar focus</strong><span>{alignment.grammar_topic}</span><span><strong>Goal:</strong> {alignment.goal}</span></div>
+        <GrammarLessonContent day={day} />
         <div data-b2-grammar-video-status="missing" style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }}>
           <strong>Grammar video not added yet</strong>
           <span>Für diesen B2-Tag wurde noch kein passendes Grammatikvideo hinzugefügt. Falowen zeigt bewusst kein altes oder themenfremdes Video.</span>
