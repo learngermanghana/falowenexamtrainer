@@ -326,11 +326,9 @@ export const B1_LISTENING_TASKS = Object.freeze({
     instructions: "This lesson intentionally preserves the existing reading-style Teil 4 instead of inventing a listening resource.",
   }),
   23: task({
-    status: "planned",
-    title: "Hören material for Day 23 will be added here.",
-    instructions: "The listening section is prepared structurally. Add the media and questions when the audio material is available.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones reserved for future listening content",
+    status: "unavailable",
+    title: "Für diese Lektion gibt es kein Teil 4 · Hören.",
+    instructions: "Day 23 intentionally contains Sprechen, Schreiben and Lesen only. The official B1-7.23 answer key has no Teil 4 answers.",
     submitRequired: false,
   }),
   24: task({
