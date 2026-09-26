@@ -30,13 +30,6 @@ const schreibenContent = (
 
 
 
-const hoerenQuestions = [
-  { stem: "Wohin möchte Thomas fahren?", options: ["A) Zum Strand", "B) In die Berge", "C) In die Stadt", "D) Zum Flughafen"] },
-  { stem: "Welches Auto wählt Thomas?", options: ["A) Ein kleines Auto", "B) Ein mittelgroßes Auto", "C) Ein großes Auto", "D) Ein Elektroauto"] },
-  { stem: "Wie viel kostet das Auto pro Tag?", options: ["A) 40 Euro", "B) 50 Euro", "C) 60 Euro", "D) 70 Euro"] },
-  { stem: "Welche Dokumente zeigt Thomas?", options: ["A) Führerschein und Personalausweis", "B) Führerschein und Reisepass", "C) Führerschein und Kreditkarte", "D) Reisepass und Mietvertrag"] },
-  { stem: "Was überprüft Thomas vor der Fahrt?", options: ["A) Den Benzinstand", "B) Das Auto auf mögliche Schäden", "C) Das Navigationssystem", "D) Die Klimaanlage"] },
-];
 
 export default function A2Day11UnterwegsVerkehrsmittelWorkbookPage() {
   return (
@@ -50,9 +43,6 @@ export default function A2Day11UnterwegsVerkehrsmittelWorkbookPage() {
       schreibenTask="Schreiben Sie eine formelle E-Mail an eine Autovermietung."
       schreibenContent={schreibenContent}
       schreibenPlaceholder={"Sehr geehrte Damen und Herren,\n\nich möchte für das Wochenende ..."}
-      hoerenTask="Höre das Gespräch bei der Autovermietung und beantworte die Fragen. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/cpiYNbbIvr4"
-      hoerenQuestions={hoerenQuestions}
       showWorkbookGuidance={false}
     />
   );
