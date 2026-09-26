@@ -45,10 +45,14 @@ const firstValidMoney = (...values) => {
 
 const normalizeStudentBilling = (student = {}) => {
   const tuitionFee = firstValidMoney(student.tuitionFee) ?? 0;
+  const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
+  const confirmedInitialPayment = ["paid", "partial"].includes(paymentStatus)
+    ? student.initialPaymentAmount
+    : null;
   const paidSoFar = firstValidMoney(
     student.paid,
-    student.initialPaymentAmount,
-    student.paidAmount
+    student.paidAmount,
+    confirmedInitialPayment
   ) ?? 0;
   const explicitBalance = firstValidMoney(student.balanceDue, student.balance);
   const derivedBalance = Math.max(roundMoney(tuitionFee - paidSoFar), 0);
@@ -82,6 +86,32 @@ const addMonths = (date, months) => {
   if (Number.isNaN(result.getTime())) return null;
   result.setMonth(result.getMonth() + Number(months || 0));
   return result;
+};
+
+const hasTrialHistory = (student = {}) => {
+  const trialStatus = String(student.trialStatus || "").trim().toLowerCase();
+  return Boolean(
+    student.trialStartedAt ||
+    student.trialUsedAt ||
+    student.trialEndsAt ||
+    student.trialPurgeAt ||
+    student.trialConvertedAt ||
+    ["active", "expired", "used", "ended", "converted"].includes(trialStatus)
+  );
+};
+
+const buildTrialConversionUpdates = (student = {}, paidAtIso = "") => {
+  if (!hasTrialHistory(student)) return {};
+  const convertedAt = student.trialConvertedAt || paidAtIso || admin.firestore.FieldValue.serverTimestamp();
+  return {
+    trialStatus: "converted",
+    trialRetentionStatus: "converted",
+    trialConvertedAt: convertedAt,
+    trialPurgeAt: admin.firestore.FieldValue.delete(),
+    purgeStatus: admin.firestore.FieldValue.delete(),
+    purgeError: admin.firestore.FieldValue.delete(),
+    purgeFailedAt: admin.firestore.FieldValue.delete(),
+  };
 };
 
 const getAuthedUser = async (req) => {
@@ -490,6 +520,10 @@ app.post("/paystack/webhook", async (req, res) => {
 
     const queuedUpgradeLevel = String(student.upgradeToLevel || "").toUpperCase();
     const applyUpgrade = Boolean(queuedUpgradeLevel) && paymentStatus === "paid";
+    const trialConversionUpdates = buildTrialConversionUpdates(
+      student,
+      Number.isFinite(paidAtMs) ? new Date(paidAtMs).toISOString() : now.toISOString()
+    );
     const updates = {
       paid: totalPaid,
       initialPaymentAmount: totalPaid,
@@ -518,11 +552,26 @@ app.post("/paystack/webhook", async (req, res) => {
       upgradeSnapshot: applyUpgrade
         ? admin.firestore.FieldValue.delete()
         : student.upgradeSnapshot || null,
+      ...trialConversionUpdates,
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     await match.ref.set(updates, { merge: true });
-    await appendStudentToStudentsSheetSafely({ ...student, ...updates }).catch((error) => {
+    const sheetStudent = {
+      ...student,
+      ...updates,
+      ...(hasTrialHistory(student)
+        ? {
+            trialStatus: "converted",
+            trialRetentionStatus: "converted",
+            trialPurgeAt: "",
+            trialConvertedAt:
+              student.trialConvertedAt ||
+              (Number.isFinite(paidAtMs) ? new Date(paidAtMs).toISOString() : now.toISOString()),
+          }
+        : {}),
+    };
+    await appendStudentToStudentsSheetSafely(sheetStudent).catch((error) => {
       console.warn("Payment succeeded but sheet sync failed", error?.message || error);
     });
 
