@@ -121,7 +121,7 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
         style={{ display: "grid", gap: 16 }}
       >
         <A2B1GrammarVideoCard level={level} day={day} />
-        <GrammarNotes />
+        <GrammarNotes embedded />
       </div>
     );
   }
