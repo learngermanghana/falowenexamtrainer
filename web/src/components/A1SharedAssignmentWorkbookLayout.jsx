@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
+import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
   <section data-workbook-section={sectionKey}>{children}</section>
@@ -66,7 +67,20 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   const fallbackTab = sections.length ? "overview" : "assignment";
   const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const requestedTab = rawSearch.get("workbookTab");
-  const requestedActiveTab = allowedTabs.includes(requestedTab) ? requestedTab : fallbackTab;
+  const requestedView = normalizeA1SectionView(rawSearch.get("view") || "");
+  const requestedViewTab =
+    requestedView === "workbook"
+      ? fallbackTab
+      : requestedView === "grammar" || requestedView === "submit"
+        ? requestedView
+        : allowedTabs.includes(requestedView)
+          ? requestedView
+          : "";
+  const requestedActiveTab = allowedTabs.includes(requestedTab)
+    ? requestedTab
+    : allowedTabs.includes(requestedViewTab)
+      ? requestedViewTab
+      : fallbackTab;
   const [activeTab, setActiveTab] = useState(requestedActiveTab);
 
   useEffect(() => {
@@ -94,6 +108,10 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
 
     const search = sanitizeA1WorkbookSearch(location.search);
     search.set("workbookTab", key);
+    const canonicalView = key === "overview" || key === "assignment" ? "workbook" : key;
+    const synchronizedSearch = new URLSearchParams(replaceLessonView(search.toString(), canonicalView));
+    search.delete("view");
+    synchronizedSearch.forEach((value, paramKey) => search.set(paramKey, value));
     search.set("assignmentKey", assignment.assignmentKey);
     search.set("assignmentId", assignment.assignmentKey);
     search.set("level", "A1");

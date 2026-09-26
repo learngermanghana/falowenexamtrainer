@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { styles } from "../styles";
 
@@ -11,10 +12,28 @@ const FalowenRadioTabContent = ({
   onContinue,
   actionLabel = "Continue to Teil 1 · Sprechen →",
   actionDisabled = false,
+  persistCompletionInUrl = true,
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const radio = resource || getLessonRadioResource(level, day) || {};
   const hasVideo = Boolean(String(radio.youtubeId || "").trim());
   const showAction = typeof onContinue === "function";
+
+  const handleContinue = () => {
+    if (actionDisabled) return;
+    onContinue?.();
+
+    if (!persistCompletionInUrl) return;
+    const params = new URLSearchParams(location.search || "");
+    params.set("radio", "done");
+    if (String(params.get("view") || "").toLowerCase() === "radio") params.delete("view");
+    const query = params.toString();
+    navigate(
+      { pathname: location.pathname, search: query ? `?${query}` : "", hash: location.hash },
+      { replace: true, state: location.state },
+    );
+  };
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -117,7 +136,7 @@ const FalowenRadioTabContent = ({
       {showAction ? (
         <button
           type="button"
-          onClick={onContinue}
+          onClick={handleContinue}
           disabled={actionDisabled}
           aria-busy={actionDisabled ? "true" : undefined}
           style={{

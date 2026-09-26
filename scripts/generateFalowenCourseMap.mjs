@@ -31,8 +31,15 @@ const absolute = (route = "") => {
 };
 const withView = (route, view) => {
   if (!route || !view) return route || null;
-  const joiner = route.includes("?") ? "&" : "?";
-  return `${route}${joiner}view=${encodeURIComponent(view)}`;
+  const parsed = new URL(route, "https://www.falowen.app");
+  parsed.searchParams.set("view", view);
+  const query = parsed.searchParams.toString();
+  return `${parsed.pathname}${query ? `?${query}` : ""}`;
+};
+
+const canonicalLessonRoute = (level, day, chapter = "") => {
+  const base = `/campus/course/lesson/${level}/${Number(day)}`;
+  return chapter ? `${base}?chapter=${encodeURIComponent(chapter)}` : base;
 };
 
 const extractNamedObjectBody = (source, marker) => {
@@ -160,6 +167,14 @@ const buildA1A2B1 = (entry) => {
     ];
   }
 
+  const canonicalRoute = day > 0 ? canonicalLessonRoute(level, day, chapter) : workbookRoute;
+  const sectionRoutes = Object.fromEntries(
+    sections.map((section) => {
+      if (day === 0) return [section.key, absolute(workbookRoute)];
+      return [section.key, absolute(withView(canonicalRoute, section.key))];
+    }),
+  );
+
   return {
     id: entry.id,
     level,
@@ -172,6 +187,7 @@ const buildA1A2B1 = (entry) => {
     courseBookRoute: "https://www.falowen.app/campus/course",
     grammarRoute: absolute(entry.grammarPage),
     workbookRoute: absolute(workbookRoute),
+    sectionRoutes,
     availableSections: sections,
     radio,
     submission: {
@@ -293,6 +309,12 @@ const buildC1 = (entry) => {
     courseBookRoute: "https://www.falowen.app/campus/course",
     grammarRoute: absolute(route),
     workbookRoute: absolute(route),
+    sectionRoutes: Object.fromEntries(
+      [
+        ...(radio.required ? [{ key: "radio", label: "Falowen Radio" }] : []),
+        ...tabs,
+      ].map((tab) => [tab.key, absolute(withView(route, tab.key))]),
+    ),
     availableSections: [
       ...(radio.required ? [{ key: "radio", label: "Falowen Radio" }] : []),
       ...tabs,
@@ -308,7 +330,7 @@ const buildC1 = (entry) => {
       audioAvailable: null,
       transcriptAvailable: null,
     },
-    assistantHint: "Open the C1 lesson from Learn → Course Book, then choose the visible tab. Current C1 guided pages use in-page tab state, so do not invent ?view= deep links.",
+    assistantHint: "Open the C1 lesson from Learn → Course Book or use the exact sectionRoutes deep link. C1 now supports ?view= deep links and preserves the requested section through Falowen Radio when Radio is required.",
     aliases: [`C1 Day ${day}`, chapter ? `C1 ${chapter}` : null, C1_CANONICAL_TITLES[day - 1], entry.title].filter(Boolean),
   };
 };
@@ -409,7 +431,7 @@ const output = {
     "Use availableSections before telling a learner which tab to tap.",
     "Respect radio.required: Falowen Radio comes first when required.",
     "Respect submission.mode: never tell a self-learning or self-practice lesson to submit work.",
-    "Use sectionRoutes only when they are present. Do not invent ?view= links for C1.",
+    "Use sectionRoutes for exact lesson-section links. A1 through C2 now expose supported deep links where the section exists.",
     "A false audioAvailable value means the section may exist but the actual listening source has not yet been added.",
   ],
   counts: Object.fromEntries(Object.entries(byLevel).map(([level, entries]) => [level, entries.length])),

@@ -112,9 +112,13 @@ const renderSelfLearningPage = ({ level, lesson, canonicalLesson }) => {
   return <SelfLearningLessonFrame level={normalizedLevel} day={day} lesson={lesson} canonicalLesson={canonicalLesson}>{page}</SelfLearningLessonFrame>;
 };
 
-export const shouldSkipSelfLearningRadio = (level, search = "") =>
-  String(level || "").toUpperCase() === "C1"
-  && new URLSearchParams(search || "").get("radio") === "done";
+export const shouldSkipSelfLearningRadio = (level, search = "") => {
+  const params = new URLSearchParams(search || "");
+  const forceRadio = String(params.get("view") || "").toLowerCase() === "radio";
+  return String(level || "").toUpperCase() === "C1"
+    && !forceRadio
+    && params.get("radio") === "done";
+};
 
 const createSelfLearningLessonComponent = (level, lesson) => {
   const SelfLearningLessonComponent = ({ canonicalLesson }) => {

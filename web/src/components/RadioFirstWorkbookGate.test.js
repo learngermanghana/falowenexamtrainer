@@ -7,26 +7,31 @@ import {
 } from "./RadioFirstWorkbookGate";
 
 describe("RadioFirstWorkbookGate navigation", () => {
-  it("preserves the workbook view and adds the completed radio flag", () => {
-    expect(buildCompletedRadioSearch("?view=workbook")).toBe("?view=workbook&radio=done");
+  it("preserves the requested workbook section and adds the completed radio flag", () => {
+    expect(buildCompletedRadioSearch("?view=submit")).toBe("?view=submit&radio=done");
+    expect(buildCompletedRadioSearch("?view=hoeren")).toBe("?view=hoeren&radio=done");
   });
 
-  it("builds the correct B1 Day 21 workbook URL", () => {
+  it("removes the explicit Radio view after the Radio step is completed", () => {
+    expect(buildCompletedRadioSearch("?view=radio")).toBe("?radio=done");
+  });
+
+  it("builds the correct B1 section URL after Radio", () => {
     expect(
       buildCompletedRadioHref({
-        pathname: "/campus/course/lesson/B1/21",
-        search: "?view=workbook",
+        pathname: "/campus/course/lesson/B1/15",
+        search: "?view=schreiben",
         hash: "",
       })
-    ).toBe("/campus/course/lesson/B1/21?view=workbook&radio=done");
+    ).toBe("/campus/course/lesson/B1/15?view=schreiben&radio=done");
   });
 
   it("uses direct browser navigation so Continue always opens the workbook", () => {
     const assign = jest.fn();
     const opened = openCompletedWorkbook(
       {
-        pathname: "/campus/course/lesson/B1/21",
-        search: "?view=workbook",
+        pathname: "/campus/course/lesson/B1/15",
+        search: "?view=submit",
         hash: "",
       },
       { location: { assign } }
@@ -34,7 +39,7 @@ describe("RadioFirstWorkbookGate navigation", () => {
 
     expect(opened).toBe(true);
     expect(assign).toHaveBeenCalledWith(
-      "/campus/course/lesson/B1/21?view=workbook&radio=done"
+      "/campus/course/lesson/B1/15?view=submit&radio=done"
     );
   });
 });
@@ -62,6 +67,26 @@ describe("A1 direct Radio destinations", () => {
     if (assignmentKey === "A1-12.2" || assignmentKey === "A1-12.3") {
       expect(url.searchParams.get("view")).toBe("workbook");
     }
+  });
+
+  test("returns an A1 grammar deep link to the grammar page after Radio", () => {
+    const href = buildCompletedRadioHref({
+      pathname: "/campus/course/lesson/A1/9",
+      search: "?chapter=5&view=grammar",
+    });
+    expect(href).toBe("/campus/course/a1-day-9-nominative-and-accusative-cases?radio=done");
+  });
+
+  test("preserves an A1 Submit target through Radio", () => {
+    const href = buildCompletedRadioHref({
+      pathname: "/campus/course/lesson/A1/9",
+      search: "?chapter=5&view=submit",
+    });
+    const url = new URL(href, "https://www.falowen.app");
+    expect(url.pathname).toBe("/campus/course/a1-chapter-5-german-cases-workbook");
+    expect(url.searchParams.get("view")).toBe("submit");
+    expect(url.searchParams.get("radio")).toBe("done");
+    expect(url.searchParams.get("assignmentKey")).toBe("A1-5");
   });
 
   test("keeps Day 3 chapter 1.1 self-practice separate from the Day 2 tutor assignment", () => {

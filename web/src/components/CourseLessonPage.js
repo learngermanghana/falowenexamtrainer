@@ -48,12 +48,14 @@ import B1Day28KlimafreundlichLebenWorkbookPage from "./B1Day28KlimafreundlichLeb
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
-import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
+import { applyA1GrammarRouteToLesson, getA1GrammarRoute } from "../data/a1GrammarRoutes";
+import { getA1RadioResource } from "../data/a1RadioResources";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
 import { courseSchedules } from "../data/courseSchedule";
-import { getConfiguredInAppWorkbookRoute } from "../data/inAppWorkbookRoutes";
+import { getConfiguredInAppWorkbookRoute, getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 import CourseLessonPageLegacy, { LessonResourcesHub } from "./CourseLessonPageLegacy";
+import { mergeLessonSearchIntoRoute, normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
@@ -412,7 +414,36 @@ export default function CourseLessonPage() {
 
   const query = new URLSearchParams(location.search);
   const requestedView = query.get("view");
+  const normalizedWorkbookView = normalizeA2B1SectionView(requestedView || "");
   const requestedChapter = String(query.get("chapter") || "").trim();
+
+  if ((level === "A1" || level === "A2") && requestedView && day > 0) {
+    const a1Radio = level === "A1" ? getA1RadioResource(day, requestedChapter) : null;
+    const forceA1Radio = Boolean(a1Radio && normalizedWorkbookView === "radio");
+    const hasPendingA1Radio =
+      Boolean(a1Radio)
+      && (forceA1Radio || query.get("radio") !== "done");
+
+    if (!hasPendingA1Radio) {
+      const grammarRoute =
+        level === "A1" && normalizedWorkbookView === "grammar"
+          ? getA1GrammarRoute({ day, chapter: requestedChapter })
+          : "";
+      const workbookRoute = getConfiguredInAppWorkbookResourceRoute({
+        level,
+        day,
+        chapter: requestedChapter,
+      });
+      const destination = mergeLessonSearchIntoRoute(
+        grammarRoute || workbookRoute,
+        location.search,
+        { dropKeys: grammarRoute ? ["chapter", "view"] : ["chapter"] },
+      );
+      if (destination && destination !== `${location.pathname}${location.search}`) {
+        return <Navigate to={destination} replace state={location.state} />;
+      }
+    }
+  }
 
   if ((level === "A1" || level === "A2" || level === "B1") && !requestedView && requestedChapter) {
     const workbookRoute = getConfiguredInAppWorkbookRoute({ level, day, chapter: requestedChapter });
@@ -424,12 +455,27 @@ export default function CourseLessonPage() {
     const chapterWorkbookRequested =
       Boolean(B1_WORKBOOK_CHAPTER_LINKS[dayNumber]) && requestedChapter === B1_WORKBOOK_CHAPTER_LINKS[dayNumber];
 
-    if (requestedView === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
+    if (normalizedWorkbookView === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
       const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
-      return <GrammarPage />;
+      return (
+        <RadioFirstWorkbookGate level={level} day={dayNumber}>
+          <GrammarPage />
+        </RadioFirstWorkbookGate>
+      );
     }
 
-    if ((requestedView === "workbook" || chapterWorkbookRequested) && B1_WORKBOOK_PAGES[dayNumber]) {
+    const workbookSectionRequested = new Set([
+      "workbook",
+      "radio",
+      "sprechen",
+      "schreiben",
+      "lesen",
+      "hoeren",
+      "references",
+      "submit",
+    ]).has(normalizedWorkbookView);
+
+    if ((workbookSectionRequested || chapterWorkbookRequested) && B1_WORKBOOK_PAGES[dayNumber]) {
       const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
       return (
         <RadioFirstWorkbookGate level={level} day={dayNumber}>

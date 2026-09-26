@@ -126,11 +126,13 @@ The course map tells an assistant the current lesson identity, visible sections,
 
 Important examples:
 
-- For **A2/B1**, distinguish the visible workbook Teil tabs from separate top-level pages. Do not invent a direct Hören URL when the learner should open the workbook and select the Hören/Teil tab.
+- **A1** supports direct lesson links for **Radio, Grammar, Workbook and Submit** where those sections exist. Tutor-marked workbooks translate the public `view=` target into the correct internal workbook tab.
+- **A2/B1** support direct `?view=` links for Grammar, Sprechen, Schreiben, Lesen, Hören, Ref and Submit when those tabs exist.
+- If a lesson requires **Falowen Radio**, a deep link to Grammar, Hören, Schreiben, Submit or another workbook section shows Radio first and then returns the learner to the originally requested section.
 - **A2 Day 14** currently has no Hören section.
 - **B1 Day 21** currently has no Hören section.
+- **C1** supports direct `?view=learn`, `?view=speak`, `?view=write`, `?view=finish` and `?view=references` links. A Radio gate preserves the requested C1 section.
 - **B2 and C2** use rotating daily focus skills and support direct `?view=` links for the tabs listed in the course map.
-- Current **C1** guided lessons use in-page tabs. Do not invent C1 `?view=` deep links.
 - An existing Hören section does not guarantee that audio has already been added. Check `media.audioAvailable` and `media.transcriptAvailable`.
 
 ## Lesson anatomy and feature meaning

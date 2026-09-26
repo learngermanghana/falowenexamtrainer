@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { normalizeA2B1SectionView, normalizeAdvancedSectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import { getC2DayTabs } from "../data/c2SkillCycle";
 import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
@@ -147,11 +149,36 @@ export const WorkbookTabNav = ({
   ariaLabel = "Workbook sections",
   renderLegacyGrammarPanel = true,
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     context: legacyGrammarContext,
     integratesLegacyGrammar,
     tabs: effectiveTabs,
   } = getWorkbookTabsWithLegacyGrammar({ tabs, ariaLabel });
+  const effectiveKeys = useMemo(() => new Set(effectiveTabs.map((tab) => tab.key)), [effectiveTabs]);
+  const requestedView = useMemo(
+    () => normalizeA2B1SectionView(new URLSearchParams(location.search || "").get("view") || ""),
+    [location.search],
+  );
+
+  useEffect(() => {
+    if (!legacyGrammarContext || !requestedView) return;
+    if (requestedView === "radio" || requestedView === "workbook") return;
+    if (!effectiveKeys.has(requestedView)) return;
+    if (requestedView !== activeTab) onChange?.(requestedView);
+  }, [activeTab, effectiveKeys, legacyGrammarContext, onChange, requestedView]);
+
+  const selectTab = (key) => {
+    onChange?.(key);
+    if (!legacyGrammarContext) return;
+    const search = replaceLessonView(location.search, key);
+    navigate(
+      { pathname: location.pathname, search, hash: location.hash },
+      { replace: true, state: location.state },
+    );
+  };
+
   const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
   const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");
   const sectionProgress = effectiveTabs.length
@@ -195,7 +222,7 @@ export const WorkbookTabNav = ({
             <TabButton
               key={tab.key}
               active={tab.key === activeTab}
-              onClick={() => onChange(tab.key)}
+              onClick={() => selectTab(tab.key)}
               label={tab.label}
               description={tab.description}
             />
@@ -244,6 +271,8 @@ export const WorkbookTabNav = ({
 };
 
 export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const normalizedLevel = String(level || "").toUpperCase();
 
   const rotatingTabs = normalizedLevel === "C2"
@@ -251,6 +280,28 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
     : normalizedLevel === "B2"
       ? getB2DayTabs(day)
       : B2_C1_WORKBOOK_TABS;
+  const rotatingKeys = useMemo(() => new Set(rotatingTabs.map((tab) => tab.key)), [rotatingTabs]);
+  const requestedView = useMemo(
+    () => normalizeAdvancedSectionView(new URLSearchParams(location.search || "").get("view") || ""),
+    [location.search],
+  );
+
+  useEffect(() => {
+    if (normalizedLevel !== "C1" || !requestedView || requestedView === "radio" || requestedView === "workbook") return;
+    if (!rotatingKeys.has(requestedView)) return;
+    if (requestedView !== activeTab) onChange?.(requestedView);
+  }, [activeTab, normalizedLevel, onChange, requestedView, rotatingKeys]);
+
+  const selectAdvancedTab = (key) => {
+    onChange?.(key);
+    if (normalizedLevel !== "C1") return;
+    const search = replaceLessonView(location.search, key);
+    navigate(
+      { pathname: location.pathname, search, hash: location.hash },
+      { replace: true, state: location.state },
+    );
+  };
+
   const sticky = !["B2", "C2"].includes(normalizedLevel);
 
   return (
@@ -261,7 +312,7 @@ export const AdvancedSelfLearningTabNav = ({ level, day, activeTab, onChange }) 
     >
       <WorkbookTabNav
         activeTab={activeTab}
-        onChange={onChange}
+        onChange={selectAdvancedTab}
         tabs={rotatingTabs}
         ariaLabel={`${normalizedLevel} Day ${day} self-learning sections`}
         renderLegacyGrammarPanel={false}

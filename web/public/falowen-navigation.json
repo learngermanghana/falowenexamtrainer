@@ -14,7 +14,8 @@
     "Do not invent pages, tabs, learner status, scores, attendance, payment status or assignment requirements.",
     "If a route depends on level or access, explain the relevant prerequisite briefly.",
     "For private account state, explain where to check it rather than claiming to know it.",
-    "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability."
+    "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
+    "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio."
   ],
   "navigation": [
     {
