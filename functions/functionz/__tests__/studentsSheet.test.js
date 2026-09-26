@@ -120,6 +120,7 @@ describe('upsertStudentToSheet paid field sync', () => {
       'TrialEndsAt',
       'TrialPurgeAt',
       'TrialUsedAt',
+      'TrialConvertedAt',
     ];
 
     mockValuesGet
@@ -140,6 +141,7 @@ describe('upsertStudentToSheet paid field sync', () => {
       trialEndsAt: '2026-09-28T10:00:00.000Z',
       trialPurgeAt: '2026-10-28T10:00:00.000Z',
       trialUsedAt: '2026-09-21T10:00:00.000Z',
+      trialConvertedAt: '2026-09-22T10:00:00.000Z',
     });
 
     expect(result).toEqual({ action: 'updated', row: 2 });
@@ -147,7 +149,7 @@ describe('upsertStudentToSheet paid field sync', () => {
     expect(mockUpdate.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         spreadsheetId: 'sheet-123',
-        range: 'students!K1:N1',
+        range: 'students!K1:O1',
         valueInputOption: 'RAW',
         requestBody: {
           values: [[
@@ -155,6 +157,7 @@ describe('upsertStudentToSheet paid field sync', () => {
             'TrialEndsAt',
             'TrialPurgeAt',
             'TrialUsedAt',
+            'TrialConvertedAt',
           ]],
         },
       })
@@ -178,6 +181,10 @@ describe('upsertStudentToSheet paid field sync', () => {
         expect.objectContaining({
           range: 'students!N2',
           values: [['2026-09-21T10:00:00.000Z']],
+        }),
+        expect.objectContaining({
+          range: 'students!O2',
+          values: [['2026-09-22T10:00:00.000Z']],
         }),
       ])
     );
