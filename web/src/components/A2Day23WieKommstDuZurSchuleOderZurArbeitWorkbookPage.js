@@ -20,10 +20,6 @@ export default function A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage() {
         topicPrompt="Beschreibe deinen Weg zur Schule oder zur Arbeit. Sage, welche Verkehrsmittel du benutzt, wie lange der Weg dauert und warum du diese Möglichkeit wählst."
         schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihren Weg zur Schule oder zur Arbeit. Beschreiben Sie Ihre Verkehrsmittel, die Dauer des Weges und einen Vor- oder Nachteil. Fragen Sie auch, wie die andere Person zur Schule oder zur Arbeit kommt."
         schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinem Arbeitsweg erzählen. Normalerweise ..."
-        hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
-        hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"
-        hoerenQuestions={[]}
-      hoerenSelfCheck
         showWorkbookGuidance={false}
       />
     </div>
