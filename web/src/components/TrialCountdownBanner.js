@@ -1,53 +1,34 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { toDateMs } from "../lib/dateUtils";
-import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { getTrialLifecycleState } from "../lib/trialAccess";
 import { styles } from "../styles";
 import { PrimaryActionBar } from "./ui";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
-
-export const getTrialCountdown = (trialEndsAt, nowMs = Date.now()) => {
-  const trialEndMs = toDateMs(trialEndsAt);
-  if (!Number.isFinite(trialEndMs) || trialEndMs <= nowMs) return null;
-
-  const remainingMs = trialEndMs - nowMs;
-  return {
-    trialEndMs,
-    remainingMs,
-    daysRemaining: Math.ceil(remainingMs / DAY_MS),
-  };
-};
 
 const TrialCountdownBanner = ({ studentProfile, onCompletePayment }) => {
   const [nowMs, setNowMs] = useState(() => Date.now());
-  const trialEndsAt = studentProfile?.trialEndsAt;
-  const countdown = useMemo(() => getTrialCountdown(trialEndsAt, nowMs), [nowMs, trialEndsAt]);
-  const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
-  const balanceDue = studentProfile?.balanceDue ?? studentProfile?.balance;
-  const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
+  const lifecycle = useMemo(
+    () => getTrialLifecycleState(studentProfile, nowMs),
+    [nowMs, studentProfile]
+  );
 
   useEffect(() => {
     setNowMs(Date.now());
-    if (!trialEndsAt) return undefined;
-
     const interval = window.setInterval(() => setNowMs(Date.now()), MINUTE_MS);
     return () => window.clearInterval(interval);
-  }, [trialEndsAt]);
+  }, []);
 
-  if (!countdown || paymentComplete) return null;
+  if (!["active", "ending_soon"].includes(lifecycle.key)) return null;
 
-  const { daysRemaining, trialEndMs, remainingMs } = countdown;
-  const title =
-    remainingMs <= DAY_MS
-      ? "Free trial — less than 1 day remaining"
-      : `Free trial — ${daysRemaining} days remaining`;
-  const endLabel = new Date(trialEndMs).toLocaleString(undefined, {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const endingSoon = lifecycle.key === "ending_soon";
+  const endLabel = Number.isFinite(lifecycle.endsAtMs)
+    ? new Date(lifecycle.endsAtMs).toLocaleString(undefined, {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
 
   return (
     <section
@@ -56,28 +37,32 @@ const TrialCountdownBanner = ({ studentProfile, onCompletePayment }) => {
         ...styles.card,
         display: "grid",
         gap: 9,
-        background: "linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 55%, #ffffff 100%)",
-        border: "2px solid #22c55e",
-        boxShadow: "0 12px 28px rgba(34, 197, 94, 0.14)",
+        background: endingSoon
+          ? "linear-gradient(135deg, #fff7ed 0%, #fffbeb 55%, #ffffff 100%)"
+          : "linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 55%, #ffffff 100%)",
+        border: endingSoon ? "2px solid #f59e0b" : "2px solid #22c55e",
       }}
     >
       <span
         style={{
           ...styles.badge,
           width: "fit-content",
-          background: "#15803d",
+          background: endingSoon ? "#b45309" : "#15803d",
           color: "#ffffff",
         }}
       >
-        7-day free trial
+        {endingSoon ? "Trial ending soon" : "7-day free trial"}
       </span>
-      <strong style={{ fontSize: 18, color: "#14532d" }}>{title}</strong>
-      <p style={{ ...styles.helperText, margin: 0, color: "#166534", lineHeight: 1.6 }}>
-        Your learning progress is being saved. Complete your tuition payment before {endLabel} to continue without interruption.
+      <strong style={{ fontSize: 18, color: endingSoon ? "#92400e" : "#14532d" }}>
+        {lifecycle.daysRemaining} day{lifecycle.daysRemaining === 1 ? "" : "s"} remaining
+      </strong>
+      <p style={{ ...styles.helperText, margin: 0, color: endingSoon ? "#92400e" : "#166534", lineHeight: 1.6 }}>
+        Your progress is saved. {endLabel ? `Trial access ends on ${endLabel}. ` : ""}
+        Complete payment before the trial ends to continue without interruption.
       </p>
       <PrimaryActionBar align="start">
         <button type="button" style={styles.primaryButton} onClick={onCompletePayment}>
-          Complete Payment
+          Pay now
         </button>
       </PrimaryActionBar>
     </section>
