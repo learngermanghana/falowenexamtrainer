@@ -5,6 +5,9 @@ import { styles } from "../styles";
 const day0HeroImage =
   "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
 
+const A1_DAY0_ORIENTATION_VIDEO_URL = "https://youtu.be/sLvFPtyfpjQ";
+const A1_DAY0_ORIENTATION_VIDEO_EMBED = "https://www.youtube-nocookie.com/embed/sLvFPtyfpjQ";
+
 const listStyle = {
   margin: 0,
   paddingLeft: 22,
@@ -233,6 +236,42 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
           style={{ width: "100%", maxHeight: 240, objectFit: "cover", borderRadius: 12 }}
         />
       </div>
+
+      <SectionCard title="A1 orientation video">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Watch this orientation video before you continue with the Day 0 guide. It introduces how
+          to use Falowen and how to begin your A1 learning journey.
+        </p>
+
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "16 / 9",
+            borderRadius: 14,
+            overflow: "hidden",
+            background: "#0f172a",
+          }}
+        >
+          <iframe
+            src={A1_DAY0_ORIENTATION_VIDEO_EMBED}
+            title="A1 Day 0 Falowen orientation video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+          />
+        </div>
+
+        <a
+          href={A1_DAY0_ORIENTATION_VIDEO_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+        >
+          Open orientation video on YouTube
+        </a>
+      </SectionCard>
 
       <SectionCard title="Welcome to A1">
         <NoteBox tone="green">
