@@ -144,6 +144,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     ? context.learnerSupportState
     : null;
   const supportNextAction = learnerState?.nextAction || null;
+  const supportLearningPlan = learnerState?.learningPlan || null;
+  const supportPlanItems = Array.isArray(supportLearningPlan?.items) ? supportLearningPlan.items.slice(0, 3) : [];
   const supportReview = learnerState?.review || null;
   const supportCourse = learnerState?.course || null;
   const supportResume = supportCourse?.resume || null;
@@ -159,6 +161,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     `Latest review score: ${supportReview?.score ?? "Not provided"}`,
     `Authoritative next action: ${supportNextAction?.label || "Not provided"}`,
     `Authoritative next URL: ${supportNextAction?.url || "Not provided"}`,
+    `Daily learning plan: ${supportPlanItems.length ? supportPlanItems.map((item, index) => `${index + 1}. ${item.title}${item.url ? ` -> ${item.url}` : ""}`).join(" | ") : "Not provided"}`,
+    `Daily plan summary: ${supportLearningPlan?.summary || "Not provided"}`,
     `Synced resume: ${supportResume ? `${supportResume.level || ""} Day ${supportResume.day || ""} · ${supportResume.activeView || "learn"}` : "Not provided"}`,
     `Synced Radio completion: ${supportRadio?.completed === true ? "complete" : supportRadio?.completed === false ? "not complete" : "unknown"}`,
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
@@ -199,6 +203,7 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     "For language-learning questions, stay focused on the current lesson, level and task below.",
     "When structured course context is present, treat it as authoritative over guessed page text. Use the exact day, topic, grammar focus, vocabulary, main skill and current task.",
     "When Falowen access/review/next-action state is provided, treat it as authoritative. Do not invent a different reason for blocked access, marking state, payment requirement, or next step.",
+    "When a Daily learning plan is provided, use its ordered tasks for questions such as 'What should I study today?', 'What should I do next?', or 'Make me a plan'. Do not replace it with a generic study plan.",
     "If Falowen says Radio state is unknown, do not claim Radio is complete. The lesson route itself enforces Radio when required.",
     "If the student refers to a numbered Lesen/Hören question such as 'question 3', use the matching Current task item. Give a hint or explain the relevant language first; do not reveal the correct option before the student has tried unless they explicitly ask for the answer.",
     "For grammar questions such as 'Why is this Dativ?', explain the rule using the current lesson's grammar focus and vocabulary before adding a generic example.",
