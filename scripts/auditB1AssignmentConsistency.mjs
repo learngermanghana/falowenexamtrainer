@@ -219,16 +219,28 @@ for (const route of routeEntries) {
 }
 
 const grammarMapMatch = grammarSource.match(/B1:\s*\{([\s\S]*?)\n\s*\},\n\};/);
+const extractB1DayFromComponentName = (value = "") =>
+  Number(String(value).match(/^B1Day(\d+)/)?.[1] || 0);
+
 const importedGrammarByComponent = new Map(
   [...grammarSource.matchAll(
     /import\s+(B1Day(\d+)\w+GrammarNotesPage)\s+from\s+"\.\/([^"]+)";/g,
-  )].map((match) => [
-    match[1],
-    {
-      day: Number(match[2]),
-      file: path.join(COMPONENT_ROOT, `${match[3]}.js`),
-    },
-  ]),
+  )].map((match) => {
+    const alias = match[1];
+    const aliasDay = Number(match[2]);
+    const target = match[3];
+    const targetDay = extractB1DayFromComponentName(target);
+
+    return [
+      alias,
+      {
+        aliasDay,
+        target,
+        targetDay,
+        file: path.join(COMPONENT_ROOT, `${target}.js`),
+      },
+    ];
+  }),
 );
 
 const mappedGrammarByDay = new Map(
@@ -244,10 +256,17 @@ for (const day of expectedDays) {
   if (!component) continue;
 
   const imported = importedGrammarByComponent.get(component);
-  if (!imported || imported.day !== day) {
+  if (!imported || imported.aliasDay !== day) {
     fail(
       "Grammar",
-      `Day ${day} must map to its own B1Day${day}...GrammarNotesPage; found ${component}`,
+      `Day ${day} must map to its own B1Day${day}...GrammarNotesPage alias; found ${component}`,
+    );
+    continue;
+  }
+  if (imported.targetDay !== day) {
+    fail(
+      "Grammar",
+      `Day ${day} grammar import is miswired: ${component} imports ./${imported.target} (Day ${imported.targetDay || "unknown"})`,
     );
     continue;
   }
