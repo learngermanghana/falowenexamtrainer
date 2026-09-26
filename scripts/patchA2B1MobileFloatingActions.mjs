@@ -12,7 +12,14 @@ let courseTab = fs.readFileSync(courseTabPath, "utf8");
 if (courseTab.includes(mobileActionsBlock)) {
   courseTab = courseTab.replace(mobileActionsBlock, "");
 } else if (courseTab.includes('className="course-book-mobile-actions"')) {
-  throw new Error("Could not remove the A2/B1 floating mobile action bar safely.");
+  const markerIndex = courseTab.indexOf('className="course-book-mobile-actions"');
+  const blockStart = courseTab.lastIndexOf("          {usesSharedA2B1Design ? (", markerIndex);
+  const blockEndMarker = "          ) : null}\n";
+  const blockEnd = courseTab.indexOf(blockEndMarker, markerIndex);
+  if (blockStart === -1 || blockEnd === -1 || blockEnd <= blockStart) {
+    throw new Error("Could not remove the A2/B1 floating mobile action bar safely.");
+  }
+  courseTab = `${courseTab.slice(0, blockStart)}${courseTab.slice(blockEnd + blockEndMarker.length)}`;
 }
 fs.writeFileSync(courseTabPath, courseTab);
 

@@ -16,12 +16,14 @@ import { expandCourseBookEntries } from "../utils/courseBookEntries";
 import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
 import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
 import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
+import { subscribeLessonResumeMap } from "../services/lessonResumeService";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { db, doc, serverTimestamp, setDoc } from "../firebase";
 import { useLessonProgress } from "../hooks/useLessonProgress";
 import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
 import { getC2SkillLabel } from "../data/c2SkillCycle";
 import { getB2SkillLabel } from "../data/b2SkillCycle";
+import { resolveCourseBookSmartProgress } from "../utils/courseBookSmartProgress";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -686,6 +688,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [practiceProgress, setPracticeProgress] = useState({});
+  const [lessonResumeByDay, setLessonResumeByDay] = useState({});
 
   useEffect(() => {
     if (!selectedCourseLevel && levels[0]) setSelectedCourseLevel(levels[0]);
@@ -705,6 +708,20 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     user,
     level: selectedCourseLevel,
   });
+
+  useEffect(() => {
+    if (!user?.uid || !selectedCourseLevel || isFrenchProgram) {
+      setLessonResumeByDay({});
+      return undefined;
+    }
+    setLessonResumeByDay({});
+    return subscribeLessonResumeMap({
+      userId: user.uid,
+      level: selectedCourseLevel,
+      onChange: setLessonResumeByDay,
+      onError: () => setLessonResumeByDay({}),
+    });
+  }, [isFrenchProgram, selectedCourseLevel, user?.uid]);
   const isC2Selected = String(selectedCourseLevel || "").toUpperCase() === "C2";
   const { byDay: c2ProgressByDay, summary: c2SkillSummary, loading: loadingC2Progress } = useC2CourseProgress({
     enabled: isC2Selected,
@@ -914,8 +931,34 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;
   };
 
-  const openLesson = (entry) => {
-    navigate(getLessonHref(entry), {
+  const getSmartProgressForEntry = (entry) => {
+    if (!entry) return null;
+    const displayDay = Number(getCourseBookDisplayDay(entry) || entry.day || 0);
+    const resume = lessonResumeByDay[displayDay] || null;
+    const practiceState = practiceProgress[entry.assignmentKey] || {};
+    const canonicalSelfLearningState =
+      !isC2CourseBook && isSelfLearningLevel
+        ? courseCompletion?.states?.find((item) => Number(item.requirement?.day) === displayDay) || null
+        : null;
+    const selfLearningComplete = isC2CourseBook
+      ? Boolean(c2ProgressByDay[displayDay]?.dayComplete)
+      : Boolean(canonicalSelfLearningState?.completed);
+
+    return resolveCourseBookSmartProgress({
+      entry,
+      resume,
+      dayTaskCount: dayTaskCounts[String(displayDay)] || 1,
+      tutorStatus: entry.status,
+      selfLearningComplete,
+      practiceComplete: Boolean(practiceState.completed),
+    });
+  };
+
+  const nextLessonSmartProgress = nextLesson ? getSmartProgressForEntry(nextLesson) : null;
+  const nextLessonHref = nextLessonSmartProgress?.continueUrl || (nextLesson ? getLessonHref(nextLesson) : "");
+
+  const openLesson = (entry, destination = "") => {
+    navigate(destination || getLessonHref(entry), {
       state: {
         level: selectedCourseLevel,
         day: entry.day,
@@ -927,7 +970,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
   };
 
-  const handleLessonLinkClick = (event, entry) => {
+  const handleLessonLinkClick = (event, entry, destination = "") => {
     if (
       event.defaultPrevented ||
       event.button !== 0 ||
@@ -940,7 +983,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     }
 
     event.preventDefault();
-    openLesson(entry);
+    openLesson(entry, destination);
   };
 
   return (
@@ -1005,7 +1048,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     ))}
                   </select>
                 </label>
-                <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
+                <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson, nextLessonHref)}>
                   Continue learning
                 </button>
                 {canShowCourseSubmit ? (
@@ -1165,12 +1208,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   ) : null}
                 </div>
                 <a
-                  href={getLessonHref(nextLesson)}
+                  href={nextLessonHref}
                   style={{ ...styles.primaryButton, textDecoration: "none" }}
-                  aria-label={`Open ${nextLessonTitle}`}
-                  onClick={(event) => handleLessonLinkClick(event, nextLesson)}
+                  aria-label={`Continue ${nextLessonTitle}`}
+                  onClick={(event) => handleLessonLinkClick(event, nextLesson, nextLessonHref)}
                 >
-                  Open: {nextLessonTitle}
+                  {nextLessonSmartProgress?.resumeMatches
+                    ? nextLessonSmartProgress.continueLabel
+                    : `Open: ${nextLessonTitle}`}
                 </a>
               </section>
             ) : (
@@ -1241,6 +1286,19 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const practiceMeta = isSelfLearningLevel
                       ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
                       : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
+                    const displayDay = Number(getCourseBookDisplayDay(entry) || entry.day || 0);
+                    const resume = lessonResumeByDay[displayDay] || null;
+                    const smartProgress = resolveCourseBookSmartProgress({
+                      entry,
+                      resume,
+                      dayTaskCount: dayTaskCounts[String(displayDay)] || 1,
+                      tutorStatus: entry.status,
+                      selfLearningComplete: canonicalSelfLearningComplete,
+                      practiceComplete: Boolean(practiceState.completed),
+                    });
+                    const defaultLessonHref = getLessonHref(entry);
+                    const smartLessonHref = smartProgress.continueUrl || defaultLessonHref;
+                    const sectionProgress = smartProgress.sections.slice(0, 5);
                     const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
                       <article className="course-book-lesson-card" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
@@ -1256,7 +1314,51 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
                                 {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
                                 {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
+                                <span
+                                  data-coursebook-smart-status={smartProgress.key}
+                                  style={{
+                                    ...courseBookStyles.statusChip,
+                                    color: smartProgress.color,
+                                    border: `1px solid ${smartProgress.border}`,
+                                    background: smartProgress.background,
+                                  }}
+                                >
+                                  {smartProgress.label}
+                                </span>
+                                {smartProgress.radioDone ? (
+                                  <span
+                                    data-coursebook-radio-complete="true"
+                                    style={{ ...courseBookStyles.chip, background: "#f0fdf4", borderColor: "#86efac", color: "#166534" }}
+                                  >
+                                    Radio ✓
+                                  </span>
+                                ) : null}
                               </div>
+                              {smartProgress.resumeMatches && (sectionProgress.length || smartProgress.detail) ? (
+                                <div
+                                  data-coursebook-smart-progress="true"
+                                  style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8, alignItems: "center" }}
+                                >
+                                  {sectionProgress.map((sectionState) => (
+                                    <span
+                                      key={sectionState.key}
+                                      style={{
+                                        ...courseBookStyles.chip,
+                                        background: sectionState.completed ? "#f0fdf4" : "#f8fafc",
+                                        borderColor: sectionState.completed ? "#86efac" : "#cbd5e1",
+                                        color: sectionState.completed ? "#166534" : "#64748b",
+                                      }}
+                                    >
+                                      {sectionState.label} {sectionState.completed ? "✓" : "unfinished"}
+                                    </span>
+                                  ))}
+                                  {smartProgress.detail ? (
+                                    <span style={{ fontSize: 12, color: smartProgress.color, fontWeight: 700 }}>
+                                      {smartProgress.detail}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              ) : null}
                               {!entry.isTutorMarked ? (
                                 isC2CourseBook ? (() => {
                                   const dayProgress = c2ProgressByDay[Number(entry.day)] || {};
@@ -1320,11 +1422,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               </>
                             ) : null}
                             <a
-                              href={getLessonHref(entry)}
+                              href={smartLessonHref}
+                              data-coursebook-smart-action={smartProgress.key}
                               style={{ ...styles.primaryButton, textDecoration: "none" }}
-                              onClick={(event) => handleLessonLinkClick(event, entry)}
+                              onClick={(event) => handleLessonLinkClick(event, entry, smartLessonHref)}
                             >
-                              Open Lesson
+                              {smartProgress.resumeMatches || smartProgress.key !== "not-started"
+                                ? smartProgress.continueLabel || "Open Lesson"
+                                : "Start lesson"}
                             </a>
                           </div>
                         </div>
@@ -1366,7 +1471,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
           {usesSharedA2B1Design ? (
             <nav className="course-book-mobile-actions" aria-label="Course Book actions">
-              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson)}>
+              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson, nextLessonHref)}>
                 Continue
               </button>
               <button type="button" onClick={() => setCourseSubmitOpen(true)}>

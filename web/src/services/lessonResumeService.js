@@ -238,3 +238,41 @@ export const subscribeLatestLessonResume = ({ userId, onChange, onError } = {}) 
     },
   );
 };
+
+export const subscribeLessonResumeMap = ({
+  userId,
+  level = "",
+  onChange,
+  onError,
+} = {}) => {
+  const uid = clean(userId);
+  const normalizedLevel = normalizeLevel(level);
+  if (!db || !uid) {
+    onChange?.({});
+    return () => {};
+  }
+
+  return onSnapshot(
+    collection(db, "users", uid, LESSON_RESUME_SUBCOLLECTION),
+    (snapshot) => {
+      const rows = snapshot.docs
+        .map((entry) => ({ id: entry.id, ...(entry.data() || {}) }))
+        .filter((row) => !normalizedLevel || normalizeLevel(row.level) === normalizedLevel);
+
+      const byDay = {};
+      rows.forEach((row) => {
+        const day = Number(row.day);
+        if (!Number.isInteger(day)) return;
+        const existing = byDay[day];
+        if (!existing || getResumeActivityMillis(row) >= getResumeActivityMillis(existing)) {
+          byDay[day] = row;
+        }
+      });
+      onChange?.(byDay);
+    },
+    (error) => {
+      console.warn("Could not subscribe to Course Book lesson resume map", error);
+      onError?.(error);
+    },
+  );
+};
