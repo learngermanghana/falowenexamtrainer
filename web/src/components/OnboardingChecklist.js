@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { detectLevelKey } from "../lib/day0Workbook";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
-import { getTrialAccessState } from "../lib/trialAccess";
+import { getTrialLifecycleState } from "../lib/trialAccess";
 import { useToast } from "../context/ToastContext";
 
 const day0WorkbookByLevel = {
@@ -40,14 +40,20 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const balanceDue = Math.max(Number(studentProfile?.balanceDue ?? studentProfile?.balance) || 0, 0);
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
-  const trialAccess = useMemo(() => getTrialAccessState(studentProfile), [studentProfile]);
+  const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
   const firstLessonPath = day0WorkbookByLevel[level] || "/campus/course";
 
   const accessLabel = paymentComplete
     ? "Paid access active"
-    : trialAccess.active
-      ? `7-day trial · ${trialAccess.daysRemaining} day${trialAccess.daysRemaining === 1 ? "" : "s"} remaining`
-      : "Access setup required";
+    : trialLifecycle.key === "ending_soon"
+      ? `Trial ending soon · ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining`
+      : trialLifecycle.key === "active"
+        ? `7-day trial · ${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining`
+        : trialLifecycle.key === "expired_retained"
+          ? `Trial expired · progress retained ${trialLifecycle.retentionDaysRemaining} more day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"}`
+          : trialLifecycle.key === "retention_ending_soon"
+            ? `Recovery window ending · ${trialLifecycle.retentionDaysRemaining} day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"} left`
+            : "Access setup required";
 
   const paymentLabel = paymentComplete
     ? "Paid"
@@ -142,9 +148,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
           ) : null}
         </div>
 
-        {!trialAccess.active && !paymentComplete ? (
+        {!trialLifecycle.active && !paymentComplete ? (
           <p style={{ ...styles.helperText, margin: 0, color: "#92400e" }}>
-            Your trial is not currently active. Open billing to complete payment and restore course access.
+            Your trial is not currently active. Open billing to restore access with the same account while your retained data is still available.
           </p>
         ) : null}
       </section>
