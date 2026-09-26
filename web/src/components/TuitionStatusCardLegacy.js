@@ -6,6 +6,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../lib/formatters";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
+import { savePaymentAttempt } from "../lib/paymentAttempt";
 
 const PAYMENT_GRACE_PERIOD_DAYS = 7;
 
@@ -248,6 +249,11 @@ const TuitionStatusCard = ({
 
       const url = json?.authorization_url;
       if (!url) throw new Error("Paystack did not return a payment link.");
+
+      savePaymentAttempt(studentProfile, {
+        amount: amountToPay,
+        startedAt: new Date().toISOString(),
+      });
       window.location.assign(url);
     } catch (error) {
       setPaymentError(
