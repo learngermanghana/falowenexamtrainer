@@ -1,36 +1,33 @@
 const OPINION_NOTE = "Denken Sie an eine Einleitung und einen Schluss. Bei der Bewertung wird darauf geachtet, wie genau die Inhaltspunkte bearbeitet sind, wie korrekt der Text ist und wie gut die Sätze und Abschnitte sprachlich miteinander verknüpft sind. Schreiben Sie mindestens 150 Wörter.";
 const FORMAL_NOTE = "Achten Sie auf eine passende Anrede und einen passenden Schluss. Bearbeiten Sie alle vier Inhaltspunkte klar und höflich. Schreiben Sie mindestens 100 Wörter.";
 
-const opinionTemplate = (topic) => `In der heutigen Zeit wird oft über ${topic} diskutiert.
+const opinionTemplate = `In der heutigen Zeit wird oft über ... diskutiert.
 
-Meiner Meinung nach [eigene Meinung].
+Meiner Meinung nach ...
 
-Ein wichtiger Grund dafür ist, dass [Grund].
+Ein wichtiger Grund dafür ist, dass ...
+Ein weiterer Grund ist, dass ...
 
-Eine andere Möglichkeit wäre, [Alternative / Lösung].
+Eine andere Möglichkeit wäre, ...
 
-Ein Vorteil dieser Möglichkeit ist, dass [Vorteil].
+Ein Vorteil davon ist, dass ...
 
-Zusammenfassend lässt sich sagen, dass [kurzes Fazit].`;
+Zusammenfassend lässt sich sagen, dass ...`;
 
-const formalTemplate = `Betreff: [kurzer Betreff]
+const formalTemplate = `Betreff: ...
 
-Sehr geehrte Frau [Name] / Sehr geehrter Herr [Name],
+Sehr geehrte Frau ... / Sehr geehrter Herr ...,
 
-ich schreibe Ihnen, weil [Anlass].
+ich bitte um Verständnis, weil ...
 
-[Inhaltspunkt 1]
+Zurzeit ...
 
-[Inhaltspunkt 2]
+Für die kommenden Tage schlage ich vor, dass ...
 
-[Inhaltspunkt 3]
-
-[Inhaltspunkt 4]
-
-Vielen Dank für Ihr Verständnis.
+Mir ist bewusst, dass ...
 
 Mit freundlichen Grüßen
-[Ihr Name]`;
+...`;
 
 export const B2_WRITE_DAYS = Object.freeze([4, 8, 12, 16, 20, 24, 28]);
 
@@ -48,7 +45,7 @@ export const B2_WRITING_TASKS = Object.freeze({
     ]),
     minimumWords: 150,
     note: OPINION_NOTE,
-    starterTemplate: opinionTemplate("Plastikverpackungen im Alltag"),
+    starterTemplate: opinionTemplate,
   }),
   8: Object.freeze({
     day: 8,
@@ -63,7 +60,7 @@ export const B2_WRITING_TASKS = Object.freeze({
     ]),
     minimumWords: 150,
     note: OPINION_NOTE,
-    starterTemplate: opinionTemplate("gleiche Bildungschancen"),
+    starterTemplate: opinionTemplate,
   }),
   12: Object.freeze({
     day: 12,
@@ -78,7 +75,7 @@ export const B2_WRITING_TASKS = Object.freeze({
     ]),
     minimumWords: 150,
     note: OPINION_NOTE,
-    starterTemplate: opinionTemplate("Studiengebühren und Weiterbildung"),
+    starterTemplate: opinionTemplate,
   }),
   16: Object.freeze({
     day: 16,
@@ -108,7 +105,7 @@ export const B2_WRITING_TASKS = Object.freeze({
     ]),
     minimumWords: 150,
     note: OPINION_NOTE,
-    starterTemplate: opinionTemplate("Privatsphäre in sozialen Medien"),
+    starterTemplate: opinionTemplate,
   }),
   24: Object.freeze({
     day: 24,
