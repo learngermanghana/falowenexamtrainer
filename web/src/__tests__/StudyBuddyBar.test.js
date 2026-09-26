@@ -25,6 +25,7 @@ describe("StudyBuddyBar", () => {
     localStorage.clear();
     mockNavigate.mockReset();
     fetchLearnerSupportState.mockReset();
+    fetchLearnerSupportState.mockResolvedValue({ learningPlan: { items: [] }, nextAction: null });
   });
 
   it("starts as the bottom-right launcher without rendering the Study Buddy bar", () => {
@@ -75,6 +76,53 @@ describe("StudyBuddyBar", () => {
     expect(screen.getByText(/latest result/i)).toBeInTheDocument();
     expect(screen.getByText(/attendance/i)).toBeInTheDocument();
     expect(screen.getByText(/^weekly planner$/i)).toBeInTheDocument();
+  });
+
+  it("shows the same ordered daily plan that powers learner support", async () => {
+    fetchLearnerSupportState.mockResolvedValue({
+      learningPlan: {
+        title: "Your learning plan today",
+        items: [
+          {
+            id: "resume-last-section",
+            type: "resume-learning",
+            title: "Finish Möbel & Räume · Hören",
+            helper: "Continue from your last synced section.",
+            url: "/campus/course/lesson/A2/6?chapter=3.6&view=hoeren&radio=done",
+            actionLabel: "Continue Hören",
+          },
+          {
+            id: "return-warmup",
+            type: "warmup-review",
+            title: "Do a 5-minute return warm-up",
+            helper: "Review the last lesson briefly.",
+            url: "/campus/course/lesson/A2/6?chapter=3.6&view=hoeren&radio=done",
+            actionLabel: "Review last lesson",
+          },
+        ],
+        primaryAction: {
+          id: "resume-last-section",
+          type: "resume-learning",
+          title: "Finish Möbel & Räume · Hören",
+          helper: "Continue from your last synced section.",
+          url: "/campus/course/lesson/A2/6?chapter=3.6&view=hoeren&radio=done",
+          actionLabel: "Continue Hören",
+        },
+      },
+    });
+
+    render(<StudyBuddyBar studentProfile={{ level: "A2", studentCode: "A2-TEST" }} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /reopen study buddy bar/i }));
+
+    expect(await screen.findByText("Your learning plan today")).toBeInTheDocument();
+    expect(screen.getByText("Finish Möbel & Räume · Hören")).toBeInTheDocument();
+    expect(screen.getByText("Do a 5-minute return warm-up")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Continue Hören" }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/campus/course/lesson/A2/6?chapter=3.6&view=hoeren&radio=done",
+    );
   });
 
   it("loads the authoritative next action and opens its exact route", async () => {
