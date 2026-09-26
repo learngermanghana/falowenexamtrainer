@@ -128,6 +128,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain('applyB2WritingTaskToLesson');
     expect(page).toContain('getB2WritingTask(day)');
     expect(page).toContain('minimumWords: writingTask.minimumWords');
+    expect(page).toContain('questions: []');
     expect(page).toContain('<WritingTaskPrompt lesson={writingLesson} />');
     expect(page).toContain('<GuidedWritingWorkspace config={writingConfig}');
 
@@ -135,6 +136,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(writingWorkspace).toContain('data-writing-word-requirement="true"');
     expect(writingWorkspace).toContain('const meetsMinimumWords');
     expect(writingWorkspace).toContain('starterEllipsisWarning');
+    expect(writingWorkspace).toContain('placeholderWarning || starterEllipsisWarning');
     expect(writingWorkspace).toContain('Replace every <strong>...</strong> with your own content');
     expect(writingWorkspace).toContain("const b2PlanningBullets");
     expect(writingWorkspace).toContain("Write one short idea for each of the four task points");
