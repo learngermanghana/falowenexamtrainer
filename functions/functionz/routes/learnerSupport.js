@@ -139,7 +139,7 @@ const resolveLearnerAccess = (student = {}, nowMs = Date.now()) => {
     };
   }
 
-  if (trialExpired || status === "trial_expired") {
+  if (!paid && (trialExpired || status === "trial_expired")) {
     return {
       allowed: false,
       state: "trial-ended",
@@ -320,11 +320,11 @@ const loadSubmissions = async (db, { uid, studentCode } = {}) => {
   const tasks = [];
   if (uid) tasks.push(db.collection("submissions").where("studentId", "==", uid).limit(100).get());
   if (studentCode) {
-    tasks.push(db.collection("submissions").where("studentCode", "==", studentCode).limit(100).get());
-    const lowerCode = lower(studentCode);
-    if (lowerCode && lowerCode !== studentCode) {
-      tasks.push(db.collection("submissions").where("studentCode", "==", lowerCode).limit(100).get());
-    }
+    const variants = [...new Set([studentCode, lower(studentCode), clean(studentCode).toUpperCase()].filter(Boolean))];
+    variants.forEach((value) => {
+      tasks.push(db.collection("submissions").where("studentCode", "==", value).limit(100).get());
+      tasks.push(db.collection("submissions").where("studentcode", "==", value).limit(100).get());
+    });
   }
   const settled = await Promise.allSettled(tasks);
   const rows = new Map();
