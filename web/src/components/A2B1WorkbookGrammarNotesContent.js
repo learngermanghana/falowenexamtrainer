@@ -51,6 +51,11 @@ import B1Day20BerufKennenGrammarNotesPage from "./B1Day20BerufKennenGrammarNotes
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day22BeziehungWichtigGrammarNotesPage from "./B1Day22BeziehungWichtigGrammarNotesPage";
 import B1Day23ErstesDateGrammarNotesPage from "./B1Day23ErstesDateGrammarNotesPage";
+import B1Day24KonsumNachhaltigkeitGrammarNotesPage from "./B1Day24KonsumNachhaltigkeitGrammarNotesPage";
+import B1Day25OnlineShoppingRightsRisksGrammarNotesPage from "./B1Day25OnlineShoppingRightsRisksGrammarNotesPage";
+import B1Day26ReiseproblemeGrammarNotesPage from "./B1Day26ReiseproblemeGrammarNotesPage";
+import B1Day27UmweltfreundlichAlltagGrammarNotesPage from "./B1Day27UmweltfreundlichAlltagGrammarNotesPage";
+import B1Day28KlimafreundlichLebenGrammarNotesPage from "./B1Day28KlimafreundlichLebenGrammarNotesPage";
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import B1TopicIntroduction from "./B1TopicIntroduction";
 import B1Days18To23LearningUpgrade from "./B1Days18To23LearningUpgrade";
@@ -85,6 +90,8 @@ const GRAMMAR_NOTES_BY_LEVEL_DAY = {
     16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage, 17: B1Day17WieLerntManAmBestenGrammarNotesPage,
     18: B1Day18WegeZumWunschberufGrammarNotesPage, 19: B1Day19VorstellungsgespraechGrammarNotesPage, 20: B1Day20BerufKennenGrammarNotesPage,
     21: B1Day21LebensformenHeuteGrammarNotesPage, 22: B1Day22BeziehungWichtigGrammarNotesPage, 23: B1Day23ErstesDateGrammarNotesPage,
+    24: B1Day24KonsumNachhaltigkeitGrammarNotesPage, 25: B1Day25OnlineShoppingRightsRisksGrammarNotesPage,
+    26: B1Day26ReiseproblemeGrammarNotesPage, 27: B1Day27UmweltfreundlichAlltagGrammarNotesPage, 28: B1Day28KlimafreundlichLebenGrammarNotesPage,
   },
 };
 
