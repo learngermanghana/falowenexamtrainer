@@ -9,6 +9,18 @@ const A1_DAY_2 = {
 };
 
 describe("getLessonVideoResources", () => {
+  test("A1 Day 0 uses the new Falowen orientation video only", () => {
+    const resources = getLessonVideoResources("A1", 0);
+    expect(resources).toEqual([
+      expect.objectContaining({
+        key: "a1-day0-orientation-video",
+        url: "https://youtu.be/sLvFPtyfpjQ",
+      }),
+    ]);
+    expect(resources.map((resource) => resource.url)).not.toContain("https://youtu.be/6Jxg3lqZAFU");
+    expect(resources.map((resource) => resource.url)).not.toContain("https://youtu.be/PP38eObAMh8");
+  });
+
   test("A1 Day 15 uses the requested Imperatives AI grammar video", () => {
     expect(getLessonVideoResources("A1", 15)).toEqual([
       expect.objectContaining({
