@@ -33,7 +33,7 @@ describe("A2 Day 1 Small Talk Falowen Radio", () => {
 
     expect(listeningBlock).not.toBeNull();
     expect((listeningBlock?.[1].match(/stem:/g) || [])).toHaveLength(5);
-    expect(Object.keys(smallTalkKey.answers.teil3)).toHaveLength(7);
+    expect(Object.keys(smallTalkKey.answers.teil3)).toHaveLength(5);
     expect(Object.keys(smallTalkKey.answers.teil4)).toHaveLength(5);
     expect(source).toContain('hoerenQuestions={listeningQuestions}');
     expect(source).toContain("beantworte alle fünf Fragen");

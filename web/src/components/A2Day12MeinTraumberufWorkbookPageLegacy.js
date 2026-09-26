@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -220,61 +221,8 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
 
       {activeTab === "lesen" && (
         <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
-            alt="Reading worksheet with professional qualification content"
-            loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
-          />
-          <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
-          <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit
-            section at the bottom of the lesson to send your answers.
-          </p>
-
-          <h3 style={sectionTitle}>Zeugnisse und Anerkennung</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In Ihrem Heimatland haben Sie eine Berufsausbildung mit Abschluss, einen Hochschulabschluss oder
-            Schulabschluss gemacht? Dann müssen Sie diese Zeugnisse / Dokumente übersetzen und beglaubigen lassen.
-            Beglaubigen heißt: Eine offizielle Instanz prüft, ob Ihre Dokumente echt sind. Das macht am besten eine
-            Behörde in Ihrem Heimatland. Manchmal ist Ihr Abschluss in Deutschland nicht gültig. Das können Sie schon in
-            Ihrem Heimatland prüfen (Anerkennung ausländischer Abschlüsse). Auf der Internetseite „Anerkennung in
-            Deutschland“ bekommen Sie mehr Informationen. Sehen Sie sich hierzu auch unsere Infografiken an.
-          </p>
-
-          <h3 style={sectionTitle}>Freie Stellen</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sie haben eine Arbeitserlaubnis? Dann können Sie eine Stelle suchen. Es gibt viele Möglichkeiten: Internet,
-            Zeitung, Arbeitsagentur / Jobcenter. In der Zeitung finden Sie meistens nur regionale Stellenangebote, aber
-            sie sind aktuell. Im Internet gibt es viele Anzeigen, aber nicht alle sind aktuell. Das Jobcenter berät Sie
-            und sucht passende Stellen für Sie. Sie können auch direkt bei einer Firma nachfragen. Manche Stellen sind
-            nicht öffentlich ausgeschrieben. Besuchen Sie auch die Internetseite einer Firma (dort findet man manchmal
-            freie Stellen) und das BIZ (Berufsinformationszentrum) der Arbeitsagentur. Dort gibt es Stellenanzeigen,
-            viele Informationen zum Thema Beruf und Arbeit und Berufsberatung. Im BIZ und beim Jobcenter können Sie auch
-            Ihr Profil ins Internet stellen. Ein Praktikum in einer Firma kann ebenfalls nützlich sein: Sie lernen die
-            Arbeit kennen und knüpfen Kontakte.
-          </p>
-
-          <h3 style={sectionTitle}>Bewerbung</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Die Bewerbung ist der erste Schritt in den Arbeitsmarkt. Sehr wichtig sind die Bewerbungsunterlagen: ein
-            Anschreiben (Brief an die Firma), ein gutes Bewerbungsfoto, ein Lebenslauf, Ihre Zeugnisse (auf Deutsch).
-            Das BIZ bietet Workshops an: „Bewerbung in Deutschland“ – dort lernt man, wie eine Bewerbung aussieht und wie
-            man sich auf das Vorstellungsgespräch vorbereitet. In vielen Städten gibt es Beratungsstellen für Migranten.
-            Dort hilft man Ihnen bei der Arbeitssuche und der Bewerbung (siehe Bundesamt für Migration und Flüchtlinge,
-            BAMF). Für junge Menschen bis 27 Jahre gibt es bei den Jugendmigrationsdiensten eine spezielle Beratung.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen zum Text</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
+          <A2ReadingTaskPanel day={12} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>

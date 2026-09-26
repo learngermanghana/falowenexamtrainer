@@ -20,6 +20,7 @@ import {
 } from "./A2SecondStageLearningUpgrade";
 import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
+import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -132,7 +133,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
     </div>}
 
-    {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><p style={{ margin: 0 }}>Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.</p><p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line" }}>{lesenText || "Read a short A2 text about the lesson topic. Identify the main idea, important details and the correct answer letters."}</p><QuestionList questions={lesenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
+    {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} fallbackText={lesenText} fallbackQuestions={lesenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
     {showHoeren && activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
 
