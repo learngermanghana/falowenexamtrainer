@@ -180,10 +180,10 @@ if (!sharedSource.includes("<A2ReadingTaskPanel day={day}")) {
 }
 
 const day14ForbiddenCopy = [
-  "Arbeiten in Deutschland",
   "Was bedeutet Gleitzeit?",
   "Was ist der Betriebsrat?",
-  "0 of 12 answered",
+  "Wie viele Stunden arbeitet man in der Regel pro Woche in Vollzeit?",
+  "Was muss man bei einer Kündigung beachten?",
 ];
 const webSourceRoot = path.join(ROOT, "web", "src");
 const sourceFilesToCheck = [];
@@ -276,8 +276,14 @@ for (const day of expectedDays) {
     }
 
     const listeningQuestions = extractQuestionsProp(source, "hoerenQuestions", label);
-    if (!Array.isArray(listeningQuestions) || listeningQuestions.length === 0) {
-      fail(label, "Teil 4 Hören is visible but no parseable listening questions were found");
+    const explicitSelfCheck = /hoerenQuestions=\{\[\]\}/.test(source)
+      && listeningAnswers.length === 0
+      && /self-check|Goethe-Hören-Übung|kontrollieren Sie Ihre Antworten/i.test(source);
+
+    if (explicitSelfCheck) {
+      note(`${expectedAssignmentId}: Teil 4 is external self-check practice, not a submitted Hören assignment`);
+    } else if (!Array.isArray(listeningQuestions) || listeningQuestions.length === 0) {
+      fail(label, "Teil 4 Hören is visible but has neither graded questions nor an explicit self-check contract");
     } else {
       if (listeningAnswers.length !== listeningQuestions.length) {
         fail(
