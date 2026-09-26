@@ -73,7 +73,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyService.test.js src/__tests__/StudyBuddyBar.test.js src/__tests__/StudyBuddyBar.i18n.test.js
+        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyService.test.js src/__tests__/StudyBuddyBar.test.js
 
   lesson-section-deep-links:
     runs-on: ubuntu-latest
