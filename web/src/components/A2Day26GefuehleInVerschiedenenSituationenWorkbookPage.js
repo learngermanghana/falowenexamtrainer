@@ -40,6 +40,7 @@ export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() 
       hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
       hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
       hoerenQuestions={[]}
+      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
