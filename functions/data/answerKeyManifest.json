@@ -400,13 +400,11 @@
   "A2 1.1 Small Talk": {
     "answers": {
       "teil3": {
-        "Answer1": "C) In einer Schule",
-        "Answer2": "B) Weil sie gerne mit Kindern arbeitet",
-        "Answer3": "A) In einem Buro",
-        "Answer4": "B) Tennis",
-        "Answer5": "B) Es war sonnig und warm",
-        "Answer6": "B) Italien und Spanien",
-        "Answer7": "C) Weil die Baume so schon bunt sind"
+        "Answer1": "A) Seit Montag",
+        "Answer2": "B) Jana",
+        "Answer3": "C) In der Kantine",
+        "Answer4": "B) Sie besucht einen Deutschkurs.",
+        "Answer5": "C) Sie möchte die Kollegen besser kennenlernen."
       },
       "teil4": {
         "Answer1": "B) Ins Kino gehen",
@@ -424,10 +422,11 @@
   "A2 1.2 Personen Beschreiben": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Ein Jahr",
-        "Answer2": "C) Einen Anzug und eine Brille",
-        "Answer3": "B) Er hilft geduldig",
-        "Answer4": "A) Weil er fair ist"
+        "Answer1": "A) In einem Hotel",
+        "Answer2": "B) Ruhig und zuverlässig",
+        "Answer3": "B) Eine Brille",
+        "Answer4": "C) Basketball spielen",
+        "Answer5": "D) Beide haben Freizeitaktivitäten nach oder neben der Arbeit."
       },
       "teil4": {
         "Answer1": "B) Weil er in Deutschland arbeiten möchte.",
@@ -443,10 +442,11 @@
   "A2 1.3 Dinge und Personen vergleichen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Max",
-        "Answer2": "B) Max",
-        "Answer3": "B) Max ist älter als Anna.",
-        "Answer4": "A) Beide sind freundlich."
+        "Answer1": "A) Sprachschule A",
+        "Answer2": "B) In Sprachschule B",
+        "Answer3": "B) Sprachschule B",
+        "Answer4": "B) Sprachschule B",
+        "Answer5": "B) Dienstag und Donnerstag"
       },
       "teil4": {
         "Answer1": "B) Julia ist 26 Jahre alt",
@@ -464,11 +464,11 @@
   "A2 2.4 Wo möchten wir uns treffen?": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Faul sein",
-        "Answer2": "D) Hockey spielen",
-        "Answer3": "A) Schwimmen gehen",
-        "Answer4": "D) Zum See fahren und dort im Zelt übernachten",
-        "Answer5": "B) Eine Route mit dem Zug durch das ganze Land"
+        "Answer1": "A) Im Stadtpark",
+        "Answer2": "C) Es soll regnen.",
+        "Answer3": "B) Neben der U-Bahn-Station Rathaus",
+        "Answer4": "C) Um 15:30 Uhr",
+        "Answer5": "B) Er reserviert einen Tisch."
       },
       "teil4": {
         "Answer1": "B) Um 10 Uhr",
@@ -486,11 +486,11 @@
   "A2 2.5 Was machst du in deiner Freizeit": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Nudeln, Pizza und Salat",
-        "Answer2": "B) Den grünen Salat",
-        "Answer3": "A) Sie ist kalt.",
-        "Answer4": "B) Tiramisu und Schokoladenkuchen",
-        "Answer5": "B) Bar"
+        "Answer1": "C) Fahrradtour",
+        "Answer2": "B) Im Raum 5",
+        "Answer3": "C) Der Kochkurs",
+        "Answer4": "C) Für Fahrradtour und Kochkurs",
+        "Answer5": "A) 5 Euro"
       },
       "teil4": {
         "Answer1": "A) Tee trinken und lesen",
@@ -508,11 +508,11 @@
   "A2 3.6 Möbel und Räume kennenlernen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Weil ich studiere",
-        "Answer2": "B) Wenn es nicht regnet, stürmt oder schneit",
-        "Answer3": "D) Es ist billig",
-        "Answer4": "D) Haustiere",
-        "Answer5": "C) Im Zoo"
+        "Answer1": "A) Neben dem Fenster",
+        "Answer2": "B) Ein Teppich",
+        "Answer3": "C) Im Regal über dem Schreibtisch",
+        "Answer4": "B) Sie essen zusammen in der Küche.",
+        "Answer5": "C) Im Keller"
       },
       "teil4": {
         "Answer1": "A) Die 2-Zimmer-Wohnung",
@@ -530,13 +530,11 @@
   "A2 3.7 Eine Wohnung suchen": {
     "answers": {
       "teil3": {
-        "Answer1": "b) In Zeitungen und im Internet",
-        "Answer2": "c) Eine Person, die bei der Wohnungssuche hilft",
-        "Answer3": "c) Kaltmiete und Nebenkosten",
-        "Answer4": "b) Ein Betrag, den man beim Auszug zurückbekommt",
-        "Answer5": "c) Ein Formular, das Schäden in der Wohnung zeigt",
-        "Answer6": "C) Von 22–7 Uhr und 13–15 Uhr",
-        "Answer7": "C) Zum Wertstoffcontainer bringen"
+        "Answer1": "A) Wohnung A",
+        "Answer2": "B) Wohnung B",
+        "Answer3": "C) Wohnung C",
+        "Answer4": "D) Keine Wohnung passt.",
+        "Answer5": "A) Wohnung A"
       },
       "teil4": {
         "Answer1": "C) im dritten stock",
@@ -554,13 +552,11 @@
   "A2 3.8 Rezepte und Essen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Brot, Brotchen, Aufschnitt, Kase und Marmelade",
-        "Answer2": "B) Ein Kaltes Abendessen",
-        "Answer3": "A) Fischgerichte",
-        "Answer4": "B) Oktoberfest",
-        "Answer5": "B) Gerichte aus aller Welt",
-        "Answer6": "C) Sauerkraut und Bratwurst",
-        "Answer7": "A) Eine zentrale Rolle"
+        "Answer1": "B) Für zwei Personen",
+        "Answer2": "B) Die Nudeln",
+        "Answer3": "A) Die Zwiebel",
+        "Answer4": "B) Nach fünf Minuten",
+        "Answer5": "C) Man mischt Nudeln und Gemüse und würzt."
       },
       "teil4": {
         "Answer1": "B) Samstag",
@@ -578,13 +574,11 @@
   "A2 4.9 Urlaub": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Musik hören, Bücher lesen, Filme sehen oder ausleihen",
-        "Answer2": "C) An der Volkshochschule",
-        "Answer3": "C) Sie treffen sich, weil sie gemeinsame Interessen haben.",
-        "Answer4": "C) Im botanischen Garten",
-        "Answer5": "B) Der Besuch von Parks und Spielplätzen",
-        "Answer6": "C) 17,98 Euro",
-        "Answer7": "C) In der Hausordnung"
+        "Answer1": "B) Drei Nächte",
+        "Answer2": "C) 82 Euro",
+        "Answer3": "B) Frühstück",
+        "Answer4": "C) Ab 14 Uhr",
+        "Answer5": "B) Die Rezeption informieren."
       },
       "teil4": {
         "Answer1": "B) Griechenland",
@@ -602,13 +596,11 @@
   "A2 4.10 Tourismus und Traditionelle Feste": {
     "answers": {
       "teil3": {
-        "Answer1": "b) Die wichtigsten rechtlichen und politischen Regeln",
-        "Answer2": "c) Man muss Steuern zahlen",
-        "Answer3": "b) EU-Bürger dürfen bei Kommunalwahlen wählen",
-        "Answer4": "b) Er vertritt die Interessen von Migranten",
-        "Answer5": "A) Christlich-orthodox, jüdisch, islamisch, evangelisch und katholisch",
-        "Answer6": "b) Seit 1. Oktober 2017",
-        "Answer7": "c) Jeder darf seine Religion frei wählen und ausüben"
+        "Answer1": "A) Um 10:00 Uhr",
+        "Answer2": "C) Internationales Mittagessen",
+        "Answer3": "B) Vor dem Rathaus",
+        "Answer4": "C) Er ist kostenlos.",
+        "Answer5": "C) Es findet im Kulturhaus statt."
       },
       "teil4": {
         "Answer1": "C) Munchen",
@@ -626,13 +618,11 @@
   "A2 4.11 Unterwegs: Verkehrsmittel vergleichen": {
     "answers": {
       "teil3": {
-        "Answer1": "b) In Italien",
-        "Answer2": "b) Weil sie in der Stadt fahren wird",
-        "Answer3": "a) Eine gute Versicherung",
-        "Answer4": "b) Führerschein und Personalausweis",
-        "Answer5": "b) Der Angestellte der Autovermietung",
-        "Answer6": "a) Viele Städte zu besuchen",
-        "Answer7": "b) Sehr zufrieden"
+        "Answer1": "C) Taxi",
+        "Answer2": "A) 7 Euro",
+        "Answer3": "B) Am ZOB",
+        "Answer4": "B) Alle 20 Minuten",
+        "Answer5": "C) Die S8 fährt erst ab 08:30 Uhr."
       },
       "teil4": {
         "Answer1": "B) in die Berge",
@@ -650,13 +640,11 @@
   "A2 5.12 Ein Tag im Leben": {
     "answers": {
       "teil3": {
-        "Answer1": "C) Eine Behörde prüft, ob das Dokument echt ist",
-        "Answer2": "b) Auf der Internetseite „Anerkennung in Deutschland“",
-        "Answer3": "b) Die Zeitung",
-        "Answer4": "c) Berufsinformationszentrum",
-        "Answer5": "b) Ein Praktikum",
-        "Answer6": "c) Ein Kochrezept",
-        "Answer7": "c) Menschen unter 27 Jahren"
+        "Answer1": "A) Anzeige A",
+        "Answer2": "B) Anzeige B",
+        "Answer3": "C) Anzeige C",
+        "Answer4": "D) Anzeige D",
+        "Answer5": "B) Anzeige B"
       },
       "teil4": {
         "Answer1": "B) um 6 Uhr",
@@ -674,11 +662,11 @@
   "A2 5.13 Ein Vorstellungsgespräch": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Sich über das Unternehmen informieren",
-        "Answer2": "B) Pünktlich sein und passende Kleidung tragen",
-        "Answer3": "B) Über Erfahrungen, Stärken und berufliche Ziele",
-        "Answer4": "A) Fragen zu Aufgaben, Arbeitszeiten oder Weiterbildung",
-        "Answer5": "A) Eine kurze Dankes-E-Mail schicken"
+        "Answer1": "A) Büroassistentin",
+        "Answer2": "B) Dienstag um 10:30 Uhr",
+        "Answer3": "B) Herrn Berger",
+        "Answer4": "B) Lebenslauf und Zeugnisse",
+        "Answer5": "C) Sich spätestens am Freitag melden."
       },
       "teil4": {
         "Answer1": "B) Um Interesse zu zeigen",
@@ -696,18 +684,11 @@
   "A2 5.14 Beruf und Karriere": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Die Kollegen und die Arbeit",
-        "Answer2": "C) Mit „Sie“",
-        "Answer3": "C) Eine Arbeitnehmervertretung",
-        "Answer4": "C) Arbeitskleidung, Pausen und feste Arbeitszeiten",
-        "Answer5": "C) Man kann Arbeitsbeginn und -ende flexibel wählen",
-        "Answer6": "C) 38–40 Stunden",
-        "Answer7": "B) Den Urlaub eintragen und genehmigen lassen",
-        "Answer8": "D) Weiter das Gehalt oder den Lohn",
-        "Answer9": "C) Sofort den Arbeitgeber informieren und zum Arzt gehen",
-        "Answer10": "C) Auf der Baustelle oder am Flughafen",
-        "Answer11": "C) Die Kündigung schriftlich und mit Frist einreichen",
-        "Answer12": "C) In der Volkshochschule"
+        "Answer1": "A) Zwischen 8:00 und 9:00 Uhr",
+        "Answer2": "C) 30 Minuten",
+        "Answer3": "B) Im Online-System",
+        "Answer4": "A) Am ersten Tag vor 9:00 Uhr",
+        "Answer5": "B) Frau König"
       },
       "teil4": {}
     },
@@ -719,11 +700,11 @@
   "A2 6.15 Mein Lieblingssport": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Yoga und Zumba",
-        "Answer2": "B) Fußball, Handball und Volleyball",
-        "Answer3": "C) Die Spenden an lokale Wohltätigkeitsorganisationen",
-        "Answer4": "A) Im Stadtzentrum",
-        "Answer5": "B) Fitnessprogramme"
+        "Answer1": "A) Laufgruppe",
+        "Answer2": "B) Im Hallenbad",
+        "Answer3": "C) Freitag um 17:30 Uhr",
+        "Answer4": "B) Für Erwachsene mit Kindern ab 6 Jahren",
+        "Answer5": "B) Schwimmen und Badminton"
       },
       "teil4": {
         "Answer1": "B) Pilates- und Aerobic-Kurse",
@@ -741,11 +722,11 @@
   "A2 6.16 Wohlbefinden und Entspannung": {
     "answers": {
       "teil3": {
-        "Answer1": "C) Anzeige C",
-        "Answer2": "B) Anzeige B",
-        "Answer3": "E) Anzeige E",
-        "Answer4": "F) Anzeige F",
-        "Answer5": "A) Anzeige A"
+        "Answer1": "B) Angebot B",
+        "Answer2": "C) Angebot C",
+        "Answer3": "D) Angebot D",
+        "Answer4": "A) Angebot A",
+        "Answer5": "C) Angebot C"
       },
       "teil4": {
         "Answer1": "B) Mehr Obst und Gemüse essen",
@@ -763,13 +744,11 @@
   "A2 6.17 In die Apotheke gehen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Weil sie sich krank fühlte",
-        "Answer2": "B) Hustensaft",
-        "Answer3": "C) Hilfsbereit",
-        "Answer4": "B) Broschüren mit Tipps",
-        "Answer5": "C) Besser",
-        "Answer6": "B) Nach einigen Stunden",
-        "Answer7": "A) Sie kann sich auf den Rat der Apotheker verlassen"
+        "Answer1": "B) Ruhe und viel trinken",
+        "Answer2": "A) Lutschtabletten",
+        "Answer3": "B) Nur wenige Tage",
+        "Answer4": "A) Bei hohem Fieber oder starken Schmerzen",
+        "Answer5": "C) Sie müssen zum Alter passen."
       },
       "teil4": {
         "Answer1": "B) Wegen Kopfschmerzen",
@@ -787,11 +766,11 @@
   "A2 7.18 Die Bank Anrufen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Sparkasse",
-        "Answer2": "F) ING-DiBa",
-        "Answer3": "B) Sparkasse",
-        "Answer4": "D) Volksbank",
-        "Answer5": "C) Commerzbank"
+        "Answer1": "A) Donnerstag um 14:00 Uhr",
+        "Answer2": "B) Am Marktplatz 8",
+        "Answer3": "B) Einen Reisepass",
+        "Answer4": "C) 45 Minuten",
+        "Answer5": "B) Die Formulare vorher online ausfüllen"
       },
       "teil4": {
         "Answer1": "B) Reisepass, Meldebescheinigung, Einkommensnachweis",
@@ -809,13 +788,11 @@
   "A2 7.19 Einkaufen? Wo und wie?": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Die Zunahme von Online-Shopping und Werbung",
-        "Answer2": "B) Wegen der ständigen Verfügbarkeit und einfachen Bestellung",
-        "Answer3": "B) Nachhaltiger Konsum",
-        "Answer4": "B) Weniger Plastik verwenden und lokale Produkte kaufen",
-        "Answer5": "B) Umweltverschmutzung und schlechte Arbeitsbedingungen",
-        "Answer6": "A) Sich gut informieren",
-        "Answer7": "B) Als komplexes Thema mit positiven und negativen Auswirkungen"
+        "Answer1": "A) Dienstag und Samstag",
+        "Answer2": "B) Kartenzahlung",
+        "Answer3": "B) Ab 19 Uhr",
+        "Answer4": "B) Kleidung und kleine Haushaltsartikel",
+        "Answer5": "A) Kleidung abgeben"
       },
       "teil4": {
         "Answer1": "B) Bequeme Möglichkeit Produkte nach Hause zu bestellen",
@@ -833,11 +810,11 @@
   "A2 7.20 Typische Reklamationssituationen üben": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Der Wasserkocher funktionierte nicht mehr.",
-        "Answer2": "A) Den Kassenbon",
-        "Answer3": "A) Ruhig",
-        "Answer4": "B) Umtausch oder Rückerstattung",
-        "Answer5": "A) Die Lösung war schnell."
+        "Answer1": "B) Einen Wasserkocher",
+        "Answer2": "C) 39 Euro",
+        "Answer3": "B) Es schaltet sich nicht mehr ein.",
+        "Answer4": "A) Der Kassenbon",
+        "Answer5": "B) Ein neues Gerät oder sein Geld zurück"
       },
       "teil4": {
         "Answer1": "B) Er funktioniert nicht",
@@ -859,7 +836,7 @@
         "Answer2": "B) Am Rhein spazieren",
         "Answer3": "B) Restaurant und Konzert",
         "Answer4": "A) Sie gehen in ein Museum.",
-        "Answer5": "A) Ihr Zug fährt um 17 Uhr."
+        "Answer5": "C) Um 17:00 Uhr"
       },
       "teil4": {}
     },
@@ -887,11 +864,11 @@
   "A2 9.23 Wie kommst du zur Schule / zur Arbeit?": {
     "answers": {
       "teil3": {
-        "Answer1": "C) An die Nordsee",
-        "Answer2": "B) Auf einer Insel",
-        "Answer3": "A) Aus der Schweiz",
-        "Answer4": "A) Mit der U-Bahn",
-        "Answer5": "D) Die Berge und die Natur"
+        "Answer1": "A) Den Regionalzug",
+        "Answer2": "C) 45 Minuten",
+        "Answer3": "A) Bei gutem Wetter",
+        "Answer4": "B) Den Bus 16",
+        "Answer5": "C) Zu Fuß"
       },
       "teil4": {}
     },
@@ -903,11 +880,11 @@
   "A2 9.24 Einen Urlaub planen": {
     "answers": {
       "teil3": {
-        "Answer1": "F) Anzeige f",
-        "Answer2": "C) Anzeige c",
-        "Answer3": "X) Keine passende Anzeige",
-        "Answer4": "B) Anzeige b",
-        "Answer5": "A) Anzeige a"
+        "Answer1": "A) Angebot A",
+        "Answer2": "B) Angebot B",
+        "Answer3": "C) Angebot C",
+        "Answer4": "D) Angebot D",
+        "Answer5": "C) Angebot C"
       },
       "teil4": {}
     },
@@ -919,11 +896,11 @@
   "A2 9.25 Tagesablauf": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Kurz vor sieben Uhr",
-        "Answer2": "A) Damit sie morgens Zeit spart.",
-        "Answer3": "A) Müsli oder Toast mit Marmelade",
-        "Answer4": "A) Sie macht Hausaufgaben.",
-        "Answer5": "A) Sie bereitet ihre Sachen für den nächsten Tag vor."
+        "Answer1": "A) Damit sie morgens Zeit spart.",
+        "Answer2": "B) Mit dem Bus",
+        "Answer3": "B) Um 12:30 Uhr",
+        "Answer4": "B) Sie geht ins Fitnessstudio.",
+        "Answer5": "C) Um 22:30 Uhr"
       },
       "teil4": {}
     },
@@ -935,11 +912,11 @@
   "A2 10.26 Gefühle in verschiedenen Situationen beschr": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Sie hatte Angst vor schwierigen Aufgaben.",
-        "Answer2": "A) Ruhig atmen und zuerst einfache Fragen beantworten",
+        "Answer1": "A) Er hat eine wichtige Präsentation.",
+        "Answer2": "B) Er atmet langsam ein und aus.",
         "Answer3": "A) Erleichtert",
-        "Answer4": "A) Sie war überrascht und stolz.",
-        "Answer5": "A) Ein ruhiges Gespräch"
+        "Answer4": "B) Seine Schwester hat eine Prüfung bestanden.",
+        "Answer5": "B) Musik"
       },
       "teil4": {}
     },
@@ -951,13 +928,11 @@
   "A2 10.27 Digitale Kommunikation": {
     "answers": {
       "teil3": {
-        "Answer1": "b) Sie sind oft sehr teuer oder funktionieren nicht.",
-        "Answer2": "c) Ein deutsches Bankkonto und einen Ausweis.",
-        "Answer3": "C) 1 bis 2 Jahre",
-        "Answer4": "c) Drei Monate vor Vertragsende",
-        "Answer5": "c) In Supermärkten, Tankstellen oder Kiosken",
-        "Answer6": "b) Name, Adresse, Geburtsdatum und ein Ausweisdokument",
-        "Answer7": "d) Mit öffentlichem WLAN"
+        "Answer1": "B) Unterschiedliche Passwörter",
+        "Answer2": "B) Ein Passwort",
+        "Answer3": "C) Nicht öffnen, wenn man den Absender nicht kennt",
+        "Answer4": "B) Die Absenderadresse",
+        "Answer5": "B) Die Nachricht speichern und eine verantwortliche Person informieren."
       },
       "teil4": {
         "Answer1": "B) Ihr Handy",
@@ -974,11 +949,11 @@
   "A2 10.28 Über die Zukunft sprechen": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Die B1-Prüfung bestehen",
-        "Answer2": "A) Täglich lesen und regelmäßig mit Freunden sprechen",
-        "Answer3": "A) Damit er bessere Chancen auf dem Arbeitsmarkt hat.",
-        "Answer4": "A) Geld sparen, später umziehen und reisen",
-        "Answer5": "A) Klare Ziele helfen, auch wenn nicht alles genau so funktioniert."
+        "Answer1": "A) Die B1-Prüfung",
+        "Answer2": "B) Für eine Ausbildung in Logistik",
+        "Answer3": "C) Im Herbst",
+        "Answer4": "B) Weil er im Beruf sicher sprechen und schreiben möchte.",
+        "Answer5": "B) Seine Schwester"
       },
       "teil4": {
         "Answer1": "A) Um Zukunftspläne und Ziele",
