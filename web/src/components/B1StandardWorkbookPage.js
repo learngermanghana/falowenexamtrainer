@@ -13,6 +13,7 @@ import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { styles } from "../styles";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
+import { getB1ListeningTask } from "../data/b1ListeningTasks";
 
 const card = {
   ...styles.card,
@@ -205,7 +206,10 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
 
   const speaking = config.speaking || {};
   const { writing, reading } = resolveB1CanonicalAssignmentSections(config);
-  const listening = config.listening || { status: "planned" };
+  const canonicalListening = getB1ListeningTask(config.day);
+  const listening = canonicalListening
+    ? { ...(config.listening || {}), ...canonicalListening }
+    : (config.listening || { status: "planned" });
   const embedUrl = getYouTubeEmbedUrl(listening);
   const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
 
@@ -237,8 +241,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
         </section>
       )}
 
-      {renderSections ? (
-        React.createElement(renderSections, { activeTab, prepared, setPreparedFor })
+      {renderSections && (activeTab !== "hoeren" || listening.mode === "reading-fallback") ? (
+        React.createElement(renderSections, { activeTab, prepared, setPreparedFor, listening })
       ) : (
         <>
       {activeTab === "sprechen" && (
@@ -417,7 +421,12 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
 
           <SectionImage image={listening.image} alt={listening.imageAlt} />
 
-          {listening.status === "planned" ? (
+          {listening.status === "unavailable" ? (
+            <PlaceholderCard
+              title={listening.title || "No listening task for this lesson"}
+              text={listening.instructions || "This lesson intentionally has no Teil 4 · Hören."}
+            />
+          ) : listening.status === "planned" ? (
             <PlaceholderCard
               title="Listening content skeleton"
               text={
