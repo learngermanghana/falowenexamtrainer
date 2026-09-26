@@ -38,6 +38,7 @@ const GrammarLessonContent = ({ day }) => {
       <strong>{grammar.title}</strong>
       <span><strong>Heute im Kontext:</strong> {grammar.context}</span>
       <span><strong>Lernziel:</strong> {grammar.goal}</span>
+      <span data-b2-grammar-relevance="true"><strong>Warum diese Grammatik?</strong> {grammar.whyThisGrammar}</span>
     </div>
 
     <div style={{ display: "grid", gap: 12 }}>
