@@ -579,6 +579,9 @@ export const AuthProvider = ({ children }) => {
       const studentCode = profile.studentCode;
       const studentId = studentCode || credential.user.uid;
       const studentsRef = doc(db, "students", studentId);
+      const trialStartedDate = new Date();
+      const trialEndsDate = new Date(trialStartedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const trialPurgeDate = new Date(trialEndsDate.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       const payload = {
         uid: credential.user.uid,
@@ -600,7 +603,10 @@ export const AuthProvider = ({ children }) => {
         emergencyContactPhone: profile.emergencyContactPhone || "",
         status: profile.status || "pending",
         trialStatus: profile.trialStatus || "active",
-        trialStartedAt: serverTimestamp(),
+        trialStartedAt: Timestamp.fromDate(trialStartedDate),
+        trialUsedAt: Timestamp.fromDate(trialStartedDate),
+        trialEndsAt: Timestamp.fromDate(trialEndsDate),
+        trialPurgeAt: Timestamp.fromDate(trialPurgeDate),
         initialPaymentAmount: profile.initialPaymentAmount ?? 0,
         tuitionFee: profile.tuitionFee ?? null,
         balanceDue: profile.balanceDue ?? null,
@@ -610,7 +616,7 @@ export const AuthProvider = ({ children }) => {
         contractStart: profile.contractStart || "",
         contractEnd: profile.contractEnd || "",
         contractTermMonths: profile.contractTermMonths ?? null,
-        joined_at: new Date().toISOString(),
+        joined_at: trialStartedDate.toISOString(),
         updated_at: serverTimestamp(),
         syncedToSheets: false,
       };
