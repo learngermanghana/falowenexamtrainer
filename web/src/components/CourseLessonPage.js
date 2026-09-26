@@ -48,7 +48,7 @@ import B1Day28KlimafreundlichLebenWorkbookPage from "./B1Day28KlimafreundlichLeb
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
-import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
+import { applyA1GrammarRouteToLesson, getA1GrammarRoute } from "../data/a1GrammarRoutes";
 import { getA1RadioResource } from "../data/a1RadioResources";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
@@ -418,20 +418,27 @@ export default function CourseLessonPage() {
   const requestedChapter = String(query.get("chapter") || "").trim();
 
   if ((level === "A1" || level === "A2") && requestedView && day > 0) {
+    const a1Radio = level === "A1" ? getA1RadioResource(day, requestedChapter) : null;
+    const forceA1Radio = Boolean(a1Radio && normalizedWorkbookView === "radio");
     const hasPendingA1Radio =
-      level === "A1"
-      && Boolean(getA1RadioResource(day, requestedChapter))
-      && query.get("radio") !== "done";
+      Boolean(a1Radio)
+      && (forceA1Radio || query.get("radio") !== "done");
 
     if (!hasPendingA1Radio) {
+      const grammarRoute =
+        level === "A1" && normalizedWorkbookView === "grammar"
+          ? getA1GrammarRoute({ day, chapter: requestedChapter })
+          : "";
       const workbookRoute = getConfiguredInAppWorkbookResourceRoute({
         level,
         day,
         chapter: requestedChapter,
       });
-      const destination = mergeLessonSearchIntoRoute(workbookRoute, location.search, {
-        dropKeys: ["chapter"],
-      });
+      const destination = mergeLessonSearchIntoRoute(
+        grammarRoute || workbookRoute,
+        location.search,
+        { dropKeys: grammarRoute ? ["chapter", "view"] : ["chapter"] },
+      );
       if (destination && destination !== `${location.pathname}${location.search}`) {
         return <Navigate to={destination} replace state={location.state} />;
       }
