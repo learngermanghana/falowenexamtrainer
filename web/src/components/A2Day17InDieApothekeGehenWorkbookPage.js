@@ -32,7 +32,6 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => (
     workbookId="A2Day17InDieApothekeGehen"
     topicPrompt="In die Apotheke gehen"
     mindMapOnlySpeaking
-    openGrammarAfterRadio
     hoerenTask="Höre das Gespräch in der Apotheke. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein."
     hoerenAudioUrl="https://youtu.be/jgl__L4L9kE"
     hoerenQuestions={hoerenQuestions}
