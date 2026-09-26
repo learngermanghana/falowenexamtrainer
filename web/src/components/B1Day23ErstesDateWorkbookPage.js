@@ -104,14 +104,6 @@ export const B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(23),
   reading: getB1ReadingTask(23),
-  listening: {
-    status: "planned",
-    title: "Hören material for Day 23 will be added here.",
-    instructions:
-      "The listening section is already prepared structurally. Add the video, instructions and self-check questions when the audio material is available.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones reserved for future listening content",
-  },
   submitWritingDescription: "Paste your final 80–100 word opinion text.",
   submitReadingDescription: "Paste your seven reading answer letters.",
 };
