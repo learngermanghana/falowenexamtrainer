@@ -24,13 +24,13 @@ const cleanedLateA2Days = [day20, day21, day22, day23, day24, day25, day26, day2
 describe("shared A2 workbook regression", () => {
   it("keeps the shared workbook shell complete", () => {
     expect(standardShell).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
-    expect(standardShell).toContain('activeTab === "grammar"');
-    expect(standardShell).toContain('activeTab === "sprechen"');
-    expect(standardShell).toContain('activeTab === "schreiben"');
-    expect(standardShell).toContain('activeTab === "lesen"');
-    expect(standardShell).toContain('activeTab === "hoeren"');
-    expect(standardShell).toContain('activeTab === "references"');
-    expect(standardShell).toContain('activeTab === "submit"');
+    expect(standardShell).toContain('visibleActiveTab === "grammar"');
+    expect(standardShell).toContain('visibleActiveTab === "sprechen"');
+    expect(standardShell).toContain('visibleActiveTab === "schreiben"');
+    expect(standardShell).toContain('visibleActiveTab === "lesen"');
+    expect(standardShell).toContain('visibleActiveTab === "hoeren"');
+    expect(standardShell).toContain('visibleActiveTab === "references"');
+    expect(standardShell).toContain('visibleActiveTab === "submit"');
     expect(standardShell).toContain("SpeakingMindMap");
     expect(standardShell).toContain("SpeakingPracticeTimerCard");
     expect(standardShell).toContain("WorkbookReferenceAnswers");
