@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG = {
   day: 14,
@@ -96,41 +97,7 @@ export const B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG = {
       "Ein Vorteil ist, dass ...",
       "Ein Nachteil besteht darin, dass ...",
       "Ich bevorzuge ..., weil ...",
-      "Die beste Lösung ist meiner Meinung nach eine Kombination aus beiden Methoden.",
-    ],
-  },
-  writing: {
-    title: "Formelle E-Mail: Teilnahme an einem Weiterbildungsprogramm ablehnen",
-    instructions: "Ihr Arbeitgeber bietet Ihnen die Möglichkeit, an einem beruflichen Weiterbildungsprogramm teilzunehmen. Das Programm findet nach der regulären Arbeitszeit statt und dauert sechs Monate. Schreiben Sie eine formelle E-Mail an Ihren Chef und begründen Sie höflich, warum Sie nicht teilnehmen können.",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Formelle E-Mail im beruflichen Kontext",
-    sourceTitle: "Aufgabe",
-    sourceText: "Ihr Arbeitgeber bietet Ihnen die Möglichkeit, an einem beruflichen Weiterbildungsprogramm teilzunehmen. Das Programm findet jedoch nach der regulären Arbeitszeit statt und dauert sechs Monate. Schreiben Sie einen formellen Brief an Ihren Chef, in dem Sie klar mitteilen, dass Sie nicht teilnehmen können, und begründen Sie Ihre Entscheidung. Schreiben Sie eine E-Mail (circa 40 Wörter). Vergessen Sie nicht die Anrede und den Gruß am Schluss.",
-    taskPoints: [
-      "Verwenden Sie eine passende formelle Anrede.",
-      "Bedanken Sie sich kurz für das Angebot.",
-      "Teilen Sie klar mit, dass Sie nicht teilnehmen können.",
-      "Begründen Sie Ihre Entscheidung höflich.",
-      "Schließen Sie mit einem formellen Gruß.",
-    ],
-    supportStructure: [
-      "Anrede: Sehr geehrter Herr ... / Sehr geehrte Frau ...",
-      "Dank: Vielen Dank für die Möglichkeit ...",
-      "Absage: Leider kann ich an dem Programm nicht teilnehmen.",
-      "Grund: Es findet nach der regulären Arbeitszeit statt und dauert sechs Monate.",
-      "Schluss: Ich bitte um Ihr Verständnis. Mit freundlichen Grüßen ...",
-    ],
-    vocabulary: [
-      "die Weiterbildung",
-      "das Programm",
-      "nach der Arbeitszeit",
-      "teilnehmen an + Dativ",
-      "aus privaten Gründen",
-      "zeitlich nicht möglich",
-      "Ich bitte um Verständnis",
-      "Mit freundlichen Grüßen",
-    ],
-    template: "Sehr geehrte/r Frau/Herr ...,\n\nvielen Dank für die Möglichkeit, an dem Weiterbildungsprogramm teilzunehmen. Leider kann ich nicht teilnehmen, weil das Programm nach meiner regulären Arbeitszeit stattfindet und sechs Monate dauert. Aus privaten Gründen ist das für mich zurzeit nicht möglich.\n\nMit freundlichen Grüßen\n...",
+      "Die beste Lösung ist meiner Meinung writing: getB1WritingTask(14),urzeit nicht möglich.\n\nMit freundlichen Grüßen\n...",
   },
   reading: {
     title: "Lesen Sie den Text über lebenslanges Lernen und beantworten Sie die sieben Fragen.",

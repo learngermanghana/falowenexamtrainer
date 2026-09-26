@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 const config = {
   day: 10,
@@ -89,41 +90,7 @@ const config = {
       "Im Vergleich zu einem normalen Arbeitstag …",
       "Einerseits hilft das Smartphone im Alltag, andererseits …",
       "Am wichtigsten ist für mich, dass …",
-      "Zusammenfassend bin ich der Meinung, dass …",
-    ],
-  },
-  writing: {
-    title: "Brauchen wir digitale Auszeiten für unsere Gesundheit?",
-    instructions: "Reagieren Sie auf den Impulstext. Schreiben Sie über Vorteile und Schwierigkeiten einer digitalen Auszeit, nennen Sie konkrete Strategien und formulieren Sie Ihre eigene Meinung.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an opinion essay about digital detox and self-care",
-    sourceTitle: "Impulstext",
-    sourceText: "In der heutigen schnelllebigen Welt ist es immer schwieriger, Zeit für sich selbst zu finden. Zwischen Arbeit, Familie und anderen Verpflichtungen bleibt oft wenig Raum für persönliche Auszeiten. Regelmäßige Momente der Ruhe können Stress reduzieren und neue Energie geben. Ob ein Spaziergang, ein Buch oder einige Minuten ohne Smartphone – solche Pausen sind wichtig für das allgemeine Wohlbefinden.",
-    taskPoints: [
-      "Fassen Sie die Hauptaussage des Impulstextes kurz zusammen.",
-      "Nennen Sie mindestens zwei Vorteile einer digitalen Auszeit.",
-      "Erklären Sie eine Schwierigkeit oder einen möglichen Nachteil.",
-      "Beschreiben Sie zwei konkrete Strategien für einen gesünderen Umgang mit Technik.",
-      "Geben Sie ein persönliches Beispiel oder beschreiben Sie die Situation in Ihrem Heimatland.",
-      "Formulieren Sie Ihre eigene Meinung und einen klaren Schluss.",
-    ],
-    supportStructure: [
-      "Einleitung und Bezug zum Impulstext",
-      "Vorteile einer digitalen Auszeit",
-      "Herausforderungen oder Gegenargumente",
-      "Konkrete Strategien",
-      "Persönliches Beispiel und eigene Meinung",
-      "Zusammenfassung",
-    ],
-    template: "Liebe Forum-Mitglieder,\n\nich möchte meine Meinung zum Thema digitale Auszeit und Selbstfürsorge äußern.\n\nDer Impulstext zeigt, dass …\n\nEinerseits … Andererseits …\n\nEine gute Strategie ist …, weil …\n\nIn meinem Alltag / In meinem Heimatland …\n\nMeiner Meinung nach …\n\nZusammenfassend lässt sich sagen, dass …\n\nMit freundlichen Grüßen\n[Ihr Name]",
-    vocabulary: [
-      "die Bildschirmzeit reduzieren",
-      "Benachrichtigungen ausschalten",
-      "ständig erreichbar sein",
-      "eine handyfreie Zone einrichten",
-      "Stress abbauen und neue Energie tanken",
-      "auf die eigene Gesundheit achten",
-      "bewusst Zeit mit Familie und Freunden verbringen",
+      "Zwriting: getB1WritingTask(10),
       "eine Gewohnheit schrittweise verändern",
     ],
   },

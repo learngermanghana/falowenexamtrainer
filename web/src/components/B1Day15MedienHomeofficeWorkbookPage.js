@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG = {
   day: 15,
@@ -105,46 +106,7 @@ export const B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG = {
       "Ein Nachteil besteht darin, dass ...",
       "Einerseits ..., andererseits ...",
       "Meiner Meinung nach sollte ...",
-      "Zusammenfassend kann ich sagen, dass ...",
-    ],
-  },
-  writing: {
-    title: "Meinungsbeitrag: Erleichtern Medien das Arbeiten im Homeoffice?",
-    instructions:
-      "Reagiere auf Daniels Meinung. Schreibe circa 80–100 Wörter. Äußere deine Meinung, nenne Vorteile und mögliche Probleme digitaler Medien und erkläre, wie man Arbeit und Privatleben besser trennen kann.",
-    image:
-      "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Digitale Zusammenarbeit im Homeoffice",
-    sourceTitle: "Daniel",
-    sourceText:
-      "Moderne Medien wie E-Mails, Videokonferenzen und digitale Tools machen das Arbeiten im Homeoffice einfacher. Ich stimme dem zu, denn sie ermöglichen eine schnelle Kommunikation und flexible Zusammenarbeit. Dennoch kann ständige Erreichbarkeit auch stressig sein und die Grenze zwischen Arbeit und Privatleben verschwimmen lassen. Ich finde, dass man klare Arbeitszeiten festlegen sollte, um eine gute Balance zu behalten. Was denken Sie darüber?",
-    taskPoints: [
-      "Reagiere klar auf Daniels Meinung.",
-      "Erkläre, wie digitale Medien das Homeoffice erleichtern.",
-      "Nenne mindestens einen Nachteil oder ein Risiko.",
-      "Schlage eine Lösung für ständige Erreichbarkeit oder fehlende Grenzen vor.",
-      "Fasse deine Meinung am Schluss kurz zusammen.",
-    ],
-    supportStructure: [
-      "Einleitung: Das Thema Homeoffice und digitale Medien wird immer wichtiger.",
-      "Reaktion: Ich stimme Daniel zu / nur teilweise zu, weil ...",
-      "Vorteile: E-Mails, Videokonferenzen und digitale Tools ermöglichen ...",
-      "Nachteile: Allerdings kann ...",
-      "Lösung: Deshalb sollte man ...",
-      "Schluss: Insgesamt bin ich der Meinung, dass ...",
-    ],
-    vocabulary: [
-      "die Videokonferenz",
-      "die digitale Zusammenarbeit",
-      "die ständige Erreichbarkeit",
-      "die Arbeitszeit",
-      "Arbeit und Privatleben trennen",
-      "Datenschutz beachten",
-      "eine klare Grenze setzen",
-      "flexibel zusammenarbeiten",
-    ],
-    template:
-      "Das Thema Homeoffice und digitale Medien wird immer wichtiger. Ich stimme Daniel zu, weil E-Mails, Videokonferenzen und digitale Programme eine schnelle Zusammenarbeit ermöglichen. Allerdings kann die ständige Erreichbarkeit Stress verursachen. Deshalb sollte man feste Arbeitszeiten planen und nach Feierabend berufliche Nachrichten ausschalten. Insgesamt erleichtern Medien das Homeoffice, wenn sie bewusst genutzt werden.",
+     writing: getB1WritingTask(15),dien das Homeoffice, wenn sie bewusst genutzt werden.",
   },
   reading: {
     title:

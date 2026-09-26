@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 const config = {
   day: 9,
@@ -87,40 +88,7 @@ const config = {
       "Arbeitgeber können helfen, indem sie …",
       "Viele Menschen setzen klare Grenzen, um …",
       "Obwohl moderne Arbeitsmodelle Vorteile haben, …",
-      "Zusammenfassend lässt sich sagen, dass …",
-    ],
-  },
-  writing: {
-    title: "Ist eine gute Work-Life-Balance im modernen Arbeitsumfeld möglich?",
-    instructions: "Reagieren Sie auf Lisas Meinung. Nennen Sie Argumente dafür und dagegen, geben Sie ein Beispiel und formulieren Sie Ihre eigene Position.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Student writing an opinion about work-life balance",
-    sourceTitle: "Meinung von Lisa",
-    sourceText: "Viele Menschen haben Schwierigkeiten, Arbeit und Privatleben in Einklang zu bringen. Ich stimme dem zu, denn lange Arbeitszeiten und ständiger Stress können die Gesundheit und das Wohlbefinden beeinträchtigen. Dennoch gibt es heute flexible Arbeitsmodelle wie Homeoffice oder Gleitzeit, die helfen können, eine bessere Balance zu finden. Ich finde, dass jeder bewusst Pausen einplanen und Zeit für Familie und Hobbys nehmen sollte, um langfristig produktiv und zufrieden zu bleiben. Was denken Sie darüber?",
-    taskPoints: [
-      "Fassen Sie Lisas Meinung kurz zusammen.",
-      "Nennen Sie mindestens ein Argument dafür und ein Argument dagegen.",
-      "Erklären Sie, welche Rolle Homeoffice oder flexible Arbeitszeiten spielen.",
-      "Geben Sie ein persönliches Beispiel oder beschreiben Sie die Situation in Ihrem Heimatland.",
-      "Formulieren Sie Ihre eigene Meinung und einen klaren Schluss.",
-    ],
-    supportStructure: [
-      "Einleitung zum Thema",
-      "Reaktion auf Lisas Meinung",
-      "Argumente dafür",
-      "Argumente dagegen",
-      "Persönliches Beispiel und eigene Meinung",
-      "Schluss",
-    ],
-    template: "Liebe Forum-Mitglieder,\n\nich möchte meine Meinung zum Thema Work-Life-Balance äußern.\n\nLisa meint, dass … Ich stimme ihr zu / nicht ganz zu, weil …\n\nEinerseits … Andererseits …\n\nIn meinem Alltag / In meinem Heimatland …\n\nMeiner Meinung nach ist eine gute Work-Life-Balance möglich, wenn …\n\nZusammenfassend lässt sich sagen, dass …\n\nMit freundlichen Grüßen\n[Ihr Name]",
-    vocabulary: [
-      "Arbeit und Privatleben in Einklang bringen",
-      "klare Grenzen setzen",
-      "Pausen einplanen",
-      "Überstunden machen",
-      "ständig erreichbar sein",
-      "flexible Arbeitszeiten nutzen",
-      "Stress reduzieren",
+     writing: getB1WritingTask(9),uzieren",
       "langfristig produktiv bleiben",
     ],
   },

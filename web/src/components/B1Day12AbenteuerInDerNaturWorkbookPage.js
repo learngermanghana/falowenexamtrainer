@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG = {
   day: 12,
@@ -83,44 +84,7 @@ export const B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG = {
       "Besonders schön war, dass ...",
       "Die größte Herausforderung war, dass ...",
       "Trotzdem habe ich gelernt, dass ...",
-      "In meinem Heimatland erlebt man Naturabenteuer oft ...",
-    ],
-  },
-  writing: {
-    title: "Schreiben Sie einen informellen Brief an Ihren Freund Felix über ein spannendes Abenteuer.",
-    instructions: "Sie haben kürzlich ein spannendes Abenteuer erlebt – zum Beispiel eine Reise, eine Wanderung oder ein besonderes Erlebnis. Schreiben Sie einen informellen Brief und erzählen Sie davon.",
-    image: "https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Ein Reisender schreibt nach einem Abenteuer",
-    sourceTitle: "Aufgabe",
-    sourceText: "Sie haben kürzlich ein spannendes Abenteuer erlebt – zum Beispiel eine aufregende Reise, eine Wanderung oder ein besonderes Erlebnis. Schreiben Sie einen informellen Brief an Ihren Freund Felix und erzählen Sie ihm davon.",
-    taskPoints: [
-      "Begrüßen Sie Felix und fragen Sie kurz, wie es ihm geht.",
-      "Erklären Sie, welches Abenteuer Sie erlebt haben und wo es war.",
-      "Beschreiben Sie zwei wichtige Erlebnisse oder Eindrücke.",
-      "Nennen Sie eine Schwierigkeit und wie Sie sie gelöst haben.",
-      "Schreiben Sie, was Sie gelernt haben oder warum das Erlebnis besonders war.",
-      "Beenden Sie den Brief freundlich.",
-    ],
-    supportStructure: [
-      "Anrede: Lieber Felix,",
-      "Einleitung: Wie geht es dir? Ich möchte dir von meinem Abenteuer erzählen.",
-      "Hauptteil 1: Ort, Zeit, Personen und Aktivität beschreiben.",
-      "Hauptteil 2: Erlebnisse, Gefühle und Herausforderung beschreiben.",
-      "Schluss: Lernmoment, Einladung zu einer Antwort und Gruß.",
-    ],
-    vocabulary: [
-      "das Abenteuer",
-      "die Wanderung",
-      "die Aussicht",
-      "atemberaubend",
-      "sich verlaufen",
-      "die Herausforderung",
-      "die Vorbereitung",
-      "draußen kochen",
-      "im Zelt schlafen",
-      "unvergesslich",
-    ],
-    template: "Lieber Felix,\n\nwie geht es dir? Ich hoffe, dir geht es gut. Ich möchte dir heute von meinem letzten Abenteuer erzählen.\n\nLetzte Woche war ich ... Dort habe ich ... Besonders schön war ...\n\nEs gab auch ein Problem: ... Zum Glück habe ich ... Dadurch habe ich gelernt, dass ...\n\nDas Erlebnis war für mich sehr besonders, weil ... Schreib mir bald zurück!\n\nViele Grüße\n...",
+      "In meinem Hewriting: getB1WritingTask(12),weil ... Schreib mir bald zurück!\n\nViele Grüße\n...",
   },
   reading: {
     title: "Lesen Sie den Text über Abenteuer und beantworten Sie die sieben Fragen.",
