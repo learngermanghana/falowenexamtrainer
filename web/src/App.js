@@ -178,6 +178,7 @@ import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
+import { getTrialAccessState } from "./lib/trialAccess";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 import { persistInterfaceLanguage } from "./i18n";
 
@@ -333,11 +334,10 @@ function App() {
     const parsed = toDateMs(studentProfile.contractEnd);
     return Number.isFinite(parsed) ? parsed : NaN;
   }, [studentProfile?.contractEnd]);
-  const trialEndMs = useMemo(() => {
-    if (!studentProfile?.trialEndsAt) return NaN;
-    const parsed = toDateMs(studentProfile.trialEndsAt);
-    return Number.isFinite(parsed) ? parsed : NaN;
-  }, [studentProfile?.trialEndsAt]);
+  const trialAccess = useMemo(
+    () => getTrialAccessState(studentProfile),
+    [studentProfile]
+  );
   const upgradeCarryoverMs = useMemo(() => {
     if (!studentProfile?.upgradeCarryoverUntil) return NaN;
     const parsed = toDateMs(studentProfile.upgradeCarryoverUntil);
@@ -349,7 +349,7 @@ function App() {
   );
 
   const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
-  const hasActiveTrial = Number.isFinite(trialEndMs) && trialEndMs > Date.now();
+  const hasActiveTrial = trialAccess.active;
   const hasQueuedUpgradeAccess =
     String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
     Number.isFinite(upgradeCarryoverMs) &&
