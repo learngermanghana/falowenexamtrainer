@@ -203,6 +203,7 @@ const WoTreffenUnsGrammarPage = () => (
       <p style={{ margin: 0, lineHeight: 1.7 }}>
         These are called <strong>Wechselpräpositionen</strong> because they can take either Dativ or Akkusativ.
         The preposition itself usually stays the same; the <strong>article shows the case change</strong>.
+        Important: movement alone does not automatically mean Akkusativ. Ask whether the sentence answers <strong>Wo?</strong> or <strong>Wohin?</strong>.
       </p>
     </section>
 

@@ -27,7 +27,6 @@ import A2Day25TagesablaufGrammarPage from "./A2Day25TagesablaufGrammarPage";
 import A2Day26GefuehleGrammarPage from "./A2Day26GefuehleGrammarPage";
 import A2Day27DigitaleKommunikationGrammarPage from "./A2Day27DigitaleKommunikationGrammarPage";
 import A2Day28UeberDieZukunftSprechenGrammarPage from "./A2Day28UeberDieZukunftSprechenGrammarPage";
-import A2SituationIntroduction from "./A2SituationIntroduction";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 import B1Day3ErfolgsgeschichtenGrammarNotesPage from "./B1Day3ErfolgsgeschichtenGrammarNotesPage";
@@ -59,11 +58,6 @@ import B1Day28KlimafreundlichLebenGrammarNotesPage from "./B1Day28Klimafreundlic
 import A2B1GrammarVideoCard from "./A2B1GrammarVideoCard";
 import B1TopicIntroduction from "./B1TopicIntroduction";
 import B1Days18To23LearningUpgrade from "./B1Days18To23LearningUpgrade";
-import { A2ThinkingFirstGrammarGuide } from "./A2Days2To6ThinkingSupport";
-import { A2Days7To11ThinkingFirstGrammarGuide } from "./A2Days7To11ThinkingSupport";
-import { A2Days12To16ThinkingFirstGrammarGuide } from "./A2Days12To16ThinkingSupport";
-import { A2Days17To21ThinkingFirstGrammarGuide } from "./A2Days17To21ThinkingSupport";
-import { A2Days22To28ThinkingFirstGrammarGuide } from "./A2Days22To28ThinkingSupport";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 
 const GRAMMAR_NOTES_BY_LEVEL_DAY = {
@@ -108,39 +102,39 @@ export const A2B1GrammarNotesTab = ({ level, day }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const numericDay = Number(day);
   const GrammarNotes = getA2B1GrammarNotesComponent(level, day);
-  const showA2SituationIntro = normalizedLevel === "A2" && numericDay >= 1 && numericDay <= 28 && numericDay !== 4;
-  const showB1TopicIntro = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 28;
 
-  if (!GrammarNotes && !showA2SituationIntro && !showB1TopicIntro) {
+  if (!GrammarNotes) {
     return (
       <section style={{ display: "grid", gap: 10 }}>
         <h2 style={{ margin: 0 }}>Grammar Notes</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Grammar notes have not been added for this workbook day yet. Continue with Teil 1–4, Ref and Submit.</p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Grammar notes have not been added for this workbook day yet.
+        </p>
       </section>
     );
   }
 
-  const showDays2To6Guide = normalizedLevel === "A2" && numericDay >= 2 && numericDay <= 6 && numericDay !== 4;
-  const showDays7To11Guide = normalizedLevel === "A2" && numericDay >= 7 && numericDay <= 11;
-  const showDays12To16Guide = normalizedLevel === "A2" && numericDay >= 12 && numericDay <= 16;
-  const showDays17To21Guide = normalizedLevel === "A2" && numericDay >= 17 && numericDay <= 21;
-  const showDays22To28Guide = normalizedLevel === "A2" && numericDay >= 22 && numericDay <= 28;
-  // B1 Days 12-17 already have complete day-specific grammar pages. Do not
-  // stack the older range learning-upgrade block above those native notes.
+  if (normalizedLevel === "A2") {
+    return (
+      <div
+        data-a2-focused-grammar={numericDay}
+        style={{ display: "grid", gap: 16 }}
+      >
+        <A2B1GrammarVideoCard level={level} day={day} />
+        <GrammarNotes embedded />
+      </div>
+    );
+  }
+
+  const showB1TopicIntro = normalizedLevel === "B1" && numericDay >= 1 && numericDay <= 28;
   const showB1Days18To23Upgrade = normalizedLevel === "B1" && numericDay >= 18 && numericDay <= 23;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      {GrammarNotes ? <A2B1GrammarVideoCard level={level} day={day} /> : null}
-      {showA2SituationIntro ? <A2SituationIntroduction day={numericDay} /> : null}
+      <A2B1GrammarVideoCard level={level} day={day} />
       {showB1TopicIntro ? <B1TopicIntroduction day={numericDay} /> : null}
       {showB1Days18To23Upgrade ? <B1Days18To23LearningUpgrade day={numericDay} /> : null}
-      {showDays2To6Guide ? <A2ThinkingFirstGrammarGuide day={numericDay} /> : null}
-      {showDays7To11Guide ? <A2Days7To11ThinkingFirstGrammarGuide day={numericDay} /> : null}
-      {showDays12To16Guide ? <A2Days12To16ThinkingFirstGrammarGuide day={numericDay} /> : null}
-      {showDays17To21Guide ? <A2Days17To21ThinkingFirstGrammarGuide day={numericDay} /> : null}
-      {showDays22To28Guide ? <A2Days22To28ThinkingFirstGrammarGuide day={numericDay} /> : null}
-      {GrammarNotes ? <GrammarNotes /> : <section style={{ display: "grid", gap: 8 }}><h2 style={{ margin: 0 }}>Grammar Notes</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{normalizedLevel === "A2" ? "The short situation introduction prepares the lesson. A separate deep-grammar page has not been added for this day yet." : "The short topic introduction prepares the content for this lesson. A separate deep-grammar page has not been added yet."}</p></section>}
+      <GrammarNotes />
     </div>
   );
 };

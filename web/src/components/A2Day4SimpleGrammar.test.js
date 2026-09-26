@@ -34,9 +34,14 @@ describe("A2 Day 4 simple Wo/Wohin grammar", () => {
     }
   });
 
-  test("keeps Day 4 free from stacked generic A2 grammar extras", () => {
-    expect(content).toContain("numericDay !== 4");
-    expect(wrapper).toContain('normalizedLevel === "A2" && numericDay !== 4');
-    expect(wrapper).toContain("showA2Collocations && numericDay !== 4");
+  test("keeps all A2 grammar pages free from stacked generic grammar extras", () => {
+    expect(content).not.toContain("A2SituationIntroduction");
+    expect(content).not.toContain("A2ThinkingFirstGrammarGuide");
+    expect(content).not.toContain("A2Days7To11ThinkingFirstGrammarGuide");
+    expect(content).not.toContain("A2Days12To16ThinkingFirstGrammarGuide");
+    expect(content).not.toContain("A2Days17To21ThinkingFirstGrammarGuide");
+    expect(content).not.toContain("A2Days22To28ThinkingFirstGrammarGuide");
+    expect(wrapper).not.toContain("A2SecondStageGrammarUpgrade");
+    expect(wrapper).not.toContain("A2TopicCollocationPractice");
   });
 });
