@@ -25,38 +25,7 @@ const speakingContent = <>
   </WorkbookTaskCard>
 </>;
 
-const lesenText = `Meine Pläne für die nächsten Jahre
 
-David hat seinen A2-Deutschkurs fast beendet und denkt über seine Zukunft nach. Zuerst möchte er die B1-Prüfung bestehen. Deshalb plant er, jeden Tag Deutsch zu lesen und zweimal pro Woche mit Freunden zu sprechen.
-
-Beruflich interessiert David sich für IT. Im nächsten Jahr möchte er eine Weiterbildung beginnen, damit er bessere Chancen auf dem Arbeitsmarkt hat. Wenn er genug Berufserfahrung gesammelt hat, kann er sich vorstellen, in einem internationalen Unternehmen zu arbeiten.
-
-Auch privat hat David Pläne. Er möchte Geld sparen und in zwei Jahren eine größere Wohnung suchen. Außerdem möchte er mehr reisen und neue Länder kennenlernen. Gesundheit ist ihm ebenfalls wichtig: Er will regelmäßig Sport machen und weniger Stress haben.
-
-David weiß, dass nicht jeder Plan genau so funktionieren wird. Trotzdem findet er es hilfreich, klare Ziele zu haben und Schritt für Schritt daran zu arbeiten.`;
-
-const lesenQuestions = [
-  {
-    stem: "Was möchte David zuerst erreichen?",
-    options: ["A) Die B1-Prüfung bestehen", "B) Sofort ein Haus kaufen", "C) Deutsch nicht mehr lernen", "D) Eine lange Reise machen"],
-  },
-  {
-    stem: "Wie möchte David sein Deutsch verbessern?",
-    options: ["A) Täglich lesen und regelmäßig mit Freunden sprechen", "B) Nur Filme sehen", "C) Nur einmal im Monat lernen", "D) Keine Gespräche führen"],
-  },
-  {
-    stem: "Warum möchte David eine IT-Weiterbildung beginnen?",
-    options: ["A) Damit er bessere Chancen auf dem Arbeitsmarkt hat.", "B) Weil er nicht arbeiten möchte.", "C) Damit er weniger Deutsch lernt.", "D) Weil er sofort umziehen muss."],
-  },
-  {
-    stem: "Was plant David privat?",
-    options: ["A) Geld sparen, später umziehen und reisen", "B) Seine Wohnung sofort verkaufen", "C) Nie mehr reisen", "D) Nur arbeiten"],
-  },
-  {
-    stem: "Wie denkt David über Zukunftspläne?",
-    options: ["A) Klare Ziele helfen, auch wenn nicht alles genau so funktioniert.", "B) Pläne sind immer nutzlos.", "C) Jeder Plan muss perfekt funktionieren.", "D) Man soll keine Ziele haben."],
-  },
-];
 
 const hoerenQuestions = [
   {
@@ -84,8 +53,6 @@ export default function A2Day28UeberDieZukunftSprechenWorkbookPage() {
       sprechenContent={speakingContent}
       schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihre Zukunftspläne. Beschreiben Sie Ihre beruflichen oder schulischen Ziele, nennen Sie mindestens einen persönlichen Wunsch und fragen Sie nach den Zukunftsplänen der anderen Person."
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dir von meinen Zukunftsplänen erzählen. Zuerst ..."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Hören Sie den Beitrag zu Zukunftsplänen. Achten Sie auf Ziele, Zeitangaben und Gründe und beantworten Sie anschließend die Fragen."
       hoerenAudioUrl="https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
       hoerenQuestions={hoerenQuestions}

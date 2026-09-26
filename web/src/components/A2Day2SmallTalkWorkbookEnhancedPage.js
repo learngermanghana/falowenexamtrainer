@@ -158,25 +158,7 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Br
   <p style={paragraph}><strong>Useful structure:</strong> Lieber Felix, → Grund → Arbeit/Studium → Familie → Frage → Viele Grüße.</p>
 </WorkbookTaskCard>;
 
-const readingText = `Mein Gespräch mit Lisa
 
-Gestern habe ich Lisa im Café getroffen. Sie arbeitet in einer Schule und unterrichtet Kinder. Wir haben über unsere Arbeit gesprochen. Lisa sagt, dass sie ihren Beruf liebt, weil sie gerne mit Kindern arbeitet. Ich habe ihr erzählt, dass ich in einem Büro arbeite.
-
-Dann haben wir über Sport gesprochen. Lisa spielt gern Tennis, aber ich mag Fußball mehr. Wir haben auch über das Wetter geredet. Es war gestern sonnig und warm, und Lisa liebt den Sommer. Ich habe ihr erzählt, dass ich lieber den Herbst mag, weil die Bäume so schön bunt sind.
-
-Zum Schluss haben wir über Reisen gesprochen. Lisa war schon in Italien und Spanien. Sie möchte nächstes Jahr nach Frankreich reisen. Ich war noch nie in Spanien, aber ich würde gerne dorthin reisen.
-
-Es war ein sehr nettes Gespräch, und wir haben viel gelacht!`;
-
-const readingQuestions = [
-  { stem: "Wo arbeitet Lisa?", options: ["A. In einem Büro", "B. In einem Café", "C. In einer Schule", "D. In einem Krankenhaus"] },
-  { stem: "Warum liebt Lisa ihren Beruf?", options: ["A. Weil sie gerne reist", "B. Weil sie gerne mit Kindern arbeitet", "C. Weil sie Tennis mag", "D. Weil sie gerne im Büro arbeitet"] },
-  { stem: "Wo arbeitet die erzählende Person?", options: ["A. In einem Büro", "B. In einer Schule", "C. In einem Café", "D. In einem Krankenhaus"] },
-  { stem: "Welchen Sport mag Lisa?", options: ["A. Fußball", "B. Tennis", "C. Schwimmen", "D. Volleyball"] },
-  { stem: "Wie war das Wetter gestern?", options: ["A. Es war regnerisch", "B. Es war sonnig und warm", "C. Es war kalt", "D. Es war windig"] },
-  { stem: "In welchen Ländern war Lisa schon?", options: ["A. Frankreich und Deutschland", "B. Italien und Spanien", "C. Österreich und Schweiz", "D. Griechenland und Kroatien"] },
-  { stem: "Warum mag die erzählende Person den Herbst?", options: ["A. Weil es sonnig ist", "B. Weil es warm ist", "C. Weil die Bäume so schön bunt sind", "D. Weil sie gerne Tennis spielt"] },
-];
 
 const listeningQuestions = [
   { stem: "Was hat Lena am Samstag vor?", options: ["A. Spazieren mit Freundin", "B. Ins Kino gehen", "C. Tennis spielen", "D. Spaziergang im Park"] },
@@ -196,8 +178,6 @@ export default function A2Day1SmallTalkWorkbookPage() {
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
     schreibenPlaceholder={"Lieber Felix,\n\nwie geht es dir? Ich hoffe, es geht dir gut.\n\nIch schreibe dir, weil ...\n\nIch arbeite / studiere ...\nMeine Familie ...\n\nWie geht es dir? Was ist bei dir neu?\n\nViele Grüße\n[Dein Name]"}
-    lesenText={readingText}
-    lesenQuestions={readingQuestions}
     hoerenTask="Höre den Text zweimal und beantworte alle fünf Fragen. Achte auf Lenas Pläne, den Film, Sport, das Wetter und das nächste Treffen."
     hoerenAudioUrl="https://youtu.be/z5yj1HQZbQo"
     hoerenQuestions={listeningQuestions}

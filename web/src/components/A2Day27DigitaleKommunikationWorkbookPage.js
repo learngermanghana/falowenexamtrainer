@@ -71,25 +71,7 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="E-
   <p style={paragraph}><strong>Useful structure:</strong> Anrede → Grund → Modell/Anforderungen → Bestellung/Lieferung → Schluss.</p>
 </WorkbookTaskCard>;
 
-const readingText = `Telefonieren und Internet in Deutschland
 
-Wer in Deutschland mit seiner SIM-Karte aus der Heimat telefonieren will, hat oft Probleme. Viele Karten funktionieren in Deutschland nicht, und Telefonieren mit ausländischen SIM-Karten ist sehr teuer. Es gibt mehrere Möglichkeiten, um in Deutschland mobil zu telefonieren: Handyvertrag, Prepaid-SIM-Karte, Datentarife und WLAN.
-
-Für einen Handyvertrag braucht man ein deutsches Bankkonto und einen Ausweis. Die Laufzeit beträgt meistens ein bis zwei Jahre. Man muss oft drei Monate vor Vertragsende kündigen, sonst verlängert sich der Vertrag automatisch.
-
-Prepaid-SIM-Karten kann man in Supermärkten, Tankstellen oder Kiosken kaufen. Zur Aktivierung braucht man Name, Adresse, Geburtsdatum und ein Ausweisdokument mit Foto. Danach lädt man Guthaben auf.
-
-Kostenloses Internet gibt es oft über öffentliche WLAN-Netze in Cafés, Bibliotheken oder anderen öffentlichen Gebäuden.`;
-
-const readingQuestions = [
-  { stem: "Warum ist Telefonieren mit ausländischen SIM-Karten oft schwierig?", options: ["A) Sie sind oft defekt.", "B) Sie sind oft sehr teuer oder funktionieren nicht.", "C) Sie sind zu alt.", "D) Sie sind zu groß."] },
-  { stem: "Was braucht man für einen Handyvertrag?", options: ["A) Nur eine SIM-Karte.", "B) Einen Reisepass und Flugticket.", "C) Ein deutsches Bankkonto und einen Ausweis.", "D) Nur ein Handy."] },
-  { stem: "Wie lange läuft ein Handyvertrag normalerweise?", options: ["A) 1 bis 2 Wochen", "B) 1 bis 2 Monate", "C) 1 bis 2 Jahre", "D) Unbegrenzt"] },
-  { stem: "Wann muss man einen Vertrag kündigen, wenn man wechseln möchte?", options: ["A) Sofort nach dem Abschluss", "B) Einen Monat vorher", "C) Drei Monate vor Vertragsende", "D) Nach der Kündigungsfrist"] },
-  { stem: "Wo kann man Prepaid-SIM-Karten kaufen?", options: ["A) Nur im Internet", "B) Nur im Rathaus", "C) In Supermärkten, Tankstellen oder Kiosken", "D) Nur im Ausland"] },
-  { stem: "Was braucht man zur Aktivierung einer Prepaid-SIM-Karte?", options: ["A) Nur das Handy", "B) Name, Adresse, Geburtsdatum und ein Ausweisdokument", "C) Nur einen Reisepass", "D) Einen Wohnsitznachweis"] },
-  { stem: "Wie kann man kostenlos im Internet surfen?", options: ["A) Mit Auslandstarif", "B) Mit Guthaben-Karten", "C) Mit Video-Ident", "D) Mit öffentlichem WLAN"] },
-];
 
 const listeningQuestions = [
   { stem: "Was hat Miriam gestern verloren?", options: ["A) Ihren Laptop", "B) Ihr Handy", "C) Ihre Tasche", "D) Ihren Ausweis"] },
@@ -108,8 +90,6 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
     schreibenPlaceholder={"Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich mein Handy verloren habe. ...\n\nKönnten Sie mir bitte ein passendes Modell empfehlen? ...\n\nMit freundlichen Grüßen\n[Name]"}
-    lesenText={readingText}
-    lesenQuestions={readingQuestions}
     hoerenTask="Sieh dir den Beitrag zur digitalen Kommunikation an und beantworte danach die vier Fragen."
     hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
     hoerenQuestions={listeningQuestions}

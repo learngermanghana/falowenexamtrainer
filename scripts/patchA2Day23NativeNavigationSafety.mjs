@@ -14,7 +14,7 @@ const requiredMarkers = [
   'day={23}',
   'chapter="9.23"',
   'title="Wie kommst du zur Schule / zur Arbeit?"',
-  'Wohin fuhr Matthias?',
+  'hoerenSelfCheck',
   'hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"',
 ];
 
@@ -30,5 +30,10 @@ if (/key:\s*"teil[1-4]"/i.test(source)) {
 if (source.includes("Go to Submission Area")) {
   throw new Error("A2 Day 23 reverted to the legacy external submission flow.");
 }
+for (const marker of ["lesenText=", "lesenQuestions=", "const lesenText", "const lesenQuestions"]) {
+  if (source.includes(marker)) {
+    throw new Error(`A2 Day 23 reintroduced obsolete inline Lesen source: ${marker}`);
+  }
+}
 
-console.log("A2 Day 23 owns the restored original assessment in the shared workbook shell; no legacy navigation patch required.");
+console.log("A2 Day 23 uses canonical Lesen plus explicit external Hören self-check in the shared workbook shell.");

@@ -78,11 +78,11 @@ const ListeningMedia = ({ url }) => {
   return <a href={url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Open listening audio</a>;
 };
 
-const PreparedCheckbox = ({ checked, onChange }) => <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={checked} onChange={onChange} />I prepared this part.</label>;
+const PreparedCheckbox = ({ checked, onChange, label = "I prepared this part." }) => <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={checked} onChange={onChange} />{label}</label>;
 const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultImages.sprechen} alt={alt} loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />;
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
-const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", lesenText, lesenQuestions = [], hoerenTask, hoerenAudioUrl, hoerenQuestions = [], showHoeren = true, showWorkbookGuidance = true }) => {
+const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", hoerenTask, hoerenAudioUrl, hoerenQuestions = [], hoerenSelfCheck = false, showHoeren = true, showWorkbookGuidance = true }) => {
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
@@ -133,9 +133,9 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
     </div>}
 
-    {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} fallbackText={lesenText} fallbackQuestions={lesenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
+    {activeTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-    {showHoeren && activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>Teil 4 · Hören (Exercise)</h2><p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} /></div>}
+    {showHoeren && activeTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
     {activeTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
     {activeTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import { A2_READING_TASKS } from "./a2ReadingTasks";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
@@ -22,31 +23,31 @@ describe("A2 Course Book final audit · Days 25–28", () => {
     });
   });
 
-  test("restores Day 25 Hören and removes unrelated Swiss-hotel reading", () => {
+  test("keeps Day 25 on canonical Lesen with no Hören assignment", () => {
     const source = readComponent("A2Day25TagesablaufWorkbookPage.js");
-    expect(source).toContain("Annas Tagesablauf");
-    expect(source).toContain("m7nP2qE9gNg");
+    expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
+    expect(source).toContain("showHoeren={false}");
     expect(source).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
-    expect(source).not.toContain("There is no Hören assignment");
+    expect(source).not.toContain("hoerenAudioUrl=");
   });
 
   test("keeps Day 26 fully focused on feelings", () => {
     const source = readComponent("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
-    expect(source).toContain("Gefühle im Alltag");
-    expect(source).toContain("9OVfA1B-nuU");
+    expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
+    expect(source).toContain("JEJZypJfrD8");
     expect(source).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
   });
 
   test("preserves the already-clean Day 27 digital communication workbook", () => {
     const source = readComponent("A2Day27DigitaleKommunikationWorkbookPage.js");
     expect(source).toContain("Digitale Kommunikation");
-    expect(source).toContain("Telefonieren und Internet in Deutschland");
+    expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
     expect(source).toContain("A2Days26To28LearningUpgrade");
   });
 
   test("moves Day 28 to the standard shell with future-focused reading and grammar", () => {
     const source = readComponent("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
-    expect(source).toContain("Meine Pläne für die nächsten Jahre");
+    expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
     expect(source).toContain("Teuu287XY_M");
     expect(source).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
 

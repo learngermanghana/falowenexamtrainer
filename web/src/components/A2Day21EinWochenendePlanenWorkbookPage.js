@@ -1,34 +1,7 @@
 import React from "react";
 import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";
 
-const lesenText = `Unser Wochenende in Köln
 
-Mara und Daniel planen ein gemeinsames Wochenende in Köln. Am Samstagmorgen möchten sie mit dem Zug ankommen und zuerst im Hotel einchecken. Danach wollen sie den Kölner Dom besichtigen. Wenn das Wetter gut ist, machen sie am Nachmittag einen Spaziergang am Rhein. Am Abend möchten sie in einem kleinen Restaurant essen und später ein Konzert besuchen.
-
-Für Sonntag haben sie zwei Möglichkeiten: Falls es regnet, gehen sie in ein Museum. Wenn die Sonne scheint, leihen sie Fahrräder aus und fahren durch den Rheinpark. Um 17 Uhr fährt ihr Zug zurück. Deshalb möchten sie spätestens um 16 Uhr am Bahnhof sein.`;
-
-const lesenQuestions = [
-  {
-    stem: "Wie reisen Mara und Daniel nach Köln?",
-    options: ["A) Mit dem Zug", "B) Mit dem Auto", "C) Mit dem Flugzeug", "D) Mit dem Fahrrad"],
-  },
-  {
-    stem: "Was möchten sie am Samstagnachmittag machen, wenn das Wetter gut ist?",
-    options: ["A) Im Hotel bleiben", "B) Am Rhein spazieren", "C) Ein Museum besuchen", "D) Nach Hause fahren"],
-  },
-  {
-    stem: "Was planen sie für Samstagabend?",
-    options: ["A) Einkaufen und schwimmen", "B) Restaurant und Konzert", "C) Museum und Bahnhof", "D) Fahrradtour und Picknick"],
-  },
-  {
-    stem: "Was machen sie am Sonntag, falls es regnet?",
-    options: ["A) Sie gehen in ein Museum.", "B) Sie fahren Fahrrad.", "C) Sie besuchen den Dom noch einmal.", "D) Sie fahren früher nach Hause."],
-  },
-  {
-    stem: "Warum möchten sie spätestens um 16 Uhr am Bahnhof sein?",
-    options: ["A) Ihr Zug fährt um 17 Uhr.", "B) Das Hotel schließt.", "C) Das Konzert beginnt.", "D) Sie treffen Freunde."],
-  },
-];
 
 const schreibenContent = (
   <div style={{ display: "grid", gap: 10 }}>
@@ -64,11 +37,10 @@ export default function A2Day21EinWochenendePlanenWorkbookPage() {
       schreibenTask="Einladung zu einem gemeinsamen Wochenende"
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dich zu einem gemeinsamen Wochenende einladen ..."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Dies ist eine separate Goethe-Hören-Übung für Teil 4. Hören Sie den Test aufmerksam und kontrollieren Sie Ihre Antworten anschließend mit der Lösung im Video. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht Teil 4."
       hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"
       hoerenQuestions={[]}
+      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
