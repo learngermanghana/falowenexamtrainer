@@ -46,9 +46,10 @@ const firstValidMoney = (...values) => {
 const normalizeStudentBilling = (student = {}) => {
   const tuitionFee = firstValidMoney(student.tuitionFee) ?? 0;
   const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
-  const confirmedInitialPayment = ["paid", "partial"].includes(paymentStatus)
-    ? student.initialPaymentAmount
-    : null;
+  const confirmedInitialPayment =
+    !paymentStatus || ["paid", "partial"].includes(paymentStatus)
+      ? student.initialPaymentAmount
+      : null;
   const paidSoFar = firstValidMoney(
     student.paid,
     student.paidAmount,
