@@ -17,6 +17,7 @@ export default function A2Day24EinenUrlaubPlanenWorkbookPage() {
       hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
       hoerenAudioUrl="https://youtu.be/iPScKV6JWaA"
       hoerenQuestions={[]}
+      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
