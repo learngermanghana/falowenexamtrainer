@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -138,44 +139,11 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-export default function B1Day20BerufKennenWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({
-    sprechen: false,
-    schreiben: false,
-    lesen: false,
-    hoeren: false,
-  });
-
-  const setPreparedFor = (tabKey) => (event) =>
-    setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
-
+const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 20 · Kapitel 6.20</span>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · Wie wird man …?</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4 below. The highlighted card at the top of each section tells you exactly what to prepare, answer or submit.
-        </p>
-        <img
-          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
-          alt="Learners discussing professions, education and career paths"
-          loading="lazy"
-          style={tabImageStyle}
-        />
-        <WorkbookTabNav
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          tabs={STANDARD_WORKBOOK_TABS}
-          ariaLabel="B1 Day 20 Wie wird man workbook sections"
-        />
-      </div>
-
-      <A2B1WorkbookGuidance level="B1" />
-
-      {activeTab === "sprechen" && (
+    <>
+{activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Beruf kennen (Group Practice)</h2>
           <WorkbookTaskCard
@@ -266,7 +234,7 @@ export default function B1Day20BerufKennenWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "schreiben" && (
+{activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
@@ -310,7 +278,7 @@ export default function B1Day20BerufKennenWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "lesen" && (
+{activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
@@ -351,7 +319,7 @@ export default function B1Day20BerufKennenWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+{activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Hören (Self-check)</h2>
           <WorkbookTaskCard
@@ -393,41 +361,21 @@ export default function B1Day20BerufKennenWorkbookPage() {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers
-          level="B1"
-          lesson={{ title: "B1Day20BerufKennen", level: "B1", day: 20, workbookId: "B1Day20BerufKennen" }}
-          workbookId="B1Day20BerufKennen"
-        />
-      )}
-
-      {activeTab === "submit" && (
-        <section style={card}>
-          <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <WorkbookTaskCard
-            eyebrow="Final step"
-            title="Submit Teil 2 and Teil 3."
-            submissionNote="Do not submit Teil 1 or Teil 4."
-          >
-            <p style={{ margin: 0 }}>
-              Paste your final 80–100 word opinion text and your six reading answer letters into the form below.
-            </p>
-          </WorkbookTaskCard>
-          <div className="b1-day20-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day20-submission-page > div > section:first-child { display: none !important; }
-            .b1-day20-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
-              submissionContext={{
-                level: "B1",
-                day: 20,
-                assignmentKey: "B1-6.20",
-                canonicalAssignmentKey: "B1-6.20",
-              }}
-            />
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
+};
+
+const config = {
+  day: 20,
+  chapter: "6.20",
+  assignmentKey: "B1-6.20",
+  workbookId: "B1Day20BerufKennen",
+  title: "Wie wird man …?",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. Teil 4 remains self-check and is not submitted.",
+  submitListening: false,
+  listening: { submitRequired: false },
+};
+
+export default function B1Day20BerufKennenWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day20PreservedSections} />;
 }
