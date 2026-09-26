@@ -108,6 +108,13 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
   });
 
 
+  test("Day 26 explains bevor chronology correctly", () => {
+    const source = componentSource("B1Day26ReiseproblemeGrammarNotesPage.js");
+    expect(source).toContain("Mit <strong>bevor</strong> passiert die Handlung im Hauptsatz zuerst");
+    expect(source).toContain("Mit <strong>nachdem</strong> passiert die Handlung im Nebensatz zuerst");
+    expect(source).not.toContain("Mit <strong>bevor</strong> passiert die Handlung im Nebensatz zuerst");
+  });
+
   test("Days 24-28 now have native deep grammar inside the shared workbook Grammar tab", () => {
     const grammarContent = componentSource("A2B1WorkbookGrammarNotesContent.js");
     const availability = componentSource("a2B1GrammarAvailability.js");
