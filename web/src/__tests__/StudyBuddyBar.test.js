@@ -1,21 +1,29 @@
+const mockNavigate = jest.fn();
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "../i18n";
 import StudyBuddyBar from "../components/StudyBuddyBar";
+import { fetchLearnerSupportState } from "../services/learnerSupportService";
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useNavigate: () => jest.fn(),
+  useNavigate: () => mockNavigate,
 }));
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({ idToken: "token", user: { uid: "student-1" } }),
 }));
 
+jest.mock("../services/learnerSupportService", () => ({
+  fetchLearnerSupportState: jest.fn(),
+}));
+
 describe("StudyBuddyBar", () => {
   beforeEach(() => {
     localStorage.clear();
+    mockNavigate.mockReset();
+    fetchLearnerSupportState.mockReset();
   });
 
   it("starts as the bottom-right launcher without rendering the Study Buddy bar", () => {
@@ -66,6 +74,30 @@ describe("StudyBuddyBar", () => {
     expect(screen.getByText(/latest result/i)).toBeInTheDocument();
     expect(screen.getByText(/attendance/i)).toBeInTheDocument();
     expect(screen.getByText(/^weekly planner$/i)).toBeInTheDocument();
+  });
+
+  it("loads the authoritative next action and opens its exact route", async () => {
+    fetchLearnerSupportState.mockResolvedValue({
+      nextAction: {
+        type: "continue-course",
+        label: "Continue: Möbel & Räume",
+        reason: "next_incomplete_course_item",
+        url: "/campus/course/lesson/A2/6?chapter=3.6&view=workbook",
+      },
+    });
+
+    render(<StudyBuddyBar studentProfile={{ level: "A2", studentCode: "A2-TEST" }} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /reopen study buddy bar/i }));
+    await userEvent.click(screen.getByRole("button", { name: /what should i do next/i }));
+
+    expect(await screen.findByText("Continue: Möbel & Räume")).toBeInTheDocument();
+    expect(fetchLearnerSupportState).toHaveBeenCalledWith(expect.objectContaining({
+      idToken: "token",
+    }));
+
+    await userEvent.click(screen.getByRole("button", { name: /^continue$/i }));
+    expect(mockNavigate).toHaveBeenCalledWith("/campus/course/lesson/A2/6?chapter=3.6&view=workbook");
   });
 
   it("renders the Study Buddy launcher in document.body so learning-page layouts cannot clip it", () => {
