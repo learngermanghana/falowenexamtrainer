@@ -23,6 +23,7 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import fetchB2AudioPlaybackUrl from "../services/b2AudioService";
 import { useB2CloudDraftField } from "../utils/b2CloudDraftSync";
+import { useLessonResumeSync } from "../hooks/useLessonResumeSync";
 
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const sub = { border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 };
@@ -300,6 +301,19 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
 
   useEffect(() => { try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch {} }, [progress, storageKey]);
   useB2CloudDraftField({ day, field: "progress", value: progress, setValue: setProgress, seedCloudWhenMissing: true, defaultValue: { learnDone: false, lesenDone: false, hoerenDone: false, speakDone: false, writeDone: false, readingAnswers: {}, readingFirstAttempts: {}, listeningAnswers: {}, listeningFirstAttempts: {} } });
+  useLessonResumeSync({
+    level: "B2",
+    day,
+    chapter: alignment?.chapter || lesson?.chapter || "",
+    title: alignment?.title || lesson?.title || "",
+    activeView: active,
+    route: `${location.pathname}${location.search || ""}`,
+    radioDone: new URLSearchParams(location.search || "").get("radio") === "done",
+    progress,
+    setProgress,
+    completed: Boolean(progress.completedAt),
+    source: "b2-unified",
+  });
   useEffect(() => setActive(requestedView), [requestedView]);
 
   const changeView = (next) => {
