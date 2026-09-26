@@ -175,7 +175,7 @@ const getYouTubeEmbedUrl = (listening = {}) => {
   return `https://www.youtube-nocookie.com/embed/${listening.videoId}?rel=0&playsinline=1`;
 };
 
-export default function B1StandardWorkbookPage({ config }) {
+export default function B1StandardWorkbookPage({ config, renderSections = null }) {
   const [activeTab, setActiveTab] = useState("grammar");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -222,6 +222,10 @@ export default function B1StandardWorkbookPage({ config }) {
         </section>
       )}
 
+      {renderSections ? (
+        renderSections({ activeTab, prepared, setPreparedFor })
+      ) : (
+        <>
       {activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
@@ -424,6 +428,9 @@ export default function B1StandardWorkbookPage({ config }) {
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
+      )}
+
+        </>
       )}
 
       {activeTab === "references" && (
