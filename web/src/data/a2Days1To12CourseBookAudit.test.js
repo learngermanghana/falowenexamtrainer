@@ -125,20 +125,17 @@ describe("A2 Course Book batch audit · Days 1–12", () => {
     expect(standardWorkbookSource).toContain("Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein.");
   });
 
-  test("keeps Day 12 on its native workbook wrapper and current listening-media repair", () => {
-    const wrapper = fs.readFileSync(
+  test("keeps Day 12 on the shared workbook shell with the current listening video", () => {
+    const source = fs.readFileSync(
       path.join(componentRoot, "A2Day12MeinTraumberufWorkbookPage.js"),
       "utf8",
     );
-    const legacy = fs.readFileSync(
-      path.join(componentRoot, "A2Day12MeinTraumberufWorkbookPageLegacy.js"),
-      "utf8",
-    );
 
-    expect(wrapper).toContain("A2Day12MeinTraumberufWorkbookPageLegacy");
-    expect(wrapper).toContain('YOUTUBE_URL = "https://youtu.be/VGzHSjn3O-A"');
-    expect(wrapper).toContain("patchListeningMedia");
-    expect(legacy).toContain('assignmentKey: "A2-5.12"');
-    expect(legacy).toContain('canonicalAssignmentKey: "A2-5.12"');
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("day={12}");
+    expect(source).toContain('chapter="5.12"');
+    expect(source).toContain('workbookId="A2Day12MeinTraumberuf"');
+    expect(source).toContain('hoerenAudioUrl="https://youtu.be/VGzHSjn3O-A"');
+    expect(source).not.toMatch(/WorkbookPageLegacy|patchListeningMedia|MutationObserver/);
   });
 });
