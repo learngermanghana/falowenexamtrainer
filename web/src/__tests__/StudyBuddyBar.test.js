@@ -114,6 +114,7 @@ describe("StudyBuddyBar", () => {
     render(<StudyBuddyBar studentProfile={{ level: "A2", studentCode: "A2-TEST" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: /reopen study buddy bar/i }));
+    await userEvent.click(screen.getByRole("button", { name: /show details/i }));
 
     expect(await screen.findByText("Your learning plan today")).toBeInTheDocument();
     expect(screen.getByText("Finish Möbel & Räume · Hören")).toBeInTheDocument();
