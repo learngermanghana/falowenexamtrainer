@@ -320,6 +320,15 @@ export default function GuidedWritingWorkspace({
   const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
   const promptText = getMainWritingPrompt(config);
+  const b2PlanningBullets = String(config.level || "").trim().toUpperCase() === "B2"
+    && Array.isArray(config.writingPromptBullets)
+    ? config.writingPromptBullets.filter(Boolean)
+    : [];
+  const planningNotesPlaceholder = b2PlanningBullets.length
+    ? `Write one short idea for each of the four task points. English is okay.\n\n${b2PlanningBullets
+        .map((item, index) => `${index + 1}. ${item}\n   → ...`)
+        .join("\n\n")}`
+    : PLANNING_NOTES_PLACEHOLDER;
   const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning && !starterEllipsisWarning;
 
   const update = (updater) =>
@@ -758,7 +767,7 @@ export default function GuidedWritingWorkspace({
                   planningNotes: event.target.value,
                 }))
               }
-              placeholder={PLANNING_NOTES_PLACEHOLDER}
+              placeholder={planningNotesPlaceholder}
               style={{
                 minHeight: 130,
                 padding: 12,
