@@ -19,6 +19,9 @@ on:
       - "web/src/data/inAppWorkbookRoutes.js"
       - "web/src/components/A2Day*Workbook*.js"
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGrammarNotes.js"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/A2Day*Grammar*.js"
       - "web/src/components/A2StarterConjunctionsPage.js"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
@@ -54,6 +57,7 @@ jobs:
           src/data/a2Days19To24CourseBookAudit.test.js
           src/data/a2Days25To28CourseBookAudit.test.js
           src/components/A2Day1RadioRegression.test.js
+          src/components/A2Day14BerufUndKarriereWorkbookPage.test.js
           src/components/A2SharedWorkbookRegression.test.js
       - name: Build web app
         working-directory: web
