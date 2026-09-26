@@ -77,6 +77,22 @@ const docIdPart = (value) =>
     .replace(/[^a-z0-9._-]/g, "_")
     .slice(0, 160);
 const firstText = (...values) => values.map(clean).find(Boolean) || "";
+const RESUME_VIEW_LABELS = {
+  learn: "Learn",
+  grammar: "Grammar",
+  workbook: "Workbook",
+  sprechen: "Sprechen",
+  schreiben: "Schreiben",
+  lesen: "Lesen",
+  hoeren: "Hören",
+  speak: "Speak",
+  write: "Write",
+  review: "Review",
+  finish: "Finish",
+  references: "Reference",
+  submit: "Submit",
+};
+const resumeViewLabel = (value = "") => RESUME_VIEW_LABELS[lower(value)] || clean(value);
 
 const hasPaidAccess = (student = {}) => {
   const paymentStatus = lower(student.paymentStatus);
@@ -503,7 +519,7 @@ const buildNextAction = ({
   }
 
   if (resume?.lastRoute && resume.completed !== true) {
-    const viewLabel = clean(resume.activeView || "lesson");
+    const viewLabel = resumeViewLabel(resume.activeView || "lesson");
     const lessonLabel = resume.title
       ? resume.title
       : `${resume.level || level}${resume.day ? ` Day ${resume.day}` : ""}`.trim();
@@ -595,7 +611,7 @@ async function learnerSupportStateHandler(req, res) {
 
     return res.json({
       ok: true,
-      schemaVersion: 1,
+      schemaVersion: 2,
       generatedAt: new Date().toISOString(),
       student: {
         level,
