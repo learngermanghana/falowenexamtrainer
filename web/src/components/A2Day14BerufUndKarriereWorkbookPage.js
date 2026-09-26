@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -210,29 +211,8 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
 
       {activeTab === "lesen" && (
         <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80"
-            alt="Employee reading workplace guidelines and notes"
-            loading="lazy"
-            style={imageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 3 · Lesen</h2>
-          <WorkbookTaskCard
-            eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Text und beantworten Sie die Fragen."
-            submissionNote="Submit your reading answer letters through the Submit tab."
-          >
-            <p style={{ margin: 0 }}>Do not answer directly on this page.</p>
-          </WorkbookTaskCard>
-
-          <h3 style={sectionTitle}>Lesetext: Arbeiten in Deutschland</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In den ersten Tagen am neuen Arbeitsplatz lernen Sie Ihre Kolleginnen und Kollegen sowie die Arbeitsabläufe kennen. Beim Vorgesetzten sagt man fast immer „Sie“. In Deutschland gibt es außerdem Arbeitnehmerschutz, zum Beispiel Arbeitskleidung, Pausen und feste Arbeitszeiten. In größeren Unternehmen gibt es oft einen Betriebsrat. Die normale Wochenarbeitszeit liegt meist zwischen 38 und 40 Stunden. Jeder Arbeitnehmer hat Urlaubstage. Bei Krankheit muss man den Arbeitgeber sofort informieren und zum Arzt gehen. Für Fort- und Weiterbildung bieten Volkshochschulen viele Kurse an.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          <QuestionList questions={lesenQuestions} />
-
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
+          <A2ReadingTaskPanel day={14} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
