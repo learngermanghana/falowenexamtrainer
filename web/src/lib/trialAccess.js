@@ -42,14 +42,13 @@ const resolveTrialPurgeMs = (studentProfile = {}, trialEndMs = Number.NaN) => {
 const hasConfirmedPayment = (studentProfile = {}) => {
   const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
   const balance = studentProfile?.balanceDue ?? studentProfile?.balance;
-  const paidAmount = Number(
+  const confirmedPaidAmount = Number(
     studentProfile?.paid ??
     studentProfile?.paidAmount ??
-    studentProfile?.initialPaymentAmount ??
     0
   ) || 0;
 
-  return paymentStatus === "paid" || hasClearedBalance(balance) || paidAmount >= Number(studentProfile?.tuitionFee || Infinity);
+  return ["paid", "partial"].includes(paymentStatus) || hasClearedBalance(balance) || confirmedPaidAmount > 0;
 };
 
 export const getTrialLifecycleState = (studentProfile = {}, nowMs = Date.now()) => {
