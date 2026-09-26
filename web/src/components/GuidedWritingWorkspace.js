@@ -312,12 +312,16 @@ export default function GuidedWritingWorkspace({
     : state.combinedDraftMode === "auto" ? autoText : state.finalEssay;
   const completeCount = questions.filter((question) => question.complete).length;
   const placeholderWarning = hasUnfilledPlaceholders(finalEssay);
-  const allComplete = singleBoxMode ? Boolean(finalEssay.trim()) && !placeholderWarning : completeCount === questions.length;
+  const finalWordCount = countWords(finalEssay);
+  const minimumWordCount = Math.max(0, Number(config.minimumWords || 0));
+  const meetsMinimumWords = minimumWordCount === 0 || finalWordCount >= minimumWordCount;
+  const allComplete = singleBoxMode
+    ? Boolean(finalEssay.trim()) && !placeholderWarning && meetsMinimumWords
+    : completeCount === questions.length;
   const totalMissingWords = questions.reduce((sum, question) => sum + Math.max(question.minimumWords - question.words, 0), 0);
   const nextQuestion = questions.find((question) => !question.complete);
   const motivationMessage = getMotivationMessage({ completeCount, totalQuestions: questions.length, totalMissingWords });
   const lessonDay = inferDay(config, storageKey);
-  const finalWordCount = countWords(finalEssay);
   const promptText = getMainWritingPrompt(config);
   const readyForAnalysis = Boolean(finalEssay.trim()) && !placeholderWarning;
 
@@ -816,8 +820,10 @@ export default function GuidedWritingWorkspace({
           textareaRef={combinedDraftRef}
           studentProfile={studentProfile}
         />
-        <div>
-          <strong>{finalWordCount} words</strong> · Target: about {config.targetWords}
+        <div data-writing-word-requirement="true">
+          <strong>{finalWordCount} words</strong> · {minimumWordCount
+            ? <>Minimum: <strong>{minimumWordCount}</strong> words {meetsMinimumWords ? "✓" : `· ${Math.max(minimumWordCount - finalWordCount, 0)} more needed`}</>
+            : <>Target: about {config.targetWords}</>}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
