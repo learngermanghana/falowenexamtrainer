@@ -278,6 +278,7 @@ const EVENT_LABELS = {
   weekly_plan_expand: "Expanded weekly plan",
   weekly_plan_collapse: "Collapsed weekly plan",
   umlaut_insert: "Inserted German special character",
+  next_action_open: "Opened authoritative next action",
 };
 
 const sanitizeMetadata = (metadata = {}) => {
