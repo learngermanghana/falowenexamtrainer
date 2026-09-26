@@ -122,57 +122,7 @@ export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(24),
-  reading: {
-    title:
-      "Lesen Sie den Text und entscheiden Sie bei allen sieben Aussagen: richtig oder falsch.",
-    instructions:
-      "Lesen Sie zuerst Elenis vollständigen Text. Wählen Sie danach bei jeder Aussage genau eine Antwort: Richtig oder Falsch.",
-    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Reading about environmental awareness and recycling",
-    text: {
-      title: "Hallo liebe Umweltfreunde!",
-      questionTitle: "Aussagen: Richtig oder Falsch",
-      paragraphs: [
-        "Durch meine Nachbarin Heike habe ich über eine Bürgerinitiative in unserem Viertel erfahren, die sich für den Umweltschutz und für die Umwelterziehung einsetzt. Ich finde es wichtig, dass man sich in der eigenen Stadt für die Umwelt einsetzt und den Kindern beibringt, wie wir umweltbewusst leben können. Meine Tochter ist zwar erst vier Jahre alt, aber ich denke, sie sollte schon früh mitbekommen, dass wir nicht so weitermachen können wie bisher.",
-        "In Griechenland ist das Umweltbewusstsein leider nicht so hoch. Das finde ich an Deutschland viel besser! In Griechenland ist auch die Sperrmüllabholung nicht so gut organisiert wie hier. Wir schmeißen einfach alles auf die Straße, aber es wird nicht wirklich abgeholt, zumindest nicht regelmäßig. Manchmal liegen bei uns wirklich alte Möbel monatelang am Straßenrand herum.",
-        "In Deutschland stellen die Leute ihre alten Möbel gut geordnet am Abend vor der Abholung vor die Tür. Manche Sachen sind auch noch brauchbar. Ich habe auch schon Stühle und einen Tisch aus dem Sperrmüll geholt und benutze sie jetzt bei mir zu Hause. Man gibt Sachen eine zweite Chance! Hier wird man nicht blöd angeschaut, wenn man das macht.",
-        "Ich finde es super, dass man auch Kleidung, die man vielleicht nicht mehr mag, die aber noch tragbar ist, in Altkleidercontainern sammelt und bedürftigen Menschen zukommen lässt. Die Container stehen überall in der Stadt und man kann die Sachen da reingeben. Auch dass es die Möglichkeit gibt, Einwegglas zu sammeln, und dass man daraus wieder neues Glas herstellt, ist genial.",
-        "In Deutschland habe ich zum ersten Mal einen Wertstoffhof und ein Schadstoffmobil kennengelernt. Es ist richtig, dass giftige und umweltschädliche Sachen nicht einfach in den Müll geworfen werden und dass man Teile von alten Elektrogeräten wiederverwendet. Das sind wir unseren Kindern schuldig!",
-        "Eure Eleni",
-      ],
-      questions: [
-        {
-          stem: "Eleni hat mit ihrer Nachbarin eine Bürgerinitiative gegründet.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Sie findet, dass Kinder früh etwas über Umweltschutz lernen sollten.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "In Griechenland sind alle Menschen sehr umweltbewusst.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem:
-            "Eleni meint, dass es in Deutschland zu viele unnötige Sammelstellen für Müll gibt.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Altkleidersammlungen findet sie sinnvoll.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Das Recyceln von Wertstoffen ist ihrer Meinung nach nutzlos.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Sie mag es, wenn Sachen eine zweite Chance bekommen.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(24),
   listening: {
     title:
       "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -95,6 +96,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(5);
   const writing = getB1WritingTask(5);
   const mark = setPreparedFor;
   return (
@@ -181,10 +183,10 @@ const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Text und beantworten Sie alle sieben Fragen."
-            submissionNote="Submit only the answer letters in this format: 1B, 2A, 3C ..."
+            title={reading.title}
+            submissionNote={reading.submissionNote}
           >
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–D, for every question.</p>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
 
           <h3 style={{ margin: 0 }}>Eine Wohnungsbesichtigung in der Innenstadt</h3>

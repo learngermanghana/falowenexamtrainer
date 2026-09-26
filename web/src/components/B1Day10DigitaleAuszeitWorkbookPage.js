@@ -94,31 +94,7 @@ const config = {
     ],
   },
   writing: getB1WritingTask(10),
-  reading: {
-    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
-    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
-    image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Reading quietly during a digital detox weekend",
-    text: {
-      title: "Ein Wochenende ohne Smartphone",
-      paragraphs: [
-        "Als Miriam bemerkte, dass sie ihr Smartphone sogar beim Frühstück und kurz vor dem Einschlafen kontrollierte, entschied sie sich für ein Experiment: Von Freitagabend bis Sonntagabend wollte sie das Gerät ausschalten. Zuerst informierte sie ihre Familie und ihre Arbeitskollegen, damit niemand sich Sorgen machte.",
-        "Am Samstagmorgen griff Miriam automatisch nach dem Handy. Sie fühlte sich unruhig und dachte, sie könnte wichtige Nachrichten verpassen. Statt soziale Medien zu öffnen, ging sie eine Stunde spazieren. Danach frühstückte sie in Ruhe und las ein Buch, das seit Monaten ungelesen im Regal stand.",
-        "Am Nachmittag traf sie eine Freundin im Park. Normalerweise machten beide viele Fotos und beantworteten zwischendurch Nachrichten. Dieses Mal blieb das Smartphone zu Hause. Das Gespräch war länger und persönlicher als sonst. Miriam merkte, dass sie aufmerksamer zuhörte und sich besser an Einzelheiten erinnern konnte.",
-        "Der Abend war schwieriger. Miriam wollte eine Adresse nachsehen und Musik hören. Sie musste deshalb vorher planen und benutzte ein kleines Radio. Dabei wurde ihr klar, dass digitale Geräte sehr praktisch sind und eine vollständige Trennung nicht für jeden Alltag realistisch ist.",
-        "Am Sonntag schlief Miriam länger und fühlte sich ruhiger. Nach dem Experiment schaltete sie ihr Smartphone wieder ein, aber sie änderte einige Einstellungen: Sie deaktivierte viele Benachrichtigungen, verbannte das Gerät aus dem Schlafzimmer und plante jeden Abend eine bildschirmfreie Stunde. Für sie war nicht ein Leben ohne Technik das Ziel, sondern ein bewussterer Umgang damit.",
-      ],
-      questions: [
-        { stem: "Warum begann Miriam das Experiment?", options: ["A) Ihr Smartphone war kaputt.", "B) Sie kontrollierte das Gerät sehr häufig.", "C) Ihre Familie verbot ihr das Smartphone.", "D) Sie musste für eine Prüfung lernen."] },
-        { stem: "Was tat Miriam vor dem Ausschalten des Smartphones?", options: ["A) Sie kaufte ein neues Gerät.", "B) Sie löschte alle Kontakte.", "C) Sie informierte Familie und Kollegen.", "D) Sie fuhr in eine andere Stadt."] },
-        { stem: "Wie fühlte sie sich am Samstagmorgen?", options: ["A) Unruhig, weil sie Nachrichten verpassen könnte.", "B) Glücklich, weil sie länger arbeitete.", "C) Ärgerlich über ihre Freundin.", "D) Müde wegen des Spaziergangs."] },
-        { stem: "Was war beim Treffen im Park anders als sonst?", options: ["A) Die Freundin kam zu spät.", "B) Sie machten besonders viele Fotos.", "C) Das Gespräch war länger und persönlicher.", "D) Miriam beantwortete viele Nachrichten."] },
-        { stem: "Welche Schwierigkeit hatte Miriam am Abend?", options: ["A) Sie konnte nicht kochen.", "B) Sie wollte eine Adresse nachsehen und Musik hören.", "C) Sie hatte keine Bücher.", "D) Sie konnte ihre Freundin nicht treffen."] },
-        { stem: "Welche Erkenntnis hatte Miriam über digitale Geräte?", options: ["A) Sie sind grundsätzlich gefährlich.", "B) Sie sind praktisch, und eine vollständige Trennung ist nicht immer realistisch.", "C) Sie sollte nie wieder ein Smartphone benutzen.", "D) Nur soziale Medien sind nützlich."] },
-        { stem: "Was war Miriams Ziel nach dem Wochenende?", options: ["A) Ein Leben völlig ohne Technik", "B) Mehr Zeit in sozialen Medien", "C) Ein bewussterer Umgang mit Technik", "D) Ein neues Smartphone zu kaufen"] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(10),
   listening: {
     title: "Hören Sie den Beitrag über Zeit für sich und kontrollieren Sie Ihre Antworten selbst.",
     instructions: "Read the questions first. Listen carefully, answer all five questions and check your own work afterwards.",

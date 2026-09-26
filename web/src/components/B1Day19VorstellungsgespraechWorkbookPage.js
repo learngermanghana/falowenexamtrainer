@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -85,6 +86,7 @@ const murtenQuestions = [
 ];
 
 const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(19);
   const writing = getB1WritingTask(19);
   const mark = setPreparedFor;
   return (
@@ -129,8 +131,8 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie 3 Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C.">
-            <p style={{ margin: 0 }}>Read the complete text „Ein Dorf für grüne Energie“. Choose one answer, a–c, for each question.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <article style={box}>
             <h3 style={{ margin: 0 }}>Ein Dorf für grüne Energie</h3>

@@ -105,32 +105,7 @@ export const B1_DAY16_PRUEFUNGSANGST_STRESSBEWAELTIGUNG_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(16),
-  reading: {
-    title: "Lesen Sie den Text über Prüfungen im Bildungswesen und beantworten Sie die sieben Fragen.",
-    instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Prüfungen und Bildungssystem",
-    text: {
-      title: "Die Bedeutung der Prüfungen im Bildungswesen",
-      questionTitle: "Fragen",
-      paragraphs: [
-        "In vielen Ländern sind Prüfungen der zentrale Bestandteil des Bildungssystems. Sie bestimmen, ob Schüler und Studenten in die nächste Klasse kommen, ein Studium beginnen oder eine Ausbildung abschließen können. Doch wie gerecht sind diese Prüfungen wirklich? In den letzten Jahren haben viele Bildungsexperten diskutiert, ob Prüfungen wirklich die beste Methode sind, um Wissen zu messen. Einige Experten meinen, dass Prüfungen oft nur das Kurzzeitgedächtnis testen und nicht die tiefe Auseinandersetzung mit einem Thema fördern. Andere sehen darin ein wichtiges Instrument, um Leistungsstandards zu gewährleisten.",
-        "Es gibt unterschiedliche Arten von Prüfungen: schriftliche Prüfungen, mündliche Prüfungen und praktische Prüfungen. Jede Prüfungsform hat ihre eigenen Vorteile und Herausforderungen. Schriftliche Prüfungen sind oft standardisiert und leicht zu bewerten, während mündliche Prüfungen ein tieferes Verständnis des Lernstoffes erfordern. Praktische Prüfungen hingegen testen oft Fähigkeiten, die im Alltag oder Beruf relevant sind.",
-        "Ein weiteres Thema ist der Prüfungsstress. Viele Schüler leiden unter Prüfungsangst und erzielen deshalb schlechtere Ergebnisse, als sie es in einer stressfreien Umgebung tun würden. Es gibt viele Methoden, um Prüfungsangst zu bekämpfen, zum Beispiel durch Entspannungstechniken, eine gute Vorbereitung und ausreichend Schlaf vor der Prüfung. Dennoch bleibt das Thema Prüfungsstress ein wichtiges Problem im Bildungssystem.",
-        "Bildungsexperten diskutieren, ob alternative Formen der Leistungsbewertung, wie zum Beispiel kontinuierliche Leistungskontrollen, Projekte oder Hausarbeiten, gerechter sind als einmalige Prüfungen. Diese Methoden bieten oft mehr Möglichkeiten, individuelle Stärken zu zeigen und weniger Druck aufzubauen. Allerdings sind sie auch zeitaufwändiger und schwieriger zu standardisieren.",
-        "Am Ende bleibt die Frage, wie Prüfungen in Zukunft gestaltet werden sollten, um fair, gerecht und stressfrei zu sein. Klar ist, dass das Bildungssystem in vielen Ländern vor großen Herausforderungen steht und sich weiterentwickeln muss, um den Bedürfnissen der Schüler gerecht zu werden.",
-      ],
-      questions: [
-        { stem: "Welche Meinung vertreten Bildungsexperten zu Prüfungen?", options: ["a) Prüfungen sind die beste Methode, um Wissen zu testen.", "b) Prüfungen fördern das Kurzzeitgedächtnis.", "c) Prüfungen sind völlig nutzlos.", "d) Prüfungen fördern die Kreativität."] },
-        { stem: "Welche Arten von Prüfungen werden im Text genannt?", options: ["a) Nur schriftliche Prüfungen.", "b) Nur mündliche Prüfungen.", "c) Schriftliche, mündliche und praktische Prüfungen.", "d) Es werden keine Prüfungen erwähnt."] },
-        { stem: "Was wird als eine der Herausforderungen von Prüfungen erwähnt?", options: ["a) Zu wenig Prüfungsarten.", "b) Prüfungsstress.", "c) Prüfungen sind zu einfach.", "d) Prüfungen fördern die Teamarbeit."] },
-        { stem: "Was sind alternative Methoden zur Wissensbewertung laut Text?", options: ["a) Mehrere Prüfungen hintereinander.", "b) Projekte und Hausarbeiten.", "c) Nur mündliche Prüfungen.", "d) Keine Prüfungen mehr."] },
-        { stem: "Welche Prüfungsform erfordert ein tieferes Verständnis des Lernstoffes?", options: ["a) Schriftliche Prüfungen.", "b) Mündliche Prüfungen.", "c) Praktische Prüfungen.", "d) Es gibt keinen Unterschied."] },
-        { stem: "Welche Methoden helfen gegen Prüfungsangst?", options: ["a) Noch mehr Lernen.", "b) Entspannungstechniken und gute Vorbereitung.", "c) Weniger Prüfungen.", "d) Kürzere Prüfungen."] },
-        { stem: "Was wird als Vorteil von alternativen Bewertungsmethoden beschrieben?", options: ["a) Sie sind einfacher zu organisieren.", "b) Sie sind fairer und individueller.", "c) Sie machen keinen Unterschied.", "d) Sie sind nur für schriftliche Prüfungen geeignet."] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(16),
   listening: {
     title: "Hören Sie den Text über Prüfungsangst und beantworten Sie die fünf Fragen.",
     instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
