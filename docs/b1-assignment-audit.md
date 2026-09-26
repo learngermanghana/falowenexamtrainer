@@ -28,11 +28,11 @@ The most obvious legacy/V2 proxy days are:
 
 **1, 3, 6, 22**
 
-Day 21 already uses the shared workbook but still relies on DOM mutation/layout logic to inject a writing video and hide Teil 4.
+Day 21 now uses the shared workbook declaratively: unavailable Hören is hidden by the shared shell and the writing video is React-owned.
 
 ### Incomplete material
 
-Day 23 still has a planned Hören placeholder rather than finished listening material.
+Day 23 is explicitly a no-Hören lesson, matching its answer key and historical design.
 
 ### Grammar
 
