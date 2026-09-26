@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import {
   getWritingVideoResource,
   getYouTubeEmbedUrl,
@@ -182,23 +183,7 @@ const config = {
       "Obwohl …, finde ich …",
     ],
   },
-  writing: {
-    title: "Welche Lebensform ist heute am besten – Familie, Wohngemeinschaft oder Singleleben?",
-    instructions: "Reagieren Sie auf Maras Meinung. Vergleichen Sie die Lebensformen, nennen Sie Vor- und Nachteile und begründen Sie Ihre eigene Meinung.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Student writing an opinion about modern living arrangements",
-    sourceTitle: "Meinung von Mara",
-    sourceText: "Heute gibt es viele verschiedene Lebensformen, und jede hat ihre Vorteile. Ich finde, dass die beste Lebensform von der persönlichen Situation abhängt. In einer Familie hat man oft viel Unterstützung und Nähe. In einer Wohngemeinschaft lebt man mit anderen zusammen und kann Kosten teilen. Das Singleleben bietet dagegen viel Freiheit und Unabhängigkeit. Dennoch kann es manchmal auch einsam sein. Ich denke, dass jeder selbst entscheiden sollte, welche Lebensform am besten zu ihm passt. Was denken Sie darüber?",
-    taskPoints: [
-      "Fassen Sie Maras Meinung kurz zusammen.",
-      "Vergleichen Sie Familie, WG und Singleleben.",
-      "Nennen Sie mindestens einen Vorteil und einen Nachteil.",
-      "Geben Sie ein persönliches Beispiel oder beschreiben Sie die Situation in Ihrem Heimatland.",
-      "Formulieren Sie einen klaren Schluss.",
-    ],
-    supportStructure: ["Einleitung zum Thema", "Reaktion auf Maras Meinung", "Vergleich mit Gründen und Beispiel", "Eigene Meinung", "Kurzer Schluss"],
-    vocabulary: ["zusammenleben", "Kosten teilen", "unabhängig sein", "Unterstützung bekommen", "Privatsphäre haben", "sich einsam fühlen"],
-  },
+  writing: getB1WritingTask(21),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle fünf Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

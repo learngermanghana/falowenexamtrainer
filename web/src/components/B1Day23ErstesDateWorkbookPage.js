@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG = {
   day: 23,
@@ -101,39 +102,7 @@ export const B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG = {
       "Ich würde diese Möglichkeit wählen, weil …",
     ],
   },
-  writing: {
-    title: "Ist das erste Date wirklich wichtig für eine Beziehung? Schreiben Sie Ihre Meinung.",
-    instructions:
-      "Lesen Sie Sophies Meinung. Schreiben Sie danach Ihre eigene Meinung und begründen Sie Ihren Standpunkt.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an opinion text about first dates",
-    sourceTitle: "Sophie",
-    sourceText:
-      "Viele Menschen glauben, dass das erste Date entscheidet, ob man zusammenpasst. Ich stimme dem teilweise zu, denn der erste Eindruck kann viel bedeuten. Man merkt oft schnell, ob man sich sympathisch ist. Trotzdem finde ich, dass man nicht zu viel erwarten sollte. Manche Menschen sind beim ersten Treffen nervös und zeigen sich nicht so, wie sie wirklich sind. Ich denke, wichtiger ist, wie sich die Beziehung danach entwickelt. Was denken Sie darüber?",
-    taskPoints: [
-      "Sagen Sie, ob Sie Sophie zustimmen oder nicht.",
-      "Erklären Sie, welche Bedeutung der erste Eindruck haben kann.",
-      "Nennen Sie einen Grund, warum ein erstes Date auch täuschen kann.",
-      "Begründen Sie Ihre eigene Meinung mit einem Beispiel.",
-      "Formulieren Sie einen klaren Schluss.",
-    ],
-    supportStructure: [
-      "Einleitung",
-      "Reaktion auf Sophies Meinung",
-      "Argument für die Bedeutung des ersten Dates",
-      "Gegenargument und Beispiel",
-      "Eigene Meinung",
-      "Schluss",
-    ],
-    vocabulary: [
-      "der erste Eindruck",
-      "nervös sein",
-      "sich sympathisch finden",
-      "Erwartungen haben",
-      "sich besser kennenlernen",
-      "eine Beziehung entwickeln",
-    ],
-  },
+  writing: getB1WritingTask(23),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions:

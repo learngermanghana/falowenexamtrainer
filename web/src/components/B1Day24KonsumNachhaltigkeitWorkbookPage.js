@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
   day: 24,
@@ -120,41 +121,7 @@ export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
       "In Zukunft wird nachhaltiger Konsum immer wichtiger sein, weil …",
     ],
   },
-  writing: {
-    title:
-      "Ist es wichtig, beim Konsum auf Nachhaltigkeit zu achten? Schreiben Sie Ihre Meinung.",
-    instructions:
-      "Lesen Sie Pauls Meinung. Schreiben Sie danach Ihre eigene Meinung, begründen Sie Ihren Standpunkt und nennen Sie konkrete Beispiele.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an opinion about sustainable consumption",
-    sourceTitle: "Paul",
-    sourceText:
-      "In der heutigen Zeit ist es immer wichtiger, nachhaltig zu konsumieren. Ich stimme dem zu, denn durch bewusstes Einkaufen können wir die Umwelt schützen und Ressourcen sparen. Viele Produkte, die wir kaufen, haben einen großen Einfluss auf die Natur, zum Beispiel durch Verpackungen oder den CO₂-Ausstoß bei der Herstellung. Dennoch ist es manchmal schwierig, nachhaltige Alternativen zu finden, vor allem bei den Preisen. Ich finde, dass jeder von uns kleine Schritte machen kann, wie weniger Plastik zu verwenden oder Secondhand zu kaufen. Was denken Sie darüber?",
-    taskPoints: [
-      "Sagen Sie, ob Sie Paul zustimmen oder nicht.",
-      "Erklären Sie, warum nachhaltiger Konsum wichtig sein kann.",
-      "Nennen Sie Schwierigkeiten oder Nachteile nachhaltiger Alternativen.",
-      "Geben Sie konkrete Beispiele für nachhaltigen Konsum.",
-      "Formulieren Sie einen klaren Schluss.",
-    ],
-    supportStructure: [
-      "Einleitung",
-      "Reaktion auf Pauls Meinung",
-      "Argumente für nachhaltigen Konsum",
-      "Schwierigkeiten oder Gegenargumente",
-      "Persönliches Beispiel und eigene Meinung",
-      "Schluss",
-    ],
-    vocabulary: [
-      "Ressourcen sparen",
-      "Verpackungen vermeiden",
-      "Secondhand kaufen",
-      "regionale Produkte",
-      "nachhaltige Alternative",
-      "bewusst konsumieren",
-      "CO₂-Ausstoß reduzieren",
-    ],
-  },
+  writing: getB1WritingTask(24),
   reading: {
     title:
       "Lesen Sie den Text und entscheiden Sie bei allen sieben Aussagen: richtig oder falsch.",

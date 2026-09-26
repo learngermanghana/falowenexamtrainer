@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -51,6 +52,7 @@ const Prepared = ({ checked, onChange }) => (
 );
 
 const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(6);
   const mark = setPreparedFor;
   return (
     <>
@@ -77,8 +79,8 @@ const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Stadt oder Land – welches ist Ihrer Meinung nach besser und warum?" submissionNote="Write approximately 80 words and submit your final text through Submit.">
-            <p style={{ margin: 0 }}>Reagieren Sie auf Tanjas Meinung, vergleichen Sie beide Wohnorte und begründen Sie Ihre persönliche Entscheidung.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Writing" title={writing.title} submissionNote={writing.submissionNote}>
+            <p style={{ margin: 0 }}>{writing.instructions}</p>
           </WorkbookTaskCard>
           <div style={{ ...box, background: "#eff6ff" }}>
             <strong>Meinung von Tanja</strong>

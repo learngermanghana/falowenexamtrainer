@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -84,6 +85,7 @@ const murtenQuestions = [
 ];
 
 const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(19);
   const mark = setPreparedFor;
   return (
     <>
@@ -111,8 +113,8 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind Vorstellungsgespräche schwierig? Schreiben Sie Ihre Meinung." submissionNote="Write about 80 words and submit your final text in the Submit tab.">
-            <p style={{ margin: 0 }}>Situation: Emma findet, dass ein Vorstellungsgespräch stressig sein kann. Reagieren Sie auf ihre Meinung. Schreiben Sie, ob Sie zustimmen, warum Vorstellungsgespräche schwierig sein können, wie man sich vorbereiten kann und was für Erfolg wichtig ist.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Writing" title={writing.title} submissionNote={writing.submissionNote}>
+            <p style={{ margin: 0 }}>{writing.instructions}</p>
           </WorkbookTaskCard>
           <WritingSupportVideo />
           <div style={highlight}><strong>Emma</strong><p style={{ margin: 0 }}>Ein Vorstellungsgespräch kann stressig sein. Ich stimme dem zu, denn man muss viele Fragen beantworten und einen guten Eindruck machen. Dennoch kann man sich gut vorbereiten, zum Beispiel mit Übungsgesprächen. Ich finde, dass Selbstbewusstsein und eine gute Vorbereitung helfen, erfolgreich zu sein. Was denken Sie darüber?</p></div>

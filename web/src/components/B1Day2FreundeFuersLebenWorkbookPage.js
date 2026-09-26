@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { styles } from "../styles";
@@ -64,6 +65,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(2);
   const mark = setPreparedFor;
   return (
     <>
@@ -108,10 +110,10 @@ const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Schreiben Sie eine E-Mail über einen Freund fürs Leben."
-            submissionNote="Write approximately 80 words and submit your final email through the Submit tab."
+            title={writing.title}
+            submissionNote={writing.submissionNote}
           >
-            <p style={{ margin: 0 }}>Sie haben einen Freund fürs Leben gefunden und möchten einer anderen Freundin darüber berichten.</p>
+            <p style={{ margin: 0 }}>{writing.instructions}</p>
             <ul style={listSpacing}>
               <li>Wie haben Sie sich kennengelernt?</li>
               <li>Warum ist diese Freundschaft besonders für Sie? Begründen Sie.</li>

@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 const config = {
   day: 25,
@@ -41,29 +42,7 @@ const config = {
     ],
     usefulPhrases: ["Ich möchte die Ware zurückgeben.", "Das Produkt ist beschädigt angekommen.", "Wie funktioniert die Rücksendung?", "Ich möchte mein Geld zurück.", "Könnten Sie mir bitte Ersatz schicken?"],
   },
-  writing: {
-    title: "Schreiben Sie einen formellen Beschwerdebrief an den Kundenservice.",
-    instructions: "Sie haben online ein Handy gekauft. Das Display war bei der Lieferung kaputt, und Sie haben das Gerät zurückgeschickt. Schreiben Sie jetzt an den Kundenservice.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing a formal customer complaint",
-    taskPoints: [
-      "Wann Sie das Handy gekauft haben",
-      "Was genau das Problem war",
-      "Wann und wie Sie das Handy zurückgeschickt haben",
-      "Was Sie jetzt erwarten: Ersatz, Reparatur oder Geld zurück",
-      "Eine höfliche Bitte um schnelle Antwort",
-    ],
-    supportStructure: [
-      "Anrede: Sehr geehrte Damen und Herren,",
-      "Grund des Schreibens nennen.",
-      "Bestellung und Schaden genau beschreiben.",
-      "Rücksendung erklären.",
-      "Gewünschte Lösung höflich formulieren.",
-      "Grußformel und Name.",
-    ],
-    template: "Sehr geehrte Damen und Herren,\n\nam [Datum] habe ich in Ihrem Online-Shop [Produkt] bestellt. Leider …\n\nDas Problem ist, dass … Deshalb habe ich das Handy am [Datum] zurückgeschickt.\n\nIch bitte Sie, mir [eine Ersatzlieferung / mein Geld] …\n\nIch freue mich auf Ihre schnelle Antwort.\n\nMit freundlichen Grüßen\n[Name]",
-    vocabulary: ["eine Bestellung aufgeben", "beschädigt ankommen", "die Ware zurückschicken", "eine Reklamation bearbeiten", "Ersatz verlangen", "den Kaufpreis erstatten"],
-  },
+  writing: getB1WritingTask(25),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

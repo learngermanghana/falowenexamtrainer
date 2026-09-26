@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY16_PRUEFUNGSANGST_STRESSBEWAELTIGUNG_WORKBOOK_CONFIG = {
   day: 16,
@@ -103,41 +104,7 @@ export const B1_DAY16_PRUEFUNGSANGST_STRESSBEWAELTIGUNG_WORKBOOK_CONFIG = {
       "Zusammenfassend ist wichtig, dass ...",
     ],
   },
-  writing: {
-    title: "Kann man Prüfungsangst mit der richtigen Stressbewältigung reduzieren?",
-    instructions: "Lesen Sie Julias Meinung und schreiben Sie Ihre eigene Antwort. Sagen Sie, ob Sie zustimmen oder nicht, und begründen Sie Ihre Meinung mit Beispielen.",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Prüfungsvorbereitung und Stressbewältigung",
-    sourceTitle: "Aufgabe",
-    sourceText: "Kann man Prüfungsangst mit der richtigen Stressbewältigung reduzieren? Schreiben Sie Ihre Meinung. Julia: Viele Menschen haben Angst vor Prüfungen, weil sie unter Druck stehen. Ich stimme dem zu, denn Nervosität kann die Leistung beeinflussen. Dennoch gibt es viele Strategien, um besser mit Stress umzugehen, wie gute Vorbereitung oder Entspannungsübungen. Ich finde, dass jeder seine eigene Methode finden sollte, um ruhig zu bleiben und sich sicher zu fühlen. Was denken Sie darüber?",
-    taskPoints: [
-      "Beziehen Sie sich kurz auf Julias Meinung.",
-      "Schreiben Sie, ob Sie zustimmen oder nicht.",
-      "Nennen Sie mindestens zwei Strategien gegen Prüfungsangst.",
-      "Begründen Sie, warum diese Strategien helfen können.",
-      "Schreiben Sie ein klares Fazit.",
-    ],
-    supportStructure: [
-      "Einleitung: Ich finde Julias Meinung interessant, weil ...",
-      "Meinung: Ich stimme ihr zu / Ich stimme ihr nur teilweise zu.",
-      "Begründung 1: Gute Vorbereitung kann helfen, weil ...",
-      "Begründung 2: Entspannungsübungen sind wichtig, damit ...",
-      "Fazit: Deshalb denke ich, dass ...",
-    ],
-    vocabulary: [
-      "die Prüfungsangst",
-      "der Stress",
-      "unter Druck stehen",
-      "die Leistung beeinflussen",
-      "sich vorbereiten",
-      "Entspannungsübungen machen",
-      "ruhig bleiben",
-      "sich sicher fühlen",
-      "positive Gedanken",
-      "eine Methode finden",
-    ],
-    template: "Ich finde Julias Meinung sehr richtig. Viele Menschen haben Prüfungsangst, weil sie unter Druck stehen und Angst vor schlechten Noten haben. Meiner Meinung nach kann gute Stressbewältigung helfen. Wenn man früh lernt, Pausen macht und tief atmet, fühlt man sich sicherer. Außerdem sollte man positiv denken. Zusammenfassend denke ich, dass Prüfungsangst normal ist, aber man sie mit der richtigen Methode reduzieren kann.",
-  },
+  writing: getB1WritingTask(16),
   reading: {
     title: "Lesen Sie den Text über Prüfungen im Bildungswesen und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

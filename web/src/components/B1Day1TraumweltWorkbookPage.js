@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
@@ -196,6 +197,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(1);
   const mark = setPreparedFor;
   return (
     <>
@@ -262,8 +264,8 @@ const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Ist persönlicher Kontakt im Traumberuf wichtiger als flexible Arbeit im Homeoffice?"
-            submissionNote="Write approximately 80 words and submit the finished text through the Submit tab."
+            title={writing.title}
+            submissionNote={writing.submissionNote}
           >
             <ol style={listSpacing}>
               <li>Sagen Sie, ob persönlicher Kontakt im Traumberuf für Sie wichtig ist.</li>

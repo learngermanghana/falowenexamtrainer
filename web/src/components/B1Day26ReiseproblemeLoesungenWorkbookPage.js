@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
   day: 26,
@@ -93,35 +94,7 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
       "Ich würde eine Reiseversicherung abschließen, weil ...",
     ],
   },
-  writing: {
-    title: "Schreibaufgabe: Informeller Brief – Reiseprobleme und Lösungen",
-    instructions:
-      "Du hast eine Reise gemacht, aber es gab ein paar Probleme. Schreibe deinem Freund Max oder deiner Freundin Lisa einen Brief.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an informal letter about travel problems",
-    taskPoints: [
-      "Wohin du gefahren bist und wie du gereist bist, zum Beispiel mit dem Zug oder Flugzeug.",
-      "Was genau passiert ist, zum Beispiel Verspätung, Hotel geschlossen oder Gepäck verloren.",
-      "Was du gemacht hast, um das Problem zu lösen, zum Beispiel umgebucht oder Kundenservice kontaktiert.",
-    ],
-    supportStructure: [
-      "Anrede: Lieber Max / Liebe Lisa,",
-      "Kurz erzählen, wohin du gereist bist.",
-      "Das Reiseproblem genau beschreiben.",
-      "Erklären, wie du reagiert hast.",
-      "Sagen, wie die Reise am Ende war.",
-      "Grußformel und Name.",
-    ],
-    vocabulary: [
-      "die Verspätung",
-      "das Gepäck",
-      "die Reservierung",
-      "umbuchen",
-      "sich beschweren",
-      "den Kundenservice kontaktieren",
-      "eine Lösung finden",
-    ],
-  },
+  writing: getB1WritingTask(26),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

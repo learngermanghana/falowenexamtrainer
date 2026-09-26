@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -19,6 +20,7 @@ const QuestionList = ({ items }) => <div style={{ display: "grid", gap: 10 }}>{i
 const Prepared = ({ checked, onChange }) => <label style={{ display: "inline-flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={checked} onChange={onChange} /> I prepared this part.</label>;
 
 const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(8);
   const mark = setPreparedFor;
   return (
     <>
@@ -37,8 +39,8 @@ const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 
     {activeTab === "schreiben" && <section style={card}>
       <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
-      <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind regelmäßige Sporteinheiten der Schlüssel zu einem gesunden Leben? Schreiben Sie Ihre Meinung." submissionNote="Write about 80–100 words and submit the final text in Submit.">
-        <p style={{ margin: 0 }}>Situation: Max sagt, dass regelmäßige Sporteinheiten helfen, fit zu bleiben und das Immunsystem zu stärken. Schreiben Sie Ihre Meinung. Gehen Sie auf Max ein, nennen Sie Vorteile von Sport, erklären Sie die Rolle von Ernährung und schreiben Sie, was Sie persönlich im Alltag tun oder verbessern möchten.</p>
+      <WorkbookTaskCard eyebrow="Your assignment · Writing" title={writing.title} submissionNote={writing.submissionNote}>
+        <p style={{ margin: 0 }}>{writing.instructions}</p>
       </WorkbookTaskCard>
       <div style={{ ...box, background: "#eff6ff" }}><strong>Max</strong><p style={{ margin: 0 }}>Regelmäßige Sporteinheiten helfen, fit zu bleiben und das Immunsystem zu stärken. Ich stimme dem zu, denn Bewegung reduziert das Risiko für viele Krankheiten wie Herzprobleme oder Diabetes. Dennoch ist auch eine ausgewogene Ernährung wichtig, um gesund zu bleiben. Ich finde, dass jeder eine Sportart finden sollte, die ihm Spaß macht, damit Bewegung langfristig Teil des Alltags wird. Was denken Sie darüber?</p></div>
       <div style={box}><strong>Writing support</strong><ol style={list}><li>Einleitung: Thema nennen.</li><li>Auf Max reagieren: zustimmen oder teilweise widersprechen.</li><li>Sport und Ernährung begründen.</li><li>Eigene Gewohnheiten und Verbesserung nennen.</li><li>Kurzer Schluss.</li></ol></div>

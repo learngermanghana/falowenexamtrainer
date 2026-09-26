@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
@@ -92,6 +93,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(22);
   const mark = setPreparedFor;
   return (
     <>
@@ -142,12 +144,10 @@ const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Was denken Sie über Partnersuche im Internet?"
-            submissionNote="Write approximately 80–100 words and submit the finished text through the Submit tab."
+            title={writing.title}
+            submissionNote={writing.submissionNote}
           >
-            <p style={{ margin: 0 }}>
-              Teilen Sie Marias Ansicht oder haben Sie eine andere Meinung? Begründen Sie Ihre Antwort.
-            </p>
+            <p style={{ margin: 0 }}>{writing.instructions}</p>
           </WorkbookTaskCard>
 
           <div style={contentCard}>

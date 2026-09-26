@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG = {
   day: 17,
@@ -98,41 +99,7 @@ export const B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG = {
       "Zusammenfassend kann ich sagen, dass ...",
     ],
   },
-  writing: {
-    title: "Wie lernt man am besten?",
-    instructions: "Lesen Sie Tims Meinung und schreiben Sie Ihre eigene Antwort. Sagen Sie, welche Lernmethoden Sie gut finden und warum.",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Meinung zum effektiven Lernen schreiben",
-    sourceTitle: "Aufgabe",
-    sourceText: "Wie lernt man am besten? Schreiben Sie Ihre Meinung. Tim: Jeder Mensch lernt anders. Ich denke, dass es wichtig ist, eine gute Methode zu finden. Manche lernen gut mit Büchern, andere mit Videos oder in Gruppen. Dennoch ist regelmäßiges Üben immer wichtig. Ich finde, dass man sich Ziele setzen und Pausen machen sollte, um effektiv zu lernen. Was denken Sie darüber?",
-    taskPoints: [
-      "Beziehen Sie sich kurz auf Tims Meinung.",
-      "Schreiben Sie, ob Sie zustimmen oder nicht.",
-      "Nennen Sie zwei Lernmethoden, die für Sie gut funktionieren.",
-      "Erklären Sie, warum Ziele, Pausen oder Wiederholung wichtig sind.",
-      "Schreiben Sie ein klares Fazit.",
-    ],
-    supportStructure: [
-      "Einleitung: Ich finde Tims Meinung interessant, weil ...",
-      "Meinung: Ich stimme ihm zu / Ich stimme ihm teilweise zu.",
-      "Begründung 1: Eine gute Methode ist ..., weil ...",
-      "Begründung 2: Pausen und Wiederholung helfen, damit ...",
-      "Fazit: Deshalb denke ich, dass ...",
-    ],
-    vocabulary: [
-      "die Lernmethode",
-      "Notizen machen",
-      "regelmäßig üben",
-      "Ziele setzen",
-      "Pausen machen",
-      "Wiederholung einplanen",
-      "sich konzentrieren",
-      "in einer Gruppe lernen",
-      "effektiv lernen",
-      "den Lernstoff behalten",
-    ],
-    template: "Ich finde Tims Meinung sehr richtig. Jeder Mensch lernt anders, deshalb sollte man eine passende Methode finden. Ich lerne am besten, wenn ich mir Notizen mache und den Lernstoff regelmäßig wiederhole. Außerdem helfen mir Pausen, weil ich mich danach besser konzentrieren kann. Meiner Meinung nach sind klare Ziele und eine ruhige Umgebung sehr wichtig. Zusammenfassend denke ich, dass man am besten lernt, wenn man regelmäßig übt und die Methode zu einem passt.",
-  },
+  writing: getB1WritingTask(17),
   reading: {
     title: "Lesen Sie den Text über effektives Lernen und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

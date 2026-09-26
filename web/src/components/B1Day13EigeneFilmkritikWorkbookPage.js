@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG = {
   day: 13,
@@ -105,42 +106,7 @@ export const B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG = {
       "Für Fans von ... ist der Film sehr geeignet.",
     ],
   },
-  writing: {
-    title: "Sind spannende Filme besser als ruhige Filme?",
-    instructions: "Schreiben Sie einen B1-Meinungsaufsatz. Erklären Sie Ihre Meinung, nennen Sie Vorteile und Nachteile und schließen Sie mit einem klaren Fazit.",
-    image: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Filmabend und Meinung zu Filmen",
-    sourceTitle: "Opinion Assignment",
-    sourceText: "Students are to write an essay expressing their opinion on the following topic: Sind spannende Filme besser als ruhige Filme?",
-    taskPoints: [
-      "Schreiben Sie eine passende Einleitung zum Thema Spannung im Film.",
-      "Erklären Sie Ihre Meinung klar.",
-      "Nennen Sie Vorteile spannender Filme: fesselnder, emotionaler, bleiben länger im Gedächtnis.",
-      "Nennen Sie Nachteile: Stress, zu hohe Spannung, ruhigere Filme haben oft tiefere Botschaften.",
-      "Vergleichen Sie spannende und ruhige Filme kurz.",
-      "Schreiben Sie ein Fazit mit Ihrer endgültigen Meinung.",
-    ],
-    supportStructure: [
-      "Einleitung: Heutzutage ist Spannung im Film ein wichtiges Thema in unserem Leben.",
-      "Meinung: Ich bin der Meinung, dass spannende Filme eine besondere Wirkung auf das Publikum haben.",
-      "Vorteile: Filme sind fesselnder und erzeugen starke Emotionen.",
-      "Nachteile: Nicht jeder mag Spannung; manchmal ist sie stressig oder anstrengend.",
-      "Fazit: Spannende Filme unterhalten oft besser, aber ruhige Filme sind auch wertvoll.",
-    ],
-    vocabulary: [
-      "die Spannung",
-      "der Thriller",
-      "die Handlung",
-      "fesselnd",
-      "ruhig",
-      "stressig",
-      "die Botschaft",
-      "die Atmosphäre",
-      "das Publikum",
-      "im Gedächtnis bleiben",
-    ],
-    template: "Heutzutage ist Spannung im Film ein wichtiges Thema in unserem Leben. Ich bin der Meinung, dass spannende Filme eine besondere Wirkung auf das Publikum haben.\n\nEin wichtiger Vorteil ist, dass spannende Filme fesselnder sind. Außerdem erzeugen sie Emotionen wie Angst, Freude oder Überraschung. Deshalb bleiben sie oft länger im Gedächtnis.\n\nAndererseits gibt es auch Nachteile. Nicht jeder mag Spannung, weil sie stressig sein kann. Manchmal ist die Spannung zu hoch, sodass der Film anstrengend wird. Ruhigere Filme haben oft tiefere emotionale Botschaften.\n\nZusammenfassend bin ich der Meinung, dass spannende Filme in den meisten Fällen besser unterhalten, aber das bedeutet nicht, dass ruhige Filme weniger wertvoll sind.",
-  },
+  writing: getB1WritingTask(13),
   reading: {
     title: "Lesen Sie die Filmkritik und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst die komplette Kritik. Wählen Sie danach bei jeder Frage genau eine Antwort.",

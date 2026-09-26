@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -52,6 +53,7 @@ const Prepared = ({ checked, onChange }) => (
 );
 
 const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(7);
   const mark = setPreparedFor;
   return (
     <>
@@ -79,8 +81,8 @@ const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind Fertiggerichte eine gute Wahl für eine gesunde Ernährung? Schreiben Sie Ihre Meinung." submissionNote="Write approximately 80 words and submit your final text through Submit.">
-            <p style={{ margin: 0 }}>Reagieren Sie auf Tanjas Meinung. Erklären Sie, ob Fertiggerichte eine gute Wahl für eine gesunde Ernährung sind. Nennen Sie Vorteile, Nachteile und Ihre persönliche Lösung im Alltag.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Writing" title={writing.title} submissionNote={writing.submissionNote}>
+            <p style={{ margin: 0 }}>{writing.instructions}</p>
           </WorkbookTaskCard>
           <div style={{ ...box, background: "#eff6ff" }}>
             <strong>Meinung von Tanja</strong>

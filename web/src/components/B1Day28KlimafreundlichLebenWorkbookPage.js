@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY28_KLIMAFREUNDLICH_LEBEN_WORKBOOK_CONFIG = {
   day: 28,
@@ -29,17 +30,7 @@ export const B1_DAY28_KLIMAFREUNDLICH_LEBEN_WORKBOOK_CONFIG = {
     answerStructure: ["Das Thema Klimaschutz kurz vorstellen.", "Beispiele aus Energie, Verkehr, Konsum und Ernährung nennen.", "Vorteile und Nachteile erklären.", "Die Situation im eigenen Land beschreiben.", "Eine persönliche Meinung und einen Schluss formulieren."],
     usefulPhrases: ["In meinem Land kann man klimafreundlich leben, indem man ...", "Ein Vorteil ist, dass ...", "Ein Nachteil ist jedoch, dass ...", "Für viele Menschen ist es schwierig, weil ...", "Trotzdem kann jeder einen kleinen Beitrag leisten."],
   },
-  writing: {
-    title: "Kann jeder Mensch klimafreundlich leben? Schreiben Sie Ihre Meinung.",
-    instructions: "Schreiben Sie einen Meinungstext und beziehen Sie sich auf konkrete Beispiele aus dem Alltag.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an opinion text about climate-friendly living",
-    sourceTitle: "Meinungstext",
-    sourceText: "In der heutigen Zeit ist der Klimawandel ein großes Problem. Viele Menschen fragen sich, was sie persönlich tun können, um die Umwelt zu schützen. Meiner Meinung nach kann jeder im Alltag kleine Schritte machen. Man kann zum Beispiel öfter mit dem Fahrrad fahren oder öffentliche Verkehrsmittel nutzen, statt mit dem Auto zu fahren. Auch beim Einkaufen kann man klimafreundlich handeln – etwa durch den Kauf regionaler Produkte oder durch Vermeidung von Plastik. Zu Hause hilft es, Strom zu sparen, Geräte nicht im Standby-Modus zu lassen und weniger zu heizen. Natürlich ist es manchmal nicht einfach, klimafreundlich zu leben, besonders wenn man auf dem Land wohnt oder wenig Geld hat. Trotzdem glaube ich, dass jeder einen Beitrag leisten kann. Zusammenfassend denke ich, dass viele kleine Taten eine große Wirkung haben können, wenn alle mitmachen.",
-    taskPoints: ["Sagen Sie, ob jeder Mensch klimafreundlich leben kann.", "Nennen Sie Beispiele aus Verkehr, Einkaufen oder Haushalt.", "Beschreiben Sie Schwierigkeiten, zum Beispiel Land, Geld oder Gewohnheiten.", "Begründen Sie Ihre Meinung.", "Formulieren Sie einen Schluss."],
-    supportStructure: ["Einleitung", "Eigene Meinung", "Beispiele", "Schwierigkeiten", "Begründung", "Schluss"],
-    vocabulary: ["der Klimawandel", "klimafreundlich handeln", "regionale Produkte", "Plastik vermeiden", "Strom sparen", "einen Beitrag leisten"],
-  },
+  writing: getB1WritingTask(28),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",

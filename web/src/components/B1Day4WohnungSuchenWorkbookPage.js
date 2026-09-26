@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
@@ -81,6 +82,7 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const writing = getB1WritingTask(4);
   const mark = setPreparedFor;
   return (
     <>
@@ -128,12 +130,10 @@ const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Writing"
-            title="Sind persönliche Kontakte bei der Wohnungssuche hilfreicher als Online-Portale?"
-            submissionNote="Write approximately 80 words and submit your final text through the Submit tab."
+            title={writing.title}
+            submissionNote={writing.submissionNote}
           >
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Schreiben Sie Ihre <strong>eigene Meinung</strong> zu der Frage, ob persönliche Kontakte bei der Wohnungssuche hilfreicher sind als Online-Portale. Begründen Sie Ihre Meinung und geben Sie ein konkretes Beispiel.
-            </p>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>{writing.instructions}</p>
           </WorkbookTaskCard>
 
           <div style={questionCardStyle}>

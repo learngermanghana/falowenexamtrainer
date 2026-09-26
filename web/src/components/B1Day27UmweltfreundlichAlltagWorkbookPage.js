@@ -1,5 +1,6 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
 
 export const B1_DAY27_UMWELTFREUNDLICH_ALLTAG_WORKBOOK_CONFIG = {
   day: 27,
@@ -30,17 +31,7 @@ export const B1_DAY27_UMWELTFREUNDLICH_ALLTAG_WORKBOOK_CONFIG = {
     answerStructure: ["Das Thema vorstellen.", "Möglichkeiten zu Hause beschreiben.", "Einkaufen und Mobilität erklären.", "Schwierigkeiten und Vorteile vergleichen.", "Eine realistische Lösung formulieren."],
     usefulPhrases: ["Zu Hause kann man umweltfreundlicher leben, indem man ...", "Beim Einkaufen ist es sinnvoll, ...", "Unterwegs könnte man öfter ...", "Für mich ist schwierig, dass ...", "Gut klappt schon, dass ..."],
   },
-  writing: {
-    title: "Kann jeder Mensch umweltfreundlich leben? Schreiben Sie Ihre Meinung.",
-    instructions: "Lesen Sie Ahmeds Meinung. Schreiben Sie danach Ihre eigene Meinung und begründen Sie Ihren Standpunkt.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing about eco-friendly living",
-    sourceTitle: "Ahmed",
-    sourceText: "Ich denke, dass jeder Mensch umweltfreundlich leben kann, aber es ist manchmal nicht so einfach. Manche Menschen leben in Städten, wo sie kein Auto brauchen, andere auf dem Land, wo es keine Busse gibt. Ich finde, man kann auch kleine Dinge tun: zum Beispiel Stofftaschen benutzen oder das Licht ausschalten, wenn man den Raum verlässt. Das kostet nichts und hilft trotzdem der Umwelt. Außerdem ist es wichtig, dass man in der Schule oder in den Medien über Umweltschutz spricht. So lernen mehr Menschen, warum es wichtig ist. Was meinen Sie dazu?",
-    taskPoints: ["Sagen Sie, ob Sie Ahmed zustimmen oder nicht.", "Erklären Sie, warum umweltfreundliches Leben wichtig ist.", "Nennen Sie Beispiele aus dem Alltag.", "Beschreiben Sie Schwierigkeiten.", "Formulieren Sie einen klaren Schluss."],
-    supportStructure: ["Einleitung", "Reaktion auf Ahmeds Meinung", "Argumente und Beispiele", "Schwierigkeiten oder Gegenargumente", "Eigene Meinung", "Schluss"],
-    vocabulary: ["umweltfreundlich leben", "Stofftaschen benutzen", "das Licht ausschalten", "öffentliche Verkehrsmittel", "Umweltschutz", "kleine Schritte machen"],
-  },
+  writing: getB1WritingTask(27),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",
