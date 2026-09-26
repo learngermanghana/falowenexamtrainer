@@ -31,11 +31,6 @@ const writingContent = <WorkbookTaskCard eyebrow="Teil 2 · Schreiben" title="Br
 
 
 
-const listeningQuestions = [
-  { stem:"Warum lernt der Sprecher Deutsch?", options:["A. Weil er nach Frankreich ziehen möchte.","B. Weil er in Deutschland arbeiten möchte.","C. Weil er eine deutsche Freundin hat.","D. Weil er Deutsch liebt."] },
-  { stem:"Welche Methoden benutzt der Sprecher?", options:["A. Nur Bücher","B. Nur Filme","C. Sprachkurse, Apps und Freunde","D. Nur Musik"] },
-  { stem:"Wie oft übt der Sprecher Deutsch?", options:["A. Jeden Tag eine Stunde.","B. Einmal pro Woche.","C. Einmal im Monat.","D. Nie."] }
-];
 
 export default function A2Day2PersonenBeschreibenWorkbookPage() {
   return <A2StandardTabbedWorkbookPage
@@ -47,8 +42,5 @@ export default function A2Day2PersonenBeschreibenWorkbookPage() {
     sprechenContent={speakingContent}
     schreibenContent={writingContent}
     schreibenPlaceholder={"Lieber Felix,\n\nich schreibe dir, weil ...\n\nMein Chef / Meine Chefin ist ... Er/Sie hat ... Er/Sie ist ...\n\nIch finde ...\n\nWie ist dein Chef / deine Chefin?\n\nViele Grüße\n[Dein Name]"}
-    hoerenTask="Sieh dir das eingebettete Video an und beantworte danach die drei Hörverstehen-Fragen."
-    hoerenAudioUrl="https://youtu.be/5ttnGcZWo-Q"
-    hoerenQuestions={listeningQuestions}
   />;
 }
