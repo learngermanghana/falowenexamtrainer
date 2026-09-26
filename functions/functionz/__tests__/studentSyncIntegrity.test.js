@@ -107,6 +107,18 @@ describe("student sync integrity", () => {
     expect(index).not.toContain("student.paidAmount, student.initialPaymentAmount");
   });
 
+  test("confirmed trial payment conversion cannot remain eligible for future purge", () => {
+    const paymentApp = readRepoFile("functions", "functionz", "paymentAwareApp.js");
+    const index = readRepoFile("functions", "index.js");
+
+    expect(paymentApp).toContain('trialStatus: "converted"');
+    expect(paymentApp).toContain('trialRetentionStatus: "converted"');
+    expect(paymentApp).toContain("trialPurgeAt: admin.firestore.FieldValue.delete()");
+    expect(paymentApp).toContain("trialConvertedAt");
+    expect(index).toContain('if (lifecycle.state === "converted")');
+    expect(index).toContain("continue;");
+  });
+
   test("Firestore student creation and updates both flow into the sheet upsert", () => {
     const index = readRepoFile("functions", "index.js");
 
@@ -129,6 +141,7 @@ describe("student sync integrity", () => {
       "student.trialStartedAt ||",
       "student.trialEndsAt ||",
       "student.trialPurgeAt ||",
+      "student.trialConvertedAt ||",
       "student.learningMode ||",
       "student.address ||",
       "student.emergencyContactPhone ||",
