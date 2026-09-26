@@ -11,6 +11,7 @@ import WritingTaskPrompt from "./WritingTaskPrompt";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import { AdvancedSelfLearningTabNav } from "./StandardWorkbookComponents";
 import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
+import { applyB2WritingTaskToLesson, getB2WritingTask } from "../data/b2WritingTasks";
 import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2ListeningPractice, hasB2ListeningSource } from "../data/b2ListeningPractice";
 import { getB2ReadingPractice } from "../data/b2ReadingPractice";
@@ -318,6 +319,21 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
   const navigate = useNavigate();
   const day = Number(lesson?.day || 0);
   const alignment = getB2LessonContentAlignment(day);
+  const writingTask = getB2WritingTask(day);
+  const writingLesson = useMemo(() => applyB2WritingTaskToLesson(lesson), [lesson]);
+  const writingConfig = useMemo(() => {
+    const config = getStandardWritingConfig(writingLesson);
+    if (!writingTask) return config;
+    return {
+      ...config,
+      minimumWords: writingTask.minimumWords,
+      targetWords: writingTask.minimumWords,
+      starterTemplate: writingTask.starterTemplate,
+      writingTaskType: writingTask.taskType,
+      writingTopic: writingTask.lead,
+      writingPromptBullets: [...writingTask.bullets],
+    };
+  }, [writingLesson, writingTask]);
   const skillFocus = getB2SkillFocus(day);
   const skillLabel = getB2SkillLabel(day);
   const listeningAvailable = hasB2ListeningSource(getB2ListeningPractice(day));
@@ -411,7 +427,7 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
     {active === "lesen" ? <ReadingPractice day={day} progress={progress} setProgress={setProgress} /> : null}
     {active === "hoeren" ? <ListeningPractice day={day} progress={progress} setProgress={setProgress} /> : null}
     {active === "speak" ? <Section title="Sprechen"><B2SpeakingSupportGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700 }}><input type="checkbox" checked={Boolean(progress.speakDone)} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />Ich habe die Sprechaufgabe abgeschlossen.</label></Section> : null}
-    {active === "write" ? <Section title="Schreiben"><WritingCheatSheetTabs level="B2" day={day}><WritingTaskPrompt lesson={lesson} /><GuidedWritingWorkspace config={getStandardWritingConfig(lesson)} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={({ complete }) => setProgress((old) => old.writeDone === Boolean(complete) ? old : ({ ...old, writeDone: Boolean(complete) }))} /></WritingCheatSheetTabs></Section> : null}
+    {active === "write" ? <Section title="Schreiben"><WritingCheatSheetTabs level="B2" day={day}><WritingTaskPrompt lesson={writingLesson} /><GuidedWritingWorkspace config={writingConfig} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={({ complete }) => setProgress((old) => old.writeDone === Boolean(complete) ? old : ({ ...old, writeDone: Boolean(complete) }))} /></WritingCheatSheetTabs></Section> : null}
     {active === "review" ? <Review day={day} alignment={alignment} lesson={lesson} skillLabel={skillLabel} ready={ready} progress={progress} /> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}
 
