@@ -10,6 +10,7 @@ import { styles } from "../styles";
 import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 import { addDay20WorkbookView } from "../utils/a1ChapterResourceHubState";
 import { buildA1TutorMarkedWorkbookHref, getA1AssignmentByDayAndChapter } from "../data/a1AssignmentRegistry";
+import { getA1GrammarRoute } from "../data/a1GrammarRoutes";
 
 const RADIO_COMPLETE_PARAM = "radio";
 const RADIO_COMPLETE_VALUE = "done";
@@ -54,6 +55,20 @@ export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" 
     const params = new URLSearchParams(search);
     const day = Number(match[1]);
     const chapter = params.get("chapter") || "";
+    const requestedView = String(params.get("view") || "").toLowerCase();
+
+    if (requestedView === "grammar") {
+      const grammarRoute = getA1GrammarRoute({ day, chapter });
+      if (grammarRoute) {
+        const destination = new URL(grammarRoute, "https://www.falowen.app");
+        params.delete("hub");
+        params.delete("chapter");
+        params.delete("view");
+        destination.searchParams.forEach((value, key) => params.set(key, value));
+        return `${destination.pathname}${buildCompletedRadioSearch(params.toString())}${destination.hash || hash || ""}`;
+      }
+    }
+
     const tutorAssignment = getA1AssignmentByDayAndChapter(day, chapter);
     if (tutorAssignment) {
       params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
