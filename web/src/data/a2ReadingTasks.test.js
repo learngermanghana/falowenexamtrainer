@@ -50,18 +50,20 @@ describe("A2 canonical Lesen tasks", () => {
     expect(A2_READING_TASKS[23].text).toMatch(/U-Bahn/);
   });
 
-  test("routes shared and custom workbooks through the canonical Lesen renderer", () => {
-    expect(readComponent("A2StandardTabbedWorkbookPage.js")).toContain("A2ReadingTaskPanel");
+  test("routes Days 12, 13, 14 and 17 through the shared canonical workbook shell", () => {
+    const shared = readComponent("A2StandardTabbedWorkbookPage.js");
+    expect(shared).toContain("A2ReadingTaskPanel");
 
     [
-      "A2Day12MeinTraumberufWorkbookPageLegacy.js",
-      "A2Day13VorstellungsgespraechWorkbookPageLegacy.js",
+      "A2Day12MeinTraumberufWorkbookPage.js",
+      "A2Day13VorstellungsgespraechWorkbookPage.js",
       "A2Day14BerufUndKarriereWorkbookPage.js",
       "A2Day17InDieApothekeGehenWorkbookPage.js",
     ].forEach((fileName) => {
       const source = readComponent(fileName);
-      expect(source).toContain('import A2ReadingTaskPanel from "./A2ReadingTaskPanel"');
-      expect(source).toMatch(/<A2ReadingTaskPanel day=\{(?:12|13|14|17)\}/);
+      expect(source).toContain('import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage"');
+      expect(source).toContain("<A2StandardTabbedWorkbookPage");
+      expect(source).not.toMatch(/WorkbookPageLegacy|useLayoutEffect|MutationObserver/);
     });
   });
 });
