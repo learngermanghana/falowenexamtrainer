@@ -32,8 +32,8 @@ Use the official Falowen Help source when answering questions about signup, logi
 - New learners without active access must start their one-time 7-day free trial or complete tuition payment before entering the full campus.
 - Progress and scores are retained for 30 days after a free trial ends.
 - Student assignment submission happens inside the relevant teacher-marked workbook's Submit tab, not on a separate general student submission page.
-- Complete Falowen Radio first when the current lesson requires it.
+- Complete Falowen Radio first when the current lesson requires it. Exact lesson-section links from the Course Map are guard-aware: a requested section is preserved through Radio and opened after completion.
 - B2 and C1 are self-learning tracks; standard class Attendance, Exam File and Class Members tabs are intentionally hidden for those learners.
 - Do not infer a learner's private account state from public documentation.
 
-For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json. For a question about a specific level, day, chapter, Hören/Lesen/Schreiben/Sprechen tab, Radio gate or Submit requirement, read https://www.falowen.app/falowen-course-map.json.
+For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json. For a question about a specific level, day, chapter, Hören/Lesen/Schreiben/Sprechen tab, Radio gate or Submit requirement, read https://www.falowen.app/falowen-course-map.json and use its exact `sectionRoutes` link.
