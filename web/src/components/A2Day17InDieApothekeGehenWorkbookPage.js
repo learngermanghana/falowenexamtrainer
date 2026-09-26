@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
@@ -242,27 +243,8 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
 
       {activeTab === "lesen" && (
         <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80"
-            alt="Reading exercise text on a desk with glasses"
-            loading="lazy"
-            style={imageStyle}
-          />
           <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
-          <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Submit answers through the Submit tab.
-          </p>
-
-          <h3 style={sectionTitle}>Essay</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Es war ein kalter Wintermorgen, als ich entschied, in die Apotheke zu gehen. Ich fühlte mich seit Tagen krank und wusste, dass ich etwas gegen meine Erkältung tun musste. Als ich in die Apotheke kam, begrüßte mich die Apothekerin freundlich. Ich erklärte ihr meine Symptome: Husten, Halsschmerzen und eine laufende Nase. Sie empfahl mir sofort einen Hustensaft und Tabletten gegen die Halsschmerzen. Außerdem gab sie mir Nasenspray.
-          </p>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Während sie die Medikamente holte, erzählte sie mir von verschiedenen Hausmitteln. Nachdem ich bezahlt hatte, gab sie mir noch einige Broschüren mit Tipps zur Gesundheit im Winter. Zu Hause nahm ich die empfohlenen Medikamente ein und nach einigen Stunden spürte ich eine Verbesserung.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          <QuestionList questions={lesenQuestions} />
+          <A2ReadingTaskPanel day={17} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
