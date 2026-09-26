@@ -5,7 +5,17 @@ describe("A1 Day 18 Kapitel 12.1 view routing", () => {
     expect(__TESTING__.hasWorkbookView({ search: "?view=workbook", state: null })).toBe(true);
   });
 
-  test("keeps the grammar notes without the workbook query", () => {
+  test("keeps the workbook mounted when the shared Grammar tab updates the URL", () => {
+    expect(
+      __TESTING__.hasWorkbookView({
+        search: "?view=grammar&workbookTab=grammar&assignmentKey=A1-12.1&level=A1",
+        state: null,
+      }),
+    ).toBe(true);
+  });
+
+  test("keeps the standalone grammar notes when Grammar is opened outside the workbook shell", () => {
+    expect(__TESTING__.hasWorkbookView({ search: "?view=grammar", state: null })).toBe(false);
     expect(__TESTING__.hasWorkbookView({ search: "", state: null })).toBe(false);
   });
 
