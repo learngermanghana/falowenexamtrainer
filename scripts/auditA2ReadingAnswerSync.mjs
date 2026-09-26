@@ -7,7 +7,7 @@ import vm from "node:vm";
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const COMPONENTS_DIR = path.join(ROOT, "web", "src", "components");
 const MANIFEST_PATH = path.join(ROOT, "functions", "data", "answerKeyManifest.json");
-const liveSheets = !process.argv.includes("--no-live-sheets");
+const liveSheets = process.argv.includes("--live-sheets");
 
 const read = (file) => fs.readFileSync(file, "utf8");
 
@@ -385,6 +385,6 @@ if (failures.length) {
 
 console.log(
   liveSheets
-    ? "PASS Falowen Lesen pages, GitHub answer manifest, and Google Sheets are synchronized."
+    ? "PASS Falowen Lesen pages, GitHub answer manifest, and publicly reachable Google Sheets are synchronized."
     : "PASS Falowen Lesen pages and GitHub answer manifest are synchronized (live Sheets check skipped).",
 );
