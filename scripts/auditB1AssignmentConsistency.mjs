@@ -109,8 +109,8 @@ const extractConfigChapter = (combinedSource) =>
 
 const CUSTOM_BASELINE_DAYS = new Set();
 const LEGACY_PROXY_BASELINE_DAYS = new Set();
-const DOM_PATCH_BASELINE_DAYS = new Set([21]);
-const PLANNED_BASELINE_COUNTS = new Map([[23, 1]]);
+const DOM_PATCH_BASELINE_DAYS = new Set();
+const PLANNED_BASELINE_COUNTS = new Map();
 
 const liveRows = [];
 
@@ -278,7 +278,7 @@ for (const day of expectedDays) {
 }
 
 const missingDeepGrammar = expectedDays.filter((day) => !deepGrammarDays.has(day));
-const expectedMissingDeepGrammar = [24, 25, 26, 27, 28];
+const expectedMissingDeepGrammar = [];
 const unexpectedMissingDeepGrammar = missingDeepGrammar.filter(
   (day) => !expectedMissingDeepGrammar.includes(day),
 );
