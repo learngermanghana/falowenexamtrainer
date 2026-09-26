@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { styles } from "../styles";
@@ -62,27 +63,11 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-const B1Day2FreundeFuersLebenWorkbookPage = () => {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
-
+const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 2 · Kapitel 1.2</span>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Freunde fürs Leben – Workbook</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4 below. Each section begins with the exact question or assignment you must complete.
-        </p>
-        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80" alt="Friends together for a B1 workbook about lifelong friendship" loading="lazy" style={tabImageStyle} />
-        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 2 workbook sections" />
-      </div>
-
-      <A2B1WorkbookGuidance level="B1" />
-
-      {activeTab === "sprechen" && (
+    <>
+{activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <WorkbookTaskCard
@@ -118,7 +103,7 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
         </section>
       )}
 
-      {activeTab === "schreiben" && (
+{activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
@@ -140,7 +125,7 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
         </section>
       )}
 
-      {activeTab === "lesen" && (
+{activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
@@ -168,7 +153,7 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+{activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard
@@ -187,26 +172,21 @@ const B1Day2FreundeFuersLebenWorkbookPage = () => {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day2FreundeFuersLeben", level: "B1", day: 2, workbookId: "B1Day2FreundeFuersLeben" }} workbookId="B1Day2FreundeFuersLeben" />
-      )}
-
-      {activeTab === "submit" && (
-        <section style={card}>
-          <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
-            <p style={{ margin: 0 }}>Paste your final email, seven reading answer letters and five listening answer letters into the form below.</p>
-          </WorkbookTaskCard>
-          <div className="b1-day2-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day2-submission-page > div > section:first-child { display: none !important; }
-            .b1-day2-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 2, assignmentKey: "B1-1.2", canonicalAssignmentKey: "B1-1.2" }} />
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
 };
 
-export default B1Day2FreundeFuersLebenWorkbookPage;
+const config = {
+  day: 2,
+  chapter: "1.2",
+  assignmentKey: "B1-1.2",
+  workbookId: "B1Day2FreundeFuersLeben",
+  title: "Freunde fürs Leben",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 2 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day2FreundeFuersLebenWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day2PreservedSections} />;
+}

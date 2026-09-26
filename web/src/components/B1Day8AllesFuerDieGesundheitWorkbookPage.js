@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -17,23 +18,11 @@ const box = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 13, backgr
 const QuestionList = ({ items }) => <div style={{ display: "grid", gap: 10 }}>{items.map((item) => <div key={item.stem} style={box}><strong>{item.stem}</strong>{item.options.map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 const Prepared = ({ checked, onChange }) => <label style={{ display: "inline-flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={checked} onChange={onChange} /> I prepared this part.</label>;
 
-export default function B1Day8AllesFuerDieGesundheitWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const mark = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
-
-  return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-    <header style={card}>
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 8 · Kapitel 3.8</span>
-      <h1 style={{ ...styles.title, margin: 0 }}>Alles für die Gesundheit</h1>
-      <p style={{ ...styles.subtitle, margin: 0 }}>Select Teil 1–4, Ref or Submit. Each tab begins with the exact task and preparation instructions.</p>
-      <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 8 workbook sections" />
-    </header>
-
-    <A2B1WorkbookGuidance level="B1" />
-
-    {activeTab === "sprechen" && <section style={card}>
+const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
+  return (
+    <>
+      {activeTab === "sprechen" && <section style={card}>
       <h2 style={title}>Teil 1 · Sprechen (Class Preparation)</h2>
       <WorkbookTaskCard eyebrow="Question of the Day · Speaking" title="Wie wichtig ist eine gesunde Lebensweise für dich?" practiceOnly submissionNote="Speak for 1–2 minutes. Teil 1 is class preparation and is not submitted.">
         <p style={{ margin: 0 }}>Diskutieren Sie, was Sie tun, um fit und gesund zu bleiben. Sprechen Sie über Ernährung, Sport, Stress und Arztbesuche. Nutzen Sie Modalverben und Redemittel wie „Man sollte ...“, „Ich glaube, dass ...“ und „Meiner Meinung nach ...“.</p>
@@ -76,9 +65,21 @@ export default function B1Day8AllesFuerDieGesundheitWorkbookPage() {
       <WorkbookSubmissionReminder />
       <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
     </section>}
+    </>
+  );
+};
 
-    {activeTab === "references" && <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day8AllesFuerDieGesundheit", level: "B1", day: 8, workbookId: "B1Day8AllesFuerDieGesundheit" }} workbookId="B1Day8AllesFuerDieGesundheit" />}
+const config = {
+  day: 8,
+  chapter: "3.8",
+  assignmentKey: "B1-3.8",
+  workbookId: "B1Day8AllesFuerDieGesundheit",
+  title: "Alles für die Gesundheit",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 8 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
 
-    {activeTab === "submit" && <section style={card}><h2 style={title}>Submit workbook answers</h2><WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1."><p style={{ margin: 0 }}>Paste your final writing text, reading answer letters and listening answer letters into the form below.</p></WorkbookTaskCard><div className="b1-day8-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}><style>{`.b1-day8-submission-page > div > section:first-child { display: none !important; }.b1-day8-submission-page select { display: none !important; }`}</style><AssignmentSubmissionPage submissionContext={{ level: "B1", day: 8, assignmentKey: "B1-3.8", canonicalAssignmentKey: "B1-3.8" }} /></div></section>}
-  </div>;
+export default function B1Day8AllesFuerDieGesundheitWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day8PreservedSections} />;
 }

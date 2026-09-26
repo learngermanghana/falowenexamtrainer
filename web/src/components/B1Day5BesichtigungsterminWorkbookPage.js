@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -92,34 +93,10 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-export default function B1Day5BesichtigungsterminWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const setPreparedFor = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
-
+const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 5 · Kapitel 2.5</span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Der Besichtigungstermin – Workbook</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4 below. Each section begins with the exact question or assignment you must complete.
-        </p>
-        <img
-          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80"
-          alt="Wohnungsbesichtigung und Terminplanung"
-          loading="lazy"
-          style={{ width: "100%", borderRadius: 14, maxHeight: 290, objectFit: "cover" }}
-        />
-        <NoteBox>
-          <strong>Grammar focus:</strong> höfliche Terminvereinbarung mit <em>könnte, würde, wäre</em> und indirekten Fragen mit <em>ob, wann, wo</em> und <em>wie</em>.
-        </NoteBox>
-        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 5 workbook sections" />
-      </div>
-
-      <A2B1WorkbookGuidance level="B1" />
-
+    <>
       {activeTab === "sprechen" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
@@ -247,28 +224,21 @@ export default function B1Day5BesichtigungsterminWorkbookPage() {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       ) : null}
-
-      {activeTab === "references" ? (
-        <WorkbookReferenceAnswers
-          level="B1"
-          lesson={{ title: "B1Day5Besichtigungstermin", level: "B1", day: 5, workbookId: "B1Day5Besichtigungstermin" }}
-          workbookId="B1Day5Besichtigungstermin"
-        />
-      ) : null}
-
-      {activeTab === "submit" ? (
-        <section style={card}>
-          <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
-            <p style={{ margin: 0 }}>Paste your final email, seven reading answer letters and five listening answer letters into the form below.</p>
-          </WorkbookTaskCard>
-          <div className="b1-day5-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day5-submission-page > div > section:first-child { display: none !important; }
-            .b1-day5-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 5, assignmentKey: "B1-2.5", canonicalAssignmentKey: "B1-2.5" }} />
-          </div>
-        </section>
-      ) : null}
-    </div>
+    </>
   );
+};
+
+const config = {
+  day: 5,
+  chapter: "2.5",
+  assignmentKey: "B1-2.5",
+  workbookId: "B1Day5Besichtigungstermin",
+  title: "Der Besichtigungstermin",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 5 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day5BesichtigungsterminWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day5PreservedSections} />;
 }

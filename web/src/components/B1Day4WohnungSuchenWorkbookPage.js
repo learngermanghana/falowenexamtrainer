@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
@@ -79,29 +80,10 @@ const PreparedCheckbox = ({ checked, onChange }) => (
   </label>
 );
 
-export default function B1Day4WohnungSuchenWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const setPreparedFor = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
-
+const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 4 · Kapitel 2.4</span>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Wohnung suchen – Workbook</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4 below. Each section begins with the exact question or assignment you must complete.
-        </p>
-        <img src="https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1600&q=80" alt="Wohnungen in einer Großstadt" loading="lazy" style={imageStyle} />
-        <NoteBox>
-          <strong>Grammar focus:</strong> sowohl … als auch, nicht nur … sondern auch, zwar … aber, einerseits … andererseits, entweder … oder und weder … noch.
-        </NoteBox>
-        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 4 workbook sections" />
-      </div>
-
-      <A2B1WorkbookGuidance level="B1" />
-
+    <>
       {activeTab === "sprechen" ? (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
@@ -219,24 +201,21 @@ export default function B1Day4WohnungSuchenWorkbookPage() {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       ) : null}
-
-      {activeTab === "references" ? (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day4WohnungSuchen", level: "B1", day: 4, workbookId: "B1Day4WohnungSuchen" }} workbookId="B1Day4WohnungSuchen" />
-      ) : null}
-
-      {activeTab === "submit" ? (
-        <section style={card}>
-          <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
-            <p style={{ margin: 0 }}>Paste your final opinion text, five reading answer letters and five listening answer letters into the form below.</p>
-          </WorkbookTaskCard>
-          <div className="b1-day4-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day4-submission-page > div > section:first-child { display: none !important; }
-            .b1-day4-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 4, assignmentKey: "B1-2.4", canonicalAssignmentKey: "B1-2.4" }} />
-          </div>
-        </section>
-      ) : null}
-    </div>
+    </>
   );
+};
+
+const config = {
+  day: 4,
+  chapter: "2.4",
+  assignmentKey: "B1-2.4",
+  workbookId: "B1Day4WohnungSuchen",
+  title: "Wohnung suchen",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 4 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day4WohnungSuchenWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day4PreservedSections} />;
 }

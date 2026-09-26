@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -82,24 +83,11 @@ const murtenQuestions = [
   { number: 6, stem: "Der Geschäftsführer von Murten Tourismus will, dass ...", options: ["a) es in Murten mehr Stadtführungen für Gruppen gibt.", "b) die Leute normale Velos statt Elektro-Velos benutzen.", "c) mehr Velo-Touristen in die Region kommen."] },
 ];
 
-export default function B1Day19VorstellungsgespraechWorkbookPage() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const mark = (key) => (event) => setPrepared((old) => ({ ...old, [key]: event.target.checked }));
-
+const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 19 · Kapitel 6.19</span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Das Vorstellungsgespräch</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Select Teil 1–4, Ref or Submit. Teil 1 prepares you for class; submit only Teil 2, Teil 3 and Teil 4.</p>
-        <WorkbookTabNav activeTab={activeTab} onChange={setActiveTab} tabs={STANDARD_WORKBOOK_TABS} ariaLabel="B1 Day 19 workbook sections" />
-      </header>
-
-      <A2B1WorkbookGuidance level="B1" />
-
-      {activeTab === "sprechen" && (
+    <>
+{activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={title}>Teil 1 · Sprechen (Group Practice)</h2>
           <WorkbookTaskCard eyebrow="Question of the Day · Speaking" title="Wie bereitest du dich auf ein Vorstellungsgespräch vor?" practiceOnly submissionNote="Speak for 1–2 minutes. Teil 1 is class preparation and is not submitted.">
@@ -120,7 +108,7 @@ export default function B1Day19VorstellungsgespraechWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "schreiben" && (
+{activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Writing" title="Sind Vorstellungsgespräche schwierig? Schreiben Sie Ihre Meinung." submissionNote="Write about 80 words and submit your final text in the Submit tab.">
@@ -136,7 +124,7 @@ export default function B1Day19VorstellungsgespraechWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "lesen" && (
+{activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie 3 Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C.">
@@ -158,7 +146,7 @@ export default function B1Day19VorstellungsgespraechWorkbookPage() {
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+{activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Kein Hören-Medium wurde geliefert: Bearbeiten Sie den zweiten Lesetext als Teil 4." submissionNote="Submit only answer letters, for example: 4B, 5B, 6C.">
@@ -178,23 +166,21 @@ export default function B1Day19VorstellungsgespraechWorkbookPage() {
           <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
         </section>
       )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers level="B1" lesson={{ title: "B1Day19Vorstellungsgespraech", level: "B1", day: 19, workbookId: "B1Day19Vorstellungsgespraech" }} workbookId="B1Day19Vorstellungsgespraech" />
-      )}
-
-      {activeTab === "submit" && (
-        <section style={card}>
-          <h2 style={title}>Submit workbook answers</h2>
-          <WorkbookTaskCard eyebrow="Final step" title="Submit Teil 2, Teil 3 and Teil 4." submissionNote="Do not submit Teil 1.">
-            <p style={{ margin: 0 }}>Paste your writing text from Teil 2, your reading answers from Teil 3 and your Teil 4 answer letters into the form below.</p>
-          </WorkbookTaskCard>
-          <div className="b1-day19-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day19-submission-page > div > section:first-child { display: none !important; }.b1-day19-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage submissionContext={{ level: "B1", day: 19, assignmentKey: "B1-6.19", canonicalAssignmentKey: "B1-6.19" }} />
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
+};
+
+const config = {
+  day: 19,
+  chapter: "6.19",
+  assignmentKey: "B1-6.19",
+  workbookId: "B1Day19Vorstellungsgespraech",
+  title: "Vorstellungsgespräch",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 19 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day19VorstellungsgespraechWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day19PreservedSections} />;
 }
