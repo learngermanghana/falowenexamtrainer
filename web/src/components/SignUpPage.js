@@ -51,27 +51,6 @@ const MOBILE_INPUT_CSS = `
     box-shadow: 0 0 0 1000px #ffffff inset !important;
   }
 
-  .signup-password-visibility {
-    position: fixed;
-    right: 14px;
-    bottom: calc(14px + env(safe-area-inset-bottom));
-    z-index: 40;
-    border: 1px solid #bfdbfe;
-    border-radius: 999px;
-    background: #ffffff;
-    color: #1d4ed8;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-    padding: 10px 14px;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-
-  .signup-password-visibility:focus-visible {
-    outline: 3px solid rgba(37, 99, 235, 0.28);
-    outline-offset: 2px;
-  }
 `;
 
 const slugify = (value) =>
@@ -115,7 +94,7 @@ const setAttributes = (element, attributes = {}) => {
   });
 };
 
-const applyMobileFieldEnhancements = (form, { showPasswords = false } = {}) => {
+const applyMobileFieldEnhancements = (form) => {
   if (!form) return;
   form.setAttribute("autocomplete", "on");
 
@@ -141,7 +120,6 @@ const applyMobileFieldEnhancements = (form, { showPasswords = false } = {}) => {
     form.querySelectorAll('input[autocomplete="new-password"]')
   );
   passwordInputs.forEach((input, index) => {
-    input.type = showPasswords ? "text" : "password";
     setAttributes(input, {
       name: index === 0 ? "password" : "confirmPassword",
       autocapitalize: "none",
@@ -298,10 +276,7 @@ export default function SignUpPage(props) {
   const rootRef = useRef(null);
   const restoredRef = useRef(false);
   const createdRef = useRef(false);
-  const showPasswordsRef = useRef(false);
   const [mount, setMount] = useState(null);
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [passwordFieldActive, setPasswordFieldActive] = useState(false);
   const [draft, setDraft] = useState(() =>
     typeof window === "undefined" ? null : readDraft()
   );
@@ -327,15 +302,12 @@ export default function SignUpPage(props) {
     if (!root) return undefined;
 
     let draftSaveTimer = null;
-    let focusTimer = null;
 
     const sync = () => {
       const form = root.querySelector("form");
       if (!form) return;
 
-      applyMobileFieldEnhancements(form, {
-        showPasswords: showPasswordsRef.current,
-      });
+      applyMobileFieldEnhancements(form);
 
       let target = document.getElementById(MOUNT_ID);
       if (!target) {
@@ -415,69 +387,28 @@ export default function SignUpPage(props) {
       }).catch(() => {});
     };
 
-    const isPasswordInput = (element) =>
-      element?.matches?.('input[autocomplete="new-password"]');
-
-    const handleFocusIn = (event) => {
-      if (isPasswordInput(event.target)) {
-        window.clearTimeout(focusTimer);
-        setPasswordFieldActive(true);
-      }
-    };
-
-    const handleFocusOut = () => {
-      window.clearTimeout(focusTimer);
-      focusTimer = window.setTimeout(() => {
-        setPasswordFieldActive(isPasswordInput(document.activeElement));
-      }, 80);
-    };
 
     // Do not update React parent state during the native input event. On mobile,
     // doing so can reset controlled fields before the keyboard composition finishes.
     root.addEventListener("input", queueDraftSave);
     root.addEventListener("change", queueDraftSave);
     root.addEventListener("submit", handleSubmit, true);
-    root.addEventListener("focusin", handleFocusIn);
-    root.addEventListener("focusout", handleFocusOut);
 
     return () => {
       observer.disconnect();
       window.clearTimeout(draftSaveTimer);
-      window.clearTimeout(focusTimer);
       root.removeEventListener("input", queueDraftSave);
       root.removeEventListener("change", queueDraftSave);
       root.removeEventListener("submit", handleSubmit, true);
-      root.removeEventListener("focusin", handleFocusIn);
-      root.removeEventListener("focusout", handleFocusOut);
       document.getElementById(MOUNT_ID)?.remove();
     };
   }, []);
-
-  const togglePasswordVisibility = () => {
-    const next = !showPasswordsRef.current;
-    showPasswordsRef.current = next;
-    setShowPasswords(next);
-    applyMobileFieldEnhancements(rootRef.current?.querySelector("form"), {
-      showPasswords: next,
-    });
-  };
 
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
       <SignUpPageLegacy {...props} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} />, mount) : null}
-      {passwordFieldActive ? (
-        <button
-          type="button"
-          className="signup-password-visibility"
-          aria-pressed={showPasswords}
-          onPointerDown={(event) => event.preventDefault()}
-          onClick={togglePasswordVisibility}
-        >
-          {showPasswords ? "Hide passwords" : "Show passwords"}
-        </button>
-      ) : null}
     </div>
   );
 }
