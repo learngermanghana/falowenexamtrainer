@@ -19,10 +19,10 @@ const questionCard = {
   gap: 6,
 };
 
-const A2ReadingTaskPanel = ({ day, fallbackText = "", fallbackQuestions = [] }) => {
+const A2ReadingTaskPanel = ({ day }) => {
   const task = getA2ReadingTask(day);
-  const text = task?.text || fallbackText;
-  const questions = task?.questions || fallbackQuestions;
+  const text = task?.text || "";
+  const questions = task?.questions || [];
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
