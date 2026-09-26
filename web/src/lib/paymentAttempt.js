@@ -1,4 +1,5 @@
 const PREFIX = "falowen:payment-attempt";
+const MAX_ATTEMPT_AGE_MS = 24 * 60 * 60 * 1000;
 
 const identityFor = (studentProfile = {}) =>
   studentProfile?.studentCode ||
@@ -26,7 +27,13 @@ export const getPaymentAttempt = (studentProfile = {}) => {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : null;
+    if (!parsed || typeof parsed !== "object") return null;
+    const startedAtMs = new Date(parsed.startedAt || "").getTime();
+    if (Number.isFinite(startedAtMs) && Date.now() - startedAtMs > MAX_ATTEMPT_AGE_MS) {
+      window.localStorage.removeItem(paymentAttemptKey(studentProfile));
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
