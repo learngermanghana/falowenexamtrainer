@@ -30,50 +30,6 @@ export default function A2Day8RezepteUndEssenWorkbookPage() {
       showSpeakingTaskCard={false}
       schreibenTask="Sie möchten einen Tisch in einem Restaurant reservieren. Schreiben Sie eine E-Mail an das Restaurant."
       schreibenContent={schreibenContent}
-      hoerenTask="Sieh dir das eingebettete Video zum Thema Rezepte und Essen an. Achte auf den Tag, die Zutaten, den Ort und das Gericht. Submitte deine Antwortbuchstaben im Submit-Tab."
-      hoerenAudioUrl="https://youtu.be/mYh4DRaaWSY"
-      hoerenQuestions={[
-        {
-          stem: "Wann gehen die Personen einkaufen oder kochen zusammen?",
-          options: [
-            "a) Montag",
-            "b) Samstag",
-            "c) Mittwoch",
-          ],
-        },
-        {
-          stem: "Was kaufen sie?",
-          options: [
-            "a) Fleisch und Fisch",
-            "b) Obst und Gemüse",
-            "c) Brot und Käse",
-          ],
-        },
-        {
-          stem: "Welche Zutat wird im Hörtext genannt?",
-          options: [
-            "a) Reis",
-            "b) Mozzarella",
-            "c) Kartoffeln",
-          ],
-        },
-        {
-          stem: "Was machen sie danach?",
-          options: [
-            "a) Sie gehen ins Kino",
-            "b) Sie gehen in ein Café",
-            "c) Sie gehen in die Schule",
-          ],
-        },
-        {
-          stem: "Welches Gericht wird genannt?",
-          options: [
-            "a) Gemüselasagne",
-            "b) Bratwurst mit Sauerkraut",
-            "c) Fischsuppe",
-          ],
-        },
-      ]}
     />
   );
 }
