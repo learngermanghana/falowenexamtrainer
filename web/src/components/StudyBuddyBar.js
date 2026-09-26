@@ -102,6 +102,16 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [learnerSupportState, setLearnerSupportState] = useState(null);
   const [learnerSupportError, setLearnerSupportError] = useState("");
   const [isLearnerSupportLoading, setIsLearnerSupportLoading] = useState(false);
+  const dailyLearningPlanItems = useMemo(
+    () => (Array.isArray(learnerSupportState?.learningPlan?.items)
+      ? learnerSupportState.learningPlan.items.filter((item) => item?.title).slice(0, 3)
+      : []),
+    [learnerSupportState?.learningPlan?.items],
+  );
+  const primaryLearningPlanItem =
+    learnerSupportState?.learningPlan?.primaryAction ||
+    dailyLearningPlanItems[0] ||
+    null;
 
   const trackStudyBuddyEvent = useCallback(
     (event, metadata = {}) =>
@@ -325,6 +335,34 @@ const StudyBuddyBar = ({ studentProfile }) => {
       isMounted = false;
     };
   }, [className, idToken, resolvedLevel, studentCode, studentEmail]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!idToken) {
+      setLearnerSupportState(null);
+      return undefined;
+    }
+
+    const route =
+      typeof window !== "undefined"
+        ? `${window.location.pathname || ""}${window.location.search || ""}`
+        : "";
+
+    fetchLearnerSupportState({ idToken, route })
+      .then((response) => {
+        if (!mounted) return;
+        setLearnerSupportState(response || null);
+        setLearnerSupportError("");
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setLearnerSupportState(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [idToken]);
 
   useEffect(() => {
     setCompletedPlanItems(readStoredPlanState(planStorageKey));
@@ -781,33 +819,67 @@ const StudyBuddyBar = ({ studentProfile }) => {
           </div>
 
           <div className="study-buddy-insight study-buddy-next-up">
-            <p className="study-buddy-label">{t("studyBuddy.insights.nextUp")}</p>
+            <p className="study-buddy-label">
+              {learnerSupportState?.learningPlan?.title || t("studyBuddy.insights.nextUp")}
+            </p>
             <div className="study-buddy-value">
               {isLearnerSupportLoading
                 ? "Checking your Falowen progress…"
-                : learnerSupportState?.nextAction?.label || primarySuggestion}
+                : primaryLearningPlanItem?.title ||
+                  learnerSupportState?.nextAction?.label ||
+                  primarySuggestion}
             </div>
-            {learnerSupportState?.nextAction?.reason ? (
+            {primaryLearningPlanItem?.helper ? (
+              <div className="study-buddy-next-reason">{primaryLearningPlanItem.helper}</div>
+            ) : learnerSupportState?.nextAction?.reason ? (
               <div className="study-buddy-next-reason">
                 {learnerSupportState.nextAction.reason.replace(/_/g, " ")}
               </div>
             ) : null}
-            {learnerSupportState?.nextAction?.url ? (
+            {primaryLearningPlanItem?.url || learnerSupportState?.nextAction?.url ? (
               <button
                 type="button"
                 className="study-buddy-next-action-button"
                 onClick={() => {
-                  const destination = learnerSupportState.nextAction.url;
+                  const selectedAction = primaryLearningPlanItem || learnerSupportState?.nextAction;
+                  const destination = selectedAction?.url;
+                  if (!destination) return;
                   trackStudyBuddyEvent("next_action_open", {
                     destination,
-                    actionType: learnerSupportState.nextAction.type || "",
+                    actionType: selectedAction?.type || "",
+                    planItemId: selectedAction?.id || "",
                   });
                   triggerInteractionFeedback({ sound: "open" });
                   navigate(destination);
                 }}
               >
-                Continue
+                {primaryLearningPlanItem?.actionLabel || "Continue"}
               </button>
+            ) : null}
+            {dailyLearningPlanItems.length > 1 ? (
+              <ol className="study-buddy-daily-plan">
+                {dailyLearningPlanItems.slice(1).map((item) => (
+                  <li key={item.id || item.title}>
+                    <span>{item.title}</span>
+                    {item.url ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          trackStudyBuddyEvent("next_action_open", {
+                            destination: item.url,
+                            actionType: item.type || "",
+                            planItemId: item.id || "",
+                          });
+                          triggerInteractionFeedback({ sound: "open" });
+                          navigate(item.url);
+                        }}
+                      >
+                        {item.actionLabel || "Open"}
+                      </button>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
             ) : null}
             {learnerSupportError ? (
               <div className="study-buddy-next-error" role="alert">{learnerSupportError}</div>
