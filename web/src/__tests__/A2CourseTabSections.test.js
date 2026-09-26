@@ -60,6 +60,15 @@ test("presents one A2 course as A2.1 Days 1-14 and A2.2 Days 15-28", () => {
   expect(within(second).getByRole("heading", { name: "Welcome to A2.2" })).toBeInTheDocument();
 });
 
+test("shows Day 29 as a separate A2 exam-orientation section", () => {
+  render(<CourseTab defaultLevel="A2" />);
+
+  const orientation = sectionByTitle("A2 Exam Orientation");
+  expect(orientation).toBeTruthy();
+  expect(cardDays(orientation)).toEqual([29]);
+  expect(within(orientation).getByText(/Goethe A2 Exam Orientation/i)).toBeInTheDocument();
+});
+
 test("keeps Day 15 on its existing A2 identity and chapter route", () => {
   render(<CourseTab defaultLevel="A2" />);
   const second = sectionByTitle("A2.2 – Independent Communication");
