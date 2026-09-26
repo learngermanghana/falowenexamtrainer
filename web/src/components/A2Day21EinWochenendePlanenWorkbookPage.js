@@ -37,10 +37,6 @@ export default function A2Day21EinWochenendePlanenWorkbookPage() {
       schreibenTask="Einladung zu einem gemeinsamen Wochenende"
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Liebe/r ...,\n\nich möchte dich zu einem gemeinsamen Wochenende einladen ..."
-      hoerenTask="Dies ist eine separate Goethe-Hören-Übung für Teil 4. Hören Sie den Test aufmerksam und kontrollieren Sie Ihre Antworten anschließend mit der Lösung im Video. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht Teil 4."
-      hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"
-      hoerenQuestions={[]}
-      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
