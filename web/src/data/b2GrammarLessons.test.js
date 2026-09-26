@@ -27,6 +27,24 @@ describe("B2 grammar content coverage", () => {
     });
   });
 
+  test("updated B2 topics use grammar with a clear communicative purpose", () => {
+    expect(getB2GrammarLesson(5).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["während / wohingegen", "je ... desto", "Konjunktiv II"]),
+    );
+    expect(getB2GrammarLesson(6).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["Passiv", "Modalpassiv", "falls / sofern", "wodurch / sodass"]),
+    );
+    expect(getB2GrammarLesson(8).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["um ... zu / damit", "Passiv", "Modalpassiv", "Nominalisierung"]),
+    );
+    expect(getB2GrammarLesson(18).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["je ... desto", "Passiv", "Modalpassiv", "Nominalisierung"]),
+    );
+    expect(getB2GrammarLesson(21).focuses.map((item) => item.title)).toEqual(
+      expect.arrayContaining(["falls / sofern", "Passiv", "Modalpassiv", "Konjunktiv II", "indem / dadurch, dass"]),
+    );
+  });
+
   test("representative days teach the structures named by the curriculum", () => {
     expect(getB2GrammarLesson(2).focuses.map((item) => item.title)).toEqual(
       expect.arrayContaining(["Passiv", "Modalpassiv", "Nominalisierung"]),
