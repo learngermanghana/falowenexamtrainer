@@ -6,11 +6,21 @@ import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";
 const hasWorkbookView = (location) => {
   const routerSearch = String(location?.search || "");
   const browserSearch = typeof window !== "undefined" ? String(window.location?.search || "") : "";
-  const routerView = new URLSearchParams(routerSearch).get("view");
-  const browserView = new URLSearchParams(browserSearch).get("view");
+  const routerParams = new URLSearchParams(routerSearch);
+  const browserParams = new URLSearchParams(browserSearch);
+  const routerView = routerParams.get("view");
+  const browserView = browserParams.get("view");
+  const routerWorkbookTab = routerParams.get("workbookTab");
+  const browserWorkbookTab = browserParams.get("workbookTab");
   const stateView = String(location?.state?.view || location?.state?.resourceView || "").toLowerCase();
 
-  return routerView === "workbook" || browserView === "workbook" || stateView === "workbook";
+  return (
+    routerView === "workbook"
+    || browserView === "workbook"
+    || Boolean(routerWorkbookTab)
+    || Boolean(browserWorkbookTab)
+    || stateView === "workbook"
+  );
 };
 
 const TwoCasePrepositionsPage = () => {
