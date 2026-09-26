@@ -24,36 +24,7 @@ const speakingContent = <>
   </WorkbookTaskCard>
 </>;
 
-const lesenText = `Gefühle im Alltag
 
-Am Montag hatte Leila eine wichtige Deutschprüfung. Vor der Prüfung war sie sehr nervös, weil sie Angst vor schwierigen Aufgaben hatte. Ihre Freundin erinnerte sie daran, ruhig zu atmen und zuerst die einfachen Fragen zu beantworten. Nach der Prüfung fühlte Leila sich erleichtert.
-
-Am Mittwoch bekam sie die Nachricht, dass sie die Prüfung bestanden hatte. Sie war überrascht und sehr stolz auf sich. Am Abend rief sie ihre Familie an, weil sie die gute Nachricht teilen wollte.
-
-Am Freitag hatte Leila einen kleinen Streit mit einer Kollegin. Zuerst war sie wütend und enttäuscht. Später sprachen beide ruhig miteinander und erklärten, was passiert war. Danach fühlte Leila sich wieder besser. Sie merkte, dass offene Gespräche ihr helfen, schwierige Gefühle zu verstehen.`;
-
-const lesenQuestions = [
-  {
-    stem: "Warum war Leila vor der Prüfung nervös?",
-    options: ["A) Sie hatte Angst vor schwierigen Aufgaben.", "B) Sie hatte die Prüfung schon bestanden.", "C) Sie wollte nicht lernen.", "D) Sie war im Urlaub."],
-  },
-  {
-    stem: "Was empfahl ihre Freundin?",
-    options: ["A) Ruhig atmen und zuerst einfache Fragen beantworten", "B) Die Prüfung verlassen", "C) Nicht antworten", "D) Sofort die Familie anrufen"],
-  },
-  {
-    stem: "Wie fühlte Leila sich nach der Prüfung?",
-    options: ["A) Erleichtert", "B) Einsam", "C) Wütend", "D) Gelangweilt"],
-  },
-  {
-    stem: "Wie reagierte Leila auf die Nachricht, dass sie bestanden hatte?",
-    options: ["A) Sie war überrascht und stolz.", "B) Sie war traurig.", "C) Sie war enttäuscht.", "D) Sie war gleichgültig."],
-  },
-  {
-    stem: "Was half Leila nach dem Streit?",
-    options: ["A) Ein ruhiges Gespräch", "B) Mehr Streit", "C) Die Arbeit verlassen", "D) Niemandem zuhören"],
-  },
-];
 
 export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() {
   return (
@@ -66,8 +37,6 @@ export default function A2Day26GefuehleInVerschiedenenSituationenWorkbookPage() 
       sprechenContent={speakingContent}
       schreibenTask="Ihr Nachbar hat Ihnen geholfen, als Sie krank waren. Schreiben Sie eine kurze Dankesnachricht. Bedanken Sie sich, erklären Sie, wie Sie sich durch die Hilfe gefühlt haben, und bieten Sie an, sich zu revanchieren."
       schreibenPlaceholder="Liebe/r ...,\n\nvielen Dank für deine Hilfe. Ich war sehr ..."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
       hoerenAudioUrl="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5"
       hoerenQuestions={[]}
