@@ -8,6 +8,7 @@ describe("A2 Day 29 Goethe exam orientation", () => {
   const schedule = read("../data/courseSchedule.js");
   const app = read("../App.js");
   const completionJourney = read("../data/courseCompletionJourney.js");
+  const lifecyclePatch = read("../../scripts/patchA2CompletionAndDay0ClassParticipation.mjs");
 
   test("uses Day 29 for official Goethe A2 exam orientation", () => {
     expect(schedule).toContain('day: 29');
@@ -35,6 +36,12 @@ describe("A2 Day 29 Goethe exam orientation", () => {
     });
     expect((page.match(/duration: "30 Min\."/g) || [])).toHaveLength(3);
     expect(page).toContain('duration: "ca. 15 Min."');
+  });
+
+  test("keeps lifecycle normalization aligned with the Day 30 completion milestone", () => {
+    expect(lifecyclePatch).toContain('day: 30,\\n    topic: "Course Completed!"');
+    expect(lifecyclePatch).toContain("A2 Day 30 completion milestone");
+    expect(lifecyclePatch).not.toContain("A2 Day 29 completion milestone is missing");
   });
 
   test("registers a direct in-app route without a workbook radio gate", () => {
