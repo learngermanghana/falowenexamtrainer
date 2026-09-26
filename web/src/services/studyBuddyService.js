@@ -1,6 +1,7 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 import { getStudyBuddyLessonContext } from "./studyBuddyLessonContext";
+import { fetchLearnerSupportState } from "./learnerSupportService";
 
 const DEFAULT_STUDY_BUDDY_MODE = "lesson";
 const STUDY_BUDDY_MODE_LABELS = {
@@ -139,8 +140,23 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     ? Object.entries(context.progress).map(([key, value]) => `${key}=${value}`).join(", ")
     : "";
 
+  const learnerState = context.learnerSupportState && typeof context.learnerSupportState === "object"
+    ? context.learnerSupportState
+    : null;
+  const supportNextAction = learnerState?.nextAction || null;
+  const supportReview = learnerState?.review || null;
+  const supportCourse = learnerState?.course || null;
+  const supportAccess = learnerState?.access || null;
+
   const contextLines = [
     `Context source: ${context.source || "page"}`,
+    `Falowen access state: ${supportAccess?.state || "Not provided"}`,
+    `Falowen access reason: ${supportAccess?.reason || "Not provided"}`,
+    `Course completion: ${supportCourse?.completionPercent ?? "Not provided"}%`,
+    `Latest review status: ${supportReview?.status || "Not provided"}`,
+    `Latest review score: ${supportReview?.score ?? "Not provided"}`,
+    `Authoritative next action: ${supportNextAction?.label || "Not provided"}`,
+    `Authoritative next URL: ${supportNextAction?.url || "Not provided"}`,
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
     `Day: ${context.day || "Not provided"}`,
     `Chapter: ${context.chapter || "Not provided"}`,
@@ -178,6 +194,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     FALOWEN_NAVIGATION_GUIDANCE,
     "For language-learning questions, stay focused on the current lesson, level and task below.",
     "When structured course context is present, treat it as authoritative over guessed page text. Use the exact day, topic, grammar focus, vocabulary, main skill and current task.",
+    "When Falowen access/review/next-action state is provided, treat it as authoritative. Do not invent a different reason for blocked access, marking state, payment requirement, or next step.",
+    "If Falowen says Radio state is unknown, do not claim Radio is complete. The lesson route itself enforces Radio when required.",
     "If the student refers to a numbered Lesen/Hören question such as 'question 3', use the matching Current task item. Give a hint or explain the relevant language first; do not reveal the correct option before the student has tried unless they explicitly ask for the answer.",
     "For grammar questions such as 'Why is this Dativ?', explain the rule using the current lesson's grammar focus and vocabulary before adding a generic example.",
     "Use the progress summary to avoid telling the student to repeat sections they have already completed unless revision is useful.",
@@ -207,13 +225,26 @@ export const requestStudyBuddyReply = async ({ message, level, idToken, mode, le
   const structuredLessonContext = lessonContext && typeof lessonContext === "object" && Object.keys(lessonContext).length
     ? lessonContext
     : getStudyBuddyLessonContext();
+  const currentRoute = typeof window !== "undefined"
+    ? `${window.location.pathname || ""}${window.location.search || ""}`
+    : "";
+  const learnerSupportState = idToken
+    ? await fetchLearnerSupportState({ idToken, route: currentRoute }).catch((error) => {
+        console.warn("Study Buddy could not load authoritative learner state", error);
+        return null;
+      })
+    : null;
+  const groundedLessonContext = {
+    ...(structuredLessonContext || {}),
+    learnerSupportState,
+  };
   const response = await callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message: buildCourseFocusedMessage({ message, mode, lessonContext: structuredLessonContext, conversationHistory }),
+      message: buildCourseFocusedMessage({ message, mode, lessonContext: groundedLessonContext, conversationHistory }),
       level,
       mode: mode || getStoredStudyBuddyMode(),
-      lessonContext: structuredLessonContext || null,
+      lessonContext: groundedLessonContext || null,
     },
     idToken,
   });
