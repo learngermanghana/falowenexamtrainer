@@ -613,4 +613,10 @@ module.exports = {
   upsertStudentToSheet,
   appendStudentToStudentsSheetSafely,
   purgeStudentFromSheets,
+  __testables: {
+    collectMatchingRows,
+    resolvePaidValue,
+    resolveBalanceValue,
+    normalizeHeader,
+  },
 };
