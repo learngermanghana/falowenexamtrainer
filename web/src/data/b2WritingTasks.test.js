@@ -40,13 +40,12 @@ describe("B2 Goethe-style writing tasks", () => {
 
   test("opinion template is only a short starter scaffold", () => {
     const template = getB2WritingTask(4).starterTemplate;
-    expect(template).toContain("In der heutigen Zeit wird oft über ... diskutiert.");
-    expect(template).toContain("Meiner Meinung nach ...");
+    expect(template.split(/\n\n/)).toHaveLength(4);
+    expect(template).toContain("In der heutigen Zeit wird oft über ... diskutiert. Meiner Meinung nach ...");
     expect(template).toContain("Ein wichtiger Grund dafür ist, dass ...");
-    expect(template).toContain("Ein weiterer Grund ist, dass ...");
-    expect(template).toContain("Eine andere Möglichkeit wäre, ...");
-    expect(template).toContain("Ein Vorteil davon ist, dass ...");
+    expect(template).toContain("Eine andere Möglichkeit wäre, ... Ein Vorteil davon ist, dass ...");
     expect(template).toContain("Zusammenfassend lässt sich sagen, dass ...");
+    expect(template).not.toContain("Ein weiterer Grund ist, dass ...");
     expect(template).not.toContain("Natürlich gibt es auch andere Meinungen");
     expect(template).not.toContain("Gegenargument");
     expect(template).not.toContain("eigene Position stärken");
