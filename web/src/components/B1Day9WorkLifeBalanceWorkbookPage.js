@@ -88,10 +88,10 @@ const config = {
       "Arbeitgeber können helfen, indem sie …",
       "Viele Menschen setzen klare Grenzen, um …",
       "Obwohl moderne Arbeitsmodelle Vorteile haben, …",
-     writing: getB1WritingTask(9),uzieren",
-      "langfristig produktiv bleiben",
+      "Zusammenfassend lässt sich sagen, dass …",
     ],
   },
+  writing: getB1WritingTask(9),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

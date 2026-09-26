@@ -103,8 +103,10 @@ export const B1_DAY13_EIGENE_FILMKRITIK_WORKBOOK_CONFIG = {
       "Besonders gut fand ich, dass ...",
       "Nicht so gut fand ich, dass ...",
       "Ich würde den Film empfehlen, weil ...",
-      "Füwriting: getB1WritingTask(13),eutet nicht, dass ruhige Filme weniger wertvoll sind.",
+      "Für Fans von ... ist der Film sehr geeignet.",
+    ],
   },
+  writing: getB1WritingTask(13),
   reading: {
     title: "Lesen Sie die Filmkritik und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst die komplette Kritik. Wählen Sie danach bei jeder Frage genau eine Antwort.",

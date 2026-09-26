@@ -106,8 +106,10 @@ export const B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG = {
       "Ein Nachteil besteht darin, dass ...",
       "Einerseits ..., andererseits ...",
       "Meiner Meinung nach sollte ...",
-     writing: getB1WritingTask(15),dien das Homeoffice, wenn sie bewusst genutzt werden.",
+      "Zusammenfassend kann ich sagen, dass ...",
+    ],
   },
+  writing: getB1WritingTask(15),
   reading: {
     title:
       "Lesen Sie den Text über den digitalen Menschen und beantworten Sie die sieben Fragen.",

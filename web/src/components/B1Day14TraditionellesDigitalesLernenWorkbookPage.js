@@ -97,8 +97,10 @@ export const B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG = {
       "Ein Vorteil ist, dass ...",
       "Ein Nachteil besteht darin, dass ...",
       "Ich bevorzuge ..., weil ...",
-      "Die beste Lösung ist meiner Meinung writing: getB1WritingTask(14),urzeit nicht möglich.\n\nMit freundlichen Grüßen\n...",
+      "Die beste Lösung ist meiner Meinung nach eine Kombination aus beiden Methoden.",
+    ],
   },
+  writing: getB1WritingTask(14),
   reading: {
     title: "Lesen Sie den Text über lebenslanges Lernen und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

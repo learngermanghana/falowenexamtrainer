@@ -96,8 +96,10 @@ export const B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG = {
       "Ich finde es hilfreich, ...",
       "Ein Vorteil dieser Methode ist, dass ...",
       "Ein Nachteil ist, dass ...",
-     writing: getB1WritingTask(17),nn man regelmäßig übt und die Methode zu einem passt.",
+      "Zusammenfassend kann ich sagen, dass ...",
+    ],
   },
+  writing: getB1WritingTask(17),
   reading: {
     title: "Lesen Sie den Text über effektives Lernen und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

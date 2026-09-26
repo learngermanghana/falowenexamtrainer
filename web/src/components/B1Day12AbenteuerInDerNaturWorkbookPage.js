@@ -84,8 +84,10 @@ export const B1_DAY12_ABENTEUER_IN_DER_NATUR_WORKBOOK_CONFIG = {
       "Besonders schön war, dass ...",
       "Die größte Herausforderung war, dass ...",
       "Trotzdem habe ich gelernt, dass ...",
-      "In meinem Hewriting: getB1WritingTask(12),weil ... Schreib mir bald zurück!\n\nViele Grüße\n...",
+      "In meinem Heimatland erlebt man Naturabenteuer oft ...",
+    ],
   },
+  writing: getB1WritingTask(12),
   reading: {
     title: "Lesen Sie den Text über Abenteuer und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",

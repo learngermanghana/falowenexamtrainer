@@ -90,10 +90,10 @@ const config = {
       "Im Vergleich zu einem normalen Arbeitstag …",
       "Einerseits hilft das Smartphone im Alltag, andererseits …",
       "Am wichtigsten ist für mich, dass …",
-      "Zwriting: getB1WritingTask(10),
-      "eine Gewohnheit schrittweise verändern",
+      "Zusammenfassend bin ich der Meinung, dass …",
     ],
   },
+  writing: getB1WritingTask(10),
   reading: {
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",

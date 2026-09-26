@@ -101,8 +101,10 @@ export const B1_DAY16_PRUEFUNGSANGST_STRESSBEWAELTIGUNG_WORKBOOK_CONFIG = {
       "Ein häufiges Symptom ist ...",
       "Mir hilft es, wenn ich ...",
       "Man sollte frühzeitig lernen und Pausen machen.",
-  writing: getB1WritingTask(16),er man sie mit der richtigen Methode reduzieren kann.",
+      "Zusammenfassend ist wichtig, dass ...",
+    ],
   },
+  writing: getB1WritingTask(16),
   reading: {
     title: "Lesen Sie den Text über Prüfungen im Bildungswesen und beantworten Sie die sieben Fragen.",
     instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
