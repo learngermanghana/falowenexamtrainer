@@ -69,6 +69,26 @@ describe("A1 direct Radio destinations", () => {
     }
   });
 
+  test("returns an A1 grammar deep link to the grammar page after Radio", () => {
+    const href = buildCompletedRadioHref({
+      pathname: "/campus/course/lesson/A1/9",
+      search: "?chapter=5&view=grammar",
+    });
+    expect(href).toBe("/campus/course/a1-day-9-nominative-and-accusative-cases?radio=done");
+  });
+
+  test("preserves an A1 Submit target through Radio", () => {
+    const href = buildCompletedRadioHref({
+      pathname: "/campus/course/lesson/A1/9",
+      search: "?chapter=5&view=submit",
+    });
+    const url = new URL(href, "https://www.falowen.app");
+    expect(url.pathname).toBe("/campus/course/a1-chapter-5-german-cases-workbook");
+    expect(url.searchParams.get("view")).toBe("submit");
+    expect(url.searchParams.get("radio")).toBe("done");
+    expect(url.searchParams.get("assignmentKey")).toBe("A1-5");
+  });
+
   test("keeps Day 3 chapter 1.1 self-practice separate from the Day 2 tutor assignment", () => {
     const href = buildCompletedRadioHref({
       pathname: "/campus/course/lesson/A1/3",
