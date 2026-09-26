@@ -51,14 +51,17 @@ describe("B2 Goethe-style writing tasks", () => {
     expect(template).not.toContain("eigene Position stärken");
   });
 
-  test("formal template is only a short starter scaffold", () => {
+  test("formal template uses a short opening, open body and B2 closing", () => {
     const template = getB2WritingTask(28).starterTemplate;
     expect(template).toContain("Sehr geehrte Frau ... / Sehr geehrter Herr ...");
-    expect(template).toContain("ich bitte um Verständnis, weil ...");
-    expect(template).toContain("Zurzeit ...");
-    expect(template).toContain("Für die kommenden Tage schlage ich vor, dass ...");
-    expect(template).toContain("Mir ist bewusst, dass ...");
+    expect(template).toContain("ich wende mich an Sie, da ...");
+    expect(template).toContain("Falls Sie weitere Informationen benötigen, stehe ich Ihnen gerne zur Verfügung.");
+    expect(template).toContain("Ich bedanke mich im Voraus für Ihre Unterstützung und freue mich auf Ihre Rückmeldung.");
     expect(template).toContain("Mit freundlichen Grüßen");
+    expect(template).not.toContain("ich bitte um Verständnis, weil ...");
+    expect(template).not.toContain("Zurzeit ...");
+    expect(template).not.toContain("Für die kommenden Tage schlage ich vor, dass ...");
+    expect(template).not.toContain("Mir ist bewusst, dass ...");
     expect(template).not.toContain("[Inhaltspunkt");
   });
 
