@@ -78,6 +78,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("renders the requested A2 Day 5 tutor lecture", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 5,
+        chapter: "2.5",
+        topic: "Was machst du in deiner Freizeit?",
+      },
+      "A2",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "2.5",
+        title: "Kapitel 2.5 · Teacher lecture video",
+        url: "https://youtu.be/YktdQ4eyaRY",
+      }),
+    );
+    expect(lesson.resources.videos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "https://youtu.be/YktdQ4eyaRY" }),
+      ]),
+    );
+  });
+
   test("renders the A2 Day 14 tutor lecture alongside the AI video", () => {
     const lesson = normalizeA2B1Lesson(
       {
