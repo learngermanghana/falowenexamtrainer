@@ -32,6 +32,7 @@ const TuitionStatusCard = ({
   title,
   description,
   checkoutAmountOverride,
+  paymentActionLabel,
 }) => {
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -360,7 +361,7 @@ const TuitionStatusCard = ({
               >
                 {isStartingPayment
                   ? t("accountSettings.tuition.opening")
-                  : `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} to finish`}
+                  : paymentActionLabel || `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} to finish`}
               </button>
             </>
           ) : (
@@ -408,7 +409,7 @@ const TuitionStatusCard = ({
                 >
                   {isStartingPayment
                     ? t("accountSettings.tuition.opening")
-                    : `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} online`}
+                    : paymentActionLabel || `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} online`}
                 </button>
               </div>
             </>
