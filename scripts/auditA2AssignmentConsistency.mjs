@@ -178,6 +178,15 @@ if (!sharedSource.includes("canonicalAssignmentKey: assignmentKey")) {
 if (!sharedSource.includes("<A2ReadingTaskPanel day={day}")) {
   fail("Shared workbook", "Teil 3 must render the canonical A2ReadingTaskPanel");
 }
+if (/fallbackText|fallbackQuestions|lesenText, lesenQuestions/.test(sharedSource)) {
+  fail("Shared workbook", "Teil 3 must not accept legacy inline Lesen fallbacks");
+}
+if (!sharedSource.includes("hoerenSelfCheck ? \"Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)\"")) {
+  fail("Shared workbook", "self-check Hören must render a distinct Goethe self-check heading");
+}
+if (!sharedSource.includes("Du trägst für diese Übung nichts im Falowen Submit-Tab ein.")) {
+  fail("Shared workbook", "self-check Hören must explicitly say that nothing is submitted in Falowen");
+}
 
 const day14ForbiddenCopy = [
   "Was bedeutet Gleitzeit?",
@@ -262,6 +271,13 @@ for (const day of expectedDays) {
 
   if (!wrapper) continue;
   const source = wrapper.source;
+  if (/\blesenText\s*=|\blesenQuestions\s*=/.test(source)) {
+    fail(label, "contains obsolete inline Lesen props; a2ReadingTasks.js must be the only A2 Lesen source");
+  }
+  if (/\b(?:const|let)\s+(?:lesenText|readingText|cultureFreeTimeReadingText|lesenQuestions|readingQuestions)\b/.test(source)) {
+    fail(label, "contains obsolete inline Lesen data declarations");
+  }
+
   const showHoeren = !/showHoeren=\{false\}/.test(source);
   const listeningAnswers = sortedAnswers(manifestEntry.answers?.teil4);
 
@@ -276,12 +292,17 @@ for (const day of expectedDays) {
     }
 
     const listeningQuestions = extractQuestionsProp(source, "hoerenQuestions", label);
-    const explicitSelfCheck = /hoerenQuestions=\{\[\]\}/.test(source)
-      && listeningAnswers.length === 0
-      && /self-check|Goethe-Hören-Übung|kontrollieren Sie Ihre Antworten/i.test(source);
+    const declaresSelfCheck = /\bhoerenSelfCheck\b/.test(source);
+    const explicitSelfCheck = declaresSelfCheck
+      && /hoerenQuestions=\{\[\]\}/.test(source)
+      && listeningAnswers.length === 0;
+
+    if (declaresSelfCheck && !explicitSelfCheck) {
+      fail(label, "hoerenSelfCheck requires an empty question list and no submitted Teil 4 answers");
+    }
 
     if (explicitSelfCheck) {
-      note(`${expectedAssignmentId}: Teil 4 is external self-check practice, not a submitted Hören assignment`);
+      note(`${expectedAssignmentId}: Teil 4 is explicitly labeled external self-check practice, not a submitted Hören assignment`);
     } else if (!Array.isArray(listeningQuestions) || listeningQuestions.length === 0) {
       fail(label, "Teil 4 Hören is visible but has neither graded questions nor an explicit self-check contract");
     } else {
