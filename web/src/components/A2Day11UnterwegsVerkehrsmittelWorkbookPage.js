@@ -28,17 +28,7 @@ const schreibenContent = (
   </WorkbookTaskCard>
 );
 
-const lesenText = `Julia möchte ein Auto für ihren Urlaub in Italien mieten. Sie sucht online nach verschiedenen Autovermietungen. Sie entscheidet sich für eine Firma mit guten Bewertungen und günstigen Preisen. Julia wählt ein kleines Auto, weil sie hauptsächlich in der Stadt fahren wird. Eine gute Versicherung ist ihr wichtig. Am Tag der Abholung bringt sie ihren Führerschein und ihren Personalausweis mit. Der Angestellte erklärt ihr die Vertragsbedingungen. Julia plant, viele Städte zu besuchen. Nach einer Woche gibt sie das Auto ohne Probleme zurück und ist sehr zufrieden mit dem Service.`;
 
-const lesenQuestions = [
-  { stem: "Wo möchte Julia ein Auto mieten?", options: ["A) In Deutschland", "B) In Italien", "C) In Frankreich", "D) In Spanien"] },
-  { stem: "Warum wählt Julia ein kleines Auto?", options: ["A) Weil es billiger ist", "B) Weil sie in der Stadt fahren wird", "C) Weil es mehr Platz bietet", "D) Weil es schneller ist"] },
-  { stem: "Was ist für Julia wichtig?", options: ["A) Eine gute Versicherung", "B) Ein Navigationssystem", "C) Ein großes Auto", "D) Eine rote Farbe"] },
-  { stem: "Welche Dokumente bringt Julia mit?", options: ["A) Führerschein und Reisepass", "B) Führerschein und Personalausweis", "C) Personalausweis und Kreditkarte", "D) Mietvertrag und Kreditkarte"] },
-  { stem: "Wer erklärt die Vertragsbedingungen?", options: ["A) Ein Freund", "B) Der Angestellte", "C) Ein Reisebüro", "D) Ein Polizist"] },
-  { stem: "Was plant Julia?", options: ["A) Viele Städte zu besuchen", "B) Am Strand zu liegen", "C) In den Bergen zu wandern", "D) Im Hotel zu bleiben"] },
-  { stem: "Wie zufrieden ist Julia?", options: ["A) Nicht zufrieden", "B) Sehr zufrieden", "C) Etwas zufrieden", "D) Unzufrieden"] },
-];
 
 const hoerenQuestions = [
   { stem: "Wohin möchte Thomas fahren?", options: ["A) Zum Strand", "B) In die Berge", "C) In die Stadt", "D) Zum Flughafen"] },
@@ -60,8 +50,6 @@ export default function A2Day11UnterwegsVerkehrsmittelWorkbookPage() {
       schreibenTask="Schreiben Sie eine formelle E-Mail an eine Autovermietung."
       schreibenContent={schreibenContent}
       schreibenPlaceholder={"Sehr geehrte Damen und Herren,\n\nich möchte für das Wochenende ..."}
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Höre das Gespräch bei der Autovermietung und beantworte die Fragen. Submitte deine Antwortbuchstaben im Submit-Tab."
       hoerenAudioUrl="https://youtu.be/cpiYNbbIvr4"
       hoerenQuestions={hoerenQuestions}
