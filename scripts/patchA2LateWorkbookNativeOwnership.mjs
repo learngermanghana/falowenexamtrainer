@@ -109,6 +109,7 @@ const a2SectionDefinitions = `${a1SectionResolver}
 const A2_COURSE_BOOK_SECTIONS = [
   { key: "a2-1", title: "A2.1 – Building Independence", days: "Days 1–14", firstDay: 1, lastDay: 14 },
   { key: "a2-2", title: "A2.2 – Independent Communication", days: "Days 15–28", firstDay: 15, lastDay: 28 },
+  { key: "a2-exam", title: "A2 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29 },
 ];
 
 const getA2CourseBookSection = (entry) => {
@@ -237,6 +238,9 @@ if (!courseTab.includes('title: "A2.1 – Building Independence"')) {
 }
 if (!courseTab.includes('title: "A2.2 – Independent Communication"')) {
   throw new Error("A2.2 Course Book section was not installed.");
+}
+if (!courseTab.includes('title: "A2 Exam Orientation"')) {
+  throw new Error("A2 Day 29 exam-orientation section was not installed.");
 }
 if (!courseTab.includes("Welcome to A2.2")) {
   throw new Error("A2.2 Course Book introduction was not installed.");
