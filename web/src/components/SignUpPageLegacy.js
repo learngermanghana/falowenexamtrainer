@@ -770,7 +770,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
               );
             })}
           </div>
-          <input id="initial-payment-amount" type="hidden" value={paymentOption} readOnly />
+          <select
+            id="initial-payment-amount"
+            value={paymentOption}
+            onChange={(event) => setPaymentOption(event.target.value)}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <option value="trial">trial</option>
+            <option value="full">full</option>
+            <option value="part">part</option>
+          </select>
           {fieldErrors.initialPaymentAmount ? (
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
@@ -801,7 +812,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
               clearFieldError("selectedClass");
               setAuthError("");
             }}
-            required
             style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
             tabIndex={-1}
             aria-hidden="true"
