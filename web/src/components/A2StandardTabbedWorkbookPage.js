@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
@@ -22,6 +23,7 @@ import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
+import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -84,10 +86,18 @@ const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultIma
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
+  const location = useLocation();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
+  const [activeTab, setActiveTab] = useState(() => {
+    const requestedView = normalizeA2B1SectionView(
+      new URLSearchParams(location.search || "").get("view") || "",
+    );
+    if (!requestedView || requestedView === "radio" || requestedView === "workbook") return "sprechen";
+    if (requestedView === "hoeren" && !showHoeren) return "sprechen";
+    return requestedView;
+  });
+  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const hoerenSelfCheck = listeningConfig?.mode === A2_LISTENING_MODES.SELF_CHECK;
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
