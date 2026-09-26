@@ -241,6 +241,7 @@ async function upsertStudentToSheet(student) {
     student.trialEndsAt,
     student.trialPurgeAt,
     student.trialUsedAt,
+    student.trialConvertedAt,
   ].some((value) => value !== undefined && value !== null && String(value).trim() !== "");
 
   const { headers, headerMap } = hasTrialMetadata
@@ -249,6 +250,7 @@ async function upsertStudentToSheet(student) {
         "TrialEndsAt",
         "TrialPurgeAt",
         "TrialUsedAt",
+        "TrialConvertedAt",
       ])
     : await loadHeaderMap(sheets, sheetId, tabName);
 
@@ -272,6 +274,7 @@ async function upsertStudentToSheet(student) {
   const colTrialEndsAt = findCol(headerMap, "TrialEndsAt", "Trial Ends At");
   const colTrialPurgeAt = findCol(headerMap, "TrialPurgeAt", "Trial Purge At");
   const colTrialUsedAt = findCol(headerMap, "TrialUsedAt", "Trial Used At");
+  const colTrialConvertedAt = findCol(headerMap, "TrialConvertedAt", "Trial Converted At");
   const colEmergencyPhone = findCol(
     headerMap,
     "Emergency Contact (Phone Number)",
@@ -402,6 +405,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colTrialEndsAt, student.trialEndsAt || "");
     pushCell(colTrialPurgeAt, student.trialPurgeAt || "");
     pushCell(colTrialUsedAt, student.trialUsedAt || "");
+    pushCell(colTrialConvertedAt, student.trialConvertedAt || "");
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
     pushCell(colContractMergeMode, student.contractMergeMode || "");
@@ -457,6 +461,7 @@ async function upsertStudentToSheet(student) {
   if (colTrialEndsAt !== null) row[colTrialEndsAt] = student.trialEndsAt || "";
   if (colTrialPurgeAt !== null) row[colTrialPurgeAt] = student.trialPurgeAt || "";
   if (colTrialUsedAt !== null) row[colTrialUsedAt] = student.trialUsedAt || "";
+  if (colTrialConvertedAt !== null) row[colTrialConvertedAt] = student.trialConvertedAt || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
   if (colContractMergeMode !== null)
