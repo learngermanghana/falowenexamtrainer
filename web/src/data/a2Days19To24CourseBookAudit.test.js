@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import { A2_READING_TASKS } from "./a2ReadingTasks";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
@@ -35,7 +36,7 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="7.20"');
     expect(source).toContain('<RadioFirstWorkbookGate level="A2" day={20}>');
-    expect(source).toContain("Reklamation im Elektrogeschäft");
+    expect(A2_READING_TASKS[20].title).toBe("Der neue Wasserkocher funktioniert nicht");
     expect(source).not.toMatch(/Frauensachen|Berufswahl|vor 50 Jahren/i);
   });
 
@@ -43,7 +44,7 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     const source = readComponent("A2Day21EinWochenendePlanenWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="8.21"');
-    expect(source).toContain("Unser Wochenende in Köln");
+    expect(A2_READING_TASKS[21].title).toBe("Unser Wochenende in Köln");
     expect(source).toContain('hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"');
     expect(source).toContain("separate Goethe-Hören-Übung");
     expect(source).not.toContain('hoerenAudioUrl="https://youtu.be/LlXsNA1a8lc"');
@@ -54,7 +55,7 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     const source = readComponent("A2Day22DieWochePlanungWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="8.22"');
-    expect(source).toContain("Eine volle Woche");
+    expect(A2_READING_TASKS[22].title).toBe("Eine volle Woche");
     expect(source).not.toMatch(/Gülcan|Willkommensführung|Literaturkurs/i);
     expect(source).not.toContain("Go to Submission Area");
   });
@@ -63,10 +64,10 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     const source = readComponent("A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="9.23"');
-    expect(source).toContain("Mein Arbeitsweg");
+    expect(A2_READING_TASKS[23].title).toBe("Drei Wege zur Arbeit");
     expect(source).toContain('ariaLabel="A2 Day 23 workbook sections"');
     expect(source).toContain('data-a2-day23-native-guidance="true"');
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/LtARwiCljLY"');
+    expect(source).toContain('hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"');
     expect(source).toContain('hoerenQuestions={[]}');
     expect(source).not.toMatch(/key:\s*"teil[1-4]"/i);
   });
@@ -75,7 +76,7 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     const source = readComponent("A2Day24EinenUrlaubPlanenWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="9.24"');
-    expect(source).toContain("Urlaub in Salzburg");
+    expect(A2_READING_TASKS[24].title).toBe("Welches Angebot passt?");
     expect(source).not.toMatch(/Park-Café|Kindergeburtstag|Weinhaus/i);
     expect(source).not.toContain("Go to submission area");
   });
