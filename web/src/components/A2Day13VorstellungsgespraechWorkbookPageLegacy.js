@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 
 import { styles } from "../styles";
+import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -209,32 +210,8 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
 
       {activeTab === "lesen" && (
         <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80"
-            alt="Open German reading workbook on a desk"
-            loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
-          />
-          <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
-          <p style={{ margin: 0 }}>
-            Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the Submit tab to send your answers.
-          </p>
-
-          <h3 style={sectionTitle}>Kinderbetreuung in Deutschland (A2-Niveau)</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In Deutschland gibt es viele Möglichkeiten für kleine Kinder. Wenn Vater und Mutter arbeiten, können sie ihr Kind in eine Kinderkrippe bringen. Eine Kinderkrippe ist für Kinder bis 3 Jahre. Es gibt nur wenige Plätze. Man muss das Kind früh anmelden. Ab 3 Jahren können Kinder in den Kindergarten gehen. Dort können sie spielen, singen, malen und basteln. Im Sommer gehen viele Erzieherinnen mit den Kindern nach draußen. Viele Kindergärten helfen auch mit der Sprache. Die Kinder hören Geschichten und machen Sprachspiele. Ein Kindergarten ist eine gute Vorbereitung für die Schule. Aber es gibt nicht überall genug Plätze. Man muss das Kind rechtzeitig anmelden. Einige Kindergärten sind vormittags offen (z. B. 7–13 Uhr). Andere Kindergärten sind den ganzen Tag offen (z. B. 7–17 Uhr). Diese heißen Kitas. In einer Kita bekommt das Kind auch Mittagessen. Die Eltern müssen für den Kindergarten Geld bezahlen. Der Preis ist in jedem Bundesland anders. Wer wenig Geld hat, zahlt weniger. Wer mehr verdient, zahlt mehr. Private Kindergärten sind teurer als staatliche. In einigen privaten Kitas spricht man zwei Sprachen, zum Beispiel Deutsch und Spanisch. Vor der Schule machen viele Kinder einen Sprachtest. Wenn ein Kind noch nicht gut Deutsch spricht, bekommt es Hilfe beim Deutschlernen.
-          </p>
-
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
-          {lesenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
+          <h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2>
+          <A2ReadingTaskPanel day={13} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
