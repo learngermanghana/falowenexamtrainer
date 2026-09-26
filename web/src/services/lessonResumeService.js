@@ -171,11 +171,11 @@ export const recordLessonResumeActivity = async ({
     updatedAt: serverTimestamp(),
   };
 
+  // Radio completion is monotonic. Opening a lesson on another device before
+  // hydration must never turn a previously completed Radio step back to false.
   if (radioDone === true) {
     payload.radioDone = true;
     payload.radioCompletedAt = serverTimestamp();
-  } else if (radioDone === false) {
-    payload.radioDone = false;
   }
 
   await setDoc(doc(db, "users", uid, LESSON_RESUME_SUBCOLLECTION, docId), payload, { merge: true });
