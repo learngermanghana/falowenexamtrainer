@@ -883,6 +883,15 @@ export const AuthProvider = ({ children }) => {
     return auth.currentUser;
   }, []);
 
+  const refreshStudentProfile = useCallback(async () => {
+    if (!studentProfile?.id || !db) return null;
+    const snapshot = await getDoc(doc(db, "students", studentProfile.id));
+    if (!snapshot.exists()) return null;
+    const profile = { id: snapshot.id, ...snapshot.data() };
+    setStudentProfile(profile);
+    return profile;
+  }, [studentProfile?.id]);
+
   const resetPassword = useCallback(async (email) => {
     if (!isFirebaseConfigured || !auth) {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
@@ -1035,6 +1044,7 @@ export const AuthProvider = ({ children }) => {
       notificationStatus,
       saveStudentProfile,
       refreshUser,
+      refreshStudentProfile,
     }),
     [
       user,
@@ -1052,6 +1062,7 @@ export const AuthProvider = ({ children }) => {
       enableNotifications,
       logout,
       refreshUser,
+      refreshStudentProfile,
     ]
   );
 

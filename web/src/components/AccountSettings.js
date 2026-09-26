@@ -9,6 +9,8 @@ import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
+import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
+import { getTrialAccessState } from "../lib/trialAccess";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -22,7 +24,7 @@ const formatDate = (value) => {
 };
 
 const AccountSettings = () => {
-  const { user, studentProfile, saveStudentProfile } = useAuth();
+  const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -33,6 +35,7 @@ const AccountSettings = () => {
   const paymentsEnabled = isPaymentsEnabled();
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
+  const [isRefreshingPayment, setIsRefreshingPayment] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const requestedTab = new URLSearchParams(window.location.search).get("tab");
     return ["studentData", "notifications", "billing", "upgrade"].includes(requestedTab)
@@ -54,6 +57,96 @@ const AccountSettings = () => {
 
   const paidAmount = billingSummary.paidAmount;
   const balanceDue = billingSummary.balanceDue;
+
+  const paymentAttempt = useMemo(() => getPaymentAttempt(studentProfile), [studentProfile]);
+  const trialAccess = useMemo(() => getTrialAccessState(studentProfile), [studentProfile]);
+  const normalizedPaymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
+  const paymentCleared = normalizedPaymentStatus === "paid" || hasClearedBalance(balanceDue);
+
+  const billingState = useMemo(() => {
+    if (paymentCleared) {
+      return {
+        key: "paid",
+        label: "Paid",
+        title: "Tuition paid",
+        body: "Your tuition payment is confirmed in Falowen.",
+        tone: "#166534",
+        background: "#ecfdf5",
+        border: "#86efac",
+      };
+    }
+    if (normalizedPaymentStatus === "partial" || paidAmount > 0) {
+      return {
+        key: "partial",
+        label: "Part payment received",
+        title: "Balance remaining",
+        body: `Falowen has confirmed ${formatMoney(paidAmount)}. You still have ${formatMoney(balanceDue)} remaining.`,
+        tone: "#92400e",
+        background: "#fffbeb",
+        border: "#fcd34d",
+      };
+    }
+    if (paymentAttempt) {
+      return {
+        key: "pending-attempt",
+        label: "Payment pending",
+        title: "Payment checkout started",
+        body: "If you closed Paystack before finishing, your account remains unpaid. You can safely continue payment below. Falowen only marks you paid after confirmation.",
+        tone: "#1e40af",
+        background: "#eff6ff",
+        border: "#93c5fd",
+      };
+    }
+    if (trialAccess.active) {
+      return {
+        key: "trial",
+        label: "Trial active",
+        title: "7-day trial active",
+        body: `You can continue learning during your trial. ${trialAccess.daysRemaining} day${trialAccess.daysRemaining === 1 ? "" : "s"} remaining.`,
+        tone: "#166534",
+        background: "#f0fdf4",
+        border: "#86efac",
+      };
+    }
+    return {
+      key: "attention",
+      label: "Payment needs attention",
+      title: "Complete payment to continue",
+      body: "Your account does not currently have confirmed paid access. Use the payment section below or refresh status if you have already paid.",
+      tone: "#9a3412",
+      background: "#fff7ed",
+      border: "#fdba74",
+    };
+  }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialAccess.active, trialAccess.daysRemaining]);
+
+  React.useEffect(() => {
+    if (paymentCleared && paymentAttempt) {
+      clearPaymentAttempt(studentProfile);
+    }
+  }, [paymentAttempt, paymentCleared, studentProfile]);
+
+  const handleRefreshPaymentStatus = async () => {
+    if (!refreshStudentProfile || isRefreshingPayment) return;
+    setIsRefreshingPayment(true);
+    setStatus("");
+    try {
+      const latest = await refreshStudentProfile();
+      const latestStatus = normalizePaymentStatus(latest?.paymentStatus);
+      const latestBalance = latest?.balanceDue ?? latest?.balance;
+      if (latestStatus === "paid" || hasClearedBalance(latestBalance)) {
+        clearPaymentAttempt(latest || studentProfile);
+        setStatus("Payment confirmed. Your account is up to date.");
+      } else if (latestStatus === "partial" || Number(latest?.paid ?? latest?.initialPaymentAmount ?? 0) > 0) {
+        setStatus("Part payment confirmed. Your remaining balance is shown below.");
+      } else {
+        setStatus("No confirmed payment yet. If you left Paystack before finishing, use Continue payment below.");
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not refresh payment status.");
+    } finally {
+      setIsRefreshingPayment(false);
+    }
+  };
 
   const transactionHistory = useMemo(() => {
     const candidates = [
@@ -335,6 +428,42 @@ const AccountSettings = () => {
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.billing.title")}</h2>
         <p style={styles.helperText}>{t("accountSettings.billing.subtitle")}</p>
+
+        <div
+          style={{
+            ...styles.card,
+            margin: "8px 0 12px",
+            background: billingState.background,
+            borderColor: billingState.border,
+            display: "grid",
+            gap: 7,
+          }}
+        >
+          <span style={{ ...styles.badge, width: "fit-content", color: billingState.tone }}>
+            {billingState.label}
+          </span>
+          <strong style={{ color: billingState.tone }}>{billingState.title}</strong>
+          <p style={{ ...styles.helperText, margin: 0, color: billingState.tone, lineHeight: 1.55 }}>
+            {billingState.body}
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              onClick={handleRefreshPaymentStatus}
+              disabled={isRefreshingPayment}
+            >
+              {isRefreshingPayment ? "Refreshing..." : "Refresh payment status"}
+            </button>
+          </div>
+        </div>
+
+        {status ? (
+          <div style={{ ...styles.card, margin: "0 0 12px", background: "#f8fafc" }}>
+            <strong>{status}</strong>
+          </div>
+        ) : null}
+
         {paymentAlert ? <div style={styles.errorBox}>{paymentAlert.message}</div> : null}
         <div style={{ ...styles.card, margin: "8px 0 0" }}>
           <div style={styles.metaRow}><span>{t("accountSettings.billing.nextRenewal")}</span><strong>{subscription.renewalDate}</strong></div>
@@ -349,8 +478,19 @@ const AccountSettings = () => {
           balanceDue={balanceDue}
           tuitionFee={billingSummary.tuitionFee}
           checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
+          paymentActionLabel={
+            billingState.key === "pending-attempt"
+              ? "Continue payment"
+              : billingState.key === "partial"
+                ? "Pay balance"
+                : undefined
+          }
           title={t("accountSettings.billing.balanceTitle")}
-          description={t("accountSettings.billing.email", { email: subscription.invoiceEmail || t("accountSettings.billing.addEmail") })}
+          description={
+            billingState.key === "pending-attempt"
+              ? "Continue payment safely below. Starting checkout again does not mark you paid; Paystack confirmation still controls your status."
+              : t("accountSettings.billing.email", { email: subscription.invoiceEmail || t("accountSettings.billing.addEmail") })
+          }
         />
 
         <div style={{ ...styles.card, marginTop: 12 }}>
