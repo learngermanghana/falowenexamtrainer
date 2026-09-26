@@ -49,6 +49,7 @@ import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeute
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
 import { applyA1GrammarRouteToLesson } from "../data/a1GrammarRoutes";
+import { getA1RadioResource } from "../data/a1RadioResources";
 import { applyA2GrammarRouteToLesson } from "../data/a2GrammarRoutes";
 import { applyB1LessonResourceOverride } from "../data/b1LessonResourceOverrides";
 import { courseSchedules } from "../data/courseSchedule";
@@ -417,16 +418,23 @@ export default function CourseLessonPage() {
   const requestedChapter = String(query.get("chapter") || "").trim();
 
   if ((level === "A1" || level === "A2") && requestedView && day > 0) {
-    const workbookRoute = getConfiguredInAppWorkbookResourceRoute({
-      level,
-      day,
-      chapter: requestedChapter,
-    });
-    const destination = mergeLessonSearchIntoRoute(workbookRoute, location.search, {
-      dropKeys: ["chapter"],
-    });
-    if (destination && destination !== `${location.pathname}${location.search}`) {
-      return <Navigate to={destination} replace state={location.state} />;
+    const hasPendingA1Radio =
+      level === "A1"
+      && Boolean(getA1RadioResource(day, requestedChapter))
+      && query.get("radio") !== "done";
+
+    if (!hasPendingA1Radio) {
+      const workbookRoute = getConfiguredInAppWorkbookResourceRoute({
+        level,
+        day,
+        chapter: requestedChapter,
+      });
+      const destination = mergeLessonSearchIntoRoute(workbookRoute, location.search, {
+        dropKeys: ["chapter"],
+      });
+      if (destination && destination !== `${location.pathname}${location.search}`) {
+        return <Navigate to={destination} replace state={location.state} />;
+      }
     }
   }
 
