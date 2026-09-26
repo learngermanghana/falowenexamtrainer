@@ -223,7 +223,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
       )}
 
       {renderSections ? (
-        renderSections({ activeTab, prepared, setPreparedFor })
+        React.createElement(renderSections, { activeTab, prepared, setPreparedFor })
       ) : (
         <>
       {activeTab === "sprechen" && (
