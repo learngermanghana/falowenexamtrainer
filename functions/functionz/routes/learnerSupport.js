@@ -238,6 +238,8 @@ const normalizeProgressStatus = (row = {}) => {
 
 const rowTime = (row = {}) =>
   Math.max(
+    toMillis(row.lastActivityAt),
+    toMillis(row.lastActivityAtClient),
     toMillis(row.updatedAt),
     toMillis(row.markedAt),
     toMillis(row.scoredAt),
@@ -296,6 +298,57 @@ const loadCompletionSnapshot = async (db, { uid, level } = {}) => {
     .filter((row) => normalizeLevel(row.level) === level)
     .sort((a, b) => rowTime(b) - rowTime(a));
   return matches[0] || null;
+};
+
+const loadLatestLessonResume = async (db, { uid, level } = {}) => {
+  if (!uid || !level) return null;
+  try {
+    const snapshot = await db
+      .collection("users")
+      .doc(uid)
+      .collection("lessonResume")
+      .limit(100)
+      .get();
+    const rows = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...(doc.data() || {}) }))
+      .filter((row) => normalizeLevel(row.level) === level)
+      .sort((a, b) => rowTime(b) - rowTime(a));
+    return rows[0] || null;
+  } catch (error) {
+    console.warn("learner_support_resume_failed", error?.message || error);
+    return null;
+  }
+};
+
+const safeResumeState = (resume = null) => {
+  if (!resume) return null;
+  const level = normalizeLevel(resume.level);
+  const day = finiteNumber(resume.day);
+  const route = buildLessonRoute({
+    level,
+    day,
+    chapter: resume.chapter,
+    route: resume.lastRoute,
+  });
+  return {
+    level,
+    day,
+    chapter: clean(resume.chapter) || null,
+    title: clean(resume.title) || null,
+    activeView: clean(resume.activeView) || "learn",
+    lastRoute: route,
+    sections:
+      resume.sections && typeof resume.sections === "object"
+        ? Object.fromEntries(
+            Object.entries(resume.sections)
+              .filter(([, value]) => typeof value === "boolean")
+              .slice(0, 20),
+          )
+        : {},
+    completed: resume.completed === true,
+    radioDone: typeof resume.radioDone === "boolean" ? resume.radioDone : null,
+    lastActivityAt: toIso(resume.lastActivityAt || resume.lastActivityAtClient || resume.updatedAt),
+  };
 };
 
 const loadLessonProgress = async (db, { studentCode, level } = {}) => {
@@ -400,6 +453,7 @@ const buildNextAction = ({
   access = {},
   completion = null,
   review = {},
+  resume = null,
   level = "",
 } = {}) => {
   if (!access.allowed) {
@@ -433,6 +487,21 @@ const buildNextAction = ({
       label: review.lesson.title ? `Review and improve ${review.lesson.title}` : "Review and improve your failed work",
       reason: "latest_work_needs_improvement",
       url: review.lesson.route,
+    };
+  }
+
+  if (resume?.lastRoute && resume.completed !== true) {
+    const viewLabel = clean(resume.activeView || "lesson");
+    const lessonLabel = resume.title
+      ? resume.title
+      : `${resume.level || level}${resume.day ? ` Day ${resume.day}` : ""}`.trim();
+    return {
+      type: "resume-learning",
+      label: viewLabel && viewLabel !== "learn"
+        ? `Continue ${lessonLabel} · ${viewLabel}`
+        : `Continue ${lessonLabel}`,
+      reason: "resume_last_active_section",
+      url: resume.lastRoute,
     };
   }
 
@@ -496,10 +565,11 @@ async function learnerSupportStateHandler(req, res) {
     const studentCode = firstText(student.studentCode, student.studentcode, match.id);
     const access = resolveLearnerAccess(student);
 
-    const [completion, progressRows, submissions] = await Promise.all([
+    const [completion, progressRows, submissions, rawResume] = await Promise.all([
       loadCompletionSnapshot(db, { uid: user.uid, level }),
       loadLessonProgress(db, { studentCode, level }),
       loadSubmissions(db, { uid: user.uid, studentCode }),
+      loadLatestLessonResume(db, { uid: user.uid, level }),
     ]);
 
     const review = getReviewState({ progressRows, submissions, level });
@@ -510,7 +580,8 @@ async function learnerSupportStateHandler(req, res) {
     }) || null;
     const lastCompletedLesson = safeLessonFromRow(lastCompletedRow, level);
     const attendance = getAttendanceState(student);
-    const nextAction = buildNextAction({ access, completion, review, level });
+    const resume = safeResumeState(rawResume);
+    const nextAction = buildNextAction({ access, completion, review, resume, level });
 
     return res.json({
       ok: true,
@@ -529,8 +600,9 @@ async function learnerSupportStateHandler(req, res) {
         awaitingReview: finiteNumber(completion?.awaitingReview) || 0,
         needsImprovement: finiteNumber(completion?.needsImprovement) || 0,
         courseWorkCompleted: completion?.courseWorkCompleted === true,
-        currentLesson: nextLesson,
+        currentLesson: resume?.completed === false ? resume : nextLesson,
         nextLesson,
+        resume,
         lastCompletedLesson,
         snapshotUpdatedAt: toIso(completion?.updatedAt),
       },
@@ -538,9 +610,12 @@ async function learnerSupportStateHandler(req, res) {
       attendance,
       radio: {
         required: null,
-        completed: null,
+        completed: resume?.radioDone ?? null,
         enforcement: "lesson-route",
-        note: "Falowen Radio is enforced by the lesson route when a lesson requires it.",
+        note:
+          resume?.radioDone === true
+            ? "Falowen Radio completion was synced from the learner's lesson progress."
+            : "Falowen Radio is enforced by the lesson route when a lesson requires it.",
       },
       nextAction,
       requestContext: {
@@ -561,4 +636,6 @@ module.exports = {
   buildLessonRoute,
   getReviewState,
   completionNextLesson,
+  safeResumeState,
+  loadLatestLessonResume,
 };
