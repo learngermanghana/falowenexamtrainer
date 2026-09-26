@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { getA2GrammarRoute } from "./a2GrammarRoutes";
 import { A2_READING_TASKS } from "./a2ReadingTasks";
+import { A2_LISTENING_MODES, A2_LISTENING_TASKS } from "./a2ListeningTasks";
 
 const componentRoot = path.resolve(__dirname, "../components");
 const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
@@ -45,9 +46,9 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="8.21"');
     expect(A2_READING_TASKS[21].title).toBe("Unser Wochenende in Köln");
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/Qg0tQFveI0M"');
-    expect(source).toContain("separate Goethe-Hören-Übung");
-    expect(source).not.toContain('hoerenAudioUrl="https://youtu.be/LlXsNA1a8lc"');
+    expect(A2_LISTENING_TASKS[21].audioUrl).toBe("https://youtu.be/Qg0tQFveI0M");
+    expect(A2_LISTENING_TASKS[21].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_LISTENING_TASKS[21].audioUrl).not.toContain("LlXsNA1a8lc");
     expect(source).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
 
@@ -67,8 +68,9 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(A2_READING_TASKS[23].title).toBe("Drei Wege zur Arbeit");
     expect(source).toContain('ariaLabel="A2 Day 23 workbook sections"');
     expect(source).toContain('data-a2-day23-native-guidance="true"');
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL"');
-    expect(source).toContain('hoerenQuestions={[]}');
+    expect(A2_LISTENING_TASKS[23].audioUrl).toBe("https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL");
+    expect(A2_LISTENING_TASKS[23].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_LISTENING_TASKS[23].questions).toHaveLength(0);
     expect(source).not.toMatch(/key:\s*"teil[1-4]"/i);
   });
 
