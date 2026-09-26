@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { A2_READING_TASKS } from "../data/a2ReadingTasks";
 
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
@@ -61,10 +62,10 @@ describe("shared A2 workbook regression", () => {
   it("keeps Day 20 Radio-first and complaint-specific", () => {
     expect(day20).toContain('<RadioFirstWorkbookGate level="A2" day={20}>');
     expect(day20).toContain('chapter="7.20"');
-    expect(day20).toContain("Reklamation im Elektrogeschäft");
+    expect(A2_READING_TASKS[20].title).toBe("Der neue Wasserkocher funktioniert nicht");
     expect(day20).toContain("https://youtu.be/pH1X3E7vOao");
-    expect(day20).toContain("Warum bringt Laura den Wasserkocher zurück?");
-    expect(day20).toContain("Was bittet Laura den Kundenservice zu schicken?");
+    expect(A2_READING_TASKS[20].text).toContain("Wasserkocher");
+    expect(A2_READING_TASKS[20].questions).toHaveLength(5);
     expect(day20).not.toMatch(/Frauensachen|Berufswahl|vor 50 Jahren/i);
     expect(day20).not.toMatch(/1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3|1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD/);
   });
@@ -72,7 +73,7 @@ describe("shared A2 workbook regression", () => {
   it("keeps Day 21 weekend-focused while preserving its historical Teil 2 prompt", () => {
     expect(day21).toContain('title="Ein Wochenende planen"');
     expect(day21).toContain('chapter="8.21"');
-    expect(day21).toContain("Unser Wochenende in Köln");
+    expect(A2_READING_TASKS[21].title).toBe("Unser Wochenende in Köln");
     expect(day21).toContain("Schreiben Sie einen Brief an einen Freund oder eine Freundin");
     expect(day21).toContain("Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind");
     expect(day21).toContain("Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann");
@@ -83,38 +84,38 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 22 focused on weekly planning with contextual Submit", () => {
     expect(day22).toContain('chapter="8.22"');
-    expect(day22).toContain("Eine volle Woche");
-    expect(day22).toContain("KR2oT-mujmI");
+    expect(A2_READING_TASKS[22].title).toBe("Eine volle Woche");
+    expect(day22).toContain("wK9JOG5lhdc");
     expect(day22).not.toMatch(/Gülcan|Willkommensführung|Literaturkurs/i);
     expect(day22).not.toContain("Go to Submission Area");
   });
 
   it("keeps Day 23 commuting tabs and content coherent", () => {
     expect(day23).toContain('chapter="9.23"');
-    expect(day23).toContain("Mein Arbeitsweg");
-    expect(day23).toContain("LtARwiCljLY");
+    expect(A2_READING_TASKS[23].title).toBe("Drei Wege zur Arbeit");
+    expect(day23).toContain("6DA1dYfqEZo");
     expect(day23).not.toMatch(/key:\s*"teil[1-4]"/i);
   });
 
   it("keeps Day 24 focused on vacation planning", () => {
     expect(day24).toContain('chapter="9.24"');
-    expect(day24).toContain("Urlaub in Salzburg");
+    expect(A2_READING_TASKS[24].title).toBe("Welches Angebot passt?");
     expect(day24).toContain("iPScKV6JWaA");
     expect(day24).not.toMatch(/Park-Café|Kindergeburtstag|Weinhaus/i);
   });
 
   it("keeps Day 25 aligned with canonical Lesen & Hören", () => {
     expect(day25).toContain('chapter="9.25"');
-    expect(day25).toContain("Annas Tagesablauf");
-    expect(day25).toContain("m7nP2qE9gNg");
+    expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
+    expect(day25).toContain("showHoeren={false}");
     expect(day25).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
     expect(day25).not.toContain(["There is no", "Hören assignment in this workbook"].join(" "));
   });
 
   it("keeps Day 26 focused on feelings", () => {
     expect(day26).toContain('chapter="10.26"');
-    expect(day26).toContain("Gefühle im Alltag");
-    expect(day26).toContain("9OVfA1B-nuU");
+    expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
+    expect(day26).toContain("JEJZypJfrD8");
     expect(day26).toContain("A2Days26To28LearningUpgrade");
     expect(day26).toContain("SpeakingMindMap");
     expect(day26).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
@@ -123,14 +124,14 @@ describe("shared A2 workbook regression", () => {
   it("preserves the already-clean Day 27 digital communication lesson", () => {
     expect(day27).toContain('chapter="10.27"');
     expect(day27).toContain("Digitale Kommunikation");
-    expect(day27).toContain("Telefonieren und Internet in Deutschland");
+    expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
     expect(day27).toContain("A2Days26To28LearningUpgrade");
     expect(day27).toContain("JEJZypJfrD8");
   });
 
   it("keeps Day 28 future-focused with standard Grammar and Submit ownership", () => {
     expect(day28).toContain('chapter="10.28"');
-    expect(day28).toContain("Meine Pläne für die nächsten Jahre");
+    expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
     expect(day28).toContain("A2Days26To28LearningUpgrade");
     expect(day28).toContain("Teuu287XY_M");
     expect(day28).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
