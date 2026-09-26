@@ -221,7 +221,7 @@ const guidanceDayReplacement = `${guidanceDayAnchor}
     );
   }, [workbookLevel]);
   const isGoetheSelfCheckDay =
-    workbookLevel === "A2" && [21, 22, 23, 24, 26, 27, 28].includes(Number(workbookDay));
+    workbookLevel === "A2" && [21, 22, 23, 24, 26].includes(Number(workbookDay));
   const isDay25ReadingOnly = workbookLevel === "A2" && Number(workbookDay) === 25;`;
 if (!guidanceSource.includes("const isGoetheSelfCheckDay =")) {
   if (!guidanceSource.includes(guidanceDayAnchor)) {
