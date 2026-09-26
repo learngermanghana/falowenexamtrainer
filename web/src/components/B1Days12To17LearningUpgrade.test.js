@@ -4,12 +4,12 @@ import path from "path";
 const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
 
 describe("B1 Days 12-17 thinking and quiz-first grammar upgrade", () => {
-  test("central grammar tab does not stack the legacy upgrade on Days 12-16", () => {
+  test("central grammar tab does not stack the legacy upgrade on Days 12-17", () => {
     const source = read("A2B1WorkbookGrammarNotesContent.js");
-    expect(source).toContain('import B1Days12To17LearningUpgrade from "./B1Days12To17LearningUpgrade"');
-    expect(source).toContain('normalizedLevel === "B1" && numericDay === 17');
+    expect(source).not.toContain('import B1Days12To17LearningUpgrade from "./B1Days12To17LearningUpgrade"');
+    expect(source).not.toContain('showB1Day17Upgrade');
+    expect(source).not.toContain('<B1Days12To17LearningUpgrade day={numericDay} />');
     expect(source).not.toContain('normalizedLevel === "B1" && numericDay >= 12 && numericDay <= 17');
-    expect(source).toContain("showB1Day17Upgrade ? <B1Days12To17LearningUpgrade day={numericDay} /> : null");
     expect(source.indexOf("<A2B1GrammarVideoCard level={level} day={day} />")).toBeLessThan(
       source.indexOf("<GrammarNotes />"),
     );
