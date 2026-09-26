@@ -10,6 +10,7 @@ const {
   completionNextLesson,
   learnerSupportStateHandler,
   safeResumeState,
+  buildDailyLearningPlan,
 } = require("../routes/learnerSupport");
 
 describe("learner support state", () => {
@@ -234,6 +235,145 @@ describe("learner support state", () => {
       completed: false,
       radioDone: true,
       lastActivityAt: "2026-09-26T07:30:00.000Z",
+    });
+  });
+
+  test("daily plan prioritizes failed work before resume and attendance", () => {
+    const plan = buildDailyLearningPlan({
+      access: { allowed: true, state: "paid-active" },
+      level: "B1",
+      review: {
+        needsImprovement: true,
+        lesson: {
+          title: "Medien & Homeoffice",
+          route: "/campus/course/lesson/B1/15?chapter=5.15",
+        },
+        updatedAt: "2026-09-26T09:00:00.000Z",
+      },
+      resume: {
+        level: "B1",
+        day: 16,
+        title: "Bewerbung",
+        activeView: "schreiben",
+        lastRoute: "/campus/course/lesson/B1/16?view=schreiben",
+        completed: false,
+        lastActivityAt: "2026-09-26T10:00:00.000Z",
+      },
+      attendance: { available: true, rate: 65 },
+      completion: { completionPercent: 48 },
+      nowMs: now,
+    });
+
+    expect(plan.items[0]).toMatchObject({
+      id: "repair-latest-work",
+      type: "review-and-retry",
+      title: "Improve: Medien & Homeoffice",
+      url: "/campus/course/lesson/B1/15?chapter=5.15",
+    });
+    expect(plan.items.some((item) => item.id === "attendance-reset")).toBe(true);
+    expect(plan.items.some((item) => item.id === "resume-last-section")).toBe(false);
+  });
+
+  test("daily plan moves forward while tutor marking is pending", () => {
+    const plan = buildDailyLearningPlan({
+      access: { allowed: true, state: "paid-active" },
+      level: "A2",
+      review: { pending: true, updatedAt: "2026-09-26T11:00:00.000Z" },
+      resume: {
+        level: "A2",
+        day: 5,
+        activeView: "submit",
+        lastRoute: "/campus/course/lesson/A2/5?view=submit",
+        completed: false,
+      },
+      completion: {
+        nextDay: 6,
+        nextChapter: "3.6",
+        nextLabel: "Möbel & Räume",
+        nextRoute: "/campus/course/lesson/A2/6?chapter=3.6",
+        awaitingReview: 1,
+      },
+      nowMs: now,
+    });
+
+    expect(plan.items[0]).toMatchObject({
+      id: "continue-while-marking",
+      reason: "continue_while_marking_pending",
+      url: "/campus/course/lesson/A2/6?chapter=3.6",
+    });
+    expect(plan.items.some((item) => item.id === "resume-last-section")).toBe(false);
+  });
+
+  test("daily plan adds a return warm-up after three inactive days without overriding resume", () => {
+    const plan = buildDailyLearningPlan({
+      access: { allowed: true, state: "paid-active" },
+      level: "C1",
+      review: { status: "none" },
+      resume: {
+        level: "C1",
+        day: 16,
+        title: "Technologie im Alltag",
+        activeView: "write",
+        lastRoute: "/campus/course/lesson/C1/16?view=write&radio=done",
+        completed: false,
+        radioDone: true,
+        lastActivityAt: "2026-09-20T12:00:00.000Z",
+      },
+      completion: { completionPercent: 52 },
+      nowMs: now,
+    });
+
+    expect(plan.items[0]).toMatchObject({
+      id: "resume-last-section",
+      title: "Finish Technologie im Alltag · Write",
+    });
+    expect(plan.items[1]).toMatchObject({
+      id: "return-warmup",
+      type: "warmup-review",
+    });
+    expect(plan.inactivityDays).toBe(6);
+  });
+
+  test("daily plan adds A1 finish preparation near course completion", () => {
+    const plan = buildDailyLearningPlan({
+      access: { allowed: true, state: "paid-active" },
+      level: "A1",
+      review: { status: "none" },
+      completion: {
+        completionPercent: 86,
+        nextDay: 22,
+        nextLabel: "Final review",
+        nextRoute: "/campus/course/lesson/A1/22",
+        courseWorkCompleted: false,
+      },
+      nowMs: now,
+    });
+
+    expect(plan.items[0]).toMatchObject({
+      id: "next-course-item",
+      url: "/campus/course/lesson/A1/22",
+    });
+    expect(plan.items.some((item) => item.id === "a1-finish-prep")).toBe(true);
+  });
+
+  test("daily plan uses one access-restoration item when access is blocked", () => {
+    const plan = buildDailyLearningPlan({
+      access: { allowed: false, state: "trial-ended", reason: "trial_ended" },
+      nextAction: {
+        type: "complete-payment",
+        label: "Complete payment to continue after your trial",
+        reason: "trial_ended",
+        url: "/campus/account?tab=billing",
+      },
+      level: "A1",
+      nowMs: now,
+    });
+
+    expect(plan.items).toHaveLength(1);
+    expect(plan.primaryAction).toMatchObject({
+      id: "restore-access",
+      type: "complete-payment",
+      url: "/campus/account?tab=billing",
     });
   });
 
