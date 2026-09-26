@@ -91,6 +91,46 @@ const PreparedCheckbox = ({ checked, onChange }) => (
   </label>
 );
 
+const WritingVideoCard = ({ resource }) => {
+  if (!resource) return null;
+  return (
+    <div
+      data-writing-video-support="true"
+      aria-label="B1 writing explanation video"
+      style={{
+        display: "grid",
+        gap: 12,
+        border: "1px solid #bfdbfe",
+        borderRadius: 16,
+        padding: 14,
+        background: "#eff6ff",
+      }}
+    >
+      <span style={{ width: "fit-content", borderRadius: 999, padding: "5px 10px", background: "#dbeafe", color: "#1e3a8a", fontSize: ".82rem", fontWeight: 800 }}>
+        Writing Video · Essay Ideas
+      </span>
+      <h3 style={{ margin: 0, color: "#1e3a8a" }}>{resource.title || "Writing explanation video"}</h3>
+      {resource.description ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>{resource.description}</p> : null}
+      {resource.embedUrl ? (
+        <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#0f172a" }}>
+          <iframe
+            title={resource.title || "Writing explanation video"}
+            src={resource.embedUrl}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+          />
+        </div>
+      ) : resource.url ? (
+        <a href={resource.url} target="_blank" rel="noreferrer" style={{ width: "fit-content", fontWeight: 800, color: "#1d4ed8" }}>
+          Open writing video
+        </a>
+      ) : null}
+    </div>
+  );
+};
+
 const SectionImage = ({ image, alt }) => {
   if (!image) return null;
   return <img src={image} alt={alt || "Workbook section"} loading="lazy" style={imageStyle} />;
@@ -351,6 +391,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
               ) : null}
             </>
           )}
+
+          <WritingVideoCard resource={config.writingVideo} />
 
           <CourseInlinePracticePanel
             type="writing"
