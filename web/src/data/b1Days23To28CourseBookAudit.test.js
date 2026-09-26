@@ -107,7 +107,30 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
     });
   });
 
-  test("CourseLessonPage mounts all six native workbooks and no non-existent grammar components", () => {
+
+  test("Days 24-28 now have native deep grammar inside the shared workbook Grammar tab", () => {
+    const grammarContent = componentSource("A2B1WorkbookGrammarNotesContent.js");
+    const availability = componentSource("a2B1GrammarAvailability.js");
+    const grammarFiles = [
+      "B1Day24KonsumNachhaltigkeitGrammarNotesPage.js",
+      "B1Day25OnlineShoppingRightsRisksGrammarNotesPage.js",
+      "B1Day26ReiseproblemeGrammarNotesPage.js",
+      "B1Day27UmweltfreundlichAlltagGrammarNotesPage.js",
+      "B1Day28KlimafreundlichLebenGrammarNotesPage.js",
+    ];
+
+    grammarFiles.forEach((fileName, index) => {
+      const day = index + 24;
+      expect(grammarContent).toContain(fileName.replace(".js", ""));
+      const source = componentSource(fileName);
+      expect(source).toContain(`B1 · Day ${day} · Grammar Notes`);
+      expect(source).toContain(`<B1GrammarEnglishSupport day={${day}} />`);
+    });
+
+    expect(availability).toContain("24, 25, 26, 27, 28");
+  });
+
+  test("CourseLessonPage mounts all six native workbooks and no standalone grammar routes", () => {
     const courseLessonPage = componentSource("CourseLessonPage.js");
     const workbookComponents = [
       "B1Day23ErstesDateWorkbookPage",
