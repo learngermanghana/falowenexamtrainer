@@ -855,7 +855,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/a2-day-18-die-bank-anrufen-workbook" element={withRadioWorkbookGate("A2", 18, <A2Day18DieBankAnrufenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook" element={withRadioWorkbookGate("A2", 19, <A2Day19EinkaufenWoUndWieWorkbookPage />)} />
-          <Route path="/campus/course/a2-day-20-typische-reklamationssituationen-workbook" element={<A2Day20TypischeReklamationssituationenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-20-typische-reklamationssituationen-workbook" element={withRadioWorkbookGate("A2", 20, <A2Day20TypischeReklamationssituationenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-21-ein-wochenende-planen-workbook" element={withRadioWorkbookGate("A2", 21, <A2Day21EinWochenendePlanenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-22-die-woche-planung-workbook" element={withRadioWorkbookGate("A2", 22, <A2Day22DieWochePlanungWorkbookPage />)} />
           <Route path="/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook" element={withRadioWorkbookGate("A2", 23, <A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />)} />
