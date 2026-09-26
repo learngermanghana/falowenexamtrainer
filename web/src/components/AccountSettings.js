@@ -478,6 +478,13 @@ const AccountSettings = () => {
           balanceDue={balanceDue}
           tuitionFee={billingSummary.tuitionFee}
           checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
+          paymentActionLabel={
+            billingState.key === "pending-attempt"
+              ? "Continue payment"
+              : billingState.key === "partial"
+                ? "Pay balance"
+                : undefined
+          }
           title={t("accountSettings.billing.balanceTitle")}
           description={
             billingState.key === "pending-attempt"
