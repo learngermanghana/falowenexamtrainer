@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -20,6 +21,7 @@ const QuestionList = ({ items }) => <div style={{ display: "grid", gap: 10 }}>{i
 const Prepared = ({ checked, onChange }) => <label style={{ display: "inline-flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={checked} onChange={onChange} /> I prepared this part.</label>;
 
 const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(8);
   const writing = getB1WritingTask(8);
   const mark = setPreparedFor;
   return (
@@ -51,7 +53,7 @@ const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 
     {activeTab === "lesen" && <section style={card}>
       <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
-      <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text „Ein moderner Held in der Medizinwelt“ und beantworten Sie 7 Fragen." submissionNote="Submit only answer letters, for example: 1A, 2B, 3C."><p style={{ margin: 0 }}>Read the complete text. Choose one answer, a–d, for each question.</p></WorkbookTaskCard>
+      <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}><p style={{ margin: 0 }}>{reading.instructions}</p></WorkbookTaskCard>
       <h3 style={{ margin: 0 }}>Ein moderner Held in der Medizinwelt</h3>
       {B1_DAY8_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
       <QuestionList items={B1_DAY8_READING_QUESTIONS} />

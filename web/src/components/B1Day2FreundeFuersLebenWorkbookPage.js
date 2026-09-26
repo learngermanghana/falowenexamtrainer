@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { styles } from "../styles";
@@ -65,6 +66,7 @@ const QuestionList = ({ questions }) => (
 );
 
 const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(2);
   const writing = getB1WritingTask(2);
   const mark = setPreparedFor;
   return (
@@ -132,10 +134,10 @@ const B1Day2PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Essay und beantworten Sie alle sieben Fragen."
-            submissionNote="Submit only the answer letters in this format: 1B, 2A, 3C ..."
+            title={reading.title}
+            submissionNote={reading.submissionNote}
           >
-            <p style={{ margin: 0 }}>Read the complete text first. Then select one answer, A–C, for each question.</p>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1600&q=80" alt="Reading exercise about true friendship" loading="lazy" style={tabImageStyle} />
           <h3 style={sectionTitle}>Essay: Was bedeutet es, ein wahrer Freund zu sein?</h3>

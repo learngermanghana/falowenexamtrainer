@@ -1,5 +1,5 @@
 // Canonical B1 Lesen source of truth.
-// Initial migration covers config-driven workbook days; preserved-section days follow separately.
+// All 28 B1 days resolve their reading task contract from this canonical registry.
 
 export const B1_READING_TASKS = Object.freeze({
   9: Object.freeze({ assignmentKey: "B1-3.9", ...{
@@ -553,6 +553,18 @@ export const B1_READING_TASKS = Object.freeze({
       ],
     },
   } }),
+  1: Object.freeze({ assignmentKey: "B1-1.1", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3C ..." }),
+  2: Object.freeze({ assignmentKey: "B1-1.2", title: "Lesen Sie den Essay und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then select one answer, A–C, for each question.", submissionNote: "Submit only the answer letters in this format: 1B, 2A, 3C ..." }),
+  3: Object.freeze({ assignmentKey: "B1-1.3", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3C ..." }),
+  4: Object.freeze({ assignmentKey: "B1-2.4", title: "Lesen Sie den Text und beantworten Sie alle fünf Fragen.", instructions: "Read the complete text first. Then choose one answer, A–C, for every question.", submissionNote: "Submit only the answer letters in this format: 1B, 2A, 3C ..." }),
+  5: Object.freeze({ assignmentKey: "B1-2.5", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1B, 2A, 3C ..." }),
+  6: Object.freeze({ assignmentKey: "B1-2.6", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–C, for every question.", submissionNote: "Submit only answer letters, for example: 1B, 2C, 3A." }),
+  7: Object.freeze({ assignmentKey: "B1-3.7", title: "Lesen Sie den Text und beantworten Sie sieben Textfragen und fünf Anzeige-Fragen.", instructions: "Read the complete text first. Then choose one answer, A–C, for questions 1–7 and one Anzeige letter, A–F, for questions 1–5.", submissionNote: "Submit only answer letters, for example: Text: 1A, 2B. Anzeigen: 1F, 2B." }),
+  8: Object.freeze({ assignmentKey: "B1-3.8", title: "Lesen Sie den Text „Ein moderner Held in der Medizinwelt“ und beantworten Sie 7 Fragen.", instructions: "Read the complete text. Choose one answer, a–d, for each question.", submissionNote: "Submit only answer letters, for example: 1A, 2B, 3C." }),
+  11: Object.freeze({ assignmentKey: "B1-4.11", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1C, 2B, 3C …" }),
+  19: Object.freeze({ assignmentKey: "B1-6.19", title: "Lesen Sie den Text und beantworten Sie 3 Fragen.", instructions: "Read the complete text „Ein Dorf für grüne Energie“. Choose one answer, a–c, for each question.", submissionNote: "Submit only answer letters, for example: 1B, 2A, 3C." }),
+  20: Object.freeze({ assignmentKey: "B1-6.20", title: "Lesen Sie den Blogeintrag und beantworten Sie alle sechs Richtig/Falsch-Fragen.", instructions: "Lesen Sie zuerst den vollständigen Text. Entscheiden Sie danach bei jeder Aussage: A) Richtig oder B) Falsch.", submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3A …" }),
+  22: Object.freeze({ assignmentKey: "B1-7.22", title: "Lesen Sie den Text Berlin und beantworten Sie alle fünf Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1D, 2B, 3D …" }),
 });
 
 export function getB1ReadingTask(day) {

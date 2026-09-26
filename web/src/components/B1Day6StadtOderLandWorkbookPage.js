@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -52,6 +53,7 @@ const Prepared = ({ checked, onChange }) => (
 );
 
 const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(6);
   const writing = getB1WritingTask(6);
   const mark = setPreparedFor;
   return (
@@ -96,8 +98,8 @@ const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie alle sieben Fragen." submissionNote="Submit only answer letters, for example: 1B, 2C, 3A.">
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–C, for every question.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={{ margin: 0 }}>Verschiedene Wohnarten in Deutschland</h3>
           {B1_DAY6_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}

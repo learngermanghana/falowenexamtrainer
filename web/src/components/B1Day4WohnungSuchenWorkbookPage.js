@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
@@ -82,6 +83,7 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(4);
   const writing = getB1WritingTask(4);
   const mark = setPreparedFor;
   return (
@@ -169,10 +171,10 @@ const B1Day4PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
             eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Text und beantworten Sie alle fünf Fragen."
-            submissionNote="Submit only the answer letters in this format: 1B, 2A, 3C ..."
+            title={reading.title}
+            submissionNote={reading.submissionNote}
           >
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–C, for every question.</p>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={sectionTitle}>Die Herausforderungen der Wohnungssuche in Großstädten</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>In vielen Großstädten Deutschlands ist bezahlbarer Wohnraum knapp. Die Mieten steigen, und viele Interessenten bewerben sich um dieselbe Wohnung. Dadurch haben Menschen mit geringerem Einkommen oft schlechtere Chancen.</p>

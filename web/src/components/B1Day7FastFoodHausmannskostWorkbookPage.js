@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -53,6 +54,7 @@ const Prepared = ({ checked, onChange }) => (
 );
 
 const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(7);
   const writing = getB1WritingTask(7);
   const mark = setPreparedFor;
   return (
@@ -99,8 +101,8 @@ const B1Day7PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Lesen Sie den Text und beantworten Sie sieben Textfragen und fünf Anzeige-Fragen." submissionNote="Submit only answer letters, for example: Text: 1A, 2B. Anzeigen: 1F, 2B.">
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–C, for questions 1–7 and one Anzeige letter, A–F, for questions 1–5.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}>
+            <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <h3 style={{ margin: 0 }}>Der Einfluss von Süßigkeiten auf die Gesundheit</h3>
           {B1_DAY7_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
