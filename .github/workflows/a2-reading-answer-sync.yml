@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "web/src/components/A2Day*WorkbookPage.js"
+      - "web/src/components/A2ReadingTaskPanel.js"
+      - "web/src/data/a2ReadingTasks.js"
       - "functions/data/answerKeyManifest.json"
       - "scripts/auditA2ReadingAnswerSync.mjs"
       - "docs/a2-answer-sheet-sync.md"
