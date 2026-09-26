@@ -26,11 +26,16 @@ const B1_GRAMMAR_NOTE_FILES = [
   "B1Day21LebensformenHeuteGrammarNotesPage.js",
   "B1Day22BeziehungWichtigGrammarNotesPage.js",
   "B1Day23ErstesDateGrammarNotesPage.js",
+  "B1Day24KonsumNachhaltigkeitGrammarNotesPage.js",
+  "B1Day25OnlineShoppingRightsRisksGrammarNotesPage.js",
+  "B1Day26ReiseproblemeGrammarNotesPage.js",
+  "B1Day27UmweltfreundlichAlltagGrammarNotesPage.js",
+  "B1Day28KlimafreundlichLebenGrammarNotesPage.js",
 ];
 
 describe("B1 grammar English support", () => {
-  test("covers every existing B1 grammar-note day from 1 to 23 with substantial support", () => {
-    for (let day = 1; day <= 23; day += 1) {
+  test("covers every B1 grammar-note day from 1 to 28 with substantial support", () => {
+    for (let day = 1; day <= 28; day += 1) {
       const support = getB1GrammarEnglishSupport(day);
       expect(support).toBeTruthy();
       expect(support.terms.length).toBeGreaterThan(10);
@@ -42,11 +47,6 @@ describe("B1 grammar English support", () => {
     }
   });
 
-  test("does not invent English support for B1 days without grammar-note pages", () => {
-    [24, 25, 26, 27, 28].forEach((day) => {
-      expect(getB1GrammarEnglishSupport(day)).toBeNull();
-    });
-  });
 
   test("Day 15 explains the passive clearly in English", () => {
     const day15 = getB1GrammarEnglishSupport(15);
