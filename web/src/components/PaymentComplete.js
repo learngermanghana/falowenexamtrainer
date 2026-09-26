@@ -5,8 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
 const PaymentComplete = () => {
-  const { refreshUser, user } = useAuth();
-  const [message, setMessage] = useState("Refreshing your payment status...");
+  const { refreshUser, refreshStudentProfile, user } = useAuth();
+  const [message, setMessage] = useState("Checking for Paystack confirmation...");
 
   useEffect(() => {
     let timeoutId;
@@ -14,14 +14,15 @@ const PaymentComplete = () => {
       try {
         if (user) {
           await refreshUser();
+          await refreshStudentProfile?.();
         }
-        setMessage("Thanks! Your payment is syncing. Taking you back to the app...");
+        setMessage("Your payment was submitted. Falowen will show it as paid only after Paystack confirmation.");
       } catch (error) {
         console.error("Failed to refresh after payment", error);
-        setMessage("Thanks! Your payment is processing. We'll keep checking in the app.");
+        setMessage("Your payment was submitted. Confirmation may still be processing; check Account & Billing for the latest status.");
       } finally {
         timeoutId = setTimeout(() => {
-          window.location.replace("/");
+          window.location.replace("/campus/account?tab=billing&payment=return");
         }, 1200);
       }
     };
@@ -33,14 +34,14 @@ const PaymentComplete = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [refreshUser, user]);
+  }, [refreshStudentProfile, refreshUser, user]);
 
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, maxWidth: 520, width: "100%" }}>
-        <h2 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Payment received</h2>
+        <h2 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Payment submitted</h2>
         <p style={{ ...styles.helperText, marginBottom: 16 }}>{message}</p>
-        <AppBackButton label="Back to dashboard" fallbackPath="/" />
+        <AppBackButton label="Open Account & Billing" fallbackPath="/campus/account?tab=billing" />
       </div>
     </div>
   );
