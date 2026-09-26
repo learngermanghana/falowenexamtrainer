@@ -133,6 +133,23 @@ AI assistants must **not** guess a learner's payment, access, marking, attendanc
 
 Falowen Radio remains enforced by the lesson route. If learner state reports Radio completion as unknown, do not claim it is complete.
 
+### Smart Learning Interventions
+
+Authenticated Falowen learner state also returns a rule-driven `learningPlan` titled **Your learning plan today**. The plan contains at most three ordered tasks and uses the same state as Study Buddy and the Home dashboard.
+
+Priority rules:
+
+1. Restore access when trial/payment/contract access blocks learning.
+2. Fix tutor-marked work that needs improvement.
+3. When work is waiting for tutor marking, continue the canonical next lesson.
+4. Resume the exact unfinished synced lesson section.
+5. Continue the next incomplete Course Book item.
+6. Add a short return warm-up after several inactive days.
+7. Surface low attendance as a secondary support action when attendance data is available.
+8. Near the end of A1, add short exam preparation; after A1 course completion, begin A1 → A2 transition guidance.
+
+AI must preserve this order. It may explain or coach the learner through a plan item, but it must not replace the server plan with a generic study routine when authenticated `learningPlan.items` are available.
+
 ### Cross-device Smart Resume
 
 Falowen stores one authenticated lesson-resume record per learner, level and day. It can include the last active section, exact resume route, tracked section completion, lesson completion and Falowen Radio completion.

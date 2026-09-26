@@ -17,7 +17,8 @@
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
     "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
     "Never infer a specific learner's access, payment, marking, attendance or completion state from public navigation data. Inside authenticated Falowen support, use the protected learner-state service and follow its nextAction.",
-    "For a signed-in learner asking where they stopped or what to continue, use authenticated learner-state Smart Resume before public course-map navigation. Never infer another learner's resume state from public data."
+    "For a signed-in learner asking where they stopped or what to continue, use authenticated learner-state Smart Resume before public course-map navigation. Never infer another learner's resume state from public data.",
+    "For signed-in questions like 'What should I study today?' or 'What should I do next?', use authenticated learningPlan.items in order. Do not replace the server plan with a generic study routine."
   ],
   "navigation": [
     {

@@ -119,6 +119,16 @@ describe("Study Buddy conversation memory", () => {
         label: "Complete payment to continue after your trial",
         url: "/campus/account?tab=billing",
       },
+      learningPlan: {
+        summary: "Restore access before continuing your course.",
+        items: [
+          {
+            id: "restore-access",
+            title: "Complete payment to continue after your trial",
+            url: "/campus/account?tab=billing",
+          },
+        ],
+      },
     });
     callAI.mockResolvedValue({ reply: "Your trial has ended. Complete payment to continue." });
 
@@ -139,7 +149,10 @@ describe("Study Buddy conversation memory", () => {
     expect(request.payload.message).toContain("Falowen access state: trial-ended");
     expect(request.payload.message).toContain("Authoritative next action: Complete payment to continue after your trial");
     expect(request.payload.message).toContain("Authoritative next URL: /campus/account?tab=billing");
+    expect(request.payload.message).toContain("Daily learning plan: 1. Complete payment to continue after your trial -> /campus/account?tab=billing");
+    expect(request.payload.message).toContain("Daily plan summary: Restore access before continuing your course.");
     expect(request.payload.message).toContain("Do not invent a different reason for blocked access");
+    expect(request.payload.message).toContain("Do not replace it with a generic study plan");
   });
 
   it("stores successful exchanges and keeps levels separated", async () => {
