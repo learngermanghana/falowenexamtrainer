@@ -30,6 +30,6 @@ describe("B1 canonical listening registry", () => {
     expect(getB1ListeningTask(19).mode).toBe("reading-fallback");
     expect(getB1ListeningTask(21).status).toBe("unavailable");
     expect(getB1ListeningTask(22).mode).toBe("reading-fallback");
-    expect(getB1ListeningTask(23).status).toBe("planned");
+    expect(getB1ListeningTask(23).status).toBe("unavailable");
   });
 });
