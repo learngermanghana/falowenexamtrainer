@@ -1,0 +1,25 @@
+name: A2 assignment consistency
+
+on:
+  pull_request:
+    paths:
+      - "functions/data/answerKeyManifest.json"
+      - "scripts/auditA2AssignmentConsistency.mjs"
+      - "web/src/components/A2*Workbook*.js"
+      - "web/src/components/A2StandardTabbedWorkbookPage.js"
+      - "web/src/components/A2ReadingTaskPanel.js"
+      - "web/src/data/a2GoetheWritingTasks.js"
+      - "web/src/data/a2ReadingTasks.js"
+      - ".github/workflows/a2-assignment-consistency.yml"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit A2 Days 1–28
+        run: node scripts/auditA2AssignmentConsistency.mjs
