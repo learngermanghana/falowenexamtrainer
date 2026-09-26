@@ -53,8 +53,8 @@ const addClassParticipationToDay0 = (source, level) => {
 
 let courseTab = fs.readFileSync(courseTabPath, "utf8");
 
-// A2 has a canonical Day 29 milestone at the bottom. Do not duplicate it in
-// the generic next-lesson slot at the top.
+// A2 has a canonical Day 30 completion milestone after the Day 29 exam orientation.
+// Do not duplicate it in the generic next-lesson slot at the top.
 const completionText = "Course Book complete";
 if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
   const completionTextIndex = courseTab.indexOf(completionText);
@@ -81,8 +81,10 @@ if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
 }
 
 let schedule = fs.readFileSync(schedulePath, "utf8");
-if (!schedule.includes('day: 29,\n    topic: "Course Completed!"')) {
-  throw new Error("A2 Day 29 completion milestone is missing; cannot suppress the duplicate top message safely.");
+if (!schedule.includes('day: 30,\n    topic: "Course Completed!"')) {
+  throw new Error(
+    "A2 Day 30 completion milestone is missing after Day 29 exam orientation; cannot suppress the duplicate top message safely.",
+  );
 }
 
 // Retire the old email-based completion wording at the data source too. This
@@ -129,5 +131,5 @@ for (const [level, day0Path] of day0Paths) {
 }
 
 console.log(
-  "Legacy completion copy retired; A2 milestone remains bottom-only and A1-A2-B1 Day 0 includes Class Participation.",
+  "Legacy completion copy retired; A2 Day 30 milestone remains bottom-only after Day 29 exam orientation, and A1-A2-B1 Day 0 includes Class Participation.",
 );
