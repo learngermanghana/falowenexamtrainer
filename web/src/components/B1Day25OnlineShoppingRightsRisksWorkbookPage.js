@@ -43,30 +43,7 @@ const config = {
     usefulPhrases: ["Ich möchte die Ware zurückgeben.", "Das Produkt ist beschädigt angekommen.", "Wie funktioniert die Rücksendung?", "Ich möchte mein Geld zurück.", "Könnten Sie mir bitte Ersatz schicken?"],
   },
   writing: getB1WritingTask(25),
-  reading: {
-    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
-    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
-    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Reading about consumer rights and daily decisions",
-    text: {
-      title: "Selbstständigkeit, Umweltschutz und Verbraucherberatung in Deutschland",
-      paragraphs: [
-        "Ich habe einen eigenen Friseursalon. Ein großer Vorteil daran ist, dass ich endlich gut Geld verdienen kann. Früher, als ich angestellt war, war mein Gehalt sehr niedrig. Jetzt ist das anders. Ich kann selbst entscheiden, welche Dienstleistungen ich anbiete, und bin unabhängig. Viele Kunden bleiben mir treu, obwohl es in Kaufhäusern oft günstigere Angebote gibt. Das liegt daran, dass wir auf gute Beratung achten und uns viel Zeit für die Kunden nehmen.",
-        "Ein Problem in meiner Arbeit ist die Konkurrenz. Ein weiteres Problem ist die Sozialversicherung. Als Selbstständige muss ich keine Rentenversicherung haben, aber ich habe freiwillig eine abgeschlossen. Auch wenn ich später vielleicht nicht viel Rente bekomme, habe ich dadurch eine gewisse Sicherheit. Insgesamt bin ich sehr zufrieden mit meiner Selbstständigkeit.",
-        "In meiner Familie spielt auch der Umweltschutz eine wichtige Rolle. Wir fahren mit dem Fahrrad oder mit öffentlichen Verkehrsmitteln, wenn wir einkaufen gehen. Außerdem achten wir darauf, möglichst wenig Müll zu produzieren. Wir kaufen Produkte mit wenig Verpackung und trennen den Müll richtig. Ich habe das Gefühl, dass die Menschen heute umweltbewusster sind als früher. Auch wir sparen Energie in der Wohnung: Wir heizen nur die Zimmer, die wir benutzen, und schalten das Licht und elektrische Geräte aus, wenn wir das Haus verlassen.",
-        "Wenn man Fragen rund um das Thema Konsum hat, kann man sich in Deutschland an die Verbraucherzentralen wenden. Es gibt ungefähr 200 Beratungsstellen in allen Bundesländern. Die Mitarbeiter dort helfen bei Fragen zu Kaufverträgen, Krediten, Gewinnspielen, Versicherungen oder auch beim Wechsel des Stromanbieters. Sie informieren auch über Lebensmittel und gesunde Ernährung. Die Verbraucherzentralen werden vom Staat unterstützt, aber trotzdem müssen Kunden für manche Beratungen etwas bezahlen. Einfache Informationen sind oft kostenlos. Im Internet gibt es viele Broschüren, die man gratis herunterladen kann.",
-      ],
-      questions: [
-        { stem: "Warum ist die Friseurin zufrieden mit ihrer Arbeit?", options: ["A) Sie arbeitet in Teilzeit.", "B) Sie ist selbstständig und verdient mehr.", "C) Sie hat einen neuen Chef.", "D) Sie muss keine Kunden bedienen."] },
-        { stem: "Warum bleiben viele Kunden bei ihrem Friseursalon?", options: ["A) Weil sie keine andere Wahl haben.", "B) Weil der Salon am billigsten ist.", "C) Weil Service und Beratung gut sind.", "D) Weil sie dort arbeiten."] },
-        { stem: "Was macht die Familie für den Umweltschutz?", options: ["A) Sie nutzt immer das Auto.", "B) Sie trennt Müll und spart Energie.", "C) Sie kauft viele neue Geräte.", "D) Sie wirft alles in den gleichen Müll."] },
-        { stem: "Was passiert in der Wohnung, wenn niemand zu Hause ist?", options: ["A) Die Heizung wird höher gestellt.", "B) Alle Lichter bleiben an.", "C) Licht und elektrische Geräte werden ausgeschaltet.", "D) Die Türen bleiben offen."] },
-        { stem: "Was bieten die Verbraucherzentralen an?", options: ["A) Friseurdienstleistungen", "B) Beratung zu Konsum, Verträgen und Ernährung", "C) Fahrstunden", "D) Sportkurse"] },
-        { stem: "Wie werden die Verbraucherzentralen finanziert?", options: ["A) Nur durch Spenden", "B) Nur durch Mitgliedsbeiträge", "C) Durch staatliche Unterstützung und teilweise Kundenzahlungen", "D) Nur durch Werbung"] },
-        { stem: "Was ist im Internet kostenlos erhältlich?", options: ["A) Kinokarten", "B) Broschüren mit Informationen", "C) Reisen ins Ausland", "D) Elektronische Geräte"] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(25),
   listening: {
     title: "Bearbeiten Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
     instructions: "Complete the listening task without checking the solutions first. Listen a second time where necessary.",

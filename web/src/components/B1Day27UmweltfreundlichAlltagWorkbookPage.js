@@ -32,32 +32,7 @@ export const B1_DAY27_UMWELTFREUNDLICH_ALLTAG_WORKBOOK_CONFIG = {
     usefulPhrases: ["Zu Hause kann man umweltfreundlicher leben, indem man ...", "Beim Einkaufen ist es sinnvoll, ...", "Unterwegs könnte man öfter ...", "Für mich ist schwierig, dass ...", "Gut klappt schon, dass ..."],
   },
   writing: getB1WritingTask(27),
-  reading: {
-    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
-    instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Protecting the environment",
-    text: {
-      title: "Die Umwelt schützen: Was können wir tun?",
-      questionTitle: "Questions",
-      paragraphs: [
-        "Die Umwelt zu schützen ist eine der größten Herausforderungen unserer Zeit. Es gibt viele Maßnahmen, die wir ergreifen können, um unseren Planeten zu schützen. Eine der effektivsten Methoden ist das Recycling. Durch das Wiederverwerten von Materialien wie Papier, Glas und Plastik können wir die Menge an Abfall reduzieren, der auf Deponien landet. Das spart nicht nur Platz, sondern auch Ressourcen.",
-        "Ein weiterer wichtiger Aspekt ist der Energieverbrauch. Indem wir energieeffiziente Geräte nutzen und bewusster mit Energie umgehen, können wir unseren CO2-Fußabdruck verringern. Dies schließt auch den Einsatz erneuerbarer Energien wie Solar- oder Windkraft ein.",
-        "Der Transport ist ein weiterer Bereich, in dem wir viel bewirken können. Wenn wir öfter das Fahrrad nutzen oder öffentliche Verkehrsmittel nehmen, reduzieren wir die Emissionen, die durch Autos verursacht werden. Auch das Carsharing kann eine umweltfreundliche Alternative sein.",
-        "Nicht zuletzt spielt der Konsum eine große Rolle. Wir sollten bewusster einkaufen und Produkte bevorzugen, die umweltfreundlich hergestellt wurden. Dazu gehört auch, weniger Fleisch zu konsumieren, da die Fleischproduktion sehr ressourcenintensiv ist.",
-        "Jeder Einzelne kann seinen Beitrag leisten. Wenn wir alle kleine Änderungen in unserem Alltag vornehmen, können wir gemeinsam große Erfolge erzielen. Der Schutz der Umwelt beginnt bei jedem von uns.",
-      ],
-      questions: [
-        { stem: "Welche Materialien können recycelt werden?", options: ["A) Nur Plastik", "B) Nur Glas", "C) Papier, Glas und Plastik", "D) Nur Papier"] },
-        { stem: "Wie können wir unseren CO2-Fußabdruck verringern?", options: ["A) Durch den Einsatz energieeffizienter Geräte", "B) Durch den Verzicht auf Recycling", "C) Durch häufigeres Autofahren", "D) Durch den Einsatz von Kohleenergie"] },
-        { stem: "Welche Energiequellen sind erneuerbar?", options: ["A) Kohle und Öl", "B) Solar- und Windkraft", "C) Gas und Atomenergie", "D) Holz und Torf"] },
-        { stem: "Welche Verkehrsmittel helfen, Emissionen zu reduzieren?", options: ["A) Fahrräder und öffentliche Verkehrsmittel", "B) Autos und Motorräder", "C) Flugzeuge und Schiffe", "D) Lastwagen und Busse"] },
-        { stem: "Warum sollten wir weniger Fleisch konsumieren?", options: ["A) Weil es gesund ist", "B) Weil die Fleischproduktion ressourcenintensiv ist", "C) Weil es teuer ist", "D) Weil es schwer zu kochen ist"] },
-        { stem: "Was können wir tun, um die Umwelt zu schützen?", options: ["A) Recycling vernachlässigen", "B) Energie verschwenden", "C) Umweltfreundlich einkaufen", "D) Fleischproduktion fördern"] },
-        { stem: "Wo beginnt der Schutz der Umwelt?", options: ["A) Bei den Politikern", "B) Bei jedem Einzelnen", "C) In den Fabriken", "D) Bei den Tieren"] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(27),
   listening: {
     title: "Bearbeiten Sie den Hörtest und kontrollieren Sie Ihre Antworten selbst.",
     instructions: "Hören Sie zuerst aufmerksam zu. Kontrollieren Sie Ihre Antworten danach mit dem Video.",

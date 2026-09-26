@@ -107,31 +107,7 @@ export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(18),
-  reading: {
-    title: "Lesen Sie den Text über Berufswahl und beantworten Sie die sieben Fragen.",
-    instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Berufswahl und Karriereentscheidung",
-    text: {
-      title: "Berufswahl – Wunsch oder Realität?",
-      questionTitle: "Fragen",
-      paragraphs: [
-        "Die Berufswahl ist eine der wichtigsten Entscheidungen im Leben. Schon in der Schulzeit werden Jugendliche gefragt, was sie später einmal beruflich machen möchten. Doch während einige schon früh eine klare Vorstellung haben, sind andere unsicher oder lassen sich von äußeren Einflüssen, wie Eltern oder Lehrern, leiten. Die Frage ist: Sollte man seinen Traumberuf verfolgen oder lieber einen Beruf wählen, der Sicherheit und ein gutes Einkommen bietet?",
-        "Die Wahl des Berufs ist oft nicht nur eine Frage der Leidenschaft, sondern auch eine der Vernunft. Einige Berufe sind sehr beliebt, aber die Chancen, einen Job in diesem Bereich zu finden, sind gering. Andere Berufe bieten mehr Sicherheit, sind aber vielleicht nicht so spannend. Viele junge Menschen stehen daher vor der schwierigen Entscheidung: Soll ich meinen Traum verfolgen oder lieber auf Nummer sicher gehen?",
-        "Ein weiteres Problem ist, dass sich der Arbeitsmarkt ständig verändert. Was heute ein gefragter Beruf ist, kann morgen schon nicht mehr relevant sein. Das bedeutet, dass Flexibilität und die Bereitschaft, sich weiterzubilden, in der modernen Arbeitswelt immer wichtiger werden. Dennoch bleibt der Wunsch nach einem Traumberuf oft stark, besonders bei jungen Menschen.",
-        "Experten empfehlen, bei der Berufswahl sowohl die eigenen Interessen als auch die realen Bedingungen des Arbeitsmarktes zu berücksichtigen. Eine gute Mischung aus Leidenschaft und Vernunft kann der Schlüssel zu einer erfolgreichen Karriere sein. Letztendlich muss jeder für sich selbst entscheiden, welche Prioritäten bei der Berufswahl am wichtigsten sind.",
-      ],
-      questions: [
-        { stem: "Welche Faktoren beeinflussen die Berufswahl laut Text?", options: ["a) Nur die Leidenschaft.", "b) Nur die Sicherheit.", "c) Leidenschaft und Vernunft.", "d) Nur das Einkommen."] },
-        { stem: "Was wird im Text als wichtiger Aspekt der modernen Arbeitswelt genannt?", options: ["a) Sicherheit.", "b) Flexibilität und Weiterbildung.", "c) Beliebte Berufe.", "d) Elternrat."] },
-        { stem: "Welche Empfehlung geben Experten laut Text?", options: ["a) Nur den Traumberuf verfolgen.", "b) Einen gut bezahlten Beruf wählen.", "c) Eine Mischung aus Leidenschaft und Vernunft finden.", "d) Auf äußere Einflüsse hören."] },
-        { stem: "Warum ist es schwierig, den Traumberuf zu verfolgen?", options: ["a) Die Berufe verändern sich nicht.", "b) Der Traumberuf ist nicht immer gefragt.", "c) Der Traumberuf ist immer unsicher.", "d) Man kann nie wissen, was man will."] },
-        { stem: "Was sollten junge Menschen laut Text bei der Berufswahl berücksichtigen?", options: ["a) Nur die Leidenschaft.", "b) Nur das Gehalt.", "c) Die realen Bedingungen auf dem Arbeitsmarkt.", "d) Nur den Rat der Eltern."] },
-        { stem: "Was passiert oft mit beliebten Berufen laut Text?", options: ["a) Sie werden zu unsicheren Berufen.", "b) Sie bleiben immer gefragt.", "c) Sie sind nur kurzfristig gefragt.", "d) Sie haben immer schlechte Bedingungen."] },
-        { stem: "Wie kann man laut dem Text erfolgreich im Beruf sein?", options: ["a) Durch Flexibilität und Bereitschaft zur Weiterbildung.", "b) Durch die Wahl eines festen Berufs.", "c) Durch die Konzentration auf hohe Gehälter.", "d) Durch völlige Sicherheit in der Berufswahl."] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(18),
   listening: {
     title: "Hören Sie den Text über Berufswahl und beantworten Sie die fünf Fragen.",
     instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",

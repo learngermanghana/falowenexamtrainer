@@ -95,31 +95,7 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
     ],
   },
   writing: getB1WritingTask(26),
-  reading: {
-    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
-    instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Travel destinations in Germany",
-    text: {
-      title: "Urlaubsland Deutschland",
-      questionTitle: "Fragen zum Text",
-      paragraphs: [
-        "Die Auswahl an Attraktionen erscheint fast unbegrenzt, was Deutschland auch bei den eigenen Einwohnern zum populären Urlaubsland macht. Die Deutschen verreisen gerne – und das auch innerhalb ihres Landes, zum Beispiel in das Bundesland Mecklenburg-Vorpommern: Im Sommer wünschen sich viele einen Strandurlaub, und dazu bieten die Ostsee und ihre bekannten Inseln Rügen und Usedom eine wunderschöne Gelegenheit. Die Mecklenburgische Seenplatte mit ihren mehr als 1.000 Seen lockt Wassersportler und Wanderfans – was die Deutschen sehr häufig sind.",
-        "Das Bundesland Bayern, ebenfalls ein beliebtes Reiseziel, hat zwar keine Meeresküste, aber zahlreiche andere Attraktionen: Die Alpen beispielsweise begeistern Wanderer, Biker, Wintersportler und andere Aktivurlauber. Die Zugspitze, höchster Berg der Republik, der Watzmann am Königssee und die weltbekannten Schlösser des „Märchenkönigs“ Ludwig II., wie Neuschwanstein, Herrenchiemsee oder Linderhof – das sind nur einige Beispiele für die Angebotsvielfalt im deutschen Süden.",
-        "Eine Entwicklung, über die sich die deutsche Tourismusbranche besonders freut: Auch internationale Touristen wählen Deutschland immer öfter als Ziel für eine Reise. Häufig kommt der Besuch aus europäischen Nachbarländern, aber auch aus den USA, Asien und den arabischen Golfstaaten. Für die ausländischen Gäste gehört zum Deutschland-Trip natürlich oft ein Besuch in der Hauptstadt Berlin. Auch Hamburg, Köln und Dresden sind sehr beliebt – oder München, das allein mit dem weltberühmten Oktoberfest im Herbst Besucher aus aller Welt anzieht. Als weitere Sightseeing-Klassiker unter den Urlaubszielen gelten bei den ausländischen Touristen etwa auch der Schwarzwald, der Bodensee und der Vergnügungspark Rust in Baden-Württemberg.",
-        "Urlaubsland Deutschland – da gäbe es noch viel zu erzählen. Wer perfektes Sommerwetter ohne Ausnahme als sonnig und warm definiert, wird hier allerdings nicht immer glücklich, weshalb auch viele Deutsche – oft kurzfristig – doch noch eine Reise ins Ausland buchen.",
-      ],
-      questions: [
-        { stem: "Welches Bundesland ist bekannt für seine Strände an der Ostsee?", options: ["A) Bayern", "B) Mecklenburg-Vorpommern", "C) Baden-Württemberg"] },
-        { stem: "Was ist ein bekanntes Ziel in Bayern für Wanderer und Wintersportler?", options: ["A) Die Zugspitze", "B) Der Bodensee", "C) Der Watzmann"] },
-        { stem: "Welche Inseln gehören zur Ostsee in Mecklenburg-Vorpommern?", options: ["A) Rügen und Usedom", "B) Sylt und Föhr", "C) Mallorca und Ibiza"] },
-        { stem: "Was zieht internationale Touristen nach Deutschland?", options: ["A) Nur die Hauptstadt Berlin", "B) Städte wie Berlin, Hamburg, Köln und München", "C) Nur die Berge in Bayern"] },
-        { stem: "Welches große Ereignis in München zieht Besucher aus aller Welt an?", options: ["A) Die Berlinale", "B) Das Oktoberfest", "C) Der Weihnachtsmarkt"] },
-        { stem: "Welche Sehenswürdigkeiten sind im Süden von Deutschland besonders bekannt?", options: ["A) Neuschwanstein, Herrenchiemsee und Linderhof", "B) Der Schwarzwald und der Bodensee", "C) Das Miniatur Wunderland in Hamburg"] },
-        { stem: "Warum buchen viele Deutsche kurzfristig Reisen ins Ausland?", options: ["A) Wegen des perfekten Sommerwetters", "B) Wegen der hohen Temperaturen im Sommer", "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"] },
-      ],
-    },
-  },
+  reading: getB1ReadingTask(26),
   listening: {
     title: "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",
     instructions: "Bearbeiten Sie den vollständigen Hörtest zuerst ohne die Lösungen anzusehen. Kontrollieren und markieren Sie Ihre Antworten anschließend selbst.",

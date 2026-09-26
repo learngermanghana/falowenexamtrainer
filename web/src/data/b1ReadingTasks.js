@@ -269,6 +269,290 @@ export const B1_READING_TASKS = Object.freeze({
       ],
     },
   } }),
+  18: Object.freeze({ assignmentKey: "B1-6.18", ...{
+    title: "Lesen Sie den Text über Berufswahl und beantworten Sie die sieben Fragen.",
+    instructions: "Lesen Sie zuerst den Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Berufswahl und Karriereentscheidung",
+    text: {
+      title: "Berufswahl – Wunsch oder Realität?",
+      questionTitle: "Fragen",
+      paragraphs: [
+        "Die Berufswahl ist eine der wichtigsten Entscheidungen im Leben. Schon in der Schulzeit werden Jugendliche gefragt, was sie später einmal beruflich machen möchten. Doch während einige schon früh eine klare Vorstellung haben, sind andere unsicher oder lassen sich von äußeren Einflüssen, wie Eltern oder Lehrern, leiten. Die Frage ist: Sollte man seinen Traumberuf verfolgen oder lieber einen Beruf wählen, der Sicherheit und ein gutes Einkommen bietet?",
+        "Die Wahl des Berufs ist oft nicht nur eine Frage der Leidenschaft, sondern auch eine der Vernunft. Einige Berufe sind sehr beliebt, aber die Chancen, einen Job in diesem Bereich zu finden, sind gering. Andere Berufe bieten mehr Sicherheit, sind aber vielleicht nicht so spannend. Viele junge Menschen stehen daher vor der schwierigen Entscheidung: Soll ich meinen Traum verfolgen oder lieber auf Nummer sicher gehen?",
+        "Ein weiteres Problem ist, dass sich der Arbeitsmarkt ständig verändert. Was heute ein gefragter Beruf ist, kann morgen schon nicht mehr relevant sein. Das bedeutet, dass Flexibilität und die Bereitschaft, sich weiterzubilden, in der modernen Arbeitswelt immer wichtiger werden. Dennoch bleibt der Wunsch nach einem Traumberuf oft stark, besonders bei jungen Menschen.",
+        "Experten empfehlen, bei der Berufswahl sowohl die eigenen Interessen als auch die realen Bedingungen des Arbeitsmarktes zu berücksichtigen. Eine gute Mischung aus Leidenschaft und Vernunft kann der Schlüssel zu einer erfolgreichen Karriere sein. Letztendlich muss jeder für sich selbst entscheiden, welche Prioritäten bei der Berufswahl am wichtigsten sind.",
+      ],
+      questions: [
+        { stem: "Welche Faktoren beeinflussen die Berufswahl laut Text?", options: ["a) Nur die Leidenschaft.", "b) Nur die Sicherheit.", "c) Leidenschaft und Vernunft.", "d) Nur das Einkommen."] },
+        { stem: "Was wird im Text als wichtiger Aspekt der modernen Arbeitswelt genannt?", options: ["a) Sicherheit.", "b) Flexibilität und Weiterbildung.", "c) Beliebte Berufe.", "d) Elternrat."] },
+        { stem: "Welche Empfehlung geben Experten laut Text?", options: ["a) Nur den Traumberuf verfolgen.", "b) Einen gut bezahlten Beruf wählen.", "c) Eine Mischung aus Leidenschaft und Vernunft finden.", "d) Auf äußere Einflüsse hören."] },
+        { stem: "Warum ist es schwierig, den Traumberuf zu verfolgen?", options: ["a) Die Berufe verändern sich nicht.", "b) Der Traumberuf ist nicht immer gefragt.", "c) Der Traumberuf ist immer unsicher.", "d) Man kann nie wissen, was man will."] },
+        { stem: "Was sollten junge Menschen laut Text bei der Berufswahl berücksichtigen?", options: ["a) Nur die Leidenschaft.", "b) Nur das Gehalt.", "c) Die realen Bedingungen auf dem Arbeitsmarkt.", "d) Nur den Rat der Eltern."] },
+        { stem: "Was passiert oft mit beliebten Berufen laut Text?", options: ["a) Sie werden zu unsicheren Berufen.", "b) Sie bleiben immer gefragt.", "c) Sie sind nur kurzfristig gefragt.", "d) Sie haben immer schlechte Bedingungen."] },
+        { stem: "Wie kann man laut dem Text erfolgreich im Beruf sein?", options: ["a) Durch Flexibilität und Bereitschaft zur Weiterbildung.", "b) Durch die Wahl eines festen Berufs.", "c) Durch die Konzentration auf hohe Gehälter.", "d) Durch völlige Sicherheit in der Berufswahl."] },
+      ],
+    },
+  } }),
+  21: Object.freeze({ assignmentKey: "B1-7.21", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle fünf Fragen.",
+    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
+    image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading about a family living in different places",
+    text: {
+      title: "Andrea Müller: Familie an verschiedenen Orten",
+      paragraphs: [
+        "Mein Name ist Andrea Müller und meine Familie lebt nicht gemeinsam an einem Ort, sondern ist über mehrere Bundesländer innerhalb Deutschlands verstreut. Ursprünglich komme ich aus Nordrhein-Westfalen und habe in Köln studiert. Nach Abschluss des Studiums fand ich jedoch nicht gleich eine Arbeit, die mir zusagte, und so entschied ich mich, zunächst einmal ins Ausland zu gehen und Erfahrungen zu sammeln.",
+        "Ich lebte zwei Jahre lang in den Niederlanden, wo es mir sehr gut gefiel und ich sowohl meine Englischkenntnisse verbessern als auch die niederländische Sprache als neue Fremdsprache hinzulernen konnte. Mit dieser internationalen Berufserfahrung und den erweiterten Sprachkenntnissen fand ich eine Anstellung in Hessen.",
+        "Dort lernte ich auch meinen Mann kennen, der ursprünglich aus Bayern stammt. Wir heirateten und bekamen zwei Söhne. In Hessen haben wir uns inzwischen einen größeren Kreis an Freunden und Bekannten aufgebaut, unsere Familien leben jedoch noch immer größtenteils in Nordrhein-Westfalen und Bayern. Hinzu kommt, dass meine fünf Geschwister ebenfalls nicht in Nordrhein-Westfalen sesshaft geworden sind, sondern über die gesamte Bundesrepublik Deutschland verstreut leben.",
+        "Nur bei größeren Familienfesten und Geburtstagen sehen wir uns alle. Ich würde sehr gern in der Nähe meiner Eltern leben, da diese mittlerweile auch ziemlich alt sind und sicherlich bald Unterstützung benötigen. Auch unsere Kinder vermissen die Großeltern und Verwandten oft.",
+        "Unsere mittelfristige Perspektive ist es daher, für meinen Mann und mich in der nächsten Zeit Arbeitsstellen und ein Haus in Nordrhein-Westfalen zu finden.",
+      ],
+      questions: [
+        { stem: "Warum ging Frau Müller ins Ausland?", options: ["A) Sie wollte Urlaub machen.", "B) Sie wollte Auslandserfahrung sammeln.", "C) Sie wollte ihre Eltern besuchen.", "D) Sie wollte einen Mann kennenlernen."] },
+        { stem: "In welchem Land sammelte Frau Müller Auslandserfahrungen?", options: ["A) Niederlande", "B) Hessen", "C) Nordrhein-Westfalen", "D) Österreich"] },
+        { stem: "Hat Frau Müller Kinder?", options: ["A) Ja, einen Sohn und eine Tochter.", "B) Nein.", "C) Ja, einen Sohn.", "D) Ja, zwei Söhne."] },
+        { stem: "Hat Frau Müller Geschwister?", options: ["A) Nein.", "B) Ja, zwei Brüder.", "C) Das steht nicht im Text.", "D) Ja, fünf Geschwister."] },
+        { stem: "Warum möchte Frau Müller wieder nach Nordrhein-Westfalen umziehen?", options: ["A) Weil ihr Mann aus Nordrhein-Westfalen ist.", "B) Weil sie arbeitslos ist.", "C) Weil ihre Eltern dort wohnen.", "D) Weil ihre Geschwister dort wohnen."] },
+      ],
+    },
+  } }),
+  23: Object.freeze({ assignmentKey: "B1-7.23", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions:
+      "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort: A, B, C oder D.",
+    image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading practice with books and notes",
+    text: {
+      title: "Die Frau, die Monopoly erfand",
+      questionTitle: "Fragen zum Text",
+      paragraphs: [
+        "Elizabeth Magie Phillips ist nicht sehr bekannt – ihre Erfindung aber schon: das Brettspiel Monopoly. Doch diese Idee wurde ihr gestohlen. Und das Spiel, das sie eigentlich im Sinn hatte, wurde vergessen.",
+        "Straßen kaufen, Mieten einnehmen, Hotels bauen – und mit etwas Würfelglück gehört einem am Ende das ganze Geld – und die Mitspieler sind bankrott. Millionen Menschen haben in ihrer Kindheit das Brettspiel Monopoly gespielt. Bis vor Kurzem wusste allerdings kaum jemand, wer die Idee zu dem Spieleklassiker hatte – und dass das Spiel eigentlich ganz anders konzipiert war. Denn die Erfinderin wurde um ihre Idee betrogen. Die US-amerikanische Autorin und Journalistin Mary Pilon hat die Geschichte in einem Buch aufgeschrieben.",
+        "Monopoly stammt von der US-Amerikanerin Elizabeth Magie Phillips, und sie nannte es zuerst „The Landlord’s Game“. Phillips wurde 1866 geboren und lebte in der Zeit der Industrialisierung. Täglich sah sie Ungleichheit, Armut und Elend. Ihr Spiel sollte diese Zustände kritisieren. Phillips entwickelte deshalb zwei Regelwerke für ihr Spiel: „Eins, in dem es darum ging, Monopole aufzubrechen“, so Pilon. „Und eins, in dem es darum ging, zu zeigen, wie schädlich Monopole sind.“",
+        "1903 meldete Phillips ein Patent auf ihr Spiel an. Es war zunächst unter Studenten beliebt und bekam schließlich den Namen Monopoly. Doch in den 1930er-Jahren kopierte der Verkäufer Charles Darrow ihr Spiel, übernahm aber nur das heute noch bekannte zweite Regelwerk. Er gab das Spiel als sein eigenes aus, verkaufte die Rechte an den Parker-Brothers-Spieleverlag – und wurde Millionär. Über 275 Millionen Spiele hat Parker Brothers laut eigenen Angaben bis 2010 weltweit verkauft. Der schnelle Reichtum, den Phillips eigentlich kritisieren wollte – bei ihrem eigenen Spiel wurde er Wirklichkeit.",
+        "Phillips selbst sah nichts von dem vielen Geld. Als sie von Charles Darrows Erfolg erfuhr, machte sie die Presse auf ihre Geschichte aufmerksam. Daraufhin bot der Spieleverlag ihr an, zwei andere Spiele von ihr zu veröffentlichen. Doch daraus wurde anscheinend nichts. Laut Pilon erkennt Parker Brothers bis heute nicht an, dass Elizabeth Magie Phillips die Erfinderin von Monopoly ist. Auch Phillips selbst wurde nach ihrem Tod 1948 vergessen. Ihren späten Ruhm verdankt sie Mary Pilon, die fünf Jahre lang für ihr Buch recherchiert hat.",
+      ],
+      questions: [
+        {
+          stem: "Wer hat das Spiel Monopoly ursprünglich erfunden?",
+          options: [
+            "A) Charles Darrow",
+            "B) Mary Pilon",
+            "C) Elizabeth Magie Phillips",
+            "D) Parker Brothers",
+          ],
+        },
+        {
+          stem: "Wie hieß das Spiel zuerst?",
+          options: [
+            "A) Monopoly",
+            "B) The Landlord’s Game",
+            "C) Real Estate Race",
+            "D) Monopoly Classic",
+          ],
+        },
+        {
+          stem: "Was wollte Elizabeth Magie Phillips mit dem Spiel zeigen?",
+          options: [
+            "A) Wie man Hotels kauft",
+            "B) Wie unfair Monopole sind",
+            "C) Wie man Geld verdient",
+            "D) Wie man mit Freunden spielt",
+          ],
+        },
+        {
+          stem: "Was tat Charles Darrow mit dem Spiel?",
+          options: [
+            "A) Er spielte es nur mit Freunden.",
+            "B) Er veröffentlichte es gemeinsam mit Phillips.",
+            "C) Er gab es als seine eigene Idee aus.",
+            "D) Er verschenkte es an Studenten.",
+          ],
+        },
+        {
+          stem: "Was bekam Elizabeth Magie Phillips für ihre Idee?",
+          options: [
+            "A) Einen großen Geldpreis",
+            "B) Ruhm und Erfolg",
+            "C) Eine Auszeichnung vom Präsidenten",
+            "D) So gut wie nichts",
+          ],
+        },
+        {
+          stem: "Wie wurde das Spiel bekannt?",
+          options: [
+            "A) Durch Werbung in Zeitungen",
+            "B) Weil Parker Brothers es verkaufte",
+            "C) Weil Phillips es im Fernsehen präsentierte",
+            "D) Durch ein berühmtes Turnier",
+          ],
+        },
+        {
+          stem: "Wer schrieb ein Buch über die wahre Geschichte von Monopoly?",
+          options: [
+            "A) Charles Darrow",
+            "B) Mary Pilon",
+            "C) Parker Brothers",
+            "D) Elizabeth Magie Phillips",
+          ],
+        },
+      ],
+    },
+  } }),
+  24: Object.freeze({ assignmentKey: "B1-8.24", ...{
+    title:
+      "Lesen Sie den Text und entscheiden Sie bei allen sieben Aussagen: richtig oder falsch.",
+    instructions:
+      "Lesen Sie zuerst Elenis vollständigen Text. Wählen Sie danach bei jeder Aussage genau eine Antwort: Richtig oder Falsch.",
+    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading about environmental awareness and recycling",
+    text: {
+      title: "Hallo liebe Umweltfreunde!",
+      questionTitle: "Aussagen: Richtig oder Falsch",
+      paragraphs: [
+        "Durch meine Nachbarin Heike habe ich über eine Bürgerinitiative in unserem Viertel erfahren, die sich für den Umweltschutz und für die Umwelterziehung einsetzt. Ich finde es wichtig, dass man sich in der eigenen Stadt für die Umwelt einsetzt und den Kindern beibringt, wie wir umweltbewusst leben können. Meine Tochter ist zwar erst vier Jahre alt, aber ich denke, sie sollte schon früh mitbekommen, dass wir nicht so weitermachen können wie bisher.",
+        "In Griechenland ist das Umweltbewusstsein leider nicht so hoch. Das finde ich an Deutschland viel besser! In Griechenland ist auch die Sperrmüllabholung nicht so gut organisiert wie hier. Wir schmeißen einfach alles auf die Straße, aber es wird nicht wirklich abgeholt, zumindest nicht regelmäßig. Manchmal liegen bei uns wirklich alte Möbel monatelang am Straßenrand herum.",
+        "In Deutschland stellen die Leute ihre alten Möbel gut geordnet am Abend vor der Abholung vor die Tür. Manche Sachen sind auch noch brauchbar. Ich habe auch schon Stühle und einen Tisch aus dem Sperrmüll geholt und benutze sie jetzt bei mir zu Hause. Man gibt Sachen eine zweite Chance! Hier wird man nicht blöd angeschaut, wenn man das macht.",
+        "Ich finde es super, dass man auch Kleidung, die man vielleicht nicht mehr mag, die aber noch tragbar ist, in Altkleidercontainern sammelt und bedürftigen Menschen zukommen lässt. Die Container stehen überall in der Stadt und man kann die Sachen da reingeben. Auch dass es die Möglichkeit gibt, Einwegglas zu sammeln, und dass man daraus wieder neues Glas herstellt, ist genial.",
+        "In Deutschland habe ich zum ersten Mal einen Wertstoffhof und ein Schadstoffmobil kennengelernt. Es ist richtig, dass giftige und umweltschädliche Sachen nicht einfach in den Müll geworfen werden und dass man Teile von alten Elektrogeräten wiederverwendet. Das sind wir unseren Kindern schuldig!",
+        "Eure Eleni",
+      ],
+      questions: [
+        {
+          stem: "Eleni hat mit ihrer Nachbarin eine Bürgerinitiative gegründet.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem: "Sie findet, dass Kinder früh etwas über Umweltschutz lernen sollten.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem: "In Griechenland sind alle Menschen sehr umweltbewusst.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem:
+            "Eleni meint, dass es in Deutschland zu viele unnötige Sammelstellen für Müll gibt.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem: "Altkleidersammlungen findet sie sinnvoll.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem: "Das Recyceln von Wertstoffen ist ihrer Meinung nach nutzlos.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+        {
+          stem: "Sie mag es, wenn Sachen eine zweite Chance bekommen.",
+          options: ["A) Richtig", "B) Falsch"],
+        },
+      ],
+    },
+  } }),
+  25: Object.freeze({ assignmentKey: "B1-8.25", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Read the complete text first. Then choose one answer, A–D, for every question.",
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Reading about consumer rights and daily decisions",
+    text: {
+      title: "Selbstständigkeit, Umweltschutz und Verbraucherberatung in Deutschland",
+      paragraphs: [
+        "Ich habe einen eigenen Friseursalon. Ein großer Vorteil daran ist, dass ich endlich gut Geld verdienen kann. Früher, als ich angestellt war, war mein Gehalt sehr niedrig. Jetzt ist das anders. Ich kann selbst entscheiden, welche Dienstleistungen ich anbiete, und bin unabhängig. Viele Kunden bleiben mir treu, obwohl es in Kaufhäusern oft günstigere Angebote gibt. Das liegt daran, dass wir auf gute Beratung achten und uns viel Zeit für die Kunden nehmen.",
+        "Ein Problem in meiner Arbeit ist die Konkurrenz. Ein weiteres Problem ist die Sozialversicherung. Als Selbstständige muss ich keine Rentenversicherung haben, aber ich habe freiwillig eine abgeschlossen. Auch wenn ich später vielleicht nicht viel Rente bekomme, habe ich dadurch eine gewisse Sicherheit. Insgesamt bin ich sehr zufrieden mit meiner Selbstständigkeit.",
+        "In meiner Familie spielt auch der Umweltschutz eine wichtige Rolle. Wir fahren mit dem Fahrrad oder mit öffentlichen Verkehrsmitteln, wenn wir einkaufen gehen. Außerdem achten wir darauf, möglichst wenig Müll zu produzieren. Wir kaufen Produkte mit wenig Verpackung und trennen den Müll richtig. Ich habe das Gefühl, dass die Menschen heute umweltbewusster sind als früher. Auch wir sparen Energie in der Wohnung: Wir heizen nur die Zimmer, die wir benutzen, und schalten das Licht und elektrische Geräte aus, wenn wir das Haus verlassen.",
+        "Wenn man Fragen rund um das Thema Konsum hat, kann man sich in Deutschland an die Verbraucherzentralen wenden. Es gibt ungefähr 200 Beratungsstellen in allen Bundesländern. Die Mitarbeiter dort helfen bei Fragen zu Kaufverträgen, Krediten, Gewinnspielen, Versicherungen oder auch beim Wechsel des Stromanbieters. Sie informieren auch über Lebensmittel und gesunde Ernährung. Die Verbraucherzentralen werden vom Staat unterstützt, aber trotzdem müssen Kunden für manche Beratungen etwas bezahlen. Einfache Informationen sind oft kostenlos. Im Internet gibt es viele Broschüren, die man gratis herunterladen kann.",
+      ],
+      questions: [
+        { stem: "Warum ist die Friseurin zufrieden mit ihrer Arbeit?", options: ["A) Sie arbeitet in Teilzeit.", "B) Sie ist selbstständig und verdient mehr.", "C) Sie hat einen neuen Chef.", "D) Sie muss keine Kunden bedienen."] },
+        { stem: "Warum bleiben viele Kunden bei ihrem Friseursalon?", options: ["A) Weil sie keine andere Wahl haben.", "B) Weil der Salon am billigsten ist.", "C) Weil Service und Beratung gut sind.", "D) Weil sie dort arbeiten."] },
+        { stem: "Was macht die Familie für den Umweltschutz?", options: ["A) Sie nutzt immer das Auto.", "B) Sie trennt Müll und spart Energie.", "C) Sie kauft viele neue Geräte.", "D) Sie wirft alles in den gleichen Müll."] },
+        { stem: "Was passiert in der Wohnung, wenn niemand zu Hause ist?", options: ["A) Die Heizung wird höher gestellt.", "B) Alle Lichter bleiben an.", "C) Licht und elektrische Geräte werden ausgeschaltet.", "D) Die Türen bleiben offen."] },
+        { stem: "Was bieten die Verbraucherzentralen an?", options: ["A) Friseurdienstleistungen", "B) Beratung zu Konsum, Verträgen und Ernährung", "C) Fahrstunden", "D) Sportkurse"] },
+        { stem: "Wie werden die Verbraucherzentralen finanziert?", options: ["A) Nur durch Spenden", "B) Nur durch Mitgliedsbeiträge", "C) Durch staatliche Unterstützung und teilweise Kundenzahlungen", "D) Nur durch Werbung"] },
+        { stem: "Was ist im Internet kostenlos erhältlich?", options: ["A) Kinokarten", "B) Broschüren mit Informationen", "C) Reisen ins Ausland", "D) Elektronische Geräte"] },
+      ],
+    },
+  } }),
+  26: Object.freeze({ assignmentKey: "B1-9.26", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
+    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Travel destinations in Germany",
+    text: {
+      title: "Urlaubsland Deutschland",
+      questionTitle: "Fragen zum Text",
+      paragraphs: [
+        "Die Auswahl an Attraktionen erscheint fast unbegrenzt, was Deutschland auch bei den eigenen Einwohnern zum populären Urlaubsland macht. Die Deutschen verreisen gerne – und das auch innerhalb ihres Landes, zum Beispiel in das Bundesland Mecklenburg-Vorpommern: Im Sommer wünschen sich viele einen Strandurlaub, und dazu bieten die Ostsee und ihre bekannten Inseln Rügen und Usedom eine wunderschöne Gelegenheit. Die Mecklenburgische Seenplatte mit ihren mehr als 1.000 Seen lockt Wassersportler und Wanderfans – was die Deutschen sehr häufig sind.",
+        "Das Bundesland Bayern, ebenfalls ein beliebtes Reiseziel, hat zwar keine Meeresküste, aber zahlreiche andere Attraktionen: Die Alpen beispielsweise begeistern Wanderer, Biker, Wintersportler und andere Aktivurlauber. Die Zugspitze, höchster Berg der Republik, der Watzmann am Königssee und die weltbekannten Schlösser des „Märchenkönigs“ Ludwig II., wie Neuschwanstein, Herrenchiemsee oder Linderhof – das sind nur einige Beispiele für die Angebotsvielfalt im deutschen Süden.",
+        "Eine Entwicklung, über die sich die deutsche Tourismusbranche besonders freut: Auch internationale Touristen wählen Deutschland immer öfter als Ziel für eine Reise. Häufig kommt der Besuch aus europäischen Nachbarländern, aber auch aus den USA, Asien und den arabischen Golfstaaten. Für die ausländischen Gäste gehört zum Deutschland-Trip natürlich oft ein Besuch in der Hauptstadt Berlin. Auch Hamburg, Köln und Dresden sind sehr beliebt – oder München, das allein mit dem weltberühmten Oktoberfest im Herbst Besucher aus aller Welt anzieht. Als weitere Sightseeing-Klassiker unter den Urlaubszielen gelten bei den ausländischen Touristen etwa auch der Schwarzwald, der Bodensee und der Vergnügungspark Rust in Baden-Württemberg.",
+        "Urlaubsland Deutschland – da gäbe es noch viel zu erzählen. Wer perfektes Sommerwetter ohne Ausnahme als sonnig und warm definiert, wird hier allerdings nicht immer glücklich, weshalb auch viele Deutsche – oft kurzfristig – doch noch eine Reise ins Ausland buchen.",
+      ],
+      questions: [
+        { stem: "Welches Bundesland ist bekannt für seine Strände an der Ostsee?", options: ["A) Bayern", "B) Mecklenburg-Vorpommern", "C) Baden-Württemberg"] },
+        { stem: "Was ist ein bekanntes Ziel in Bayern für Wanderer und Wintersportler?", options: ["A) Die Zugspitze", "B) Der Bodensee", "C) Der Watzmann"] },
+        { stem: "Welche Inseln gehören zur Ostsee in Mecklenburg-Vorpommern?", options: ["A) Rügen und Usedom", "B) Sylt und Föhr", "C) Mallorca und Ibiza"] },
+        { stem: "Was zieht internationale Touristen nach Deutschland?", options: ["A) Nur die Hauptstadt Berlin", "B) Städte wie Berlin, Hamburg, Köln und München", "C) Nur die Berge in Bayern"] },
+        { stem: "Welches große Ereignis in München zieht Besucher aus aller Welt an?", options: ["A) Die Berlinale", "B) Das Oktoberfest", "C) Der Weihnachtsmarkt"] },
+        { stem: "Welche Sehenswürdigkeiten sind im Süden von Deutschland besonders bekannt?", options: ["A) Neuschwanstein, Herrenchiemsee und Linderhof", "B) Der Schwarzwald und der Bodensee", "C) Das Miniatur Wunderland in Hamburg"] },
+        { stem: "Warum buchen viele Deutsche kurzfristig Reisen ins Ausland?", options: ["A) Wegen des perfekten Sommerwetters", "B) Wegen der hohen Temperaturen im Sommer", "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"] },
+      ],
+    },
+  } }),
+  27: Object.freeze({ assignmentKey: "B1-10.27", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",
+    image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Protecting the environment",
+    text: {
+      title: "Die Umwelt schützen: Was können wir tun?",
+      questionTitle: "Questions",
+      paragraphs: [
+        "Die Umwelt zu schützen ist eine der größten Herausforderungen unserer Zeit. Es gibt viele Maßnahmen, die wir ergreifen können, um unseren Planeten zu schützen. Eine der effektivsten Methoden ist das Recycling. Durch das Wiederverwerten von Materialien wie Papier, Glas und Plastik können wir die Menge an Abfall reduzieren, der auf Deponien landet. Das spart nicht nur Platz, sondern auch Ressourcen.",
+        "Ein weiterer wichtiger Aspekt ist der Energieverbrauch. Indem wir energieeffiziente Geräte nutzen und bewusster mit Energie umgehen, können wir unseren CO2-Fußabdruck verringern. Dies schließt auch den Einsatz erneuerbarer Energien wie Solar- oder Windkraft ein.",
+        "Der Transport ist ein weiterer Bereich, in dem wir viel bewirken können. Wenn wir öfter das Fahrrad nutzen oder öffentliche Verkehrsmittel nehmen, reduzieren wir die Emissionen, die durch Autos verursacht werden. Auch das Carsharing kann eine umweltfreundliche Alternative sein.",
+        "Nicht zuletzt spielt der Konsum eine große Rolle. Wir sollten bewusster einkaufen und Produkte bevorzugen, die umweltfreundlich hergestellt wurden. Dazu gehört auch, weniger Fleisch zu konsumieren, da die Fleischproduktion sehr ressourcenintensiv ist.",
+        "Jeder Einzelne kann seinen Beitrag leisten. Wenn wir alle kleine Änderungen in unserem Alltag vornehmen, können wir gemeinsam große Erfolge erzielen. Der Schutz der Umwelt beginnt bei jedem von uns.",
+      ],
+      questions: [
+        { stem: "Welche Materialien können recycelt werden?", options: ["A) Nur Plastik", "B) Nur Glas", "C) Papier, Glas und Plastik", "D) Nur Papier"] },
+        { stem: "Wie können wir unseren CO2-Fußabdruck verringern?", options: ["A) Durch den Einsatz energieeffizienter Geräte", "B) Durch den Verzicht auf Recycling", "C) Durch häufigeres Autofahren", "D) Durch den Einsatz von Kohleenergie"] },
+        { stem: "Welche Energiequellen sind erneuerbar?", options: ["A) Kohle und Öl", "B) Solar- und Windkraft", "C) Gas und Atomenergie", "D) Holz und Torf"] },
+        { stem: "Welche Verkehrsmittel helfen, Emissionen zu reduzieren?", options: ["A) Fahrräder und öffentliche Verkehrsmittel", "B) Autos und Motorräder", "C) Flugzeuge und Schiffe", "D) Lastwagen und Busse"] },
+        { stem: "Warum sollten wir weniger Fleisch konsumieren?", options: ["A) Weil es gesund ist", "B) Weil die Fleischproduktion ressourcenintensiv ist", "C) Weil es teuer ist", "D) Weil es schwer zu kochen ist"] },
+        { stem: "Was können wir tun, um die Umwelt zu schützen?", options: ["A) Recycling vernachlässigen", "B) Energie verschwenden", "C) Umweltfreundlich einkaufen", "D) Fleischproduktion fördern"] },
+        { stem: "Wo beginnt der Schutz der Umwelt?", options: ["A) Bei den Politikern", "B) Bei jedem Einzelnen", "C) In den Fabriken", "D) Bei den Tieren"] },
+      ],
+    },
+  } }),
+  28: Object.freeze({ assignmentKey: "B1-10.28", ...{
+    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
+    instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",
+    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Water as a precious resource",
+    text: {
+      title: "Bewusst Leben: Wasser als kostbare Ressource",
+      questionTitle: "Fragen",
+      paragraphs: [
+        "Wasser ist eine der wertvollsten Ressourcen auf unserem Planeten. Ohne Wasser wäre Leben, wie wir es kennen, nicht möglich. Doch in vielen Teilen der Welt ist Wasser knapp, und der bewusste Umgang mit dieser Ressource wird immer wichtiger.",
+        "In den letzten Jahrzehnten hat der Wasserverbrauch weltweit stark zugenommen. Besonders in den Industrieländern ist der Wasserverbrauch pro Kopf sehr hoch. Hier wird Wasser nicht nur zum Trinken und Kochen verwendet, sondern auch in großen Mengen für die Landwirtschaft und die Industrie benötigt.",
+        "Um Wasser zu sparen, gibt es viele Maßnahmen, die jeder Einzelne ergreifen kann. Zum Beispiel sollte man darauf achten, Wasser nicht unnötig laufen zu lassen, etwa beim Zähneputzen oder Geschirrspülen. Auch der Einsatz von wassersparenden Geräten, wie effizienten Duschköpfen und Toilettenspülungen, kann den Wasserverbrauch erheblich reduzieren.",
+        "Ein weiteres Problem ist die Verschmutzung der Wasserressourcen. Industrieabfälle, chemische Düngemittel und Plastikmüll gelangen in Flüsse und Meere und verschmutzen das Trinkwasser. Daher ist es wichtig, umweltfreundliche Produkte zu verwenden und Abfälle korrekt zu entsorgen.",
+        "Neben den individuellen Maßnahmen ist auch die Politik gefragt. Regierungen können durch Gesetze und Verordnungen den Wasserverbrauch regulieren und Anreize für wassersparende Technologien schaffen. Auch die Aufklärung der Bevölkerung über die Bedeutung des Wassersparens spielt eine wichtige Rolle.",
+        "Zusammenfassend lässt sich sagen, dass der bewusste Umgang mit Wasser unerlässlich ist, um diese wertvolle Ressource zu schützen. Jeder Einzelne kann durch kleine Maßnahmen einen Beitrag leisten, und auch die Politik muss ihren Teil dazu beitragen. Nur so können wir sicherstellen, dass auch zukünftige Generationen ausreichend Wasser zur Verfügung haben.",
+      ],
+      questions: [
+        { stem: "Warum ist Wasser eine kostbare Ressource?", options: ["A) Weil es unbegrenzt verfügbar ist.", "B) Weil es in vielen Teilen der Welt knapp ist.", "C) Weil es nicht verschmutzt werden kann."] },
+        { stem: "Wofür wird in den Industrieländern besonders viel Wasser verwendet?", options: ["A) Nur zum Trinken und Kochen.", "B) Für die Landwirtschaft und die Industrie.", "C) Nur für die Industrie."] },
+        { stem: "Welche Maßnahmen können Einzelne ergreifen, um Wasser zu sparen?", options: ["A) Wasser beim Zähneputzen laufen lassen.", "B) Wassersparende Geräte benutzen.", "C) Wasser nur zum Trinken verwenden."] },
+        { stem: "Warum ist die Verschmutzung der Wasserressourcen ein Problem?", options: ["A) Weil es die Landwirtschaft unterstützt.", "B) Weil es das Trinkwasser verschmutzt.", "C) Weil es die Industrie stärkt."] },
+        { stem: "Was können Regierungen tun, um den Wasserverbrauch zu regulieren?", options: ["A) Gesetze und Verordnungen erlassen.", "B) Mehr Wasser verbrauchen.", "C) Wasserquellen verschmutzen."] },
+        { stem: "Warum ist die Aufklärung der Bevölkerung wichtig?", options: ["A) Damit die Industrie mehr Wasser verbraucht.", "B) Um die Bedeutung des Wassersparens zu verstehen.", "C) Um den Wasserverbrauch zu erhöhen."] },
+        { stem: "Was ist die Hauptaussage des Essays?", options: ["A) Wasser ist unbegrenzt verfügbar.", "B) Wasser ist eine kostbare Ressource, die geschützt werden muss.", "C) Der Wasserverbrauch sollte nicht reguliert werden."] },
+      ],
+    },
+  } }),
 });
 
 export function getB1ReadingTask(day) {
