@@ -9,6 +9,7 @@ import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
 import { findPublicClassName, loadPublicClasses, publicClassLabel } from "../services/publicClassCatalogService";
 import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
+import { buildPaystackCheckoutLink } from "../lib/paystack";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
@@ -96,7 +97,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [address, setAddress] = useState("");
   const [learningMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [paymentOption, setPaymentOption] = useState("full");
+  const [paymentOption, setPaymentOption] = useState("trial");
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const [publicClasses, setPublicClasses] = useState([]);
   const [publicClassesLoaded, setPublicClassesLoaded] = useState(false);
@@ -128,19 +129,43 @@ const SignUpPage = ({ onLogin, onBack }) => {
       value: course.title,
       label: publicClassLabel(course),
       source: "firestore",
+      level: String(course.level || course.title?.split(" ")[0] || "").toUpperCase(),
+      startDate: course.startDate || "",
+      schedule: course.meetingDays || [],
+      learningMode: course.city === "Online" || course.availability === "always" ? "Online" : "",
+      isSelfLearning: course.availability === "always" || course.isSelfLearning === true,
     }));
     const liveTokens = new Set(liveOptions.map((option) => option.value));
-    const fallbackOptions = staticClassOptions(now).filter((option) => !liveTokens.has(option.value));
+    const fallbackOptions = staticClassOptions(now)
+      .filter((option) => !liveTokens.has(option.value))
+      .map((option) => {
+        const details = classCatalog[option.value] || {};
+        return {
+          ...option,
+          level: String(option.value.split(" ")[0] || "").toUpperCase(),
+          startDate: details.startDate || "",
+          schedule: details.schedule || [],
+          learningMode: details.isSelfLearning || details.availability === "always" ? "Online" : "",
+          isSelfLearning: details.isSelfLearning || details.availability === "always",
+        };
+      });
     return publicClassesLoaded ? [...liveOptions, ...fallbackOptions] : fallbackOptions;
   }, [now, publicClasses, publicClassesLoaded]);
 
+  const filteredClassOptions = useMemo(
+    () => classOptions.filter((option) => option.level === selectedLevel),
+    [classOptions, selectedLevel]
+  );
+
+  const recommendedClass = filteredClassOptions.length === 1 ? filteredClassOptions[0].value : "";
+
   useEffect(() => {
     if (!publicClassesLoaded || !selectedClass) return;
-    const availableValues = new Set(classOptions.map((option) => option.value));
+    const availableValues = new Set(filteredClassOptions.map((option) => option.value));
     if (!availableValues.has(selectedClass)) {
       setSelectedClass("");
     }
-  }, [classOptions, publicClassesLoaded, selectedClass]);
+  }, [filteredClassOptions, publicClassesLoaded, selectedClass]);
 
   useEffect(() => {
     if (!publicClassesLoaded || selectedClass || typeof window === "undefined") return;
@@ -215,7 +240,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     };
   };
 
-  const initialPaymentAmount = paymentOption === "part" ? MIN_INITIAL_PAYMENT : tuitionFeeForLevel;
+  const initialPaymentAmount = paymentOption === "trial" ? 0 : paymentOption === "part" ? MIN_INITIAL_PAYMENT : tuitionFeeForLevel;
 
   const tuitionSummary = computeTuitionStatus({
     level: selectedLevel,
@@ -238,17 +263,17 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     const validationIssues = {};
 
-    if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
+    if (paymentOption !== "trial" && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
       validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
         MIN_INITIAL_PAYMENT
       )} to start a paid account.`;
     }
 
-    if (numericInitialPayment < 0) {
+    if (paymentOption !== "trial" && numericInitialPayment < 0) {
       validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
     }
 
-    if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
+    if (paymentOption !== "trial" && (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT)) {
       validationIssues.initialPaymentAmount = `Enter ${formatMoney(
         MIN_INITIAL_PAYMENT
       )} or more to reserve your class.`;
@@ -310,7 +335,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
     try {
       const tuitionFee = tuitionSummary.tuitionFee;
       // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
-      const intendedPaymentAmount = Math.max(Number(numericInitialPayment) || 0, 0);
+      const intendedPaymentAmount = paymentOption === "trial"
+        ? 0
+        : Math.max(Number(numericInitialPayment) || 0, 0);
       const paidAmount = 0;
       const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
       const paymentStatus = "pending";
@@ -318,6 +345,22 @@ const SignUpPage = ({ onLogin, onBack }) => {
       // Store the base Paystack link, but create the actual checkout URL on-demand
       // via the backend so we can validate amounts and attach clear metadata.
       const paystackLink = paystackLinkForLevel(selectedLevel);
+      const immediateCheckoutLink =
+        paymentOption !== "trial" && paymentsEnabled
+          ? buildPaystackCheckoutLink({
+              baseLink: paystackLink,
+              amount: intendedPaymentAmount,
+              redirectUrl: "https://www.falowen.app/payment-complete",
+              metadata: {
+                studentCode,
+                email: cleanedEmail,
+                level: selectedLevel,
+                className: selectedClass,
+                paymentChoice: paymentOption,
+              },
+              allowedRedirectOrigins: ["https://www.falowen.app"],
+            })
+          : "";
 
       await signup(cleanedEmail, password, {
         name: cleanedName,
@@ -346,13 +389,23 @@ const SignUpPage = ({ onLogin, onBack }) => {
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(cleanedEmail, studentCode);
       const balanceText = balanceDue > 0 ? ` Your tuition balance is ${formatMoney(balanceDue)}.` : "";
-      const amountCopy = intendedPaymentAmount
-        ? `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`
-        : "You can choose your payment inside Falowen.";
-      const paymentInstruction = paymentsEnabled
-        ? "You can start your trial now or pay immediately through Paystack for paid access."
-        : "You can start your trial now. If you want to pay immediately, sign in on the web app and open Account & Billing.";
-      const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. You can start learning before payment. ${amountCopy} ${paymentInstruction}${balanceText}`;
+      if (immediateCheckoutLink) {
+        showToast("Account created. Opening secure Paystack checkout…", "success");
+        window.location.assign(immediateCheckoutLink);
+        return;
+      }
+
+      const amountCopy =
+        paymentOption === "trial"
+          ? "No payment was required to start your trial."
+          : `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`;
+      const paymentInstruction =
+        paymentOption === "trial"
+          ? "You can pay at any time from Account & Billing."
+          : paymentsEnabled
+            ? "Open Account & Billing to complete Paystack payment."
+            : "Sign in on the web app and open Account & Billing to complete payment.";
+      const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. ${amountCopy} ${paymentInstruction}${balanceText}`;
       setMessage(successMessage);
       showToast(`Your 7-day trial is active. Start learning now.`, "success");
       triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
@@ -538,7 +591,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
               fieldRefs.current.selectedLevel = element;
             }}
             value={selectedLevel}
-            onChange={(event) => setSelectedLevel(event.target.value)}
+            onChange={(event) => {
+              setSelectedLevel(event.target.value);
+              setSelectedClass("");
+              clearFieldError("selectedClass");
+            }}
             style={styles.select}
           >
             {ALLOWED_LEVELS.map((option) => (
@@ -661,29 +718,73 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
 
-          <label style={styles.label} htmlFor="initial-payment-amount">Payment option</label>
-          <select
-            id="initial-payment-amount"
+          <label style={styles.label}>How would you like to start?</label>
+          <div
             ref={(element) => {
               fieldRefs.current.initialPaymentAmount = element;
             }}
-            value={paymentOption}
-            onChange={(event) => {
-              setPaymentOption(event.target.value);
-              clearFieldError("initialPaymentAmount");
-              setAuthError("");
-            }}
-            style={styles.select}
+            style={{ display: "grid", gap: 10 }}
           >
-            <option value="full">Full fee — {formatMoney(tuitionFeeForLevel)} (recommended)</option>
-            <option value="part">Part payment — {formatMoney(MIN_INITIAL_PAYMENT)}</option>
+            {[
+              {
+                value: "trial",
+                title: "Start 7-day trial",
+                copy: "Start learning now without payment. You can pay later from Account & Billing.",
+              },
+              {
+                value: "full",
+                title: `Pay full fee now · ${formatMoney(tuitionFeeForLevel)}`,
+                copy: "Create your account, then continue directly to secure Paystack checkout.",
+              },
+              {
+                value: "part",
+                title: `Part payment now · ${formatMoney(MIN_INITIAL_PAYMENT)}`,
+                copy: "Create your account, then continue directly to Paystack for the first installment.",
+              },
+            ].map((option) => {
+              const selected = paymentOption === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setPaymentOption(option.value);
+                    clearFieldError("initialPaymentAmount");
+                    setAuthError("");
+                  }}
+                  aria-pressed={selected}
+                  style={{
+                    textAlign: "left",
+                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                    background: selected ? "#eff6ff" : "#fff",
+                    borderRadius: 12,
+                    padding: 14,
+                    cursor: "pointer",
+                    display: "grid",
+                    gap: 4,
+                  }}
+                >
+                  <strong style={{ color: "#0f172a" }}>{option.title}</strong>
+                  <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{option.copy}</span>
+                </button>
+              );
+            })}
+          </div>
+          <select
+            id="initial-payment-amount"
+            value={paymentOption}
+            onChange={(event) => setPaymentOption(event.target.value)}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <option value="trial">trial</option>
+            <option value="full">full</option>
+            <option value="part">part</option>
           </select>
           {fieldErrors.initialPaymentAmount ? (
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Full payment is selected by default and unlocks 6 months of access. Part payment unlocks 1 month of access, with the remaining balance due afterward. We confirm Paystack payments before marking you as paid.
-          </p>
 
           <TuitionStatusCard
             level={selectedLevel}
@@ -694,12 +795,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
             paystackLink={tuitionSummary.paystackLink}
             showPaymentAction={false}
             title="Tuition summary"
-            description={`For ${selectedLevel} we charge ${formatMoney(
+            description={`For ${selectedLevel} tuition is ${formatMoney(
               tuitionSummary.tuitionFee
-            )}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
+            )}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
           />
 
-          <label style={styles.label} htmlFor="class-selection">{t("signupPage.fields.classSelection")}</label>
+          <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>
           <select
             id="class-selection"
             value={selectedClass}
@@ -711,19 +812,81 @@ const SignUpPage = ({ onLogin, onBack }) => {
               clearFieldError("selectedClass");
               setAuthError("");
             }}
-            style={styles.select}
-            required
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
           >
             <option value="">{t("signupPage.options.chooseClass")}</option>
-            {classOptions.map((classOption) => (
+            {filteredClassOptions.map((classOption) => (
               <option key={classOption.value} value={classOption.value}>
                 {classOption.label}
               </option>
             ))}
           </select>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            {filteredClassOptions.map((classOption) => {
+              const selected = selectedClass === classOption.value;
+              const scheduleText = (classOption.schedule || [])
+                .map(({ day, startTime, endTime }) =>
+                  [day, startTime && ` ${startTime}`, endTime && `-${endTime}`].filter(Boolean).join("")
+                )
+                .join(" · ");
+              const startText = classOption.isSelfLearning
+                ? "Start anytime"
+                : classOption.startDate
+                  ? new Date(`${classOption.startDate}T00:00:00`).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "Schedule available";
+              return (
+                <button
+                  key={classOption.value}
+                  type="button"
+                  onClick={() => {
+                    setSelectedClass(classOption.value);
+                    clearFieldError("selectedClass");
+                    setAuthError("");
+                  }}
+                  aria-pressed={selected}
+                  style={{
+                    textAlign: "left",
+                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                    background: selected ? "#eff6ff" : "#fff",
+                    borderRadius: 12,
+                    padding: 14,
+                    display: "grid",
+                    gap: 7,
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <strong style={{ color: "#0f172a" }}>{classOption.value}</strong>
+                    {recommendedClass === classOption.value ? (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8" }}>Recommended for you</span>
+                    ) : null}
+                  </div>
+                  <span style={{ color: "#475569", fontSize: 13 }}>
+                    {classOption.isSelfLearning ? "Self-learning · Online" : `Starts ${startText}`}
+                  </span>
+                  {scheduleText ? <span style={{ color: "#475569", fontSize: 13 }}>{scheduleText}</span> : null}
+                  {classOption.learningMode ? (
+                    <span style={{ color: "#64748b", fontSize: 12 }}>{classOption.learningMode}</span>
+                  ) : null}
+                </button>
+              );
+            })}
+            {!filteredClassOptions.length && publicClassesLoaded ? (
+              <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 12, padding: 12, color: "#92400e" }}>
+                No open {selectedLevel} class is currently listed. Please contact Falowen support for the next intake.
+              </div>
+            ) : null}
+          </div>
           {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Picking a class is required so we can reserve your spot. Current upcoming classes are loaded from Falowen Admin.
+            Choose the class that fits your schedule. We only show open classes for {selectedLevel}.
             {!publicClassesLoaded ? " Loading the latest class list…" : ""}
           </p>
 
