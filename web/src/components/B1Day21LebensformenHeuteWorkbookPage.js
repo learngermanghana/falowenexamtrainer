@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from "react";
+import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import {
@@ -6,139 +6,12 @@ import {
   getYouTubeEmbedUrl,
 } from "../data/writingVideoResources";
 
-const WRITING_VIDEO_ATTRIBUTE = "data-b1-day21-writing-video";
-
-const Day21WritingVideoInjector = () => {
-  useEffect(() => {
-    const resource = getWritingVideoResource("B1", 21);
-    const embedUrl = getYouTubeEmbedUrl(resource?.url);
-    if (!resource || !embedUrl) return undefined;
-
-    const root = document.getElementById("root") || document.body;
-
-    const mountVideo = () => {
-      const existing = root.querySelector(`[${WRITING_VIDEO_ATTRIBUTE}]`);
-      const writingSection = Array.from(root.querySelectorAll("section")).find((section) => {
-        const heading = String(section.querySelector("h2")?.textContent || "").toLowerCase();
-        return heading.includes("teil 2") && heading.includes("schreiben");
-      });
-
-      if (!writingSection) {
-        existing?.remove();
-        return false;
-      }
-
-      if (existing && writingSection.contains(existing)) return true;
-      existing?.remove();
-
-      const card = document.createElement("div");
-      card.setAttribute(WRITING_VIDEO_ATTRIBUTE, "true");
-      card.setAttribute("aria-label", "B1 Day 21 writing explanation video");
-      Object.assign(card.style, {
-        display: "grid",
-        gap: "12px",
-        border: "1px solid #bfdbfe",
-        borderRadius: "16px",
-        padding: "14px",
-        background: "#eff6ff",
-      });
-
-      const badge = document.createElement("span");
-      badge.textContent = "Writing Video · Essay Ideas";
-      Object.assign(badge.style, {
-        width: "fit-content",
-        borderRadius: "999px",
-        padding: "5px 10px",
-        background: "#dbeafe",
-        color: "#1e3a8a",
-        fontSize: ".82rem",
-        fontWeight: "800",
-      });
-      card.appendChild(badge);
-
-      const heading = document.createElement("h3");
-      heading.textContent = resource.title;
-      Object.assign(heading.style, { margin: "0", color: "#1e3a8a" });
-      card.appendChild(heading);
-
-      const description = document.createElement("p");
-      description.textContent = resource.description;
-      Object.assign(description.style, {
-        margin: "0",
-        color: "#475569",
-        lineHeight: "1.7",
-      });
-      card.appendChild(description);
-
-      const frameWrap = document.createElement("div");
-      Object.assign(frameWrap.style, {
-        position: "relative",
-        width: "100%",
-        paddingTop: "56.25%",
-        borderRadius: "14px",
-        overflow: "hidden",
-        background: "#0f172a",
-      });
-
-      const iframe = document.createElement("iframe");
-      iframe.title = resource.title;
-      iframe.src = embedUrl;
-      iframe.loading = "lazy";
-      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-      iframe.allowFullscreen = true;
-      Object.assign(iframe.style, {
-        position: "absolute",
-        inset: "0",
-        width: "100%",
-        height: "100%",
-        border: "0",
-      });
-      frameWrap.appendChild(iframe);
-      card.appendChild(frameWrap);
-
-      const anchor = writingSection.querySelector('[data-course-inline-practice="writing"]');
-      if (anchor) writingSection.insertBefore(card, anchor);
-      else writingSection.appendChild(card);
-      return true;
-    };
-
-    mountVideo();
-    const observer = new MutationObserver(mountVideo);
-    observer.observe(root, { childList: true, subtree: true });
-
-    return () => {
-      observer.disconnect();
-      root.querySelector(`[${WRITING_VIDEO_ATTRIBUTE}]`)?.remove();
-    };
-  }, []);
-
-  return null;
-};
-
-const Day21NoListeningTabGuard = () => {
-  useLayoutEffect(() => {
-    const root = document.querySelector('[data-b1-day21-no-listening="true"]');
-    if (!root) return undefined;
-
-    const hideTeil4Tab = () => {
-      const tab = root.querySelector('[role="tab"][aria-label="Teil 4"]');
-      if (!tab) return;
-      tab.hidden = true;
-      tab.setAttribute("aria-hidden", "true");
-      tab.tabIndex = -1;
-    };
-
-    hideTeil4Tab();
-    const observer = new MutationObserver(hideTeil4Tab);
-    observer.observe(root, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return null;
-};
-
 export const B1_DAY21_HAS_TEIL4 = false;
+
+const day21WritingVideoResource = getWritingVideoResource("B1", 21);
+const day21WritingVideo = day21WritingVideoResource
+  ? { ...day21WritingVideoResource, embedUrl: getYouTubeEmbedUrl(day21WritingVideoResource.url) }
+  : null;
 
 const config = {
   day: 21,
@@ -185,6 +58,7 @@ const config = {
   },
   writing: getB1WritingTask(21),
   reading: getB1ReadingTask(21),
+  writingVideo: day21WritingVideo,
   submitListening: false,
   submitTitle: "Submit Teil 2 and Teil 3.",
   submitNote: "Teil 1 is group practice. There is no Teil 4 in this workbook.",
@@ -194,37 +68,5 @@ const config = {
 };
 
 export default function B1Day21LebensformenHeuteWorkbookPage() {
-  return (
-    <div data-b1-day21-no-listening="true">
-      <style>{`
-        [data-b1-day21-no-listening="true"] [role="tab"][aria-label="Teil 4"] {
-          display: none !important;
-        }
-        [data-b1-day21-no-listening="true"] [data-workbook-tab-navigation] > p {
-          display: none !important;
-        }
-      `}</style>
-      <div
-        data-b1-day21-no-teil4-notice="true"
-        role="note"
-        style={{
-          width: "min(calc(100% - 24px), 960px)",
-          margin: "12px auto 0",
-          border: "1px solid #f59e0b",
-          borderRadius: 14,
-          padding: 12,
-          background: "#fffbeb",
-          color: "#92400e",
-          fontWeight: 800,
-          lineHeight: 1.55,
-          boxSizing: "border-box",
-        }}
-      >
-        This workbook has Teil 1 · Sprechen, Teil 2 · Schreiben and Teil 3 · Lesen. There is no Teil 4 · Hören for this lesson.
-      </div>
-      <B1StandardWorkbookPage config={config} />
-      <Day21NoListeningTabGuard />
-      <Day21WritingVideoInjector />
-    </div>
-  );
+  return <B1StandardWorkbookPage config={config} />;
 }
