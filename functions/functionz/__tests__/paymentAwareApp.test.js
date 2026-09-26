@@ -183,6 +183,18 @@ describe("Paystack billing normalization", () => {
     expect(response.body.ok).toBe(true);
   });
 
+  it("preserves legacy initialPaymentAmount when paymentStatus is absent", () => {
+    const { normalizeStudentBilling } = loadApp();
+    expect(normalizeStudentBilling({
+      tuitionFee: 3000,
+      initialPaymentAmount: 2800,
+      balanceDue: 200,
+    })).toEqual(expect.objectContaining({
+      paidSoFar: 2800,
+      effectiveBalance: 200,
+    }));
+  });
+
   it("does not treat a pending signup payment intent as prior paid money", () => {
     const { normalizeStudentBilling } = loadApp();
     expect(normalizeStudentBilling({
