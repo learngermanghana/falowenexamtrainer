@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import AppBackButton from "./navigation/AppBackButton";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -162,44 +163,11 @@ const QuestionList = ({ questions }) => (
   </div>
 );
 
-function B1Day11TeamspieleWorkbookContent() {
-  const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({
-    sprechen: false,
-    schreiben: false,
-    lesen: false,
-    hoeren: false,
-  });
-
-  const setPreparedFor = (tabKey) => (event) =>
-    setPrepared((previous) => ({ ...previous, [tabKey]: event.target.checked }));
-
+const B1Day11PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const mark = setPreparedFor;
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span style={{ ...styles.badge, width: "fit-content" }}>B1 · Day 11 · Kapitel 4.11</span>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · Teamspiele und kooperative Aktivitäten</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Select Teil 1–4 below. The highlighted card at the top of each section tells you exactly what to answer.
-        </p>
-        <img
-          src="https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=1600&q=80"
-          alt="Team members cooperating during a group activity"
-          loading="lazy"
-          style={tabImageStyle}
-        />
-        <WorkbookTabNav
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          tabs={STANDARD_WORKBOOK_TABS}
-          ariaLabel="B1 Day 11 Teamspiele workbook sections"
-        />
-      </div>
-
-      <A2B1WorkbookGuidance level="B1" />
-
-      {activeTab === "sprechen" && (
+    <>
+{activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <WorkbookTaskCard
@@ -262,7 +230,7 @@ function B1Day11TeamspieleWorkbookContent() {
         </section>
       )}
 
-      {activeTab === "schreiben" && (
+{activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
@@ -328,7 +296,7 @@ Mit freundlichen Grüßen
         </section>
       )}
 
-      {activeTab === "lesen" && (
+{activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
@@ -367,7 +335,7 @@ Mit freundlichen Grüßen
         </section>
       )}
 
-      {activeTab === "hoeren" && (
+{activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard
@@ -403,49 +371,25 @@ Mit freundlichen Grüßen
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers
-          level="B1"
-          lesson={{ title: "B1Day11Teamspiele", level: "B1", day: 11, workbookId: "B1Day11Teamspiele" }}
-          workbookId="B1Day11Teamspiele"
-        />
-      )}
-
-      {activeTab === "submit" && (
-        <section style={card}>
-          <h2 style={sectionTitle}>Submit workbook answers</h2>
-          <WorkbookTaskCard
-            eyebrow="Final step"
-            title="Submit Teil 2, Teil 3 and Teil 4."
-            submissionNote="Do not submit Teil 1."
-          >
-            <p style={{ margin: 0 }}>
-              Paste your final opinion text, seven reading answer letters and five listening answer letters into the form below.
-            </p>
-          </WorkbookTaskCard>
-          <div className="b1-day11-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
-            <style>{`.b1-day11-submission-page > div > section:first-child { display: none !important; }
-            .b1-day11-submission-page select { display: none !important; }`}</style>
-            <AssignmentSubmissionPage
-              submissionContext={{
-                level: "B1",
-                day: 11,
-                assignmentKey: "B1-4.11",
-                canonicalAssignmentKey: "B1-4.11",
-              }}
-            />
-          </div>
-        </section>
-      )}
-    </div>
+    </>
   );
-}
+};
+
+const config = {
+  day: 11,
+  chapter: "4.11",
+  assignmentKey: "B1-4.11",
+  workbookId: "B1Day11Teamspiele",
+  title: "Teamspiele und kooperative Aktivitäten",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 11 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
 
 export default function B1Day11TeamspieleWorkbookPage() {
   return (
     <RadioFirstWorkbookGate level="B1" day={11}>
-      <B1Day11TeamspieleWorkbookContent />
+      <B1StandardWorkbookPage config={config} renderSections={B1Day11PreservedSections} />
     </RadioFirstWorkbookGate>
   );
 }
