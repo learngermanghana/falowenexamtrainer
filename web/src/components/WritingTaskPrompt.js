@@ -23,6 +23,7 @@ export default function WritingTaskPrompt({ lesson }) {
   const bullets = Array.isArray(lesson?.writingPromptBullets)
     ? lesson.writingPromptBullets.filter(Boolean)
     : [];
+  const taskNote = String(lesson?.writingTaskNote || "").trim();
 
   return (
     <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 14, background: "#eff6ff", color: "#1e3a8a", display: "grid", gap: 10, lineHeight: 1.65 }}>
@@ -39,6 +40,7 @@ export default function WritingTaskPrompt({ lesson }) {
           </ul>
         </div>
       ) : null}
+      {taskNote ? <p data-writing-task-note="true" style={{ margin: 0, color: "#334155" }}>{taskNote}</p> : null}
     </div>
   );
 }

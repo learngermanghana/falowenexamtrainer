@@ -15,6 +15,10 @@ on:
       - "web/src/components/StandardLessonWritingCoachPage.js"
       - "web/src/components/StandardLessonWritingCoachPage.test.js"
       - "web/src/data/b2SkillCycle.js"
+      - "web/src/data/b2WritingTasks.js"
+      - "web/src/data/b2WritingTasks.test.js"
+      - "web/src/components/WritingTaskPrompt.js"
+      - "web/src/components/GuidedWritingWorkspace.js"
       - "web/src/data/b2LessonContentAlignment.js"
       - "web/src/data/b2LessonContentAlignment.test.js"
       - "web/src/data/b2GrammarLessons.js"
@@ -66,6 +70,7 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/components/B2UnifiedGuidedWorkbookPage.test.js
+          src/data/b2WritingTasks.test.js
           src/data/b2LessonContentAlignment.test.js
           src/data/b2GrammarLessons.test.js
           src/components/B2MediaGatePolicy.test.js
