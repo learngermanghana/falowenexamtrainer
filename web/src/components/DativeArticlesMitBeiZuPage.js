@@ -322,12 +322,26 @@ export const DativeArticlesMitBeiZuGrammarNotes = () => {
   );
 };
 
+export const hasWorkbookView = (location) => {
+  const routerSearch = String(location?.search || "");
+  const browserSearch = typeof window !== "undefined" ? String(window.location?.search || "") : "";
+  const routerParams = new URLSearchParams(routerSearch);
+  const browserParams = new URLSearchParams(browserSearch);
+  const stateView = String(location?.state?.view || location?.state?.resourceView || "").toLowerCase();
+
+  return (
+    routerParams.get("view") === "workbook"
+    || browserParams.get("view") === "workbook"
+    || Boolean(routerParams.get("workbookTab"))
+    || Boolean(browserParams.get("workbookTab"))
+    || stateView === "workbook"
+  );
+};
+
 const DativeArticlesMitBeiZuPage = () => {
   const location = useLocation();
-  const query = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
-  const isWorkbook = query.get("view") === "workbook";
 
-  if (isWorkbook) {
+  if (hasWorkbookView(location)) {
     return <A1Day18Kapitel122WorkbookPage />;
   }
 
@@ -335,3 +349,5 @@ const DativeArticlesMitBeiZuPage = () => {
 };
 
 export default DativeArticlesMitBeiZuPage;
+
+export const __TESTING__ = { hasWorkbookView };
