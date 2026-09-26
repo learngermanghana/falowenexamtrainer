@@ -175,6 +175,8 @@ const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
 const UNPAID_SIGNUP_GRACE_DAYS = 7;
 const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
+const TRIAL_DURATION_DAYS = 7;
+const TRIAL_DURATION_MS = TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000;
 const TRIAL_RETENTION_DAYS = 30;
 const TRIAL_RETENTION_MS = TRIAL_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const CONTRACT_EXPIRY_GRACE_DAYS = 30;
@@ -298,12 +300,28 @@ const hasStudentMadePayment = (student = {}) => {
   const paymentStatus = normalizeValue(student.paymentStatus);
   if (["paid", "partial"].includes(paymentStatus)) return true;
 
-  const paidFields = [student.paid, student.paidAmount, student.initialPaymentAmount];
-  return paidFields.some((value) => Number(value) > 0);
+  const confirmedPaidFields = [student.paid, student.paidAmount];
+  return confirmedPaidFields.some((value) => Number(value) > 0);
 };
 
-const getTrialEndMillis = (student = {}) =>
-  getMillisFromTimestampLike(student.trialEndsAt);
+const getTrialStartMillis = (student = {}) => {
+  const startedAtMs = getMillisFromTimestampLike(student.trialStartedAt);
+  if (Number.isFinite(startedAtMs)) return startedAtMs;
+
+  const usedAtMs = getMillisFromTimestampLike(student.trialUsedAt);
+  return Number.isFinite(usedAtMs) ? usedAtMs : Number.NaN;
+};
+
+const getTrialEndMillis = (student = {}) => {
+  const explicitEndMs = getMillisFromTimestampLike(student.trialEndsAt);
+  if (Number.isFinite(explicitEndMs)) return explicitEndMs;
+
+  if (normalizeValue(student.trialStatus) !== "active") return Number.NaN;
+  const startedAtMs = getTrialStartMillis(student);
+  return Number.isFinite(startedAtMs)
+    ? startedAtMs + TRIAL_DURATION_MS
+    : Number.NaN;
+};
 
 const getTrialPurgeMillis = (student = {}) => {
   const explicit = getMillisFromTimestampLike(student.trialPurgeAt);
@@ -995,6 +1013,9 @@ exports.cleanupExpiredTrials = onSchedule(
       trialRecords += 1;
 
       const currentStatus = normalizeValue(student.status);
+      const expectedTrialEndIso = Number.isFinite(lifecycle.trialEndMs)
+        ? new Date(lifecycle.trialEndMs).toISOString()
+        : "";
       const expectedPurgeIso = Number.isFinite(lifecycle.purgeAtMs)
         ? new Date(lifecycle.purgeAtMs).toISOString()
         : "";
@@ -1020,6 +1041,7 @@ exports.cleanupExpiredTrials = onSchedule(
 
       if (lifecycle.state === "active") {
         const updates = {};
+        if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso;
         if (currentStatus !== "trial_active") updates.status = "trial_active";
         if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
           updates.trialPurgeAt = expectedPurgeIso;
@@ -1035,6 +1057,7 @@ exports.cleanupExpiredTrials = onSchedule(
 
       if (lifecycle.state === "expired") {
         const updates = {};
+        if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso;
         if (currentStatus !== "trial_expired") updates.status = "trial_expired";
         if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
           updates.trialPurgeAt = expectedPurgeIso;

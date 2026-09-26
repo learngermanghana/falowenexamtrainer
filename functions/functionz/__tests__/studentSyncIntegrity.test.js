@@ -84,8 +84,27 @@ describe("student sync integrity", () => {
       "paymentStatus: profile.paymentStatus",
       "paymentIntentAmount: profile.paymentIntentAmount",
       "trialStatus: profile.trialStatus",
-      "trialStartedAt: serverTimestamp()",
+      "trialStartedAt: Timestamp.fromDate(trialStartedDate)",
+      "trialUsedAt: Timestamp.fromDate(trialStartedDate)",
+      "trialEndsAt: Timestamp.fromDate(trialEndsDate)",
+      "trialPurgeAt: Timestamp.fromDate(trialPurgeDate)",
     ].forEach((contract) => expect(auth).toContain(contract));
+  });
+
+  test("backend derives and protects legacy active trials before stale-signup cleanup", () => {
+    const index = readRepoFile("functions", "index.js");
+
+    expect(index).toContain('normalizeValue(student.trialStatus) !== "active"');
+    expect(index).toContain("startedAtMs + TRIAL_DURATION_MS");
+    expect(index).toContain("if (Number.isFinite(getTrialEndMillis(student))) return false");
+    expect(index).toContain("if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso");
+  });
+
+  test("payment intent alone is not treated as confirmed backend payment", () => {
+    const index = readRepoFile("functions", "index.js");
+
+    expect(index).toContain("const confirmedPaidFields = [student.paid, student.paidAmount]");
+    expect(index).not.toContain("student.paidAmount, student.initialPaymentAmount");
   });
 
   test("Firestore student creation and updates both flow into the sheet upsert", () => {
