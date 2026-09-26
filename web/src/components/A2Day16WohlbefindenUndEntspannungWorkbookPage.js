@@ -131,55 +131,8 @@ const schreibenContent = (
   </div>
 );
 
-const lesenText = `Anzeige A: Yoga-Kurs für Anfänger
-Jeden Montag und Donnerstag von 18:00 bis 19:00 Uhr bieten wir Yoga-Kurse für Anfänger an. Unser erfahrener Lehrer hilft Ihnen, die Grundlagen des Yoga zu erlernen und Ihre Flexibilität sowie Ihr allgemeines Wohlbefinden zu verbessern. Die Teilnahme ist kostenlos, aber eine vorherige Anmeldung ist erforderlich. Kontaktieren Sie uns unter yoga@fit.de oder rufen Sie uns unter 030-987654321 an.
 
-Anzeige B: Fitnessstudio Mitgliedschaft
-Profitieren Sie von unserem exklusiven Sommerangebot und erhalten Sie 20% Rabatt auf alle Jahresmitgliedschaften. Unser Fitnessstudio bietet eine Vielzahl von Kursen, moderne Trainingsgeräte und persönliche Trainingsprogramme. Besuchen Sie uns in der Hauptstraße 12 oder rufen Sie uns unter 030-123456789 an, um mehr zu erfahren. Unser Team freut sich darauf, Ihnen zu helfen, Ihre Fitnessziele zu erreichen.
 
-Anzeige C: Gesunde Ernährung Kochkurs
-Lernen Sie, wie man leckere und gesunde Mahlzeiten zubereitet. Unser Kochkurs findet jeden Samstag um 10:00 Uhr statt und bietet praktische Tipps zur Verbesserung Ihrer Ernährungsgewohnheiten. Unsere erfahrenen Köche zeigen Ihnen, wie man einfache, gesunde Rezepte mit frischen Zutaten zubereitet. Für weitere Informationen und zur Anmeldung schreiben Sie an kochkurs@gesund.de oder besuchen Sie unsere Website www.gesund-kochen.de.
-
-Anzeige D: Zahnarztpraxis Dr. Müller
-Wir bieten umfassende zahnärztliche Versorgung, einschließlich Zahnreinigung, Vorsorgeuntersuchungen und Behandlungen. Unsere Praxis ist von Montag bis Freitag von 8:00 bis 18:00 Uhr geöffnet. Vereinbaren Sie einen Termin unter 030-123456 oder besuchen Sie uns in der Zahnstraße 5. Ihr Lächeln ist uns wichtig!
-
-Anzeige E: Physiotherapiezentrum Gesund
-Unsere spezialisierten Therapeuten bieten Behandlungen für Rückenschmerzen, Sportverletzungen und andere Beschwerden. Wir erstellen individuelle Therapiepläne, die auf Ihre speziellen Bedürfnisse abgestimmt sind. Termine sind nach Vereinbarung möglich. Kontaktieren Sie uns unter physiotherapie@gesund.de oder rufen Sie uns unter 030-654321987 an.
-
-Anzeige F: Laufgruppe im Stadtpark
-Treffen Sie sich mit anderen Laufbegeisterten und bleiben Sie fit. Unsere Laufgruppe trifft sich jeden Sonntag um 9:00 Uhr am Haupteingang des Stadtparks. Egal ob Anfänger oder Fortgeschrittene, alle sind willkommen. Genießen Sie die frische Luft und die Gemeinschaft. Für weitere Informationen schreiben Sie an laufgruppe@gesund.de.`;
-
-const advertChoices = [
-  "A) Anzeige A",
-  "B) Anzeige B",
-  "C) Anzeige C",
-  "D) Anzeige D",
-  "E) Anzeige E",
-  "F) Anzeige F",
-];
-
-const lesenQuestions = [
-  {
-    stem: "Welche Anzeige informiert über einen Kochkurs für gesunde Ernährung?",
-    options: advertChoices,
-  },
-  {
-    stem: "Wo kann man einen Rabatt für eine Jahresmitgliedschaft im Fitnessstudio bekommen?",
-    options: advertChoices,
-  },
-  {
-    stem: "Wer bietet Physiotherapie speziell für Rückenschmerzen an?",
-    options: advertChoices,
-  },
-  {
-    stem: "Welche Anzeige ist für eine Laufgruppe im Stadtpark?",
-    options: advertChoices,
-  },
-  {
-    stem: "Wo kann man einen Yoga-Kurs für Anfänger besuchen?",
-    options: advertChoices,
-  },
-];
 
 const hoerenQuestions = [
   {
@@ -216,8 +169,6 @@ export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
       schreibenTask="E-Mail an einen Arzt wegen Ihrer Gesundheit"
       schreibenContent={schreibenContent}
       schreibenPlaceholder="Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ..."
-      lesenText={lesenText}
-      lesenQuestions={lesenQuestions}
       hoerenTask="Hören Sie den Text über gesunde Ernährung, Bewegung, Fitness und regelmäßige Arztbesuche. Wählen Sie jeweils die richtige Antwort."
       hoerenAudioUrl="https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing"
       hoerenQuestions={hoerenQuestions}
