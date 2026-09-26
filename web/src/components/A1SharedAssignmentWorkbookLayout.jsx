@@ -4,6 +4,7 @@ import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
+import { recordLessonResumeActivity } from "../services/lessonResumeService";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
   <section data-workbook-section={sectionKey}>{children}</section>
@@ -86,6 +87,29 @@ export const useA1WorkbookTabState = ({ assignment, sections = assignment.sectio
   useEffect(() => {
     setActiveTab((current) => (current === requestedActiveTab ? current : requestedActiveTab));
   }, [requestedActiveTab]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search || "");
+    const canonicalView =
+      activeTab === "overview" || activeTab === "assignment" ? "workbook" : activeTab;
+    recordLessonResumeActivity({
+      level: "A1",
+      day: assignment.day,
+      chapter: assignment.chapter,
+      title: assignment.title || "",
+      activeView: canonicalView,
+      route: `${location.pathname}${location.search || ""}`,
+      radioDone: params.get("radio") === "done" ? true : undefined,
+      source: "a1-workbook",
+    }).catch(() => {});
+  }, [
+    activeTab,
+    assignment.chapter,
+    assignment.day,
+    assignment.title,
+    location.pathname,
+    location.search,
+  ]);
 
   useEffect(() => {
     const hasInvalidRequestedTab = Boolean(requestedTab && !allowedTabs.includes(requestedTab));
