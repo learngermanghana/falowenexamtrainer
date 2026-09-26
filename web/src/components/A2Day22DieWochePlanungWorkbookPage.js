@@ -14,10 +14,6 @@ export default function A2Day22DieWochePlanungWorkbookPage() {
       mindMapOnlySpeaking
       schreibenTask="Schreiben Sie einem Freund oder einer Freundin über Ihre kommende Woche. Nennen Sie mindestens drei Termine oder Aktivitäten, erklären Sie, wann Sie Zeit haben, und schlagen Sie ein Treffen vor."
       schreibenPlaceholder="Liebe/r ...,\n\nmeine nächste Woche ist ziemlich voll. Am Montag ..."
-      hoerenTask="Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe."
-      hoerenAudioUrl="https://youtu.be/wK9JOG5lhdc?list=PLtjMpIkGWMzD1BkOt9Jx9RhUk2e439CNZ"
-      hoerenQuestions={[]}
-      hoerenSelfCheck
       showWorkbookGuidance={false}
     />
   );
