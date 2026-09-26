@@ -368,7 +368,8 @@ const B1Day1PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <iframe
             title="Traumwelt listening exercise"
             src="https://www.youtube.com/embed/dZDgNxPWox8?rel=0"
-            allow="autoplay"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
             style={audioPreviewStyle}
           />
 
