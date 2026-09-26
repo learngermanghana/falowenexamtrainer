@@ -42,6 +42,29 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/data/falowenPublicHelpDiscovery.test.js
 
+  coursebook-smart-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test Course Book smart progress map
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/utils/courseBookSmartProgress.test.js src/components/CourseTabSmartProgress.test.js src/services/lessonResumeService.test.js
+
   smart-resume-progress:
     runs-on: ubuntu-latest
     steps:
