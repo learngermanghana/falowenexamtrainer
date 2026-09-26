@@ -170,9 +170,9 @@ describe("Paystack billing normalization", () => {
     );
   });
 
-  it("falls back to initialPaymentAmount when paid is missing", async () => {
+  it("falls back to initialPaymentAmount only when payment status confirms it", async () => {
     const app = loadApp();
-    mockStudent({ tuitionFee: 3000, initialPaymentAmount: 2800, balanceDue: 200 });
+    mockStudent({ tuitionFee: 3000, initialPaymentAmount: 2800, balanceDue: 200, paymentStatus: "partial" });
 
     const response = await request(app, "/paystack/initialize", {
       body: { studentCode: "STU123", amount: 200 },
@@ -183,11 +183,112 @@ describe("Paystack billing normalization", () => {
     expect(response.body.ok).toBe(true);
   });
 
+  it("does not treat a pending signup payment intent as prior paid money", () => {
+    const { normalizeStudentBilling } = loadApp();
+    expect(normalizeStudentBilling({
+      tuitionFee: 3000,
+      initialPaymentAmount: 3000,
+      paymentStatus: "pending",
+      balanceDue: 3000,
+    })).toEqual(expect.objectContaining({
+      paidSoFar: 0,
+      effectiveBalance: 3000,
+    }));
+  });
+
   it("uses derived balance when explicit balance is stale", () => {
     const { normalizeStudentBilling } = loadApp();
     expect(normalizeStudentBilling({ tuitionFee: 3000, paid: 2800, balanceDue: 3000 })).toEqual(
       expect.objectContaining({ explicitBalance: 3000, derivedBalance: 200, effectiveBalance: 200 })
     );
+  });
+
+  it("converts a trial and clears purge metadata after confirmed Paystack payment", async () => {
+    const app = loadApp();
+    mockStudent({
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+      trialStatus: "active",
+      trialStartedAt: "2026-09-20T10:00:00.000Z",
+      trialEndsAt: "2026-09-27T10:00:00.000Z",
+      trialPurgeAt: "2026-10-27T10:00:00.000Z",
+    });
+    const paidAt = new Date().toISOString();
+    const payload = {
+      event: "charge.success",
+      data: {
+        reference: "ref_trial_convert",
+        amount: 306122,
+        currency: "GHS",
+        fees: 6122,
+        paid_at: paidAt,
+        customer: { email: "student@example.com" },
+        metadata: {
+          studentCode: "STU123",
+          tuitionAmount: 3000,
+          checkoutAmount: 3061.22,
+          studentFeeContribution: 61.22,
+          feePolicy: "shared_50_50",
+        },
+      },
+    };
+
+    const response = await request(app, "/paystack/webhook", {
+      body: payload,
+      headers: signedWebhookHeaders(payload),
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockStudentSet).toHaveBeenCalledWith(expect.objectContaining({
+      paymentStatus: "paid",
+      trialStatus: "converted",
+      trialRetentionStatus: "converted",
+      trialConvertedAt: paidAt,
+      trialPurgeAt: "DELETE_FIELD",
+      purgeStatus: "DELETE_FIELD",
+    }), { merge: true });
+    expect(mockAppendSheet).toHaveBeenCalledWith(expect.objectContaining({
+      studentCode: "STU123",
+      paymentStatus: "paid",
+      trialStatus: "converted",
+      trialPurgeAt: "",
+      trialConvertedAt: paidAt,
+    }));
+  });
+
+  it("does not add trial conversion metadata to a non-trial payer", async () => {
+    const app = loadApp();
+    mockStudent({ tuitionFee: 3000, paid: 2800, balanceDue: 200, paymentStatus: "partial" });
+    const payload = {
+      event: "charge.success",
+      data: {
+        reference: "ref_non_trial",
+        amount: 20408,
+        currency: "GHS",
+        fees: 408,
+        paid_at: new Date().toISOString(),
+        customer: { email: "student@example.com" },
+        metadata: {
+          studentCode: "STU123",
+          tuitionAmount: 200,
+          checkoutAmount: 204.08,
+          studentFeeContribution: 4.08,
+          feePolicy: "shared_50_50",
+        },
+      },
+    };
+
+    const response = await request(app, "/paystack/webhook", {
+      body: payload,
+      headers: signedWebhookHeaders(payload),
+    });
+
+    expect(response.status).toBe(200);
+    const updatePayload = mockStudentSet.mock.calls.find((call) => call[1]?.merge === true)?.[0] || {};
+    expect(updatePayload.trialConvertedAt).toBeUndefined();
+    expect(updatePayload.trialStatus).toBeUndefined();
   });
 
   it("updates paid and initialPaymentAmount after a successful webhook payment", async () => {
