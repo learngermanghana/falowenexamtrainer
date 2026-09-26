@@ -11,7 +11,7 @@ const requiredMarkers = [
   'day={22}',
   'chapter="8.22"',
   'title="Die Woche planen"',
-  'Eine volle Woche',
+  'hoerenSelfCheck',
 ];
 
 for (const marker of requiredMarkers) {
@@ -25,6 +25,10 @@ const retiredMarkers = [
   "function TabButton(",
   "Gülcan schreibt Sonja, dass",
   "Willkommensführung",
+  "lesenText=",
+  "lesenQuestions=",
+  "const lesenText",
+  "const lesenQuestions",
 ];
 
 for (const marker of retiredMarkers) {
@@ -33,4 +37,4 @@ for (const marker of retiredMarkers) {
   }
 }
 
-console.log("A2 Day 22 already owns the cleaned shared workbook shell; no legacy DOM patch required.");
+console.log("A2 Day 22 uses the cleaned shared workbook shell, canonical Lesen source and explicit Hören self-check mode.");
