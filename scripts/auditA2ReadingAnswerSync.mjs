@@ -25,12 +25,12 @@ const stripSheetRowPrefix = (value = "") =>
 
 const stripChoicePrefix = (value = "") =>
   stripSheetRowPrefix(value)
-    .replace(/^\s*[a-z]\)\s*/i, "")
+    .replace(/^\s*[a-z]\s*[).:-]\s*/i, "")
     .replace(/^\s*anzeige\s*:\s*/i, "")
     .trim();
 
 const choiceLetter = (value = "") => {
-  const direct = stripSheetRowPrefix(value).match(/^\s*([a-z])\)\s*/i);
+  const direct = stripSheetRowPrefix(value).match(/^\s*([a-z])\s*[).:-]\s*/i);
   if (direct) return direct[1].toUpperCase();
   const advert = stripSheetRowPrefix(value).match(/^\s*anzeige\s*:\s*([a-zx])\b/i);
   return advert ? advert[1].toUpperCase() : "";
@@ -155,6 +155,50 @@ const evaluateConstants = (source) => {
   return values;
 };
 
+const extractJsxPropExpression = (source, propName) => {
+  const propMatch = new RegExp("\\b" + propName + "\\s*=\\s*\\{", "g").exec(source);
+  if (!propMatch) return null;
+
+  const openBraceIndex = propMatch.index + propMatch[0].lastIndexOf("{");
+  const closeBraceIndex = findBalanced(source, openBraceIndex, "{", "}");
+  if (closeBraceIndex < 0) return { error: "unclosed JSX expression" };
+
+  return {
+    expression: source.slice(openBraceIndex + 1, closeBraceIndex).trim(),
+  };
+};
+
+const resolveQuestionArray = (source, values, propName) => {
+  const prop = extractJsxPropExpression(source, propName);
+  if (!prop) return { present: false, questions: null };
+  if (prop.error) return { present: true, questions: null, error: prop.error };
+
+  const expression = prop.expression;
+  if (/^[A-Za-z_$][\\w$]*$/.test(expression)) {
+    const questions = values[expression];
+    return Array.isArray(questions)
+      ? { present: true, questions }
+      : { present: true, questions: null, error: "could not evaluate " + expression };
+  }
+
+  if (expression.startsWith("[")) {
+    try {
+      const questions = vm.runInNewContext("(" + expression + ")", Object.create(null), { timeout: 100 });
+      return Array.isArray(questions)
+        ? { present: true, questions }
+        : { present: true, questions: null, error: "inline expression is not an array" };
+    } catch (error) {
+      return { present: true, questions: null, error: "could not evaluate inline array: " + error.message };
+    }
+  }
+
+  return {
+    present: true,
+    questions: null,
+    error: "unsupported lesenQuestions expression: " + expression.slice(0, 80),
+  };
+};
+
 const parseCsv = (text) => {
   const rows = [];
   let row = [];
@@ -225,14 +269,21 @@ for (const fileName of workbookFiles) {
   const chapterMatch = source.match(/\bchapter\s*=\s*[\"']([^\"']+)[\"']/);
   if (!chapterMatch) continue;
 
-  const questionProp = source.match(/\blessenQuestions\s*=\s*\{([A-Za-z_$][\w$]*)\}/);
-  const values = evaluateConstants(source);
-  const questionVar = questionProp?.[1] || (Array.isArray(values.lesenQuestions) ? "lesenQuestions" : "");
-  const questions = questionVar ? values[questionVar] : null;
-
-  if (!Array.isArray(questions) || !questions.length) continue;
-
   const assignmentId = ("A2-" + chapterMatch[1]).toUpperCase();
+  const values = evaluateConstants(source);
+  const resolvedQuestions = resolveQuestionArray(source, values, "lesenQuestions");
+
+  if (!resolvedQuestions.present) continue;
+  if (!Array.isArray(resolvedQuestions.questions) || !resolvedQuestions.questions.length) {
+    fail(
+      assignmentId,
+      "could not parse lesenQuestions in " + fileName +
+        (resolvedQuestions.error ? ": " + resolvedQuestions.error : ""),
+    );
+    continue;
+  }
+
+  const questions = resolvedQuestions.questions;
   const entry = manifestByAssignmentId.get(assignmentId);
 
   if (!entry) {
@@ -272,14 +323,21 @@ for (const fileName of workbookFiles) {
     let matchingOption = null;
 
     if (letter) {
-      matchingOption = question.options.find((option) =>
-        new RegExp("^\\s*" + letter + "\\)", "i").test(String(option)),
-      );
-    }
-    if (!matchingOption && answerBody) {
+      matchingOption = question.options.find((option) => {
+        const optionLetter = choiceLetter(option);
+        const optionBody = normalize(stripChoicePrefix(option));
+        if (optionLetter !== letter) return false;
+        if (!answerBody) return true;
+        return optionBody === answerBody ||
+          optionBody.includes(answerBody) ||
+          answerBody.includes(optionBody);
+      });
+    } else if (answerBody) {
       matchingOption = question.options.find((option) => {
         const optionBody = normalize(stripChoicePrefix(option));
-        return optionBody === answerBody || optionBody.includes(answerBody) || answerBody.includes(optionBody);
+        return optionBody === answerBody ||
+          optionBody.includes(answerBody) ||
+          answerBody.includes(optionBody);
       });
     }
 
