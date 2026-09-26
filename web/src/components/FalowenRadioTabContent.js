@@ -1,4 +1,5 @@
 import React from "react";
+import { recordLessonResumeActivity } from "../services/lessonResumeService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getLessonRadioResource } from "../data/lessonRadioDictionary";
 import { styles } from "../styles";
@@ -22,13 +23,26 @@ const FalowenRadioTabContent = ({
 
   const handleContinue = () => {
     if (actionDisabled) return;
-    onContinue?.();
 
-    if (!persistCompletionInUrl) return;
     const params = new URLSearchParams(location.search || "");
     params.set("radio", "done");
     if (String(params.get("view") || "").toLowerCase() === "radio") params.delete("view");
+    const activeView = String(params.get("view") || "learn").toLowerCase();
     const query = params.toString();
+    const resumeRoute = `${location.pathname}${query ? `?${query}` : ""}${location.hash || ""}`;
+
+    recordLessonResumeActivity({
+      level,
+      day,
+      activeView,
+      route: resumeRoute,
+      radioDone: true,
+      source: "falowen-radio",
+    }).catch(() => {});
+
+    onContinue?.();
+
+    if (!persistCompletionInUrl) return;
     navigate(
       { pathname: location.pathname, search: query ? `?${query}` : "", hash: location.hash },
       { replace: true, state: location.state },
