@@ -8,10 +8,27 @@ const {
   buildNextAction,
   normalizeProgressStatus,
   completionNextLesson,
+  learnerSupportStateHandler,
 } = require("../routes/learnerSupport");
 
 describe("learner support state", () => {
   const now = Date.parse("2026-09-26T12:00:00Z");
+
+  test("requires Firebase authentication", async () => {
+    const req = { method: "GET", headers: {}, query: {} };
+    const payloads = [];
+    const res = {
+      statusCode: 200,
+      status(code) { this.statusCode = code; return this; },
+      json(payload) { payloads.push(payload); return payload; },
+      setHeader: jest.fn(),
+    };
+
+    await learnerSupportStateHandler(req, res);
+
+    expect(res.statusCode).toBe(401);
+    expect(payloads[0]).toEqual({ ok: false, error: "Authentication required" });
+  });
 
   test("keeps an unpaid learner active during the seven-day trial", () => {
     const access = resolveLearnerAccess(
