@@ -185,6 +185,46 @@ const SUPPORT_BY_DAY = Object.freeze({
     watchOut: "Keep the verb at the end after wenn and weil, even if the clause contains several details.",
     example: "Wir könnten in ein Café gehen, weil man dort gut sprechen kann.",
   },
+  24: {
+    terms: "indem = by doing · dadurch, dass = by the fact that · je … desto = the … the … · Passiv = passive voice",
+    rule: "Use indem to explain how something is done and je … desto to connect two changing quantities. Passive voice describes processes when the action matters more than the actor.",
+    structure: "indem + subject + ... + verb · je + comparative + ..., desto + comparative + verb + subject · werden + Partizip II",
+    use: "Use these forms to explain sustainable actions, environmental effects and general processes.",
+    watchOut: "In the desto-clause the conjugated verb comes directly after the comparative phrase, while indem sends the verb to the end.",
+    example: "Je bewusster wir einkaufen, desto weniger Abfall entsteht. · Plastik wird recycelt.",
+  },
+  25: {
+    terms: "falls = if/in case · Relativsatz = relative clause · Passiv mit Modalverb = passive with a modal verb",
+    rule: "Use falls for possible conditions, relative clauses to describe products or shops, and modal passive forms for rules and consumer rights.",
+    structure: "falls + subject + ... + verb · noun + relative pronoun + ... + verb · modal verb + ... + Partizip II + werden",
+    use: "Use these structures for online-shopping conditions, complaints, consumer protection and product descriptions.",
+    watchOut: "With a modal passive, do not place werden before the participle. The end should be geschützt werden, zurückgeschickt werden, etc.",
+    example: "Falls die Ware beschädigt ist, kann sie zurückgeschickt werden.",
+  },
+  26: {
+    terms: "Plusquamperfekt = past perfect · nachdem = after · bevor = before · Konjunktiv II = polite/hypothetical form",
+    rule: "Use Plusquamperfekt for an event that happened before another past event. nachdem and bevor make the sequence explicit; Konjunktiv II makes requests more polite.",
+    structure: "hatte/war + Partizip II · nachdem/bevor + subject + ... + verb · Könnten/Würden Sie ...?",
+    use: "Use these forms when narrating travel problems in order and when asking staff for help politely.",
+    watchOut: "Do not use Plusquamperfekt for every past sentence. Use it mainly when you need to show which past event happened first.",
+    example: "Der Zug war schon abgefahren, als wir ankamen. · Könnten Sie mir bitte weiterhelfen?",
+  },
+  27: {
+    terms: "indem = by doing · statt … zu = instead of doing · ohne … zu = without doing · um … zu = in order to",
+    rule: "These infinitive and subordinate structures help explain methods, alternatives, avoided actions and goals. Use the zu-forms mainly when the subject stays the same.",
+    structure: "indem + ... + verb · statt/ohne/um + ... + zu + infinitive",
+    use: "Use them to describe practical eco-friendly habits and explain what you do instead, what you avoid and why.",
+    watchOut: "If the subject changes, a full clause such as ohne dass or damit is often needed instead of a simple zu-construction.",
+    example: "Statt mit dem Auto zu fahren, nehme ich den Bus. · Ich kaufe regional, um Transportwege zu verkürzen.",
+  },
+  28: {
+    terms: "je … desto = the … the … · obwohl = although · trotzdem = nevertheless · Konjunktiv II = hypothetical form",
+    rule: "Use je … desto for linked changes, obwohl for a subordinate contrast and trotzdem for a contrasting main clause. Konjunktiv II expresses realistic hypothetical proposals.",
+    structure: "je + comparative + ..., desto + comparative + verb + subject · obwohl + ... + verb · trotzdem + verb + subject",
+    use: "Use these structures to discuss climate consequences, obstacles and realistic policy or personal proposals.",
+    watchOut: "Do not use the same word order after obwohl and trotzdem: obwohl sends the verb to the end; trotzdem is followed by normal main-clause inversion.",
+    example: "Obwohl Busfahren länger dauert, nutze ich den Bus. Trotzdem fahre ich manchmal Auto.",
+  },
 });
 
 export const getB1GrammarEnglishSupport = (day) =>
