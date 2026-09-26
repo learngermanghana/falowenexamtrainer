@@ -107,9 +107,9 @@ const extractConfigChapter = (combinedSource) =>
   || combinedSource.match(/\bchapter="([^"]+)"/)?.[1]
   || "";
 
-const CUSTOM_BASELINE_DAYS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 11, 19, 20, 22]);
-const LEGACY_PROXY_BASELINE_DAYS = new Set([1, 3, 6, 22]);
-const DOM_PATCH_BASELINE_DAYS = new Set([1, 21]);
+const CUSTOM_BASELINE_DAYS = new Set();
+const LEGACY_PROXY_BASELINE_DAYS = new Set();
+const DOM_PATCH_BASELINE_DAYS = new Set([21]);
 const PLANNED_BASELINE_COUNTS = new Map([[23, 1]]);
 
 const liveRows = [];
