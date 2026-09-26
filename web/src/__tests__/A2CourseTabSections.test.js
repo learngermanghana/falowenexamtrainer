@@ -24,11 +24,13 @@ jest.mock("../firebase", () => ({
 jest.mock("../components/ClassMembersTab", () => () => null);
 
 const sectionByTitle = (name) => screen.getByRole("heading", { name }).closest("details");
+const lessonAction = (card) =>
+  card.querySelector('a[data-coursebook-smart-action]') || within(card).getByRole("link");
 const cardDays = (section) =>
   within(section)
     .getAllByRole("article")
     .map((card) => {
-      const href = within(card).getByRole("link", { name: "Open Lesson" }).getAttribute("href");
+      const href = lessonAction(card)?.getAttribute("href");
       const match = href?.match(/\/lesson\/A2\/(\d+)/);
       return match ? Number(match[1]) : null;
     })
@@ -66,12 +68,12 @@ test("keeps Day 15 on its existing A2 identity and chapter route", () => {
   const day15 = within(second)
     .getAllByRole("article")
     .find((card) => {
-      const href = within(card).getByRole("link", { name: "Open Lesson" }).getAttribute("href") || "";
+      const href = lessonAction(card)?.getAttribute("href") || "";
       return href.includes("/campus/course/lesson/A2/15");
     });
 
   expect(day15).toBeTruthy();
-  const lessonLink = within(day15).getByRole("link", { name: "Open Lesson" });
+  const lessonLink = lessonAction(day15);
   expect(lessonLink.getAttribute("href")).toContain("/campus/course/lesson/A2/15");
   expect(lessonLink.getAttribute("href")).toContain("chapter=6.15");
 });
