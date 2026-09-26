@@ -42,6 +42,39 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/data/falowenPublicHelpDiscovery.test.js
 
+  learner-support-state:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            functions/package-lock.json
+            web/package-lock.json
+
+      - name: Install Functions dependencies
+        working-directory: functions
+        run: npm install --no-audit --no-fund --loglevel=error
+
+      - name: Test protected learner-state rules
+        working-directory: functions
+        run: npx jest functionz/tests/learnerSupport.state.test.js --runInBand
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+
+      - name: Test Study Buddy learner-state integration
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyService.test.js src/__tests__/StudyBuddyBar.test.js src/__tests__/StudyBuddyBar.i18n.test.js
+
   lesson-section-deep-links:
     runs-on: ubuntu-latest
     steps:
