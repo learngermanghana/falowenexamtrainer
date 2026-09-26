@@ -29,8 +29,10 @@ export const useLessonResumeSync = ({
   const saveTimerRef = useRef(null);
   const hydratedRef = useRef(false);
   const progressRef = useRef(progress);
+  const onRemoteRadioDoneRef = useRef(onRemoteRadioDone);
 
   progressRef.current = progress;
+  onRemoteRadioDoneRef.current = onRemoteRadioDone;
 
   const stableSections = useMemo(
     () => normalizeLessonSections(progress || {}),
@@ -51,7 +53,7 @@ export const useLessonResumeSync = ({
       level,
       day,
       onChange: (remote) => {
-        if (remote?.radioDone === true) onRemoteRadioDone?.(remote);
+        if (remote?.radioDone === true) onRemoteRadioDoneRef.current?.(remote);
         if (remote?.sections && typeof setProgress === "function") {
           setProgress((current) => {
             const merged = mergeResumeSectionsIntoProgress(current, remote.sections);
@@ -66,7 +68,7 @@ export const useLessonResumeSync = ({
         setCloudReady(true);
       },
     });
-  }, [day, level, onRemoteRadioDone, setProgress, user?.uid]);
+  }, [day, level, setProgress, user?.uid]);
 
   useEffect(() => {
     if (!cloudReady || !user?.uid || !level || !Number.isInteger(Number(day))) return undefined;
