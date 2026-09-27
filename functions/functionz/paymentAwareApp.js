@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { getScoresForStudent } = require("./scoresSheet");
+const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
 
 const DEFAULT_TUITION_CURRENCY = "GHS";
 const PAYSTACK_MAX_EVENT_AGE_MINUTES = 60 * 24 * 3;
@@ -43,32 +45,58 @@ const firstValidMoney = (...values) => {
   return null;
 };
 
-const normalizeCompletionSnapshotIdPart = (value = "") =>
-  String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]/g, "_")
-    .slice(0, 160);
+const TRUSTED_COMPLETION_LEVELS = new Set(["A1", "A2", "B1"]);
 
-const getCourseCompletionSnapshot = async ({ userId, level } = {}) => {
-  const normalizedUserId = normalizeCompletionSnapshotIdPart(userId);
-  const normalizedLevel = normalizeCompletionSnapshotIdPart(level);
-  if (!normalizedUserId || !normalizedLevel) return null;
+const normalizeTrustedAssignmentId = ({ row = {}, level = "", plannedSet = new Set() } = {}) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  const direct = String(row.assignment_id || row.assignmentId || "").trim().toUpperCase();
+  const directCandidates = [
+    direct,
+    direct && !/^(A1|A2|B1|B2|C1|C2)-/.test(direct) ? `${normalizedLevel}-${direct}` : "",
+  ].filter(Boolean);
 
-  const snapshot = await admin
-    .firestore()
-    .collection("courseCompletionSnapshots")
-    .doc(`${normalizedUserId}__${normalizedLevel}`)
-    .get();
+  for (const candidate of directCandidates) {
+    if (plannedSet.has(candidate)) return candidate;
+  }
 
-  return snapshot.exists ? snapshot.data() || null : null;
+  const assignmentText = String(row.assignment || "").trim();
+  const identifiers = assignmentText.match(/\d+(?:\.\d+)?/g) || [];
+  for (let index = identifiers.length - 1; index >= 0; index -= 1) {
+    const candidate = `${normalizedLevel}-${identifiers[index]}`;
+    if (plannedSet.has(candidate)) return candidate;
+  }
+
+  return "";
 };
 
-const isCourseWorkCompleteSnapshot = (snapshot = null) => {
-  if (!snapshot || snapshot.courseWorkCompleted !== true) return false;
-  const completed = Number(snapshot.completed);
-  const total = Number(snapshot.total);
-  return Number.isFinite(total) && total > 0 && Number.isFinite(completed) && completed >= total;
+const getTrustedCourseCompletion = async ({ studentCode, level } = {}) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  if (!TRUSTED_COMPLETION_LEVELS.has(normalizedLevel)) {
+    return { required: false, complete: true, completed: 0, total: 0 };
+  }
+
+  const { plannedSet } = getAssignmentSummary(normalizedLevel);
+  const total = plannedSet.size;
+  if (!total) {
+    return { required: true, complete: false, completed: 0, total: 0 };
+  }
+
+  const rows = await getScoresForStudent(studentCode);
+  const completedIds = new Set();
+
+  rows.forEach((row) => {
+    const rowLevel = String(row.level || "").trim().toUpperCase();
+    if (rowLevel && rowLevel !== normalizedLevel) return;
+    const assignmentId = normalizeTrustedAssignmentId({ row, level: normalizedLevel, plannedSet });
+    if (assignmentId) completedIds.add(assignmentId);
+  });
+
+  return {
+    required: true,
+    complete: [...plannedSet].every((assignmentId) => completedIds.has(assignmentId)),
+    completed: completedIds.size,
+    total,
+  };
 };
 
 const normalizeStudentBilling = (student = {}) => {
@@ -228,14 +256,16 @@ app.post("/paystack/initialize", async (req, res) => {
     const queuedUpgradeLevel = String(student.upgradeToLevel || "").trim().toUpperCase();
     if (queuedUpgradeLevel) {
       const currentLevel = String(student.upgradeFromLevel || student.level || "").trim().toUpperCase();
-      const completionSnapshot = await getCourseCompletionSnapshot({
-        userId: student.uid || authedUser.uid,
+      const trustedCompletion = await getTrustedCourseCompletion({
+        studentCode,
         level: currentLevel,
       });
-      if (!isCourseWorkCompleteSnapshot(completionSnapshot)) {
+      if (trustedCompletion.required && !trustedCompletion.complete) {
         return res.status(409).json({
           error: `Complete your ${currentLevel || "current"} Course Book before paying for ${queuedUpgradeLevel}.`,
           code: "course_completion_required",
+          completed: trustedCompletion.completed,
+          total: trustedCompletion.total,
         });
       }
     }
