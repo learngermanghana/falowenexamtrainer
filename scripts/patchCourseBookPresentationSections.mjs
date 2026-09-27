@@ -17,6 +17,7 @@ const B1_COURSE_BOOK_SECTIONS = [
   { key: "orientation", title: "Orientation", days: "Day 0", firstDay: 0, lastDay: 0 },
   { key: "b1-1", title: "B1.1 – Independent Everyday Communication", days: "Days 1–14", firstDay: 1, lastDay: 14, introTitle: "Build independent B1 communication", intro: "Use familiar grammar and vocabulary in longer, connected responses. Give an idea, explain why, add an example and communicate without depending on memorised sentences." },
   { key: "b1-2", title: "B1.2 – Connected Communication and Exam Readiness", days: "Days 15–28", firstDay: 15, lastDay: 28, introTitle: "Move from correct sentences to developed answers", intro: "Combine connectors, reasons, examples and organised writing more confidently as you improve fluency, accuracy and exam-style communication." },
+  { key: "b1-exam", title: "B1 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29 },
 ];
 
 const B2_COURSE_BOOK_SECTIONS = [
@@ -235,6 +236,15 @@ if (!source.includes("COURSE_BOOK_PRESENTATION_SECTIONS")) {
   source = source.replace(anchor, extra);
 }
 
+if (!source.includes('key: "b1-exam"')) {
+  const b1FinalTeachingSection = '  { key: "b1-2", title: "B1.2 – Connected Communication and Exam Readiness", days: "Days 15–28", firstDay: 15, lastDay: 28, introTitle: "Move from correct sentences to developed answers", intro: "Combine connectors, reasons, examples and organised writing more confidently as you improve fluency, accuracy and exam-style communication." },';
+  if (!source.includes(b1FinalTeachingSection)) throw new Error("Missing B1.2 section anchor for exam orientation.");
+  source = source.replace(
+    b1FinalTeachingSection,
+    b1FinalTeachingSection + '\n  { key: "b1-exam", title: "B1 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29 },',
+  );
+}
+
 const groupingStart = source.indexOf("  const groupedLessons = useMemo(() => {");
 const visibleLessonsEnd = source.lastIndexOf("  const visibleLessons = useMemo(", groupingStart);
 const existingPresentationStart = source.indexOf(
@@ -331,7 +341,7 @@ if (!source.includes("data-course-week-goal")) {
   source = source.replace(articleMarker, goalPanel);
 }
 
-for (const label of ["B1.1 – Independent Everyday Communication", "B2.1 – Independent Communication and Analysis", "C1.1 – Advanced Expression and Analysis"]) {
+for (const label of ["B1.1 – Independent Everyday Communication", "B1 Exam Orientation", "B2.1 – Independent Communication and Analysis", "C1.1 – Advanced Expression and Analysis"]) {
   if (!source.includes(label)) throw new Error("Missing section label");
 }
 if (!source.includes("data-course-week-goal")) throw new Error("Missing weekly Course Book goal card");
