@@ -497,11 +497,11 @@ if (!courseTab.includes('data-compact-course-hero="true"')) {
                   <div style={courseBookStyles.statCard}>
                     <p style={courseBookStyles.statLabel}>Mastery</p>
                     <p style={courseBookStyles.statValue}>
-                      {courseCompletion.masteryAvailable ? `${courseCompletion.masteryPercent ?? 0}% passed` : "Self-learning"}
+                      {courseCompletion.masteryAvailable ? String(courseCompletion.masteryPercent ?? 0) + "% passed" : "Self-learning"}
                     </p>
                     {courseCompletion.masteryAvailable && latestResultScore !== null ? (
                       <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>
-                        Latest: {Math.round(latestResultScore)}/100{latestResultTitle ? ` · ${latestResultTitle}` : ""}
+                        Latest: {Math.round(latestResultScore)}/100{latestResultTitle ? " · " + latestResultTitle : ""}
                       </p>
                     ) : null}
                   </div>
