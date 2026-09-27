@@ -172,12 +172,13 @@ const AccountSettings = () => {
     const now = Date.now();
     const contractEnd = toDate(studentProfile?.contractEnd);
     const contractEndMs = contractEnd?.getTime?.();
-    const hasCurrentContract = Number.isFinite(contractEndMs) && contractEndMs > now;
+    const hasContractEnd = Number.isFinite(contractEndMs);
+    const hasCurrentContract = hasContractEnd && contractEndMs > now;
     const daysRemaining = hasCurrentContract
       ? Math.max(0, Math.ceil((contractEndMs - now) / (1000 * 60 * 60 * 24)))
       : null;
 
-    if (hasCurrentContract || paymentCleared) {
+    if (hasCurrentContract || (!hasContractEnd && paymentCleared)) {
       return {
         label: "Active",
         detail: hasCurrentContract
@@ -187,6 +188,17 @@ const AccountSettings = () => {
         tone: "#166534",
         background: "#ecfdf5",
         border: "#86efac",
+      };
+    }
+
+    if (hasContractEnd && contractEndMs <= now) {
+      return {
+        label: "Access ended",
+        detail: `Course access ended ${formatDate(studentProfile?.contractEnd)}`,
+        daysRemaining: null,
+        tone: "#9a3412",
+        background: "#fff7ed",
+        border: "#fdba74",
       };
     }
 
