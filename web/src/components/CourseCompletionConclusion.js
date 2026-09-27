@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";
 
 const nextLevelByLevel = {
   A1: "A2",
@@ -37,6 +38,8 @@ const CourseCompletionConclusion = ({
 
   const nextLevel = nextLevelByLevel[normalizedLevel] || "";
   const isTutorGuided = tutorGuidedLevels.has(normalizedLevel);
+  const goetheOrientation = isTutorGuided ? getGoetheExamOrientationConfig(normalizedLevel) : null;
+  const officialGoetheRoute = goetheOrientation?.courseRoute || "";
   const progressPercent = totalRequirements
     ? Math.round((completedRequirements / totalRequirements) * 100)
     : 0;
@@ -75,9 +78,11 @@ const CourseCompletionConclusion = ({
         </h2>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65, maxWidth: 780 }}>
           {isComplete
-            ? nextLevel
-              ? `You have completed the required ${normalizedLevel} Course Book work. Review your progress, continue with exam preparation, or preview what comes next in ${nextLevel}.`
-              : `You have completed the required ${normalizedLevel} Course Book work. Review your progress and continue with focused exam preparation.`
+            ? isTutorGuided && officialGoetheRoute
+              ? `You have completed the required ${normalizedLevel} Course Book work. Your next step is the official Goethe ${normalizedLevel} practice in the final Course Book Exam Orientation. The Falowen Exams Room remains available for extra practice afterwards.`
+              : nextLevel
+                ? `You have completed the required ${normalizedLevel} Course Book work. Review your progress, continue with exam preparation, or preview what comes next in ${nextLevel}.`
+                : `You have completed the required ${normalizedLevel} Course Book work. Review your progress and continue with focused exam preparation.`
             : `This is the final checkpoint for your ${normalizedLevel} Course Book. You are ${progressPercent}% complete. Finish the outstanding required work and review corrections before moving forward.`}
         </p>
       </div>
@@ -116,15 +121,33 @@ const CourseCompletionConclusion = ({
           {!isComplete ? <li>Complete the remaining required Course Book work.</li> : null}
           <li>Review your Results, corrections and weak areas.</li>
           {isTutorGuided ? <li>Check your Attendance and Class Participation records.</li> : null}
-          <li>Continue with focused {normalizedLevel} exam preparation in the Exams Room.</li>
+          {isTutorGuided && officialGoetheRoute ? (
+            <>
+              <li>Open the final Course Book Exam Orientation and work with the official Goethe {normalizedLevel} practice material.</li>
+              <li>Use the Falowen Exams Room afterwards for optional extra practice in weak areas.</li>
+            </>
+          ) : (
+            <li>Continue with focused {normalizedLevel} exam preparation in the Exams Room.</li>
+          )}
           {nextLevel ? <li>Preview the first {nextLevel} chapter before deciding when to upgrade.</li> : null}
         </ol>
       </div>
 
       <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-        <a href="/exams/question" style={{ ...styles.primaryButton, textDecoration: "none" }}>
-          Go to Exams Room
-        </a>
+        {isComplete && isTutorGuided && officialGoetheRoute ? (
+          <>
+            <a href={officialGoetheRoute} style={{ ...styles.primaryButton, textDecoration: "none" }}>
+              Continue to Official Goethe Practice
+            </a>
+            <a href="/exams/question" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Exams Room (optional)
+            </a>
+          </>
+        ) : (
+          <a href="/exams/question" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+            Go to Exams Room
+          </a>
+        )}
         {nextLevel ? (
           <button type="button" style={styles.secondaryButton} onClick={onExploreNextLevel}>
             Explore {nextLevel}
