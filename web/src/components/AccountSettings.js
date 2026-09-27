@@ -283,9 +283,12 @@ const AccountSettings = () => {
     return candidates
       .map((entry, index) => {
         const amount = Number(entry?.amount ?? entry?.paidAmount ?? 0) || 0;
+        const rawDate = entry?.date || entry?.paidAt || entry?.createdAt;
+        const timestamp = toDateMs(rawDate);
         return {
           id: entry?.id || entry?.reference || `tx-${index}`,
-          date: formatDate(entry?.date || entry?.paidAt || entry?.createdAt),
+          date: formatDate(rawDate),
+          timestamp: Number.isFinite(timestamp) ? timestamp : 0,
           amount,
           channel: entry?.channel || entry?.provider || "Paystack",
           reference: entry?.reference || entry?.transactionReference || "—",
@@ -293,7 +296,7 @@ const AccountSettings = () => {
           receiptUrl: entry?.receiptUrl || entry?.receipt || entry?.receiptLink || "",
         };
       })
-      .sort((a, b) => (a.date < b.date ? 1 : -1));
+      .sort((a, b) => b.timestamp - a.timestamp);
   }, [studentProfile?.paymentHistory, studentProfile?.payments, studentProfile?.transactions, t]);
 
   const subscription = useMemo(() => {
@@ -498,6 +501,9 @@ const AccountSettings = () => {
       studentCode: studentProfile?.studentCode || "",
     })
   )}`;
+  const accessUntil =
+    studentProfile?.contractEnd ||
+    (Number.isFinite(trialLifecycle.endsAtMs) ? trialLifecycle.endsAtMs : null);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -658,7 +664,7 @@ const AccountSettings = () => {
           </div>
           <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
             <span style={{ ...styles.helperText, fontSize: 12 }}>Access until</span>
-            <strong>{formatDate(studentProfile?.contractEnd)}</strong>
+            <strong>{formatDate(accessUntil)}</strong>
           </div>
           <div style={{ ...styles.card, margin: 0, background: billingState.background, borderColor: billingState.border }}>
             <span style={{ ...styles.helperText, fontSize: 12, color: billingState.tone }}>Payment status</span>
