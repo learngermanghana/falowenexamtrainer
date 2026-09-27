@@ -55,7 +55,7 @@ describe("requested video assignments", () => {
   test("A2 completion journey uses the requested next-step video", () => {
     expect(getCourseCompletionJourney("A2")).toEqual(
       expect.objectContaining({
-        title: "After A2: prepare for the Goethe A2 exam",
+        title: "After A2: prepare with the official Goethe A2 practice",
         videoUrl: "https://youtu.be/Qw54j9GiMd4",
       })
     );
