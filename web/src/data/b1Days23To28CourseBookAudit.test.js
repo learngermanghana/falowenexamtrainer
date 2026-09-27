@@ -138,7 +138,7 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
     expect(availability).toContain("24, 25, 26, 27, 28");
   });
 
-  test("CourseLessonPage mounts all six native workbooks and no standalone grammar routes", () => {
+  test("CourseLessonPage mounts all six workbooks and all six Grammar deep-link pages", () => {
     const courseLessonPage = componentSource("CourseLessonPage.js");
     const workbookComponents = [
       "B1Day23ErstesDateWorkbookPage",
@@ -148,10 +148,15 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
       "B1Day27UmweltfreundlichAlltagWorkbookPage",
       "B1Day28KlimafreundlichLebenWorkbookPage",
     ];
+    const grammarComponents = [
+      "B1Day23ErstesDateGrammarNotesPage",
+      "B1Day24KonsumNachhaltigkeitGrammarNotesPage",
+      "B1Day25OnlineShoppingRightsRisksGrammarNotesPage",
+      "B1Day26ReiseproblemeGrammarNotesPage",
+      "B1Day27UmweltfreundlichAlltagGrammarNotesPage",
+      "B1Day28KlimafreundlichLebenGrammarNotesPage",
+    ];
     workbookComponents.forEach((name) => expect(courseLessonPage).toContain(name));
-
-    for (let day = 23; day <= 28; day += 1) {
-      expect(courseLessonPage).not.toMatch(new RegExp(`B1Day${day}.*GrammarNotesPage`));
-    }
+    grammarComponents.forEach((name) => expect(courseLessonPage).toContain(name));
   });
 });
