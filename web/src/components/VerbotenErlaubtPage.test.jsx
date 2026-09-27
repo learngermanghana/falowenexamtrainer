@@ -11,109 +11,67 @@ const renderPage = () => render(
   </MemoryRouter>,
 );
 
-describe("VerbotenErlaubtPage A1 exam practice", () => {
-  test("combines five picture rules with matching questions and exam choices", () => {
+describe("A1 Day 19 Goethe speaking readiness", () => {
+  test("presents the three speaking exam parts instead of a forbidden/allowed grammar lesson", () => {
     renderPage();
 
-    expect(document.querySelectorAll("[data-combined-rule-question]")).toHaveLength(5);
-    expect(screen.getByRole("img", { name: "water is allowed" })).toBeVisible();
-    expect(screen.getByRole("img", { name: "food is forbidden" })).toBeVisible();
-    expect(screen.getByText(/Im Kursraum darfst du nicht essen\./)).toBeVisible();
-    expect(screen.getByText("Darf Kojo im Kursraum essen?")).toBeVisible();
-    expect(screen.getByText(/Im Unterricht darfst du nicht telefonieren\./)).toBeVisible();
-    expect(screen.getByText("Darf Yaw im Unterricht telefonieren?")).toBeVisible();
-    expect(screen.getByText(/Im Computerraum darfst du Deutsch üben\./)).toBeVisible();
-    expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
-    expect(screen.queryAllByLabelText("Verboten")).toHaveLength(0);
-    expect(screen.getAllByRole("button", { name: "Erlaubt" })).toHaveLength(5);
-    expect(screen.getAllByRole("button", { name: "Verboten" })).toHaveLength(5);
+    expect(screen.getByRole("heading", { name: /Are you ready for the A1 speaking exam/i })).toBeVisible();
+    expect(screen.getByText(/Teil 1 · Sich vorstellen/i)).toBeVisible();
+    expect(screen.getByText(/Teil 2 · Fragen und Antworten/i)).toBeVisible();
+    expect(screen.getByText(/Teil 3 · Bitten und reagieren/i)).toBeVisible();
+    expect(screen.queryByRole("heading", { name: /Erlaubt oder verboten/i })).not.toBeInTheDocument();
   });
 
-  test("teaches both rule patterns and the full dürfen conjugation", () => {
+  test("Teil 1 covers the complete self-introduction plus spelling and number tasks", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Erlaubt oder verboten?" })).toBeVisible();
-    expect(screen.getByText("Rauchen ist verboten.")).toBeVisible();
-    expect(screen.getAllByText(/Man darf hier nicht rauchen/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("Das Fotografieren ist erlaubt.")).toBeVisible();
-    expect(screen.getByText("= Man darf hier fotografieren.")).toBeVisible();
-    expect(screen.getByText("Dürfen is a modal verb")).toBeVisible();
-    expect(screen.getByText("darfst")).toBeVisible();
-    expect(screen.getByText("dürft")).toBeVisible();
-    expect(screen.getByText("Wir dürfen hier Deutsch lernen.")).toBeVisible();
-    expect(screen.getByText("Sie dürfen hier parken.")).toBeVisible();
-    expect(screen.getByText(/Both mean the same thing/)).toBeVisible();
+    ["Name", "Alter", "Land", "Wohnort", "Sprachen", "Beruf / Studium", "Hobby"].forEach((label) => {
+      expect(screen.getByText(label)).toBeVisible();
+    });
+    expect(screen.getByText(/Buchstabiere deinen Nachnamen/i)).toBeVisible();
+    expect(screen.getByText(/Telefonnummer oder eine Zahl/i)).toBeVisible();
   });
 
-  test("exam mode hides translations, badges and instant explanations", () => {
+  test("Teil 2 requires the learner to ask before revealing the model", () => {
     renderPage();
 
-    expect(screen.getByText("You may drink water in class.")).toBeVisible();
-    expect(screen.getByText(/In the real exam there is no translation/)).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Start Exam Mode" }));
-
-    expect(screen.queryByText("You may drink water in class.")).not.toBeInTheDocument();
-    expect(screen.queryByText("Im Unterricht darfst du Wasser trinken.")).not.toBeInTheDocument();
-    expect(screen.queryAllByLabelText("Erlaubt")).toHaveLength(0);
-    expect(screen.getByLabelText("Exam mode timer")).toHaveTextContent("01:00");
-
-    fireEvent.click(screen.getAllByRole("button", { name: "Erlaubt" })[0]);
-    expect(screen.queryByText(/Richtig\./)).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Finish exam" }));
-    expect(screen.getByText(/Richtig\./)).toBeVisible();
-    expect(screen.getByText(/Ama darf im Unterricht Wasser trinken/)).toBeVisible();
-  });
-
-  test("Teil 2 requires an attempt before revealing the model", () => {
-    renderPage();
-
-    const teil2Heading = screen.getByRole("heading", { name: "Ask first, then reveal the model" });
+    const teil2Heading = screen.getByRole("heading", { name: "Turn the topic card into a question" });
     const teil2Section = teil2Heading.closest("section");
     expect(teil2Section).not.toBeNull();
     const teil2 = within(teil2Section);
 
-    expect(teil2.getByText("THEMA: Getränke")).toBeVisible();
-    expect(teil2.getAllByText("KEYWORD")).toHaveLength(4);
-    expect(teil2.queryByText("Trinken Sie im Unterricht Wasser?")).not.toBeInTheDocument();
+    expect(teil2.getByText("Wochenende")).toBeVisible();
+    expect(teil2.queryByText("Was machst du am Wochenende?")).not.toBeInTheDocument();
 
-    fireEvent.click(teil2.getAllByRole("button", { name: "Show model question and answer" })[0]);
+    fireEvent.click(teil2.getAllByRole("button", { name: "Show model" })[0]);
 
-    expect(teil2.getByText("Trinken Sie im Unterricht Wasser?")).toBeVisible();
-    expect(teil2.getByText("Ja, ich trinke im Unterricht Wasser.")).toBeVisible();
+    expect(teil2.getByText("Was machst du am Wochenende?")).toBeVisible();
   });
 
-  test("Teil 2 uses every keyword in both the model question and answer", () => {
+  test("Teil 3 practises requests and reactions", () => {
     renderPage();
 
-    screen.getAllByRole("button", { name: "Show model question and answer" }).forEach((button) => {
-      fireEvent.click(button);
-    });
+    const teil3Heading = screen.getByRole("heading", { name: "Make a request and react" });
+    const teil3Section = teil3Heading.closest("section");
+    expect(teil3Section).not.toBeNull();
+    const teil3 = within(teil3Section);
 
-    [
-      ["Trinken Sie im Unterricht Wasser?", "Ja, ich trinke im Unterricht Wasser."],
-      ["Wann ist Ihre Pause?", "Meine Pause ist um zwölf Uhr."],
-      ["Lernen Sie Deutsch im Computerraum?", "Ja, ich lerne Deutsch im Computerraum."],
-      ["Haben Sie ein Fahrrad?", "Ja, ich habe ein Fahrrad."],
-    ].forEach(([question, answer]) => {
-      expect(screen.getByText(question)).toBeVisible();
-      expect(screen.getByText(answer)).toBeVisible();
-    });
+    expect(teil3.getByText("Stift")).toBeVisible();
+    expect(teil3.queryByText("Können Sie mir bitte einen Stift geben?")).not.toBeInTheDocument();
+
+    fireEvent.click(teil3.getAllByRole("button", { name: "Show model" })[0]);
+
+    expect(teil3.getByText("Können Sie mir bitte einen Stift geben?")).toBeVisible();
+    expect(teil3.getByText("Ja, gern.")).toBeVisible();
   });
 
-  test("Teil 3 uses picture cards and reveals the request after the attempt", () => {
+  test("includes mock exam, speaking practice and readiness checklist", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Use the picture, then reveal the model" })).toBeVisible();
-    expect(screen.getByRole("img", { name: "glass of water" })).toBeVisible();
-    expect(screen.getByRole("img", { name: "mobile phone" })).toBeVisible();
-    expect(screen.getByRole("img", { name: "window" })).toBeVisible();
-    expect(screen.getByRole("img", { name: "no smoking sign" })).toBeVisible();
-    expect(screen.queryByText("Können Sie mir bitte Wasser geben?")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getAllByRole("button", { name: "Show request and reaction" })[0]);
-
-    expect(screen.getByText("Können Sie mir bitte Wasser geben?")).toBeVisible();
-    expect(screen.getByText("Ja, gern.")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Teil 1 → Teil 2 → Teil 3 · with minimal help/i })).toBeVisible();
+    expect(screen.getByTestId("a1-speaking-practice")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Can I do this tomorrow in the exam/i })).toBeVisible();
+    expect(screen.getAllByRole("checkbox")).toHaveLength(6);
+    expect(screen.getByText(/fresh prompt/i)).toBeVisible();
   });
 });
