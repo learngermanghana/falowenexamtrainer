@@ -82,6 +82,15 @@ import { normalizeLesson } from "./lessonModel";
     expect(normalized.resources.workbook.url).not.toContain("drive.google.com");
   });
 
+  test("all B1 Days 1 to 28 expose native Grammar and Workbook deep links", () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const override = getB1LessonResourceOverride(day);
+      expect(override).toBeTruthy();
+      expect(override.grammarBook).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(override.workbook).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
+    }
+  });
+
   test("B1 Days 20 to 28 open the in-app standard workbook route without skipping radio", () => {
     for (let day = 20; day <= 28; day += 1) {
       const lesson = {
