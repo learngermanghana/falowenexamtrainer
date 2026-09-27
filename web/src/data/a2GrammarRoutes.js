@@ -15,7 +15,7 @@ const ROUTE_ENTRIES = [
   [14, "5.14", "/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes"],
   [15, "6.15", "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes"],
   [16, "6.16", "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"],
-  [17, "6.17", "/campus/course/modal-verbs-day-14-3-6?level=A2&day=17"],
+  [17, "6.17", "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook?view=grammar"],
   [18, "7.18", "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"],
   [19, "7.19", "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes"],
   [20, "7.20", "/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes"],
@@ -23,6 +23,9 @@ const ROUTE_ENTRIES = [
   [22, "8.22", "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes"],
   [23, "9.23", "/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"],
   [24, "9.24", "/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes"],
+  [25, "9.25", "/campus/course/a2-day-25-tagesablauf-workbook?view=grammar"],
+  [26, "10.26", "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook?view=grammar"],
+  [27, "10.27", "/campus/course/a2-day-27-digitale-kommunikation-workbook?view=grammar"],
   [28, "10.28", "/campus/course/ueber-die-zukunft-sprechen-10-28-final-a2-grammar-notes"],
 ];
 
