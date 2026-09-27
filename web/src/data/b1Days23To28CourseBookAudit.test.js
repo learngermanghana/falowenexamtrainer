@@ -35,22 +35,23 @@ const expectedTitles = new Map([
 ]);
 
 describe("B1 Course Book cleanup · Days 23-28", () => {
-  test("Days 23-28 resolve native workbook routes without fake grammar routes", () => {
+  test("Days 23-28 expose native Grammar and Workbook deep links", () => {
     for (let day = 23; day <= 28; day += 1) {
       const override = getB1LessonResourceOverride(day);
       expect(override).toBeTruthy();
       expect(override.workbook).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(override.workbook).not.toContain("drive.google.com");
-      expect(override.grammarBook).toBeUndefined();
+      expect(override.grammarBook).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(override.grammarBook).not.toContain("drive.google.com");
 
       const metadata = getB1Days23To28LessonMetadata(day);
       expect(metadata).toBeTruthy();
-      expect(metadata.workbookOnly).toBe(true);
+      expect(metadata.workbookOnly).toBe(false);
       expect(metadata.title).toBe(expectedTitles.get(day));
     }
   });
 
-  test("curriculum alignment replaces stale workbook URLs and clears stale grammar URLs", () => {
+  test("curriculum alignment replaces stale Drive links with native Grammar and Workbook deep links", () => {
     const raw = Array.from({ length: 6 }, (_, index) => ({
       id: `B1-test-${index + 23}`,
       level: "B1",
@@ -71,10 +72,10 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
       const day = index + 23;
       expect(entry.workbookPage).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(entry.workbookRoute).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
-      expect(entry.grammarNotesPage).toBeNull();
-      expect(entry.grammarPage).toBeNull();
-      expect(entry.grammarbook_link).toBeNull();
-      expect(entry.resources[0].grammarbook_link).toBeNull();
+      expect(entry.grammarNotesPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(entry.grammarPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(entry.grammarbook_link).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(entry.resources[0].grammarbook_link).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
       expect(entry.resources[0].workbook_link).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(JSON.stringify(entry)).not.toContain("drive.google.com");
     });
@@ -137,7 +138,7 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
     expect(availability).toContain("24, 25, 26, 27, 28");
   });
 
-  test("CourseLessonPage mounts all six native workbooks and no standalone grammar routes", () => {
+  test("CourseLessonPage mounts all six workbooks and all six Grammar deep-link pages", () => {
     const courseLessonPage = componentSource("CourseLessonPage.js");
     const workbookComponents = [
       "B1Day23ErstesDateWorkbookPage",
@@ -147,10 +148,15 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
       "B1Day27UmweltfreundlichAlltagWorkbookPage",
       "B1Day28KlimafreundlichLebenWorkbookPage",
     ];
+    const grammarComponents = [
+      "B1Day23ErstesDateGrammarNotesPage",
+      "B1Day24KonsumNachhaltigkeitGrammarNotesPage",
+      "B1Day25OnlineShoppingRightsRisksGrammarNotesPage",
+      "B1Day26ReiseproblemeGrammarNotesPage",
+      "B1Day27UmweltfreundlichAlltagGrammarNotesPage",
+      "B1Day28KlimafreundlichLebenGrammarNotesPage",
+    ];
     workbookComponents.forEach((name) => expect(courseLessonPage).toContain(name));
-
-    for (let day = 23; day <= 28; day += 1) {
-      expect(courseLessonPage).not.toMatch(new RegExp(`B1Day${day}.*GrammarNotesPage`));
-    }
+    grammarComponents.forEach((name) => expect(courseLessonPage).toContain(name));
   });
 });

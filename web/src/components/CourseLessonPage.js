@@ -33,18 +33,27 @@ import B1Day15MedienHomeofficeGrammarNotesPage from "./B1Day15MedienHomeofficeGr
 import B1Day16PruefungsangstStressbewaeltigungWorkbookPage from "./B1Day16PruefungsangstStressbewaeltigungWorkbookPage";
 import B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage from "./B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage";
 import B1Day17WieLerntManAmBestenWorkbookPage from "./B1Day17WieLerntManAmBestenWorkbookPage";
+import B1Day17WieLerntManAmBestenGrammarNotesPage from "./B1Day17WieLerntManAmBestenGrammarNotesPage";
 import B1Day18WegeZumWunschberufWorkbookPage from "./B1Day18WegeZumWunschberufWorkbookPage";
 import B1Day18WegeZumWunschberufGrammarNotesPage from "./B1Day18WegeZumWunschberufGrammarNotesPage";
 import B1Day19VorstellungsgespraechWorkbookPage from "./B1Day19VorstellungsgespraechWorkbookPage";
 import B1Day20BerufKennenWorkbookPage from "./B1Day20BerufKennenWorkbookPage";
+import B1Day20BerufKennenGrammarNotesPage from "./B1Day20BerufKennenGrammarNotesPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./B1Day22BeziehungWichtigWorkbookPage";
+import B1Day22BeziehungWichtigGrammarNotesPage from "./B1Day22BeziehungWichtigGrammarNotesPage";
 import B1Day23ErstesDateWorkbookPage from "./B1Day23ErstesDateWorkbookPage";
+import B1Day23ErstesDateGrammarNotesPage from "./B1Day23ErstesDateGrammarNotesPage";
 import B1Day24KonsumNachhaltigkeitWorkbookPage from "./B1Day24KonsumNachhaltigkeitWorkbookPage";
+import B1Day24KonsumNachhaltigkeitGrammarNotesPage from "./B1Day24KonsumNachhaltigkeitGrammarNotesPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./B1Day25OnlineShoppingRightsRisksWorkbookPage";
+import B1Day25OnlineShoppingRightsRisksGrammarNotesPage from "./B1Day25OnlineShoppingRightsRisksGrammarNotesPage";
 import B1Day26ReiseproblemeLoesungenWorkbookPage from "./B1Day26ReiseproblemeLoesungenWorkbookPage";
+import B1Day26ReiseproblemeGrammarNotesPage from "./B1Day26ReiseproblemeGrammarNotesPage";
 import B1Day27UmweltfreundlichAlltagWorkbookPage from "./B1Day27UmweltfreundlichAlltagWorkbookPage";
+import B1Day27UmweltfreundlichAlltagGrammarNotesPage from "./B1Day27UmweltfreundlichAlltagGrammarNotesPage";
 import B1Day28KlimafreundlichLebenWorkbookPage from "./B1Day28KlimafreundlichLebenWorkbookPage";
+import B1Day28KlimafreundlichLebenGrammarNotesPage from "./B1Day28KlimafreundlichLebenGrammarNotesPage";
 import B1Day21LebensformenHeuteGrammarNotesPage from "./B1Day21LebensformenHeuteGrammarNotesPage";
 import B1Day19VorstellungsgespraechGrammarNotesPage from "./B1Day19VorstellungsgespraechGrammarNotesPage";
 import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate";
@@ -124,9 +133,18 @@ const B1_GRAMMAR_PAGES = {
   14: B1Day14TraditionellesDigitalesLernenGrammarNotesPage,
   15: B1Day15MedienHomeofficeGrammarNotesPage,
   16: B1Day16PruefungsangstStressbewaeltigungGrammarNotesPage,
+  17: B1Day17WieLerntManAmBestenGrammarNotesPage,
   18: B1Day18WegeZumWunschberufGrammarNotesPage,
   19: B1Day19VorstellungsgespraechGrammarNotesPage,
+  20: B1Day20BerufKennenGrammarNotesPage,
   21: B1Day21LebensformenHeuteGrammarNotesPage,
+  22: B1Day22BeziehungWichtigGrammarNotesPage,
+  23: B1Day23ErstesDateGrammarNotesPage,
+  24: B1Day24KonsumNachhaltigkeitGrammarNotesPage,
+  25: B1Day25OnlineShoppingRightsRisksGrammarNotesPage,
+  26: B1Day26ReiseproblemeGrammarNotesPage,
+  27: B1Day27UmweltfreundlichAlltagGrammarNotesPage,
+  28: B1Day28KlimafreundlichLebenGrammarNotesPage,
 };
 
 const B1_WORKBOOK_CHAPTER_LINKS = {

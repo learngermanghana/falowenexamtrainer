@@ -24,8 +24,7 @@ const workbookFiles = new Map([
   [22, "B1Day22BeziehungWichtigWorkbookPageV2.js"],
 ]);
 
-const grammarDays = new Set([18, 19, 21]);
-const workbookOnlyDays = new Set([17, 20, 22]);
+const grammarDays = new Set([17, 18, 19, 20, 21, 22]);
 
 describe("B1 Course Book cleanup · Days 17-22", () => {
   test("Days 17-22 resolve workbook routes inside Falowen and only expose verified grammar routes", () => {
@@ -35,11 +34,7 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
       expect(override.workbook).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(override.workbook).not.toContain("drive.google.com");
 
-      if (grammarDays.has(day)) {
-        expect(override.grammarBook).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
-      } else {
-        expect(override.grammarBook).toBe("");
-      }
+      expect(override.grammarBook).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
     }
   });
 
@@ -65,14 +60,9 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
       expect(entry.workbookRoute).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(JSON.stringify(entry)).not.toContain("drive.google.com");
 
-      if (grammarDays.has(day)) {
-        expect(entry.grammarNotesPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
-        expect(entry.grammarPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
-      } else {
-        expect(entry.grammarNotesPage).toBeNull();
-        expect(entry.grammarPage).toBeNull();
-        expect(entry.resources[0].grammarbook_link).toBeNull();
-      }
+      expect(entry.grammarNotesPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(entry.grammarPage).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
+      expect(entry.resources[0].grammarbook_link).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
     });
   });
 
@@ -95,11 +85,11 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
     });
   });
 
-  test("Day 22 has centralized workbook metadata without a fake grammar route", () => {
+  test("Day 22 has centralized workbook metadata with the shared Grammar deep link", () => {
     const override = getB1LessonResourceOverride(22);
     expect(override.chapter).toBe("7.22");
     expect(override.title).toBe("Was ist dir in einer Beziehung wichtig?");
-    expect(override.grammarBook).toBe("");
+    expect(override.grammarBook).toBe("/campus/course/lesson/B1/22?view=grammar");
     expect(override.goal).toContain("Beziehungen");
     expect(override.workbook).toBe("/campus/course/lesson/B1/22?view=workbook");
 
@@ -109,8 +99,9 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
     expect(workbook).toContain("STANDARD_WORKBOOK_TABS");
   });
 
-  test("CourseLessonPage mounts native workbook pages for all six days and grammar only where it exists", () => {
+  test("CourseLessonPage mounts all six workbooks and the shared grammar registry covers all six days", () => {
     const courseLessonPage = componentSource("CourseLessonPage.js");
+    const grammarRegistry = componentSource("A2B1WorkbookGrammarNotesContent.js");
     const workbookComponents = [
       "B1Day17WieLerntManAmBestenWorkbookPage",
       "B1Day18WegeZumWunschberufWorkbookPage",
@@ -122,13 +113,12 @@ describe("B1 Course Book cleanup · Days 17-22", () => {
     workbookComponents.forEach((name) => expect(courseLessonPage).toContain(name));
 
     [
+      "B1Day17WieLerntManAmBestenGrammarNotesPage",
       "B1Day18WegeZumWunschberufGrammarNotesPage",
       "B1Day19VorstellungsgespraechGrammarNotesPage",
+      "B1Day20BerufKennenGrammarNotesPage",
       "B1Day21LebensformenHeuteGrammarNotesPage",
-    ].forEach((name) => expect(courseLessonPage).toContain(name));
-
-    workbookOnlyDays.forEach((day) => {
-      expect(courseLessonPage).not.toMatch(new RegExp(`B1Day${day}.*GrammarNotesPage`));
-    });
+      "B1Day22BeziehungWichtigGrammarNotesPage",
+    ].forEach((name) => expect(grammarRegistry).toContain(name));
   });
 });
