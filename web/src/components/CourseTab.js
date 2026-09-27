@@ -53,6 +53,7 @@ const A1_COURSE_BOOK_SECTIONS = [
   { key: "orientation", title: "Orientation", days: "Day 0", firstDay: 0, lastDay: 0 },
   { key: "a1-1", title: "A1.1 – Foundations", days: "Days 1–12", firstDay: 1, lastDay: 12 },
   { key: "a1-2", title: "A1.2 – Application and Readiness", days: "Days 13–24", firstDay: 13, lastDay: 24 },
+  { key: "a1-exam", title: "A1 Exam Orientation", days: "Day 25", firstDay: 25, lastDay: 25 },
 ];
 
 const getA1CourseBookSection = (entry) => {
@@ -1227,7 +1228,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         communicating more independently as you prepare for the A1 exam and future A2 study.
                       </p>
                       <p>
-                        After the final Conjunctions lesson on Day 24, continue in the Exam Room for focused exam preparation.
+                        After the final Conjunctions lesson on Day 24, continue to Day 25 for official Goethe exam practice directly from the Course Book.
                       </p>
                     </div>
                   ) : null}
