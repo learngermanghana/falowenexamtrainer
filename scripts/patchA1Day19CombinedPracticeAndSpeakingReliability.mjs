@@ -33,7 +33,8 @@ const replaceRange = (source, start, end, replacement, label) => {
 };
 
 let page = read(paths.page);
-if (!page.includes("data-combined-rule-question")) {
+const hasLegacyCombinedRulePractice = page.includes("{knowledgeQuestions.map((question, index) => {");
+if (!page.includes("data-combined-rule-question") && hasLegacyCombinedRulePractice) {
   page = replaceOnce(
   page,
   `{knowledgeQuestions.map((question, index) => {\n          const selected = answers[index];`,
