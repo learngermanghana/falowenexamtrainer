@@ -13,6 +13,7 @@ import { formatCurrency } from "../lib/formatters";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
 import { getTrialLifecycleState } from "../lib/trialAccess";
+import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -38,6 +39,16 @@ const AccountSettings = () => {
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
   const [isRefreshingPayment, setIsRefreshingPayment] = useState(false);
+  const {
+    progress: courseCompletion,
+    loading: courseCompletionLoading,
+    error: courseCompletionError,
+    refresh: refreshCourseCompletion,
+  } = useCourseCompletionProgress({
+    studentProfile,
+    user,
+    level: studentProfile?.level,
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
@@ -366,6 +377,13 @@ const AccountSettings = () => {
   const levelUpgrade = useMemo(() => {
     const currentLevel = String(studentProfile?.level || "").toUpperCase();
     const nextLevel = getNextLevel(currentLevel);
+    const hasOutstandingBalance = (Number(balanceDue) || 0) > 0;
+    const completionVerified = Boolean(
+      courseCompletion &&
+      courseCompletion.level === currentLevel &&
+      Number(courseCompletion.total) > 0
+    );
+    const courseCompleted = completionVerified && courseCompletion.courseWorkCompleted === true;
 
     if (hasQueuedUpgrade) {
       return {
@@ -373,6 +391,9 @@ const AccountSettings = () => {
         nextLevel: queuedUpgradeLevel,
         canUpgrade: false,
         reason: t("accountSettings.upgrade.pending", { level: queuedUpgradeLevel }),
+        completionVerified,
+        courseCompleted,
+        hasOutstandingBalance,
       };
     }
 
@@ -382,16 +403,59 @@ const AccountSettings = () => {
         nextLevel: null,
         canUpgrade: false,
         reason: t("accountSettings.upgrade.maxedOut"),
+        completionVerified,
+        courseCompleted,
+        hasOutstandingBalance,
       };
     }
 
-    const hasOutstandingBalance = (Number(balanceDue) || 0) > 0;
+    if (courseCompletionLoading) {
+      return {
+        currentLevel,
+        nextLevel,
+        canUpgrade: false,
+        reason: "Checking your Course Book completion before upgrade.",
+        completionVerified: false,
+        courseCompleted: false,
+        hasOutstandingBalance,
+      };
+    }
+
+    if (!completionVerified) {
+      return {
+        currentLevel,
+        nextLevel,
+        canUpgrade: false,
+        reason: courseCompletionError
+          ? "Falowen could not verify your Course Book completion. Refresh your progress and try again."
+          : `Complete your ${currentLevel} Course Book before upgrading to ${nextLevel}.`,
+        completionVerified: false,
+        courseCompleted: false,
+        hasOutstandingBalance,
+      };
+    }
+
+    if (!courseCompleted) {
+      return {
+        currentLevel,
+        nextLevel,
+        canUpgrade: false,
+        reason: `Complete your ${currentLevel} Course Book first (${courseCompletion.completed}/${courseCompletion.total} required ${courseCompletion.mode === "self-learning" ? "lessons" : "assignments"} complete).`,
+        completionVerified: true,
+        courseCompleted: false,
+        hasOutstandingBalance,
+      };
+    }
+
     if (hasOutstandingBalance) {
       return {
         currentLevel,
         nextLevel,
         canUpgrade: false,
         reason: t("accountSettings.upgrade.clearBalance"),
+        completionVerified: true,
+        courseCompleted: true,
+        hasOutstandingBalance: true,
       };
     }
 
@@ -403,11 +467,23 @@ const AccountSettings = () => {
       nextTuitionFee,
       canUpgrade: true,
       reason: "",
+      completionVerified: true,
+      courseCompleted: true,
+      hasOutstandingBalance: false,
     };
-  }, [balanceDue, hasQueuedUpgrade, queuedUpgradeLevel, studentProfile?.level, t]);
+  }, [
+    balanceDue,
+    courseCompletion,
+    courseCompletionError,
+    courseCompletionLoading,
+    hasQueuedUpgrade,
+    queuedUpgradeLevel,
+    studentProfile?.level,
+    t,
+  ]);
 
   const handleUpgradeToNextLevel = async () => {
-    if (hasQueuedUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.nextLevel) return;
+    if (hasQueuedUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.courseCompleted || !levelUpgrade?.nextLevel) return;
 
     setIsUpgradingLevel(true);
     setStatus("");
@@ -807,26 +883,124 @@ const AccountSettings = () => {
       ) : null}
 
       {activeTab === "upgrade" ? (
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>{t("accountSettings.upgrade.title")}</h2>
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>{t("accountSettings.upgrade.title")}</h2>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Your next level unlocks only after both your current Course Book and current tuition balance are complete.
+          </p>
+        </div>
+
         {levelUpgrade.nextLevel ? (
           <>
-            <p style={styles.helperText}>{t("accountSettings.upgrade.description", { currentLevel: levelUpgrade.currentLevel, nextLevel: levelUpgrade.nextLevel, amount: formatMoney(levelUpgrade.nextTuitionFee || 0) })}</p>
-            <button type="button" style={styles.primaryButton} onClick={handleUpgradeToNextLevel} disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}>
-              {isUpgradingLevel ? t("accountSettings.upgrade.upgrading") : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
+            <div
+              data-upgrade-eligibility
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  ...styles.card,
+                  margin: 0,
+                  background: levelUpgrade.courseCompleted ? "#f0fdf4" : "#fff7ed",
+                  borderColor: levelUpgrade.courseCompleted ? "#86efac" : "#fdba74",
+                }}
+              >
+                <span style={{ ...styles.helperText, fontSize: 12 }}>Course Book</span>
+                <strong style={{ color: levelUpgrade.courseCompleted ? "#166534" : "#9a3412" }}>
+                  {courseCompletionLoading
+                    ? "Checking…"
+                    : levelUpgrade.courseCompleted
+                      ? "Complete"
+                      : courseCompletion?.total
+                        ? `${courseCompletion.completed}/${courseCompletion.total} complete`
+                        : "Not verified"}
+                </strong>
+              </div>
+
+              <div
+                style={{
+                  ...styles.card,
+                  margin: 0,
+                  background: levelUpgrade.hasOutstandingBalance ? "#fff7ed" : "#f0fdf4",
+                  borderColor: levelUpgrade.hasOutstandingBalance ? "#fdba74" : "#86efac",
+                }}
+              >
+                <span style={{ ...styles.helperText, fontSize: 12 }}>Current balance</span>
+                <strong style={{ color: levelUpgrade.hasOutstandingBalance ? "#9a3412" : "#166534" }}>
+                  {levelUpgrade.hasOutstandingBalance ? formatMoney(balanceDue) : "Cleared"}
+                </strong>
+              </div>
+            </div>
+
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {t("accountSettings.upgrade.description", {
+                currentLevel: levelUpgrade.currentLevel,
+                nextLevel: levelUpgrade.nextLevel,
+                amount: formatMoney(levelUpgrade.nextTuitionFee || getTuitionFeeForLevel(levelUpgrade.nextLevel)),
+              })}
+            </p>
+
+            {levelUpgrade.reason ? (
+              <div
+                style={{
+                  borderRadius: 12,
+                  padding: 12,
+                  border: "1px solid #fdba74",
+                  background: "#fff7ed",
+                  color: "#9a3412",
+                }}
+              >
+                <strong>{levelUpgrade.reason}</strong>
+                {!courseCompletionLoading && !levelUpgrade.courseCompleted ? (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                    <button
+                      type="button"
+                      style={styles.secondaryButton}
+                      onClick={() => navigate("/campus/course")}
+                    >
+                      Continue Course Book
+                    </button>
+                    {courseCompletionError || !levelUpgrade.completionVerified ? (
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={refreshCourseCompletion}
+                      >
+                        Refresh progress
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              style={styles.primaryButton}
+              onClick={handleUpgradeToNextLevel}
+              disabled={!levelUpgrade.canUpgrade || isUpgradingLevel || courseCompletionLoading}
+            >
+              {isUpgradingLevel
+                ? t("accountSettings.upgrade.upgrading")
+                : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
             </button>
+
             {hasQueuedUpgrade ? (
               <button
                 type="button"
-                style={{ ...styles.secondaryButton, marginTop: 8 }}
+                style={{ ...styles.secondaryButton, marginTop: -4 }}
                 onClick={handleCancelQueuedUpgrade}
                 disabled={isUpgradingLevel}
               >
                 {t("accountSettings.upgrade.cancel")}
               </button>
             ) : null}
-            {status ? <p style={{ ...styles.helperText, marginTop: 8 }}>{status}</p> : null}
-            {levelUpgrade.reason ? <p style={{ ...styles.helperText, color: "#92400e" }}>{levelUpgrade.reason}</p> : null}
+
+            {status ? <p style={{ ...styles.helperText, margin: 0 }}>{status}</p> : null}
           </>
         ) : (
           <p style={styles.helperText}>{levelUpgrade.reason}</p>
