@@ -43,9 +43,10 @@ describe("A1 and B1 final-day Goethe practice", () => {
     expect(courseTab).toContain("continue to Day 25 for official Goethe exam practice");
   });
 
-  test("tracks four Goethe sections without changing course completion", () => {
-    expect(page).toContain("window.localStorage.setItem");
+  test("shows four Goethe sections without tracking them or changing course completion", () => {
     expect(page).toContain("data-goethe-exam-section");
     expect(page).toContain("keine zusätzliche Falowen-Aufgabe");
+    expect(page).not.toContain("window.localStorage");
+    expect(page).not.toContain('type="checkbox"');
   });
 });

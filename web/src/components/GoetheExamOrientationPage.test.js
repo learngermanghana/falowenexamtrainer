@@ -30,13 +30,16 @@ describe("shared Goethe exam orientation", () => {
     expect(page).not.toContain("section.url");
   });
 
-  test("shows all four exam sections with local progress tracking", () => {
+  test("shows all four exam sections without tracking student progress", () => {
     ["Lesen", "Hören", "Schreiben", "Sprechen"].forEach((section) => {
       expect(config).toContain(`name: "${section}"`);
     });
-    expect(page).toContain("window.localStorage.setItem");
     expect(page).toContain("data-goethe-exam-section");
     expect(page).toContain("keine zusätzliche Falowen-Aufgabe");
+    expect(page).toContain("Falowen verfolgt hier keinen Fortschritt");
+    expect(page).not.toContain("window.localStorage");
+    expect(page).not.toContain('type="checkbox"');
+    expect(page).not.toContain("abgeschlossen");
   });
 
   test("preserves final-day schedule placement and completion requirements", () => {
