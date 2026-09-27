@@ -620,81 +620,153 @@ const AccountSettings = () => {
       {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
       {activeTab === "billing" ? (
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>{t("accountSettings.billing.title")}</h2>
-        <p style={styles.helperText}>{t("accountSettings.billing.subtitle")}</p>
+      <section style={{ ...styles.card, display: "grid", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div>
+            <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>{t("accountSettings.billing.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("accountSettings.billing.subtitle")}</p>
+          </div>
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={handleRefreshPaymentStatus}
+            disabled={isRefreshingPayment}
+          >
+            {isRefreshingPayment ? "Refreshing..." : "Refresh payment status"}
+          </button>
+        </div>
 
         <div
+          data-account-billing-summary
           style={{
-            ...styles.card,
-            margin: "8px 0 12px",
-            background: billingState.background,
-            borderColor: billingState.border,
             display: "grid",
-            gap: 7,
+            gridTemplateColumns: "repeat(auto-fit, minmax(135px, 1fr))",
+            gap: 8,
           }}
         >
-          <span style={{ ...styles.badge, width: "fit-content", color: billingState.tone }}>
-            {billingState.label}
-          </span>
-          <strong style={{ color: billingState.tone }}>{billingState.title}</strong>
-          <p style={{ ...styles.helperText, margin: 0, color: billingState.tone, lineHeight: 1.55 }}>
-            {billingState.body}
-          </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
-            <button
-              type="button"
-              style={styles.secondaryButton}
-              onClick={handleRefreshPaymentStatus}
-              disabled={isRefreshingPayment}
-            >
-              {isRefreshingPayment ? "Refreshing..." : "Refresh payment status"}
-            </button>
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Tuition</span>
+            <strong>{formatMoney(billingSummary.tuitionFee)}</strong>
+          </div>
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Paid</span>
+            <strong>{formatMoney(paidAmount)}</strong>
+          </div>
+          <div style={{ ...styles.card, margin: 0, background: balanceDue > 0 ? "#fff7ed" : "#f0fdf4" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Balance</span>
+            <strong>{formatMoney(balanceDue)}</strong>
+          </div>
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Access until</span>
+            <strong>{formatDate(studentProfile?.contractEnd)}</strong>
+          </div>
+          <div style={{ ...styles.card, margin: 0, background: billingState.background, borderColor: billingState.border }}>
+            <span style={{ ...styles.helperText, fontSize: 12, color: billingState.tone }}>Payment status</span>
+            <strong style={{ color: billingState.tone }}>{billingState.label}</strong>
           </div>
         </div>
 
+        {billingState.key !== "paid" ? (
+          <div
+            style={{
+              border: `1px solid ${billingState.border}`,
+              background: billingState.background,
+              color: billingState.tone,
+              borderRadius: 12,
+              padding: 12,
+              display: "grid",
+              gap: 4,
+            }}
+          >
+            <strong>{billingState.title}</strong>
+            <p style={{ ...styles.helperText, margin: 0, color: billingState.tone, lineHeight: 1.55 }}>
+              {billingState.body}
+            </p>
+          </div>
+        ) : null}
+
         {status ? (
-          <div style={{ ...styles.card, margin: "0 0 12px", background: "#f8fafc" }}>
+          <div style={{ borderRadius: 12, padding: 12, background: "#f8fafc", border: "1px solid #e2e8f0" }}>
             <strong>{status}</strong>
           </div>
         ) : null}
 
         {paymentAlert ? <div style={styles.errorBox}>{paymentAlert.message}</div> : null}
-        <div style={{ ...styles.card, margin: "8px 0 0" }}>
-          <div style={styles.metaRow}><span>{t("accountSettings.billing.nextRenewal")}</span><strong>{subscription.renewalDate}</strong></div>
-          <div style={styles.metaRow}><span>{t("accountSettings.billing.countdown")}</span><strong>{subscription.renewalDays > 0 ? t("accountSettings.billing.inDays", { count: subscription.renewalDays }) : t("accountSettings.billing.dueNow")}</strong></div>
-          <div style={styles.metaRow}><span>{t("accountSettings.billing.renewalMode")}</span><strong>{subscription.autoRenew ? t("accountSettings.billing.autoRenew") : t("accountSettings.billing.manualRenew")}</strong></div>
-          <p style={{ ...styles.helperText, marginTop: 8 }}>{t("accountSettings.billing.policySummary")}</p>
-        </div>
 
-        <TuitionStatusCard
-          level={studentProfile.level}
-          paidAmount={paidAmount}
-          balanceDue={balanceDue}
-          tuitionFee={billingSummary.tuitionFee}
-          checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
-          paymentActionLabel={
-            billingState.key === "pending-attempt"
-              ? "Continue payment"
-              : billingState.key === "partial"
-                ? "Pay balance"
-                : undefined
-          }
-          title={t("accountSettings.billing.balanceTitle")}
-          description={
-            billingState.key === "pending-attempt"
-              ? "Continue payment safely below. Starting checkout again does not mark you paid; Paystack confirmation still controls your status."
-              : t("accountSettings.billing.email", { email: subscription.invoiceEmail || t("accountSettings.billing.addEmail") })
-          }
-        />
+        {balanceDue > 0 ? (
+          <div style={{ display: "grid", gap: 8 }}>
+            <div>
+              <h3 style={{ margin: 0 }}>Make a payment</h3>
+              <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                Choose the tuition amount to pay now. Falowen updates your balance only after Paystack confirms the payment.
+              </p>
+            </div>
+            <TuitionStatusCard
+              level={studentProfile.level}
+              paidAmount={paidAmount}
+              balanceDue={balanceDue}
+              tuitionFee={billingSummary.tuitionFee}
+              checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
+              paymentActionLabel={
+                billingState.key === "pending-attempt"
+                  ? "Continue payment"
+                  : billingState.key === "partial"
+                    ? "Pay balance"
+                    : undefined
+              }
+              description={
+                billingState.key === "pending-attempt"
+                  ? "Continue your unfinished checkout or choose another valid amount below."
+                  : "Your payment amount and any Paystack fee contribution are shown before checkout."
+              }
+              showSummary={false}
+            />
+          </div>
+        ) : null}
 
-        <div style={{ ...styles.card, marginTop: 12 }}>
-          <h3 style={{ marginTop: 0 }}>{t("accountSettings.billing.transaction.title")}</h3>
+        <details
+          style={{
+            ...styles.card,
+            margin: 0,
+            background: "#f8fafc",
+          }}
+        >
+          <summary style={{ cursor: "pointer", fontWeight: 800, color: "#0f172a" }}>
+            Course access details
+          </summary>
+          <div style={{ display: "grid", gap: 7, marginTop: 10 }}>
+            <div style={styles.metaRow}><span>Contract start</span><strong>{formatDate(studentProfile?.contractStart)}</strong></div>
+            <div style={styles.metaRow}><span>Contract end</span><strong>{formatDate(studentProfile?.contractEnd)}</strong></div>
+            <div style={styles.metaRow}>
+              <span>{t("accountSettings.billing.countdown")}</span>
+              <strong>
+                {subscription.renewalDays === null
+                  ? "–"
+                  : subscription.renewalDays > 0
+                    ? t("accountSettings.billing.inDays", { count: subscription.renewalDays })
+                    : t("accountSettings.billing.dueNow")}
+              </strong>
+            </div>
+            <div style={styles.metaRow}><span>{t("accountSettings.billing.renewalMode")}</span><strong>{subscription.autoRenew ? t("accountSettings.billing.autoRenew") : t("accountSettings.billing.manualRenew")}</strong></div>
+            <div style={styles.metaRow}><span>Payment method</span><strong>{subscription.paymentMethod}</strong></div>
+            <p style={{ ...styles.helperText, margin: "3px 0 0" }}>{t("accountSettings.billing.policySummary")}</p>
+          </div>
+        </details>
+
+        <div style={{ ...styles.card, margin: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+            <h3 style={{ margin: 0 }}>{t("accountSettings.billing.transaction.title")}</h3>
+            {transactionHistory.length > 0 ? (
+              <span style={{ ...styles.helperText, fontSize: 12 }}>
+                {transactionHistory.length} transaction{transactionHistory.length === 1 ? "" : "s"}
+              </span>
+            ) : null}
+          </div>
           {transactionHistory.length === 0 ? (
-            <p style={styles.helperText}>{t("accountSettings.billing.transaction.empty")}</p>
+            <p style={{ ...styles.helperText, marginBottom: 0 }}>{t("accountSettings.billing.transaction.empty")}</p>
           ) : (
-            <div style={{ display: "grid", gap: 8 }}>
-              {transactionHistory.map((tx) => (
+            <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+              {transactionHistory.slice(0, 2).map((tx) => (
                 <div key={tx.id} style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
                   <div style={styles.metaRow}><span>{tx.date}</span><strong>{formatMoney(tx.amount)}</strong></div>
                   <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.channel")}</span><span>{tx.channel}</span></div>
@@ -703,6 +775,25 @@ const AccountSettings = () => {
                   {tx.receiptUrl ? <a href={tx.receiptUrl} target="_blank" rel="noreferrer">{t("accountSettings.billing.transaction.receipt")}</a> : null}
                 </div>
               ))}
+
+              {transactionHistory.length > 2 ? (
+                <details style={{ borderTop: "1px solid #e2e8f0", paddingTop: 8 }}>
+                  <summary style={{ cursor: "pointer", fontWeight: 700, color: "#1d4ed8" }}>
+                    Show {transactionHistory.length - 2} older transaction{transactionHistory.length - 2 === 1 ? "" : "s"}
+                  </summary>
+                  <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    {transactionHistory.slice(2).map((tx) => (
+                      <div key={tx.id} style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+                        <div style={styles.metaRow}><span>{tx.date}</span><strong>{formatMoney(tx.amount)}</strong></div>
+                        <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.channel")}</span><span>{tx.channel}</span></div>
+                        <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.reference")}</span><span>{tx.reference}</span></div>
+                        <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.status")}</span><span>{tx.status}</span></div>
+                        {tx.receiptUrl ? <a href={tx.receiptUrl} target="_blank" rel="noreferrer">{t("accountSettings.billing.transaction.receipt")}</a> : null}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
             </div>
           )}
         </div>
