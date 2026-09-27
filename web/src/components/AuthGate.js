@@ -26,33 +26,6 @@ const getDiagnosticValue = (error, key) => {
   return diagnostic[key] || profile[key] || "";
 };
 
-const formatSupportValue = (value) => {
-  if (value === null || value === undefined || value === "") return "Not provided";
-  return String(value);
-};
-
-const appendSupportDetails = (message, error) => {
-  const details = [
-    "",
-    "Support details:",
-    `Error code: ${formatSupportValue(error?.code)}`,
-    `Reason: ${formatSupportValue(getDiagnosticValue(error, "reason"))}`,
-    `Student code: ${formatSupportValue(getDiagnosticValue(error, "studentCode") || getDiagnosticValue(error, "studentcode"))}`,
-    `Email: ${formatSupportValue(getDiagnosticValue(error, "email"))}`,
-    `Account status: ${formatSupportValue(getDiagnosticValue(error, "status"))}`,
-    `Level: ${formatSupportValue(getDiagnosticValue(error, "level"))}`,
-    `Class: ${formatSupportValue(getDiagnosticValue(error, "className") || getDiagnosticValue(error, "class"))}`,
-    `Contract end: ${formatSupportValue(getDiagnosticValue(error, "contractEndLabel") || getDiagnosticValue(error, "contractEnd"))}`,
-    `Payment status: ${formatSupportValue(getDiagnosticValue(error, "paymentStatus"))}`,
-  ];
-
-  if (error?.message && error.message !== message) {
-    details.push(`Backend/Firebase message: ${error.message}`);
-  }
-
-  return `${message}\n${details.join("\n")}`;
-};
-
 const getRecoveryAction = (error, identifier = "") => {
   const code = String(error?.code || "");
   const reason = String(getDiagnosticValue(error, "reason") || "").toLowerCase();
@@ -107,11 +80,17 @@ const getRecoveryAction = (error, identifier = "") => {
   }
 
   if (code === "auth/permission-denied" || code === "permission-denied") {
-    return {
-      kind: "support",
-      title: "Account lookup needs support",
-      description: "Falowen could not verify this account record. Contact support instead of creating a duplicate account.",
-    };
+    return enteredEmail
+      ? {
+          kind: "email",
+          title: "Check your login details",
+          description: "We could not find a matching student account. Check your email and password and try again.",
+        }
+      : {
+          kind: "email",
+          title: "Try your email address",
+          description: "We could not find that student code. Check the code or sign in with the email linked to your account.",
+        };
   }
 
   return null;
@@ -148,7 +127,7 @@ const formatAuthErrorMessage = (error, mode = "login") => {
         break;
       case "auth/permission-denied":
       case "permission-denied":
-        message = error?.message || "Firestore denied access while checking this login. Please contact support.";
+        message = "We could not find a matching account. Check your email or student code and try again.";
         break;
       case "auth/network-request-failed":
         message = "We could not connect to the internet. Please check your connection and try again.";
@@ -178,7 +157,7 @@ const formatAuthErrorMessage = (error, mode = "login") => {
   }
 
   message = message || error?.message || "Something went wrong. Please try again.";
-  return mode === "login" ? appendSupportDetails(message, error) : message;
+  return message;
 };
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
@@ -302,7 +281,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       if (mode === "login") {
         setRecoveryAction(getRecoveryAction(error, email));
       }
-      showToast(errorMessage, "error");
+      if (mode !== "login") showToast(errorMessage, "error");
       triggerInteractionFeedback({
         sound: "error",
         vibratePattern: [120],
@@ -384,7 +363,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       const errorMessage = formatAuthErrorMessage(error, "login");
       setAuthError(errorMessage);
       setRecoveryAction(getRecoveryAction(error, email));
-      showToast(errorMessage, "error");
       triggerInteractionFeedback({
         sound: "error",
         vibratePattern: [120],
@@ -494,6 +472,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
+              setAuthError("");
               setRecoveryAction(null);
             }}
             style={inputStyle}
