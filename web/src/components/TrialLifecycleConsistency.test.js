@@ -60,6 +60,23 @@ describe("central trial lifecycle", () => {
     expect(state.active).toBe(false);
   });
 
+  test("admin Partially Paid status converts trial and keeps one-month paid access", () => {
+    const now = new Date("2026-09-27T10:00:00Z").getTime();
+    const lastPaymentAt = new Date("2026-09-26T10:00:00Z").toISOString();
+    const state = getTrialLifecycleState({
+      trialStatus: "active",
+      trialStartedAt: new Date(now - DAY_MS).toISOString(),
+      paymentStatus: "Partially Paid",
+      paid: 2000,
+      balanceDue: 1000,
+      lastPaymentAt,
+    }, now);
+
+    expect(state.key).toBe("converted");
+    expect(state.paid).toBe(true);
+    expect(state.active).toBe(false);
+  });
+
   test("signup payment intent does not count as confirmed payment", () => {
     const now = Date.now();
     const state = getTrialLifecycleState({
@@ -122,5 +139,8 @@ describe("central trial lifecycle", () => {
     const source = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     expect(source).toContain("getTrialLifecycleState(studentProfile)");
     expect(source).toContain("const hasActiveTrial = trialLifecycle.active");
+    expect(source).toContain("const hasActivePartialPaymentAccess =");
+    expect(source).toContain("getPartialPaymentAccessEndMs(studentProfile)");
+
   });
 });
