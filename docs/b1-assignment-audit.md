@@ -44,7 +44,7 @@ Days **24–28** fall back to the general B1 topic introduction rather than a de
 
 All 28 B1 assignments exist in the answer manifest.
 
-`B1-3.9` is currently the only B1 assignment without `answer_url` and `sheet_url`.
+All B1 assignments, including `B1-3.9`, now have `answer_url` and `sheet_url` mappings.
 
 ### Assessment shape
 
