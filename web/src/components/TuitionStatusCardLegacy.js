@@ -35,6 +35,7 @@ const TuitionStatusCard = ({
   checkoutAmountOverride,
   paymentActionLabel,
   paymentPurpose = "balance",
+  showSummary = true,
 }) => {
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -288,30 +289,40 @@ const TuitionStatusCard = ({
   };
 
   return (
-    <div style={{ ...styles.card, margin: 0 }} data-testid="tuition-status-card">
-      <div style={styles.metaRow}>
-        <h3 style={{ margin: 0 }}>{title || t("accountSettings.billing.balanceTitle")}</h3>
-        <span style={styles.badge}>{summary.statusLabel}</span>
-      </div>
+    <div
+      style={{ ...styles.card, margin: 0 }}
+      data-testid="tuition-status-card"
+      data-compact-payment={showSummary ? "false" : "true"}
+    >
+      {showSummary ? (
+        <>
+          <div style={styles.metaRow}>
+            <h3 style={{ margin: 0 }}>{title || t("accountSettings.billing.balanceTitle")}</h3>
+            <span style={styles.badge}>{summary.statusLabel}</span>
+          </div>
 
-      {description ? (
-        <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{description}</p>
+          {description ? (
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{description}</p>
+          ) : null}
+
+          <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+            <div style={styles.metaRow}>
+              <span>{t("accountSettings.tuition.tuition")}</span>
+              <strong>{formatMoney(summary.tuitionFee)}</strong>
+            </div>
+            <div style={styles.metaRow}>
+              <span>{t("accountSettings.tuition.paidSoFar")}</span>
+              <strong>{formatMoney(summary.paidAmount)}</strong>
+            </div>
+            <div style={styles.metaRow}>
+              <span>{t("accountSettings.tuition.balanceRemaining")}</span>
+              <strong>{formatMoney(summary.balanceDue)}</strong>
+            </div>
+          </div>
+        </>
+      ) : description ? (
+        <p style={{ ...styles.helperText, margin: 0 }}>{description}</p>
       ) : null}
-
-      <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.tuition")}</span>
-          <strong>{formatMoney(summary.tuitionFee)}</strong>
-        </div>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.paidSoFar")}</span>
-          <strong>{formatMoney(summary.paidAmount)}</strong>
-        </div>
-        <div style={styles.metaRow}>
-          <span>{t("accountSettings.tuition.balanceRemaining")}</span>
-          <strong>{formatMoney(summary.balanceDue)}</strong>
-        </div>
-      </div>
 
       {paymentsEnabled && showPaymentAction ? (
         <div style={{ marginTop: 12 }}>
