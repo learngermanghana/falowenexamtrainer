@@ -83,6 +83,15 @@ describe("Goethe-first course completion handoff", () => {
     expect(screen.queryByRole("link", { name: "Continue to Official Goethe Practice" })).not.toBeInTheDocument();
   });
 
+  test("legacy portal wiring navigates the Goethe-primary CTA to the shared orientation route", () => {
+    const source = read("YouTubeSubscribeButton.js");
+
+    expect(source).toContain('import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";');
+    expect(source).toContain("const goetheOrientation = getGoetheExamOrientationConfig(courseState.level);");
+    expect(source).toContain("onOpenOfficialGoethe={goetheOrientation?.courseRoute ? () => navigate(goetheOrientation.courseRoute) : null}");
+    expect(source).toContain('onOpenExamsRoom={() => navigate("/exams/overview")}');
+  });
+
   test("course-book normalization keeps A2 and B1 exam orientation as dedicated final sections", () => {
     const a2Patch = read("../../../scripts/patchA2LateWorkbookNativeOwnership.mjs");
     const presentationPatch = read("../../../scripts/patchCourseBookPresentationSections.mjs");
