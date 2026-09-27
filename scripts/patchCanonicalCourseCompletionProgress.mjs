@@ -286,10 +286,15 @@ const hasCanonicalMasteryMarker = /courseCompletion\??\.masteryAvailable/.test(c
 if (!hasCanonicalMasteryMarker) {
   const masteryIndex = courseTab.indexOf(">Mastery</p>");
   const requiredWorkIndex = courseTab.indexOf(">Required work</p>");
-  const diagnosticIndex = masteryIndex >= 0 ? masteryIndex : requiredWorkIndex;
+  const statGridIndex = courseTab.indexOf('className="course-book-stat-grid"');
+  const diagnosticIndex = masteryIndex >= 0
+    ? masteryIndex
+    : requiredWorkIndex >= 0
+      ? requiredWorkIndex
+      : statGridIndex;
   const diagnostic = diagnosticIndex >= 0
-    ? courseTab.slice(Math.max(0, diagnosticIndex - 500), diagnosticIndex + 1400)
-    : "No Mastery or Required work card found.";
+    ? courseTab.slice(Math.max(0, diagnosticIndex - 500), diagnosticIndex + 5200)
+    : "No Mastery, Required work or stat grid found.";
   console.error("CourseTab mastery diagnostic:\n" + diagnostic);
   throw new Error("CourseTab missing canonical completion marker: courseCompletion[?.]masteryAvailable");
 }
