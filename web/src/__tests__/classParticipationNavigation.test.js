@@ -27,13 +27,19 @@ describe("Class Participation navigation", () => {
     expect(source).toContain("const navigate = useNavigate();");
     expect(source).toContain('new URLSearchParams(location.search).get("tab")');
     expect(source).toContain('activeTab === "participation"');
-    expect(source).toContain("View class participation");
+    expect(source).toContain("Learning records");
+    expect(source).toContain('selectAccountTab("participation")');
+    expect(source).toContain('navigate("/campus/results")');
+    expect(source).toContain('navigate("/campus/attendance")');
+    expect(source).toContain('navigate("/campus/course")');
     expect(source).toContain("Back to Student Data");
     expect(source).toContain('params.set("tab", tabKey)');
     expect(source).toContain("navigate(nextUrl, { replace: true })");
     expect(source).not.toContain("window.history.replaceState");
     expect(source).not.toContain("setActiveTab(tabKey)");
     expect(source).not.toContain('{ key: "participation", label:');
+    expect(source).not.toContain("<span>Contract start</span>");
+    expect(source).not.toContain("<span>Contract end</span>");
     expect(source).not.toContain('{activeTab === "studentData" ? <ClassParticipationCard /> : null}');
   });
 
