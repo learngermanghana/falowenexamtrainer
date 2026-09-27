@@ -32,6 +32,20 @@ describe("payment recovery billing flow", () => {
     expect(source).toContain("older transaction");
   });
 
+  test("billing uses trial expiry when there is no contract end", () => {
+    const source = read("AccountSettings.js");
+    expect(source).toContain("Number.isFinite(trialLifecycle.endsAtMs)");
+    expect(source).toContain("formatDate(accessUntil)");
+  });
+
+  test("transaction history sorts raw timestamps before collapsing older items", () => {
+    const source = read("AccountSettings.js");
+    expect(source).toContain("const timestamp = toDateMs(rawDate)");
+    expect(source).toContain("timestamp: Number.isFinite(timestamp) ? timestamp : 0");
+    expect(source).toContain(".sort((a, b) => b.timestamp - a.timestamp)");
+    expect(source).toContain("transactionHistory.slice(0, 2)");
+  });
+
   test("refresh payment status re-fetches the student Firestore profile", () => {
     const source = fs.readFileSync(path.resolve(__dirname, "../context/AuthContext.js"), "utf8");
     expect(source).toContain("const refreshStudentProfile = useCallback");
