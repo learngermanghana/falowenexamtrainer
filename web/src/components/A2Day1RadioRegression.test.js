@@ -10,18 +10,22 @@ describe("A2 Day 1 Small Talk Falowen Radio", () => {
     expect(getLessonRadioResource("A2", 1)).toEqual(
       expect.objectContaining({
         key: "a2-day1-small-talk-falowen-radio",
-        youtubeId: "76JUgui6CnY",
+        youtubeId: "_AHBm9nw_bA",
       }),
     );
   });
 
-  it("keeps the existing Small Talk workbook route component behind the radio gate", () => {
+  it("keeps the Small Talk workbook behind the route-level radio gate", () => {
     const source = read("A2Day2SmallTalkWorkbookEnhancedPage.js");
-    expect(source).toContain('import RadioFirstWorkbookGate from "./RadioFirstWorkbookGate"');
-    expect(source).toContain('<RadioFirstWorkbookGate level="A2" day={1}>');
-    expect(source).toContain("<SmallTalkWorkbook />");
+    const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
+
     expect(source).toContain('chapter="1.1"');
     expect(source).toContain('workbookId="A2Day1SmallTalk"');
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).not.toContain("RadioFirstWorkbookGate");
+
+    expect(appSource).toContain('path="/campus/course/a2-day-1-small-talk-workbook"');
+    expect(appSource).toContain('withRadioWorkbookGate("A2", 1, <A2Day2SmallTalkWorkbookEnhancedPage />)');
   });
 
   it("keeps Teil 4 as the canonical five-question listening task", () => {
