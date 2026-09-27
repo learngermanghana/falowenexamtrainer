@@ -41,6 +41,9 @@ describe("shared Goethe exam orientation", () => {
     expect(schedule).toContain('workbook_link: "/campus/course/a1-day-25-goethe-exam-orientation"');
     expect(schedule).toContain('workbook_link: "/campus/course/a2-day-29-goethe-exam-orientation"');
     expect(schedule).toContain('workbook_link: "/campus/course/b1-day-29-goethe-exam-orientation"');
+    expect(schedule).toContain('topic: "Goethe A1 Exam Orientation & Official Practice"\n      chapter: "Exam Orientation",\n      attendance: false');
+    expect(schedule).toContain('topic: "Goethe A2 Exam Orientation & Official Practice"\n    chapter: "Exam Orientation",\n    attendance: false');
+    expect(schedule).toContain('topic: "Goethe B1 Exam Orientation & Official Practice"\n      chapter: "Exam Orientation",\n      attendance: false');
     expect(completionJourney).toContain("A1: 19");
     expect(completionJourney).toContain("A2: 28");
     expect(completionJourney).toContain("B1: 28");
