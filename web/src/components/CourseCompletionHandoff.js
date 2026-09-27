@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";
 
 const extractYouTubeId = (url = "") => {
   try {
@@ -21,12 +22,15 @@ const CourseCompletionHandoff = ({
   progressPercent,
   finalLessonTitle,
   journey,
+  onOpenOfficialGoethe,
   onOpenExamsRoom,
   onReviewFinalLesson,
 }) => {
   const youtubeId = extractYouTubeId(journey?.videoUrl || "");
   const title = isComplete ? journey?.completedTitle : journey?.title;
   const description = isComplete ? journey?.completedDescription : journey?.description;
+  const goetheOrientation = getGoetheExamOrientationConfig(level);
+  const useOfficialGoetheHandoff = Boolean(isComplete && goetheOrientation?.courseRoute && onOpenOfficialGoethe);
 
   return (
     <section
@@ -105,18 +109,34 @@ const CourseCompletionHandoff = ({
 
           {isComplete ? (
             <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", color: "#166534", borderRadius: 14, padding: 12, lineHeight: 1.6 }}>
-              <strong>Do not stop here.</strong> Your language course is complete, but exam preparation is the next stage of your journey.
+              <strong>Do not stop here.</strong>{" "}
+              {goetheOrientation
+                ? `Your language course is complete. Continue first with the official Goethe ${goetheOrientation.level} practice in the final Course Book Exam Orientation.`
+                : "Your language course is complete, but exam preparation is the next stage of your journey."}
             </div>
           ) : (
             <div style={{ border: "1px solid #fde68a", background: "#fffbeb", color: "#92400e", borderRadius: 14, padding: 12, lineHeight: 1.6 }}>
-              Finish the remaining Course Book lessons, then use the Exams Room for focused exam preparation.
+              {goetheOrientation
+                ? `Finish the remaining Course Book work, then continue to the official Goethe ${goetheOrientation.level} Exam Orientation.`
+                : "Finish the remaining Course Book lessons, then use the Exams Room for focused exam preparation."}
             </div>
           )}
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button type="button" style={{ ...styles.primaryButton, minHeight: 46, fontWeight: 900 }} onClick={onOpenExamsRoom}>
-              Go to Exams Room
-            </button>
+            {useOfficialGoetheHandoff ? (
+              <>
+                <button type="button" style={{ ...styles.primaryButton, minHeight: 46, fontWeight: 900 }} onClick={onOpenOfficialGoethe}>
+                  Continue to Official Goethe Practice
+                </button>
+                <button type="button" style={{ ...styles.secondaryButton, minHeight: 46 }} onClick={onOpenExamsRoom}>
+                  Exams Room (optional)
+                </button>
+              </>
+            ) : (
+              <button type="button" style={{ ...styles.primaryButton, minHeight: 46, fontWeight: 900 }} onClick={onOpenExamsRoom}>
+                Go to Exams Room
+              </button>
+            )}
             {onReviewFinalLesson ? (
               <button type="button" style={{ ...styles.secondaryButton, minHeight: 46 }} onClick={onReviewFinalLesson}>
                 Review final lesson{finalLessonTitle ? `: ${finalLessonTitle}` : ""}
