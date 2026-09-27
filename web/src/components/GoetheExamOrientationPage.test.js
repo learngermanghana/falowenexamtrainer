@@ -21,9 +21,17 @@ describe("shared Goethe exam orientation", () => {
   });
 
   test("keeps official URLs in one configuration file", () => {
-    expect(config).toContain("https://bfu.goethe.de/a1_sd1/hoeren.php");
-    expect(config).toContain("https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html");
-    expect(config).toContain("https://bfu.goethe.de/b1_mod/lesen.php");
+    [
+      "https://bfu.goethe.de/a1_sd1/lesen.php",
+      "https://bfu.goethe.de/a1_sd1/hoeren.php",
+      "https://bfu.goethe.de/a1_sd1/schreiben.php",
+      "https://bfu.goethe.de/a1_sd1/sprechen.php",
+      "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html",
+      "https://bfu.goethe.de/b1_mod/lesen.php",
+      "https://bfu.goethe.de/b1_mod/hoeren.php",
+      "https://bfu.goethe.de/b1_mod/schreiben.php",
+      "https://bfu.goethe.de/b1_mod/sprechen.php",
+    ].forEach((url) => expect(config).toContain(url));
     expect(page).toContain("config.practiceUrl");
     expect(page).toContain("section.url");
   });
