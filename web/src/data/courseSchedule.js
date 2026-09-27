@@ -1773,6 +1773,9 @@ Nächste Schritte:
 Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
       grammar_topic: null,
       assignment: false,
+      completion: {
+        nonActionableStatus: "milestoneComplete",
+      },
       lesen_hören: {
         video: null,
         youtube_link: null,
