@@ -671,15 +671,19 @@ export const AuthProvider = ({ children }) => {
             profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
           } catch (error) {
             if (error?.code === "permission-denied" || error?.code === "auth/permission-denied") {
-              throw new Error(
-                "We could not verify that student code before login because Firestore denied the lookup. Please log in with your email address or contact support."
+              throw new LoginDiagnosticError(
+                "We could not find that student code. Check the code or sign in with the email linked to your account.",
+                { code: "auth/user-not-found" }
               );
             }
             throw error;
           }
         }
         if (!profileFromCode) {
-          throw new Error("Student code not found. Please check and try again.");
+          throw new LoginDiagnosticError(
+            "We could not find that student code. Check the code or sign in with the email linked to your account.",
+            { code: "auth/user-not-found" }
+          );
         }
         if (!profileFromCode.email) {
           throw new Error("We couldn't find an email for this student code. Please contact support.");
