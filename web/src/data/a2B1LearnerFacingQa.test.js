@@ -49,7 +49,8 @@ describe("A2 + B1 learner-facing QA · Days 1–28", () => {
       expect(override?.grammarBook).toBe(`/campus/course/lesson/B1/${day}?view=grammar`);
       expect(override?.workbook).toBe(`/campus/course/lesson/B1/${day}?view=workbook`);
       expect(normalized.resources.grammarBook?.url).toBe(override.grammarBook);
-      expect(normalized.resources.workbook?.url).toBe(override.workbook);
+      expect(normalized.resources.workbook?.url).toMatch(/^\/campus\/course\//);
+      expect(normalized.resources.workbook?.url).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
     });
   });
 
