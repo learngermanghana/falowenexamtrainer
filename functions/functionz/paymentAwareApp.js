@@ -43,6 +43,34 @@ const firstValidMoney = (...values) => {
   return null;
 };
 
+const normalizeCompletionSnapshotIdPart = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "_")
+    .slice(0, 160);
+
+const getCourseCompletionSnapshot = async ({ userId, level } = {}) => {
+  const normalizedUserId = normalizeCompletionSnapshotIdPart(userId);
+  const normalizedLevel = normalizeCompletionSnapshotIdPart(level);
+  if (!normalizedUserId || !normalizedLevel) return null;
+
+  const snapshot = await admin
+    .firestore()
+    .collection("courseCompletionSnapshots")
+    .doc(`${normalizedUserId}__${normalizedLevel}`)
+    .get();
+
+  return snapshot.exists ? snapshot.data() || null : null;
+};
+
+const isCourseWorkCompleteSnapshot = (snapshot = null) => {
+  if (!snapshot || snapshot.courseWorkCompleted !== true) return false;
+  const completed = Number(snapshot.completed);
+  const total = Number(snapshot.total);
+  return Number.isFinite(total) && total > 0 && Number.isFinite(completed) && completed >= total;
+};
+
 const normalizeStudentBilling = (student = {}) => {
   const tuitionFee = firstValidMoney(student.tuitionFee) ?? 0;
   const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
@@ -195,6 +223,21 @@ app.post("/paystack/initialize", async (req, res) => {
 
     if (student.uid && student.uid !== authedUser.uid && studentEmail !== authedEmail) {
       return res.status(403).json({ error: "Not authorized for this student" });
+    }
+
+    const queuedUpgradeLevel = String(student.upgradeToLevel || "").trim().toUpperCase();
+    if (queuedUpgradeLevel) {
+      const currentLevel = String(student.upgradeFromLevel || student.level || "").trim().toUpperCase();
+      const completionSnapshot = await getCourseCompletionSnapshot({
+        userId: student.uid || authedUser.uid,
+        level: currentLevel,
+      });
+      if (!isCourseWorkCompleteSnapshot(completionSnapshot)) {
+        return res.status(409).json({
+          error: `Complete your ${currentLevel || "current"} Course Book before paying for ${queuedUpgradeLevel}.`,
+          code: "course_completion_required",
+        });
+      }
     }
 
     const { tuitionFee, paidSoFar, effectiveBalance: balanceDue } = normalizeStudentBilling(student);
