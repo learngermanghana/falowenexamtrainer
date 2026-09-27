@@ -1,8 +1,10 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import fs from "fs";
 import path from "path";
 import CourseCompletionConclusion from "./CourseCompletionConclusion";
+import CourseCompletionHandoff from "./CourseCompletionHandoff";
+import { getCourseCompletionJourney } from "../data/courseCompletionJourney";
 
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
@@ -25,7 +27,30 @@ describe("Goethe-first course completion handoff", () => {
 
     expect(screen.getByRole("link", { name: "Continue to Official Goethe Practice" })).toHaveAttribute("href", route);
     expect(screen.getByRole("link", { name: "Exams Room (optional)" })).toHaveAttribute("href", "/exams/question");
-    expect(screen.getByText(new RegExp(`official Goethe ${level} practice`, "i"))).toBeInTheDocument();
+    expect(screen.getAllByText(new RegExp(`official Goethe ${level} practice`, "i")).length).toBeGreaterThan(0);
+  });
+
+  test.each(["A1", "A2", "B1"])("%s legacy portal handoff also routes completed students to Goethe first", (level) => {
+    const onOpenOfficialGoethe = jest.fn();
+    const onOpenExamsRoom = jest.fn();
+
+    render(
+      <CourseCompletionHandoff
+        level={level}
+        isComplete
+        progressPercent={100}
+        journey={getCourseCompletionJourney(level)}
+        onOpenOfficialGoethe={onOpenOfficialGoethe}
+        onOpenExamsRoom={onOpenExamsRoom}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue to Official Goethe Practice" }));
+    expect(onOpenOfficialGoethe).toHaveBeenCalledTimes(1);
+    expect(onOpenExamsRoom).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Exams Room (optional)" }));
+    expect(onOpenExamsRoom).toHaveBeenCalledTimes(1);
   });
 
   test("incomplete tutor-guided course does not present Goethe practice as the primary completion action", () => {
