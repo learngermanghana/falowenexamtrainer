@@ -137,16 +137,6 @@ const GoetheExamOrientationPage = ({ level }) => {
                     <span style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 13 }}>{section.duration}</span>
                   </div>
                   <p style={{ margin: 0, color: "#475569", lineHeight: 1.6, fontSize: 14 }}>{section.description}</p>
-                  {section.url ? (
-                    <a
-                      href={section.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-                    >
-                      {section.name} direkt öffnen
-                    </a>
-                  ) : null}
                   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#334155", fontWeight: 800, cursor: "pointer" }}>
                     <input
                       type="checkbox"
