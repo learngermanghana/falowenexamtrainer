@@ -20,19 +20,49 @@ const DEFAULT_COMPLETION_JOURNEY = {
 const COMPLETION_JOURNEYS = {
   A1: {
     ...DEFAULT_COMPLETION_JOURNEY,
-    title: "After A1: prepare for the Goethe A1 exam",
-    completedTitle: "You finished the A1 Course Book — now prepare for the exam",
+    title: "After A1: prepare with the official Goethe A1 practice",
+    completedTitle: "You finished the A1 Course Book — continue to official Goethe practice",
+    description:
+      "Finish your required A1 Course Book work, then use the final Exam Orientation day to open the official Goethe A1 model test directly.",
+    completedDescription:
+      "You have reached the end of the A1 Course Book. Continue to the final Exam Orientation day and work with the official Goethe A1 material before using the Falowen Exams Room for extra practice.",
+    steps: [
+      "Open the final A1 Exam Orientation day in the Course Book.",
+      "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
+      "Mark the four practice areas as you attempt them.",
+      "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
+    ],
   },
   A2: {
     ...DEFAULT_COMPLETION_JOURNEY,
     videoUrl: "https://youtu.be/Qw54j9GiMd4",
-    title: "After A2: prepare for the Goethe A2 exam",
-    completedTitle: "You finished the A2 Course Book — now prepare for the exam",
+    title: "After A2: prepare with the official Goethe A2 practice",
+    completedTitle: "You finished the A2 Course Book — continue to official Goethe practice",
+    description:
+      "Finish your required A2 Course Book work, then use Day 29 Exam Orientation to open the official Goethe A2 practice material directly.",
+    completedDescription:
+      "You have reached the end of the A2 Course Book. Continue to Day 29 Exam Orientation and work with the official Goethe A2 material before using the Falowen Exams Room for extra practice.",
+    steps: [
+      "Open A2 Day 29 Exam Orientation in the Course Book.",
+      "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
+      "Mark the four practice areas as you attempt them.",
+      "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
+    ],
   },
   B1: {
     ...DEFAULT_COMPLETION_JOURNEY,
-    title: "After B1: prepare for the Goethe B1 exam",
-    completedTitle: "You finished the B1 Course Book — now prepare for the exam",
+    title: "After B1: prepare with the official Goethe B1 practice",
+    completedTitle: "You finished the B1 Course Book — continue to official Goethe practice",
+    description:
+      "Finish your required B1 Course Book work, then use Day 29 Exam Orientation to open the official Goethe B1 model test directly.",
+    completedDescription:
+      "You have reached the end of the B1 Course Book. Continue to Day 29 Exam Orientation and work with the official Goethe B1 material before using the Falowen Exams Room for extra practice.",
+    steps: [
+      "Open B1 Day 29 Exam Orientation in the Course Book.",
+      "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
+      "Mark the four practice areas as you attempt them.",
+      "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
+    ],
   },
   B2: {
     ...DEFAULT_COMPLETION_JOURNEY,
