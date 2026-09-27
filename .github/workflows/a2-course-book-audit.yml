@@ -24,6 +24,8 @@ on:
       - "web/src/components/A2Day*Grammar*.js"
       - "web/src/components/A2StarterConjunctionsPage.js"
       - "web/src/components/A2FocusedGrammarQuality.test.js"
+      - "web/src/components/ComparingThingsAndPeopleGrammarPage.js"
+      - "web/src/components/WoTreffenUnsGrammarPage.js"
       - "web/src/components/A2MiniLearningBlock.jsx"
       - "web/src/components/A2Day1RadioRegression.test.js"
       - "web/src/components/A2SharedWorkbookRegression.test.js"
