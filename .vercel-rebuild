@@ -1,4 +1,4 @@
 Vercel rebuild trigger
-Reason: deploy merged C2 Review, next-assignment navigation, and C2 AI writing analysis after automatic main deployment did not start.
-Target main includes: cc777fd5f21cc6db31719ef7b549d1298b2cec5d
-Triggered: 2026-09-24
+Reason: retry production deployment after Hobby build-rate limit.
+Target main includes: 9e854784ecb7340d66588f964350b285375bced4
+Triggered: 2026-09-27 21:43 UTC
