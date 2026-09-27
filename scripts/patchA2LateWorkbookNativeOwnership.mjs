@@ -189,7 +189,7 @@ const a1Intro = `                  {section?.key === "a1-2" && lessons.some((ent
                         communicating more independently as you prepare for the A1 exam and future A2 study.
                       </p>
                       <p>
-                        After the final Conjunctions lesson on Day 24, continue in the Exam Room for focused exam preparation.
+                        After the final Conjunctions lesson on Day 24, continue to Day 25 for official Goethe exam practice directly from the Course Book.
                       </p>
                     </div>
                   ) : null}`;
