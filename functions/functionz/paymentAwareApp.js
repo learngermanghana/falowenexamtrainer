@@ -6,7 +6,7 @@ const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { getScoresForStudent } = require("./scoresSheet");
-const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
+const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
 
 const DEFAULT_TUITION_CURRENCY = "GHS";
 const PAYSTACK_MAX_EVENT_AGE_MINUTES = 60 * 24 * 3;
@@ -50,17 +50,37 @@ const TRUSTED_COMPLETION_LEVELS = new Set(["A1", "A2", "B1"]);
 const normalizeTrustedAssignmentId = ({ row = {}, level = "", plannedSet = new Set() } = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const direct = String(row.assignment_id || row.assignmentId || "").trim().toUpperCase();
+  const explicitLevelMatch = direct.match(/^(A1|A2|B1|B2|C1|C2)-/);
+  const assignmentText = String(row.assignment || "").trim().toUpperCase();
+  const prefixedMatches = Array.from(
+    assignmentText.matchAll(/\b(A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/g)
+  );
+
+  // Any explicit evidence that the row belongs to another course wins over
+  // unprefixed legacy IDs or numeric title fallbacks.
+  if (explicitLevelMatch && explicitLevelMatch[1] !== normalizedLevel) return "";
+  if (prefixedMatches.some((match) => match[1] !== normalizedLevel)) return "";
+
   const directCandidates = [
     direct,
-    direct && !/^(A1|A2|B1|B2|C1|C2)-/.test(direct) ? `${normalizedLevel}-${direct}` : "",
+    direct && !explicitLevelMatch ? `${normalizedLevel}-${direct}` : "",
   ].filter(Boolean);
 
   for (const candidate of directCandidates) {
     if (plannedSet.has(candidate)) return candidate;
   }
 
-  const assignmentText = String(row.assignment || "").trim();
-  const identifiers = assignmentText.match(/\d+(?:\.\d+)?/g) || [];
+  for (let index = prefixedMatches.length - 1; index >= 0; index -= 1) {
+    const [, rowLevel, identifier] = prefixedMatches[index];
+    const candidate = `${rowLevel}-${identifier}`;
+    if (plannedSet.has(candidate)) return candidate;
+  }
+
+  const unprefixedText = assignmentText.replace(
+    /\b(A1|A2|B1|B2|C1|C2)[\s-]+\d+(?:\.\d+)?\b/g,
+    " "
+  );
+  const identifiers = unprefixedText.match(/\d+(?:\.\d+)?/g) || [];
   for (let index = identifiers.length - 1; index >= 0; index -= 1) {
     const candidate = `${normalizedLevel}-${identifiers[index]}`;
     if (plannedSet.has(candidate)) return candidate;
@@ -75,7 +95,7 @@ const getTrustedCourseCompletion = async ({ studentCode, level } = {}) => {
     return { required: false, complete: true, completed: 0, total: 0 };
   }
 
-  const { plannedSet } = getAssignmentSummary(normalizedLevel);
+  const plannedSet = getCanonicalTutorAssignmentSet(normalizedLevel);
   const total = plannedSet.size;
   if (!total) {
     return { required: true, complete: false, completed: 0, total: 0 };

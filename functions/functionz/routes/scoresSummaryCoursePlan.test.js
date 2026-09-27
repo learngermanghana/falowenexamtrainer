@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { getAssignmentSummary } = require("./scoresSummaryCoursePlan");
+const { getAssignmentSummary, getCanonicalTutorRequirements } = require("./scoresSummaryCoursePlan");
 
 test("A1 split tasks use visible Course Book days and chapters", () => {
   const { lessons, plannedSet } = getAssignmentSummary("A1");
@@ -35,4 +35,17 @@ test("A1 self-study items expose completion keys for Course Book progress", () =
   assert.equal(practice.displayDay, 3);
   assert.ok(practice.practiceKeys.includes("A1-1.1-PRACTICE"));
   assert.ok(practice.practiceKeys.includes("A1-DAY-3-PRACTICE-1.1"));
+});
+
+
+test("canonical tutor completion requirements match the Course Book totals", () => {
+  const a1 = getCanonicalTutorRequirements("A1");
+  const a2 = getCanonicalTutorRequirements("A2");
+  const b1 = getCanonicalTutorRequirements("B1");
+
+  assert.equal(a1.length, 19);
+  assert.equal(a2.length, 28);
+  assert.equal(b1.length, 28);
+  assert.deepEqual(b1.map((item) => item.day), Array.from({ length: 28 }, (_, index) => index + 1));
+  assert.equal(b1.some((item) => item.assignmentId === "B1-10.28"), true);
 });
