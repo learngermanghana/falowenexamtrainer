@@ -51,6 +51,25 @@ describe("TuitionStatusCard", () => {
     expect(cardText).toContain("Pay tuition online");
   });
 
+  it("supports compact payment mode without repeating the tuition summary", () => {
+    render(
+      <TuitionStatusCard
+        level="B1"
+        paidAmount={500}
+        tuitionFee={3000}
+        balanceDue={2500}
+        showSummary={false}
+        description="Choose an amount below."
+      />,
+    );
+
+    const card = screen.getByTestId("tuition-status-card");
+    expect(card).toHaveAttribute("data-compact-payment", "true");
+    expect(screen.queryByText("Balance & tuition")).not.toBeInTheDocument();
+    expect(screen.getByText("Choose an amount below.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /pay tuition online/i })).toBeInTheDocument();
+  });
+
   it("shows 7-day payment countdown notice for unpaid students", () => {
     const sixDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString();
     authMockState = {
