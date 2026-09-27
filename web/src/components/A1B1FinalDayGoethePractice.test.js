@@ -4,8 +4,8 @@ import path from "path";
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 describe("A1 and B1 final-day Goethe practice", () => {
-  const a1Page = read("A1Day25GoetheExamOrientationPage.jsx");
-  const b1Page = read("B1Day29GoetheExamOrientationPage.jsx");
+  const page = read("GoetheExamOrientationPage.jsx");
+  const config = read("../data/goetheExamOrientation.js");
   const schedule = read("../data/courseSchedule.js");
   const app = read("../App.js");
   const courseTab = read("CourseTab.js");
@@ -22,16 +22,17 @@ describe("A1 and B1 final-day Goethe practice", () => {
     expect(completionJourney).toContain("B1: 28");
   });
 
-  test("uses the exact official Goethe model-test links", () => {
-    expect(a1Page).toContain("https://bfu.goethe.de/a1_sd1/hoeren.php");
-    expect(b1Page).toContain("https://bfu.goethe.de/b1_mod/lesen.php");
-    expect(a1Page).toContain("Offizielle Goethe-A1-Prüfung öffnen");
-    expect(b1Page).toContain("Offizielle Goethe-B1-Prüfung öffnen");
+  test("keeps both official model-test links in shared config", () => {
+    expect(config).toContain("https://bfu.goethe.de/a1_sd1/hoeren.php");
+    expect(config).toContain("https://bfu.goethe.de/b1_mod/lesen.php");
+    expect(config).toContain('practiceLabel: "Offizielle Goethe-A1-Prüfung öffnen"');
+    expect(config).toContain('practiceLabel: "Offizielle Goethe-B1-Prüfung öffnen"');
+    expect(page).toContain("config.practiceUrl");
   });
 
-  test("registers direct in-app orientation routes without radio gates", () => {
-    expect(app).toContain('path="/campus/course/a1-day-25-goethe-exam-orientation" element={<A1Day25GoetheExamOrientationPage />}');
-    expect(app).toContain('path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1Day29GoetheExamOrientationPage />}');
+  test("registers direct in-app shared routes without radio gates", () => {
+    expect(app).toContain('path="/campus/course/a1-day-25-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A1" />}');
+    expect(app).toContain('path="/campus/course/b1-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="B1" />}');
     expect(app).not.toContain('withRadioWorkbookGate("A1", 25');
     expect(app).not.toContain('withRadioWorkbookGate("B1", 29');
   });
@@ -40,5 +41,11 @@ describe("A1 and B1 final-day Goethe practice", () => {
     expect(courseTab).toContain('title: "A1 Exam Orientation"');
     expect(courseTab).toContain('days: "Day 25"');
     expect(courseTab).toContain("continue to Day 25 for official Goethe exam practice");
+  });
+
+  test("tracks four Goethe sections without changing course completion", () => {
+    expect(page).toContain("window.localStorage.setItem");
+    expect(page).toContain("data-goethe-exam-section");
+    expect(page).toContain("keine zusätzliche Falowen-Aufgabe");
   });
 });
