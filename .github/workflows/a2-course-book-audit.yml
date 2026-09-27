@@ -8,7 +8,9 @@ on:
       - "scripts/patchA2LateWorkbookNativeOwnership.mjs"
       - "web/src/__tests__/A2CourseTabSections.test.js"
       - "web/src/components/CourseTab.js"
+      - "functions/data/answerKeyManifest.json"
       - "web/src/data/a2CurriculumAlignment.js"
+      - "web/src/data/a2B1LearnerFacingQa.test.js"
       - "web/src/data/a2Day*CourseBookAudit.test.js"
       - "web/src/data/a2Days*CourseBookAudit.test.js"
       - "web/src/data/a2GrammarRoutes.js"
@@ -60,6 +62,7 @@ jobs:
           src/data/a2Days13To18CourseBookAudit.test.js
           src/data/a2Days19To24CourseBookAudit.test.js
           src/data/a2Days25To28CourseBookAudit.test.js
+          src/data/a2B1LearnerFacingQa.test.js
           src/components/A2Day1RadioRegression.test.js
           src/components/A2Day14BerufUndKarriereWorkbookPage.test.js
           src/components/A2FocusedGrammarQuality.test.js
