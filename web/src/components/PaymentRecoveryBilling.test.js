@@ -18,6 +18,20 @@ describe("payment recovery billing flow", () => {
     ].forEach((text) => expect(source).toContain(text));
   });
 
+  test("billing keeps one summary and a compact payment panel", () => {
+    const source = read("AccountSettings.js");
+    expect(source).toContain("data-account-billing-summary");
+    expect(source).toContain(">Tuition<");
+    expect(source).toContain(">Paid<");
+    expect(source).toContain(">Balance<");
+    expect(source).toContain(">Access until<");
+    expect(source).toContain(">Payment status<");
+    expect(source).toContain("Course access details");
+    expect(source).toContain("showSummary={false}");
+    expect(source).toContain("transactionHistory.slice(0, 2)");
+    expect(source).toContain("older transaction");
+  });
+
   test("refresh payment status re-fetches the student Firestore profile", () => {
     const source = fs.readFileSync(path.resolve(__dirname, "../context/AuthContext.js"), "utf8");
     expect(source).toContain("const refreshStudentProfile = useCallback");
