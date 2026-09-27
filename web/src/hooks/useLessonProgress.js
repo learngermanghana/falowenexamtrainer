@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, db, getDocs, onSnapshot, query, where } from "../firebase";
 import { fetchResults } from "../services/resultsService";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
@@ -332,6 +332,8 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
   const userId = user?.uid || studentProfile?.uid || "";
   const normalizedLevel = normalizeCourseLevel(level) || "";
   const [state, setState] = useState({ loading: false, error: "", progressByAssignmentId: {}, source: "none" });
+  const [refreshRevision, setRefreshRevision] = useState(0);
+  const refresh = useCallback(() => setRefreshRevision((value) => value + 1), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -395,7 +397,7 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
       cancelled = true;
       if (typeof unsubscribe === "function") unsubscribe();
     };
-  }, [email, normalizedLevel, studentCode, userId]);
+  }, [email, normalizedLevel, refreshRevision, studentCode, userId]);
 
-  return state;
+  return { ...state, refresh };
 };

@@ -7,7 +7,8 @@ const mockStudentSet = jest.fn();
 const mockEventSet = jest.fn();
 const mockEventGet = jest.fn();
 const mockInitSet = jest.fn();
-const mockCompletionGet = jest.fn();
+const mockGetScoresForStudent = jest.fn();
+const mockGetAssignmentSummary = jest.fn();
 const mockAppendSheet = jest.fn();
 
 jest.mock("firebase-admin", () => ({
@@ -31,9 +32,6 @@ jest.mock("firebase-admin", () => ({
         if (name === "paystackInitRequests") {
           return { doc: () => ({ set: mockInitSet }) };
         }
-        if (name === "courseCompletionSnapshots") {
-          return { doc: () => ({ get: mockCompletionGet }) };
-        }
         return { doc: () => ({ set: jest.fn(), get: jest.fn() }) };
       },
       runTransaction: async (callback) => callback({
@@ -48,6 +46,12 @@ jest.mock("firebase-admin", () => ({
 jest.mock("../app", () => (req, res) => res.status(404).json({ error: "legacy" }));
 jest.mock("../studentsSheet", () => ({
   appendStudentToStudentsSheetSafely: (...args) => mockAppendSheet(...args),
+}));
+jest.mock("../scoresSheet", () => ({
+  getScoresForStudent: (...args) => mockGetScoresForStudent(...args),
+}));
+jest.mock("../routes/scoresSummaryCoursePlan", () => ({
+  getAssignmentSummary: (...args) => mockGetAssignmentSummary(...args),
 }));
 
 const listen = (app) => new Promise((resolve) => {
@@ -129,7 +133,12 @@ describe("Paystack billing normalization", () => {
     });
     mockVerifyIdToken.mockResolvedValue({ uid: "uid-1", email: "student@example.com" });
     mockEventGet.mockResolvedValue({ exists: false });
-    mockCompletionGet.mockResolvedValue({ exists: false, data: () => ({}) });
+    mockGetScoresForStudent.mockResolvedValue([]);
+    mockGetAssignmentSummary.mockReturnValue({
+      lessons: [],
+      plannedSet: new Set(["A2-1", "A2-2"]),
+      totalCourseItems: 2,
+    });
     mockAppendSheet.mockResolvedValue(undefined);
   });
 
@@ -166,10 +175,14 @@ describe("Paystack billing normalization", () => {
       balanceDue: 3000,
       paymentStatus: "pending",
     });
-    mockCompletionGet.mockResolvedValue({
-      exists: true,
-      data: () => ({ level: "A2", completed: 14, total: 28, courseWorkCompleted: false }),
+    mockGetAssignmentSummary.mockReturnValue({
+      lessons: [],
+      plannedSet: new Set(["A2-1", "A2-2"]),
+      totalCourseItems: 2,
     });
+    mockGetScoresForStudent.mockResolvedValue([
+      { assignment_id: "A2-1", assignment: "A2 1", level: "A2", score: 75 },
+    ]);
 
     const response = await request(app, "/paystack/initialize", {
       body: { studentCode: "STU123", amount: 3000 },
@@ -179,6 +192,9 @@ describe("Paystack billing normalization", () => {
     expect(response.status).toBe(409);
     expect(response.body.code).toBe("course_completion_required");
     expect(response.body.error).toContain("Complete your A2 Course Book");
+    expect(response.body.completed).toBe(1);
+    expect(response.body.total).toBe(2);
+    expect(mockGetScoresForStudent).toHaveBeenCalledWith("STU123");
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -194,10 +210,15 @@ describe("Paystack billing normalization", () => {
       balanceDue: 3000,
       paymentStatus: "pending",
     });
-    mockCompletionGet.mockResolvedValue({
-      exists: true,
-      data: () => ({ level: "A2", completed: 28, total: 28, courseWorkCompleted: true }),
+    mockGetAssignmentSummary.mockReturnValue({
+      lessons: [],
+      plannedSet: new Set(["A2-1", "A2-2"]),
+      totalCourseItems: 2,
     });
+    mockGetScoresForStudent.mockResolvedValue([
+      { assignment_id: "A2-1", assignment: "A2 1", level: "A2", score: 75 },
+      { assignment_id: "A2-2", assignment: "A2 2", level: "A2", score: 40 },
+    ]);
 
     const response = await request(app, "/paystack/initialize", {
       body: { studentCode: "STU123", amount: 3000 },

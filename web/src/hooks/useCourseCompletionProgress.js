@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   buildCourseCompletionProgress,
   readSelfLearningProgressByDay,
@@ -12,6 +12,10 @@ export const useCourseCompletionProgress = ({ studentProfile, user, level } = {}
   const normalizedLevel = String(level || studentProfile?.level || "").trim().toUpperCase();
   const [revision, setRevision] = useState(0);
   const lessonProgress = useLessonProgress({ studentProfile, user, level: normalizedLevel });
+  const refresh = useCallback(() => {
+    setRevision((value) => value + 1);
+    if (typeof lessonProgress.refresh === "function") lessonProgress.refresh();
+  }, [lessonProgress.refresh]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -58,7 +62,7 @@ export const useCourseCompletionProgress = ({ studentProfile, user, level } = {}
     loading: lessonProgress.loading,
     error: lessonProgress.error,
     source: lessonProgress.source,
-    refresh: () => setRevision((value) => value + 1),
+    refresh,
   };
 };
 

@@ -9,6 +9,14 @@ describe("Account upgrade course-completion gate", () => {
     path.resolve(__dirname, "../../../functions/functionz/paymentAwareApp.js"),
     "utf8",
   );
+  const courseProgressHook = fs.readFileSync(
+    path.resolve(__dirname, "../hooks/useCourseCompletionProgress.js"),
+    "utf8",
+  );
+  const lessonProgressHook = fs.readFileSync(
+    path.resolve(__dirname, "../hooks/useLessonProgress.js"),
+    "utf8",
+  );
 
   test("uses canonical Course Book completion before enabling upgrade", () => {
     expect(account).toContain('import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";');
@@ -28,10 +36,22 @@ describe("Account upgrade course-completion gate", () => {
     expect(account).toContain("disabled={!levelUpgrade.canUpgrade || isUpgradingLevel || courseCompletionLoading}");
   });
 
-  test("Paystack independently enforces canonical completion for queued upgrades", () => {
-    expect(paymentBackend).toContain('collection("courseCompletionSnapshots")');
-    expect(paymentBackend).toContain("isCourseWorkCompleteSnapshot");
+  test("Paystack derives tutor-course completion from trusted score records, not client snapshots", () => {
+    expect(paymentBackend).toContain('const { getScoresForStudent } = require("./scoresSheet");');
+    expect(paymentBackend).toContain('const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");');
+    expect(paymentBackend).toContain("getTrustedCourseCompletion");
+    expect(paymentBackend).toContain('TRUSTED_COMPLETION_LEVELS = new Set(["A1", "A2", "B1"])');
+    expect(paymentBackend).not.toContain("getCourseCompletionSnapshot");
+    expect(paymentBackend).not.toContain("isCourseWorkCompleteSnapshot");
     expect(paymentBackend).toContain('code: "course_completion_required"');
-    expect(paymentBackend).toContain("Complete your ${currentLevel || \"current\"} Course Book before paying");
+  });
+
+  test("Refresh progress retries the underlying remote lesson-progress loader", () => {
+    expect(lessonProgressHook).toContain("const [refreshRevision, setRefreshRevision] = useState(0)");
+    expect(lessonProgressHook).toContain("const refresh = useCallback(() => setRefreshRevision");
+    expect(lessonProgressHook).toContain("[email, normalizedLevel, refreshRevision, studentCode, userId]");
+    expect(lessonProgressHook).toContain("return { ...state, refresh }");
+    expect(courseProgressHook).toContain('if (typeof lessonProgress.refresh === "function") lessonProgress.refresh()');
+    expect(courseProgressHook).toContain("refresh,");
   });
 });
