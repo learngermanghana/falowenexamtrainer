@@ -29,7 +29,7 @@ const COMPLETION_JOURNEYS = {
     steps: [
       "Open the final A1 Exam Orientation day in the Course Book.",
       "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
-      "Mark the four practice areas as you attempt them.",
+      "Work through the four exam parts directly on the official Goethe page.",
       "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
     ],
   },
@@ -45,7 +45,7 @@ const COMPLETION_JOURNEYS = {
     steps: [
       "Open A2 Day 29 Exam Orientation in the Course Book.",
       "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
-      "Mark the four practice areas as you attempt them.",
+      "Work through the four exam parts directly on the official Goethe page.",
       "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
     ],
   },
@@ -60,7 +60,7 @@ const COMPLETION_JOURNEYS = {
     steps: [
       "Open B1 Day 29 Exam Orientation in the Course Book.",
       "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
-      "Mark the four practice areas as you attempt them.",
+      "Work through the four exam parts directly on the official Goethe page.",
       "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
     ],
   },
