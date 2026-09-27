@@ -26,6 +26,8 @@ const formatDate = (value) => {
   });
 };
 
+const COURSE_COMPLETION_UPGRADE_LEVELS = new Set(["A1", "A2", "B1"]);
+
 const AccountSettings = () => {
   const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
@@ -378,12 +380,13 @@ const AccountSettings = () => {
     const currentLevel = String(studentProfile?.level || "").toUpperCase();
     const nextLevel = getNextLevel(currentLevel);
     const hasOutstandingBalance = (Number(balanceDue) || 0) > 0;
-    const completionVerified = Boolean(
+    const requiresCourseCompletion = COURSE_COMPLETION_UPGRADE_LEVELS.has(currentLevel);
+    const completionVerified = !requiresCourseCompletion || Boolean(
       courseCompletion &&
       courseCompletion.level === currentLevel &&
       Number(courseCompletion.total) > 0
     );
-    const courseCompleted = completionVerified && courseCompletion.courseWorkCompleted === true;
+    const courseCompleted = !requiresCourseCompletion || (completionVerified && courseCompletion.courseWorkCompleted === true);
 
     if (hasQueuedUpgrade) {
       return {
@@ -394,6 +397,7 @@ const AccountSettings = () => {
         completionVerified,
         courseCompleted,
         hasOutstandingBalance,
+        requiresCourseCompletion,
       };
     }
 
@@ -406,10 +410,11 @@ const AccountSettings = () => {
         completionVerified,
         courseCompleted,
         hasOutstandingBalance,
+        requiresCourseCompletion,
       };
     }
 
-    if (courseCompletionLoading) {
+    if (requiresCourseCompletion && courseCompletionLoading) {
       return {
         currentLevel,
         nextLevel,
@@ -418,10 +423,11 @@ const AccountSettings = () => {
         completionVerified: false,
         courseCompleted: false,
         hasOutstandingBalance,
+        requiresCourseCompletion,
       };
     }
 
-    if (!completionVerified) {
+    if (requiresCourseCompletion && !completionVerified) {
       return {
         currentLevel,
         nextLevel,
@@ -432,10 +438,11 @@ const AccountSettings = () => {
         completionVerified: false,
         courseCompleted: false,
         hasOutstandingBalance,
+        requiresCourseCompletion,
       };
     }
 
-    if (!courseCompleted) {
+    if (requiresCourseCompletion && !courseCompleted) {
       return {
         currentLevel,
         nextLevel,
@@ -444,6 +451,7 @@ const AccountSettings = () => {
         completionVerified: true,
         courseCompleted: false,
         hasOutstandingBalance,
+        requiresCourseCompletion,
       };
     }
 
@@ -456,6 +464,7 @@ const AccountSettings = () => {
         completionVerified: true,
         courseCompleted: true,
         hasOutstandingBalance: true,
+        requiresCourseCompletion,
       };
     }
 
@@ -470,6 +479,7 @@ const AccountSettings = () => {
       completionVerified: true,
       courseCompleted: true,
       hasOutstandingBalance: false,
+      requiresCourseCompletion,
     };
   }, [
     balanceDue,
@@ -887,7 +897,9 @@ const AccountSettings = () => {
         <div>
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>{t("accountSettings.upgrade.title")}</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Your next level unlocks only after both your current Course Book and current tuition balance are complete.
+            {levelUpgrade.requiresCourseCompletion
+              ? "Your next level unlocks only after both your current Course Book and current tuition balance are complete."
+              : "Your next level unlocks after your current tuition balance is cleared."}
           </p>
         </div>
 
@@ -901,25 +913,27 @@ const AccountSettings = () => {
                 gap: 8,
               }}
             >
-              <div
-                style={{
-                  ...styles.card,
-                  margin: 0,
-                  background: levelUpgrade.courseCompleted ? "#f0fdf4" : "#fff7ed",
-                  borderColor: levelUpgrade.courseCompleted ? "#86efac" : "#fdba74",
-                }}
-              >
-                <span style={{ ...styles.helperText, fontSize: 12 }}>Course Book</span>
-                <strong style={{ color: levelUpgrade.courseCompleted ? "#166534" : "#9a3412" }}>
-                  {courseCompletionLoading
-                    ? "Checking…"
-                    : levelUpgrade.courseCompleted
-                      ? "Complete"
-                      : courseCompletion?.total
-                        ? `${courseCompletion.completed}/${courseCompletion.total} complete`
-                        : "Not verified"}
-                </strong>
-              </div>
+              {levelUpgrade.requiresCourseCompletion ? (
+                <div
+                  style={{
+                    ...styles.card,
+                    margin: 0,
+                    background: levelUpgrade.courseCompleted ? "#f0fdf4" : "#fff7ed",
+                    borderColor: levelUpgrade.courseCompleted ? "#86efac" : "#fdba74",
+                  }}
+                >
+                  <span style={{ ...styles.helperText, fontSize: 12 }}>Course Book</span>
+                  <strong style={{ color: levelUpgrade.courseCompleted ? "#166534" : "#9a3412" }}>
+                    {courseCompletionLoading
+                      ? "Checking…"
+                      : levelUpgrade.courseCompleted
+                        ? "Complete"
+                        : courseCompletion?.total
+                          ? `${courseCompletion.completed}/${courseCompletion.total} complete`
+                          : "Not verified"}
+                  </strong>
+                </div>
+              ) : null}
 
               <div
                 style={{
@@ -955,7 +969,7 @@ const AccountSettings = () => {
                 }}
               >
                 <strong>{levelUpgrade.reason}</strong>
-                {!courseCompletionLoading && !levelUpgrade.courseCompleted ? (
+                {levelUpgrade.requiresCourseCompletion && !courseCompletionLoading && !levelUpgrade.courseCompleted ? (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
                     <button
                       type="button"
