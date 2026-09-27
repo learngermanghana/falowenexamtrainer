@@ -2,6 +2,8 @@ import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
 import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import { getC1CanonicalGrammarTitle, getC1CanonicalTitle, getC1ContentProfile } from "./c1ContentRefresh";
+import { A2_LISTENING_MODES, getA2ListeningTask } from "./a2ListeningTasks";
+import { getB1ListeningTask } from "./b1ListeningTasks";
 
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
@@ -300,7 +302,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Modalverben + W-Fragen/Ja-Nein-Fragen in der Apotheke",
     video: "https://youtu.be/0p28KQE2A8c",
     youtube_link: "https://youtu.be/0p28KQE2A8c",
-    grammarbook_link: "/campus/course/modal-verbs-day-14-3-6",
+    grammarbook_link: "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook?view=grammar",
     workbook_link: "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
   },
   {
@@ -403,6 +405,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Present tense routine verbs, time expressions, and sequence connectors",
     video: "https://youtu.be/NxoQH-BY9Js",
     youtube_link: "https://youtu.be/NxoQH-BY9Js",
+    grammarbook_link: "/campus/course/a2-day-25-tagesablauf-workbook?view=grammar",
     workbook_link: "/campus/course/a2-day-25-tagesablauf-workbook",
   },
   {
@@ -415,6 +418,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Gefühle ausdrücken, Alltagssituationen beschreiben und körperliche Reaktionen benennen",
     video: "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     youtube_link: "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+    grammarbook_link: "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook?view=grammar",
     workbook_link: "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook",
   },
   {
@@ -427,6 +431,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Kommunikationsmittel, Vor- und Nachteile digitaler Medien, Sicherheit und Datenschutz",
     video: "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     youtube_link: "https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+    grammarbook_link: "/campus/course/a2-day-27-digitale-kommunikation-workbook?view=grammar",
     workbook_link: "/campus/course/a2-day-27-digitale-kommunikation-workbook",
   },
   {
@@ -1546,7 +1551,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "",
         youtube_link: "",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/17?view=grammar",
         workbook_link: "https://drive.google.com/file/d/1U2qtjXfid8Aj5LOqP2Uqpbv18-utgZIh/view?usp=sharing",
       },
     },
@@ -1590,7 +1595,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/fMCYUVNYc9U",
         youtube_link: "https://youtu.be/fMCYUVNYc9U",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/20?view=grammar",
         workbook_link: "",
       },
     },
@@ -1603,8 +1608,8 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "Vor- und Nachteile abwägen: Nebensätze mit weil, obwohl, während und zweiteilige Konnektoren",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
+        video: "",
+        youtube_link: "",
         grammarbook_link: "/campus/course/lesson/B1/21?view=grammar",
         workbook_link: "/campus/course/lesson/B1/21?view=workbook&radio=done",
       },
@@ -1618,9 +1623,9 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "Beziehung und Werte: Kommunikation, Vertrauen, gemeinsame Interessen, Respekt und Zukunftspläne",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        grammarbook_link: "https://drive.google.com/file/d/1x7Ycdg1DlCjukYoeoSTmnUL8WgkmdXAY/view?usp=sharing",
+        video: "",
+        youtube_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/22?view=grammar",
         workbook_link: "",
       },
     },
@@ -1633,9 +1638,9 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "Erstes Date: situative Kommunikation, Höflichkeit, Gesprächsführung und Eindruck",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-        grammarbook_link: "",
+        video: "",
+        youtube_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/23?view=grammar",
         workbook_link: "",
       },
     },
@@ -1651,7 +1656,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/zzPpGxzvJCY",
         youtube_link: "https://youtu.be/zzPpGxzvJCY",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/24?view=grammar",
         workbook_link: "",
       },
     },
@@ -1665,7 +1670,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "",
         youtube_link: "",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/25?view=grammar",
         workbook_link: "",
       },
     },
@@ -1680,7 +1685,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/0sZVT9XAEBc",
         youtube_link: "https://youtu.be/0sZVT9XAEBc",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/26?view=grammar",
         workbook_link: "",
       },
     },
@@ -1695,7 +1700,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/jzm-MnWC7I0",
         youtube_link: "https://youtu.be/jzm-MnWC7I0",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/27?view=grammar",
         workbook_link: "",
       },
     },
@@ -1710,7 +1715,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
         youtube_link: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/lesson/B1/28?view=grammar",
         workbook_link: "",
       },
     },
@@ -2194,6 +2199,31 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
 const DEFAULT_INSTRUCTION_EN = "Watch the video, review grammar, and complete your workbook. Assignment: complete only Teil 2, Teil 3, and Teil 4. Teil 1 is group practice.";
 const DEFAULT_INSTRUCTION_DE = "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch. Abgabe: Bearbeite nur Teil 2, Teil 3 und Teil 4. Teil 1 ist Gruppenübung.";
 const DEFAULT_INSTRUCTION_DE_FORMAL = "Schauen Sie das Video, wiederholen Sie die Grammatik und bearbeiten Sie das Arbeitsbuch.";
+
+const getA2LearnerInstruction = (day) => {
+  const listening = getA2ListeningTask(day);
+  if (listening?.mode === A2_LISTENING_MODES.NONE) {
+    return "Review the Grammar notes and complete Teil 1–3 in the workbook. Submit Teil 2 · Schreiben and Teil 3 · Lesen. Teil 1 is group practice; this lesson has no Teil 4 · Hören.";
+  }
+  if (listening?.mode === A2_LISTENING_MODES.SELF_CHECK) {
+    return "Review the Grammar notes and complete Teil 1–4 in the workbook. Submit Teil 2 · Schreiben and Teil 3 · Lesen. Teil 1 is group practice; Teil 4 · Hören is self-check and is not submitted.";
+  }
+  return "Review the Grammar notes and complete Teil 1–4 in the workbook. Submit Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören. Teil 1 is group practice.";
+};
+
+const getB1LearnerInstruction = (day) => {
+  const listening = getB1ListeningTask(day);
+  if (listening?.status === "unavailable") {
+    return "Lies die Grammatiknotizen und bearbeite Teil 1–3 im Workbook. Reiche Teil 2 · Schreiben und Teil 3 · Lesen ein. Teil 1 ist Gruppenübung; diese Lektion hat kein Teil 4 · Hören.";
+  }
+  if (listening?.mode === "reading-fallback") {
+    return "Lies die Grammatiknotizen und bearbeite Teil 1–4 im Workbook. Teil 4 ist der erhaltene zweite Lesetext dieser Lektion. Reiche Schreiben sowie beide Leseteile ein; Teil 1 ist Gruppenübung.";
+  }
+  if (listening?.submitRequired === false) {
+    return "Lies die Grammatiknotizen und bearbeite Teil 1–4 im Workbook. Reiche Teil 2 · Schreiben und Teil 3 · Lesen ein. Teil 1 ist Gruppenübung; Teil 4 · Hören ist Selbstkontrolle und wird nicht eingereicht.";
+  }
+  return "Lies die Grammatiknotizen und bearbeite Teil 1–4 im Workbook. Reiche Teil 2 · Schreiben, Teil 3 · Lesen und Teil 4 · Hören ein. Teil 1 ist Gruppenübung.";
+};
 const SELF_PRACTICE_NOTE = "Self-practice only; no video or grammar book for this lesson.";
 
 const normalizeResourceUrl = (value) => {
@@ -2484,10 +2514,12 @@ const normalizeCourseSchedules = (schedules) =>
           const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction, level);
           const levelSpecificInstruction =
             level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
-              ? DEFAULT_INSTRUCTION_EN
-              : ["B1", "B2"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
-                ? DEFAULT_INSTRUCTION_DE
-                : baseInstruction;
+              ? getA2LearnerInstruction(entryWithAssignmentId.day)
+              : level === "B1" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+                ? getB1LearnerInstruction(entryWithAssignmentId.day)
+                : level === "B2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+                  ? DEFAULT_INSTRUCTION_DE
+                  : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
           const canonicalOverlay = overlayCanonicalCurriculumResources({
             entry: entryWithAssignmentId,
