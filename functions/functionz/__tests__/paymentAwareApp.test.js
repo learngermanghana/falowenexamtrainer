@@ -7,6 +7,7 @@ const mockStudentSet = jest.fn();
 const mockEventSet = jest.fn();
 const mockEventGet = jest.fn();
 const mockInitSet = jest.fn();
+const mockCompletionGet = jest.fn();
 const mockAppendSheet = jest.fn();
 
 jest.mock("firebase-admin", () => ({
@@ -29,6 +30,9 @@ jest.mock("firebase-admin", () => ({
         }
         if (name === "paystackInitRequests") {
           return { doc: () => ({ set: mockInitSet }) };
+        }
+        if (name === "courseCompletionSnapshots") {
+          return { doc: () => ({ get: mockCompletionGet }) };
         }
         return { doc: () => ({ set: jest.fn(), get: jest.fn() }) };
       },
@@ -125,6 +129,7 @@ describe("Paystack billing normalization", () => {
     });
     mockVerifyIdToken.mockResolvedValue({ uid: "uid-1", email: "student@example.com" });
     mockEventGet.mockResolvedValue({ exists: false });
+    mockCompletionGet.mockResolvedValue({ exists: false, data: () => ({}) });
     mockAppendSheet.mockResolvedValue(undefined);
   });
 
@@ -147,6 +152,61 @@ describe("Paystack billing normalization", () => {
     const paystackBody = JSON.parse(global.fetch.mock.calls[0][1].body);
     expect(paystackBody.metadata.balanceBefore).toBe(200);
     expect(paystackBody.metadata.paidSoFar).toBe(2800);
+  });
+
+  it("blocks queued level-upgrade checkout when Course Book completion is not verified", async () => {
+    const app = loadApp();
+    mockStudent({
+      uid: "uid-1",
+      level: "A2",
+      upgradeFromLevel: "A2",
+      upgradeToLevel: "B1",
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+    });
+    mockCompletionGet.mockResolvedValue({
+      exists: true,
+      data: () => ({ level: "A2", completed: 14, total: 28, courseWorkCompleted: false }),
+    });
+
+    const response = await request(app, "/paystack/initialize", {
+      body: { studentCode: "STU123", amount: 3000 },
+      headers: { authorization: "Bearer token" },
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body.code).toBe("course_completion_required");
+    expect(response.body.error).toContain("Complete your A2 Course Book");
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("allows queued level-upgrade checkout after canonical Course Book completion", async () => {
+    const app = loadApp();
+    mockStudent({
+      uid: "uid-1",
+      level: "A2",
+      upgradeFromLevel: "A2",
+      upgradeToLevel: "B1",
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+    });
+    mockCompletionGet.mockResolvedValue({
+      exists: true,
+      data: () => ({ level: "A2", completed: 28, total: 28, courseWorkCompleted: true }),
+    });
+
+    const response = await request(app, "/paystack/initialize", {
+      body: { studentCode: "STU123", amount: 3000 },
+      headers: { authorization: "Bearer token" },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.ok).toBe(true);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   it("rejects a below-minimum payment that is not the final balance", async () => {
