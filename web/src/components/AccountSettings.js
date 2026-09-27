@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
 import NotificationSettingsCard from "./NotificationSettingsCard";
+import ClassParticipationCard from "./ClassParticipationCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
@@ -36,12 +38,24 @@ const AccountSettings = () => {
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
   const [isRefreshingPayment, setIsRefreshingPayment] = useState(false);
-  const [activeTab, setActiveTab] = useState(() => {
-    const requestedTab = new URLSearchParams(window.location.search).get("tab");
-    return ["studentData", "notifications", "billing", "upgrade"].includes(requestedTab)
-      ? requestedTab
-      : "studentData";
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const requestedTab = new URLSearchParams(location.search).get("tab");
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
+    ? requestedTab
+    : "studentData";
+
+  const selectAccountTab = (tabKey) => {
+    const params = new URLSearchParams(location.search);
+    if (tabKey === "studentData") params.delete("tab");
+    else params.set("tab", tabKey);
+    const nextSearch = params.toString();
+    const nextUrl =
+      location.pathname +
+      (nextSearch ? "?" + nextSearch : "") +
+      (location.hash || "");
+    navigate(nextUrl, { replace: true });
+  };
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
@@ -153,6 +167,82 @@ const AccountSettings = () => {
       border: "#fdba74",
     };
   }, [balanceDue, formatMoney, normalizedPaymentStatus, paidAmount, paymentAttempt, paymentCleared, trialLifecycle.key, trialLifecycle.daysRemaining, trialLifecycle.retentionDaysRemaining]);
+
+  const accountAccess = useMemo(() => {
+    const now = Date.now();
+    const contractEnd = toDate(studentProfile?.contractEnd);
+    const contractEndMs = contractEnd?.getTime?.();
+    const hasContractEnd = Number.isFinite(contractEndMs);
+    const hasCurrentContract = hasContractEnd && contractEndMs > now;
+    const daysRemaining = hasCurrentContract
+      ? Math.max(0, Math.ceil((contractEndMs - now) / (1000 * 60 * 60 * 24)))
+      : null;
+
+    if (hasCurrentContract || (!hasContractEnd && paymentCleared)) {
+      return {
+        label: "Active",
+        detail: hasCurrentContract
+          ? `Course access until ${formatDate(studentProfile?.contractEnd)}`
+          : "Paid course access",
+        daysRemaining,
+        tone: "#166534",
+        background: "#ecfdf5",
+        border: "#86efac",
+      };
+    }
+
+    if (hasContractEnd && contractEndMs <= now) {
+      return {
+        label: "Access ended",
+        detail: `Course access ended ${formatDate(studentProfile?.contractEnd)}`,
+        daysRemaining: null,
+        tone: "#9a3412",
+        background: "#fff7ed",
+        border: "#fdba74",
+      };
+    }
+
+    if (trialLifecycle.key === "active" || trialLifecycle.key === "ending_soon") {
+      return {
+        label: "Trial",
+        detail: `${trialLifecycle.daysRemaining} day${trialLifecycle.daysRemaining === 1 ? "" : "s"} remaining`,
+        daysRemaining: trialLifecycle.daysRemaining,
+        tone: trialLifecycle.key === "ending_soon" ? "#92400e" : "#166534",
+        background: trialLifecycle.key === "ending_soon" ? "#fffbeb" : "#f0fdf4",
+        border: trialLifecycle.key === "ending_soon" ? "#fcd34d" : "#86efac",
+      };
+    }
+
+    if (trialLifecycle.key === "expired_retained" || trialLifecycle.key === "retention_ending_soon") {
+      return {
+        label: "Access ended",
+        detail: `Progress retained for ${trialLifecycle.retentionDaysRemaining} more day${trialLifecycle.retentionDaysRemaining === 1 ? "" : "s"}`,
+        daysRemaining: null,
+        tone: "#9a3412",
+        background: "#fff7ed",
+        border: "#fdba74",
+      };
+    }
+
+    return {
+      label: "Payment required",
+      detail: billingState.body,
+      daysRemaining: null,
+      tone: billingState.tone,
+      background: billingState.background,
+      border: billingState.border,
+    };
+  }, [
+    billingState.background,
+    billingState.body,
+    billingState.border,
+    billingState.tone,
+    paymentCleared,
+    studentProfile?.contractEnd,
+    trialLifecycle.daysRemaining,
+    trialLifecycle.key,
+    trialLifecycle.retentionDaysRemaining,
+  ]);
 
   React.useEffect(() => {
     if (paymentCleared && paymentAttempt) {
@@ -411,6 +501,68 @@ const AccountSettings = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <section
+        aria-label="Account overview"
+        style={{
+          ...styles.card,
+          border: `1px solid ${accountAccess.border}`,
+          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 62%, " + accountAccess.background + " 100%)",
+          display: "grid",
+          gap: 14,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, color: "#64748b", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".05em" }}>
+              My Falowen account
+            </p>
+            <h2 style={{ margin: "5px 0 3px", color: "#0f172a" }}>
+              {studentProfile?.name || user?.displayName || "Student"}
+            </h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {[studentProfile?.level, studentProfile?.className].filter(Boolean).join(" · ") || "Course account"}
+            </p>
+          </div>
+          <span
+            style={{
+              ...styles.badge,
+              color: accountAccess.tone,
+              background: accountAccess.background,
+              border: `1px solid ${accountAccess.border}`,
+              fontWeight: 900,
+            }}
+          >
+            {accountAccess.label}
+          </span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 9 }}>
+          <div style={{ ...styles.card, margin: 0, background: "#ffffff" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Student code</span>
+            <strong>{studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}</strong>
+          </div>
+          <div style={{ ...styles.card, margin: 0, background: "#ffffff" }}>
+            <span style={{ ...styles.helperText, fontSize: 12 }}>Course access</span>
+            <strong>{accountAccess.detail}</strong>
+            {accountAccess.daysRemaining !== null ? (
+              <span style={{ ...styles.helperText, fontSize: 12 }}>
+                {accountAccess.daysRemaining === 0 ? "Ends today" : `${accountAccess.daysRemaining} day${accountAccess.daysRemaining === 1 ? "" : "s"} remaining`}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 12, display: "grid", gap: 8 }}>
+          <strong style={{ color: "#0f172a" }}>Learning records</strong>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/results")}>Results</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>Attendance</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>Class Participation</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>Course Book</button>
+          </div>
+        </div>
+      </section>
+
       <div style={styles.tabList}>
         {[
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
@@ -421,7 +573,7 @@ const AccountSettings = () => {
           <button
             key={tab.key}
             type="button"
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => selectAccountTab(tab.key)}
             style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
           >
             {tab.label}
@@ -441,9 +593,6 @@ const AccountSettings = () => {
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.className")}</span><strong>{studentProfile?.className || "–"}</strong></div>
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.level")}</span><strong>{studentProfile?.level || "–"}</strong></div>
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.location")}</span><strong>{studentProfile?.emailLocation || studentProfile?.location || studentProfile?.country || "–"}</strong></div>
-          <div style={styles.metaRow}><span>Contract start</span><strong>{formatDate(studentProfile?.contractStart)}</strong></div>
-          <div style={styles.metaRow}><span>Contract end</span><strong>{formatDate(studentProfile?.contractEnd)}</strong></div>
-          <div style={styles.metaRow}><span>{t("accountSettings.billing.nextRenewal")}</span><strong>{subscription.renewalDate}</strong></div>
         </div>
 
         <h3 style={{ marginTop: 0 }}>{t("accountSettings.profile.title")}</h3>
@@ -455,6 +604,17 @@ const AccountSettings = () => {
           Biography editing has moved to the Class Members tab so it is easier to find.
         </p>
       </section>
+      ) : null}
+
+      {activeTab === "participation" ? (
+        <section style={{ display: "grid", gap: 12 }} aria-label="Class Participation details">
+          <div>
+            <button type="button" style={styles.backTextLink} onClick={() => selectAccountTab("studentData")}>
+              <span aria-hidden="true">←</span> Back to Student Data
+            </button>
+          </div>
+          <ClassParticipationCard />
+        </section>
       ) : null}
 
       {activeTab === "notifications" ? <NotificationSettingsCard /> : null}

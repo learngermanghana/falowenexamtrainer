@@ -86,7 +86,9 @@ const activeTabAfter = `  const location = useLocation();
     navigate(nextUrl, { replace: true });
   };`;
 
-if (account.includes(previousActiveTabAfter)) {
+if (account.includes("const activeTab = [\"studentData\", \"participation\", \"notifications\", \"billing\", \"upgrade\"].includes(requestedTab)")) {
+  // The modern Account page already derives tab state from React Router.
+} else if (account.includes(previousActiveTabAfter)) {
   account = account.replace(previousActiveTabAfter, activeTabAfter);
 } else if (account.includes(queryDrivenActiveTabBefore)) {
   account = account.replace(queryDrivenActiveTabBefore, activeTabAfter);
@@ -118,7 +120,9 @@ const studentDataFooterAfter = `        <p style={{ ...styles.helperText, margin
           </button>
         </div>
       </section>`;
-replaceAccountOnce(studentDataFooterBefore, studentDataFooterAfter, "Student Data participation entry point");
+if (!account.includes("Learning records")) {
+  replaceAccountOnce(studentDataFooterBefore, studentDataFooterAfter, "Student Data participation entry point");
+}
 
 replaceAccountOnce(
   '      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}',
@@ -143,9 +147,12 @@ const requiredMarkers = [
   'new URLSearchParams(location.search)',
   'navigate(nextUrl, { replace: true })',
   '"participation"',
-  'View class participation',
+  'Learning records',
   'activeTab === "participation"',
   'Back to Student Data',
+  'navigate("/campus/results")',
+  'navigate("/campus/attendance")',
+  'navigate("/campus/course")',
 ];
 requiredMarkers.forEach((marker) => {
   if (!account.includes(marker)) throw new Error(`Class Participation Account marker missing: ${marker}`);
