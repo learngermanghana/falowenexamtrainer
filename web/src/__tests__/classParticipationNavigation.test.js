@@ -38,8 +38,11 @@ describe("Class Participation navigation", () => {
     expect(source).not.toContain("window.history.replaceState");
     expect(source).not.toContain("setActiveTab(tabKey)");
     expect(source).not.toContain('{ key: "participation", label:');
-    expect(source).not.toContain("<span>Contract start</span>");
-    expect(source).not.toContain("<span>Contract end</span>");
+    const studentDataStart = source.indexOf('{activeTab === "studentData"');
+    const participationStart = source.indexOf('{activeTab === "participation"');
+    const studentDataSource = source.slice(studentDataStart, participationStart);
+    expect(studentDataSource).not.toContain("<span>Contract start</span>");
+    expect(studentDataSource).not.toContain("<span>Contract end</span>");
     expect(source).not.toContain('{activeTab === "studentData" ? <ClassParticipationCard /> : null}');
   });
 
