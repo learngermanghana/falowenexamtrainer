@@ -451,6 +451,7 @@ const A2_SCHEDULE = [
     day: 29,
     topic: "Goethe A2 Exam Orientation & Official Practice",
     chapter: "Exam Orientation",
+    attendance: false,
     goal: "Understand the official Goethe A2 exam structure and use the official practice materials confidently.",
     instruction:
       "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, review the four official exam sections, then use the official Goethe A2 practice materials to familiarise yourself with the real exam format.",
@@ -1285,6 +1286,7 @@ const RAW_COURSE_SCHEDULES = {
       day: 25,
       topic: "Goethe A1 Exam Orientation & Official Practice",
       chapter: "Exam Orientation",
+      attendance: false,
       goal: "Use the official Goethe A1 model test directly from the Course Book and identify the areas that still need review.",
       instruction:
         "No new lesson content and no Falowen submission. Open the Day 25 exam-orientation page, then use the official Goethe A1 model test. The official link starts with Hören and also provides access to Lesen, Schreiben and Sprechen.",
@@ -1739,6 +1741,7 @@ const RAW_COURSE_SCHEDULES = {
       day: 29,
       topic: "Goethe B1 Exam Orientation & Official Practice",
       chapter: "Exam Orientation",
+      attendance: false,
       goal: "Use the official Goethe B1 model test directly from the Course Book and identify the areas that still need review.",
       instruction:
         "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, then use the official Goethe B1 model test. The official link starts with Lesen and also provides access to Hören, Schreiben and Sprechen.",

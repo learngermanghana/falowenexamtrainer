@@ -1,7 +1,7 @@
 import { courseSchedules } from "../data/courseSchedule";
 
 const isExpectedAttendanceSession = (entry) => {
-  if (!entry || entry.completion) return false;
+  if (!entry || entry.completion || entry.attendance === false) return false;
   const topic = String(entry.topic || "").trim();
   if (/course completed|kurs abgeschlossen/i.test(topic)) return false;
   const day = Number(entry.day);
