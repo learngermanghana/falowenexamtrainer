@@ -19,7 +19,9 @@ describe("authentication routes in the service worker", () => {
     expect(source).toContain("handleAuthNavigationRequest(request)");
   });
 
-  it("changes the cache version for installed apps", () => {
-    expect(source).toContain('`${CACHE_PREFIX}-v14`');
+  it("keeps installed apps on cache version 15 or newer", () => {
+    const match = source.match(/CACHE_NAME = \`\\\$\{CACHE_PREFIX\}-v(\\d+)\`/);
+    expect(match).not.toBeNull();
+    expect(Number(match[1])).toBeGreaterThanOrEqual(15);
   });
 });
