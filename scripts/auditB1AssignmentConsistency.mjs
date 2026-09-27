@@ -299,7 +299,7 @@ const missingSheetLinks = b1Manifest
   .filter((entry) => !String(entry.answer_url || "").trim() || !String(entry.sheet_url || "").trim())
   .map((entry) => entry.assignmentId);
 
-const allowedMissingSheetLinks = new Set(["B1-3.9"]);
+const allowedMissingSheetLinks = new Set();
 for (const id of missingSheetLinks) {
   if (!allowedMissingSheetLinks.has(id)) fail("Answer sheets", `new missing answer-sheet link: ${id}`);
 }
