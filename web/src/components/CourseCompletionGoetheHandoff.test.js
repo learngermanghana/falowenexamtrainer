@@ -59,8 +59,8 @@ describe("Goethe-first course completion handoff", () => {
   });
 
   test("course-book normalization keeps A2 and B1 exam orientation as dedicated final sections", () => {
-    const a2Patch = read("../../scripts/patchA2LateWorkbookNativeOwnership.mjs");
-    const presentationPatch = read("../../scripts/patchCourseBookPresentationSections.mjs");
+    const a2Patch = read("../../../scripts/patchA2LateWorkbookNativeOwnership.mjs");
+    const presentationPatch = read("../../../scripts/patchCourseBookPresentationSections.mjs");
 
     expect(a2Patch).toContain('{ key: "a2-exam", title: "A2 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29 }');
     expect(presentationPatch).toContain('{ key: "b1-exam", title: "B1 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29 }');
