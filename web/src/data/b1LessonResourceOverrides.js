@@ -128,11 +128,11 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
   17: Object.freeze({
     chapter: "5.17",
     title: "Wie lernt man am besten?",
-    grammarBook: "",
+    grammarBook: route(17, "grammar"),
     workbook: route(17, "workbook"),
     grammarTopic: "Effektiv lernen: Lernmethoden, Lernumgebung, Zeitmanagement, Motivation und Wiederholung",
     goal: "Eigene Lernmethoden beschreiben, effektives Lernen erklären und eine B1-Meinung zu Lernstrategien schreiben.",
-    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit Schreiben, Lesen and Hören.",
+    instruction: "Open the Grammar notes, then complete Teil 1, Teil 2 and Teil 3 in the workbook. Submit Schreiben and Lesen. This lesson intentionally has no Teil 4 · Hören.",
   }),
   18: Object.freeze({
     chapter: "6.18",
@@ -156,7 +156,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
   20: Object.freeze({
     chapter: "6.20",
     title: "Wie wird man …?",
-    grammarBook: "",
+    grammarBook: route(20, "grammar"),
     workbook: route(20, "workbook"),
     grammarTopic: "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
     goal: "Über Ausbildung, Qualifikationen und Karrierewege strukturiert sprechen.",
@@ -174,17 +174,17 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
   22: Object.freeze({
     chapter: "7.22",
     title: "Was ist dir in einer Beziehung wichtig?",
-    grammarBook: "",
+    grammarBook: route(22, "grammar"),
     workbook: route(22, "workbook"),
     goal: "Über wichtige Werte in Beziehungen sprechen, Online-Partnersuche abwägen und eine klare B1-Meinung formulieren.",
-    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit the required writing and reading answers.",
+    instruction: "Open the Grammar notes, then complete Teil 1–4 in the workbook. Teil 4 is the preserved second reading task for this lesson. Submit Schreiben and both reading sections.",
   }),
-  23: Object.freeze({ chapter: "7.23", workbook: route(23, "workbook") }),
-  24: Object.freeze({ chapter: "8.24", workbook: route(24, "workbook") }),
-  25: Object.freeze({ chapter: "8.25", workbook: route(25, "workbook") }),
-  26: Object.freeze({ chapter: "9.26", workbook: route(26, "workbook") }),
-  27: Object.freeze({ chapter: "10.27", workbook: route(27, "workbook") }),
-  28: Object.freeze({ chapter: "10.28", workbook: route(28, "workbook") }),
+  23: Object.freeze({ chapter: "7.23", grammarBook: route(23, "grammar"), workbook: route(23, "workbook") }),
+  24: Object.freeze({ chapter: "8.24", grammarBook: route(24, "grammar"), workbook: route(24, "workbook") }),
+  25: Object.freeze({ chapter: "8.25", grammarBook: route(25, "grammar"), workbook: route(25, "workbook") }),
+  26: Object.freeze({ chapter: "9.26", grammarBook: route(26, "grammar"), workbook: route(26, "workbook") }),
+  27: Object.freeze({ chapter: "10.27", grammarBook: route(27, "grammar"), workbook: route(27, "workbook") }),
+  28: Object.freeze({ chapter: "10.28", grammarBook: route(28, "grammar"), workbook: route(28, "workbook") }),
 });
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
