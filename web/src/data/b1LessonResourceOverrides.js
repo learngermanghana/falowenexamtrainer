@@ -132,7 +132,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     workbook: route(17, "workbook"),
     grammarTopic: "Effektiv lernen: Lernmethoden, Lernumgebung, Zeitmanagement, Motivation und Wiederholung",
     goal: "Eigene Lernmethoden beschreiben, effektives Lernen erklären und eine B1-Meinung zu Lernstrategien schreiben.",
-    instruction: "Open the Grammar notes, then complete Teil 1, Teil 2 and Teil 3 in the workbook. Submit Schreiben and Lesen. This lesson intentionally has no Teil 4 · Hören.",
+    instruction: "Lies zuerst die Grammatiknotizen. Bearbeite danach Teil 1 bis Teil 4 im Workbook. Reiche Schreiben, Lesen und Hören über den Submit-Tab ein.",
   }),
   18: Object.freeze({
     chapter: "6.18",
@@ -169,7 +169,7 @@ const B1_RESOURCE_OVERRIDES = Object.freeze({
     workbook: route(21, "workbook"),
     grammarTopic: "Vor- und Nachteile abwägen: weil, obwohl, während und zweiteilige Konnektoren",
     goal: "Familie, Wohngemeinschaft, Singleleben und neue Lebensformen vergleichen.",
-    instruction: "Open the in-app workbook and complete Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit. Submit Schreiben, Lesen and Hören.",
+    instruction: "Open the Grammar notes, then complete Teil 1, Teil 2 and Teil 3 in the workbook. Submit Schreiben and Lesen. This lesson intentionally has no Teil 4 · Hören.",
   }),
   22: Object.freeze({
     chapter: "7.22",
