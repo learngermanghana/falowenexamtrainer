@@ -180,7 +180,7 @@ import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
-import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
+import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 import { persistInterfaceLanguage } from "./i18n";
 
 const getTabStructure = (program, t) => {
@@ -348,8 +348,16 @@ function App() {
     () => hasClearedBalance(studentProfile?.balanceDue),
     [studentProfile?.balanceDue]
   );
+  const partialPaymentAccessEndMs = useMemo(
+    () => getPartialPaymentAccessEndMs(studentProfile),
+    [studentProfile]
+  );
 
   const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
+  const hasActivePartialPaymentAccess =
+    paymentStatus === "partial" &&
+    Number.isFinite(partialPaymentAccessEndMs) &&
+    partialPaymentAccessEndMs > Date.now();
   const hasActiveTrial = trialLifecycle.active;
   const hasQueuedUpgradeAccess =
     String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
@@ -360,7 +368,7 @@ function App() {
   const awaitingPayment =
     Boolean(studentProfile) &&
     !isStaff &&
-    !(hasActiveContract || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
+    !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
   if (!isFirebaseConfigured) {
     return (
