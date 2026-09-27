@@ -26,7 +26,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
     renderPage();
 
     ["Name", "Alter", "Land", "Wohnort", "Sprachen", "Beruf / Studium", "Hobby"].forEach((label) => {
-      expect(screen.getAllByText(label).some((node) => node.offsetParent !== null || node.getClientRects().length >= 0)).toBe(true);
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
     expect(screen.getByText(/Buchstabiere deinen Nachnamen/i)).toBeVisible();
     expect(screen.getByText(/Telefonnummer oder eine Zahl/i)).toBeVisible();
