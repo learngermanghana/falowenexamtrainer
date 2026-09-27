@@ -50,10 +50,11 @@ const AccountSettings = () => {
     if (tabKey === "studentData") params.delete("tab");
     else params.set("tab", tabKey);
     const nextSearch = params.toString();
-    navigate(
-      location.pathname + (nextSearch ? `?${nextSearch}` : "") + (location.hash || ""),
-      { replace: true },
-    );
+    const nextUrl =
+      location.pathname +
+      (nextSearch ? "?" + nextSearch : "") +
+      (location.hash || "");
+    navigate(nextUrl, { replace: true });
   };
 
   const billingSummary = useMemo(() => {
