@@ -386,7 +386,12 @@ const AccountSettings = () => {
       courseCompletion.level === currentLevel &&
       Number(courseCompletion.total) > 0
     );
-    const courseCompleted = !requiresCourseCompletion || (completionVerified && courseCompletion.courseWorkCompleted === true);
+    const awaitingReview = requiresCourseCompletion
+      ? Math.max(Number(courseCompletion?.awaitingReview) || 0, 0)
+      : 0;
+    const courseCompleted =
+      !requiresCourseCompletion ||
+      (completionVerified && courseCompletion.courseWorkCompleted === true && awaitingReview === 0);
 
     if (hasQueuedUpgrade) {
       return {
@@ -398,6 +403,7 @@ const AccountSettings = () => {
         courseCompleted,
         hasOutstandingBalance,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
@@ -411,6 +417,7 @@ const AccountSettings = () => {
         courseCompleted,
         hasOutstandingBalance,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
@@ -424,6 +431,7 @@ const AccountSettings = () => {
         courseCompleted: false,
         hasOutstandingBalance,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
@@ -439,19 +447,24 @@ const AccountSettings = () => {
         courseCompleted: false,
         hasOutstandingBalance,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
     if (requiresCourseCompletion && !courseCompleted) {
+      const reason = courseCompletion.courseWorkCompleted === true && awaitingReview > 0
+        ? `${awaitingReview} assignment${awaitingReview === 1 ? "" : "s"} awaiting review. Upgrade opens after all required assignments have been reviewed.`
+        : `Complete your ${currentLevel} Course Book first (${courseCompletion.completed}/${courseCompletion.total} required assignments complete).`;
       return {
         currentLevel,
         nextLevel,
         canUpgrade: false,
-        reason: `Complete your ${currentLevel} Course Book first (${courseCompletion.completed}/${courseCompletion.total} required ${courseCompletion.mode === "self-learning" ? "lessons" : "assignments"} complete).`,
+        reason,
         completionVerified: true,
         courseCompleted: false,
         hasOutstandingBalance,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
@@ -465,6 +478,7 @@ const AccountSettings = () => {
         courseCompleted: true,
         hasOutstandingBalance: true,
         requiresCourseCompletion,
+        awaitingReview,
       };
     }
 
@@ -480,6 +494,7 @@ const AccountSettings = () => {
       courseCompleted: true,
       hasOutstandingBalance: false,
       requiresCourseCompletion,
+      awaitingReview,
     };
   }, [
     balanceDue,
@@ -928,9 +943,11 @@ const AccountSettings = () => {
                       ? "Checking…"
                       : levelUpgrade.courseCompleted
                         ? "Complete"
-                        : courseCompletion?.total
-                          ? `${courseCompletion.completed}/${courseCompletion.total} complete`
-                          : "Not verified"}
+                        : levelUpgrade.awaitingReview > 0
+                          ? `${levelUpgrade.awaitingReview} awaiting review`
+                          : courseCompletion?.total
+                            ? `${courseCompletion.completed}/${courseCompletion.total} complete`
+                            : "Not verified"}
                   </strong>
                 </div>
               ) : null}
