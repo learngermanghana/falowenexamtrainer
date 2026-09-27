@@ -2371,13 +2371,20 @@ const overlayCanonicalCurriculumResources = ({ entry, level, lesen_hören, schre
 
   const patchResource = (resource) => {
     if (!resource || typeof resource !== "object") return resource;
+
+    const canonicalVideo = canonical.video || resource.video || resource.youtube_link || null;
+    const canonicalGrammar = canonical.grammarPage || resource.grammarPage || resource.grammar_link || resource.grammarbook_link || null;
+    const canonicalWorkbook = canonical.workbookRoute || resource.workbookRoute || resource.workbook_link || null;
+
     return {
       ...resource,
-      video: null,
-      youtube_link: null,
-      grammarbook_link: null,
-      grammar_link: canonical.grammarPage || resource.grammar_link || resource.grammarbook_link || null,
-      workbook_link: canonical.workbookRoute || resource.workbook_link || null,
+      video: canonicalVideo,
+      youtube_link: canonicalVideo,
+      grammarbook_link: canonicalGrammar,
+      grammar_link: canonicalGrammar,
+      grammarPage: canonicalGrammar,
+      workbook_link: canonicalWorkbook,
+      workbookRoute: canonicalWorkbook,
       assignment: canonical.submissionRequired,
       assignmentId: canonical.assignment_id,
       assignment_id: canonical.assignment_id,
@@ -2400,7 +2407,7 @@ const overlayCanonicalCurriculumResources = ({ entry, level, lesen_hören, schre
       assignment_id: canonical.assignment_id,
       grammarPage: canonical.grammarPage,
       workbookRoute: canonical.workbookRoute,
-      video: null,
+      video: canonical.video || entry.video || null,
     },
     lesen_hören: Array.isArray(lesen_hören) ? lesen_hören.map(patchResource) : patchResource(lesen_hören),
     schreiben_sprechen: Array.isArray(schreiben_sprechen) ? schreiben_sprechen.map(patchResource) : patchResource(schreiben_sprechen),
