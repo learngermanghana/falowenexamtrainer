@@ -56,9 +56,8 @@ let courseTab = fs.readFileSync(courseTabPath, "utf8");
 // A2 has a canonical Day 30 completion milestone after the Day 29 exam orientation.
 // Do not duplicate it in the generic next-lesson slot at the top.
 const completionText = "Course Book complete";
-if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
+if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (') && courseTab.includes(completionText)) {
   const completionTextIndex = courseTab.indexOf(completionText);
-  if (completionTextIndex === -1) throw new Error("Course Book generic completion card anchor missing.");
   const branchStart = courseTab.lastIndexOf("            ) : (", completionTextIndex);
   if (branchStart === -1) throw new Error("Course Book completion ternary branch start missing.");
   const branchEndMarker = '\n\n          <section className="course-book-toolbar"';
@@ -76,7 +75,7 @@ if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
   courseTab = `${courseTab.slice(0, branchStart)}${guardedBranch}${courseTab.slice(branchEnd)}`;
 }
 
-if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
+if (courseTab.includes(completionText) && !courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (')) {
   throw new Error("A2 generic top completion card was not suppressed.");
 }
 

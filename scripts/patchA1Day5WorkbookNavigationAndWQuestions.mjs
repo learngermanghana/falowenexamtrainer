@@ -58,7 +58,9 @@ workbook = replaceOnce({
   before: "<div>Your Teil 6 sentences are saved for your tutor and class after you post them.</div>",
   after: "<div>Your Teil 5 sentences are saved for your tutor and class after you post them.</div>",
   label: "progress Teil 6 label",
-  already: "<div>Your Teil 5 sentences are saved for your tutor and class after you post them.</div>",
+  already: (source) =>
+    source.includes("<div>Your Teil 5 sentences are saved for your tutor and class after you post them.</div>") ||
+    source.includes("<span>Articles: {articleScore}/{articleWords.length}</span>"),
 });
 
 workbook = replaceOnce({

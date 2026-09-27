@@ -27,7 +27,9 @@ const replacements = [
 ];
 
 replacements.forEach(([before, after]) => {
-  source = source.replaceAll(before, after);
+  source = source.replaceAll(before, (match, offset) =>
+    source[offset - 1] === "\\" ? match : after,
+  );
 });
 
 // Keep the student-facing destination name explicit on desktop and mobile.

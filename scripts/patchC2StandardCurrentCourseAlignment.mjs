@@ -67,7 +67,7 @@ panel = panel.replace(
   ' const d=getC2ExamStandard(day);const mastery=getC2CanonicalMastery(day);if(!d)return null;\n const [principle,...examples]=d.grammar||[];',
 );
 const grammarCheckAnchor = '  <Section title="Grammar check">{completion(completed,onCompleteChange,"Ich kann die heutige Struktur erklären und sie bewusst in Sprechen oder Schreiben einsetzen.")}</Section>';
-if (!panel.includes("Kollokationen · {d.title}")) {
+if (!panel.includes("mastery?.collocations?.length")) {
   if (!panel.includes(grammarCheckAnchor)) throw new Error("C2 standard Grammar check anchor missing.");
   panel = panel.replace(grammarCheckAnchor, `  {mastery?.vocabulary?.length?<Section title="Wortschatz · Thema"><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10}}>{mastery.vocabulary.map(([word,meaning])=><div key={word} style={sub}><strong>{word}</strong><span style={{color:"#64748b"}}>{meaning}</span></div>)}</div></Section>:null}\n  {mastery?.collocations?.length?<Section title={\`Kollokationen · \${d.title}\`}><div style={{display:"grid",gap:10}}>{mastery.collocations.map(([phrase,meaning,example])=><div key={phrase} style={sub}><strong>{phrase}</strong><span style={{color:"#64748b"}}>{meaning}</span><span style={{lineHeight:1.7}}>{example}</span></div>)}</div></Section>:null}\n${grammarCheckAnchor}`);
 }

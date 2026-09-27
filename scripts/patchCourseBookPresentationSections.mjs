@@ -235,8 +235,16 @@ if (!source.includes("COURSE_BOOK_PRESENTATION_SECTIONS")) {
   source = source.replace(anchor, extra);
 }
 
-const start = source.indexOf("  const groupedLessons = useMemo(() => {");
-const end = source.indexOf("  const persistPracticeProgress =", start);
+const groupingStart = source.indexOf("  const groupedLessons = useMemo(() => {");
+const visibleLessonsEnd = source.lastIndexOf("  const visibleLessons = useMemo(", groupingStart);
+const existingPresentationStart = source.indexOf(
+  "  const presentationSections = COURSE_BOOK_PRESENTATION_SECTIONS[normalizedSelectedCourseLevel] || null;",
+  visibleLessonsEnd,
+);
+const start = existingPresentationStart >= 0 && existingPresentationStart < groupingStart
+  ? existingPresentationStart
+  : groupingStart;
+const end = source.indexOf("  const persistPracticeProgress =", groupingStart);
 if (start < 0 || end < 0) throw new Error("Missing Course Book grouping block");
 
 const grouping = `  const presentationSections = COURSE_BOOK_PRESENTATION_SECTIONS[normalizedSelectedCourseLevel] || null;
