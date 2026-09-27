@@ -54,7 +54,7 @@ const getCanonicalTutorRequirements = (level = "A1") => {
 
   const explicitAssignments = dedupeTutorRequirements(
     entries
-      .filter((entry) => Boolean(entry.assignment ?? entry.submissionRequired))
+      .filter((entry) => entry.assignment === true)
       .map((entry) => ({
         day: tutorDay(entry),
         chapter: tutorChapter(entry),
