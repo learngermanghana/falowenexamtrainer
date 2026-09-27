@@ -284,6 +284,13 @@ requiredCourseMarkers.forEach((marker) => {
 
 const hasCanonicalMasteryMarker = /courseCompletion\??\.masteryAvailable/.test(courseTab);
 if (!hasCanonicalMasteryMarker) {
+  const masteryIndex = courseTab.indexOf(">Mastery</p>");
+  const requiredWorkIndex = courseTab.indexOf(">Required work</p>");
+  const diagnosticIndex = masteryIndex >= 0 ? masteryIndex : requiredWorkIndex;
+  const diagnostic = diagnosticIndex >= 0
+    ? courseTab.slice(Math.max(0, diagnosticIndex - 500), diagnosticIndex + 1400)
+    : "No Mastery or Required work card found.";
+  console.error("CourseTab mastery diagnostic:\n" + diagnostic);
   throw new Error("CourseTab missing canonical completion marker: courseCompletion[?.]masteryAvailable");
 }
 
