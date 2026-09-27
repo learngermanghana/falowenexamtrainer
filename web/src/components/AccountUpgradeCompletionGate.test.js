@@ -20,7 +20,7 @@ describe("Account upgrade course-completion gate", () => {
 
   test("uses canonical Course Book completion before enabling upgrade", () => {
     expect(account).toContain('import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";');
-    expect(account).toContain("courseCompletion.courseWorkCompleted === true");
+    expect(account).toContain("courseCompletion.courseWorkCompleted === true && awaitingReview === 0");
     expect(account).toContain("data-upgrade-eligibility");
     expect(account).toContain("Course Book");
     expect(account).toContain("Current balance");
@@ -33,13 +33,17 @@ describe("Account upgrade course-completion gate", () => {
     expect(account).toContain('reason: "Checking your Course Book completion before upgrade."');
     expect(account).toContain("Falowen could not verify your Course Book completion");
     expect(account).toContain("Complete your ${currentLevel} Course Book first");
+    expect(account).toContain("awaiting review. Upgrade opens after all required assignments have been reviewed.");
+    expect(account).toContain("levelUpgrade.awaitingReview > 0");
     expect(account).toContain("disabled={!levelUpgrade.canUpgrade || isUpgradingLevel || courseCompletionLoading}");
   });
 
   test("Paystack derives tutor-course completion from trusted score records, not client snapshots", () => {
     expect(paymentBackend).toContain('const { getScoresForStudent } = require("./scoresSheet");');
-    expect(paymentBackend).toContain('const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");');
+    expect(paymentBackend).toContain('const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");');
     expect(paymentBackend).toContain("getTrustedCourseCompletion");
+    expect(paymentBackend).toContain("if (explicitLevelMatch && explicitLevelMatch[1] !== normalizedLevel) return");
+    expect(paymentBackend).toContain("prefixedMatches.some((match) => match[1] !== normalizedLevel)");
     expect(paymentBackend).toContain('TRUSTED_COMPLETION_LEVELS = new Set(["A1", "A2", "B1"])');
     expect(paymentBackend).not.toContain("getCourseCompletionSnapshot");
     expect(paymentBackend).not.toContain("isCourseWorkCompleteSnapshot");
