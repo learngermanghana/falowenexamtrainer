@@ -51,10 +51,15 @@ const normalizeTrustedAssignmentId = ({ row = {}, level = "", plannedSet = new S
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const direct = String(row.assignment_id || row.assignmentId || "").trim().toUpperCase();
   const explicitLevelMatch = direct.match(/^(A1|A2|B1|B2|C1|C2)-/);
+  const assignmentText = String(row.assignment || "").trim().toUpperCase();
+  const prefixedMatches = Array.from(
+    assignmentText.matchAll(/\b(A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/g)
+  );
 
-  // A conflicting explicit level is authoritative evidence that this row belongs
-  // to another course. Never fall back to title parsing in that case.
+  // Any explicit evidence that the row belongs to another course wins over
+  // unprefixed legacy IDs or numeric title fallbacks.
   if (explicitLevelMatch && explicitLevelMatch[1] !== normalizedLevel) return "";
+  if (prefixedMatches.some((match) => match[1] !== normalizedLevel)) return "";
 
   const directCandidates = [
     direct,
@@ -64,15 +69,6 @@ const normalizeTrustedAssignmentId = ({ row = {}, level = "", plannedSet = new S
   for (const candidate of directCandidates) {
     if (plannedSet.has(candidate)) return candidate;
   }
-
-  const assignmentText = String(row.assignment || "").trim().toUpperCase();
-  const prefixedMatches = Array.from(
-    assignmentText.matchAll(/\b(A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/g)
-  );
-
-  // Historical rows with a blank level column may still carry a level prefix in
-  // the title. Reject any conflicting prefix rather than re-prefixing its number.
-  if (prefixedMatches.some((match) => match[1] !== normalizedLevel)) return "";
 
   for (let index = prefixedMatches.length - 1; index >= 0; index -= 1) {
     const [, rowLevel, identifier] = prefixedMatches[index];
