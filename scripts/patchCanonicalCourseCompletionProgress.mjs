@@ -276,12 +276,16 @@ writing = replaceOnce(writing, nextWritingEffect, writingCompletionEffect, "Guid
 const requiredCourseMarkers = [
   "buildCourseCompletionProgress",
   "findCourseBookEntryForRequirement",
-  "courseCompletion.masteryAvailable",
   "Complete inside lesson",
 ];
 requiredCourseMarkers.forEach((marker) => {
   if (!courseTab.includes(marker)) throw new Error(`CourseTab missing canonical completion marker: ${marker}`);
 });
+
+const hasCanonicalMasteryMarker = /courseCompletion\??\.masteryAvailable/.test(courseTab);
+if (!hasCanonicalMasteryMarker) {
+  throw new Error("CourseTab missing canonical completion marker: courseCompletion[?.]masteryAvailable");
+}
 
 if (!writing.includes("getSelfLearningProgressStorageKey") || !writing.includes('section: "write"')) {
   throw new Error("Guided writing does not publish the self-learning Write completion signal.");

@@ -495,9 +495,15 @@ if (!courseTab.includes('data-compact-course-hero="true"')) {
                     {nextLessonTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{nextLessonTitle}</p> : null}
                   </div>
                   <div style={courseBookStyles.statCard}>
-                    <p style={courseBookStyles.statLabel}>Latest result</p>
-                    <p style={courseBookStyles.statValue}>{latestResultScore !== null ? Math.round(latestResultScore) + "/100" : "—"}</p>
-                    {latestResultTitle ? <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>{latestResultTitle}</p> : null}
+                    <p style={courseBookStyles.statLabel}>Mastery</p>
+                    <p style={courseBookStyles.statValue}>
+                      {courseCompletion.masteryAvailable ? String(courseCompletion.masteryPercent ?? 0) + "% passed" : "Self-learning"}
+                    </p>
+                    {courseCompletion.masteryAvailable && latestResultScore !== null ? (
+                      <p style={{ ...styles.helperText, margin: "2px 0 0", fontSize: 11 }}>
+                        Latest: {Math.round(latestResultScore)}/100{latestResultTitle ? " · " + latestResultTitle : ""}
+                      </p>
+                    ) : null}
                   </div>
                 </>
               )}
@@ -1012,7 +1018,8 @@ requiredAppMarkers.forEach((marker) => {
 
 [
   'data-compact-course-hero="true"',
-  "Latest result",
+  "Mastery",
+  "courseCompletion.masteryAvailable",
   "const latestCourseResult = useMemo(",
 ].forEach((marker) => {
   if (!courseTab.includes(marker)) throw new Error(`Course Book compact marker missing: ${marker}`);

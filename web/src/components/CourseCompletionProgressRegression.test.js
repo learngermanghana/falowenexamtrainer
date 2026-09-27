@@ -21,6 +21,8 @@ describe("canonical course completion wiring", () => {
     expect(courseTab).toContain("buildCourseCompletionProgress({");
     expect(courseTab).toContain("findCourseBookEntryForRequirement");
     expect(courseTab).toContain("courseCompletion?.completed");
+    expect(courseTab).toContain("courseCompletion.masteryAvailable");
+    expect(courseTab).toContain("Mastery");
     expect(courseTab).toContain("Complete inside lesson");
 
     expect(courseTab).toContain('source: "c2-cloud-progress"');
