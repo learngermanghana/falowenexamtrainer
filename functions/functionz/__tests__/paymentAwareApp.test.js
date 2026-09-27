@@ -247,6 +247,34 @@ describe("Paystack billing normalization", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it("rejects an unprefixed legacy ID when the title carries a conflicting level", async () => {
+    const app = loadApp();
+    mockStudent({
+      uid: "uid-1",
+      level: "A2",
+      upgradeFromLevel: "A2",
+      upgradeToLevel: "B1",
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1.1", "A2-2"]));
+    mockGetScoresForStudent.mockResolvedValue([
+      { assignment_id: "1.1", assignment: "B1-1.1", level: "", score: 80 },
+      { assignment_id: "A2-2", assignment: "A2 2", level: "A2", score: 70 },
+    ]);
+
+    const response = await request(app, "/paystack/initialize", {
+      body: { studentCode: "STU123", amount: 3000 },
+      headers: { authorization: "Bearer token" },
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body.completed).toBe(1);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it("does not re-prefix a legacy title from another course when row level is blank", async () => {
     const app = loadApp();
     mockStudent({
