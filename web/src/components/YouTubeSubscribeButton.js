@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import CourseCompletionHandoff from "./CourseCompletionHandoff";
 import { getCourseCompletionJourney } from "../data/courseCompletionJourney";
+import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";
 
 const YOUTUBE_SUBSCRIBE_URL = "https://www.youtube.com/@LLEAGhana?sub_confirmation=1";
 const COURSE_HANDOFF_HOST = "data-course-completion-handoff-host";
@@ -98,6 +99,8 @@ const YouTubeSubscribeButton = ({ label = "Subscribe on YouTube" }) => {
     };
   }, [location.pathname, studentProfile?.className, studentProfile?.level]);
 
+  const goetheOrientation = getGoetheExamOrientationConfig(courseState.level);
+
   const reviewFinalLesson = () => {
     const finalLesson = finalLessonRef.current;
     const openButton = Array.from(finalLesson?.querySelectorAll("button") || []).find((button) =>
@@ -141,6 +144,7 @@ const YouTubeSubscribeButton = ({ label = "Subscribe on YouTube" }) => {
               progressPercent={courseState.progressPercent}
               finalLessonTitle={courseState.finalLessonTitle}
               journey={getCourseCompletionJourney(courseState.level)}
+              onOpenOfficialGoethe={goetheOrientation?.courseRoute ? () => navigate(goetheOrientation.courseRoute) : null}
               onOpenExamsRoom={() => navigate("/exams/overview")}
               onReviewFinalLesson={courseState.finalLessonTitle ? reviewFinalLesson : null}
             />,
