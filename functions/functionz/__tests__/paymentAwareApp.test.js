@@ -8,7 +8,7 @@ const mockEventSet = jest.fn();
 const mockEventGet = jest.fn();
 const mockInitSet = jest.fn();
 const mockGetScoresForStudent = jest.fn();
-const mockGetAssignmentSummary = jest.fn();
+const mockGetCanonicalTutorAssignmentSet = jest.fn();
 const mockAppendSheet = jest.fn();
 
 jest.mock("firebase-admin", () => ({
@@ -51,7 +51,7 @@ jest.mock("../scoresSheet", () => ({
   getScoresForStudent: (...args) => mockGetScoresForStudent(...args),
 }));
 jest.mock("../routes/scoresSummaryCoursePlan", () => ({
-  getAssignmentSummary: (...args) => mockGetAssignmentSummary(...args),
+  getCanonicalTutorAssignmentSet: (...args) => mockGetCanonicalTutorAssignmentSet(...args),
 }));
 
 const listen = (app) => new Promise((resolve) => {
@@ -134,11 +134,7 @@ describe("Paystack billing normalization", () => {
     mockVerifyIdToken.mockResolvedValue({ uid: "uid-1", email: "student@example.com" });
     mockEventGet.mockResolvedValue({ exists: false });
     mockGetScoresForStudent.mockResolvedValue([]);
-    mockGetAssignmentSummary.mockReturnValue({
-      lessons: [],
-      plannedSet: new Set(["A2-1", "A2-2"]),
-      totalCourseItems: 2,
-    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1", "A2-2"]));
     mockAppendSheet.mockResolvedValue(undefined);
   });
 
@@ -175,11 +171,7 @@ describe("Paystack billing normalization", () => {
       balanceDue: 3000,
       paymentStatus: "pending",
     });
-    mockGetAssignmentSummary.mockReturnValue({
-      lessons: [],
-      plannedSet: new Set(["A2-1", "A2-2"]),
-      totalCourseItems: 2,
-    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1", "A2-2"]));
     mockGetScoresForStudent.mockResolvedValue([
       { assignment_id: "A2-1", assignment: "A2 1", level: "A2", score: 75 },
     ]);
@@ -210,11 +202,7 @@ describe("Paystack billing normalization", () => {
       balanceDue: 3000,
       paymentStatus: "pending",
     });
-    mockGetAssignmentSummary.mockReturnValue({
-      lessons: [],
-      plannedSet: new Set(["A2-1", "A2-2"]),
-      totalCourseItems: 2,
-    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1", "A2-2"]));
     mockGetScoresForStudent.mockResolvedValue([
       { assignment_id: "A2-1", assignment: "A2 1", level: "A2", score: 75 },
       { assignment_id: "A2-2", assignment: "A2 2", level: "A2", score: 40 },
@@ -228,6 +216,63 @@ describe("Paystack billing normalization", () => {
     expect(response.status).toBe(200);
     expect(response.body.ok).toBe(true);
     expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not let a conflicting explicit level fall back to a matching title", async () => {
+    const app = loadApp();
+    mockStudent({
+      uid: "uid-1",
+      level: "A2",
+      upgradeFromLevel: "A2",
+      upgradeToLevel: "B1",
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1.1", "A2-2"]));
+    mockGetScoresForStudent.mockResolvedValue([
+      { assignment_id: "B1-1.1", assignment: "A2-1.1", level: "", score: 80 },
+      { assignment_id: "A2-2", assignment: "A2 2", level: "A2", score: 70 },
+    ]);
+
+    const response = await request(app, "/paystack/initialize", {
+      body: { studentCode: "STU123", amount: 3000 },
+      headers: { authorization: "Bearer token" },
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body.completed).toBe(1);
+    expect(response.body.total).toBe(2);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not re-prefix a legacy title from another course when row level is blank", async () => {
+    const app = loadApp();
+    mockStudent({
+      uid: "uid-1",
+      level: "A2",
+      upgradeFromLevel: "A2",
+      upgradeToLevel: "B1",
+      tuitionFee: 3000,
+      paid: 0,
+      balanceDue: 3000,
+      paymentStatus: "pending",
+    });
+    mockGetCanonicalTutorAssignmentSet.mockReturnValue(new Set(["A2-1.1", "A2-2"]));
+    mockGetScoresForStudent.mockResolvedValue([
+      { assignment: "B1-1.1", level: "", score: 80 },
+      { assignment_id: "A2-2", assignment: "A2 2", level: "A2", score: 70 },
+    ]);
+
+    const response = await request(app, "/paystack/initialize", {
+      body: { studentCode: "STU123", amount: 3000 },
+      headers: { authorization: "Bearer token" },
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body.completed).toBe(1);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("rejects a below-minimum payment that is not the final balance", async () => {
