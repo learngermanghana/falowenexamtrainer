@@ -6,10 +6,8 @@ import {
 } from "./a2GrammarRoutes";
 import { normalizeLesson } from "./lessonModel";
 
-const A2_DAY17_APOTHEKE_ROUTE = [
-  "/campus/course/modal-verbs-day-14-3-6?level=A2",
-  "&day=17",
-].join("");
+const A2_DAY17_APOTHEKE_ROUTE =
+  "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook?view=grammar";
 
 describe("A2 in-app grammar routes", () => {
   test("all configured A2 grammar routes stay inside Falowen", () => {
@@ -67,7 +65,15 @@ describe("A2 in-app grammar routes", () => {
     );
   });
 
-  test("returns no route for days without a dedicated grammar page", () => {
-    expect(getA2GrammarRoute({ day: 25, chapter: "9.25" })).toBe("");
+  test("keeps focused grammar available for the late A2 workbook days", () => {
+    expect(getA2GrammarRoute({ day: 25, chapter: "9.25" })).toBe(
+      "/campus/course/a2-day-25-tagesablauf-workbook?view=grammar"
+    );
+    expect(getA2GrammarRoute({ day: 26, chapter: "10.26" })).toBe(
+      "/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook?view=grammar"
+    );
+    expect(getA2GrammarRoute({ day: 27, chapter: "10.27" })).toBe(
+      "/campus/course/a2-day-27-digitale-kommunikation-workbook?view=grammar"
+    );
   });
 });
