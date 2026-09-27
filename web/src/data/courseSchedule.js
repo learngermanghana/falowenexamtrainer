@@ -1283,6 +1283,22 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 25,
+      topic: "Goethe A1 Exam Orientation & Official Practice",
+      chapter: "Exam Orientation",
+      goal: "Use the official Goethe A1 model test directly from the Course Book and identify the areas that still need review.",
+      instruction:
+        "No new lesson content and no Falowen submission. Open the Day 25 exam-orientation page, then use the official Goethe A1 model test. The official link starts with Hören and also provides access to Lesen, Schreiben and Sprechen.",
+      grammar_topic: null,
+      assignment: false,
+      lesen_hören: {
+        video: null,
+        youtube_link: null,
+        grammarbook_link: null,
+        workbook_link: "/campus/course/a1-day-25-goethe-exam-orientation",
+      },
+    },
+    {
+      day: 26,
       topic: "Course Completed!",
       chapter: null,
       ...buildCompletionMessage({ level: "A1", nextLevel: "A2" }),
@@ -1721,6 +1737,22 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 29,
+      topic: "Goethe B1 Exam Orientation & Official Practice",
+      chapter: "Exam Orientation",
+      goal: "Use the official Goethe B1 model test directly from the Course Book and identify the areas that still need review.",
+      instruction:
+        "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, then use the official Goethe B1 model test. The official link starts with Lesen and also provides access to Hören, Schreiben and Sprechen.",
+      grammar_topic: null,
+      assignment: false,
+      lesen_hören: {
+        video: null,
+        youtube_link: null,
+        grammarbook_link: null,
+        workbook_link: "/campus/course/b1-day-29-goethe-exam-orientation",
+      },
+    },
+    {
+      day: 30,
       topic: "Kurs abgeschlossen!",
       chapter: null,
       goal: "🎯 Ziel: Feiere deinen Erfolg und plane deine nächsten Schritte.",
