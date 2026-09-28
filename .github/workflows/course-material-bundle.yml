@@ -1,6 +1,11 @@
 name: Course material bundle
 
 on:
+  pull_request:
+    paths:
+      - ".github/workflows/course-material-bundle.yml"
+      - "scripts/course-material-bundles/**"
+      - "shared/curriculumCanonical.json"
   workflow_dispatch:
     inputs:
       level:
@@ -13,7 +18,6 @@ on:
           - B1
           - B2
           - C1
-          - C2
       build_pdf:
         description: Render and merge the complete level PDF
         required: true
@@ -23,9 +27,51 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: course-material-bundle-${{ github.event_name }}-${{ github.ref }}-${{ inputs.level || 'validation' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  validate-manifests:
+    name: Validate ${{ matrix.level }} manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        level: [A1, A2, B1, B2, C1]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build and validate manifest
+        env:
+          LEVEL: ${{ matrix.level }}
+        run: |
+          node scripts/course-material-bundles/buildLevelManifest.mjs "$LEVEL"
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const level = process.env.LEVEL;
+          const file = `artifacts/course-material-bundles/${level}/Falowen-${level}-Course-Materials-manifest.json`;
+          const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
+          if (manifest.schemaVersion !== 3) throw new Error(`Expected schemaVersion 3, received ${manifest.schemaVersion}.`);
+          if (!manifest.curriculumComplete) throw new Error(`Missing curriculum days: ${manifest.missingDays.join(", ")}.`);
+          if (!manifest.routesClassified) throw new Error(`${manifest.unresolvedLessonCount} printable routes need classification.`);
+          if (!manifest.readyForPdfGeneration) throw new Error(`${level} is not ready for PDF generation.`);
+          console.log(`${level}: ${manifest.printableLessonCount} printable lessons are ready.`);
+          NODE
+
   build-bundle:
     name: Build ${{ inputs.level }} course material bundle
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: validate-manifests
     runs-on: ubuntu-latest
     timeout-minutes: 90
 

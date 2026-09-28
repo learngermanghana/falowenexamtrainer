@@ -41,7 +41,7 @@ const classifyPrintableLesson = (level, day) => {
     };
   }
 
-  if (level === "B1") {
+  if (["A2", "B1"].includes(level)) {
     if (day === 0) {
       return {
         printKind: "excluded",
