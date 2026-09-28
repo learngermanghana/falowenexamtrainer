@@ -70,12 +70,12 @@ const teil1Fields = [
 ];
 
 const teil2Cards = [
-  ["Wochenende", "Was machst du am Wochenende?"],
-  ["Familie", "Hast du Geschwister?"],
-  ["Wohnort", "Wo wohnst du?"],
-  ["Getränke", "Trinkst du gern Kaffee?"],
-  ["Freizeit", "Was machst du gern in deiner Freizeit?"],
-  ["Deutsch", "Warum lernst du Deutsch?"],
+  ["Freizeit", "Wochenende", "Was machst du am Wochenende?"],
+  ["Persönliche Informationen", "Familie", "Hast du Geschwister?"],
+  ["Wohnen", "Wohnort", "Wo wohnst du?"],
+  ["Essen und Trinken", "Getränke", "Trinkst du gern Kaffee?"],
+  ["Alltag", "Freizeit", "Was machst du gern in deiner Freizeit?"],
+  ["Sprachen", "Deutsch", "Warum lernst du Deutsch?"],
 ];
 
 const teil3Cards = [
@@ -145,16 +145,23 @@ export default function VerbotenErlaubtPage() {
         </Callout>
       </Section>
 
-      <Section eyebrow="Goethe A1 · Teil 2" title="Turn the topic card into a question" description="Say your question aloud before you reveal the model. Then answer your partner in one short complete sentence.">
+      <Section eyebrow="Goethe A1 · Teil 2" title="Use the theme and keyword to form a question" description="The THEMA gives the broad area. The STICHWORT / KEYWORD is the word you use to build your question. Say your question aloud before you reveal the model.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-          {teil2Cards.map(([topic, model]) => {
-            const open = Boolean(revealedTeil2[topic]);
+          {teil2Cards.map(([theme, keyword, model]) => {
+            const cardKey = `${theme}:${keyword}`;
+            const open = Boolean(revealedTeil2[cardKey]);
             return (
-              <article key={topic} style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, display: "grid", gap: 10, background: "#f8faff" }}>
-                <span style={{ color: palette.muted, fontSize: 12, fontWeight: 900 }}>THEMA</span>
-                <strong style={{ fontSize: 22, color: palette.indigo }}>{topic}</strong>
-                <p style={{ margin: 0, color: palette.muted }}>Stelle deinem Partner eine passende Frage.</p>
-                <button type="button" onClick={() => setRevealedTeil2((current) => ({ ...current, [topic]: !open }))} style={styles.secondaryButton}>
+              <article key={cardKey} style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, display: "grid", gap: 10, background: "#f8faff" }}>
+                <div style={{ display: "grid", gap: 3 }}>
+                  <span style={{ color: palette.muted, fontSize: 11, fontWeight: 900, letterSpacing: 0.6 }}>THEMA</span>
+                  <strong style={{ fontSize: 16, color: palette.ink }}>{theme}</strong>
+                </div>
+                <div style={{ display: "grid", gap: 3, borderTop: "1px solid #dbeafe", paddingTop: 9 }}>
+                  <span style={{ color: palette.indigo, fontSize: 11, fontWeight: 900, letterSpacing: 0.6 }}>STICHWORT · KEYWORD</span>
+                  <strong style={{ fontSize: 24, color: palette.indigo }}>{keyword}</strong>
+                </div>
+                <p style={{ margin: 0, color: palette.muted }}>Stelle deinem Partner mit dem Stichwort eine passende Frage.</p>
+                <button type="button" onClick={() => setRevealedTeil2((current) => ({ ...current, [cardKey]: !open }))} style={styles.secondaryButton}>
                   {open ? "Hide model" : "Show model"}
                 </button>
                 {open ? <Callout><strong>Model</strong><span>{model}</span></Callout> : null}
