@@ -1358,10 +1358,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               totalAssignments={isC2CourseBook ? 0 : assignmentCount}
               needsImprovement={isC2CourseBook ? 0 : (courseCompletion?.needsImprovement || 0)}
               awaitingReview={isC2CourseBook ? 0 : (courseCompletion?.awaitingReview || 0)}
-              onExploreNextLevel={() => {
-                const nextLevel = { A1: "A2", A2: "B1", B1: "B2", B2: "C1", C1: "C2" }[normalizedSelectedCourseLevel];
-                if (nextLevel) navigate(`/campus/course/preview/${nextLevel}`);
-              }}
             />
           ) : null}
 

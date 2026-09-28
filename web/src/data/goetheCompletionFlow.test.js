@@ -14,10 +14,10 @@ describe("official Goethe completion configuration", () => {
     expect(config).toContain('courseRoute: "/campus/course/b1-day-29-goethe-exam-orientation"');
   });
 
-  test("tutor-guided completion copy sends students to official Goethe practice before optional Exams Room practice", () => {
-    expect(conclusion).toContain("Continue to Official Goethe Practice");
-    expect(conclusion).toContain("Exams Room (optional)");
-    expect(conclusion).toContain("getGoetheExamOrientationConfig");
+  test("the single completion card exposes official samples and the Exams Room for every level", () => {
+    expect(conclusion).toContain("Open Official Goethe");
+    expect(conclusion).toContain("Go to Exams Room");
+    expect(conclusion).toContain("getGoetheExamFileGuide");
     expect(journey).toContain("official Goethe A1 practice");
     expect(journey).toContain("official Goethe A2 practice");
     expect(journey).toContain("official Goethe B1 practice");
