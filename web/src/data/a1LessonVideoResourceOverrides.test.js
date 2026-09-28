@@ -37,6 +37,27 @@ test("A1 Day 2 separates Kapitel 0.2 and Kapitel 1.1 AI videos", () => {
   expect(videos.some((video) => video.title.includes("Kapitel 0.2 + 1.1"))).toBe(false);
 });
 
+test("A1 Day 8 uses the canonical Countries and Languages teacher video", () => {
+  const scheduledLesson = getA1Lesson(8);
+  const lesson = normalizeLesson(scheduledLesson, "A1");
+
+  expect(scheduledLesson).toEqual(
+    expect.objectContaining({
+      video: "https://youtu.be/z5ClrkL4O3k",
+      lesen_hören: expect.objectContaining({
+        video: "https://youtu.be/z5ClrkL4O3k",
+        youtube_link: "https://youtu.be/z5ClrkL4O3k",
+      }),
+    }),
+  );
+  expect(lesson.resources.teacherVideo).toEqual(
+    expect.objectContaining({
+      chapter: "4",
+      url: "https://youtu.be/z5ClrkL4O3k",
+    }),
+  );
+});
+
 test("A1 Day 3 uses Kapitel 1.2 assignment AI video", () => {
   expectRequestedAiVideo(3, {
     chapter: "1.2",
