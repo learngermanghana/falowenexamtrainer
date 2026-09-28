@@ -256,6 +256,22 @@ const MyExamFilePage = () => {
             )}
           </div>
 
+          <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 12, background: "#f0fdf4", display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 900, color: "#166534" }}>EXAM SAMPLE</div>
+            <div style={{ fontWeight: 900, color: "#111827" }}>
+              Goethe {examGuide?.level || summaryLevel?.level || detectedLevel || ""} exam sample
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.45, color: "#4b5563" }}>
+              Open the Goethe sample for your level to see the task types and practise the exam format.
+            </div>
+            {examGuide?.sampleUrl ? (
+              <a href={examGuide.sampleUrl} target="_blank" rel="noreferrer" style={{ ...primaryLinkStyle, background: "#15803d" }}>
+                Open exam sample →
+              </a>
+            ) : (
+              <div style={styles.errorBox}>The Goethe exam sample link has not been added for this level yet.</div>
+            )}
+          </div>
         </div>
       </section>
 
