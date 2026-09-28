@@ -78,7 +78,7 @@ const TabButton = ({ active, onClick, label, description }) => (
   <button
     type="button"
     role="tab"
-    aria-label={label}
+    aria-label={[label, description].filter(Boolean).join(" · ")}
     aria-selected={active}
     onClick={onClick}
     style={{
