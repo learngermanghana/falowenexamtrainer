@@ -285,7 +285,7 @@ const MyExamFilePage = () => {
         <ol style={{ margin: 0, paddingLeft: 22, color: "#374151", lineHeight: 1.7, fontSize: 13 }}>
           <li>Open the Goethe account link above. If you are new, use <strong>Create account</strong> and complete your profile before registration day.</li>
           <li>Keep your Goethe login details ready, then open the official registration page for your level.</li>
-          <li>On the advertised date, select the exam and secure an available place. Goethe Ghana states that registration opens at 07:00 German time.</li>
+          <li>On the advertised registration date, open the registration page early, select your exam and secure an available place.</li>
           <li>Complete the booking and payment only after you have secured a place on Goethe's website.</li>
         </ol>
       </section>
