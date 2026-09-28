@@ -449,6 +449,13 @@ const FormingBasicStatementsPage = () => {
           At A1, remember this simple pattern: <strong>a</strong> often changes to <strong>ä</strong> in the second and third person singular, for example <strong>du fährst</strong> and <strong>er fährt</strong>. The vowel <strong>e</strong> often changes to <strong>i</strong> or <strong>ie</strong>, for example <strong>du sprichst</strong> / <strong>er spricht</strong> and <strong>du liest</strong> / <strong>er liest</strong>.
         </div>
 
+        <div style={noteBox}>
+          <strong>Small note:</strong> You do not need to learn every vowel change now. At A1, this is only an overview to help you notice that some verbs change their vowel in the <strong>du</strong> and <strong>er / sie / es</strong> forms.
+          <br />
+          <br />
+          You will learn more irregular verb patterns and vowel changes as you progress through the course.
+        </div>
+
         <TableScroll caption="Common vowel changes" minWidth={760}>
           <thead>
             <tr>
