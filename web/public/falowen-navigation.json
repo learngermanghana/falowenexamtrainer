@@ -1,12 +1,14 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-09-25",
+  "lastReviewed": "2026-09-28",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
     "aiHelp": "https://www.falowen.app/falowen-help.md",
     "structuredNavigation": "https://www.falowen.app/falowen-navigation.json",
-    "courseMap": "https://www.falowen.app/falowen-course-map.json"
+    "courseMap": "https://www.falowen.app/falowen-course-map.json",
+    "courseCatalogue": "https://www.falowen.app/courses/",
+    "courseCatalogueJson": "https://www.falowen.app/course-catalogue.json"
   },
   "assistantRules": [
     "Answer the learner's immediate navigation or support question first.",
@@ -65,7 +67,7 @@
     },
     {
       "id": "course-book",
-      "label": "Learn → Course Book",
+      "label": "Course Book",
       "route": "/campus/course",
       "purpose": "Start or continue course lessons",
       "requiresLogin": true,
@@ -78,7 +80,7 @@
     },
     {
       "id": "vocabulary",
-      "label": "Practice",
+      "label": "Vocab",
       "route": "/campus/vocab",
       "purpose": "Open vocabulary practice",
       "requiresLogin": true,
@@ -240,15 +242,15 @@
       "destinationId": "course-book",
       "steps": [
         "Open Falowen",
-        "Tap or click Learn",
-        "Continue from the Course Book"
+        "Tap or click Course Book",
+        "Continue from the current lesson"
       ]
     },
     {
       "intent": "find my homework or assignment",
       "destinationId": "course-book",
       "steps": [
-        "Open Learn → Course Book",
+        "Open Course Book",
         "Open the current lesson",
         "Open its workbook",
         "If Falowen Radio is required, complete it first"
@@ -326,7 +328,7 @@
     {
       "state": "paid-active",
       "meaning": "Paid learner access is active",
-      "nextAction": "Use Learn → Course Book to continue."
+      "nextAction": "Use Course Book to continue."
     },
     {
       "state": "radio-gated",
@@ -348,8 +350,8 @@
     "A1": "Mixes foundation lessons, self-practice and teacher-marked assignments. Do not describe every workbook as a submission.",
     "A2": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
     "B1": "Uses lesson material, workbooks and teacher-marked submissions. Falowen Radio may gate the workbook.",
-    "B2": "Self-learning track with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden.",
-    "C1": "Self-learning track with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden.",
+    "B2": "Self-learning track with AI support. Exam File is available; standard class Attendance and Class Members remain hidden.",
+    "C1": "Self-learning track with AI support. Exam File is available; standard class Attendance and Class Members remain hidden.",
     "C2": "Advanced self-learning and AI-supported practice. Do not invent a teacher-marked assignment requirement unless the current page explicitly provides one."
   },
   "deprecatedLabels": [
@@ -374,8 +376,8 @@
       "action": "Check Results. Marking or synchronization may still be pending."
     },
     {
-      "problem": "B2/C1 cannot see Attendance, Exam File or Class Members",
-      "action": "These class-based tabs are intentionally hidden for B2/C1 self-learning."
+      "problem": "B2/C1 cannot see Attendance or Class Members",
+      "action": "These class-based tabs are intentionally hidden for B2/C1 self-learning. Exam File is available."
     },
     {
       "problem": "Payment was made but access has not updated",
@@ -385,5 +387,17 @@
       "problem": "Trial ended",
       "action": "Complete tuition payment within the 30-day retention period to continue with the same stored progress and scores."
     }
-  ]
+  ],
+  "courseSchedules": {
+    "index": "https://www.falowen.app/courses/",
+    "levels": {
+      "A1": "https://www.falowen.app/courses/german-a1.html",
+      "A2": "https://www.falowen.app/courses/german-a2.html",
+      "B1": "https://www.falowen.app/courses/german-b1.html",
+      "B2": "https://www.falowen.app/courses/german-b2.html",
+      "C1": "https://www.falowen.app/courses/german-c1.html",
+      "C2": "https://www.falowen.app/courses/german-c2.html"
+    },
+    "guidance": "Use these pages for exact day-by-day lesson titles, chapters and grammar topics."
+  }
 }

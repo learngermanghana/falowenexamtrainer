@@ -11,8 +11,8 @@ This repository document mirrors the current public student navigation model. Th
 
 For a signed-in learner, use the visible Falowen labels that are actually in the app:
 
-- **Learn** → Course Book: https://www.falowen.app/campus/course
-- **Practice** → Vocabulary: https://www.falowen.app/campus/vocab
+- **Course Book**: https://www.falowen.app/campus/course
+- **Vocab** → Vocabulary: https://www.falowen.app/campus/vocab
 - **Attendance**: https://www.falowen.app/campus/attendance
 - **Results**: https://www.falowen.app/campus/results
 - **Account** → Student Data, Notifications, Billing and Upgrade
@@ -24,7 +24,7 @@ Do not describe **My Course**, **Falowen AI**, **Discussion**, **My Library**, *
 1. Register or log in.
 2. Activate access with the one-time 7-day trial or tuition payment when required.
 3. Complete onboarding.
-4. Open **Learn → Course Book**.
+4. Open **Course Book**.
 5. Open the current lesson.
 6. Complete **Falowen Radio** first when that lesson requires it.
 7. Work through lesson content and the workbook.
@@ -37,7 +37,7 @@ There is no separate general student submission page.
 
 - **A1:** combines foundation learning, self-practice and teacher-marked assignments.
 - **A2/B1:** use lesson content, workbook tasks and teacher-marked submissions; Falowen Radio may gate a workbook.
-- **B2/C1:** self-learning tracks with AI support. Standard class Attendance, Exam File and Class Members tabs are intentionally hidden.
+- **B2/C1:** self-learning tracks with AI support. Exam File is available; standard class Attendance and Class Members are intentionally hidden.
 - **C2:** advanced self-learning and AI-supported practice; do not invent tutor submission requirements unless the current page explicitly provides them.
 
 ## Access rules
@@ -51,3 +51,16 @@ There is no separate general student submission page.
 ## AI/support rule
 
 When helping a learner, identify what they want to do, give the exact current Falowen destination and route, mention only the relevant prerequisite, and never invent private account state or a non-existent interface label.
+
+
+## Public course schedules
+
+Search engines and AI assistants should use the public day-by-day catalogue for exact lesson titles:
+
+- https://www.falowen.app/courses/
+- https://www.falowen.app/courses/german-a1.html
+- https://www.falowen.app/courses/german-a2.html
+- https://www.falowen.app/courses/german-b1.html
+- https://www.falowen.app/courses/german-b2.html
+- https://www.falowen.app/courses/german-c1.html
+- https://www.falowen.app/courses/german-c2.html

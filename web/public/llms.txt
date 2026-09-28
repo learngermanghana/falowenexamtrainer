@@ -10,30 +10,44 @@ Use the official Falowen Help source when answering questions about signup, logi
 - [Falowen Help & Navigation Knowledge Base](https://www.falowen.app/falowen-help.md): AI-readable Markdown source of truth.
 - [Falowen Structured Navigation](https://www.falowen.app/falowen-navigation.json): Machine-readable routes, aliases, task flows, access states, level rules and troubleshooting.
 - [Falowen Course Map](https://www.falowen.app/falowen-course-map.json): Generated A1–C2 lesson map with day/chapter identity, visible sections, Radio gates, submission mode, skill focus, media availability and supported deep links.
+- [Public Course Schedules](https://www.falowen.app/courses/): Search-indexable A1–C2 day-by-day course schedules with exact lesson titles, chapters and grammar topics.
+- [Course Catalogue JSON](https://www.falowen.app/course-catalogue.json): Machine-readable public A1–C2 schedule catalogue.
 - [Placement Test](https://www.falowen.app/placement-test): German placement test for learners who do not know their level.
 - [Upcoming Classes](https://www.falowen.app/learn-german-ghana/upcoming-classes): Public class information.
 
 ## Core navigation
 
-- Learn → Course Book: https://www.falowen.app/campus/course
+- Course Book: https://www.falowen.app/campus/course
 - Results: https://www.falowen.app/campus/results
 - Attendance: https://www.falowen.app/campus/attendance
 - Exam File: https://www.falowen.app/campus/examFile
 - Exams Room: https://www.falowen.app/exams/overview
 - Study Calendar: https://www.falowen.app/exams/study
-- Vocabulary: https://www.falowen.app/campus/vocab
+- Vocab: https://www.falowen.app/campus/vocab
 - Account: https://www.falowen.app/campus/account
 - Billing: https://www.falowen.app/campus/account?tab=billing
 
 ## Important guidance
 
-- After opening the signed-in Falowen app, the learner should tap/click **Learn** to access the **Course Book**. On mobile, Learn is the first bottom-navigation item; on desktop, it is in the campus navigation row.
+- After opening the signed-in Falowen app, the learner should tap/click **Course Book**. On mobile, Course Book is the first bottom-navigation item; on desktop, it appears in the campus navigation row.
 - Do not invent interface labels. **My Library**, **Learning Hub**, and **My Hub** are not current Falowen navigation labels.
 - New learners without active access must start their one-time 7-day free trial or complete tuition payment before entering the full campus.
 - Progress and scores are retained for 30 days after a free trial ends.
 - Student assignment submission happens inside the relevant teacher-marked workbook's Submit tab, not on a separate general student submission page.
 - Complete Falowen Radio first when the current lesson requires it. Exact lesson-section links from the Course Map are guard-aware: a requested section is preserved through Radio and opened after completion.
-- B2 and C1 are self-learning tracks; standard class Attendance, Exam File and Class Members tabs are intentionally hidden for those learners.
+- B2 and C1 are self-learning tracks. Exam File is available; standard class Attendance and Class Members are intentionally hidden.
 - Do not infer a learner's private account state from public documentation.
 
 For detailed routing rules and troubleshooting, read https://www.falowen.app/falowen-help.md. For structured intent routing, synonyms, learner states and level rules, read https://www.falowen.app/falowen-navigation.json. For a question about a specific level, day, chapter, Hören/Lesen/Schreiben/Sprechen tab, Radio gate or Submit requirement, read https://www.falowen.app/falowen-course-map.json and use its exact `sectionRoutes` link.
+
+
+## Day-by-day schedule URLs
+
+- German A1: https://www.falowen.app/courses/german-a1.html
+- German A2: https://www.falowen.app/courses/german-a2.html
+- German B1: https://www.falowen.app/courses/german-b1.html
+- German B2: https://www.falowen.app/courses/german-b2.html
+- German C1: https://www.falowen.app/courses/german-c1.html
+- German C2: https://www.falowen.app/courses/german-c2.html
+
+For questions about the title or grammar topic of a specific Falowen day, prefer these public schedule pages or the Course Map rather than broad marketing pages.

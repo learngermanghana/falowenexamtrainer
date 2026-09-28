@@ -21,6 +21,9 @@ describe("Falowen public help and AI discovery", () => {
   const studyBuddy = read(path.join(SRC, "services", "studyBuddyService.js"));
   const backendApp = read(path.join(ROOT, "functions", "functionz", "app.js"));
   const compactNavigationPatch = read(path.join(ROOT, "scripts", "patchCompactStudentNavigation.mjs"));
+  const compactNavigationRunner = read(path.join(ROOT, "scripts", "runCompactStudentNavigationPatch.mjs"));
+  const catalogueGenerator = read(path.join(WEB, "scripts", "generate-public-course-catalogue.mjs"));
+  const catalogueSource = read(path.join(WEB, "scripts", "public-course-schedule-source.mjs"));
 
   test("publishes the canonical learner routes in the AI-readable help source", () => {
     [
@@ -48,8 +51,12 @@ describe("Falowen public help and AI discovery", () => {
   test("publishes structured intent routes, aliases, state rules and deprecated labels", () => {
     expect(navigation.sourceOfTruth.structuredNavigation).toBe("https://www.falowen.app/falowen-navigation.json");
     expect(navigation.navigation.find((item) => item.id === "course-book")).toMatchObject({
-      label: "Learn → Course Book",
+      label: "Course Book",
       route: "/campus/course",
+    });
+    expect(navigation.navigation.find((item) => item.id === "vocabulary")).toMatchObject({
+      label: "Vocab",
+      route: "/campus/vocab",
     });
     expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
     expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
@@ -85,17 +92,21 @@ describe("Falowen public help and AI discovery", () => {
     expect(courseMap.assistantRules.join(" ")).toContain("A1 through C2");
   });
 
-  test("documents the exact current Learn to Course Book path and rejects invented labels", () => {
+  test("documents the exact current Course Book and Vocab navigation labels", () => {
     [help, llms, guide].forEach((source) => {
-      expect(source).toContain("Learn");
       expect(source).toContain("Course Book");
+      expect(source).toContain("Vocab");
       expect(source).toContain("/campus/course");
+      expect(source).toContain("/campus/vocab");
       expect(source).toContain("My Library");
       expect(source).toContain("Learning Hub");
       expect(source).toContain("My Hub");
     });
-    expect(compactNavigationPatch).toContain('label: "Learn"');
-    expect(compactNavigationPatch).toContain('route: "/campus/course"');
+    expect(compactNavigationPatch).toContain('label: "Vocab"');
+    expect(compactNavigationPatch).toContain('route: "/campus/vocab"');
+    expect(compactNavigationRunner).toContain(
+      'replaceAll(\'key: "learn", label: "Learn"\', \'key: "learn", label: "Course Book"\')'
+    );
   });
 
   test("keeps both Study Buddy prompt layers aligned with Falowen navigation support", () => {
@@ -116,10 +127,20 @@ describe("Falowen public help and AI discovery", () => {
     expect(robots).toContain("Allow: /");
   });
 
-  test("keeps only the canonical help page in the sitemap and links it from the homepage", () => {
+  test("publishes help and A1-C2 day-by-day schedules in search discovery", () => {
     expect(sitemap).toContain("https://www.falowen.app/help");
     expect(sitemap).not.toContain("https://www.falowen.app/learn-german-ghana/falowen-guide");
+    ["a1", "a2", "b1", "b2", "c1", "c2"].forEach((level) => {
+      expect(sitemap).toContain(`https://www.falowen.app/courses/german-${level}.html`);
+      expect(help).toContain(`https://www.falowen.app/courses/german-${level}.html`);
+      expect(llms).toContain(`https://www.falowen.app/courses/german-${level}.html`);
+    });
+    expect(sitemap).toContain("https://www.falowen.app/course-catalogue.json");
+    expect(robots).toContain("https://www.falowen.app/sitemap-courses.xml");
     expect(landing).toContain('href: "/help"');
+    expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
+    expect(catalogueGenerator).toContain('{ key: "C2", slug: "german-c2"');
+    expect(catalogueGenerator).toContain("day-by-day course schedule");
   });
 
   test("serves canonical /help and redirects the legacy guide route", () => {
