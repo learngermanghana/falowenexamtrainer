@@ -150,7 +150,14 @@ const ClassMembersTab = () => {
             <div key={member.id} style={{ ...styles.card, margin: 0 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <div style={{ display: "grid", gap: 4 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{member.name}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>{member.name}</div>
+                    {member.id === studentProfile?.id ? (
+                      <span style={styles.badge} data-testid="current-class-member-badge">
+                        You
+                      </span>
+                    ) : null}
+                  </div>
                   <div style={{ fontSize: 13, color: "#4b5563" }}>{member.email}</div>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
