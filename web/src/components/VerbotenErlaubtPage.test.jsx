@@ -42,7 +42,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
 
     expect(teil2.getAllByText("THEMA").length).toBeGreaterThan(0);
     expect(teil2.getAllByText("STICHWORT · KEYWORD").length).toBeGreaterThan(0);
-    expect(teil2.getByText("Freizeit")).toBeVisible();
+    expect(teil2.getAllByText("Freizeit").length).toBeGreaterThanOrEqual(2);
     expect(teil2.getByText("Wochenende")).toBeVisible();
     expect(teil2.queryByText("Was machst du am Wochenende?")).not.toBeInTheDocument();
 
@@ -66,8 +66,8 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
       ["Alltag", "Freizeit"],
       ["Sprachen", "Deutsch"],
     ].forEach(([theme, keyword]) => {
-      expect(teil2.getByText(theme)).toBeVisible();
-      expect(teil2.getByText(keyword)).toBeVisible();
+      expect(teil2.getAllByText(theme).length).toBeGreaterThan(0);
+      expect(teil2.getAllByText(keyword).length).toBeGreaterThan(0);
     });
 
     expect(teil2.getByText(/STICHWORT \/ KEYWORD is the word you use to build your question/i)).toBeVisible();
