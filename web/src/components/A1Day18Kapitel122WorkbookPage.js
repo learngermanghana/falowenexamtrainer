@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import { styles } from "../styles";
 
 const LEVEL = "A1";
@@ -133,20 +134,20 @@ const A1Day18Kapitel122WorkbookPage = () => {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen</h2>
-        <article style={questionCard}>
-          <strong>Anzeige 1: Reisen mit der Bahn</strong>
-          <h3 style={{ margin: 0 }}>Schnell und bequem mit der Bahn reisen</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Der Zug von Hamburg nach Berlin fährt täglich um 9:00 Uhr ab und kommt um 12:00 Uhr in Berlin an. Der Rückzug von Berlin nach Hamburg fährt um 18:00 Uhr ab und kommt um 21:00 Uhr in Hamburg an.
-          </p>
-        </article>
-        <article style={questionCard}>
-          <strong>Anzeige 2: Büroartikel für den Arbeitsplatz</strong>
-          <h3 style={{ margin: 0 }}>Alles für Ihr Büro</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In unserem Bürogeschäft finden Sie Schreibtische, Stühle, Computer, Drucker und vieles mehr. Wir haben alles, was Sie für eine produktive Arbeitsumgebung benötigen.
-          </p>
-        </article>
+        <A1ReadingSourceGrid>
+          <A1ReadingSourceCard label="Anzeige 1" title="Reisen mit der Bahn">
+            <h3 style={{ margin: 0 }}>Schnell und bequem mit der Bahn reisen</h3>
+            <p style={{ margin: 0 }}>
+              Der Zug von Hamburg nach Berlin fährt täglich um 9:00 Uhr ab und kommt um 12:00 Uhr in Berlin an. Der Rückzug von Berlin nach Hamburg fährt um 18:00 Uhr ab und kommt um 21:00 Uhr in Hamburg an.
+            </p>
+          </A1ReadingSourceCard>
+          <A1ReadingSourceCard label="Anzeige 2" title="Büroartikel für den Arbeitsplatz">
+            <h3 style={{ margin: 0 }}>Alles für Ihr Büro</h3>
+            <p style={{ margin: 0 }}>
+              In unserem Bürogeschäft finden Sie Schreibtische, Stühle, Computer, Drucker und vieles mehr. Wir haben alles, was Sie für eine produktive Arbeitsumgebung benötigen.
+            </p>
+          </A1ReadingSourceCard>
+        </A1ReadingSourceGrid>
         <QuestionList questions={trainQuestions} />
       </section>
 
