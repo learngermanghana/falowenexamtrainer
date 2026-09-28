@@ -4,6 +4,7 @@ import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
+import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
   <section data-workbook-section={sectionKey}>{children}</section>
@@ -221,6 +222,7 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
 export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
   const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
+  const activeTabDefinition = tabs[activeIndex] || null;
   const progressPercent = tabs.length ? Math.round(((activeIndex + 1) / tabs.length) * 100) : 0;
 
   return (
@@ -262,7 +264,12 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 13, fontWeight: 800 }}>
           <span>Section {activeIndex + 1} of {tabs.length}</span>
-          <span>{progressPercent}%</span>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <span>{progressPercent}%</span>
+            {activeTabDefinition?.key !== "submit" ? (
+              <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
+            ) : null}
+          </div>
         </div>
         <div
           role="progressbar"

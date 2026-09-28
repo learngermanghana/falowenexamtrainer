@@ -14,7 +14,7 @@ const A1_SPECIAL_WORKBOOK_PATHS = new Set([
   "/campus/course/a1-12-2-dative-articles-mit-bei-zu",
   "/campus/course/letter-writing-intro-german-a1-day-12-3",
 ]);
-const COURSE_LESSON_PATTERN = /^\/campus\/course\/lesson\/(A1|A2|B1|B2|C1)\/(\d+)\/?$/i;
+const COURSE_LESSON_PATTERN = /^\/campus\/course\/lesson\/(A1|A2|B1|B2|C1|C2)\/(\d+)\/?$/i;
 const A2_B1_LEVELS = new Set(["A2", "B1"]);
 const MAX_A2_B1_DAY = 28;
 
@@ -158,9 +158,9 @@ export const getPrintableBookKind = (pathname = "", search = "") => {
   if (view === "grammar") return "grammar";
   if (view === "workbook") return level === "B1" ? "workbook" : "combined";
 
-  // Canonical B2 and C1 self-learning links open the complete lesson without
+  // Canonical B2, C1 and C2 self-learning links open the complete lesson without
   // a view query parameter. Those pages contain both grammar and workbook work.
-  if ((level === "B2" || level === "C1") && !view) return "combined";
+  if (["B2", "C1", "C2"].includes(level) && !view) return "combined";
 
   return null;
 };

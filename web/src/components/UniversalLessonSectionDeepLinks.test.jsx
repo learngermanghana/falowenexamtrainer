@@ -48,6 +48,26 @@ const StatefulAdvancedNav = ({ day = 16 }) => {
 };
 
 describe("universal lesson section deep links", () => {
+  test("keeps a section-specific PDF action beside the shared navigation", () => {
+    const printSpy = jest.spyOn(window, "print").mockImplementation(() => {});
+
+    render(
+      <MemoryRouter initialEntries={["/campus/course/a2-day-6-moebel-und-raeume-workbook"]}>
+        <StatefulWorkbookNav ariaLabel="A2 Day 6 workbook sections" tabs={STANDARD_WORKBOOK_TABS} />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Save Teil 1 as PDF" }));
+    expect(printSpy).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
+    expect(screen.getByRole("button", { name: "Save Teil 2 as PDF" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Submit" }));
+    expect(screen.queryByRole("button", { name: /Save .* as PDF/ })).not.toBeInTheDocument();
+    printSpy.mockRestore();
+  });
+
   test("normalizes common learner wording into canonical section keys", () => {
     expect(normalizeA2B1SectionView("Hören")).toBe("hoeren");
     expect(normalizeA2B1SectionView("writing")).toBe("schreiben");

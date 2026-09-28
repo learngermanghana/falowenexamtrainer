@@ -5,6 +5,7 @@ import { normalizeA2B1SectionView, normalizeAdvancedSectionView, replaceLessonVi
 import { getC2DayTabs } from "../data/c2SkillCycle";
 import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
+import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
 import {
   filterA2B1WorkbookTabsByProfile,
   getA2B1WorkbookSectionProfile,
@@ -181,6 +182,7 @@ export const WorkbookTabNav = ({
 
   const activeIndex = Math.max(0, effectiveTabs.findIndex((tab) => tab.key === activeTab));
   const tabNames = effectiveTabs.map((tab) => tab.label).join(", ");
+  const activeTabDefinition = effectiveTabs[activeIndex] || null;
   const sectionProgress = effectiveTabs.length
     ? Math.round(((activeIndex + 1) / effectiveTabs.length) * 100)
     : 0;
@@ -234,7 +236,12 @@ export const WorkbookTabNav = ({
             <p style={{ margin: 0, color: "#1e3a8a", fontWeight: 800, fontSize: 13 }}>
               Section {activeIndex + 1} of {effectiveTabs.length} · Select {tabNames}.
             </p>
-            <span style={{ color: "#475569", fontWeight: 800, fontSize: 12 }}>{sectionProgress}% through sections</span>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <span style={{ color: "#475569", fontWeight: 800, fontSize: 12 }}>{sectionProgress}% through sections</span>
+              {activeTabDefinition?.key !== "submit" ? (
+                <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
+              ) : null}
+            </div>
           </div>
           <div
             role="progressbar"
