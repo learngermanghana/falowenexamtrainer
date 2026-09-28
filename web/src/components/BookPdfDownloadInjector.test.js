@@ -42,6 +42,7 @@ describe("BookPdfDownloadInjector helpers", () => {
     ["B1", "workbook", false],
     ["B2", "combined", true],
     ["C1", "combined", true],
+    ["C2", "combined", true],
   ])(
     "supports the printable %s lesson workbook route",
     (level, workbookKind, printsCompleteLesson) => {
