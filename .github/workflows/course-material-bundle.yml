@@ -39,7 +39,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        level: [A1, A2, B1, B2, C1]
+        include:
+          - level: A1
+            first_day: 0
+            last_day: 24
+            lesson_count: 25
+          - level: A2
+            first_day: 0
+            last_day: 28
+            lesson_count: 29
+          - level: B1
+            first_day: 0
+            last_day: 28
+            lesson_count: 29
+          - level: B2
+            first_day: 0
+            last_day: 28
+            lesson_count: 29
+          - level: C1
+            first_day: 0
+            last_day: 28
+            lesson_count: 29
 
     steps:
       - name: Check out repository
@@ -53,6 +73,9 @@ jobs:
       - name: Build and validate manifest
         env:
           LEVEL: ${{ matrix.level }}
+          EXPECTED_FIRST_DAY: ${{ matrix.first_day }}
+          EXPECTED_LAST_DAY: ${{ matrix.last_day }}
+          EXPECTED_LESSON_COUNT: ${{ matrix.lesson_count }}
         run: |
           node scripts/course-material-bundles/buildLevelManifest.mjs "$LEVEL"
           node --input-type=module <<'NODE'
@@ -61,7 +84,18 @@ jobs:
           const level = process.env.LEVEL;
           const file = `artifacts/course-material-bundles/${level}/Falowen-${level}-Course-Materials-manifest.json`;
           const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
+          const expectedFirstDay = Number(process.env.EXPECTED_FIRST_DAY);
+          const expectedLastDay = Number(process.env.EXPECTED_LAST_DAY);
+          const expectedLessonCount = Number(process.env.EXPECTED_LESSON_COUNT);
           if (manifest.schemaVersion !== 3) throw new Error(`Expected schemaVersion 3, received ${manifest.schemaVersion}.`);
+          if (manifest.firstDay !== expectedFirstDay || manifest.lastDay !== expectedLastDay) {
+            throw new Error(
+              `Expected ${level} curriculum boundaries ${expectedFirstDay}-${expectedLastDay}, received ${manifest.firstDay}-${manifest.lastDay}.`,
+            );
+          }
+          if (manifest.lessonCount !== expectedLessonCount) {
+            throw new Error(`Expected ${expectedLessonCount} ${level} lessons, received ${manifest.lessonCount}.`);
+          }
           if (!manifest.curriculumComplete) throw new Error(`Missing curriculum days: ${manifest.missingDays.join(", ")}.`);
           if (!manifest.routesClassified) throw new Error(`${manifest.unresolvedLessonCount} printable routes need classification.`);
           if (!manifest.readyForPdfGeneration) throw new Error(`${level} is not ready for PDF generation.`);
