@@ -21,7 +21,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 5, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 6, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -142,23 +142,32 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
 const injectPrintMode = async (page) => {
   await page.emulateMedia({ media: "print" });
-  await page.addStyleTag({ content: `
+  return page.addStyleTag({ content: `
     @page { size: A4; margin: 12mm 10mm 15mm; }
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    nav, [role="navigation"], .book-print-stamp,
-    .book-pdf-download-action, iframe,
-    [class*="study-buddy" i], [class*="floating" i],
-    [aria-label*="Study Buddy" i], [aria-label*="download" i] { display: none !important; }
+    nav, [role="navigation"], [role="tablist"], .book-print-stamp,
+    .book-pdf-download-action, iframe, video, button, input[type="checkbox"],
+    [class*="study-buddy" i], [class*="floating" i], [class*="chat" i],
+    [class*="video-card" i], [class*="videoCard"], [class*="thumbnail" i],
+    [data-pdf-exclude], [aria-label*="Study Buddy" i], [aria-label*="download" i],
+    [aria-label*="video" i] { display: none !important; }
+    section:has(> iframe), section:has(> video), article:has(> iframe), article:has(> video) { display: none !important; }
     [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
     section, article, table, pre, blockquote { break-inside: avoid; }
+    img { max-width: 100% !important; }
+    a { color: inherit !important; text-decoration: none !important; }
   ` });
 };
 
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
-  await injectPrintMode(page);
+  const printStyle = await injectPrintMode(page);
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
-  await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+  try {
+    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+  } finally {
+    await printStyle.evaluate((style) => style.remove()).catch(() => {});
+  }
   return { tab: suffix, file };
 };
 
@@ -198,8 +207,15 @@ const renderGuidedLesson = async (page, lesson) => {
 
 const clickWorkbookTab = async (page, names) => {
   for (const name of names) {
-    const tab = page.getByRole("tab", { name: new RegExp("^" + name + "$", "i") }).first();
-    if (await tab.count()) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const exactName = new RegExp(`^\\s*${escaped}(?:\\s*[·:–—-].*)?\\s*$`, "i");
+    const candidates = [
+      page.getByRole("tab", { name: exactName }).first(),
+      page.getByRole("button", { name: exactName }).first(),
+      page.locator('[role="tab"], button').filter({ hasText: exactName }).first(),
+    ];
+    for (const tab of candidates) {
+      if (!(await tab.count()) || !(await tab.isVisible().catch(() => false))) continue;
       await tab.click({ timeout: 10000 });
       await page.waitForTimeout(350);
       return true;
@@ -222,8 +238,15 @@ const renderB1Lesson = async (page, lesson) => {
   for (const tabSpec of tabSpecs) {
     const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
-      if (tabSpec.key === "teil-4") continue;
-      throw new Error(`B1 Day ${lesson.day} is missing printable workbook tab: ${tabSpec.names[0]}.`);
+      // Grammar is the default view on standard workbook pages. Some older
+      // deployments render it without a semantic tab, so print that view and
+      // gracefully skip only genuinely unavailable sections.
+      if (tabSpec.key === "grammar" && !rendered.length) {
+        rendered.push(await saveCurrentPagePdf(page, lesson, tabSpec.key));
+        continue;
+      }
+      console.warn(`${level} Day ${lesson.day}: skipping unavailable printable section ${tabSpec.names[0]}.`);
+      continue;
     }
     rendered.push(await saveCurrentPagePdf(page, lesson, tabSpec.key));
   }
@@ -233,8 +256,8 @@ const renderB1Lesson = async (page, lesson) => {
 
 const renderLesson = async (page, lesson) => {
   if (level === "A1") return renderA1Lesson(page, lesson);
-  if (level === "B1") return renderB1Lesson(page, lesson);
-  if (level === "B2" || level === "C1") return renderGuidedLesson(page, lesson);
+  if (level === "A2" || level === "B1") return renderB1Lesson(page, lesson);
+  if (level === "B2" || level === "C1" || level === "C2") return renderGuidedLesson(page, lesson);
   await ensureAuthenticatedLesson(page, lesson);
   return [await saveCurrentPagePdf(page, lesson, "lesson")];
 };
