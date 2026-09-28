@@ -24,6 +24,14 @@ export const hasPlayableRadioResource = (resource) =>
       String(resource?.url || "").trim(),
   );
 
+export const isFalowenRadioResource = (resource) => {
+  if (!hasPlayableRadioResource(resource)) return false;
+  const key = String(resource?.key || "").trim().toLowerCase();
+  const role = String(resource?.resourceRole || resource?.role || "").trim().toLowerCase();
+  const title = String(resource?.title || "").trim().toLowerCase();
+  return key.includes("radio") || role === "falowenradio" || title.includes("falowen radio");
+};
+
 export const resolveRadioFirstWorkbookResource = (level, day) => {
   const resource =
     getB2C1RadioResource(level, day) ||
@@ -113,7 +121,8 @@ export const shouldShowRadioFirst = (level, day) =>
   Boolean(resolveRadioFirstWorkbookResource(level, day));
 
 const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
-  const radio = resource || resolveRadioFirstWorkbookResource(level, day);
+  const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
+  const radio = explicitRadio || resolveRadioFirstWorkbookResource(level, day);
   const location = useLocation();
   const navigate = useNavigate();
   const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
