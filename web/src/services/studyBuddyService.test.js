@@ -1,4 +1,5 @@
 import { callAI } from "./aiClient";
+import { fetchLearnerSupportState } from "./learnerSupportService";
 import {
   clearStudyBuddyConversationHistory,
   readStudyBuddyConversationHistory,
@@ -7,6 +8,10 @@ import {
 
 jest.mock("./aiClient", () => ({
   callAI: jest.fn(),
+}));
+
+jest.mock("./learnerSupportService", () => ({
+  fetchLearnerSupportState: jest.fn(),
 }));
 
 jest.mock("../firebase", () => ({
@@ -22,6 +27,7 @@ describe("Study Buddy conversation memory", () => {
     window.localStorage.clear();
     window.history.replaceState({}, "", "/");
     callAI.mockReset();
+    fetchLearnerSupportState.mockReset();
   });
 
   it("includes the previous Study Buddy exchange when the student asks a follow-up", async () => {
@@ -101,6 +107,39 @@ describe("Study Buddy conversation memory", () => {
     expect(prompt).toContain("My Library");
     expect(prompt).toContain("Learning Hub");
     expect(prompt).toContain("My Hub");
+  });
+
+  it("grounds support questions in the protected learner state", async () => {
+    fetchLearnerSupportState.mockResolvedValue({
+      access: { state: "trial-ended", reason: "trial_ended" },
+      course: { completionPercent: 18 },
+      review: { status: "submitted", score: null },
+      nextAction: {
+        type: "complete-payment",
+        label: "Complete payment to continue after your trial",
+        url: "/campus/account?tab=billing",
+      },
+    });
+    callAI.mockResolvedValue({ reply: "Your trial has ended. Complete payment to continue." });
+
+    await requestStudyBuddyReply({
+      message: "Why can't I continue?",
+      level: "A2",
+      idToken: "firebase-token",
+    });
+
+    expect(fetchLearnerSupportState).toHaveBeenCalledWith(expect.objectContaining({
+      idToken: "firebase-token",
+    }));
+    const request = callAI.mock.calls[0][0];
+    expect(request.payload.lessonContext.learnerSupportState).toMatchObject({
+      access: { state: "trial-ended" },
+      nextAction: { url: "/campus/account?tab=billing" },
+    });
+    expect(request.payload.message).toContain("Falowen access state: trial-ended");
+    expect(request.payload.message).toContain("Authoritative next action: Complete payment to continue after your trial");
+    expect(request.payload.message).toContain("Authoritative next URL: /campus/account?tab=billing");
+    expect(request.payload.message).toContain("Do not invent a different reason for blocked access");
   });
 
   it("stores successful exchanges and keeps levels separated", async () => {
