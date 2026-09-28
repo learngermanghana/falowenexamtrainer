@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import { styles } from "../styles";
 
 const LEVEL = "A1";
@@ -116,15 +117,16 @@ const A1Day18Kapitel121WorkbookPage = () => (
 
     <section style={card}>
       <h2 style={{ margin: 0 }}>Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen</h2>
-      {adverts.map((advert, index) => (
-        <article key={advert.title} style={questionCard}>
-          <strong>Anzeige {index + 1}: {advert.title}</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>{advert.text}</p>
-          <strong>{index + 1}. {advert.question}</strong>
-          <span>a) Richtig</span>
-          <span>b) Falsch</span>
-        </article>
-      ))}
+      <A1ReadingSourceGrid>
+        {adverts.map((advert, index) => (
+          <A1ReadingSourceCard key={advert.title} label={`Anzeige ${index + 1}`} title={advert.title}>
+            <p style={{ margin: 0 }}>{advert.text}</p>
+            <strong>{index + 1}. {advert.question}</strong>
+            <span>a) Richtig</span>
+            <span>b) Falsch</span>
+          </A1ReadingSourceCard>
+        ))}
+      </A1ReadingSourceGrid>
     </section>
 
     <section style={card}>
