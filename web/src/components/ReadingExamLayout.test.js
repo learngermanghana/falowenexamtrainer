@@ -41,7 +41,7 @@ describe("shared A2-C2 Lesen exam layout", () => {
     const source = read("B1StandardWorkbookPage.js");
     expect(source).toContain('level="B1"');
     expect(source).toContain("<ReadingExamDocument");
-    expect(source).toContain("<ReadingQuestionGrid>");
+    expect(source).toContain("examGrid ? ReadingQuestionGrid : React.Fragment");
     expect(source).toContain("reading.additionalTexts?.length");
   });
 
