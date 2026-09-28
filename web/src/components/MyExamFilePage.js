@@ -212,9 +212,9 @@ const MyExamFilePage = () => {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam hub</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Registration, sample exam and structure</h2>
+            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Registration and exam structure</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Keep your Goethe account, official registration page and official sample exam in one place.
+              Keep your Goethe account, official registration page and a clear overview of the exam structure in one place.
             </p>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -256,22 +256,6 @@ const MyExamFilePage = () => {
             )}
           </div>
 
-          <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 12, background: "#f0fdf4", display: "grid", gap: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 900, color: "#166534" }}>OFFICIAL SAMPLE</div>
-            <div style={{ fontWeight: 900, color: "#111827" }}>
-              Goethe {examGuide?.level || summaryLevel?.level || detectedLevel || ""} sample exam
-            </div>
-            <div style={{ fontSize: 13, lineHeight: 1.45, color: "#4b5563" }}>
-              Practise with Goethe's official exam material and become familiar with the real task types before exam day.
-            </div>
-            {examGuide?.practiceUrl ? (
-              <a href={examGuide.practiceUrl} target="_blank" rel="noreferrer" style={{ ...primaryLinkStyle, background: "#15803d" }}>
-                {examGuide.practiceLabel || "Open official Goethe sample exam"} →
-              </a>
-            ) : (
-              <div style={styles.errorBox}>Official practice material has not been added for this level yet.</div>
-            )}
-          </div>
         </div>
       </section>
 
