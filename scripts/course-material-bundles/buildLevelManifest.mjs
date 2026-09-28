@@ -41,6 +41,21 @@ const classifyPrintableLesson = (level, day) => {
     };
   }
 
+  if (level === "B1") {
+    if (day === 0) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Orientation and platform tutorial",
+      };
+    }
+
+    return {
+      printKind: "workbook",
+      status: "ready-for-render-audit",
+    };
+  }
+
   if (["B2", "C1"].includes(level)) {
     return {
       printKind: "combined",
@@ -81,7 +96,15 @@ const visit = (value, inheritedLevel = "") => {
       chapter: String(value.chapter || value.chapterNumber || "").trim(),
       title,
       sourceUrl: String(
-        value.url || value.route || value.path || value.workbookUrl || value.lessonUrl || "",
+        value.workbook_link
+          || value.workbookLink
+          || value.workbookRoute
+          || value.workbookUrl
+          || value.url
+          || value.route
+          || value.path
+          || value.lessonUrl
+          || "",
       ).trim(),
     });
   }
@@ -102,9 +125,11 @@ for (const lesson of lessonCandidates) {
 const lessons = [...byDay.values()]
   .sort((a, b) => a.day - b.day)
   .map((lesson) => {
-    const route = lesson.sourceUrl.startsWith("/")
-      ? lesson.sourceUrl
-      : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
+    const route = requestedLevel === "B1" && lesson.day > 0
+      ? `/campus/course/lesson/B1/${lesson.day}?view=workbook`
+      : lesson.sourceUrl.startsWith("/")
+        ? lesson.sourceUrl
+        : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
     const classification = classifyPrintableLesson(requestedLevel, lesson.day);
 
     return {
