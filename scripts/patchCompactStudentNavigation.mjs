@@ -137,7 +137,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
 
   const navigationHelpers = `const getCampusNavigationItems = (allowedSections = {}) => [
   { key: "learn", label: "Learn", route: "/campus/course", enabled: true },
-  { key: "practice", label: "Practice", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) },
+  { key: "practice", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) },
   { key: "attendance", label: "Attendance", route: "/campus/attendance", enabled: Boolean(allowedSections.attendance) },
   { key: "results", label: "Results", route: "/campus/results", enabled: Boolean(allowedSections.results) },
   { key: "examFile", label: "Exam File", route: "/campus/examFile", enabled: Boolean(allowedSections.examFile) },
@@ -178,7 +178,7 @@ const CampusPrimaryNavigation = ({ allowedSections }) => {
 
 const MOBILE_NAV_ITEMS = [
   { key: "learn", label: "Learn", icon: "▤", route: "/campus/course", permission: "course" },
-  { key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab", permission: "vocab" },
+  { key: "practice", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" },
   { key: "attendance", label: "Attendance", icon: "✓", route: "/campus/attendance", permission: "attendance" },
   { key: "results", label: "Results", icon: "◎", route: "/campus/results", permission: "results" },
 ];
