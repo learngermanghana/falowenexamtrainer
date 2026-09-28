@@ -18,6 +18,7 @@ import{useAuth}from"../context/AuthContext";
 import{markLetterWithAI}from"../services/coachService";
 import{fetchC2AudioPlaybackUrl}from"../services/c2AudioService";
 import WritingFeedbackCard from"./WritingFeedbackCard";
+import ReadingExamFrame,{ReadingExamDocument,ReadingQuestionGrid}from"./ReadingExamLayout";
 
 const card={...styles.card,display:"grid",gap:14,border:"1px solid #e2e8f0",borderRadius:18,boxShadow:"0 10px 26px rgba(15,23,42,.06)"};
 const sub={border:"1px solid #dbeafe",borderRadius:14,padding:13,background:"#f8fbff",display:"grid",gap:6};
@@ -204,8 +205,8 @@ function ReadingPractice({day,completed,onCompleteChange}){
  if(!practice)return <Section title="Lesen"><p style={{margin:0}}>Für diesen Tag ist keine Leseaufgabe vorgesehen.</p></Section>;
  return <Section title={`Lesen · ${practice.title}`}>
   <div style={{...sub,background:"#eff6ff"}}><strong>So arbeiten Sie</strong><span>Lesen Sie den Text aufmerksam. Klicken Sie bei jeder Frage auf eine Antwort. Sie sehen sofort, ob sie richtig ist und warum. Eine falsche erste Antwort blockiert den Abschluss nicht.</span></div>
-  <article style={{display:"grid",gap:12,lineHeight:1.8,fontSize:"1.02rem"}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</article>
-  <div style={{display:"grid",gap:14}}>{questions.map((item,index)=>{
+  <ReadingExamFrame level="C2" title={practice.title} format="Lesetext" variant="document"><ReadingExamDocument title={practice.title}><div style={{display:"grid",gap:12}}>{practice.text.map((paragraph,index)=><p key={index} style={{margin:0}}>{paragraph}</p>)}</div></ReadingExamDocument></ReadingExamFrame>
+  <ReadingQuestionGrid>{questions.map((item,index)=>{
    const selected=answers[index];
    const hasAnswer=Number.isInteger(selected);
    const correct=selected===item.answerIndex;
