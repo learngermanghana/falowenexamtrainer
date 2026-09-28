@@ -1,19 +1,20 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import fs from "fs";
 import path from "path";
 import CourseCompletionConclusion from "./CourseCompletionConclusion";
-import CourseCompletionHandoff from "./CourseCompletionHandoff";
-import { getCourseCompletionJourney } from "../data/courseCompletionJourney";
 
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
-describe("Goethe-first course completion handoff", () => {
+describe("course completion exam actions", () => {
   test.each([
-    ["A1", "/campus/course/a1-day-25-goethe-exam-orientation"],
-    ["A2", "/campus/course/a2-day-29-goethe-exam-orientation"],
-    ["B1", "/campus/course/b1-day-29-goethe-exam-orientation"],
-  ])("%s completed course points first to official Goethe practice", (level, route) => {
+    ["A1", "https://bfu.goethe.de/a1_sd1/hoeren.php"],
+    ["A2", "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html"],
+    ["B1", "https://bfu.goethe.de/b1_mod/lesen.php"],
+    ["B2", "https://www.goethe.de/en/spr/prf/ueb/pb2.html"],
+    ["C1", "https://www.goethe.de/en/spr/prf/ueb/pc1.html"],
+    ["C2", "https://www.goethe.de/en/spr/prf/ueb/pc2.html"],
+  ])("%s shows the official sample and Falowen Exams Room", (level, sampleUrl) => {
     render(
       <CourseCompletionConclusion
         level={level}
@@ -25,35 +26,11 @@ describe("Goethe-first course completion handoff", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Continue to Official Goethe Practice" })).toHaveAttribute("href", route);
-    expect(screen.getByRole("link", { name: "Exams Room (optional)" })).toHaveAttribute("href", "/exams/question");
-    expect(screen.getAllByText(new RegExp(`official Goethe ${level} practice`, "i")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: `Open Official Goethe ${level} Exam Sample` })).toHaveAttribute("href", sampleUrl);
+    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
   });
 
-  test.each(["A1", "A2", "B1"])("%s legacy portal handoff also routes completed students to Goethe first", (level) => {
-    const onOpenOfficialGoethe = jest.fn();
-    const onOpenExamsRoom = jest.fn();
-
-    render(
-      <CourseCompletionHandoff
-        level={level}
-        isComplete
-        progressPercent={100}
-        journey={getCourseCompletionJourney(level)}
-        onOpenOfficialGoethe={onOpenOfficialGoethe}
-        onOpenExamsRoom={onOpenExamsRoom}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Continue to Official Goethe Practice" }));
-    expect(onOpenOfficialGoethe).toHaveBeenCalledTimes(1);
-    expect(onOpenExamsRoom).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Exams Room (optional)" }));
-    expect(onOpenExamsRoom).toHaveBeenCalledTimes(1);
-  });
-
-  test("incomplete tutor-guided course does not present Goethe practice as the primary completion action", () => {
+  test("an incomplete course still exposes both practice destinations", () => {
     render(
       <CourseCompletionConclusion
         level="A2"
@@ -65,31 +42,16 @@ describe("Goethe-first course completion handoff", () => {
       />,
     );
 
-    expect(screen.queryByRole("link", { name: "Continue to Official Goethe Practice" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open Official Goethe A2 Exam Sample" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
   });
 
-  test("self-learning levels retain the existing Exams Room handoff", () => {
-    render(
-      <CourseCompletionConclusion
-        level="B2"
-        isComplete
-        completedRequirements={28}
-        totalRequirements={28}
-      />,
-    );
-
-    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
-    expect(screen.queryByRole("link", { name: "Continue to Official Goethe Practice" })).not.toBeInTheDocument();
-  });
-
-  test("legacy portal wiring navigates the Goethe-primary CTA to the shared orientation route", () => {
+  test("the YouTube button no longer injects a duplicate completion handoff", () => {
     const source = read("YouTubeSubscribeButton.js");
 
-    expect(source).toContain('import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";');
-    expect(source).toContain("const goetheOrientation = getGoetheExamOrientationConfig(courseState.level);");
-    expect(source).toContain("onOpenOfficialGoethe={goetheOrientation?.courseRoute ? () => navigate(goetheOrientation.courseRoute) : null}");
-    expect(source).toContain('onOpenExamsRoom={() => navigate("/exams/overview")}');
+    expect(source).not.toContain("CourseCompletionHandoff");
+    expect(source).not.toContain("createPortal");
+    expect(source).not.toContain("data-course-completion-handoff-host");
   });
 
   test("course-book normalization keeps A2 and B1 exam orientation as dedicated final sections", () => {

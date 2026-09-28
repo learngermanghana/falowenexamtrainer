@@ -1,6 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
-import { getGoetheExamOrientationConfig } from "../data/goetheExamOrientation";
+import { getGoetheExamFileGuide } from "../data/goetheExamFileGuide";
 
 const nextLevelByLevel = {
   A1: "A2",
@@ -31,15 +31,14 @@ const CourseCompletionConclusion = ({
   totalAssignments = 0,
   needsImprovement = 0,
   awaitingReview = 0,
-  onExploreNextLevel,
 }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   if (!supportedLevels.has(normalizedLevel)) return null;
 
   const nextLevel = nextLevelByLevel[normalizedLevel] || "";
   const isTutorGuided = tutorGuidedLevels.has(normalizedLevel);
-  const goetheOrientation = isTutorGuided ? getGoetheExamOrientationConfig(normalizedLevel) : null;
-  const officialGoetheRoute = goetheOrientation?.courseRoute || "";
+  const goetheGuide = getGoetheExamFileGuide(normalizedLevel);
+  const officialGoetheSampleUrl = goetheGuide?.sampleUrl || "";
   const progressPercent = totalRequirements
     ? Math.round((completedRequirements / totalRequirements) * 100)
     : 0;
@@ -78,9 +77,7 @@ const CourseCompletionConclusion = ({
         </h2>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65, maxWidth: 780 }}>
           {isComplete
-            ? isTutorGuided && officialGoetheRoute
-              ? `You have completed the required ${normalizedLevel} Course Book work. Your next step is the official Goethe ${normalizedLevel} practice in the final Course Book Exam Orientation. The Falowen Exams Room remains available for extra practice afterwards.`
-              : nextLevel
+            ? nextLevel
                 ? `You have completed the required ${normalizedLevel} Course Book work. Review your progress, continue with exam preparation, or preview what comes next in ${nextLevel}.`
                 : `You have completed the required ${normalizedLevel} Course Book work. Review your progress and continue with focused exam preparation.`
             : `This is the final checkpoint for your ${normalizedLevel} Course Book. You are ${progressPercent}% complete. Finish the outstanding required work and review corrections before moving forward.`}
@@ -121,38 +118,21 @@ const CourseCompletionConclusion = ({
           {!isComplete ? <li>Complete the remaining required Course Book work.</li> : null}
           <li>Review your Results, corrections and weak areas.</li>
           {isTutorGuided ? <li>Check your Attendance and Class Participation records.</li> : null}
-          {isTutorGuided && officialGoetheRoute ? (
-            <>
-              <li>Open the final Course Book Exam Orientation and work with the official Goethe {normalizedLevel} practice material.</li>
-              <li>Use the Falowen Exams Room afterwards for optional extra practice in weak areas.</li>
-            </>
-          ) : (
-            <li>Continue with focused {normalizedLevel} exam preparation in the Exams Room.</li>
-          )}
+          <li>Open the official Goethe {normalizedLevel} exam sample and work through the real practice material.</li>
+          <li>Go to the Falowen Exams Room for additional practice in weak areas.</li>
           {nextLevel ? <li>Preview the first {nextLevel} chapter before deciding when to upgrade.</li> : null}
         </ol>
       </div>
 
       <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-        {isComplete && isTutorGuided && officialGoetheRoute ? (
-          <>
-            <a href={officialGoetheRoute} style={{ ...styles.primaryButton, textDecoration: "none" }}>
-              Continue to Official Goethe Practice
-            </a>
-            <a href="/exams/question" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-              Exams Room (optional)
-            </a>
-          </>
-        ) : (
-          <a href="/exams/question" style={{ ...styles.primaryButton, textDecoration: "none" }}>
-            Go to Exams Room
+        {officialGoetheSampleUrl ? (
+          <a href={officialGoetheSampleUrl} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+            Open Official Goethe {normalizedLevel} Exam Sample
           </a>
-        )}
-        {nextLevel ? (
-          <button type="button" style={styles.secondaryButton} onClick={onExploreNextLevel}>
-            Explore {nextLevel}
-          </button>
         ) : null}
+        <a href="/exams/question" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+          Go to Exams Room
+        </a>
       </div>
 
       <div style={{ borderRadius: 14, padding: 13, background: "#fffbeb", border: "1px solid #fde68a", color: "#78350f", lineHeight: 1.6 }}>
