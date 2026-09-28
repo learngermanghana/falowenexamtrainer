@@ -221,7 +221,7 @@ function ReadingPractice({day,completed,onCompleteChange}){
     })}</div>
     {hasAnswer?<div style={{border:`1px solid ${correct?"#86efac":"#fecaca"}`,borderRadius:12,padding:11,background:correct?"#f0fdf4":"#fff7f7",lineHeight:1.65}}><strong>{correct?"Richtig.":"Noch nicht richtig."}</strong> {!correct?<span>Richtige Antwort: <strong>{String.fromCharCode(65+item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </span>:null}<span>{item.explanation}</span></div>:null}
    </article>;
-  })}</div>
+  })}</ReadingQuestionGrid>
   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:10}}>
    <div style={{...sub,background:answered===questions.length?"#f0fdf4":"#f8fafc"}}><strong>{answered}/{questions.length} Fragen beantwortet</strong><span>{answered===questions.length?"Lesen ist für heute abgeschlossen.":"Beantworten Sie alle Fragen. Fehler sind erlaubt — die Aufgabe dient dem direkten Lernen."}</span></div>
    <div style={{...sub,background:"#f8fafc"}}><strong>Erster Versuch: {firstAttemptCorrect}/{questions.length}</strong><span>{firstAttemptAnswered<questions.length?`${firstAttemptAnswered}/${questions.length} erste Antworten erfasst`:"Dieser Wert dient nur als Lernstand. Er entscheidet nicht über den Kursabschluss."}</span></div>
