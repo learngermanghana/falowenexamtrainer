@@ -14,6 +14,7 @@ const LEVELS = [
   { key: "B1", slug: "german-b1", language: "German", label: "German B1" },
   { key: "B2", slug: "german-b2", language: "German", label: "German B2" },
   { key: "C1", slug: "german-c1", language: "German", label: "German C1" },
+  { key: "C2", slug: "german-c2", language: "German", label: "German C2" },
   { key: "FRENCH_A1", aliases: ["FR_A1", "French A1", "FRENCH-A1"], slug: "french-a1", language: "French", label: "French A1" },
 ];
 
@@ -81,7 +82,7 @@ const levelLinks = catalogue.map((level) => `<a href="/courses/${level.slug}.htm
 
 for (const level of catalogue) {
   const canonical = `${baseUrl}/courses/${level.slug}.html`;
-  const description = `Public ${level.label} course schedule from Falowen, showing lesson titles, days, chapters and grammar topics without protected lesson content.`;
+  const description = `Public ${level.label} day-by-day course schedule from Falowen, showing exact lesson titles, days, chapters and grammar topics without protected lesson content.`;
   const itemList = level.lessons.map((lesson, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -101,7 +102,7 @@ for (const level of catalogue) {
       },
       {
         "@type": "ItemList",
-        name: `${level.label} course schedule`,
+        name: `${level.label} day-by-day course schedule`,
         numberOfItems: level.lessons.length,
         itemListElement: itemList,
       },
@@ -121,7 +122,7 @@ for (const level of catalogue) {
   const body = `<main class="wrap">
     <section class="hero">
       <p>Falowen public curriculum catalogue</p>
-      <h1>${escapeHtml(level.label)} Course Schedule</h1>
+      <h1>${escapeHtml(level.label)} Day-by-Day Course Schedule</h1>
       <p>${escapeHtml(description)}</p>
     </section>
     <nav class="nav"><a href="/courses/">All levels</a>${levelLinks}<a class="cta" href="/signup?program=${level.language === "French" ? "french" : "german"}">Join Falowen</a></nav>
@@ -132,7 +133,7 @@ for (const level of catalogue) {
   await fs.writeFile(path.join(coursesDir, `${level.slug}.html`), documentShell({ title: `${level.label} Course Schedule | Falowen`, description, canonical, body, jsonLd }), "utf8");
 }
 
-const indexDescription = "Explore Falowen public German A1–C1 and French A1 course schedules. View lesson titles, chapters and grammar themes without accessing protected course content.";
+const indexDescription = "Explore Falowen public German A1–C2 and French A1 course schedules. View the exact day-by-day lesson titles, chapters and grammar themes without accessing protected course content.";
 const indexJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
