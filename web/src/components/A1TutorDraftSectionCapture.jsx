@@ -339,9 +339,37 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
 
   const allChoiceItemsBound = choiceItems.length > 0 && choiceItems.every((item) => boundChoiceNumbers.includes(item.number));
   const choiceOnlySection = choiceItems.length > 0 && shortItems.length === 0 && !sectionProfile.writing && !sectionProfile.embeddedWriting;
+  const inlineAnswers = Boolean(sectionProfile.inlineAnswers);
   const fallbackChoiceItems = choiceBindingChecked
     ? choiceItems.filter((item) => !boundChoiceNumbers.includes(item.number))
     : [];
+
+  if (inlineAnswers) {
+    return (
+      <div
+        ref={captureRef}
+        data-a1-tutor-draft-capture={sectionKey}
+        data-assignment-key={assignmentKey}
+        data-inline-answers-status="true"
+        aria-live="polite"
+        style={{
+          borderTop: "1px solid #dbeafe",
+          marginTop: 14,
+          paddingTop: 10,
+          color: progress?.complete ? "#166534" : "#475569",
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 10,
+          flexWrap: "wrap",
+          fontSize: 13,
+          fontWeight: 800,
+        }}
+      >
+        <span>{progress?.completed || 0} of {progress?.total || 0} answered · Your answers are saved in the task cards above.</span>
+        <span>{statusText(saveState)}</span>
+      </div>
+    );
+  }
 
   if (choiceOnlySection && allChoiceItemsBound) {
     return (
