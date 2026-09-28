@@ -2,7 +2,9 @@ import {
   buildCompletedRadioHref,
   buildCompletedRadioSearch,
   hasPlayableRadioResource,
+  isFalowenRadioResource,
   openCompletedWorkbook,
+  resolveRadioFirstWorkbookResource,
   shouldShowRadioFirst,
 } from "./RadioFirstWorkbookGate";
 
@@ -115,6 +117,21 @@ describe("Radio link gating", () => {
     expect(shouldShowRadioFirst("B2", 1)).toBe(false);
     expect(shouldShowRadioFirst("B2", 2)).toBe(false);
     expect(shouldShowRadioFirst("B2", 28)).toBe(false);
+  });
+
+  test("keeps B1 Day 14 on the approved Falowen Radio resource and rejects teacher-video substitution", () => {
+    const radio = resolveRadioFirstWorkbookResource("B1", 14);
+    expect(radio).toEqual(expect.objectContaining({
+      key: "b1-day14-traditionelles-digitales-lernen-falowen-radio",
+      youtubeId: "FmzZD9c-Shc",
+    }));
+
+    expect(isFalowenRadioResource(radio)).toBe(true);
+    expect(isFalowenRadioResource({
+      key: "b1-day14-teacher-lecture-video",
+      title: "Teacher lecture video",
+      url: "https://youtu.be/exampleTeacher",
+    })).toBe(false);
   });
 
   test("still recognises a configured C1 Radio override with a playable link", () => {
