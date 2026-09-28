@@ -31,15 +31,6 @@ const questionBox = {
   gap: 8,
 };
 
-const adBox = {
-  border: "1px solid #d1d5db",
-  borderRadius: 12,
-  padding: 14,
-  background: "#f9fafb",
-  display: "grid",
-  gap: 6,
-};
-
 const highlight = {
   border: "1px solid #bfdbfe",
   background: "#eff6ff",
