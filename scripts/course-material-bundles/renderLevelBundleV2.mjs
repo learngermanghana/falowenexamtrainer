@@ -21,7 +21,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 4, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 5, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -71,28 +71,53 @@ const credentials = () => {
   return { email, password };
 };
 
+const getLoginForm = (page) =>
+  page.locator("form").filter({ hasText: /Email or student code/i }).first();
+
 const openLogin = async (page) => {
   const loginUrl = `${baseUrl}/login/`;
   console.log(`Opening Falowen login directly: ${loginUrl}`);
   await page.goto(loginUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForPage(page);
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-  await emailInput.waitFor({ state: "visible", timeout: 15000 });
+
+  const loginForm = getLoginForm(page);
+  await loginForm.waitFor({ state: "visible", timeout: 15000 });
+
+  const identityInput = loginForm.locator('input[type="text"], input[type="email"]').first();
+  const passwordInput = loginForm.locator('input[type="password"]').first();
+  await identityInput.waitFor({ state: "visible", timeout: 15000 });
   await passwordInput.waitFor({ state: "visible", timeout: 15000 });
 };
 
 const submitLogin = async (page) => {
   const { email, password } = credentials();
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-  if (!(await emailInput.count()) || !(await passwordInput.count())) throw new Error("Falowen login form fields were not found.");
-  await emailInput.fill(email);
+  const loginForm = getLoginForm(page);
+  await loginForm.waitFor({ state: "visible", timeout: 15000 });
+
+  const identityInput = loginForm.locator('input[type="text"], input[type="email"]').first();
+  const passwordInput = loginForm.locator('input[type="password"]').first();
+  if (!(await identityInput.count()) || !(await passwordInput.count())) {
+    throw new Error("Falowen login form fields were not found.");
+  }
+
+  await identityInput.fill(email);
   await passwordInput.fill(password);
-  const submit = page.locator('button[type="submit"], input[type="submit"]').first();
+
+  const submit = loginForm.getByRole("button", { name: /^Log in$/i }).first();
   if (!(await submit.count())) throw new Error("Falowen login submit button was not found.");
   await submit.click({ timeout: 10000 });
-  await page.waitForTimeout(2500);
+
+  await page.waitForFunction(
+    () => !document.body?.innerText?.includes("Returning Falowen student"),
+    undefined,
+    { timeout: 25000 },
+  ).catch(() => {});
+  await waitForPage(page);
+
+  const authText = await getBodyText(page);
+  if (/Password mismatch|could not find an account|cannot log in right now|permission denied/i.test(authText)) {
+    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
+  }
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
