@@ -35,17 +35,42 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
   test("Teil 2 requires the learner to ask before revealing the model", () => {
     renderPage();
 
-    const teil2Heading = screen.getByRole("heading", { name: "Turn the topic card into a question" });
+    const teil2Heading = screen.getByRole("heading", { name: "Use the theme and keyword to form a question" });
     const teil2Section = teil2Heading.closest("section");
     expect(teil2Section).not.toBeNull();
     const teil2 = within(teil2Section);
 
+    expect(teil2.getAllByText("THEMA").length).toBeGreaterThan(0);
+    expect(teil2.getAllByText("STICHWORT · KEYWORD").length).toBeGreaterThan(0);
+    expect(teil2.getAllByText("Freizeit").length).toBeGreaterThanOrEqual(2);
     expect(teil2.getByText("Wochenende")).toBeVisible();
     expect(teil2.queryByText("Was machst du am Wochenende?")).not.toBeInTheDocument();
 
     fireEvent.click(teil2.getAllByRole("button", { name: "Show model" })[0]);
 
     expect(teil2.getByText("Was machst du am Wochenende?")).toBeVisible();
+  });
+
+
+  test("Teil 2 cards separate Goethe theme from the keyword used to form the question", () => {
+    renderPage();
+
+    const teil2Section = screen.getByRole("heading", { name: "Use the theme and keyword to form a question" }).closest("section");
+    const teil2 = within(teil2Section);
+
+    [
+      ["Freizeit", "Wochenende"],
+      ["Persönliche Informationen", "Familie"],
+      ["Wohnen", "Wohnort"],
+      ["Essen und Trinken", "Getränke"],
+      ["Alltag", "Freizeit"],
+      ["Sprachen", "Deutsch"],
+    ].forEach(([theme, keyword]) => {
+      expect(teil2.getAllByText(theme).length).toBeGreaterThan(0);
+      expect(teil2.getAllByText(keyword).length).toBeGreaterThan(0);
+    });
+
+    expect(teil2.getByText(/STICHWORT \/ KEYWORD is the word you use to build your question/i)).toBeVisible();
   });
 
   test("Teil 3 practises requests and reactions", () => {
