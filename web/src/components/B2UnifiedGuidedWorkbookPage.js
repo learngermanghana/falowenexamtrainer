@@ -22,6 +22,7 @@ import {
   getStandardWritingConfig,
 } from "../data/standardLessonJourney";
 import { styles } from "../styles";
+import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid } from "./ReadingExamLayout";
 import { useAuth } from "../context/AuthContext";
 import fetchB2AudioPlaybackUrl from "../services/b2AudioService";
 import { useB2CloudDraftField } from "../utils/b2CloudDraftSync";
@@ -114,15 +115,18 @@ function ReadingPractice({ day, progress, setProgress }) {
   };
 
   return <Section title={`Lesen · ${practice.title}`}>
-    <article style={{ ...sub, background: "#f8fafc", lineHeight: 1.8 }} data-b2-reading-text="true">
-      <strong>Lesetext</strong>
-      {practice.paragraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}>{paragraph}</p>)}
-    </article>
+    <ReadingExamFrame level="B2" title={practice.title} format="Lesetext" variant="document">
+      <ReadingExamDocument title={practice.title}>
+        <div data-b2-reading-text="true" style={{ display: "grid", gap: 12 }}>
+          {practice.paragraphs.map((paragraph, index) => <p key={index} style={{ margin: 0 }}>{paragraph}</p>)}
+        </div>
+      </ReadingExamDocument>
+    </ReadingExamFrame>
     <div style={{ ...sub, background: "#eff6ff" }}>
       <strong>Textverständnis</strong>
       <span>Lesen Sie den vollständigen Text und beantworten Sie alle fünf Fragen. Sie erhalten sofort Rückmeldung; der erste Versuch dient nur als Lernstand.</span>
     </div>
-    <div style={{ display: "grid", gap: 14 }}>
+    <ReadingQuestionGrid>
       {questions.map((item, index) => {
         const selected = answers[index];
         const hasAnswer = Number.isInteger(selected);
@@ -153,7 +157,7 @@ function ReadingPractice({ day, progress, setProgress }) {
           {hasAnswer ? <div style={{ borderRadius: 12, padding: 10, background: correct ? "#f0fdf4" : "#fff7f7", lineHeight: 1.6 }}><strong>{correct ? "Richtig." : "Noch nicht richtig."}</strong> {!correct ? <>Richtige Antwort: <strong>{String.fromCharCode(65 + item.answerIndex)}. {item.options[item.answerIndex]}</strong>. </> : null}{item.explanation}</div> : null}
         </article>;
       })}
-    </div>
+    </ReadingQuestionGrid>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
       <div style={{ ...sub, background: answered === questions.length ? "#f0fdf4" : "#f8fafc" }}><strong>{answered}/{questions.length} beantwortet</strong><span>{answered === questions.length ? "Lesen ist für heute abgeschlossen." : "Beantworten Sie alle Fragen."}</span></div>
       <div style={{ ...sub, background: "#f8fafc" }}><strong>Erster Versuch: {firstCorrect}/{questions.length}</strong><span>Nur Lernstand — kein Blockieren des Kursabschlusses.</span></div>
