@@ -62,6 +62,7 @@ export const goetheExamLevels = [
   },
   { level: "B2", title: "Goethe-Zertifikat B2", description: "A German exam for young people and adults. It certifies advanced language skills at B2 level.", registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb2.cfm", price: "Contact Goethe-Institut Accra", location: "Goethe-Institut Accra", exams: [] },
   { level: "C1", title: "Goethe-Zertifikat C1", description: "A German exam for adults. It certifies proficient language skills at C1 level.", registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzc1.cfm", price: "Contact Goethe-Institut Accra", location: "Goethe-Institut Accra", exams: [] },
+  { level: "C2", title: "Goethe-Zertifikat C2: Großes Deutsches Sprachdiplom", description: "A German exam for adults. It certifies extremely advanced language skills at C2 level.", registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzc2.cfm", price: "Contact Goethe-Institut Accra", location: "Goethe-Institut Accra", exams: [] },
 ];
 
 export const defaultGoetheExamConfig = {
