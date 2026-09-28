@@ -161,7 +161,9 @@ describe("Falowen public help and AI discovery", () => {
     expect(catalogueGenerator).toContain("Public course catalogue cannot advertise A1–C2");
     expect(catalogueGenerator).toContain("Expected complete C2 Days 1–28");
     expect(catalogueGenerator).toContain('"@type": "FAQPage"');
-    expect(catalogueSource).toContain('C2_COURSE_BOOK_ENTRIES');
+    expect(catalogueSource).toContain('c2ExamStandardContent.js');
+    expect(catalogueSource).toContain("c2ExamRows.size !== 28");
+    expect(catalogueSource).toContain("c2PublicLessons");
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
 
     expect(scheduleMarkdown).toContain("## Falowen C2 Course Schedule");
