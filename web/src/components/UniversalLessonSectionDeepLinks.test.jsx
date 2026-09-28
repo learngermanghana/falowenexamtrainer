@@ -60,10 +60,10 @@ describe("universal lesson section deep links", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save Teil 1 as PDF" }));
     expect(printSpy).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 2 · Schreiben" }));
     expect(screen.getByRole("button", { name: "Save Teil 2 as PDF" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Submit" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Submit · Send work" }));
     expect(screen.queryByRole("button", { name: /Save .* as PDF/ })).not.toBeInTheDocument();
     printSpy.mockRestore();
   });
@@ -94,7 +94,7 @@ describe("universal lesson section deep links", () => {
     );
 
     await waitFor(() => expect(screen.getByTestId("active-workbook-tab")).toHaveTextContent("hoeren"));
-    expect(screen.getByRole("tab", { name: "Teil 4" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Teil 4 · Hören" })).toHaveAttribute("aria-selected", "true");
   });
 
   test("does not expose a Hören deep link on A2 Day 14", () => {
@@ -104,7 +104,7 @@ describe("universal lesson section deep links", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.queryByRole("tab", { name: "Teil 4" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "Teil 4 · Hören" })).not.toBeInTheDocument();
   });
 
   test("opens C1 Write from view=write and keeps clicked tabs in the URL", async () => {
@@ -115,9 +115,9 @@ describe("universal lesson section deep links", () => {
     );
 
     await waitFor(() => expect(screen.getByTestId("active-advanced-tab")).toHaveTextContent("write"));
-    expect(screen.getByRole("tab", { name: "Write" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Write · Practice" })).toHaveAttribute("aria-selected", "true");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Speak" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Speak · Practice" }));
 
     await waitFor(() => {
       expect(screen.getByTestId("active-advanced-tab")).toHaveTextContent("speak");
