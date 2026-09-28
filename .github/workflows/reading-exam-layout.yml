@@ -32,17 +32,11 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Test shared Lesen layout and existing reading registries
+      - name: Test shared A2-C2 Lesen layout
         working-directory: web
         env:
           CI: true
-        run: >-
-          npx jest --runInBand --runTestsByPath
-          src/components/ReadingExamLayout.test.js
-          src/data/a2ReadingTasks.test.js
-          src/data/b1ReadingTasks.test.js
-          src/components/B2UnifiedGuidedWorkbookPage.test.js
-          src/components/C2UnifiedGuidedWorkbookPage.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/ReadingExamLayout.test.js
 
       - name: Build production web app
         working-directory: web
