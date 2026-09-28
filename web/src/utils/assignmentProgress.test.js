@@ -61,6 +61,54 @@ describe("resolveAssignmentStatus", () => {
     expect(status.bestScore).toBe(74);
     expect(status.latestScore).toBe(74);
   });
+  test("numeric score overrides a stale passed flag", () => {
+    const status = resolveAssignmentStatus({
+      assignmentId: "A1-10",
+      resultRecords: [
+        {
+          assignmentId: "A1-10",
+          score: 53.333333333333336,
+          status: "passed",
+          passed: true,
+          updatedAt: "2026-09-11T14:47:16.000Z",
+        },
+      ],
+    });
+
+    expect(status.status).toBe("failed");
+    expect(status.passed).toBe(false);
+    expect(status.failed).toBe(true);
+    expect(status.latestScore).toBe(53.333333333333336);
+  });
+
+  test("latest canonical numeric score controls status instead of an older higher score", () => {
+    const status = resolveAssignmentStatus({
+      assignmentId: "A1-10",
+      resultRecords: [
+        {
+          assignmentId: "A1-10",
+          score: 88,
+          status: "passed",
+          passed: true,
+          updatedAt: "2026-09-01T10:00:00.000Z",
+        },
+        {
+          assignmentId: "A1-10",
+          score: 53.333333333333336,
+          status: "passed",
+          passed: true,
+          updatedAt: "2026-09-11T14:47:16.000Z",
+        },
+      ],
+    });
+
+    expect(status.status).toBe("failed");
+    expect(status.passed).toBe(false);
+    expect(status.failed).toBe(true);
+    expect(status.bestScore).toBe(88);
+    expect(status.latestScore).toBe(53.333333333333336);
+  });
+
   test("manual correction to 40 overrides an earlier mistaken pass", () => {
     const status = resolveAssignmentStatus({
       assignmentId: "A1-1.2",
@@ -160,6 +208,48 @@ describe("mergeAssignmentProgress", () => {
     expect(merged[0].assignmentId).toBe("A1-1.2");
     expect(merged[0].status).toBe("passed");
     expect(merged[0].bestScore).toBe(83);
+  });
+
+  test("A1-10 with 53.33 stays failed even when the stored row still says passed", () => {
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [
+        {
+          level: "A1",
+          assignmentId: "10",
+          chapter: "10",
+          title: "Food and Daily Life",
+          assignmentDay: 16,
+          assignment: true,
+        },
+      ],
+      firestoreDrafts: [],
+      firestoreSubmissions: [
+        {
+          level: "A1",
+          assignmentId: "A1-10",
+          status: "passed",
+          updatedAt: "2026-09-11T14:47:16.000Z",
+        },
+      ],
+      sheetResults: [
+        {
+          level: "A1",
+          assignmentId: "A1-10",
+          score: 53.333333333333336,
+          status: "passed",
+          passed: true,
+          studentCode: "st-1",
+          date: "2026-09-11T14:47:16.000Z",
+        },
+      ],
+      studentCode: "st-1",
+    });
+
+    const row = merged.find((entry) => entry.assignmentId === "A1-10");
+    expect(row?.status).toBe("failed");
+    expect(row?.passed).toBe(false);
+    expect(row?.failed).toBe(true);
+    expect(row?.latestScore).toBe(53.333333333333336);
   });
 
   test("missing assignment_id fallback is isolated", () => {
