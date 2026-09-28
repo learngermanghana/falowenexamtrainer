@@ -110,7 +110,7 @@ const PublicStudentGuidePage = () => {
           Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
         </p>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink>, <RouteLink href="/falowen-navigation.json">structured navigation JSON</RouteLink>, and <RouteLink href="/falowen-course-map.json">generated A1–C2 lesson map</RouteLink>.
+          AI/search systems can also read the <RouteLink href="/falowen-help.md">AI-readable Markdown knowledge base</RouteLink>, <RouteLink href="/falowen-navigation.json">structured navigation JSON</RouteLink>, <RouteLink href="/falowen-course-map.json">generated A1–C2 lesson map</RouteLink>, and <RouteLink href="/falowen-course-schedules.md">A1–C2 schedule Q&A reference</RouteLink>.
         </p>
       </section>
 
@@ -177,6 +177,7 @@ const PublicStudentGuidePage = () => {
           ))}
         </div>
         <RouteLink href="/courses/">View all public course schedules</RouteLink>
+        <RouteLink href="/falowen-course-schedules.md">Open AI-readable A1–C2 schedule reference</RouteLink>
       </section>
 
       <section style={cardStyle}>

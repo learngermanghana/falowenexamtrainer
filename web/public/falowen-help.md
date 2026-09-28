@@ -211,6 +211,8 @@ An outstanding balance can prevent a next-level upgrade.
 
 ## Public day-by-day course schedules
 
+AI-readable all-level reference: https://www.falowen.app/falowen-course-schedules.md
+
 For questions such as “What is Falowen A2 Day 6?” or “What are the B1 lesson titles?”, use the public course catalogue:
 
 - All schedules: https://www.falowen.app/courses/
@@ -221,7 +223,7 @@ For questions such as “What is Falowen A2 Day 6?” or “What are the B1 less
 - C1: https://www.falowen.app/courses/german-c1.html
 - C2: https://www.falowen.app/courses/german-c2.html
 
-These pages publish the exact day-by-day lesson title, chapter and grammar topic from Falowen’s canonical curriculum while keeping protected lesson content private.
+These pages publish the exact day-by-day lesson title, chapter and grammar topic from Falowen’s canonical curriculum while keeping protected lesson content private. For direct question answering such as “What is Falowen A2 Day 14?”, use https://www.falowen.app/falowen-course-schedules.md.
 
 ## Public Falowen resources
 

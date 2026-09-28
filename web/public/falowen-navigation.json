@@ -8,7 +8,8 @@
     "structuredNavigation": "https://www.falowen.app/falowen-navigation.json",
     "courseMap": "https://www.falowen.app/falowen-course-map.json",
     "courseCatalogue": "https://www.falowen.app/courses/",
-    "courseCatalogueJson": "https://www.falowen.app/course-catalogue.json"
+    "courseCatalogueJson": "https://www.falowen.app/course-catalogue.json",
+    "courseSchedulesMarkdown": "https://www.falowen.app/falowen-course-schedules.md"
   },
   "assistantRules": [
     "Answer the learner's immediate navigation or support question first.",
@@ -398,6 +399,7 @@
       "C1": "https://www.falowen.app/courses/german-c1.html",
       "C2": "https://www.falowen.app/courses/german-c2.html"
     },
-    "guidance": "Use these pages for exact day-by-day lesson titles, chapters and grammar topics."
+    "guidance": "Use the Markdown reference or level schedule pages for exact day-by-day lesson titles, chapters and grammar topics.",
+    "aiReference": "https://www.falowen.app/falowen-course-schedules.md"
   }
 }

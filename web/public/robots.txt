@@ -5,6 +5,7 @@
 # ChatGPT Search / OpenAI web discovery.
 User-agent: OAI-SearchBot
 Allow: /
+Allow: /falowen-course-schedules.md
 Disallow: /api/
 Disallow: /admin/
 Disallow: /server-status
@@ -13,6 +14,7 @@ Disallow: /server-status
 # Google's normal crawlers; the same private paths remain excluded here.
 User-agent: Google-Extended
 Allow: /
+Allow: /falowen-course-schedules.md
 Disallow: /api/
 Disallow: /admin/
 Disallow: /server-status
@@ -20,6 +22,7 @@ Disallow: /server-status
 # Bingbot and other search/AI crawlers are covered by the public wildcard.
 User-agent: *
 Allow: /
+Allow: /falowen-course-schedules.md
 Disallow: /api/
 Disallow: /admin/
 Disallow: /server-status
