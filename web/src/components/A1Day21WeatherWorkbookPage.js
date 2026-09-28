@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
+import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import { styles } from "../styles";
 
@@ -28,15 +29,6 @@ const questionBox = {
   background: "#fff",
   display: "grid",
   gap: 8,
-};
-
-const adBox = {
-  border: "1px solid #d1d5db",
-  borderRadius: 12,
-  padding: 14,
-  background: "#f9fafb",
-  display: "grid",
-  gap: 6,
 };
 
 const highlight = {
@@ -84,29 +76,24 @@ const Teil1Content = () => (
     <h2>Teil 1 · Anzeigen</h2>
     <p><b>Instruction:</b> Read each question and choose the correct option.</p>
 
-    <div style={card}>
-      <h3>Anzeige A</h3>
-      <div style={adBox}>
-        <b>Sommerurlaub in Spanien</b>
-        <div>📍 Costa Brava</div>
-        <div>📅 1. Juli – 31. August</div>
-        <div>☀️ 25°C – 30°C</div>
-        <div>✈️ Flug: Berlin, Hamburg, München</div>
-        <div>🏨 Hotel oder Ferienwohnung</div>
-        <div>🎡 Strände, Freizeitparks, Märkte</div>
-      </div>
-
-      <h3>Anzeige B</h3>
-      <div style={adBox}>
-        <b>Winterurlaub in Österreich</b>
-        <div>📍 Tirol</div>
-        <div>📅 1. Dezember – 31. Januar</div>
-        <div>❄️ -5°C bis 5°C</div>
-        <div>🚆 Zug: Frankfurt, Stuttgart, Wien</div>
-        <div>🏔️ Berghütte oder Hotel</div>
-        <div>⛷️ Skifahren, Thermen, Weihnachtsmärkte</div>
-      </div>
-    </div>
+    <A1ReadingSourceGrid>
+      <A1ReadingSourceCard label="Anzeige A" title="Sommerurlaub in Spanien">
+        <div>Costa Brava</div>
+        <div>1. Juli – 31. August</div>
+        <div>25°C – 30°C</div>
+        <div>Flug: Berlin, Hamburg, München</div>
+        <div>Hotel oder Ferienwohnung</div>
+        <div>Strände, Freizeitparks, Märkte</div>
+      </A1ReadingSourceCard>
+      <A1ReadingSourceCard label="Anzeige B" title="Winterurlaub in Österreich">
+        <div>Tirol</div>
+        <div>1. Dezember – 31. Januar</div>
+        <div>-5°C bis 5°C</div>
+        <div>Zug: Frankfurt, Stuttgart, Wien</div>
+        <div>Berghütte oder Hotel</div>
+        <div>Skifahren, Thermen, Weihnachtsmärkte</div>
+      </A1ReadingSourceCard>
+    </A1ReadingSourceGrid>
 
     {[
       "Du möchtest im Sommer an den Strand gehen und warmes Wetter genießen.",
@@ -120,28 +107,23 @@ const Teil1Content = () => (
       </div>
     ))}
 
-    <div style={card}>
-      <h3>Anzeige A</h3>
-      <div style={adBox}>
-        <b>Arbeiten am Meer in Griechenland</b>
-        <div>📍 Kreta</div>
-        <div>📅 Ganzjährig</div>
-        <div>🌊 Direkt am Strand</div>
-        <div>💼 Gastronomie, Tourismus, Hotel</div>
-        <div>✈️ Flug: Frankfurt, Berlin, Düsseldorf</div>
-        <div>🏠 Mitarbeiterwohnung</div>
-      </div>
-
-      <h3>Anzeige B</h3>
-      <div style={adBox}>
-        <b>Berufschancen in Kanada</b>
-        <div>📍 Vancouver</div>
-        <div>📅 Ganzjährig</div>
-        <div>🌊 Pazifikküste</div>
-        <div>💻 IT, Gesundheit, Bildung</div>
-        <div>🏠 Firmenwohnung oder eigene Unterkunft</div>
-      </div>
-    </div>
+    <A1ReadingSourceGrid>
+      <A1ReadingSourceCard label="Anzeige A" title="Arbeiten am Meer in Griechenland">
+        <div>Kreta</div>
+        <div>Ganzjährig</div>
+        <div>Direkt am Strand</div>
+        <div>Gastronomie, Tourismus, Hotel</div>
+        <div>Flug: Frankfurt, Berlin, Düsseldorf</div>
+        <div>Mitarbeiterwohnung</div>
+      </A1ReadingSourceCard>
+      <A1ReadingSourceCard label="Anzeige B" title="Berufschancen in Kanada">
+        <div>Vancouver</div>
+        <div>Ganzjährig</div>
+        <div>Pazifikküste</div>
+        <div>IT, Gesundheit, Bildung</div>
+        <div>Firmenwohnung oder eigene Unterkunft</div>
+      </A1ReadingSourceCard>
+    </A1ReadingSourceGrid>
 
     {[
       "Du möchtest am Meer arbeiten in der Gastronomie.",

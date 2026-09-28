@@ -5,6 +5,7 @@ import A1CanonicalSubmissionPanel from "./A1CanonicalSubmissionPanel";
 import A1Day21WeatherResources from "./A1Day21WeatherResources";
 import A1SharedAssignmentWorkbookLayout, { WorkbookSection } from "./A1SharedAssignmentWorkbookLayout";
 import A1TutorMarkedOverviewGuidance from "./A1TutorMarkedOverviewGuidance";
+import A1TutorMarkedReadingFrame, { isA1TutorReadingLabel } from "./A1TutorMarkedReadingLayout";
 import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
 import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
@@ -119,17 +120,29 @@ const A1TutorMarkedWorkbookShell = ({
   const { sectionMap, overviewNodes } = splitA1WorkbookContent(children);
   const sections = assignment.sections
     .filter(({ key }) => sectionMap.has(key))
-    .map(({ key, number }) => (
-      <WorkbookSection key={key} sectionKey={key}>
-        {isFirstA1Workbook && number === 1 ? (
-          <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, marginBottom: 12, background: "#eff6ff", lineHeight: 1.6 }}>
-            <strong>Reading + Questions:</strong> Read the text first, then continue directly to the questions below on this same page. Do not submit here. Finish all required parts before opening <strong>Review &amp; Submit</strong>.
-          </div>
-        ) : null}
-        {sectionMap.get(key)}
-        {sharedDraftCaptureEnabled ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
-      </WorkbookSection>
-    ));
+    .map(({ key, number, label }) => {
+      const sectionContent = (
+        <>
+          {isFirstA1Workbook && number === 1 ? (
+            <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, marginBottom: 12, background: "#eff6ff", lineHeight: 1.6 }}>
+              <strong>Reading + Questions:</strong> Read the text first, then continue directly to the questions below on this same page. Do not submit here. Finish all required parts before opening <strong>Review &amp; Submit</strong>.
+            </div>
+          ) : null}
+          {sectionMap.get(key)}
+          {sharedDraftCaptureEnabled ? <A1TutorDraftSectionCapture sectionKey={key} /> : null}
+        </>
+      );
+
+      return (
+        <WorkbookSection key={key} sectionKey={key}>
+          {isA1TutorReadingLabel(label) ? (
+            <A1TutorMarkedReadingFrame label={label}>
+              {sectionContent}
+            </A1TutorMarkedReadingFrame>
+          ) : sectionContent}
+        </WorkbookSection>
+      );
+    });
 
   if (process.env.NODE_ENV !== "production") {
     const missing = assignment.sections.filter(({ key }) => !sectionMap.has(key)).map(({ key }) => key);

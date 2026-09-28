@@ -60,6 +60,7 @@ jobs:
           src/data/a1TeacherVideoResources.test.js
           src/components/A1RadioFirstWorkbookRoutes.test.jsx
           src/components/A1WorkbookSectionTabs.test.js
+          src/components/A1TutorMarkedReadingLayout.test.js
           src/utils/courseWorkbookSubmission.test.js
 
       - name: Run A1 workbook media regression in isolation
