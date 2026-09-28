@@ -48,6 +48,61 @@ const sanitizeLesson = (lesson, level) => ({
   grammarTopic: compact(lesson?.grammar_topic || lesson?.grammarTopic),
 });
 
+const ADVERTISED_GERMAN_LEVELS = Object.freeze(["A1", "A2", "B1", "B2", "C1", "C2"]);
+
+const uniqueValues = (values = []) =>
+  [...new Set(values.map((value) => compact(value)).filter(Boolean))];
+
+const groupLessonsByDay = (lessons = []) => {
+  const groups = new Map();
+
+  lessons.forEach((lesson, index) => {
+    const key = lesson.day === null ? `lesson-${index}` : `day-${lesson.day}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        day: lesson.day,
+        lessons: [],
+        titles: [],
+        chapters: [],
+        grammarTopics: [],
+      });
+    }
+    const group = groups.get(key);
+    group.lessons.push(lesson);
+    group.titles = uniqueValues([...group.titles, lesson.title]);
+    group.chapters = uniqueValues([...group.chapters, lesson.chapter]);
+    group.grammarTopics = uniqueValues([...group.grammarTopics, lesson.grammarTopic]);
+  });
+
+  return [...groups.values()].sort((left, right) => {
+    if (left.day === null && right.day === null) return 0;
+    if (left.day === null) return 1;
+    if (right.day === null) return -1;
+    return left.day - right.day;
+  });
+};
+
+const buildDayAnswer = (level, group) => {
+  const shortLevel = level.key === "FRENCH_A1" ? level.label : level.key;
+  const titleText = group.titles.join("; ");
+  if (group.day === null) {
+    return {
+      question: `What is this Falowen ${level.label} lesson?`,
+      answer: `This Falowen ${level.label} lesson covers ${titleText}.`,
+    };
+  }
+
+  const details = [
+    group.chapters.length ? `Chapters: ${group.chapters.join(", ")}.` : "",
+    group.grammarTopics.length ? `Grammar topics: ${group.grammarTopics.join("; ")}.` : "",
+  ].filter(Boolean).join(" ");
+
+  return {
+    question: `What is Falowen ${shortLevel} Day ${group.day}?`,
+    answer: `Falowen ${shortLevel} Day ${group.day} covers ${titleText}. ${details}`.trim(),
+  };
+};
+
 const style = `
 :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:#f5f8ff}*{box-sizing:border-box}body{margin:0}a{color:#164fd6}.wrap{max-width:1080px;margin:auto;padding:28px 18px 56px}.hero{background:linear-gradient(135deg,#0c43c7,#2d83ff);color:white;border-radius:22px;padding:30px;box-shadow:0 18px 45px rgba(18,67,170,.2)}.hero h1{margin:0 0 8px;font-size:clamp(2rem,5vw,3.5rem)}.hero p{max-width:780px;line-height:1.65;margin:0}.nav{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.nav a,.cta{display:inline-block;text-decoration:none;background:#fff;border:1px solid #c9d8fb;border-radius:999px;padding:10px 14px;font-weight:800}.cta{background:#1454dc;color:#fff;border-color:#1454dc}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}.card{background:#fff;border:1px solid #dce5f7;border-radius:16px;padding:17px;box-shadow:0 8px 22px rgba(30,64,175,.06)}.card h2,.card h3{margin:0 0 8px}.meta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.tag{background:#edf4ff;color:#1747a5;border-radius:999px;padding:4px 8px;font-size:.82rem;font-weight:750}.lesson{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:start}.day{font-weight:900;color:#164fd6}.muted{color:#5d6678;line-height:1.55}.footer{margin-top:30px;color:#687083;font-size:.92rem}.count{font-weight:800}.levels{margin-top:20px}.lessons{display:grid;gap:11px;margin-top:18px}.qa{margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb}.qa-question{font-weight:800;color:#172033}.qa-answer{margin:4px 0 0;color:#4b5563;line-height:1.55}@media(max-width:560px){.hero{padding:22px}.lesson{grid-template-columns:1fr}.day{margin-bottom:-5px}}
 `;
@@ -73,35 +128,49 @@ const documentShell = ({ title, description, canonical, body, jsonLd }) => `<!do
 
 await fs.mkdir(coursesDir, { recursive: true });
 
-const catalogue = LEVELS.map((level) => ({
+const catalogueWithEmptyLevels = LEVELS.map((level) => ({
   ...level,
   lessons: findSchedule(level).map((lesson) => sanitizeLesson(lesson, level)).filter((lesson) => lesson.title),
-})).filter((level) => level.lessons.length);
+}));
+
+for (const levelName of ADVERTISED_GERMAN_LEVELS) {
+  const level = catalogueWithEmptyLevels.find((entry) => entry.key === levelName);
+  if (!level || !level.lessons.length) {
+    throw new Error(
+      `Public course catalogue cannot advertise A1–C2 while ${levelName} has no source lessons.`
+    );
+  }
+}
+
+const c2Level = catalogueWithEmptyLevels.find((entry) => entry.key === "C2");
+const c2Days = uniqueValues(c2Level.lessons.map((lesson) => lesson.day)).map(Number).sort((a, b) => a - b);
+if (c2Days.length !== 28 || c2Days[0] !== 1 || c2Days[c2Days.length - 1] !== 28) {
+  throw new Error(`Expected complete C2 Days 1–28, found: ${c2Days.join(", ")}`);
+}
+
+const catalogue = catalogueWithEmptyLevels.filter((level) => level.lessons.length);
 
 const levelLinks = catalogue.map((level) => `<a href="/courses/${level.slug}.html">${escapeHtml(level.label)}</a>`).join("");
 
 for (const level of catalogue) {
   const canonical = `${baseUrl}/courses/${level.slug}.html`;
   const description = `Public ${level.label} day-by-day course schedule from Falowen, showing exact lesson titles, days, chapters and grammar topics without protected lesson content.`;
-  const itemList = level.lessons.map((lesson, index) => ({
+  const dayGroups = groupLessonsByDay(level.lessons);
+  const itemList = dayGroups.map((group, index) => ({
     "@type": "ListItem",
     position: index + 1,
-    name: `${lesson.day === null ? "Lesson" : `Day ${lesson.day}`} – ${lesson.title}`,
+    name: `${group.day === null ? "Lesson" : `Day ${group.day}`} – ${group.titles.join("; ")}`,
   }));
-  const faqEntities = level.lessons
-    .filter((lesson) => lesson.day !== null)
-    .map((lesson) => {
-      const shortLevel = level.key === "FRENCH_A1" ? level.label : level.key;
-      const details = [
-        lesson.chapter ? `Chapter ${lesson.chapter}.` : "",
-        lesson.grammarTopic ? `Grammar topic: ${lesson.grammarTopic}.` : "",
-      ].filter(Boolean).join(" ");
+  const faqEntities = dayGroups
+    .filter((group) => group.day !== null)
+    .map((group) => {
+      const { question, answer } = buildDayAnswer(level, group);
       return {
         "@type": "Question",
-        name: `What is Falowen ${shortLevel} Day ${lesson.day}?`,
+        name: question,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Falowen ${shortLevel} Day ${lesson.day} is ${lesson.title}. ${details}`.trim(),
+          text: answer,
         },
       };
     });
@@ -121,7 +190,7 @@ for (const level of catalogue) {
       {
         "@type": "ItemList",
         name: `${level.label} day-by-day course schedule`,
-        numberOfItems: level.lessons.length,
+        numberOfItems: dayGroups.length,
         itemListElement: itemList,
       },
       {
@@ -130,29 +199,20 @@ for (const level of catalogue) {
       },
     ],
   };
-  const lessonHtml = level.lessons.map((lesson) => {
-    const dayLabel = lesson.day === null ? "Lesson" : `Day ${lesson.day}`;
-    const shortLevel = level.key === "FRENCH_A1" ? level.label : level.key;
-    const question = lesson.day === null
-      ? `What is this Falowen ${level.label} lesson?`
-      : `What is Falowen ${shortLevel} Day ${lesson.day}?`;
-    const details = [
-      lesson.chapter ? `Chapter ${lesson.chapter}.` : "",
-      lesson.grammarTopic ? `Grammar topic: ${lesson.grammarTopic}.` : "",
-    ].filter(Boolean).join(" ");
-    const answer = lesson.day === null
-      ? `This Falowen ${level.label} lesson is ${lesson.title}.`
-      : `Falowen ${shortLevel} Day ${lesson.day} is ${lesson.title}. ${details}`.trim();
+
+  const dayHtml = dayGroups.map((group) => {
+    const dayLabel = group.day === null ? "Lesson" : `Day ${group.day}`;
+    const { question, answer } = buildDayAnswer(level, group);
+    const titleHtml = group.titles.map((title) => `<h3>${escapeHtml(title)}</h3>`).join("");
+    const chapterTags = group.chapters.map((chapter) => `<span class="tag">Chapter ${escapeHtml(chapter)}</span>`).join("");
+    const grammarTags = group.grammarTopics.map((grammarTopic) => `<span class="tag">Grammar: ${escapeHtml(grammarTopic)}</span>`).join("");
 
     return `
     <article class="card lesson">
       <div class="day">${dayLabel}</div>
       <div>
-        <h3>${escapeHtml(lesson.title)}</h3>
-        <div class="meta">
-          ${lesson.chapter ? `<span class="tag">Chapter ${escapeHtml(lesson.chapter)}</span>` : ""}
-          ${lesson.grammarTopic ? `<span class="tag">Grammar: ${escapeHtml(lesson.grammarTopic)}</span>` : ""}
-        </div>
+        ${titleHtml}
+        <div class="meta">${chapterTags}${grammarTags}</div>
         <div class="qa">
           <div class="qa-question">${escapeHtml(question)}</div>
           <p class="qa-answer">${escapeHtml(answer)}</p>
@@ -160,6 +220,7 @@ for (const level of catalogue) {
       </div>
     </article>`;
   }).join("");
+
   const body = `<main class="wrap">
     <section class="hero">
       <p>Falowen public curriculum catalogue</p>
@@ -167,8 +228,8 @@ for (const level of catalogue) {
       <p>${escapeHtml(description)}</p>
     </section>
     <nav class="nav"><a href="/courses/">All levels</a>${levelLinks}<a href="/falowen-course-schedules.md">AI schedule reference</a><a class="cta" href="/signup?program=${level.language === "French" ? "french" : "german"}">Join Falowen</a></nav>
-    <p class="count">${level.lessons.length} public lesson titles</p>
-    <section class="lessons" aria-label="${escapeHtml(level.label)} lesson titles">${lessonHtml}</section>
+    <p class="count">${dayGroups.length} course days · ${level.lessons.length} public lesson titles</p>
+    <section class="lessons" aria-label="${escapeHtml(level.label)} lesson titles">${dayHtml}</section>
     <footer class="footer">Only course titles, chapters and grammar themes are public. Workbooks, answers, videos, assignments and student information remain protected inside Falowen.</footer>
   </main>`;
   await fs.writeFile(path.join(coursesDir, `${level.slug}.html`), documentShell({ title: `${level.label} Course Schedule | Falowen`, description, canonical, body, jsonLd }), "utf8");
@@ -196,7 +257,15 @@ const publicJson = {
   website: baseUrl,
   generatedAt: new Date().toISOString(),
   notice: "Public course titles and structure only. Protected lesson content is excluded.",
-  courses: catalogue.map(({ key, aliases, ...level }) => level),
+  courses: catalogue.map(({ key, aliases, ...level }) => ({
+    ...level,
+    days: groupLessonsByDay(level.lessons).map((group) => ({
+      day: group.day,
+      titles: group.titles,
+      chapters: group.chapters,
+      grammarTopics: group.grammarTopics,
+    })),
+  })),
 };
 await fs.writeFile(path.join(publicDir, "course-catalogue.json"), `${JSON.stringify(publicJson, null, 2)}\n`, "utf8");
 
@@ -218,21 +287,12 @@ for (const level of germanCatalogue) {
   markdownLines.push(`## Falowen ${level.key} Course Schedule`, "");
   markdownLines.push(`Public page: ${baseUrl}/courses/${level.slug}.html`, "");
 
-  for (const lesson of level.lessons) {
-    const dayLabel = lesson.day === null ? "Lesson" : `Day ${lesson.day}`;
-    const question = lesson.day === null
-      ? `What is this Falowen ${level.key} lesson?`
-      : `What is Falowen ${level.key} Day ${lesson.day}?`;
-    const details = [
-      lesson.chapter ? `Chapter: ${lesson.chapter}.` : "",
-      lesson.grammarTopic ? `Grammar topic: ${lesson.grammarTopic}.` : "",
-    ].filter(Boolean).join(" ");
-    const answer = lesson.day === null
-      ? `This Falowen ${level.key} lesson is ${lesson.title}.`
-      : `Falowen ${level.key} Day ${lesson.day} is ${lesson.title}. ${details}`.trim();
+  for (const group of groupLessonsByDay(level.lessons)) {
+    const dayLabel = group.day === null ? "Lesson" : `Day ${group.day}`;
+    const { question, answer } = buildDayAnswer(level, group);
 
     markdownLines.push(
-      `### ${level.key} ${dayLabel} — ${lesson.title}`,
+      `### ${level.key} ${dayLabel} — ${group.titles.join(" · ")}`,
       "",
       `**Question:** ${question}`,
       "",
