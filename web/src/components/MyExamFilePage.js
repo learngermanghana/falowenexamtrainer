@@ -6,6 +6,8 @@ import { useExam } from "../context/ExamContext";
 import { useGoetheExamConfig } from "../hooks/useGoetheExamConfig";
 import { toDate } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
+import { goetheExamLevels as fallbackGoetheExamLevels } from "../data/goetheExamSchedule";
+import { getGoetheExamFileGuide, GOETHE_EXAM_FILE_LEVELS } from "../data/goetheExamFileGuide";
 
 const GOETHE_ACCOUNT_URL =
   "https://login.goethe.de/cas/login?service=https%3A%2F%2Fwww.goethe.de%2Fservices%2Fcas%2Fservice%2Fgoethe%2F&locale=de&renew=false";
@@ -129,7 +131,16 @@ const MyExamFilePage = () => {
     loading: examScheduleLoading,
     source: examScheduleSource,
   } = useGoetheExamConfig();
-  const goetheExamLevels = goetheExamConfig.levels;
+  const goetheExamLevels = useMemo(() => {
+    const merged = new Map(
+      fallbackGoetheExamLevels.map((levelInfo) => [levelInfo.level, levelInfo])
+    );
+    (goetheExamConfig.levels || []).forEach((levelInfo) => {
+      if (!levelInfo?.level) return;
+      merged.set(levelInfo.level, { ...merged.get(levelInfo.level), ...levelInfo });
+    });
+    return GOETHE_EXAM_FILE_LEVELS.map((levelName) => merged.get(levelName)).filter(Boolean);
+  }, [goetheExamConfig.levels]);
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -160,6 +171,10 @@ const MyExamFilePage = () => {
   const summaryLevel = useMemo(
     () => goetheExamLevels.find((levelInfo) => levelInfo.level === detectedLevel) || visibleExamLevels[0] || null,
     [detectedLevel, goetheExamLevels, visibleExamLevels]
+  );
+  const examGuide = useMemo(
+    () => getGoetheExamFileGuide(summaryLevel?.level || detectedLevel),
+    [detectedLevel, summaryLevel?.level]
   );
 
   const nextRegistration = useMemo(() => {
@@ -196,10 +211,10 @@ const MyExamFilePage = () => {
       <section style={{ ...styles.card, display: "grid", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam registration</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Register in two steps</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam hub</p>
+            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Registration, sample exam and structure</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Create your Goethe account first. On the registration date, open the official registration page and book immediately.
+              Keep your Goethe account, official registration page and official sample exam in one place.
             </p>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -213,10 +228,10 @@ const MyExamFilePage = () => {
             <div style={{ fontSize: 12, fontWeight: 900, color: "#1d4ed8" }}>STEP 1</div>
             <div style={{ fontWeight: 900, color: "#111827" }}>Create or open your Goethe account</div>
             <div style={{ fontSize: 13, lineHeight: 1.45, color: "#6b7280" }}>
-              Set up the account before booking opens and keep your login details ready.
+              Set up the account before booking opens. If you are new, choose Create account on Goethe and keep your login details ready.
             </div>
             <a href={GOETHE_ACCOUNT_URL} target="_blank" rel="noreferrer" style={primaryLinkStyle}>
-              Create or open Goethe account →
+              Create / sign in to Goethe account →
             </a>
           </div>
 
@@ -240,8 +255,62 @@ const MyExamFilePage = () => {
               <div style={styles.errorBox}>The official registration link has not been added for this level yet.</div>
             )}
           </div>
+
+          <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 12, background: "#f0fdf4", display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 900, color: "#166534" }}>OFFICIAL SAMPLE</div>
+            <div style={{ fontWeight: 900, color: "#111827" }}>
+              Goethe {examGuide?.level || summaryLevel?.level || detectedLevel || ""} sample exam
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.45, color: "#4b5563" }}>
+              Practise with Goethe's official exam material and become familiar with the real task types before exam day.
+            </div>
+            {examGuide?.practiceUrl ? (
+              <a href={examGuide.practiceUrl} target="_blank" rel="noreferrer" style={{ ...primaryLinkStyle, background: "#15803d" }}>
+                {examGuide.practiceLabel || "Open official Goethe sample exam"} →
+              </a>
+            ) : (
+              <div style={styles.errorBox}>Official practice material has not been added for this level yet.</div>
+            )}
+          </div>
         </div>
       </section>
+
+      <section style={{ ...styles.card, display: "grid", gap: 10 }} data-exam-file-registration-guide="true">
+        <div>
+          <h3 style={{ margin: 0, color: "#111827" }}>How to register</h3>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+            Do these steps before and on the advertised Goethe registration date.
+          </p>
+        </div>
+        <ol style={{ margin: 0, paddingLeft: 22, color: "#374151", lineHeight: 1.7, fontSize: 13 }}>
+          <li>Open the Goethe account link above. If you are new, use <strong>Create account</strong> and complete your profile before registration day.</li>
+          <li>Keep your Goethe login details ready, then open the official registration page for your level.</li>
+          <li>On the advertised date, select the exam and secure an available place. Goethe Ghana states that registration opens at 07:00 German time.</li>
+          <li>Complete the booking and payment only after you have secured a place on Goethe's website.</li>
+        </ol>
+      </section>
+
+      {examGuide ? (
+        <section style={{ ...styles.card, display: "grid", gap: 10 }} data-exam-file-structure={examGuide.level}>
+          <div>
+            <h3 style={{ margin: 0, color: "#111827" }}>How the {examGuide.level} exam is structured</h3>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{examGuide.structureNote}</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8 }}>
+            {examGuide.sections.map((section) => (
+              <div key={section.key} style={{ border: "1px solid #e5e7eb", borderRadius: 11, padding: 10, background: "#ffffff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
+                  <strong style={{ color: "#111827" }}>{section.name}</strong>
+                  <span style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 12 }}>{section.duration}</span>
+                </div>
+                <p style={{ ...styles.helperText, margin: "6px 0 0", fontSize: 12, lineHeight: 1.5 }}>
+                  {section.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
