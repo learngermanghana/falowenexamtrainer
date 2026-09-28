@@ -149,6 +149,19 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
+  test("Day 19 chapter 5.9 uses the current speaking teacher lecture and not the retired video", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(19, "5.9");
+
+    expect(configuredVideo).toEqual(
+      expect.objectContaining({
+        chapter: "5.9",
+        topic: "Goethe A1 Speaking Confidence Lab",
+        url: "https://youtu.be/ZfXw4fRQ0Tg",
+      })
+    );
+    expect(configuredVideo.url).not.toBe("https://youtu.be/Wbfu87ZL8LY");
+  });
+
   test("chapter lookup returns only the canonical resources for that chapter", () => {
     expect(getA1TeacherVideoResources(2, "0.2").map((video) => video.chapter)).toEqual([
       "0.2",
