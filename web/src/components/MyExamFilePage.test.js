@@ -22,6 +22,7 @@ describe("Goethe Exam File hub", () => {
     expect(page).toContain("EXAM SAMPLE");
     expect(page).toContain("Open exam sample");
     expect(page).toContain("How the {examGuide.level} exam is structured");
+    expect(page).toContain("7:00 AM German time");
     expect(page).toContain('data-exam-file-registration-guide="true"');
   });
 
