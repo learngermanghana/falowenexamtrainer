@@ -10,7 +10,7 @@ const frenchPath = path.join(repoRoot, "web", "src", "data", "frenchCourseSchedu
 
 const canonicalLessons = JSON.parse(await fs.readFile(canonicalPath, "utf8"));
 
-const germanLevels = ["A1", "A2", "B1", "B2", "C1"];
+const germanLevels = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const courseSchedules = Object.fromEntries(
   germanLevels.map((level) => [
     level,
