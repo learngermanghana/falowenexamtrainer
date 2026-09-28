@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
+import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import { styles } from "../styles";
 
@@ -173,19 +174,19 @@ const Teil1Content = () => (
             <strong style={{ lineHeight: 1.6 }}>{question.title}:</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
 
-            <div style={infoBoxStyle}>
-              <strong>Anzeige A</strong>
-              {question.adA.map((line) => (
-                <span key={`${question.title}-a-${line}`}>{line}</span>
-              ))}
-            </div>
+            <A1ReadingSourceGrid minWidth={220}>
+              <A1ReadingSourceCard label="Anzeige A" title={question.adA[0]}>
+                {question.adA.slice(1).map((line) => (
+                  <span key={`${question.title}-a-${line}`}>{line}</span>
+                ))}
+              </A1ReadingSourceCard>
 
-            <div style={infoBoxStyle}>
-              <strong>Anzeige B</strong>
-              {question.adB.map((line) => (
-                <span key={`${question.title}-b-${line}`}>{line}</span>
-              ))}
-            </div>
+              <A1ReadingSourceCard label="Anzeige B" title={question.adB[0]}>
+                {question.adB.slice(1).map((line) => (
+                  <span key={`${question.title}-b-${line}`}>{line}</span>
+                ))}
+              </A1ReadingSourceCard>
+            </A1ReadingSourceGrid>
 
             <p style={{ margin: 0 }}>
               <strong>Welche Anzeige ist richtig?</strong>
