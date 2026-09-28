@@ -60,6 +60,9 @@ export function A1TutorMarkedReadingFrame({ label = "", children }) {
           paddingTop: 14,
           display: "grid",
           gap: 12,
+          width: "100%",
+          maxWidth: mode === "document" ? 900 : "none",
+          justifySelf: "center",
         }}
       >
         {children}
