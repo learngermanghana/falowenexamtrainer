@@ -1,0 +1,43 @@
+name: A2-C2 Lesen exam layout
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/ReadingExamLayout.jsx"
+      - "web/src/components/ReadingExamLayout.test.js"
+      - "web/src/components/A2ReadingTaskPanel.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/B2UnifiedGuidedWorkbookPage.js"
+      - "web/src/components/C1SelfLearningCourse.js"
+      - "web/src/components/C2UnifiedGuidedWorkbookPage.js"
+      - "web/src/data/a2ReadingTasks.js"
+      - "web/src/data/b1ReadingTasks.js"
+      - "web/src/data/b2ReadingPractice.js"
+      - "web/src/data/c2ReadingPractice.js"
+      - ".github/workflows/reading-exam-layout.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Test shared A2-C2 Lesen layout
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/ReadingExamLayout.test.js
+
+      - name: Build production web app
+        working-directory: web
+        run: npx vite build

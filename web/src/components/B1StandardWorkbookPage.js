@@ -11,6 +11,7 @@ import {
 } from "./StandardWorkbookComponents";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import { styles } from "../styles";
+import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSourceCard, ReadingSourceGrid, readingSourceLabel } from "./ReadingExamLayout";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import { getB1ListeningTask } from "../data/b1ListeningTasks";
@@ -169,35 +170,53 @@ const IdeaGrid = ({ groups }) => {
   );
 };
 
-const QuestionList = ({ questions, startAt = 1 }) => {
+const QuestionList = ({ questions, startAt = 1, examGrid = false }) => {
   if (!questions?.length) return null;
+  const Wrapper = examGrid ? ReadingQuestionGrid : React.Fragment;
   return (
-    <div style={{ display: "grid", gap: 10 }}>
+    <Wrapper>
       {questions.map((question, index) => (
         <div key={`${question.stem}-${index}`} style={contentCard}>
           <strong>{startAt + index}. {question.stem}</strong>
           {question.options?.map((option) => <span key={option}>{option}</span>)}
         </div>
       ))}
-    </div>
+    </Wrapper>
   );
 };
 
-const TextBlock = ({ block }) => {
+const TextBlock = ({ block, examReading = false, sourceLabel = "" }) => {
   if (!block) return null;
-  return (
-    <div style={{ display: "grid", gap: 10 }}>
-      {block.title ? <h3 style={sectionTitle}>{block.title}</h3> : null}
-      {block.subtitle ? <p style={{ margin: 0, color: "#475569" }}>{block.subtitle}</p> : null}
+
+  const body = (
+    <>
       {block.paragraphs?.map((paragraph, index) => (
         <p key={`${block.title || "text"}-${index}`} style={{ margin: 0, lineHeight: 1.75 }}>
           {paragraph}
         </p>
       ))}
+    </>
+  );
+
+  const source = examReading
+    ? sourceLabel
+      ? <ReadingSourceCard label={sourceLabel} title={block.title || ""}>{body}</ReadingSourceCard>
+      : <ReadingExamDocument title={block.title || ""} subtitle={block.subtitle || ""}>{body}</ReadingExamDocument>
+    : (
+      <div style={{ display: "grid", gap: 10 }}>
+        {block.title ? <h3 style={sectionTitle}>{block.title}</h3> : null}
+        {block.subtitle ? <p style={{ margin: 0, color: "#475569" }}>{block.subtitle}</p> : null}
+        {body}
+      </div>
+    );
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      {source}
       {block.questions?.length ? (
         <>
           <h3 style={sectionTitle}>{block.questionTitle || "Questions"}</h3>
-          <QuestionList questions={block.questions} startAt={block.startAt || 1} />
+          <QuestionList questions={block.questions} startAt={block.startAt || 1} examGrid={examReading} />
         </>
       ) : null}
     </div>
@@ -437,14 +456,28 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
               text="Add the reading text, question set, answer options and answer format here when the material is ready."
             />
           ) : (
-            <>
-              <TextBlock block={reading.text} />
-              {reading.additionalTexts?.map((block, index) => (
-                <div key={`${block.title || "additional"}-${index}`} style={{ borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
-                  <TextBlock block={block} />
-                </div>
-              ))}
-            </>
+            <ReadingExamFrame
+              level="B1"
+              title={reading.text?.title || reading.title || "Lesen"}
+              format={reading.additionalTexts?.length ? "Mehrere Texte" : "Lesetext"}
+              variant={reading.additionalTexts?.length ? "sources" : "document"}
+            >
+              {reading.additionalTexts?.length ? (
+                <ReadingSourceGrid>
+                  <TextBlock block={reading.text} examReading sourceLabel={readingSourceLabel(0)} />
+                  {reading.additionalTexts.map((block, index) => (
+                    <TextBlock
+                      key={`${block.title || "additional"}-${index}`}
+                      block={block}
+                      examReading
+                      sourceLabel={readingSourceLabel(index + 1)}
+                    />
+                  ))}
+                </ReadingSourceGrid>
+              ) : (
+                <TextBlock block={reading.text} examReading />
+              )}
+            </ReadingExamFrame>
           )}
 
           <WorkbookSubmissionReminder />

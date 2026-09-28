@@ -1,5 +1,6 @@
 import React from "react";
 import { getA2ReadingTask } from "../data/a2ReadingTasks";
+import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSourceCard, ReadingSourceGrid, getReadingExamVariant, readingSourceLabel, splitReadingSourceText } from "./ReadingExamLayout";
 
 const taskCard = {
   border: "1px solid #dbeafe",
@@ -23,53 +24,52 @@ const A2ReadingTaskPanel = ({ day }) => {
   const task = getA2ReadingTask(day);
   const text = task?.text || "";
   const questions = task?.questions || [];
+  const sourceBlocks = splitReadingSourceText(text, task?.format || "");
+  const variant = getReadingExamVariant({
+    format: task?.format || "",
+    sourceCount: sourceBlocks.length,
+  });
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      {task ? (
-        <div style={taskCard}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: 12, fontWeight: 900, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".05em" }}>
-              {task.format}
-            </span>
-            <span style={{ fontSize: 12, color: "#64748b" }}>A2 exam reading practice</span>
-          </div>
-          <strong style={{ color: "#0f172a" }}>{task.title}</strong>
-          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            <strong>Lesestrategie:</strong> {task.strategy}
-          </p>
-        </div>
-      ) : null}
-
       <p style={{ margin: 0 }}>
         Lies den Text und die Fragen. <strong>Antworte nicht direkt auf dieser Seite.</strong> Trage deine endgültigen
         Antwortbuchstaben im Submit-Bereich ein.
       </p>
 
-      <div
-        style={{
-          border: "1px solid #e2e8f0",
-          borderRadius: 12,
-          padding: 14,
-          background: "#fff",
-          lineHeight: 1.75,
-          whiteSpace: "pre-line",
-          color: "#1f2937",
-        }}
+      <ReadingExamFrame
+        level="A2"
+        title={task?.title || "Lesen"}
+        format={task?.format || "Lesetext"}
+        strategy={task?.strategy || ""}
+        variant={variant}
       >
-        {text || "Lies einen kurzen A2-Text zum Thema des Tages und finde Hauptinformation und wichtige Details."}
-      </div>
+        {variant === "sources" ? (
+          <ReadingSourceGrid>
+            {sourceBlocks.map((source, index) => (
+              <ReadingSourceCard key={`${day}-source-${index}`} label={readingSourceLabel(index)}>
+                <div style={{ whiteSpace: "pre-line" }}>{source}</div>
+              </ReadingSourceCard>
+            ))}
+          </ReadingSourceGrid>
+        ) : (
+          <ReadingExamDocument title={task?.title || ""}>
+            <div style={{ whiteSpace: "pre-line" }}>
+              {text || "Lies einen kurzen A2-Text zum Thema des Tages und finde Hauptinformation und wichtige Details."}
+            </div>
+          </ReadingExamDocument>
+        )}
+      </ReadingExamFrame>
 
-      <div style={{ display: "grid", gap: 10 }}>
+      <ReadingQuestionGrid>
         {questions.map((question, index) => (
           <div key={`${day}-reading-${index}-${question.stem}`} style={questionCard}>
             <strong>{index + 1}. {question.stem}</strong>
             {(question.options || []).map((option) => <span key={option}>{option}</span>)}
           </div>
         ))}
-      </div>
+      </ReadingQuestionGrid>
     </div>
   );
 };
-
 export default A2ReadingTaskPanel;
