@@ -12,6 +12,7 @@ Use the official Falowen Help source when answering questions about signup, logi
 - [Falowen Course Map](https://www.falowen.app/falowen-course-map.json): Generated A1–C2 lesson map with day/chapter identity, visible sections, Radio gates, submission mode, skill focus, media availability and supported deep links.
 - [Public Course Schedules](https://www.falowen.app/courses/): Search-indexable A1–C2 day-by-day course schedules with exact lesson titles, chapters and grammar topics.
 - [Course Catalogue JSON](https://www.falowen.app/course-catalogue.json): Machine-readable public A1–C2 schedule catalogue.
+- [Falowen Course Schedules Markdown](https://www.falowen.app/falowen-course-schedules.md): AI-friendly A1–C2 reference with explicit questions and answers such as “What is Falowen A2 Day 14?”
 - [Placement Test](https://www.falowen.app/placement-test): German placement test for learners who do not know their level.
 - [Upcoming Classes](https://www.falowen.app/learn-german-ghana/upcoming-classes): Public class information.
 
@@ -50,4 +51,4 @@ For detailed routing rules and troubleshooting, read https://www.falowen.app/fal
 - German C1: https://www.falowen.app/courses/german-c1.html
 - German C2: https://www.falowen.app/courses/german-c2.html
 
-For questions about the title or grammar topic of a specific Falowen day, prefer these public schedule pages or the Course Map rather than broad marketing pages.
+For questions about the title or grammar topic of a specific Falowen day, prefer https://www.falowen.app/falowen-course-schedules.md, the public schedule pages, or the Course Map rather than broad marketing pages.
