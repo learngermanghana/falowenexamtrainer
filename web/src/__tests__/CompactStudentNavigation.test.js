@@ -10,6 +10,10 @@ const healthIndicator = readSource("components/HealthIndicator.js");
 const notificationBell = readSource("components/NotificationBell.js");
 const courseTab = readSource("components/CourseTab.js");
 const studyBuddyCss = readSource("components/StudyBuddyBar.css");
+const compactNavigationPatch = fs.readFileSync(
+  path.resolve(__dirname, "../../../scripts/patchCompactStudentNavigation.mjs"),
+  "utf8",
+);
 
 describe("compact student navigation", () => {
   it("keeps the signed-in top bar compact and moves account controls into the profile menu", () => {
@@ -46,6 +50,16 @@ describe("compact student navigation", () => {
     expect(appCss).toContain(".campus-mobile-bottom-nav");
     expect(appCss).toContain("min-height: 52px");
     expect(appCss).toContain("min-width: 44px");
+  });
+
+  it("repairs Vocab labels even when campus navigation was already patched", () => {
+    expect(compactNavigationPatch).toContain("already-patched worktrees");
+    expect(compactNavigationPatch).toContain(
+      '.replaceAll(\n    \'{ key: "practice", label: "Practice", route: "/campus/vocab"\'',
+    );
+    expect(compactNavigationPatch).toContain(
+      '.replaceAll(\n    \'{ key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab"\'',
+    );
   });
 
   it("keeps the Course Book first screen focused on student data and actions", () => {
