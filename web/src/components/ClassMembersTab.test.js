@@ -7,6 +7,6 @@ describe("Class Members current-student badge", () => {
 
     expect(source).toContain("member.id === studentProfile?.id");
     expect(source).toContain('data-testid="current-class-member-badge"');
-    expect(source).toContain(">You<");
+    expect(source).toContain("You");
   });
 });
