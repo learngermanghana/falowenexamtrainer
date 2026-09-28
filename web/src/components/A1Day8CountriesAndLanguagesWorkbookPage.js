@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import A1TranslationTask from "./A1TranslationTask";
 
 import { styles } from "../styles";
 
@@ -59,20 +60,24 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
     >
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>Teil 1 · Countries and Languages Part 1: Translation</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Translate the following sentences into German.</p>
         <img
           src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1600&q=80"
           alt="World map with highlighted countries and language connections"
           loading="lazy"
           style={imageStyle}
         />
-        <ol style={listStyle}>
-          <li>I come from Germany. I speak German.</li>
-          <li>She comes from France. She speaks French.</li>
-          <li>They come from Russia. They speak Russian.</li>
-          <li>We come from Japan. We speak Japanese.</li>
-          <li>He comes from England. He speaks English.</li>
-        </ol>
+        <A1TranslationTask
+          sectionKey="teil-1"
+          title="Herkunft und Sprache"
+          instruction="Translate each sentence into German. Pay attention to the subject, verb form, country and language."
+          questions={[
+            { number: 1, text: "I come from Germany. I speak German.", cue: "kommen aus · sprechen" },
+            { number: 2, text: "She comes from France. She speaks French.", cue: "sie · kommt · spricht" },
+            { number: 3, text: "They come from Russia. They speak Russian.", cue: "sie (Plural) · kommen · sprechen" },
+            { number: 4, text: "We come from Japan. We speak Japanese.", cue: "wir · kommen · sprechen" },
+            { number: 5, text: "He comes from England. He speaks English.", cue: "er · kommt · spricht" },
+          ]}
+        />
       </section>
 
       <section style={cardStyle}>
