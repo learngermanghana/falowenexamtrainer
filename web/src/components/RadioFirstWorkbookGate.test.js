@@ -123,7 +123,7 @@ describe("Radio link gating", () => {
     const radio = resolveRadioFirstWorkbookResource("B1", 14);
     expect(radio).toEqual(expect.objectContaining({
       key: "b1-day14-traditionelles-digitales-lernen-falowen-radio",
-      youtubeId: "FmzZD9c-Shc",
+      youtubeId: "NS58BIySjx8",
     }));
 
     expect(isFalowenRadioResource(radio)).toBe(true);
