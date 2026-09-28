@@ -173,186 +173,7 @@ const renderGuidedLesson = async (page, lesson) => {
 
 const clickWorkbookTab = async (page, names) => {
   for (const name of names) {
-    const matcher = new RegExp(`^${name.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\const renderGuidedLesson = async (page, lesson) => {
-  await ensureAuthenticatedLesson(page, lesson);
-  const tabSpecs = [
-    { key: "learn", names: ["1. Learn", "Learn", "Grammar"] },
-    { key: "speak", names: ["2. Speak", "Speak"] },
-    { key: "write", names: ["3. Write", "Write", "Workbook"] },
-  ];
-  const rendered = [];
-  for (const tab of tabSpecs) {
-    const clicked = await clickTab(page, tab.names);
-    if (!clicked && tab.key !== "learn") continue;
-    rendered.push(await saveCurrentPagePdf(page, lesson, tab.key));
-  }
-  if (!rendered.length) throw new Error(`No guided lesson sections were rendered for Day ${lesson.day}.`);
-  return rendered;
-};
-
-const renderLesson = async (page, lesson) => {
-  if (level === "A1") return renderA1Lesson(page, lesson);
-  if (level === "B2" || level === "C1") return renderGuidedLesson(page, lesson);
-  await ensureAuthenticatedLesson(page, lesson);
-  return [await saveCurrentPagePdf(page, lesson, "lesson")];
-};")}import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { chromium } from "playwright";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "../..");
-const level = String(process.argv[2] || "").trim().toUpperCase();
-const baseUrl = String(process.env.FALOWEN_PDF_BASE_URL || "https://www.falowen.app").replace(/\/$/, "");
-const outputDir = path.join(repoRoot, "artifacts", "course-material-bundles", level);
-const manifestPath = path.join(outputDir, `Falowen-${level}-Course-Materials-manifest.json`);
-const finalPdfPath = path.join(outputDir, `Falowen-${level}-Course-Materials.pdf`);
-const renderDir = path.join(outputDir, "rendered-lessons");
-const diagnosticsPath = path.join(outputDir, "render-diagnostics.json");
-
-if (!fs.existsSync(manifestPath)) throw new Error(`Manifest not found: ${manifestPath}`);
-const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not ready for PDF generation.`);
-
-fs.rmSync(renderDir, { recursive: true, force: true });
-fs.mkdirSync(renderDir, { recursive: true });
-
-const diagnostics = { level, rendererVersion: 3, startedAt: new Date().toISOString(), lessons: [] };
-const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
-
-const storageStateFromEnv = () => {
-  const encoded = String(process.env.FALOWEN_PDF_AUTH_STATE_B64 || "").trim();
-  if (!encoded) return undefined;
-  const file = path.join(outputDir, "playwright-storage-state.json");
-  fs.writeFileSync(file, Buffer.from(encoded, "base64").toString("utf8"));
-  return file;
-};
-
-const waitForPage = async (page) => {
-  await page.waitForLoadState("domcontentloaded", { timeout: 30000 });
-  await page.locator("body").waitFor({ state: "visible", timeout: 10000 });
-  await page.waitForFunction(() => (document.body?.innerText || "").trim().length > 120, undefined, { timeout: 10000 }).catch(() => {});
-  await page.waitForTimeout(500);
-};
-
-const getBodyText = async (page) => (await page.locator("body").innerText().catch(() => "")).replace(/\s+/g, " ").trim();
-
-const isPublicLanding = async (page) => {
-  if (await page.locator(".falowen-public-home").count()) return true;
-  const text = await getBodyText(page);
-  return /German and French learning in one place|Ready to start learning\?|Create your Falowen account or log in to continue your course/i.test(text);
-};
-
-const hasLessonContent = async (page, lesson) => {
-  if (await isPublicLanding(page)) return false;
-  const text = await getBodyText(page);
-  const title = String(lesson?.title || "").trim();
-  if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
-
-  if (level === "A1") {
-    return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
-  }
-
-  if (level === "B2" || level === "C1") {
-    return /\bLearn\b/i.test(text) && /\bSpeak\b/i.test(text) && /\bWrite\b/i.test(text);
-  }
-
-  return /Workbook|Grammar|Course Book|Kapitel/i.test(text) && text.length > 500;
-};
-
-const credentials = () => {
-  const email = String(process.env.FALOWEN_PDF_EMAIL || "").trim();
-  const password = String(process.env.FALOWEN_PDF_PASSWORD || "");
-  if (!email || !password) throw new Error("Falowen PDF login requires FALOWEN_PDF_EMAIL and FALOWEN_PDF_PASSWORD repository secrets.");
-  return { email, password };
-};
-
-const openLogin = async (page) => {
-  const loginUrl = `${baseUrl}/login/`;
-  console.log(`Opening Falowen login directly: ${loginUrl}`);
-  await page.goto(loginUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForPage(page);
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-  await emailInput.waitFor({ state: "visible", timeout: 15000 });
-  await passwordInput.waitFor({ state: "visible", timeout: 15000 });
-};
-
-const submitLogin = async (page) => {
-  const { email, password } = credentials();
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-  if (!(await emailInput.count()) || !(await passwordInput.count())) throw new Error("Falowen login form fields were not found.");
-  await emailInput.fill(email);
-  await passwordInput.fill(password);
-  const submit = page.locator('button[type="submit"], input[type="submit"]').first();
-  if (!(await submit.count())) throw new Error("Falowen login submit button was not found.");
-  await submit.click({ timeout: 10000 });
-  await page.waitForTimeout(2500);
-};
-
-const ensureAuthenticatedLesson = async (page, lesson) => {
-  const targetUrl = new URL(lesson.route, baseUrl).toString();
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForPage(page);
-  if (await hasLessonContent(page, lesson)) return;
-
-  const loginFormAlreadyVisible = (await page.locator('input[type="email"]').count()) > 0;
-  if (!loginFormAlreadyVisible) {
-    await openLogin(page);
-  }
-
-  await submitLogin(page);
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForPage(page);
-  if (!(await hasLessonContent(page, lesson))) {
-    const preview = (await getBodyText(page)).slice(0, 700);
-    throw new Error(`Login completed but Day ${lesson.day} still did not show the real lesson. Current URL: ${page.url()}. Preview: ${preview}`);
-  }
-};
-
-const injectPrintMode = async (page) => {
-  await page.emulateMedia({ media: "print" });
-  await page.addStyleTag({ content: `
-    @page { size: A4; margin: 12mm 10mm 15mm; }
-    html, body { background: #fff !important; }
-    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    nav, [role="navigation"], .book-print-stamp,
-    .book-pdf-download-action, iframe,
-    [class*="study-buddy" i], [class*="floating" i],
-    [aria-label*="Study Buddy" i], [aria-label*="download" i] { display: none !important; }
-    [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
-    section, article, table, pre, blockquote { break-inside: avoid; }
-  ` });
-};
-
-const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
-  await injectPrintMode(page);
-  const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
-  await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
-  return { tab: suffix, file };
-};
-
-const renderA1Lesson = async (page, lesson) => {
-  await ensureAuthenticatedLesson(page, lesson);
-  return [await saveCurrentPagePdf(page, lesson, "lesson")];
-};
-
-const clickTab = async (page, names) => {
-  for (const name of names) {
-    const button = page.getByRole("button", { name: new RegExp(name, "i") }).first();
-    if (await button.count()) {
-      await button.click({ timeout: 10000 });
-      await page.waitForTimeout(350);
-      return true;
-    }
-  }
-  return false;
-};
-
-, "i");
-    const tab = page.getByRole("tab", { name: matcher }).first();
+    const tab = page.getByRole("tab", { name: new RegExp("^" + name + "$", "i") }).first();
     if (await tab.count()) {
       await tab.click({ timeout: 10000 });
       await page.waitForTimeout(350);
@@ -373,13 +194,13 @@ const renderB1Lesson = async (page, lesson) => {
     { key: "ref", names: ["Ref"] },
   ];
   const rendered = [];
-  for (const tab of tabSpecs) {
-    const clicked = await clickWorkbookTab(page, tab.names);
+  for (const tabSpec of tabSpecs) {
+    const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
-      if (tab.key === "teil-4") continue;
-      throw new Error(`B1 Day ${lesson.day} is missing printable workbook tab: ${tab.names[0]}.`);
+      if (tabSpec.key === "teil-4") continue;
+      throw new Error(`B1 Day ${lesson.day} is missing printable workbook tab: ${tabSpec.names[0]}.`);
     }
-    rendered.push(await saveCurrentPagePdf(page, lesson, tab.key));
+    rendered.push(await saveCurrentPagePdf(page, lesson, tabSpec.key));
   }
   if (!rendered.length) throw new Error(`No B1 workbook sections were rendered for Day ${lesson.day}.`);
   return rendered;
