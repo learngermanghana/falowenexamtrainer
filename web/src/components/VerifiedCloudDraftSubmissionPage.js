@@ -900,19 +900,8 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
   if (locked) {
     if (compact) {
       return (
-        <div
-          {...debugAttributes}
-          role="status"
-          style={{
-            background: "#ecfdf5",
-            border: "1px solid #86efac",
-            borderRadius: 12,
-            color: "#166534",
-            fontWeight: 800,
-            padding: "12px 14px",
-          }}
-        >
-          ✓ Already submitted — this assignment has already been sent to your tutor.
+        <div {...debugAttributes} data-compact-locked-submission="true">
+          <AssignmentSubmissionPage submissionContext={submissionContext} />
         </div>
       );
     }
