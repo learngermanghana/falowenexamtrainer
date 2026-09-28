@@ -3,6 +3,7 @@ import { getGoetheExamOrientationConfig } from "./goetheExamOrientation";
 const ADVANCED_GUIDES = Object.freeze({
   B2: {
     level: "B2",
+    sampleUrl: "https://www.goethe.de/en/spr/prf/ueb/pb2.html",
     structureNote: "B2 has four modules. The modules can be taken individually or together.",
     sections: [
       { key: "lesen", name: "Lesen", duration: "65 min", description: "Read longer everyday and public texts and identify main ideas, details, opinions and rules." },
@@ -13,6 +14,7 @@ const ADVANCED_GUIDES = Object.freeze({
   },
   C1: {
     level: "C1",
+    sampleUrl: "https://www.goethe.de/en/spr/prf/ueb/pc1.html",
     structureNote: "C1 has four modules. The oral module is normally a pair exam.",
     sections: [
       { key: "lesen", name: "Lesen", duration: "65 min", description: "Understand complex articles and contributions, including viewpoints, details and implicit meaning." },
@@ -23,6 +25,7 @@ const ADVANCED_GUIDES = Object.freeze({
   },
   C2: {
     level: "C2",
+    sampleUrl: "https://www.goethe.de/en/spr/prf/ueb/pc2.html",
     structureNote: "C2 has four modules. The speaking module is an individual oral exam.",
     sections: [
       { key: "lesen", name: "Lesen", duration: "80 min", description: "Understand complex factual texts, commentaries, reports and advertisements, including implicit meaning." },
@@ -39,6 +42,7 @@ export const getGoetheExamFileGuide = (level = "") => {
   if (courseGuide) {
     return {
       level: normalizedLevel,
+      sampleUrl: courseGuide.practiceUrl,
       structureNote:
         normalizedLevel === "B1"
           ? "B1 has four modules that can be taken individually or together."
