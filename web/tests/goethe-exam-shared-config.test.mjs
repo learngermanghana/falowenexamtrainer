@@ -38,12 +38,16 @@ test("Exam File and Study Calendar react when the shared Admin config arrives", 
   assert.match(hook, /fallbackGoetheExamConfig/);
 });
 
-test("Exam File gives students only the essential registration actions", async () => {
+test("Exam File gives students registration, sample and structure guidance without clutter", async () => {
   const examFile = await source("src/components/MyExamFilePage.js");
 
-  assert.match(examFile, /Register in two steps/);
-  assert.match(examFile, /Create or open Goethe account/);
+  assert.match(examFile, /Registration and exam structure/);
+  assert.match(examFile, /Create or open your Goethe account/);
   assert.match(examFile, /Open the official registration page/);
+  assert.match(examFile, /EXAM SAMPLE/);
+  assert.match(examFile, /Open exam sample/);
+  assert.match(examFile, /How to register/);
+  assert.match(examFile, /How the \{examGuide\.level\} exam is structured/);
   assert.match(examFile, /The registration link is the same for every date/);
   assert.match(examFile, /Registration: \{formatDate\(exam\.registrationStart\)\}/);
   assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
@@ -54,7 +58,6 @@ test("Exam File gives students only the essential registration actions", async (
   assert.doesNotMatch(examFile, /getCountdownLabel/);
   assert.doesNotMatch(examFile, /Official registration link:/);
   assert.doesNotMatch(examFile, /Account link:/);
-  assert.doesNotMatch(examFile, /How to register/);
   assert.doesNotMatch(examFile, /Submitted assignments \(locked\)/);
   assert.doesNotMatch(examFile, /Level leaderboard/);
   assert.doesNotMatch(examFile, /Teacher feedback history/);
