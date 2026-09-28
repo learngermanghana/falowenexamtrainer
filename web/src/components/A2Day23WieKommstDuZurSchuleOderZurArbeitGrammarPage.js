@@ -7,6 +7,39 @@ const card = { ...styles.card, display: "grid", gap: 10 };
 const paragraph = { margin: 0, lineHeight: 1.78 };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.8 };
 
+const focusedLesson = {
+  title: "Knowledge Test · Schul- und Arbeitsweg",
+  english:
+    "Use mit + dative for transport, zu + dative for many destinations, nach for cities and countries without an article, and the fixed phrase zu Fuß. Use weil with the conjugated verb at the end.",
+  rule:
+    "Transport: mit + Dativ. Destination: zu + Dativ for many places, nach for cities/countries without an article, and zu Fuß as a fixed phrase.",
+  examples: [
+    "Ich fahre mit dem Bus zur Arbeit.",
+    "Sie fährt mit der Bahn zur Schule.",
+    "Ich gehe zu Fuß zum Bahnhof.",
+    "Wir fahren morgen nach Accra.",
+  ],
+  commonMistake:
+    "Do not say mit die Bahn, mit Fuß or zu Berlin. Say mit der Bahn, zu Fuß and nach Berlin. After weil, put the conjugated verb at the end.",
+  questions: [
+    { stem: "Ich fahre ___ dem Bus zur Arbeit.", options: ["mit", "zu", "nach"], answer: 0, explanation: "Means of transport use mit + dative." },
+    { stem: "Ich fahre mit ___ Bahn.", options: ["die", "der", "den"], answer: 1, explanation: "mit takes dative: die Bahn → der Bahn." },
+    { stem: "Welcher Satz ist richtig?", options: ["Ich gehe mit Fuß.", "Ich gehe zu Fuß.", "Ich gehe nach Fuß."], answer: 1, explanation: "zu Fuß is a fixed expression." },
+    { stem: "Wir fahren morgen ___ Berlin.", options: ["nach", "zu", "mit"], answer: 0, explanation: "Cities normally use nach." },
+    { stem: "Ich fahre ___ Arbeit.", options: ["zur", "zum", "nach"], answer: 0, explanation: "die Arbeit → zu der Arbeit → zur Arbeit." },
+    { stem: "Which weil-sentence is correct?", options: ["..., weil der Bus ist schnell.", "..., weil der Bus schnell ist.", "..., weil ist der Bus schnell."], answer: 1, explanation: "In a weil-clause, the conjugated verb goes to the end." },
+  ],
+  outputPrompt:
+    "Beschreibe deinen Weg zur Schule oder Arbeit in 5–6 Sätzen. Nenne Verkehrsmittel, Dauer, Reihenfolge und einen Grund.",
+  starters: [
+    "Ich fahre/gehe ...",
+    "Zuerst ...",
+    "Dann ...",
+    "Der Weg dauert ...",
+    "Ich benutze ..., weil ...",
+  ],
+};
+
 const GrammarContent = () => (
   <div style={{ display: "grid", gap: 16 }}>
     <section style={card}>
@@ -142,33 +175,7 @@ const GrammarContent = () => (
       </ul>
     </section>
 
-    <A2MiniLearningBlock
-      title="Knowledge Test · Schul- und Arbeitsweg"
-      rule="Transport: mit + Dativ. Destination: zu + Dativ for many places, nach for cities/countries without an article, and zu Fuß as a fixed phrase."
-      examples={[
-        "Ich fahre mit dem Bus zur Arbeit.",
-        "Sie fährt mit der Bahn zur Schule.",
-        "Ich gehe zu Fuß zum Bahnhof.",
-        "Wir fahren morgen nach Accra.",
-      ]}
-      questions={[
-        { stem: "Ich fahre ___ dem Bus zur Arbeit.", options: ["mit", "zu", "nach"], answer: 0, explanation: "Means of transport use mit + dative." },
-        { stem: "Ich fahre mit ___ Bahn.", options: ["die", "der", "den"], answer: 1, explanation: "mit takes dative: die Bahn → der Bahn." },
-        { stem: "Welcher Satz ist richtig?", options: ["Ich gehe mit Fuß.", "Ich gehe zu Fuß.", "Ich gehe nach Fuß."], answer: 1, explanation: "zu Fuß is a fixed expression." },
-        { stem: "Wir fahren morgen ___ Berlin.", options: ["nach", "zu", "mit"], answer: 0, explanation: "Cities normally use nach." },
-        { stem: "Ich fahre ___ Arbeit.", options: ["zur", "zum", "nach"], answer: 0, explanation: "die Arbeit → zu der Arbeit → zur Arbeit." },
-        { stem: "Which weil-sentence is correct?", options: ["..., weil der Bus ist schnell.", "..., weil der Bus schnell ist.", "..., weil ist der Bus schnell."], answer: 1, explanation: "In a weil-clause, the conjugated verb goes to the end." },
-      ]}
-      outputPrompt="Beschreibe deinen Weg zur Schule oder Arbeit in 5–6 Sätzen. Nenne Verkehrsmittel, Dauer, Reihenfolge und einen Grund."
-      starters={[
-        "Ich fahre/gehe ...",
-        "Zuerst ...",
-        "Dann ...",
-        "Der Weg dauert ...",
-        "Ich benutze ..., weil ...",
-      ]}
-    />
-  </div>
+    <A2MiniLearningBlock {...focusedLesson} />  </div>
 );
 
 export default function A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage({ embedded = false }) {
