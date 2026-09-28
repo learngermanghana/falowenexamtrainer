@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { B1_READING_TASKS, getB1ReadingTask } from "./b1ReadingTasks";
 
 describe("B1 canonical reading registry", () => {
@@ -11,5 +13,21 @@ describe("B1 canonical reading registry", () => {
     expect(task.assignmentKey).toMatch(new RegExp(`^B1-(?:\\d+)\\.${day}$`));
     expect(task.title).toBeTruthy();
     expect(task.instructions).toBeTruthy();
+  });
+
+  test("every workbook that uses the registry imports its accessor", () => {
+    const componentsDirectory = path.join(process.cwd(), "src", "components");
+    const workbookFiles = fs
+      .readdirSync(componentsDirectory)
+      .filter((fileName) => /^B1Day.*WorkbookPage\.js$/.test(fileName));
+
+    workbookFiles.forEach((fileName) => {
+      const source = fs.readFileSync(path.join(componentsDirectory, fileName), "utf8");
+      if (!source.includes("getB1ReadingTask(")) return;
+
+      expect(source).toContain(
+        'import { getB1ReadingTask } from "../data/b1ReadingTasks";',
+      );
+    });
   });
 });

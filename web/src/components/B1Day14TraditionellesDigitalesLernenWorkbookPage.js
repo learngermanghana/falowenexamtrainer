@@ -1,6 +1,7 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
 
 export const B1_DAY14_TRADITIONELLES_DIGITALES_LERNEN_WORKBOOK_CONFIG = {
   day: 14,
