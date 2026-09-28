@@ -24,6 +24,10 @@ describe("Falowen public help and AI discovery", () => {
   const compactNavigationRunner = read(path.join(ROOT, "scripts", "runCompactStudentNavigationPatch.mjs"));
   const catalogueGenerator = read(path.join(WEB, "scripts", "generate-public-course-catalogue.mjs"));
   const catalogueSource = read(path.join(WEB, "scripts", "public-course-schedule-source.mjs"));
+  const scheduleMarkdown = read(path.join(PUBLIC, "falowen-course-schedules.md"));
+  const a1ScheduleHtml = read(path.join(PUBLIC, "courses", "german-a1.html"));
+  const c2ScheduleHtml = read(path.join(PUBLIC, "courses", "german-c2.html"));
+  const publicCatalogue = JSON.parse(read(path.join(PUBLIC, "course-catalogue.json")));
 
   test("publishes the canonical learner routes in the AI-readable help source", () => {
     [
@@ -150,15 +154,30 @@ describe("Falowen public help and AI discovery", () => {
     expect(catalogueGenerator).toContain("day-by-day course schedule");
   });
 
-  test("generates AI-friendly A1-C2 schedule questions and Markdown", () => {
+  test("generates a complete A1-C2 AI schedule reference with one answer per day", () => {
     expect(catalogueGenerator).toContain('path.join(publicDir, "falowen-course-schedules.md")');
-    expect(catalogueGenerator).toContain('`What is Falowen');
-    expect(catalogueGenerator).toContain('`**Question:**');
-    expect(catalogueGenerator).toContain('`**Answer:**');
+    expect(catalogueGenerator).toContain("groupLessonsByDay");
+    expect(catalogueGenerator).toContain("buildDayAnswer");
+    expect(catalogueGenerator).toContain("Public course catalogue cannot advertise A1–C2");
+    expect(catalogueGenerator).toContain("Expected complete C2 Days 1–28");
     expect(catalogueGenerator).toContain('"@type": "FAQPage"');
-    expect(catalogueGenerator).toContain("faqEntities");
-    expect(catalogueGenerator).toContain("Falowen ${shortLevel} Day ${lesson.day} is");
+    expect(catalogueSource).toContain('C2_COURSE_BOOK_ENTRIES');
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
+
+    expect(scheduleMarkdown).toContain("## Falowen C2 Course Schedule");
+    expect((scheduleMarkdown.match(/\*\*Question:\*\* What is Falowen C2 Day/g) || [])).toHaveLength(28);
+    expect(scheduleMarkdown).toContain("**Question:** What is Falowen C2 Day 28?");
+    expect(c2ScheduleHtml).toContain("What is Falowen C2 Day 28?");
+
+    expect((scheduleMarkdown.match(/\*\*Question:\*\* What is Falowen A1 Day 2\?/g) || [])).toHaveLength(1);
+    expect((a1ScheduleHtml.match(/What is Falowen A1 Day 2\?/g) || [])).toHaveLength(2);
+    expect(scheduleMarkdown).toContain("German Alphabet");
+    expect(scheduleMarkdown).toContain("Personal Pronouns and Verb Conjugation");
+
+    const c2 = publicCatalogue.courses.find((course) => course.label === "German C2");
+    expect(c2).toBeTruthy();
+    expect(c2.days).toHaveLength(28);
+    expect(c2.days.map((day) => day.day)).toEqual(Array.from({ length: 28 }, (_, index) => index + 1));
 
     expect(sitemap).toContain("https://www.falowen.app/falowen-course-schedules.md");
     expect(robots).toContain("Allow: /falowen-course-schedules.md");
