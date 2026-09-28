@@ -284,7 +284,7 @@ function App() {
     () => ({
       submit: isStaff,
       course: true,
-      examFile: (isEnrolled || isStaff) && !isSelfLearningTrack,
+      examFile: isEnrolled || isStaff,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
       vocab: true,
