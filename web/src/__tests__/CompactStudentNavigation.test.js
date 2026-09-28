@@ -34,9 +34,11 @@ describe("compact student navigation", () => {
     expect(app).toContain("const CampusPrimaryNavigation =");
     expect(app).toContain("const CampusMobileBottomNav =");
     expect(app).toContain('aria-label="Mobile campus navigation"');
-    ["Learn", "Practice", "Attendance", "Results", "More"].forEach((label) => {
+    ["Course Book", "Vocab", "Attendance", "Results", "More"].forEach((label) => {
       expect(app).toContain(label);
     });
+    expect(app).toContain('label: "Vocab", route: "/campus/vocab"');
+    expect(app).not.toContain('label: "Practice", route: "/campus/vocab"');
     expect(app).toContain('label: "Exam File"');
     expect(app).toContain('label: "Class Members"');
     expect(app).toContain('label: "Falowen Home"');
