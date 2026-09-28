@@ -12,13 +12,13 @@ describe("A2 Day 14 Beruf und Karriere workbook", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("tab", { name: "Grammar" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Teil 1" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Teil 2" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Teil 3" })).toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Teil 4" })).not.toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Ref" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Submit" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Grammar · Notes" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Teil 1 · Sprechen" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Teil 2 · Schreiben" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Teil 3 · Lesen" })).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "Teil 4 · Hören" })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Ref · Notes" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Submit · Send work" })).toBeInTheDocument();
   });
 
   test("shows one focused grammar lesson and no generic grammar stacks", async () => {
@@ -46,7 +46,7 @@ describe("A2 Day 14 Beruf und Karriere workbook", () => {
 
     expect(await screen.findByRole("heading", { name: "um ... zu + Infinitiv" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Teil 3" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Teil 3 · Lesen" }));
 
     expect(await screen.findByRole("heading", { name: "Teil 3 · Lesen (Exercise)" })).toBeInTheDocument();
     await waitFor(() => {
