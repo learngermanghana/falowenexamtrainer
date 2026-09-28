@@ -8,7 +8,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [5, "1.3", "Introducing Yourself and Articles", "https://youtu.be/KuGq_0r0FCY"],
   [6, "2.3", "Family and Hobbies", "https://youtu.be/_WdlEcKXuVg"],
   [7, "3", "Asking About Prices", "https://youtu.be/Ioq0_bNJ1bE"],
-  [8, "4", "Countries and Languages", "https://youtu.be/p3xFdekEZPg"],
+  [8, "4", "Countries and Languages", "https://youtu.be/z5ClrkL4O3k"],
   [9, "5", "German Cases", "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0"],
   [10, "6", "Objects and Colors", "https://youtu.be/sDL5z3lsITk"],
   [11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],
