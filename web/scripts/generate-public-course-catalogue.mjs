@@ -166,7 +166,7 @@ for (const level of catalogue) {
       <h1>${escapeHtml(level.label)} Day-by-Day Course Schedule</h1>
       <p>${escapeHtml(description)}</p>
     </section>
-    <nav class="nav"><a href="/courses/">All levels</a>${levelLinks}<a class="cta" href="/signup?program=${level.language === "French" ? "french" : "german"}">Join Falowen</a></nav>
+    <nav class="nav"><a href="/courses/">All levels</a>${levelLinks}<a href="/falowen-course-schedules.md">AI schedule reference</a><a class="cta" href="/signup?program=${level.language === "French" ? "french" : "german"}">Join Falowen</a></nav>
     <p class="count">${level.lessons.length} public lesson titles</p>
     <section class="lessons" aria-label="${escapeHtml(level.label)} lesson titles">${lessonHtml}</section>
     <footer class="footer">Only course titles, chapters and grammar themes are public. Workbooks, answers, videos, assignments and student information remain protected inside Falowen.</footer>
@@ -188,7 +188,7 @@ const indexJsonLd = {
   })),
 };
 const levelCards = catalogue.map((level) => `<article class="card"><h2>${escapeHtml(level.label)}</h2><p class="muted">${level.lessons.length} lesson titles with public chapter and grammar-topic information.</p><a class="cta" href="/courses/${level.slug}.html">View ${escapeHtml(level.label)} schedule</a></article>`).join("");
-const indexBody = `<main class="wrap"><section class="hero"><p>Falowen Learning Hub</p><h1>Public Course Catalogue</h1><p>${escapeHtml(indexDescription)}</p></section><nav class="nav">${levelLinks}<a class="cta" href="/signup?program=german">Join Falowen</a></nav><section class="grid levels">${levelCards}</section><footer class="footer">This catalogue intentionally publishes only curriculum names and structure. Protected learning content is not included.</footer></main>`;
+const indexBody = `<main class="wrap"><section class="hero"><p>Falowen Learning Hub</p><h1>Public Course Catalogue</h1><p>${escapeHtml(indexDescription)}</p></section><nav class="nav">${levelLinks}<a href="/falowen-course-schedules.md">AI schedule reference</a><a class="cta" href="/signup?program=german">Join Falowen</a></nav><section class="grid levels">${levelCards}</section><footer class="footer">This catalogue intentionally publishes only curriculum names and structure. Protected learning content is not included.</footer></main>`;
 await fs.writeFile(path.join(coursesDir, "index.html"), documentShell({ title: "German and French Course Schedules | Falowen", description: indexDescription, canonical: `${baseUrl}/courses/`, body: indexBody, jsonLd: indexJsonLd }), "utf8");
 
 const publicJson = {
