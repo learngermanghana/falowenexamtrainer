@@ -36,6 +36,10 @@ jobs:
         working-directory: web
         run: npm run generate:ai-course-map
 
+      - name: Generate public A1-C2 course catalogue
+        working-directory: web
+        run: npm run generate:public-course-catalogue
+
       - name: Verify Falowen public help and AI discovery
         working-directory: web
         env:
@@ -62,6 +66,10 @@ jobs:
       - name: Generate Falowen AI course map
         working-directory: web
         run: npm run generate:ai-course-map
+
+      - name: Generate public A1-C2 course catalogue
+        working-directory: web
+        run: npm run generate:public-course-catalogue
 
       - name: Test universal lesson section links and Radio return behavior
         working-directory: web
