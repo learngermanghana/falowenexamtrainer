@@ -53,6 +53,19 @@ const hasLessonContent = async (page, lesson) => {
   const title = String(lesson?.title || "").trim();
   if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
 
+  // A2/B1 workbook routes do not all repeat the manifest title in the page
+  // heading. Their section tabs are a more stable indication that the
+  // authenticated lesson has loaded. Without this check, a valid workbook can
+  // be mistaken for a logged-out page and the renderer navigates an already
+  // authenticated user to /login, where no login form is rendered.
+  if (level === "A2" || level === "B1") {
+    const workbookTabs = page.locator('[role="tab"], button').filter({
+      hasText: /^\s*(?:Grammar|Teil\s+[1-4]|Ref)(?:\s*[·:–—-].*)?\s*$/i,
+    });
+    if (await workbookTabs.count()) return true;
+    return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
+  }
+
   if (level === "A1") {
     return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
   }
@@ -126,7 +139,7 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
   await waitForPage(page);
   if (await hasLessonContent(page, lesson)) return;
 
-  const loginFormAlreadyVisible = (await page.locator('input[type="email"]').count()) > 0;
+  const loginFormAlreadyVisible = (await getLoginForm(page).count()) > 0;
   if (!loginFormAlreadyVisible) {
     await openLogin(page);
   }
