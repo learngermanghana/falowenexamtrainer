@@ -31,7 +31,6 @@ describe("A1 Day 8 translation task layout", () => {
   test("does not render a duplicate short-answer panel below inline translation cards", () => {
     const capture = read("A1TutorDraftSectionCapture.jsx");
     expect(capture).toContain("const inlineAnswers = Boolean(sectionProfile.inlineAnswers)");
-    expect(capture).toContain('data-inline-answers-status="true"');
-    expect(capture).toContain("Your answers are saved in the task cards above.");
+    expect(capture).toContain("if (inlineAnswers) return null");
   });
 });
