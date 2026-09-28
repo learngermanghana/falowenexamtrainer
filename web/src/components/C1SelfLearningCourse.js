@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
+import ReadingExamFrame, { ReadingExamDocument } from "./ReadingExamLayout";
 
 const SCORE_THRESHOLD = 80;
 
@@ -365,7 +366,22 @@ export default function C1SelfLearningCourse() {
                     ["Schreiben", entry.writingTask, "/campus/writing"],
                     ["Lesen", entry.readingTask, "/exams/lesen"],
                     ["Hören", entry.listeningTask, "/exams/horen"],
-                  ].map(([label, task, route]) => (
+                  ].map(([label, task, route]) => label === "Lesen" ? (
+                    <ReadingExamFrame
+                      key={label}
+                      level="C1"
+                      title={entry.title}
+                      format="Lesen · Selbstlernauftrag"
+                      variant="document"
+                    >
+                      <ReadingExamDocument label="Leseauftrag" title={entry.title}>
+                        <p style={{ margin: 0 }}>{task}</p>
+                        <button type="button" style={{ ...styles.linkButton, width: "fit-content" }} onClick={() => navigate(route)}>
+                          Lesen AI öffnen
+                        </button>
+                      </ReadingExamDocument>
+                    </ReadingExamFrame>
+                  ) : (
                     <div key={label} style={miniCard}>
                       <strong>{label}</strong>
                       <p style={{ margin: "4px 0 8px", color: "#4b5563" }}>{task}</p>
