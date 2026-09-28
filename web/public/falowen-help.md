@@ -25,7 +25,7 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 | Goethe/exam information | Exam File | https://www.falowen.app/campus/examFile |
 | Exam-style practice | Exams Room | https://www.falowen.app/exams/overview |
 | Study/exam planning | Study Calendar | https://www.falowen.app/exams/study |
-| Vocabulary practice | Vocabulary | https://www.falowen.app/campus/vocab |
+| Vocabulary practice | Vocab | https://www.falowen.app/campus/vocab |
 | Profile and student data | Account → Student Data | https://www.falowen.app/campus/account?tab=studentData |
 | Notification settings | Account → Notifications | https://www.falowen.app/campus/account?tab=notifications |
 | Tuition, balance, history, receipts | Account → Billing | https://www.falowen.app/campus/account?tab=billing |
@@ -243,10 +243,10 @@ Send them to https://www.falowen.app/login/.
 Explain that access still needs to be activated. On the setup screen, the learner can start the one-time 7-day free trial or complete tuition payment. After access is active, Falowen takes a new learner through onboarding.
 
 ### “Where is my lesson?”
-Tell them to tap/click **Learn**. Learn opens the **Course Book** at https://www.falowen.app/campus/course.
+Tell them to tap/click **Course Book** at https://www.falowen.app/campus/course.
 
 ### “When I open the app, where do I go for my Course Book?”
-Say: **Tap **Course Book**. On mobile, Course Book is the first item in the bottom navigation. On desktop, click Course Book in the campus navigation row. It opens https://www.falowen.app/campus/course.
+Say: **Tap Course Book.** On mobile, Course Book is the first item in the bottom navigation. On desktop, click Course Book in the campus navigation row. It opens https://www.falowen.app/campus/course.
 
 ### “Where is my assignment?”
 Send them to the current Course Book lesson and its workbook. If Falowen Radio appears first, complete Radio before continuing.
