@@ -150,6 +150,30 @@ describe("teacher lecture media regressions", () => {
     );
   });
 
+  test("renders the B1 Day 14 teacher lecture separately from Falowen Radio", () => {
+    const lesson = normalizeA2B1Lesson(
+      {
+        day: 14,
+        chapter: "5.14",
+        topic: "Traditionelles vs. digitales Lernen",
+      },
+      "B1",
+    );
+
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "5.14",
+        title: "Kapitel 5.14 · Teacher lecture video",
+        url: "https://youtu.be/FmzZD9c-Shc",
+      }),
+    );
+    expect(lesson.resources.falowenRadio).toEqual(
+      expect.objectContaining({
+        youtubeId: "NS58BIySjx8",
+      }),
+    );
+  });
+
   test("renders the B1 Day 13 film review teacher lecture", () => {
     const lesson = normalizeA2B1Lesson(
       {
