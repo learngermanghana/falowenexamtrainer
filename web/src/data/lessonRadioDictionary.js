@@ -168,7 +168,7 @@ export const LESSON_RADIO_DICTIONARY = {
     14: {
       key: "b1-day14-traditionelles-digitales-lernen-falowen-radio",
       title: "Traditionelles vs. digitales Lernen 5.14",
-      youtubeId: "FmzZD9c-Shc",
+      youtubeId: "NS58BIySjx8",
       duration: "",
       instruction:
         "Höre aufmerksam zu und stimme dich auf traditionelles und digitales Lernen ein. Danach gehst du weiter zum Workbook.",
