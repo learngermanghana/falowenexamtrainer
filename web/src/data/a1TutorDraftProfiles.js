@@ -19,6 +19,7 @@ const section = (items, options = {}) => ({
   writing: Boolean(options.writing),
   embeddedWriting: Boolean(options.embeddedWriting),
   readOnly: Boolean(options.readOnly),
+  inlineAnswers: Boolean(options.inlineAnswers),
   placeholder: options.placeholder || "",
 });
 
@@ -66,7 +67,7 @@ const profiles = {
   // compatible with the shared serializer and final submission page.
   "A1-4": {
     sections: {
-      "teil-1": section(shortItems(5, "Translate into German"), { label: "Translation" }),
+      "teil-1": section(shortItems(5, "Translate into German"), { label: "Translation", inlineAnswers: true }),
       "teil-2": section(choiceItems(7), { label: "Germany's neighbours" }),
       "teil-3": section([
         ...choiceItems(4),
