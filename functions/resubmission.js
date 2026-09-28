@@ -1,10 +1,13 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const { FieldValue, Timestamp } = require("firebase-admin/firestore");
+const {
+  PASS_THRESHOLD_SCORE,
+  MAX_RESUBMISSION_TRIES,
+  MAX_TOTAL_SUBMISSION_ATTEMPTS,
+  evaluateResubmissionPolicy,
+} = require("./resubmissionPolicy");
 
-const PASS_THRESHOLD_SCORE = 60;
-const MAX_RESUBMISSION_TRIES = 2;
-const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
 const RESUBMISSION_COOLDOWN_MS = 10 * 60 * 1000;
 const ATTEMPT_STATUSES = new Set([
   "submitted",
@@ -503,14 +506,18 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
       ) {
         throw buildCooldownError({ latestSubmissionMillis: serverLatestSubmissionMillis });
       }
-      if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
+      const attemptPolicy = evaluateResubmissionPolicy({
+        score: validated.previousScore,
+        attempts,
+      });
+      if (attemptPolicy.reason === "attempt_limit") {
         throw new HttpsError(
           "resource-exhausted",
           "You have used all resubmissions for this assignment."
         );
       }
 
-      const nextAttempt = attempts + 1;
+      const nextAttempt = attemptPolicy.nextAttempt;
       const now = FieldValue.serverTimestamp();
       const submissionRef = submissionsRef.doc();
       const trustedStudentCode = cleanText(trustedStudentCodes[0] || data.studentCode, 120);
@@ -616,9 +623,13 @@ exports.submitAssignmentResubmission = onCall({ region: "europe-west1" }, async 
 });
 
 exports._testing = {
+  MAX_RESUBMISSION_TRIES,
+  MAX_TOTAL_SUBMISSION_ATTEMPTS,
+  PASS_THRESHOLD_SCORE,
   assignmentMatches,
   buildCooldownError,
   compareStructuredSections,
+  evaluateResubmissionPolicy,
   getReviewedScore,
   isAttemptDocument,
   sanitizePartList,
