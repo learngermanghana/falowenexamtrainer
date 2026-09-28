@@ -244,6 +244,19 @@ const CampusQuickNavigation = ({ allowedSections }) => <CampusPrimaryNavigation 
   app = `${app.slice(0, start)}${navigationHelpers}${app.slice(end)}`;
 }
 
+// Keep the generated vocabulary destination correct on already-patched worktrees.
+// prestart/prebuild rerun this patch after CampusPrimaryNavigation already exists,
+// so this replacement must live outside the initialization-only guard above.
+app = app
+  .replaceAll(
+    '{ key: "practice", label: "Practice", route: "/campus/vocab"',
+    '{ key: "practice", label: "Vocab", route: "/campus/vocab"',
+  )
+  .replaceAll(
+    '{ key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab"',
+    '{ key: "practice", label: "Vocab", icon: "✦", route: "/campus/vocab"',
+  );
+
 if (!app.includes('<CampusPrimaryNavigation allowedSections={allowedSections} />\n\n      {showCampusHero ? (')) {
   const campusNavStart = `      <div style={{ marginBottom: 10 }}>`;
   const campusNavEnd = `      {showCampusHero ? (`;
