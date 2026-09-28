@@ -127,18 +127,14 @@ export const resolveAssignmentStatus = ({
   const effectiveResults = manualOverrides.length ? [manualOverrides[0]] : results;
 
   const hasExplicitPassed = effectiveResults.some((row) => {
-    const correctedScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
-    if ((row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true || row?.manuallyEdited === true) && correctedScore !== null) {
-      return correctedScore >= passMark;
-    }
+    const rowScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
+    if (rowScore !== null) return false;
     if (row?.passed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "passed";
   });
   const hasExplicitFailed = effectiveResults.some((row) => {
-    const correctedScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
-    if ((row?.scoreOverrideAuthoritative === true || row?.manualScoreOverride === true || row?.manuallyEdited === true) && correctedScore !== null) {
-      return correctedScore < passMark;
-    }
+    const rowScore = toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade);
+    if (rowScore !== null) return false;
     if (row?.failed === true) return true;
     return String(row?.status || "").trim().toLowerCase() === "failed";
   });
@@ -186,8 +182,13 @@ export const resolveAssignmentStatus = ({
   const hasSubmission = Boolean(submissionRecord);
   const hasResult = scored.length > 0 || hasExplicitPassed || hasExplicitFailed || hasExplicitSubmitted;
 
-  const passed = hasExplicitPassed || (scored.length > 0 && bestScore >= passMark);
-  const failed = !passed && (hasExplicitFailed || (scored.length > 0 && bestScore < passMark));
+  const authoritativeScore = latestScored?.score ?? null;
+  const passed = authoritativeScore !== null
+    ? authoritativeScore >= passMark
+    : hasExplicitPassed;
+  const failed = authoritativeScore !== null
+    ? authoritativeScore < passMark
+    : !passed && hasExplicitFailed;
   const submitted = hasSubmission || hasResult;
   const inProgress = hasDraft && !submitted;
 
@@ -201,7 +202,7 @@ export const resolveAssignmentStatus = ({
     assignmentId,
     status,
     bestScore: Number.isFinite(bestScore) ? bestScore : null,
-    latestScore: latestScored?.score ?? null,
+    latestScore: authoritativeScore,
     hasDraft,
     hasSubmission,
     hasResult,
