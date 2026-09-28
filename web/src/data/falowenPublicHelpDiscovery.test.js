@@ -152,9 +152,9 @@ describe("Falowen public help and AI discovery", () => {
 
   test("generates AI-friendly A1-C2 schedule questions and Markdown", () => {
     expect(catalogueGenerator).toContain('path.join(publicDir, "falowen-course-schedules.md")');
-    expect(catalogueGenerator).toContain('"What is Falowen');
-    expect(catalogueGenerator).toContain('"**Question:**');
-    expect(catalogueGenerator).toContain('"**Answer:**');
+    expect(catalogueGenerator).toContain('`What is Falowen');
+    expect(catalogueGenerator).toContain('`**Question:**');
+    expect(catalogueGenerator).toContain('`**Answer:**');
     expect(catalogueGenerator).toContain('"@type": "FAQPage"');
     expect(catalogueGenerator).toContain("faqEntities");
     expect(catalogueGenerator).toContain("Falowen ${shortLevel} Day ${lesson.day} is");
