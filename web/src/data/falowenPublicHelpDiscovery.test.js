@@ -46,6 +46,7 @@ describe("Falowen public help and AI discovery", () => {
     expect(llms).toContain("https://www.falowen.app/falowen-help.md");
     expect(llms).toContain("https://www.falowen.app/falowen-navigation.json");
     expect(llms).toContain("https://www.falowen.app/falowen-course-map.json");
+    expect(llms).toContain("https://www.falowen.app/falowen-course-schedules.md");
   });
 
   test("publishes structured intent routes, aliases, state rules and deprecated labels", () => {
@@ -60,6 +61,12 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
     expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
+    expect(navigation.sourceOfTruth.courseSchedulesMarkdown).toBe(
+      "https://www.falowen.app/falowen-course-schedules.md"
+    );
+    expect(navigation.courseSchedules.aiReference).toBe(
+      "https://www.falowen.app/falowen-course-schedules.md"
+    );
     expect(navigation.deprecatedLabels).toEqual(expect.arrayContaining(["My Library", "Learning Hub", "My Hub", "My Course", "Falowen AI", "Discussion"]));
   });
 
@@ -141,6 +148,22 @@ describe("Falowen public help and AI discovery", () => {
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
     expect(catalogueGenerator).toContain('{ key: "C2", slug: "german-c2"');
     expect(catalogueGenerator).toContain("day-by-day course schedule");
+  });
+
+  test("generates AI-friendly A1-C2 schedule questions and Markdown", () => {
+    expect(catalogueGenerator).toContain('path.join(publicDir, "falowen-course-schedules.md")');
+    expect(catalogueGenerator).toContain('"What is Falowen');
+    expect(catalogueGenerator).toContain('"**Question:**');
+    expect(catalogueGenerator).toContain('"**Answer:**');
+    expect(catalogueGenerator).toContain('"@type": "FAQPage"');
+    expect(catalogueGenerator).toContain("faqEntities");
+    expect(catalogueGenerator).toContain("Falowen ${shortLevel} Day ${lesson.day} is");
+    expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
+
+    expect(sitemap).toContain("https://www.falowen.app/falowen-course-schedules.md");
+    expect(robots).toContain("Allow: /falowen-course-schedules.md");
+    expect(help).toContain("https://www.falowen.app/falowen-course-schedules.md");
+    expect(guide).toContain('href="/falowen-course-schedules.md"');
   });
 
   test("serves canonical /help and redirects the legacy guide route", () => {
