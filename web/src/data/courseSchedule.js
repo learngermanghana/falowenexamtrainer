@@ -1198,8 +1198,8 @@ const RAW_COURSE_SCHEDULES = {
         "This chapter has no assignment. Use the workbook notes and Goethe A1 speaking practice tips.",
       grammar_topic: "Goethe A1 Speaking Practice",
       schreiben_sprechen: {
-        video: "https://youtu.be/nbLeeQ2_Xes",
-        youtube_link: "https://youtu.be/nbLeeQ2_Xes",
+        video: "https://youtu.be/ZfXw4fRQ0Tg",
+        youtube_link: "https://youtu.be/ZfXw4fRQ0Tg",
         assignment: false,
         workbook_link: "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
       },
