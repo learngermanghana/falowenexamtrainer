@@ -225,7 +225,6 @@
     if (actions) {
       const scheduleHref = document.getElementById("scheduleLink")?.getAttribute("href") || "";
       actions.innerHTML = `
-        <a id="heroRegisterCta" class="button primary" href="${getSignupUrl()}">Register for this class</a>
         <a id="heroScheduleCta" class="button" href="${scheduleHref || "#class-schedule-section"}" ${scheduleHref ? 'target="_blank" rel="noreferrer"' : ""}>View full schedule</a>
         <a class="hero-placement-action" href="/placement-test">Not sure of your level? Take the free placement test.</a>
       `;
@@ -480,37 +479,9 @@
     list.dataset.paymentUpdated = "true";
   }
 
-  function addStickyMobileCta() {
-    const courseTitle =
-      document.getElementById("classTitle")?.textContent?.trim()
-      || document.getElementById("leadDecisionTitle")?.textContent?.trim()
-      || "Falowen German class";
-    if (!courseTitle || /loading|no class/i.test(courseTitle)) return;
-
-    let bar = document.getElementById("brochureMobileCta");
-    if (!bar) {
-      bar = document.createElement("aside");
-      bar.id = "brochureMobileCta";
-      bar.className = "brochure-mobile-cta hide-print";
-      bar.setAttribute("aria-label", "Class registration actions");
-      document.body.appendChild(bar);
-    }
-
-    const signupHref = getSignupUrl();
-    const whatsappHref =
-      document.getElementById("whatsappLink")?.getAttribute("href")
-      || "https://wa.me/233241113054?text=" + encodeURIComponent("Hello Falowen, I would like more information about your German classes.");
-    bar.innerHTML = `
-      <div class="brochure-mobile-cta-copy">
-        <strong>${courseTitle}</strong>
-        <span>Ready when the schedule works for you.</span>
-      </div>
-      <div class="brochure-mobile-cta-actions">
-        <a class="button primary" href="${signupHref}">Register</a>
-        <a class="button" href="${whatsappHref}" target="_blank" rel="noreferrer">WhatsApp</a>
-      </div>
-    `;
-    document.body.classList.add("has-mobile-brochure-cta");
+  function removeStickyMobileRegisterBar() {
+    document.getElementById("brochureMobileCta")?.remove();
+    document.body.classList.remove("has-mobile-brochure-cta");
   }
 
   function enhanceAgreement() {
@@ -565,7 +536,7 @@
     tagSections();
     enhanceAgreement();
     applySignupLinks();
-    addStickyMobileCta();
+    removeStickyMobileRegisterBar();
   }
 
   window.addEventListener("load", runEnhancements);
