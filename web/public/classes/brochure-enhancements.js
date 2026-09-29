@@ -64,6 +64,19 @@
     };
   }
 
+  function getAcademyProfile() {
+    return {
+      academyName: "Learn Language Education Academy",
+      formerName: "Learn German Ghana",
+      establishedYear: 2022,
+      germanLevels: "A1–C2",
+      examPassHeadline: "High exam pass rate",
+      examPassDescription: "Our students have maintained a high pass rate in German language examinations.",
+      overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
+      ...(window.FalowenClassBrochureData?.academyProfile || {}),
+    };
+  }
+
   function injectLiteStyles() {
     if (document.getElementById("brochureLiteStyles")) return;
     const style = document.createElement("style");
@@ -111,6 +124,17 @@
       .brochure-mobile-cta { display: none; }
       .catalog-status-notice { border-color: #fde68a; background: #fffbeb; color: #78350f; gap: 8px; }
       .catalog-status-notice p { margin: 0; color: #92400e; }
+      .academy-track-record-card { display: grid; gap: 12px; border-color: #bfdbfe; background: #ffffff; }
+      .academy-track-record-card h2 { margin: 0; font-size: 21px; color: #0f172a; }
+      .academy-track-record-card > p { margin: 0; color: #475569; font-size: 14px; line-height: 1.55; }
+      .academy-track-record-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+      .academy-track-record-stat { border: 1px solid #dbeafe; background: #eff6ff; border-radius: 12px; padding: 11px; display: grid; gap: 4px; }
+      .academy-track-record-stat span { color: #64748b; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+      .academy-track-record-stat strong { color: #0f172a; font-size: 16px; line-height: 1.35; }
+      .academy-track-record-scope { color: #64748b !important; font-size: 12px !important; }
+      @media (max-width: 620px) {
+        .academy-track-record-grid { grid-template-columns: 1fr; }
+      }
       @media (max-width: 760px) {
         body.has-mobile-brochure-cta { padding-bottom: 86px; }
         .brochure-mobile-cta {
@@ -327,6 +351,42 @@
       : `<h3>Class mode</h3><p>This class is flexible: ${modes.join(", ")}. Choose the suitable mode for each session.</p>`;
   }
 
+  function addTrackRecordCard() {
+    const profile = getAcademyProfile();
+    let card = document.getElementById("academyTrackRecordCard");
+    if (!card) {
+      card = document.createElement("section");
+      card.id = "academyTrackRecordCard";
+      card.className = "card academy-track-record-card";
+    }
+
+    card.innerHTML = `
+      <h2>Our track record</h2>
+      <p>${profile.overview}</p>
+      <div class="academy-track-record-grid">
+        <div class="academy-track-record-stat">
+          <span>Established</span>
+          <strong>${profile.establishedYear}</strong>
+        </div>
+        <div class="academy-track-record-stat">
+          <span>Exam performance</span>
+          <strong>${profile.examPassHeadline}</strong>
+        </div>
+        <div class="academy-track-record-stat">
+          <span>German learning</span>
+          <strong>${profile.germanLevels}</strong>
+        </div>
+      </div>
+      <p class="academy-track-record-scope">Our exam track record covers German language examinations generally and is not limited to one exam provider.</p>
+    `;
+
+    const leadCard = document.getElementById("leadCaptureCard");
+    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
+    const anchorNode = leadCard || classSummary || document.querySelector(".page");
+    if (!anchorNode || anchorNode === card) return;
+    if (anchorNode.nextElementSibling !== card) anchorNode.insertAdjacentElement("afterend", card);
+  }
+
   function addAfterSignupCard() {
     const anchor = document.getElementById("classModeCard") || document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
     if (!anchor || document.getElementById("afterSignupCard")) return;
@@ -493,6 +553,7 @@
     addMainSignupButton();
     addClassScheduleButton();
     addHybridModeCard();
+    addTrackRecordCard();
     addAfterSignupCard();
     enhanceWhoFor();
     simplifyScheduleCard();
